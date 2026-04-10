@@ -18,7 +18,7 @@
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           @click="emit('markAsRead')"
         >
-          Mark as read
+          Read
         </button>
         <button
           type="button"
@@ -26,7 +26,7 @@
           class="daisy-btn daisy-btn-outline daisy-btn-sm"
           @click="emit('markAsSkimmed')"
         >
-          Mark as skimmed
+          Skim
         </button>
         <button
           type="button"
@@ -34,7 +34,7 @@
           class="daisy-btn daisy-btn-outline daisy-btn-sm"
           @click="emit('markAsSkipped')"
         >
-          Mark as skipped
+          Skip
         </button>
       </div>
     </div>

@@ -659,7 +659,7 @@ describe("BookReadingPage", () => {
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    it("calls PUT with SKIMMED when Mark as skimmed is used", async () => {
+    it("calls PUT with SKIMMED when Skim is used", async () => {
       const putSpy = vi
         .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
         .mockResolvedValue(
@@ -699,7 +699,7 @@ describe("BookReadingPage", () => {
       )
     })
 
-    it("moves book layout selection to the successor block after Mark as read", async () => {
+    it("moves book layout selection to the successor block after Read", async () => {
       vi.spyOn(
         NotebookBooksController,
         "putNotebookBookBlockReadingRecord"
@@ -737,7 +737,7 @@ describe("BookReadingPage", () => {
       )
     })
 
-    it("unmounts the reading control panel after Mark as read once it was shown", async () => {
+    it("unmounts the reading control panel after Read once it was shown", async () => {
       vi.spyOn(
         NotebookBooksController,
         "putNotebookBookBlockReadingRecord"

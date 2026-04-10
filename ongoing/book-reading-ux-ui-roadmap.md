@@ -37,15 +37,15 @@
 
 | State | Behavior |
 |--------|-----------|
-| **Expanded** | Shows **short context** (e.g. which **book block**’s direct content is in question — title from the **selected block**) and **actions** (**Mark as read**, **Mark as skimmed**, **Mark as skipped**). Optional secondary control to **open the book layout** or focus the relevant **book block** if the drawer is closed. |
-| **Minimized** | Collapses to a **small bar** with **one or two** controls only — e.g. **chevron to expand** + **single primary** action (quick “mark read”), or **expand** + **overflow** for less common actions. Minimized state must **not** block page text: prefer floating strip, rounded bar, or thin dock with **large enough touch targets** (same comfort as **book blocks** in the list). |
+| **Expanded** | Shows **short context** (e.g. which **book block**’s direct content is in question — title from the **selected block**) and **actions** (**Read**, **Skim**, **Skip** — short labels; full sense is “mark direct content as read / skimmed / skipped”). Optional secondary control to **open the book layout** or focus the relevant **book block** if the drawer is closed. |
+| **Minimized** | Collapses to a **small bar** with **one or two** controls only — e.g. **chevron to expand** + **single primary** action (quick **Read**), or **expand** + **overflow** for less common actions. Minimized state must **not** block page text: prefer floating strip, rounded bar, or thin dock with **large enough touch targets** (same comfort as **book blocks** in the list). |
 
 **Interaction rules**
 
 - **Does not own document scroll:** The panel sits **over** or **above** the scrollable PDF viewport; vertical swipe on the page remains **scroll-through** except on the panel’s own hit targets.
 - **Coexists with viewport sync:** The **selected block** drives **which** block’s direct content the panel describes. The panel appears **as soon as** the bottom of the selected block’s last direct-content bbox scrolls into view above the panel’s obstruction zone (geometry-based; see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) Phase 2 for timing and fallback rules). This allows prompting the user before the next heading becomes the viewport-derived current block.
 - **Coexists with drawer:** Opening/closing the book layout **does not** reset panel expand/minimize preference for the session unless we later persist it (open UX question).
-- **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for “mark read.”
+- **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for the primary disposition action.
 
 **Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book blocks** via this panel) and **Phase 3** (**auto-mark when no direct content**, so the panel is not needed on that path) are **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** (**skim/skip** actions + layout `data-*` cues + **`PUT` disposition body**) is **shipped** — [`ongoing/book-reading-phase-4-skim-skip-plan.md`](book-reading-phase-4-skim-skip-plan.md). Optional **persistence of panel state** stays deferred unless product pulls it in.
 
