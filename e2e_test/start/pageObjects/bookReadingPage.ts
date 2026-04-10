@@ -2,19 +2,6 @@ import { pageIsNotLoading } from '../pageBase'
 
 export type BookLayoutRow = { depth: number; title: string }
 
-function scrollableAncestorWithinBookReadingPage(viewerEl: HTMLElement) {
-  const pageRoot = viewerEl.closest('[data-testid="book-reading-page"]')
-  if (!pageRoot) throw new Error('book-reading-page not found')
-  let el: HTMLElement | null = viewerEl
-  while (el && pageRoot.contains(el)) {
-    if (el.scrollHeight > el.clientHeight + 1) {
-      return el
-    }
-    el = el.parentElement
-  }
-  return viewerEl
-}
-
 const bookReadingPage = () => {
   const bookBlockRows = () =>
     cy
@@ -171,11 +158,9 @@ const bookReadingPage = () => {
           const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
             .height
           const deltaPx = Math.round(pageHeight * 0.42)
-          cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
-            const el = scrollableAncestorWithinBookReadingPage(
-              $viewer[0] as HTMLElement
-            )
-            el.scrollTop += deltaPx
+          cy.get('[data-testid="pdf-book-viewer"]').then(($el) => {
+            const newTop = ($el[0] as HTMLElement).scrollTop + deltaPx
+            cy.get('[data-testid="pdf-book-viewer"]').scrollTo(0, newTop)
           })
         })
       return this
