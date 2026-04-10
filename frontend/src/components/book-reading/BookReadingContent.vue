@@ -37,7 +37,7 @@
     v-model:opened="bookLayoutOpened"
     :panel-id="bookReadingBookLayoutPanelId"
     :is-md-or-larger="isMdOrLarger"
-    :book-block-rows="bookBlockRows"
+    :book-block-rows="flatBookBlocks"
     :current-block-anchor-id="currentBlockAnchorId"
     :selected-block-id="selectedBlockId"
     :disposition-for-block="bookReading.dispositionForBlock"
@@ -172,7 +172,6 @@ function buildFlatBookBlocks(
 }
 
 const flatBookBlocks = ref<BookReadingBookLayoutBlockRow[]>([])
-const bookBlockRows = computed(() => flatBookBlocks.value)
 const currentBlockAnchorId = ref<number | null>(null)
 
 const selectedBlockId = ref<number | null>(null)
@@ -187,7 +186,7 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   const selId = selectedBlockId.value
   if (selId === null) return false
   if (bookReading.hasRecordedDisposition(selId)) return false
-  const rows = bookBlockRows.value
+  const rows = flatBookBlocks.value
   const selIdx = rows.findIndex((r) => r.id === selId)
   if (selIdx < 0 || selIdx >= rows.length - 1) return false
   const sel = rows[selIdx]!
@@ -202,7 +201,7 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
 function performSnapBack(): void {
   const selId = selectedBlockId.value
   if (selId === null) return
-  const rows = bookBlockRows.value
+  const rows = flatBookBlocks.value
   const sel = rows.find((r) => r.id === selId)
   if (!sel || sel.allBboxes.length <= 1) return
   const lastBbox = sel.allBboxes[sel.allBboxes.length - 1]!
@@ -222,7 +221,7 @@ function selectedBlockHasSuccessorAndNoDisposition(): {
   const selId = selectedBlockId.value
   if (selId === null) return null
   if (bookReading.hasRecordedDisposition(selId)) return null
-  const rows = bookBlockRows.value
+  const rows = flatBookBlocks.value
   const selIdx = rows.findIndex((r) => r.id === selId)
   if (selIdx < 0 || selIdx >= rows.length - 1) return null
   return { selId, successor: rows[selIdx + 1]! }
@@ -235,7 +234,7 @@ const blockAwaitingConfirmation =
     const context = selectedBlockHasSuccessorAndNoDisposition()
     if (context === null) return null
     const { selId, successor } = context
-    const rows = bookBlockRows.value
+    const rows = flatBookBlocks.value
     const sel = rows.find((r) => r.id === selId)!
     if (!sel.hasDirectContent) return null
     const lastBbox =
@@ -291,7 +290,7 @@ function onViewportAnchorPage(payload: {
     pdfBarPagesTotal.value = payload.pagesCount
   }
   const candidate = currentBlockAnchorIdFromAnchorPage(
-    bookBlockRows.value.map((r) => r.startAnchor),
+    flatBookBlocks.value.map((r) => r.startAnchor),
     payload.anchorPageIndexZeroBased,
     payload.viewport,
     payload.pagesCount
@@ -299,7 +298,7 @@ function onViewportAnchorPage(payload: {
   currentBlockAnchorDebouncer.propose(candidate)
   const selIdForGeometry = selectedBlockId.value
   if (selIdForGeometry !== null) {
-    const selForGeometry = bookBlockRows.value.find(
+    const selForGeometry = flatBookBlocks.value.find(
       (r) => r.id === selIdForGeometry
     )
     if (selForGeometry?.hasDirectContent) {
@@ -350,7 +349,7 @@ watch(currentBlockAnchorId, (id) => {
   const { text, changed } = nextLiveAnnouncementText(
     lastAnnouncedCurrentBlockTitle.value,
     id,
-    bookBlockRows.value
+    flatBookBlocks.value
   )
   if (!changed) {
     return
@@ -361,7 +360,7 @@ watch(currentBlockAnchorId, (id) => {
 
 watch(currentBlockAnchorId, async (anchorId) => {
   if (anchorId === null) return
-  const rows = bookBlockRows.value
+  const rows = flatBookBlocks.value
   const bIdx = rows.findIndex((r) => r.startAnchor.id === anchorId)
   if (bIdx <= 0) return
   const predecessor = rows[bIdx - 1]!
@@ -419,7 +418,7 @@ async function applyBookBlockSelection(block: BookReadingBookLayoutBlockRow) {
 }
 
 useBookReadingBlockSelection({
-  bookBlockRows: () => bookBlockRows.value,
+  bookBlockRows: () => flatBookBlocks.value,
   currentBlockAnchorId,
   onDwellSelectBlock: (row) => {
     selectedBlockId.value = row.id
@@ -438,7 +437,7 @@ async function markSelectedDisposition(status: BookBlockReadingDisposition) {
   if (!ok) {
     return
   }
-  const rows = bookBlockRows.value
+  const rows = flatBookBlocks.value
   const selIdx = rows.findIndex((r) => r.id === id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {
     await applyBookBlockSelection(rows[selIdx + 1]!)
