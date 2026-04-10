@@ -33,92 +33,16 @@
       @zoom-out="pdfViewerRef?.zoomOut()"
     />
   </GlobalBar>
-  <div
-    v-if="!isMdOrLarger && bookLayoutOpened"
-    class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
-    aria-hidden="true"
-    @click="bookLayoutOpened = false"
-  />
-  <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
-    <aside
-      :id="bookReadingBookLayoutPanelId"
-      ref="bookLayoutAsideRef"
-      data-testid="book-reading-book-layout-aside"
-      :class="[
-        'daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
-        isMdOrLarger
-          ? bookLayoutOpened
-            ? 'daisy-relative daisy-shrink-0 daisy-border-r daisy-border-base-300'
-            : 'daisy-hidden'
-          : bookLayoutOpened
-            ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full daisy-pt-[env(safe-area-inset-top)]'
-            : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full',
-      ]"
-    >
-      <div
-        data-testid="book-reading-book-layout"
-        class="daisy-p-3 daisy-pb-8"
-      >
-        <button
-          v-for="block in bookBlockRows"
-          :key="block.id"
-          type="button"
-          data-testid="book-reading-book-block"
-          class="book-reading-book-block"
-          :data-book-block-depth="block.depth"
-          :data-current-block="
-            block.startAnchor.id === currentBlockAnchorId
-              ? 'true'
-              : undefined
-          "
-          :data-current-selection="
-            block.id === selectedBlockId ? 'true' : undefined
-          "
-          :data-direct-content-read="
-            bookReading.dispositionForBlock(block.id) === 'READ'
-              ? 'true'
-              : undefined
-          "
-          :data-direct-content-skimmed="
-            bookReading.dispositionForBlock(block.id) === 'SKIMMED'
-              ? 'true'
-              : undefined
-          "
-          :data-direct-content-skipped="
-            bookReading.dispositionForBlock(block.id) === 'SKIPPED'
-              ? 'true'
-              : undefined
-          "
-          :aria-current="
-            block.startAnchor.id === currentBlockAnchorId
-              ? 'location'
-              : undefined
-          "
-          :style="{ paddingLeft: `${block.depth * 0.75}rem` }"
-          @click="onBookBlockClick(block)"
-        >
-          {{ block.title }}
-          <span
-            v-if="bookReading.dispositionForBlock(block.id) === 'READ'"
-            class="daisy-sr-only"
-          >
-            Marked as read
-          </span>
-          <span
-            v-else-if="bookReading.dispositionForBlock(block.id) === 'SKIMMED'"
-            class="daisy-sr-only"
-          >
-            Marked as skimmed
-          </span>
-          <span
-            v-else-if="bookReading.dispositionForBlock(block.id) === 'SKIPPED'"
-            class="daisy-sr-only"
-          >
-            Marked as skipped
-          </span>
-        </button>
-      </div>
-    </aside>
+  <BookReadingBookLayout
+    v-model:opened="bookLayoutOpened"
+    :panel-id="bookReadingBookLayoutPanelId"
+    :is-md-or-larger="isMdOrLarger"
+    :book-block-rows="bookBlockRows"
+    :current-block-anchor-id="currentBlockAnchorId"
+    :selected-block-id="selectedBlockId"
+    :disposition-for-block="bookReading.dispositionForBlock"
+    @block-click="onBookBlockClick"
+  >
     <main class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-relative">
       <div
         v-if="pdfViewerLoadError"
@@ -144,11 +68,14 @@
         />
       </template>
     </main>
-  </div>
+  </BookReadingBookLayout>
 </template>
 
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
+import BookReadingBookLayout, {
+  type BookReadingBookLayoutBlockRow,
+} from "@/components/book-reading/BookReadingBookLayout.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
@@ -166,12 +93,7 @@ import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDow
 import { useBookReadingBlockSelection } from "@/composables/useBookReadingBlockSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type {
-  BookAnchorFull,
-  BookBlockContentBboxItemFull,
-  BookBlockFull,
-  BookFull,
-} from "@generated/doughnut-backend-api"
+import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
@@ -197,7 +119,6 @@ const pdfBarCurrentPage = ref<number | null>(null)
 const pdfBarPagesTotal = ref<number | null>(null)
 
 const bookLayoutOpened = ref(false)
-const bookLayoutAsideRef = ref<HTMLElement | null>(null)
 const windowWidth = ref(
   typeof window !== "undefined"
     ? window.innerWidth
@@ -216,16 +137,9 @@ function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
 }
 
-type BookBlockRow = {
-  id: number
-  title: string
-  depth: number
-  startAnchor: BookAnchorFull
-  hasDirectContent: boolean
-  allBboxes: BookBlockContentBboxItemFull[]
-}
-
-function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
+function buildFlatBookBlocks(
+  blocks: BookBlockFull[]
+): BookReadingBookLayoutBlockRow[] {
   const childrenMap = new Map<number | null, BookBlockFull[]>()
   for (const block of blocks) {
     const parentId =
@@ -237,7 +151,7 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
   const sortByOrder = (a: BookBlockFull, b: BookBlockFull) =>
     (a.siblingOrder ?? 0) - (b.siblingOrder ?? 0)
 
-  const result: BookBlockRow[] = []
+  const result: BookReadingBookLayoutBlockRow[] = []
   function visit(parentId: number | null, depth: number) {
     const children = (childrenMap.get(parentId) ?? []).slice().sort(sortByOrder)
     for (const child of children) {
@@ -256,7 +170,7 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
   return result
 }
 
-const flatBookBlocks = ref<BookBlockRow[]>([])
+const flatBookBlocks = ref<BookReadingBookLayoutBlockRow[]>([])
 const bookBlockRows = computed(() => flatBookBlocks.value)
 const currentBlockAnchorId = ref<number | null>(null)
 
@@ -267,7 +181,7 @@ const geometryEverVisibleForSelection = ref(false)
 
 function selectedBlockHasSuccessorAndNoDisposition(): {
   selId: number
-  successor: (typeof bookBlockRows.value)[number]
+  successor: BookReadingBookLayoutBlockRow
 } | null {
   const selId = selectedBlockId.value
   if (selId === null) return null
@@ -280,27 +194,28 @@ function selectedBlockHasSuccessorAndNoDisposition(): {
 
 // allBboxes: index 0 is the anchor; remaining entries are direct-content blocks.
 // When length > 1, the last entry is the last direct-content bbox.
-const blockAwaitingConfirmation = computed<BookBlockRow | null>(() => {
-  const context = selectedBlockHasSuccessorAndNoDisposition()
-  if (context === null) return null
-  const { selId, successor } = context
-  const rows = bookBlockRows.value
-  const sel = rows.find((r) => r.id === selId)!
-  if (!sel.hasDirectContent) return null
-  const lastBbox =
-    sel.allBboxes.length > 1 ? sel.allBboxes[sel.allBboxes.length - 1]! : null
-  if (lastBbox !== null) {
-    if (lastContentBottomVisible.value) return sel
-    if (geometryEverVisibleForSelection.value) {
-      return successor.startAnchor.id === currentBlockAnchorId.value
-        ? null
-        : sel
+const blockAwaitingConfirmation =
+  computed<BookReadingBookLayoutBlockRow | null>(() => {
+    const context = selectedBlockHasSuccessorAndNoDisposition()
+    if (context === null) return null
+    const { selId, successor } = context
+    const rows = bookBlockRows.value
+    const sel = rows.find((r) => r.id === selId)!
+    if (!sel.hasDirectContent) return null
+    const lastBbox =
+      sel.allBboxes.length > 1 ? sel.allBboxes[sel.allBboxes.length - 1]! : null
+    if (lastBbox !== null) {
+      if (lastContentBottomVisible.value) return sel
+      if (geometryEverVisibleForSelection.value) {
+        return successor.startAnchor.id === currentBlockAnchorId.value
+          ? null
+          : sel
+      }
+      return null
     }
-    return null
-  }
-  // Fallback: no usable bbox → use successor-anchor rule
-  return successor.startAnchor.id === currentBlockAnchorId.value ? sel : null
-})
+    // Fallback: no usable bbox → use successor-anchor rule
+    return successor.startAnchor.id === currentBlockAnchorId.value ? sel : null
+  })
 
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
@@ -403,25 +318,6 @@ watch(currentBlockAnchorId, (id) => {
   currentBlockLiveText.value = text
 })
 
-watch(
-  currentBlockAnchorId,
-  (id) => {
-    if (id === null || !bookLayoutOpened.value) {
-      return
-    }
-    requestAnimationFrame(() => {
-      if (!bookLayoutOpened.value) {
-        return
-      }
-      const row = bookLayoutAsideRef.value?.querySelector(
-        '[data-current-block="true"]'
-      )
-      row?.scrollIntoView({ block: "nearest", inline: "nearest" })
-    })
-  },
-  { flush: "post" }
-)
-
 watch(currentBlockAnchorId, async (anchorId) => {
   if (anchorId === null) return
   const rows = bookBlockRows.value
@@ -461,7 +357,7 @@ const pdfViewerRef = ref<{
   ) => boolean
 } | null>(null)
 
-async function applyBookBlockSelection(block: BookBlockRow) {
+async function applyBookBlockSelection(block: BookReadingBookLayoutBlockRow) {
   const parsed = parsePdfOutlineV1Anchor(block.startAnchor)
   if (parsed === null) {
     return
@@ -509,7 +405,7 @@ function onPagesReady() {
     .catch(() => undefined)
 }
 
-async function onBookBlockClick(block: BookBlockRow) {
+async function onBookBlockClick(block: BookReadingBookLayoutBlockRow) {
   await applyBookBlockSelection(block)
 }
 
@@ -528,39 +424,3 @@ onBeforeUnmount(() => {
   lastReadPositionPatchDebouncer.cancel()
 })
 </script>
-
-<style scoped>
-aside {
-  max-height: 100%;
-}
-
-.book-reading-book-block {
-  @apply daisy-w-full daisy-min-h-10 daisy-text-left daisy-rounded-md;
-  @apply daisy-border-0 daisy-border-solid daisy-border-l-4 daisy-border-transparent;
-  @apply daisy-py-2 daisy-pr-2 daisy-pl-2 daisy-text-sm daisy-leading-snug daisy-font-normal;
-  @apply daisy-transition-colors daisy-duration-150;
-  @apply hover:daisy-bg-base-300/55;
-  @apply focus:daisy-outline-none focus-visible:daisy-ring-2 focus-visible:daisy-ring-primary/50;
-  @apply focus-visible:daisy-ring-offset-2 focus-visible:daisy-ring-offset-base-200;
-}
-
-.book-reading-book-block[data-current-block="true"] {
-  @apply daisy-bg-primary/35;
-}
-
-.book-reading-book-block[data-current-selection="true"] {
-  @apply daisy-border-primary daisy-font-medium;
-}
-
-.book-reading-book-block[data-direct-content-read="true"] {
-  @apply daisy-border-r-4 daisy-border-r-success;
-}
-
-.book-reading-book-block[data-direct-content-skimmed="true"] {
-  @apply daisy-border-r-4 daisy-border-r-warning;
-}
-
-.book-reading-book-block[data-direct-content-skipped="true"] {
-  @apply daisy-border-r-4 daisy-border-r-neutral;
-}
-</style>
