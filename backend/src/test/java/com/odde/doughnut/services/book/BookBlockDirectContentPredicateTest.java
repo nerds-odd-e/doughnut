@@ -78,7 +78,7 @@ class BookBlockDirectContentPredicateTest {
         Arguments.of(
             "unknown type",
             List.of(new BlockSpec("equation", "{\"type\":\"equation\",\"text\":\"E=mc^2\"}")),
-            false),
+            true),
         Arguments.of(
             "legacy heading-shaped text row (text_level 2) only",
             List.of(

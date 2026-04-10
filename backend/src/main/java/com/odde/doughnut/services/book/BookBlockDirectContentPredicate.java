@@ -25,8 +25,9 @@ public final class BookBlockDirectContentPredicate {
   }
 
   /**
-   * MinerU blocks that count as direct reading content (not header/footer/page chrome/structural
-   * headings).
+   * MinerU blocks that count as direct reading content. Excludes header, footer, {@code page_*},
+   * and {@code text} with {@code text_level} 1–3. Other types default to counting as direct
+   * content.
    */
   public static boolean contributesDirectContent(BookContentBlock cb) {
     if (cb == null) {
@@ -39,17 +40,13 @@ public final class BookBlockDirectContentPredicate {
     if ("header".equals(t) || "footer".equals(t) || t.startsWith("page_")) {
       return false;
     }
-    if ("table".equals(t) || "image".equals(t)) {
-      return true;
-    }
     if ("text".equals(t)) {
       Integer level = textLevelFromRaw(cb.getRawData());
       if (level != null && level >= 1 && level <= 3) {
         return false;
       }
-      return true;
     }
-    return false;
+    return true;
   }
 
   static Integer textLevelFromRaw(String rawData) {
