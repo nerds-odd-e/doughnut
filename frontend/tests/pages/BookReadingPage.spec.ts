@@ -1006,7 +1006,7 @@ describe("BookReadingPage", () => {
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
         // Use default blocks: none have allBboxes (length 0)
-        stubGetBookWithTopMathsBlocks()
+        stubGetBookWithTopMathsBlocks(notebookId)
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)

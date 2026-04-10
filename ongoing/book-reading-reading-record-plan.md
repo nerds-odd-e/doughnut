@@ -55,6 +55,49 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 ---
 
+## Phase 5a — Snap to block start when block fits on one page
+
+**User story scenario:** the user scrolls past an unread block whose top and last direct-content bbox are on the same page — snap-back should show the full block from the beginning.
+
+**User outcome:** when the snap fires and the selected block's start anchor and last direct-content bbox are on the **same page**, the reader scrolls to the **block's start position** (same scroll target as when the user clicks the block in the layout), not just to the last content bbox bottom. If they are on **different pages**, the existing Phase 5 behavior (last content bbox bottom above the panel) applies unchanged.
+
+**Depends on:** Phase 5.
+
+**Notes for implementation shape:**
+
+- The condition is: `lastBbox.pageIndex === startAnchor.pageIndex` (start anchor parsed page index equals last content bbox page index).
+- The "block start" scroll target is the existing `scrollToPdfOutlineV1Target` path used by `applyBookBlockSelection` — reuse that, not a new coordinate calculation.
+- `snapToContentBottomAndHold` in `PdfBookViewer` still handles the suppression window; the scroll target is just chosen differently before the call, or a new exposed method handles both.
+- No change to the snap attempt counter or suppression duration.
+
+**Tests (no new E2E):**
+
+- **Mounted test — same-page block:** block whose start anchor and last content bbox are on the same page; assert that `scrollToPdfOutlineV1Target` (not `snapToContentBottomAndHold`'s raw scrollTop) is called when snap fires.
+- **Mounted test — cross-page block:** block whose start anchor and last content bbox are on different pages; assert that the existing last-bbox-bottom target is used.
+
+---
+
+## Phase 5b — Animated panel on snap
+
+**User story scenario:** the snap fires but the user did not notice the Reading Control Panel was already visible; the animation draws their eye to it.
+
+**User outcome:** when a snap-back fires, the Reading Control Panel plays a brief attention animation (e.g. a pulse, shake, or highlight flash) so the user clearly sees the prompt they need to answer.
+
+**Depends on:** Phase 5.
+
+**Notes for implementation shape:**
+
+- The animation is applied to the `ReadingControlPanel` component root element at the moment the snap fires, not on every render.
+- Use a CSS keyframe animation class that is added on snap and removed after it plays (one-shot via `animationend` listener or a short timer matching the animation duration).
+- The panel's layout and hit targets must not shift during the animation; prefer transforms or opacity/shadow rather than position changes.
+- If the panel is already visible when snap fires, the animation still replays (re-triggers).
+
+**Tests (no new E2E):**
+
+- **Mounted test:** after snap fires, assert that the panel root element has the animation class (or a `data-*` attribute used to trigger it via CSS); assert that the class is removed after the animation completes or the timer elapses.
+
+---
+
 ## Phase 6 — One more reminder, then release scrolling
 
 **User story scenario:** after the first snap-back, the user again tries to scroll past the same unread block without marking it as read.
