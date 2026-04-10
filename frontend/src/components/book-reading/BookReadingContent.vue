@@ -190,9 +190,11 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   const selIdx = rows.findIndex((r) => r.id === selId)
   if (selIdx < 0 || selIdx >= rows.length - 1) return false
   const sel = rows[selIdx]!
-  const successor = rows[selIdx + 1]!
   if (!sel.hasDirectContent) return false
-  if (proposedAnchorId !== successor.startAnchor.id) return false
+  const proposedIdx = rows.findIndex(
+    (r) => r.startAnchor.id === proposedAnchorId
+  )
+  if (proposedIdx <= selIdx) return false
   if (!geometryEverVisibleForSelection.value) return false
   if (sel.allBboxes.length <= 1) return false
   return (snapbackAttempts.get(selId) ?? 0) < 1

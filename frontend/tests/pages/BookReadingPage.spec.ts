@@ -989,6 +989,40 @@ describe("BookReadingPage", () => {
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
+      it("snaps back when scrolling lands two or more blocks ahead (not just immediate successor)", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // geometry passes while Section 1 is current
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // mid=600 → Section 3 (two ahead) becomes proposed → snap still fires
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 600, bottom: 1000 },
+          pagesCount: 10,
+        })
+
+        expect(suppressSpy).toHaveBeenCalledWith(500)
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
+      })
+
       it("hides the panel after snap hold expires and user scrolls past again", async () => {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
