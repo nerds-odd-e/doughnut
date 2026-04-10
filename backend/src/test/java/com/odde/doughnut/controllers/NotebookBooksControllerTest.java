@@ -455,6 +455,53 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void lastDirectContentBboxIsNullWhenNoDirectContent() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> pageNumOnly = new LinkedHashMap<>();
+      pageNumOnly.put("type", "page_number");
+      pageNumOnly.put("text", "1");
+      pageNumOnly.put("page_idx", 0);
+      pageNumOnly.put("bbox", new ArrayList<>(List.of(0.0, 0.0, 100.0, 10.0)));
+      AttachBookLayoutNodeRequest n = node("Header-only section");
+      n.setContentBlocks(new ArrayList<>(List.of(pageNumOnly)));
+      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      makeMe.entityPersister.flushAndClear();
+
+      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
+      assertThat(block.getLastDirectContentBbox(), nullValue());
+    }
+
+    @Test
+    void lastDirectContentBboxReturnsLastEligibleItem() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> body1 = new LinkedHashMap<>();
+      body1.put("type", "text");
+      body1.put("text", "First paragraph");
+      body1.put("page_idx", 1);
+      body1.put("bbox", new ArrayList<>(List.of(10.0, 20.0, 200.0, 50.0)));
+      Map<String, Object> footer = new LinkedHashMap<>();
+      footer.put("type", "footer");
+      footer.put("text", "Page footer");
+      footer.put("page_idx", 1);
+      footer.put("bbox", new ArrayList<>(List.of(0.0, 900.0, 1000.0, 950.0)));
+      Map<String, Object> body2 = new LinkedHashMap<>();
+      body2.put("type", "text");
+      body2.put("text", "Last paragraph");
+      body2.put("page_idx", 2);
+      body2.put("bbox", new ArrayList<>(List.of(10.0, 30.0, 200.0, 60.0)));
+      AttachBookLayoutNodeRequest n = node("Multi-block section");
+      n.setContentBlocks(new ArrayList<>(List.of(body1, footer, body2)));
+      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      makeMe.entityPersister.flushAndClear();
+
+      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
+      assertThat(block.getLastDirectContentBbox(), notNullValue());
+      assertThat(block.getLastDirectContentBbox().pageIndex(), equalTo(2));
+      assertThat(
+          block.getLastDirectContentBbox().bbox(), equalTo(List.of(10.0, 30.0, 200.0, 60.0)));
+    }
+
+    @Test
     void hasDirectContentFalseWhenOnlyPageNumberContentBlocks() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> pageNum = new LinkedHashMap<>();

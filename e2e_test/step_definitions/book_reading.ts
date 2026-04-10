@@ -110,6 +110,16 @@ When(
 )
 
 When(
+  'I scroll the PDF book reader until the Reading Control Panel shows for {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (selectedBlockTitle: string) => {
+    return bookReadingPage().scrollPdfUntilReadingControlPanelVisible(
+      selectedBlockTitle
+    )
+  }
+)
+
+When(
   'I mark the book block {string} as read in the Reading Control Panel',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (blockTitle: string) => {

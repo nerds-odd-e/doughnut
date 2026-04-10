@@ -222,6 +222,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
+/** Vertical space (px) reserved at the bottom of the PDF main pane by ReadingControlPanel. */
+const READING_PANEL_OBSTRUCTION_PX = 80
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -274,6 +276,7 @@ type BookBlockRow = {
   startAnchor: BookAnchorFull
   hasDirectContent: boolean
   allBboxes: BookBlockContentBboxItemFull[]
+  lastDirectContentBbox: BookBlockContentBboxItemFull | null
 }
 
 function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
@@ -299,6 +302,7 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
         startAnchor: child.startAnchor,
         hasDirectContent: child.hasDirectContent ?? true,
         allBboxes: child.allBboxes ?? [],
+        lastDirectContentBbox: child.lastDirectContentBbox ?? null,
       })
       visit(child.id, depth + 1)
     }
@@ -321,23 +325,54 @@ const readingControlSelectedBlockTitle = computed(() => {
   return bookBlockRows.value.find((r) => r.id === selId)?.title ?? ""
 })
 
-const readingControlPanelVisible = computed(() => {
+const readingControlPanelVisible = ref(false)
+
+function selectedBlockHasSuccessorAndNoDisposition(): {
+  selId: number
+  successor: (typeof bookBlockRows.value)[number]
+} | null {
   const selId = selectedBlockId.value
-  const curAnchorId = currentBlockAnchorId.value
-  if (selId === null || curAnchorId === null) {
-    return false
-  }
+  if (selId === null) return null
+  if (bookReading.hasRecordedDisposition(selId)) return null
   const rows = bookBlockRows.value
   const selIdx = rows.findIndex((r) => r.id === selId)
-  if (selIdx < 0 || selIdx >= rows.length - 1) {
-    return false
+  if (selIdx < 0 || selIdx >= rows.length - 1) return null
+  return { selId, successor: rows[selIdx + 1]! }
+}
+
+function updateReadingControlPanelVisible() {
+  const context = selectedBlockHasSuccessorAndNoDisposition()
+  if (context === null) {
+    readingControlPanelVisible.value = false
+    return
   }
-  if (bookReading.hasRecordedDisposition(selId)) {
-    return false
+  const { selId, successor } = context
+  const rows = bookBlockRows.value
+  const sel = rows.find((r) => r.id === selId)!
+  const lastBbox = sel.lastDirectContentBbox
+
+  if (!sel.hasDirectContent) {
+    readingControlPanelVisible.value = false
+    return
   }
-  const successor = rows[selIdx + 1]!
-  return successor.startAnchor.id === curAnchorId
-})
+
+  if (lastBbox !== null) {
+    const target = {
+      pageIndex: lastBbox.pageIndex,
+      bbox: lastBbox.bbox as [number, number, number, number],
+    }
+    const visible = pdfViewerRef.value?.isLastContentBottomVisible(
+      target,
+      READING_PANEL_OBSTRUCTION_PX
+    )
+    readingControlPanelVisible.value = visible ?? false
+    return
+  }
+
+  // Fallback: no usable bbox → use successor-anchor rule
+  readingControlPanelVisible.value =
+    successor.startAnchor.id === currentBlockAnchorId.value
+}
 
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
@@ -378,6 +413,7 @@ function onViewportAnchorPage(payload: {
     payload.pagesCount
   )
   currentBlockAnchorDebouncer.propose(candidate)
+  updateReadingControlPanelVisible()
   let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
     null
   if (payload.readingPosition !== undefined) {
@@ -440,7 +476,19 @@ watch(currentBlockAnchorId, async (anchorId) => {
   ) {
     await bookReading.submitMarkRead(predecessor.id)
   }
+  updateReadingControlPanelVisible()
 })
+
+watch(selectedBlockId, () => {
+  updateReadingControlPanelVisible()
+})
+
+watch(
+  () => bookReading.hasRecordedDisposition(selectedBlockId.value ?? -1),
+  () => {
+    updateReadingControlPanelVisible()
+  }
+)
 
 const initialLastRead = ref<{
   pageIndexZeroBased: number
@@ -461,6 +509,10 @@ const pdfViewerRef = ref<{
   ) => Promise<void>
   zoomIn: () => void
   zoomOut: () => void
+  isLastContentBottomVisible: (
+    target: PdfOutlineV1NavigationTarget,
+    obstructionPx: number
+  ) => boolean
 } | null>(null)
 
 async function applyBookBlockSelection(block: BookBlockRow) {

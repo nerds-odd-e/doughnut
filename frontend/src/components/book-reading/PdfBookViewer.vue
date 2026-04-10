@@ -389,12 +389,42 @@ function highlightBlockSelection(
   showSelectionBboxHighlights(highlightBboxes)
 }
 
+/**
+ * Returns true when the bottom edge of the given bbox (0–1000 MinerU normalized, page-local) is
+ * both visible in the scroll container's viewport and above `obstructionPx` from the container's
+ * bottom edge (so the Reading Control Panel does not obscure it).
+ */
+function isLastContentBottomVisible(
+  target: PdfOutlineV1NavigationTarget,
+  obstructionPx: number
+): boolean {
+  const container = containerRef.value
+  if (!container || !pdfViewer) return false
+  const { pageIndex, bbox } = target
+  if (
+    bbox === null ||
+    !Number.isInteger(pageIndex) ||
+    pageIndex < 0 ||
+    pageIndex >= pdfViewer.pagesCount
+  ) {
+    return false
+  }
+  const pageView = pdfViewer.getPageView(pageIndex)
+  if (!pageView?.div) return false
+  const pageRect = pageView.div.getBoundingClientRect()
+  const containerRect = container.getBoundingClientRect()
+  const bboxBottomClient = pageRect.top + (bbox[3] / 1000) * pageRect.height
+  const panelTop = containerRect.bottom - obstructionPx
+  return bboxBottomClient < panelTop && bboxBottomClient > containerRect.top
+}
+
 defineExpose({
   scrollToPdfOutlineV1Target,
   highlightBlockSelection,
   scrollToStoredReadingPosition,
   zoomIn,
   zoomOut,
+  isLastContentBottomVisible,
 })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {

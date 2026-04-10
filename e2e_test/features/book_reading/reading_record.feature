@@ -18,7 +18,7 @@ Feature: Reading record
 
   Scenario: Mark a book block as read (reading record)
     When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
-    And I scroll the PDF until the book block "2.2 Refactoring as Strengthening the Code" is the current block in the book reader
+    And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"
     When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
     Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
     And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout

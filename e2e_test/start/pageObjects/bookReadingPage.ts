@@ -201,6 +201,37 @@ const bookReadingPage = () => {
       return this
     },
     /**
+     * Scrolls down the PDF viewer in increments until the Reading Control Panel appears,
+     * asserting it contains the selected block title.
+     */
+    scrollPdfUntilReadingControlPanelVisible(selectedBlockTitle: string) {
+      pageIsNotLoading()
+      const step = 150
+      const doScroll = (remaining: number): void => {
+        if (remaining <= 0) return
+        cy.get('[data-testid="book-reading-reading-control-panel"]').then(
+          ($panel) => {
+            if ($panel.length > 0 && $panel.is(':visible')) return
+            cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+              const el = $viewer[0] as HTMLElement
+              cy.get('[data-testid="pdf-book-viewer"]').scrollTo(
+                0,
+                el.scrollTop + step
+              )
+            })
+            doScroll(remaining - 1)
+          }
+        )
+      }
+      doScroll(20)
+      cy.get('[data-testid="book-reading-reading-control-panel"]', {
+        timeout: 10000,
+      })
+        .should('be.visible')
+        .and('contain', selectedBlockTitle)
+      return this
+    },
+    /**
      * Reading Control Panel (Phase 2 reading record): bottom of PDF main pane.
      * Contract for production: data-testid book-reading-reading-control-panel + book-reading-mark-as-read.
      */

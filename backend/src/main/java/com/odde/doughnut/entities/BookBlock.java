@@ -24,7 +24,8 @@ import lombok.Setter;
   "title",
   "parentBlockId",
   "hasDirectContent",
-  "allBboxes"
+  "allBboxes",
+  "lastDirectContentBbox"
 })
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
@@ -86,5 +87,11 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   public List<BookBlockContentBboxItem> getAllBboxes() {
     String anchorValue = Optional.ofNullable(startAnchor).map(BookAnchor::getValue).orElse(null);
     return BookBlockContentBboxes.allBboxes(anchorValue, contentBlocks);
+  }
+
+  @JsonProperty("lastDirectContentBbox")
+  @JsonView(BookViews.Full.class)
+  public BookBlockContentBboxItem getLastDirectContentBbox() {
+    return BookBlockDirectContentPredicate.lastBbox(contentBlocks).orElse(null);
   }
 }

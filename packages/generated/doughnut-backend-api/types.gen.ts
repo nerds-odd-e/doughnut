@@ -344,6 +344,7 @@ export type BookBlockFull = {
     parentBlockId?: string;
     hasDirectContent?: boolean;
     allBboxes?: Array<BookBlockContentBboxItemFull>;
+    lastDirectContentBbox?: BookBlockContentBboxItemFull;
 };
 
 export type BookFull = {

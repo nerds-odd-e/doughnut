@@ -783,6 +783,90 @@ describe("BookReadingPage", () => {
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
+    describe("geometry-gated panel (lastDirectContentBbox)", () => {
+      const lastBbox = { pageIndex: 0, bbox: [10, 700, 500, 750] }
+
+      function stubGetBookWithFirstBlockHavingBbox() {
+        const anchors = makeMe.bookReadingTopMathsLikeAnchors()
+        const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
+          id: i + 1,
+          title: `Section ${i + 1}`,
+          startAnchor,
+          siblingOrder: i,
+          hasDirectContent: true,
+          lastDirectContentBbox: i === 0 ? lastBbox : undefined,
+        }))
+        vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+          wrapSdkResponse(makeMe.aBook.blocks(blocks).please())
+        )
+      }
+
+      function mockIsLastContentBottomVisible(
+        wrapper: BookReadingPageWrapper,
+        returnValue: boolean
+      ) {
+        const pdf = wrapper.findComponent(PdfBookViewer)
+        const exposed = (
+          pdf.vm as unknown as {
+            $: { exposed: { isLastContentBottomVisible: () => boolean } }
+          }
+        ).$.exposed
+        vi.spyOn(exposed, "isLastContentBottomVisible").mockReturnValue(
+          returnValue
+        )
+      }
+
+      it("shows the panel when last content bottom is visible and above obstruction", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        const pdf = wrapper.findComponent(PdfBookViewer)
+        pdf.vm.$emit("viewportAnchorPage", {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await flushPromises()
+
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
+      })
+
+      it("hides the panel when last content bottom is not yet above obstruction", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, false)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        const pdf = wrapper.findComponent(PdfBookViewer)
+        pdf.vm.$emit("viewportAnchorPage", {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await flushPromises()
+
+        expect(readingControlPanel(wrapper).exists()).toBe(false)
+      })
+    })
+
     it("auto-marks predecessor with READ body when it has no direct content and no record", async () => {
       const putSpy = vi
         .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
