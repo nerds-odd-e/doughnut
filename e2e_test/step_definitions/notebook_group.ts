@@ -55,9 +55,9 @@ Then(
 )
 
 When(
-  'I set notebook {string} to ungrouped on the notebook settings page',
+  'I set notebook {string} to ungrouped from the catalog',
   (notebookTitle: string) => {
-    start.navigateToNotebookPage(notebookTitle).setNotebookUngrouped()
+    start.navigateToNotebooksPage().moveOwnedNotebookToUngrouped(notebookTitle)
   }
 )
 

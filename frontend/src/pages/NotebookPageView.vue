@@ -63,10 +63,6 @@
           </div>
         </button>
       </div>
-      <NotebookGroupAssignmentControl
-        v-bind="{ notebook, user }"
-        @notebook-updated="emit('notebook-updated', $event)"
-      />
     </section>
     
     <!-- Notebook Settings Section -->
@@ -215,7 +211,6 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { GitMerge, Share2 } from "lucide-vue-next"
-import NotebookGroupAssignmentControl from "@/components/notebook/NotebookGroupAssignmentControl.vue"
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"

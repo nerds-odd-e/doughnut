@@ -11,7 +11,7 @@ Feature: Notebook group
     Then I should see notebook group "E2E Owned Group" with a hint including "Group E2E Root"
     When I open notebook group "E2E Owned Group" from the catalog header
     Then I should be on the notebook group page for "E2E Owned Group" with notebook "Group E2E Root" listed
-    When I set notebook "Group E2E Root" to ungrouped on the notebook settings page
+    When I set notebook "Group E2E Root" to ungrouped from the catalog
     Then notebook "Group E2E Root" should appear at the top level of the notebook catalog
 
   Scenario: Catalog group for subscribed notebook

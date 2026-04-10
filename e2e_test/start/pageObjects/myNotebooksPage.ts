@@ -20,6 +20,14 @@ const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
   pageIsNotLoading()
 }
 
+const completeMoveNotebookToUngroupedDialog = () => {
+  cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
+    cy.get('#notebook-catalog-move-to-group-target').select('ungrouped')
+    cy.findByRole('button', { name: 'Move' }).click()
+  })
+  pageIsNotLoading()
+}
+
 const myNotebooksPage = () => {
   cy.contains('h1', 'My notebooks').should('be.visible')
 
@@ -66,6 +74,11 @@ const myNotebooksPage = () => {
         notebookCard(notebookTitle).openMoveToGroupDialog()
       }
       completeMoveNotebookToNewGroupDialog(groupName)
+      return this as any
+    },
+    moveOwnedNotebookToUngrouped(notebookTitle: string) {
+      notebookCard(notebookTitle).openMoveToGroupDialog()
+      completeMoveNotebookToUngroupedDialog()
       return this as any
     },
     expectNotebookGroupWithMemberHint(
