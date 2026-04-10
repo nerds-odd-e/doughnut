@@ -298,13 +298,8 @@ export type RedirectToNoteResponse = {
     noteId?: number;
 };
 
-export type AttachBookAnchorRequestFull = {
-    value: string;
-};
-
 export type AttachBookLayoutNodeRequestFull = {
     title: string;
-    startAnchor?: AttachBookAnchorRequestFull;
     children?: Array<AttachBookLayoutNodeRequestFull>;
     contentBlocks?: Array<{
         [key: string]: unknown;

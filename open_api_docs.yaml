@@ -3746,13 +3746,6 @@ components:
         noteId:
           type: integer
           format: int32
-    AttachBookAnchorRequest_Full:
-      type: object
-      properties:
-        value:
-          type: string
-      required:
-      - value
     AttachBookLayoutNodeRequest_Full:
       type: object
       properties:
@@ -3760,8 +3753,6 @@ components:
           type: string
           maxLength: 512
           minLength: 0
-        startAnchor:
-          $ref: "#/components/schemas/AttachBookAnchorRequest_Full"
         children:
           type: array
           items:
