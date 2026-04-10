@@ -9,39 +9,10 @@
     {{ currentBlockLiveText }}
   </div>
   <GlobalBar>
-    <button
-      type="button"
-      class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0"
-      :class="{ 'sidebar-expanded': bookLayoutOpened }"
-      data-testid="book-reading-book-layout-toggle"
-      aria-label="Book layout"
-      title="Book layout"
-      :aria-expanded="bookLayoutOpened"
-      aria-controls="book-reading-book-layout-panel"
-      @click="bookLayoutOpened = !bookLayoutOpened"
-    >
-      <div class="daisy-w-4 daisy-h-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="w-4 h-4"
-        >
-          <template v-if="bookLayoutOpened">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </template>
-          <template v-else>
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="6" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </template>
-        </svg>
-      </div>
-    </button>
+    <BookLayoutToggleButton
+      v-model:opened="bookLayoutOpened"
+      :panel-id="bookReadingBookLayoutPanelId"
+    />
     <router-link
       :to="{ name: 'notebookEdit', params: { notebookId: props.notebookId } }"
       class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0 daisy-no-underline"
@@ -70,7 +41,7 @@
   />
   <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
     <aside
-      id="book-reading-book-layout-panel"
+      :id="bookReadingBookLayoutPanelId"
       ref="bookLayoutAsideRef"
       data-testid="book-reading-book-layout-aside"
       :class="[
@@ -177,6 +148,7 @@
 </template>
 
 <script setup lang="ts">
+import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
@@ -203,6 +175,7 @@ import type {
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
+const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
@@ -220,20 +193,8 @@ const bookReading = useNotebookBookReadingRecords(() => props.notebookId)
 
 const pdfViewerLoadError = ref<string | null>(null)
 
-watch(
-  () => props.bookPdfBytes,
-  () => {
-    pdfViewerLoadError.value = null
-  }
-)
-
 const pdfBarCurrentPage = ref<number | null>(null)
 const pdfBarPagesTotal = ref<number | null>(null)
-
-function resetPdfPageIndicator() {
-  pdfBarCurrentPage.value = null
-  pdfBarPagesTotal.value = null
-}
 
 const bookLayoutOpened = ref(false)
 const bookLayoutAsideRef = ref<HTMLElement | null>(null)
@@ -253,7 +214,6 @@ const isMdOrLarger = computed(
 
 function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
-  resetPdfPageIndicator()
 }
 
 type BookBlockRow = {
