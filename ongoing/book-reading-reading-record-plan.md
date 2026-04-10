@@ -79,33 +79,13 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 ---
 
-## Phase 6 — Animated snap-back
-
-**User story scenario:** the reader snaps the scroll position back after the first unread boundary crossing (Phase 5).
-
-**User outcome:** that restoration feels **intentional and readable**, not like a glitch: motion is **smooth** (or otherwise clearly animated) over a short duration, consistent with **mobile-realistic** reading in [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md) (native-feeling scroll, no jarring instant jump unless product explicitly prefers it).
-
-**Depends on:** Phase 5 (functional snap-back to last valid position).
-
-**Notes for implementation shape:**
-
-- Prefer **smooth scroll** (or pdf.js–compatible equivalent) from the overscroll position to the stored target; keep duration and easing **subtle** so it reads as a gentle nudge, not a long tour.
-- The animation applies to the **same** restore contract as Phase 5 (same target: last valid position inside the block); this phase is **presentation only**, not a second reminder count or new persistence.
-- If smooth scrolling is unreliable in some environments (e.g. certain zoom/layout paths), document the fallback (e.g. instant jump) in code only; avoid expanding scope into generic scroll physics.
-
-**Tests (no new E2E):**
-
-- Prefer **observable** checks where cheap: e.g. mounted test that the viewer is invoked with a **smooth** scroll path or option if the API exposes one; otherwise a **single** focused test or manual checklist is enough — do not add brittle timing assertions.
-
----
-
-## Phase 7 — One more reminder, then release scrolling
+## Phase 6 — One more reminder, then release scrolling
 
 **User story scenario:** after the first snap-back, the user again tries to scroll past the same unread block without marking it as read.
 
 **User outcome:** the reader applies the same snap-back behavior **one more time** on the **second** attempt, then allows **normal scrolling** on the **third and later** attempts for that same block.
 
-**Depends on:** Phase 6.
+**Depends on:** Phase 5.
 
 **Notes for implementation shape:**
 
@@ -120,7 +100,7 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 ---
 
-## Phase 8 — Clear snap-back on read; scope reminders per block
+## Phase 7 — Clear snap-back on read; scope reminders per block
 
 **User story scenario:** the user marks a block as read after one or two reminders, then continues reading and later reaches another unread block.
 
@@ -129,7 +109,7 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 - marking the block **READ** clears that block’s snap-back reminder state immediately, so later scrolling for that block proceeds normally, and
 - a different unread block gets its **own** reminder budget of up to two snap-backs.
 
-**Depends on:** Phase 7.
+**Depends on:** Phase 6.
 
 **Notes for implementation shape:**
 
