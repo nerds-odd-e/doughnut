@@ -17,6 +17,7 @@
 - **Phase 4:** explicit **skimmed / skipped** dispositions.
 - **Phase 5:** first snap-back reminder when scrolling past an unread block's end boundary.
 - **Phase 6:** second snap-back reminder on the second crossing; normal scrolling from the third attempt onward. (`snapbackAttempts` limit changed from `< 1` to `< 2` in `BookReadingContent.vue`.)
+- **Phase 7:** marking **READ** clears that block's snap-back state immediately (`snapbackAttempts.delete(id)` in `markSelectedDisposition`); per-block budgets are independent (keyed by block id).
 
 ---
 
@@ -120,28 +121,9 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 ---
 
-## Phase 7 — Clear snap-back on read; scope reminders per block
+## Phase 7 — Clear snap-back on read; scope reminders per block (shipped)
 
-**User story scenario:** the user marks a block as read after one or two reminders, then continues reading and later reaches another unread block.
-
-**User outcome:**
-
-- marking the block **READ** clears that block's snap-back reminder state immediately, so later scrolling for that block proceeds normally, and
-- a different unread block gets its **own** reminder budget of up to two snap-backs.
-
-**Depends on:** Phase 6.
-
-**Notes for implementation shape:**
-
-- Clearing is immediate on successful **Mark as read** completion; do not wait for navigation away and back.
-- The per-block scope should not accidentally share attempt counts across siblings, parent/child neighbors, or repeated visits to a different block.
-- This phase is only about **READ** because the requested behavior says "marked as read"; if product later wants skim/skip to clear the reminder too, that should be an explicit follow-up decision.
-
-**Tests (no new E2E):**
-
-- **Mounted reader/page test:** after one or two snap-backs, complete **Mark as read** and assert that subsequent scrolling no longer restores position for that block.
-- **Mounted per-block test:** exhaust reminders for block A, move to a different unread block B, and assert that B still gets its own first and second snap-backs.
-- **Controller coverage only if needed:** add or extend HTTP tests only if the implementation introduces a new observable API contract. Otherwise keep coverage in mounted reader-flow tests.
+`snapbackAttempts.delete(id)` added to `markSelectedDisposition` after a successful **READ** PUT. Per-block budgets verified independently. Tests: "marking READ clears snap reminder" and "different unread blocks get independent snap budgets" in `BookReadingPage.spec.ts`.
 
 ---
 

@@ -462,6 +462,9 @@ async function markSelectedDisposition(status: BookBlockReadingDisposition) {
   if (!ok) {
     return
   }
+  if (status === "READ") {
+    snapbackAttempts.delete(id)
+  }
   const rows = flatBookBlocks.value
   const selIdx = rows.findIndex((r) => r.id === id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {

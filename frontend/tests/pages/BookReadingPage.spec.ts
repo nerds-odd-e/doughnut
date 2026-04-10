@@ -1407,6 +1407,200 @@ describe("BookReadingPage", () => {
           readingControlPanel(wrapper).attributes("data-snap-animating")
         ).toBeUndefined()
       })
+
+      it("marking READ clears snap reminder: block no longer snaps when re-visited", async () => {
+        vi.spyOn(
+          NotebookBooksController,
+          "putNotebookBookBlockReadingRecord"
+        ).mockResolvedValue(
+          wrapSdkResponse([
+            {
+              bookBlockId: "1",
+              status: "READ",
+              completedAt: "2020-01-01T00:00:00Z",
+            },
+          ])
+        )
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // geometry passes
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // first crossing → snap fires (count=1)
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(suppressSpy).toHaveBeenCalledTimes(1)
+
+        // mark as READ → selection advances to Section 2
+        await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsRead")
+        await flushPromises()
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 2"
+        )
+
+        // re-select Section 1 (now READ; text includes "Marked as read")
+        const section1Row = wrapper
+          .findAll('[data-testid="book-reading-book-block"]')
+          .find((w) => w.text().startsWith("Section 1"))
+        expect(section1Row, "book block row Section 1").toBeDefined()
+        await section1Row!.trigger("click")
+        await flushPromises()
+
+        // re-establish geometry after selection reset
+        mockIsLastContentBottomVisible(wrapper, true)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // crossing: Section 1 is READ → shouldSnapBack returns false → no snap
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // suppress count stays at 1 — no new snap for Section 1 after READ
+        expect(suppressSpy).toHaveBeenCalledTimes(1)
+      })
+
+      it("different unread blocks get independent snap budgets", async () => {
+        // Section 2 anchor: page 0, bbox [48,72,564,200]; Section 3 anchor: page 0, bbox [48,520,564,756]
+        // To propose Section 3 as current, viewport.top must exceed Section 2's y1=200 so anchor 102 is
+        // no longer visible, leaving anchor 103 as the first visible.
+        const section2ContentBbox = { pageIndex: 0, bbox: [48, 200, 564, 500] }
+        const anchors = makeMe.bookReadingTopMathsLikeAnchors()
+        const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
+          id: i + 1,
+          title: `Section ${i + 1}`,
+          startAnchor,
+          siblingOrder: i,
+          hasDirectContent: true,
+          allBboxes:
+            i === 0
+              ? [anchorBbox, contentBbox]
+              : i === 1
+                ? [anchorBbox, section2ContentBbox]
+                : [],
+        }))
+        vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+          wrapSdkResponse(
+            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+          )
+        )
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
+
+        // --- exhaust Section 1's two snap budget ---
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+        mockIsLastContentBottomVisible(wrapper, false)
+
+        // snap 1 for Section 1
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await withFakeTimers(async () => {
+          await vi.advanceTimersByTimeAsync(500)
+          await flushPromises()
+        })
+
+        // snap 2 for Section 1
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await withFakeTimers(async () => {
+          await vi.advanceTimersByTimeAsync(500)
+          await flushPromises()
+        })
+
+        expect(suppressSpy).toHaveBeenCalledTimes(2)
+
+        // third crossing: no snap, current block commits to Section 2
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(suppressSpy).toHaveBeenCalledTimes(2)
+
+        // --- Section 2 gets its own fresh snap budget ---
+        await clickBookBlockByTitle(wrapper, "Section 2")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 2"
+          )
+        )
+
+        // establish geometry for Section 2 (mid=140 keeps Section 2 as current block)
+        mockIsLastContentBottomVisible(wrapper, true)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 140, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // snap 1 for Section 2: top=201 scrolls past Section 2's bbox (y1=200), making Section 3 current
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 201, mid: 640, bottom: 1000 },
+          pagesCount: 10,
+        })
+        await withFakeTimers(async () => {
+          await vi.advanceTimersByTimeAsync(500)
+          await flushPromises()
+        })
+
+        // snap 2 for Section 2
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 201, mid: 640, bottom: 1000 },
+          pagesCount: 10,
+        })
+
+        // Section 2 gets both its own snaps regardless of Section 1's exhausted budget
+        expect(suppressSpy).toHaveBeenCalledTimes(4)
+      })
     })
 
     it("auto-marks predecessor with READ body when it has no direct content and no record", async () => {
