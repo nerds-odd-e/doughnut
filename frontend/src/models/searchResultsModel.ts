@@ -148,7 +148,9 @@ export class SearchResultsModel {
       (!hasSearchKey || isWaitingForFirstSearch) &&
       !hasSearchResults
 
-    const containerClass = opts.isDropdown ? "dropdown-list" : "result-section"
+    const containerClass = opts.isDropdown
+      ? "dropdown-section"
+      : "result-section"
 
     if (shouldShowRecent && hasRecentNotes) {
       return {

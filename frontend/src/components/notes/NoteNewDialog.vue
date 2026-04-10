@@ -177,8 +177,8 @@ const onTitleChange = () => {
 
   :deep(.dropdown-list)
     max-height: none
-    height: 100%
-    overflow-y: auto
+    height: auto
+    overflow-y: visible
     padding: 0.5rem
     font-size: 0.75rem
 
