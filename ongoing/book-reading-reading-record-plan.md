@@ -16,6 +16,7 @@
 - **Phase 3:** auto-mark **READ** for blocks with **no direct content**.
 - **Phase 4:** explicit **skimmed / skipped** dispositions.
 - **Phase 5:** first snap-back reminder when scrolling past an unread block's end boundary.
+- **Phase 6:** second snap-back reminder on the second crossing; normal scrolling from the third attempt onward. (`snapbackAttempts` limit changed from `< 1` to `< 2` in `BookReadingContent.vue`.)
 
 ---
 

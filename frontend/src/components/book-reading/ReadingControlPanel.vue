@@ -69,16 +69,16 @@ watch(
     if (key <= 0) return
     const el = cardRef.value
     if (!el) return
+    isAnimating.value = true
     el.classList.remove("snap-attention")
+    const onEnd = () => {
+      el.classList.remove("snap-attention")
+      isAnimating.value = false
+      el.removeEventListener("animationend", onEnd)
+    }
+    el.addEventListener("animationend", onEnd)
     requestAnimationFrame(() => {
-      isAnimating.value = true
       el.classList.add("snap-attention")
-      const onEnd = () => {
-        el.classList.remove("snap-attention")
-        isAnimating.value = false
-        el.removeEventListener("animationend", onEnd)
-      }
-      el.addEventListener("animationend", onEnd)
     })
   }
 )

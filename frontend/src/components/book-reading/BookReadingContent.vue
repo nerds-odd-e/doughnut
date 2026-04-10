@@ -207,7 +207,7 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   }
   if (!geometryEverVisibleForSelection.value) return false
   if (sel.allBboxes.length <= 1) return false
-  return (snapbackAttempts.get(selId) ?? 0) < 1
+  return (snapbackAttempts.get(selId) ?? 0) < 2
 }
 
 function performSnapBack(): void {

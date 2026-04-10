@@ -1023,12 +1023,13 @@ describe("BookReadingPage", () => {
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
-      it("hides the panel after snap hold expires and user scrolls past again", async () => {
+      it("snaps back on second crossing, then allows normal scrolling on third", async () => {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1051,22 +1052,102 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
+        expect(suppressSpy).toHaveBeenCalledTimes(1)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
 
-        // snap hold expires
+        // first snap hold expires
         await withFakeTimers(async () => {
           await vi.advanceTimersByTimeAsync(500)
           await flushPromises()
         })
 
-        // second crossing → no snap, commit goes through, panel hides
+        // second crossing → snap fires again
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
+
+        // second snap hold expires
+        await withFakeTimers(async () => {
+          await vi.advanceTimersByTimeAsync(500)
+          await flushPromises()
+        })
+
+        // third crossing → no snap, commit goes through, panel hides
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
 
+        expect(suppressSpy).toHaveBeenCalledTimes(2)
         expect(readingControlPanel(wrapper).exists()).toBe(false)
+      })
+
+      it("does not snap on fourth and later crossings after budget exhausted", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // geometry passes
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+        mockIsLastContentBottomVisible(wrapper, false)
+
+        // first crossing → snap 1
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await withFakeTimers(async () => {
+          await vi.advanceTimersByTimeAsync(500)
+          await flushPromises()
+        })
+
+        // second crossing → snap 2
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await withFakeTimers(async () => {
+          await vi.advanceTimersByTimeAsync(500)
+          await flushPromises()
+        })
+
+        // third crossing → no snap (commit goes through, panel hides, current block advances)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(readingControlPanel(wrapper).exists()).toBe(false)
+
+        // fourth crossing → still no snap
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(suppressSpy).toHaveBeenCalledTimes(2)
       })
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
