@@ -47,8 +47,19 @@ defineProps<{
   background: transparent;
 }
 
-.notebook-list-row--subscribed {
-  border-left-width: 3px;
-  border-left-color: oklch(var(--p));
+.notebook-list-row.notebook-list-row--subscribed {
+  background: linear-gradient(
+    to right,
+    oklch(var(--p) / 0.2) 0%,
+    oklch(var(--p) / 0.1) 5%
+  );
+}
+
+.notebook-list-row.notebook-list-row--subscribed:hover {
+  background: linear-gradient(
+    to right,
+    oklch(var(--p) / 0.24) 0%,
+    oklch(var(--p) / 0.14) 5%
+  );
 }
 </style>
