@@ -19,8 +19,17 @@ const completeMoveNotebookToGroupDialog = (groupName: string) => {
   pageIsNotLoading()
 }
 
+const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
+  cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
+    cy.get('#notebook-catalog-move-to-group-target').select('new')
+    cy.findByLabelText('New group name').type(newGroupName)
+    cy.findByRole('button', { name: 'Move' }).click()
+  })
+  pageIsNotLoading()
+}
+
 const myNotebooksPage = () => {
-  addNewNotebookButton()
+  cy.contains('h1', 'My notebooks').should('be.visible')
 
   return {
     ...notebookList(),
@@ -54,11 +63,17 @@ const myNotebooksPage = () => {
           .should('exist')
       )
     },
-    creatingNotebookGroup(name: string) {
-      cy.findByRole('button', { name: 'New notebook group' }).click()
-      cy.findByLabelText('Group name').type(name)
-      cy.findByRole('button', { name: 'Create notebook group' }).click()
-      pageIsNotLoading()
+    creatingNotebookGroupFromCatalogMove(
+      notebookTitle: string,
+      groupName: string,
+      isSubscribed?: boolean
+    ) {
+      if (isSubscribed) {
+        subscribedNotebooks().card(notebookTitle).openMoveToGroupDialog()
+      } else {
+        notebookCard(notebookTitle).openMoveToGroupDialog()
+      }
+      completeMoveNotebookToNewGroupDialog(groupName)
       return this as any
     },
     expectNotebookGroupWithMemberHint(

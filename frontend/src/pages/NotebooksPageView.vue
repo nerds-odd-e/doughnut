@@ -62,24 +62,6 @@
   >
     <section class="daisy-mb-12">
       <div
-        v-if="user"
-        class="daisy-mb-5 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-justify-end"
-      >
-          <PopButton
-            title="New notebook group"
-            aria-label="New notebook group"
-            btn-class="daisy-btn daisy-btn-outline daisy-btn-sm"
-          >
-            <template #button_face>
-              <FolderPlus class="h-4 w-4 sm:daisy-mr-1" />
-              New notebook group
-            </template>
-            <template #default="{ closer }">
-              <NotebookGroupNewForm :close="closer" @created="emit('refresh')" />
-            </template>
-          </PopButton>
-      </div>
-      <div
         v-if="catalogItems.length > 0"
         class="daisy-mb-4"
       >
@@ -156,7 +138,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, onMounted, ref, watch } from "vue"
-import { FolderPlus, LayoutGrid, List, Search, X } from "lucide-vue-next"
+import { LayoutGrid, List, Search, X } from "lucide-vue-next"
 import type {
   Notebook,
   Subscription,
@@ -165,8 +147,6 @@ import type {
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { sortNotebookCatalogAlphabetically } from "@/components/notebook/sortNotebookCatalogAlphabetically"
 import { useNotebooksLayout } from "@/composables/useNotebooksLayout"
-import PopButton from "@/components/commons/Popups/PopButton.vue"
-import NotebookGroupNewForm from "@/components/notebook/NotebookGroupNewForm.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
 import { narrowGroupNotebooksForCatalogFilter } from "@/components/notebook/narrowGroupNotebooksForCatalogFilter"

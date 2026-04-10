@@ -6,9 +6,20 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When(
-  'I create a notebook group named {string} from my notebooks page',
-  (name: string) => {
-    start.navigateToNotebooksPage().creatingNotebookGroup(name)
+  'I create a notebook group named {string} by moving owned notebook {string} from the catalog',
+  (groupName: string, notebookTitle: string) => {
+    start
+      .navigateToNotebooksPage()
+      .creatingNotebookGroupFromCatalogMove(notebookTitle, groupName, false)
+  }
+)
+
+When(
+  'I create a notebook group named {string} by moving subscribed notebook {string} from the catalog',
+  (groupName: string, notebookTitle: string) => {
+    start
+      .navigateToNotebooksPage()
+      .creatingNotebookGroupFromCatalogMove(notebookTitle, groupName, true)
   }
 )
 

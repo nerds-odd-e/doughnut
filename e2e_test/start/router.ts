@@ -20,9 +20,9 @@ const router = () => {
     cy.get('@firstVisited').then((firstVisited) => {
       const isFirstVisited =
         (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
-      cy.window().then((win: CustomWindow) => {
+      return cy.window().then((win: CustomWindow) => {
         if (win.router && isFirstVisited) {
-          cy.wrap(
+          return cy.wrap(
             win.router
               .push({
                 name,
@@ -35,10 +35,9 @@ const router = () => {
                 throw error
               })
           )
-        } else {
-          cy.wrap('yes').as('firstVisited')
-          cy.visit(fallback)
         }
+        cy.wrap('yes').as('firstVisited')
+        return cy.visit(fallback)
       })
     })
   }
