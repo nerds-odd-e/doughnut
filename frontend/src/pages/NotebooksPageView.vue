@@ -119,6 +119,7 @@
         :subscriptions="subscriptions"
         :layout="notebooksLayout"
         :user="user"
+        :catalog-filter-active="filterText.trim().length > 0"
         @notebook-updated="handleNotebookUpdated"
         @refresh="emit('refresh')"
       />
@@ -168,6 +169,7 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import NotebookGroupNewForm from "@/components/notebook/NotebookGroupNewForm.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
+import { narrowGroupNotebooksForCatalogFilter } from "@/components/notebook/narrowGroupNotebooksForCatalogFilter"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 const props = defineProps({
@@ -205,7 +207,7 @@ const filteredOnlyCatalogItems = computed(() => {
   if (!q) {
     return props.catalogItems
   }
-  return props.catalogItems.filter((item) => {
+  const rows = props.catalogItems.filter((item) => {
     if (item.type === "notebook" || item.type === "subscribedNotebook") {
       return (item.notebook.title ?? "").toLowerCase().includes(q)
     }
@@ -215,6 +217,15 @@ const filteredOnlyCatalogItems = computed(() => {
     return item.notebooks.some((nb) =>
       (nb.title ?? "").toLowerCase().includes(q)
     )
+  })
+  return rows.map((item) => {
+    if (item.type !== "notebookGroup") {
+      return item
+    }
+    return {
+      ...item,
+      notebooks: narrowGroupNotebooksForCatalogFilter(item, q),
+    }
   })
 })
 

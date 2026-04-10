@@ -32,10 +32,11 @@
     </component>
     <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-border-l-2 daisy-border-primary/30 daisy-pl-3">
       <NotebookListRow
-        v-for="nb in group.notebooks"
+        v-for="nb in previewNotebooks"
         :key="nb.id"
         :notebook="nb"
         :is-subscribed="!!subscriptionForNotebook(nb.id)"
+        :compact="compactMembers"
       >
         <SubscriptionNoteButtons
           v-if="subscriptionForNotebook(nb.id)"
@@ -85,14 +86,14 @@
       class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4"
     >
       <div
-        v-for="nb in group.notebooks"
+        v-for="nb in previewNotebooks"
         :key="nb.id"
         role="card"
         class="daisy-card"
         :class="{ 'subscribed-notebook': !!subscriptionForNotebook(nb.id) }"
         data-cy="notebook-card"
       >
-        <NotebookCard :notebook="nb">
+        <NotebookCard :notebook="nb" :compact="compactMembers">
           <template #cardHeader>
             <span class="daisy-flex daisy-justify-end daisy-p-0">
               <SubscriptionNoteButtons
@@ -127,7 +128,7 @@ import NotebookButtons from "./NotebookButtons.vue"
 import NotebookCard from "../notebooks/NotebookCard.vue"
 import NotebookListRow from "./NotebookListRow.vue"
 import SubscriptionNoteButtons from "../subscriptions/SubscriptionNoteButtons.vue"
-import { groupMemberHint } from "./groupMemberHint"
+import { groupCatalogMemberPreviewHint } from "./groupMemberHint"
 
 const props = defineProps({
   group: {
@@ -150,6 +151,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  memberPreviewLimit: {
+    type: Number as PropType<number | null>,
+    default: null,
+  },
+  catalogFilterActive: {
+    type: Boolean,
+    default: false,
+  },
+  compactMembers: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 defineEmits<{
@@ -160,7 +173,23 @@ defineEmits<{
 const headerLinkClassList =
   "daisy-block daisy-rounded-md daisy-no-underline daisy-text-inherit daisy-outline-offset-2 hover:daisy-bg-primary/10"
 
-const hint = computed(() => groupMemberHint(props.group.notebooks))
+const previewNotebooks = computed(() => {
+  const all = props.group.notebooks
+  const lim = props.memberPreviewLimit
+  if (lim === null) {
+    return all
+  }
+  return all.slice(0, lim)
+})
+
+const hint = computed(() =>
+  groupCatalogMemberPreviewHint({
+    groupName: props.group.name,
+    notebooks: props.group.notebooks,
+    memberPreviewLimit: props.memberPreviewLimit,
+    catalogFilterActive: props.catalogFilterActive,
+  })
+)
 
 function subscriptionForNotebook(notebookId: number): Subscription | undefined {
   return props.subscriptions.find((s) => s.notebook?.id === notebookId)

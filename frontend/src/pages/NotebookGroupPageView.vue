@@ -52,6 +52,8 @@
         :subscriptions="subscriptions"
         :user="user"
         :header-navigates-to-group="false"
+        :member-preview-limit="null"
+        compact-members
         @notebook-updated="emit('notebook-updated', $event)"
         @refresh="emit('refresh')"
       />

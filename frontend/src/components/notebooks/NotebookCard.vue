@@ -1,16 +1,23 @@
 <template>
-  <div class="notebook-card">
+  <div class="notebook-card" :class="{ 'notebook-card--compact': compact }">
     <div class="notebook-binding"></div>
     <slot name="cardHeader" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
       class="no-underline"
     >
-      <div class="daisy-p-4">
-        <h5 class="daisy-text-lg daisy-font-semibold">
+      <div :class="compact ? 'daisy-p-2' : 'daisy-p-4'">
+        <h5
+          class="daisy-font-semibold"
+          :class="compact ? 'daisy-text-sm' : 'daisy-text-lg'"
+        >
           {{ notebook.title }}
         </h5>
-        <p v-if="notebook.shortDetails" class="note-short-details">
+        <p
+          v-if="notebook.shortDetails"
+          class="note-short-details"
+          :class="{ 'note-short-details--compact': compact }"
+        >
           {{ notebook.shortDetails }}
         </p>
       </div>
@@ -24,6 +31,7 @@ import type { Notebook } from "@generated/doughnut-backend-api"
 
 defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
+  compact: { type: Boolean, default: false },
 })
 </script>
 
@@ -74,5 +82,14 @@ defineProps({
 .note-short-details {
   color: oklch(var(--bc) / 0.6);
   line-height: 2rem; /* Align with ruled lines */
+}
+
+.notebook-card--compact {
+  margin-bottom: 0;
+}
+
+.note-short-details--compact {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
 }
 </style>

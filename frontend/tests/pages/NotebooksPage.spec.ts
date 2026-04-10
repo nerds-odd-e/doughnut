@@ -396,11 +396,16 @@ describe("Notebooks Page", () => {
 
       await flushPromises()
 
-      expect(wrapper.text()).toContain("Member Alpha, Member Beta, and 2 more")
+      expect(wrapper.text()).toContain("Showing 3 of 4 notebooks")
 
       const groupCard = wrapper.find('[data-cy="notebook-group-card"]')
       expect(groupCard.exists()).toBe(true)
       expect(groupCard.classes()).toContain("notebook-catalog-group")
+      expect(groupCard.findAll(".notebook-list-row").length).toBe(3)
+      expect(groupCard.text()).toContain("Member Alpha")
+      expect(groupCard.text()).toContain("Member Beta")
+      expect(groupCard.text()).toContain("Member Gamma")
+      expect(groupCard.text()).not.toContain("Member Delta")
       expect(groupCard.attributes("aria-label")).toContain("Member Alpha")
       expect(groupCard.attributes("aria-label")).toContain("Member Delta")
     })
@@ -509,9 +514,33 @@ describe("Notebooks Page", () => {
       await wrapper.find("#notebook-filter-input").setValue("api")
 
       expect(wrapper.text()).toContain("Design Group")
-      expect(wrapper.text()).toContain("UI Patterns")
+      expect(wrapper.text()).not.toContain("UI Patterns")
       expect(wrapper.text()).toContain("API Notes")
       expect(wrapper.text()).not.toContain("Other notebook")
+    })
+
+    it("caps filtered matching members at three with matching count subtitle", async () => {
+      const catalogItems = makeMe.notebookCatalog
+        .group("Batch", "X One", "X Two", "X Three", "X Four")
+        .please()
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions: [],
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+      await wrapper.find("#notebook-filter-input").setValue("x ")
+
+      const groupCard = wrapper.get('[data-cy="notebook-group-card"]')
+      expect(groupCard.findAll(".notebook-list-row").length).toBe(3)
+      expect(groupCard.text()).toContain("Showing 3 of 4 matching notebooks")
     })
 
     it("restores full list after clearing filter", async () => {

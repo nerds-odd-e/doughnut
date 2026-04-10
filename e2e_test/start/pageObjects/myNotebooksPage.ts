@@ -57,9 +57,10 @@ const myNotebooksPage = () => {
       groupName: string,
       hintSubstring: string
     ) {
-      cy.contains('[data-cy="notebook-group-card"]', groupName)
-        .find('p')
-        .should('contain.text', hintSubstring)
+      cy.contains('[data-cy="notebook-group-card"]', groupName).should(
+        'contain.text',
+        hintSubstring
+      )
       return this as any
     },
     openNotebookGroupFromHeader(groupName: string) {

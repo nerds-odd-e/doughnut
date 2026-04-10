@@ -35,6 +35,9 @@
         :layout="layout"
         :subscriptions="subscriptions"
         :user="user"
+        :member-preview-limit="memberPreviewLimit"
+        :catalog-filter-active="catalogFilterActive"
+        compact-members
         header-navigates-to-group
         @notebook-updated="$emit('notebook-updated', $event)"
         @refresh="$emit('refresh')"
@@ -92,6 +95,9 @@
         :layout="layout"
         :subscriptions="subscriptions"
         :user="user"
+        :member-preview-limit="memberPreviewLimit"
+        :catalog-filter-active="catalogFilterActive"
+        compact-members
         header-navigates-to-group
         @notebook-updated="$emit('notebook-updated', $event)"
         @refresh="$emit('refresh')"
@@ -130,6 +136,14 @@ const props = defineProps({
   user: {
     type: Object as PropType<User>,
     required: true,
+  },
+  catalogFilterActive: {
+    type: Boolean,
+    default: false,
+  },
+  memberPreviewLimit: {
+    type: Number as PropType<number | null>,
+    default: 3,
   },
 })
 
