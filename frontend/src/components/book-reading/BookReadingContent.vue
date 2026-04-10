@@ -206,12 +206,23 @@ function performSnapBack(): void {
   if (!sel || sel.allBboxes.length <= 1) return
   const lastBbox = sel.allBboxes[sel.allBboxes.length - 1]!
   snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
-  pdfViewerRef.value?.snapToContentBottomAndHold(
-    lastBbox.pageIndex,
-    (lastBbox.bbox as number[])[3]!,
-    READING_PANEL_OBSTRUCTION_PX,
-    SNAP_HOLD_MS
-  )
+  const parsedStart = parsePdfOutlineV1Anchor(sel.startAnchor)
+  if (parsedStart !== null && parsedStart.pageIndex === lastBbox.pageIndex) {
+    pdfViewerRef.value
+      ?.scrollToPdfOutlineV1Target(
+        parsedStart,
+        wireItemsToNavigationTargets(sel.allBboxes)
+      )
+      .then(() => pdfViewerRef.value?.suppressScrollInput(SNAP_HOLD_MS))
+      .catch(() => undefined)
+  } else {
+    pdfViewerRef.value?.snapToContentBottomAndHold(
+      lastBbox.pageIndex,
+      (lastBbox.bbox as number[])[3]!,
+      READING_PANEL_OBSTRUCTION_PX,
+      SNAP_HOLD_MS
+    )
+  }
 }
 
 function selectedBlockHasSuccessorAndNoDisposition(): {
@@ -396,6 +407,7 @@ const pdfViewerRef = ref<{
     obstructionPx: number,
     holdMs: number
   ) => void
+  suppressScrollInput: (holdMs: number) => void
   zoomIn: () => void
   zoomOut: () => void
   isLastContentBottomVisible: (

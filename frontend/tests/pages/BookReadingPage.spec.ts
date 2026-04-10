@@ -838,6 +838,35 @@ describe("BookReadingPage", () => {
         return vi.spyOn(exposed, "snapToContentBottomAndHold")
       }
 
+      function spyOnSuppressScrollInput(wrapper: BookReadingPageWrapper) {
+        const pdf = wrapper.findComponent(PdfBookViewer)
+        const exposed = (
+          pdf.vm as unknown as {
+            $: { exposed: { suppressScrollInput: (holdMs: number) => void } }
+          }
+        ).$.exposed
+        return vi.spyOn(exposed, "suppressScrollInput")
+      }
+
+      function stubGetBookWithFirstBlockHavingCrossPageBbox() {
+        const anchors = makeMe.bookReadingTopMathsLikeAnchors()
+        const crossPageContentBbox = { pageIndex: 1, bbox: [10, 100, 500, 150] }
+        const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
+          id: i + 1,
+          title: `Section ${i + 1}`,
+          startAnchor,
+          siblingOrder: i,
+          hasDirectContent: true,
+          // Section 1: anchor on page 0, direct-content bbox on page 1 (cross-page)
+          allBboxes: i === 0 ? [anchorBbox, crossPageContentBbox] : [],
+        }))
+        vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+          wrapSdkResponse(
+            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+          )
+        )
+      }
+
       it("shows the panel when last content bottom is visible and above obstruction", async () => {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
@@ -921,13 +950,14 @@ describe("BookReadingPage", () => {
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
-      it("snaps back and keeps panel visible on first boundary crossing", async () => {
+      it("snaps back and keeps panel visible on first boundary crossing (same-page: scrolls to block start)", async () => {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        const snapSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
+        const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -944,7 +974,7 @@ describe("BookReadingPage", () => {
         })
         expect(readingControlPanel(wrapper).exists()).toBe(true)
 
-        // mid=200 → Section 2 (successor) becomes current → snap fires, panel stays
+        // mid=200 → Section 2 (successor) becomes current → same-page snap fires, panel stays
         mockIsLastContentBottomVisible(wrapper, false)
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -952,8 +982,10 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        // contentBbox.bbox[3] = 750, READING_PANEL_OBSTRUCTION_PX = 80, SNAP_HOLD_MS = 500
-        expect(snapSpy).toHaveBeenCalledWith(0, 750, 80, 500)
+        // same-page: scrolls to block start via scrollToPdfOutlineV1Target, then suppresses scroll
+        expect(suppressSpy).toHaveBeenCalledWith(500)
+        // cross-page snap-to-bottom path not used
+        expect(snapToBottomSpy).not.toHaveBeenCalled()
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
@@ -963,7 +995,6 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        spyOnSnapToContentBottomAndHold(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1039,7 +1070,7 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         // geometry never becomes true
         mockIsLastContentBottomVisible(wrapper, false)
-        const snapSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1055,7 +1086,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        expect(snapSpy).not.toHaveBeenCalled()
+        expect(suppressSpy).not.toHaveBeenCalled()
         // current block commits normally via fallback
         expect(wrapper.find('[data-current-block="true"]').text()).toBe(
           "Section 2"
@@ -1080,7 +1111,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        const snapSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         // Block 1 is READ so its text is "Section 1 Marked as read"; click directly
         const section1Row = wrapper
@@ -1106,7 +1137,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        expect(snapSpy).not.toHaveBeenCalled()
+        expect(suppressSpy).not.toHaveBeenCalled()
         expect(wrapper.find('[data-current-block="true"]').text()).toBe(
           "Section 2"
         )
@@ -1118,7 +1149,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        const snapSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1139,7 +1170,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(snapSpy).toHaveBeenCalledTimes(1)
+        expect(suppressSpy).toHaveBeenCalledTimes(1)
 
         // Select Section 2 (resets snap state), geometry passes, then Section 3 crossing
         await clickBookBlockByTitle(wrapper, "Section 2")
@@ -1149,7 +1180,42 @@ describe("BookReadingPage", () => {
           )
         )
         // Section 2 has no allBboxes so no snap for it — just confirm state cleared
-        expect(snapSpy).toHaveBeenCalledTimes(1)
+        expect(suppressSpy).toHaveBeenCalledTimes(1)
+      })
+
+      it("snaps to last bbox bottom when start anchor and last content bbox are on different pages", async () => {
+        stubGetBookWithFirstBlockHavingCrossPageBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // geometry passes for Section 1
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // first crossing: successor becomes current → cross-page snap uses bbox bottom
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        // cross-page: snapToContentBottomAndHold called with last bbox (pageIndex=1, bottom=150)
+        expect(snapToBottomSpy).toHaveBeenCalledWith(1, 150, 80, 500)
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
     })
 

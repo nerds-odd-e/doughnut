@@ -420,6 +420,18 @@ function isLastContentBottomVisible(
   return bboxBottomClient < panelTop && bboxBottomClient > containerRect.top
 }
 
+/** Suppresses wheel/touch-move scroll input for `holdMs` milliseconds. */
+function suppressScrollInput(holdMs: number): void {
+  if (scrollSuppressTimer !== null) {
+    clearTimeout(scrollSuppressTimer)
+  }
+  scrollSuppressed = true
+  scrollSuppressTimer = setTimeout(() => {
+    scrollSuppressed = false
+    scrollSuppressTimer = null
+  }, holdMs)
+}
+
 /**
  * Scrolls so the bottom of the given bbox sits just above `obstructionPx` from the container
  * bottom, then suppresses wheel/touch-move scroll input for `holdMs` milliseconds so trailing
@@ -448,15 +460,7 @@ function snapToContentBottomAndHold(
     pageRect.top + (normalizedBboxBottom / 1000) * pageRect.height
   const targetClient = containerRect.bottom - obstructionPx
   container.scrollTop += bboxBottomClient - targetClient
-
-  if (scrollSuppressTimer !== null) {
-    clearTimeout(scrollSuppressTimer)
-  }
-  scrollSuppressed = true
-  scrollSuppressTimer = setTimeout(() => {
-    scrollSuppressed = false
-    scrollSuppressTimer = null
-  }, holdMs)
+  suppressScrollInput(holdMs)
 }
 
 defineExpose({
@@ -464,6 +468,7 @@ defineExpose({
   highlightBlockSelection,
   scrollToStoredReadingPosition,
   snapToContentBottomAndHold,
+  suppressScrollInput,
   zoomIn,
   zoomOut,
   isLastContentBottomVisible,
