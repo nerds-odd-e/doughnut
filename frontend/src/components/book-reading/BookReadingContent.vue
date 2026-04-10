@@ -219,17 +219,17 @@ const READING_PANEL_OBSTRUCTION_PX = 80
 const props = defineProps<{
   book: BookFull
   notebookId: number
+  pdfLoading: boolean
+  pdfError: string | null
+  bookPdfBytes: ArrayBuffer | null
+  initialLastRead: { pageIndexZeroBased: number; normalizedY: number } | null
+}>()
+
+const emit = defineEmits<{
+  pdfLoadError: [message: string]
 }>()
 
 const bookReading = useNotebookBookReadingRecords(() => props.notebookId)
-
-function notebookBookFilePath(notebookId: number) {
-  return `/api/notebooks/${notebookId}/book/file`
-}
-
-const bookPdfBytes = ref<ArrayBuffer | null>(null)
-const pdfLoading = ref(false)
-const pdfError = ref<string | null>(null)
 
 const pdfBarCurrentPage = ref<number | null>(null)
 const pdfBarPagesTotal = ref<number | null>(null)
@@ -256,7 +256,7 @@ const isMdOrLarger = computed(
 )
 
 function onPdfLoadError(message: string) {
-  pdfError.value = message
+  emit("pdfLoadError", message)
   resetPdfPageIndicator()
 }
 
@@ -511,11 +511,6 @@ watch(blockAwaitingConfirmation, (block) => {
   )
 })
 
-const initialLastRead = ref<{
-  pageIndexZeroBased: number
-  normalizedY: number
-} | null>(null)
-
 const pdfViewerRef = ref<{
   scrollToPdfOutlineV1Target: (
     target: PdfOutlineV1NavigationTarget,
@@ -577,7 +572,7 @@ async function markSelectedDisposition(status: BookBlockReadingDisposition) {
 }
 
 function onPagesReady() {
-  const snap = initialLastRead.value
+  const snap = props.initialLastRead
   if (!snap) return
   pdfViewerRef.value
     ?.scrollToStoredReadingPosition(snap.pageIndexZeroBased, snap.normalizedY)
@@ -593,47 +588,8 @@ onMounted(async () => {
   if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
     bookLayoutOpened.value = true
   }
-
   flatBookBlocks.value = buildFlatBookBlocks(props.book.blocks ?? [])
-  if (props.book.hasSourceFile) {
-    pdfLoading.value = true
-    pdfError.value = null
-    resetPdfPageIndicator()
-    try {
-      const [res, posResult] = await Promise.all([
-        fetch(notebookBookFilePath(props.notebookId), {
-          credentials: "same-origin",
-        }),
-        NotebookBooksController.getNotebookBookReadingPosition({
-          path: { notebook: props.notebookId },
-        }).catch(() => null),
-        bookReading.syncFromServer(),
-      ])
-      if (!res.ok) {
-        pdfError.value = "Could not load the book file."
-        return
-      }
-      if (
-        posResult !== null &&
-        !posResult.error &&
-        posResult.data &&
-        typeof posResult.data.pageIndex === "number" &&
-        typeof posResult.data.normalizedY === "number"
-      ) {
-        initialLastRead.value = {
-          pageIndexZeroBased: posResult.data.pageIndex,
-          normalizedY: posResult.data.normalizedY,
-        }
-      }
-      bookPdfBytes.value = await res.arrayBuffer()
-    } catch {
-      pdfError.value = "Could not load the book file."
-    } finally {
-      pdfLoading.value = false
-    }
-  } else {
-    await bookReading.syncFromServer()
-  }
+  await bookReading.syncFromServer()
 })
 
 onBeforeUnmount(() => {
