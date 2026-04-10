@@ -12,10 +12,9 @@ public final class BookBlockContentBboxes {
 
   private BookBlockContentBboxes() {}
 
-  public static List<BookBlockContentBboxItem> allBboxes(
-      String anchorValue, List<BookContentBlock> orderedBlocks) {
-    List<BookBlockContentBboxItem> out = new ArrayList<>();
-    BookBlockContentBboxItem anchorItem = fromRaw(anchorValue);
+  public static List<PageBbox> allBboxes(String anchorValue, List<BookContentBlock> orderedBlocks) {
+    List<PageBbox> out = new ArrayList<>();
+    PageBbox anchorItem = fromRaw(anchorValue);
     if (anchorItem != null) {
       out.add(anchorItem);
     }
@@ -24,7 +23,7 @@ public final class BookBlockContentBboxes {
         if (!BookBlockDirectContentPredicate.contributesDirectContent(cb)) {
           continue;
         }
-        BookBlockContentBboxItem item = fromRaw(cb.getRawData());
+        PageBbox item = fromRaw(cb.getRawData());
         if (item != null) {
           out.add(item);
         }
@@ -33,7 +32,7 @@ public final class BookBlockContentBboxes {
     return List.copyOf(out);
   }
 
-  private static BookBlockContentBboxItem fromRaw(String rawData) {
+  private static PageBbox fromRaw(String rawData) {
     if (rawData == null || rawData.isBlank()) {
       return null;
     }
@@ -69,7 +68,7 @@ public final class BookBlockContentBboxes {
       if (x0 >= x1 || y0 >= y1) {
         return null;
       }
-      return new BookBlockContentBboxItem(pageIndex, List.copyOf(bbox));
+      return new PageBbox(pageIndex, List.copyOf(bbox));
     } catch (Exception e) {
       return null;
     }

@@ -87,7 +87,7 @@
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type {
   BookAnchorFull,
-  BookBlockContentBboxItemFull,
+  PageBboxFull,
 } from "@generated/doughnut-backend-api"
 import { ref, watch } from "vue"
 
@@ -97,7 +97,7 @@ export type BookReadingBookLayoutBlockRow = {
   depth: number
   startAnchor: BookAnchorFull
   hasDirectContent: boolean
-  allBboxes: BookBlockContentBboxItemFull[]
+  allBboxes: PageBboxFull[]
 }
 
 const opened = defineModel<boolean>("opened", { required: true })

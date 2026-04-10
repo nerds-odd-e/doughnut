@@ -3810,20 +3810,6 @@ components:
       required:
       - id
       - value
-    BookBlockContentBboxItem_Full:
-      type: object
-      properties:
-        pageIndex:
-          type: integer
-          format: int32
-        bbox:
-          type: array
-          items:
-            type: number
-            format: double
-      required:
-      - bbox
-      - pageIndex
     BookBlock_Full:
       type: object
       properties:
@@ -3844,7 +3830,7 @@ components:
         allBboxes:
           type: array
           items:
-            $ref: "#/components/schemas/BookBlockContentBboxItem_Full"
+            $ref: "#/components/schemas/PageBbox_Full"
       required:
       - id
       - startAnchor
@@ -3877,6 +3863,20 @@ components:
       - format
       - id
       - notebookId
+    PageBbox_Full:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          format: int32
+        bbox:
+          type: array
+          items:
+            type: number
+            format: double
+      required:
+      - bbox
+      - pageIndex
     NotebookCertificateApproval:
       type: object
       properties:

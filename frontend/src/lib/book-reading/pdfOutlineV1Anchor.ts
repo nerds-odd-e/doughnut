@@ -83,7 +83,7 @@ export function parsePdfOutlineV1Anchor(
 }
 
 /**
- * Convert `allBboxes` wire items (from `BookBlockFull.allBboxes`) to navigation targets.
+ * Convert `allBboxes` wire items (`PageBboxFull` from `BookBlockFull.allBboxes`) to navigation targets.
  * The server pre-validates these; we still guard against malformed items defensively.
  */
 export function wireItemsToNavigationTargets(

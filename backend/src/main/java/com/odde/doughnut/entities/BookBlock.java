@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.BookAnchorFullWire;
-import com.odde.doughnut.services.book.BookBlockContentBboxItem;
 import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.BookBlockDirectContentPredicate;
+import com.odde.doughnut.services.book.PageBbox;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)
-  public List<BookBlockContentBboxItem> getAllBboxes() {
+  public List<PageBbox> getAllBboxes() {
     return BookBlockContentBboxes.allBboxes(startAnchorValue, contentBlocks);
   }
 }

@@ -65,7 +65,7 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 **Notes for implementation shape:**
 
-- The condition is: `lastBbox.pageIndex === startAnchor.pageIndex` (start anchor parsed page index equals last content bbox page index).
+- The condition is: `lastBbox.pageIndex === startAnchor.pageIndex` (start anchor parsed page index equals last content bbox page index), where **`lastBbox`** is the last **`PageBbox`** in the block’s **`allBboxes`** array from **`GET …/book`**.
 - The "block start" scroll target is the existing `scrollToPdfOutlineV1Target` path used by `applyBookBlockSelection` — reuse that, not a new coordinate calculation.
 - `snapToContentBottomAndHold` in `PdfBookViewer` still handles the suppression window; the scroll target is just chosen differently before the call, or a new exposed method handles both.
 - No change to the snap attempt counter or suppression duration.

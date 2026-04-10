@@ -2,7 +2,7 @@
 
 **Scope:** The **single** user-experience and interface direction for book reading in Doughnut: **Story 2** layout (drawer, book layout ↔ PDF sync, show/hide structure), **mobile-realistic** reading, and **reading record** surfaces (including the **Reading Control Panel**). **This file is guidance only** — apply it when implementing features; it does not replace delivery plans or tests.
 
-**Related:** Architecture and vocabulary — [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (*Story 2 — Read a block*, **direct content**, `ReadingRecord`; **`BookAnchor`** is a single **`value`** string — PDF MinerU outline v1 JSON for navigation). Shipped milestones for the block reader — [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md). Reading record delivery — [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md).
+**Related:** Architecture and vocabulary — [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md) (*Story 2 — Read a block*, **direct content**, `ReadingRecord`; **`BookAnchor`** is a single **`value`** string — PDF MinerU outline v1 JSON for navigation; per-block **`allBboxes`** is an ordered list of **`PageBbox`** — start anchor first, then direct-content regions). Shipped milestones for the block reader — [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md). Reading record delivery — [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md).
 
 ---
 
