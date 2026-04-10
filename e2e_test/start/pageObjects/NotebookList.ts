@@ -40,6 +40,15 @@ export const notebookList = () => {
   }
 }
 
+const OVERFLOW_MENU_ACTION_NAMES = [
+  'Edit notebook settings',
+  'Edit subscription',
+] as const
+
+function usesCatalogOverflowMenu(name: string): boolean {
+  return (OVERFLOW_MENU_ACTION_NAMES as readonly string[]).includes(name)
+}
+
 export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
     pageIsNotLoading()
@@ -55,15 +64,26 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
       })
       .then(($cards) => {
         expect($cards.length).to.be.greaterThan(0)
-        const preferredCards = $cards.filter((_index, card) => {
-          const $card = Cypress.$(card)
-          return $card.find(`button[title="${name}"]`).length > 0
-        })
+        const preferredCards = usesCatalogOverflowMenu(name)
+          ? $cards
+          : $cards.filter((_index, card) => {
+              const $card = Cypress.$(card)
+              return $card.find(`button[title="${name}"]`).length > 0
+            })
         const targetCard =
           preferredCards.length > 0 ? preferredCards.first() : $cards.first()
 
         return cy.wrap(targetCard)
       })
+      .as('notebookCatalogCard')
+      .then(() => {
+        if (usesCatalogOverflowMenu(name)) {
+          cy.get('@notebookCatalogCard')
+            .find('[data-cy="notebook-catalog-overflow"]')
+            .click()
+        }
+      })
+      .get('@notebookCatalogCard')
       .findByRole('button', { name: name })
   }
 

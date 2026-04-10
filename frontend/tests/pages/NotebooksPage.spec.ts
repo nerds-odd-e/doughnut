@@ -629,6 +629,12 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       expect(wrapper.find('button[title="Unsubscribe"]').exists()).toBe(true)
+      const overflowTriggers = wrapper.findAll(
+        '[data-cy="notebook-catalog-overflow"]'
+      )
+      expect(overflowTriggers.length).toBeGreaterThanOrEqual(2)
+      await overflowTriggers[1]!.trigger("click")
+      await flushPromises()
       expect(wrapper.find('button[title="Edit subscription"]').exists()).toBe(
         true
       )
@@ -670,6 +676,17 @@ describe("Notebooks Page", () => {
 
       const unsubButtons = wrapper.findAll('button[title="Unsubscribe"]')
       expect(unsubButtons.length).toBe(1)
+      const subMemberCard = wrapper
+        .findAll('[data-cy="notebook-card"]')
+        .find((c) => c.text().includes("Subscribed In Group"))
+      expect(subMemberCard?.exists()).toBe(true)
+      await subMemberCard!
+        .find('[data-cy="notebook-catalog-overflow"]')
+        .trigger("click")
+      await flushPromises()
+      expect(
+        subMemberCard!.find('button[title="Edit subscription"]').exists()
+      ).toBe(true)
     })
   })
 })
