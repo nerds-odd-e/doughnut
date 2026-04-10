@@ -106,7 +106,7 @@
                   : undefined
               "
               :data-current-selection="
-                block.id === currentSelectionBlockId ? 'true' : undefined
+                block.id === selectedBlockId ? 'true' : undefined
               "
               :data-direct-content-read="
                 bookReading.dispositionForBlock(block.id) === 'READ'
@@ -206,6 +206,7 @@ import { createCurrentBlockAnchorDebouncer } from "@/lib/book-reading/debounceCu
 import { nextLiveAnnouncementText } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockAnchorIdFromAnchorPage } from "@/lib/book-reading/currentBlockAnchorFromAnchorPage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import { useBookReadingBlockSelection } from "@/composables/useBookReadingBlockSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type {
@@ -304,11 +305,12 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
 
 const flatBookBlocks = ref<BookBlockRow[]>([])
 const bookBlockRows = computed(() => flatBookBlocks.value)
-const currentSelectionBlockId = ref<number | null>(null)
 const currentBlockAnchorId = ref<number | null>(null)
 
+const selectedBlockId = ref<number | null>(null)
+
 const readingControlSelectedBlockTitle = computed(() => {
-  const selId = currentSelectionBlockId.value
+  const selId = selectedBlockId.value
   if (selId === null) {
     return ""
   }
@@ -316,7 +318,7 @@ const readingControlSelectedBlockTitle = computed(() => {
 })
 
 const readingControlPanelVisible = computed(() => {
-  const selId = currentSelectionBlockId.value
+  const selId = selectedBlockId.value
   const curAnchorId = currentBlockAnchorId.value
   if (selId === null || curAnchorId === null) {
     return false
@@ -333,21 +335,6 @@ const readingControlPanelVisible = computed(() => {
   return successor.startAnchor.id === curAnchorId
 })
 
-async function markSelectedDisposition(status: BookBlockReadingDisposition) {
-  const id = currentSelectionBlockId.value
-  if (id === null) {
-    return
-  }
-  const ok = await bookReading.submitReadingDisposition(id, status)
-  if (!ok) {
-    return
-  }
-  const rows = bookBlockRows.value
-  const selIdx = rows.findIndex((r) => r.id === id)
-  if (selIdx >= 0 && selIdx < rows.length - 1) {
-    currentSelectionBlockId.value = rows[selIdx + 1]!.id
-  }
-}
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
 
@@ -468,6 +455,42 @@ const pdfViewerRef = ref<{
   zoomOut: () => void
 } | null>(null)
 
+async function applyBookBlockSelection(block: BookBlockRow) {
+  const parsed = parsePdfOutlineV1Anchor(block.startAnchor)
+  if (parsed === null) {
+    return
+  }
+  selectedBlockId.value = block.id
+  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed)
+  currentBlockAnchorDebouncer.commitNow(block.startAnchor.id)
+}
+
+useBookReadingBlockSelection({
+  bookBlockRows: () => bookBlockRows.value,
+  currentBlockAnchorId,
+  onDwellSelectBlock: (row) => {
+    Promise.resolve(applyBookBlockSelection(row as BookBlockRow)).catch(
+      () => undefined
+    )
+  },
+})
+
+async function markSelectedDisposition(status: BookBlockReadingDisposition) {
+  const id = selectedBlockId.value
+  if (id === null) {
+    return
+  }
+  const ok = await bookReading.submitReadingDisposition(id, status)
+  if (!ok) {
+    return
+  }
+  const rows = bookBlockRows.value
+  const selIdx = rows.findIndex((r) => r.id === id)
+  if (selIdx >= 0 && selIdx < rows.length - 1) {
+    await applyBookBlockSelection(rows[selIdx + 1]!)
+  }
+}
+
 function onPagesReady() {
   const snap = initialLastRead.value
   if (!snap) return
@@ -477,13 +500,7 @@ function onPagesReady() {
 }
 
 async function onBookBlockClick(block: BookBlockRow) {
-  const parsed = parsePdfOutlineV1Anchor(block.startAnchor)
-  if (parsed === null) {
-    return
-  }
-  currentSelectionBlockId.value = block.id
-  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed)
-  currentBlockAnchorDebouncer.commitNow(block.startAnchor.id)
+  await applyBookBlockSelection(block)
 }
 
 onMounted(async () => {
