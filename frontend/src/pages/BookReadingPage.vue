@@ -3,24 +3,43 @@
     data-testid="book-reading-page"
     class="book-reading-page daisy-flex daisy-flex-col daisy-h-full daisy-min-h-0"
   >
-    <BookReadingContent
-      v-if="book"
-      :book="book"
-      :notebook-id="props.notebookId"
-      :pdf-loading="pdfLoading"
-      :pdf-error="pdfError"
-      :book-pdf-bytes="bookPdfBytes"
-      :initial-last-read="initialLastRead"
-      @pdf-load-error="(msg) => (pdfError = msg)"
-    />
+    <template v-if="book">
+      <div
+        v-if="book.hasSourceFile && pdfLoading"
+        class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-flex-col"
+      >
+        <div class="daisy-px-2 daisy-py-2 sm:daisy-px-4 daisy-flex-1">
+          <ContentLoader />
+        </div>
+      </div>
+      <div
+        v-else-if="book.hasSourceFile && bookFileLoadError"
+        class="daisy-px-2 daisy-py-2 sm:daisy-px-4"
+      >
+        <div
+          class="daisy-alert daisy-alert-error daisy-mb-2 daisy-mx-2 daisy-mt-2"
+          data-testid="book-reading-book-file-load-error"
+        >
+          {{ bookFileLoadError }}
+        </div>
+      </div>
+      <BookReadingContent
+        v-else
+        :book="book"
+        :notebook-id="props.notebookId"
+        :book-pdf-bytes="contentPdfBytes"
+        :initial-last-read="initialLastRead"
+      />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -33,11 +52,16 @@ function notebookBookFilePath(notebookId: number) {
 const book = ref<BookFull | null>(null)
 const bookPdfBytes = ref<ArrayBuffer | null>(null)
 const pdfLoading = ref(false)
-const pdfError = ref<string | null>(null)
+const bookFileLoadError = ref<string | null>(null)
 const initialLastRead = ref<{
   pageIndexZeroBased: number
   normalizedY: number
 } | null>(null)
+
+const contentPdfBytes = computed(() => {
+  if (!book.value?.hasSourceFile) return undefined
+  return bookPdfBytes.value ?? undefined
+})
 
 onMounted(async () => {
   const { data, error } = await NotebookBooksController.getBook({
@@ -47,7 +71,7 @@ onMounted(async () => {
     book.value = data
     if (data.hasSourceFile) {
       pdfLoading.value = true
-      pdfError.value = null
+      bookFileLoadError.value = null
       try {
         const [res, posResult] = await Promise.all([
           fetch(notebookBookFilePath(props.notebookId), {
@@ -58,7 +82,7 @@ onMounted(async () => {
           }).catch(() => null),
         ])
         if (!res.ok) {
-          pdfError.value = "Could not load the book file."
+          bookFileLoadError.value = "Could not load the book file."
           return
         }
         if (
@@ -75,7 +99,7 @@ onMounted(async () => {
         }
         bookPdfBytes.value = await res.arrayBuffer()
       } catch {
-        pdfError.value = "Could not load the book file."
+        bookFileLoadError.value = "Could not load the book file."
       } finally {
         pdfLoading.value = false
       }

@@ -222,7 +222,9 @@ describe("BookReadingPage", () => {
     const wrapper = mountBookReadingPage(notebookId)
     await flushPromises()
 
-    const err = wrapper.find('[data-testid="book-reading-pdf-error"]')
+    const err = wrapper.find(
+      '[data-testid="book-reading-book-file-load-error"]'
+    )
     expect(err.exists()).toBe(true)
     expect(err.text()).toBe("Could not load the book file.")
     expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
@@ -239,7 +241,12 @@ describe("BookReadingPage", () => {
 
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
     expect(
-      wrapper.find('[data-testid="book-reading-pdf-error"]').exists()
+      wrapper.find('[data-testid="book-reading-book-file-load-error"]').exists()
+    ).toBe(false)
+    expect(
+      wrapper
+        .find('[data-testid="book-reading-pdf-viewer-load-error"]')
+        .exists()
     ).toBe(false)
   })
 
@@ -296,15 +303,17 @@ describe("BookReadingPage", () => {
     await vi.waitFor(
       () => {
         expect(
-          wrapper.find('[data-testid="book-reading-pdf-error"]').exists()
+          wrapper
+            .find('[data-testid="book-reading-pdf-viewer-load-error"]')
+            .exists()
         ).toBe(true)
       },
       { timeout: 5000 }
     )
 
-    expect(wrapper.find('[data-testid="book-reading-pdf-error"]').text()).toBe(
-      "This file is not a valid PDF."
-    )
+    expect(
+      wrapper.find('[data-testid="book-reading-pdf-viewer-load-error"]').text()
+    ).toBe("This file is not a valid PDF.")
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 

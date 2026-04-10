@@ -150,19 +150,13 @@
     </aside>
     <main class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-relative">
       <div
-        v-if="pdfLoading"
-        class="daisy-px-2 daisy-py-2 sm:daisy-px-4"
-      >
-        <ContentLoader />
-      </div>
-      <div
-        v-else-if="pdfError"
+        v-if="pdfViewerLoadError"
         class="daisy-alert daisy-alert-error daisy-mb-2 daisy-mx-2 daisy-mt-2"
-        data-testid="book-reading-pdf-error"
+        data-testid="book-reading-pdf-viewer-load-error"
       >
-        {{ pdfError }}
+        {{ pdfViewerLoadError }}
       </div>
-      <template v-else-if="bookPdfBytes">
+      <template v-else-if="bookPdfBytes !== undefined">
         <PdfBookViewer
           ref="pdfViewerRef"
           :pdf-bytes="bookPdfBytes"
@@ -183,7 +177,6 @@
 </template>
 
 <script setup lang="ts">
-import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
@@ -219,17 +212,20 @@ const READING_PANEL_OBSTRUCTION_PX = 80
 const props = defineProps<{
   book: BookFull
   notebookId: number
-  pdfLoading: boolean
-  pdfError: string | null
-  bookPdfBytes: ArrayBuffer | null
+  bookPdfBytes?: ArrayBuffer
   initialLastRead: { pageIndexZeroBased: number; normalizedY: number } | null
 }>()
 
-const emit = defineEmits<{
-  pdfLoadError: [message: string]
-}>()
-
 const bookReading = useNotebookBookReadingRecords(() => props.notebookId)
+
+const pdfViewerLoadError = ref<string | null>(null)
+
+watch(
+  () => props.bookPdfBytes,
+  () => {
+    pdfViewerLoadError.value = null
+  }
+)
 
 const pdfBarCurrentPage = ref<number | null>(null)
 const pdfBarPagesTotal = ref<number | null>(null)
@@ -256,7 +252,7 @@ const isMdOrLarger = computed(
 )
 
 function onPdfLoadError(message: string) {
-  emit("pdfLoadError", message)
+  pdfViewerLoadError.value = message
   resetPdfPageIndicator()
 }
 
