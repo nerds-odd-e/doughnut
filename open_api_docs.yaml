@@ -3851,8 +3851,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BookBlockContentBboxItem_Full"
-        lastDirectContentBbox:
-          $ref: "#/components/schemas/BookBlockContentBboxItem_Full"
       required:
       - id
       - startAnchor

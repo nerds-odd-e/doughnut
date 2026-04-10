@@ -276,7 +276,6 @@ type BookBlockRow = {
   startAnchor: BookAnchorFull
   hasDirectContent: boolean
   allBboxes: BookBlockContentBboxItemFull[]
-  lastDirectContentBbox: BookBlockContentBboxItemFull | null
 }
 
 function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
@@ -302,7 +301,6 @@ function buildFlatBookBlocks(blocks: BookBlockFull[]): BookBlockRow[] {
         startAnchor: child.startAnchor,
         hasDirectContent: child.hasDirectContent ?? true,
         allBboxes: child.allBboxes ?? [],
-        lastDirectContentBbox: child.lastDirectContentBbox ?? null,
       })
       visit(child.id, depth + 1)
     }
@@ -349,12 +347,16 @@ function updateReadingControlPanelVisible() {
   const { selId, successor } = context
   const rows = bookBlockRows.value
   const sel = rows.find((r) => r.id === selId)!
-  const lastBbox = sel.lastDirectContentBbox
 
   if (!sel.hasDirectContent) {
     readingControlPanelVisible.value = false
     return
   }
+
+  // allBboxes: index 0 is the anchor; remaining entries are direct-content blocks.
+  // When length > 1, the last entry is the last direct-content bbox.
+  const lastBbox =
+    sel.allBboxes.length > 1 ? sel.allBboxes[sel.allBboxes.length - 1]! : null
 
   if (lastBbox !== null) {
     const target = {

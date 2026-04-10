@@ -33,14 +33,6 @@ public final class BookBlockContentBboxes {
     return List.copyOf(out);
   }
 
-  /**
-   * Package-visible so {@link BookBlockDirectContentPredicate} can reuse parsing without
-   * duplication.
-   */
-  static BookBlockContentBboxItem fromRawPublic(String rawData) {
-    return fromRaw(rawData);
-  }
-
   private static BookBlockContentBboxItem fromRaw(String rawData) {
     if (rawData == null || rawData.isBlank()) {
       return null;

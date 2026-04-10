@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.BookContentBlock;
 import java.util.List;
-import java.util.Optional;
 
 /** MinerU direct-content predicate for reading-record heuristics; see phase 3 plan §5. */
 public final class BookBlockDirectContentPredicate {
@@ -23,27 +22,6 @@ public final class BookBlockDirectContentPredicate {
       }
     }
     return false;
-  }
-
-  /**
-   * Returns the last {@link BookContentBlock} that qualifies as direct content, together with its
-   * parsed bbox, or {@link Optional#empty()} when none exists or none has geometry.
-   */
-  public static Optional<BookBlockContentBboxItem> lastBbox(List<BookContentBlock> orderedBlocks) {
-    if (orderedBlocks == null || orderedBlocks.isEmpty()) {
-      return Optional.empty();
-    }
-    BookBlockContentBboxItem last = null;
-    for (BookContentBlock cb : orderedBlocks) {
-      if (!contributesDirectContent(cb)) {
-        continue;
-      }
-      BookBlockContentBboxItem item = BookBlockContentBboxes.fromRawPublic(cb.getRawData());
-      if (item != null) {
-        last = item;
-      }
-    }
-    return Optional.ofNullable(last);
   }
 
   /**

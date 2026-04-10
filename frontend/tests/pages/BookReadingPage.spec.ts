@@ -783,8 +783,10 @@ describe("BookReadingPage", () => {
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    describe("geometry-gated panel (lastDirectContentBbox)", () => {
-      const lastBbox = { pageIndex: 0, bbox: [10, 700, 500, 750] }
+    describe("geometry-gated panel (allBboxes last entry)", () => {
+      // anchor bbox at index 0, direct-content bbox at index 1 (last)
+      const anchorBbox = { pageIndex: 0, bbox: [10, 600, 500, 640] }
+      const contentBbox = { pageIndex: 0, bbox: [10, 700, 500, 750] }
 
       function stubGetBookWithFirstBlockHavingBbox() {
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
@@ -794,7 +796,8 @@ describe("BookReadingPage", () => {
           startAnchor,
           siblingOrder: i,
           hasDirectContent: true,
-          lastDirectContentBbox: i === 0 ? lastBbox : undefined,
+          // Section 1 has anchor + one direct-content bbox; others have none
+          allBboxes: i === 0 ? [anchorBbox, contentBbox] : [],
         }))
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(makeMe.aBook.blocks(blocks).please())
