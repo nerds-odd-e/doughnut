@@ -43,7 +43,7 @@
 **Interaction rules**
 
 - **Does not own document scroll:** The panel sits **over** or **above** the scrollable PDF viewport; vertical swipe on the page remains **scroll-through** except on the panel’s own hit targets.
-- **Coexists with viewport sync:** The **selected block** drives **which** block’s direct content the panel describes. The panel appears **as soon as** the bottom of the selected block’s last direct-content bbox scrolls into view above the panel’s obstruction zone (geometry-based; see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) Phase 2 for timing and fallback rules). This allows prompting the user before the next heading becomes the viewport-derived current block.
+- **Coexists with viewport sync:** The **selected block** drives **which** block’s direct content the panel describes. The panel appears **as soon as** the bottom of the selected block’s last direct-content bbox scrolls into view above the panel’s obstruction zone (geometry-based). Once it has appeared, the panel **remains visible** even if that bbox scrolls out of view — it hides only when the successor block becomes the viewport-derived current block, or when any other precondition fails (block gets a disposition, selection changes, etc.). The fallback path (no bbox available) uses the successor-becomes-current rule directly.
 - **Coexists with drawer:** Opening/closing the book layout **does not** reset panel expand/minimize preference for the session unless we later persist it (open UX question).
 - **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for the primary disposition action.
 

@@ -368,11 +368,25 @@ function updateReadingControlPanelVisible() {
       pageIndex: lastBbox.pageIndex,
       bbox: lastBbox.bbox as [number, number, number, number],
     }
-    const visible = pdfViewerRef.value?.isLastContentBottomVisible(
-      target,
-      READING_PANEL_OBSTRUCTION_PX
-    )
-    readingControlPanelVisible.value = visible ?? false
+    const geometryVisible =
+      pdfViewerRef.value?.isLastContentBottomVisible(
+        target,
+        READING_PANEL_OBSTRUCTION_PX
+      ) ?? false
+
+    if (geometryVisible) {
+      readingControlPanelVisible.value = true
+      return
+    }
+
+    if (readingControlPanelVisible.value) {
+      const successorIsCurrent =
+        successor.startAnchor.id === currentBlockAnchorId.value
+      readingControlPanelVisible.value = !successorIsCurrent
+      return
+    }
+
+    readingControlPanelVisible.value = false
     return
   }
 
@@ -494,6 +508,7 @@ watch(currentBlockAnchorId, async (anchorId) => {
 })
 
 watch(selectedBlockId, () => {
+  readingControlPanelVisible.value = false
   updateReadingControlPanelVisible()
 })
 

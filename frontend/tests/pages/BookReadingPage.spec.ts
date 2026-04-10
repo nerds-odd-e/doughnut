@@ -868,6 +868,72 @@ describe("BookReadingPage", () => {
 
         expect(readingControlPanel(wrapper).exists()).toBe(false)
       })
+
+      it("keeps panel visible after geometry becomes false while successor is not yet current", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // mid=40 → Section 1 is current (before Section 2's y0=72); geometry passes → panel shows
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
+
+        // geometry now false, but current block is still Section 1 (not the successor Section 2)
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
+      })
+
+      it("hides the panel when geometry was true but the successor becomes the current block", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // mid=40 → Section 1 current; geometry passes → panel shows
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 40, bottom: 600 },
+          pagesCount: 10,
+        })
+        expect(readingControlPanel(wrapper).exists()).toBe(true)
+
+        // geometry false; mid=200 → Section 2 (successor) becomes current → panel hides
+        mockIsLastContentBottomVisible(wrapper, false)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+
+        expect(readingControlPanel(wrapper).exists()).toBe(false)
+      })
     })
 
     it("auto-marks predecessor with READ body when it has no direct content and no record", async () => {
