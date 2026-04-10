@@ -314,6 +314,11 @@ const bookBlockRows = computed(() => flatBookBlocks.value)
 const currentBlockAnchorId = ref<number | null>(null)
 
 const selectedBlockId = ref<number | null>(null)
+const lastPositionInsideSelectedBlock = ref<{
+  pageIndexZeroBased: number
+  normalizedTop: number
+} | null>(null)
+const snapBackAttempts = new Map<number, number>()
 
 const readingControlSelectedBlockTitle = computed(() => {
   const selId = selectedBlockId.value
@@ -432,6 +437,13 @@ function onViewportAnchorPage(payload: {
       Math.round(reading.normalizedTop)
     )
   }
+  const selId = selectedBlockId.value
+  if (selId !== null && reading !== null) {
+    const selRow = bookBlockRows.value.find((r) => r.id === selId)
+    if (selRow && candidate === selRow.startAnchor.id) {
+      lastPositionInsideSelectedBlock.value = reading
+    }
+  }
 }
 
 watch(currentBlockAnchorId, (id) => {
@@ -491,6 +503,21 @@ watch(
     updateReadingControlPanelVisible()
   }
 )
+
+watch(readingControlPanelVisible, (visible) => {
+  if (!visible) return
+  const selId = selectedBlockId.value
+  if (selId === null) return
+  const attempts = snapBackAttempts.get(selId) ?? 0
+  if (attempts >= 1) return
+  const pos = lastPositionInsideSelectedBlock.value
+  if (pos === null) return
+  snapBackAttempts.set(selId, attempts + 1)
+  pdfViewerRef.value?.scrollToStoredReadingPosition(
+    pos.pageIndexZeroBased,
+    pos.normalizedTop
+  )
+})
 
 const initialLastRead = ref<{
   pageIndexZeroBased: number
