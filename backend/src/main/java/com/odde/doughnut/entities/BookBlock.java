@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.odde.doughnut.controllers.dto.BookAnchorFullWire;
 import com.odde.doughnut.services.book.BookBlockContentBboxItem;
 import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.BookBlockDirectContentPredicate;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,13 +49,19 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String structuralTitle;
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "start_anchor_id", nullable = false)
+  @Column(name = "start_anchor_value", nullable = false, columnDefinition = "TEXT")
   @Getter
   @Setter
+  @JsonIgnore
+  private String startAnchorValue;
+
+  @Transient
+  @JsonProperty("startAnchor")
   @JsonView(BookViews.Full.class)
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private BookAnchor startAnchor;
+  public BookAnchorFullWire getStartAnchor() {
+    return new BookAnchorFullWire(getId() == null ? 0 : getId(), startAnchorValue);
+  }
 
   @Column(name = "sibling_order", nullable = false)
   @Getter
@@ -84,7 +90,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)
   public List<BookBlockContentBboxItem> getAllBboxes() {
-    String anchorValue = Optional.ofNullable(startAnchor).map(BookAnchor::getValue).orElse(null);
-    return BookBlockContentBboxes.allBboxes(anchorValue, contentBlocks);
+    return BookBlockContentBboxes.allBboxes(startAnchorValue, contentBlocks);
   }
 }

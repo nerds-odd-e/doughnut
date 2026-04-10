@@ -3,7 +3,6 @@ package com.odde.doughnut.testability.builders;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 
 import com.odde.doughnut.entities.Book;
-import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -61,12 +60,9 @@ public class BookBuilder extends EntityBuilder<Book> {
     byte[] toStore = pdfBytes == null || pdfBytes.length == 0 ? new byte[] {1} : pdfBytes;
     entity.setSourceFileRef(makeMe.bookStorage.put(toStore));
 
-    BookAnchor anchor = new BookAnchor();
-    anchor.setValue("{\"p\":1}");
-
     BookBlock block = new BookBlock();
     block.setStructuralTitle(rootBlockTitle);
-    block.setStartAnchor(anchor);
+    block.setStartAnchorValue("{\"p\":1}");
     block.setParent(null);
     block.setSiblingOrder(0);
     entity.addBlock(block);

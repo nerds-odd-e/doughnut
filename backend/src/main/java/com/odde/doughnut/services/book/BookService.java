@@ -12,7 +12,6 @@ import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
-import com.odde.doughnut.entities.BookAnchor;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
 import com.odde.doughnut.entities.BookContentBlock;
@@ -305,12 +304,9 @@ public class BookService {
           "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
     }
 
-    BookAnchor start = new BookAnchor();
-    start.setValue(node.getStartAnchor().getValue().trim());
-
     BookBlock block = new BookBlock();
     block.setStructuralTitle(trimmedMax(node.getTitle(), 512));
-    block.setStartAnchor(start);
+    block.setStartAnchorValue(node.getStartAnchor().getValue().trim());
     block.setParent(parent);
     block.setSiblingOrder(siblingIndex);
     book.addBlock(block);
