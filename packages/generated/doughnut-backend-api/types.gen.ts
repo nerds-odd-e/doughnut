@@ -352,8 +352,8 @@ export type BookFull = {
     format: string;
     createdAt?: string;
     updatedAt?: string;
-    blocks?: Array<BookBlockFull>;
-    notebookId?: string;
+    blocks: Array<BookBlockFull>;
+    notebookId: string;
     hasSourceFile?: boolean;
 };
 

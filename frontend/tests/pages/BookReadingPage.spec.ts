@@ -117,18 +117,24 @@ async function withFakeTimers(run: () => Promise<void>) {
   }
 }
 
-function stubGetBookPlain() {
+function stubGetBookPlain(notebookId: number) {
   return vi
     .spyOn(NotebookBooksController, "getBook")
-    .mockResolvedValue(wrapSdkResponse(makeMe.aBook.please()))
+    .mockResolvedValue(
+      wrapSdkResponse(makeMe.aBook.notebookId(String(notebookId)).please())
+    )
 }
 
-function stubGetBookWithTopMathsBlocks(firstBlockHasNoDirectContent?: boolean) {
+function stubGetBookWithTopMathsBlocks(
+  notebookId: number,
+  firstBlockHasNoDirectContent?: boolean
+) {
   return vi
     .spyOn(NotebookBooksController, "getBook")
     .mockResolvedValue(
       wrapSdkResponse(
         makeMe.aBook
+          .notebookId(String(notebookId))
           .blocks(topMathsLikeFlatBlocks({ firstBlockHasNoDirectContent }))
           .please()
       )
@@ -143,7 +149,7 @@ async function mountLoadedBookWithBlocks(
     firstBlockHasNoDirectContent?: boolean
   }
 ) {
-  stubGetBookWithTopMathsBlocks(options?.firstBlockHasNoDirectContent)
+  stubGetBookWithTopMathsBlocks(id, options?.firstBlockHasNoDirectContent)
   mockNotebookBookFilePdfOk(id, topMathsPdfBytes, {
     assertSameOriginCredentials: options?.assertSameOriginCredentials,
   })
@@ -176,7 +182,7 @@ function pdfScrollRestoreSpy(wrapper: BookReadingPageWrapper) {
 }
 
 async function mountPatchDebounceScenario() {
-  stubGetBookWithTopMathsBlocks(undefined)
+  stubGetBookWithTopMathsBlocks(notebookId)
   mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
   const patchSpy = vi
     .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
@@ -214,7 +220,7 @@ describe("BookReadingPage", () => {
   })
 
   it("shows fetch error when book file returns an error status", async () => {
-    stubGetBookPlain()
+    stubGetBookPlain(notebookId)
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 404 })
     )
@@ -233,7 +239,12 @@ describe("BookReadingPage", () => {
 
   it("does not load PDF viewer when hasSourceFile is false", async () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.hasSourceFile(false).please())
+      wrapSdkResponse(
+        makeMe.aBook
+          .hasSourceFile(false)
+          .notebookId(String(notebookId))
+          .please()
+      )
     )
 
     const wrapper = mountBookReadingPage(notebookId)
@@ -251,7 +262,7 @@ describe("BookReadingPage", () => {
   })
 
   it("shows loading indicator while PDF is loading, hides it after render", async () => {
-    stubGetBookPlain()
+    stubGetBookPlain(notebookId)
     let resolveFetch!: (r: Response) => void
     vi.spyOn(globalThis, "fetch").mockReturnValue(
       new Promise<Response>((resolve) => {
@@ -280,7 +291,7 @@ describe("BookReadingPage", () => {
   })
 
   it("loads PDF into viewer when hasSourceFile is true", async () => {
-    stubGetBookPlain()
+    stubGetBookPlain(notebookId)
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes, {
       assertSameOriginCredentials: true,
     })
@@ -290,7 +301,7 @@ describe("BookReadingPage", () => {
   })
 
   it("shows error when PDF bytes are not valid", async () => {
-    stubGetBookPlain()
+    stubGetBookPlain(notebookId)
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(new TextEncoder().encode("not a pdf").buffer, {
         status: 200,
@@ -446,7 +457,7 @@ describe("BookReadingPage", () => {
   })
 
   it("restores reading position from stored snapshot on open (Phase 1.4)", async () => {
-    stubGetBookPlain()
+    stubGetBookPlain(notebookId)
     vi.spyOn(
       NotebookBooksController,
       "getNotebookBookReadingPosition"
@@ -466,7 +477,7 @@ describe("BookReadingPage", () => {
   })
 
   it("does not restore reading position when no snapshot exists (Phase 1.4)", async () => {
-    stubGetBookPlain()
+    stubGetBookPlain(notebookId)
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
@@ -809,7 +820,9 @@ describe("BookReadingPage", () => {
           allBboxes: i === 0 ? [anchorBbox, contentBbox] : [],
         }))
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-          wrapSdkResponse(makeMe.aBook.blocks(blocks).please())
+          wrapSdkResponse(
+            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+          )
         )
       }
 

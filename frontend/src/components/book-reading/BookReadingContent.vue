@@ -14,14 +14,14 @@
       :panel-id="bookReadingBookLayoutPanelId"
     />
     <router-link
-      :to="{ name: 'notebookEdit', params: { notebookId: props.notebookId } }"
+      :to="{ name: 'notebookEdit', params: { notebookId: notebookId } }"
       class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0 daisy-no-underline"
     >
       Notebook
     </router-link>
     <span
       class="daisy-truncate daisy-text-sm daisy-font-medium daisy-min-w-0 daisy-ml-1"
-      :title="book.bookName ?? undefined"
+      :title="book.bookName"
     >
       {{ book.bookName }}
     </span>
@@ -106,12 +106,12 @@ const READING_PANEL_OBSTRUCTION_PX = 80
 
 const props = defineProps<{
   book: BookFull
-  notebookId: number
   bookPdfBytes?: ArrayBuffer
   initialLastRead: { pageIndexZeroBased: number; normalizedY: number } | null
 }>()
 
-const bookReading = useNotebookBookReadingRecords(() => props.notebookId)
+const notebookId = computed(() => Number(props.book.notebookId))
+const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const pdfViewerLoadError = ref<string | null>(null)
 
@@ -231,7 +231,7 @@ const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
   delayMs: LAST_READ_POSITION_PATCH_DEBOUNCE_MS,
   patch: (body) =>
     NotebookBooksController.patchNotebookBookReadingPosition({
-      path: { notebook: props.notebookId },
+      path: { notebook: notebookId.value },
       body,
     }),
 })
@@ -414,7 +414,7 @@ onMounted(async () => {
   if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
     bookLayoutOpened.value = true
   }
-  flatBookBlocks.value = buildFlatBookBlocks(props.book.blocks ?? [])
+  flatBookBlocks.value = buildFlatBookBlocks(props.book.blocks)
   await bookReading.syncFromServer()
 })
 

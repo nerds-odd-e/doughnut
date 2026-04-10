@@ -14,7 +14,7 @@
       <button
         type="button"
         class="daisy-btn daisy-btn-primary daisy-btn-sm"
-        @click="router.push({ name: 'bookReading', params: { notebookId: props.notebookId } })"
+        @click="router.push({ name: 'bookReading', params: { notebookId: book.notebookId } })"
       >
         Read
       </button>
@@ -76,7 +76,9 @@ const loadBook = async () => {
 }
 
 const confirmRemoveBook = async () => {
-  const name = book.value?.bookName ?? "this book"
+  const current = book.value
+  if (!current) return
+  const name = current.bookName
   if (
     !(await popups.confirm(
       `Remove "${name}" from this notebook? The PDF will be deleted from the server. This cannot be undone.`

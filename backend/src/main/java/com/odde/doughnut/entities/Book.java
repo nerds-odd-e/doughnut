@@ -34,7 +34,7 @@ public class Book extends EntityIdentifiedByIdOnly {
   private Notebook notebook;
 
   @JsonProperty("notebookId")
-  @Schema(type = "integer")
+  @Schema(type = "integer", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getNotebookId() {
     return notebook == null ? null : notebook.getId();
   }
@@ -81,6 +81,7 @@ public class Book extends EntityIdentifiedByIdOnly {
 
   @JsonProperty("blocks")
   @JsonView(BookViews.Full.class)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<BookBlock> getBlocks() {
     return blocks;
   }

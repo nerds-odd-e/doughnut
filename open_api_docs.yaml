@@ -3880,9 +3880,11 @@ components:
         hasSourceFile:
           type: boolean
       required:
+      - blocks
       - bookName
       - format
       - id
+      - notebookId
     NotebookCertificateApproval:
       type: object
       properties:

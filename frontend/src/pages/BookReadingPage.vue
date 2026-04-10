@@ -26,7 +26,6 @@
       <BookReadingContent
         v-else
         :book="book"
-        :notebook-id="props.notebookId"
         :book-pdf-bytes="contentPdfBytes"
         :initial-last-read="initialLastRead"
       />
@@ -69,16 +68,17 @@ onMounted(async () => {
   })
   if (!error && data) {
     book.value = data
+    const notebook = Number(data.notebookId)
     if (data.hasSourceFile) {
       pdfLoading.value = true
       bookFileLoadError.value = null
       try {
         const [res, posResult] = await Promise.all([
-          fetch(notebookBookFilePath(props.notebookId), {
+          fetch(notebookBookFilePath(notebook), {
             credentials: "same-origin",
           }),
           NotebookBooksController.getNotebookBookReadingPosition({
-            path: { notebook: props.notebookId },
+            path: { notebook },
           }).catch(() => null),
         ])
         if (!res.ok) {
