@@ -76,7 +76,11 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
     return parent == null ? null : parent.getId();
   }
 
-  @OneToMany(mappedBy = "bookBlock", fetch = FetchType.LAZY)
+  @OneToMany(
+      mappedBy = "bookBlock",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @OrderBy("siblingOrder ASC")
   @JsonIgnore
   private final List<BookContentBlock> contentBlocks = new ArrayList<>();
