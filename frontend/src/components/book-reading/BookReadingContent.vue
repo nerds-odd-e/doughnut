@@ -51,7 +51,7 @@
       >
         {{ pdfViewerLoadError }}
       </div>
-      <template v-else-if="bookPdfBytes !== undefined">
+      <template v-else>
         <PdfBookViewer
           ref="pdfViewerRef"
           :pdf-bytes="bookPdfBytes"
@@ -107,7 +107,7 @@ const SNAP_HOLD_MS = 500
 
 const props = defineProps<{
   book: BookFull
-  bookPdfBytes?: ArrayBuffer
+  bookPdfBytes: ArrayBuffer
   initialLastRead: { pageIndexZeroBased: number; normalizedY: number } | null
 }>()
 

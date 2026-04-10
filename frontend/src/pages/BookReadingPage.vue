@@ -24,9 +24,9 @@
         </div>
       </div>
       <BookReadingContent
-        v-else
+        v-else-if="bookPdfBytes !== null"
         :book="book"
-        :book-pdf-bytes="contentPdfBytes"
+        :book-pdf-bytes="bookPdfBytes"
         :initial-last-read="initialLastRead"
       />
     </template>
@@ -38,7 +38,7 @@ import BookReadingContent from "@/components/book-reading/BookReadingContent.vue
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, onMounted, ref } from "vue"
+import { onMounted, ref } from "vue"
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -56,11 +56,6 @@ const initialLastRead = ref<{
   pageIndexZeroBased: number
   normalizedY: number
 } | null>(null)
-
-const contentPdfBytes = computed(() => {
-  if (!book.value) return undefined
-  return bookPdfBytes.value ?? undefined
-})
 
 onMounted(async () => {
   const { data, error } = await NotebookBooksController.getBook({
