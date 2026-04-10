@@ -35,7 +35,6 @@
         v-for="nb in previewNotebooks"
         :key="nb.id"
         :notebook="nb"
-        :is-subscribed="!!subscriptionForNotebook(nb.id)"
         :compact="compactMembers"
       >
         <SubscriptionNoteButtons
@@ -90,7 +89,6 @@
         :key="nb.id"
         role="card"
         class="daisy-card"
-        :class="{ 'subscribed-notebook': !!subscriptionForNotebook(nb.id) }"
         data-cy="notebook-card"
       >
         <NotebookCard :notebook="nb" :compact="compactMembers">
@@ -214,19 +212,5 @@ function subscriptionForNotebook(notebookId: number): Subscription | undefined {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.daisy-card.subscribed-notebook :deep(.notebook-card) {
-  background: linear-gradient(
-    to right,
-    oklch(var(--p) / 0.2) 0%,
-    oklch(var(--p) / 0.1) 5%
-  );
-  border: 1px solid oklch(var(--p) / 0.4);
-}
-
-.daisy-card.subscribed-notebook :deep(.notebook-binding) {
-  background: oklch(var(--p));
-  border-right: 1px solid oklch(var(--p) / 0.7);
 }
 </style>

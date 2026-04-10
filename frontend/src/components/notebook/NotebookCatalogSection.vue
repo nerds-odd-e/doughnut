@@ -16,7 +16,6 @@
       <NotebookListRow
         v-else-if="item.type === 'subscribedNotebook'"
         :notebook="item.notebook"
-        :is-subscribed="true"
       >
         <SubscriptionNoteButtons
           v-if="subscriptionById(item.subscriptionId)"
@@ -69,7 +68,7 @@
       <div
         v-else-if="item.type === 'subscribedNotebook'"
         role="card"
-        class="daisy-card subscribed-notebook"
+        class="daisy-card"
         data-cy="notebook-card"
       >
         <NotebookCard :notebook="item.notebook">
@@ -181,19 +180,5 @@ function catalogItemKey(item: NotebookCatalogEntry): string {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.daisy-card.subscribed-notebook :deep(.notebook-card) {
-  background: linear-gradient(
-    to right,
-    oklch(var(--p) / 0.2) 0%,
-    oklch(var(--p) / 0.1) 5%
-  );
-  border: 1px solid oklch(var(--p) / 0.4);
-}
-
-.daisy-card.subscribed-notebook :deep(.notebook-binding) {
-  background: oklch(var(--p));
-  border-right: 1px solid oklch(var(--p) / 0.7);
 }
 </style>

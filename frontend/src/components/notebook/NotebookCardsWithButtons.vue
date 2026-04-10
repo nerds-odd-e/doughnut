@@ -7,7 +7,6 @@
       v-for="notebook in notebooks"
       :key="notebook.id"
       :notebook="notebook"
-      :is-subscribed="isSubscribed"
     >
       <slot :notebook="notebook" />
     </NotebookListRow>
@@ -21,7 +20,6 @@
       :key="notebook.id"
       role="card"
       class="daisy-card"
-      :class="{ 'subscribed-notebook': isSubscribed }"
       data-cy="notebook-card"
     >
       <NotebookCard :notebook="notebook">
@@ -43,7 +41,6 @@ import NotebookListRow from "./NotebookListRow.vue"
 withDefaults(
   defineProps<{
     notebooks: Notebook[]
-    isSubscribed?: boolean
     layout?: "grid" | "list"
   }>(),
   { layout: "grid" }
@@ -68,15 +65,5 @@ withDefaults(
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.daisy-card.subscribed-notebook .notebook-card {
-  background: linear-gradient(to right, oklch(var(--p) / 0.2) 0%, oklch(var(--p) / 0.1) 5%);
-  border: 1px solid oklch(var(--p) / 0.4);
-}
-
-.daisy-card.subscribed-notebook .notebook-binding {
-  background: oklch(var(--p));
-  border-right: 1px solid oklch(var(--p) / 0.7);
 }
 </style>
