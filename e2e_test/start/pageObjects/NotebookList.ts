@@ -43,6 +43,7 @@ export const notebookList = () => {
 const OVERFLOW_MENU_ACTION_NAMES = [
   'Edit notebook settings',
   'Edit subscription',
+  'Move to group…',
 ] as const
 
 function usesCatalogOverflowMenu(name: string): boolean {

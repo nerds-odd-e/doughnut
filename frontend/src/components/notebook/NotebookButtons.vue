@@ -26,8 +26,29 @@
             Edit notebook settings
           </button>
         </li>
+        <li class="daisy-menu-item daisy-p-0">
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
+            title="Move to group"
+            @click="openMoveToGroup"
+          >
+            Move to group…
+          </button>
+        </li>
       </ul>
     </details>
+    <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
+      <template #body>
+        <NotebookCatalogMoveToGroupDialog
+          mode="owned"
+          :notebook-id="notebook.id"
+          :catalog-group-id="catalogGroupId"
+          @close="closeMoveToGroup"
+          @success="onMoveToGroupSuccess"
+        />
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -37,27 +58,50 @@ import { useRouter } from "vue-router"
 import { MoreHorizontal } from "lucide-vue-next"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
+import Modal from "@/components/commons/Modal.vue"
+import NotebookCatalogMoveToGroupDialog from "@/components/notebook/NotebookCatalogMoveToGroupDialog.vue"
 
 const router = useRouter()
 
 const props = defineProps<{
   notebook: Notebook
   user?: User
+  catalogGroupId?: number
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
+  (e: "refresh"): void
 }>()
 
 const actionsDropdown = ref<HTMLDetailsElement | null>(null)
+const showMoveToGroup = ref(false)
 
-const onEditNotebookSettings = () => {
+const closeDropdown = () => {
   if (actionsDropdown.value) {
     actionsDropdown.value.open = false
   }
+}
+
+const onEditNotebookSettings = () => {
+  closeDropdown()
   router.push({
     name: "notebookEdit",
     params: { notebookId: props.notebook.id },
   })
+}
+
+const openMoveToGroup = () => {
+  closeDropdown()
+  showMoveToGroup.value = true
+}
+
+const closeMoveToGroup = () => {
+  showMoveToGroup.value = false
+}
+
+const onMoveToGroupSuccess = () => {
+  showMoveToGroup.value = false
+  emit("refresh")
 }
 </script>

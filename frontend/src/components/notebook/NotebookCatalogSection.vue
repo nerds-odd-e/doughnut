@@ -11,6 +11,7 @@
         <NotebookButtons
           v-bind="{ notebook: item.notebook, user }"
           @notebook-updated="$emit('notebook-updated', $event)"
+          @refresh="$emit('refresh')"
         />
       </NotebookListRow>
       <NotebookListRow
@@ -20,12 +21,14 @@
         <SubscriptionNoteButtons
           v-if="subscriptionById(item.subscriptionId)"
           :subscription="subscriptionById(item.subscriptionId)!"
+          :notebook-id="item.notebook.id"
           @updated="$emit('refresh')"
         />
         <NotebookButtons
           v-else
           v-bind="{ notebook: item.notebook, user }"
           @notebook-updated="$emit('notebook-updated', $event)"
+          @refresh="$emit('refresh')"
         />
       </NotebookListRow>
       <NotebookCatalogGroupPanel
@@ -60,6 +63,7 @@
               <NotebookButtons
                 v-bind="{ notebook: item.notebook, user }"
                 @notebook-updated="$emit('notebook-updated', $event)"
+                @refresh="$emit('refresh')"
               />
             </span>
           </template>
@@ -77,12 +81,14 @@
               <SubscriptionNoteButtons
                 v-if="subscriptionById(item.subscriptionId)"
                 :subscription="subscriptionById(item.subscriptionId)!"
+                :notebook-id="item.notebook.id"
                 @updated="$emit('refresh')"
               />
               <NotebookButtons
                 v-else
                 v-bind="{ notebook: item.notebook, user }"
                 @notebook-updated="$emit('notebook-updated', $event)"
+                @refresh="$emit('refresh')"
               />
             </span>
           </template>

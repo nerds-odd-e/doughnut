@@ -4,6 +4,9 @@ import notebookPage from './notebookPage'
 
 export const notebookCard = (notebook: string) => ({
   ...notebookList(),
+  openMoveToGroupDialog() {
+    findNotebookCardButton(notebook, 'Move to group…').click()
+  },
   updateSubscription() {
     findNotebookCardButton(notebook, 'Edit subscription').click()
   },

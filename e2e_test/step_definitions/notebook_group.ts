@@ -19,6 +19,24 @@ When(
   }
 )
 
+When(
+  'I move notebook {string} to notebook group {string} from the notebook catalog',
+  (notebookTitle: string, groupName: string) => {
+    start
+      .navigateToNotebooksPage()
+      .moveNotebookToGroupFromCatalog(notebookTitle, groupName, false)
+  }
+)
+
+When(
+  'I move subscribed notebook {string} to notebook group {string} from the notebook catalog',
+  (notebookTitle: string, groupName: string) => {
+    start
+      .navigateToNotebooksPage()
+      .moveNotebookToGroupFromCatalog(notebookTitle, groupName, true)
+  }
+)
+
 When('I go to my notebooks page', () => {
   start.navigateToNotebooksPage()
 })

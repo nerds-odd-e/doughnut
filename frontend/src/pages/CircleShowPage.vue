@@ -16,6 +16,7 @@
               v-bind="{ notebook, user }"
               class="card-header-btn"
               @notebook-updated="handleNotebookUpdated"
+              @refresh="fetchData"
             />
           </template>
         </NotebookCardsWithButtons>

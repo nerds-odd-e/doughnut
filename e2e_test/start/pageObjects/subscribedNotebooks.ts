@@ -6,7 +6,36 @@ import { pageIsNotLoading } from '../pageBase'
 export const subscribedNotebooks = () => {
   pageIsNotLoading()
 
+  const openOverflowOnSubscribedCard = (notebookTitle: string) => {
+    cy.get('[data-cy="notebook-card"]')
+      .filter((_index, card) => {
+        const $card = Cypress.$(card)
+        const titleMatch = $card
+          .find('.notebook-card h5')
+          .toArray()
+          .some((h) => h.textContent?.trim() === notebookTitle)
+        if (!titleMatch) return false
+        return $card.find('button[title="Edit subscription"]').length > 0
+      })
+      .first()
+      .as('subscribedCatalogCard')
+    cy.get('@subscribedCatalogCard')
+      .find('[data-cy="notebook-catalog-overflow"]')
+      .click()
+  }
+
   return {
+    card(notebookTitle: string) {
+      return {
+        openMoveToGroupDialog() {
+          pageIsNotLoading()
+          openOverflowOnSubscribedCard(notebookTitle)
+          cy.get('@subscribedCatalogCard')
+            .findByRole('button', { name: 'Move to group…' })
+            .click()
+        },
+      }
+    },
     expectNotebook(notebookTitle: string) {
       cy.get('main').within(() => {
         cy.findByText(notebookTitle, {

@@ -40,12 +40,16 @@
         <SubscriptionNoteButtons
           v-if="subscriptionForNotebook(nb.id)"
           :subscription="subscriptionForNotebook(nb.id)!"
+          :notebook-id="nb.id"
+          :catalog-group-id="group.id"
           @updated="$emit('refresh')"
         />
         <NotebookButtons
           v-else
           v-bind="{ notebook: nb, user }"
+          :catalog-group-id="group.id"
           @notebook-updated="$emit('notebook-updated', $event)"
+          @refresh="$emit('refresh')"
         />
       </NotebookListRow>
     </div>
@@ -97,12 +101,16 @@
               <SubscriptionNoteButtons
                 v-if="subscriptionForNotebook(nb.id)"
                 :subscription="subscriptionForNotebook(nb.id)!"
+                :notebook-id="nb.id"
+                :catalog-group-id="group.id"
                 @updated="$emit('refresh')"
               />
               <NotebookButtons
                 v-else
                 v-bind="{ notebook: nb, user }"
+                :catalog-group-id="group.id"
                 @notebook-updated="$emit('notebook-updated', $event)"
+                @refresh="$emit('refresh')"
               />
             </span>
           </template>

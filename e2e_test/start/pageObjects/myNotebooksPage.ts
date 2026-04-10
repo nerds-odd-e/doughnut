@@ -76,6 +76,23 @@ const myNotebooksPage = () => {
         .should('be.visible')
       return this as any
     },
+    moveNotebookToGroupFromCatalog(
+      notebookTitle: string,
+      groupName: string,
+      isSubscribed?: boolean
+    ) {
+      if (isSubscribed) {
+        subscribedNotebooks().card(notebookTitle).openMoveToGroupDialog()
+      } else {
+        notebookCard(notebookTitle).openMoveToGroupDialog()
+      }
+      cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
+        cy.get('#notebook-catalog-move-to-group-target').select(groupName)
+        cy.findByRole('button', { name: 'Move' }).click()
+      })
+      pageIsNotLoading()
+      return this as any
+    },
   }
 }
 

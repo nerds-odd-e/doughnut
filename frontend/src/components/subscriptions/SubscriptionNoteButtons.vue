@@ -25,6 +25,16 @@
             Edit subscription
           </button>
         </li>
+        <li class="daisy-menu-item daisy-p-0">
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
+            title="Move to group"
+            @click="openMoveToGroup"
+          >
+            Move to group…
+          </button>
+        </li>
       </ul>
     </details>
     <button
@@ -39,6 +49,18 @@
         <SubscriptionEditDialog :subscription="subscription" />
       </template>
     </Modal>
+    <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
+      <template #body>
+        <NotebookCatalogMoveToGroupDialog
+          mode="subscribed"
+          :notebook-id="notebookId"
+          :subscription-id="subscription.id"
+          :catalog-group-id="catalogGroupId"
+          @close="closeMoveToGroup"
+          @success="onMoveToGroupSuccess"
+        />
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -51,12 +73,21 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { Minus, MoreHorizontal } from "lucide-vue-next"
+import NotebookCatalogMoveToGroupDialog from "@/components/notebook/NotebookCatalogMoveToGroupDialog.vue"
 import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
 
 const props = defineProps({
   subscription: {
     type: Object as PropType<Subscription>,
     required: true,
+  },
+  notebookId: {
+    type: Number,
+    required: true,
+  },
+  catalogGroupId: {
+    type: Number as PropType<number | undefined>,
+    default: undefined,
   },
 })
 
@@ -67,6 +98,7 @@ const emit = defineEmits<{
 const { popups } = usePopups()
 const actionsDropdown = ref<HTMLDetailsElement | null>(null)
 const showEdit = ref(false)
+const showMoveToGroup = ref(false)
 
 const closeDropdown = () => {
   if (actionsDropdown.value) {
@@ -81,6 +113,20 @@ const openEdit = () => {
 
 const closeEdit = () => {
   showEdit.value = false
+}
+
+const openMoveToGroup = () => {
+  closeDropdown()
+  showMoveToGroup.value = true
+}
+
+const closeMoveToGroup = () => {
+  showMoveToGroup.value = false
+}
+
+const onMoveToGroupSuccess = () => {
+  showMoveToGroup.value = false
+  emit("updated")
 }
 
 const processForm = async () => {
