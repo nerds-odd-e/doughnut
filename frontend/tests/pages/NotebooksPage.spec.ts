@@ -1,6 +1,6 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
-import { describe, it, expect } from "vitest"
+import { beforeEach, describe, it, expect } from "vitest"
 import makeMe, {
   type NotebookCatalogEntry,
 } from "doughnut-test-fixtures/makeMe"
@@ -8,6 +8,11 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 
 describe("Notebooks Page", () => {
+  beforeEach(() => {
+    localStorage.removeItem("doughnut.notebooksPage.sortOrder")
+    localStorage.removeItem("doughnut.notebooksPage.layout")
+  })
+
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please()
 
@@ -277,6 +282,94 @@ describe("Notebooks Page", () => {
         "Inside One",
         "Bottom Loose",
       ])
+    })
+
+    it("sorts catalog alphabetically when sort order is alphabetical", async () => {
+      const catalogItems = makeMe.notebookCatalog
+        .notebook("Top Loose")
+        .group("Middle Group", "Inside One")
+        .notebook("Bottom Loose")
+        .please()
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions: [],
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+      await wrapper.find("#notebook-catalog-sort").setValue("alphabetical")
+      await flushPromises()
+
+      const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
+      expect(headingTexts).toEqual([
+        "Bottom Loose",
+        "Middle Group",
+        "Inside One",
+        "Top Loose",
+      ])
+    })
+
+    it("restores API order when switching back to by created time", async () => {
+      const catalogItems = makeMe.notebookCatalog
+        .notebook("Top Loose")
+        .group("Middle Group", "Inside One")
+        .notebook("Bottom Loose")
+        .please()
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions: [],
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+      await wrapper.find("#notebook-catalog-sort").setValue("alphabetical")
+      await flushPromises()
+      await wrapper.find("#notebook-catalog-sort").setValue("created")
+      await flushPromises()
+
+      const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
+      expect(headingTexts).toEqual([
+        "Top Loose",
+        "Middle Group",
+        "Inside One",
+        "Bottom Loose",
+      ])
+    })
+
+    it("sorts notebooks inside a group alphabetically", async () => {
+      const catalogItems = makeMe.notebookCatalog
+        .group("My Group", "Zebra", "Alpha")
+        .please()
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions: [],
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+      await wrapper.find("#notebook-catalog-sort").setValue("alphabetical")
+      await flushPromises()
+
+      const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
+      expect(headingTexts).toEqual(["My Group", "Alpha", "Zebra"])
     })
 
     it("shows member hint for groups with many notebooks", async () => {

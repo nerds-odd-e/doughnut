@@ -6,34 +6,52 @@
       My notebooks
     </h1>
     <template #right>
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
-        :class="{ 'daisy-btn-active': notebooksLayout === 'list' }"
-        title="List view"
-        aria-label="List view"
-        :aria-pressed="notebooksLayout === 'list'"
-        @click="notebooksLayout = 'list'"
-      >
-        <List class="h-5 w-5" />
-      </button>
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
-        :class="{ 'daisy-btn-active': notebooksLayout === 'grid' }"
-        title="Grid view"
-        aria-label="Grid view"
-        :aria-pressed="notebooksLayout === 'grid'"
-        @click="notebooksLayout = 'grid'"
-      >
-        <LayoutGrid class="h-5 w-5" />
-      </button>
-      <NotebookNewButton
-        v-if="user"
-        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
-      >
-        Add New Notebook
-      </NotebookNewButton>
+      <div class="daisy-flex daisy-items-center daisy-gap-2">
+        <div class="daisy-join">
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
+            :class="{ 'daisy-btn-active': notebooksLayout === 'list' }"
+            title="List view"
+            aria-label="List view"
+            :aria-pressed="notebooksLayout === 'list'"
+            @click="notebooksLayout = 'list'"
+          >
+            <List class="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
+            :class="{ 'daisy-btn-active': notebooksLayout === 'grid' }"
+            title="Grid view"
+            aria-label="Grid view"
+            :aria-pressed="notebooksLayout === 'grid'"
+            @click="notebooksLayout = 'grid'"
+          >
+            <LayoutGrid class="h-5 w-5" />
+          </button>
+        </div>
+        <div class="daisy-form-control daisy-w-auto">
+          <label class="daisy-label daisy-sr-only" for="notebook-catalog-sort">
+            Sort notebooks
+          </label>
+          <select
+            id="notebook-catalog-sort"
+            v-model="notebooksSortOrder"
+            class="daisy-select daisy-select-bordered daisy-select-sm daisy-w-max daisy-max-w-[12rem]"
+            title="Sort notebooks"
+          >
+            <option value="created">By created time</option>
+            <option value="alphabetical">Alphabetical</option>
+          </select>
+        </div>
+        <NotebookNewButton
+          v-if="user"
+          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
+        >
+          Add New Notebook
+        </NotebookNewButton>
+      </div>
     </template>
   </GlobalBar>
   <main
@@ -144,6 +162,7 @@ import type {
   User,
 } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
+import { sortNotebookCatalogAlphabetically } from "@/components/notebook/sortNotebookCatalogAlphabetically"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import NotebookGroupNewForm from "@/components/notebook/NotebookGroupNewForm.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
@@ -175,11 +194,13 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
 }
 
 const NOTEBOOKS_LAYOUT_STORAGE_KEY = "doughnut.notebooksPage.layout"
+const NOTEBOOKS_SORT_STORAGE_KEY = "doughnut.notebooksPage.sortOrder"
 
 const notebooksLayout = ref<"list" | "grid">("list")
+const notebooksSortOrder = ref<"created" | "alphabetical">("created")
 const filterText = ref("")
 
-const filteredCatalogItems = computed(() => {
+const filteredOnlyCatalogItems = computed(() => {
   const q = filterText.value.trim().toLowerCase()
   if (!q) {
     return props.catalogItems
@@ -197,18 +218,34 @@ const filteredCatalogItems = computed(() => {
   })
 })
 
+const filteredCatalogItems = computed(() => {
+  const items = filteredOnlyCatalogItems.value
+  if (notebooksSortOrder.value === "created") {
+    return items
+  }
+  return sortNotebookCatalogAlphabetically(items)
+})
+
 const clearFilter = () => {
   filterText.value = ""
 }
 
 onMounted(() => {
-  const stored = localStorage.getItem(NOTEBOOKS_LAYOUT_STORAGE_KEY)
-  if (stored === "list" || stored === "grid") {
-    notebooksLayout.value = stored
+  const storedLayout = localStorage.getItem(NOTEBOOKS_LAYOUT_STORAGE_KEY)
+  if (storedLayout === "list" || storedLayout === "grid") {
+    notebooksLayout.value = storedLayout
+  }
+  const storedSort = localStorage.getItem(NOTEBOOKS_SORT_STORAGE_KEY)
+  if (storedSort === "created" || storedSort === "alphabetical") {
+    notebooksSortOrder.value = storedSort
   }
 })
 
 watch(notebooksLayout, (value) => {
   localStorage.setItem(NOTEBOOKS_LAYOUT_STORAGE_KEY, value)
+})
+
+watch(notebooksSortOrder, (value) => {
+  localStorage.setItem(NOTEBOOKS_SORT_STORAGE_KEY, value)
 })
 </script>
