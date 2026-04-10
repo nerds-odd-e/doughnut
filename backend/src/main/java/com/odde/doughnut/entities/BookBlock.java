@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.BookAnchorFullWire;
 import com.odde.doughnut.services.book.BookBlockContentBboxes;
-import com.odde.doughnut.services.book.BookBlockDirectContentPredicate;
 import com.odde.doughnut.services.book.PageBbox;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -17,15 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({
-  "id",
-  "startAnchor",
-  "siblingOrder",
-  "title",
-  "parentBlockId",
-  "hasDirectContent",
-  "allBboxes"
-})
+@JsonPropertyOrder({"id", "startAnchor", "siblingOrder", "title", "parentBlockId", "allBboxes"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -79,12 +70,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @OrderBy("siblingOrder ASC")
   @JsonIgnore
   private final List<BookContentBlock> contentBlocks = new ArrayList<>();
-
-  @JsonProperty("hasDirectContent")
-  @JsonView(BookViews.Full.class)
-  public boolean getHasDirectContent() {
-    return BookBlockDirectContentPredicate.hasDirectContent(contentBlocks);
-  }
 
   @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)

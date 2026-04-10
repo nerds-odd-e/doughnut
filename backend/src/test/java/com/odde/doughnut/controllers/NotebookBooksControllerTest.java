@@ -340,40 +340,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void hasDirectContentFalseForHeadingOnlyBlock() throws Exception {
-      Notebook nb = myNotebook();
-      AttachBookLayoutNodeRequest n = node("Section A");
-      n.setContentBlocks(new ArrayList<>());
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      Book book = controller.getBook(nb);
-
-      BookBlock block = rootBlocksSorted(book).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(false));
-    }
-
-    @Test
-    void hasDirectContentTrueWhenBlockHasBodyText() throws Exception {
-      Notebook nb = myNotebook();
-      Map<String, Object> bodyItem = new LinkedHashMap<>();
-      bodyItem.put("type", "text");
-      bodyItem.put("text", "Some body text");
-      bodyItem.put("page_idx", 0);
-      AttachBookLayoutNodeRequest n = node("Section B");
-      n.setContentBlocks(
-          new ArrayList<>(
-              List.of(headingBlock("Section B", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      Book book = controller.getBook(nb);
-
-      BookBlock block = rootBlocksSorted(book).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(true));
-    }
-
-    @Test
     void allBboxesDerivesStartAnchorFromFirstContentBlock() throws Exception {
       Notebook nb = myNotebook();
       AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
@@ -463,98 +429,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(block.getAllBboxes(), hasSize(2));
       assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
       assertThat(block.getAllBboxes().get(1).bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
-    }
-
-    @Test
-    void hasDirectContentFalseWhenOnlyPageNumberContentBlocks() throws Exception {
-      Notebook nb = myNotebook();
-      Map<String, Object> pageNum = new LinkedHashMap<>();
-      pageNum.put("type", "page_number");
-      pageNum.put("text", "1");
-      pageNum.put("page_idx", 0);
-      AttachBookLayoutNodeRequest n = node("Section C");
-      n.setContentBlocks(
-          new ArrayList<>(
-              List.of(headingBlock("Section C", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), pageNum)));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(false));
-    }
-
-    @Test
-    void hasDirectContentFalseWhenOnlyHeaderContentBlocks() throws Exception {
-      Notebook nb = myNotebook();
-      Map<String, Object> header = new LinkedHashMap<>();
-      header.put("type", "header");
-      header.put("text", "Running title");
-      header.put("page_idx", 0);
-      AttachBookLayoutNodeRequest n = node("Section D");
-      n.setContentBlocks(
-          new ArrayList<>(
-              List.of(headingBlock("Section D", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), header)));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(false));
-    }
-
-    @Test
-    void hasDirectContentTrueWhenOnlyTableContentBlocks() throws Exception {
-      Notebook nb = myNotebook();
-      Map<String, Object> table = new LinkedHashMap<>();
-      table.put("type", "table");
-      table.put("table_body", "<table></table>");
-      table.put("page_idx", 0);
-      AttachBookLayoutNodeRequest n = node("Section E");
-      n.setContentBlocks(
-          new ArrayList<>(
-              List.of(headingBlock("Section E", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), table)));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(true));
-    }
-
-    @Test
-    void hasDirectContentTrueWhenOnlyImageContentBlocks() throws Exception {
-      Notebook nb = myNotebook();
-      Map<String, Object> image = new LinkedHashMap<>();
-      image.put("type", "image");
-      image.put("img_path", "x.png");
-      image.put("page_idx", 0);
-      AttachBookLayoutNodeRequest n = node("Section F");
-      n.setContentBlocks(
-          new ArrayList<>(
-              List.of(headingBlock("Section F", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), image)));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(true));
-    }
-
-    @Test
-    void hasDirectContentFalseWhenHeadingShapedTextInBodyPosition() throws Exception {
-      Notebook nb = myNotebook();
-      Map<String, Object> headingRow = new LinkedHashMap<>();
-      headingRow.put("type", "text");
-      headingRow.put("text_level", 2);
-      headingRow.put("text", "2.1 A heading");
-      headingRow.put("page_idx", 0);
-      AttachBookLayoutNodeRequest n = node("Section G");
-      n.setContentBlocks(
-          new ArrayList<>(
-              List.of(
-                  headingBlock("Section G", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), headingRow)));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
-      makeMe.entityPersister.flushAndClear();
-
-      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getHasDirectContent(), equalTo(false));
     }
   }
 

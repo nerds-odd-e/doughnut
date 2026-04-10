@@ -3815,8 +3815,6 @@ components:
           type: string
         parentBlockId:
           type: string
-        hasDirectContent:
-          type: boolean
         allBboxes:
           type: array
           items:

@@ -3,7 +3,6 @@ package com.odde.doughnut.services.book;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.BookContentBlock;
-import java.util.List;
 
 /** MinerU direct-content predicate for reading-record heuristics; see phase 3 plan §5. */
 public final class BookBlockDirectContentPredicate {
@@ -11,18 +10,6 @@ public final class BookBlockDirectContentPredicate {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private BookBlockDirectContentPredicate() {}
-
-  public static boolean hasDirectContent(List<BookContentBlock> orderedBlocks) {
-    if (orderedBlocks == null || orderedBlocks.size() <= 1) {
-      return false;
-    }
-    for (int i = 1; i < orderedBlocks.size(); i++) {
-      if (contributesDirectContent(orderedBlocks.get(i))) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   /**
    * MinerU blocks that count as direct reading content. Excludes header, footer, {@code page_*},
