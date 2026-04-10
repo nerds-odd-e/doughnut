@@ -365,6 +365,7 @@ export type NotebookCertificateApproval = {
 
 export type CreateNotebookGroupRequest = {
     name: string;
+    circleId?: number;
 };
 
 export type NotebookGroup = {

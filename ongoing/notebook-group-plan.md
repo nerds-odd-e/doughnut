@@ -48,9 +48,9 @@
 
 ## Phase 5 — Circle page: same catalog affordances as My notebooks
 
-**Outcome:** [`CircleShowPage`](../frontend/src/pages/CircleShowPage.vue) gains parity with **My notebooks** for **list vs grid**, **grouping** (render `catalogItems` / groups + members, not only flat `notebooks`), and the **same** overflow + move-to-group behavior where the API allows. **Research sub-step:** confirm circle DTO exposes `catalogItems` (and subscriptions if needed) the same way as `myNotebooks`; if not, smallest backend addition + `pnpm generateTypeScript`, then UI.
+**Outcome:** [`CircleShowPage`](../frontend/src/pages/CircleShowPage.vue) uses **`circle.notebooks.catalogItems`** with [`NotebookCatalogSection`](../frontend/src/components/notebook/NotebookCatalogSection.vue) (list/grid, sort, filter, overflow, move-to-group). `GET /api/circles/{id}` already returned merged `catalogItems` via [`NotebookCatalogService.buildView`](../backend/src/main/java/com/odde/doughnut/services/NotebookCatalogService.java). **Create group on circle:** optional `circleId` on [`CreateNotebookGroupRequest`](../backend/src/main/java/com/odde/doughnut/controllers/dto/CreateNotebookGroupRequest.java) + [`NotebookGroupController`](../backend/src/main/java/com/odde/doughnut/controllers/NotebookGroupController.java); circle page **provide**s catalog group choices for [`NotebookCatalogMoveToGroupDialog`](../frontend/src/components/notebook/NotebookCatalogMoveToGroupDialog.vue).
 
-**Tests:** E2E for one circle scenario: see groups/layout controls and move (if circle-owned notebooks support grouping in product rules).
+**Tests:** [`e2e_test/features/circles/notebooks_in_circles.feature`](../e2e_test/features/circles/notebooks_in_circles.feature) scenario “Circle catalog shows notebook groups and layout controls”; Vitest [`frontend/tests/pages/CircleShowPage.spec.ts`](../frontend/tests/pages/CircleShowPage.spec.ts).
 
 ---
 

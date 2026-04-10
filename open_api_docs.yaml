@@ -3904,6 +3904,9 @@ components:
           type: string
           maxLength: 255
           minLength: 0
+        circleId:
+          type: integer
+          format: int32
       required:
       - name
     NotebookGroup:

@@ -30,8 +30,7 @@ describe("circle show page", () => {
     })
   })
 
-  const moveButtonTitle = "Move to ..."
-  it("does not show the move notebook button on circle page (moved to settings)", async () => {
+  it("shows catalog list and grid controls when the circle has notebooks", async () => {
     helper
       .component(CircleShowPage)
       .withRouter()
@@ -40,6 +39,7 @@ describe("circle show page", () => {
       .withProps({ circleId: circleNote.id })
       .render()
     await flushPromises()
-    expect(screen.queryByTitle(moveButtonTitle)).toBeNull()
+    expect(screen.getByRole("button", { name: "List view" })).toBeVisible()
+    expect(screen.getByRole("button", { name: "Grid view" })).toBeVisible()
   })
 })

@@ -11,4 +11,6 @@ public class CreateNotebookGroupRequest {
   @NotBlank
   @Size(max = 255)
   private String name;
+
+  private Integer circleId;
 }

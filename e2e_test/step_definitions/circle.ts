@@ -77,6 +77,29 @@ When('I am on {string} circle page', (circleName: string) => {
   start.navigateToCircle(circleName)
 })
 
+Then('I should see circle notebook catalog layout controls', () => {
+  start.assumeCirclePage().expectCatalogLayoutControls()
+})
+
+When(
+  'I create a notebook group named {string} by moving notebook {string} from the circle catalog',
+  (groupName: string, notebookTitle: string) => {
+    start
+      .assumeCirclePage()
+      .creatingNotebookGroupFromCatalogMove(notebookTitle, groupName)
+  }
+)
+
+Then(
+  'I should see notebook group {string} with a hint including {string} on the circle page',
+  (groupName: string, hintSubstring: string) => {
+    cy.contains('[data-cy="notebook-group-card"]', groupName).should(
+      'contain.text',
+      hintSubstring
+    )
+  }
+)
+
 When(
   'There is a notebook {string} in circle {string} by {string}',
   (title: string, circleName: string, externalIdentifier: string) => {

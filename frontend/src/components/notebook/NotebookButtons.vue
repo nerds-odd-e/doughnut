@@ -44,6 +44,8 @@
           mode="owned"
           :notebook-id="notebook.id"
           :catalog-group-id="catalogGroupId"
+          :existing-groups="moveToGroupExistingGroups"
+          :circle-id="moveToGroupCircleId"
           @close="closeMoveToGroup"
           @success="onMoveToGroupSuccess"
         />
@@ -53,15 +55,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed, inject, ref, type ComputedRef } from "vue"
 import { useRouter } from "vue-router"
 import { MoreHorizontal } from "lucide-vue-next"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import Modal from "@/components/commons/Modal.vue"
+import {
+  catalogMoveToGroupContextKey,
+  type CatalogMoveToGroupInjected,
+} from "@/components/notebook/catalogMoveToGroupContext"
 import NotebookCatalogMoveToGroupDialog from "@/components/notebook/NotebookCatalogMoveToGroupDialog.vue"
 
 const router = useRouter()
+
+const catalogMoveToGroupContext = inject<
+  ComputedRef<CatalogMoveToGroupInjected | undefined> | undefined
+>(catalogMoveToGroupContextKey, undefined)
+
+const moveToGroupExistingGroups = computed(() => {
+  const ctx = catalogMoveToGroupContext?.value
+  return ctx?.existingGroups
+})
+
+const moveToGroupCircleId = computed(
+  () => catalogMoveToGroupContext?.value?.circleId
+)
 
 const props = defineProps<{
   notebook: Notebook

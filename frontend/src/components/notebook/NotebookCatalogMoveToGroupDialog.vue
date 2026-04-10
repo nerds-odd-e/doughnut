@@ -88,6 +88,10 @@ const props = defineProps<{
   notebookId: number
   subscriptionId?: number
   catalogGroupId?: number
+  /** When set (including empty array), skip myNotebooks fetch and use these groups. */
+  existingGroups?: { id: number; name: string }[]
+  /** When set, createGroup includes circleId (circle ownership). */
+  circleId?: number
 }>()
 
 const emit = defineEmits<{
@@ -115,7 +119,7 @@ watch(selectedTarget, () => {
   newGroupError.value = undefined
 })
 
-onMounted(async () => {
+async function loadGroupsFromMyNotebooks() {
   const { data, error } = await NotebookController.myNotebooks({})
   loadingGroups.value = false
   if (error || !data?.catalogItems) {
@@ -126,7 +130,26 @@ onMounted(async () => {
   groups.value = items
     .filter((i): i is NotebookCatalogGroupItem => i.type === "notebookGroup")
     .map((g) => ({ id: g.id, name: g.name }))
+}
+
+onMounted(async () => {
+  if (props.existingGroups !== undefined) {
+    groups.value = props.existingGroups.map((g) => ({ ...g }))
+    loadingGroups.value = false
+    return
+  }
+  await loadGroupsFromMyNotebooks()
 })
+
+watch(
+  () => props.existingGroups,
+  (list) => {
+    if (list !== undefined) {
+      groups.value = list.map((g) => ({ ...g }))
+    }
+  },
+  { deep: true }
+)
 
 async function applyNotebookGroup(notebookGroupId: number | undefined) {
   if (props.mode === "owned") {
@@ -165,7 +188,12 @@ const submit = async () => {
     }
     applying.value = true
     const { data: created, error: createErr } = await apiCallWithLoading(() =>
-      NotebookGroupController.createGroup({ body: { name: trimmed } })
+      NotebookGroupController.createGroup({
+        body:
+          props.circleId !== undefined
+            ? { name: trimmed, circleId: props.circleId }
+            : { name: trimmed },
+      })
     )
     if (createErr || !created?.id) {
       applying.value = false

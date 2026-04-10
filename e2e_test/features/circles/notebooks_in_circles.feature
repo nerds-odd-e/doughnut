@@ -22,3 +22,10 @@ Feature: Notes in circles
     And  There is a notebook "Family gathering guidelines" in circle "Odd-e SG Team" by "old_learner"
     When I move the notebook "Family gathering guidelines" from "Odd-e SG Team" to "Odd-e Thai Team"
     Then I should see the notebook "Family gathering guidelines" in circle "Odd-e Thai Team"
+
+  Scenario: Circle catalog shows notebook groups and layout controls
+    When I create a notebook "Circle catalog nb" in circle "Odd-e SG Team"
+    And I am on "Odd-e SG Team" circle page
+    Then I should see circle notebook catalog layout controls
+    When I create a notebook group named "Circle E2E Group" by moving notebook "Circle catalog nb" from the circle catalog
+    Then I should see notebook group "Circle E2E Group" with a hint including "Circle catalog nb" on the circle page
