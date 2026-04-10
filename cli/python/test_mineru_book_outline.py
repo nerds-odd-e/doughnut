@@ -35,10 +35,14 @@ class LayoutRootsWithContentBlocksTest(unittest.TestCase):
         roots = mbo.layout_roots_with_content_blocks(data)
         self.assertEqual(len(roots), 2)
         self.assertEqual(roots[0]["title"], "*beginning*")
-        self.assertEqual(len(roots[0]["contentBlocks"]), 1)
-        self.assertEqual(roots[0]["contentBlocks"][0]["text"], "Orphan body")
+        # index 0 is the synthetic anchor block, index 1 is the orphan body
+        self.assertEqual(len(roots[0]["contentBlocks"]), 2)
+        self.assertEqual(roots[0]["contentBlocks"][0]["type"], "beginning_anchor")
+        self.assertEqual(roots[0]["contentBlocks"][1]["text"], "Orphan body")
         self.assertEqual(roots[1]["title"], "Chapter One")
-        self.assertEqual(roots[1]["contentBlocks"], [])
+        # index 0 is the heading item itself
+        self.assertEqual(len(roots[1]["contentBlocks"]), 1)
+        self.assertEqual(roots[1]["contentBlocks"][0]["text"], "Chapter One")
 
     def test_synthetic_bbox_one_line_above_first_orphan(self) -> None:
         data = [
@@ -46,10 +50,11 @@ class LayoutRootsWithContentBlocksTest(unittest.TestCase):
             {"type": "text", "text": "H", "text_level": 1, "bbox": [0, 0, 1, 1], "page_idx": 0},
         ]
         roots = mbo.layout_roots_with_content_blocks(data)
-        inner = json.loads(roots[0]["startAnchor"]["value"])
-        self.assertEqual(inner["page_idx"], 0)
-        self.assertEqual(inner["kind"], "beginning")
-        self.assertEqual(inner["bbox"], [10.0, 70.0, 20.0, 100.0])
+        anchor_block = roots[0]["contentBlocks"][0]
+        self.assertEqual(anchor_block["type"], "beginning_anchor")
+        self.assertEqual(anchor_block["page_idx"], 0)
+        self.assertEqual(anchor_block["kind"], "beginning")
+        self.assertEqual(anchor_block["bbox"], [10.0, 70.0, 20.0, 100.0])
 
     def test_synthetic_bbox_clamps_y0_at_zero(self) -> None:
         data = [
@@ -57,10 +62,10 @@ class LayoutRootsWithContentBlocksTest(unittest.TestCase):
             {"type": "text", "text": "H", "text_level": 1, "bbox": [0, 0, 1, 1], "page_idx": 0},
         ]
         roots = mbo.layout_roots_with_content_blocks(data)
-        inner = json.loads(roots[0]["startAnchor"]["value"])
-        self.assertEqual(inner["bbox"], [0.0, 0.0, 100.0, 15.0])
+        anchor_block = roots[0]["contentBlocks"][0]
+        self.assertEqual(anchor_block["bbox"], [0.0, 0.0, 100.0, 15.0])
 
-    def test_no_orphan_prefix_matches_heading_first_layout(self) -> None:
+    def test_no_orphan_prefix_heading_is_first_content_block(self) -> None:
         data = [
             {
                 "type": "text",
@@ -79,15 +84,34 @@ class LayoutRootsWithContentBlocksTest(unittest.TestCase):
         roots = mbo.layout_roots_with_content_blocks(data)
         self.assertEqual(len(roots), 1)
         self.assertEqual(roots[0]["title"], "Code Refactoring")
-        self.assertEqual(len(roots[0]["contentBlocks"]), 1)
-        self.assertIn("Refactoring", roots[0]["contentBlocks"][0]["text"])
+        # index 0: heading item; index 1: body text
+        self.assertEqual(len(roots[0]["contentBlocks"]), 2)
+        self.assertEqual(roots[0]["contentBlocks"][0]["text"], "Code Refactoring")
+        self.assertEqual(roots[0]["contentBlocks"][0]["text_level"], 2)
+        self.assertIn("Refactoring", roots[0]["contentBlocks"][1]["text"])
 
-    def test_orphan_with_valid_bbox_creates_beginning_root(self) -> None:
+    def test_heading_node_has_no_startAnchor_field(self) -> None:
+        data = [
+            {
+                "type": "text",
+                "text": "Chapter One",
+                "text_level": 1,
+                "bbox": [10, 50, 300, 90],
+                "page_idx": 2,
+            }
+        ]
+        roots = mbo.layout_roots_with_content_blocks(data)
+        self.assertNotIn("startAnchor", roots[0])
+
+    def test_orphan_with_valid_bbox_creates_beginning_root_with_anchor_and_orphan(self) -> None:
         data = [{"type": "text", "text": "intro", "bbox": [10, 100, 200, 130], "page_idx": 0}]
         roots = mbo.layout_roots_with_content_blocks(data)
         self.assertEqual(len(roots), 1)
         self.assertEqual(roots[0]["title"], "*beginning*")
-        self.assertEqual(len(roots[0]["contentBlocks"]), 1)
+        # index 0: synthetic anchor; index 1: the orphan item
+        self.assertEqual(len(roots[0]["contentBlocks"]), 2)
+        self.assertEqual(roots[0]["contentBlocks"][0]["type"], "beginning_anchor")
+        self.assertEqual(roots[0]["contentBlocks"][1]["text"], "intro")
 
     def test_orphan_without_bbox_is_ignored(self) -> None:
         data = [{"type": "page_number", "text": "1", "page_idx": 0}]
@@ -178,9 +202,9 @@ class LayoutRootsFilteringByBboxTest(unittest.TestCase):
         roots = mbo.layout_roots_with_content_blocks(data)
         self.assertEqual(len(roots), 1)
         self.assertEqual(roots[0]["title"], "Chapter One")
-        anchor = json.loads(roots[0]["startAnchor"]["value"])
-        self.assertEqual(anchor["page_idx"], 2)
-        self.assertEqual(anchor["bbox"], [10, 50, 300, 90])
+        first_cb = roots[0]["contentBlocks"][0]
+        self.assertEqual(first_cb["page_idx"], 2)
+        self.assertEqual(first_cb["bbox"], [10, 50, 300, 90])
 
     def test_beginning_node_not_created_when_orphan_has_no_bbox(self) -> None:
         data = [

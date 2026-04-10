@@ -193,7 +193,11 @@ def _beginning_anchor_payload(first_orphan: dict[str, Any]) -> dict[str, Any]:
 
 
 def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order."""
+    """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order.
+
+    The heading record is stored as contentBlocks[0] (the structural title block that also
+    serves as startAnchor), with no separate startAnchor field.
+    """
     roots: list[dict[str, Any]] = []
     stack: list[tuple[int, dict[str, Any]]] = []
     for rec in records:
@@ -201,11 +205,13 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
         title = str(rec["title"]).strip()
         if not title:
             continue
-        payload = {k: rec[k] for k in ("page_idx", "bbox", "source", "spine_index", "href") if k in rec and rec[k] is not None}
-        start_a = _anchor(payload if payload else {"kind": "heading"})
+        heading_block = {"type": "text", "text_level": level, "text": title}
+        for k in ("page_idx", "bbox", "source", "spine_index", "href"):
+            if k in rec and rec[k] is not None:
+                heading_block[k] = rec[k]
         node: dict[str, Any] = {
             "title": title,
-            "startAnchor": start_a,
+            "contentBlocks": [heading_block],
         }
         while stack and stack[-1][0] >= level:
             stack.pop()
@@ -221,10 +227,11 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
 def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
     """Build nested layout nodes with ordered contentBlocks from the full content_list.
 
-    Each layout node's contentBlocks holds only non-heading MinerU items that belong
-    to that section (body stream in reading order). The heading lives on the node's
-    title and startAnchor only. Items before the first heading attach to a synthetic
-    root block titled *beginning* (startAnchor one line height above the first orphan).
+    Each layout node's contentBlocks holds the heading item as index 0 (the structural
+    title block that also serves as startAnchor), followed by non-heading MinerU body
+    items in reading order. Items before the first heading attach to a synthetic root
+    block titled *beginning* whose contentBlocks[0] is a synthetic anchor block derived
+    one line height above the first orphan, followed by the orphan body items.
     """
     roots: list[dict[str, Any]] = []
     stack: list[tuple[int, dict[str, Any]]] = []
@@ -250,11 +257,9 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
             if page_idx is None or not _is_valid_bbox(bbox):
                 continue
             flush_beginning()
-            start_a = _anchor({"page_idx": page_idx, "bbox": bbox})
             node: dict[str, Any] = {
                 "title": title,
-                "startAnchor": start_a,
-                "contentBlocks": [],
+                "contentBlocks": [item],
             }
             while stack and stack[-1][0] >= text_level:
                 stack.pop()
@@ -270,10 +275,10 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
                 if beginning_node is None:
                     anchor_payload = _beginning_anchor_payload(item)
                     if anchor_payload.get("page_idx") is not None and _is_valid_bbox(anchor_payload.get("bbox")):
+                        synthetic_anchor = {"type": "beginning_anchor", **anchor_payload}
                         beginning_node = {
                             "title": "*beginning*",
-                            "startAnchor": _anchor(anchor_payload),
-                            "contentBlocks": [],
+                            "contentBlocks": [synthetic_anchor],
                         }
                 if beginning_node is not None:
                     beginning_node["contentBlocks"].append(item)

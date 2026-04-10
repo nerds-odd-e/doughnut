@@ -13,11 +13,11 @@ public final class BookBlockDirectContentPredicate {
   private BookBlockDirectContentPredicate() {}
 
   public static boolean hasDirectContent(List<BookContentBlock> orderedBlocks) {
-    if (orderedBlocks == null || orderedBlocks.isEmpty()) {
+    if (orderedBlocks == null || orderedBlocks.size() <= 1) {
       return false;
     }
-    for (BookContentBlock cb : orderedBlocks) {
-      if (contributesDirectContent(cb)) {
+    for (int i = 1; i < orderedBlocks.size(); i++) {
+      if (contributesDirectContent(orderedBlocks.get(i))) {
         return true;
       }
     }

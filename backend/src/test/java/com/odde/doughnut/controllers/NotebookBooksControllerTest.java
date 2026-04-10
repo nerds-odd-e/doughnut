@@ -112,21 +112,25 @@ class NotebookBooksControllerTest extends ControllerTestBase {
         .toList();
   }
 
-  private static AttachBookAnchorRequest anchor(String value) {
-    AttachBookAnchorRequest a = new AttachBookAnchorRequest();
-    a.setValue(value);
-    return a;
-  }
-
   private static AttachBookLayoutNodeRequest node(
       String title, AttachBookLayoutNodeRequest... kids) {
     AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
     n.setTitle(title);
-    n.setStartAnchor(anchor("{\"p\":1}"));
     if (kids != null && kids.length > 0) {
       n.setChildren(new ArrayList<>(List.of(kids)));
     }
     return n;
+  }
+
+  private static Map<String, Object> headingBlock(
+      String text, int textLevel, int pageIdx, List<Double> bbox) {
+    Map<String, Object> h = new LinkedHashMap<>();
+    h.put("type", "text");
+    h.put("text_level", textLevel);
+    h.put("text", text);
+    h.put("page_idx", pageIdx);
+    h.put("bbox", new ArrayList<>(bbox));
+    return h;
   }
 
   private static AttachBookRequest attachRequest(AttachBookLayoutNodeRequest... roots) {
@@ -255,7 +259,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       bodyItem.put("text", "Some body text");
       bodyItem.put("page_idx", 1);
       AttachBookLayoutNodeRequest n = node("Chapter 1");
-      n.setContentBlocks(new ArrayList<>(List.of(bodyItem)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Chapter 1", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
 
       ResponseEntity<Book> res =
           controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
@@ -264,22 +270,28 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       BookBlock block = rootBlocksSorted(created).getFirst();
       List<BookContentBlock> cbs =
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(block.getId());
-      assertThat(cbs, hasSize(1));
+      assertThat(cbs, hasSize(2));
       assertThat(cbs.get(0).getSiblingOrder(), equalTo(0));
       assertThat(cbs.get(0).getType(), equalTo("text"));
-      assertThat(cbs.get(0).getPageIdx(), equalTo(1));
+      assertThat(cbs.get(1).getSiblingOrder(), equalTo(1));
+      assertThat(cbs.get(1).getType(), equalTo("text"));
+      assertThat(cbs.get(1).getPageIdx(), equalTo(1));
     }
 
     @Test
     void persistsContentBlocksUnderSyntheticBeginningRoot() throws Exception {
       Notebook nb = myNotebook();
+      Map<String, Object> anchorBlock = new LinkedHashMap<>();
+      anchorBlock.put("type", "beginning_anchor");
+      anchorBlock.put("page_idx", 0);
+      anchorBlock.put("bbox", new ArrayList<>(List.of(10.0, 70.0, 200.0, 100.0)));
       Map<String, Object> orphan = new LinkedHashMap<>();
       orphan.put("type", "text");
       orphan.put("text", "Preface paragraph");
       orphan.put("page_idx", 0);
 
       AttachBookLayoutNodeRequest beginning = node("*beginning*");
-      beginning.setContentBlocks(new ArrayList<>(List.of(orphan)));
+      beginning.setContentBlocks(new ArrayList<>(List.of(anchorBlock, orphan)));
       AttachBookLayoutNodeRequest chapter = node("Chapter 1");
 
       ResponseEntity<Book> res =
@@ -295,10 +307,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       List<BookContentBlock> beginningCbs =
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(
               roots.getFirst().getId());
-      assertThat(beginningCbs, hasSize(1));
+      assertThat(beginningCbs, hasSize(2));
       assertThat(beginningCbs.getFirst().getSiblingOrder(), equalTo(0));
-      assertThat(beginningCbs.getFirst().getType(), equalTo("text"));
-      assertThat(beginningCbs.getFirst().getPageIdx(), equalTo(0));
+      assertThat(beginningCbs.getFirst().getType(), equalTo("beginning_anchor"));
+      assertThat(beginningCbs.get(1).getSiblingOrder(), equalTo(1));
+      assertThat(beginningCbs.get(1).getType(), equalTo("text"));
+      assertThat(beginningCbs.get(1).getPageIdx(), equalTo(0));
     }
   }
 
@@ -347,7 +361,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       bodyItem.put("text", "Some body text");
       bodyItem.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section B");
-      n.setContentBlocks(new ArrayList<>(List.of(bodyItem)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Section B", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -355,15 +371,16 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
       BookBlock block = rootBlocksSorted(book).getFirst();
       assertThat(block.getHasDirectContent(), equalTo(true));
-      assertThat(block.getAllBboxes(), empty());
     }
 
     @Test
-    void allBboxesIncludesStartAnchorBboxFirst() throws Exception {
+    void allBboxesDerivesStartAnchorFromFirstContentBlock() throws Exception {
       Notebook nb = myNotebook();
       AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
       n.setTitle("Headed Section");
-      n.setStartAnchor(anchor("{\"page_idx\":1,\"bbox\":[5.0,10.0,200.0,50.0]}"));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Headed Section", 1, 1, List.of(5.0, 10.0, 200.0, 50.0)))));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -374,7 +391,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void allBboxesIncludesAnchorBboxThenContentBboxes() throws Exception {
+    void allBboxesIncludesHeadingBboxThenBodyBboxes() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
@@ -383,8 +400,11 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       bodyItem.put("bbox", new ArrayList<>(List.of(10.0, 20.0, 300.0, 400.0)));
       AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
       n.setTitle("Section With Bbox");
-      n.setStartAnchor(anchor("{\"page_idx\":2,\"bbox\":[1.0,2.0,100.0,15.0]}"));
-      n.setContentBlocks(new ArrayList<>(List.of(bodyItem)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(
+                  headingBlock("Section With Bbox", 1, 2, List.of(1.0, 2.0, 100.0, 15.0)),
+                  bodyItem)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -397,7 +417,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void allBboxesSkipsHeaderFooterPageChromeAndStructuralHeadings() throws Exception {
+    void allBboxesSkipsHeaderFooterPageChromeAndStructuralHeadingsInBodyBlocks() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> header = new LinkedHashMap<>();
       header.put("type", "header");
@@ -414,12 +434,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       pageNum.put("text", "7");
       pageNum.put("page_idx", 2);
       pageNum.put("bbox", new ArrayList<>(List.of(400.0, 500.0, 410.0, 510.0)));
-      Map<String, Object> heading = new LinkedHashMap<>();
-      heading.put("type", "text");
-      heading.put("text_level", 2);
-      heading.put("text", "2.1 Section");
-      heading.put("page_idx", 2);
-      heading.put("bbox", new ArrayList<>(List.of(15.0, 30.0, 200.0, 45.0)));
+      Map<String, Object> subHeading = new LinkedHashMap<>();
+      subHeading.put("type", "text");
+      subHeading.put("text_level", 2);
+      subHeading.put("text", "2.1 Section");
+      subHeading.put("page_idx", 2);
+      subHeading.put("bbox", new ArrayList<>(List.of(15.0, 30.0, 200.0, 45.0)));
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
       bodyItem.put("text", "Body paragraph");
@@ -427,8 +447,15 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       bodyItem.put("bbox", new ArrayList<>(List.of(10.0, 20.0, 300.0, 400.0)));
       AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
       n.setTitle("Section With Noise");
-      n.setStartAnchor(anchor("{\"page_idx\":2,\"bbox\":[1.0,2.0,100.0,15.0]}"));
-      n.setContentBlocks(new ArrayList<>(List.of(header, footer, pageNum, heading, bodyItem)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(
+                  headingBlock("Section With Noise", 1, 2, List.of(1.0, 2.0, 100.0, 15.0)),
+                  header,
+                  footer,
+                  pageNum,
+                  subHeading,
+                  bodyItem)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -446,7 +473,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       pageNum.put("text", "1");
       pageNum.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section C");
-      n.setContentBlocks(new ArrayList<>(List.of(pageNum)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Section C", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), pageNum)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -462,7 +491,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       header.put("text", "Running title");
       header.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section D");
-      n.setContentBlocks(new ArrayList<>(List.of(header)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Section D", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), header)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -478,7 +509,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       table.put("table_body", "<table></table>");
       table.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section E");
-      n.setContentBlocks(new ArrayList<>(List.of(table)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Section E", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), table)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -494,7 +527,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       image.put("img_path", "x.png");
       image.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section F");
-      n.setContentBlocks(new ArrayList<>(List.of(image)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Section F", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), image)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
@@ -503,7 +538,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void hasDirectContentFalseWhenLegacyHeadingShapedTextOnly() throws Exception {
+    void hasDirectContentFalseWhenHeadingShapedTextInBodyPosition() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> headingRow = new LinkedHashMap<>();
       headingRow.put("type", "text");
@@ -511,7 +546,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       headingRow.put("text", "2.1 A heading");
       headingRow.put("page_idx", 0);
       AttachBookLayoutNodeRequest n = node("Section G");
-      n.setContentBlocks(new ArrayList<>(List.of(headingRow)));
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(
+                  headingBlock("Section G", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), headingRow)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 

@@ -12,21 +12,23 @@ public final class BookBlockContentBboxes {
 
   private BookBlockContentBboxes() {}
 
-  public static List<PageBbox> allBboxes(String anchorValue, List<BookContentBlock> orderedBlocks) {
+  public static List<PageBbox> allBboxes(List<BookContentBlock> orderedBlocks) {
+    if (orderedBlocks == null || orderedBlocks.isEmpty()) {
+      return List.of();
+    }
     List<PageBbox> out = new ArrayList<>();
-    PageBbox anchorItem = fromRaw(anchorValue);
+    PageBbox anchorItem = fromRaw(orderedBlocks.getFirst().getRawData());
     if (anchorItem != null) {
       out.add(anchorItem);
     }
-    if (orderedBlocks != null) {
-      for (BookContentBlock cb : orderedBlocks) {
-        if (!BookBlockDirectContentPredicate.contributesDirectContent(cb)) {
-          continue;
-        }
-        PageBbox item = fromRaw(cb.getRawData());
-        if (item != null) {
-          out.add(item);
-        }
+    for (int i = 1; i < orderedBlocks.size(); i++) {
+      BookContentBlock cb = orderedBlocks.get(i);
+      if (!BookBlockDirectContentPredicate.contributesDirectContent(cb)) {
+        continue;
+      }
+      PageBbox item = fromRaw(cb.getRawData());
+      if (item != null) {
+        out.add(item);
       }
     }
     return List.copyOf(out);

@@ -62,7 +62,6 @@ public class BookBuilder extends EntityBuilder<Book> {
 
     BookBlock block = new BookBlock();
     block.setStructuralTitle(rootBlockTitle);
-    block.setStartAnchorValue("{\"p\":1}");
     block.setParent(null);
     block.setSiblingOrder(0);
     entity.addBlock(block);

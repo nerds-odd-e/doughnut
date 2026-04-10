@@ -49,18 +49,13 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String structuralTitle;
 
-  @Column(name = "start_anchor_value", nullable = false, columnDefinition = "TEXT")
-  @Getter
-  @Setter
-  @JsonIgnore
-  private String startAnchorValue;
-
   @Transient
   @JsonProperty("startAnchor")
   @JsonView(BookViews.Full.class)
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public BookAnchorFullWire getStartAnchor() {
-    return new BookAnchorFullWire(getId() == null ? 0 : getId(), startAnchorValue);
+    String value = contentBlocks.isEmpty() ? "{}" : contentBlocks.getFirst().getRawData();
+    return new BookAnchorFullWire(getId() == null ? 0 : getId(), value);
   }
 
   @Column(name = "sibling_order", nullable = false)
@@ -94,6 +89,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)
   public List<PageBbox> getAllBboxes() {
-    return BookBlockContentBboxes.allBboxes(startAnchorValue, contentBlocks);
+    return BookBlockContentBboxes.allBboxes(contentBlocks);
   }
 }

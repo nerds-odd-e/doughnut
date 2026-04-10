@@ -3772,7 +3772,6 @@ components:
             type: object
             additionalProperties: {}
       required:
-      - startAnchor
       - title
     AttachBookLayoutRequest_Full:
       type: object

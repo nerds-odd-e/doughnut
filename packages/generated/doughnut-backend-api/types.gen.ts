@@ -304,7 +304,7 @@ export type AttachBookAnchorRequestFull = {
 
 export type AttachBookLayoutNodeRequestFull = {
     title: string;
-    startAnchor: AttachBookAnchorRequestFull;
+    startAnchor?: AttachBookAnchorRequestFull;
     children?: Array<AttachBookLayoutNodeRequestFull>;
     contentBlocks?: Array<{
         [key: string]: unknown;

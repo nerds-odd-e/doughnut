@@ -6,7 +6,6 @@ import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOU
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
-import com.odde.doughnut.controllers.dto.AttachBookAnchorRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
@@ -267,26 +266,11 @@ public class BookService {
           ApiError.ErrorType.BINDING_ERROR,
           "title exceeds maximum length");
     }
-    validateAnchor(node.getStartAnchor(), "startAnchor");
     List<AttachBookLayoutNodeRequest> children = node.getChildren();
     if (children != null) {
       for (AttachBookLayoutNodeRequest child : children) {
         validateLayoutNode(child, depth + 1);
       }
-    }
-  }
-
-  private void validateAnchor(AttachBookAnchorRequest anchor, String label) {
-    if (anchor == null) {
-      throw new ApiException(
-          label + " is required", ApiError.ErrorType.BINDING_ERROR, label + " is required");
-    }
-    String value = trimToNull(anchor.getValue());
-    if (value == null || value.isEmpty()) {
-      throw new ApiException(
-          label + ".value must be non-empty",
-          ApiError.ErrorType.BINDING_ERROR,
-          label + ".value must be non-empty");
     }
   }
 
@@ -306,7 +290,6 @@ public class BookService {
 
     BookBlock block = new BookBlock();
     block.setStructuralTitle(trimmedMax(node.getTitle(), 512));
-    block.setStartAnchorValue(node.getStartAnchor().getValue().trim());
     block.setParent(parent);
     block.setSiblingOrder(siblingIndex);
     book.addBlock(block);
