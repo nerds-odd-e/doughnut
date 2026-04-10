@@ -34,9 +34,10 @@ function topMathsLikeFlatBlocks(options?: {
     title: `Section ${i + 1}`,
     startAnchor,
     siblingOrder: i,
-    ...(options?.firstBlockHasNoDirectContent && i === 0
-      ? { allBboxes: [{ pageIndex: 0, bbox: [0, 0, 0, 0] }] }
-      : {}),
+    allBboxes:
+      options?.firstBlockHasNoDirectContent && i === 0
+        ? [{ pageIndex: 0, bbox: [0, 0, 0, 0] }]
+        : [],
   }))
 }
 
@@ -1151,7 +1152,7 @@ describe("BookReadingPage", () => {
       })
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
-        // Use default blocks: none have allBboxes (length 0)
+        // Use default blocks: allBboxes empty for every block
         stubGetBookWithTopMathsBlocks(notebookId)
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
@@ -1294,7 +1295,7 @@ describe("BookReadingPage", () => {
             "Section 2"
           )
         )
-        // Section 2 has no allBboxes so no snap for it — just confirm state cleared
+        // Section 2 has empty allBboxes so no snap for it — just confirm state cleared
         expect(suppressSpy).toHaveBeenCalledTimes(1)
       })
 

@@ -162,7 +162,7 @@ function buildFlatBookBlocks(
         title: child.title,
         depth,
         startAnchor: child.startAnchor,
-        allBboxes: child.allBboxes ?? [],
+        allBboxes: child.allBboxes,
       })
       visit(child.id, depth + 1)
     }

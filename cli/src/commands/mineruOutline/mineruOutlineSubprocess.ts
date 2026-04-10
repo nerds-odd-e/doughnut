@@ -210,26 +210,12 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
 }
 
-function validateAnchor(a: unknown, label: string): string | null {
-  if (!isRecord(a)) {
-    return `${label} must be an object`
-  }
-  if (typeof a.value !== 'string') {
-    return `${label}.value is required`
-  }
-  return null
-}
-
 function validateLayoutNode(node: unknown): string | null {
   if (!isRecord(node)) {
     return 'each layout node must be an object'
   }
   if (typeof node.title !== 'string' || node.title.trim() === '') {
     return 'each layout node needs a non-empty title'
-  }
-  const startErr = validateAnchor(node.startAnchor, 'startAnchor')
-  if (startErr !== null) {
-    return startErr
   }
   if (node.children !== undefined) {
     if (!Array.isArray(node.children)) {

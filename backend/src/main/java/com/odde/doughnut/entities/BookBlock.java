@@ -88,6 +88,7 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<PageBbox> getAllBboxes() {
     return BookBlockContentBboxes.allBboxes(contentBlocks);
   }

@@ -65,14 +65,22 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
 
     const firstRoot = result.layout?.roots?.[0] as { contentBlocks?: unknown[] }
     expect(Array.isArray(firstRoot?.contentBlocks)).toBe(true)
-    expect((firstRoot?.contentBlocks?.length ?? 0) > 0).toBe(true)
-    const firstBlock = firstRoot?.contentBlocks?.[0] as {
+    expect((firstRoot?.contentBlocks?.length ?? 0) > 1).toBe(true)
+    const headingBlock = firstRoot?.contentBlocks?.[0] as {
       type?: string
       text_level?: number
       text?: string
     }
-    expect(firstBlock?.type).toBe('text')
-    expect(firstBlock?.text_level).toBeUndefined()
-    expect(firstBlock?.text).toMatch(/^Refactoring is often explained/)
+    expect(headingBlock?.type).toBe('text')
+    expect(typeof headingBlock?.text_level).toBe('number')
+    expect(headingBlock?.text).toBe('Code Refactoring')
+    const firstBodyBlock = firstRoot?.contentBlocks?.[1] as {
+      type?: string
+      text_level?: number
+      text?: string
+    }
+    expect(firstBodyBlock?.type).toBe('text')
+    expect(firstBodyBlock?.text_level).toBeUndefined()
+    expect(firstBodyBlock?.text).toMatch(/^Refactoring is often explained/)
   })
 })

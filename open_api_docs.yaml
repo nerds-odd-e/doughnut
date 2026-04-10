@@ -3822,6 +3822,7 @@ components:
           items:
             $ref: "#/components/schemas/PageBbox_Full"
       required:
+      - allBboxes
       - id
       - startAnchor
       - title
