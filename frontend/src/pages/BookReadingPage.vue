@@ -469,9 +469,7 @@ useBookReadingBlockSelection({
   bookBlockRows: () => bookBlockRows.value,
   currentBlockAnchorId,
   onDwellSelectBlock: (row) => {
-    Promise.resolve(applyBookBlockSelection(row as BookBlockRow)).catch(
-      () => undefined
-    )
+    selectedBlockId.value = row.id
   },
 })
 
