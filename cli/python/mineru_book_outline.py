@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 import tempfile
 import zipfile
@@ -158,6 +159,24 @@ def _anchor(payload: dict[str, Any]) -> dict[str, str]:
     return {"value": s}
 
 
+def _is_valid_bbox(bbox: Any) -> bool:
+    """Return True if bbox is a valid [x0, y0, x1, y1] array (mirrors TypeScript parseOptionalBbox)."""
+    if not isinstance(bbox, list) or len(bbox) != 4:
+        return False
+    try:
+        x0, y0, x1, y1 = (float(b) for b in bbox)
+    except (TypeError, ValueError):
+        return False
+    return (
+        math.isfinite(x0)
+        and math.isfinite(y0)
+        and math.isfinite(x1)
+        and math.isfinite(y1)
+        and x0 < x1
+        and y0 < y1
+    )
+
+
 def _beginning_anchor_payload(first_orphan: dict[str, Any]) -> dict[str, Any]:
     payload: dict[str, Any] = {"kind": "beginning"}
     if first_orphan.get("page_idx") is not None:
@@ -226,9 +245,12 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
             title = (item.get("text") or "").strip()
             if not title:
                 continue
+            page_idx = item.get("page_idx")
+            bbox = item.get("bbox")
+            if page_idx is None or not _is_valid_bbox(bbox):
+                continue
             flush_beginning()
-            payload = {k: item[k] for k in ("page_idx", "bbox") if k in item and item[k] is not None}
-            start_a = _anchor(payload if payload else {"kind": "heading"})
+            start_a = _anchor({"page_idx": page_idx, "bbox": bbox})
             node: dict[str, Any] = {
                 "title": title,
                 "startAnchor": start_a,
@@ -246,12 +268,15 @@ def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
                 stack[-1][1]["contentBlocks"].append(item)
             else:
                 if beginning_node is None:
-                    beginning_node = {
-                        "title": "*beginning*",
-                        "startAnchor": _anchor(_beginning_anchor_payload(item)),
-                        "contentBlocks": [],
-                    }
-                beginning_node["contentBlocks"].append(item)
+                    anchor_payload = _beginning_anchor_payload(item)
+                    if anchor_payload.get("page_idx") is not None and _is_valid_bbox(anchor_payload.get("bbox")):
+                        beginning_node = {
+                            "title": "*beginning*",
+                            "startAnchor": _anchor(anchor_payload),
+                            "contentBlocks": [],
+                        }
+                if beginning_node is not None:
+                    beginning_node["contentBlocks"].append(item)
 
     if beginning_node is not None:
         roots.append(beginning_node)
