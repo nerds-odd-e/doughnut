@@ -53,6 +53,9 @@ const bookReadingPage = () => {
     },
     clickBookBlockByTitle(title: string) {
       pageIsNotLoading()
+      cy.get('[data-testid="book-reading-page-indicator"]')
+        .should('be.visible')
+        .and('contain', ' /')
       bookBlockRows().contains(title).click()
       bookBlockRows()
         .contains(title)
