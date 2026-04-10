@@ -43,8 +43,8 @@ Then(
   'I should be on the notebook group page for {string} with notebook {string} listed',
   (groupName: string, notebookTitle: string) => {
     cy.url().should('match', /\/d\/notebooks\/groups\/\d+/)
+    cy.contains('h1', groupName).should('be.visible')
     cy.get('main').within(() => {
-      cy.contains('h1', groupName).should('be.visible')
       cy.contains('h5', notebookTitle).should('be.visible')
     })
   }
