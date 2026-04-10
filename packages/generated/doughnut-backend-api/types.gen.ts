@@ -343,7 +343,7 @@ export type BookBlockFull = {
     title: string;
     parentBlockId?: string;
     hasDirectContent?: boolean;
-    contentBboxes?: Array<BookBlockContentBboxItemFull>;
+    allBboxes?: Array<BookBlockContentBboxItemFull>;
 };
 
 export type BookFull = {

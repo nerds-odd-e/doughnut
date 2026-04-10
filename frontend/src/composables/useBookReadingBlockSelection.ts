@@ -9,7 +9,7 @@ export const AUTO_SELECT_BOOK_BLOCK_DWELL_MS = 5000
 export type BookBlockRowForSelection = {
   id: number
   startAnchor: BookAnchorFull
-  contentBboxes: BookBlockContentBboxItemFull[]
+  allBboxes: BookBlockContentBboxItemFull[]
 }
 
 /**

@@ -3847,7 +3847,7 @@ components:
           type: string
         hasDirectContent:
           type: boolean
-        contentBboxes:
+        allBboxes:
           type: array
           items:
             $ref: "#/components/schemas/BookBlockContentBboxItem_Full"

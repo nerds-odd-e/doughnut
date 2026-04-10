@@ -371,27 +371,45 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
       BookBlock block = rootBlocksSorted(book).getFirst();
       assertThat(block.getHasDirectContent(), equalTo(true));
-      assertThat(block.getContentBboxes(), empty());
+      assertThat(block.getAllBboxes(), empty());
     }
 
     @Test
-    void contentBboxesListsItemsWithPageAndBboxFromRawData() throws Exception {
+    void allBboxesIncludesStartAnchorBboxFirst() throws Exception {
+      Notebook nb = myNotebook();
+      AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
+      n.setTitle("Headed Section");
+      n.setStartAnchor(anchor("{\"page_idx\":1,\"bbox\":[5.0,10.0,200.0,50.0]}"));
+      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      makeMe.entityPersister.flushAndClear();
+
+      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
+      assertThat(block.getAllBboxes(), hasSize(1));
+      assertThat(block.getAllBboxes().getFirst().pageIndex(), equalTo(1));
+      assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(5.0, 10.0, 200.0, 50.0)));
+    }
+
+    @Test
+    void allBboxesIncludesAnchorBboxThenContentBboxes() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
       bodyItem.put("text", "Body paragraph");
       bodyItem.put("page_idx", 2);
       bodyItem.put("bbox", new ArrayList<>(List.of(10.0, 20.0, 300.0, 400.0)));
-      AttachBookLayoutNodeRequest n = node("Section With Bbox");
+      AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
+      n.setTitle("Section With Bbox");
+      n.setStartAnchor(anchor("{\"page_idx\":2,\"bbox\":[1.0,2.0,100.0,15.0]}"));
       n.setContentBlocks(new ArrayList<>(List.of(bodyItem)));
       controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getContentBboxes(), hasSize(1));
-      assertThat(block.getContentBboxes().getFirst().pageIndex(), equalTo(2));
-      assertThat(
-          block.getContentBboxes().getFirst().bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
+      assertThat(block.getAllBboxes(), hasSize(2));
+      assertThat(block.getAllBboxes().getFirst().pageIndex(), equalTo(2));
+      assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
+      assertThat(block.getAllBboxes().get(1).pageIndex(), equalTo(2));
+      assertThat(block.getAllBboxes().get(1).bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
     }
 
     @Test

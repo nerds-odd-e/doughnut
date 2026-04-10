@@ -27,14 +27,6 @@ export type PdfJsXyzDestArray = readonly [
   null,
 ]
 
-/** Same rules as anchor `bbox` JSON: four finite numbers, x0 < x1, y0 < y1. */
-export function parseNormalizedBBoxArray(
-  raw: ReadonlyArray<number> | undefined
-): PdfOutlineV1Bbox | null {
-  if (!raw || raw.length !== 4) return null
-  return parseOptionalBbox(raw as unknown[])
-}
-
 function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
   if (!Array.isArray(raw) || raw.length !== 4) return null
   const a = raw[0]
@@ -92,7 +84,11 @@ export function parsePdfOutlineV1Anchor(
   return parsePdfOutlineV1StartAnchor(anchor.value)
 }
 
-export function contentBboxWireItemsToNavigationTargets(
+/**
+ * Convert `allBboxes` wire items (from `BookBlockFull.allBboxes`) to navigation targets.
+ * The server pre-validates these; we still guard against malformed items defensively.
+ */
+export function wireItemsToNavigationTargets(
   items:
     | ReadonlyArray<{ pageIndex: number; bbox: ReadonlyArray<number> }>
     | undefined
@@ -100,8 +96,6 @@ export function contentBboxWireItemsToNavigationTargets(
   if (!items?.length) return []
   const out: PdfOutlineV1NavigationTarget[] = []
   for (const it of items) {
-    const bbox = parseNormalizedBBoxArray(it.bbox)
-    if (bbox === null) continue
     if (
       typeof it.pageIndex !== "number" ||
       !Number.isInteger(it.pageIndex) ||
@@ -109,6 +103,8 @@ export function contentBboxWireItemsToNavigationTargets(
     ) {
       continue
     }
+    const bbox = parseOptionalBbox(it.bbox as unknown[])
+    if (bbox === null) continue
     out.push({ pageIndex: it.pageIndex, bbox })
   }
   return out

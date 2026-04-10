@@ -1,13 +1,12 @@
 import {
-  contentBboxWireItemsToNavigationTargets,
   extractPageIndexZeroBased,
   normalizedYToViewportY,
   outlineV1BboxToPdfJsXyzDestArray,
   outlineV1BboxToPixelRect,
-  parseNormalizedBBoxArray,
   parsePdfOutlineV1Anchor,
   parsePdfOutlineV1StartAnchor,
   screenYToNormalizedY,
+  wireItemsToNavigationTargets,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { describe, expect, it } from "vitest"
 
@@ -131,24 +130,10 @@ describe("parsePdfOutlineV1Anchor", () => {
   })
 })
 
-describe("parseNormalizedBBoxArray", () => {
-  it("accepts valid four-number bbox", () => {
-    expect(parseNormalizedBBoxArray([10, 20, 100, 200])).toEqual([
-      10, 20, 100, 200,
-    ])
-  })
-
-  it("rejects wrong length or non-finite or inverted ranges", () => {
-    expect(parseNormalizedBBoxArray([1, 2, 3])).toBe(null)
-    expect(parseNormalizedBBoxArray([2, 1, 0, 0])).toBe(null)
-    expect(parseNormalizedBBoxArray(undefined)).toBe(null)
-  })
-})
-
-describe("contentBboxWireItemsToNavigationTargets", () => {
-  it("maps API items to navigation targets", () => {
+describe("wireItemsToNavigationTargets", () => {
+  it("maps allBboxes wire items to navigation targets", () => {
     expect(
-      contentBboxWireItemsToNavigationTargets([
+      wireItemsToNavigationTargets([
         { pageIndex: 0, bbox: [1, 2, 3, 4] },
         { pageIndex: 1, bbox: [10, 20, 30, 40] },
       ])
@@ -158,9 +143,9 @@ describe("contentBboxWireItemsToNavigationTargets", () => {
     ])
   })
 
-  it("drops invalid bbox or page", () => {
+  it("drops items with invalid bbox or negative page", () => {
     expect(
-      contentBboxWireItemsToNavigationTargets([
+      wireItemsToNavigationTargets([
         { pageIndex: 0, bbox: [1, 2, 3] },
         { pageIndex: -1, bbox: [0, 0, 1, 1] },
         { pageIndex: 0, bbox: [0, 0, 1, 1] },
@@ -169,8 +154,8 @@ describe("contentBboxWireItemsToNavigationTargets", () => {
   })
 
   it("returns empty for undefined or empty input", () => {
-    expect(contentBboxWireItemsToNavigationTargets(undefined)).toEqual([])
-    expect(contentBboxWireItemsToNavigationTargets([])).toEqual([])
+    expect(wireItemsToNavigationTargets(undefined)).toEqual([])
+    expect(wireItemsToNavigationTargets([])).toEqual([])
   })
 })
 

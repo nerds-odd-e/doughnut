@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +24,7 @@ import lombok.Setter;
   "title",
   "parentBlockId",
   "hasDirectContent",
-  "contentBboxes"
+  "allBboxes"
 })
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
@@ -80,9 +81,10 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
     return BookBlockDirectContentPredicate.hasDirectContent(contentBlocks);
   }
 
-  @JsonProperty("contentBboxes")
+  @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)
-  public List<BookBlockContentBboxItem> getContentBboxes() {
-    return BookBlockContentBboxes.fromOrderedBlocks(contentBlocks);
+  public List<BookBlockContentBboxItem> getAllBboxes() {
+    String anchorValue = Optional.ofNullable(startAnchor).map(BookAnchor::getValue).orElse(null);
+    return BookBlockContentBboxes.allBboxes(anchorValue, contentBlocks);
   }
 }
