@@ -1,12 +1,14 @@
 package com.odde.doughnut.services.book;
 
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
+import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_CONTENT_LIST_ITEMS;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
+import com.odde.doughnut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
@@ -226,22 +228,50 @@ public class BookService {
   }
 
   private void validateAttachRequest(AttachBookRequest request) {
-    if (request.getLayout() == null) {
-      throw new ApiException(
-          "layout is required", ApiError.ErrorType.BINDING_ERROR, "layout is required");
-    }
     if (!BOOK_FORMAT_PDF.equals(request.getFormat())) {
       throw new ApiException(
           "format must be \"pdf\"", ApiError.ErrorType.BINDING_ERROR, "format must be \"pdf\"");
     }
-    List<AttachBookLayoutNodeRequest> roots = request.getLayout().getRoots();
-    if (roots == null || roots.isEmpty()) {
+
+    List<Object> contentList = request.getContentList();
+    boolean hasContentList = contentList != null && !contentList.isEmpty();
+    AttachBookLayoutRequest layout = request.getLayout();
+    List<AttachBookLayoutNodeRequest> layoutRoots =
+        layout != null && layout.getRoots() != null ? layout.getRoots() : null;
+    boolean hasLayoutRoots = layoutRoots != null && !layoutRoots.isEmpty();
+
+    if (hasContentList && hasLayoutRoots) {
       throw new ApiException(
-          "layout.roots must be non-empty",
+          "cannot send both layout.roots and contentList",
           ApiError.ErrorType.BINDING_ERROR,
-          "layout.roots must be non-empty");
+          "cannot send both layout.roots and contentList");
     }
-    for (AttachBookLayoutNodeRequest root : roots) {
+    if (!hasContentList && !hasLayoutRoots) {
+      throw new ApiException(
+          "exactly one of layout.roots or contentList is required",
+          ApiError.ErrorType.BINDING_ERROR,
+          "exactly one of layout.roots or contentList is required");
+    }
+
+    if (hasContentList) {
+      if (contentList.size() > MAX_CONTENT_LIST_ITEMS) {
+        throw new ApiException(
+            "contentList exceeds maximum size of " + MAX_CONTENT_LIST_ITEMS,
+            ApiError.ErrorType.BINDING_ERROR,
+            "contentList exceeds maximum size of " + MAX_CONTENT_LIST_ITEMS);
+      }
+      AttachBookLayoutRequest built = MineruContentListLayoutBuilder.buildLayout(contentList);
+      if (built.getRoots().isEmpty()) {
+        throw new ApiException(
+            "contentList produced no book layout blocks",
+            ApiError.ErrorType.BINDING_ERROR,
+            "contentList produced no book layout blocks");
+      }
+      request.setLayout(built);
+      layoutRoots = built.getRoots();
+    }
+
+    for (AttachBookLayoutNodeRequest root : layoutRoots) {
       validateLayoutNode(root, 1);
     }
   }

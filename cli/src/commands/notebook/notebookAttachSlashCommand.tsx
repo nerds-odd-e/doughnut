@@ -91,12 +91,13 @@ async function runNotebookAttachPdf(
   if (!minerResult.ok) {
     throw new Error(minerResult.error)
   }
-  if (
-    minerResult.layout === undefined ||
-    minerResult.layout.roots.length === 0
-  ) {
+  const hasContentList =
+    minerResult.contentList !== undefined && minerResult.contentList.length > 0
+  const hasLayout =
+    minerResult.layout !== undefined && minerResult.layout.roots.length > 0
+  if (!(hasContentList || hasLayout)) {
     throw new Error(
-      'Outline script did not return layout.roots; attach requires nested layout JSON from the MinerU script.'
+      'Outline script did not return contentList or layout.roots; attach requires MinerU outline JSON from the Python script.'
     )
   }
 
@@ -106,11 +107,17 @@ async function runNotebookAttachPdf(
 
   const book = await attachNotebookBookWithPdf(
     notebook.id,
-    {
-      bookName,
-      format: 'pdf',
-      layout: minerResult.layout,
-    },
+    hasContentList
+      ? {
+          bookName,
+          format: 'pdf',
+          contentList: minerResult.contentList,
+        }
+      : {
+          bookName,
+          format: 'pdf',
+          layout: minerResult.layout,
+        },
     absPdf
   )
 

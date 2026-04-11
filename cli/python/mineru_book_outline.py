@@ -9,8 +9,10 @@ EPUB: MinerU does not accept EPUB. For `.epub` we walk the OPF spine and collect
 
 MinerU writes `{stem}_content_list.json` (not `document_content_list.json`).
 
-With `--json-result`, stdout is one JSON object with `outline`, optional `note`, and `layout` with
-nested `roots` / `children` for `POST …/attach-book`. Logs stay on stderr.
+With `--json-result`, stdout is one JSON object with `outline`, optional `note`, and either
+`contentList` (MinerU `content_list` array for PDFs parsed from content_list) or `layout` with
+nested `roots` / `children` (EPUB or PDF middle.json fallback) for `POST …/attach-book`. Logs stay
+on stderr.
 
 Example:
   python3 cli/python/mineru_book_outline.py "/path/to/file.pdf" --json-result --end-page 4
@@ -472,20 +474,23 @@ def run_pdf(
         f"[L{r['level']} {'p' + str(r['page_idx']) if r.get('page_idx') is not None else 'p?'}] {r['title']}"
         for r in records
     ]
-    if source == "content_list" and isinstance(raw_cl, list):
-        layout_payload = {"roots": layout_roots_with_content_blocks(raw_cl)}
-    else:
-        layout_payload = {"roots": layout_roots_from_heading_records(records)}
-
     if json_mode:
-        _print_json_result(
-            {
+        if source == "content_list" and isinstance(raw_cl, list):
+            payload: dict[str, Any] = {
+                "ok": True,
+                "outline": "\n".join(outline),
+                "source": source,
+                "contentList": raw_cl,
+            }
+        else:
+            layout_payload = {"roots": layout_roots_from_heading_records(records)}
+            payload = {
                 "ok": True,
                 "outline": "\n".join(outline),
                 "source": source,
                 "layout": layout_payload,
             }
-        )
+        _print_json_result(payload)
     else:
         print(f"--- outline ({source}) ---")
         for line in outline:

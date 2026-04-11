@@ -122,6 +122,45 @@ describe('runMineruOutlineSubprocess', () => {
     )
   })
 
+  test('returns contentList when subprocess JSON includes valid contentList', async () => {
+    const contentList = [
+      {
+        type: 'text',
+        text: 'Chapter',
+        text_level: 1,
+        page_idx: 0,
+        bbox: [0, 0, 100, 50],
+      },
+      { type: 'text', text: 'Body', page_idx: 0, bbox: [0, 60, 100, 80] },
+    ]
+    fakeChild((child) => {
+      setImmediate(() => {
+        child.stdout!.end(
+          JSON.stringify({
+            ok: true,
+            outline: 'x',
+            source: 'content_list',
+            contentList,
+          })
+        )
+        child.stderr!.end('')
+        child.emit('close', 0, null)
+      })
+    })
+
+    const result = await runMineruOutlineSubprocess({
+      bookPath: epubPath,
+      cwd: workDir,
+    })
+
+    expect(result).toEqual({
+      ok: true,
+      outline: 'x',
+      source: 'content_list',
+      contentList,
+    })
+  })
+
   test('returns layout when subprocess JSON includes valid layout', async () => {
     const layout = {
       roots: [
@@ -202,6 +241,39 @@ describe('runMineruOutlineSubprocess', () => {
       outline: 'x',
       source: 'content_list',
       layout,
+    })
+  })
+
+  test('fails when stdout JSON includes both layout and contentList', async () => {
+    fakeChild((child) => {
+      setImmediate(() => {
+        child.stdout!.end(
+          JSON.stringify({
+            ok: true,
+            outline: 'x',
+            source: 'y',
+            layout: {
+              roots: [{ title: 'A', startAnchor: { value: '{}' } }],
+            },
+            contentList: [
+              { type: 'text', text: 'x', page_idx: 0, bbox: [0, 0, 1, 1] },
+            ],
+          })
+        )
+        child.stderr!.end('')
+        child.emit('close', 0, null)
+      })
+    })
+
+    const result = await runMineruOutlineSubprocess({
+      bookPath: epubPath,
+      cwd: workDir,
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      error: 'cannot send both layout and contentList in outline JSON',
+      exitCode: 0,
     })
   })
 

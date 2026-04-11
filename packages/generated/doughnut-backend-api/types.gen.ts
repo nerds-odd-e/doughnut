@@ -316,7 +316,8 @@ export type AttachBookLayoutRequestFull = {
 export type AttachBookRequestFull = {
     bookName: string;
     format: string;
-    layout: AttachBookLayoutRequestFull;
+    layout?: AttachBookLayoutRequestFull;
+    contentList?: Array<unknown>;
 };
 
 export type BookAnchorFull = {

@@ -24,6 +24,8 @@ export type MineruOutlineOk = {
   note?: string
   /** Present when stdout JSON includes a valid attach-book `layout`. */
   layout?: AttachBookLayoutRequestFull
+  /** MinerU content_list array; server builds layout (PDF content_list path). */
+  contentList?: unknown[]
 }
 
 export type MineruOutlineErr = {
@@ -231,6 +233,27 @@ function validateLayoutNode(node: unknown): string | null {
   return null
 }
 
+function parseContentListFromStdoutJson(
+  raw: Record<string, unknown>
+): { contentList: unknown[] } | { error: string } | { omit: true } {
+  if (!('contentList' in raw)) {
+    return { omit: true }
+  }
+  const cl = raw.contentList
+  if (!Array.isArray(cl)) {
+    return { error: 'contentList must be an array' }
+  }
+  if (cl.length === 0) {
+    return { error: 'contentList must be a non-empty array' }
+  }
+  for (const item of cl) {
+    if (!isRecord(item)) {
+      return { error: 'each contentList item must be an object' }
+    }
+  }
+  return { contentList: cl }
+}
+
 function parseLayoutFromStdoutJson(
   raw: Record<string, unknown>
 ):
@@ -257,6 +280,43 @@ function parseLayoutFromStdoutJson(
   return { layout: layoutRaw as AttachBookLayoutRequestFull }
 }
 
+function parseAttachPayloadFromStdoutJson(
+  raw: Record<string, unknown>
+):
+  | { layout: AttachBookLayoutRequestFull }
+  | { contentList: unknown[] }
+  | { error: string }
+  | { omit: true } {
+  const clParsed = parseContentListFromStdoutJson(raw)
+  const layoutParsed = parseLayoutFromStdoutJson(raw)
+  const clKey = 'contentList' in raw
+  const layoutKey = 'layout' in raw
+
+  if (clKey && layoutKey) {
+    const clOk = 'contentList' in clParsed
+    const loOk = 'layout' in layoutParsed
+    if (clOk && loOk) {
+      return {
+        error: 'cannot send both layout and contentList in outline JSON',
+      }
+    }
+  }
+
+  if (clKey && 'error' in clParsed) {
+    return clParsed
+  }
+  if (layoutKey && 'error' in layoutParsed) {
+    return layoutParsed
+  }
+  if ('contentList' in clParsed) {
+    return clParsed
+  }
+  if ('layout' in layoutParsed) {
+    return layoutParsed
+  }
+  return { omit: true }
+}
+
 function toMineruResult(raw: unknown): MineruOutlineResult | null {
   if (!isRecord(raw)) {
     return null
@@ -265,16 +325,19 @@ function toMineruResult(raw: unknown): MineruOutlineResult | null {
     const outline = typeof raw.outline === 'string' ? raw.outline.trim() : ''
     const source = typeof raw.source === 'string' ? raw.source : ''
     const note = typeof raw.note === 'string' ? raw.note : undefined
-    const layoutParsed = parseLayoutFromStdoutJson(raw)
-    if ('error' in layoutParsed) {
-      return { ok: false, error: layoutParsed.error }
+    const attachParsed = parseAttachPayloadFromStdoutJson(raw)
+    if ('error' in attachParsed) {
+      return { ok: false, error: attachParsed.error }
     }
     const out: MineruOutlineOk = { ok: true, outline, source }
     if (note !== undefined) {
       out.note = note
     }
-    if ('layout' in layoutParsed) {
-      out.layout = layoutParsed.layout
+    if ('layout' in attachParsed) {
+      out.layout = attachParsed.layout
+    }
+    if ('contentList' in attachParsed) {
+      out.contentList = attachParsed.contentList
     }
     return out
   }

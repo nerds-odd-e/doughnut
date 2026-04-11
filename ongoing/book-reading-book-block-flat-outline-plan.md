@@ -17,6 +17,7 @@
 - **Total order:** Each structural block has a single **`layout_sequence`** (or equivalent) so `GET …/book` can emit blocks in **preorder** deterministically. Do **not** rely on implicit JPA list order without an explicit sort key.
 - **Depth:** Each block has integer **`depth` ≥ 0** (root-level sections = 0 unless product standardizes differently — pick one convention and keep it stable through Phase 4).
 - **Outline rule:** For blocks sorted by `layout_sequence`, **`depth[i] ≤ depth[i-1] + 1`**. Importer normalizes raw MinerU `text_level` (and gaps) into this rule; **raw** levels may still live on `BookContentBlock` / payload where needed.
+- **Direct content:** Paragraphs and other **non-heading** content rows that appear **between** two structural book blocks in preorder still **belong to** the **preceding** structural block (the section the reader is in). Flat storage only changes how outline position is represented; it does **not** turn that content into a free-floating slice between sections. **`BookContentBlock`** and reading-record keys **by block id** keep that association.
 - **Reading successor:** Product logic continues to treat the **next row in preorder** as the structural successor of the current block (direct content, auto-mark, panel gating). Changing this rule is out of scope unless a phase explicitly rewrites those scenarios.
 
 ---

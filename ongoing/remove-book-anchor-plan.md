@@ -48,16 +48,47 @@ Current frontend unit tests may have `startAnchor` values that are inconsistent 
 
 **User-visible change:** None (same underlying data). Frontend no longer references `startAnchor` at all.
 
-**Scope:**
+There are four production `startAnchor` usage sites in the frontend, each addressed by a sub-phase. The sub-phases follow E2E-led decomposition: each is independently deployable, has no dead code at its boundary, and is verified by E2E.
 
-- **`currentBlockAnchorIdFromAnchorPage`** — rewrite signature from `(orderedPreorderStartAnchors: BookAnchorFull[], ...)` to take `{ id: number; firstBbox: PageBboxFull | undefined }[]` (or equivalent). Internally, use `firstBbox.pageIndex` and `firstBbox.bbox` instead of `parsePdfOutlineV1Anchor(anchor).pageIndex` / `.bbox`. Update callers in `BookReadingContent.vue` (`flatBookBlocks.value.map(r => r.startAnchor)` → map to new shape from `r.id` + `r.allBboxes[0]`).
-- **`BookReadingContent.vue` navigation** — `parsePdfOutlineV1Anchor(block.startAnchor)` in `applyBookBlockSelection` → derive from `block.allBboxes[0]` (use `wireItemsToNavigationTargets([block.allBboxes[0]])` or direct field access). Same for snap-back logic (`parsePdfOutlineV1Anchor(sel.startAnchor)` → `allBboxes[0]`).
-- **`pdfOutlineV1Anchor.ts`** — remove `parsePdfOutlineV1Anchor(anchor: BookAnchorFull)` and `parsePdfOutlineV1StartAnchor(value: string)` once no callers remain; remove `BookAnchorFull` import. Keep `wireItemsToNavigationTargets`, `outlineV1BboxToPdfJsXyzDestArray`, and geometry helpers (they operate on `PageBboxFull` / `PdfOutlineV1NavigationTarget`, not on anchor strings). If `extractPageIndexZeroBased(value: string)` has no callers, remove it too.
-- **Remove `startAnchor` from `BookReadingBookLayoutBlockRow`** type — it is no longer read.
-- **Test fixture updates** — ensure `allBboxes[0]` in test data matches what `startAnchor.value` used to provide (page index, bbox coordinates). If `BookAnchorFullBuilder` is no longer imported anywhere in frontend tests, remove its usage. May need to build `PageBboxFull` values in tests where only `startAnchor` was provided before.
-- **Remove `BookAnchorFullBuilder`** and `aBookAnchor` from `doughnut-test-fixtures` if no consumers remain after this phase (check CLI tests — they may still reference it; if so, defer removal to Phase 4).
-- Update unit tests: `currentBlockAnchorFromAnchorPage.spec.ts` (new input shape), `pdfOutlineV1Anchor.spec.ts` (remove anchor-string tests), `BookReadingPage.spec.ts` (navigation-related assertions).
-- After changes, run frontend unit tests + E2E `book_browsing.feature` and `reading_record.feature`.
+### Sub-phase 2a (RED) — Rewrite `currentBlockAnchorFromAnchorPage` unit tests for structured input
+
+Rewrite `currentBlockAnchorFromAnchorPage.spec.ts` to pass structured `{ id, firstBbox }` objects (matching `PageBboxFull` shape) instead of `BookAnchorFull`. The spec currently uses `makeMe.aBookAnchor` and `makeMe.bookReadingTopMathsLikeAnchors()` — replace with inline `{ id, firstBbox: { pageIndex, bbox } }` arrays.
+
+- Tests **fail** (function still expects `BookAnchorFull[]`).
+- E2E: existing `book_browsing.feature` still passes (no production change).
+- No dead code.
+
+### Sub-phase 2b (GREEN) — Rewrite `currentBlockAnchorIdFromAnchorPage` implementation and caller
+
+- Change function signature from `(orderedPreorderStartAnchors: BookAnchorFull[], ...)` to take `{ id: number; firstBbox: { pageIndex: number; bbox: ReadonlyArray<number> } | undefined }[]` (or equivalent). Remove internal `parsePdfOutlineV1Anchor` call; use `firstBbox.pageIndex` and `firstBbox.bbox` directly.
+- Update caller in `BookReadingContent.vue` (`flatBookBlocks.value.map((r) => r.startAnchor)` → `flatBookBlocks.value.map((r) => ({ id: r.id, firstBbox: r.allBboxes[0] }))`).
+- Remove `BookAnchorFull` import from `currentBlockAnchorFromAnchorPage.ts`.
+- Unit tests from 2a now **pass**.
+- E2E: `book_browsing.feature` (viewport-driven current-block highlight).
+- No dead code: `parsePdfOutlineV1Anchor` is still called by navigation (line 426) and snap-back (line 227).
+
+### Sub-phase 2c — Replace `startAnchor` in block-selection navigation with `allBboxes[0]`
+
+- In `applyBookBlockSelection`: replace `parsePdfOutlineV1Anchor(block.startAnchor)` with `wireItemsToNavigationTargets(block.allBboxes)[0] ?? null`.
+- E2E: `book_browsing.feature` (clicking a book block scrolls PDF to the right place).
+- No dead code: `parsePdfOutlineV1Anchor` is still called by snap-back (line 227).
+
+### Sub-phase 2d — Replace `startAnchor` in snap-back with `allBboxes[0]`; remove dead anchor-parsing code
+
+- In `performSnapBack`: replace `parsePdfOutlineV1Anchor(sel.startAnchor)` with `wireItemsToNavigationTargets(sel.allBboxes)[0] ?? null`.
+- `parsePdfOutlineV1Anchor` now has **zero** production callers → remove it, `parsePdfOutlineV1StartAnchor`, and `extractPageIndexZeroBased` from `pdfOutlineV1Anchor.ts`. Remove `BookAnchorFull` import from that file.
+- Remove corresponding unit tests from `pdfOutlineV1Anchor.spec.ts` (the `parsePdfOutlineV1Anchor`, `parsePdfOutlineV1StartAnchor`, and `extractPageIndexZeroBased` describe blocks). Keep `wireItemsToNavigationTargets`, `outlineV1BboxToPdfJsXyzDestArray`, and geometry helper tests.
+- E2E: `reading_record.feature` (snap-back behavior) + `book_browsing.feature`.
+- No dead code.
+
+### Sub-phase 2e — Remove `startAnchor` from row type and test fixtures
+
+- Remove `startAnchor` field from `BookReadingBookLayoutBlockRow` type in `BookReadingBookLayout.vue`.
+- Remove `startAnchor: child.startAnchor` from row construction in `BookReadingContent.vue` (line 164).
+- Update `BookReadingPage.spec.ts`: the `.map((startAnchor, i) => ({ ... startAnchor, ...}))` pattern no longer needs `startAnchor` on the built blocks. Ensure `allBboxes[0]` in test data carries the same page/bbox info.
+- Remove `BookAnchorFullBuilder`, `makeMe.aBookAnchor`, and `makeMe.bookReadingTopMathsLikeAnchors()` from `doughnut-test-fixtures` **if no consumers remain** (check CLI tests; if CLI still references them, defer removal to Phase 4).
+- E2E: `book_browsing.feature` + `reading_record.feature`.
+- No dead code.
 
 ---
 

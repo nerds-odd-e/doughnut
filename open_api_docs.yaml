@@ -3785,10 +3785,12 @@ components:
           type: string
         layout:
           $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
+        contentList:
+          type: array
+          items: {}
       required:
       - bookName
       - format
-      - layout
     BookAnchor_Full:
       type: object
       properties:

@@ -38,7 +38,7 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     }
   })
 
-  test('returns ok JSON with layout roots (argv compatible with runMineruOutlineSubprocess)', async () => {
+  test('returns ok JSON with contentList (argv compatible with runMineruOutlineSubprocess)', async () => {
     const result = await runMineruOutlineSubprocess({
       bookPath: pdfPath,
       cwd: repoRoot,
@@ -47,26 +47,12 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.outline).toContain('[L2 p0] Code Refactoring')
-    expect(result.layout?.roots?.[0]?.title).toBe('Code Refactoring')
-    expect(result.layout?.roots?.[0]?.children).toBeUndefined()
-    expect(result.layout?.roots?.[4]?.title).toBe(
-      '2.2 Refactoring as Strengthening the Code'
-    )
-    const section3 = result.layout?.roots?.[5]
-    expect(section3?.title).toBe(
-      '3. Refactoring Is Not Only About Changing Production Code'
-    )
-    expect(section3?.children?.[0]?.title).toBe(
-      '3.1 Can You Refactor Without Tests?'
-    )
-    expect(section3?.children?.[7]?.title).toBe(
-      '6. Why Refactoring Matters More with AI'
-    )
+    expect(result.layout).toBeUndefined()
+    const cl = result.contentList
+    expect(Array.isArray(cl)).toBe(true)
+    expect((cl?.length ?? 0) > 2).toBe(true)
 
-    const firstRoot = result.layout?.roots?.[0] as { contentBlocks?: unknown[] }
-    expect(Array.isArray(firstRoot?.contentBlocks)).toBe(true)
-    expect((firstRoot?.contentBlocks?.length ?? 0) > 1).toBe(true)
-    const headingBlock = firstRoot?.contentBlocks?.[0] as {
+    const headingBlock = cl?.[0] as {
       type?: string
       text_level?: number
       text?: string
@@ -74,7 +60,7 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     expect(headingBlock?.type).toBe('text')
     expect(typeof headingBlock?.text_level).toBe('number')
     expect(headingBlock?.text).toBe('Code Refactoring')
-    const firstBodyBlock = firstRoot?.contentBlocks?.[1] as {
+    const firstBodyBlock = cl?.[1] as {
       type?: string
       text_level?: number
       text?: string

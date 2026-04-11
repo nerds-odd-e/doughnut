@@ -314,6 +314,83 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(beginningCbs.get(1).getType(), equalTo("text"));
       assertThat(beginningCbs.get(1).getPageIdx(), equalTo(0));
     }
+
+    @Test
+    void persistsFromContentListBuildsBeginningAndChapter() throws Exception {
+      Notebook nb = myNotebook();
+      List<Object> cl = new ArrayList<>();
+      Map<String, Object> orphan = new LinkedHashMap<>();
+      orphan.put("type", "text");
+      orphan.put("text", "Orphan body");
+      orphan.put("bbox", new ArrayList<>(List.of(10, 100, 200, 130)));
+      orphan.put("page_idx", 0);
+      cl.add(orphan);
+      cl.add(headingBlock("Chapter One", 2, 1, List.of(1.0, 200.0, 300.0, 240.0)));
+
+      AttachBookRequest req = new AttachBookRequest();
+      req.setBookName("Linear Algebra");
+      req.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
+      req.setContentList(cl);
+
+      ResponseEntity<Book> res = controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES));
+
+      Book created = res.getBody();
+      assertThat(created, notNullValue());
+      List<BookBlock> roots = rootBlocksSorted(created);
+      assertThat(roots, hasSize(2));
+      assertThat(roots.getFirst().getStructuralTitle(), equalTo("*beginning*"));
+      assertThat(roots.get(1).getStructuralTitle(), equalTo("Chapter One"));
+
+      List<BookContentBlock> beginningCbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(
+              roots.getFirst().getId());
+      assertThat(beginningCbs, hasSize(2));
+      assertThat(beginningCbs.getFirst().getType(), equalTo("beginning_anchor"));
+      assertThat(beginningCbs.get(1).getRawData(), containsString("Orphan body"));
+    }
+
+    @Test
+    void rejectsBothLayoutRootsAndContentList() {
+      Notebook nb = myNotebook();
+      AttachBookRequest req = attachRequest(node("A"));
+      List<Object> cl = new ArrayList<>();
+      Map<String, Object> noise = new LinkedHashMap<>();
+      noise.put("type", "text");
+      noise.put("text", "only body");
+      noise.put("page_idx", 0);
+      noise.put("bbox", new ArrayList<>(List.of(0.0, 0.0, 1.0, 1.0)));
+      cl.add(noise);
+      req.setContentList(cl);
+      assertThrows(
+          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+    }
+
+    @Test
+    void rejectsNeitherLayoutNorContentList() {
+      Notebook nb = myNotebook();
+      AttachBookRequest req = new AttachBookRequest();
+      req.setBookName("X");
+      req.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
+      assertThrows(
+          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+    }
+
+    @Test
+    void rejectsContentListThatProducesNoBlocks() {
+      Notebook nb = myNotebook();
+      List<Object> cl = new ArrayList<>();
+      Map<String, Object> pn = new LinkedHashMap<>();
+      pn.put("type", "page_number");
+      pn.put("text", "1");
+      pn.put("page_idx", 0);
+      cl.add(pn);
+      AttachBookRequest req = new AttachBookRequest();
+      req.setBookName("Book");
+      req.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
+      req.setContentList(cl);
+      assertThrows(
+          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+    }
   }
 
   @Nested
