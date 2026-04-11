@@ -1,6 +1,6 @@
 # Plan: Book layout — flat outline storage (depth + order)
 
-**Status:** Draft — not executed.
+**Status:** Phases 1–3 shipped; Phase 4 (frontend consumes API `depth` directly) not started.
 
 **Precondition:** **No production book data to migrate.** Schema changes may **drop and recreate** book-related tables or columns without backfill. Local and CI fixtures stay under test control.
 
@@ -50,6 +50,8 @@
 ---
 
 ## Phase 3 — API exposes canonical fields (`depth`, order); optional transitional dual fields
+
+**Status:** Shipped (Option A: **`depth`** + OpenAPI **`blocks`** ordering description; **`parentBlockId`** / **`siblingOrder`** retained).
 
 **Outcome:** **`GET …/book`** (and OpenAPI) expose **`depth`** and a clear **ordering** contract (document that **`blocks` array order is preorder** and matches `layout_sequence`). Either:
 

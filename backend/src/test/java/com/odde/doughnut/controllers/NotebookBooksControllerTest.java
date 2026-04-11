@@ -4,12 +4,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
 import com.odde.doughnut.entities.BookContentBlock;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
+import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookBlockReadingRecordRepository;
@@ -53,6 +56,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   @Autowired BookContentBlockRepository bookContentBlockRepository;
   @Autowired BookStorage bookStorage;
+  @Autowired ObjectMapper objectMapper;
 
   @BeforeEach
   void setup() {
@@ -192,6 +196,36 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       ResponseEntity<byte[]> fileRes = controller.getBookFile(webRequest(), nb);
       assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(fileRes.getBody(), equalTo(pdfBytes));
+    }
+
+    @Test
+    void getBookFullViewJsonExposesDepthAndPreorderMatchesLayoutSequence() throws Exception {
+      Notebook nb = myNotebook();
+      AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
+      AttachBookLayoutNodeRequest ch2 = node("Section 1.2");
+      AttachBookLayoutNodeRequest root = node("Chapter 1", ch1, ch2);
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+      controller.attachBook(nb, attachRequest(root), pdfFile(pdfBytes));
+
+      Book detail = controller.getBook(nb);
+      String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
+      JsonNode tree = objectMapper.readTree(json);
+      JsonNode blocks = tree.get("blocks");
+      assertThat(blocks.size(), equalTo(3));
+      assertThat(blocks.get(0).get("depth").asInt(), equalTo(0));
+      assertThat(blocks.get(1).get("depth").asInt(), equalTo(1));
+      assertThat(blocks.get(2).get("depth").asInt(), equalTo(1));
+      assertThat(blocks.get(0).get("title").asText(), equalTo("Chapter 1"));
+      assertThat(blocks.get(1).get("title").asText(), equalTo("Section 1.1"));
+      assertThat(blocks.get(2).get("title").asText(), equalTo("Section 1.2"));
+
+      List<BookBlock> byLayoutSeq =
+          detail.getBlocks().stream()
+              .sorted(Comparator.comparingInt(BookBlock::getLayoutSequence))
+              .toList();
+      for (int i = 0; i < 3; i++) {
+        assertThat(blocks.get(i).get("id").asInt(), equalTo(byLayoutSeq.get(i).getId()));
+      }
     }
 
     @Test

@@ -16,7 +16,15 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({"id", "startAnchor", "siblingOrder", "title", "parentBlockId", "allBboxes"})
+@JsonPropertyOrder({
+  "id",
+  "depth",
+  "startAnchor",
+  "siblingOrder",
+  "title",
+  "parentBlockId",
+  "allBboxes"
+})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -33,9 +41,13 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   private int layoutSequence;
 
   @Column(name = "depth", nullable = false)
-  @JsonIgnore
   @Getter
   @Setter
+  @JsonProperty("depth")
+  @JsonView(BookViews.Full.class)
+  @Schema(
+      requiredMode = Schema.RequiredMode.REQUIRED,
+      description = "Nesting depth in the book layout; root-level blocks are 0.")
   private int depth;
 
   @Column(name = "structural_title", nullable = false, length = 512)

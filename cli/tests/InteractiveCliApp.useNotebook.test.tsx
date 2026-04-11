@@ -161,12 +161,22 @@ describe('InteractiveCliApp /use notebook integration', () => {
         bookName: 'top-maths',
         format: 'pdf',
         blocks: [
-          { id: 1, title: 'Part One', siblingOrder: 0 },
+          {
+            id: 1,
+            depth: 0,
+            title: 'Part One',
+            siblingOrder: 0,
+            startAnchor: { id: 1, value: '{}' },
+            allBboxes: [],
+          },
           {
             id: 2,
+            depth: 1,
             title: 'Part One Child',
             siblingOrder: 0,
             parentBlockId: '1',
+            startAnchor: { id: 2, value: '{}' },
+            allBboxes: [],
           },
         ],
       } as Awaited<

@@ -3808,6 +3808,10 @@ components:
         id:
           type: integer
           format: int32
+        depth:
+          type: integer
+          format: int32
+          description: Nesting depth in the book layout; root-level blocks are 0.
         startAnchor:
           $ref: "#/components/schemas/BookAnchor_Full"
         siblingOrder:
@@ -3823,6 +3827,7 @@ components:
             $ref: "#/components/schemas/PageBbox_Full"
       required:
       - allBboxes
+      - depth
       - id
       - startAnchor
       - title
@@ -3844,6 +3849,8 @@ components:
           format: date-time
         blocks:
           type: array
+          description: "Book blocks in depth-first preorder (parent before descendants,\
+            \ then siblings). Order matches ascending layout_sequence in persistence."
           items:
             $ref: "#/components/schemas/BookBlock_Full"
         notebookId:

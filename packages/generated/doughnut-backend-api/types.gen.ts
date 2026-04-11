@@ -327,6 +327,10 @@ export type BookAnchorFull = {
 
 export type BookBlockFull = {
     id: number;
+    /**
+     * Nesting depth in the book layout; root-level blocks are 0.
+     */
+    depth: number;
     startAnchor: BookAnchorFull;
     siblingOrder?: number;
     title: string;
@@ -340,6 +344,9 @@ export type BookFull = {
     format: string;
     createdAt?: string;
     updatedAt?: string;
+    /**
+     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
+     */
     blocks: Array<BookBlockFull>;
     notebookId: string;
 };

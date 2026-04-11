@@ -154,17 +154,17 @@ function buildFlatBookBlocks(
     (a.siblingOrder ?? 0) - (b.siblingOrder ?? 0)
 
   const result: BookReadingBookLayoutBlockRow[] = []
-  function visit(parentId: number | null, depth: number) {
+  function visit(parentId: number | null, nestDepth: number) {
     const children = (childrenMap.get(parentId) ?? []).slice().sort(sortByOrder)
     for (const child of children) {
       result.push({
         id: child.id,
         title: child.title,
-        depth,
+        depth: nestDepth,
         startAnchor: child.startAnchor,
         allBboxes: child.allBboxes,
       })
-      visit(child.id, depth + 1)
+      visit(child.id, nestDepth + 1)
     }
   }
   visit(null, 0)

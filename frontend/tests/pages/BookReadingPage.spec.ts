@@ -31,6 +31,7 @@ function topMathsLikeFlatBlocks(options?: {
   const anchors = makeMe.bookReadingTopMathsLikeAnchors()
   return anchors.map((startAnchor, i) => ({
     id: startAnchor.id,
+    depth: 0,
     title: `Section ${i + 1}`,
     startAnchor,
     siblingOrder: i,
@@ -806,6 +807,7 @@ describe("BookReadingPage", () => {
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
           id: startAnchor.id,
+          depth: 0,
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
@@ -855,6 +857,7 @@ describe("BookReadingPage", () => {
         const crossPageContentBbox = { pageIndex: 1, bbox: [10, 100, 500, 150] }
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
           id: startAnchor.id,
+          depth: 0,
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
@@ -1495,6 +1498,7 @@ describe("BookReadingPage", () => {
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
           id: startAnchor.id,
+          depth: 0,
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,

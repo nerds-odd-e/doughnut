@@ -67,7 +67,11 @@ public class Book extends EntityIdentifiedByIdOnly {
 
   @JsonProperty("blocks")
   @JsonView(BookViews.Full.class)
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(
+      requiredMode = Schema.RequiredMode.REQUIRED,
+      description =
+          "Book blocks in depth-first preorder (parent before descendants, then siblings). "
+              + "Order matches ascending layout_sequence in persistence.")
   public List<BookBlock> getBlocks() {
     return blocks;
   }
