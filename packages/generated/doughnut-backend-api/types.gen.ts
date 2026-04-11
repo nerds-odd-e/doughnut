@@ -320,18 +320,12 @@ export type AttachBookRequestFull = {
     contentList?: Array<unknown>;
 };
 
-export type BookAnchorFull = {
-    id: number;
-    value: string;
-};
-
 export type BookBlockFull = {
     id: number;
     /**
      * Nesting depth in the book layout; root-level blocks are 0.
      */
     depth: number;
-    startAnchor: BookAnchorFull;
     title: string;
     allBboxes: Array<PageBboxFull>;
 };

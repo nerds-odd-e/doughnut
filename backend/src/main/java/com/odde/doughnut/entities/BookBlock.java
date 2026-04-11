@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.odde.doughnut.controllers.dto.BookAnchorFullWire;
 import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.PageBbox;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +15,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({"id", "depth", "startAnchor", "title", "allBboxes"})
+@JsonPropertyOrder({"id", "depth", "title", "allBboxes"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -48,15 +47,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonProperty("title")
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String structuralTitle;
-
-  @Transient
-  @JsonProperty("startAnchor")
-  @JsonView(BookViews.Full.class)
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  public BookAnchorFullWire getStartAnchor() {
-    String value = contentBlocks.isEmpty() ? "{}" : contentBlocks.getFirst().getRawData();
-    return new BookAnchorFullWire(getId() == null ? 0 : getId(), value);
-  }
 
   @OneToMany(
       mappedBy = "bookBlock",

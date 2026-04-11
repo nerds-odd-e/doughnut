@@ -3791,17 +3791,6 @@ components:
       required:
       - bookName
       - format
-    BookAnchor_Full:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        value:
-          type: string
-      required:
-      - id
-      - value
     BookBlock_Full:
       type: object
       properties:
@@ -3812,8 +3801,6 @@ components:
           type: integer
           format: int32
           description: Nesting depth in the book layout; root-level blocks are 0.
-        startAnchor:
-          $ref: "#/components/schemas/BookAnchor_Full"
         title:
           type: string
         allBboxes:
@@ -3824,7 +3811,6 @@ components:
       - allBboxes
       - depth
       - id
-      - startAnchor
       - title
     Book_Full:
       type: object
