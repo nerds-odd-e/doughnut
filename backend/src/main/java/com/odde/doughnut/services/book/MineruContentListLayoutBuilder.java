@@ -9,7 +9,8 @@ import java.util.Map;
 
 /**
  * Builds attach-book {@link AttachBookLayoutRequest} from a MinerU {@code content_list} array.
- * Matches {@code layout_roots_with_content_blocks} in {@code cli/python/mineru_book_outline.py}.
+ * Canonical implementation for attach-book {@code contentList} → layout; covered by {@code
+ * com.odde.doughnut.services.book.MineruContentListLayoutBuilderTest}.
  */
 public final class MineruContentListLayoutBuilder {
 

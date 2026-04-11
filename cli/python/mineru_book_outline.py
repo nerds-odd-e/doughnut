@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 import tempfile
 import zipfile
@@ -156,44 +155,6 @@ def find_middle_json(output_dir: Path, stem: str) -> Path | None:
     return matches[0] if matches else None
 
 
-def _anchor(payload: dict[str, Any]) -> dict[str, str]:
-    s = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    return {"value": s}
-
-
-def _is_valid_bbox(bbox: Any) -> bool:
-    """Return True if bbox is a valid [x0, y0, x1, y1] array (mirrors TypeScript parseOptionalBbox)."""
-    if not isinstance(bbox, list) or len(bbox) != 4:
-        return False
-    try:
-        x0, y0, x1, y1 = (float(b) for b in bbox)
-    except (TypeError, ValueError):
-        return False
-    return (
-        math.isfinite(x0)
-        and math.isfinite(y0)
-        and math.isfinite(x1)
-        and math.isfinite(y1)
-        and x0 < x1
-        and y0 < y1
-    )
-
-
-def _beginning_anchor_payload(first_orphan: dict[str, Any]) -> dict[str, Any]:
-    payload: dict[str, Any] = {"kind": "beginning"}
-    if first_orphan.get("page_idx") is not None:
-        payload["page_idx"] = first_orphan["page_idx"]
-    bbox = first_orphan.get("bbox")
-    if isinstance(bbox, list) and len(bbox) == 4:
-        try:
-            x0, y0, x1, y1 = (float(b) for b in bbox)
-            h = y1 - y0
-            payload["bbox"] = [x0, max(0.0, y0 - h), x1, y0]
-        except (TypeError, ValueError):
-            pass
-    return payload
-
-
 def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order.
 
@@ -223,71 +184,6 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
             parent = stack[-1][1]
             parent.setdefault("children", []).append(node)
         stack.append((level, node))
-    return roots
-
-
-def layout_roots_with_content_blocks(data: list[Any]) -> list[dict[str, Any]]:
-    """Build nested layout nodes with ordered contentBlocks from the full content_list.
-
-    Each layout node's contentBlocks holds the heading item as index 0 (the structural
-    title block that also serves as startAnchor), followed by non-heading MinerU body
-    items in reading order. Items before the first heading attach to a synthetic root
-    block titled *beginning* whose contentBlocks[0] is a synthetic anchor block derived
-    one line height above the first orphan, followed by the orphan body items.
-    """
-    roots: list[dict[str, Any]] = []
-    stack: list[tuple[int, dict[str, Any]]] = []
-    beginning_node: dict[str, Any] | None = None
-
-    def flush_beginning() -> None:
-        nonlocal beginning_node
-        if beginning_node is not None:
-            roots.append(beginning_node)
-            beginning_node = None
-
-    for item in data:
-        if not isinstance(item, dict):
-            continue
-        item_type = item.get("type")
-        text_level = item.get("text_level") if item_type == "text" else None
-        if item_type == "text" and text_level in (1, 2, 3):
-            title = (item.get("text") or "").strip()
-            if not title:
-                continue
-            page_idx = item.get("page_idx")
-            bbox = item.get("bbox")
-            if page_idx is None or not _is_valid_bbox(bbox):
-                continue
-            flush_beginning()
-            node: dict[str, Any] = {
-                "title": title,
-                "contentBlocks": [item],
-            }
-            while stack and stack[-1][0] >= text_level:
-                stack.pop()
-            if not stack:
-                roots.append(node)
-            else:
-                stack[-1][1].setdefault("children", []).append(node)
-            stack.append((text_level, node))
-        else:
-            if stack:
-                stack[-1][1]["contentBlocks"].append(item)
-            else:
-                if beginning_node is None:
-                    anchor_payload = _beginning_anchor_payload(item)
-                    if anchor_payload.get("page_idx") is not None and _is_valid_bbox(anchor_payload.get("bbox")):
-                        synthetic_anchor = {"type": "beginning_anchor", **anchor_payload}
-                        beginning_node = {
-                            "title": "*beginning*",
-                            "contentBlocks": [synthetic_anchor],
-                        }
-                if beginning_node is not None:
-                    beginning_node["contentBlocks"].append(item)
-
-    if beginning_node is not None:
-        roots.append(beginning_node)
-
     return roots
 
 
