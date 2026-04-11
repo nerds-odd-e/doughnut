@@ -30,7 +30,7 @@ function topMathsLikeFlatBlocks(options?: {
 }): BookBlockFull[] {
   const anchors = makeMe.bookReadingTopMathsLikeAnchors()
   return anchors.map((startAnchor, i) => ({
-    id: i + 1,
+    id: startAnchor.id,
     title: `Section ${i + 1}`,
     startAnchor,
     siblingOrder: i,
@@ -548,7 +548,7 @@ describe("BookReadingPage", () => {
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookBlockId: "1",
+            bookBlockId: "101",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
@@ -601,7 +601,7 @@ describe("BookReadingPage", () => {
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookBlockId: "1",
+            bookBlockId: "101",
             status: "SKIMMED",
             completedAt: "2020-01-01T00:00:00Z",
           },
@@ -679,7 +679,7 @@ describe("BookReadingPage", () => {
         .mockResolvedValue(
           wrapSdkResponse([
             {
-              bookBlockId: "1",
+              bookBlockId: "101",
               status: "SKIMMED",
               completedAt: "2020-01-01T00:00:00Z",
             },
@@ -706,7 +706,7 @@ describe("BookReadingPage", () => {
         expect.objectContaining({
           path: expect.objectContaining({
             notebook: notebookId,
-            bookBlock: 1,
+            bookBlock: 101,
           }),
           body: { status: "SKIMMED" },
         })
@@ -720,7 +720,7 @@ describe("BookReadingPage", () => {
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookBlockId: "1",
+            bookBlockId: "101",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
@@ -758,7 +758,7 @@ describe("BookReadingPage", () => {
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookBlockId: "1",
+            bookBlockId: "101",
             status: "READ",
             completedAt: "2020-01-01T00:00:00Z",
           },
@@ -805,7 +805,7 @@ describe("BookReadingPage", () => {
       function stubGetBookWithFirstBlockHavingBbox() {
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
-          id: i + 1,
+          id: startAnchor.id,
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
@@ -854,7 +854,7 @@ describe("BookReadingPage", () => {
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
         const crossPageContentBbox = { pageIndex: 1, bbox: [10, 100, 500, 150] }
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
-          id: i + 1,
+          id: startAnchor.id,
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
@@ -1216,7 +1216,7 @@ describe("BookReadingPage", () => {
         ).mockResolvedValue(
           wrapSdkResponse([
             {
-              bookBlockId: "1",
+              bookBlockId: "101",
               status: "READ",
               completedAt: "2020-01-01T00:00:00Z",
             },
@@ -1416,7 +1416,7 @@ describe("BookReadingPage", () => {
         ).mockResolvedValue(
           wrapSdkResponse([
             {
-              bookBlockId: "1",
+              bookBlockId: "101",
               status: "READ",
               completedAt: "2020-01-01T00:00:00Z",
             },
@@ -1494,7 +1494,7 @@ describe("BookReadingPage", () => {
         const section2ContentBbox = { pageIndex: 0, bbox: [48, 200, 564, 500] }
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
-          id: i + 1,
+          id: startAnchor.id,
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
@@ -1609,7 +1609,7 @@ describe("BookReadingPage", () => {
         .mockResolvedValue(
           wrapSdkResponse([
             {
-              bookBlockId: "1",
+              bookBlockId: "101",
               status: "READ",
               completedAt: "2020-01-01T00:00:00Z",
             },
@@ -1630,7 +1630,7 @@ describe("BookReadingPage", () => {
         expect.objectContaining({
           path: expect.objectContaining({
             notebook: notebookId,
-            bookBlock: 1,
+            bookBlock: 101,
           }),
           body: { status: "READ" },
         })
@@ -1644,7 +1644,7 @@ describe("BookReadingPage", () => {
       ).mockResolvedValue(
         wrapSdkResponse([
           {
-            bookBlockId: "1",
+            bookBlockId: "101",
             status: "SKIMMED",
             completedAt: "2020-01-01T00:00:00Z",
           },
