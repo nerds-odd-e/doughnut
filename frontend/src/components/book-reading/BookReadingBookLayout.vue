@@ -26,7 +26,7 @@
         class="daisy-p-3 daisy-pb-8"
       >
         <button
-          v-for="block in bookBlockRows"
+          v-for="block in blocks"
           :key="block.id"
           type="button"
           data-testid="book-reading-book-block"
@@ -84,17 +84,12 @@ import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockId
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { ref, watch } from "vue"
 
-export type BookReadingBookLayoutBlockRow = Pick<
-  BookBlockFull,
-  "id" | "title" | "depth" | "allBboxes"
->
-
 const opened = defineModel<boolean>("opened", { required: true })
 
 const props = defineProps<{
   panelId: string
   isMdOrLarger: boolean
-  bookBlockRows: BookReadingBookLayoutBlockRow[]
+  blocks: BookBlockFull[]
   currentBlockId: number | null
   selectedBlockId: number | null
   dispositionForBlock: (
@@ -103,7 +98,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  blockClick: [block: BookReadingBookLayoutBlockRow]
+  blockClick: [block: BookBlockFull]
 }>()
 
 const asideRef = ref<HTMLElement | null>(null)

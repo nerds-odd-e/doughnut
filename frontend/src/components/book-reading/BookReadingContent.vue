@@ -37,7 +37,7 @@
     v-model:opened="bookLayoutOpened"
     :panel-id="bookReadingBookLayoutPanelId"
     :is-md-or-larger="isMdOrLarger"
-    :book-block-rows="flatBookBlocks"
+    :blocks="bookBlocks"
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
     :disposition-for-block="bookReading.dispositionForBlock"
@@ -74,9 +74,7 @@
 
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
-import BookReadingBookLayout, {
-  type BookReadingBookLayoutBlockRow,
-} from "@/components/book-reading/BookReadingBookLayout.vue"
+import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
@@ -138,24 +136,15 @@ function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
 }
 
-function bookLayoutRowsFromApiBlocks(
-  blocks: BookBlockFull[]
-): BookReadingBookLayoutBlockRow[] {
-  return blocks.map((block) => ({
-    id: block.id,
-    title: block.title,
-    depth: block.depth,
-    allBboxes: block.allBboxes,
-  }))
-}
+const bookBlocks = computed(() => props.book.blocks)
 
 function selectedIndexAndSuccessor(
-  rows: readonly BookReadingBookLayoutBlockRow[],
+  rows: readonly BookBlockFull[],
   selId: number
 ): {
   selIdx: number
-  sel: BookReadingBookLayoutBlockRow
-  successor: BookReadingBookLayoutBlockRow
+  sel: BookBlockFull
+  successor: BookBlockFull
 } | null {
   const selIdx = rows.findIndex((r) => r.id === selId)
   if (selIdx < 0 || selIdx >= rows.length - 1) {
@@ -168,7 +157,6 @@ function selectedIndexAndSuccessor(
   }
 }
 
-const flatBookBlocks = ref<BookReadingBookLayoutBlockRow[]>([])
 const currentBlockId = ref<number | null>(null)
 
 const selectedBlockId = ref<number | null>(null)
@@ -179,11 +167,11 @@ const geometryEverVisibleForSelection = ref(false)
 const snapbackAttempts = new Map<number, number>()
 const snapAnimationKey = ref(0)
 
-function hasDirectContent(row: BookReadingBookLayoutBlockRow): boolean {
+function hasDirectContent(row: BookBlockFull): boolean {
   return row.allBboxes.length > 1
 }
 
-function lastContentBbox(row: BookReadingBookLayoutBlockRow) {
+function lastContentBbox(row: BookBlockFull) {
   return hasDirectContent(row) ? row.allBboxes[row.allBboxes.length - 1]! : null
 }
 
@@ -192,7 +180,7 @@ function shouldSnapBack(proposedBlockId: number | null): boolean {
   const selId = selectedBlockId.value
   if (selId === null) return false
   if (bookReading.hasRecordedDisposition(selId)) return false
-  const rows = flatBookBlocks.value
+  const rows = bookBlocks.value
   const chain = selectedIndexAndSuccessor(rows, selId)
   if (chain === null) return false
   const { selIdx, sel, successor } = chain
@@ -214,7 +202,7 @@ function performSnapBack(): void {
   const selId = selectedBlockId.value
   if (selId === null) return
   snapAnimationKey.value += 1
-  const rows = flatBookBlocks.value
+  const rows = bookBlocks.value
   const sel = rows.find((r) => r.id === selId)
   if (!sel) return
   const lastBbox = lastContentBbox(sel)
@@ -241,26 +229,25 @@ function performSnapBack(): void {
 
 // allBboxes: index 0 is the block start region; remaining entries are direct-content blocks.
 // When length > 1, the last entry is the last direct-content bbox.
-const blockAwaitingConfirmation =
-  computed<BookReadingBookLayoutBlockRow | null>(() => {
-    const selId = selectedBlockId.value
-    if (selId === null) return null
-    if (bookReading.hasRecordedDisposition(selId)) return null
-    const rows = flatBookBlocks.value
-    const chain = selectedIndexAndSuccessor(rows, selId)
-    if (chain === null) return null
-    const { sel, successor } = chain
-    const lastBbox = lastContentBbox(sel)
-    if (lastBbox !== null) {
-      if (lastContentBottomVisible.value) return sel
-      if (geometryEverVisibleForSelection.value) {
-        return successor.id === currentBlockId.value ? null : sel
-      }
-      return null
+const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
+  const selId = selectedBlockId.value
+  if (selId === null) return null
+  if (bookReading.hasRecordedDisposition(selId)) return null
+  const rows = bookBlocks.value
+  const chain = selectedIndexAndSuccessor(rows, selId)
+  if (chain === null) return null
+  const { sel, successor } = chain
+  const lastBbox = lastContentBbox(sel)
+  if (lastBbox !== null) {
+    if (lastContentBottomVisible.value) return sel
+    if (geometryEverVisibleForSelection.value) {
+      return successor.id === currentBlockId.value ? null : sel
     }
-    // Fallback: no usable bbox → use successor-as-current rule
-    return successor.id === currentBlockId.value ? sel : null
-  })
+    return null
+  }
+  // Fallback: no usable bbox → use successor-as-current rule
+  return successor.id === currentBlockId.value ? sel : null
+})
 
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
@@ -300,7 +287,7 @@ function onViewportAnchorPage(payload: {
     pdfBarPagesTotal.value = payload.pagesCount
   }
   const candidate = currentBlockAnchorIdFromAnchorPage(
-    flatBookBlocks.value.map((r) => ({
+    bookBlocks.value.map((r) => ({
       id: r.id,
       firstBbox: r.allBboxes?.[0],
     })),
@@ -311,7 +298,7 @@ function onViewportAnchorPage(payload: {
   currentBlockAnchorDebouncer.propose(candidate)
   const selIdForGeometry = selectedBlockId.value
   if (selIdForGeometry !== null) {
-    const selForGeometry = flatBookBlocks.value.find(
+    const selForGeometry = bookBlocks.value.find(
       (r) => r.id === selIdForGeometry
     )
     const lastBboxForGeometry =
@@ -353,7 +340,7 @@ watch(currentBlockId, (id) => {
   const { text, changed } = nextLiveAnnouncementText(
     lastAnnouncedCurrentBlockTitle.value,
     id,
-    flatBookBlocks.value
+    bookBlocks.value
   )
   if (!changed) {
     return
@@ -364,7 +351,7 @@ watch(currentBlockId, (id) => {
 
 watch(currentBlockId, async (blockId) => {
   if (blockId === null) return
-  const rows = flatBookBlocks.value
+  const rows = bookBlocks.value
   const bIdx = rows.findIndex((r) => r.id === blockId)
   if (bIdx <= 0) return
   const predecessor = rows[bIdx - 1]!
@@ -410,7 +397,7 @@ const pdfViewerRef = ref<{
   ) => boolean
 } | null>(null)
 
-async function applyBookBlockSelection(block: BookReadingBookLayoutBlockRow) {
+async function applyBookBlockSelection(block: BookBlockFull) {
   const targets = wireItemsToNavigationTargets(block.allBboxes)
   const parsed = targets[0] ?? null
   if (parsed === null) {
@@ -422,12 +409,12 @@ async function applyBookBlockSelection(block: BookReadingBookLayoutBlockRow) {
 }
 
 useBookReadingBlockSelection({
-  bookBlockRows: () => flatBookBlocks.value,
+  blocks: () => bookBlocks.value,
   currentBlockId,
-  onDwellSelectBlock: (row) => {
-    selectedBlockId.value = row.id
+  onDwellSelectBlock: (block) => {
+    selectedBlockId.value = block.id
     pdfViewerRef.value?.highlightBlockSelection(
-      wireItemsToNavigationTargets(row.allBboxes)
+      wireItemsToNavigationTargets(block.allBboxes)
     )
   },
 })
@@ -444,7 +431,7 @@ async function markSelectedDisposition(status: BookBlockReadingDisposition) {
   if (status === "READ") {
     snapbackAttempts.delete(id)
   }
-  const rows = flatBookBlocks.value
+  const rows = bookBlocks.value
   const selIdx = rows.findIndex((r) => r.id === id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {
     await applyBookBlockSelection(rows[selIdx + 1]!)
@@ -459,7 +446,7 @@ function onPagesReady() {
     .catch(() => undefined)
 }
 
-async function onBookBlockClick(block: BookReadingBookLayoutBlockRow) {
+async function onBookBlockClick(block: BookBlockFull) {
   await applyBookBlockSelection(block)
 }
 
@@ -468,7 +455,6 @@ onMounted(async () => {
   if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
     bookLayoutOpened.value = true
   }
-  flatBookBlocks.value = bookLayoutRowsFromApiBlocks(props.book.blocks)
   await bookReading.syncFromServer()
 })
 
