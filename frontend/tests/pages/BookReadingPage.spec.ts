@@ -51,7 +51,6 @@ function topMathsLikeFlatBlocks(options?: {
     depth: 0,
     title: `Section ${i + 1}`,
     startAnchor,
-    siblingOrder: i,
     // Block 101 (i=0) has no bbox by default so it doesn't participate in detection
     // and won't trigger auto-mark (allBboxes.length=0).
     // When firstBlockHasNoDirectContent=true, give it a degenerate bbox so allBboxes.length>0
@@ -291,6 +290,40 @@ describe("BookReadingPage", () => {
       () => expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false),
       { timeout: 5000 }
     )
+  })
+
+  it("uses API depth for nested preorder blocks in the layout list", async () => {
+    const anchors = makeMe.bookReadingTopMathsLikeAnchors()
+    const aParent = anchors[0]!
+    const aChild = anchors[1]!
+    const blocks: BookBlockFull[] = [
+      {
+        id: aParent.id,
+        depth: 0,
+        title: "Parent Section",
+        startAnchor: aParent,
+        allBboxes: [{ pageIndex: 0, bbox: [48, 72, 564, 200] }],
+      },
+      {
+        id: aChild.id,
+        depth: 1,
+        title: "Child Section",
+        startAnchor: aChild,
+        allBboxes: [{ pageIndex: 0, bbox: [48, 200, 564, 400] }],
+      },
+    ]
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(
+        makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+      )
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+    const rows = wrapper.findAll('[data-testid="book-reading-book-block"]')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]!.attributes("data-book-block-depth")).toBe("0")
+    expect(rows[1]!.attributes("data-book-block-depth")).toBe("1")
   })
 
   it("loads PDF into viewer", async () => {
@@ -832,7 +865,6 @@ describe("BookReadingPage", () => {
           depth: 0,
           title: `Section ${i + 1}`,
           startAnchor,
-          siblingOrder: i,
           // Section 1: no-bbox anchor point + direct-content bbox; others have anchor only
           allBboxes:
             i === 0
@@ -885,7 +917,6 @@ describe("BookReadingPage", () => {
           depth: 0,
           title: `Section ${i + 1}`,
           startAnchor,
-          siblingOrder: i,
           // Section 1: no-bbox anchor point on page 0, direct-content bbox on page 1 (cross-page)
           allBboxes:
             i === 0
@@ -1532,7 +1563,6 @@ describe("BookReadingPage", () => {
           depth: 0,
           title: `Section ${i + 1}`,
           startAnchor,
-          siblingOrder: i,
           // Section 1: no-bbox point + direct content; Section 2: anchor bbox + direct content
           allBboxes:
             i === 0

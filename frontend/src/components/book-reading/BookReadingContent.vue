@@ -139,36 +139,16 @@ function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
 }
 
-function buildFlatBookBlocks(
+function bookLayoutRowsFromApiBlocks(
   blocks: BookBlockFull[]
 ): BookReadingBookLayoutBlockRow[] {
-  const childrenMap = new Map<number | null, BookBlockFull[]>()
-  for (const block of blocks) {
-    const parentId =
-      block.parentBlockId != null ? Number(block.parentBlockId) : null
-    const siblings = childrenMap.get(parentId) ?? []
-    siblings.push(block)
-    childrenMap.set(parentId, siblings)
-  }
-  const sortByOrder = (a: BookBlockFull, b: BookBlockFull) =>
-    (a.siblingOrder ?? 0) - (b.siblingOrder ?? 0)
-
-  const result: BookReadingBookLayoutBlockRow[] = []
-  function visit(parentId: number | null, nestDepth: number) {
-    const children = (childrenMap.get(parentId) ?? []).slice().sort(sortByOrder)
-    for (const child of children) {
-      result.push({
-        id: child.id,
-        title: child.title,
-        depth: nestDepth,
-        startAnchor: child.startAnchor,
-        allBboxes: child.allBboxes,
-      })
-      visit(child.id, nestDepth + 1)
-    }
-  }
-  visit(null, 0)
-  return result
+  return blocks.map((block) => ({
+    id: block.id,
+    title: block.title,
+    depth: block.depth,
+    startAnchor: block.startAnchor,
+    allBboxes: block.allBboxes,
+  }))
 }
 
 const flatBookBlocks = ref<BookReadingBookLayoutBlockRow[]>([])
@@ -485,7 +465,7 @@ onMounted(async () => {
   if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
     bookLayoutOpened.value = true
   }
-  flatBookBlocks.value = buildFlatBookBlocks(props.book.blocks)
+  flatBookBlocks.value = bookLayoutRowsFromApiBlocks(props.book.blocks)
   await bookReading.syncFromServer()
 })
 

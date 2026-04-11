@@ -30,35 +30,11 @@ function pdfEndPageFromMineruEnv(): number | undefined {
   return n
 }
 
-function normParentId(v: string | number | undefined | null): string | null {
-  if (v === undefined || v === null || v === '') return null
-  return String(v)
-}
-
 function bookBlocksTreeLines(blocks: BookBlockFull[] | undefined): string {
   if (blocks === undefined || blocks.length === 0) {
     return ''
   }
-  const roots = blocks
-    .filter((r) => normParentId(r.parentBlockId) === null)
-    .sort((a, b) => Number(a.siblingOrder ?? 0) - Number(b.siblingOrder ?? 0))
-
-  const lines: string[] = []
-  function walk(nodes: BookBlockFull[], depth: number): void {
-    const sorted = [...nodes].sort(
-      (a, b) => Number(a.siblingOrder ?? 0) - Number(b.siblingOrder ?? 0)
-    )
-    for (const r of sorted) {
-      lines.push(`${'  '.repeat(depth)}${r.title}`)
-      const idStr = String(r.id)
-      const children = blocks.filter(
-        (x) => normParentId(x.parentBlockId) === idStr
-      )
-      walk(children, depth + 1)
-    }
-  }
-  walk(roots, 0)
-  return lines.join('\n')
+  return blocks.map((b) => `${'  '.repeat(b.depth)}${b.title}`).join('\n')
 }
 
 async function runNotebookAttachPdf(

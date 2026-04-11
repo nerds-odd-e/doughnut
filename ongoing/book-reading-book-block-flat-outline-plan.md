@@ -1,6 +1,6 @@
 # Plan: Book layout — flat outline storage (depth + order)
 
-**Status:** Phases 1–3 shipped; Phase 4 (frontend consumes API `depth` directly) not started.
+**Status:** Phases 1–4 shipped.
 
 **Precondition:** **No production book data to migrate.** Schema changes may **drop and recreate** book-related tables or columns without backfill. Local and CI fixtures stay under test control.
 
@@ -60,13 +60,15 @@
 
 **`pnpm generateTypeScript`** after OpenAPI changes.
 
-**Phase-complete tests:** Assert new fields in **controller** responses; **frontend** may still **ignore** `depth` until Phase 4.
+**Phase-complete tests:** Assert new fields in **controller** responses; **frontend** consumed `depth` from Phase 4 onward.
 
 **Deploy gate:** As usual.
 
 ---
 
 ## Phase 4 — Frontend consumes API layout directly
+
+**Status:** Shipped.
 
 **Outcome:** Remove or shrink **client-side** reconstruction (e.g. building preorder + depth from `parentBlockId` + `siblingOrder`) when the API already delivers **preorder-ordered** blocks and **`depth`**. **User-visible behavior** unchanged: same highlights, successor rules, Reading Control Panel, and reading-record borders.
 
