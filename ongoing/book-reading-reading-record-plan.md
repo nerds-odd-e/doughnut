@@ -66,7 +66,7 @@
 
 ## Phase 8 — No timed auto-selection of the viewport “current” block (shipped)
 
-**Shipped:** removed dwell timer that promoted **current** → **selected**; mounted coverage in `BookReadingPage.spec.ts` (`viewport current does not auto-select after dwell`).
+**Shipped:** removed dwell timer that promoted **current** → **selected**.
 
 ---
 

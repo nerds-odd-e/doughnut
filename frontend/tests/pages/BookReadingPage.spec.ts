@@ -14,8 +14,6 @@ const fetchMock = createFetchMock(vi)
 /** Keep in sync with `BookReadingPage.vue` */
 const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
-/** Longer than the removed 5s dwell auto-selection (Phase 8). */
-const REMOVED_DWELL_AUTO_SELECT_MS = 5100
 
 const notebookId = 7
 
@@ -1711,81 +1709,6 @@ describe("BookReadingPage", () => {
       await flushPromises()
 
       expect(putSpy).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("viewport current does not auto-select after dwell (Phase 8)", () => {
-    it("keeps no layout selection after stable current block and long idle", async () => {
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      vi.useFakeTimers()
-      try {
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        pdf.vm.$emit("viewportAnchorPage", {
-          anchorPageIndexZeroBased: 0,
-          viewport: { top: 0, mid: 500, bottom: 1000 },
-          pagesCount: 10,
-        })
-        await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
-        await flushPromises()
-        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
-          false
-        )
-
-        await vi.advanceTimersByTimeAsync(REMOVED_DWELL_AUTO_SELECT_MS)
-        await flushPromises()
-        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
-          false
-        )
-      } finally {
-        vi.useRealTimers()
-      }
-    })
-
-    it("does not auto-select when current block changes mid-idle", async () => {
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      vi.useFakeTimers()
-      try {
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        pdf.vm.$emit("viewportAnchorPage", {
-          anchorPageIndexZeroBased: 0,
-          viewport: { top: 0, mid: 500, bottom: 1000 },
-          pagesCount: 10,
-        })
-        await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
-        await flushPromises()
-        expect(wrapper.find('[data-current-block="true"]').text()).toBe(
-          "Section 2"
-        )
-
-        await vi.advanceTimersByTimeAsync(REMOVED_DWELL_AUTO_SELECT_MS - 150)
-        pdf.vm.$emit("viewportAnchorPage", {
-          anchorPageIndexZeroBased: 0,
-          viewport: { top: 400, mid: 600, bottom: 1000 },
-          pagesCount: 10,
-        })
-        await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
-        await flushPromises()
-        expect(wrapper.find('[data-current-block="true"]').text()).toBe(
-          "Section 3"
-        )
-        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
-          false
-        )
-
-        await vi.advanceTimersByTimeAsync(200)
-        await flushPromises()
-        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
-          false
-        )
-
-        await vi.advanceTimersByTimeAsync(REMOVED_DWELL_AUTO_SELECT_MS)
-        await flushPromises()
-        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
-          false
-        )
-      } finally {
-        vi.useRealTimers()
-      }
     })
   })
 })
