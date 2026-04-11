@@ -1,6 +1,6 @@
 # Plan: Book layout — flat outline storage (depth + order)
 
-**Status:** Phases 1–4 shipped.
+**Status:** Phases 1–5 shipped.
 
 **Precondition:** **No production book data to migrate.** Schema changes may **drop and recreate** book-related tables or columns without backfill. Local and CI fixtures stay under test control.
 
@@ -51,7 +51,7 @@
 
 ## Phase 3 — API exposes canonical fields (`depth`, order); optional transitional dual fields
 
-**Status:** Shipped (Option A: **`depth`** + OpenAPI **`blocks`** ordering description; **`parentBlockId`** / **`siblingOrder`** retained).
+**Status:** Shipped (Option A: **`depth`** + OpenAPI **`blocks`** ordering description; transitional **`parentBlockId`** / **`siblingOrder`** later removed in Phase 5).
 
 **Outcome:** **`GET …/book`** (and OpenAPI) expose **`depth`** and a clear **ordering** contract (document that **`blocks` array order is preorder** and matches `layout_sequence`). Either:
 
@@ -78,10 +78,13 @@
 
 ---
 
-## After all phases
+## Phase 5 — Remove dual-field wire serialization
 
-- Trim this plan’s **draft** sections; point **architecture roadmap** at the final attach contract and persisted fields.
-- Remove **interim** dual-field serialization if Phase 3 used Option A.
+**Status:** Shipped.
+
+**Outcome:** **`GET …/book`** no longer emits derived **`parentBlockId`** or **`siblingOrder`**. **`BookBlock`** JSON uses **preorder `blocks` order**, **`depth`**, and the existing navigation fields (`startAnchor`, **`allBboxes`**, title, id). Server-side `BookBlockFlatOutlineWire` hydration is removed.
+
+**Phase-complete tests:** Controller tests assert hierarchy via **`layout_sequence`** + **`depth`** instead of derived parent links.
 
 ---
 

@@ -112,7 +112,6 @@ public class BookService {
       persistContentBlocks(entry.getKey(), entry.getValue());
     }
 
-    BookBlockFlatOutlineWire.hydrateBook(book);
     return book;
   }
 
@@ -120,7 +119,6 @@ public class BookService {
   public Book getBookForNotebook(Notebook notebook) {
     Book book = requireBook(notebook);
     book.getBlocks().size();
-    BookBlockFlatOutlineWire.hydrateBook(book);
     return book;
   }
 

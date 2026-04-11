@@ -16,15 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({
-  "id",
-  "depth",
-  "startAnchor",
-  "siblingOrder",
-  "title",
-  "parentBlockId",
-  "allBboxes"
-})
+@JsonPropertyOrder({"id", "depth", "startAnchor", "title", "allBboxes"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -57,10 +49,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String structuralTitle;
 
-  @Transient @JsonIgnore @Getter @Setter private Integer wireParentBlockId;
-
-  @Transient @JsonIgnore @Getter @Setter private Long wireSiblingOrder;
-
   @Transient
   @JsonProperty("startAnchor")
   @JsonView(BookViews.Full.class)
@@ -68,19 +56,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   public BookAnchorFullWire getStartAnchor() {
     String value = contentBlocks.isEmpty() ? "{}" : contentBlocks.getFirst().getRawData();
     return new BookAnchorFullWire(getId() == null ? 0 : getId(), value);
-  }
-
-  @JsonProperty("siblingOrder")
-  @JsonView(BookViews.Full.class)
-  public long getSiblingOrder() {
-    return wireSiblingOrder == null ? 0L : wireSiblingOrder;
-  }
-
-  @JsonProperty("parentBlockId")
-  @JsonView(BookViews.Full.class)
-  @Schema(type = "integer")
-  public Integer getParentBlockId() {
-    return wireParentBlockId;
   }
 
   @OneToMany(

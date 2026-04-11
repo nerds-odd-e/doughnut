@@ -332,9 +332,7 @@ export type BookBlockFull = {
      */
     depth: number;
     startAnchor: BookAnchorFull;
-    siblingOrder?: number;
     title: string;
-    parentBlockId?: string;
     allBboxes: Array<PageBboxFull>;
 };
 

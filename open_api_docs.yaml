@@ -3814,12 +3814,7 @@ components:
           description: Nesting depth in the book layout; root-level blocks are 0.
         startAnchor:
           $ref: "#/components/schemas/BookAnchor_Full"
-        siblingOrder:
-          type: integer
-          format: int64
         title:
-          type: string
-        parentBlockId:
           type: string
         allBboxes:
           type: array

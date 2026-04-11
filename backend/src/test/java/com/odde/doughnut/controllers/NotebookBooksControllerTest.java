@@ -21,7 +21,6 @@ import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.book.BookBlockFlatOutlineWire;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +29,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -103,20 +101,45 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return new ServletWebRequest(new MockHttpServletRequest());
   }
 
-  private static List<BookBlock> rootBlocksSorted(Book book) {
-    BookBlockFlatOutlineWire.hydrateBookBlocks(book.getBlocks());
+  private static List<BookBlock> blocksByLayoutOrder(Book book) {
     return book.getBlocks().stream()
-        .filter(r -> r.getParentBlockId() == null)
-        .sorted(Comparator.comparingLong(BookBlock::getSiblingOrder))
+        .sorted(Comparator.comparingInt(BookBlock::getLayoutSequence))
         .toList();
   }
 
+  private static List<BookBlock> rootBlocksSorted(Book book) {
+    return blocksByLayoutOrder(book).stream().filter(b -> b.getDepth() == 0).toList();
+  }
+
   private static List<BookBlock> childrenOf(Book book, BookBlock parent) {
-    BookBlockFlatOutlineWire.hydrateBookBlocks(book.getBlocks());
-    return book.getBlocks().stream()
-        .filter(r -> Objects.equals(r.getParentBlockId(), parent.getId()))
-        .sorted(Comparator.comparingLong(BookBlock::getSiblingOrder))
-        .toList();
+    List<BookBlock> ordered = blocksByLayoutOrder(book);
+    int p = -1;
+    for (int i = 0; i < ordered.size(); i++) {
+      if (ordered.get(i).getId().equals(parent.getId())) {
+        p = i;
+        break;
+      }
+    }
+    if (p < 0) {
+      return List.of();
+    }
+    int parentDepth = parent.getDepth();
+    List<BookBlock> out = new ArrayList<>();
+    int i = p + 1;
+    while (i < ordered.size() && ordered.get(i).getDepth() > parentDepth) {
+      BookBlock candidate = ordered.get(i);
+      if (candidate.getDepth() == parentDepth + 1) {
+        out.add(candidate);
+        int subtreeRootDepth = candidate.getDepth();
+        i++;
+        while (i < ordered.size() && ordered.get(i).getDepth() > subtreeRootDepth) {
+          i++;
+        }
+      } else {
+        i++;
+      }
+    }
+    return out;
   }
 
   private static AttachBookLayoutNodeRequest node(
