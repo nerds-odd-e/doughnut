@@ -10,7 +10,7 @@
 
 **This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**Shipped baseline (do not regress):** Reading-record Phases **2–8** — same as **2–7**, plus **no timed auto-selection**: viewport **current** block does **not** become **selected** after idle; selection changes only via explicit actions (until Phase 9 default selection). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
+**Shipped baseline (do not regress):** Reading-record Phases **2–9** — Phases **2–8** plus **default selection** to the first block in wire order when the book has blocks (no PDF scroll on that default; explicit layout click and post-read advance still scroll). Viewport **current** still does **not** become **selected** after idle. Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
 
 ---
 
@@ -70,7 +70,9 @@
 
 ---
 
-## Phase 9 — Always a selected book block; default to the first
+## Phase 9 — Always a selected book block; default to the first (shipped)
+
+**Shipped:** `BookReadingContent` watches `book.blocks` (`immediate`); when non-empty, sets **selected** to **`blocks[0].id`** if selection is null or not in the list; empty layout clears selection. Does **not** call `applyBookBlockSelection` (last-read position restore unchanged).
 
 **User story scenario:** open a book or land in a state where no block was explicitly chosen.
 
@@ -78,7 +80,7 @@
 
 **Depends on:** Phase 8 (no silent timer overriding this).
 
-**Tests (no new E2E):** mounted/page — initial load and edge transitions assert a non-null selected id (first block when appropriate).
+**Tests (no new E2E):** mounted `BookReadingPage` — default `data-current-selection` on first block; panel hidden when that block is viewport **current** (midpoint rule).
 
 ---
 

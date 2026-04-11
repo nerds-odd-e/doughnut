@@ -369,6 +369,21 @@ watch(selectedBlockId, () => {
   snapbackAttempts.clear()
 })
 
+watch(
+  bookBlocks,
+  (blocks) => {
+    if (blocks.length === 0) {
+      selectedBlockId.value = null
+      return
+    }
+    const id = selectedBlockId.value
+    if (id === null || !blocks.some((r) => r.id === id)) {
+      selectedBlockId.value = blocks[0]!.id
+    }
+  },
+  { immediate: true }
+)
+
 const pdfViewerRef = ref<{
   scrollToPdfOutlineV1Target: (
     target: PdfOutlineV1NavigationTarget,

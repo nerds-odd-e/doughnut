@@ -636,15 +636,32 @@ describe("BookReadingPage", () => {
       ).toBeUndefined()
     })
 
-    it("hides the panel when nothing is selected", async () => {
+    it("defaults selection to the first book block in reading order on load (Phase 9)", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
+    })
+
+    it("hides the Reading Control Panel when the default-selected first block is viewport current (Phase 9)", async () => {
+      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      )
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
-        viewport: { top: 0, mid: 500, bottom: 1000 },
+        viewport: { top: 0, mid: 10, bottom: 1000 },
         pagesCount: 10,
       })
 
+      expect(wrapper.find('[data-current-block="true"]').text()).toBe(
+        "Section 1"
+      )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
