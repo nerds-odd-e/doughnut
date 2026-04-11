@@ -1,7 +1,7 @@
-import { createCurrentBlockAnchorDebouncer } from "@/lib/book-reading/debounceCurrentBlockAnchorId"
+import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-describe("createCurrentBlockAnchorDebouncer", () => {
+describe("createCurrentBlockIdDebouncer", () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -11,7 +11,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("commits once with latest value after rapid proposes", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 120,
       commit: (id) => {
         commits.push(id)
@@ -28,7 +28,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("does not commit when cancel runs before delay", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 120,
       commit: (id) => {
         commits.push(id)
@@ -43,7 +43,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("skips redundant propose matching last committed", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 120,
       commit: (id) => {
         commits.push(id)
@@ -60,7 +60,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("commits null after debounce when candidate becomes null", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 50,
       commit: (id) => {
         commits.push(id)
@@ -76,7 +76,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("commitNow applies immediately and clears a pending propose", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 120,
       commit: (id) => {
         commits.push(id)
@@ -92,7 +92,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("resets delay on each propose", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 100,
       commit: (id) => {
         commits.push(id)
@@ -111,7 +111,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
   it("allows the same transition to be re-detected when commit returns false", () => {
     let rejectNext = true
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 50,
       commit: (id) => {
         commits.push(id)
@@ -135,7 +135,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
   it("rejected commitNow allows the same id to be committed again", () => {
     let reject = true
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 50,
       commit: (id) => {
         commits.push(id)
@@ -155,7 +155,7 @@ describe("createCurrentBlockAnchorDebouncer", () => {
 
   it("accepted commit prevents re-detecting the same transition", () => {
     const commits: (number | null)[] = []
-    const d = createCurrentBlockAnchorDebouncer({
+    const d = createCurrentBlockIdDebouncer({
       delayMs: 50,
       commit: (id) => {
         commits.push(id)

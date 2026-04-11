@@ -1,15 +1,15 @@
 import { debounce } from "es-toolkit"
 
-export type CurrentBlockAnchorDebouncer = {
+export type CurrentBlockIdDebouncer = {
   propose: (id: number | null) => void
   cancel: () => void
   commitNow: (id: number | null) => void
 }
 
-export function createCurrentBlockAnchorDebouncer(options: {
+export function createCurrentBlockIdDebouncer(options: {
   delayMs: number
   commit: (id: number | null) => boolean
-}): CurrentBlockAnchorDebouncer {
+}): CurrentBlockIdDebouncer {
   const { delayMs, commit } = options
   let lastCommitted: number | null = null
 

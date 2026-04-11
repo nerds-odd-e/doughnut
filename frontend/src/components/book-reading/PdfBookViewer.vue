@@ -27,11 +27,11 @@ import {
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { attachBookBlockSelectionBboxHighlight } from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
 import {
+  normalizedBboxToPdfJsXyzDestArray,
+  normalizedBboxToPixelRect,
   normalizedYToViewportY,
-  outlineV1BboxToPdfJsXyzDestArray,
-  outlineV1BboxToPixelRect,
-  type PdfOutlineV1Bbox,
-  type PdfOutlineV1NavigationTarget,
+  type BookNavigationTarget,
+  type NormalizedPageBbox,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
   getDocument,
@@ -234,8 +234,8 @@ function applyResponsiveDefaultScale(options?: { force?: boolean }) {
 }
 
 type PendingNavigation = {
-  target: PdfOutlineV1NavigationTarget
-  highlightBboxes: ReadonlyArray<PdfOutlineV1NavigationTarget>
+  target: BookNavigationTarget
+  highlightBboxes: ReadonlyArray<BookNavigationTarget>
 }
 
 let pendingNavigation: PendingNavigation | null = null
@@ -250,12 +250,12 @@ function clearBookBlockSelectionBboxHighlight() {
 
 function appendBookBlockSelectionBboxHighlight(
   pageNumber: number,
-  bbox: PdfOutlineV1Bbox
+  bbox: NormalizedPageBbox
 ) {
   if (!pdfViewer) return
   const pageView = pdfViewer.getPageView(pageNumber - 1)
   if (!pageView?.div) return
-  const rect = outlineV1BboxToPixelRect(
+  const rect = normalizedBboxToPixelRect(
     bbox,
     pageView.viewport.width,
     pageView.viewport.height
@@ -266,7 +266,7 @@ function appendBookBlockSelectionBboxHighlight(
 }
 
 function showSelectionBboxHighlights(
-  highlightBboxes: ReadonlyArray<PdfOutlineV1NavigationTarget>
+  highlightBboxes: ReadonlyArray<BookNavigationTarget>
 ) {
   clearBookBlockSelectionBboxHighlight()
   if (!pdfViewer) return
@@ -283,9 +283,9 @@ function showSelectionBboxHighlights(
   }
 }
 
-async function applyPdfOutlineV1Target(
-  target: PdfOutlineV1NavigationTarget,
-  highlightBboxes: ReadonlyArray<PdfOutlineV1NavigationTarget> = []
+async function applyBookNavigationTarget(
+  target: BookNavigationTarget,
+  highlightBboxes: ReadonlyArray<BookNavigationTarget> = []
 ) {
   if (!pdfViewer?.pdfDocument) return
   const { pageIndex, bbox } = target
@@ -302,7 +302,7 @@ async function applyPdfOutlineV1Target(
   } else {
     const page = await pdfViewer.pdfDocument.getPage(pageNumber)
     const vp = page.getViewport({ scale: 1 })
-    const destArray = outlineV1BboxToPdfJsXyzDestArray(
+    const destArray = normalizedBboxToPdfJsXyzDestArray(
       vp.width,
       vp.height,
       bbox
@@ -319,14 +319,14 @@ function flushPendingNavigation() {
   }
   const shot = pendingNavigation
   pendingNavigation = null
-  applyPdfOutlineV1Target(shot.target, shot.highlightBboxes).catch(() => {
+  applyBookNavigationTarget(shot.target, shot.highlightBboxes).catch(() => {
     /* Outline jump failures from pdf.js must not reject pagesinit / viewer setup. */
   })
 }
 
-async function scrollToPdfOutlineV1Target(
-  target: PdfOutlineV1NavigationTarget,
-  highlightBboxes: ReadonlyArray<PdfOutlineV1NavigationTarget> = []
+async function scrollToBookNavigationTarget(
+  target: BookNavigationTarget,
+  highlightBboxes: ReadonlyArray<BookNavigationTarget> = []
 ) {
   if (!Number.isInteger(target.pageIndex) || target.pageIndex < 0) {
     return
@@ -335,7 +335,7 @@ async function scrollToPdfOutlineV1Target(
     pendingNavigation = { target, highlightBboxes }
     return
   }
-  await applyPdfOutlineV1Target(target, highlightBboxes)
+  await applyBookNavigationTarget(target, highlightBboxes)
 }
 
 async function scrollToStoredReadingPosition(
@@ -386,7 +386,7 @@ function zoomOut() {
 }
 
 function highlightBlockSelection(
-  highlightBboxes: ReadonlyArray<PdfOutlineV1NavigationTarget>
+  highlightBboxes: ReadonlyArray<BookNavigationTarget>
 ) {
   showSelectionBboxHighlights(highlightBboxes)
 }
@@ -397,7 +397,7 @@ function highlightBlockSelection(
  * bottom edge (so the Reading Control Panel does not obscure it).
  */
 function isLastContentBottomVisible(
-  target: PdfOutlineV1NavigationTarget,
+  target: BookNavigationTarget,
   obstructionPx: number
 ): boolean {
   const container = containerRef.value
@@ -464,7 +464,7 @@ function snapToContentBottomAndHold(
 }
 
 defineExpose({
-  scrollToPdfOutlineV1Target,
+  scrollToBookNavigationTarget,
   highlightBlockSelection,
   scrollToStoredReadingPosition,
   snapToContentBottomAndHold,

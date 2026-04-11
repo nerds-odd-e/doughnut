@@ -1032,7 +1032,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        // same-page: scrolls to block start via scrollToPdfOutlineV1Target, then suppresses scroll
+        // same-page: scrolls to block start via scrollToBookNavigationTarget, then suppresses scroll
         expect(suppressSpy).toHaveBeenCalledWith(500)
         // cross-page snap-to-bottom path not used
         expect(snapToBottomSpy).not.toHaveBeenCalled()

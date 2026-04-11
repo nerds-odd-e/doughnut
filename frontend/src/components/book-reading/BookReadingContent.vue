@@ -79,15 +79,16 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
-import {
-  wireItemsToNavigationTargets,
-  type PdfOutlineV1NavigationTarget,
-} from "@/lib/book-reading/pdfOutlineV1Anchor"
+import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
-import { createCurrentBlockAnchorDebouncer } from "@/lib/book-reading/debounceCurrentBlockAnchorId"
+import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { nextLiveAnnouncementText } from "@/lib/book-reading/currentBlockLiveAnnouncement"
-import { currentBlockAnchorIdFromAnchorPage } from "@/lib/book-reading/currentBlockAnchorFromAnchorPage"
+import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import {
+  useBookReadingSnapBack,
+  type BookReadingPdfViewerRef,
+} from "@/composables/useBookReadingSnapBack"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
@@ -96,7 +97,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
-const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
+const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 /** Vertical space (px) reserved at the bottom of the PDF main pane by ReadingControlPanel. */
 const READING_PANEL_OBSTRUCTION_PX = 80
@@ -137,122 +138,35 @@ function onPdfLoadError(message: string) {
 
 const bookBlocks = computed(() => props.book.blocks)
 
-function selectedIndexAndSuccessor(
-  rows: readonly BookBlockFull[],
-  selId: number
-): {
-  selIdx: number
-  sel: BookBlockFull
-  successor: BookBlockFull
-} | null {
-  const selIdx = rows.findIndex((r) => r.id === selId)
-  if (selIdx < 0 || selIdx >= rows.length - 1) {
-    return null
-  }
-  return {
-    selIdx,
-    sel: rows[selIdx]!,
-    successor: rows[selIdx + 1]!,
-  }
-}
-
 const currentBlockId = ref<number | null>(null)
 
 const selectedBlockId = ref<number | null>(null)
 
-const lastContentBottomVisible = ref(false)
-const geometryEverVisibleForSelection = ref(false)
+const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
 
-const snapbackAttempts = new Map<number, number>()
-const snapAnimationKey = ref(0)
-
-function hasDirectContent(row: BookBlockFull): boolean {
-  return row.allBboxes.length > 1
-}
-
-function lastContentBbox(row: BookBlockFull) {
-  return hasDirectContent(row) ? row.allBboxes[row.allBboxes.length - 1]! : null
-}
-
-function shouldSnapBack(proposedBlockId: number | null): boolean {
-  if (proposedBlockId === null) return false
-  const selId = selectedBlockId.value
-  if (selId === null) return false
-  if (bookReading.hasRecordedDisposition(selId)) return false
-  const rows = bookBlocks.value
-  const chain = selectedIndexAndSuccessor(rows, selId)
-  if (chain === null) return false
-  const { selIdx, sel, successor } = chain
-  const proposedIdx = rows.findIndex((r) => r.id === proposedBlockId)
-  if (proposedIdx < 0 || proposedIdx <= selIdx) return false
-  const immediateSuccessor = proposedBlockId === successor.id
-  if (!immediateSuccessor) {
-    if (proposedIdx <= selIdx + 1) return false
-    for (let i = selIdx + 1; i < proposedIdx; i++) {
-      if (!hasDirectContent(rows[i]!)) return false
-    }
-  }
-  if (!geometryEverVisibleForSelection.value) return false
-  if (!hasDirectContent(sel)) return false
-  return (snapbackAttempts.get(selId) ?? 0) < 2
-}
-
-function performSnapBack(): void {
-  const selId = selectedBlockId.value
-  if (selId === null) return
-  snapAnimationKey.value += 1
-  const rows = bookBlocks.value
-  const sel = rows.find((r) => r.id === selId)
-  if (!sel) return
-  const lastBbox = lastContentBbox(sel)
-  if (lastBbox === null) return
-  snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
-  const parsedStart = wireItemsToNavigationTargets(sel.allBboxes)[0] ?? null
-  if (parsedStart !== null && parsedStart.pageIndex === lastBbox.pageIndex) {
-    pdfViewerRef.value
-      ?.scrollToPdfOutlineV1Target(
-        parsedStart,
-        wireItemsToNavigationTargets(sel.allBboxes)
-      )
-      .then(() => pdfViewerRef.value?.suppressScrollInput(SNAP_HOLD_MS))
-      .catch(() => undefined)
-  } else {
-    pdfViewerRef.value?.snapToContentBottomAndHold(
-      lastBbox.pageIndex,
-      (lastBbox.bbox as number[])[3]!,
-      READING_PANEL_OBSTRUCTION_PX,
-      SNAP_HOLD_MS
-    )
-  }
-}
-
-// allBboxes: index 0 is the block start region; remaining entries are direct-content blocks.
-// When length > 1, the last entry is the last direct-content bbox.
-const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
-  const selId = selectedBlockId.value
-  if (selId === null) return null
-  if (bookReading.hasRecordedDisposition(selId)) return null
-  const rows = bookBlocks.value
-  const chain = selectedIndexAndSuccessor(rows, selId)
-  if (chain === null) return null
-  const { sel, successor } = chain
-  const lastBbox = lastContentBbox(sel)
-  if (lastBbox !== null) {
-    if (lastContentBottomVisible.value) return sel
-    if (geometryEverVisibleForSelection.value) {
-      return successor.id === currentBlockId.value ? null : sel
-    }
-    return null
-  }
-  // Fallback: no usable bbox → use successor-as-current rule
-  return successor.id === currentBlockId.value ? sel : null
+const {
+  snapAnimationKey,
+  blockAwaitingConfirmation,
+  shouldSnapBack,
+  performSnapBack,
+  updateLastDirectContentGeometry,
+  clearSnapbackAttemptsForBlock,
+  hasDirectContent,
+} = useBookReadingSnapBack({
+  bookBlocks,
+  selectedBlockId,
+  currentBlockId,
+  hasRecordedDisposition: bookReading.hasRecordedDisposition,
+  pdfViewerRef,
+  obstructionPx: READING_PANEL_OBSTRUCTION_PX,
+  snapHoldMs: SNAP_HOLD_MS,
 })
 
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
 
-const currentBlockAnchorDebouncer = createCurrentBlockAnchorDebouncer({
-  delayMs: CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS,
+const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
+  delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
   commit: (id) => {
     if (shouldSnapBack(id)) {
       performSnapBack()
@@ -285,7 +199,7 @@ function onViewportAnchorPage(payload: {
     pdfBarCurrentPage.value = payload.anchorPageIndexZeroBased + 1
     pdfBarPagesTotal.value = payload.pagesCount
   }
-  const candidate = currentBlockAnchorIdFromAnchorPage(
+  const candidate = currentBlockIdFromVisiblePage(
     bookBlocks.value.map((r) => ({
       id: r.id,
       firstBbox: r.allBboxes?.[0],
@@ -294,29 +208,8 @@ function onViewportAnchorPage(payload: {
     payload.viewport,
     payload.pagesCount
   )
-  currentBlockAnchorDebouncer.propose(candidate)
-  const selIdForGeometry = selectedBlockId.value
-  if (selIdForGeometry !== null) {
-    const selForGeometry = bookBlocks.value.find(
-      (r) => r.id === selIdForGeometry
-    )
-    const lastBboxForGeometry =
-      selForGeometry !== undefined ? lastContentBbox(selForGeometry) : null
-    if (lastBboxForGeometry !== null) {
-      const geometryVisible =
-        pdfViewerRef.value?.isLastContentBottomVisible(
-          {
-            pageIndex: lastBboxForGeometry.pageIndex,
-            bbox: lastBboxForGeometry.bbox as [number, number, number, number],
-          },
-          READING_PANEL_OBSTRUCTION_PX
-        ) ?? false
-      lastContentBottomVisible.value = geometryVisible
-      if (geometryVisible) {
-        geometryEverVisibleForSelection.value = true
-      }
-    }
-  }
+  currentBlockIdDebouncer.propose(candidate)
+  updateLastDirectContentGeometry()
   let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
     null
   if (payload.readingPosition !== undefined) {
@@ -363,12 +256,6 @@ watch(currentBlockId, async (blockId) => {
   }
 })
 
-watch(selectedBlockId, () => {
-  lastContentBottomVisible.value = false
-  geometryEverVisibleForSelection.value = false
-  snapbackAttempts.clear()
-})
-
 watch(
   bookBlocks,
   (blocks) => {
@@ -384,33 +271,6 @@ watch(
   { immediate: true }
 )
 
-const pdfViewerRef = ref<{
-  scrollToPdfOutlineV1Target: (
-    target: PdfOutlineV1NavigationTarget,
-    highlightBboxes?: ReadonlyArray<PdfOutlineV1NavigationTarget>
-  ) => Promise<void>
-  highlightBlockSelection: (
-    highlightBboxes: ReadonlyArray<PdfOutlineV1NavigationTarget>
-  ) => void
-  scrollToStoredReadingPosition: (
-    pageIndexZeroBased: number,
-    normalizedY: number
-  ) => Promise<void>
-  snapToContentBottomAndHold: (
-    pageIndex: number,
-    normalizedBboxBottom: number,
-    obstructionPx: number,
-    holdMs: number
-  ) => void
-  suppressScrollInput: (holdMs: number) => void
-  zoomIn: () => void
-  zoomOut: () => void
-  isLastContentBottomVisible: (
-    target: PdfOutlineV1NavigationTarget,
-    obstructionPx: number
-  ) => boolean
-} | null>(null)
-
 async function applyBookBlockSelection(block: BookBlockFull) {
   const targets = wireItemsToNavigationTargets(block.allBboxes)
   const parsed = targets[0] ?? null
@@ -418,8 +278,8 @@ async function applyBookBlockSelection(block: BookBlockFull) {
     return
   }
   selectedBlockId.value = block.id
-  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed, targets)
-  currentBlockAnchorDebouncer.commitNow(block.id)
+  await pdfViewerRef.value?.scrollToBookNavigationTarget(parsed, targets)
+  currentBlockIdDebouncer.commitNow(block.id)
 }
 
 async function markSelectedDisposition(status: BookBlockReadingDisposition) {
@@ -432,7 +292,7 @@ async function markSelectedDisposition(status: BookBlockReadingDisposition) {
     return
   }
   if (status === "READ") {
-    snapbackAttempts.delete(id)
+    clearSnapbackAttemptsForBlock(id)
   }
   const rows = bookBlocks.value
   const selIdx = rows.findIndex((r) => r.id === id)
@@ -463,7 +323,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
-  currentBlockAnchorDebouncer.cancel()
+  currentBlockIdDebouncer.cancel()
   lastReadPositionPatchDebouncer.cancel()
 })
 </script>

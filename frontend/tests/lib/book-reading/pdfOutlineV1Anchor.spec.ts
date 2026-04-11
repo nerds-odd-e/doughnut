@@ -1,7 +1,7 @@
 import {
+  normalizedBboxToPdfJsXyzDestArray,
+  normalizedBboxToPixelRect,
   normalizedYToViewportY,
-  outlineV1BboxToPdfJsXyzDestArray,
-  outlineV1BboxToPixelRect,
   screenYToNormalizedY,
   wireItemsToNavigationTargets,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
@@ -48,11 +48,11 @@ describe("wireItemsToNavigationTargets", () => {
   })
 })
 
-describe("outlineV1BboxToPdfJsXyzDestArray", () => {
+describe("normalizedBboxToPdfJsXyzDestArray", () => {
   it("converts 0-1000 bbox to PDF user space XYZ with top padding clamped at page top", () => {
     const w = 612
     const h = 792
-    expect(outlineV1BboxToPdfJsXyzDestArray(w, h, [0, 0, 100, 200])).toEqual([
+    expect(normalizedBboxToPdfJsXyzDestArray(w, h, [0, 0, 100, 200])).toEqual([
       null,
       { name: "XYZ" },
       (50 / 1000) * 612,
@@ -65,15 +65,15 @@ describe("outlineV1BboxToPdfJsXyzDestArray", () => {
     const w = 400
     const h = 600
     const yTopPdf = Math.max(0, (400 / 1000) * 600 - 40)
-    expect(outlineV1BboxToPdfJsXyzDestArray(w, h, [10, 400, 200, 550])).toEqual(
-      [null, { name: "XYZ" }, (105 / 1000) * 400, h - yTopPdf, null]
-    )
+    expect(
+      normalizedBboxToPdfJsXyzDestArray(w, h, [10, 400, 200, 550])
+    ).toEqual([null, { name: "XYZ" }, (105 / 1000) * 400, h - yTopPdf, null])
   })
 })
 
-describe("outlineV1BboxToPixelRect", () => {
+describe("normalizedBboxToPixelRect", () => {
   it("converts normalized bbox to pixel coordinates", () => {
-    expect(outlineV1BboxToPixelRect([100, 200, 300, 400], 800, 600)).toEqual({
+    expect(normalizedBboxToPixelRect([100, 200, 300, 400], 800, 600)).toEqual({
       left: 80,
       top: 120,
       width: 160,
@@ -82,7 +82,7 @@ describe("outlineV1BboxToPixelRect", () => {
   })
 
   it("maps full-page bbox to full viewport", () => {
-    expect(outlineV1BboxToPixelRect([0, 0, 1000, 1000], 500, 400)).toEqual({
+    expect(normalizedBboxToPixelRect([0, 0, 1000, 1000], 500, 400)).toEqual({
       left: 0,
       top: 0,
       width: 500,

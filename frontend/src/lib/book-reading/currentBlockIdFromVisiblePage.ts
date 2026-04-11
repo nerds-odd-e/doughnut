@@ -2,11 +2,12 @@ import { parseOptionalBbox } from "./pdfOutlineV1Anchor"
 import type { ViewportYRange } from "./pdfViewerViewportTopYDown"
 
 /**
- * Normalized distance for the close-nodes transition (tuned with pdfOutlineV1Anchor scroll padding
+ * Normalized distance for the close-nodes transition (tuned with scroll padding
  * and typical page height in mind).
  */
 const SCROLL_PADDING_NORMALIZED = 50
 
+/** First bbox per block may omit `bbox` (page-only); stricter than generated OpenAPI `PageBboxFull`. */
 export type BookBlockFirstBboxRow = {
   readonly id: number
   readonly firstBbox?: {
@@ -17,7 +18,7 @@ export type BookBlockFirstBboxRow = {
 
 /**
  * **Rule (in priority order):**
- * 1. Current = the **earliest** block on `anchorPageZeroBased` whose first-bbox region is visible
+ * 1. Current = the **earliest** block on `visiblePageIndexZeroBased` whose first-bbox region is visible
  *    (`y0 < viewport.bottom AND y1 > viewport.top`).
  * 2. If that block's top (`y0`) has **not** passed the viewport midpoint (`y0 > viewport.mid`) →
  *    use the block **before** it (or `bestFromEarlierPages` if none on the page).
@@ -35,20 +36,23 @@ export type BookBlockFirstBboxRow = {
  * are treated as a point at `y = 0` (never visible by the bbox check, but reachable as the "previous"
  * fallback). A bbox array that is **present** but fails validation skips the whole row.
  */
-export function currentBlockAnchorIdFromAnchorPage(
+export function currentBlockIdFromVisiblePage(
   orderedPreorderRows: readonly BookBlockFirstBboxRow[],
-  anchorPageZeroBased: number,
+  visiblePageIndexZeroBased: number,
   viewport: ViewportYRange | null = null,
   pdfPageCount: number | null = null
 ): number | null {
-  if (!Number.isInteger(anchorPageZeroBased) || anchorPageZeroBased < 0) {
+  if (
+    !Number.isInteger(visiblePageIndexZeroBased) ||
+    visiblePageIndexZeroBased < 0
+  ) {
     return null
   }
   if (pdfPageCount != null) {
     if (!Number.isInteger(pdfPageCount) || pdfPageCount <= 0) {
       return null
     }
-    if (anchorPageZeroBased >= pdfPageCount) {
+    if (visiblePageIndexZeroBased >= pdfPageCount) {
       return null
     }
   }
@@ -79,9 +83,9 @@ export function currentBlockAnchorIdFromAnchorPage(
       y0 = bbox[1]
       y1 = bbox[3]
     }
-    if (pageIdx < anchorPageZeroBased) {
+    if (pageIdx < visiblePageIndexZeroBased) {
       bestFromEarlierPages = row.id
-    } else if (pageIdx === anchorPageZeroBased) {
+    } else if (pageIdx === visiblePageIndexZeroBased) {
       onCurrentPage.push({ id: row.id, y0, y1 })
     }
   }

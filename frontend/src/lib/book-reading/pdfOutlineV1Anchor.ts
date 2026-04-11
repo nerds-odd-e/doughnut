@@ -6,11 +6,11 @@
 const NORMALIZED_MAX = 1000
 const SCROLL_TOP_PADDING_PDF = 40
 
-export type PdfOutlineV1Bbox = readonly [number, number, number, number]
+export type NormalizedPageBbox = readonly [number, number, number, number]
 
-export type PdfOutlineV1NavigationTarget = {
+export type BookNavigationTarget = {
   pageIndex: number
-  bbox: PdfOutlineV1Bbox | null
+  bbox: NormalizedPageBbox | null
 }
 
 /** pdf.js scrollPageIntoView XYZ dest array shape. */
@@ -22,7 +22,7 @@ export type PdfJsXyzDestArray = readonly [
   null,
 ]
 
-export function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
+export function parseOptionalBbox(raw: unknown): NormalizedPageBbox | null {
   if (!Array.isArray(raw) || raw.length !== 4) return null
   const a = raw[0]
   const b = raw[1]
@@ -57,9 +57,9 @@ export function wireItemsToNavigationTargets(
   items:
     | ReadonlyArray<{ pageIndex: number; bbox?: ReadonlyArray<number> }>
     | undefined
-): PdfOutlineV1NavigationTarget[] {
+): BookNavigationTarget[] {
   if (!items?.length) return []
-  const out: PdfOutlineV1NavigationTarget[] = []
+  const out: BookNavigationTarget[] = []
   for (const it of items) {
     if (
       typeof it.pageIndex !== "number" ||
@@ -81,13 +81,13 @@ export function wireItemsToNavigationTargets(
 }
 
 /**
- * Map v1 bbox to pdf.js scrollPageIntoView XYZ so the viewport top sits a little above the
+ * Map normalized bbox to pdf.js scrollPageIntoView XYZ so the viewport top sits a little above the
  * bbox top. Zoom null keeps the current scale.
  */
-export function outlineV1BboxToPdfJsXyzDestArray(
+export function normalizedBboxToPdfJsXyzDestArray(
   pageWidthPdf: number,
   pageHeightPdf: number,
-  bbox: PdfOutlineV1Bbox
+  bbox: NormalizedPageBbox
 ): PdfJsXyzDestArray {
   const [x0, y0, x1] = bbox
   const x = ((x0 + x1) / 2 / NORMALIZED_MAX) * pageWidthPdf
@@ -100,8 +100,8 @@ export function outlineV1BboxToPdfJsXyzDestArray(
 }
 
 /** Convert normalized bbox to pixel rectangle in the given viewport dimensions. */
-export function outlineV1BboxToPixelRect(
-  bbox: PdfOutlineV1Bbox,
+export function normalizedBboxToPixelRect(
+  bbox: NormalizedPageBbox,
   viewportWidth: number,
   viewportHeight: number
 ): { left: number; top: number; width: number; height: number } {
