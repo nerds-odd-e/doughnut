@@ -178,3 +178,35 @@ Then(
     return bookReadingPage().expectCurrentBlockVisibleInBookLayoutAside(title)
   }
 )
+
+Then(
+  'I should see the current block navigation bar showing {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectCurrentBlockNavigationBar(title)
+  }
+)
+
+When(
+  'I click "Read from here" in the current block navigation bar',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().clickReadFromHere()
+  }
+)
+
+When(
+  'I click "Back to selected" in the current block navigation bar',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().clickBackToSelected()
+  }
+)
+
+Then(
+  'the current block navigation bar should not be visible',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectCurrentBlockNavigationBarNotVisible()
+  }
+)

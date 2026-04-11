@@ -256,6 +256,28 @@ const bookReadingPage = () => {
         .should('have.attr', 'data-direct-content-read', 'true')
       return this
     },
+    expectCurrentBlockNavigationBar(title: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="current-block-navigation-bar"]', { timeout: 10000 })
+        .should('be.visible')
+        .and('contain', title)
+      return this
+    },
+    expectCurrentBlockNavigationBarNotVisible() {
+      pageIsNotLoading()
+      cy.get('[data-testid="current-block-navigation-bar"]').should('not.exist')
+      return this
+    },
+    clickReadFromHere() {
+      pageIsNotLoading()
+      cy.get('[data-testid="read-from-here"]').should('be.visible').click()
+      return this
+    },
+    clickBackToSelected() {
+      pageIsNotLoading()
+      cy.get('[data-testid="back-to-selected"]').should('be.visible').click()
+      return this
+    },
   }
 }
 

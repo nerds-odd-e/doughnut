@@ -73,8 +73,10 @@ And I should see that book block "2.2 Refactoring as Strengthening the Code" is 
 
 - improve the UX/UI of the book layout list, to make the nesting more clear
 - drag layout item right to increase depth
-- drag item left to decre
-- use AI to reorg the levels
+- drag item left to decrease depth
+- tab / shift-tab keys to increase and decrease
+- use AI to reorg the depth
+
 
 ---
 

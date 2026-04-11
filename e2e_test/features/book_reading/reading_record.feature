@@ -22,3 +22,19 @@ Feature: Reading record
     When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
     Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
     And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout
+
+  Scenario: Current block differs from selected shows navigation affordance (reading record)
+    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+    And I scroll the PDF book reader down within the same page to move viewport past the next book block bbox
+    Then I should see the current block navigation bar showing "2.1 Easier to Change—and Harder to Misuse"
+    When I click "Read from here" in the current block navigation bar
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is selected in the book layout
+    And the current block navigation bar should not be visible
+
+  Scenario: Back to selected scrolls back to the selected block (reading record)
+    When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+    And I scroll the PDF book reader down within the same page to move viewport past the next book block bbox
+    Then I should see the current block navigation bar showing "2.1 Easier to Change—and Harder to Misuse"
+    When I click "Back to selected" in the current block navigation bar
+    Then the book block "1. Refactoring: Protecting Intention in Working Software" should be the current block in the book reader
+    And the book block "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader

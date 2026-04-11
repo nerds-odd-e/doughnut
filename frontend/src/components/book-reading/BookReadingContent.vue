@@ -71,6 +71,12 @@
           @mark-as-skimmed="() => markSelectedDisposition('SKIMMED')"
           @mark-as-skipped="() => markSelectedDisposition('SKIPPED')"
         />
+        <CurrentBlockNavigationBar
+          v-if="currentBlockForNavBar"
+          :current-block-title="currentBlockForNavBar.title"
+          @read-from-here="onReadFromHere"
+          @back-to-selected="onBackToSelected"
+        />
       </template>
     </main>
   </BookReadingBookLayout>
@@ -79,6 +85,7 @@
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
+import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
@@ -151,6 +158,13 @@ const bookBlocks = computed(() => props.book.blocks)
 const currentBlockId = ref<number | null>(null)
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+
+const currentBlockForNavBar = computed(() => {
+  const curId = currentBlockId.value
+  const selId = selectedBlockId.value
+  if (curId === null || selId === null || curId === selId) return null
+  return bookBlocks.value.find((b) => b.id === curId) ?? null
+})
 
 const lastReadingForPatch = ref<{
   pageIndex: number
@@ -376,6 +390,18 @@ function onPagesReady() {
 
 async function onBookBlockClick(block: BookBlockFull) {
   await applyBookBlockSelection(block)
+}
+
+async function onReadFromHere() {
+  const block = currentBlockForNavBar.value
+  if (block) await applyBookBlockSelection(block)
+}
+
+async function onBackToSelected() {
+  const selId = selectedBlockId.value
+  if (selId === null) return
+  const block = bookBlocks.value.find((b) => b.id === selId)
+  if (block) await applyBookBlockSelection(block)
 }
 
 onMounted(async () => {

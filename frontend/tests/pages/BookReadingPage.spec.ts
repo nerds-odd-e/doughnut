@@ -1,3 +1,4 @@
+import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
@@ -1831,6 +1832,139 @@ describe("BookReadingPage", () => {
       await flushPromises()
 
       expect(putSpy).not.toHaveBeenCalled()
+    })
+
+    describe("Current block navigation bar", () => {
+      function currentBlockNavBar(wrapper: BookReadingPageWrapper) {
+        return wrapper.find('[data-testid="current-block-navigation-bar"]')
+      }
+
+      function spyOnScrollToBookNavTarget(wrapper: BookReadingPageWrapper) {
+        const pdf = wrapper.findComponent(PdfBookViewer)
+        const exposed = (
+          pdf.vm as unknown as {
+            $: {
+              exposed: {
+                scrollToBookNavigationTarget: (
+                  target: unknown,
+                  targets: unknown[]
+                ) => Promise<void>
+              }
+            }
+          }
+        ).$.exposed
+        return vi
+          .spyOn(exposed, "scrollToBookNavigationTarget")
+          .mockResolvedValue(undefined)
+      }
+
+      it("shows navigation bar when current block differs from selected block", async () => {
+        const wrapper = await mountLoadedBookWithBlocks(notebookId)
+        spyOnScrollToBookNavTarget(wrapper)
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // mid=500 puts Section 2 (y0=72) as current while Section 1 stays selected
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 500, bottom: 1000 },
+          pagesCount: 10,
+        })
+
+        expect(wrapper.find('[data-current-block="true"]').text()).toBe(
+          "Section 2"
+        )
+        expect(currentBlockNavBar(wrapper).exists()).toBe(true)
+        expect(currentBlockNavBar(wrapper).text()).toContain("Section 2")
+      })
+
+      it("hides navigation bar when current block equals selected block", async () => {
+        const wrapper = await mountLoadedBookWithBlocks(notebookId)
+        spyOnScrollToBookNavTarget(wrapper)
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        // mid=10: Section 1 y0=0, y1=0 (page-only bbox, never "visible" by y1>top check)
+        // gap case: only y0<=mid blocks → Section 1 (y0=0 <= 10) wins as gapBest
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 10, bottom: 1000 },
+          pagesCount: 10,
+        })
+
+        expect(wrapper.find('[data-current-block="true"]').text()).toBe(
+          "Section 1"
+        )
+        expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+      })
+
+      it("Read from here makes current block the selected block and hides nav bar", async () => {
+        const wrapper = await mountLoadedBookWithBlocks(notebookId)
+        spyOnScrollToBookNavTarget(wrapper)
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 500, bottom: 1000 },
+          pagesCount: 10,
+        })
+
+        expect(currentBlockNavBar(wrapper).exists()).toBe(true)
+        await wrapper
+          .findComponent(CurrentBlockNavigationBar)
+          .vm.$emit("readFromHere")
+        await flushPromises()
+
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 2"
+          )
+        )
+        expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+      })
+
+      it("Back to selected scrolls to selected block and hides nav bar", async () => {
+        const wrapper = await mountLoadedBookWithBlocks(notebookId)
+        spyOnScrollToBookNavTarget(wrapper)
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 500, bottom: 1000 },
+          pagesCount: 10,
+        })
+
+        expect(currentBlockNavBar(wrapper).exists()).toBe(true)
+        await wrapper
+          .findComponent(CurrentBlockNavigationBar)
+          .vm.$emit("backToSelected")
+        await flushPromises()
+
+        await vi.waitFor(() =>
+          expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+        )
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 1"
+        )
+      })
     })
   })
 })
