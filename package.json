@@ -106,7 +106,7 @@
     "tty-assert": "workspace:*",
     "typescript": "6.0.2",
     "util": "^0.12.5",
-    "wait-on": "^9.0.4",
+    "wait-on": "^9.0.5",
     "yaml": "^2.8.3"
   },
   "dependencies": {
