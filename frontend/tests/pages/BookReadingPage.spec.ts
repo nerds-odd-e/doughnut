@@ -51,15 +51,12 @@ function topMathsLikeFlatBlocks(options?: {
     depth: 0,
     title: `Section ${i + 1}`,
     startAnchor,
-    // Block 101 (i=0) has no bbox by default so it doesn't participate in detection
-    // and won't trigger auto-mark (allBboxes.length=0).
-    // When firstBlockHasNoDirectContent=true, give it a degenerate bbox so allBboxes.length>0
-    // triggers auto-mark, but the invalid geometry means it's still skipped in detection.
+    // Block 101: page-only allBboxes entry (matches startAnchor JSON shape).
     allBboxes:
       i === 0
         ? options?.firstBlockHasNoDirectContent
           ? [{ pageIndex: 0, bbox: [0, 0, 0, 0] }]
-          : []
+          : [{ pageIndex: 0 } as unknown as PageBboxFull]
         : [PREORDER_FIRST_BBOXES[i]!],
   }))
 }
@@ -242,6 +239,10 @@ describe("BookReadingPage", () => {
     vi.spyOn(
       NotebookBooksController,
       "getNotebookBookReadingRecords"
+    ).mockResolvedValue(wrapSdkResponse([]))
+    vi.spyOn(
+      NotebookBooksController,
+      "putNotebookBookBlockReadingRecord"
     ).mockResolvedValue(wrapSdkResponse([]))
   })
 
@@ -731,17 +732,22 @@ describe("BookReadingPage", () => {
     })
 
     it("calls PUT with SKIMMED when Skim is used", async () => {
+      let putCall = 0
       const putSpy = vi
         .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
-        .mockResolvedValue(
-          wrapSdkResponse([
+        .mockImplementation(async () => {
+          putCall++
+          if (putCall === 1) {
+            return wrapSdkResponse([])
+          }
+          return wrapSdkResponse([
             {
               bookBlockId: "101",
               status: "SKIMMED",
               completedAt: "2020-01-01T00:00:00Z",
             },
           ])
-        )
+        })
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
@@ -771,18 +777,24 @@ describe("BookReadingPage", () => {
     })
 
     it("moves book layout selection to the successor block after Read", async () => {
+      const readRecord = [
+        {
+          bookBlockId: "101",
+          status: "READ" as const,
+          completedAt: "2020-01-01T00:00:00Z",
+        },
+      ]
+      let putCall = 0
       vi.spyOn(
         NotebookBooksController,
         "putNotebookBookBlockReadingRecord"
-      ).mockResolvedValue(
-        wrapSdkResponse([
-          {
-            bookBlockId: "101",
-            status: "READ",
-            completedAt: "2020-01-01T00:00:00Z",
-          },
-        ])
-      )
+      ).mockImplementation(async () => {
+        putCall++
+        if (putCall === 1) {
+          return wrapSdkResponse([])
+        }
+        return wrapSdkResponse(readRecord)
+      })
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
@@ -809,18 +821,24 @@ describe("BookReadingPage", () => {
     })
 
     it("unmounts the reading control panel after Read once it was shown", async () => {
+      const readRecord = [
+        {
+          bookBlockId: "101",
+          status: "READ" as const,
+          completedAt: "2020-01-01T00:00:00Z",
+        },
+      ]
+      let putCall = 0
       vi.spyOn(
         NotebookBooksController,
         "putNotebookBookBlockReadingRecord"
-      ).mockResolvedValue(
-        wrapSdkResponse([
-          {
-            bookBlockId: "101",
-            status: "READ",
-            completedAt: "2020-01-01T00:00:00Z",
-          },
-        ])
-      )
+      ).mockImplementation(async () => {
+        putCall++
+        if (putCall === 1) {
+          return wrapSdkResponse([])
+        }
+        return wrapSdkResponse(readRecord)
+      })
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       await clickBookBlockByTitle(wrapper, "Section 1")
       await vi.waitFor(() =>
@@ -1217,8 +1235,16 @@ describe("BookReadingPage", () => {
       })
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
-        // Use default blocks: allBboxes empty for every block
-        stubGetBookWithTopMathsBlocks(notebookId)
+        const blocks = topMathsLikeFlatBlocks().map((b, i) =>
+          i === 0
+            ? { ...b, allBboxes: [{ pageIndex: 0 } as unknown as PageBboxFull] }
+            : b
+        )
+        vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+          wrapSdkResponse(
+            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+          )
+        )
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)

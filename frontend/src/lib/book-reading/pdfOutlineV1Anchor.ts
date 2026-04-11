@@ -85,10 +85,11 @@ export function parsePdfOutlineV1Anchor(
 /**
  * Convert `allBboxes` wire items (`PageBboxFull` from `BookBlockFull.allBboxes`) to navigation targets.
  * The server pre-validates these; we still guard against malformed items defensively.
+ * Missing `bbox` yields a page-only target (`bbox: null`).
  */
 export function wireItemsToNavigationTargets(
   items:
-    | ReadonlyArray<{ pageIndex: number; bbox: ReadonlyArray<number> }>
+    | ReadonlyArray<{ pageIndex: number; bbox?: ReadonlyArray<number> }>
     | undefined
 ): PdfOutlineV1NavigationTarget[] {
   if (!items?.length) return []
@@ -99,6 +100,11 @@ export function wireItemsToNavigationTargets(
       !Number.isInteger(it.pageIndex) ||
       it.pageIndex < 0
     ) {
+      continue
+    }
+    const rawBbox = it.bbox as unknown
+    if (rawBbox === undefined || rawBbox === null) {
+      out.push({ pageIndex: it.pageIndex, bbox: null })
       continue
     }
     const bbox = parseOptionalBbox(it.bbox as unknown[])

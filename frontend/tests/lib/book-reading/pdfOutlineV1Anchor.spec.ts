@@ -142,6 +142,18 @@ describe("wireItemsToNavigationTargets", () => {
     ).toEqual([{ pageIndex: 0, bbox: [0, 0, 1, 1] }])
   })
 
+  it("maps page-only wire items to targets with null bbox", () => {
+    expect(
+      wireItemsToNavigationTargets([
+        { pageIndex: 0 },
+        { pageIndex: 1, bbox: [0, 0, 1, 1] },
+      ])
+    ).toEqual([
+      { pageIndex: 0, bbox: null },
+      { pageIndex: 1, bbox: [0, 0, 1, 1] },
+    ])
+  })
+
   it("returns empty for undefined or empty input", () => {
     expect(wireItemsToNavigationTargets(undefined)).toEqual([])
     expect(wireItemsToNavigationTargets([])).toEqual([])

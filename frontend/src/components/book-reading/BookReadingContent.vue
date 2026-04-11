@@ -406,15 +406,13 @@ const pdfViewerRef = ref<{
 } | null>(null)
 
 async function applyBookBlockSelection(block: BookReadingBookLayoutBlockRow) {
-  const parsed = parsePdfOutlineV1Anchor(block.startAnchor)
+  const targets = wireItemsToNavigationTargets(block.allBboxes)
+  const parsed = targets[0] ?? null
   if (parsed === null) {
     return
   }
   selectedBlockId.value = block.id
-  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(
-    parsed,
-    wireItemsToNavigationTargets(block.allBboxes)
-  )
+  await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed, targets)
   currentBlockAnchorDebouncer.commitNow(block.id)
 }
 
