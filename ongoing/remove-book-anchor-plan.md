@@ -85,7 +85,7 @@ Rewrite `currentBlockAnchorFromAnchorPage.spec.ts` to pass structured `{ id, fir
 
 - Remove `startAnchor` field from `BookReadingBookLayoutBlockRow` type in `BookReadingBookLayout.vue`.
 - Remove `startAnchor: child.startAnchor` from row construction in `BookReadingContent.vue` (line 164).
-- Update `BookReadingPage.spec.ts`: the `.map((startAnchor, i) => ({ ... startAnchor, ...}))` pattern no longer needs `startAnchor` on the built blocks. Ensure `allBboxes[0]` in test data carries the same page/bbox info.
+- Update `BookReadingPage.spec.ts`: the `.map((startAnchor, i) => ({ ... startAnchor, ...}))` pattern no longer needs `startAnchor` on the built blocks. Ensure `allBboxes[0]` in test data carries the same page/bbox info. Systematic replacement of ad-hoc block construction with **`makeMe` builders** across page specs is **Phase 4**.
 - Remove `BookAnchorFullBuilder`, `makeMe.aBookAnchor`, and `makeMe.bookReadingTopMathsLikeAnchors()` from `doughnut-test-fixtures` **if no consumers remain** (check CLI tests; if CLI still references them, defer removal to Phase 5).
 - E2E: `book_browsing.feature` + `reading_record.feature`.
 - No dead code.
