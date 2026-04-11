@@ -26,6 +26,7 @@ import {
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { attachBookBlockSelectionBboxHighlight } from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
+import { createIntervalScrollSuppression } from "@/lib/book-reading/intervalScrollSuppression"
 import {
   normalizedBboxToPdfJsXyzDestArray,
   normalizedBboxToPixelRect,
@@ -87,8 +88,7 @@ let userAdjustedScale = false
 let onWheelForZoom: ((e: WheelEvent) => void) | null = null
 let onTouchStartForPinch: ((e: TouchEvent) => void) | null = null
 let onTouchMoveForPinch: ((e: TouchEvent) => void) | null = null
-let scrollSuppressed = false
-let scrollSuppressTimer: ReturnType<typeof setTimeout> | null = null
+const scrollSuppression = createIntervalScrollSuppression()
 let onTouchEndForPinch: ((e: TouchEvent) => void) | null = null
 let lastPinchDistance = 0
 
@@ -480,16 +480,8 @@ function contentFitsFromBlockTop(
   return spanPx <= container.getBoundingClientRect().height - obstructionPx
 }
 
-/** Suppresses wheel/touch-move scroll input for `holdMs` milliseconds. */
 function suppressScrollInput(holdMs: number): void {
-  if (scrollSuppressTimer !== null) {
-    clearTimeout(scrollSuppressTimer)
-  }
-  scrollSuppressed = true
-  scrollSuppressTimer = setTimeout(() => {
-    scrollSuppressed = false
-    scrollSuppressTimer = null
-  }, holdMs)
+  scrollSuppression.activate(holdMs)
 }
 
 /**
@@ -587,7 +579,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   container.addEventListener("scroll", onScrollForViewport, { passive: true })
 
   onWheelForZoom = (e: WheelEvent) => {
-    if (scrollSuppressed) {
+    if (scrollSuppression.checkEvent()) {
       e.preventDefault()
       return
     }
@@ -607,7 +599,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     }
   }
   onTouchMoveForPinch = (e: TouchEvent) => {
-    if (scrollSuppressed) {
+    if (scrollSuppression.checkEvent()) {
       e.preventDefault()
       return
     }
@@ -708,11 +700,7 @@ watch(
 )
 
 onBeforeUnmount(async () => {
-  if (scrollSuppressTimer !== null) {
-    clearTimeout(scrollSuppressTimer)
-    scrollSuppressTimer = null
-  }
-  scrollSuppressed = false
+  scrollSuppression.reset()
   const container = containerRef.value
   if (container) {
     detachViewportScrollListener(container)
