@@ -420,6 +420,39 @@ function isLastContentBottomVisible(
   return bboxBottomClient < panelTop && bboxBottomClient > containerRect.top
 }
 
+const READING_PANEL_ANCHOR_GAP_PX = 8
+
+/**
+ * When `isLastContentBottomVisible` is true, distance from `mainEl`'s top padding edge to place
+ * the Reading Control Panel wrapper immediately below the last direct-content bbox bottom.
+ */
+function readingPanelAnchorTopPx(
+  mainEl: HTMLElement,
+  target: BookNavigationTarget,
+  obstructionPx: number
+): number | null {
+  if (!isLastContentBottomVisible(target, obstructionPx)) {
+    return null
+  }
+  const container = containerRef.value
+  if (!container || !pdfViewer) return null
+  const { pageIndex, bbox } = target
+  if (
+    bbox === null ||
+    !Number.isInteger(pageIndex) ||
+    pageIndex < 0 ||
+    pageIndex >= pdfViewer.pagesCount
+  ) {
+    return null
+  }
+  const pageView = pdfViewer.getPageView(pageIndex)
+  if (!pageView?.div) return null
+  const pageRect = pageView.div.getBoundingClientRect()
+  const bboxBottomClient = pageRect.top + (bbox[3] / 1000) * pageRect.height
+  const mainRect = mainEl.getBoundingClientRect()
+  return bboxBottomClient - mainRect.top + READING_PANEL_ANCHOR_GAP_PX
+}
+
 /** Suppresses wheel/touch-move scroll input for `holdMs` milliseconds. */
 function suppressScrollInput(holdMs: number): void {
   if (scrollSuppressTimer !== null) {
@@ -472,6 +505,7 @@ defineExpose({
   zoomIn,
   zoomOut,
   isLastContentBottomVisible,
+  readingPanelAnchorTopPx,
 })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {

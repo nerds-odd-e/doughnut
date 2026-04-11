@@ -28,6 +28,11 @@ export type BookReadingPdfViewerRef = {
     target: BookNavigationTarget,
     obstructionPx: number
   ) => boolean
+  readingPanelAnchorTopPx: (
+    mainEl: HTMLElement,
+    target: BookNavigationTarget,
+    obstructionPx: number
+  ) => number | null
 }
 
 function selectedIndexAndSuccessor(
@@ -186,6 +191,7 @@ export function useBookReadingSnapBack(options: {
   return {
     snapAnimationKey,
     blockAwaitingConfirmation,
+    lastContentBottomVisible,
     shouldSnapBack,
     performSnapBack,
     updateLastDirectContentGeometry,

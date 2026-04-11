@@ -43,7 +43,10 @@
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
   >
-    <main class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-relative">
+    <main
+      ref="mainPaneRef"
+      class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-relative"
+    >
       <div
         v-if="pdfViewerLoadError"
         class="daisy-alert daisy-alert-error daisy-mb-2 daisy-mx-2 daisy-mt-2"
@@ -63,6 +66,7 @@
           v-if="blockAwaitingConfirmation"
           :selected-block-title="blockAwaitingConfirmation.title"
           :snap-animation-key="snapAnimationKey"
+          :anchor-top-px="readingPanelAnchorTopPx"
           @mark-as-read="() => markSelectedDisposition('READ')"
           @mark-as-skimmed="() => markSelectedDisposition('SKIMMED')"
           @mark-as-skipped="() => markSelectedDisposition('SKIPPED')"
@@ -101,6 +105,8 @@ const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 /** Vertical space (px) reserved at the bottom of the PDF main pane by ReadingControlPanel. */
 const READING_PANEL_OBSTRUCTION_PX = 80
+/** Fallback to bottom-docked panel if anchored top would leave too little main-pane height. */
+const MIN_READING_PANEL_RESERVE_PX = 88
 const SNAP_HOLD_MS = 500
 
 const props = withDefaults(
@@ -152,10 +158,13 @@ const lastReadingForPatch = ref<{
 } | null>(null)
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
+const mainPaneRef = ref<HTMLElement | null>(null)
+const readingPanelAnchorTopPx = ref<number | null>(null)
 
 const {
   snapAnimationKey,
   blockAwaitingConfirmation,
+  lastContentBottomVisible,
   shouldSnapBack,
   performSnapBack,
   updateLastDirectContentGeometry,
@@ -170,6 +179,38 @@ const {
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
   snapHoldMs: SNAP_HOLD_MS,
 })
+
+function updateReadingPanelAnchor() {
+  const mainEl = mainPaneRef.value
+  const pdf = pdfViewerRef.value
+  const selId = selectedBlockId.value
+  if (!mainEl || !pdf || selId === null || !lastContentBottomVisible.value) {
+    readingPanelAnchorTopPx.value = null
+    return
+  }
+  const block = bookBlocks.value.find((b) => b.id === selId)
+  if (!block || block.allBboxes.length < 2) {
+    readingPanelAnchorTopPx.value = null
+    return
+  }
+  const lastBbox = block.allBboxes[block.allBboxes.length - 1]!
+  const target = {
+    pageIndex: lastBbox.pageIndex,
+    bbox: lastBbox.bbox as [number, number, number, number],
+  }
+  let top = pdf.readingPanelAnchorTopPx(
+    mainEl,
+    target,
+    READING_PANEL_OBSTRUCTION_PX
+  )
+  if (top !== null) {
+    const mainH = mainEl.getBoundingClientRect().height
+    if (mainH > 0 && top + MIN_READING_PANEL_RESERVE_PX > mainH - 8) {
+      top = null
+    }
+  }
+  readingPanelAnchorTopPx.value = top
+}
 
 const currentBlockLiveText = ref("")
 const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
@@ -219,6 +260,7 @@ function onViewportAnchorPage(payload: {
   )
   currentBlockIdDebouncer.propose(candidate)
   updateLastDirectContentGeometry()
+  updateReadingPanelAnchor()
   let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
     null
   if (payload.readingPosition !== undefined) {
@@ -243,6 +285,7 @@ function onViewportAnchorPage(payload: {
 }
 
 watch(selectedBlockId, (id) => {
+  readingPanelAnchorTopPx.value = null
   const last = lastReadingForPatch.value
   if (last === null || id === null) {
     return

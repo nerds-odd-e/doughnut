@@ -585,6 +585,23 @@ describe("BookReadingPage", () => {
       )
     }
 
+    function mockReadingPanelAnchorTopPx(
+      wrapper: BookReadingPageWrapper,
+      returnValue: number | null
+    ) {
+      const pdf = wrapper.findComponent(PdfBookViewer)
+      const exposed = (
+        pdf.vm as unknown as {
+          $: {
+            exposed: {
+              readingPanelAnchorTopPx: () => number | null
+            }
+          }
+        }
+      ).$.exposed
+      vi.spyOn(exposed, "readingPanelAnchorTopPx").mockReturnValue(returnValue)
+    }
+
     async function clickBookBlockByTitle(
       wrapper: BookReadingPageWrapper,
       title: string
@@ -997,6 +1014,36 @@ describe("BookReadingPage", () => {
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
+      it("Phase 11: anchors panel when last content bottom is visible and anchor px is returned", async () => {
+        stubGetBookWithFirstBlockHavingBbox()
+        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        mockReadingPanelAnchorTopPx(wrapper, 120)
+
+        await clickBookBlockByTitle(wrapper, "Section 1")
+        await vi.waitFor(() =>
+          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+            "Section 1"
+          )
+        )
+
+        const pdf = wrapper.findComponent(PdfBookViewer)
+        pdf.vm.$emit("viewportAnchorPage", {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 0, mid: 200, bottom: 600 },
+          pagesCount: 10,
+        })
+        await flushPromises()
+
+        const panel = readingControlPanel(wrapper)
+        expect(panel.exists()).toBe(true)
+        expect(panel.attributes("data-panel-placement")).toBe("anchored")
+        expect((panel.element as HTMLElement).style.top).toBe("120px")
+        expect((panel.element as HTMLElement).style.bottom).toBe("auto")
+      })
+
       it("hides the panel when last content bottom is not yet above obstruction", async () => {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
@@ -1053,6 +1100,9 @@ describe("BookReadingPage", () => {
         })
 
         expect(readingControlPanel(wrapper).exists()).toBe(true)
+        expect(
+          readingControlPanel(wrapper).attributes("data-panel-placement")
+        ).toBe("fixed")
       })
 
       it("snaps back and keeps panel visible on first boundary crossing (same-page: scrolls to block start)", async () => {

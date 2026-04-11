@@ -10,7 +10,7 @@
 
 **This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**Shipped baseline (do not regress):** Reading-record Phases **2–10** — through Phase **9** as before, plus **Phase 10** (**`GET`/`PATCH` reading-position** includes optional **`selectedBookBlockId`**; client restores selection with last view position). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
+**Shipped baseline (do not regress):** Reading-record Phases **2–11** — through **Phase 10** as before, plus **Phase 11** (when the last direct-content bottom is above the obstruction band, the Reading Control Panel anchors just under that edge and tracks on scroll; otherwise bottom-docked, including the sticky-panel case). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
 
 ---
 
@@ -98,15 +98,15 @@
 
 ---
 
-## Phase 11 — Panel below last content bottom when it would float above the obstruction zone
+## Phase 11 — Panel below last content bottom when it would float above the obstruction zone (shipped)
 
 **User story scenario:** the **mark as read** (disposition) panel is showing, and the **bottom** of the selected block’s **last direct-content** bbox sits **above** the default bottom-docked panel zone (i.e. shorter content than the usual “panel eats the bottom” layout).
 
 **User outcome:** while that prompt is shown, place the panel **immediately below** that **last content bottom** (not fixed to the viewport bottom), and **update on scroll** so it **follows** that edge until the usual rules hide the panel or the geometry no longer applies — without breaking scroll-through on the PDF.
 
-**Depends on:** shipped Phase 2+ panel behavior; coordinate with UX roadmap **Reading Control Panel** placement.
+**Shipped:** `PdfBookViewer.readingPanelAnchorTopPx` + `BookReadingContent` passes **`anchorTopPx`** into **`ReadingControlPanel`** when **`lastContentBottomVisible`**; sticky / no-geometry path stays **`data-panel-placement="fixed"`**. Optional clamp falls back to bottom-docked when the main pane is too short (skip clamp when main height is 0).
 
-**Tests (no new E2E):** mounted geometry/position assertions where feasible.
+**Tests (no new E2E):** `BookReadingPage.spec.ts` (anchored vs fixed).
 
 ---
 

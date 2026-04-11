@@ -31,7 +31,7 @@
 
 **Purpose:** Let the user **mark the direct content** of a **book block** (see **Direct content** in the architecture roadmap) as **read**, **skimmed**, or **skipped** — without modal stacks that break reading flow.
 
-**Placement:** **Near the bottom** of the **PDF main pane** (above safe-area inset on notched devices). It is **not** in the global top bar: it stays visually tied to “this book / this viewport.”
+**Placement:** **Near the bottom** of the **PDF main pane** (above safe-area inset on notched devices). It is **not** in the global top bar: it stays visually tied to “this book / this viewport.” When the selected block’s last direct-content bottom is **above** the reserved bottom obstruction band, the panel **anchors just under that edge** and moves with scroll (**Phase 11**, shipped); otherwise it stays **bottom-docked** in the main pane (including the sticky “panel stays until successor is current” case).
 
 **States**
 
@@ -47,7 +47,7 @@
 - **Coexists with drawer:** Opening/closing the book layout **does not** reset panel expand/minimize preference for the session unless we later persist it (open UX question).
 - **Accessibility:** Expand/collapse and primary actions need **visible labels** or **accessible names**; avoid relying only on iconography for the primary disposition action.
 
-**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book blocks** via this panel) and **Phase 3** (**auto-mark when no direct content**, so the panel is not needed on that path) are **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** (**skim/skip** actions + layout `data-*` cues + **`PUT` disposition body**) is **shipped** — [`ongoing/book-reading-phase-4-skim-skip-plan.md`](book-reading-phase-4-skim-skip-plan.md). Optional **persistence of panel state** stays deferred unless product pulls it in.
+**Delivery mapping:** The reading-record plan’s **Phase 2** slice (**read** + persistence + read styling on **book blocks** via this panel) and **Phase 3** (**auto-mark when no direct content**, so the panel is not needed on that path) are **shipped** — see [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md) and [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature). **Phase 4** (**skim/skip** actions + layout `data-*` cues + **`PUT` disposition body**) is **shipped** — [`ongoing/book-reading-phase-4-skim-skip-plan.md`](book-reading-phase-4-skim-skip-plan.md). **Phase 11** (content-anchored panel position when geometry allows) is **shipped**. Optional **persistence of panel state** stays deferred unless product pulls it in.
 
 ---
 

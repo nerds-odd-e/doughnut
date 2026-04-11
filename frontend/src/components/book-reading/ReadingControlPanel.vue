@@ -1,8 +1,10 @@
 <template>
   <div
     data-testid="book-reading-reading-control-panel"
+    :data-panel-placement="panelPlacement"
     :data-snap-animating="isAnimating || undefined"
-    class="daisy-pointer-events-none daisy-absolute daisy-bottom-0 daisy-left-0 daisy-right-0 daisy-z-20 daisy-px-2 daisy-pb-[max(0.5rem,env(safe-area-inset-bottom))] daisy-pt-2"
+    :class="wrapperClass"
+    :style="wrapperStyle"
   >
     <div
       ref="cardRef"
@@ -44,14 +46,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
 const props = withDefaults(
   defineProps<{
     selectedBlockTitle: string
     snapAnimationKey?: number
+    anchorTopPx?: number | null
   }>(),
-  { snapAnimationKey: 0 }
+  { snapAnimationKey: 0, anchorTopPx: null }
+)
+
+const panelPlacement = computed(() =>
+  props.anchorTopPx === null ? "fixed" : "anchored"
+)
+
+const wrapperClass = computed(() => {
+  const base =
+    "daisy-pointer-events-none daisy-absolute daisy-left-0 daisy-right-0 daisy-z-20 daisy-px-2 daisy-pb-[max(0.5rem,env(safe-area-inset-bottom))] daisy-pt-2"
+  return props.anchorTopPx === null ? `${base} daisy-bottom-0` : base
+})
+
+const wrapperStyle = computed(() =>
+  props.anchorTopPx === null
+    ? undefined
+    : { top: `${props.anchorTopPx}px`, bottom: "auto" }
 )
 
 const emit = defineEmits<{
