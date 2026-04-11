@@ -145,9 +145,27 @@ function bookLayoutRowsFromApiBlocks(
     id: block.id,
     title: block.title,
     depth: block.depth,
-    startAnchor: block.startAnchor,
     allBboxes: block.allBboxes,
   }))
+}
+
+function selectedIndexAndSuccessor(
+  rows: readonly BookReadingBookLayoutBlockRow[],
+  selId: number
+): {
+  selIdx: number
+  sel: BookReadingBookLayoutBlockRow
+  successor: BookReadingBookLayoutBlockRow
+} | null {
+  const selIdx = rows.findIndex((r) => r.id === selId)
+  if (selIdx < 0 || selIdx >= rows.length - 1) {
+    return null
+  }
+  return {
+    selIdx,
+    sel: rows[selIdx]!,
+    successor: rows[selIdx + 1]!,
+  }
 }
 
 const flatBookBlocks = ref<BookReadingBookLayoutBlockRow[]>([])
@@ -175,10 +193,9 @@ function shouldSnapBack(proposedBlockId: number | null): boolean {
   if (selId === null) return false
   if (bookReading.hasRecordedDisposition(selId)) return false
   const rows = flatBookBlocks.value
-  const selIdx = rows.findIndex((r) => r.id === selId)
-  if (selIdx < 0 || selIdx >= rows.length - 1) return false
-  const sel = rows[selIdx]!
-  const successor = rows[selIdx + 1]!
+  const chain = selectedIndexAndSuccessor(rows, selId)
+  if (chain === null) return false
+  const { selIdx, sel, successor } = chain
   const proposedIdx = rows.findIndex((r) => r.id === proposedBlockId)
   if (proposedIdx < 0 || proposedIdx <= selIdx) return false
   const immediateSuccessor = proposedBlockId === successor.id
@@ -222,28 +239,17 @@ function performSnapBack(): void {
   }
 }
 
-function selectedBlockHasSuccessorAndNoDisposition(): {
-  selId: number
-  successor: BookReadingBookLayoutBlockRow
-} | null {
-  const selId = selectedBlockId.value
-  if (selId === null) return null
-  if (bookReading.hasRecordedDisposition(selId)) return null
-  const rows = flatBookBlocks.value
-  const selIdx = rows.findIndex((r) => r.id === selId)
-  if (selIdx < 0 || selIdx >= rows.length - 1) return null
-  return { selId, successor: rows[selIdx + 1]! }
-}
-
 // allBboxes: index 0 is the anchor; remaining entries are direct-content blocks.
 // When length > 1, the last entry is the last direct-content bbox.
 const blockAwaitingConfirmation =
   computed<BookReadingBookLayoutBlockRow | null>(() => {
-    const context = selectedBlockHasSuccessorAndNoDisposition()
-    if (context === null) return null
-    const { selId, successor } = context
+    const selId = selectedBlockId.value
+    if (selId === null) return null
+    if (bookReading.hasRecordedDisposition(selId)) return null
     const rows = flatBookBlocks.value
-    const sel = rows.find((r) => r.id === selId)!
+    const chain = selectedIndexAndSuccessor(rows, selId)
+    if (chain === null) return null
+    const { sel, successor } = chain
     const lastBbox = lastContentBbox(sel)
     if (lastBbox !== null) {
       if (lastContentBottomVisible.value) return sel
@@ -367,7 +373,7 @@ watch(currentBlockId, async (blockId) => {
     predecessor.allBboxes.length > 0 &&
     !bookReading.hasRecordedDisposition(predecessor.id)
   ) {
-    await bookReading.submitMarkRead(predecessor.id)
+    await bookReading.submitReadingDisposition(predecessor.id, "READ")
   }
 })
 

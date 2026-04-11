@@ -81,17 +81,13 @@
 
 <script setup lang="ts">
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type {
-  BookAnchorFull,
-  PageBboxFull,
-} from "@generated/doughnut-backend-api"
+import type { PageBboxFull } from "@generated/doughnut-backend-api"
 import { ref, watch } from "vue"
 
 export type BookReadingBookLayoutBlockRow = {
   id: number
   title: string
   depth: number
-  startAnchor: BookAnchorFull
   allBboxes: PageBboxFull[]
 }
 

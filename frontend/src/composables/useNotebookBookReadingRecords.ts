@@ -1,5 +1,4 @@
 import {
-  readBlockIdsFromRecords,
   readingDispositionByBlockId,
   type BookBlockReadingDisposition,
 } from "@/lib/book-reading/readBlockIdsFromRecords"
@@ -46,14 +45,6 @@ export function useNotebookBookReadingRecords(
     return true
   }
 
-  async function submitMarkRead(bookBlockId: number): Promise<boolean> {
-    return submitReadingDisposition(bookBlockId, "READ")
-  }
-
-  function isDirectContentRead(blockId: number): boolean {
-    return readBlockIdsFromRecords(rows.value).has(blockId)
-  }
-
   function hasRecordedDisposition(blockId: number): boolean {
     return dispositionByBlockId.value.has(blockId)
   }
@@ -66,9 +57,7 @@ export function useNotebookBookReadingRecords(
 
   return {
     syncFromServer,
-    submitMarkRead,
     submitReadingDisposition,
-    isDirectContentRead,
     hasRecordedDisposition,
     dispositionForBlock,
   }
