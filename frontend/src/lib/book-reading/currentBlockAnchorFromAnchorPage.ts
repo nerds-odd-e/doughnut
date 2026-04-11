@@ -1,5 +1,4 @@
-import type { BookAnchorFull } from "@generated/doughnut-backend-api"
-import { parsePdfOutlineV1Anchor } from "./pdfOutlineV1Anchor"
+import { parseOptionalBbox } from "./pdfOutlineV1Anchor"
 import type { ViewportYRange } from "./pdfViewerViewportTopYDown"
 
 /**
@@ -8,27 +7,36 @@ import type { ViewportYRange } from "./pdfViewerViewportTopYDown"
  */
 const SCROLL_PADDING_NORMALIZED = 50
 
+export type BookBlockFirstBboxRow = {
+  readonly id: number
+  readonly firstBbox?: {
+    readonly pageIndex: number
+    readonly bbox?: ReadonlyArray<number>
+  }
+}
+
 /**
  * **Rule (in priority order):**
- * 1. Current = the **earliest** anchor on `anchorPageZeroBased` whose bbox is visible
+ * 1. Current = the **earliest** block on `anchorPageZeroBased` whose first-bbox region is visible
  *    (`y0 < viewport.bottom AND y1 > viewport.top`).
- * 2. If that anchor's top (`y0`) has **not** passed the viewport midpoint (`y0 > viewport.mid`) →
- *    use the anchor **before** it (or `bestFromEarlierPages` if none on the page).
- * 3. If that anchor is **partially scrolled above** the viewport top (`y0 < viewport.top`) and the
- *    **next** anchor's top is within `SCROLL_PADDING_NORMALIZED` of the viewport top → use the next
- *    anchor (close-nodes transition).
- * 4. **Gap case** (no visible anchor on the page) → last anchor on the page with `y0 ≤ viewport.mid`
+ * 2. If that block's top (`y0`) has **not** passed the viewport midpoint (`y0 > viewport.mid`) →
+ *    use the block **before** it (or `bestFromEarlierPages` if none on the page).
+ * 3. If that block is **partially scrolled above** the viewport top (`y0 < viewport.top`) and the
+ *    **next** block's top is within `SCROLL_PADDING_NORMALIZED` of the viewport top → use the next
+ *    block (close-nodes transition).
+ * 4. **Gap case** (no visible block on the page) → last block on the page with `y0 ≤ viewport.mid`
  *    (most recent section heading scrolled past); falls back to `bestFromEarlierPages`.
- * 5. `viewport === null` → last anchor on the page (scroll position unknown).
+ * 5. `viewport === null` → last block on the page (scroll position unknown).
  *
- * Anchors on earlier pages contribute `bestFromEarlierPages` only when the current page has **no**
- * book blocks (`onCurrentPage` is empty).
+ * Blocks on earlier pages contribute `bestFromEarlierPages` only when the current page has **no**
+ * participating rows (`onCurrentPage` is empty).
  *
- * `y0` / `y1` come from `bbox[1]` / `bbox[3]`; anchors without a bbox are treated as a point at
- * `y = 0` (never visible by the bbox check, but reachable as the "previous" fallback).
+ * `y0` / `y1` come from `bbox[1]` / `bbox[3]`; rows with a page index but no bbox (or omitted bbox)
+ * are treated as a point at `y = 0` (never visible by the bbox check, but reachable as the "previous"
+ * fallback). A bbox array that is **present** but fails validation skips the whole row.
  */
 export function currentBlockAnchorIdFromAnchorPage(
-  orderedPreorderStartAnchors: readonly BookAnchorFull[],
+  orderedPreorderRows: readonly BookBlockFirstBboxRow[],
   anchorPageZeroBased: number,
   viewport: ViewportYRange | null = null,
   pdfPageCount: number | null = null
@@ -46,19 +54,35 @@ export function currentBlockAnchorIdFromAnchorPage(
   }
   let bestFromEarlierPages: number | null = null
   const onCurrentPage: { id: number; y0: number; y1: number }[] = []
-  for (const anchor of orderedPreorderStartAnchors) {
-    const parsed = parsePdfOutlineV1Anchor(anchor)
-    if (parsed === null) continue
-    const { pageIndex: pageIdx, bbox } = parsed
+  for (const row of orderedPreorderRows) {
+    const fb = row.firstBbox
+    if (fb === undefined) continue
+    const pageIdx = fb.pageIndex
+    if (
+      typeof pageIdx !== "number" ||
+      !Number.isInteger(pageIdx) ||
+      pageIdx < 0
+    ) {
+      continue
+    }
     if (pdfPageCount != null && pageIdx >= pdfPageCount) {
       continue
     }
-    const y0 = bbox !== null ? bbox[1] : 0
-    const y1 = bbox !== null ? bbox[3] : y0
+    let y0: number
+    let y1: number
+    if (fb.bbox === undefined) {
+      y0 = 0
+      y1 = 0
+    } else {
+      const bbox = parseOptionalBbox(fb.bbox)
+      if (bbox === null) continue
+      y0 = bbox[1]
+      y1 = bbox[3]
+    }
     if (pageIdx < anchorPageZeroBased) {
-      bestFromEarlierPages = anchor.id
+      bestFromEarlierPages = row.id
     } else if (pageIdx === anchorPageZeroBased) {
-      onCurrentPage.push({ id: anchor.id, y0, y1 })
+      onCurrentPage.push({ id: row.id, y0, y1 })
     }
   }
   if (onCurrentPage.length === 0) {

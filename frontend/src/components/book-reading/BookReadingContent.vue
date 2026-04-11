@@ -315,7 +315,10 @@ function onViewportAnchorPage(payload: {
     pdfBarPagesTotal.value = payload.pagesCount
   }
   const candidate = currentBlockAnchorIdFromAnchorPage(
-    flatBookBlocks.value.map((r) => r.startAnchor),
+    flatBookBlocks.value.map((r) => ({
+      id: r.id,
+      firstBbox: r.allBboxes?.[0],
+    })),
     payload.anchorPageIndexZeroBased,
     payload.viewport,
     payload.pagesCount
