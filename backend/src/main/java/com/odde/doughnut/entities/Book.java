@@ -62,6 +62,7 @@ public class Book extends EntityIdentifiedByIdOnly {
   private Timestamp updatedAt;
 
   @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("layoutSequence ASC")
   private final List<BookBlock> blocks = new ArrayList<>();
 
   @JsonProperty("blocks")

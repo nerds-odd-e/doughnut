@@ -18,6 +18,7 @@ import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.book.BookBlockFlatOutlineWire;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
 import java.nio.charset.StandardCharsets;
@@ -99,6 +100,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   }
 
   private static List<BookBlock> rootBlocksSorted(Book book) {
+    BookBlockFlatOutlineWire.hydrateBookBlocks(book.getBlocks());
     return book.getBlocks().stream()
         .filter(r -> r.getParentBlockId() == null)
         .sorted(Comparator.comparingLong(BookBlock::getSiblingOrder))
@@ -106,6 +108,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   }
 
   private static List<BookBlock> childrenOf(Book book, BookBlock parent) {
+    BookBlockFlatOutlineWire.hydrateBookBlocks(book.getBlocks());
     return book.getBlocks().stream()
         .filter(r -> Objects.equals(r.getParentBlockId(), parent.getId()))
         .sorted(Comparator.comparingLong(BookBlock::getSiblingOrder))
@@ -189,6 +192,31 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       ResponseEntity<byte[]> fileRes = controller.getBookFile(webRequest(), nb);
       assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(fileRes.getBody(), equalTo(pdfBytes));
+    }
+
+    @Test
+    void contentListAttachSkipsMineruLevelsAndDerivesWireTree() throws Exception {
+      Notebook nb = myNotebook();
+      List<Object> contentList = new ArrayList<>();
+      contentList.add(headingBlock("Part A", 1, 0, List.of(10.0, 20.0, 100.0, 40.0)));
+      contentList.add(headingBlock("Deep section", 3, 0, List.of(10.0, 50.0, 100.0, 70.0)));
+      AttachBookRequest req = new AttachBookRequest();
+      req.setBookName("MinerU book");
+      req.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
+      req.setContentList(contentList);
+
+      ResponseEntity<Book> res = controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES));
+
+      Book created = res.getBody();
+      assertThat(created, notNullValue());
+      assertThat(created.getBlocks(), hasSize(2));
+      BookBlock root = rootBlocksSorted(created).getFirst();
+      assertThat(root.getStructuralTitle(), equalTo("Part A"));
+      assertThat(root.getDepth(), equalTo(0));
+      List<BookBlock> children = childrenOf(created, root);
+      assertThat(children, hasSize(1));
+      assertThat(children.getFirst().getStructuralTitle(), equalTo("Deep section"));
+      assertThat(children.getFirst().getDepth(), equalTo(1));
     }
 
     @Test

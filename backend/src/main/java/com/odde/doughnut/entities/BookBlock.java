@@ -26,12 +26,17 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Setter
   private Book book;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parent_block_id")
+  @Column(name = "layout_sequence", nullable = false)
   @JsonIgnore
   @Getter
   @Setter
-  private BookBlock parent;
+  private int layoutSequence;
+
+  @Column(name = "depth", nullable = false)
+  @JsonIgnore
+  @Getter
+  @Setter
+  private int depth;
 
   @Column(name = "structural_title", nullable = false, length = 512)
   @Getter
@@ -39,6 +44,10 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonProperty("title")
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String structuralTitle;
+
+  @Transient @JsonIgnore @Getter @Setter private Integer wireParentBlockId;
+
+  @Transient @JsonIgnore @Getter @Setter private Long wireSiblingOrder;
 
   @Transient
   @JsonProperty("startAnchor")
@@ -49,17 +58,17 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
     return new BookAnchorFullWire(getId() == null ? 0 : getId(), value);
   }
 
-  @Column(name = "sibling_order", nullable = false)
-  @Getter
-  @Setter
+  @JsonProperty("siblingOrder")
   @JsonView(BookViews.Full.class)
-  private long siblingOrder;
+  public long getSiblingOrder() {
+    return wireSiblingOrder == null ? 0L : wireSiblingOrder;
+  }
 
   @JsonProperty("parentBlockId")
   @JsonView(BookViews.Full.class)
   @Schema(type = "integer")
   public Integer getParentBlockId() {
-    return parent == null ? null : parent.getId();
+    return wireParentBlockId;
   }
 
   @OneToMany(

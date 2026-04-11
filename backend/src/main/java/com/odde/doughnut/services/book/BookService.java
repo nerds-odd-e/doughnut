@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,23 +95,36 @@ public class BookService {
     book.setUpdatedAt(now);
 
     List<AttachBookLayoutNodeRequest> roots = request.getLayout().getRoots();
-    List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks = new ArrayList<>();
-    for (int i = 0; i < roots.size(); i++) {
-      persistLayoutNode(book, null, roots.get(i), i, 1, pendingContentBlocks);
+    IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock = new IdentityHashMap<>();
+    int[] seq = {0};
+    for (AttachBookLayoutNodeRequest root : roots) {
+      preorderAttachBlock(book, root, 1, seq, nodeToBlock);
     }
 
     entityPersister.save(book);
     entityPersister.flush();
 
+    List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks = new ArrayList<>();
+    for (AttachBookLayoutNodeRequest root : roots) {
+      postorderCollectPending(root, nodeToBlock, pendingContentBlocks);
+    }
     for (var entry : pendingContentBlocks) {
       persistContentBlocks(entry.getKey(), entry.getValue());
     }
 
+    BookBlockFlatOutlineWire.hydrateBook(book);
     return book;
   }
 
   @Transactional(readOnly = true)
   public Book getBookForNotebook(Notebook notebook) {
+    Book book = requireBook(notebook);
+    book.getBlocks().size();
+    BookBlockFlatOutlineWire.hydrateBook(book);
+    return book;
+  }
+
+  private Book requireBook(Notebook notebook) {
     return bookRepository
         .findByNotebook_Id(notebook.getId())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
@@ -119,7 +133,7 @@ public class BookService {
   @Transactional(readOnly = true)
   public List<BookBlockReadingRecordListItem> listReadingRecordsForBook(
       Notebook notebook, User user) {
-    Book book = getBookForNotebook(notebook);
+    Book book = requireBook(notebook);
     return bookBlockReadingRecordRepository
         .findAllByUser_IdAndBookBlock_Book_Id(user.getId(), book.getId())
         .stream()
@@ -132,14 +146,14 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public Optional<BookUserLastReadPosition> getLastReadPosition(Notebook notebook, User user) {
-    Book book = getBookForNotebook(notebook);
+    Book book = requireBook(notebook);
     return bookUserLastReadPositionRepository.findByUser_IdAndBook_Id(user.getId(), book.getId());
   }
 
   @Transactional
   public void upsertLastReadPosition(
       Notebook notebook, User user, BookLastReadPositionRequest request) {
-    Book book = getBookForNotebook(notebook);
+    Book book = requireBook(notebook);
     bookUserLastReadPositionRepository
         .findByUser_IdAndBook_Id(user.getId(), book.getId())
         .map(
@@ -168,7 +182,7 @@ public class BookService {
         || BookBlockReadingRecord.STATUS_SKIPPED.equals(status))) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid reading record status");
     }
-    Book book = getBookForNotebook(notebook);
+    Book book = requireBook(notebook);
     if (!bookBlock.getBook().getId().equals(book.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
     }
@@ -208,7 +222,7 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public BookPdfFile getBookPdfFile(Notebook notebook) {
-    Book book = getBookForNotebook(notebook);
+    Book book = requireBook(notebook);
     String ref = book.getSourceFileRef();
     byte[] bytes =
         bookStorage
@@ -304,14 +318,13 @@ public class BookService {
     }
   }
 
-  private void persistLayoutNode(
+  private void preorderAttachBlock(
       Book book,
-      BookBlock parent,
       AttachBookLayoutNodeRequest node,
-      int siblingIndex,
-      int depth,
-      List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks) {
-    if (depth > MAX_LAYOUT_DEPTH) {
+      int level,
+      int[] layoutSeq,
+      IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock) {
+    if (level > MAX_LAYOUT_DEPTH) {
       throw new ApiException(
           "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
           ApiError.ErrorType.BINDING_ERROR,
@@ -320,19 +333,30 @@ public class BookService {
 
     BookBlock block = new BookBlock();
     block.setStructuralTitle(trimmedMax(node.getTitle(), 512));
-    block.setParent(parent);
-    block.setSiblingOrder(siblingIndex);
+    block.setLayoutSequence(layoutSeq[0]++);
+    block.setDepth(level - 1);
+    nodeToBlock.put(node, block);
     book.addBlock(block);
 
     List<AttachBookLayoutNodeRequest> children =
         node.getChildren() == null ? List.of() : node.getChildren();
-    for (int j = 0; j < children.size(); j++) {
-      persistLayoutNode(book, block, children.get(j), j, depth + 1, pendingContentBlocks);
+    for (AttachBookLayoutNodeRequest child : children) {
+      preorderAttachBlock(book, child, level + 1, layoutSeq, nodeToBlock);
     }
+  }
 
+  private static void postorderCollectPending(
+      AttachBookLayoutNodeRequest node,
+      IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock,
+      List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks) {
+    List<AttachBookLayoutNodeRequest> children =
+        node.getChildren() == null ? List.of() : node.getChildren();
+    for (AttachBookLayoutNodeRequest child : children) {
+      postorderCollectPending(child, nodeToBlock, pendingContentBlocks);
+    }
     List<Map<String, Object>> cbs = node.getContentBlocks();
     if (cbs != null && !cbs.isEmpty()) {
-      pendingContentBlocks.add(new AbstractMap.SimpleEntry<>(block, cbs));
+      pendingContentBlocks.add(new AbstractMap.SimpleEntry<>(nodeToBlock.get(node), cbs));
     }
   }
 
