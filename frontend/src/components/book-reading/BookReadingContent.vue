@@ -38,7 +38,7 @@
     :panel-id="bookReadingBookLayoutPanelId"
     :is-md-or-larger="isMdOrLarger"
     :book-block-rows="flatBookBlocks"
-    :current-block-anchor-id="currentBlockAnchorId"
+    :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
@@ -172,7 +172,7 @@ function buildFlatBookBlocks(
 }
 
 const flatBookBlocks = ref<BookReadingBookLayoutBlockRow[]>([])
-const currentBlockAnchorId = ref<number | null>(null)
+const currentBlockId = ref<number | null>(null)
 
 const selectedBlockId = ref<number | null>(null)
 
@@ -190,8 +190,8 @@ function lastContentBbox(row: BookReadingBookLayoutBlockRow) {
   return hasDirectContent(row) ? row.allBboxes[row.allBboxes.length - 1]! : null
 }
 
-function shouldSnapBack(proposedAnchorId: number | null): boolean {
-  if (proposedAnchorId === null) return false
+function shouldSnapBack(proposedBlockId: number | null): boolean {
+  if (proposedBlockId === null) return false
   const selId = selectedBlockId.value
   if (selId === null) return false
   if (bookReading.hasRecordedDisposition(selId)) return false
@@ -200,12 +200,10 @@ function shouldSnapBack(proposedAnchorId: number | null): boolean {
   if (selIdx < 0 || selIdx >= rows.length - 1) return false
   const sel = rows[selIdx]!
   const successor = rows[selIdx + 1]!
-  const proposedIdx = rows.findIndex(
-    (r) => r.startAnchor.id === proposedAnchorId
-  )
+  const proposedIdx = rows.findIndex((r) => r.id === proposedBlockId)
   if (proposedIdx < 0 || proposedIdx <= selIdx) return false
-  const immediateSuccessorAnchor = proposedAnchorId === successor.startAnchor.id
-  if (!immediateSuccessorAnchor) {
+  const immediateSuccessor = proposedBlockId === successor.id
+  if (!immediateSuccessor) {
     if (proposedIdx <= selIdx + 1) return false
     for (let i = selIdx + 1; i < proposedIdx; i++) {
       if (!hasDirectContent(rows[i]!)) return false
@@ -271,14 +269,12 @@ const blockAwaitingConfirmation =
     if (lastBbox !== null) {
       if (lastContentBottomVisible.value) return sel
       if (geometryEverVisibleForSelection.value) {
-        return successor.startAnchor.id === currentBlockAnchorId.value
-          ? null
-          : sel
+        return successor.id === currentBlockId.value ? null : sel
       }
       return null
     }
     // Fallback: no usable bbox → use successor-anchor rule
-    return successor.startAnchor.id === currentBlockAnchorId.value ? sel : null
+    return successor.id === currentBlockId.value ? sel : null
   })
 
 const currentBlockLiveText = ref("")
@@ -291,7 +287,7 @@ const currentBlockAnchorDebouncer = createCurrentBlockAnchorDebouncer({
       performSnapBack()
       return false
     }
-    currentBlockAnchorId.value = id
+    currentBlockId.value = id
     return true
   },
 })
@@ -365,7 +361,7 @@ function onViewportAnchorPage(payload: {
   }
 }
 
-watch(currentBlockAnchorId, (id) => {
+watch(currentBlockId, (id) => {
   const { text, changed } = nextLiveAnnouncementText(
     lastAnnouncedCurrentBlockTitle.value,
     id,
@@ -378,10 +374,10 @@ watch(currentBlockAnchorId, (id) => {
   currentBlockLiveText.value = text
 })
 
-watch(currentBlockAnchorId, async (anchorId) => {
-  if (anchorId === null) return
+watch(currentBlockId, async (blockId) => {
+  if (blockId === null) return
   const rows = flatBookBlocks.value
-  const bIdx = rows.findIndex((r) => r.startAnchor.id === anchorId)
+  const bIdx = rows.findIndex((r) => r.id === blockId)
   if (bIdx <= 0) return
   const predecessor = rows[bIdx - 1]!
   if (
@@ -436,12 +432,12 @@ async function applyBookBlockSelection(block: BookReadingBookLayoutBlockRow) {
     parsed,
     wireItemsToNavigationTargets(block.allBboxes)
   )
-  currentBlockAnchorDebouncer.commitNow(block.startAnchor.id)
+  currentBlockAnchorDebouncer.commitNow(block.id)
 }
 
 useBookReadingBlockSelection({
   bookBlockRows: () => flatBookBlocks.value,
-  currentBlockAnchorId,
+  currentBlockId,
   onDwellSelectBlock: (row) => {
     selectedBlockId.value = row.id
     pdfViewerRef.value?.highlightBlockSelection(

@@ -1,26 +1,26 @@
 import {
   nextLiveAnnouncementText,
-  structuralTitleForStartAnchorId,
+  structuralTitleForBlockId,
 } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { describe, expect, it } from "vitest"
 
 const rows = [
-  { title: "Part A", startAnchor: { id: 10 } },
-  { title: "Part B", startAnchor: { id: 20 } },
-  { title: "Part A", startAnchor: { id: 30 } },
+  { title: "Part A", id: 10 },
+  { title: "Part B", id: 20 },
+  { title: "Part A", id: 30 },
 ]
 
-describe("structuralTitleForStartAnchorId", () => {
-  it("returns empty for null anchor", () => {
-    expect(structuralTitleForStartAnchorId(null, rows)).toBe("")
+describe("structuralTitleForBlockId", () => {
+  it("returns empty for null block", () => {
+    expect(structuralTitleForBlockId(null, rows)).toBe("")
   })
 
   it("returns empty when no row matches", () => {
-    expect(structuralTitleForStartAnchorId(999, rows)).toBe("")
+    expect(structuralTitleForBlockId(999, rows)).toBe("")
   })
 
   it("returns the matching row title", () => {
-    expect(structuralTitleForStartAnchorId(20, rows)).toBe("Part B")
+    expect(structuralTitleForBlockId(20, rows)).toBe("Part B")
   })
 })
 
@@ -32,7 +32,7 @@ describe("nextLiveAnnouncementText", () => {
     })
   })
 
-  it("reports changed when previous is undefined and anchor is null", () => {
+  it("reports changed when previous is undefined and block is null", () => {
     expect(nextLiveAnnouncementText(undefined, null, rows)).toEqual({
       text: "",
       changed: true,

@@ -1,14 +1,10 @@
 import { onWatcherCleanup, watch, type Ref } from "vue"
-import type {
-  BookAnchorFull,
-  PageBboxFull,
-} from "@generated/doughnut-backend-api"
+import type { PageBboxFull } from "@generated/doughnut-backend-api"
 
 export const AUTO_SELECT_BOOK_BLOCK_DWELL_MS = 5000
 
 export type BookBlockRowForSelection = {
   id: number
-  startAnchor: BookAnchorFull
   allBboxes: PageBboxFull[]
 }
 
@@ -19,12 +15,12 @@ export type BookBlockRowForSelection = {
  */
 export function useBookReadingBlockSelection(options: {
   bookBlockRows: () => ReadonlyArray<BookBlockRowForSelection>
-  currentBlockAnchorId: Ref<number | null>
+  currentBlockId: Ref<number | null>
   onDwellSelectBlock: (row: BookBlockRowForSelection) => void | Promise<void>
 }) {
   watch(
-    () => options.currentBlockAnchorId.value,
-    (anchorId) => {
+    () => options.currentBlockId.value,
+    (blockId) => {
       let timer: number | undefined
 
       onWatcherCleanup(() => {
@@ -34,20 +30,18 @@ export function useBookReadingBlockSelection(options: {
         }
       })
 
-      if (anchorId === null) {
+      if (blockId === null) {
         return
       }
 
-      const scheduledFor = anchorId
+      const scheduledFor = blockId
       timer = window.setTimeout(() => {
         timer = undefined
-        const still = options.currentBlockAnchorId.value
+        const still = options.currentBlockId.value
         if (still !== scheduledFor) {
           return
         }
-        const row = options
-          .bookBlockRows()
-          .find((r) => r.startAnchor.id === still)
+        const row = options.bookBlockRows().find((r) => r.id === still)
         if (!row) {
           return
         }

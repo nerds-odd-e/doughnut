@@ -1,25 +1,25 @@
 export type BookBlockRowForLiveAnnouncement = {
   title: string
-  startAnchor: { id: number }
+  id: number
 }
 
-export function structuralTitleForStartAnchorId(
-  anchorId: number | null,
+export function structuralTitleForBlockId(
+  blockId: number | null,
   rows: BookBlockRowForLiveAnnouncement[]
 ): string {
-  if (anchorId === null) {
+  if (blockId === null) {
     return ""
   }
-  const row = rows.find((r) => r.startAnchor.id === anchorId)
+  const row = rows.find((r) => r.id === blockId)
   return row?.title ?? ""
 }
 
 export function nextLiveAnnouncementText(
   previousAnnouncedTitle: string | undefined,
-  anchorId: number | null,
+  blockId: number | null,
   rows: BookBlockRowForLiveAnnouncement[]
 ): { text: string; changed: boolean } {
-  const resolved = structuralTitleForStartAnchorId(anchorId, rows)
+  const resolved = structuralTitleForBlockId(blockId, rows)
   if (resolved === previousAnnouncedTitle) {
     return { text: resolved, changed: false }
   }

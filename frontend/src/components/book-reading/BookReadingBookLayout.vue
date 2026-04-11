@@ -33,9 +33,7 @@
           class="book-reading-book-block"
           :data-book-block-depth="block.depth"
           :data-current-block="
-            block.startAnchor.id === currentBlockAnchorId
-              ? 'true'
-              : undefined
+            block.id === currentBlockId ? 'true' : undefined
           "
           :data-current-selection="
             block.id === selectedBlockId ? 'true' : undefined
@@ -50,9 +48,7 @@
             dispositionForBlock(block.id) === 'SKIPPED' ? 'true' : undefined
           "
           :aria-current="
-            block.startAnchor.id === currentBlockAnchorId
-              ? 'location'
-              : undefined
+            block.id === currentBlockId ? 'location' : undefined
           "
           :style="{ paddingLeft: `${block.depth * 0.75}rem` }"
           @click="emit('blockClick', block)"
@@ -105,7 +101,7 @@ const props = defineProps<{
   panelId: string
   isMdOrLarger: boolean
   bookBlockRows: BookReadingBookLayoutBlockRow[]
-  currentBlockAnchorId: number | null
+  currentBlockId: number | null
   selectedBlockId: number | null
   dispositionForBlock: (
     blockId: number
@@ -123,7 +119,7 @@ function closeOverlay() {
 }
 
 watch(
-  () => props.currentBlockAnchorId,
+  () => props.currentBlockId,
   (id) => {
     if (id === null || !opened.value) {
       return
