@@ -2,10 +2,6 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { AUTO_SELECT_BOOK_BLOCK_DWELL_MS } from "@/composables/useBookReadingBlockSelection"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
-import type {
-  BookBlockFull,
-  PageBboxFull,
-} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -26,42 +22,6 @@ let topMathsPdfBytes!: ArrayBuffer
 
 function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
-}
-
-/** Stable ids aligned with top-maths E2E / `PREORDER_FIRST_BBOXES` indices. */
-const TOP_MATHS_LIKE_BLOCK_IDS = [101, 102, 103, 104, 105, 106] as const
-
-/**
- * Wire shape for `allBboxes[0]` per block in top-maths-like preorder.
- * Blocks without a bbox use a no-bbox entry ({pageIndex} only) so they participate as
- * a y=0 point in current-block detection without being "visible" in the viewport.
- */
-const PREORDER_FIRST_BBOXES: PageBboxFull[] = [
-  { pageIndex: 0 } as unknown as PageBboxFull, // id=101: no bbox
-  { pageIndex: 0, bbox: [48, 72, 564, 200] }, // id=102
-  { pageIndex: 0, bbox: [48, 520, 564, 756] }, // id=103
-  { pageIndex: 1 } as unknown as PageBboxFull, // id=104: no bbox
-  { pageIndex: 1 } as unknown as PageBboxFull, // id=105: no bbox
-  { pageIndex: 1 } as unknown as PageBboxFull, // id=106: no bbox
-]
-
-function topMathsLikeFlatBlocks(options?: {
-  firstBlockHasNoDirectContent?: boolean
-}): BookBlockFull[] {
-  return TOP_MATHS_LIKE_BLOCK_IDS.map((id, i) => {
-    const block = {
-      id,
-      depth: 0,
-      title: `Section ${i + 1}`,
-      allBboxes:
-        i === 0
-          ? options?.firstBlockHasNoDirectContent
-            ? [{ pageIndex: 0, bbox: [0, 0, 0, 0] }]
-            : [{ pageIndex: 0 } as unknown as PageBboxFull]
-          : [PREORDER_FIRST_BBOXES[i]!],
-    }
-    return block as BookBlockFull
-  })
 }
 
 function fetchRequestUrl(input: RequestInfo | URL): string {
@@ -155,16 +115,18 @@ function stubGetBookWithTopMathsBlocks(
   notebookId: number,
   firstBlockHasNoDirectContent?: boolean
 ) {
-  return vi
-    .spyOn(NotebookBooksController, "getBook")
-    .mockResolvedValue(
-      wrapSdkResponse(
-        makeMe.aBook
-          .notebookId(String(notebookId))
-          .blocks(topMathsLikeFlatBlocks({ firstBlockHasNoDirectContent }))
-          .please()
-      )
+  return vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+    wrapSdkResponse(
+      makeMe.aBook
+        .notebookId(String(notebookId))
+        .blocks(
+          makeMe.bookReading.topMathsLikeFlatBlocks({
+            firstBlockHasNoDirectContent,
+          })
+        )
+        .please()
     )
+  )
 }
 
 async function mountLoadedBookWithBlocks(
@@ -298,19 +260,19 @@ describe("BookReadingPage", () => {
 
   it("uses API depth for nested preorder blocks in the layout list", async () => {
     const blocks = [
-      {
-        id: 101,
-        depth: 0,
-        title: "Parent Section",
-        allBboxes: [{ pageIndex: 0, bbox: [48, 72, 564, 200] }],
-      },
-      {
-        id: 102,
-        depth: 1,
-        title: "Child Section",
-        allBboxes: [{ pageIndex: 0, bbox: [48, 200, 564, 400] }],
-      },
-    ] as BookBlockFull[]
+      makeMe.aBookBlock
+        .id(101)
+        .depth(0)
+        .title("Parent Section")
+        .allBboxes([makeMe.pageBbox.withNormalizedBbox(0, [48, 72, 564, 200])])
+        .please(),
+      makeMe.aBookBlock
+        .id(102)
+        .depth(1)
+        .title("Child Section")
+        .allBboxes([makeMe.pageBbox.withNormalizedBbox(0, [48, 200, 564, 400])])
+        .please(),
+    ]
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(
         makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
@@ -871,20 +833,18 @@ describe("BookReadingPage", () => {
     })
 
     describe("geometry-gated panel (allBboxes last entry)", () => {
-      // direct-content bbox at index 1 (last) for Section 1
-      const contentBbox = { pageIndex: 0, bbox: [10, 700, 500, 750] }
+      const contentBbox = makeMe.pageBbox.withNormalizedBbox(
+        0,
+        [10, 700, 500, 750]
+      )
 
       function stubGetBookWithFirstBlockHavingBbox() {
-        const blocks = TOP_MATHS_LIKE_BLOCK_IDS.map((id, i) => ({
-          id,
-          depth: 0,
-          title: `Section ${i + 1}`,
-          // Section 1: page-only first bbox + direct-content bbox; others: first bbox only
-          allBboxes:
+        const blocks = makeMe.bookReading.topMathsLikeBlockRows({
+          allBboxesForIndex: (i) =>
             i === 0
-              ? [{ pageIndex: 0 } as unknown as PageBboxFull, contentBbox]
-              : [PREORDER_FIRST_BBOXES[i]!],
-        })) as BookBlockFull[]
+              ? [makeMe.pageBbox.pageIndexOnly(0), contentBbox]
+              : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+        })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
             makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
@@ -924,20 +884,16 @@ describe("BookReadingPage", () => {
       }
 
       function stubGetBookWithFirstBlockHavingCrossPageBbox() {
-        const crossPageContentBbox = { pageIndex: 1, bbox: [10, 100, 500, 150] }
-        const blocks = TOP_MATHS_LIKE_BLOCK_IDS.map((id, i) => ({
-          id,
-          depth: 0,
-          title: `Section ${i + 1}`,
-          // Section 1: page-only first bbox on page 0, direct-content bbox on page 1 (cross-page)
-          allBboxes:
+        const crossPageContentBbox = makeMe.pageBbox.withNormalizedBbox(
+          1,
+          [10, 100, 500, 150]
+        )
+        const blocks = makeMe.bookReading.topMathsLikeBlockRows({
+          allBboxesForIndex: (i) =>
             i === 0
-              ? [
-                  { pageIndex: 0 } as unknown as PageBboxFull,
-                  crossPageContentBbox,
-                ]
-              : [PREORDER_FIRST_BBOXES[i]!],
-        })) as BookBlockFull[]
+              ? [makeMe.pageBbox.pageIndexOnly(0), crossPageContentBbox]
+              : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+        })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
             makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
@@ -1229,11 +1185,13 @@ describe("BookReadingPage", () => {
       })
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
-        const blocks = topMathsLikeFlatBlocks().map((b, i) =>
-          i === 0
-            ? { ...b, allBboxes: [{ pageIndex: 0 } as unknown as PageBboxFull] }
-            : b
-        )
+        const blocks = makeMe.bookReading
+          .topMathsLikeFlatBlocks()
+          .map((b, i) =>
+            i === 0
+              ? { ...b, allBboxes: [makeMe.pageBbox.pageIndexOnly(0)] }
+              : b
+          )
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
             makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
@@ -1576,22 +1534,21 @@ describe("BookReadingPage", () => {
         // Section 2 anchor: page 0, bbox [48,72,564,200]; Section 3 anchor: page 0, bbox [48,520,564,756]
         // To propose Section 3 as current, viewport.top must exceed Section 2's y1=200 so block 102 is
         // no longer visible, leaving block 103 as the first visible.
-        const section2ContentBbox = { pageIndex: 0, bbox: [48, 200, 564, 500] }
-        const blocks = TOP_MATHS_LIKE_BLOCK_IDS.map((id, i) => ({
-          id,
-          depth: 0,
-          title: `Section ${i + 1}`,
-          // Section 1: page-only first bbox + direct content; Section 2: first bbox + direct content
-          allBboxes:
+        const section2ContentBbox = makeMe.pageBbox.withNormalizedBbox(
+          0,
+          [48, 200, 564, 500]
+        )
+        const blocks = makeMe.bookReading.topMathsLikeBlockRows({
+          allBboxesForIndex: (i) =>
             i === 0
-              ? [{ pageIndex: 0 } as unknown as PageBboxFull, contentBbox]
+              ? [makeMe.pageBbox.pageIndexOnly(0), contentBbox]
               : i === 1
                 ? [
-                    { pageIndex: 0, bbox: [48, 72, 564, 200] },
+                    makeMe.pageBbox.withNormalizedBbox(0, [48, 72, 564, 200]),
                     section2ContentBbox,
                   ]
-                : [PREORDER_FIRST_BBOXES[i]!],
-        })) as BookBlockFull[]
+                : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+        })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
             makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()

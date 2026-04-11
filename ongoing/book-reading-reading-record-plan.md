@@ -4,44 +4,23 @@
 
 **Architecture:** [`ongoing/doughnut-book-reading-architecture-roadmap.md`](doughnut-book-reading-architecture-roadmap.md).
 
-**UX context:** [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md) and shipped Story 2 reader work in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
+**UX context:** [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md) and Story 2 reader work in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
 
 **Planning rule:** `.cursor/rules/planning.mdc` — one user-visible behavior per phase, scenario-first ordering, test-first workflow.
 
 **This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**Status:** Core reading-record behavior is already shipped:
-
-- **Phase 2:** explicit **Mark as read** from the Reading Control Panel.
-- **Phase 3:** auto-mark **READ** for blocks with **no direct content**.
-- **Phase 4:** explicit **skimmed / skipped** dispositions.
-- **Phase 5:** first snap-back reminder when scrolling past an unread block's end boundary.
-- **Phase 6:** second snap-back reminder on the second crossing; normal scrolling from the third attempt onward. (`snapbackAttempts` limit changed from `< 1` to `< 2` in `BookReadingContent.vue`.)
-- **Phase 7:** marking **READ** clears that block's snap-back state immediately (`snapbackAttempts.delete(id)` in `markSelectedDisposition`); per-block budgets are independent (keyed by block id).
+**Shipped baseline (do not regress):** Reading-record Phases **2–7** — **Reading Control Panel** (read / skim / skip), auto-**READ** when a block has **no direct content**, two **snap-back** reminders per unread block then normal scroll, snap state cleared on **READ**. Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
 
 ---
 
-## Principles for remaining work
+## Principles (unchanged)
 
-- **Progress remains per block:** `ReadingRecord` is still attached to **`BookBlock`**, not arbitrary PDF coordinates.
-- **Direct-content gating stays as shipped:** explicit disposition is needed only for blocks that still have **direct content** and no recorded disposition; Phase 3 auto-read behavior remains the first path for **no-direct-content** blocks.
-- **Reading order stays linear:** predecessor/successor and reminder logic follow the same **depth-first preorder** already used for **current block** and direct-content boundaries.
-- **Snap-back is a reminder, not a lock:** each block may interrupt scrolling at most **twice**; later attempts must scroll normally even if the block remains unread.
-- **Snap-back state is local and disposable:** it belongs to the current user/session view of a specific block, clears immediately when that block is marked **READ**, and does not become a new long-lived persisted progress concept unless a later plan explicitly chooses that.
-- **Tests stay high-level:** prefer mounted `BookReadingPage` / reader-flow tests that drive the real prompt and scroll-handling contract, plus controller tests only where an observable HTTP contract changes. Avoid low-level tests that only pin private counters or watcher internals.
-
----
-
-## Existing baseline
-
-These shipped phases are the baseline that later reminder phases build on:
-
-- **Phase 2:** when the viewport reaches the immediate successor of a selected block, the **Reading Control Panel** lets the user mark that selected block **READ**.
-- **Phase 3:** when a predecessor block has **no direct content**, entering the successor auto-marks the predecessor **READ** instead of prompting.
-- **Phase 4:** the same panel path also supports **SKIMMED** and **SKIPPED**.
-- **Phase 5:** on the first crossing of the end boundary of an unread block with direct content, the reader snaps the viewport back so the last content bbox bottom sits above the panel, and keeps the panel visible. No E2E changes — covered by mounted tests.
-
-Keep this section short; detailed shipped implementation notes belong in code/tests and the architecture/UX roadmaps.
+- **Progress remains per block:** `ReadingRecord` attaches to **`BookBlock`**, not PDF coordinates.
+- **Direct-content gating:** explicit disposition only when the block has **direct content** and no recorded disposition; auto-read for **no-direct-content** blocks stays.
+- **Reading order:** depth-first preorder for predecessor/successor, **current block**, and direct-content boundaries.
+- **Snap-back:** reminder only (two attempts per block); not a persisted lock.
+- **Tests:** prefer mounted `BookReadingPage` / reader-flow tests and controller tests when HTTP changes; avoid tests that only pin private counters or watcher internals.
 
 ---
 
@@ -51,9 +30,11 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 **User outcome:** reopening the book restores the last reading position for the same user and book.
 
-**Test shape:** no E2E required; prove via controller tests for persistence and mounted reader/page tests for save + restore behavior through observable viewer contracts.
+**Test shape:** no E2E required; controller tests for persistence and mounted reader/page tests for save + restore through observable contracts.
 
-**Out of scope:** per-block disposition prompts, snap-back reminder state, read/skim/skip styling.
+**Out of scope for this slice alone:** per-block disposition prompts, snap-back state, read/skim/skip styling.
+
+**Note:** Phase **10** below extends this slice so **selected block** restores **together** with view position; implement Phase 10 in the same delivery stream as Phase 1 if Phase 1 is not yet shipped, or as a follow-up if position persistence already exists without selection.
 
 ---
 
@@ -61,69 +42,85 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 
 **User story scenario:** the user scrolls past an unread block whose top and last direct-content bbox are on the same page — snap-back should show the full block from the beginning.
 
-**User outcome:** when the snap fires and the selected block's start anchor and last direct-content bbox are on the **same page**, the reader scrolls to the **block's start position** (same scroll target as when the user clicks the block in the layout), not just to the last content bbox bottom. If they are on **different pages**, the existing Phase 5 behavior (last content bbox bottom above the panel) applies unchanged.
+**User outcome:** when snap fires and the selected block's start anchor and last direct-content bbox are on the **same page**, scroll to the **block start** (same target as layout click); if on **different pages**, keep Phase 5 behavior (last content bbox bottom above the panel).
 
-**Depends on:** Phase 5.
+**Depends on:** shipped Phase 5.
 
-**Notes for implementation shape:**
+**Implementation hints:** `lastBbox.pageIndex === startAnchor.pageIndex` from **`GET …/book`** `allBboxes`; reuse `scrollToPdfOutlineV1Target` / `applyBookBlockSelection` for the same-page case; no change to attempt counter or suppression window.
 
-- The condition is: `lastBbox.pageIndex === startAnchor.pageIndex` (start anchor parsed page index equals last content bbox page index), where **`lastBbox`** is the last **`PageBbox`** in the block’s **`allBboxes`** array from **`GET …/book`**.
-- The "block start" scroll target is the existing `scrollToPdfOutlineV1Target` path used by `applyBookBlockSelection` — reuse that, not a new coordinate calculation.
-- `snapToContentBottomAndHold` in `PdfBookViewer` still handles the suppression window; the scroll target is just chosen differently before the call, or a new exposed method handles both.
-- No change to the snap attempt counter or suppression duration.
-
-**Tests (no new E2E):**
-
-- **Mounted test — same-page block:** block whose start anchor and last content bbox are on the same page; assert that `scrollToPdfOutlineV1Target` (not `snapToContentBottomAndHold`'s raw scrollTop) is called when snap fires.
-- **Mounted test — cross-page block:** block whose start anchor and last content bbox are on different pages; assert that the existing last-bbox-bottom target is used.
+**Tests (no new E2E):** mounted same-page vs cross-page scroll target assertions.
 
 ---
 
 ## Phase 5b — Animated panel on snap
 
-**User story scenario:** the snap fires but the user did not notice the Reading Control Panel was already visible; the animation draws their eye to it.
+**User story scenario:** snap fires but the user did not notice the panel.
 
-**User outcome:** when a snap-back fires, the Reading Control Panel plays a brief attention animation (e.g. a pulse, shake, or highlight flash) so the user clearly sees the prompt they need to answer.
+**User outcome:** when snap-back fires, **Reading Control Panel** plays a brief one-shot attention animation (transform/opacity/shadow; no layout shift).
 
-**Depends on:** Phase 5.
+**Depends on:** shipped Phase 5.
 
-**Notes for implementation shape:**
-
-- The animation is applied to the `ReadingControlPanel` component root element at the moment the snap fires, not on every render.
-- Use a CSS keyframe animation class that is added on snap and removed after it plays (one-shot via `animationend` listener or a short timer matching the animation duration).
-- The panel's layout and hit targets must not shift during the animation; prefer transforms or opacity/shadow rather than position changes.
-- If the panel is already visible when snap fires, the animation still replays (re-triggers).
-
-**Tests (no new E2E):**
-
-- **Mounted test:** after snap fires, assert that the panel root element has the animation class (or a `data-*` attribute used to trigger it via CSS); assert that the class is removed after the animation completes or the timer elapses.
+**Tests (no new E2E):** mounted — animation class or `data-*` appears on snap and is removed after `animationend` or timer.
 
 ---
 
-## Phase 6 — One more reminder, then release scrolling
+## Phase 8 — No timed auto-selection of the viewport “current” block
 
-**User story scenario:** after the first snap-back, the user again tries to scroll past the same unread block without marking it as read.
+**User story scenario:** the user reads without wanting the layout’s **selected** block to change just because the viewport **current** block stayed in view for a few seconds.
 
-**User outcome:** the reader applies the same snap-back behavior **one more time** on the **second** attempt, then allows **normal scrolling** on the **third and later** attempts for that same block.
+**User outcome:** remove the behavior that **automatically promotes** the viewport-derived **current** block to **selected** after a delay (e.g. ~5s). **Selected** changes only through explicit user actions (layout tap, “read from here,” etc.) and the rules in later phases (default selection, restore).
 
-**Depends on:** Phase 5.
+**Depends on:** none beyond shipped baseline.
 
-**Notes for implementation shape:**
-
-- Count attempts **per block** in the active reader state.
-- "Allow normal scrolling" means the prompt may still be present or reappear by the usual rules, but the forced scroll restoration must stop after attempt two.
-- Keep the counting rule simple: at most **two** snap-backs for one block before normal scrolling resumes.
-
-**Tests (no new E2E):**
-
-- **Mounted reader/page sequence test:** simulate first, second, and third boundary crossings for the same unread block and assert: snap-back on attempt 1, snap-back on attempt 2, no snap-back on attempt 3.
-- **Mounted continuation test:** assert that attempt 4+ behaves the same as attempt 3.
+**Tests (no new E2E):** adjust or add mounted coverage if anything asserted the timer; keep [`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) green.
 
 ---
 
-## Phase 7 — Clear snap-back on read; scope reminders per block (shipped)
+## Phase 9 — Always a selected book block; default to the first
 
-`snapbackAttempts.delete(id)` added to `markSelectedDisposition` after a successful **READ** PUT. Per-block budgets verified independently. Tests: "marking READ clears snap reminder" and "different unread blocks get independent snap budgets" in `BookReadingPage.spec.ts`.
+**User story scenario:** open a book or land in a state where no block was explicitly chosen.
+
+**User outcome:** there is **always** a **selected** block when the book has at least one block; if none is set, **select the first block in reading order** (same depth-first preorder as the rest of the reader).
+
+**Depends on:** Phase 8 (no silent timer overriding this).
+
+**Tests (no new E2E):** mounted/page — initial load and edge transitions assert a non-null selected id (first block when appropriate).
+
+---
+
+## Phase 10 — Persist and restore selected block with last view position
+
+**User story scenario:** leave mid-chapter with a explicit **selected** block and scroll position; return later.
+
+**User outcome:** restore **both** the **last view position** (scroll/zoom contract already used for “remember position”) **and** the **selected** `BookBlock` in one coherent session — no restore of position that implies a different block without updating selection (and vice versa). Align persistence with Phase **1** (single save/restore path or explicitly ordered restore).
+
+**Depends on:** Phase 9 (stable “always selected” invariant).
+
+**Tests (no new E2E):** controller + mounted tests proving round-trip for position + selected block id together.
+
+---
+
+## Phase 11 — Panel below last content bottom when it would float above the obstruction zone
+
+**User story scenario:** the **mark as read** (disposition) panel is showing, and the **bottom** of the selected block’s **last direct-content** bbox sits **above** the default bottom-docked panel zone (i.e. shorter content than the usual “panel eats the bottom” layout).
+
+**User outcome:** while that prompt is shown, place the panel **immediately below** that **last content bottom** (not fixed to the viewport bottom), and **update on scroll** so it **follows** that edge until the usual rules hide the panel or the geometry no longer applies — without breaking scroll-through on the PDF.
+
+**Depends on:** shipped Phase 2+ panel behavior; coordinate with UX roadmap **Reading Control Panel** placement.
+
+**Tests (no new E2E):** mounted geometry/position assertions where feasible.
+
+---
+
+## Phase 12 — Current ≠ selected: “read from here” and “back to selected”
+
+**User story scenario:** the user scrolls so the viewport **current** block differs from the **selected** block (e.g. skimmed ahead while the panel still referred to an earlier section).
+
+**User outcome:** a **bottom** affordance in the main pane shows **current** block context (title) with **Read from here** (makes **current** the **selected** block — product-precise: align selection and disposition target with the viewport block) and **Back to selected** (returns focus/scroll to the **selected** block’s reading position per existing navigation rules).
+
+**Depends on:** Phases 8–9 (clear separation of current vs selected without timer; invariant selected block).
+
+**Tests:** **add E2E** in [`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) (or a tightly related feature) covering **current ≠ selected** and both buttons; keep the rest of the reading-record E2E suite green.
 
 ---
 
@@ -132,13 +129,12 @@ Keep this section short; detailed shipped implementation notes belong in code/te
 After each phase:
 
 1. Add or update the focused high-level test first, and confirm the failure is for the right reason.
-2. Implement the smallest change that makes that phase green while preserving the existing `reading_record.feature` path.
+2. Implement the smallest change that makes that phase green while preserving existing `reading_record.feature` paths (except Phase 12, which **extends** E2E deliberately).
 3. Remove temporary state or dead branches that were only useful during the phase.
-4. Update this plan to reflect what shipped and trim notes that no longer matter for later phases.
-5. If the work changes a long-lived default, update the architecture or UX roadmap in the same delivery stream.
+4. Update this plan and, when behavior changes defaults, the architecture or UX roadmap in the same delivery stream.
 
 ---
 
 ## Document maintenance
 
-Keep this file forward-looking. Detailed shipped implementation notes should move to code, tests, or the architecture/UX roadmaps once they stop helping with upcoming phases.
+Keep this file forward-looking. Shipped implementation detail lives in code, tests, and the architecture/UX roadmaps.

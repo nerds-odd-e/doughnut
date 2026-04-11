@@ -1,6 +1,17 @@
 import type { RecallPrompt } from '@generated/doughnut-backend-api'
 import ApiErrorBuilder from './ApiErrorBuilder'
+import BookBlockFullBuilder from './BookBlockFullBuilder'
 import BookFullBuilder from './BookFullBuilder'
+import {
+  TOP_MATHS_LIKE_BLOCK_IDS,
+  topMathsLikeBlockRows,
+  topMathsLikeFlatBlocks,
+  topMathsLikePreorderFirstBboxAt,
+} from './bookReadingTopMathsLike'
+import {
+  pageBboxPageIndexOnly,
+  pageBboxWithNormalizedBbox,
+} from './pageBboxFull'
 import AnsweredQuestionBuilder from './AnsweredQuestionBuilder'
 import AssessmentAttemptBuilder from './AssessmentAttemptBuilder'
 import AssessmentQuestionInstanceBuilder from './AssessmentQuestionInstanceBuilder'
@@ -112,6 +123,22 @@ class MakeMe {
 
   static get aBook(): BookFullBuilder {
     return new BookFullBuilder()
+  }
+
+  static get aBookBlock(): BookBlockFullBuilder {
+    return new BookBlockFullBuilder()
+  }
+
+  static readonly pageBbox = {
+    pageIndexOnly: pageBboxPageIndexOnly,
+    withNormalizedBbox: pageBboxWithNormalizedBbox,
+  }
+
+  static readonly bookReading = {
+    TOP_MATHS_LIKE_BLOCK_IDS,
+    topMathsLikeBlockRows,
+    topMathsLikeFlatBlocks,
+    topMathsLikePreorderFirstBboxAt,
   }
 
   static get bazaarNotebooks(): BazaarNotebooksBuilder {
