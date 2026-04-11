@@ -239,7 +239,7 @@ function performSnapBack(): void {
   }
 }
 
-// allBboxes: index 0 is the anchor; remaining entries are direct-content blocks.
+// allBboxes: index 0 is the block start region; remaining entries are direct-content blocks.
 // When length > 1, the last entry is the last direct-content bbox.
 const blockAwaitingConfirmation =
   computed<BookReadingBookLayoutBlockRow | null>(() => {
@@ -258,7 +258,7 @@ const blockAwaitingConfirmation =
       }
       return null
     }
-    // Fallback: no usable bbox → use successor-anchor rule
+    // Fallback: no usable bbox → use successor-as-current rule
     return successor.id === currentBlockId.value ? sel : null
   })
 

@@ -1,9 +1,5 @@
-import type {
-  BookAnchorFull,
-  RecallPrompt,
-} from '@generated/doughnut-backend-api'
+import type { RecallPrompt } from '@generated/doughnut-backend-api'
 import ApiErrorBuilder from './ApiErrorBuilder'
-import BookAnchorFullBuilder from './BookAnchorFullBuilder'
 import BookFullBuilder from './BookFullBuilder'
 import AnsweredQuestionBuilder from './AnsweredQuestionBuilder'
 import AssessmentAttemptBuilder from './AssessmentAttemptBuilder'
@@ -116,14 +112,6 @@ class MakeMe {
 
   static get aBook(): BookFullBuilder {
     return new BookFullBuilder()
-  }
-
-  static get aBookAnchor(): BookAnchorFullBuilder {
-    return new BookAnchorFullBuilder()
-  }
-
-  static bookReadingTopMathsLikeAnchors(): BookAnchorFull[] {
-    return BookAnchorFullBuilder.topMathsLikePreorder()
   }
 
   static get bazaarNotebooks(): BazaarNotebooksBuilder {

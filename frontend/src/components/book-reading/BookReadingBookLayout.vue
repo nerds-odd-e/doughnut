@@ -81,15 +81,13 @@
 
 <script setup lang="ts">
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type { PageBboxFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { ref, watch } from "vue"
 
-export type BookReadingBookLayoutBlockRow = {
-  id: number
-  title: string
-  depth: number
-  allBboxes: PageBboxFull[]
-}
+export type BookReadingBookLayoutBlockRow = Pick<
+  BookBlockFull,
+  "id" | "title" | "depth" | "allBboxes"
+>
 
 const opened = defineModel<boolean>("opened", { required: true })
 

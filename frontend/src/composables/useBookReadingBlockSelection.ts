@@ -9,7 +9,7 @@ export type BookBlockRowForSelection = {
 }
 
 /**
- * When the viewport-derived current block anchor stays stable for {@link AUTO_SELECT_BOOK_BLOCK_DWELL_MS},
+ * When the viewport-derived current block id stays stable for {@link AUTO_SELECT_BOOK_BLOCK_DWELL_MS},
  * calls `onDwellSelectBlock` with the matching layout row. Selection + PDF highlight should be applied
  * in that callback (same path as layout click).
  */
