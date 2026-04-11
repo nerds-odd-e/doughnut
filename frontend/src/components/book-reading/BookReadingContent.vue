@@ -83,7 +83,6 @@ import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import {
   wireItemsToNavigationTargets,
-  parsePdfOutlineV1Anchor,
   type PdfOutlineV1NavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
@@ -204,7 +203,7 @@ function performSnapBack(): void {
   const lastBbox = lastContentBbox(sel)
   if (lastBbox === null) return
   snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
-  const parsedStart = parsePdfOutlineV1Anchor(sel.startAnchor)
+  const parsedStart = wireItemsToNavigationTargets(sel.allBboxes)[0] ?? null
   if (parsedStart !== null && parsedStart.pageIndex === lastBbox.pageIndex) {
     pdfViewerRef.value
       ?.scrollToPdfOutlineV1Target(

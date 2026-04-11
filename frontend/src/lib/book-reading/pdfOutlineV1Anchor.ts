@@ -1,12 +1,8 @@
 /**
- * PDF outline v1 wire format (`pdf.mineru_outline_v1`): `BookAnchor.value` is JSON with `page_idx`
- * and optional `bbox`. Bbox coordinates come from the MinerU book-layout pipeline (`content_list`)
- * as `[x0,y0,x1,y1]` in 0–1000 normalized page space, top-left origin, y downward — not PDF user space.
- *
- * Consumers should use the exported functions; constants are internal.
+ * MinerU / book-reading geometry: bboxes are `[x0,y0,x1,y1]` in 0–1000 normalized page space
+ * (top-left origin, y downward), not PDF user space. `wireItemsToNavigationTargets` maps API
+ * `allBboxes` (`PageBboxFull`) into scroll/highlight targets for pdf.js.
  */
-import type { BookAnchorFull } from "@generated/doughnut-backend-api"
-
 const NORMALIZED_MAX = 1000
 const SCROLL_TOP_PADDING_PDF = 40
 
@@ -52,36 +48,6 @@ export function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
   return [a, b, c, d]
 }
 
-/** Parse anchor value JSON. Never throws: malformed input yields `null`. */
-export function parsePdfOutlineV1StartAnchor(
-  value: string
-): PdfOutlineV1NavigationTarget | null {
-  try {
-    const parsed: unknown = JSON.parse(value)
-    if (!parsed || typeof parsed !== "object") return null
-    const rec = parsed as Record<string, unknown>
-    const pageIdx = rec.page_idx
-    if (
-      typeof pageIdx !== "number" ||
-      !Number.isInteger(pageIdx) ||
-      pageIdx < 0
-    ) {
-      return null
-    }
-    const bbox = rec.bbox === undefined ? null : parseOptionalBbox(rec.bbox)
-    return { pageIndex: pageIdx, bbox }
-  } catch {
-    return null
-  }
-}
-
-/** Parse `BookAnchor.value` as PDF MinerU outline v1 JSON. Returns `null` for bad value. */
-export function parsePdfOutlineV1Anchor(
-  anchor: BookAnchorFull
-): PdfOutlineV1NavigationTarget | null {
-  return parsePdfOutlineV1StartAnchor(anchor.value)
-}
-
 /**
  * Convert `allBboxes` wire items (`PageBboxFull` from `BookBlockFull.allBboxes`) to navigation targets.
  * The server pre-validates these; we still guard against malformed items defensively.
@@ -112,10 +78,6 @@ export function wireItemsToNavigationTargets(
     out.push({ pageIndex: it.pageIndex, bbox })
   }
   return out
-}
-
-export function extractPageIndexZeroBased(value: string): number | null {
-  return parsePdfOutlineV1StartAnchor(value)?.pageIndex ?? null
 }
 
 /**
