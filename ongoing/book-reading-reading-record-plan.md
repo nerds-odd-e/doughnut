@@ -10,7 +10,7 @@
 
 **This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**Shipped baseline (do not regress):** Reading-record Phases **2–7** — **Reading Control Panel** (read / skim / skip), auto-**READ** when a block has **no direct content**, two **snap-back** reminders per unread block then normal scroll, snap state cleared on **READ**. Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
+**Shipped baseline (do not regress):** Reading-record Phases **2–8** — same as **2–7**, plus **no timed auto-selection**: viewport **current** block does **not** become **selected** after idle; selection changes only via explicit actions (until Phase 9 default selection). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
 
 ---
 
@@ -64,15 +64,9 @@
 
 ---
 
-## Phase 8 — No timed auto-selection of the viewport “current” block
+## Phase 8 — No timed auto-selection of the viewport “current” block (shipped)
 
-**User story scenario:** the user reads without wanting the layout’s **selected** block to change just because the viewport **current** block stayed in view for a few seconds.
-
-**User outcome:** remove the behavior that **automatically promotes** the viewport-derived **current** block to **selected** after a delay (e.g. ~5s). **Selected** changes only through explicit user actions (layout tap, “read from here,” etc.) and the rules in later phases (default selection, restore).
-
-**Depends on:** none beyond shipped baseline.
-
-**Tests (no new E2E):** adjust or add mounted coverage if anything asserted the timer; keep [`reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) green.
+**Shipped:** removed dwell timer that promoted **current** → **selected**; mounted coverage in `BookReadingPage.spec.ts` (`viewport current does not auto-select after dwell`).
 
 ---
 

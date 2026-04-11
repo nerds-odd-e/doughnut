@@ -1,6 +1,5 @@
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
-import { AUTO_SELECT_BOOK_BLOCK_DWELL_MS } from "@/composables/useBookReadingBlockSelection"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { wrapSdkResponse } from "@tests/helpers"
@@ -15,6 +14,8 @@ const fetchMock = createFetchMock(vi)
 /** Keep in sync with `BookReadingPage.vue` */
 const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
+/** Longer than the removed 5s dwell auto-selection (Phase 8). */
+const REMOVED_DWELL_AUTO_SELECT_MS = 5100
 
 const notebookId = 7
 
@@ -1713,8 +1714,8 @@ describe("BookReadingPage", () => {
     })
   })
 
-  describe("Book block dwell selection", () => {
-    it("sets selection to the viewport current block after dwell", async () => {
+  describe("viewport current does not auto-select after dwell (Phase 8)", () => {
+    it("keeps no layout selection after stable current block and long idle", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       vi.useFakeTimers()
       try {
@@ -1730,19 +1731,17 @@ describe("BookReadingPage", () => {
           false
         )
 
-        await vi.advanceTimersByTimeAsync(AUTO_SELECT_BOOK_BLOCK_DWELL_MS)
+        await vi.advanceTimersByTimeAsync(REMOVED_DWELL_AUTO_SELECT_MS)
         await flushPromises()
-
-        const current = wrapper.find('[data-current-block="true"]')
-        const selected = wrapper.find('[data-current-selection="true"]')
-        expect(selected.exists()).toBe(true)
-        expect(selected.text()).toBe(current.text())
+        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
+          false
+        )
       } finally {
         vi.useRealTimers()
       }
     })
 
-    it("resets dwell when the current block changes before dwell elapses", async () => {
+    it("does not auto-select when current block changes mid-idle", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       vi.useFakeTimers()
       try {
@@ -1758,7 +1757,7 @@ describe("BookReadingPage", () => {
           "Section 2"
         )
 
-        await vi.advanceTimersByTimeAsync(AUTO_SELECT_BOOK_BLOCK_DWELL_MS - 150)
+        await vi.advanceTimersByTimeAsync(REMOVED_DWELL_AUTO_SELECT_MS - 150)
         pdf.vm.$emit("viewportAnchorPage", {
           anchorPageIndexZeroBased: 0,
           viewport: { top: 400, mid: 600, bottom: 1000 },
@@ -1779,10 +1778,10 @@ describe("BookReadingPage", () => {
           false
         )
 
-        await vi.advanceTimersByTimeAsync(AUTO_SELECT_BOOK_BLOCK_DWELL_MS)
+        await vi.advanceTimersByTimeAsync(REMOVED_DWELL_AUTO_SELECT_MS)
         await flushPromises()
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 3"
+        expect(wrapper.find('[data-current-selection="true"]').exists()).toBe(
+          false
         )
       } finally {
         vi.useRealTimers()

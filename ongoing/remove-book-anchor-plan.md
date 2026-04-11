@@ -10,7 +10,7 @@
 
 - **DB:** `book_anchor` table and `start_anchor_value` column are already dropped (V300000139, V300000140).
 - **Backend:** `BookBlock.getStartAnchor()` is `@Transient` — synthesizes `BookAnchorFullWire(getId(), contentBlocks.getFirst().getRawData())`. `allBboxes` is built from the same content blocks. Both are on the wire via `@JsonView(BookViews.Full.class)`.
-- **Frontend:** Uses `startAnchor.id` for block identity (current-block highlight, selection matching, dwell-select, live announcements, snap-back) and `startAnchor.value` for navigation (`parsePdfOutlineV1Anchor`). `allBboxes[0]` already comes from the same source as `startAnchor.value`.
+- **Frontend:** Uses `startAnchor.id` for block identity (current-block highlight, selection matching, live announcements, snap-back) and `startAnchor.value` for navigation (`parsePdfOutlineV1Anchor`). `allBboxes[0]` already comes from the same source as `startAnchor.value`.
 - **CLI:** Python layout builder does not emit `startAnchor` on nodes. CLI TS test fixtures still include `startAnchor` in attach-book shaped payloads.
 - **Docs:** Architecture roadmap, UX roadmap, research report, and reading-record plan reference `BookAnchor`.
 
@@ -36,7 +36,6 @@ Current frontend unit tests may have `startAnchor` values that are inconsistent 
 
 - `BookReadingBookLayout.vue`: `block.startAnchor.id === currentBlockAnchorId` → `block.id === currentBlockId`; `aria-current` check likewise.
 - `BookReadingContent.vue`: all `r.startAnchor.id` comparisons → `r.id`; rename `currentBlockAnchorId` ref → `currentBlockId` throughout.
-- `useBookReadingBlockSelection.ts`: `r.startAnchor.id === still` → `r.id === still`; remove `startAnchor` from `BookBlockRowForSelection` type (only `id` and `allBboxes` needed).
 - `currentBlockLiveAnnouncement.ts`: `r.startAnchor.id === anchorId` → `r.id === blockId`; simplify `BookBlockRowForLiveAnnouncement` type (drop `startAnchor`, keep `id` + `title`).
 - Rename `currentBlockAnchorId` prop on `BookReadingBookLayout.vue` → `currentBlockId`.
 - Update unit tests: `currentBlockLiveAnnouncement.spec.ts`, `BookReadingPage.spec.ts` (identity-related assertions).

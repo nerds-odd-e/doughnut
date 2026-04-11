@@ -88,7 +88,6 @@ import { createCurrentBlockAnchorDebouncer } from "@/lib/book-reading/debounceCu
 import { nextLiveAnnouncementText } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockAnchorIdFromAnchorPage } from "@/lib/book-reading/currentBlockAnchorFromAnchorPage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import { useBookReadingBlockSelection } from "@/composables/useBookReadingBlockSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
@@ -407,17 +406,6 @@ async function applyBookBlockSelection(block: BookBlockFull) {
   await pdfViewerRef.value?.scrollToPdfOutlineV1Target(parsed, targets)
   currentBlockAnchorDebouncer.commitNow(block.id)
 }
-
-useBookReadingBlockSelection({
-  blocks: () => bookBlocks.value,
-  currentBlockId,
-  onDwellSelectBlock: (block) => {
-    selectedBlockId.value = block.id
-    pdfViewerRef.value?.highlightBlockSelection(
-      wireItemsToNavigationTargets(block.allBboxes)
-    )
-  },
-})
 
 async function markSelectedDisposition(status: BookBlockReadingDisposition) {
   const id = selectedBlockId.value
