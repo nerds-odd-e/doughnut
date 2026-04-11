@@ -106,15 +106,9 @@ describe('InteractiveCliApp /use notebook integration', () => {
           roots: [
             {
               title: 'Part One',
-              startAnchor: {
-                value: '{}',
-              },
               children: [
                 {
                   title: 'Part One Child',
-                  startAnchor: {
-                    value: '{}',
-                  },
                 },
               ],
             },
@@ -165,14 +159,12 @@ describe('InteractiveCliApp /use notebook integration', () => {
             id: 1,
             depth: 0,
             title: 'Part One',
-            startAnchor: { id: 1, value: '{}' },
             allBboxes: [],
           },
           {
             id: 2,
             depth: 1,
             title: 'Part One Child',
-            startAnchor: { id: 2, value: '{}' },
             allBboxes: [],
           },
         ],

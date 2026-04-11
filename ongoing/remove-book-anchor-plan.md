@@ -9,10 +9,10 @@
 ## Current state
 
 - **DB:** `book_anchor` table and `start_anchor_value` column are already dropped (V300000139, V300000140).
-- **Backend:** `BookBlock.getStartAnchor()` is `@Transient` — synthesizes `BookAnchorFullWire(getId(), contentBlocks.getFirst().getRawData())`. `allBboxes` is built from the same content blocks. Both are on the wire via `@JsonView(BookViews.Full.class)`.
-- **Frontend:** Uses `startAnchor.id` for block identity (current-block highlight, selection matching, live announcements, snap-back) and `startAnchor.value` for navigation (`parsePdfOutlineV1Anchor`). `allBboxes[0]` already comes from the same source as `startAnchor.value`.
-- **CLI:** Python layout builder does not emit `startAnchor` on nodes. CLI TS test fixtures still include `startAnchor` in attach-book shaped payloads.
-- **Docs:** Architecture roadmap, UX roadmap, research report, and reading-record plan reference `BookAnchor`.
+- **Backend / wire:** No `startAnchor` or `BookAnchor` on `BookBlock`; navigation uses persisted `allBboxes` (see architecture roadmap).
+- **Frontend:** Block identity uses `block.id`; navigation and viewport logic use `allBboxes`.
+- **CLI:** Python layout emits `title` / `children` / `contentBlocks` only; TS test fixtures match (Phase 5).
+- **Docs:** Architecture roadmap, UX roadmap, research report, and reading-record plan no longer describe `BookAnchor` (Phase 5).
 
 ### Key equivalences
 

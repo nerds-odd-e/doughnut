@@ -166,13 +166,9 @@ describe('runMineruOutlineSubprocess', () => {
       roots: [
         {
           title: 'Root A',
-          startAnchor: { value: '{}' },
           children: [
             {
               title: 'Child 1',
-              startAnchor: {
-                value: '{}',
-              },
             },
           ],
         },
@@ -211,7 +207,6 @@ describe('runMineruOutlineSubprocess', () => {
       roots: [
         {
           title: 'Root A',
-          startAnchor: { value: '{}' },
           contentBlocks: [{ type: 'page_number', text: '1', page_idx: 0 }],
         },
       ],
@@ -253,7 +248,7 @@ describe('runMineruOutlineSubprocess', () => {
             outline: 'x',
             source: 'y',
             layout: {
-              roots: [{ title: 'A', startAnchor: { value: '{}' } }],
+              roots: [{ title: 'A' }],
             },
             contentList: [
               { type: 'text', text: 'x', page_idx: 0, bbox: [0, 0, 1, 1] },

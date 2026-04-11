@@ -42,11 +42,11 @@
 
 **User story scenario:** the user scrolls past an unread block whose top and last direct-content bbox are on the same page — snap-back should show the full block from the beginning.
 
-**User outcome:** when snap fires and the selected block's start anchor and last direct-content bbox are on the **same page**, scroll to the **block start** (same target as layout click); if on **different pages**, keep Phase 5 behavior (last content bbox bottom above the panel).
+**User outcome:** when snap fires and the selected block's first bbox (`allBboxes[0]`) and last direct-content bbox are on the **same page**, scroll to the **block start** (same target as layout click); if on **different pages**, keep Phase 5 behavior (last content bbox bottom above the panel).
 
 **Depends on:** shipped Phase 5.
 
-**Implementation hints:** `lastBbox.pageIndex === startAnchor.pageIndex` from **`GET …/book`** `allBboxes`; reuse `scrollToPdfOutlineV1Target` / `applyBookBlockSelection` for the same-page case; no change to attempt counter or suppression window.
+**Implementation hints:** `lastBbox.pageIndex === allBboxes[0].pageIndex` from **`GET …/book`**; reuse `scrollToPdfOutlineV1Target` / `applyBookBlockSelection` for the same-page case; no change to attempt counter or suppression window.
 
 **Tests (no new E2E):** mounted same-page vs cross-page scroll target assertions.
 

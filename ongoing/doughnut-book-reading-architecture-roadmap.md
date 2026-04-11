@@ -61,12 +61,10 @@ classDiagram
       NO_DIRECT_CONTENT_FOUND
     }
 
-    class BookAnchor {
-      +value
-    }
-
     class SourceSpan {
       +kind
+      +startLocator : text
+      +endLocator : text
     }
 
     class User {
@@ -83,7 +81,6 @@ classDiagram
     Notebook "1" --> "0..*" Book : contains
 
     Book "1" --> "0..*" BookBlock : has
-    BookBlock "1" --> "1" BookAnchor : startAnchor
     BookBlock "1" --> "0..*" BookContentBlock : owns imported content
 
     BookBlock "0..1" --> "0..*" BookBlock : child blocks
@@ -91,32 +88,26 @@ classDiagram
     BookBlock "1" ..> "0..1" DirectContentReadingState : direct content disposition
 
     Note "0..*" --> "0..1" SourceSpan : cites
-    SourceSpan "1" --> "1" BookAnchor : startAnchor
-    SourceSpan "1" --> "1" BookAnchor : endAnchor
     SourceSpan "0..*" --> "1" BookBlock : within
 
     User "1" --> "0..*" ReadingRecord : has
     ReadingRecord "0..*" --> "1" BookBlock : for
 ```
 
-### BookAnchor
-
-The most precise locator: one place in the book. For the shipped PDF + MinerU path, **`value`** holds **PDF MinerU outline v1** JSON (`page_idx`, optional `bbox` in normalized page space). If we add EPUB or other book files later, we extend storage or introduce a parallel shape explicitly — not a second discriminator field on this entity.
-
 ### BookBlock
 
-A region: **`startAnchor`** locates the section in the book file. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. Optional **`structuralTitle`** is the human-readable label for that **book block** in the **book layout** (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent blocks; we do not use a separate persisted “structural address” field.
+A region: **navigation geometry** comes from **`allBboxes`** on **`GET …/book`**—an ordered list of **`PageBbox`** (page index + optional MinerU bbox in normalized page space). **`allBboxes[0]`** is the block start (derived from the structural heading’s imported raw data); further entries cover qualifying direct-content regions. Primary unit for **navigation**, **hierarchical decomposition**, and **progress**. **`structuralTitle`** is the human-readable label for that **book block** in the **book layout** (e.g. `Chapter 3`, `2.4.1`). A breadcrumb-style path can be **derived** by walking parent blocks; we do not use a separate persisted “structural address” field.
 
 Each `BookBlock` also has a conceptual association to **direct content** (see next subsection).
 
-When imported MinerU content appears before the first heading-like block (`text_level`), we create a synthetic root-level `BookBlock` titled **`*beginning*`**. Its start anchor uses the first orphan content block’s page and a synthetic bbox placed **one line height above** that content block (`height = y1 - y0`, `syntheticY0 = max(0, y0 - height)`, `syntheticY1 = y0`). This keeps the ownership rule below total: every imported content block belongs to exactly one `BookBlock`.
+When imported MinerU content appears before the first heading-like block (`text_level`), we create a synthetic root-level `BookBlock` titled **`*beginning*`**. Its first bbox uses the first orphan content block’s page and a synthetic bbox placed **one line height above** that content block (`height = y1 - y0`, `syntheticY0 = max(0, y0 - height)`, `syntheticY1 = y0`). This keeps the ownership rule below total: every imported content block belongs to exactly one `BookBlock`.
 
 ### BookContentBlock
 
 Persisted import artifact for **MinerU `content_list` items**. A `BookContentBlock` is **not** a second navigation tree and **not** a progress record. Its job is to keep the raw imported reading stream attached to the structural `BookBlock` that owns it.
 
 - Every imported MinerU item belongs to exactly one `BookBlock`.
-- The heading item that introduces a `BookBlock` is also persisted as a `BookContentBlock`; it remains the structural boundary for that block and is **not** counted as direct body content by default.
+- The heading item that introduces a `BookBlock` is represented on **`BookBlock`** (title + **`allBboxes[0]`** from its raw data); it is **not** duplicated as a `BookContentBlock` and is **not** counted as direct body content by default.
 - Persist **queryable columns** needed by product logic (`type`, page index, bbox, optional `textLevel`, stable order within the owning block) plus the **raw payload** so unknown MinerU block types survive round-trip without schema churn.
 - Unknown future MinerU block types are persisted intact but do **not** become direct content automatically; product logic opts them in later.
 
@@ -132,7 +123,7 @@ Persisted import artifact for **MinerU `content_list` items**. A `BookContentBlo
 
 **Persistence and extraction:** For MinerU-backed PDF imports, we persist raw **`BookContentBlock`** rows grouped under each `BookBlock`. This gives reading-record **direct-content** heuristics (Phase 3, shipped) a stable source of truth for “does this block have direct content?” without introducing a second derived span table. We still do **not** require a stored extracted-text blob for the gap between blocks.
 
-**No-direct-content default:** A `BookBlock` is treated as having **no direct content** when it owns **no non-structural** imported content block whose `type` is **`text`**, **`table`**, or **`image`**. The structural heading MinerU item is **not** stored as a `BookContentBlock` (it is only on `BookBlock` as title + `startAnchor`); legacy rows that look like a heading (`text` with `text_level` 1–3) are ignored by the predicate. **`header`**, **`footer`**, any type whose name starts with **`page_`** (page numbers, page footnotes, and future `page_*` kinds), and other unknown types are preserved but ignored by this predicate until product logic promotes them.
+**No-direct-content default:** A `BookBlock` is treated as having **no direct content** when it owns **no non-structural** imported content block whose `type` is **`text`**, **`table`**, or **`image`**. The structural heading lives on **`BookBlock`** only (title + first bbox); legacy rows that look like a heading (`text` with `text_level` 1–3) are ignored by the predicate. **`header`**, **`footer`**, any type whose name starts with **`page_`** (page numbers, page footnotes, and future `page_*` kinds), and other unknown types are preserved but ignored by this predicate until product logic promotes them.
 
 **Disposition (per block, conceptual):** How the user (or system) treats the direct content attached to a block can be classified for product logic:
 
@@ -149,7 +140,7 @@ These dispositions are **not** persisted until the reading-record work lands; th
 
 ### SourceSpan
 
-Optional evidence on a **Note**: also start/end anchors, but purpose is **citation**, not navigation tree. May sit **within** a `BookBlock` so a small quote still relates to the larger reading chunk.
+Optional evidence on a **Note**: **citation** endpoints (not the navigation tree). **`startLocator`** / **`endLocator`** are placeholders in the diagram—concrete encoding (e.g. page + normalized bbox, EPUB CFI) is **TBD** when `SourceSpan` is implemented. May sit **within** a `BookBlock` so a small quote still relates to the larger reading chunk.
 
 ### Note
 
@@ -165,8 +156,8 @@ Per `User`, refers to a `BookBlock`. Progress attaches to **meaningful chunks**,
 
 ## Architectural rules (default)
 
-1. Every `BookBlock` has exactly one `startAnchor`.
-2. Every `SourceSpan` has exactly one `startAnchor` and one `endAnchor`.
+1. Every `BookBlock` has **`allBboxes`** with a well-defined first entry for block start (MinerU-normalized page + bbox where applicable); further entries optional for direct content.
+2. When implemented, every `SourceSpan` has a **start** and **end** citation locator (shape **TBD**; not the same concern as block navigation).
 3. `ReadingRecord` points at a `BookBlock`, not a `SourceSpan`.
 4. `SourceSpan` is optional on `Note`.
 5. Prefer `SourceSpan` to be smaller than or equal to the `BookBlock` it sits within.
@@ -183,13 +174,13 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 - **No `StructuralBookBlock` subtype yet:** Structural vs user-carved blocks may be distinguished later if the product requires it (e.g. import vs override).
 - **`GET …/book` layout wire:** Each block includes persisted **`depth`** (≥ 0); OpenAPI documents **`blocks`** as depth-first preorder matching ascending **`layout_sequence`**. The **browser reader** and **CLI `/attach` preview** derive tree shape from **array order** and **`depth`** only — no derived **`parentBlockId`** / **`siblingOrder`** on the wire ([`ongoing/book-reading-book-block-flat-outline-plan.md`](book-reading-book-block-flat-outline-plan.md) Phase 5).
 - **`BookContentBlock` for MinerU imports:** Persist imported `content_list` **body** items separately from `BookBlock`, grouped by owning block (structural heading MinerU item is represented on `BookBlock` only, not duplicated as a `BookContentBlock`). This keeps `BookBlock` structural while giving direct-content heuristics a durable imported-content stream.
-- **Direct content** remains a **product concept**, not a materialized “gap blob.” **Disposition** persistence is **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); persisted `BookContentBlock` rows supply the import evidence for **`hasDirectContent`**. On the wire, each block on **`GET …/book`** exposes **`allBboxes`**: an ordered list of **`PageBbox`** (OpenAPI **`PageBbox_Full`** — page index + MinerU bbox in normalized page space). The first entry matches **`startAnchor`**; further entries come from qualifying direct-content imported blocks. The reader uses the **last** entry as the bottom of direct content when **`allBboxes.length > 1`**. When the predecessor has no direct content, the reader **auto-marks** it read on successor entry (Phase 3, shipped); otherwise the **Reading Control Panel** is the primary explicit control — it appears when the bottom of the selected block’s last direct-content bbox is visible above the panel’s obstruction zone (geometry-gated), and remains available until the successor block becomes the viewport-derived current block; see [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
+- **Direct content** remains a **product concept**, not a materialized “gap blob.” **Disposition** persistence is **`ReadingRecord`** rows + **`PUT`/`GET` reading-record APIs** per [`ongoing/book-reading-reading-record-plan.md`](book-reading-reading-record-plan.md); persisted `BookContentBlock` rows supply the import evidence for **`hasDirectContent`**. On the wire, each block on **`GET …/book`** exposes **`allBboxes`**: an ordered list of **`PageBbox`** (OpenAPI **`PageBbox_Full`** — page index + MinerU bbox in normalized page space). The **first** entry is the block start; further entries come from qualifying direct-content imported blocks. The reader uses the **last** entry as the bottom of direct content when **`allBboxes.length > 1`**. When the predecessor has no direct content, the reader **auto-marks** it read on successor entry (Phase 3, shipped); otherwise the **Reading Control Panel** is the primary explicit control — it appears when the bottom of the selected block’s last direct-content bbox is visible above the panel’s obstruction zone (geometry-gated), and remains available until the successor block becomes the viewport-derived current block; see [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 
 ---
 
 ## Story 1 (shipped)
 
-**Book** metadata plus **BookBlock** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON **book layout** / `BookBlock` tree only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. **`BookAnchor`** carries only **`value`**: **PDF MinerU outline v1** JSON for block starts.
+**Book** metadata plus **BookBlock** tree on a **Notebook**: **`POST /api/notebooks/{notebook}/attach-book`** (JSON **book layout** / `BookBlock` tree only) and **`GET /api/notebooks/{notebook}/book`**, at most one book per notebook. As shipped, **`sourceFileRef` is not used** and there is **no server-side PDF storage**; the PDF stayed on the client. Layout import supplies structural nodes with **`contentBlocks`**; the server derives **`allBboxes`** (MinerU page index + normalized bbox) for each **`BookBlock`**.
 
 ---
 
@@ -209,7 +200,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 **Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
 
-**Implemented so far (Story 2):** Phases **1–6** and **11–13** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** full scrollable viewer (`PdfBookViewer` using the **legacy** pdf.js stack — see **PDF.js build** below), the **book layout** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Book layout** control in **GlobalBar**), **layout → PDF** navigation from **`BookAnchor.value`** (MinerU outline v1 JSON: page index, optional bbox, chrome/safe-area offset, bad-anchor no-op), **PDF ↔ book layout** sync (viewport drives **current block** highlight on a **book block**, debounced, with accessible live region for title changes), responsive default PDF scale (full-width on narrow viewports, comfortable max-width cap on wide viewports based on first-page intrinsic geometry, with manual zoom preserved across resize), **GlobalBar** **`PdfControl`** zoom buttons + page indicator, and **PDF-only gesture zoom** (ctrl/meta + wheel and two-finger pinch on the viewer scroll container, shared **`pdfViewer.currentScale`**, `preventDefault` to avoid browser zoom). The book-reading E2E uses **OCR on rendered canvases** (Tesseract.js, committed language data under `e2e_test/tesseract/`) for page markers — **not** a product DOM text layer on top of the canvas.
+**Implemented so far (Story 2):** Phases **1–6** and **11–13** of that plan are shipped: multipart attach, **`GET …/book/file`**, **pdf.js** full scrollable viewer (`PdfBookViewer` using the **legacy** pdf.js stack — see **PDF.js build** below), the **book layout** from **`GET …/book`** in a **left** responsive drawer/panel (PDF in **`main`**; **768px** breakpoint: open by default on large, overlay + backdrop on small; **Book layout** control in **GlobalBar**), **layout → PDF** navigation from each block’s **`allBboxes`** (structured **`PageBbox`**: page index, optional bbox, chrome/safe-area offset, bad-target no-op), **PDF ↔ book layout** sync (viewport drives **current block** highlight on a **book block**, debounced, with accessible live region for title changes), responsive default PDF scale (full-width on narrow viewports, comfortable max-width cap on wide viewports based on first-page intrinsic geometry, with manual zoom preserved across resize), **GlobalBar** **`PdfControl`** zoom buttons + page indicator, and **PDF-only gesture zoom** (ctrl/meta + wheel and two-finger pinch on the viewer scroll container, shared **`pdfViewer.currentScale`**, `preventDefault` to avoid browser zoom). The book-reading E2E uses **OCR on rendered canvases** (Tesseract.js, committed language data under `e2e_test/tesseract/`) for page markers — **not** a product DOM text layer on top of the canvas.
 
 **PDF.js build (current):** The app uses **pdf.js legacy** end-to-end (`pdfjs-dist/legacy/build/pdf.mjs`, `legacy/web/pdf_viewer.mjs` + CSS, `legacy/build/pdf.worker.mjs` wired from `frontend/src/lib/pdfjsWorker.ts`). The standard worker assumes **`Uint8Array.prototype.toHex`** (PDF fingerprints); **Cypress’s bundled Electron** is on an older Chromium without that API, which breaks PDF load (e.g. `hashOriginal.toHex is not a function`). Legacy bundles a polyfill; **main thread and worker must stay on the same build line** (mixing legacy worker + modern `getDocument` is unsupported).
 
@@ -223,7 +214,7 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 Revisit when implementation or product constraints clarify:
 
-- Whether `BookAnchor.value` should gain a typed JSON schema or stay a documented string convention as formats multiply.
+- How **`SourceSpan`** start/end locators should be typed when citations ship (parallel to **`PageBbox`** for PDF vs format-specific shapes).
 - Whether `ReadingRecord` needs finer-grained progress inside a block (percentage, character offset, etc.).
 - Whether `BookBlock` should distinguish blocks from the **imported book layout** from user-created blocks.
 - Whether `SourceSpan.kind` should classify text, image, figure, table, or mixed content for rendering and export.
@@ -236,4 +227,4 @@ Revisit when implementation or product constraints clarify:
 
 - **Single overloaded type** for **book block**, reading cursor, highlight, and AI chunk—leads to muddy APIs and broken exports.
 - **Progress on arbitrary citations**—makes re-entry and queue semantics harder than progress on `BookBlock`.
-- **Anchors that only mean “page number”**—insufficient for structure-first reading and EPUB; `BookAnchor` is the extension point.
+- **Locators that only mean “page number”**—insufficient for structure-first reading and EPUB; use **page + region** (e.g. **`PageBbox`**) or format-specific coordinates as the extension point.

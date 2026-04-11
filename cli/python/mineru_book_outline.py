@@ -158,8 +158,9 @@ def find_middle_json(output_dir: Path, stem: str) -> Path | None:
 def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order.
 
-    The heading record is stored as contentBlocks[0] (the structural title block that also
-    serves as startAnchor), with no separate startAnchor field.
+    The heading record is stored as contentBlocks[0] (the structural title block whose raw
+    data becomes allBboxes[0] on the server after attach). Layout nodes do not carry a
+    separate navigation field beyond title, children, and contentBlocks.
     """
     roots: list[dict[str, Any]] = []
     stack: list[tuple[int, dict[str, Any]]] = []
