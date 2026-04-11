@@ -26,7 +26,7 @@ export type PdfJsXyzDestArray = readonly [
   null,
 ]
 
-function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
+export function parseOptionalBbox(raw: unknown): PdfOutlineV1Bbox | null {
   if (!Array.isArray(raw) || raw.length !== 4) return null
   const a = raw[0]
   const b = raw[1]
