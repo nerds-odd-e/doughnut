@@ -22,6 +22,12 @@ export type BookReadingPdfViewerRef = {
     holdMs: number
   ) => void
   suppressScrollInput: (holdMs: number) => void
+  contentFitsFromBlockTop: (
+    pageIndex: number,
+    normalizedBlockTopY: number,
+    normalizedContentBottomY: number,
+    obstructionPx: number
+  ) => boolean
   zoomIn: () => void
   zoomOut: () => void
   isLastContentBottomVisible: (
@@ -121,15 +127,28 @@ export function useBookReadingSnapBack(options: {
     snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
     const navTargets = wireItemsToNavigationTargets(sel.allBboxes)
     const parsedStart = navTargets[0] ?? null
-    if (parsedStart !== null && parsedStart.pageIndex === lastBbox.pageIndex) {
+    const contentBottomY = (lastBbox.bbox as number[])[3]!
+    const samePage =
+      parsedStart !== null && parsedStart.pageIndex === lastBbox.pageIndex
+    const blockTopY =
+      samePage && parsedStart!.bbox !== null ? parsedStart!.bbox[1] : 0
+    const fits =
+      samePage &&
+      pdfViewerRef.value?.contentFitsFromBlockTop(
+        lastBbox.pageIndex,
+        blockTopY,
+        contentBottomY,
+        obstructionPx
+      ) === true
+    if (fits) {
       pdfViewerRef.value
-        ?.scrollToBookNavigationTarget(parsedStart, navTargets)
+        ?.scrollToBookNavigationTarget(parsedStart!, navTargets)
         .then(() => pdfViewerRef.value?.suppressScrollInput(snapHoldMs))
         .catch(() => undefined)
     } else {
       pdfViewerRef.value?.snapToContentBottomAndHold(
         lastBbox.pageIndex,
-        (lastBbox.bbox as number[])[3]!,
+        contentBottomY,
         obstructionPx,
         snapHoldMs
       )

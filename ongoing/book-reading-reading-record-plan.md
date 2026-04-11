@@ -10,7 +10,7 @@
 
 **This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**Shipped baseline (do not regress):** Reading-record Phases **1–12** — including **Phase 5a** (same-page snap to block start), **Phase 5b** (snap attention animation), **Phase 11** (content-anchored panel), and **Phase 12** (current ≠ selected: "read from here" / "back to selected"). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
+**Shipped baseline (do not regress):** Reading-record Phases **1–13** — including **Phase 5a** (same-page snap to block start), **Phase 5b** (snap attention animation), **Phase 11** (content-anchored panel), **Phase 12** (current ≠ selected: "read from here" / "back to selected"), and **Phase 13** (snap-back uses `contentFitsFromBlockTop` to choose block-start vs last-content-bottom path). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
 
 ---
 
@@ -66,22 +66,9 @@
 
 ---
 
-## Phase 13 — Snap-back target: content-fits-with-panel condition
+## Phase 13 — Snap-back target: content-fits-with-panel condition (shipped)
 
-**User story scenario:** the user scrolls past an unread block whose content is short enough to fit on one screen together with the panel — snap-back should show the whole block from the top. When content is longer, snap-back should show the last content area instead.
-
-**User outcome:** when snap fires:
-
-- **Same page + content fits with panel:** if the selected block's first bbox and last content bbox are on the **same page**, AND viewing from the block's top would place the last content bbox bottom **above** the panel anchor zone (i.e. the full block content + panel fit in the viewport) → scroll to the **block start** (same as clicking the block in the book layout). The panel anchors right below the last content bottom.
-- **Otherwise** (cross-page, or same page but content too tall for block-top + panel to coexist): scroll so the **last content area** of the selected block is fully visible, with the last content bbox bottom sitting just above the panel. The panel anchors right below the last content bottom.
-
-In both cases the panel uses Phase 11 anchoring (right below the last content block bottom).
-
-**Depends on:** shipped Phases 5a, 11.
-
-**What changes from Phase 5a:** the same-page path gains an additional check — "last content bottom is above the panel zone when viewed from block top." Without this, a same-page block with very tall content would snap to the block start but the panel would be off-screen below. With the new condition, that case falls through to the "show last content" path instead.
-
-**Tests (no new E2E):** mounted — same-page-fits → scroll-to-block-start; same-page-too-tall → scroll-to-last-content-bottom; cross-page → scroll-to-last-content-bottom. Extend or replace existing same-page snap assertions.
+**Shipped:** `PdfBookViewer` exposes `contentFitsFromBlockTop(pageIndex, normalizedBlockTopY, normalizedContentBottomY, obstructionPx): boolean`. `performSnapBack` in `useBookReadingSnapBack` uses it: if start and last-content bboxes share the same page **and** the span fits within the viewport above the panel, snap scrolls to block start; otherwise snap calls `snapToContentBottomAndHold` (same as cross-page). Tests in `BookReadingPage.spec.ts`: same-page-fits → suppress path (no `snapToContentBottomAndHold`); same-page-too-tall → `snapToContentBottomAndHold(0, 750, 80, 500)`; cross-page → `snapToContentBottomAndHold(1, 150, 80, 500)`.
 
 ---
 
