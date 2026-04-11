@@ -37,9 +37,9 @@
     "yoga-layout": "~3.2.1"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "^9.6.0",
-    "@stryker-mutator/vitest-runner": "^9.6.0",
-    "@types/node": "25.5.2",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
+    "@types/node": "25.6.0",
     "@types/react": "^19.2.14",
     "doughnut-test-fixtures": "workspace:*",
     "esbuild": "0.28.0",
