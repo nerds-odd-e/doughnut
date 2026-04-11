@@ -400,7 +400,7 @@ describe("BookReadingPage", () => {
     expect(patchSpy).toHaveBeenCalledTimes(1)
     expect(patchSpy).toHaveBeenCalledWith({
       path: { notebook: notebookId },
-      body: { pageIndex: 2, normalizedY: 200 },
+      body: { pageIndex: 2, normalizedY: 200, selectedBookBlockId: 101 },
     })
   })
 
@@ -426,7 +426,7 @@ describe("BookReadingPage", () => {
     expect(patchSpy).toHaveBeenCalledTimes(1)
     expect(patchSpy.mock.calls[0]?.[0]).toEqual({
       path: { notebook: notebookId },
-      body: { pageIndex: 0, normalizedY: 150 },
+      body: { pageIndex: 0, normalizedY: 150, selectedBookBlockId: 101 },
     })
   })
 
@@ -484,6 +484,61 @@ describe("BookReadingPage", () => {
     await flushPromises()
 
     expect(spy).not.toHaveBeenCalled()
+  })
+
+  it("restores selected book block from stored reading snapshot (Phase 10)", async () => {
+    stubGetBookWithTopMathsBlocks(notebookId)
+    vi.spyOn(
+      NotebookBooksController,
+      "getNotebookBookReadingPosition"
+    ).mockResolvedValue(
+      wrapSdkResponse({
+        id: 1,
+        pageIndex: 2,
+        normalizedY: 750,
+        selectedBookBlockId: 102,
+      })
+    )
+    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+
+    expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+      "Section 2"
+    )
+  })
+
+  it("PATCH reading position includes selectedBookBlockId after layout click (Phase 10)", async () => {
+    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
+    const row = wrapper
+      .findAll('[data-testid="book-reading-book-block"]')
+      .find((w) => w.text() === "Section 3")
+    expect(row).toBeDefined()
+    await row!.trigger("click")
+    await flushPromises()
+
+    const pdf = wrapper.findComponent(PdfBookViewer)
+    await withFakeTimers(async () => {
+      pdf.vm.$emit("viewportAnchorPage", {
+        anchorPageIndexZeroBased: 1,
+        viewport: { top: 100, mid: 200, bottom: 300 },
+        pagesCount: 10,
+      })
+      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
+      await flushPromises()
+    })
+
+    expect(patchSpy).toHaveBeenCalled()
+    const lastCall = patchSpy.mock.calls[patchSpy.mock.calls.length - 1]?.[0]
+    expect(lastCall).toEqual({
+      path: { notebook: notebookId },
+      body: {
+        pageIndex: 1,
+        normalizedY: 100,
+        selectedBookBlockId: 103,
+      },
+    })
   })
 
   it("book layout toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {

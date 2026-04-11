@@ -180,6 +180,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return r;
   }
 
+  private static BookLastReadPositionRequest lastReadBody(
+      int pageIndex, int normalizedY, int selectedBookBlockId) {
+    BookLastReadPositionRequest r = lastReadBody(pageIndex, normalizedY);
+    r.setSelectedBookBlockId(selectedBookBlockId);
+    return r;
+  }
+
   @Nested
   class AttachBook {
     @Test
@@ -763,6 +770,57 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .isEmpty(),
           equalTo(true));
     }
+
+    @Test
+    void persistsSelectedBookBlockId() throws Exception {
+      Notebook nb = myNotebook();
+      AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
+      AttachBookLayoutNodeRequest root = node("Chapter 1", ch1);
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+      controller.attachBook(nb, attachRequest(root), pdfFile(pdfBytes));
+      int secondBlockId = blocksByLayoutOrder(bookOf(nb)).get(1).getId();
+
+      controller.patchReadingPosition(nb, lastReadBody(3, 420, secondBlockId));
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      assertThat(stored.getPageIndex(), equalTo(3));
+      assertThat(stored.getNormalizedY(), equalTo(420));
+      assertThat(stored.getSelectedBookBlockId(), equalTo(secondBlockId));
+    }
+
+    @Test
+    void patchRejectsBlockIdFromAnotherNotebookBook() throws Exception {
+      Notebook nbA = myNotebook();
+      Notebook nbB = myNotebook();
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+      controller.attachBook(nbA, attachRequest(node("A")), pdfFile(pdfBytes));
+      controller.attachBook(nbB, attachRequest(node("B")), pdfFile(pdfBytes));
+      int blockFromA = blocksByLayoutOrder(bookOf(nbA)).getFirst().getId();
+
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.patchReadingPosition(nbB, lastReadBody(0, 100, blockFromA)));
+    }
+
+    @Test
+    void patchWithoutSelectedBookBlockIdLeavesStoredBlockUnchanged()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      int blockId = blocksByLayoutOrder(bookOf(nb)).getFirst().getId();
+      controller.patchReadingPosition(nb, lastReadBody(1, 500, blockId));
+      controller.patchReadingPosition(nb, lastReadBody(2, 600));
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      assertThat(stored.getPageIndex(), equalTo(2));
+      assertThat(stored.getNormalizedY(), equalTo(600));
+      assertThat(stored.getSelectedBookBlockId(), equalTo(blockId));
+    }
   }
 
   @Nested
@@ -778,6 +836,23 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(res.getBody(), notNullValue());
       assertThat(res.getBody().getPageIndex(), equalTo(3));
       assertThat(res.getBody().getNormalizedY(), equalTo(420));
+    }
+
+    @Test
+    void returnsSelectedBookBlockIdAfterPatch() throws Exception {
+      Notebook nb = myNotebook();
+      AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
+      AttachBookLayoutNodeRequest root = node("Chapter 1", ch1);
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+      controller.attachBook(nb, attachRequest(root), pdfFile(pdfBytes));
+      int secondBlockId = blocksByLayoutOrder(bookOf(nb)).get(1).getId();
+      controller.patchReadingPosition(nb, lastReadBody(1, 200, secondBlockId));
+
+      ResponseEntity<BookUserLastReadPosition> res = controller.getReadingPosition(nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(res.getBody(), notNullValue());
+      assertThat(res.getBody().getSelectedBookBlockId(), equalTo(secondBlockId));
     }
 
     @Test

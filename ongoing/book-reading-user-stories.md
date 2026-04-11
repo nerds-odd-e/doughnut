@@ -71,13 +71,16 @@ And I should see that book block "2.2 Refactoring as Strengthening the Code" is 
 
 ## Story: Reorganizing the book layout
 
-- use AI to reorg the nesting
+- improve the UX/UI of the book layout list, to make the nesting more clear
+- drag layout item right to increase depth
+- drag item left to decre
+- use AI to reorg the levels
 
 ---
 
 ## Story: Decide or navigate to the next book block to read
 
-_(Sub-stories to be added.)_
+- space key to move to next block or viewport
 
 ---
 

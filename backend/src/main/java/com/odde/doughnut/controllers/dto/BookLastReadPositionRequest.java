@@ -20,4 +20,10 @@ public class BookLastReadPositionRequest {
       requiredMode = Schema.RequiredMode.REQUIRED,
       description = "Vertical position within the page in MinerU-normalized space (0-1000)")
   private Integer normalizedY;
+
+  @Schema(
+      nullable = true,
+      description =
+          "Selected book block id for reading UI; omit or null to leave the stored value unchanged")
+  private Integer selectedBookBlockId;
 }

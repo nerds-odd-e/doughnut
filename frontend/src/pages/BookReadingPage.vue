@@ -28,6 +28,7 @@
         :book="book"
         :book-pdf-bytes="bookPdfBytes"
         :initial-last-read="initialLastRead"
+        :initial-selected-block-id="initialSelectedBlockId"
       />
     </template>
   </div>
@@ -56,6 +57,7 @@ const initialLastRead = ref<{
   pageIndexZeroBased: number
   normalizedY: number
 } | null>(null)
+const initialSelectedBlockId = ref<number | null>(null)
 
 onMounted(async () => {
   const { data, error } = await NotebookBooksController.getBook({
@@ -90,6 +92,13 @@ onMounted(async () => {
           pageIndexZeroBased: posResult.data.pageIndex,
           normalizedY: posResult.data.normalizedY,
         }
+        initialSelectedBlockId.value =
+          typeof posResult.data.selectedBookBlockId === "number"
+            ? posResult.data.selectedBookBlockId
+            : null
+      } else {
+        initialLastRead.value = null
+        initialSelectedBlockId.value = null
       }
       bookPdfBytes.value = await res.arrayBuffer()
     } catch {

@@ -537,6 +537,10 @@ export type BookLastReadPositionRequest = {
      * Vertical position within the page in MinerU-normalized space (0-1000)
      */
     normalizedY: number;
+    /**
+     * Selected book block id for reading UI; omit or null to leave the stored value unchanged
+     */
+    selectedBookBlockId?: number;
 };
 
 export type UpdateAiAssistantRequest = {
@@ -677,6 +681,7 @@ export type BookUserLastReadPosition = {
     id: number;
     pageIndex?: number;
     normalizedY?: number;
+    selectedBookBlockId?: number;
 };
 
 export type NotebookCertificateApprovalDto = {

@@ -103,11 +103,15 @@ const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const READING_PANEL_OBSTRUCTION_PX = 80
 const SNAP_HOLD_MS = 500
 
-const props = defineProps<{
-  book: BookFull
-  bookPdfBytes: ArrayBuffer
-  initialLastRead: { pageIndexZeroBased: number; normalizedY: number } | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    book: BookFull
+    bookPdfBytes: ArrayBuffer
+    initialLastRead: { pageIndexZeroBased: number; normalizedY: number } | null
+    initialSelectedBlockId?: number | null
+  }>(),
+  { initialSelectedBlockId: null }
+)
 
 const notebookId = computed(() => Number(props.book.notebookId))
 const bookReading = useNotebookBookReadingRecords(notebookId)
@@ -140,7 +144,12 @@ const bookBlocks = computed(() => props.book.blocks)
 
 const currentBlockId = ref<number | null>(null)
 
-const selectedBlockId = ref<number | null>(null)
+const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+
+const lastReadingForPatch = ref<{
+  pageIndex: number
+  normalizedY: number
+} | null>(null)
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
 
@@ -221,12 +230,25 @@ function onViewportAnchorPage(payload: {
     }
   }
   if (reading !== null) {
+    const pageIndex = reading.pageIndexZeroBased
+    const normalizedY = Math.round(reading.normalizedTop)
+    lastReadingForPatch.value = { pageIndex, normalizedY }
+    const sel = selectedBlockId.value
     lastReadPositionPatchDebouncer.propose(
-      reading.pageIndexZeroBased,
-      Math.round(reading.normalizedTop)
+      pageIndex,
+      normalizedY,
+      sel === null ? undefined : sel
     )
   }
 }
+
+watch(selectedBlockId, (id) => {
+  const last = lastReadingForPatch.value
+  if (last === null || id === null) {
+    return
+  }
+  lastReadPositionPatchDebouncer.propose(last.pageIndex, last.normalizedY, id)
+})
 
 watch(currentBlockId, (id) => {
   const { text, changed } = nextLiveAnnouncementText(

@@ -152,6 +152,8 @@ Per `User`, refers to a `BookBlock`. Progress attaches to **meaningful chunks**,
 
 **HTTP (as implemented for Phase 2 read disposition):** Rows are written with **`PUT /api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record`** (response body: full **reading-records** list for the current user and book, same JSON shape as **`GET`**) and listed with **`GET /api/notebooks/{notebook}/book/reading-records`**. **`GET …/book`** does **not** embed reading state on each `BookBlock`; the client merges layout + reading-records list when it needs borders or panel logic from the server.
 
+**Last read view (Phase 10):** **`GET`/`PATCH /api/notebooks/{notebook}/book/reading-position`** stores PDF page index, normalized vertical position, and optional **`selectedBookBlockId`**. A **`PATCH`** body omits or sends **`selectedBookBlockId: null`** to leave the stored FK unchanged; a non-null id must belong to the notebook’s book.
+
 ---
 
 ## Architectural rules (default)

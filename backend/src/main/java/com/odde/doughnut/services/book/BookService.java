@@ -20,6 +20,7 @@ import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookBlockReadingRecordRepository;
+import com.odde.doughnut.entities.repositories.BookBlockRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -44,6 +45,7 @@ public class BookService {
 
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
+  private final BookBlockRepository bookBlockRepository;
   private final BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
@@ -53,6 +55,7 @@ public class BookService {
   public BookService(
       BookRepository bookRepository,
       BookUserLastReadPositionRepository bookUserLastReadPositionRepository,
+      BookBlockRepository bookBlockRepository,
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
@@ -60,6 +63,7 @@ public class BookService {
       ObjectMapper objectMapper) {
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
+    this.bookBlockRepository = bookBlockRepository;
     this.bookBlockReadingRecordRepository = bookBlockReadingRecordRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -152,12 +156,17 @@ public class BookService {
   public void upsertLastReadPosition(
       Notebook notebook, User user, BookLastReadPositionRequest request) {
     Book book = requireBook(notebook);
+    final Optional<BookBlock> selectedBlockPatch =
+        request.getSelectedBookBlockId() == null
+            ? Optional.empty()
+            : Optional.of(resolveBookBlockForBook(request.getSelectedBookBlockId(), book));
     bookUserLastReadPositionRepository
         .findByUser_IdAndBook_Id(user.getId(), book.getId())
         .map(
             existing -> {
               existing.setPageIndex(request.getPageIndex());
               existing.setNormalizedY(request.getNormalizedY());
+              selectedBlockPatch.ifPresent(existing::setSelectedBookBlock);
               return entityPersister.save(existing);
             })
         .orElseGet(
@@ -167,9 +176,22 @@ public class BookService {
               row.setBook(book);
               row.setPageIndex(request.getPageIndex());
               row.setNormalizedY(request.getNormalizedY());
+              selectedBlockPatch.ifPresent(row::setSelectedBookBlock);
               return entityPersister.save(row);
             });
     entityPersister.flush();
+  }
+
+  private BookBlock resolveBookBlockForBook(int bookBlockId, Book book) {
+    BookBlock bb =
+        bookBlockRepository
+            .findById(bookBlockId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+    if (!bb.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    return bb;
   }
 
   @Transactional

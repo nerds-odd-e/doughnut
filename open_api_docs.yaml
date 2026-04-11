@@ -4227,6 +4227,11 @@ components:
           format: int32
           description: Vertical position within the page in MinerU-normalized space
             (0-1000)
+        selectedBookBlockId:
+          type: integer
+          format: int32
+          description: Selected book block id for reading UI; omit or null to leave
+            the stored value unchanged
       required:
       - normalizedY
       - pageIndex
@@ -4612,6 +4617,9 @@ components:
           type: integer
           format: int32
         normalizedY:
+          type: integer
+          format: int32
+        selectedBookBlockId:
           type: integer
           format: int32
       required:

@@ -10,7 +10,7 @@
 
 **This document is a delivery plan only** — update phases here before implementation, then trim obsolete detail after each shipped slice.
 
-**Shipped baseline (do not regress):** Reading-record Phases **2–9** — Phases **2–8** plus **default selection** to the first block in wire order when the book has blocks (no PDF scroll on that default; explicit layout click and post-read advance still scroll). Viewport **current** still does **not** become **selected** after idle. Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
+**Shipped baseline (do not regress):** Reading-record Phases **2–10** — through Phase **9** as before, plus **Phase 10** (**`GET`/`PATCH` reading-position** includes optional **`selectedBookBlockId`**; client restores selection with last view position). Observable contract: [`e2e_test/features/book_reading/reading_record.feature`](../e2e_test/features/book_reading/reading_record.feature) and mounted reader tests (e.g. `BookReadingPage.spec.ts`). Deeper vocabulary: architecture + UX roadmaps above.
 
 ---
 
@@ -84,7 +84,7 @@
 
 ---
 
-## Phase 10 — Persist and restore selected block with last view position
+## Phase 10 — Persist and restore selected block with last view position (shipped)
 
 **User story scenario:** leave mid-chapter with a explicit **selected** block and scroll position; return later.
 
@@ -92,7 +92,9 @@
 
 **Depends on:** Phase 9 (stable “always selected” invariant).
 
-**Tests (no new E2E):** controller + mounted tests proving round-trip for position + selected block id together.
+**Shipped:** nullable **`selected_book_block_id`** on **`book_user_last_read_position`**, **`GET`/`PATCH` reading-position** wire field **`selectedBookBlockId`**; **`PATCH`** updates the FK only when a non-null id is sent. **`BookReadingPage`** / **`BookReadingContent`** persist selection with debounced position patches and restore from **`getNotebookBookReadingPosition`**.
+
+**Tests (no new E2E):** `NotebookBooksControllerTest` + `BookReadingPage.spec.ts` round-trip / PATCH shape.
 
 ---
 
