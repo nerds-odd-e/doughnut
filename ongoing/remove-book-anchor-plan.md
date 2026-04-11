@@ -86,7 +86,7 @@ Rewrite `currentBlockAnchorFromAnchorPage.spec.ts` to pass structured `{ id, fir
 - Remove `startAnchor` field from `BookReadingBookLayoutBlockRow` type in `BookReadingBookLayout.vue`.
 - Remove `startAnchor: child.startAnchor` from row construction in `BookReadingContent.vue` (line 164).
 - Update `BookReadingPage.spec.ts`: the `.map((startAnchor, i) => ({ ... startAnchor, ...}))` pattern no longer needs `startAnchor` on the built blocks. Ensure `allBboxes[0]` in test data carries the same page/bbox info.
-- Remove `BookAnchorFullBuilder`, `makeMe.aBookAnchor`, and `makeMe.bookReadingTopMathsLikeAnchors()` from `doughnut-test-fixtures` **if no consumers remain** (check CLI tests; if CLI still references them, defer removal to Phase 4).
+- Remove `BookAnchorFullBuilder`, `makeMe.aBookAnchor`, and `makeMe.bookReadingTopMathsLikeAnchors()` from `doughnut-test-fixtures` **if no consumers remain** (check CLI tests; if CLI still references them, defer removal to Phase 5).
 - E2E: `book_browsing.feature` + `reading_record.feature`.
 - No dead code.
 
@@ -108,7 +108,24 @@ Rewrite `currentBlockAnchorFromAnchorPage.spec.ts` to pass structured `{ id, fir
 
 ---
 
-## Phase 4 — CLI and documentation: remove all remaining BookAnchor references
+## Phase 4 — Frontend tests: makeMe builders for API-shaped book data (no ad-hoc `BookBlockFull`)
+
+**User-visible change:** None. Improves test maintainability and alignment with generated API types.
+
+**Context:** The frontend consumes `BookBlockFull`, `PageBboxFull`, and related types from `@generated/doughnut-backend-api` without a separate translation layer. After Phase 2b, current-block logic and navigation depend on `allBboxes[0]` being coherent with that shape. Ad-hoc object literals in page specs (e.g. `NotebookPage.spec.ts`, `BookReadingPage.spec.ts`, and other specs that stub `getBook` or build flat block lists) tend to drift: empty `allBboxes`, `as unknown as PageBboxFull` to fake optional `bbox`, or hand-built rows that disagree with OpenAPI. That forces brittle fixes whenever wire shape or semantics change.
+
+**Scope:**
+
+- **Extend `doughnut-test-fixtures` / `makeMe`** — Add or extend builders for book-reading and notebook flows so tests can request **API-shaped** `BookBlockFull[]` (and nested `PageBboxFull`) with named options, e.g. “first block page-only anchor (no bbox)”, “first block with degenerate bbox for auto-mark scenarios”, “block with direct content (multiple `allBboxes` entries)”, cross-page last bbox, preorder helpers aligned with existing `bookReadingTopMathsLike`-style data. Prefer one coherent representation per scenario over duplicated inline arrays in specs.
+- **Migrate high-churn specs first** — Replace hand-constructed blocks in `BookReadingPage.spec.ts` (including `PREORDER_FIRST_BBOXES`-style literals and casts) and similar patterns in `NotebookPage.spec.ts` (and any other frontend tests that build `BookBlockFull` or book payloads inline for the SDK). After migration, tests should import from **`doughnut-test-fixtures/makeMe`** only (per project convention), not re-encode the same geometry in each file.
+- **Type fidelity** — Where the runtime allows `bbox` to be absent (e.g. page index only) but generated `PageBboxFull` still requires `bbox`, keep that edge in the **builder** (single place) rather than scattered `as unknown` in every spec; document the intended wire/backend behavior in the builder’s option names, not in test comments.
+- **Verification** — `pnpm frontend:test` for affected specs; no production code change required for this phase unless a gap in builders forces a tiny shared helper in test-only code (avoid if makeMe can own it).
+
+**Dependency:** Sensible to run after Phase 3 (generated types no longer expose `startAnchor`), so builders and specs target the final `BookBlockFull` shape. If Phase 3 is delayed, builders can still omit `startAnchor` to match the post–Phase 2 frontend assumption.
+
+---
+
+## Phase 5 — CLI and documentation: remove all remaining BookAnchor references
 
 **User-visible change:** Codebase and docs are free of the BookAnchor concept.
 

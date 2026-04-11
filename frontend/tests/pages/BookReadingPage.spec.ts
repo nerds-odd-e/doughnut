@@ -2,7 +2,10 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { AUTO_SELECT_BOOK_BLOCK_DWELL_MS } from "@/composables/useBookReadingBlockSelection"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type {
+  BookBlockFull,
+  PageBboxFull,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -25,6 +28,20 @@ function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
 }
 
+/**
+ * Mirrors `BookAnchorFullBuilder.topMathsLikePreorder()` — wire shape for `allBboxes[0]`.
+ * Blocks without a bbox use a no-bbox entry ({pageIndex} only) so they participate as
+ * a y=0 point in current-block detection without being "visible" in the viewport.
+ */
+const PREORDER_FIRST_BBOXES: PageBboxFull[] = [
+  { pageIndex: 0 } as unknown as PageBboxFull, // id=101: no bbox
+  { pageIndex: 0, bbox: [48, 72, 564, 200] }, // id=102
+  { pageIndex: 0, bbox: [48, 520, 564, 756] }, // id=103
+  { pageIndex: 1 } as unknown as PageBboxFull, // id=104: no bbox
+  { pageIndex: 1 } as unknown as PageBboxFull, // id=105: no bbox
+  { pageIndex: 1 } as unknown as PageBboxFull, // id=106: no bbox
+]
+
 function topMathsLikeFlatBlocks(options?: {
   firstBlockHasNoDirectContent?: boolean
 }): BookBlockFull[] {
@@ -35,10 +52,16 @@ function topMathsLikeFlatBlocks(options?: {
     title: `Section ${i + 1}`,
     startAnchor,
     siblingOrder: i,
+    // Block 101 (i=0) has no bbox by default so it doesn't participate in detection
+    // and won't trigger auto-mark (allBboxes.length=0).
+    // When firstBlockHasNoDirectContent=true, give it a degenerate bbox so allBboxes.length>0
+    // triggers auto-mark, but the invalid geometry means it's still skipped in detection.
     allBboxes:
-      options?.firstBlockHasNoDirectContent && i === 0
-        ? [{ pageIndex: 0, bbox: [0, 0, 0, 0] }]
-        : [],
+      i === 0
+        ? options?.firstBlockHasNoDirectContent
+          ? [{ pageIndex: 0, bbox: [0, 0, 0, 0] }]
+          : []
+        : [PREORDER_FIRST_BBOXES[i]!],
   }))
 }
 
@@ -799,8 +822,7 @@ describe("BookReadingPage", () => {
     })
 
     describe("geometry-gated panel (allBboxes last entry)", () => {
-      // anchor bbox at index 0, direct-content bbox at index 1 (last)
-      const anchorBbox = { pageIndex: 0, bbox: [10, 600, 500, 640] }
+      // direct-content bbox at index 1 (last) for Section 1
       const contentBbox = { pageIndex: 0, bbox: [10, 700, 500, 750] }
 
       function stubGetBookWithFirstBlockHavingBbox() {
@@ -811,8 +833,11 @@ describe("BookReadingPage", () => {
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
-          // Section 1 has anchor + one direct-content bbox; others have none
-          allBboxes: i === 0 ? [anchorBbox, contentBbox] : [],
+          // Section 1: no-bbox anchor point + direct-content bbox; others have anchor only
+          allBboxes:
+            i === 0
+              ? [{ pageIndex: 0 } as unknown as PageBboxFull, contentBbox]
+              : [PREORDER_FIRST_BBOXES[i]!],
         }))
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
@@ -861,8 +886,14 @@ describe("BookReadingPage", () => {
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
-          // Section 1: anchor on page 0, direct-content bbox on page 1 (cross-page)
-          allBboxes: i === 0 ? [anchorBbox, crossPageContentBbox] : [],
+          // Section 1: no-bbox anchor point on page 0, direct-content bbox on page 1 (cross-page)
+          allBboxes:
+            i === 0
+              ? [
+                  { pageIndex: 0 } as unknown as PageBboxFull,
+                  crossPageContentBbox,
+                ]
+              : [PREORDER_FIRST_BBOXES[i]!],
         }))
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
@@ -1492,8 +1523,8 @@ describe("BookReadingPage", () => {
 
       it("different unread blocks get independent snap budgets", async () => {
         // Section 2 anchor: page 0, bbox [48,72,564,200]; Section 3 anchor: page 0, bbox [48,520,564,756]
-        // To propose Section 3 as current, viewport.top must exceed Section 2's y1=200 so anchor 102 is
-        // no longer visible, leaving anchor 103 as the first visible.
+        // To propose Section 3 as current, viewport.top must exceed Section 2's y1=200 so block 102 is
+        // no longer visible, leaving block 103 as the first visible.
         const section2ContentBbox = { pageIndex: 0, bbox: [48, 200, 564, 500] }
         const anchors = makeMe.bookReadingTopMathsLikeAnchors()
         const blocks: BookBlockFull[] = anchors.map((startAnchor, i) => ({
@@ -1502,12 +1533,16 @@ describe("BookReadingPage", () => {
           title: `Section ${i + 1}`,
           startAnchor,
           siblingOrder: i,
+          // Section 1: no-bbox point + direct content; Section 2: anchor bbox + direct content
           allBboxes:
             i === 0
-              ? [anchorBbox, contentBbox]
+              ? [{ pageIndex: 0 } as unknown as PageBboxFull, contentBbox]
               : i === 1
-                ? [anchorBbox, section2ContentBbox]
-                : [],
+                ? [
+                    { pageIndex: 0, bbox: [48, 72, 564, 200] },
+                    section2ContentBbox,
+                  ]
+                : [PREORDER_FIRST_BBOXES[i]!],
         }))
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
