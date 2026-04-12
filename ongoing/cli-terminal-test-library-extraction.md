@@ -1,6 +1,6 @@
 # `tty-assert` — PTY terminal test library extraction
 
-**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). **Phase 13** is **complete** (shared `pollSurfaceAssertLoop`, unified `TtyAssertDumpDiagnostics` + `buildTtyAssertDumpDiagnostics`, assert JSON payload + `managedTtyAssertOptionsFromJson` on package root). **Phase 14** is **complete** (removed unused `facade` module; managed session + `waitForTextInSurface` remain the supported shapes). Phases **7–10**, **15** follow the roadmap (7–10 diagnostics and capture; **15** move out). Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
+**Status:** Phases 1–3 are **complete** in-repo; **Phase 4** is **complete** (4.3: `outputAssertions.getGuidanceContext` uses xterm viewport replay). **Phase 5** is **complete** (sub-phases **5.1–5.9 met**, including legacy replay removal — execution table in [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md)). **Phase 6** is **complete** (sub-phases **6.1–6.5 met** — managed session, `cliAssert`, docs, removal of unused `cliInteractivePtyGetBuffer`; detail in [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md)). **Phase 11** is **complete** (single **`exports`** entry + README that matches; prior-art wording removed from `packages/tty-assert`). **Phase 12** is **complete** (neutral `tty-assert:` validation errors, palette-background failure copy, `dumpDiagnostics` rename). **Phase 13** is **complete** (shared `pollSurfaceAssertLoop`, unified `TtyAssertDumpDiagnostics` + `buildTtyAssertDumpDiagnostics`, assert JSON payload + `managedTtyAssertOptionsFromJson` on package root). **Phase 14** is **complete** (removed unused `facade` module; managed session + `waitForTextInSurface` remain the supported shapes). Phases **7–10** follow the roadmap (diagnostics and capture). **Phase 15.1** is **complete** — standalone repo **[github.com/terryyin/tty-assert](https://github.com/terryyin/tty-assert)** with **git history** for `packages/tty-assert` and **`e2e_test/config/tty-assert-staging/`** (paths rewritten to repo root), CI, lockfile, and bootstrap commit on `main`. **15.2** (replace in-repo `packages/tty-assert` with the published npm package) remains. Sub-phases: Phase 1 — [`ongoing/cli-phase1-tty-assert-subphases.md`](./cli-phase1-tty-assert-subphases.md); Phase 4 — [`ongoing/cli-phase4-tty-assert-xterm-subphases.md`](./cli-phase4-tty-assert-xterm-subphases.md); Phase 5 — [`ongoing/cli-phase5-tty-assert-api-xterm-finish-subphases.md`](./cli-phase5-tty-assert-api-xterm-finish-subphases.md); Phase 6 — [`ongoing/cli-phase6-tty-assert-managed-session-subphases.md`](./cli-phase6-tty-assert-managed-session-subphases.md).
 
 **Intent:** Extract PTY-based terminal testing into a **Cypress-neutral, Doughnut-neutral** library named **`tty-assert`**, publishable on npm and eventually movable out of this repo. Goal: reliable assertions on terminal-visible state, with failures that show **expected vs actual** without manually decoding escape sequences, and CI-friendly artifacts where useful.
 
@@ -253,14 +253,34 @@
 
 ## Phase 15 — Move out of Doughnut (OSS npm package)
 
-**Outcome:** Standalone repository, semver, changelog, README for **Playwright / Vitest / raw Node** consumers; Doughnut pins a version.
+**Outcome (overall):** Standalone repository, semver, changelog, README for **Playwright / Vitest / raw Node** consumers; Doughnut pins a released npm version instead of the workspace package.
+
+### 15.1 — Copy to standalone repo
+
+**Status:** **Complete.**
+
+**Outcome:** `tty-assert` lives in **`https://github.com/terryyin/tty-assert`** with its own CI, `package.json`, README, and release process; content matches **`packages/tty-assert`** plus standalone scaffolding.
+
+**Delivered:**
+
+- **History:** `git filter-repo` on a fresh clone of Doughnut with `--path packages/tty-assert/` and `--path e2e_test/config/tty-assert-staging/`, both renamed to repo root (55 commits covering staging → package).
+- **Bootstrap commit on `main`:** `.github/workflows/ci.yml` (pnpm, Node 22, Ubuntu canvas deps), root `biome.json`, `LICENSE` (MIT), `.gitignore`, self-contained `tsconfig.json`, `pnpm-lock.yaml`, `pnpm.overrides` for a single **`canvas@3`** (transitive from `gifencoder`), README with extract recipe and integrator-focused wording.
+- **Remote:** `origin` → `git@github.com:terryyin/tty-assert.git`; **`main` pushed**.
+
+**Work remaining for npm:** First publish from that repo when ready (scoped name if needed); semver and changelog there (**15.2** consumes the tarball).
+
+**Gate:** **Met** — standalone `pnpm test` + `pnpm lint` green locally; CI on push matches.
+
+### 15.2 — Replace local `tty-assert` with npm package
+
+**Outcome:** Doughnut no longer ships `packages/tty-assert`; `e2e_test` / workspace depend on the **npm** `tty-assert` version (pinned); adapter glue stays minimal.
 
 **Work:**
 
-- Extract git history if desired; publish **`tty-assert`** (scoped if needed).
-- Doughnut: delete in-repo package, add npm dependency, shrink adapter code.
+- Remove in-repo **`packages/tty-assert`** from the monorepo (workspace entry, local path references).
+- Add **`tty-assert`** as a normal dependency with a pinned version; update CI/workflows that pointed at `packages/tty-assert/**`.
 
-**Gate:** Doughnut CI green on released version.
+**Gate:** Doughnut CI green on the released version.
 
 ---
 
@@ -272,7 +292,8 @@
 - **4 → 5 → 6:** Phase 4 (sub-phases 4.1–4.3) lands xterm replay for **`getGuidanceContext` only**; Phase 5 completes xterm migration (facade **5.1–5.2**), **locators** (**5.3**), E2E adapter + inventory (**5.5–5.8**), then **5.9** removes obsoleted code; Phase 6 is lifecycle API — **4.3** and Phase 5+ end with E2E green; **4.1–4.2** gate on `tty-assert` only.
 - **7–10** are mostly sequential in **diagnostic value**; **9–10** may share rendering infrastructure (**8 → 9** especially).
 - **11–14** improve **package honesty, cohesion, and internals** before publish; they can overlap **7–10** where there is no conflict, but **complete 11–14 before 15** so the published tarball matches docs and has no dead public sketch.
-- **15** last.
+- **15.1 → 15.2:** Standalone repo and npm publish first; Doughnut switches off the workspace package only after a consumable release exists.
+- **15** (15.1 then 15.2) last.
 
 ---
 
