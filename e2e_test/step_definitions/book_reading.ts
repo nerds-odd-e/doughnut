@@ -50,7 +50,7 @@ When(
 )
 
 When(
-  'I attach a book with MinerU fixture {string} to the notebook {string}',
+  'I attach a fake blank pdf book with layout of {string} to the notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (fixtureStem: string, notebookTitle: string) => {
     const bookName = fixtureStem

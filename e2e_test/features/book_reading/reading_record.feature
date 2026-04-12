@@ -2,9 +2,9 @@ Feature: Reading record
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "Top Maths"
-    When I attach a book with MinerU fixture "refactoring" to the notebook "Top Maths"
-    And I open the book attached to notebook "Top Maths"
+    And I have a notebook with the head note "Code Refactoring Book"
+    When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+    And I open the book attached to notebook "Code Refactoring Book"
 
   Rule: From section 1, scroll within page past the next book block bbox
 
