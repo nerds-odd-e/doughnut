@@ -203,11 +203,9 @@ Scenario: Indent a block and its children together
 
 ### Phase 7 — Drag a block with its descendants
 
-**User value:** When a block has children, dragging it moves the entire section together.
+**Shipped.** Drag on a parent block emits `blockIndent` / `blockOutdent` with the parent as the payload — the same path as Tab/Shift+Tab. `BookService.changeBlockDepth` already moves the contiguous subtree for both directions (Phase 6 backend). No new production code was required.
 
-**What changes:**
-
-- Drag applies the same subtree logic as Phase 6 (keyboard). No extra backend flag needed — the endpoint already moves descendants with the head.
+**Tests:** [`frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts`](../frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts) — "emits blockIndent with parent block when dragging right on a parent that has children" and "emits blockOutdent with parent block when dragging left on a parent that has children".
 
 ---
 

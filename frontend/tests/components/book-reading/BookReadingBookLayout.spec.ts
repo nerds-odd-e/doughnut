@@ -103,6 +103,58 @@ describe("BookReadingBookLayout", () => {
     wrapper.unmount()
   })
 
+  it("emits blockIndent with parent block when dragging right on a parent that has children", () => {
+    const parent = blockStub({ id: 10, depth: 0, title: "Parent" })
+    const child = blockStub({ id: 11, depth: 1, title: "Child" })
+    const wrapper = mountLayout([parent, child])
+    const rows = wrapper.findAll('[data-testid="book-reading-book-block"]')
+    const parentRow = rows[0]!.element as HTMLElement
+
+    const x0 = 200
+    const y0 = 120
+    pointerMouse(parentRow, { type: "pointerdown", clientX: x0, clientY: y0 })
+    pointerMouse(parentRow, {
+      type: "pointermove",
+      clientX: x0 + 30,
+      clientY: y0,
+    })
+    pointerMouse(parentRow, {
+      type: "pointerup",
+      clientX: x0 + 30,
+      clientY: y0,
+    })
+
+    expect(wrapper.emitted("blockIndent")).toHaveLength(1)
+    expect(wrapper.emitted("blockIndent")![0]![0]).toEqual(parent)
+    wrapper.unmount()
+  })
+
+  it("emits blockOutdent with parent block when dragging left on a parent that has children", () => {
+    const parent = blockStub({ id: 12, depth: 1, title: "Parent" })
+    const child = blockStub({ id: 13, depth: 2, title: "Child" })
+    const wrapper = mountLayout([parent, child])
+    const rows = wrapper.findAll('[data-testid="book-reading-book-block"]')
+    const parentRow = rows[0]!.element as HTMLElement
+
+    const x0 = 200
+    const y0 = 120
+    pointerMouse(parentRow, { type: "pointerdown", clientX: x0, clientY: y0 })
+    pointerMouse(parentRow, {
+      type: "pointermove",
+      clientX: x0 - 30,
+      clientY: y0,
+    })
+    pointerMouse(parentRow, {
+      type: "pointerup",
+      clientX: x0 - 30,
+      clientY: y0,
+    })
+
+    expect(wrapper.emitted("blockOutdent")).toHaveLength(1)
+    expect(wrapper.emitted("blockOutdent")![0]![0]).toEqual(parent)
+    wrapper.unmount()
+  })
+
   it("does not emit indent/outdent on click-sized movement and still allows blockClick", async () => {
     const block = blockStub({ id: 3, depth: 0, title: "C" })
     const wrapper = mountLayout([block])
