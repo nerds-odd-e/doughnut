@@ -98,7 +98,7 @@ import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.v
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
-import { nextLiveAnnouncementText } from "@/lib/book-reading/currentBlockLiveAnnouncement"
+import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
@@ -266,8 +266,9 @@ function updateReadingPanelAnchor() {
   readingPanelAnchorTopPx.value = top
 }
 
-const currentBlockLiveText = ref("")
-const lastAnnouncedCurrentBlockTitle = ref<string | undefined>(undefined)
+const currentBlockLiveText = computed(() =>
+  structuralTitleForBlockId(currentBlockId.value, bookBlocks.value)
+)
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
@@ -322,19 +323,6 @@ watch(selectedBlockId, (id) => {
     return
   }
   lastReadPositionPatchDebouncer.propose(last.pageIndex, last.normalizedY, id)
-})
-
-watch(currentBlockId, (id) => {
-  const { text, changed } = nextLiveAnnouncementText(
-    lastAnnouncedCurrentBlockTitle.value,
-    id,
-    bookBlocks.value
-  )
-  if (!changed) {
-    return
-  }
-  lastAnnouncedCurrentBlockTitle.value = text
-  currentBlockLiveText.value = text
 })
 
 watch(currentBlockId, async (blockId) => {
