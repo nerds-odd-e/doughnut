@@ -9,7 +9,7 @@ alwaysApply: true
 
 **YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true nix develop -c`:**
 
-**For Cloud VM setup, see the `cloud-agent-setup` rule.**
+**For Cloud VM setup, see the `cloud-vm-setup` skill.**
 
 ```bash
 CURSOR_DEV=true nix develop -c <command>
@@ -41,7 +41,7 @@ This command starts:
 
 **If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first. But once running, DO NOT suggest restarting after code changes.
 
-**Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** if nothing was listening. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see **`cloud-agent-setup`**.
+**Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** if nothing was listening. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see the `cloud-vm-setup` skill.
 
 ## Local MySQL and Redis (nix shell hook and process-compose)
 
@@ -75,7 +75,7 @@ With only **`nix develop -c`**, set **`MYSQL_*`** / **`REDIS_*`** the same way a
 
 ## Running Commands in Terminal
 
-**For Cloud VM setup, see the `cloud-agent-setup` rule.**
+**For Cloud VM setup, see the `cloud-vm-setup` skill.**
 
 Always use `CURSOR_DEV=true nix develop -c` prefix for commands (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`).
 

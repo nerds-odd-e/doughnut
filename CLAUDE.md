@@ -82,7 +82,7 @@ process-compose -f process-compose.yaml up -D redis
 2. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** in a terminal if nothing was listening.
 3. Do **not** restart `pnpm sut` after normal code edits — services auto-reload (see above).
 
-**Cloud VM** (no Nix): run **`pnpm sut:healthcheck`** and **`pnpm sut:restart`** from the repo root; **`sut:restart`** needs **`lsof`** on `PATH`. See `.cursor/rules/cloud-agent-setup.mdc`.
+**Cloud VM** (no Nix): run **`pnpm sut:healthcheck`** and **`pnpm sut:restart`** from the repo root; **`sut:restart`** needs **`lsof`** on `PATH`. See the `cloud-vm-setup` skill.
 
 ### Running Commands
 
@@ -91,7 +91,7 @@ Prefix commands with the nix wrapper:
 CURSOR_DEV=true nix develop -c <command>
 ```
 
-**Cursor Cloud VM** has no Nix — run commands without that prefix. See `.cursor/rules/cloud-agent-setup.mdc`.
+**Cursor Cloud VM** has no Nix — run commands without that prefix. See the `cloud-vm-setup` skill.
 
 ## Common Commands
 

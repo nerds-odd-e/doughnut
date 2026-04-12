@@ -76,7 +76,7 @@ The OpenAPI specification (`open_api_docs.yaml`) is validated using Redocly CLI.
 - **Missing path parameters**: Add `@PathVariable` annotation to method parameters that match path variables
 - **Identical paths**: Standardize path parameter names across controllers (e.g., use `{notebook}` consistently, not `{notebookId}` in some places)
 
-After API changes, also run frontend unit tests and fix call sites — see `.cursor/rules/generated-backend-api-code-for-frontend.mdc`.
+After API changes, also run frontend unit tests and fix call sites — see the `generate-api-client` skill.
 
 ## Linting Tools Configuration
 

@@ -264,7 +264,7 @@ Expect the Vue production build under `frontend/dist`. The CLI install URL is se
 
 ### 8. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 
-### 9. [Manual testing locally](./.cursor/rules/manual-testing.mdc)
+### 9. Manual testing locally — see `.cursor/skills/manual-testing/SKILL.md`
 
 ### 10. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 
