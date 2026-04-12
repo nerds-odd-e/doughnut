@@ -34,7 +34,7 @@ Every depth mutation must preserve this invariant.
 ### Single-block vs subtree operations
 
 - **Leaf block (no children):** Indent/outdent changes only the target block's depth by ±1. Rejected if it would violate the tree invariant with either the predecessor or successor. Phases 3–4 use this simpler case.
-- **Block with children (general case):** Indent/outdent **always** moves the target block **and all its descendants** (contiguous run of blocks with depth > target's current depth) by ±1 together, preserving internal relative depths. Rejected if the result violates invariant at the boundary. Phase 7 generalizes to this behavior — there is no separate "single-block" vs "subtree" toggle; descendants always follow the head.
+- **Block with children (general case):** Indent/outdent **always** moves the target block **and all its descendants** (contiguous run of blocks with depth > target's current depth) by ±1 together, preserving internal relative depths. Rejected if the result violates invariant at the boundary. Phase 6 generalizes to this behavior — there is no separate "single-block" vs "subtree" toggle; descendants always follow the head.
 
 ### Backend API direction
 
@@ -101,7 +101,7 @@ Scenario: Focus a book block in the layout
 
 ### Phase 3 — Indent a leaf block via keyboard (tab)
 
-**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 7 generalizes to always move descendants with the head.
+**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 6 generalizes to always move descendants with the head.
 
 **User value:** User can increase the nesting depth of a single leaf block by pressing Tab while it is focused, correcting flat structures one block at a time.
 
@@ -131,7 +131,7 @@ Scenario: Indent a leaf block in the book layout
 
 ### Phase 4 — Outdent a leaf block via keyboard (shift-tab)
 
-**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 7 generalizes to always move descendants with the head.
+**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 6 generalizes to always move descendants with the head.
 
 **User value:** User can decrease the nesting depth of a single leaf block by pressing Shift+Tab while it is focused, pulling it up in the hierarchy.
 
@@ -173,17 +173,7 @@ Scenario: Outdent a leaf block in the book layout
 
 ---
 
-### Phase 6 — Drag a block with its descendants
-
-**User value:** When a block has children, dragging it moves the entire section together.
-
-**What changes:**
-
-- Drag applies the same subtree logic as Phase 7 (keyboard). Backend `withDescendants` support is shared.
-
----
-
-### Phase 7 — Indent/outdent a block with its descendants (subtree move)
+### Phase 6 — Indent/outdent a block with its descendants (subtree move)
 
 **User value:** When a block has children, indenting or outdenting via Tab/Shift+Tab always moves the entire section together instead of requiring one-by-one adjustment. This is the general behavior — Phases 3–4 were the simple leaf-only introduction.
 
@@ -191,19 +181,33 @@ Scenario: Outdent a leaf block in the book layout
 
 ```gherkin
 Scenario: Indent a block and its children together
-  # Block "3. Refactoring Is Not Only About Changing Production Code" at depth 0
-  # has children "3.1 ..." and "3.2 ..." at depth 1
-  When I select the book block "3. Refactoring Is Not Only About Changing Production Code" in the book layout
-  And I press Tab on the book layout
-  Then the book block "3. Refactoring Is Not Only About Changing Production Code" should be at depth 1 in the book layout
-  And the book block "3.1 Can You Refactor Without Tests?" should be at depth 2 in the book layout
-  And the book block "3.2 Can You Refactor Without Changing the Code?" should be at depth 2 in the book layout
+  # Uses "subtree_indent" fixture: parent "Chapter A" at depth 0 with two children at depth 1,
+  # followed by a sibling "Chapter B" at depth 0 so the subtree boundary is clear.
+  Given the book layout shows block "Chapter A" at depth 0
+  When I choose the book block "Chapter A"
+  Then the book block "Chapter A" should be focused in the book layout
+  When I press "Tab" on the book layout
+  Then the book block "Chapter A" should be at depth 1 in the book layout
+  And the book block "A.1 First section" should be at depth 2 in the book layout
+  And the book block "A.2 Second section" should be at depth 2 in the book layout
+  And the book block "Chapter B" should be at depth 0 in the book layout
 ```
 
 **What changes:**
 
 - **Backend:** Extend the depth endpoint: when the target block has descendants (contiguous run of blocks after the target whose depth > target's current depth), always shift all by ±1 together. Validates boundary invariant at predecessor of target and successor of last descendant.
-- **Frontend:** Tab/Shift+Tab and drag now always move descendants with the head. No separate "single-block" vs "subtree" toggle needed — descendants always follow.
+- **Frontend:** Tab/Shift+Tab now always moves descendants with the head. No separate "single-block" vs "subtree" toggle needed — descendants always follow.
+- **Fixture:** `e2e_test/fixtures/book_reading/mineru_output_for_subtree_indent.json` — minimal MinerU content list encoding the parent + two children + sibling layout above.
+
+---
+
+### Phase 7 — Drag a block with its descendants
+
+**User value:** When a block has children, dragging it moves the entire section together.
+
+**What changes:**
+
+- Drag applies the same subtree logic as Phase 6 (keyboard). No extra backend flag needed — the endpoint already moves descendants with the head.
 
 ---
 

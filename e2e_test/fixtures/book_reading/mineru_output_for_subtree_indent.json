@@ -1,0 +1,67 @@
+[
+  {
+    "type": "text",
+    "text": "Book Title",
+    "text_level": 1,
+    "bbox": [0, 50, 500, 100],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Some introductory content before any chapter.",
+    "bbox": [0, 120, 500, 160],
+    "page_idx": 0
+  },
+  {
+    "type": "text",
+    "text": "Chapter A",
+    "text_level": 1,
+    "bbox": [0, 200, 500, 250],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
+    "text": "Content belonging to Chapter A before its sections.",
+    "bbox": [0, 270, 500, 310],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
+    "text": "A.1 First section",
+    "text_level": 2,
+    "bbox": [0, 100, 500, 140],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "Body text of A.1.",
+    "bbox": [0, 160, 500, 200],
+    "page_idx": 2
+  },
+  {
+    "type": "text",
+    "text": "A.2 Second section",
+    "text_level": 2,
+    "bbox": [0, 100, 500, 140],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "Body text of A.2.",
+    "bbox": [0, 160, 500, 200],
+    "page_idx": 3
+  },
+  {
+    "type": "text",
+    "text": "Chapter B",
+    "text_level": 1,
+    "bbox": [0, 100, 500, 140],
+    "page_idx": 4
+  },
+  {
+    "type": "text",
+    "text": "Content belonging to Chapter B.",
+    "bbox": [0, 160, 500, 200],
+    "page_idx": 4
+  }
+]

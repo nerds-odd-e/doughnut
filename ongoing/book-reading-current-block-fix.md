@@ -1,72 +1,86 @@
-# Book reading: current block at scroll end + tap to set current
+# Book reading: panel visibility based on block bottom in viewport
 
 ## Problem
 
-When the last book block sits low on the last page (content above), scroll-based “current block” logic may never promote it, so the mark-as-read panel never appears. The second-to-last block can fail similarly if the title never crosses the viewport threshold.
+When the last book block sits low on the last page, the mark-as-read panel never appears because the scroll-based "current block" logic cannot promote it. The current system uses a complex chain (scroll → `currentBlockId` → snap-back with attempt counters and geometry tracking → `blockAwaitingConfirmation`) that is hard to reason about and still fails for edge layouts.
 
-## Outcome
+## New approach
 
-1. **Scroll-end (automatic):** When the reader reaches the **end** of the reading scroll surface, the **last** book block (in reading order) can become **current** so mark-as-read can appear even if the title never satisfied the normal visibility rule.
+Replace the snap-back mechanism and `currentBlockId`-dependent panel logic with a simpler rule:
 
-2. **Tap to set current (manual):** The user can **tap a block** (or an explicit control on it) to **set that block as current**, independent of scroll, so awkward layouts stay completable.
+**Show the panel when the selected block's bottom is visible in the viewport with room for the panel.**
 
-## Phase 1 — Scroll-end: last block becomes eligible as current
+Core rules:
 
-**Behavior**
+1. Look at blocks whose bottoms are in the viewport minus panel height.
+2. If the **selected** block is among them and **not yet marked** → show the panel anchored at that block's bottom.
+3. If the **selected** block is among them but **already marked** → show the panel for the **next** block, if that next block's bottom is also in view with room.
+4. **Marking** a block advances `selectedBlockId` to the next block (unchanged).
+5. The PDF scroll surface gets **bottom padding** equal to the panel height, so the last block's bottom can always be scrolled into view.
 
-- **Pre-condition:** Book has multiple blocks; last block is low on the page with content above (reproduces the bug).
-- **Trigger:** User scrolls to **effective bottom** of the reading surface (one rule: e.g. `scrollTop + clientHeight >= scrollHeight - ε`, small ε for subpixel).
-- **Post-condition:** **Current block** updates to the **last** block (or a single documented rule for “last in-view at bottom”), and the mark-as-read UI can show for that block like other current blocks.
+**What this removes:** The snap-back mechanism (`useBookReadingSnapBack` — attempt counters, `geometryEverVisibleForSelection`, `snapToContentBottomAndHold`, `suppressScrollInput`). The panel no longer chases the user; it simply appears when the block bottom is visible.
 
-**Implementation notes**
+**What stays unchanged:** `currentBlockId` (scroll-based) still drives the `CurrentBlockNavigationBar`, reading position persistence, and auto-marking of content-less blocks. It is decoupled from panel visibility.
 
-- Likely touch: `currentBlockIdFromVisiblePage` (or equivalent), scroll handling, `BookReadingContent.vue` / composable that proposes `currentBlockId` via the existing debouncer.
-- **Debouncing:** At bottom, consider **immediate commit** or a narrow exception so end-of-doc does not feel laggy.
-- **Priority:** When “at bottom” conflicts with the visible-page heuristic, **bottom wins** only while the bottom condition is true.
+---
 
-**Tests**
-
-- **E2E:** Layout where the last block never wins under the old rule; scroll to bottom → assert **current block** is the last (or assert mark-as-read panel for last block—pick the most stable observable).
-
-**Deploy gate:** Commit after green E2E for this phase.
-
-## Phase 2 — Tap (or explicit control) to set current block
+## Phase 1 — Panel shows when selected block's bottom is visible + bottom padding
 
 **Behavior**
 
-- **Pre-condition:** Any book with blocks; optional: same awkward layout as Phase 1.
-- **Trigger:** User **activates** a block (tap on block chrome / row / “set as current”—exact control TBD).
-- **Post-condition:** **That block** becomes **current**; mark-as-read reflects it; scroll need not move (optional scroll-into-view deferred unless needed).
+- **Pre-condition:** Book with blocks; the selected block has not been marked.
+- **Trigger:** User scrolls until the selected block's content bottom is in the viewport with at least panel-height room below it.
+- **Post-condition:** The mark-as-read panel appears anchored at the selected block's content bottom. Scrolling the block bottom out of view hides the panel. For the last block, bottom padding on the scroll surface ensures it can always be scrolled far enough.
 
-**Implementation notes**
+**What changes:**
 
-- Wire from block list / row component to the same **`currentBlockId`** pipeline (e.g. `commitNow` / equivalent).
-- **Accessibility:** Keyboard/focus if not pointer-only.
-- **vs scroll:** Explicit user selection should **override** scroll-based proposals until the next meaningful scroll (define a minimal rule to avoid oscillation).
+- **`useBookReadingSnapBack` (or replacement):** Simplify `blockAwaitingConfirmation` to: selected block is not yet marked AND its content bottom is visible in the viewport with room for the panel. Remove snap-back logic (attempt counters, `geometryEverVisibleForSelection`, `performSnapBack`, `shouldSnapBack`, `snapToContentBottomAndHold`, `suppressScrollInput`).
+- **`PdfBookViewer.vue`:** Add bottom padding to the scroll container equal to the panel height, so the last block's bottom can be scrolled into view.
+- **`BookReadingContent.vue`:** Remove snap-back wiring (`snapAnimationKey`, `shouldSnapBack`, `performSnapBack`, `clearSnapbackAttemptsForBlock`). The `updateReadingPanelAnchor` logic can be simplified since the panel visibility and anchor are now one concern.
 
 **Tests**
 
-- **E2E:** Tap a chosen block → assert **current** (or panel) matches **that** block without requiring special scroll.
+- **E2E:** Book where the last block's content is near the bottom of the last page. Scroll to bottom → panel appears for the last block. (This is the scenario that fails today.)
 
 **Deploy gate:** Commit after green E2E for this phase.
+
+---
+
+## Phase 2 — Auto-target next block when selected is already marked
+
+**Behavior**
+
+- **Pre-condition:** The selected block is already marked (read/skimmed/skipped). The next block exists and its content bottom is also visible in the viewport with room for the panel.
+- **Trigger:** User scrolls to a position where both the selected (marked) block's bottom and the next block's bottom are in view.
+- **Post-condition:** The panel appears anchored at the **next** block's content bottom, offering to mark that block.
+
+**What changes:**
+
+- Extend the panel-target logic: when the selected block is marked, check the next block in reading order. If its bottom is in the viewport with room, show the panel for it.
+- Marking via this panel still advances `selectedBlockId` to the block after the one just marked (same `markSelectedDisposition` behavior).
+
+**Tests**
+
+- **E2E:** Mark a block → if the next block's bottom is visible, panel immediately shows for it without requiring further scrolling.
+
+**Deploy gate:** Commit after green E2E for this phase.
+
+---
 
 ## Order
 
-- **Phase 1 before Phase 2** for the smallest slice that fixes “last block never current.”
-- **Phase 2** still adds value after Phase 1 (penultimate blocks, user override).
+- **Phase 1 first** — delivers the core fix (last block reachable, snap-back removed).
+- **Phase 2** — adds the flow convenience (auto-advance panel to next visible block).
 
-## Optional sub-phases
+## Out of scope
 
-If a phase is still large, use **E2E-led sub-phases**: one Gherkin step at a time (red → green → uncomment next step).
-
-## Out of scope (for this plan)
-
-- “Mark remaining as read” / full unread block picker (not part of the two mechanisms above).
-- Large refactors of the visibility algorithm beyond what Phase 1 needs.
+- Changes to `currentBlockId` logic or `currentBlockIdFromVisiblePage` — those stay as-is for the navigation bar and reading position.
+- Tap-to-set-current (the old Phase 2) — no longer needed since the panel follows selected-block visibility.
+- "Mark remaining as read" / bulk operations.
 
 ## Status
 
-| Phase | Status   |
-|-------|----------|
-| 1     | Planned  |
-| 2     | Planned  |
+| Phase | Status  |
+|-------|---------|
+| 1     | Planned |
+| 2     | Planned |
