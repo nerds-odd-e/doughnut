@@ -180,9 +180,13 @@ function onPdfLoadError(message: string) {
 
 const bookBlocks = computed(() => props.book.blocks)
 
-const currentBlockId = ref<number | null>(null)
-
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+
+const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
+  delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
+  commit: commitCurrentBlockId,
+})
+const { currentBlockId } = currentBlockIdDebouncer
 
 const currentBlockForNavBar = computed(() => {
   const curId = currentBlockId.value
@@ -234,6 +238,14 @@ const {
   snapHoldMs: SNAP_HOLD_MS,
 })
 
+function commitCurrentBlockId(id: number | null): boolean {
+  if (shouldSnapBack(id)) {
+    performSnapBack()
+    return false
+  }
+  return true
+}
+
 function updateReadingPanelAnchor() {
   const mainEl = mainPaneRef.value
   const pdf = pdfViewerRef.value
@@ -269,18 +281,6 @@ function updateReadingPanelAnchor() {
 const currentBlockLiveText = computed(() =>
   structuralTitleForBlockId(currentBlockId.value, bookBlocks.value)
 )
-
-const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
-  delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
-  commit: (id) => {
-    if (shouldSnapBack(id)) {
-      performSnapBack()
-      return false
-    }
-    currentBlockId.value = id
-    return true
-  },
-})
 
 const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
   delayMs: LAST_READ_POSITION_PATCH_DEBOUNCE_MS,

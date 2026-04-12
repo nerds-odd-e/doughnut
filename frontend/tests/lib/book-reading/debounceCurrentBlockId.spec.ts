@@ -24,6 +24,46 @@ describe("createCurrentBlockIdDebouncer", () => {
     expect(commits).toEqual([])
     vi.advanceTimersByTime(120)
     expect(commits).toEqual([1])
+    expect(d.currentBlockId.value).toBe(1)
+  })
+
+  it("exposes currentBlockId that updates on accepted commit", () => {
+    const d = createCurrentBlockIdDebouncer({
+      delayMs: 50,
+      commit: () => true,
+    })
+    expect(d.currentBlockId.value).toBeNull()
+    d.propose(42)
+    vi.advanceTimersByTime(50)
+    expect(d.currentBlockId.value).toBe(42)
+  })
+
+  it("does not update currentBlockId when commit returns false", () => {
+    const d = createCurrentBlockIdDebouncer({
+      delayMs: 50,
+      commit: () => false,
+    })
+    d.propose(7)
+    vi.advanceTimersByTime(50)
+    expect(d.currentBlockId.value).toBeNull()
+  })
+
+  it("updates currentBlockId on accepted commitNow", () => {
+    const d = createCurrentBlockIdDebouncer({
+      delayMs: 50,
+      commit: () => true,
+    })
+    d.commitNow(99)
+    expect(d.currentBlockId.value).toBe(99)
+  })
+
+  it("does not update currentBlockId on rejected commitNow", () => {
+    const d = createCurrentBlockIdDebouncer({
+      delayMs: 50,
+      commit: () => false,
+    })
+    d.commitNow(99)
+    expect(d.currentBlockId.value).toBeNull()
   })
 
   it("does not commit when cancel runs before delay", () => {

@@ -71,7 +71,7 @@ function lastContentBbox(row: BookBlockFull) {
 export function useBookReadingSnapBack(options: {
   bookBlocks: ComputedRef<readonly BookBlockFull[]>
   selectedBlockId: Ref<number | null>
-  currentBlockId: Ref<number | null>
+  currentBlockId: Readonly<Ref<number | null>>
   hasRecordedDisposition: (id: number) => boolean
   pdfViewerRef: Ref<BookReadingPdfViewerRef | null>
   obstructionPx: number

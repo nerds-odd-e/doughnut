@@ -1,34 +1,24 @@
-# Book reading: panel visibility based on block bottom in viewport
+# Book reading: last-block panel fix + caching variable cleanup
 
 ## Problem
 
-When the last book block sits low on the last page, the mark-as-read panel never appears because the scroll-based "current block" logic cannot promote it. The current system uses a complex chain (scroll → `currentBlockId` → snap-back with attempt counters and geometry tracking → `blockAwaitingConfirmation`) that is hard to reason about and still fails for edge layouts.
+When the last book block sits low on the last page, the mark-as-read panel never appears because `selectedIndexAndSuccessor` returns null for the last block, so `blockAwaitingConfirmation` is always null. The panel cannot show for the last block regardless of scroll position.
 
-A contributing cause: many values in `BookReadingContent.vue` are stored in mutable refs and imperatively updated from multiple sites (event handlers, watchers), rather than being computed from a single source of truth. This makes data flow hard to follow and leads to unpredictable behavior.
+A contributing cause: many values in `BookReadingContent.vue` are stored in mutable refs and imperatively updated from multiple sites (event handlers, watchers), rather than being computed from a single source of truth. This makes data flow hard to follow.
 
-## New approach
+## Approach
 
-Replace the snap-back mechanism and `currentBlockId`-dependent panel logic with a simpler rule:
+Fix the last-block bug by adding a geometry-based code path for the last block in `blockAwaitingConfirmation`. Add bottom padding so the last block's bottom can always be scrolled into view. Clean up caching refs to improve readability.
 
-**Show the panel when the selected block's bottom is visible in the viewport with room for the panel.**
+**The snap-back mechanism is preserved as-is.** It continues to gate `currentBlockId` commits and snap the scroll position when the user scrolls past an unconfirmed block.
 
-Core rules:
-
-1. Look at blocks whose bottoms are in the viewport minus panel height.
-2. If the **selected** block is among them and **not yet marked** → show the panel anchored at that block's bottom.
-3. If the **selected** block is among them but **already marked** → show the panel for the **next** block, if that next block's bottom is also in view with room.
-4. **Marking** a block advances `selectedBlockId` to the next block (unchanged).
-5. The PDF scroll surface gets **bottom padding** equal to the panel height, so the last block's bottom can always be scrolled into view.
-
-**What this removes:** The snap-back mechanism (`useBookReadingSnapBack` — attempt counters, `geometryEverVisibleForSelection`, `snapToContentBottomAndHold`, `suppressScrollInput`). The panel no longer chases the user; it simply appears when the block bottom is visible.
-
-**What stays unchanged:** `currentBlockId` (scroll-based) still drives the `CurrentBlockNavigationBar`, reading position persistence, and auto-marking of content-less blocks. It is decoupled from panel visibility.
+**`currentBlockId`** (scroll-based) still drives the `CurrentBlockNavigationBar`, reading position persistence, auto-marking of content-less blocks, and snap-back decisions.
 
 ## Caching variable cleanup
 
 Replace imperatively-set caching refs with computed values or debouncer-owned readonly refs, one group per phase. Each refactoring phase is verified by existing tests staying green (no behavior change).
 
-**Variables to address (after snap-back removal):**
+**Variables to address:**
 
 | Variable | Problem | Fix |
 |----------|---------|-----|
@@ -106,57 +96,22 @@ Currently two refs (`currentBlockLiveText`, `lastAnnouncedCurrentBlockTitle`) ar
 
 ---
 
-### Phase 5 — Simplify panel visibility to geometry-only rule
-
-**Behavior**
-
-Change `blockAwaitingConfirmation` from the current multi-path logic (geometry + successor-as-current + geometryEverVisible) to the simple rule: selected block is not marked AND has direct content AND bottom is currently visible. This removes the `geometryEverVisibleForSelection` "sticky" behavior and the successor-based fallback for blocks without direct content.
-
-**What changes:**
-
-- **`useBookReadingSnapBack.ts`:** Replace `blockAwaitingConfirmation` computed body with the simple rule. Remove `geometryEverVisibleForSelection` ref and its updates.
-- **Unit test updates:** Tests asserting old behavior (e.g. "keeps panel visible after geometry becomes false while successor is not yet current", "shows the panel when the selected block's successor is the viewport current block") need updating to reflect the new geometry-only rule.
-
-**Deploy gate:** Commit after green tests.
-
----
-
-### Phase 6 — Remove snap-back mechanism + dead code cleanup
-
-**Refactoring**
-
-With panel visibility now geometry-only (Phase 5), the snap-back mechanism is dead code. Remove it and all its dependents.
-
-**What changes:**
-
-- **`useBookReadingSnapBack.ts`:** Remove `shouldSnapBack`, `performSnapBack`, `snapbackAttempts`, `snapAnimationKey`, `clearSnapbackAttemptsForBlock`. Remove `currentBlockId` and `snapHoldMs` from options.
-- **`BookReadingContent.vue`:** Simplify debouncer `commit` (always commit, no snap-back gate). Remove `clearSnapbackAttemptsForBlock` call from `markSelectedDisposition`. Remove `:snap-animation-key` from `ReadingControlPanel`.
-- **`PdfBookViewer.vue`:** Remove `snapToContentBottomAndHold`, `suppressScrollInput`, `contentFitsFromBlockTop` from expose and implementation. Remove `createIntervalScrollSuppression` import and `scrollSuppression` instance. Remove `checkEvent()` calls from wheel/touch handlers.
-- **`ReadingControlPanel.vue`:** Remove `snapAnimationKey` prop, `isAnimating` ref, watcher, `data-snap-animating` attribute, and `snap-attention` CSS.
-- **`BookReadingPdfViewerRef` type:** Remove `snapToContentBottomAndHold`, `suppressScrollInput`, `contentFitsFromBlockTop`.
-- **Delete:** `frontend/src/lib/book-reading/intervalScrollSuppression.ts`, `frontend/tests/lib/book-reading/intervalScrollSuppression.spec.ts`.
-- **Unit tests:** Remove all snap-back–specific tests (snap budgets, snap animation, cross-page snap, same-page-too-tall snap, snap state reset, etc.).
-
-**Verified by:** All remaining tests pass.
-
----
-
-### Phase 7 — `currentBlockId` → debouncer-owned readonly ref
+### Phase 5 — `currentBlockId` → debouncer-owned readonly ref
 
 **Refactoring (no behavior change)**
 
-With snap-back removed (Phase 6), the debouncer `commit` callback is unconditional. The debouncer should own `currentBlockId` internally and expose it as `Readonly<Ref<number | null>>`.
+Currently `BookReadingContent.vue` declares `currentBlockId` as a mutable ref and passes it to both the debouncer (which writes via `commit`) and `useBookReadingSnapBack` (which reads it for snap-back decisions). The debouncer should own the ref internally and expose it as `Readonly<Ref<number | null>>`.
 
 **What changes:**
 
-- **`createCurrentBlockIdDebouncer`:** Returns an additional `currentBlockId: Readonly<Ref<number | null>>`. The `commit` option is removed; the debouncer writes to its own ref.
+- **`createCurrentBlockIdDebouncer`:** Creates `currentBlockId` internally. Returns it as `Readonly<Ref<number | null>>`. The `commit` callback still gates on snap-back (returns false to reject); the debouncer only writes when `commit` returns true.
 - **`BookReadingContent.vue`:** Reads `currentBlockId` from the debouncer return value instead of declaring its own ref.
 
 **Verified by:** All existing tests pass.
 
 ---
 
-### Phase 8 — Auto-target next block when selected is already marked
+### Phase 6 — Auto-target next block when selected is already marked
 
 **Behavior**
 
@@ -166,7 +121,7 @@ With snap-back removed (Phase 6), the debouncer `commit` callback is uncondition
 
 **What changes:**
 
-- Extend panel-target logic: when selected block is marked, check next block.
+- Extend panel-target logic in `blockAwaitingConfirmation`: when the selected block is already marked, check the next block.
 - Marking via this panel still advances `selectedBlockId`.
 
 **Tests**
@@ -179,22 +134,20 @@ With snap-back removed (Phase 6), the debouncer `commit` callback is uncondition
 
 ## Remaining after all phases
 
-`readingPanelAnchorTopPx` requires DOM measurements from `PdfBookViewer` and cannot be a pure computed. After Phase 5 it will have a single update site (the viewport event handler), which is acceptable. `windowWidth` mirrors a DOM measurement via resize listener — standard pattern.
+`readingPanelAnchorTopPx` requires DOM measurements from `PdfBookViewer` and cannot be a pure computed; it is still set from two sites (event handler + watcher). Consolidating to a single update site is a possible future cleanup. `windowWidth` mirrors a DOM measurement via resize listener — standard pattern.
 
 ## Order
 
 - **Phase 1** — bottom padding (structural prep).
 - **Phase 2** — last-block bug fix (user value: last block reachable).
 - **Phases 3–4** — caching variable cleanup (structural improvement, verified by existing tests).
-- **Phase 5** — simplify panel to geometry-only (behavior change, breaks old tests).
-- **Phase 6** — remove snap-back + dead code (structural cleanup, removes old tests).
-- **Phase 7** — debouncer owns currentBlockId (structural improvement).
-- **Phase 8** — auto-advance panel to next visible block (new behavior).
+- **Phase 5** — debouncer owns currentBlockId (structural improvement).
+- **Phase 6** — auto-advance panel to next visible block (new behavior).
 
 ## Out of scope
 
 - Changes to `currentBlockIdFromVisiblePage` logic — stays as-is for the navigation bar and reading position.
-- Tap-to-set-current — no longer needed since the panel follows selected-block visibility.
+- Snap-back mechanism changes — preserved as-is.
 - "Mark remaining as read" / bulk operations.
 
 ## Status
@@ -205,7 +158,5 @@ With snap-back removed (Phase 6), the debouncer `commit` callback is uncondition
 | 2     | Done    |
 | 3     | Done    |
 | 4     | Done    |
-| 5     | Planned |
+| 5     | Done    |
 | 6     | Planned |
-| 7     | Planned |
-| 8     | Planned |
