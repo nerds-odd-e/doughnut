@@ -78,7 +78,7 @@ Then each book block in the book layout should show a visual nesting indicator m
 
 ### Phase 2 — Focus the selected block in the book layout
 
-**Shipped:** [`e2e_test/features/book_reading/change_depth.feature`](../e2e_test/features/book_reading/change_depth.feature); `BookReadingBookLayout.vue` watches `selectedBlockId` and focuses the row with `data-current-selection="true"` after render (`requestAnimationFrame`, same pattern as current-block scroll-into-view).
+**Shipped:** [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature); `BookReadingBookLayout.vue` watches `selectedBlockId` and focuses the row with `data-current-selection="true"` after render (`requestAnimationFrame`, same pattern as current-block scroll-into-view).
 
 **User value:** User can focus a block in the book layout (e.g. by clicking it), and the focus persists while interacting with the block (keyboard shortcuts). Focus blurs only when it should — clicking outside the book layout, navigating away, etc. — not prematurely (e.g. not on every scroll or PDF interaction while the user is still editing layout).
 
@@ -211,7 +211,7 @@ Scenario: Indent a block and its children together
 
 ### Phase 8 — Cancel a book block (merge content to previous)
 
-**Shipped.** [`e2e_test/features/book_reading/cancel_block.feature`](../e2e_test/features/book_reading/cancel_block.feature) — two scenarios (leaf block removal and parent block with children promotion). `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}` removes the block, reassigns its `BookContentBlock` rows to the predecessor, promotes descendants (depth -= 1), returns updated `Book`. Frontend: Backspace on a focused block row in the layout emits `blockCancel`; `BookReadingContent` calls `NotebookBooksController.cancelBookBlock` and replaces the book. First block is rejected by the backend (400).
+**Shipped.** [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature) — two scenarios (leaf block removal and parent block with children promotion). `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}` removes the block, reassigns its `BookContentBlock` rows to the predecessor, promotes descendants (depth -= 1), returns updated `Book`. Frontend: Backspace on a focused block row in the layout emits `blockCancel`; `BookReadingContent` calls `NotebookBooksController.cancelBookBlock` and replaces the book. First block is rejected by the backend (400).
 
 ---
 
