@@ -249,13 +249,12 @@ function commitCurrentBlockId(id: number | null): boolean {
 function updateReadingPanelAnchor() {
   const mainEl = mainPaneRef.value
   const pdf = pdfViewerRef.value
-  const selId = selectedBlockId.value
-  if (!mainEl || !pdf || selId === null || !lastContentBottomVisible.value) {
+  const block = blockAwaitingConfirmation.value
+  if (!mainEl || !pdf || !block || !lastContentBottomVisible.value) {
     readingPanelAnchorTopPx.value = null
     return
   }
-  const block = bookBlocks.value.find((b) => b.id === selId)
-  if (!block || block.allBboxes.length < 2) {
+  if (block.allBboxes.length < 2) {
     readingPanelAnchorTopPx.value = null
     return
   }
@@ -367,19 +366,19 @@ async function applyBookBlockSelection(block: BookBlockFull) {
 }
 
 async function markSelectedDisposition(status: BookBlockReadingDisposition) {
-  const id = selectedBlockId.value
-  if (id === null) {
+  const block = blockAwaitingConfirmation.value
+  if (!block) {
     return
   }
-  const ok = await bookReading.submitReadingDisposition(id, status)
+  const ok = await bookReading.submitReadingDisposition(block.id, status)
   if (!ok) {
     return
   }
   if (status === "READ") {
-    clearSnapbackAttemptsForBlock(id)
+    clearSnapbackAttemptsForBlock(block.id)
   }
   const rows = bookBlocks.value
-  const selIdx = rows.findIndex((r) => r.id === id)
+  const selIdx = rows.findIndex((r) => r.id === block.id)
   if (selIdx >= 0 && selIdx < rows.length - 1) {
     await applyBookBlockSelection(rows[selIdx + 1]!)
   }

@@ -815,6 +815,154 @@ describe("BookReadingPage", () => {
       expect(panel.text()).toContain("Section 6")
     })
 
+    it("shows panel for successor when selected block is already marked and successor bottom is visible", async () => {
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookBlockId: "101",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+      const section2ContentBbox = makeMe.pageBbox.withNormalizedBbox(
+        0,
+        [48, 72, 564, 200]
+      )
+      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aBook
+            .notebookId(String(notebookId))
+            .blocks(
+              makeMe.bookReading.topMathsLikeBlockRows({
+                allBboxesForIndex: (i) =>
+                  i === 1
+                    ? [
+                        makeMe.bookReading.topMathsLikePreorderFirstBboxAt(1),
+                        section2ContentBbox,
+                      ]
+                    : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+              })
+            )
+            .please()
+        )
+      )
+      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+      const wrapper = mountBookReadingPage(notebookId)
+      await waitForPdfViewer(wrapper)
+      mockIsLastContentBottomVisible(wrapper, true)
+
+      // Section 1 is already marked READ; click it as selected block
+      const section1Row = wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .find((w) => w.text().startsWith("Section 1"))
+      expect(section1Row, "book block row Section 1").toBeDefined()
+      await section1Row!.trigger("click")
+      await flushPromises()
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toMatch(
+          /^Section 1/
+        )
+      )
+
+      await emitViewportAndSettleCurrentBlock(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 100, bottom: 300 },
+        pagesCount: 10,
+      })
+
+      const panel = readingControlPanel(wrapper)
+      expect(panel.exists()).toBe(true)
+      expect(panel.isVisible()).toBe(true)
+      expect(panel.text()).toContain("Section 2")
+    })
+
+    it("marking successor via auto-targeted panel advances selection past successor", async () => {
+      vi.spyOn(
+        NotebookBooksController,
+        "getNotebookBookReadingRecords"
+      ).mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookBlockId: "101",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+      vi.spyOn(
+        NotebookBooksController,
+        "putNotebookBookBlockReadingRecord"
+      ).mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookBlockId: "102",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+      const section2ContentBbox = makeMe.pageBbox.withNormalizedBbox(
+        0,
+        [48, 72, 564, 200]
+      )
+      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aBook
+            .notebookId(String(notebookId))
+            .blocks(
+              makeMe.bookReading.topMathsLikeBlockRows({
+                allBboxesForIndex: (i) =>
+                  i === 1
+                    ? [
+                        makeMe.bookReading.topMathsLikePreorderFirstBboxAt(1),
+                        section2ContentBbox,
+                      ]
+                    : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+              })
+            )
+            .please()
+        )
+      )
+      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+      const wrapper = mountBookReadingPage(notebookId)
+      await waitForPdfViewer(wrapper)
+      mockIsLastContentBottomVisible(wrapper, true)
+
+      const section1Row = wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .find((w) => w.text().startsWith("Section 1"))
+      await section1Row!.trigger("click")
+      await flushPromises()
+
+      await emitViewportAndSettleCurrentBlock(wrapper, {
+        anchorPageIndexZeroBased: 0,
+        viewport: { top: 0, mid: 100, bottom: 300 },
+        pagesCount: 10,
+      })
+
+      await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsRead")
+      await flushPromises()
+
+      // Should have marked block 102 (Section 2), not block 101
+      expect(
+        NotebookBooksController.putNotebookBookBlockReadingRecord
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: expect.objectContaining({ bookBlock: 102 }),
+        })
+      )
+      // Selection should advance to Section 3
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 3"
+        )
+      )
+    })
+
     it("calls PUT with SKIMMED when Skim is used", async () => {
       let putCall = 0
       const putSpy = vi

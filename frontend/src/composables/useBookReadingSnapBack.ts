@@ -155,11 +155,33 @@ export function useBookReadingSnapBack(options: {
     }
   }
 
+  function geometryTargetBlock(): BookBlockFull | null {
+    const selId = selectedBlockId.value
+    if (selId === null) return null
+    const rows = bookBlocks.value
+    const sel = rows.find((r) => r.id === selId)
+    if (!sel) return null
+    if (!hasRecordedDisposition(selId)) return sel
+    const selIdx = rows.findIndex((r) => r.id === selId)
+    if (selIdx < 0 || selIdx >= rows.length - 1) return null
+    const successor = rows[selIdx + 1]!
+    if (hasRecordedDisposition(successor.id) || !hasDirectContent(successor))
+      return null
+    return successor
+  }
+
   const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
     const selId = selectedBlockId.value
     if (selId === null) return null
-    if (hasRecordedDisposition(selId)) return null
     const rows = bookBlocks.value
+    if (hasRecordedDisposition(selId)) {
+      const selIdx = rows.findIndex((r) => r.id === selId)
+      if (selIdx < 0 || selIdx >= rows.length - 1) return null
+      const successor = rows[selIdx + 1]!
+      if (hasRecordedDisposition(successor.id)) return null
+      if (!hasDirectContent(successor)) return null
+      return lastContentBottomVisible.value ? successor : null
+    }
     const chain = selectedIndexAndSuccessor(rows, selId)
     if (chain === null) {
       const sel = rows.find((r) => r.id === selId)
@@ -181,13 +203,8 @@ export function useBookReadingSnapBack(options: {
   })
 
   function updateLastDirectContentGeometry(): void {
-    const selIdForGeometry = selectedBlockId.value
-    if (selIdForGeometry === null) return
-    const selForGeometry = bookBlocks.value.find(
-      (r) => r.id === selIdForGeometry
-    )
-    const lastBboxForGeometry =
-      selForGeometry !== undefined ? lastContentBbox(selForGeometry) : null
+    const target = geometryTargetBlock()
+    const lastBboxForGeometry = target !== null ? lastContentBbox(target) : null
     if (lastBboxForGeometry === null) return
     const geometryVisible =
       pdfViewerRef.value?.isLastContentBottomVisible(

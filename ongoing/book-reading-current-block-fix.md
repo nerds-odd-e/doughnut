@@ -159,4 +159,4 @@ Currently `BookReadingContent.vue` declares `currentBlockId` as a mutable ref an
 | 3     | Done    |
 | 4     | Done    |
 | 5     | Done    |
-| 6     | Planned |
+| 6     | Done    |
