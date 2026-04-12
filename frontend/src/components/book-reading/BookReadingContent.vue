@@ -61,6 +61,7 @@
         <PdfBookViewer
           ref="pdfViewerRef"
           :pdf-bytes="bookPdfBytes"
+          :bottom-padding-px="READING_PANEL_OBSTRUCTION_PX"
           @load-error="onPdfLoadError"
           @viewport-anchor-page="onViewportAnchorPage"
           @pages-ready="onPagesReady"

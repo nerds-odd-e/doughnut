@@ -201,7 +201,7 @@ With snap-back removed (Phase 6), the debouncer `commit` callback is uncondition
 
 | Phase | Status  |
 |-------|---------|
-| 1     | Planned |
+| 1     | Done    |
 | 2     | Planned |
 | 3     | Planned |
 | 4     | Planned |

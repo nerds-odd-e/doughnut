@@ -3,6 +3,7 @@
     ref="containerRef"
     data-testid="pdf-book-viewer"
     class="pdf-book-viewer-container"
+    :style="{ paddingBottom: props.bottomPaddingPx + 'px' }"
   >
     <div ref="viewerRef" class="pdfViewer" />
   </div>
@@ -46,9 +47,13 @@ import {
 import "pdfjs-dist/legacy/web/pdf_viewer.css"
 import { nextTick, onBeforeUnmount, ref, watch } from "vue"
 
-const props = defineProps<{
-  pdfBytes: ArrayBuffer | Uint8Array | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    pdfBytes: ArrayBuffer | Uint8Array | null
+    bottomPaddingPx?: number
+  }>(),
+  { bottomPaddingPx: 0 }
+)
 
 const emit = defineEmits<{
   loadError: [message: string]
