@@ -256,6 +256,9 @@ When(
     if (key === 'Backspace') {
       return bookReadingPage().pressBackspaceOnBookLayout()
     }
+    if (key === 'Enter') {
+      return bookReadingPage().pressEnterOnBookLayout()
+    }
     return bookReadingPage().pressTabOnBookLayout()
   }
 )

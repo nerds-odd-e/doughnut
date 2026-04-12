@@ -217,21 +217,7 @@ Scenario: Indent a block and its children together
 
 ### Phase 9 — Create a book block
 
-**User value:** User can insert a new book block boundary — useful when the PDF parser missed a structural break or the user wants finer granularity.
-
-**Scenario (E2E):**
-
-```gherkin
-Scenario: Create a new book block
-  When I select a position in the book layout to insert a new block
-  And I create a new book block
-  Then a new book block should appear at the chosen position in the book layout
-```
-
-**What changes:**
-
-- **Backend:** New endpoint (e.g. `POST /api/notebooks/{notebook}/book/blocks`) accepting position info (e.g. after which block, and which content blocks to split off). Creates a new `BookBlock`, reassigns ownership of content blocks from the split point onward. Returns updated `Book`.
-- **Frontend:** UI affordance to insert a block (e.g. an "add" action between blocks, or a "split here" on a content boundary). The new block's title is derived from the first text content block it receives.
+**Shipped.** [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature) — scenario "Split a book block by pressing Enter". `POST /api/notebooks/{notebook}/book/blocks/{bookBlock}/split` splits a block: the original keeps its first content block (the structural heading); remaining content blocks move to a new block inserted right after at the same depth. New block title is derived from the first `text`-type content block it receives. Frontend: Enter on a focused block row emits `blockSplit`; `BookReadingContent` calls `NotebookBooksController.splitBookBlock` and replaces the book. Rejected with 400 if fewer than 2 content blocks or no text content to derive a title.
 
 ---
 

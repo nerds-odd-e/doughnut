@@ -337,6 +337,85 @@ public class BookService {
   }
 
   @Transactional
+  public Book splitBlock(Notebook notebook, BookBlock bookBlock) {
+    Book book = requireBook(notebook);
+    if (!bookBlock.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    List<BookBlock> blocks = book.getBlocks();
+    int idx = -1;
+    for (int i = 0; i < blocks.size(); i++) {
+      if (blocks.get(i).getId().equals(bookBlock.getId())) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx < 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+
+    List<BookContentBlock> allContent =
+        bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(bookBlock.getId());
+    if (allContent.size() <= 1) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Block has no content to split off");
+    }
+
+    List<BookContentBlock> toMove = allContent.subList(1, allContent.size());
+    String newTitle = deriveTitle(toMove);
+    if (newTitle == null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "No text content to derive title from");
+    }
+
+    // Shift layoutSequence of all blocks after the split point by 1
+    for (int i = idx + 1; i < blocks.size(); i++) {
+      BookBlock b = blocks.get(i);
+      b.setLayoutSequence(b.getLayoutSequence() + 1);
+      entityPersister.save(b);
+    }
+
+    BookBlock newBlock = new BookBlock();
+    newBlock.setStructuralTitle(trimmedMax(newTitle, 512));
+    newBlock.setLayoutSequence(bookBlock.getLayoutSequence() + 1);
+    newBlock.setDepth(bookBlock.getDepth());
+    book.addBlock(newBlock);
+    entityPersister.save(newBlock);
+    entityPersister.flush();
+
+    for (int i = 0; i < toMove.size(); i++) {
+      BookContentBlock cb = toMove.get(i);
+      cb.setBookBlock(newBlock);
+      cb.setSiblingOrder(i);
+      entityPersister.save(cb);
+    }
+    entityPersister.flush();
+
+    book.getBlocks().size();
+    return book;
+  }
+
+  private String deriveTitle(List<BookContentBlock> contentBlocks) {
+    for (BookContentBlock cb : contentBlocks) {
+      if (!"text".equals(cb.getType())) {
+        continue;
+      }
+      try {
+        var node = objectMapper.readTree(cb.getRawData());
+        var textNode = node.get("text");
+        if (textNode != null && !textNode.isNull() && textNode.isTextual()) {
+          String text = textNode.asText().trim();
+          if (!text.isEmpty()) {
+            return text;
+          }
+        }
+      } catch (Exception ignored) {
+      }
+    }
+    return null;
+  }
+
+  @Transactional
   public void deleteBookForNotebook(Notebook notebook) {
     Book book =
         bookRepository

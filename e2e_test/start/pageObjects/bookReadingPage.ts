@@ -140,6 +140,17 @@ const bookReadingPage = () => {
       })
       return this
     },
+    pressEnterOnBookLayout() {
+      cy.focused().trigger('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+        getModifierState: () => false,
+      })
+      return this
+    },
     expectBookBlockNotPresent(title: string) {
       pageIsNotLoading()
       cy.get('[data-testid="book-reading-book-layout"]').should(
