@@ -7,7 +7,20 @@ alwaysApply: true
 
 Use this when planning **new** or **changed** functionality.
 
+Use this also when it takes longer than 10 minutes to process one phase or task. Decompose further into sub-phases, or even sub-sub-phases. Save the decomposed result as `ongoing/<plan-name>-<phase-number>-sub-phases.md`.
+
 ---
+
+## Behavior and Structure distinction
+
+**Behavior** (external behavior) has 3 parts: **pre-condition**, **trigger**, and **post-condition**. Each part is:
+
+  * externally observable
+  * of user value
+  * typically involves state change.
+
+**Structure** (internal structure) is how code is organized. We want structure to be cohesive, mapped to the domain, and exposing as little information as possible from each module.
+
 
 ## Phase principles
 
@@ -17,7 +30,7 @@ Use this when planning **new** or **changed** functionality.
 
 ---
 
-## How to split phases (scenario-first)
+## How to decompose into phases (scenario-first)
 
 **Default:** Split by **user scenarios and outcomes**, not by layers (DB → API → UI) or by “build the abstraction first.”
 
@@ -71,8 +84,6 @@ Document **important structure and intent** in the same markdown plan. **Update 
 - **Minimum tests for the same coverage; no 1:1 test ↔ implementation map** — When behavior spans layers, prefer **fewer integration-style tests** (one per **observable surface** if surfaces differ — e.g. CLI TTY vs piped stdin) over **many** tests scattered across files that each pin a private function. **Do not** add a test file (or case) just because a new module exists if an existing entry-point test already proves the behavior.
 - **Cohesion for one behavior** — Assertions for a single user-visible behavior should live **together** (one file or one focused `describe`) when practical, instead of duplicating partial checks in three places.
 - **Where small unit tests still shine** — Pure functions, validation, error messages, edge inputs: **inputs → outputs** with no need to know caller shape.
-
-**Stack-specific commands and examples** — backend: `.cursor/rules/backend-development.mdc`; frontend: `.cursor/rules/frontend.mdc`; CLI Vitest + E2E: `.cursor/rules/cli.mdc`, `.cursor/rules/e2e_test.mdc`.
 
 - **Test-driven:** Prefer tests **first** or **alongside** implementation. **Concrete steps:** see **Test-driven workflow** below.
 - **Phase-complete:** Everything in a phase is **justified and tested inside that phase**. No separate “final integration phase” or deferred test pass for that slice.
