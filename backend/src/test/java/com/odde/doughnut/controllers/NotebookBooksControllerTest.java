@@ -856,6 +856,26 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void responseBodyExposesOnlySelectedBookBlockIdNotTheEntity() throws Exception {
+      Notebook nb = myNotebook();
+      AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
+      AttachBookLayoutNodeRequest root = node("Chapter 1", ch1);
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+      controller.attachBook(nb, attachRequest(root), pdfFile(pdfBytes));
+      int secondBlockId = blocksByLayoutOrder(bookOf(nb)).get(1).getId();
+      controller.patchReadingPosition(nb, lastReadBody(1, 200, secondBlockId));
+
+      ResponseEntity<BookUserLastReadPosition> res = controller.getReadingPosition(nb);
+
+      JsonNode json = objectMapper.valueToTree(res.getBody());
+      assertThat(json.get("selectedBookBlockId").asInt(), equalTo(secondBlockId));
+      assertThat(
+          "selectedBookBlock entity must not appear in JSON (causes 500 via Hibernate proxy)",
+          json.has("selectedBookBlock"),
+          is(false));
+    }
+
+    @Test
     void returns204WhenNoSnapshotStored() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
 

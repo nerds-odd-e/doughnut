@@ -37,6 +37,7 @@ public class BookUserLastReadPosition extends EntityIdentifiedByIdOnly {
   private BookBlock selectedBookBlock;
 
   @Hidden
+  @JsonIgnore
   public BookBlock getSelectedBookBlock() {
     return selectedBookBlock;
   }
