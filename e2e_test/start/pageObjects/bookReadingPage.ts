@@ -129,6 +129,25 @@ const bookReadingPage = () => {
       })
       return this
     },
+    pressBackspaceOnBookLayout() {
+      cy.focused().trigger('keydown', {
+        key: 'Backspace',
+        code: 'Backspace',
+        keyCode: 8,
+        which: 8,
+        bubbles: true,
+        getModifierState: () => false,
+      })
+      return this
+    },
+    expectBookBlockNotPresent(title: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-book-layout"]').should(
+        'not.contain',
+        title
+      )
+      return this
+    },
     expectCurrentPage(pageNumber: number) {
       pageIsNotLoading()
       cy.get('[data-testid="book-reading-page-indicator"]')

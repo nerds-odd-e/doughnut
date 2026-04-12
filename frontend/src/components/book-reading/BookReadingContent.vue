@@ -44,6 +44,7 @@
     @block-click="onBookBlockClick"
     @block-indent="onBlockIndent"
     @block-outdent="onBlockOutdent"
+    @block-cancel="onBlockCancel"
   >
     <main
       ref="mainPaneRef"
@@ -417,6 +418,16 @@ async function onBlockOutdent(block: BookBlockFull) {
   if (!error && data) {
     emit("update:book", data)
     selectedBlockId.value = block.id
+  }
+}
+
+async function onBlockCancel(block: BookBlockFull) {
+  const { data, error } = await NotebookBooksController.cancelBookBlock({
+    path: { notebook: notebookId.value, bookBlock: block.id },
+  })
+  if (!error && data) {
+    emit("update:book", data)
+    selectedBlockId.value = null
   }
 }
 

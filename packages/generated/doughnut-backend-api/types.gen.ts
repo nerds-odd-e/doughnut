@@ -3673,6 +3673,25 @@ export type DeleteTokenResponses = {
     200: unknown;
 };
 
+export type CancelBookBlockData = {
+    body?: never;
+    path: {
+        notebook: number;
+        bookBlock: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}';
+};
+
+export type CancelBookBlockResponses = {
+    /**
+     * OK
+     */
+    200: BookFull;
+};
+
+export type CancelBookBlockResponse = CancelBookBlockResponses[keyof CancelBookBlockResponses];
+
 export type DeleteUnansweredRecallPromptsData = {
     body?: never;
     path: {

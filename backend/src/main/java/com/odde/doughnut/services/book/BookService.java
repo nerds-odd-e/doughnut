@@ -21,6 +21,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookBlockReadingRecordRepository;
 import com.odde.doughnut.entities.repositories.BookBlockRepository;
+import com.odde.doughnut.entities.repositories.BookContentBlockRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -46,6 +47,7 @@ public class BookService {
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   private final BookBlockRepository bookBlockRepository;
+  private final BookContentBlockRepository bookContentBlockRepository;
   private final BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
@@ -56,6 +58,7 @@ public class BookService {
       BookRepository bookRepository,
       BookUserLastReadPositionRepository bookUserLastReadPositionRepository,
       BookBlockRepository bookBlockRepository,
+      BookContentBlockRepository bookContentBlockRepository,
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
@@ -64,6 +67,7 @@ public class BookService {
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
     this.bookBlockRepository = bookBlockRepository;
+    this.bookContentBlockRepository = bookContentBlockRepository;
     this.bookBlockReadingRecordRepository = bookBlockReadingRecordRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -274,6 +278,60 @@ public class BookService {
       entityPersister.save(b);
     }
     entityPersister.flush();
+    book.getBlocks().size();
+    return book;
+  }
+
+  @Transactional
+  public Book cancelBlock(Notebook notebook, BookBlock bookBlock) {
+    Book book = requireBook(notebook);
+    if (!bookBlock.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    List<BookBlock> blocks = book.getBlocks();
+    int idx = -1;
+    for (int i = 0; i < blocks.size(); i++) {
+      if (blocks.get(i).getId().equals(bookBlock.getId())) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx < 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    if (idx == 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel the first block");
+    }
+    BookBlock predecessor = blocks.get(idx - 1);
+
+    List<BookContentBlock> predecessorContentBlocks =
+        bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(predecessor.getId());
+    List<BookContentBlock> cancelledContentBlocks =
+        bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(bookBlock.getId());
+    int offset = predecessorContentBlocks.size();
+    for (int i = 0; i < cancelledContentBlocks.size(); i++) {
+      BookContentBlock cb = cancelledContentBlocks.get(i);
+      cb.setBookBlock(predecessor);
+      cb.setSiblingOrder(offset + i);
+      entityPersister.save(cb);
+    }
+    entityPersister.flush();
+
+    int currentDepth = bookBlock.getDepth();
+    int subtreeEnd = idx + 1;
+    while (subtreeEnd < blocks.size() && blocks.get(subtreeEnd).getDepth() > currentDepth) {
+      subtreeEnd++;
+    }
+    for (int i = idx + 1; i < subtreeEnd; i++) {
+      BookBlock b = blocks.get(i);
+      b.setDepth(b.getDepth() - 1);
+      entityPersister.save(b);
+    }
+    entityPersister.flush();
+
+    blocks.remove(bookBlock);
+    entityPersister.flush();
+
     book.getBlocks().size();
     return book;
   }

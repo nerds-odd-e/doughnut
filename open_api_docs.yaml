@@ -3104,6 +3104,30 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/book/blocks/{bookBlock}:
+    delete:
+      tags:
+      - notebook-books-controller
+      summary: Cancel a book block (merge content to previous)
+      operationId: cancelBookBlock
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: bookBlock
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Book_Full"
   /api/memory-trackers/{memoryTracker}/recall-prompts/unanswered:
     delete:
       tags:

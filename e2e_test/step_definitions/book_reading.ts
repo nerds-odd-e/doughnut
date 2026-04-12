@@ -253,7 +253,18 @@ When(
     if (key === 'Shift+Tab') {
       return bookReadingPage().pressShiftTabOnBookLayout()
     }
+    if (key === 'Backspace') {
+      return bookReadingPage().pressBackspaceOnBookLayout()
+    }
     return bookReadingPage().pressTabOnBookLayout()
+  }
+)
+
+Then(
+  'the book block {string} should no longer appear in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectBookBlockNotPresent(title)
   }
 )
 

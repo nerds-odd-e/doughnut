@@ -211,23 +211,7 @@ Scenario: Indent a block and its children together
 
 ### Phase 8 — Cancel a book block (merge content to previous)
 
-**User value:** User can remove a book block boundary, merging its content into the previous block — useful when the PDF parser created too many structural splits.
-
-**Scenario (E2E):**
-
-```gherkin
-Scenario: Cancel a book block and merge to previous
-  Given the book layout has blocks "A" at depth 0 and "B" at depth 0
-  When I select the book block "B" in the book layout
-  And I cancel the book block "B"
-  Then the book block "B" should no longer appear in the book layout
-  And the content that belonged to "B" should now belong to the previous block "A"
-```
-
-**What changes:**
-
-- **Backend:** New endpoint (e.g. `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}` or `POST .../merge-to-previous`). Removes the target block, reassigns its `BookContentBlock` rows to the predecessor block, recalculates `allBboxes` for the predecessor. If the cancelled block had children, they become children of the predecessor (or are promoted — decide during implementation). Returns updated `Book`.
-- **Frontend:** UI action (context menu, button, or keyboard shortcut) on a focused/selected block to cancel it. Disabled on the first block (no predecessor to merge into).
+**Shipped.** [`e2e_test/features/book_reading/cancel_block.feature`](../e2e_test/features/book_reading/cancel_block.feature) — two scenarios (leaf block removal and parent block with children promotion). `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}` removes the block, reassigns its `BookContentBlock` rows to the predecessor, promotes descendants (depth -= 1), returns updated `Book`. Frontend: Backspace on a focused block row in the layout emits `blockCancel`; `BookReadingContent` calls `NotebookBooksController.cancelBookBlock` and replaces the book. First block is rejected by the backend (400).
 
 ---
 

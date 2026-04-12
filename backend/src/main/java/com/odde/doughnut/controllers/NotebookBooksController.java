@@ -168,6 +168,20 @@ class NotebookBooksController {
     return bookService.changeBlockDepth(notebook, bookBlock, body.getDirection());
   }
 
+  @Operation(
+      operationId = "cancelBookBlock",
+      summary = "Cancel a book block (merge content to previous)")
+  @DeleteMapping("/{notebook}/book/blocks/{bookBlock}")
+  @Transactional
+  @JsonView(BookViews.Full.class)
+  public Book cancelBookBlock(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    return bookService.cancelBlock(notebook, bookBlock);
+  }
+
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)
   public ResponseEntity<byte[]> getBookFile(
       WebRequest request, @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
