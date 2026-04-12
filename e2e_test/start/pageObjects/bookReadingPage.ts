@@ -8,6 +8,12 @@ const bookReadingPage = () => {
       .get('[data-testid="book-reading-book-layout"]')
       .find('[data-testid="book-reading-book-block"]')
 
+  /** Row is the block button; `.contains(text)` alone would match the inner title span. */
+  const bookBlockRowByTitle = (title: string) =>
+    cy
+      .get('[data-testid="book-reading-book-layout"]')
+      .contains('[data-testid="book-reading-book-block"]', title)
+
   const assertPdfCanvasHasDarkPixels = (el: HTMLCanvasElement) => {
     expect(el.width, 'PDF canvas should have width').to.be.greaterThan(0)
     const ctx = el.getContext('2d')
@@ -44,6 +50,16 @@ const bookReadingPage = () => {
           cy.wrap($el)
             .should('have.attr', 'data-book-block-depth', String(row.depth))
             .and('contain', row.title)
+          cy.wrap($el)
+            .find('[data-testid="book-reading-book-block-guides"]')
+            .should(
+              'have.attr',
+              'data-book-block-guide-depth',
+              String(row.depth)
+            )
+          cy.wrap($el)
+            .find('[data-testid="book-reading-book-block-guide"]')
+            .should('have.length', row.depth)
         })
       return this
     },
@@ -56,16 +72,21 @@ const bookReadingPage = () => {
       cy.get('[data-testid="book-reading-page-indicator"]')
         .should('be.visible')
         .and('contain', ' /')
-      bookBlockRows().contains(title).click()
-      bookBlockRows()
-        .contains(title)
-        .should('have.attr', 'data-current-block', 'true')
+      bookBlockRowByTitle(title).click()
+      bookBlockRowByTitle(title).should(
+        'have.attr',
+        'data-current-block',
+        'true'
+      )
       return this
     },
     expectBookBlockIsCurrentSelectionByTitle(title: string) {
       pageIsNotLoading()
-      const row = bookBlockRows().contains(title)
-      row.should('have.attr', 'data-current-selection', 'true')
+      bookBlockRowByTitle(title).should(
+        'have.attr',
+        'data-current-selection',
+        'true'
+      )
       bookBlockRows()
         .filter('[data-current-selection="true"]')
         .should('have.length', 1)
@@ -170,8 +191,7 @@ const bookReadingPage = () => {
     },
     expectBookBlockIsCurrentBlockByTitle(title: string) {
       pageIsNotLoading()
-      const row = bookBlockRows().contains(title)
-      row
+      bookBlockRowByTitle(title)
         .should('have.attr', 'data-current-block', 'true')
         .and('have.attr', 'aria-current', 'location')
       bookBlockRows()
@@ -197,7 +217,7 @@ const bookReadingPage = () => {
           ).to.be.greaterThan(0)
         }
       )
-      bookBlockRows().contains(title).should('be.visible')
+      bookBlockRowByTitle(title).should('be.visible')
       return this
     },
     /**
@@ -251,9 +271,11 @@ const bookReadingPage = () => {
      */
     expectBookBlockMarkedAsReadInBookLayout(title: string) {
       pageIsNotLoading()
-      bookBlockRows()
-        .contains(title)
-        .should('have.attr', 'data-direct-content-read', 'true')
+      bookBlockRowByTitle(title).should(
+        'have.attr',
+        'data-direct-content-read',
+        'true'
+      )
       return this
     },
     expectCurrentBlockNavigationBar(title: string) {

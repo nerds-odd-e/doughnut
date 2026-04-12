@@ -33,8 +33,8 @@ Every depth mutation must preserve this invariant.
 
 ### Single-block vs subtree operations
 
-- **Single-block indent/outdent:** changes only the target block's depth by ±1. The operation is rejected if it would violate the tree invariant with either the predecessor or successor.
-- **Subtree indent/outdent:** changes the target block **and all its descendants** (contiguous run of blocks with depth > target's current depth). All move by ±1 together, preserving internal relative depths. Rejected if the result violates invariant at the boundary (predecessor of the target, or successor of the last descendant).
+- **Leaf block (no children):** Indent/outdent changes only the target block's depth by ±1. Rejected if it would violate the tree invariant with either the predecessor or successor. Phases 3–4 use this simpler case.
+- **Block with children (general case):** Indent/outdent **always** moves the target block **and all its descendants** (contiguous run of blocks with depth > target's current depth) by ±1 together, preserving internal relative depths. Rejected if the result violates invariant at the boundary. Phase 7 generalizes to this behavior — there is no separate "single-block" vs "subtree" toggle; descendants always follow the head.
 
 ### Backend API direction
 
@@ -42,14 +42,14 @@ A single endpoint for depth change:
 
 ```
 PUT /api/notebooks/{notebook}/book/blocks/{bookBlock}/depth
-Body: { "direction": "INDENT" | "OUTDENT", "withDescendants": false }
+Body: { "direction": "INDENT" | "OUTDENT" }
 ```
 
-Returns the updated `Book` (same shape as `GET …/book`) so the client can replace the layout in one round-trip. `withDescendants` added in Phase 4.
+Returns the updated `Book` (same shape as `GET …/book`) so the client can replace the layout in one round-trip. The backend always moves descendants with the head when they exist — no `withDescendants` flag needed.
 
-### AI reorganization (Phase 6)
+### AI reorganization (Phase 11)
 
-Sends the current flat layout (titles + depths) to the AI, receives a suggested depth array, previews diff to the user, applies on confirm. Exact API shape deferred to Phase 6.
+Sends the current flat layout (titles + depths) to the AI, receives a suggested depth array, previews diff to the user, applies on confirm. Exact API shape deferred to Phase 11.
 
 ---
 
@@ -76,15 +76,39 @@ Then each book block in the book layout should show a visual nesting indicator m
 
 ---
 
-### Phase 2 — Indent a single block via keyboard (tab)
+### Phase 2 — Focus the selected block in the book layout
 
-**User value:** User can increase the nesting depth of a single block by pressing Tab while it is selected, correcting flat structures one block at a time.
+**User value:** User can focus a block in the book layout (e.g. by clicking it), and the focus persists while interacting with the block (keyboard shortcuts). Focus blurs only when it should — clicking outside the book layout, navigating away, etc. — not prematurely (e.g. not on every scroll or PDF interaction while the user is still editing layout).
 
 **Scenario (E2E):**
 
 ```gherkin
-Scenario: Indent a single block in the book layout
+Scenario: Focus a book block in the layout
+  When I select the book block "2. The Usual Defi nition Is Not Enough" in the book layout
+  Then the book block "2. The Usual Defi nition Is Not Enough" should be focused in the book layout
+```
+
+**What changes:**
+
+- **Frontend:** Ensure book block items in the layout are focusable (`tabindex` or native button/link). Clicking a block focuses it (DOM focus, not just "selected" highlight). Focus is retained while the user presses keyboard shortcuts (Tab, Shift+Tab) on the layout — it should not blur until the user explicitly moves focus elsewhere (click outside, tab out of the layout list, etc.).
+- No backend changes.
+
+**Why a separate phase:** Tab/Shift+Tab (Phases 3–4) rely on a focused block to know which block to indent/outdent. Getting focus management right (stable focus that survives API round-trips and re-renders) is its own testable behavior.
+
+---
+
+### Phase 3 — Indent a leaf block via keyboard (tab)
+
+**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 7 generalizes to always move descendants with the head.
+
+**User value:** User can increase the nesting depth of a single leaf block by pressing Tab while it is focused, correcting flat structures one block at a time.
+
+**Scenario (E2E):**
+
+```gherkin
+Scenario: Indent a leaf block in the book layout
   # (uses existing background with attached refactoring.pdf)
+  # The block used here has no children in the test fixture
   Given the book layout shows block "2. The Usual Defi nition Is Not Enough" at depth 0
   When I select the book block "2. The Usual Defi nition Is Not Enough" in the book layout
   And I press Tab on the book layout
@@ -94,7 +118,7 @@ Scenario: Indent a single block in the book layout
 **What changes:**
 
 - **Backend:** New endpoint `PUT /api/notebooks/{notebook}/book/blocks/{bookBlock}/depth` accepting `{ "direction": "INDENT" }`. Validates depth constraint against predecessor and successor. Updates `depth` column. Returns updated `Book`.
-- **Frontend:** On `keydown.tab` (with `preventDefault`) while a block is focused/selected in the layout, call the indent API and refresh the book data.
+- **Frontend:** On `keydown.tab` (with `preventDefault`) while a block is focused in the layout, call the indent API and refresh the book data. Focus must remain on the same block after re-render.
 - **Validation:** Reject if the block is already at predecessor's depth + 1 (can't nest deeper), or if it is the first block (no predecessor to be child of).
 
 **Sub-phases (E2E-led):**
@@ -103,14 +127,17 @@ Scenario: Indent a single block in the book layout
 
 ---
 
-### Phase 3 — Outdent a single block via keyboard (shift-tab)
+### Phase 4 — Outdent a leaf block via keyboard (shift-tab)
 
-**User value:** User can decrease the nesting depth of a single block by pressing Shift+Tab, pulling it up in the hierarchy.
+**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 7 generalizes to always move descendants with the head.
+
+**User value:** User can decrease the nesting depth of a single leaf block by pressing Shift+Tab while it is focused, pulling it up in the hierarchy.
 
 **Scenario (E2E):**
 
 ```gherkin
-Scenario: Outdent a single block in the book layout
+Scenario: Outdent a leaf block in the book layout
+  # The block used here has no children in the test fixture
   Given the book layout shows block "3.1 Can You Refactor Without Tests?" at depth 1
   When I select the book block "3.1 Can You Refactor Without Tests?" in the book layout
   And I press Shift+Tab on the book layout
@@ -120,7 +147,7 @@ Scenario: Outdent a single block in the book layout
 **What changes:**
 
 - **Backend:** Same endpoint, `{ "direction": "OUTDENT" }`. Validates: depth > 0, and successor's depth <= new depth + 1 (or reject).
-- **Frontend:** `keydown.tab` with `shiftKey` calls outdent.
+- **Frontend:** `keydown.tab` with `shiftKey` calls outdent. Focus must remain on the same block after re-render.
 
 **Sub-phases (E2E-led):**
 
@@ -128,7 +155,7 @@ Scenario: Outdent a single block in the book layout
 
 ---
 
-### Phase 4 — Drag a block left/right to change depth
+### Phase 5 — Drag a block left/right to change depth
 
 **User value:** More discoverable and touch-friendly alternative to keyboard — user drags a block horizontally to indent (right) or outdent (left).
 
@@ -148,14 +175,24 @@ Scenario: Drag a book block left to outdent it
 
 **What changes:**
 
-- **Frontend:** Add horizontal drag gesture detection on each book block row (pointer/touch events with a horizontal threshold). On drag-end past threshold, call the same indent/outdent API from Phases 2–3.
+- **Frontend:** Add horizontal drag gesture detection on each book block row (pointer/touch events with a horizontal threshold). On drag-end past threshold, call the same indent/outdent API from Phases 3–4.
 - No backend changes — reuses the existing depth endpoint.
 
 ---
 
-### Phase 5 — Indent/outdent a block with its descendants (subtree move)
+### Phase 6 — Drag a block with its descendants
 
-**User value:** When a block has children, indenting or outdenting moves the entire section together instead of requiring one-by-one adjustment.
+**User value:** When a block has children, dragging it moves the entire section together.
+
+**What changes:**
+
+- Drag applies the same subtree logic as Phase 7 (keyboard). Backend `withDescendants` support is shared.
+
+---
+
+### Phase 7 — Indent/outdent a block with its descendants (subtree move)
+
+**User value:** When a block has children, indenting or outdenting via Tab/Shift+Tab always moves the entire section together instead of requiring one-by-one adjustment. This is the general behavior — Phases 3–4 were the simple leaf-only introduction.
 
 **Scenario (E2E):**
 
@@ -172,12 +209,73 @@ Scenario: Indent a block and its children together
 
 **What changes:**
 
-- **Backend:** Extend the depth endpoint to accept `{ "direction": "INDENT", "withDescendants": true }`. Identifies descendants as the contiguous run of blocks after the target whose depth > target's current depth. Shifts all by ±1. Validates boundary invariant at predecessor of target and successor of last descendant.
-- **Frontend:** Default behavior for tab/shift-tab and drag becomes "with descendants." Single-block mode could be an option (e.g. holding Alt) or could be dropped if subtree is always preferable — decide during implementation.
+- **Backend:** Extend the depth endpoint: when the target block has descendants (contiguous run of blocks after the target whose depth > target's current depth), always shift all by ±1 together. Validates boundary invariant at predecessor of target and successor of last descendant.
+- **Frontend:** Tab/Shift+Tab and drag now always move descendants with the head. No separate "single-block" vs "subtree" toggle needed — descendants always follow.
 
 ---
 
-### Phase 6 — AI-assisted depth reorganization
+### Phase 8 — Cancel a book block (merge content to previous)
+
+**User value:** User can remove a book block boundary, merging its content into the previous block — useful when the PDF parser created too many structural splits.
+
+**Scenario (E2E):**
+
+```gherkin
+Scenario: Cancel a book block and merge to previous
+  Given the book layout has blocks "A" at depth 0 and "B" at depth 0
+  When I select the book block "B" in the book layout
+  And I cancel the book block "B"
+  Then the book block "B" should no longer appear in the book layout
+  And the content that belonged to "B" should now belong to the previous block "A"
+```
+
+**What changes:**
+
+- **Backend:** New endpoint (e.g. `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}` or `POST .../merge-to-previous`). Removes the target block, reassigns its `BookContentBlock` rows to the predecessor block, recalculates `allBboxes` for the predecessor. If the cancelled block had children, they become children of the predecessor (or are promoted — decide during implementation). Returns updated `Book`.
+- **Frontend:** UI action (context menu, button, or keyboard shortcut) on a focused/selected block to cancel it. Disabled on the first block (no predecessor to merge into).
+
+---
+
+### Phase 9 — Create a book block
+
+**User value:** User can insert a new book block boundary — useful when the PDF parser missed a structural break or the user wants finer granularity.
+
+**Scenario (E2E):**
+
+```gherkin
+Scenario: Create a new book block
+  When I select a position in the book layout to insert a new block
+  And I create a new book block
+  Then a new book block should appear at the chosen position in the book layout
+```
+
+**What changes:**
+
+- **Backend:** New endpoint (e.g. `POST /api/notebooks/{notebook}/book/blocks`) accepting position info (e.g. after which block, and which content blocks to split off). Creates a new `BookBlock`, reassigns ownership of content blocks from the split point onward. Returns updated `Book`.
+- **Frontend:** UI affordance to insert a block (e.g. an "add" action between blocks, or a "split here" on a content boundary). The new block's title is derived from the first text content block it receives.
+
+---
+
+### Phase 10 — Create a book block from a long or untitled content region
+
+**User value:** When the selected content region is too long or has no text suitable as a book block title, the user can still create a block — the system handles the edge case (e.g. prompts for a title, uses a placeholder, or picks the first N characters).
+
+**Scenario (E2E):**
+
+```gherkin
+Scenario: Create a book block when content has no heading text
+  Given a content region with no text suitable as a title
+  When I create a new book block from that region
+  Then a new book block should appear with a placeholder or user-supplied title
+```
+
+**What changes:**
+
+- **Backend/Frontend:** Extend the create-block flow from Phase 9 to handle: (1) content that is too long to use as a title — truncate or prompt; (2) content with no text at all (e.g. images only) — use a placeholder title or let the user type one. Exact UX to be decided during implementation.
+
+---
+
+### Phase 11 — AI-assisted depth reorganization
 
 **User value:** User can ask AI to automatically fix/suggest the nesting structure for the entire book layout, saving manual block-by-block work.
 

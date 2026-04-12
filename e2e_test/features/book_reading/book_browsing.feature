@@ -11,6 +11,7 @@ Feature: Book browsing
     And I open the book attached to notebook "Top Maths"
 
   Scenario: See book layout and beginning of PDF in the browser
+    # Nesting guides (Phase 1): same step asserts guide columns match each row depth.
     Then I should see the book layout in the browser:
       | 0 | Code Refactoring |
       | 0 | 1. Refactoring: Protecting Intention in Working Software |

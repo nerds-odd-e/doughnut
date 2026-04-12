@@ -77,6 +77,9 @@ And I should see that book block "2.2 Refactoring as Strengthening the Code" is 
 - dragging an item followed by cildrens should do indentation together
 - tab / shift-tab keys to increase and decrease
 - use AI to reorg the depth
+- cancel a book block and merge the content to the previous book block
+- create a book block
+- create a book block that the selected content block is too long or has no text as book block title
 
 
 ---

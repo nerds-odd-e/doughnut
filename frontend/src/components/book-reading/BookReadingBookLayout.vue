@@ -50,27 +50,43 @@
           :aria-current="
             block.id === currentBlockId ? 'location' : undefined
           "
-          :style="{ paddingLeft: `${block.depth * 0.75}rem` }"
           @click="emit('blockClick', block)"
         >
-          {{ block.title }}
           <span
-            v-if="dispositionForBlock(block.id) === 'READ'"
-            class="daisy-sr-only"
+            class="book-reading-book-block-guides"
+            data-testid="book-reading-book-block-guides"
+            :data-book-block-guide-depth="block.depth"
+            aria-hidden="true"
           >
-            Marked as read
+            <span
+              v-for="n in block.depth"
+              :key="n"
+              class="book-reading-book-block-guide"
+              data-testid="book-reading-book-block-guide"
+            >
+              <span class="book-reading-book-block-guide-line" />
+            </span>
           </span>
-          <span
-            v-else-if="dispositionForBlock(block.id) === 'SKIMMED'"
-            class="daisy-sr-only"
-          >
-            Marked as skimmed
-          </span>
-          <span
-            v-else-if="dispositionForBlock(block.id) === 'SKIPPED'"
-            class="daisy-sr-only"
-          >
-            Marked as skipped
+          <span class="book-reading-book-block-title">
+            {{ block.title }}
+            <span
+              v-if="dispositionForBlock(block.id) === 'READ'"
+              class="daisy-sr-only"
+            >
+              Marked as read
+            </span>
+            <span
+              v-else-if="dispositionForBlock(block.id) === 'SKIMMED'"
+              class="daisy-sr-only"
+            >
+              Marked as skimmed
+            </span>
+            <span
+              v-else-if="dispositionForBlock(block.id) === 'SKIPPED'"
+              class="daisy-sr-only"
+            >
+              Marked as skipped
+            </span>
           </span>
         </button>
       </div>
@@ -131,13 +147,29 @@ aside {
 }
 
 .book-reading-book-block {
-  @apply daisy-w-full daisy-min-h-10 daisy-text-left daisy-rounded-md;
+  @apply daisy-flex daisy-w-full daisy-min-h-10 daisy-items-stretch daisy-gap-1 daisy-text-left daisy-rounded-none;
   @apply daisy-border-0 daisy-border-solid daisy-border-l-4 daisy-border-transparent;
-  @apply daisy-py-2 daisy-pr-2 daisy-pl-2 daisy-text-sm daisy-leading-snug daisy-font-normal;
+  @apply daisy-py-0 daisy-pr-2 daisy-pl-1 daisy-text-sm daisy-leading-snug daisy-font-normal;
   @apply daisy-transition-colors daisy-duration-150;
   @apply hover:daisy-bg-base-300/55;
   @apply focus:daisy-outline-none focus-visible:daisy-ring-2 focus-visible:daisy-ring-primary/50;
   @apply focus-visible:daisy-ring-offset-2 focus-visible:daisy-ring-offset-base-200;
+}
+
+.book-reading-book-block-guides {
+  @apply daisy-flex daisy-shrink-0 daisy-items-stretch;
+}
+
+.book-reading-book-block-guide {
+  @apply daisy-flex daisy-w-3 daisy-shrink-0 daisy-flex-col daisy-items-center daisy-py-2;
+}
+
+.book-reading-book-block-guide-line {
+  @apply daisy-w-0.5 daisy-min-h-[0.875rem] daisy-flex-1 daisy-rounded-none daisy-bg-base-content/25;
+}
+
+.book-reading-book-block-title {
+  @apply daisy-min-w-0 daisy-flex-1 daisy-py-2 daisy-pl-0 daisy-text-left;
 }
 
 .book-reading-book-block[data-current-block="true"] {
