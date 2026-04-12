@@ -161,11 +161,11 @@ aside {
 }
 
 .book-reading-book-block-guide {
-  @apply daisy-flex daisy-w-3 daisy-shrink-0 daisy-flex-col daisy-items-center daisy-py-2;
+  @apply daisy-flex daisy-w-3 daisy-shrink-0 daisy-flex-col daisy-items-center daisy-self-stretch daisy-min-h-0;
 }
 
 .book-reading-book-block-guide-line {
-  @apply daisy-w-0.5 daisy-min-h-[0.875rem] daisy-flex-1 daisy-rounded-none daisy-bg-base-content/25;
+  @apply daisy-w-0.5 daisy-min-h-0 daisy-flex-1 daisy-rounded-none daisy-bg-base-content/25;
 }
 
 .book-reading-book-block-title {
