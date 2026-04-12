@@ -1165,6 +1165,50 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void indentMovesDescendantsWithHead() throws Exception {
+      // Layout: A(0), B(0), C(1), D(0) — indent B should move B to 1 and C to 2
+      BookBlock b = blockByTitle("B");
+
+      Book result = controller.changeBookBlockDepth(nb, b, indent());
+
+      List<BookBlock> resultBlocks = result.getBlocks();
+      assertThat(depthOf(resultBlocks, "A"), equalTo(0));
+      assertThat(depthOf(resultBlocks, "B"), equalTo(1));
+      assertThat(depthOf(resultBlocks, "C"), equalTo(2));
+      assertThat(depthOf(resultBlocks, "D"), equalTo(0));
+    }
+
+    @Test
+    void outdentMovesDescendantsWithHead() throws Exception {
+      // Layout: A(0), B(0), C(1), D(0) — outdent C brings it to 0 (leaf, no descendants)
+      // To test subtree outdent: attach a deeper layout X(0), Y(1), Z(2), W(0)
+      Notebook nb2 = myNotebook();
+      controller.attachBook(
+          nb2, attachRequest(node("X", node("Y", node("Z"))), node("W")), pdfFile(pdfBytes));
+      BookBlock y =
+          bookOf(nb2).getBlocks().stream()
+              .filter(b -> b.getStructuralTitle().equals("Y"))
+              .findFirst()
+              .orElseThrow();
+
+      Book result = controller.changeBookBlockDepth(nb2, y, outdent());
+
+      List<BookBlock> resultBlocks = result.getBlocks();
+      assertThat(depthOf(resultBlocks, "X"), equalTo(0));
+      assertThat(depthOf(resultBlocks, "Y"), equalTo(0));
+      assertThat(depthOf(resultBlocks, "Z"), equalTo(1));
+      assertThat(depthOf(resultBlocks, "W"), equalTo(0));
+    }
+
+    private int depthOf(List<BookBlock> blocks, String title) {
+      return blocks.stream()
+          .filter(b -> b.getStructuralTitle().equals(title))
+          .findFirst()
+          .orElseThrow(() -> new IllegalArgumentException("Block not found: " + title))
+          .getDepth();
+    }
+
+    @Test
     void indentFirstBlockThrows() {
       BookBlock a = blockByTitle("A");
 
@@ -1219,10 +1263,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void outdentWhenSuccessorWouldViolateTreeInvariantThrows() throws Exception {
-      // Make a layout where outdenting B would leave C (depth 1) as successor with B's new depth 0,
-      // but C's depth (1) > newDepth(0)+1=1 is false — need a deeper successor.
-      // Build: X(0), Y(1), Z(2) — outdenting Y would make Y depth 0, but Z depth 2 > 0+1=1
+    void outdentMovesEntireSubtreeKeepingInvariantValid() throws Exception {
+      // X(0), Y(1), Z(2) — outdenting Y moves Y+Z together → X(0), Y(0), Z(1), valid tree
       Notebook nb2 = myNotebook();
       controller.attachBook(nb2, attachRequest(node("X", node("Y", node("Z")))), pdfFile(pdfBytes));
       BookBlock y =
@@ -1231,12 +1273,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
 
-      var ex =
-          assertThrows(
-              ResponseStatusException.class,
-              () -> controller.changeBookBlockDepth(nb2, y, outdent()));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
-      assertThat(ex.getReason(), equalTo("Cannot outdent: successor would violate tree invariant"));
+      Book result = controller.changeBookBlockDepth(nb2, y, outdent());
+
+      List<BookBlock> resultBlocks = result.getBlocks();
+      assertThat(depthOf(resultBlocks, "X"), equalTo(0));
+      assertThat(depthOf(resultBlocks, "Y"), equalTo(0));
+      assertThat(depthOf(resultBlocks, "Z"), equalTo(1));
     }
 
     @Test

@@ -6,7 +6,6 @@ Feature: Change depth of a block with its descendants
     When I attach a fake blank pdf book with layout of "subtree_indent" to the notebook "Subtree Indent Book"
     And I open the book attached to notebook "Subtree Indent Book"
 
-  @ignore
   Scenario: Indent a block and its children together
     Given the book layout shows block "Chapter A" at depth 0
     When I choose the book block "Chapter A"
