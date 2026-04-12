@@ -161,23 +161,14 @@ Scenario: Outdent a leaf block in the book layout
 
 **User value:** More discoverable and touch-friendly alternative to keyboard — user drags a block horizontally to indent (right) or outdent (left).
 
-**Scenario (E2E):**
+**Unit tests (Vitest, no E2E for this phase):**
 
-```gherkin
-Scenario: Drag a book block right to indent it
-  Given the book layout shows block "2. The Usual Defi nition Is Not Enough" at depth 0
-  When I drag the book block "2. The Usual Defi nition Is Not Enough" to the right in the book layout
-  Then the book block "2. The Usual Defi nition Is Not Enough" should be at depth 1 in the book layout
-
-Scenario: Drag a book block left to outdent it
-  Given the book layout shows block "3.1 Can You Refactor Without Tests?" at depth 1
-  When I drag the book block "3.1 Can You Refactor Without Tests?" to the left in the book layout
-  Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 0 in the book layout
-```
+- [`frontend/src/lib/book-reading/bookLayoutBlockDragIntent.ts`](../frontend/src/lib/book-reading/bookLayoutBlockDragIntent.ts) — classifies accumulated `dx`/`dy` as indent, outdent, or none (horizontal threshold + horizontal-over-vertical dominance so aside scrolling does not change depth). Covered by [`frontend/tests/lib/book-reading/bookLayoutBlockDragIntent.spec.ts`](../frontend/tests/lib/book-reading/bookLayoutBlockDragIntent.spec.ts).
+- [`frontend/src/components/book-reading/BookReadingBookLayout.vue`](../frontend/src/components/book-reading/BookReadingBookLayout.vue) — pointer events on each row emit `blockIndent` / `blockOutdent` after a qualifying horizontal drag; small movement still allows `blockClick`. Covered by [`frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts`](../frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts).
 
 **What changes:**
 
-- **Frontend:** Add horizontal drag gesture detection on each book block row (pointer/touch events with a horizontal threshold). On drag-end past threshold, call the same indent/outdent API from Phases 3–4.
+- **Frontend:** Horizontal drag gesture on each book block row (pointer events, shared threshold with `bookLayoutBlockDragIntent`). On pointer-up past threshold, emit the same `blockIndent` / `blockOutdent` as Tab/Shift+Tab (parent still calls the depth API). `setPointerCapture` is used when the browser supports it; synthetic test pointers skip capture safely.
 - No backend changes — reuses the existing depth endpoint.
 
 ---

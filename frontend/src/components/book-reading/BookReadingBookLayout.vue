@@ -50,7 +50,11 @@
           :aria-current="
             block.id === currentBlockId ? 'location' : undefined
           "
-          @click="emit('blockClick', block)"
+          @click="onBlockRowClick(block, $event)"
+          @pointerdown="onBlockPointerDown(block, $event)"
+          @pointermove="onBlockPointerMove(block, $event)"
+          @pointerup="onBlockPointerUp(block, $event)"
+          @pointercancel="onBlockPointerCancel(block, $event)"
           @keydown.tab.shift.prevent="emit('blockOutdent', block)"
           @keydown.tab.exact.prevent="emit('blockIndent', block)"
         >
@@ -98,6 +102,11 @@
 </template>
 
 <script setup lang="ts">
+import {
+  BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX,
+  bookLayoutBlockDragIntent,
+  bookLayoutBlockDragShouldCapture,
+} from "@/lib/book-reading/bookLayoutBlockDragIntent"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { ref, watch } from "vue"
@@ -123,8 +132,104 @@ const emit = defineEmits<{
 
 const asideRef = ref<HTMLElement | null>(null)
 
+const dragThresholdOpts = { thresholdPx: BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX }
+
+const blockPointerDrag = ref<{
+  blockId: number
+  startX: number
+  startY: number
+  pointerId: number
+  captured: boolean
+} | null>(null)
+
+const suppressNextBlockClick = ref(false)
+
 function closeOverlay() {
   opened.value = false
+}
+
+function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {
+  if (suppressNextBlockClick.value) {
+    suppressNextBlockClick.value = false
+    e.preventDefault()
+    e.stopPropagation()
+    return
+  }
+  emit("blockClick", block)
+}
+
+function onBlockPointerDown(block: BookBlockFull, e: PointerEvent) {
+  if (e.pointerType === "mouse" && e.button !== 0) {
+    return
+  }
+  blockPointerDrag.value = {
+    blockId: block.id,
+    startX: e.clientX,
+    startY: e.clientY,
+    pointerId: e.pointerId,
+    captured: false,
+  }
+}
+
+function onBlockPointerMove(block: BookBlockFull, e: PointerEvent) {
+  const s = blockPointerDrag.value
+  if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
+    return
+  }
+  const dx = e.clientX - s.startX
+  const dy = e.clientY - s.startY
+  if (
+    !s.captured &&
+    bookLayoutBlockDragShouldCapture(dx, dy, dragThresholdOpts)
+  ) {
+    try {
+      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    } catch {
+      /* Synthetic pointer events in tests may not have an active pointer id. */
+    }
+    blockPointerDrag.value = { ...s, captured: true }
+  }
+}
+
+function onBlockPointerUp(block: BookBlockFull, e: PointerEvent) {
+  const s = blockPointerDrag.value
+  if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
+    return
+  }
+  const target = e.currentTarget as HTMLElement
+  const dx = e.clientX - s.startX
+  const dy = e.clientY - s.startY
+  if (s.captured) {
+    try {
+      target.releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+  }
+  blockPointerDrag.value = null
+  const intent = bookLayoutBlockDragIntent(dx, dy, dragThresholdOpts)
+  if (intent === "INDENT") {
+    suppressNextBlockClick.value = true
+    emit("blockIndent", block)
+  } else if (intent === "OUTDENT") {
+    suppressNextBlockClick.value = true
+    emit("blockOutdent", block)
+  }
+}
+
+function onBlockPointerCancel(block: BookBlockFull, e: PointerEvent) {
+  const s = blockPointerDrag.value
+  if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
+    return
+  }
+  if (s.captured) {
+    try {
+      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+  }
+  blockPointerDrag.value = null
 }
 
 watch(
