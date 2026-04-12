@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.controllers.dto.BookBlockDepthRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordPutRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
@@ -152,6 +153,19 @@ class NotebookBooksController {
     String status = body == null ? BookBlockReadingRecord.STATUS_READ : body.getStatus();
     bookService.upsertReadingRecord(notebook, user, bookBlock, status);
     return bookService.listReadingRecordsForBook(notebook, user);
+  }
+
+  @Operation(operationId = "changeBookBlockDepth", summary = "Change depth of a book block")
+  @PutMapping("/{notebook}/book/blocks/{bookBlock}/depth")
+  @Transactional
+  @JsonView(BookViews.Full.class)
+  public Book changeBookBlockDepth(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock,
+      @RequestBody @Valid BookBlockDepthRequest body)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    return bookService.changeBlockDepth(notebook, bookBlock, body.getDirection());
   }
 
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)

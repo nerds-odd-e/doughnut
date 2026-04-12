@@ -237,3 +237,27 @@ Then(
     return bookReadingPage().expectCurrentBlockNavigationBarNotVisible()
   }
 )
+
+Given(
+  'the book layout shows block {string} at depth {int}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string, depth: number) => {
+    return bookReadingPage().expectBookBlockAtDepth(title, depth)
+  }
+)
+
+When(
+  'I press Tab on the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressTabOnBookLayout()
+  }
+)
+
+Then(
+  'the book block {string} should be at depth {int} in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string, depth: number) => {
+    return bookReadingPage().expectBookBlockAtDepth(title, depth)
+  }
+)

@@ -97,6 +97,26 @@ const bookReadingPage = () => {
       bookBlockRowByTitle(title).should('be.focused')
       return this
     },
+    expectBookBlockAtDepth(title: string, depth: number) {
+      pageIsNotLoading()
+      bookBlockRowByTitle(title).should(
+        'have.attr',
+        'data-book-block-depth',
+        String(depth)
+      )
+      return this
+    },
+    pressTabOnBookLayout() {
+      cy.focused().trigger('keydown', {
+        key: 'Tab',
+        code: 'Tab',
+        keyCode: 9,
+        which: 9,
+        bubbles: true,
+        getModifierState: () => false,
+      })
+      return this
+    },
     expectCurrentPage(pageNumber: number) {
       pageIsNotLoading()
       cy.get('[data-testid="book-reading-page-indicator"]')

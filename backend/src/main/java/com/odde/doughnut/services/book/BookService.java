@@ -228,6 +228,54 @@ public class BookService {
   }
 
   @Transactional
+  public Book changeBlockDepth(Notebook notebook, BookBlock bookBlock, String direction) {
+    Book book = requireBook(notebook);
+    if (!bookBlock.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    List<BookBlock> blocks = book.getBlocks();
+    int idx = -1;
+    for (int i = 0; i < blocks.size(); i++) {
+      if (blocks.get(i).getId().equals(bookBlock.getId())) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx < 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    int currentDepth = bookBlock.getDepth();
+    int newDepth;
+    if ("INDENT".equals(direction)) {
+      if (idx == 0) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot indent the first block");
+      }
+      int predecessorDepth = blocks.get(idx - 1).getDepth();
+      if (currentDepth >= predecessorDepth + 1) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Block is already at maximum depth relative to predecessor");
+      }
+      newDepth = currentDepth + 1;
+    } else {
+      if (currentDepth == 0) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Block is already at minimum depth");
+      }
+      int successorDepth = idx + 1 < blocks.size() ? blocks.get(idx + 1).getDepth() : 0;
+      if (successorDepth > currentDepth - 1 + 1) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Cannot outdent: successor would violate tree invariant");
+      }
+      newDepth = currentDepth - 1;
+    }
+    bookBlock.setDepth(newDepth);
+    entityPersister.save(bookBlock);
+    entityPersister.flush();
+    book.getBlocks().size();
+    return book;
+  }
+
+  @Transactional
   public void deleteBookForNotebook(Notebook notebook) {
     Book book =
         bookRepository

@@ -36,6 +36,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BookBlockReadingRecordListItem"
+  /api/notebooks/{notebook}/book/blocks/{bookBlock}/depth:
+    put:
+      tags:
+      - notebook-books-controller
+      summary: Change depth of a book block
+      operationId: changeBookBlockDepth
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: bookBlock
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookBlockDepthRequest_Full"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Book_Full"
   /api/user:
     get:
       tags:
@@ -3133,6 +3163,82 @@ components:
       - bookBlockId
       - completedAt
       - status
+    BookBlockDepthRequest_Full:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+          - INDENT
+          - OUTDENT
+          pattern: INDENT|OUTDENT
+      required:
+      - direction
+    BookBlock_Full:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        depth:
+          type: integer
+          format: int32
+          description: Nesting depth in the book layout; root-level blocks are 0.
+        title:
+          type: string
+        allBboxes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PageBbox_Full"
+      required:
+      - allBboxes
+      - depth
+      - id
+      - title
+    Book_Full:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bookName:
+          type: string
+        format:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        blocks:
+          type: array
+          description: "Book blocks in depth-first preorder (parent before descendants,\
+            \ then siblings). Order matches ascending layout_sequence in persistence."
+          items:
+            $ref: "#/components/schemas/BookBlock_Full"
+        notebookId:
+          type: string
+      required:
+      - blocks
+      - bookName
+      - format
+      - id
+      - notebookId
+    PageBbox_Full:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          format: int32
+        bbox:
+          type: array
+          items:
+            type: number
+            format: double
+      required:
+      - bbox
+      - pageIndex
     Circle:
       type: object
       properties:
@@ -3791,71 +3897,6 @@ components:
       required:
       - bookName
       - format
-    BookBlock_Full:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        depth:
-          type: integer
-          format: int32
-          description: Nesting depth in the book layout; root-level blocks are 0.
-        title:
-          type: string
-        allBboxes:
-          type: array
-          items:
-            $ref: "#/components/schemas/PageBbox_Full"
-      required:
-      - allBboxes
-      - depth
-      - id
-      - title
-    Book_Full:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        bookName:
-          type: string
-        format:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        blocks:
-          type: array
-          description: "Book blocks in depth-first preorder (parent before descendants,\
-            \ then siblings). Order matches ascending layout_sequence in persistence."
-          items:
-            $ref: "#/components/schemas/BookBlock_Full"
-        notebookId:
-          type: string
-      required:
-      - blocks
-      - bookName
-      - format
-      - id
-      - notebookId
-    PageBbox_Full:
-      type: object
-      properties:
-        pageIndex:
-          type: integer
-          format: int32
-        bbox:
-          type: array
-          items:
-            type: number
-            format: double
-      required:
-      - bbox
-      - pageIndex
     NotebookCertificateApproval:
       type: object
       properties:

@@ -42,6 +42,7 @@
     :selected-block-id="selectedBlockId"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
+    @block-indent="onBlockIndent"
   >
     <main
       ref="mainPaneRef"
@@ -105,6 +106,10 @@ import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockId
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+
+const emit = defineEmits<{
+  "update:book": [book: BookFull]
+}>()
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
@@ -390,6 +395,17 @@ function onPagesReady() {
 
 async function onBookBlockClick(block: BookBlockFull) {
   await applyBookBlockSelection(block)
+}
+
+async function onBlockIndent(block: BookBlockFull) {
+  const { data, error } = await NotebookBooksController.changeBookBlockDepth({
+    path: { notebook: notebookId.value, bookBlock: block.id },
+    body: { direction: "INDENT" },
+  })
+  if (!error && data) {
+    emit("update:book", data)
+    selectedBlockId.value = block.id
+  }
 }
 
 async function onReadFromHere() {

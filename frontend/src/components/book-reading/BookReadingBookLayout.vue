@@ -51,6 +51,7 @@
             block.id === currentBlockId ? 'location' : undefined
           "
           @click="emit('blockClick', block)"
+          @keydown.tab.prevent="emit('blockIndent', block)"
         >
           <span
             class="book-reading-book-block-guides"
@@ -115,6 +116,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   blockClick: [block: BookBlockFull]
+  blockIndent: [block: BookBlockFull]
 }>()
 
 const asideRef = ref<HTMLElement | null>(null)

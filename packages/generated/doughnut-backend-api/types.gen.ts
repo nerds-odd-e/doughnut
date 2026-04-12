@@ -17,6 +17,38 @@ export type BookBlockReadingRecordListItem = {
     completedAt: string;
 };
 
+export type BookBlockDepthRequestFull = {
+    direction: 'INDENT' | 'OUTDENT';
+};
+
+export type BookBlockFull = {
+    id: number;
+    /**
+     * Nesting depth in the book layout; root-level blocks are 0.
+     */
+    depth: number;
+    title: string;
+    allBboxes: Array<PageBboxFull>;
+};
+
+export type BookFull = {
+    id: number;
+    bookName: string;
+    format: string;
+    createdAt?: string;
+    updatedAt?: string;
+    /**
+     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
+     */
+    blocks: Array<BookBlockFull>;
+    notebookId: string;
+};
+
+export type PageBboxFull = {
+    pageIndex: number;
+    bbox: Array<number>;
+};
+
 export type Circle = {
     id: number;
     name: string;
@@ -318,34 +350,6 @@ export type AttachBookRequestFull = {
     format: string;
     layout?: AttachBookLayoutRequestFull;
     contentList?: Array<unknown>;
-};
-
-export type BookBlockFull = {
-    id: number;
-    /**
-     * Nesting depth in the book layout; root-level blocks are 0.
-     */
-    depth: number;
-    title: string;
-    allBboxes: Array<PageBboxFull>;
-};
-
-export type BookFull = {
-    id: number;
-    bookName: string;
-    format: string;
-    createdAt?: string;
-    updatedAt?: string;
-    /**
-     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
-     */
-    blocks: Array<BookBlockFull>;
-    notebookId: string;
-};
-
-export type PageBboxFull = {
-    pageIndex: number;
-    bbox: Array<number>;
 };
 
 export type NotebookCertificateApproval = {
@@ -876,6 +880,25 @@ export type PutNotebookBookBlockReadingRecordResponses = {
 };
 
 export type PutNotebookBookBlockReadingRecordResponse = PutNotebookBookBlockReadingRecordResponses[keyof PutNotebookBookBlockReadingRecordResponses];
+
+export type ChangeBookBlockDepthData = {
+    body: BookBlockDepthRequestFull;
+    path: {
+        notebook: number;
+        bookBlock: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}/depth';
+};
+
+export type ChangeBookBlockDepthResponses = {
+    /**
+     * OK
+     */
+    200: BookFull;
+};
+
+export type ChangeBookBlockDepthResponse = ChangeBookBlockDepthResponses[keyof ChangeBookBlockDepthResponses];
 
 export type GetUserProfileData = {
     body?: never;

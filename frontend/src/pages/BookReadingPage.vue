@@ -29,6 +29,7 @@
         :book-pdf-bytes="bookPdfBytes"
         :initial-last-read="initialLastRead"
         :initial-selected-block-id="initialSelectedBlockId"
+        @update:book="(updated) => (book = updated)"
       />
     </template>
   </div>
