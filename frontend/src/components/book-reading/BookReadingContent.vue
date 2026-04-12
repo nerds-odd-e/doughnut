@@ -111,6 +111,13 @@ import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
+type ViewportPayload = {
+  anchorPageIndexZeroBased: number
+  viewport: ViewportYRange | null
+  pagesCount: number
+  readingPosition?: { pageIndexZeroBased: number; normalizedTop: number } | null
+}
+
 const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
@@ -140,8 +147,17 @@ const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const pdfViewerLoadError = ref<string | null>(null)
 
-const pdfBarCurrentPage = ref<number | null>(null)
-const pdfBarPagesTotal = ref<number | null>(null)
+const viewportPayload = ref<ViewportPayload | null>(null)
+
+const pdfBarCurrentPage = computed(() => {
+  const p = viewportPayload.value
+  return p && p.pagesCount > 0 ? p.anchorPageIndexZeroBased + 1 : null
+})
+
+const pdfBarPagesTotal = computed(() => {
+  const p = viewportPayload.value
+  return p && p.pagesCount > 0 ? p.pagesCount : null
+})
 
 const bookLayoutOpened = ref(false)
 const windowWidth = ref(
@@ -175,10 +191,25 @@ const currentBlockForNavBar = computed(() => {
   return bookBlocks.value.find((b) => b.id === curId) ?? null
 })
 
-const lastReadingForPatch = ref<{
-  pageIndex: number
-  normalizedY: number
-} | null>(null)
+const lastReadingForPatch = computed(() => {
+  const p = viewportPayload.value
+  if (!p) return null
+  let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
+    null
+  if (p.readingPosition !== undefined) {
+    reading = p.readingPosition
+  } else if (p.viewport !== null) {
+    reading = {
+      pageIndexZeroBased: p.anchorPageIndexZeroBased,
+      normalizedTop: p.viewport.top,
+    }
+  }
+  if (reading === null) return null
+  return {
+    pageIndex: reading.pageIndexZeroBased,
+    normalizedY: Math.round(reading.normalizedTop),
+  }
+})
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
 const mainPaneRef = ref<HTMLElement | null>(null)
@@ -259,19 +290,8 @@ const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
     }),
 })
 
-function onViewportAnchorPage(payload: {
-  anchorPageIndexZeroBased: number
-  viewport: ViewportYRange | null
-  pagesCount: number
-  readingPosition?: {
-    pageIndexZeroBased: number
-    normalizedTop: number
-  } | null
-}) {
-  if (payload.pagesCount > 0) {
-    pdfBarCurrentPage.value = payload.anchorPageIndexZeroBased + 1
-    pdfBarPagesTotal.value = payload.pagesCount
-  }
+function onViewportAnchorPage(payload: ViewportPayload) {
+  viewportPayload.value = payload
   const candidate = currentBlockIdFromVisiblePage(
     bookBlocks.value.map((r) => ({
       id: r.id,
@@ -284,24 +304,12 @@ function onViewportAnchorPage(payload: {
   currentBlockIdDebouncer.propose(candidate)
   updateLastDirectContentGeometry()
   updateReadingPanelAnchor()
-  let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
-    null
-  if (payload.readingPosition !== undefined) {
-    reading = payload.readingPosition
-  } else if (payload.viewport !== null) {
-    reading = {
-      pageIndexZeroBased: payload.anchorPageIndexZeroBased,
-      normalizedTop: payload.viewport.top,
-    }
-  }
+  const reading = lastReadingForPatch.value
   if (reading !== null) {
-    const pageIndex = reading.pageIndexZeroBased
-    const normalizedY = Math.round(reading.normalizedTop)
-    lastReadingForPatch.value = { pageIndex, normalizedY }
     const sel = selectedBlockId.value
     lastReadPositionPatchDebouncer.propose(
-      pageIndex,
-      normalizedY,
+      reading.pageIndex,
+      reading.normalizedY,
       sel === null ? undefined : sel
     )
   }
