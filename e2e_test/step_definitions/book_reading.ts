@@ -8,6 +8,7 @@ import bookReadingPage, {
 } from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
 import start from '../start'
+import testability from '../start/testability'
 
 function parseBookLayoutTable(data: DataTable): BookLayoutRow[] {
   return data.raw().map((row) => {
@@ -44,6 +45,24 @@ When(
           .pastCliAssistantMessages()
           .expectContains('Protecting Intention in Working Software')
         ctx.pastCliAssistantMessages().expectContains('Easier to Change')
+      })
+  }
+)
+
+When(
+  'I attach a book with MinerU fixture {string} to the notebook {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (fixtureStem: string, notebookTitle: string) => {
+    const bookName = fixtureStem
+    cy.wrap(bookName).as('attachedBookPdfStem')
+    return cy
+      .fixture(`book_reading/mineru_output_for_${fixtureStem}.json`)
+      .then((contentList: unknown) => {
+        return testability().attachBookToNotebook(
+          notebookTitle,
+          bookName,
+          contentList as Array<unknown>
+        )
       })
   }
 )
