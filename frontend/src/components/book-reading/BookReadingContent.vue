@@ -72,9 +72,9 @@
           :selected-block-title="blockAwaitingConfirmation.title"
           :snap-animation-key="snapAnimationKey"
           :anchor-top-px="readingPanelAnchorTopPx"
-          @mark-as-read="() => markSelectedDisposition('READ')"
-          @mark-as-skimmed="() => markSelectedDisposition('SKIMMED')"
-          @mark-as-skipped="() => markSelectedDisposition('SKIPPED')"
+          @mark-as-read="() => markBlockDisposition('READ')"
+          @mark-as-skimmed="() => markBlockDisposition('SKIMMED')"
+          @mark-as-skipped="() => markBlockDisposition('SKIPPED')"
         />
         <CurrentBlockNavigationBar
           v-if="currentBlockForNavBar"
@@ -365,7 +365,7 @@ async function applyBookBlockSelection(block: BookBlockFull) {
   currentBlockIdDebouncer.commitNow(block.id)
 }
 
-async function markSelectedDisposition(status: BookBlockReadingDisposition) {
+async function markBlockDisposition(status: BookBlockReadingDisposition) {
   const block = blockAwaitingConfirmation.value
   if (!block) {
     return

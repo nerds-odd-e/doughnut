@@ -155,22 +155,7 @@ export function useBookReadingSnapBack(options: {
     }
   }
 
-  function geometryTargetBlock(): BookBlockFull | null {
-    const selId = selectedBlockId.value
-    if (selId === null) return null
-    const rows = bookBlocks.value
-    const sel = rows.find((r) => r.id === selId)
-    if (!sel) return null
-    if (!hasRecordedDisposition(selId)) return sel
-    const selIdx = rows.findIndex((r) => r.id === selId)
-    if (selIdx < 0 || selIdx >= rows.length - 1) return null
-    const successor = rows[selIdx + 1]!
-    if (hasRecordedDisposition(successor.id) || !hasDirectContent(successor))
-      return null
-    return successor
-  }
-
-  const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
+  const confirmationTargetBlock = computed<BookBlockFull | null>(() => {
     const selId = selectedBlockId.value
     if (selId === null) return null
     const rows = bookBlocks.value
@@ -178,32 +163,41 @@ export function useBookReadingSnapBack(options: {
       const selIdx = rows.findIndex((r) => r.id === selId)
       if (selIdx < 0 || selIdx >= rows.length - 1) return null
       const successor = rows[selIdx + 1]!
-      if (hasRecordedDisposition(successor.id)) return null
-      if (!hasDirectContent(successor)) return null
-      return lastContentBottomVisible.value ? successor : null
+      if (hasRecordedDisposition(successor.id) || !hasDirectContent(successor))
+        return null
+      return successor
     }
+    return rows.find((r) => r.id === selId) ?? null
+  })
+
+  const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
+    const target = confirmationTargetBlock.value
+    if (target === null) return null
+    const selId = selectedBlockId.value!
+    if (hasRecordedDisposition(selId)) {
+      return lastContentBottomVisible.value ? target : null
+    }
+    const rows = bookBlocks.value
     const chain = selectedIndexAndSuccessor(rows, selId)
     if (chain === null) {
-      const sel = rows.find((r) => r.id === selId)
-      if (sel && hasDirectContent(sel) && lastContentBottomVisible.value) {
-        return sel
-      }
-      return null
+      return hasDirectContent(target) && lastContentBottomVisible.value
+        ? target
+        : null
     }
-    const { sel, successor } = chain
-    const lastBbox = lastContentBbox(sel)
+    const { successor } = chain
+    const lastBbox = lastContentBbox(target)
     if (lastBbox !== null) {
-      if (lastContentBottomVisible.value) return sel
+      if (lastContentBottomVisible.value) return target
       if (geometryEverVisibleForSelection.value) {
-        return successor.id === currentBlockId.value ? null : sel
+        return successor.id === currentBlockId.value ? null : target
       }
       return null
     }
-    return successor.id === currentBlockId.value ? sel : null
+    return successor.id === currentBlockId.value ? target : null
   })
 
   function updateLastDirectContentGeometry(): void {
-    const target = geometryTargetBlock()
+    const target = confirmationTargetBlock.value
     const lastBboxForGeometry = target !== null ? lastContentBbox(target) : null
     if (lastBboxForGeometry === null) return
     const geometryVisible =
