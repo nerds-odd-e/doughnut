@@ -1101,4 +1101,162 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(stored.getCompletedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
   }
+
+  @Nested
+  class ChangeBookBlockDepth {
+
+    private Notebook nb;
+    private byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+
+    private BookBlockDepthRequest indent() {
+      var r = new BookBlockDepthRequest();
+      r.setDirection("INDENT");
+      return r;
+    }
+
+    private BookBlockDepthRequest outdent() {
+      var r = new BookBlockDepthRequest();
+      r.setDirection("OUTDENT");
+      return r;
+    }
+
+    @BeforeEach
+    void setup() throws Exception {
+      nb = myNotebook();
+      // Layout: A(0), B(0), C(1), D(0)
+      controller.attachBook(
+          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(pdfBytes));
+    }
+
+    private List<BookBlock> blocks() {
+      return bookOf(nb).getBlocks();
+    }
+
+    private BookBlock blockByTitle(String title) {
+      return blocks().stream()
+          .filter(b -> b.getStructuralTitle().equals(title))
+          .findFirst()
+          .orElseThrow(() -> new IllegalArgumentException("Block not found: " + title));
+    }
+
+    @Test
+    void indentIncreasesDepthByOne() throws Exception {
+      BookBlock b = blockByTitle("B");
+      assertThat(b.getDepth(), equalTo(0));
+
+      Book result = controller.changeBookBlockDepth(nb, b, indent());
+
+      int newDepth =
+          result.getBlocks().stream()
+              .filter(blk -> blk.getId().equals(b.getId()))
+              .findFirst()
+              .orElseThrow()
+              .getDepth();
+      assertThat(newDepth, equalTo(1));
+    }
+
+    @Test
+    void indentReturnsFullBookWithAllBlocks() throws Exception {
+      BookBlock b = blockByTitle("B");
+
+      Book result = controller.changeBookBlockDepth(nb, b, indent());
+
+      assertThat(result.getBlocks(), hasSize(4));
+    }
+
+    @Test
+    void indentFirstBlockThrows() {
+      BookBlock a = blockByTitle("A");
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.changeBookBlockDepth(nb, a, indent()));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+      assertThat(ex.getReason(), equalTo("Cannot indent the first block"));
+    }
+
+    @Test
+    void indentWhenAlreadyAtMaxDepthRelativeToPredecessorThrows() {
+      // C is at depth 1, its predecessor B is at depth 0; C is already at B.depth+1
+      BookBlock c = blockByTitle("C");
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.changeBookBlockDepth(nb, c, indent()));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+      assertThat(
+          ex.getReason(), equalTo("Block is already at maximum depth relative to predecessor"));
+    }
+
+    @Test
+    void outdentDecreasesDepthByOne() throws Exception {
+      BookBlock c = blockByTitle("C");
+      assertThat(c.getDepth(), equalTo(1));
+
+      Book result = controller.changeBookBlockDepth(nb, c, outdent());
+
+      int newDepth =
+          result.getBlocks().stream()
+              .filter(blk -> blk.getId().equals(c.getId()))
+              .findFirst()
+              .orElseThrow()
+              .getDepth();
+      assertThat(newDepth, equalTo(0));
+    }
+
+    @Test
+    void outdentBlockAtDepthZeroThrows() {
+      BookBlock a = blockByTitle("A");
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.changeBookBlockDepth(nb, a, outdent()));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+      assertThat(ex.getReason(), equalTo("Block is already at minimum depth"));
+    }
+
+    @Test
+    void outdentWhenSuccessorWouldViolateTreeInvariantThrows() throws Exception {
+      // Make a layout where outdenting B would leave C (depth 1) as successor with B's new depth 0,
+      // but C's depth (1) > newDepth(0)+1=1 is false — need a deeper successor.
+      // Build: X(0), Y(1), Z(2) — outdenting Y would make Y depth 0, but Z depth 2 > 0+1=1
+      Notebook nb2 = myNotebook();
+      controller.attachBook(nb2, attachRequest(node("X", node("Y", node("Z")))), pdfFile(pdfBytes));
+      BookBlock y =
+          bookOf(nb2).getBlocks().stream()
+              .filter(blk -> blk.getStructuralTitle().equals("Y"))
+              .findFirst()
+              .orElseThrow();
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.changeBookBlockDepth(nb2, y, outdent()));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+      assertThat(ex.getReason(), equalTo("Cannot outdent: successor would violate tree invariant"));
+    }
+
+    @Test
+    void blockFromAnotherNotebooksBookThrows() {
+      Notebook otherNb = otherUsersNotebookWithBook();
+      BookBlock otherBlock = rootBlocksSorted(bookOf(otherNb)).getFirst();
+
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.changeBookBlockDepth(nb, otherBlock, indent()));
+    }
+
+    @Test
+    void rejectsNotebookWithoutWriteAccess() {
+      Notebook otherNb = otherUsersNotebookWithBook();
+      BookBlock block = rootBlocksSorted(bookOf(otherNb)).getFirst();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.changeBookBlockDepth(otherNb, block, indent()));
+    }
+  }
 }
