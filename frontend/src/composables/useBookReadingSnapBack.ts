@@ -161,7 +161,13 @@ export function useBookReadingSnapBack(options: {
     if (hasRecordedDisposition(selId)) return null
     const rows = bookBlocks.value
     const chain = selectedIndexAndSuccessor(rows, selId)
-    if (chain === null) return null
+    if (chain === null) {
+      const sel = rows.find((r) => r.id === selId)
+      if (sel && hasDirectContent(sel) && lastContentBottomVisible.value) {
+        return sel
+      }
+      return null
+    }
     const { sel, successor } = chain
     const lastBbox = lastContentBbox(sel)
     if (lastBbox !== null) {

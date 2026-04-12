@@ -37,13 +37,21 @@ export function topMathsLikeBlockRows(options: {
 
 export function topMathsLikeFlatBlocks(options?: {
   firstBlockHasNoDirectContent?: boolean
+  lastBlockHasDirectContent?: boolean
 }): BookBlockFull[] {
+  const lastIdx = TOP_MATHS_LIKE_BLOCK_IDS.length - 1
   return topMathsLikeBlockRows({
     allBboxesForIndex: (i) => {
       if (i === 0) {
         return options?.firstBlockHasNoDirectContent
           ? [pageBboxWithNormalizedBbox(0, [0, 0, 0, 0])]
           : [pageBboxPageIndexOnly(0)]
+      }
+      if (i === lastIdx && options?.lastBlockHasDirectContent) {
+        return [
+          topMathsLikePreorderFirstBboxAt(i),
+          pageBboxWithNormalizedBbox(1, [48, 200, 564, 500]),
+        ]
       }
       return [topMathsLikePreorderFirstBboxAt(i)]
     },

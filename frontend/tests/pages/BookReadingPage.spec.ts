@@ -113,7 +113,10 @@ function stubGetBookPlain(notebookId: number) {
 
 function stubGetBookWithTopMathsBlocks(
   notebookId: number,
-  firstBlockHasNoDirectContent?: boolean
+  options?: {
+    firstBlockHasNoDirectContent?: boolean
+    lastBlockHasDirectContent?: boolean
+  }
 ) {
   return vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
     wrapSdkResponse(
@@ -121,7 +124,8 @@ function stubGetBookWithTopMathsBlocks(
         .notebookId(String(notebookId))
         .blocks(
           makeMe.bookReading.topMathsLikeFlatBlocks({
-            firstBlockHasNoDirectContent,
+            firstBlockHasNoDirectContent: options?.firstBlockHasNoDirectContent,
+            lastBlockHasDirectContent: options?.lastBlockHasDirectContent,
           })
         )
         .please()
@@ -135,9 +139,13 @@ async function mountLoadedBookWithBlocks(
     innerWidth?: number
     assertSameOriginCredentials?: boolean
     firstBlockHasNoDirectContent?: boolean
+    lastBlockHasDirectContent?: boolean
   }
 ) {
-  stubGetBookWithTopMathsBlocks(id, options?.firstBlockHasNoDirectContent)
+  stubGetBookWithTopMathsBlocks(id, {
+    firstBlockHasNoDirectContent: options?.firstBlockHasNoDirectContent,
+    lastBlockHasDirectContent: options?.lastBlockHasDirectContent,
+  })
   mockNotebookBookFilePdfOk(id, topMathsPdfBytes, {
     assertSameOriginCredentials: options?.assertSameOriginCredentials,
   })
@@ -759,8 +767,11 @@ describe("BookReadingPage", () => {
       expect(readingControlPanel(wrapper).exists()).toBe(false)
     })
 
-    it("hides the panel when the selected block has no successor", async () => {
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+    it("hides the panel when the last block has direct content but bottom is not visible", async () => {
+      const wrapper = await mountLoadedBookWithBlocks(notebookId, {
+        lastBlockHasDirectContent: true,
+      })
+      mockIsLastContentBottomVisible(wrapper, false)
       await clickBookBlockByTitle(wrapper, "Section 6")
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
@@ -778,6 +789,30 @@ describe("BookReadingPage", () => {
         "Section 6"
       )
       expect(readingControlPanel(wrapper).exists()).toBe(false)
+    })
+
+    it("shows the panel for the last block when content bottom is visible", async () => {
+      const wrapper = await mountLoadedBookWithBlocks(notebookId, {
+        lastBlockHasDirectContent: true,
+      })
+      mockIsLastContentBottomVisible(wrapper, true)
+      await clickBookBlockByTitle(wrapper, "Section 6")
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
+          "Section 6"
+        )
+      )
+
+      await emitViewportAndSettleCurrentBlock(wrapper, {
+        anchorPageIndexZeroBased: 1,
+        viewport: null,
+        pagesCount: 10,
+      })
+
+      const panel = readingControlPanel(wrapper)
+      expect(panel.exists()).toBe(true)
+      expect(panel.isVisible()).toBe(true)
+      expect(panel.text()).toContain("Section 6")
     })
 
     it("calls PUT with SKIMMED when Skim is used", async () => {

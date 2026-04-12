@@ -34,3 +34,9 @@ Feature: Reading record
     And I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
     Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
     And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout
+
+  Scenario: Mark the last book block as read (reading record)
+    When I choose the book block "6. Why Refactoring Matters More with AI"
+    And I scroll the PDF book reader until the Reading Control Panel shows for "6. Why Refactoring Matters More with AI"
+    And I mark the book block "6. Why Refactoring Matters More with AI" as read in the Reading Control Panel
+    Then I should see that book block "6. Why Refactoring Matters More with AI" is marked as read in the book layout
