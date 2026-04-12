@@ -139,6 +139,27 @@ watch(
   },
   { flush: "post" }
 )
+
+watch(
+  () => props.selectedBlockId,
+  (id) => {
+    if (id === null || !opened.value) {
+      return
+    }
+    requestAnimationFrame(() => {
+      if (!opened.value) {
+        return
+      }
+      const row = asideRef.value?.querySelector(
+        '[data-current-selection="true"]'
+      )
+      if (row instanceof HTMLElement) {
+        row.focus()
+      }
+    })
+  },
+  { flush: "post" }
+)
 </script>
 
 <style scoped>

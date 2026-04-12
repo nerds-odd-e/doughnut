@@ -78,13 +78,15 @@ Then each book block in the book layout should show a visual nesting indicator m
 
 ### Phase 2 — Focus the selected block in the book layout
 
+**Shipped:** [`e2e_test/features/book_reading/change_depth.feature`](../e2e_test/features/book_reading/change_depth.feature); `BookReadingBookLayout.vue` watches `selectedBlockId` and focuses the row with `data-current-selection="true"` after render (`requestAnimationFrame`, same pattern as current-block scroll-into-view).
+
 **User value:** User can focus a block in the book layout (e.g. by clicking it), and the focus persists while interacting with the block (keyboard shortcuts). Focus blurs only when it should — clicking outside the book layout, navigating away, etc. — not prematurely (e.g. not on every scroll or PDF interaction while the user is still editing layout).
 
 **Scenario (E2E):**
 
 ```gherkin
 Scenario: Focus a book block in the layout
-  When I select the book block "2. The Usual Defi nition Is Not Enough" in the book layout
+  When I choose the book block "2. The Usual Defi nition Is Not Enough"
   Then the book block "2. The Usual Defi nition Is Not Enough" should be focused in the book layout
 ```
 

@@ -92,6 +92,11 @@ const bookReadingPage = () => {
         .should('have.length', 1)
       return this
     },
+    expectBookBlockIsFocusedByTitle(title: string) {
+      pageIsNotLoading()
+      bookBlockRowByTitle(title).should('be.focused')
+      return this
+    },
     expectCurrentPage(pageNumber: number) {
       pageIsNotLoading()
       cy.get('[data-testid="book-reading-page-indicator"]')

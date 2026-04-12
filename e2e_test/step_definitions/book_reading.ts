@@ -175,6 +175,14 @@ Then(
 )
 
 Then(
+  'the book block {string} should be focused in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectBookBlockIsFocusedByTitle(title)
+  }
+)
+
+Then(
   'the book block {string} should be the current selection in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
