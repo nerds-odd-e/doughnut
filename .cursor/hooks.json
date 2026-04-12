@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/reset-planning-timer.sh"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": ".cursor/hooks/check-planning-timer.sh"
+      }
+    ]
+  }
+}
