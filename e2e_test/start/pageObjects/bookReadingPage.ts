@@ -117,6 +117,18 @@ const bookReadingPage = () => {
       })
       return this
     },
+    pressShiftTabOnBookLayout() {
+      cy.focused().trigger('keydown', {
+        key: 'Tab',
+        code: 'Tab',
+        keyCode: 9,
+        which: 9,
+        shiftKey: true,
+        bubbles: true,
+        getModifierState: (key: string) => key === 'Shift',
+      })
+      return this
+    },
     expectCurrentPage(pageNumber: number) {
       pageIsNotLoading()
       cy.get('[data-testid="book-reading-page-indicator"]')

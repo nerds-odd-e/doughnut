@@ -247,9 +247,12 @@ Given(
 )
 
 When(
-  'I press Tab on the book layout',
+  'I press {string} on the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
+  (key: string) => {
+    if (key === 'Shift+Tab') {
+      return bookReadingPage().pressShiftTabOnBookLayout()
+    }
     return bookReadingPage().pressTabOnBookLayout()
   }
 )

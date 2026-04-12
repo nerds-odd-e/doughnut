@@ -6,9 +6,14 @@ Feature: Change depth of book blocks
     When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
     And I open the book attached to notebook "Code Refactoring Book"
 
-  Scenario: Focus and indent a book block in the layout
-    Given the book layout shows block "2. The Usual Defi nition Is Not Enough" at depth 0
-    When I choose the book block "2. The Usual Defi nition Is Not Enough"
-    Then the book block "2. The Usual Defi nition Is Not Enough" should be focused in the book layout
-    When I press Tab on the book layout
-    Then the book block "2. The Usual Defi nition Is Not Enough" should be at depth 1 in the book layout
+  Scenario Outline: Change depth with keyboard
+    Given the book layout shows block "<block>" at depth <start_depth>
+    When I choose the book block "<block>"
+    Then the book block "<block>" should be focused in the book layout
+    When I press "<key>" on the book layout
+    Then the book block "<block>" should be at depth <end_depth> in the book layout
+
+    Examples:
+      | block                                   | start_depth | key       | end_depth |
+      | 2. The Usual Defi nition Is Not Enough  | 0           | Tab       | 1         |
+      | 3.1 Can You Refactor Without Tests?     | 1           | Shift+Tab | 0         |

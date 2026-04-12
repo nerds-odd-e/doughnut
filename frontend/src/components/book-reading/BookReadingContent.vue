@@ -43,6 +43,7 @@
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
     @block-indent="onBlockIndent"
+    @block-outdent="onBlockOutdent"
   >
     <main
       ref="mainPaneRef"
@@ -401,6 +402,17 @@ async function onBlockIndent(block: BookBlockFull) {
   const { data, error } = await NotebookBooksController.changeBookBlockDepth({
     path: { notebook: notebookId.value, bookBlock: block.id },
     body: { direction: "INDENT" },
+  })
+  if (!error && data) {
+    emit("update:book", data)
+    selectedBlockId.value = block.id
+  }
+}
+
+async function onBlockOutdent(block: BookBlockFull) {
+  const { data, error } = await NotebookBooksController.changeBookBlockDepth({
+    path: { notebook: notebookId.value, bookBlock: block.id },
+    body: { direction: "OUTDENT" },
   })
   if (!error && data) {
     emit("update:book", data)
