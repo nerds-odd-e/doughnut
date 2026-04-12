@@ -13,11 +13,17 @@ import {
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
-import {
-  startManagedTtySession,
-  type ManagedTtyAssertInput,
-  type ManagedTtySession,
-} from 'tty-assert'
+import type { ManagedTtyAssertInput, ManagedTtySession } from 'tty-assert'
+
+type TtyAssertModule = typeof import('tty-assert')
+let ttyAssertRuntime: TtyAssertModule | undefined
+
+async function loadTtyAssert(): Promise<TtyAssertModule> {
+  if (!ttyAssertRuntime) {
+    ttyAssertRuntime = await import('tty-assert')
+  }
+  return ttyAssertRuntime
+}
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -178,6 +184,7 @@ export function createCliE2ePluginTasks(
     env?: NodeJS.ProcessEnv
   }): Promise<void> {
     disposeManagedCliPtySession()
+    const { startManagedTtySession } = await loadTtyAssert()
     const managed = await startManagedTtySession(
       {
         command: opts.command,
@@ -280,6 +287,7 @@ export function createCliE2ePluginTasks(
       disposeManagedCliPtySession()
       let managed: ManagedTtySession | undefined
       try {
+        const { startManagedTtySession } = await loadTtyAssert()
         managed = await startManagedTtySession(
           {
             command: process.execPath,
