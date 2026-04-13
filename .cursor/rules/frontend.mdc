@@ -149,6 +149,13 @@ onMounted(() => {
 // scoped styles
 </style>
 ```
+
+### Derived state: prefer `computed` over cached variables
+
+- **Avoid “cache state” in refs** — Do not keep a separate `ref` (or `reactive` field) that mirrors props, other refs, or store data and that you update in watchers, `onUpdated`, or event handlers to stay in sync. That duplicates the source of truth and is easy to get out of date.
+- **Prefer `computed`** whenever a value is fully determined by reactive inputs (props, refs, computed from the store, etc.). Computed values stay correct when dependencies change and avoid manual sync.
+- **Use `ref` / `reactive` for real mutable state** — user input, explicit UI toggles, or data you own and mutate (for example loading flags, form fields, IDs from navigation). Do not use them as a hand-maintained copy of something you could derive.
+
 ### API Integration
 
 - Import services directly from `@generated/doughnut-backend-api/sdk.gen`
