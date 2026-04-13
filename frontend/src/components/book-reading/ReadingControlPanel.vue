@@ -6,14 +6,7 @@
     :class="wrapperClass"
     :style="wrapperStyle"
   >
-    <div
-      ref="cardRef"
-      class="daisy-pointer-events-auto daisy-mx-auto daisy-max-w-3xl daisy-rounded-lg daisy-bg-base-200/95 daisy-border daisy-border-base-300 daisy-shadow-lg daisy-px-3 daisy-py-2 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-relative"
-    >
-      <span
-        aria-hidden="true"
-        class="daisy-absolute daisy-left-[20%] -daisy-top-[9px] -daisy-translate-x-1/2 daisy-w-4 daisy-h-4 daisy-bg-base-200/95 daisy-border-l daisy-border-t daisy-border-base-300 -daisy-rotate-45"
-      />
+    <CalloutCard ref="cardRef" :show-caret="panelPlacement === 'anchored'">
       <p class="daisy-text-sm daisy-min-w-0 daisy-flex-1 daisy-basis-full sm:daisy-basis-auto daisy-m-0">
         <span class="daisy-font-medium">{{ selectedBlockTitle }}</span>
       </p>
@@ -45,12 +38,13 @@
           Skip
         </button>
       </div>
-    </div>
+    </CalloutCard>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
+import CalloutCard from "@/components/book-reading/CalloutCard.vue"
 
 const props = withDefaults(
   defineProps<{
@@ -83,14 +77,14 @@ const emit = defineEmits<{
   markAsSkipped: []
 }>()
 
-const cardRef = ref<HTMLElement | null>(null)
+const cardRef = ref<InstanceType<typeof CalloutCard> | null>(null)
 const isAnimating = ref(false)
 
 watch(
   () => props.snapAnimationKey,
   (key) => {
     if (key <= 0) return
-    const el = cardRef.value
+    const el = cardRef.value?.el
     if (!el) return
     isAnimating.value = true
     el.classList.remove("snap-attention")
