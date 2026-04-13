@@ -87,6 +87,39 @@
       </template>
     </main>
   </BookReadingBookLayout>
+  <dialog
+    class="daisy-modal"
+    :class="{ 'daisy-modal-open': aiLayoutReorganizationSuggestion !== null }"
+    aria-labelledby="book-layout-reorganize-preview-title"
+    data-testid="book-layout-reorganize-preview-dialog"
+  >
+    <div class="daisy-modal-box">
+      <h2
+        id="book-layout-reorganize-preview-title"
+        class="daisy-text-lg daisy-font-semibold"
+      >
+        Reorganize layout (preview)
+      </h2>
+      <p class="daisy-m-0 daisy-py-4 daisy-text-sm daisy-text-base-content/60">
+        Suggested depths for each block will be listed here.
+      </p>
+      <div class="daisy-modal-action">
+        <button
+          type="button"
+          class="daisy-btn"
+          data-testid="book-layout-reorganize-preview-cancel"
+          @click="dismissAiReorganizePreview"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="daisy-modal-backdrop">
+      <button type="button" @click="dismissAiReorganizePreview">
+        close
+      </button>
+    </form>
+  </dialog>
 </template>
 
 <script setup lang="ts">
@@ -478,6 +511,10 @@ async function onBlockCancel(block: BookBlockFull) {
   } finally {
     pendingLayoutBlockId.value = null
   }
+}
+
+function dismissAiReorganizePreview() {
+  aiLayoutReorganizationSuggestion.value = null
 }
 
 async function onRequestAiReorganize() {

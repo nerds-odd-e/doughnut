@@ -86,4 +86,51 @@ describe("BookReadingContent AI reorganize suggest", () => {
     expect(mockToast.error).toHaveBeenCalled()
     wrapper.unmount()
   })
+
+  it("opens preview dialog with canonical title when suggest succeeds, Cancel closes", async () => {
+    vi.mocked(
+      NotebookBooksController.suggestBookLayoutReorganization
+    ).mockResolvedValueOnce(wrapSdkResponse({ blocks: [{ id: 1, depth: 0 }] }))
+
+    const wrapper = helper
+      .component(BookReadingContent)
+      .withRouter()
+      .withProps({
+        book: makeMe.aBook.notebookId("9").please(),
+        bookPdfBytes: new ArrayBuffer(0),
+        initialLastRead: null,
+      })
+      .mount({
+        global: {
+          stubs: {
+            GlobalBar: { template: "<div><slot /></div>" },
+            PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
+            ReadingControlPanel: true,
+            CurrentBlockNavigationBar: true,
+          },
+        },
+      })
+
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="book-reading-ai-reorganize-layout"]')
+      .trigger("click")
+    await flushPromises()
+
+    const dialog = wrapper.find(
+      '[data-testid="book-layout-reorganize-preview-dialog"]'
+    )
+    expect(dialog.exists()).toBe(true)
+    expect(dialog.classes()).toContain("daisy-modal-open")
+    expect(wrapper.text()).toContain("Reorganize layout (preview)")
+
+    await wrapper
+      .find('[data-testid="book-layout-reorganize-preview-cancel"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(dialog.classes()).not.toContain("daisy-modal-open")
+    wrapper.unmount()
+  })
 })
