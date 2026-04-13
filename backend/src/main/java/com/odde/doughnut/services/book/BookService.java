@@ -148,7 +148,12 @@ public class BookService {
   @Transactional(readOnly = true)
   public Book getBookForNotebook(Notebook notebook) {
     Book book = requireBook(notebook);
-    book.getBlocks().size();
+    List<BookBlock> blocks = book.getBlocks();
+    blocks.size();
+    for (BookBlock block : blocks) {
+      entityPersister.refresh(block);
+      block.getContentBlocks().size();
+    }
     return book;
   }
 

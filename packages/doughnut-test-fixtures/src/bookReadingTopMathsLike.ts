@@ -32,6 +32,7 @@ export function topMathsLikeBlockRows(options: {
     depth,
     title: `Section ${i + 1}`,
     allBboxes: options.allBboxesForIndex(i, id),
+    contentBlocks: [],
   }))
 }
 

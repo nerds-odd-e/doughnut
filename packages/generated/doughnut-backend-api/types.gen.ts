@@ -378,6 +378,14 @@ export type BookBlockFull = {
     depth: number;
     title: string;
     allBboxes: Array<PageBboxFull>;
+    contentBlocks: Array<BookContentBlockFull>;
+};
+
+export type BookContentBlockFull = {
+    id: number;
+    type: string;
+    pageIdx?: number;
+    raw: string;
 };
 
 export type BookFull = {

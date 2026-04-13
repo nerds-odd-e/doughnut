@@ -150,27 +150,27 @@ describe('InteractiveCliApp /use notebook integration', () => {
     })
 
     test('attaches PDF and shows structure excerpt from API book', async () => {
-      attachBookSpy.mockResolvedValue({
-        id: 99,
-        bookName: 'top-maths',
-        format: 'pdf',
-        blocks: [
-          {
-            id: 1,
-            depth: 0,
-            title: 'Part One',
-            allBboxes: [],
-          },
-          {
-            id: 2,
-            depth: 1,
-            title: 'Part One Child',
-            allBboxes: [],
-          },
-        ],
-      } as Awaited<
-        ReturnType<typeof doughnutBackendClient.attachNotebookBookWithPdf>
-      >)
+      attachBookSpy.mockResolvedValue(
+        makeMe.aBook
+          .id(99)
+          .bookName('top-maths')
+          .format('pdf')
+          .blocks([
+            makeMe.aBookBlock
+              .id(1)
+              .depth(0)
+              .title('Part One')
+              .allBboxes([])
+              .do(),
+            makeMe.aBookBlock
+              .id(2)
+              .depth(1)
+              .title('Part One Child')
+              .allBboxes([])
+              .do(),
+          ])
+          .do()
+      )
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)

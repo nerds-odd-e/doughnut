@@ -217,15 +217,17 @@ Scenario: Indent a block and its children together
 
 ### Phase 9 — Create a book block from a content block (long-press)
 
-**User value:** User can add a finer structural boundary from the reading surface when the import missed a break — without hunting for a control in the sidebar list.
+Phase 9 is **decomposed into sub-phases** below so each slice stays small, testable, and shippable. Together they deliver the same user story as before; **Phase 10** (title prompt when source text is long) still follows.
 
-**Interaction (UX):**
+**Overall user value:** User can add a finer structural boundary from the reading surface when the import missed a break — without hunting for a control in the sidebar list.
 
-- **Trigger:** User **clicks and holds** on an imported **content block** in the book reading stream (the rendered **CONTENT BLOCK** in the reader, not a row in the book layout drawer).
-- **While holding / after threshold:** A **callout** appears (anchored near the gesture or the block) containing a **"New block"** button (and dismiss affordance as needed so scroll/read is not trapped).
-- **On "New block":** The product creates a new **`BookBlock`** **one nesting level below** the **`BookBlock` that currently owns** that content block: the new block is a **child** of that owner (`depth = owner.depth + 1` in the flat preorder model), with imported content from the split point onward reassigned per API rules. Title for the short-content path: derived from the first suitable text on the new block (same idea as the previous plan); **Phase 10** covers when that path is insufficient.
+**Overall UX (unchanged direction):**
 
-**Scenario (E2E):**
+- **Trigger:** User **clicks and holds** on an imported **content block** in the book reading stream (not a row in the book layout drawer).
+- **After hold threshold:** A **callout** with **"New block"** (and dismiss so reading is not trapped).
+- **On confirm:** A new **`BookBlock`** is a **child** of the owner (`depth = owner.depth + 1`), with **`BookContentBlock`** rows from the split point onward reassigned. **Short-title path:** server derives **`structuralTitle`** from the first moved block’s text (trim / max length); **Phase 10** adds an explicit title step when that is insufficient.
+
+**End-state E2E (after sub-phases 9.1–9.5):**
 
 ```gherkin
 Scenario: Create a new book block from a content block via long-press
@@ -235,10 +237,70 @@ Scenario: Create a new book block from a content block via long-press
   Then a new book block should appear in the book layout as a child of the block that owned that content
 ```
 
+---
+
+#### Phase 9.1 — Expose imported `contentBlocks` on `GET …/book`
+
+**User value:** The reader (and tests) can see each layout block’s imported body stream with **stable ids**, without a second round-trip.
+
 **What changes:**
 
-- **Backend:** New endpoint (e.g. `POST /api/notebooks/{notebook}/book/blocks`) accepting which **content block** (or split index within the owner) starts the new **book block**. Creates a new `BookBlock` as **child** of the owning block, reassigns **`BookContentBlock`** ownership from that point onward in reading order. Returns updated `Book`.
-- **Frontend:** Long-press (pointer down + hold past threshold) on content-block UI → show **`CalloutCard`** (or equivalent) with **"New block"**; on confirm, call API and refresh layout. Must coexist with PDF scroll/zoom (no accidental triggers; clear hold threshold).
+- **Backend:** Extend each `BookBlock` in the `GET …/book` JSON with ordered **`contentBlocks`** (e.g. `id`, `type`, optional `pageIdx`, `raw` JSON string). Keep **`Book`** / OpenAPI / generated TS in sync (`pnpm generateTypeScript`).
+- **Loading:** Avoid N+1 and Hibernate **multiple-bag fetch** issues (e.g. fetch `blocks` with an entity graph and use **`@Fetch(SUBSELECT)`** or equivalent on `BookBlock.contentBlocks` so one extra query loads all content rows).
+- **Tests:** Controller or integration test: attached book returns non-empty `contentBlocks` where the fixture has body items; ids are stable across calls.
+
+**Out of scope for 9.1:** Split/mutation endpoint, any reader UI beyond what already consumes `GET …/book`.
+
+---
+
+#### Phase 9.2 — Split API: create child block from a `BookContentBlock`
+
+**User value:** Persisted layout can gain a new child block and move tail content in one operation (still invokable from API/tests before the long-press UI lands).
+
+**What changes:**
+
+- **Backend:** `POST /api/notebooks/{notebook}/book/blocks` with body **`{ "fromBookContentBlockId": <int> }`** (name per OpenAPI). Resolve the row, verify it belongs to the notebook’s book, split the owning block’s ordered content at that row, insert a new **`BookBlock`** immediately after the owner in preorder with **`depth = owner.depth + 1`**, reassign **`BookContentBlock`** ownership and **`sibling_order`**, renumber **`layout_sequence`** globally, derive **`structuralTitle`** from the first moved block’s text (fallback title if no text). Return **`Book`** with `@JsonView(Full)` and **201** (or project-standard success shape).
+- **Tests:** [`NotebookBooksControllerTest`](../backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java): happy path (depth, counts, ownership), unknown id / wrong book **404**, bad tree **400** if applicable, no write access on notebook.
+
+**Depends on:** 9.1 (clients need ids; implementation can ship 9.2 after 9.1 or in parallel if tests use DB ids from fixtures).
+
+---
+
+#### Phase 9.3 — Reader: content stream panel (selected block)
+
+**User value:** In the book reading **main pane**, the user sees the **imported body** for the **currently selected** layout block — the surface long-press will attach to.
+
+**What changes:**
+
+- **Frontend:** New panel (e.g. under **`PdfBookViewer`**) listing **`contentBlocks`** for **`selectedBlockId`**: short preview from **`raw`** (parse `text` when present), stable hooks **`data-testid="book-reading-content-stream"`**, **`data-testid="book-reading-content-block"`**, **`data-book-content-block-id`**. **Layout:** flex column so PDF stays primary (`min-h-0`, capped height / scroll for the stream). No long-press yet.
+- **Tests:** Vitest on the component (rows, attributes) or minimal mount test; update **`BookBlockFull`** stubs in shared fixtures / specs to include **`contentBlocks: []`** where needed.
+
+**Depends on:** 9.1 (wire shape).
+
+---
+
+#### Phase 9.4 — Reader: long-press, callout, and split integration
+
+**User value:** User can **hold** on a content row, see **"New block"**, confirm, and see the layout update.
+
+**What changes:**
+
+- **Frontend:** Pointer **hold** with duration threshold and **movement tolerance** (must not fight PDF scroll). **`CalloutCard`** (or equivalent) with **New block** + **Cancel** / dismiss (Escape, outside click). On confirm: call **`NotebookBooksController.createBookBlockFromContent`**, **`emit('update:book', data)`**, optionally **select** the new block and scroll PDF via existing selection helpers. Reuse **`pendingLayoutBlockId`** or a dedicated pending flag so layout ops don’t overlap.
+- **Tests:** Vitest for hold logic optional; behavior covered by 9.5 E2E.
+
+**Depends on:** 9.2, 9.3.
+
+---
+
+#### Phase 9.5 — E2E: long-press creates child block
+
+**User value:** Regresses the full flow in CI.
+
+**What changes:**
+
+- **E2E:** Extend [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature) (or adjacent feature): attach a fixture where a block has **≥2** `contentBlocks`, open reader, long-press a row (page object + Cypress timing), assert callout, click **New block**, assert new layout row **child depth** relative to owner. Step definitions in [`book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) + [`bookReadingPage`](../e2e_test/start/pageObjects/bookReadingPage.ts).
+
+**Depends on:** 9.4.
 
 ---
 

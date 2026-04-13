@@ -14,6 +14,7 @@ class BookBlockFullBuilder extends Builder<BookBlockFull> {
       depth: 0,
       title: '',
       allBboxes: [],
+      contentBlocks: [],
     }
   }
 

@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({"id", "depth", "title", "allBboxes"})
+@JsonPropertyOrder({"id", "depth", "title", "allBboxes", "contentBlocks"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -54,13 +56,20 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @OrderBy("siblingOrder ASC")
-  @JsonIgnore
-  private final List<BookContentBlock> contentBlocks = new ArrayList<>();
+  @Fetch(FetchMode.SUBSELECT)
+  private List<BookContentBlock> contentBlocks = new ArrayList<>();
 
   @JsonProperty("allBboxes")
   @JsonView(BookViews.Full.class)
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<PageBbox> getAllBboxes() {
     return BookBlockContentBboxes.allBboxes(contentBlocks);
+  }
+
+  @JsonProperty("contentBlocks")
+  @JsonView(BookViews.Full.class)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  public List<BookContentBlock> getContentBlocks() {
+    return contentBlocks;
   }
 }

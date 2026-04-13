@@ -267,6 +267,11 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       for (int i = 0; i < 3; i++) {
         assertThat(blocks.get(i).get("id").asInt(), equalTo(byLayoutSeq.get(i).getId()));
       }
+      for (int i = 0; i < 3; i++) {
+        JsonNode cbs = blocks.get(i).get("contentBlocks");
+        assertThat(cbs.isArray(), equalTo(true));
+        assertThat(cbs.size(), equalTo(0));
+      }
     }
 
     @Test
@@ -379,6 +384,54 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(cbs.get(1).getSiblingOrder(), equalTo(1));
       assertThat(cbs.get(1).getType(), equalTo("text"));
       assertThat(cbs.get(1).getPageIdx(), equalTo(1));
+
+      Book detail = controller.getBook(nb);
+      assertThat(
+          detail.getBlocks().stream().map(BookBlock::getId).toList(), hasItem(block.getId()));
+      BookBlock detailChapter =
+          detail.getBlocks().stream()
+              .filter(b -> b.getId().equals(block.getId()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(detailChapter.getContentBlocks(), hasSize(2));
+
+      String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
+      JsonNode blocks = objectMapper.readTree(json).get("blocks");
+      JsonNode chapter = null;
+      for (JsonNode b : blocks) {
+        if (b.get("id").asInt() == block.getId()) {
+          chapter = b;
+          break;
+        }
+      }
+      assertThat(chapter, notNullValue());
+      JsonNode wireCbs = chapter.get("contentBlocks");
+      assertThat(wireCbs.isArray(), equalTo(true));
+      assertThat(wireCbs.size(), equalTo(2));
+      assertThat(wireCbs.get(0).get("id").asInt(), equalTo(cbs.get(0).getId()));
+      assertThat(wireCbs.get(1).get("id").asInt(), equalTo(cbs.get(1).getId()));
+      assertThat(wireCbs.get(0).get("type").asText(), equalTo("text"));
+      assertThat(wireCbs.get(1).get("type").asText(), equalTo("text"));
+      assertThat(wireCbs.get(1).get("pageIdx").asInt(), equalTo(1));
+      assertThat(wireCbs.get(0).get("raw").asText().isBlank(), equalTo(false));
+      assertThat(wireCbs.get(1).get("raw").asText().isBlank(), equalTo(false));
+
+      Book detailAgain = controller.getBook(nb);
+      String jsonAgain =
+          objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detailAgain);
+      JsonNode blocksAgain = objectMapper.readTree(jsonAgain).get("blocks");
+      JsonNode chapterAgain = null;
+      for (JsonNode b : blocksAgain) {
+        if (b.get("id").asInt() == block.getId()) {
+          chapterAgain = b;
+          break;
+        }
+      }
+      assertThat(chapterAgain, notNullValue());
+      assertThat(
+          chapterAgain.get("contentBlocks").get(0).get("id").asInt(), equalTo(cbs.get(0).getId()));
+      assertThat(
+          chapterAgain.get("contentBlocks").get(1).get("id").asInt(), equalTo(cbs.get(1).getId()));
     }
 
     @Test
