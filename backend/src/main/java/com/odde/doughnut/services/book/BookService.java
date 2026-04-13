@@ -331,6 +331,7 @@ public class BookService {
         BookContentBlock cb = cancelledContentBlocks.get(i);
         cb.setBookBlock(predecessor);
         cb.setSiblingOrder(offset + i);
+        cb.setRawData(stripTextLevel(cb.getRawData()));
         entityPersister.save(cb);
       }
     }
@@ -526,6 +527,20 @@ public class BookService {
             "failed to serialize content block");
       }
       entityPersister.save(cb);
+    }
+  }
+
+  private String stripTextLevel(String rawData) {
+    if (rawData == null) {
+      return rawData;
+    }
+    try {
+      com.fasterxml.jackson.databind.node.ObjectNode node =
+          (com.fasterxml.jackson.databind.node.ObjectNode) objectMapper.readTree(rawData);
+      node.remove("text_level");
+      return objectMapper.writeValueAsString(node);
+    } catch (Exception e) {
+      return rawData;
     }
   }
 

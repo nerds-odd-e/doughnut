@@ -1352,5 +1352,41 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       JsonNode raw = objectMapper.readTree(aCbs.getFirst().getRawData());
       assertThat(raw.get("text").asText(), equalTo("B"));
     }
+
+    @Test
+    void titleBecomesFirstContentBlockOfPredecessorWhenCancelledBlockHasContent() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "Body of B");
+      bodyItem.put("page_idx", 1);
+      AttachBookLayoutNodeRequest nodeB = node("B");
+      nodeB.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("B", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
+      controller.attachBook(nb, attachRequest(node("A"), nodeB), pdfFile(STUB_PDF_BYTES));
+      Book book = bookOf(nb);
+      BookBlock blockB =
+          book.getBlocks().stream()
+              .filter(b -> b.getStructuralTitle().equals("B"))
+              .findFirst()
+              .orElseThrow();
+      BookBlock blockA =
+          book.getBlocks().stream()
+              .filter(b -> b.getStructuralTitle().equals("A"))
+              .findFirst()
+              .orElseThrow();
+
+      controller.cancelBookBlock(nb, blockB);
+
+      List<BookContentBlock> aCbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(blockA.getId());
+      assertThat(aCbs, hasSize(2));
+      JsonNode headingRaw = objectMapper.readTree(aCbs.get(0).getRawData());
+      assertThat(headingRaw.get("text").asText(), equalTo("B"));
+      assertThat(headingRaw.has("text_level"), equalTo(false));
+      JsonNode bodyRaw = objectMapper.readTree(aCbs.get(1).getRawData());
+      assertThat(bodyRaw.get("text").asText(), equalTo("Body of B"));
+    }
   }
 }
