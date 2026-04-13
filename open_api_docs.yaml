@@ -1213,30 +1213,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/notebooks/{notebook}/book/blocks/{bookBlock}/split:
-    post:
-      tags:
-      - notebook-books-controller
-      summary: Split a book block into two
-      operationId: splitBookBlock
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: bookBlock
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Book_Full"
   /api/notebooks/{notebook}/attach-book:
     post:
       tags:

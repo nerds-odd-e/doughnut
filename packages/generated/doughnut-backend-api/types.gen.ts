@@ -1880,25 +1880,6 @@ export type ImportObsidianResponses = {
     200: unknown;
 };
 
-export type SplitBookBlockData = {
-    body?: never;
-    path: {
-        notebook: number;
-        bookBlock: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}/split';
-};
-
-export type SplitBookBlockResponses = {
-    /**
-     * OK
-     */
-    200: BookFull;
-};
-
-export type SplitBookBlockResponse = SplitBookBlockResponses[keyof SplitBookBlockResponses];
-
 export type AttachBookData = {
     body?: {
         metadata: AttachBookRequestFull;

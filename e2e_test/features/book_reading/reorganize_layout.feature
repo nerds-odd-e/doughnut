@@ -52,10 +52,3 @@ Feature: Reorganize book layout
       Then the book block "Chapter A" should no longer appear in the book layout
       And the book block "A.1 First section" should be at depth 0 in the book layout
       And the book block "A.2 Second section" should be at depth 0 in the book layout
-
-    Scenario: Split a book block by pressing Enter
-      When I choose the book block "A.1 First section"
-      Then the book block "A.1 First section" should be focused in the book layout
-      When I press "Enter" on the book layout
-      Then the book block "Body text of A.1." should be at depth 1 in the book layout
-      And the book block "A.1 First section" should be at depth 1 in the book layout

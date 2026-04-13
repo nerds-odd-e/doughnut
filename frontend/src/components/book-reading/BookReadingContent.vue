@@ -45,7 +45,6 @@
     @block-indent="onBlockIndent"
     @block-outdent="onBlockOutdent"
     @block-cancel="onBlockCancel"
-    @block-split="onBlockSplit"
   >
     <main
       ref="mainPaneRef"
@@ -425,16 +424,6 @@ async function onBlockCancel(block: BookBlockFull) {
   if (!error && data) {
     emit("update:book", data)
     selectedBlockId.value = null
-  }
-}
-
-async function onBlockSplit(block: BookBlockFull) {
-  const { data, error } = await NotebookBooksController.splitBookBlock({
-    path: { notebook: notebookId.value, bookBlock: block.id },
-  })
-  if (!error && data) {
-    emit("update:book", data)
-    selectedBlockId.value = block.id
   }
 }
 

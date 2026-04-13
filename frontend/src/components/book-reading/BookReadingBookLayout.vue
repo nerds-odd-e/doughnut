@@ -58,7 +58,6 @@
           @keydown.tab.shift.prevent="emit('blockOutdent', block)"
           @keydown.tab.exact.prevent="emit('blockIndent', block)"
           @keydown.delete.prevent="emit('blockCancel', block)"
-          @keydown.enter.prevent="emit('blockSplit', block)"
         >
           <span
             class="book-reading-book-block-guides"
@@ -131,7 +130,6 @@ const emit = defineEmits<{
   blockIndent: [block: BookBlockFull]
   blockOutdent: [block: BookBlockFull]
   blockCancel: [block: BookBlockFull]
-  blockSplit: [block: BookBlockFull]
 }>()
 
 const asideRef = ref<HTMLElement | null>(null)
