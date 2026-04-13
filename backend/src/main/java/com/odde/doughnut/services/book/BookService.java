@@ -309,11 +309,27 @@ public class BookService {
     List<BookContentBlock> cancelledContentBlocks =
         bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(bookBlock.getId());
     int offset = predecessorContentBlocks.size();
-    for (int i = 0; i < cancelledContentBlocks.size(); i++) {
-      BookContentBlock cb = cancelledContentBlocks.get(i);
-      cb.setBookBlock(predecessor);
-      cb.setSiblingOrder(offset + i);
-      entityPersister.save(cb);
+    if (cancelledContentBlocks.isEmpty()) {
+      BookContentBlock titleCb = new BookContentBlock();
+      titleCb.setBookBlock(predecessor);
+      titleCb.setSiblingOrder(offset);
+      titleCb.setType("text");
+      try {
+        titleCb.setRawData(
+            objectMapper.writeValueAsString(
+                Map.of("type", "text", "text", bookBlock.getStructuralTitle())));
+      } catch (JsonProcessingException e) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR, "Failed to serialize title content block");
+      }
+      entityPersister.save(titleCb);
+    } else {
+      for (int i = 0; i < cancelledContentBlocks.size(); i++) {
+        BookContentBlock cb = cancelledContentBlocks.get(i);
+        cb.setBookBlock(predecessor);
+        cb.setSiblingOrder(offset + i);
+        entityPersister.save(cb);
+      }
     }
     entityPersister.flush();
 

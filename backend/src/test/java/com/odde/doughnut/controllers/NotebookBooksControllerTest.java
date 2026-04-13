@@ -1301,4 +1301,33 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           () -> controller.changeBookBlockDepth(otherNb, block, indent()));
     }
   }
+
+  @Nested
+  class CancelBookBlock {
+
+    @Test
+    void titleBecomesContentBlockOfPredecessorWhenCancelledBlockHasNoContent() throws Exception {
+      Notebook nb = myNotebook();
+      controller.attachBook(nb, attachRequest(node("A"), node("B")), pdfFile(STUB_PDF_BYTES));
+      Book book = bookOf(nb);
+      BookBlock blockB =
+          book.getBlocks().stream()
+              .filter(b -> b.getStructuralTitle().equals("B"))
+              .findFirst()
+              .orElseThrow();
+      BookBlock blockA =
+          book.getBlocks().stream()
+              .filter(b -> b.getStructuralTitle().equals("A"))
+              .findFirst()
+              .orElseThrow();
+
+      controller.cancelBookBlock(nb, blockB);
+
+      List<BookContentBlock> aCbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(blockA.getId());
+      assertThat(aCbs, hasSize(1));
+      JsonNode raw = objectMapper.readTree(aCbs.getFirst().getRawData());
+      assertThat(raw.get("text").asText(), equalTo("B"));
+    }
+  }
 }
