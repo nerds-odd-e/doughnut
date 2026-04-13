@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.BookBlockDepthRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordPutRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
+import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.BookMutationResponse;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
@@ -156,6 +157,18 @@ class NotebookBooksController {
     String status = body == null ? BookBlockReadingRecord.STATUS_READ : body.getStatus();
     bookService.upsertReadingRecord(notebook, user, bookBlock, status);
     return bookService.listReadingRecordsForBook(notebook, user);
+  }
+
+  @Operation(
+      operationId = "suggestBookLayoutReorganization",
+      summary = "Suggest book layout depths via AI (preview only, does not persist)")
+  @PostMapping("/{notebook}/book/reorganize-layout/suggest")
+  @Transactional(readOnly = true)
+  public BookLayoutReorganizationSuggestion suggestBookLayoutReorganization(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    return bookService.suggestLayoutReorganization(notebook);
   }
 
   @Operation(operationId = "changeBookBlockDepth", summary = "Change depth of a book block")

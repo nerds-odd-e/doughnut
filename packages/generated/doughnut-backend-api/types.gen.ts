@@ -333,6 +333,21 @@ export type RedirectToNoteResponse = {
     noteId?: number;
 };
 
+/**
+ * Suggested depth for a single block
+ */
+export type BlockDepthSuggestion = {
+    id: number;
+    depth: number;
+};
+
+/**
+ * AI suggestion for reorganizing book block depths
+ */
+export type BookLayoutReorganizationSuggestion = {
+    blocks: Array<BlockDepthSuggestion>;
+};
+
 export type AttachBookLayoutNodeRequestFull = {
     title: string;
     children?: Array<AttachBookLayoutNodeRequestFull>;
@@ -1910,6 +1925,24 @@ export type ImportObsidianResponses = {
      */
     200: unknown;
 };
+
+export type SuggestBookLayoutReorganizationData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/reorganize-layout/suggest';
+};
+
+export type SuggestBookLayoutReorganizationResponses = {
+    /**
+     * OK
+     */
+    200: BookLayoutReorganizationSuggestion;
+};
+
+export type SuggestBookLayoutReorganizationResponse = SuggestBookLayoutReorganizationResponses[keyof SuggestBookLayoutReorganizationResponses];
 
 export type AttachBookData = {
     body?: {

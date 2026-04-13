@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.RelationType;
@@ -171,6 +172,26 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return new InstructionAndSchema(
         "Please generate an understanding checklist of the note details broken down into key points. Each point should be a complete sentence that captures an important aspect of the note content. The checklist should help the user check whether they truly understood the important points in the note. There should only be a maximum of 5 points.",
         generateUnderstandingChecklist());
+  }
+
+  public static InstructionAndSchema bookLayoutReorganizationAiTool() {
+    String instruction =
+        """
+        You reorganize the outline nesting of book blocks for a PDF-derived book layout.
+
+        The user message is a JSON array of objects, each with: id (integer), title (string), depth (integer).
+        The list order is fixed (preorder: parent before descendants). Titles often encode section numbering (e.g. "1.", "1.1", "Chapter 2").
+
+        Task: propose corrected depths so the outline reflects the true hierarchy. Root-level sections have depth 0.
+        Depths must form a valid preorder tree: the first block has depth 0; each next block's depth is at most one greater than the previous block's depth, and never negative.
+
+        Output: return exactly one entry per input id with the suggested depth. Include every id exactly once. Do not add or remove ids. Preserve the logical roles implied by titles and numbering.
+        """;
+    return new InstructionAndSchema(instruction, bookLayoutReorganizationSuggestion());
+  }
+
+  public static Class<?> bookLayoutReorganizationSuggestion() {
+    return BookLayoutReorganizationSuggestion.class;
   }
 
   public static InstructionAndSchema removePointsFromDetailsAiTool(List<String> pointsToRemove) {

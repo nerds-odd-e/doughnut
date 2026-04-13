@@ -1213,6 +1213,25 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/book/reorganize-layout/suggest:
+    post:
+      tags:
+      - notebook-books-controller
+      summary: "Suggest book layout depths via AI (preview only, does not persist)"
+      operationId: suggestBookLayoutReorganization
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/BookLayoutReorganizationSuggestion"
   /api/notebooks/{notebook}/attach-book:
     post:
       tags:
@@ -3877,6 +3896,29 @@ components:
         noteId:
           type: integer
           format: int32
+    BlockDepthSuggestion:
+      type: object
+      description: Suggested depth for a single block
+      properties:
+        id:
+          type: integer
+          format: int32
+        depth:
+          type: integer
+          format: int32
+      required:
+      - depth
+      - id
+    BookLayoutReorganizationSuggestion:
+      type: object
+      description: AI suggestion for reorganizing book block depths
+      properties:
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockDepthSuggestion"
+      required:
+      - blocks
     AttachBookLayoutNodeRequest_Full:
       type: object
       properties:

@@ -5,6 +5,8 @@ import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_CONTE
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
@@ -12,6 +14,8 @@ import com.odde.doughnut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
+import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
+import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion.BlockDepthSuggestion;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
@@ -25,16 +29,26 @@ import com.odde.doughnut.entities.repositories.BookContentBlockRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +69,8 @@ public class BookService {
   private final TestabilitySettings testabilitySettings;
   private final BookStorage bookStorage;
   private final ObjectMapper objectMapper;
+  private final OpenAiApiHandler openAiApiHandler;
+  private final GlobalSettingsService globalSettingsService;
 
   public BookService(
       BookRepository bookRepository,
@@ -65,7 +81,9 @@ public class BookService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       BookStorage bookStorage,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      OpenAiApiHandler openAiApiHandler,
+      GlobalSettingsService globalSettingsService) {
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
     this.bookBlockRepository = bookBlockRepository;
@@ -75,6 +93,8 @@ public class BookService {
     this.testabilitySettings = testabilitySettings;
     this.bookStorage = bookStorage;
     this.objectMapper = objectMapper;
+    this.openAiApiHandler = openAiApiHandler;
+    this.globalSettingsService = globalSettingsService;
   }
 
   @Transactional
@@ -130,6 +150,109 @@ public class BookService {
     Book book = requireBook(notebook);
     book.getBlocks().size();
     return book;
+  }
+
+  @Transactional(readOnly = true)
+  public BookLayoutReorganizationSuggestion suggestLayoutReorganization(Notebook notebook) {
+    Book book = requireBook(notebook);
+    List<BookBlock> ordered = book.getBlocks();
+    if (ordered.isEmpty()) {
+      var empty = new BookLayoutReorganizationSuggestion();
+      empty.setBlocks(List.of());
+      return empty;
+    }
+    String userJson;
+    try {
+      userJson = objectMapper.writeValueAsString(layoutBlocksPayload(ordered));
+    } catch (JsonProcessingException e) {
+      throw new ApiException(
+          "failed to serialize book blocks",
+          ApiError.ErrorType.BINDING_ERROR,
+          "failed to serialize book blocks");
+    }
+    InstructionAndSchema tool = AiToolFactory.bookLayoutReorganizationAiTool();
+    String model = globalSettingsService.globalSettingEvaluation().getValue();
+    OpenAIChatRequestBuilder builder =
+        new OpenAIChatRequestBuilder().model(model).addUserMessage(userJson);
+    JsonNode jsonNode =
+        openAiApiHandler
+            .requestAndGetJsonSchemaResult(tool, builder)
+            .orElseThrow(
+                () ->
+                    new OpenAIServiceErrorException(
+                        "AI did not return a layout reorganization suggestion",
+                        HttpStatus.BAD_GATEWAY));
+    BookLayoutReorganizationSuggestion suggestion;
+    try {
+      suggestion =
+          objectMapper
+              .copy()
+              .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+              .treeToValue(jsonNode, BookLayoutReorganizationSuggestion.class);
+    } catch (JsonProcessingException e) {
+      throw new OpenAIServiceErrorException(
+          "AI returned malformed layout suggestion", HttpStatus.BAD_GATEWAY);
+    }
+    validateSuggestedLayout(ordered, suggestion);
+    return suggestion;
+  }
+
+  private static List<Map<String, Object>> layoutBlocksPayload(List<BookBlock> ordered) {
+    List<Map<String, Object>> payload = new ArrayList<>(ordered.size());
+    for (BookBlock b : ordered) {
+      Map<String, Object> row = new LinkedHashMap<>();
+      row.put("id", b.getId());
+      row.put("title", b.getStructuralTitle());
+      row.put("depth", b.getDepth());
+      payload.add(row);
+    }
+    return payload;
+  }
+
+  private static void validateSuggestedLayout(
+      List<BookBlock> ordered, BookLayoutReorganizationSuggestion suggestion) {
+    List<BlockDepthSuggestion> items = suggestion.getBlocks();
+    if (items == null || items.size() != ordered.size()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid AI suggestion");
+    }
+    Set<Integer> inputIds = new HashSet<>();
+    for (BookBlock b : ordered) {
+      inputIds.add(b.getId());
+    }
+    Map<Integer, Integer> idToDepth = new HashMap<>();
+    for (BlockDepthSuggestion e : items) {
+      if (e.getId() == null || e.getDepth() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid AI suggestion");
+      }
+      if (idToDepth.put(e.getId(), e.getDepth()) != null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid AI suggestion");
+      }
+    }
+    if (!inputIds.equals(idToDepth.keySet())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid AI suggestion");
+    }
+    int[] depths = new int[ordered.size()];
+    for (int i = 0; i < ordered.size(); i++) {
+      depths[i] = idToDepth.get(ordered.get(i).getId());
+    }
+    validatePreorderDepths(depths);
+  }
+
+  private static void validatePreorderDepths(int[] depths) {
+    if (depths.length == 0) {
+      return;
+    }
+    if (depths[0] != 0 || depths[0] > MAX_LAYOUT_DEPTH) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Suggested depths do not form a valid outline");
+    }
+    for (int i = 1; i < depths.length; i++) {
+      int d = depths[i];
+      if (d < 0 || d > MAX_LAYOUT_DEPTH || d > depths[i - 1] + 1) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Suggested depths do not form a valid outline");
+      }
+    }
   }
 
   private Book requireBook(Notebook notebook) {

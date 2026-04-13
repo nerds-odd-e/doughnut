@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion.BlockDepthSuggestion;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
@@ -20,9 +21,12 @@ import com.odde.doughnut.entities.repositories.BookContentBlockRepository;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,6 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +53,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   private static final byte[] STUB_PDF_BYTES = new byte[] {1};
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialOpenAiClient;
+
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
@@ -56,9 +64,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired BookStorage bookStorage;
   @Autowired ObjectMapper objectMapper;
 
+  OpenAIChatCompletionMock openAIChatCompletionMock;
+
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialOpenAiClient);
   }
 
   private Notebook myNotebook() {
@@ -1312,6 +1323,126 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.changeBookBlockDepth(otherNb, block, indent()));
+    }
+  }
+
+  @Nested
+  class SuggestBookLayoutReorganization {
+
+    private Notebook nb;
+    private final byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+
+    @BeforeEach
+    void setupBook() throws Exception {
+      nb = myNotebook();
+      controller.attachBook(
+          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(pdfBytes));
+    }
+
+    private BookLayoutReorganizationSuggestion suggestionRenestingBAndC() {
+      Book book = bookOf(nb);
+      var suggestion = new BookLayoutReorganizationSuggestion();
+      List<BlockDepthSuggestion> items = new ArrayList<>();
+      for (BookBlock b : book.getBlocks()) {
+        var e = new BlockDepthSuggestion();
+        e.setId(b.getId());
+        e.setDepth(
+            switch (b.getStructuralTitle()) {
+              case "A" -> 0;
+              case "B" -> 1;
+              case "C" -> 2;
+              case "D" -> 0;
+              default -> throw new IllegalStateException();
+            });
+        items.add(e);
+      }
+      suggestion.setBlocks(items);
+      return suggestion;
+    }
+
+    @Test
+    void returnsAiSuggestionWithValidatedDepths() throws Exception {
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(suggestionRenestingBAndC());
+
+      BookLayoutReorganizationSuggestion result = controller.suggestBookLayoutReorganization(nb);
+
+      assertThat(result.getBlocks(), hasSize(4));
+      Map<String, Integer> byTitle = new LinkedHashMap<>();
+      Book book = bookOf(nb);
+      for (BookBlock blk : book.getBlocks()) {
+        int id = blk.getId();
+        int depth =
+            result.getBlocks().stream()
+                .filter(s -> s.getId().equals(id))
+                .map(BlockDepthSuggestion::getDepth)
+                .findFirst()
+                .orElseThrow();
+        byTitle.put(blk.getStructuralTitle(), depth);
+      }
+      assertThat(byTitle.get("A"), equalTo(0));
+      assertThat(byTitle.get("B"), equalTo(1));
+      assertThat(byTitle.get("C"), equalTo(2));
+      assertThat(byTitle.get("D"), equalTo(0));
+    }
+
+    @Test
+    void rejectsInvalidPreorderDepthsFromAi() throws Exception {
+      Book book = bookOf(nb);
+      var bad = new BookLayoutReorganizationSuggestion();
+      List<BlockDepthSuggestion> items = new ArrayList<>();
+      for (BookBlock b : book.getBlocks()) {
+        var e = new BlockDepthSuggestion();
+        e.setId(b.getId());
+        e.setDepth("A".equals(b.getStructuralTitle()) ? 0 : 2);
+        items.add(e);
+      }
+      bad.setBlocks(items);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(bad);
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.suggestBookLayoutReorganization(nb));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void rejectsWhenAiOmitsABlockId() throws Exception {
+      Book book = bookOf(nb);
+      var bad = new BookLayoutReorganizationSuggestion();
+      List<BlockDepthSuggestion> items = new ArrayList<>();
+      for (BookBlock b : book.getBlocks()) {
+        if ("C".equals(b.getStructuralTitle())) {
+          continue;
+        }
+        var e = new BlockDepthSuggestion();
+        e.setId(b.getId());
+        e.setDepth(0);
+        items.add(e);
+      }
+      bad.setBlocks(items);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(bad);
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.suggestBookLayoutReorganization(nb));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void rejectsWhenAiReturnsEmptyCompletion() {
+      openAIChatCompletionMock.mockNullChatCompletion();
+
+      assertThrows(
+          OpenAIServiceErrorException.class, () -> controller.suggestBookLayoutReorganization(nb));
+    }
+
+    @Test
+    void rejectsNotebookWithoutWriteAccess() {
+      Notebook otherNb = otherUsersNotebookWithBook();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.suggestBookLayoutReorganization(otherNb));
     }
   }
 
