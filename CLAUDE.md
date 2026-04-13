@@ -197,7 +197,8 @@ doughnut/
 
 - Informal plans for active work: `ongoing/<short-name>.md`
 - **Phase principles, testing strategy, TDD workflow, deploy gate, interim behavior:** `.cursor/rules/planning.mdc`
-- **Task decomposition into phases:** `phased-planning` skill (`.cursor/skills/phased-planning/SKILL.md`); auto-triggered by planning-timer hook after 10 minutes
+- **Codebase friction retrospective:** `codebase-retrospective` skill (`.cursor/skills/codebase-retrospective/SKILL.md`); auto-triggered by timer hook after 5 minutes
+- **Task decomposition into phases:** `phased-planning` skill (`.cursor/skills/phased-planning/SKILL.md`); auto-triggered by timer hook after 10 minutes
 
 ## Development principles
 

@@ -18,11 +18,12 @@ description: >-
 ## If triggered by the 10-minute timeout
 
 1. **Stop** implementing immediately.
-2. **Summarize** what you have learned (discoveries, blockers, partial progress).
-3. **Stash** your changes: `git stash -m "WIP: <brief description>"`.
-4. **Decompose** the remaining work into phases (see below).
-5. **Write** the plan to `ongoing/<short-name>.md`.
-6. **Report** to the developer and wait for their decision.
+2. **Review your conversation history**: what files did you search, what confused you, what approaches did you try, what failed? Identify the concrete reasons progress was slow.
+3. **Summarize** what you have learned (discoveries, blockers, partial progress) — include the friction points from step 2.
+4. **Stash** your changes: `git stash -m "WIP: <brief description>"`.
+5. **Decompose** the remaining work into phases (see below).
+6. **Write** the plan to `ongoing/<short-name>.md`.
+7. **Report** to the developer and wait for their decision.
 
 ## Where to put plans
 
