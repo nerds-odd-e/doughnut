@@ -133,4 +133,65 @@ describe("BookReadingContent AI reorganize suggest", () => {
     expect(dialog.classes()).not.toContain("daisy-modal-open")
     wrapper.unmount()
   })
+
+  it("preview lists blocks with suggested depths and highlights changed rows", async () => {
+    const book = makeMe.aBook
+      .notebookId("9")
+      .blocks([
+        makeMe.aBookBlock.id(1).depth(0).title("Alpha").please(),
+        makeMe.aBookBlock.id(2).depth(0).title("Beta").please(),
+      ])
+      .please()
+
+    vi.mocked(
+      NotebookBooksController.suggestBookLayoutReorganization
+    ).mockResolvedValueOnce(
+      wrapSdkResponse({
+        blocks: [
+          { id: 1, depth: 0 },
+          { id: 2, depth: 1 },
+        ],
+      })
+    )
+
+    const wrapper = helper
+      .component(BookReadingContent)
+      .withRouter()
+      .withProps({
+        book,
+        bookPdfBytes: new ArrayBuffer(0),
+        initialLastRead: null,
+      })
+      .mount({
+        global: {
+          stubs: {
+            GlobalBar: { template: "<div><slot /></div>" },
+            PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
+            ReadingControlPanel: true,
+            CurrentBlockNavigationBar: true,
+          },
+        },
+      })
+
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="book-reading-ai-reorganize-layout"]')
+      .trigger("click")
+    await flushPromises()
+
+    const rows = wrapper.findAll(
+      '[data-testid="book-layout-reorganize-preview-row"]'
+    )
+    expect(rows).toHaveLength(2)
+    expect(rows[0]!.text()).toContain("Alpha")
+    expect(rows[0]!.attributes("data-suggested-depth")).toBe("0")
+    expect(rows[0]!.classes()).not.toContain("daisy-bg-warning/15")
+
+    expect(rows[1]!.text()).toContain("Beta")
+    expect(rows[1]!.attributes("data-suggested-depth")).toBe("1")
+    expect(rows[1]!.classes()).toContain("daisy-bg-warning/15")
+
+    wrapper.unmount()
+  })
 })

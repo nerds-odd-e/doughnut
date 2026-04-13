@@ -111,9 +111,26 @@
       >
         Reorganize layout (preview)
       </h2>
-      <p class="daisy-m-0 daisy-py-4 daisy-text-sm daisy-text-base-content/60">
-        Suggested depths for each block will be listed here.
-      </p>
+      <div
+        class="daisy-max-h-[min(24rem,50vh)] daisy-overflow-y-auto daisy-py-2"
+      >
+        <div
+          v-for="row in aiReorganizePreviewRows"
+          :key="row.block.id"
+          data-testid="book-layout-reorganize-preview-row"
+          class="daisy-rounded daisy-py-1.5 daisy-pr-2 daisy-text-sm daisy-leading-snug"
+          :class="{
+            'daisy-bg-warning/15': row.depthChanged,
+          }"
+          :data-suggested-depth="row.suggestedDepth"
+          :data-depth-changed="row.depthChanged ? 'true' : undefined"
+          :style="{
+            paddingInlineStart: `${0.75 * row.suggestedDepth}rem`,
+          }"
+        >
+          {{ row.block.title }}
+        </div>
+      </div>
       <div class="daisy-modal-action">
         <button
           type="button"
@@ -245,6 +262,27 @@ const pendingLayoutBlockId = ref<number | null>(null)
 const aiReorganizeSuggestPending = ref(false)
 const aiLayoutReorganizationSuggestion =
   ref<BookLayoutReorganizationSuggestion | null>(null)
+
+const aiReorganizePreviewRows = computed(() => {
+  const suggestion = aiLayoutReorganizationSuggestion.value
+  if (suggestion === null) return []
+  const idToDepth = new Map(
+    suggestion.blocks.map((e) => [e.id, e.depth] as const)
+  )
+  return bookBlocks.value
+    .map((block) => {
+      const suggestedDepth = idToDepth.get(block.id)
+      if (suggestedDepth === undefined) {
+        return null
+      }
+      return {
+        block,
+        suggestedDepth,
+        depthChanged: suggestedDepth !== block.depth,
+      }
+    })
+    .filter((row): row is NonNullable<typeof row> => row !== null)
+})
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,

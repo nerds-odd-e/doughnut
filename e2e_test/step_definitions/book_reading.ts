@@ -34,6 +34,23 @@ function pdfFixtureStem(fixtureFilename: string): string {
   return fixtureFilename.replace(/\.pdf$/i, '')
 }
 
+const MAX_BOOK_LAYOUT_DEPTH = 64
+
+function validatePreorderDepths(depths: number[]): void {
+  if (depths.length === 0) {
+    return
+  }
+  if (depths[0] !== 0 || depths[0] > MAX_BOOK_LAYOUT_DEPTH) {
+    throw new Error('Suggested depths do not form a valid outline')
+  }
+  for (let i = 1; i < depths.length; i++) {
+    const d = depths[i]!
+    if (d < 0 || d > MAX_BOOK_LAYOUT_DEPTH || d > depths[i - 1]! + 1) {
+      throw new Error('Suggested depths do not form a valid outline')
+    }
+  }
+}
+
 Given(
   'I set the book reading viewport to {int} by {int}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
@@ -91,6 +108,7 @@ When(
 
 Given(
   'OpenAI returns the current book block depths as the layout suggestion for notebook {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (notebookTitle: string) => {
     return testability()
       .getInjectedNoteIdByTitle(notebookTitle)
@@ -135,6 +153,61 @@ Given(
   }
 )
 
+Given(
+  'OpenAI returns a layout suggestion that indents block {string} for notebook {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (blockTitle: string, notebookTitle: string) => {
+    return testability()
+      .getInjectedNoteIdByTitle(notebookTitle)
+      .then((noteId) =>
+        cy.wrap(NoteController.showNote({ path: { note: noteId } }), {
+          log: false,
+        })
+      )
+      .then((showResponse) => {
+        const realm = unwrapData<NoteRealm>(showResponse)
+        const notebookId = realm.notebook?.id
+        expect(notebookId, 'head note must belong to a notebook').to.be.a(
+          'number'
+        )
+        return cy
+          .wrap(
+            NotebookBooksController.getBook({ path: { notebook: notebookId } }),
+            { log: false }
+          )
+          .then((bookResponse) => {
+            const book = unwrapData<BookFull>(bookResponse)
+            expect(book.blocks, 'book must have blocks').to.be.an('array')
+            const depths = book.blocks.map((b) => b.depth)
+            const idx = book.blocks.findIndex((b) => b.title === blockTitle)
+            expect(
+              idx,
+              `no block with title "${blockTitle}"`
+            ).to.be.greaterThan(0)
+            depths[idx] = depths[idx]! + 1
+            expect(() => validatePreorderDepths(depths)).not.to.throw()
+            const suggestion = {
+              blocks: book.blocks.map((b, i) => ({
+                id: b.id,
+                depth: depths[i]!,
+              })),
+            }
+            const reply = JSON.stringify(suggestion)
+            return cy.then(async () => {
+              await mock_services
+                .openAi()
+                .chatCompletion()
+                .requestMessageMatches({
+                  role: 'system',
+                  content: '.*You reorganize the outline nesting.*',
+                })
+                .stubJsonSchemaResponse(reply)
+            })
+          })
+      })
+  }
+)
+
 When(
   'I request AI reorganization of the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
@@ -148,6 +221,17 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().expectReorganizationPreviewDialog()
+  }
+)
+
+Then(
+  'the preview should show block {string} with suggested depth {int}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (blockTitle: string, suggestedDepth: number) => {
+    return bookReadingPage().expectReorganizationPreviewBlockSuggestedDepth(
+      blockTitle,
+      suggestedDepth
+    )
   }
 )
 

@@ -378,6 +378,23 @@ const bookReadingPage = () => {
       )
       return this
     },
+    expectReorganizationPreviewBlockSuggestedDepth(
+      blockTitle: string,
+      suggestedDepth: number
+    ) {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-layout-reorganize-preview-dialog"]')
+        .should('have.class', 'daisy-modal-open')
+        .within(() => {
+          cy.contains(
+            '[data-testid="book-layout-reorganize-preview-row"]',
+            blockTitle
+          )
+            .should('be.visible')
+            .and('have.attr', 'data-suggested-depth', String(suggestedDepth))
+        })
+      return this
+    },
   }
 }
 
