@@ -1136,7 +1136,8 @@ describe("BookReadingPage", () => {
                   pageIndex: number,
                   normalizedBboxBottom: number,
                   obstructionPx: number,
-                  holdMs: number
+                  holdMs: number,
+                  highlightBboxes?: ReadonlyArray<unknown>
                 ) => void
               }
             }
@@ -1702,7 +1703,16 @@ describe("BookReadingPage", () => {
         })
 
         // cross-page: snapToContentBottomAndHold called with last bbox (pageIndex=1, bottom=150)
-        expect(snapToBottomSpy).toHaveBeenCalledWith(1, 150, 80, 500)
+        expect(snapToBottomSpy).toHaveBeenCalledWith(
+          1,
+          150,
+          80,
+          500,
+          expect.any(Array)
+        )
+        expect(
+          (snapToBottomSpy.mock.calls[0]?.[4] as unknown[]).length
+        ).toBeGreaterThan(0)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
@@ -1738,7 +1748,16 @@ describe("BookReadingPage", () => {
         })
 
         // same-page-too-tall: snapToContentBottomAndHold called with last bbox (pageIndex=0, bottom=750)
-        expect(snapToBottomSpy).toHaveBeenCalledWith(0, 750, 80, 500)
+        expect(snapToBottomSpy).toHaveBeenCalledWith(
+          0,
+          750,
+          80,
+          500,
+          expect.any(Array)
+        )
+        expect(
+          (snapToBottomSpy.mock.calls[0]?.[4] as unknown[]).length
+        ).toBeGreaterThan(0)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 

@@ -432,10 +432,13 @@ async function onBlockCancel(block: BookBlockFull) {
       data.blocks.some((b) => b.id === predecessorId)
     ) {
       selectedBlockId.value = predecessorId
+      emit("update:book", data)
+      const pred = data.blocks.find((b) => b.id === predecessorId)!
+      await applyBookBlockSelection(pred)
     } else {
       selectedBlockId.value = null
+      emit("update:book", data)
     }
-    emit("update:book", data)
   }
 }
 

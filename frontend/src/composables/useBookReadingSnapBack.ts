@@ -19,7 +19,8 @@ export type BookReadingPdfViewerRef = {
     pageIndex: number,
     normalizedBboxBottom: number,
     obstructionPx: number,
-    holdMs: number
+    holdMs: number,
+    highlightBboxes?: ReadonlyArray<BookNavigationTarget>
   ) => void
   suppressScrollInput: (holdMs: number) => void
   contentFitsFromBlockTop: (
@@ -150,7 +151,8 @@ export function useBookReadingSnapBack(options: {
         lastBbox.pageIndex,
         contentBottomY,
         obstructionPx,
-        snapHoldMs
+        snapHoldMs,
+        navTargets
       )
     }
   }

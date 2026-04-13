@@ -487,12 +487,16 @@ function suppressScrollInput(holdMs: number): void {
  * Scrolls so the bottom of the given bbox sits just above `obstructionPx` from the container
  * bottom, then suppresses wheel/touch-move scroll input for `holdMs` milliseconds so trailing
  * gesture events cannot immediately undo the snap.
+ *
+ * When `highlightBboxes` is set, overlays run on the next `updateviewarea` so pdf.js does not
+ * clear them on the scroll-driven viewer update.
  */
 function snapToContentBottomAndHold(
   pageIndex: number,
   normalizedBboxBottom: number,
   obstructionPx: number,
-  holdMs: number
+  holdMs: number,
+  highlightBboxes?: ReadonlyArray<BookNavigationTarget>
 ): void {
   const container = containerRef.value
   if (!container || !pdfViewer) return
@@ -512,6 +516,15 @@ function snapToContentBottomAndHold(
   const targetClient = containerRect.bottom - obstructionPx
   container.scrollTop += bboxBottomClient - targetClient
   suppressScrollInput(holdMs)
+  if (highlightBboxes && highlightBboxes.length > 0) {
+    pdfViewer.eventBus.on(
+      "updateviewarea",
+      () => {
+        showSelectionBboxHighlights(highlightBboxes)
+      },
+      { once: true }
+    )
+  }
 }
 
 defineExpose({
