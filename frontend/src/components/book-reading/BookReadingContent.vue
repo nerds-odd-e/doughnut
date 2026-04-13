@@ -99,6 +99,7 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
+import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
   useBookReadingSnapBack,
@@ -418,12 +419,23 @@ async function onBlockOutdent(block: BookBlockFull) {
 }
 
 async function onBlockCancel(block: BookBlockFull) {
+  const predecessorId = predecessorBookBlockIdInPreorder(
+    bookBlocks.value,
+    block.id
+  )
   const { data, error } = await NotebookBooksController.cancelBookBlock({
     path: { notebook: notebookId.value, bookBlock: block.id },
   })
   if (!error && data) {
+    if (
+      predecessorId !== null &&
+      data.blocks.some((b) => b.id === predecessorId)
+    ) {
+      selectedBlockId.value = predecessorId
+    } else {
+      selectedBlockId.value = null
+    }
     emit("update:book", data)
-    selectedBlockId.value = null
   }
 }
 
