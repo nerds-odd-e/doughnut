@@ -44,6 +44,8 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class BookService {
 
+  public record CancelBlockResult(Book book, int predecessorBlockId) {}
+
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   private final BookBlockRepository bookBlockRepository;
@@ -283,7 +285,7 @@ public class BookService {
   }
 
   @Transactional
-  public Book cancelBlock(Notebook notebook, BookBlock bookBlock) {
+  public CancelBlockResult cancelBlock(Notebook notebook, BookBlock bookBlock) {
     Book book = requireBook(notebook);
     if (!bookBlock.getBook().getId().equals(book.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
@@ -302,6 +304,7 @@ public class BookService {
     if (idx == 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel the first block");
     }
+    int predecessorBlockId = blocks.get(idx - 1).getId();
     BookBlock predecessor = blocks.get(idx - 1);
 
     List<BookContentBlock> predecessorContentBlocks =
@@ -349,7 +352,7 @@ public class BookService {
     entityPersister.flush();
 
     book.getBlocks().size();
-    return book;
+    return new CancelBlockResult(book, predecessorBlockId);
   }
 
   @Transactional

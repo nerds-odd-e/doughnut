@@ -1139,16 +1139,24 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           .orElseThrow(() -> new IllegalArgumentException("Block not found: " + title));
     }
 
+    private int depthOfMut(List<BookBlockMutationResponse> blocks, String title) {
+      return blocks.stream()
+          .filter(b -> b.getTitle().equals(title))
+          .findFirst()
+          .orElseThrow(() -> new IllegalArgumentException("Block not found: " + title))
+          .getDepth();
+    }
+
     @Test
     void indentIncreasesDepthByOne() throws Exception {
       BookBlock b = blockByTitle("B");
       assertThat(b.getDepth(), equalTo(0));
 
-      Book result = controller.changeBookBlockDepth(nb, b, indent());
+      BookMutationResponse result = controller.changeBookBlockDepth(nb, b, indent());
 
       int newDepth =
           result.getBlocks().stream()
-              .filter(blk -> blk.getId().equals(b.getId()))
+              .filter(blk -> blk.getId() == b.getId())
               .findFirst()
               .orElseThrow()
               .getDepth();
@@ -1159,7 +1167,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void indentReturnsFullBookWithAllBlocks() throws Exception {
       BookBlock b = blockByTitle("B");
 
-      Book result = controller.changeBookBlockDepth(nb, b, indent());
+      BookMutationResponse result = controller.changeBookBlockDepth(nb, b, indent());
 
       assertThat(result.getBlocks(), hasSize(4));
     }
@@ -1169,13 +1177,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       // Layout: A(0), B(0), C(1), D(0) — indent B should move B to 1 and C to 2
       BookBlock b = blockByTitle("B");
 
-      Book result = controller.changeBookBlockDepth(nb, b, indent());
+      BookMutationResponse result = controller.changeBookBlockDepth(nb, b, indent());
 
-      List<BookBlock> resultBlocks = result.getBlocks();
-      assertThat(depthOf(resultBlocks, "A"), equalTo(0));
-      assertThat(depthOf(resultBlocks, "B"), equalTo(1));
-      assertThat(depthOf(resultBlocks, "C"), equalTo(2));
-      assertThat(depthOf(resultBlocks, "D"), equalTo(0));
+      List<BookBlockMutationResponse> resultBlocks = result.getBlocks();
+      assertThat(depthOfMut(resultBlocks, "A"), equalTo(0));
+      assertThat(depthOfMut(resultBlocks, "B"), equalTo(1));
+      assertThat(depthOfMut(resultBlocks, "C"), equalTo(2));
+      assertThat(depthOfMut(resultBlocks, "D"), equalTo(0));
     }
 
     @Test
@@ -1191,21 +1199,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
 
-      Book result = controller.changeBookBlockDepth(nb2, y, outdent());
+      BookMutationResponse result = controller.changeBookBlockDepth(nb2, y, outdent());
 
-      List<BookBlock> resultBlocks = result.getBlocks();
-      assertThat(depthOf(resultBlocks, "X"), equalTo(0));
-      assertThat(depthOf(resultBlocks, "Y"), equalTo(0));
-      assertThat(depthOf(resultBlocks, "Z"), equalTo(1));
-      assertThat(depthOf(resultBlocks, "W"), equalTo(0));
-    }
-
-    private int depthOf(List<BookBlock> blocks, String title) {
-      return blocks.stream()
-          .filter(b -> b.getStructuralTitle().equals(title))
-          .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException("Block not found: " + title))
-          .getDepth();
+      List<BookBlockMutationResponse> resultBlocks = result.getBlocks();
+      assertThat(depthOfMut(resultBlocks, "X"), equalTo(0));
+      assertThat(depthOfMut(resultBlocks, "Y"), equalTo(0));
+      assertThat(depthOfMut(resultBlocks, "Z"), equalTo(1));
+      assertThat(depthOfMut(resultBlocks, "W"), equalTo(0));
     }
 
     @Test
@@ -1239,11 +1239,11 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       BookBlock c = blockByTitle("C");
       assertThat(c.getDepth(), equalTo(1));
 
-      Book result = controller.changeBookBlockDepth(nb, c, outdent());
+      BookMutationResponse result = controller.changeBookBlockDepth(nb, c, outdent());
 
       int newDepth =
           result.getBlocks().stream()
-              .filter(blk -> blk.getId().equals(c.getId()))
+              .filter(blk -> blk.getId() == c.getId())
               .findFirst()
               .orElseThrow()
               .getDepth();
@@ -1273,12 +1273,25 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
 
-      Book result = controller.changeBookBlockDepth(nb2, y, outdent());
+      BookMutationResponse result = controller.changeBookBlockDepth(nb2, y, outdent());
 
-      List<BookBlock> resultBlocks = result.getBlocks();
-      assertThat(depthOf(resultBlocks, "X"), equalTo(0));
-      assertThat(depthOf(resultBlocks, "Y"), equalTo(0));
-      assertThat(depthOf(resultBlocks, "Z"), equalTo(1));
+      List<BookBlockMutationResponse> resultBlocks = result.getBlocks();
+      assertThat(depthOfMut(resultBlocks, "X"), equalTo(0));
+      assertThat(depthOfMut(resultBlocks, "Y"), equalTo(0));
+      assertThat(depthOfMut(resultBlocks, "Z"), equalTo(1));
+    }
+
+    @Test
+    void changeBookBlockDepthJsonOmitsAllBboxesOnEveryBlock() throws Exception {
+      BookBlock b = blockByTitle("B");
+      BookMutationResponse wire = controller.changeBookBlockDepth(nb, b, indent());
+      String json = objectMapper.writeValueAsString(wire);
+      JsonNode tree = objectMapper.readTree(json);
+      JsonNode blocksNode = tree.get("blocks");
+      assertThat(blocksNode.size(), equalTo(4));
+      for (JsonNode block : blocksNode) {
+        assertThat(block.has("allBboxes"), equalTo(false));
+      }
     }
 
     @Test
@@ -1321,7 +1334,17 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
 
-      controller.cancelBookBlock(nb, blockB);
+      BookMutationResponse cancelWire = controller.cancelBookBlock(nb, blockB);
+      String cancelJson = objectMapper.writeValueAsString(cancelWire);
+      JsonNode cancelTree = objectMapper.readTree(cancelJson);
+      int aId = blockA.getId();
+      for (JsonNode row : cancelTree.get("blocks")) {
+        if (row.get("id").asInt() == aId) {
+          assertThat(row.has("allBboxes"), equalTo(true));
+        } else {
+          assertThat(row.has("allBboxes"), equalTo(false));
+        }
+      }
 
       List<BookContentBlock> aCbs =
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(blockA.getId());

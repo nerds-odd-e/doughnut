@@ -17,21 +17,24 @@ export type BookBlockReadingRecordListItem = {
     completedAt: string;
 };
 
-export type BookBlockDepthRequestFull = {
+export type BookBlockDepthRequest = {
     direction: 'INDENT' | 'OUTDENT';
 };
 
-export type BookBlockFull = {
+export type BookBlockMutationResponse = {
     id: number;
     /**
      * Nesting depth in the book layout; root-level blocks are 0.
      */
     depth: number;
     title: string;
-    allBboxes: Array<PageBboxFull>;
+    /**
+     * PDF anchors; present only when anchors for this block changed (e.g. cancel merge).
+     */
+    allBboxes?: Array<PageBbox>;
 };
 
-export type BookFull = {
+export type BookMutationResponse = {
     id: number;
     bookName: string;
     format: string;
@@ -40,11 +43,11 @@ export type BookFull = {
     /**
      * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
      */
-    blocks: Array<BookBlockFull>;
+    blocks: Array<BookBlockMutationResponse>;
     notebookId: string;
 };
 
-export type PageBboxFull = {
+export type PageBbox = {
     pageIndex: number;
     bbox: Array<number>;
 };
@@ -350,6 +353,34 @@ export type AttachBookRequestFull = {
     format: string;
     layout?: AttachBookLayoutRequestFull;
     contentList?: Array<unknown>;
+};
+
+export type BookBlockFull = {
+    id: number;
+    /**
+     * Nesting depth in the book layout; root-level blocks are 0.
+     */
+    depth: number;
+    title: string;
+    allBboxes: Array<PageBboxFull>;
+};
+
+export type BookFull = {
+    id: number;
+    bookName: string;
+    format: string;
+    createdAt?: string;
+    updatedAt?: string;
+    /**
+     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
+     */
+    blocks: Array<BookBlockFull>;
+    notebookId: string;
+};
+
+export type PageBboxFull = {
+    pageIndex: number;
+    bbox: Array<number>;
 };
 
 export type NotebookCertificateApproval = {
@@ -882,7 +913,7 @@ export type PutNotebookBookBlockReadingRecordResponses = {
 export type PutNotebookBookBlockReadingRecordResponse = PutNotebookBookBlockReadingRecordResponses[keyof PutNotebookBookBlockReadingRecordResponses];
 
 export type ChangeBookBlockDepthData = {
-    body: BookBlockDepthRequestFull;
+    body: BookBlockDepthRequest;
     path: {
         notebook: number;
         bookBlock: number;
@@ -895,7 +926,7 @@ export type ChangeBookBlockDepthResponses = {
     /**
      * OK
      */
-    200: BookFull;
+    200: BookMutationResponse;
 };
 
 export type ChangeBookBlockDepthResponse = ChangeBookBlockDepthResponses[keyof ChangeBookBlockDepthResponses];
@@ -3687,7 +3718,7 @@ export type CancelBookBlockResponses = {
     /**
      * OK
      */
-    200: BookFull;
+    200: BookMutationResponse;
 };
 
 export type CancelBookBlockResponse = CancelBookBlockResponses[keyof CancelBookBlockResponses];

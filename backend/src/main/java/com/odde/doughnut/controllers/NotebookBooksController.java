@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.BookBlockDepthRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordPutRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
+import com.odde.doughnut.controllers.dto.BookMutationResponse;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
@@ -16,6 +17,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.book.BookMutationResponseMapper;
 import com.odde.doughnut.services.book.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -158,14 +161,14 @@ class NotebookBooksController {
   @Operation(operationId = "changeBookBlockDepth", summary = "Change depth of a book block")
   @PutMapping("/{notebook}/book/blocks/{bookBlock}/depth")
   @Transactional
-  @JsonView(BookViews.Full.class)
-  public Book changeBookBlockDepth(
+  public BookMutationResponse changeBookBlockDepth(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock,
       @RequestBody @Valid BookBlockDepthRequest body)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    return bookService.changeBlockDepth(notebook, bookBlock, body.getDirection());
+    Book book = bookService.changeBlockDepth(notebook, bookBlock, body.getDirection());
+    return BookMutationResponseMapper.fromBook(book, Set.of());
   }
 
   @Operation(
@@ -173,13 +176,13 @@ class NotebookBooksController {
       summary = "Cancel a book block (merge content to previous)")
   @DeleteMapping("/{notebook}/book/blocks/{bookBlock}")
   @Transactional
-  @JsonView(BookViews.Full.class)
-  public Book cancelBookBlock(
+  public BookMutationResponse cancelBookBlock(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    return bookService.cancelBlock(notebook, bookBlock);
+    var result = bookService.cancelBlock(notebook, bookBlock);
+    return BookMutationResponseMapper.fromBook(result.book(), Set.of(result.predecessorBlockId()));
   }
 
   @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)

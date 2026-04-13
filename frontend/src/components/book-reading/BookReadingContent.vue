@@ -99,6 +99,7 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
+import { mergeBookMutationIntoFull } from "@/lib/book-reading/mergeBookMutationIntoFull"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
@@ -402,7 +403,7 @@ async function onBlockIndent(block: BookBlockFull) {
     body: { direction: "INDENT" },
   })
   if (!error && data) {
-    emit("update:book", data)
+    emit("update:book", mergeBookMutationIntoFull(props.book, data))
     selectedBlockId.value = block.id
   }
 }
@@ -413,7 +414,7 @@ async function onBlockOutdent(block: BookBlockFull) {
     body: { direction: "OUTDENT" },
   })
   if (!error && data) {
-    emit("update:book", data)
+    emit("update:book", mergeBookMutationIntoFull(props.book, data))
     selectedBlockId.value = block.id
   }
 }
@@ -427,17 +428,18 @@ async function onBlockCancel(block: BookBlockFull) {
     path: { notebook: notebookId.value, bookBlock: block.id },
   })
   if (!error && data) {
+    const merged = mergeBookMutationIntoFull(props.book, data)
     if (
       predecessorId !== null &&
-      data.blocks.some((b) => b.id === predecessorId)
+      merged.blocks.some((b) => b.id === predecessorId)
     ) {
       selectedBlockId.value = predecessorId
-      emit("update:book", data)
-      const pred = data.blocks.find((b) => b.id === predecessorId)!
+      emit("update:book", merged)
+      const pred = merged.blocks.find((b) => b.id === predecessorId)!
       await applyBookBlockSelection(pred)
     } else {
       selectedBlockId.value = null
-      emit("update:book", data)
+      emit("update:book", merged)
     }
   }
 }
