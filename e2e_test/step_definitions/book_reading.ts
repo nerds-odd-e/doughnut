@@ -3,12 +3,24 @@
  */
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
+import type { BookFull, NoteRealm } from '@generated/doughnut-backend-api'
+import {
+  NoteController,
+  NotebookBooksController,
+} from '@generated/doughnut-backend-api/sdk.gen'
 import bookReadingPage, {
   type BookLayoutRow,
 } from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
-import start from '../start'
+import start, { mock_services } from '../start'
 import testability from '../start/testability'
+
+function unwrapData<T>(result: T | { data: T } | undefined): T {
+  if (result && typeof result === 'object' && 'data' in result) {
+    return (result as { data: T }).data
+  }
+  return result as T
+}
 
 function parseBookLayoutTable(data: DataTable): BookLayoutRow[] {
   return data.raw().map((row) => {
@@ -74,6 +86,68 @@ When(
     return cy.get<string>('@attachedBookPdfStem').then((stem) => {
       start.navigateToNotebookPage(notebookTitle).readBook(stem)
     })
+  }
+)
+
+Given(
+  'OpenAI returns the current book block depths as the layout suggestion for notebook {string}',
+  (notebookTitle: string) => {
+    return testability()
+      .getInjectedNoteIdByTitle(notebookTitle)
+      .then((noteId) =>
+        cy.wrap(NoteController.showNote({ path: { note: noteId } }), {
+          log: false,
+        })
+      )
+      .then((showResponse) => {
+        const realm = unwrapData<NoteRealm>(showResponse)
+        const notebookId = realm.notebook?.id
+        expect(notebookId, 'head note must belong to a notebook').to.be.a(
+          'number'
+        )
+        return cy
+          .wrap(
+            NotebookBooksController.getBook({ path: { notebook: notebookId } }),
+            { log: false }
+          )
+          .then((bookResponse) => {
+            const book = unwrapData<BookFull>(bookResponse)
+            expect(book.blocks, 'book must have blocks').to.be.an('array')
+            const suggestion = {
+              blocks: book.blocks.map((b) => ({
+                id: b.id,
+                depth: b.depth,
+              })),
+            }
+            const reply = JSON.stringify(suggestion)
+            return cy.then(async () => {
+              await mock_services
+                .openAi()
+                .chatCompletion()
+                .requestMessageMatches({
+                  role: 'system',
+                  content: '.*You reorganize the outline nesting.*',
+                })
+                .stubJsonSchemaResponse(reply)
+            })
+          })
+      })
+  }
+)
+
+When(
+  'I request AI reorganization of the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().clickAiReorganizeLayout()
+  }
+)
+
+Then(
+  'I should see a reorganization preview dialog',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectReorganizationPreviewDialog()
   }
 )
 

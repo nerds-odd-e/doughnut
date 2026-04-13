@@ -356,6 +356,28 @@ const bookReadingPage = () => {
       cy.get('[data-testid="back-to-selected"]').should('be.visible').click()
       return this
     },
+    clickAiReorganizeLayout() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-ai-reorganize-layout"]')
+        .should('be.visible')
+        .click()
+      cy.get('[data-testid="book-reading-layout-full-busy"]', {
+        timeout: 60000,
+      }).should('not.exist')
+      return this
+    },
+    expectReorganizationPreviewDialog() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-layout-reorganize-preview-dialog"]').should(
+        'have.class',
+        'daisy-modal-open'
+      )
+      cy.get('#book-layout-reorganize-preview-title').should(
+        'contain',
+        'Reorganize layout (preview)'
+      )
+      return this
+    },
   }
 }
 
