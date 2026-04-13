@@ -485,6 +485,108 @@ public class BookService {
   }
 
   @Transactional
+  public Book createBookBlockFromContent(Notebook notebook, int fromBookContentBlockId) {
+    Book book = requireBook(notebook);
+    BookContentBlock pivot =
+        bookContentBlockRepository
+            .findById(fromBookContentBlockId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+    BookBlock owner = pivot.getBookBlock();
+    if (!owner.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    if (owner.getDepth() + 1 >= MAX_LAYOUT_DEPTH) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Cannot increase nesting depth further");
+    }
+
+    List<BookBlock> blocks = book.getBlocks();
+    int ownerIdx = -1;
+    for (int i = 0; i < blocks.size(); i++) {
+      if (blocks.get(i).getId().equals(owner.getId())) {
+        ownerIdx = i;
+        break;
+      }
+    }
+    if (ownerIdx < 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+
+    List<BookContentBlock> ordered =
+        bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(owner.getId());
+    int splitAt = -1;
+    for (int i = 0; i < ordered.size(); i++) {
+      if (ordered.get(i).getId().equals(fromBookContentBlockId)) {
+        splitAt = i;
+        break;
+      }
+    }
+    if (splitAt < 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
+    if (splitAt == 0) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Cannot split at the first content block");
+    }
+
+    BookBlock newBlock = new BookBlock();
+    newBlock.setStructuralTitle(structuralTitleFromFirstMovedContent(ordered.get(splitAt)));
+    newBlock.setDepth(owner.getDepth() + 1);
+    book.getBlocks().add(ownerIdx + 1, newBlock);
+    newBlock.setBook(book);
+
+    for (int i = 0; i < splitAt; i++) {
+      BookContentBlock cb = ordered.get(i);
+      cb.setSiblingOrder(i);
+      entityPersister.save(cb);
+    }
+    for (int i = splitAt; i < ordered.size(); i++) {
+      BookContentBlock cb = ordered.get(i);
+      cb.setBookBlock(newBlock);
+      cb.setSiblingOrder(i - splitAt);
+      cb.setRawData(stripTextLevel(cb.getRawData()));
+      entityPersister.save(cb);
+    }
+
+    renumberLayoutSequences(book);
+    book.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    entityPersister.save(book);
+    entityPersister.flush();
+
+    return getBookForNotebook(notebook);
+  }
+
+  private void renumberLayoutSequences(Book book) {
+    List<BookBlock> blks = book.getBlocks();
+    for (int i = 0; i < blks.size(); i++) {
+      BookBlock b = blks.get(i);
+      b.setLayoutSequence(i);
+      entityPersister.save(b);
+    }
+  }
+
+  private String structuralTitleFromFirstMovedContent(BookContentBlock firstMoved) {
+    String raw = firstMoved.getRawData();
+    if (raw == null || raw.isBlank()) {
+      return "Untitled";
+    }
+    try {
+      JsonNode n = objectMapper.readTree(raw);
+      JsonNode text = n.get("text");
+      if (text != null && text.isTextual()) {
+        String t = trimmedMax(text.asText(), 512);
+        if (!t.isEmpty()) {
+          return t;
+        }
+      }
+    } catch (JsonProcessingException e) {
+      return "Untitled";
+    }
+    return "Untitled";
+  }
+
+  @Transactional
   public void deleteBookForNotebook(Notebook notebook) {
     Book book =
         bookRepository

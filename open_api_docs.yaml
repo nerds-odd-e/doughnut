@@ -1232,6 +1232,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/BookLayoutReorganizationSuggestion"
+  /api/notebooks/{notebook}/book/blocks:
+    post:
+      tags:
+      - notebook-books-controller
+      summary: Create a child book block by splitting at an imported content row
+      operationId: createBookBlockFromContent
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookBlockFromContentRequest_Full"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book_Full"
   /api/notebooks/{notebook}/attach-book:
     post:
       tags:
@@ -3919,51 +3944,16 @@ components:
             $ref: "#/components/schemas/BlockDepthSuggestion"
       required:
       - blocks
-    AttachBookLayoutNodeRequest_Full:
+    CreateBookBlockFromContentRequest_Full:
       type: object
       properties:
-        title:
-          type: string
-          maxLength: 512
-          minLength: 0
-        children:
-          type: array
-          items:
-            $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
-        contentBlocks:
-          type: array
-          items:
-            type: object
-            additionalProperties: {}
+        fromBookContentBlockId:
+          type: integer
+          format: int32
+          description: Split the owning book block at this imported content row; that
+            row and following rows become a new child block.
       required:
-      - title
-    AttachBookLayoutRequest_Full:
-      type: object
-      properties:
-        roots:
-          type: array
-          items:
-            $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
-      required:
-      - roots
-    AttachBookRequest_Full:
-      type: object
-      description: Attach book metadata as JSON
-      properties:
-        bookName:
-          type: string
-          maxLength: 512
-          minLength: 0
-        format:
-          type: string
-        layout:
-          $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
-        contentList:
-          type: array
-          items: {}
-      required:
-      - bookName
-      - format
+      - fromBookContentBlockId
     BookBlock_Full:
       type: object
       properties:
@@ -4051,6 +4041,51 @@ components:
       required:
       - bbox
       - pageIndex
+    AttachBookLayoutNodeRequest_Full:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 512
+          minLength: 0
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
+        contentBlocks:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - title
+    AttachBookLayoutRequest_Full:
+      type: object
+      properties:
+        roots:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
+      required:
+      - roots
+    AttachBookRequest_Full:
+      type: object
+      description: Attach book metadata as JSON
+      properties:
+        bookName:
+          type: string
+          maxLength: 512
+          minLength: 0
+        format:
+          type: string
+        layout:
+          $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
+        contentList:
+          type: array
+          items: {}
+      required:
+      - bookName
+      - format
     NotebookCertificateApproval:
       type: object
       properties:

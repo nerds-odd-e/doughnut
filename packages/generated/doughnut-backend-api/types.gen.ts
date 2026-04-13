@@ -348,26 +348,11 @@ export type BookLayoutReorganizationSuggestion = {
     blocks: Array<BlockDepthSuggestion>;
 };
 
-export type AttachBookLayoutNodeRequestFull = {
-    title: string;
-    children?: Array<AttachBookLayoutNodeRequestFull>;
-    contentBlocks?: Array<{
-        [key: string]: unknown;
-    }>;
-};
-
-export type AttachBookLayoutRequestFull = {
-    roots: Array<AttachBookLayoutNodeRequestFull>;
-};
-
-/**
- * Attach book metadata as JSON
- */
-export type AttachBookRequestFull = {
-    bookName: string;
-    format: string;
-    layout?: AttachBookLayoutRequestFull;
-    contentList?: Array<unknown>;
+export type CreateBookBlockFromContentRequestFull = {
+    /**
+     * Split the owning book block at this imported content row; that row and following rows become a new child block.
+     */
+    fromBookContentBlockId: number;
 };
 
 export type BookBlockFull = {
@@ -404,6 +389,28 @@ export type BookFull = {
 export type PageBboxFull = {
     pageIndex: number;
     bbox: Array<number>;
+};
+
+export type AttachBookLayoutNodeRequestFull = {
+    title: string;
+    children?: Array<AttachBookLayoutNodeRequestFull>;
+    contentBlocks?: Array<{
+        [key: string]: unknown;
+    }>;
+};
+
+export type AttachBookLayoutRequestFull = {
+    roots: Array<AttachBookLayoutNodeRequestFull>;
+};
+
+/**
+ * Attach book metadata as JSON
+ */
+export type AttachBookRequestFull = {
+    bookName: string;
+    format: string;
+    layout?: AttachBookLayoutRequestFull;
+    contentList?: Array<unknown>;
 };
 
 export type NotebookCertificateApproval = {
@@ -1951,6 +1958,24 @@ export type SuggestBookLayoutReorganizationResponses = {
 };
 
 export type SuggestBookLayoutReorganizationResponse = SuggestBookLayoutReorganizationResponses[keyof SuggestBookLayoutReorganizationResponses];
+
+export type CreateBookBlockFromContentData = {
+    body: CreateBookBlockFromContentRequestFull;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/blocks';
+};
+
+export type CreateBookBlockFromContentResponses = {
+    /**
+     * Created
+     */
+    201: BookFull;
+};
+
+export type CreateBookBlockFromContentResponse = CreateBookBlockFromContentResponses[keyof CreateBookBlockFromContentResponses];
 
 export type AttachBookData = {
     body?: {

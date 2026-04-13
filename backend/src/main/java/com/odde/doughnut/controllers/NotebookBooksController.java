@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.BookBlockReadingRecordPutRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.BookMutationResponse;
+import com.odde.doughnut.controllers.dto.CreateBookBlockFromContentRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
@@ -169,6 +170,30 @@ class NotebookBooksController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     return bookService.suggestLayoutReorganization(notebook);
+  }
+
+  @Operation(
+      operationId = "createBookBlockFromContent",
+      summary = "Create a child book block by splitting at an imported content row")
+  @PostMapping("/{notebook}/book/blocks")
+  @Transactional
+  @JsonView(BookViews.Full.class)
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "Created",
+        content =
+            @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = Book.class)))
+  })
+  public ResponseEntity<Book> createBookBlockFromContent(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestBody @Valid CreateBookBlockFromContentRequest body)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    Book book = bookService.createBookBlockFromContent(notebook, body.getFromBookContentBlockId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(book);
   }
 
   @Operation(operationId = "changeBookBlockDepth", summary = "Change depth of a book block")

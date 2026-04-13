@@ -1380,6 +1380,206 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class CreateBookBlockFromContent {
+
+    private static CreateBookBlockFromContentRequest splitRequest(int contentBlockId) {
+      var req = new CreateBookBlockFromContentRequest();
+      req.setFromBookContentBlockId(contentBlockId);
+      return req;
+    }
+
+    @Test
+    void createsChildBlockAndMovesTailContent() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "Some body text");
+      bodyItem.put("page_idx", 1);
+      AttachBookLayoutNodeRequest n = node("Chapter 1");
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Chapter 1", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
+
+      ResponseEntity<Book> attachRes =
+          controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      assertThat(attachRes.getStatusCode(), equalTo(HttpStatus.CREATED));
+      Book created = attachRes.getBody();
+      assertThat(created, notNullValue());
+      BookBlock chapter =
+          rootBlocksSorted(created).stream()
+              .filter(b -> b.getStructuralTitle().equals("Chapter 1"))
+              .findFirst()
+              .orElseThrow();
+      List<BookContentBlock> cbsBefore =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(chapter.getId());
+      assertThat(cbsBefore, hasSize(2));
+      int secondId = cbsBefore.get(1).getId();
+
+      ResponseEntity<Book> splitRes =
+          controller.createBookBlockFromContent(nb, splitRequest(secondId));
+      assertThat(splitRes.getStatusCode(), equalTo(HttpStatus.CREATED));
+      Book after = splitRes.getBody();
+      assertThat(after, notNullValue());
+      assertThat(after.getBlocks(), hasSize(2));
+
+      List<BookBlock> ordered = blocksByLayoutOrder(after);
+      assertThat(ordered.get(0).getStructuralTitle(), equalTo("Chapter 1"));
+      assertThat(ordered.get(1).getStructuralTitle(), equalTo("Some body text"));
+      assertThat(ordered.get(0).getDepth(), equalTo(0));
+      assertThat(ordered.get(1).getDepth(), equalTo(1));
+
+      List<BookContentBlock> ownerCbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(
+              ordered.get(0).getId());
+      List<BookContentBlock> childCbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(
+              ordered.get(1).getId());
+      assertThat(ownerCbs, hasSize(1));
+      assertThat(childCbs, hasSize(1));
+      assertThat(childCbs.get(0).getId(), equalTo(secondId));
+
+      for (int i = 0; i < ordered.size(); i++) {
+        assertThat(ordered.get(i).getLayoutSequence(), equalTo(i));
+      }
+
+      String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(after);
+      JsonNode tree = objectMapper.readTree(json);
+      JsonNode blocksNode = tree.get("blocks");
+      assertThat(blocksNode.size(), equalTo(2));
+      assertThat(blocksNode.get(0).get("contentBlocks").size(), equalTo(1));
+      assertThat(blocksNode.get(1).get("contentBlocks").size(), equalTo(1));
+      assertThat(
+          blocksNode.get(1).get("contentBlocks").get(0).get("id").asInt(), equalTo(secondId));
+    }
+
+    @Test
+    void unknownContentBlockIdThrows404() throws Exception {
+      Notebook nb = myNotebook();
+      controller.attachBook(nb, attachRequest(node("A")), pdfFile(STUB_PDF_BYTES));
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.createBookBlockFromContent(nb, splitRequest(Integer.MAX_VALUE)));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void contentBlockFromAnotherNotebookBookThrows404() throws Exception {
+      Notebook nbA = myNotebook();
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "tail");
+      AttachBookLayoutNodeRequest rootA = node("A");
+      rootA.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("A", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
+      controller.attachBook(nbA, attachRequest(rootA), pdfFile(STUB_PDF_BYTES));
+      BookBlock blockA = rootBlocksSorted(bookOf(nbA)).getFirst();
+      int foreignContentId =
+          bookContentBlockRepository
+              .findAllByBookBlock_IdOrderBySiblingOrder(blockA.getId())
+              .get(1)
+              .getId();
+
+      Notebook nbB = myNotebook();
+      controller.attachBook(nbB, attachRequest(node("B")), pdfFile(STUB_PDF_BYTES));
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.createBookBlockFromContent(nbB, splitRequest(foreignContentId)));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void splitAtFirstContentBlockThrows400() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "Some body text");
+      AttachBookLayoutNodeRequest n = node("Chapter 1");
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Chapter 1", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
+      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      BookBlock chapter = rootBlocksSorted(bookOf(nb)).getFirst();
+      int firstId =
+          bookContentBlockRepository
+              .findAllByBookBlock_IdOrderBySiblingOrder(chapter.getId())
+              .getFirst()
+              .getId();
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.createBookBlockFromContent(nb, splitRequest(firstId)));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void rejectsWhenChildWouldExceedMaxLayoutDepth() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> bodyItem1 = new LinkedHashMap<>();
+      bodyItem1.put("type", "text");
+      bodyItem1.put("text", "a");
+      Map<String, Object> bodyItem2 = new LinkedHashMap<>();
+      bodyItem2.put("type", "text");
+      bodyItem2.put("text", "b");
+      AttachBookLayoutNodeRequest leaf = node("Leaf");
+      leaf.setContentBlocks(new ArrayList<>(List.of(bodyItem1, bodyItem2)));
+      AttachBookLayoutNodeRequest cur = leaf;
+      for (int i = 0; i < 63; i++) {
+        cur = node("B" + i, cur);
+      }
+      controller.attachBook(nb, attachRequest(cur), pdfFile(STUB_PDF_BYTES));
+      Book book = bookOf(nb);
+      BookBlock deepestLeaf =
+          book.getBlocks().stream()
+              .filter(b -> b.getStructuralTitle().equals("Leaf"))
+              .findFirst()
+              .orElseThrow();
+      assertThat(deepestLeaf.getDepth(), equalTo(63));
+      List<BookContentBlock> cbs =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(deepestLeaf.getId());
+      int secondId = cbs.get(1).getId();
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.createBookBlockFromContent(nb, splitRequest(secondId)));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void rejectsNotebookWithoutWriteAccess() throws Exception {
+      User owner = makeMe.aUser().please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      currentUser.setUser(owner);
+      AttachBookLayoutNodeRequest root = node("R");
+      Map<String, Object> b1 = new LinkedHashMap<>();
+      b1.put("type", "text");
+      b1.put("text", "a");
+      Map<String, Object> b2 = new LinkedHashMap<>();
+      b2.put("type", "text");
+      b2.put("text", "b");
+      root.setContentBlocks(new ArrayList<>(List.of(b1, b2)));
+      controller.attachBook(otherNb, attachRequest(root), pdfFile(STUB_PDF_BYTES));
+      BookBlock blk = rootBlocksSorted(bookOf(otherNb)).getFirst();
+      int cid =
+          bookContentBlockRepository
+              .findAllByBookBlock_IdOrderBySiblingOrder(blk.getId())
+              .get(1)
+              .getId();
+
+      currentUser.setUser(makeMe.aUser().please());
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.createBookBlockFromContent(otherNb, splitRequest(cid)));
+    }
+  }
+
+  @Nested
   class SuggestBookLayoutReorganization {
 
     private Notebook nb;
