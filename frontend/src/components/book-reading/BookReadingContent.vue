@@ -40,6 +40,7 @@
     :blocks="bookBlocks"
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
+    :pending-layout-block-id="pendingLayoutBlockId"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
     @block-indent="onBlockIndent"
@@ -182,6 +183,7 @@ function onPdfLoadError(message: string) {
 const bookBlocks = computed(() => props.book.blocks)
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+const pendingLayoutBlockId = ref<number | null>(null)
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
@@ -398,49 +400,73 @@ async function onBookBlockClick(block: BookBlockFull) {
 }
 
 async function onBlockIndent(block: BookBlockFull) {
-  const { data, error } = await NotebookBooksController.changeBookBlockDepth({
-    path: { notebook: notebookId.value, bookBlock: block.id },
-    body: { direction: "INDENT" },
-  })
-  if (!error && data) {
-    emit("update:book", mergeBookMutationIntoFull(props.book, data))
-    selectedBlockId.value = block.id
+  if (pendingLayoutBlockId.value !== null) {
+    return
+  }
+  pendingLayoutBlockId.value = block.id
+  try {
+    const { data, error } = await NotebookBooksController.changeBookBlockDepth({
+      path: { notebook: notebookId.value, bookBlock: block.id },
+      body: { direction: "INDENT" },
+    })
+    if (!error && data) {
+      emit("update:book", mergeBookMutationIntoFull(props.book, data))
+      selectedBlockId.value = block.id
+    }
+  } finally {
+    pendingLayoutBlockId.value = null
   }
 }
 
 async function onBlockOutdent(block: BookBlockFull) {
-  const { data, error } = await NotebookBooksController.changeBookBlockDepth({
-    path: { notebook: notebookId.value, bookBlock: block.id },
-    body: { direction: "OUTDENT" },
-  })
-  if (!error && data) {
-    emit("update:book", mergeBookMutationIntoFull(props.book, data))
-    selectedBlockId.value = block.id
+  if (pendingLayoutBlockId.value !== null) {
+    return
+  }
+  pendingLayoutBlockId.value = block.id
+  try {
+    const { data, error } = await NotebookBooksController.changeBookBlockDepth({
+      path: { notebook: notebookId.value, bookBlock: block.id },
+      body: { direction: "OUTDENT" },
+    })
+    if (!error && data) {
+      emit("update:book", mergeBookMutationIntoFull(props.book, data))
+      selectedBlockId.value = block.id
+    }
+  } finally {
+    pendingLayoutBlockId.value = null
   }
 }
 
 async function onBlockCancel(block: BookBlockFull) {
-  const predecessorId = predecessorBookBlockIdInPreorder(
-    bookBlocks.value,
-    block.id
-  )
-  const { data, error } = await NotebookBooksController.cancelBookBlock({
-    path: { notebook: notebookId.value, bookBlock: block.id },
-  })
-  if (!error && data) {
-    const merged = mergeBookMutationIntoFull(props.book, data)
-    if (
-      predecessorId !== null &&
-      merged.blocks.some((b) => b.id === predecessorId)
-    ) {
-      selectedBlockId.value = predecessorId
-      emit("update:book", merged)
-      const pred = merged.blocks.find((b) => b.id === predecessorId)!
-      await applyBookBlockSelection(pred)
-    } else {
-      selectedBlockId.value = null
-      emit("update:book", merged)
+  if (pendingLayoutBlockId.value !== null) {
+    return
+  }
+  pendingLayoutBlockId.value = block.id
+  try {
+    const predecessorId = predecessorBookBlockIdInPreorder(
+      bookBlocks.value,
+      block.id
+    )
+    const { data, error } = await NotebookBooksController.cancelBookBlock({
+      path: { notebook: notebookId.value, bookBlock: block.id },
+    })
+    if (!error && data) {
+      const merged = mergeBookMutationIntoFull(props.book, data)
+      if (
+        predecessorId !== null &&
+        merged.blocks.some((b) => b.id === predecessorId)
+      ) {
+        selectedBlockId.value = predecessorId
+        emit("update:book", merged)
+        const pred = merged.blocks.find((b) => b.id === predecessorId)!
+        await applyBookBlockSelection(pred)
+      } else {
+        selectedBlockId.value = null
+        emit("update:book", merged)
+      }
     }
+  } finally {
+    pendingLayoutBlockId.value = null
   }
 }
 
