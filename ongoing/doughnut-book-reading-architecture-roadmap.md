@@ -218,7 +218,7 @@ Revisit when implementation or product constraints clarify:
 
 - How **`SourceSpan`** start/end locators should be typed when citations ship (parallel to **`PageBbox`** for PDF vs format-specific shapes).
 - Whether `ReadingRecord` needs finer-grained progress inside a block (percentage, character offset, etc.).
-- Whether `BookBlock` should distinguish blocks from the **imported book layout** from user-created blocks.
+- Whether `BookBlock` should distinguish blocks from the **imported book layout** from user-created blocks. **UX direction (delivery):** user-initiated creation from the reader is **long-press on a `BookContentBlock`** → callout **"New block"** → new `BookBlock` as **child** of the block that **owns** that content (`depth` one level deeper); if the source text is **long**, the client collects **`structuralTitle`** with default **truncated** content — see [`ongoing/book-reading-reorganize-layout-plan.md`](book-reading-reorganize-layout-plan.md) Phases **9–10** and [`ongoing/book-reading-ux-ui-roadmap.md`](book-reading-ux-ui-roadmap.md).
 - Whether `SourceSpan.kind` should classify text, image, figure, table, or mixed content for rendering and export.
 - Whether non-PDF formats (EPUB and later) should reuse the same persisted **`BookContentBlock`** shape or derive direct-content evidence another way.
 - Whether some currently ignored MinerU block types should count as direct content beyond **`text`**, **`table`**, and **`image`**.

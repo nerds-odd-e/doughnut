@@ -215,42 +215,58 @@ Scenario: Indent a block and its children together
 
 ---
 
-### Phase 9 — Create a book block
+### Phase 9 — Create a book block from a content block (long-press)
 
-**User value:** User can insert a new book block boundary — useful when the PDF parser missed a structural break or the user wants finer granularity.
+**User value:** User can add a finer structural boundary from the reading surface when the import missed a break — without hunting for a control in the sidebar list.
+
+**Interaction (UX):**
+
+- **Trigger:** User **clicks and holds** on an imported **content block** in the book reading stream (the rendered **CONTENT BLOCK** in the reader, not a row in the book layout drawer).
+- **While holding / after threshold:** A **callout** appears (anchored near the gesture or the block) containing a **"New block"** button (and dismiss affordance as needed so scroll/read is not trapped).
+- **On "New block":** The product creates a new **`BookBlock`** **one nesting level below** the **`BookBlock` that currently owns** that content block: the new block is a **child** of that owner (`depth = owner.depth + 1` in the flat preorder model), with imported content from the split point onward reassigned per API rules. Title for the short-content path: derived from the first suitable text on the new block (same idea as the previous plan); **Phase 10** covers when that path is insufficient.
 
 **Scenario (E2E):**
 
 ```gherkin
-Scenario: Create a new book block
-  When I select a position in the book layout to insert a new block
-  And I create a new book block
-  Then a new book block should appear at the chosen position in the book layout
+Scenario: Create a new book block from a content block via long-press
+  When I press and hold on a content block in the book reading view
+  Then I should see a callout with "New block"
+  When I choose "New block" in the callout
+  Then a new book block should appear in the book layout as a child of the block that owned that content
 ```
 
 **What changes:**
 
-- **Backend:** New endpoint (e.g. `POST /api/notebooks/{notebook}/book/blocks`) accepting position info (e.g. after which block, and which content blocks to split off). Creates a new `BookBlock`, reassigns ownership of content blocks from the split point onward. Returns updated `Book`.
-- **Frontend:** UI affordance to insert a block (e.g. an "add" action between blocks, or a "split here" on a content boundary). The new block's title is derived from the first text content block it receives.
+- **Backend:** New endpoint (e.g. `POST /api/notebooks/{notebook}/book/blocks`) accepting which **content block** (or split index within the owner) starts the new **book block**. Creates a new `BookBlock` as **child** of the owning block, reassigns **`BookContentBlock`** ownership from that point onward in reading order. Returns updated `Book`.
+- **Frontend:** Long-press (pointer down + hold past threshold) on content-block UI → show **`CalloutCard`** (or equivalent) with **"New block"**; on confirm, call API and refresh layout. Must coexist with PDF scroll/zoom (no accidental triggers; clear hold threshold).
 
 ---
 
-### Phase 10 — Create a book block from a long or untitled content region
+### Phase 10 — Title entry when the source content block is long
 
-**User value:** When the selected content region is too long or has no text suitable as a book block title, the user can still create a block — the system handles the edge case (e.g. prompts for a title, uses a placeholder, or picks the first N characters).
+**User value:** When the content block the user long-pressed is **too long** to use as a **structural title** as-is, the user explicitly names the new block instead of silently truncating in a way that hides the choice.
+
+**Interaction (UX):**
+
+- After **"New block"** (or before persist, depending on implementation — single user-visible flow), if the source content exceeds a **maximum title length** suitable for **`BookBlock.structuralTitle`**, show a **title prompt** (modal or inline step).
+- **Default value** in the title field: **truncated content** from that block (characters/words capped to fit under the limit so the user sees a reasonable starting point).
+- **Implementation note:** The **UI threshold** for “long” may differ from **JCK / DB / API** max length if the stack enforces a **shorter** limit — align during implementation so the prompt appears whenever an untruncated title would be rejected or degraded.
 
 **Scenario (E2E):**
 
 ```gherkin
-Scenario: Create a book block when content has no heading text
-  Given a content region with no text suitable as a title
-  When I create a new book block from that region
-  Then a new book block should appear with a placeholder or user-supplied title
+Scenario: Create a book block from long content with a typed title
+  Given a content block whose text exceeds the title length threshold
+  When I press and hold on that content block and choose "New block"
+  Then I should be prompted to enter a title defaulting to truncated content
+  When I confirm the title
+  Then a new book block should appear with the supplied title as a child of the owning block
 ```
 
 **What changes:**
 
-- **Backend/Frontend:** Extend the create-block flow from Phase 9 to handle: (1) content that is too long to use as a title — truncate or prompt; (2) content with no text at all (e.g. images only) — use a placeholder title or let the user type one. Exact UX to be decided during implementation.
+- **Backend:** Create-block API accepts optional **`structuralTitle`** override when the client collected it from the title step; validate max length consistently with persistence.
+- **Frontend:** Branch after long-press **"New block"**: if content length > threshold → title field **pre-filled with truncated** source text; else keep Phase 9 inline title derivation without an extra step. **Non-text-heavy blocks** (e.g. image-only): can reuse the same prompt with an empty or generic default — defer detail to implementation if not product-critical in this phase.
 
 ---
 

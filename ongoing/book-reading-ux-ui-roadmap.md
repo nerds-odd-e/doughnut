@@ -131,6 +131,23 @@ The following sections describe **shipped or planned** Story 2 reader behavior f
 
 **E2E alignment:** Toggle works; PDF remains **scrollable** and **usable** with drawer open and closed.
 
+### Creating a book block from the reading stream (reorganize Phases 9–10)
+
+**Plan:** [`ongoing/book-reading-reorganize-layout-plan.md`](book-reading-reorganize-layout-plan.md).
+
+**Phase 9 — Long-press on a content block**
+
+- **Gesture:** **Press and hold** on an imported **content block** in the reader (body stream), not on a book-layout row.
+- **Feedback:** A **callout** appears with a **"New block"** action.
+- **Outcome:** **New block** inserts **one nesting level below** the **book block that currently owns** that content (new node is a **child** of that owner in the layout tree).
+
+**Phase 10 — Long source text**
+
+- If the held content block’s text is **long** relative to **`structuralTitle`** limits, the flow **asks the user to type a title** after they choose **New block** (or equivalent ordering).
+- **Default** in the title field: **truncated** content from that block. **JCK / DB / API** may enforce a **shorter** maximum than the copy used for “is this long?” — implementation should align thresholds so users are prompted whenever a raw title would fail validation or be unusably long.
+
+**Cross-cutting:** Long-press must not fight **PDF scroll** (clear duration threshold, optional movement tolerance); the callout should be **dismissible** and must not permanently trap focus away from reading.
+
 ---
 
 ## Cross-cutting: reading and scrolling
