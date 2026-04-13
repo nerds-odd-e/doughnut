@@ -41,13 +41,13 @@
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
     :pending-layout-block-id="pendingLayoutBlockId"
-    :full-layout-busy="aiReorganizeSuggestPending"
+    :full-layout-busy="aiSuggestPending"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
     @block-indent="onBlockIndent"
     @block-outdent="onBlockOutdent"
     @block-cancel="onBlockCancel"
-    @request-ai-reorganize="onRequestAiReorganize"
+    @request-ai-reorganize="requestAiReorganize"
   >
     <main
       class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col"
@@ -102,7 +102,7 @@
   </BookReadingBookLayout>
   <dialog
     class="daisy-modal"
-    :class="{ 'daisy-modal-open': aiLayoutReorganizationSuggestion !== null }"
+    :class="{ 'daisy-modal-open': aiSuggestion !== null }"
     aria-labelledby="book-layout-reorganize-preview-title"
     data-testid="book-layout-reorganize-preview-dialog"
   >
@@ -117,7 +117,7 @@
         class="daisy-max-h-[min(24rem,50vh)] daisy-overflow-y-auto daisy-py-2"
       >
         <div
-          v-for="row in aiReorganizePreviewRows"
+          v-for="row in aiPreviewRows"
           :key="row.block.id"
           data-testid="book-layout-reorganize-preview-row"
           class="daisy-rounded daisy-py-1.5 daisy-pr-2 daisy-text-sm daisy-leading-snug"
@@ -173,14 +173,10 @@ import {
   useBookReadingSnapBack,
   type BookReadingPdfViewerRef,
 } from "@/composables/useBookReadingSnapBack"
+import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type {
-  BookBlockFull,
-  BookFull,
-  BookLayoutReorganizationSuggestion,
-} from "@generated/doughnut-backend-api"
+import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
@@ -261,30 +257,13 @@ const selectedBookBlock = computed<BookBlockFull | null>(() => {
   return bookBlocks.value.find((b) => b.id === id) ?? null
 })
 const pendingLayoutBlockId = ref<number | null>(null)
-const aiReorganizeSuggestPending = ref(false)
-const aiLayoutReorganizationSuggestion =
-  ref<BookLayoutReorganizationSuggestion | null>(null)
-
-const aiReorganizePreviewRows = computed(() => {
-  const suggestion = aiLayoutReorganizationSuggestion.value
-  if (suggestion === null) return []
-  const idToDepth = new Map(
-    suggestion.blocks.map((e) => [e.id, e.depth] as const)
-  )
-  return bookBlocks.value
-    .map((block) => {
-      const suggestedDepth = idToDepth.get(block.id)
-      if (suggestedDepth === undefined) {
-        return null
-      }
-      return {
-        block,
-        suggestedDepth,
-        depthChanged: suggestedDepth !== block.depth,
-      }
-    })
-    .filter((row): row is NonNullable<typeof row> => row !== null)
-})
+const {
+  suggestPending: aiSuggestPending,
+  suggestion: aiSuggestion,
+  previewRows: aiPreviewRows,
+  requestSuggest: requestAiReorganize,
+  dismiss: dismissAiReorganizePreview,
+} = useBookLayoutAiReorganize(notebookId, bookBlocks)
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
@@ -593,26 +572,6 @@ async function onCreateBlockFromContent(contentBlockId: number) {
   }
 }
 
-function dismissAiReorganizePreview() {
-  aiLayoutReorganizationSuggestion.value = null
-}
-
-async function onRequestAiReorganize() {
-  aiLayoutReorganizationSuggestion.value = null
-  aiReorganizeSuggestPending.value = true
-  try {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookBooksController.suggestBookLayoutReorganization({
-        path: { notebook: notebookId.value },
-      })
-    )
-    if (!error && data) {
-      aiLayoutReorganizationSuggestion.value = data
-    }
-  } finally {
-    aiReorganizeSuggestPending.value = false
-  }
-}
 
 async function onReadFromHere() {
   const block = currentBlockForNavBar.value
