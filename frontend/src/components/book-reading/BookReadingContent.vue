@@ -94,6 +94,8 @@
         <BookReadingContentStreamPanel
           :content-blocks="selectedBookBlock?.contentBlocks ?? []"
           :selected-block-title="selectedBookBlock?.title ?? null"
+          :disabled="pendingLayoutBlockId !== null"
+          @create-block-from-content="onCreateBlockFromContent"
         />
       </div>
     </main>
@@ -562,6 +564,28 @@ async function onBlockCancel(block: BookBlockFull) {
       } else {
         selectedBlockId.value = null
         emit("update:book", merged)
+      }
+    }
+  } finally {
+    pendingLayoutBlockId.value = null
+  }
+}
+
+async function onCreateBlockFromContent(contentBlockId: number) {
+  if (pendingLayoutBlockId.value !== null) return
+  pendingLayoutBlockId.value = selectedBookBlock.value?.id ?? -1
+  try {
+    const oldIds = new Set(bookBlocks.value.map((b) => b.id))
+    const { data, error } =
+      await NotebookBooksController.createBookBlockFromContent({
+        path: { notebook: notebookId.value },
+        body: { fromBookContentBlockId: contentBlockId },
+      })
+    if (!error && data) {
+      emit("update:book", data)
+      const newBlock = data.blocks.find((b) => !oldIds.has(b.id))
+      if (newBlock) {
+        await applyBookBlockSelection(newBlock)
       }
     }
   } finally {

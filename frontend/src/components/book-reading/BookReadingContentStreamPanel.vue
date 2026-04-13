@@ -3,6 +3,7 @@
     data-testid="book-reading-content-stream"
     class="daisy-shrink-0 daisy-max-h-[30vh] daisy-min-h-0 daisy-overflow-y-auto daisy-border-t daisy-border-base-300 daisy-bg-base-200/80 daisy-px-2 daisy-py-2"
     :aria-label="ariaLabel"
+    @keydown.escape="onCalloutDismiss"
   >
     <p
       v-if="selectedBlockTitle"
@@ -14,15 +15,50 @@
       v-if="contentBlocks.length > 0"
       class="daisy-m-0 daisy-list-none daisy-space-y-1 daisy-p-0"
     >
-      <li
-        v-for="block in contentBlocks"
-        :key="block.id"
-        data-testid="book-reading-content-block"
-        :data-book-content-block-id="String(block.id)"
-        class="daisy-text-sm daisy-text-base-content daisy-rounded daisy-bg-base-100 daisy-px-2 daisy-py-1"
-      >
-        {{ previewTextFromContentBlockRaw(block) }}
-      </li>
+      <template v-for="block in contentBlocks" :key="block.id">
+        <li
+          data-testid="book-reading-content-block"
+          :data-book-content-block-id="String(block.id)"
+          class="daisy-text-sm daisy-text-base-content daisy-rounded daisy-bg-base-100 daisy-px-2 daisy-py-1 daisy-select-none"
+          :class="{ 'daisy-opacity-60': disabled }"
+          @pointerdown="onContentBlockPointerDown(block, $event)"
+          @pointermove="onContentBlockPointerMove(block, $event)"
+          @pointerup="onContentBlockPointerUp(block, $event)"
+          @pointercancel="onContentBlockPointerCancel(block, $event)"
+        >
+          {{ previewTextFromContentBlockRaw(block) }}
+        </li>
+        <li
+          v-if="calloutBlockId === block.id"
+          key="callout"
+          class="daisy-py-1"
+          aria-live="polite"
+        >
+          <CalloutCard :show-caret="true">
+            <span class="daisy-text-sm daisy-min-w-0 daisy-flex-1">
+              Create a new block from here?
+            </span>
+            <div class="daisy-flex daisy-gap-2 daisy-shrink-0">
+              <button
+                type="button"
+                data-testid="book-reading-content-new-block-confirm"
+                class="daisy-btn daisy-btn-primary daisy-btn-sm"
+                @click="onNewBlockConfirm"
+              >
+                New block
+              </button>
+              <button
+                type="button"
+                data-testid="book-reading-content-new-block-cancel"
+                class="daisy-btn daisy-btn-sm"
+                @click="onCalloutDismiss"
+              >
+                Cancel
+              </button>
+            </div>
+          </CalloutCard>
+        </li>
+      </template>
     </ul>
     <p
       v-else
@@ -34,13 +70,22 @@
 </template>
 
 <script setup lang="ts">
+import CalloutCard from "@/components/book-reading/CalloutCard.vue"
 import { previewTextFromContentBlockRaw } from "@/lib/book-reading/contentBlockRawPreview"
 import type { BookContentBlockFull } from "@generated/doughnut-backend-api"
-import { computed } from "vue"
+import { computed, ref } from "vue"
+
+const HOLD_THRESHOLD_MS = 500
+const HOLD_MOVE_TOLERANCE_PX = 10
 
 const props = defineProps<{
   contentBlocks: BookContentBlockFull[]
   selectedBlockTitle?: string | null
+  disabled?: boolean
+}>()
+
+const emit = defineEmits<{
+  createBlockFromContent: [contentBlockId: number]
 }>()
 
 const ariaLabel = computed(() => {
@@ -49,4 +94,81 @@ const ariaLabel = computed(() => {
     ? `Imported content for ${t}`
     : "Imported content for selected section"
 })
+
+type HoldState = {
+  contentBlockId: number
+  pointerId: number
+  startX: number
+  startY: number
+  timerId: ReturnType<typeof setTimeout>
+}
+
+const holdState = ref<HoldState | null>(null)
+const calloutBlockId = ref<number | null>(null)
+
+function cancelHold() {
+  if (holdState.value) {
+    clearTimeout(holdState.value.timerId)
+    holdState.value = null
+  }
+}
+
+function onContentBlockPointerDown(
+  block: BookContentBlockFull,
+  e: PointerEvent
+) {
+  if (props.disabled || calloutBlockId.value !== null) return
+  if (e.pointerType === "mouse" && e.button !== 0) return
+  cancelHold()
+  const timerId = setTimeout(() => {
+    holdState.value = null
+    calloutBlockId.value = block.id
+  }, HOLD_THRESHOLD_MS)
+  holdState.value = {
+    contentBlockId: block.id,
+    pointerId: e.pointerId,
+    startX: e.clientX,
+    startY: e.clientY,
+    timerId,
+  }
+}
+
+function onContentBlockPointerMove(
+  block: BookContentBlockFull,
+  e: PointerEvent
+) {
+  const s = holdState.value
+  if (!s || s.pointerId !== e.pointerId || s.contentBlockId !== block.id) return
+  const dx = e.clientX - s.startX
+  const dy = e.clientY - s.startY
+  if (Math.sqrt(dx * dx + dy * dy) > HOLD_MOVE_TOLERANCE_PX) {
+    cancelHold()
+  }
+}
+
+function onContentBlockPointerUp(block: BookContentBlockFull, e: PointerEvent) {
+  const s = holdState.value
+  if (!s || s.pointerId !== e.pointerId || s.contentBlockId !== block.id) return
+  cancelHold()
+}
+
+function onContentBlockPointerCancel(
+  block: BookContentBlockFull,
+  e: PointerEvent
+) {
+  const s = holdState.value
+  if (!s || s.pointerId !== e.pointerId || s.contentBlockId !== block.id) return
+  cancelHold()
+}
+
+function onNewBlockConfirm() {
+  const id = calloutBlockId.value
+  if (id === null) return
+  calloutBlockId.value = null
+  emit("createBlockFromContent", id)
+}
+
+function onCalloutDismiss() {
+  calloutBlockId.value = null
+}
 </script>

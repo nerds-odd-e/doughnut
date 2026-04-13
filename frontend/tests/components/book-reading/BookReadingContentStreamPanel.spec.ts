@@ -2,7 +2,7 @@ import BookReadingContentStreamPanel from "@/components/book-reading/BookReading
 import { BOOK_READING_CONTENT_BLOCK_PREVIEW_MAX_CHARS } from "@/lib/book-reading/contentBlockRawPreview"
 import helper from "@tests/helpers"
 import type { BookContentBlockFull } from "@generated/doughnut-backend-api"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 function row(
   partial: Pick<BookContentBlockFull, "id" | "type" | "raw"> & {
@@ -123,5 +123,170 @@ describe("BookReadingContentStreamPanel", () => {
       wrapper.findAll('[data-testid="book-reading-content-block"]')
     ).toHaveLength(0)
     expect(wrapper.text()).toContain("No imported body for this section.")
+  })
+
+  describe("long-press callout", () => {
+    function twoBlocks() {
+      return [
+        row({
+          id: 20,
+          type: "text",
+          raw: JSON.stringify({ text: "Block A." }),
+        }),
+        row({
+          id: 21,
+          type: "text",
+          raw: JSON.stringify({ text: "Block B." }),
+        }),
+      ]
+    }
+
+    function pointerDown(el: Element, x = 50, y = 50, pointerId = 1) {
+      el.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          cancelable: true,
+          pointerId,
+          pointerType: "touch",
+          button: 0,
+          clientX: x,
+          clientY: y,
+        })
+      )
+    }
+
+    function pointerMove(el: Element, x: number, y: number, pointerId = 1) {
+      el.dispatchEvent(
+        new PointerEvent("pointermove", {
+          bubbles: true,
+          cancelable: true,
+          pointerId,
+          pointerType: "touch",
+          clientX: x,
+          clientY: y,
+        })
+      )
+    }
+
+    it("shows callout after pointer hold timer fires", async () => {
+      vi.useFakeTimers()
+      const wrapper = helper
+        .component(BookReadingContentStreamPanel)
+        .withProps({ contentBlocks: twoBlocks() })
+        .mount({ attachTo: document.body })
+
+      const items = wrapper.findAll(
+        '[data-testid="book-reading-content-block"]'
+      )
+      pointerDown(items[0]!.element)
+      expect(
+        wrapper
+          .find('[data-testid="book-reading-content-new-block-confirm"]')
+          .exists()
+      ).toBe(false)
+
+      vi.advanceTimersByTime(500)
+      await wrapper.vm.$nextTick()
+
+      expect(
+        wrapper
+          .find('[data-testid="book-reading-content-new-block-confirm"]')
+          .exists()
+      ).toBe(true)
+      vi.useRealTimers()
+    })
+
+    it("cancels hold if pointer moves beyond tolerance before timer fires", async () => {
+      vi.useFakeTimers()
+      const wrapper = helper
+        .component(BookReadingContentStreamPanel)
+        .withProps({ contentBlocks: twoBlocks() })
+        .mount({ attachTo: document.body })
+
+      const item = wrapper.findAll(
+        '[data-testid="book-reading-content-block"]'
+      )[0]!
+      pointerDown(item.element, 50, 50)
+      pointerMove(item.element, 70, 50)
+      vi.advanceTimersByTime(500)
+      await wrapper.vm.$nextTick()
+
+      expect(
+        wrapper
+          .find('[data-testid="book-reading-content-new-block-confirm"]')
+          .exists()
+      ).toBe(false)
+      vi.useRealTimers()
+    })
+
+    it("dismisses callout on Cancel click", async () => {
+      vi.useFakeTimers()
+      const wrapper = helper
+        .component(BookReadingContentStreamPanel)
+        .withProps({ contentBlocks: twoBlocks() })
+        .mount({ attachTo: document.body })
+
+      const item = wrapper.findAll(
+        '[data-testid="book-reading-content-block"]'
+      )[0]!
+      pointerDown(item.element)
+      vi.advanceTimersByTime(500)
+      await wrapper.vm.$nextTick()
+
+      await wrapper
+        .find('[data-testid="book-reading-content-new-block-cancel"]')
+        .trigger("click")
+
+      expect(
+        wrapper
+          .find('[data-testid="book-reading-content-new-block-confirm"]')
+          .exists()
+      ).toBe(false)
+      vi.useRealTimers()
+    })
+
+    it("emits createBlockFromContent with correct id when New block is clicked", async () => {
+      vi.useFakeTimers()
+      const wrapper = helper
+        .component(BookReadingContentStreamPanel)
+        .withProps({ contentBlocks: twoBlocks() })
+        .mount({ attachTo: document.body })
+
+      const item = wrapper.findAll(
+        '[data-testid="book-reading-content-block"]'
+      )[0]!
+      pointerDown(item.element)
+      vi.advanceTimersByTime(500)
+      await wrapper.vm.$nextTick()
+
+      await wrapper
+        .find('[data-testid="book-reading-content-new-block-confirm"]')
+        .trigger("click")
+
+      expect(wrapper.emitted("createBlockFromContent")).toEqual([[20]])
+      vi.useRealTimers()
+    })
+
+    it("does not show callout when disabled", async () => {
+      vi.useFakeTimers()
+      const wrapper = helper
+        .component(BookReadingContentStreamPanel)
+        .withProps({ contentBlocks: twoBlocks(), disabled: true })
+        .mount({ attachTo: document.body })
+
+      const item = wrapper.findAll(
+        '[data-testid="book-reading-content-block"]'
+      )[0]!
+      pointerDown(item.element)
+      vi.advanceTimersByTime(500)
+      await wrapper.vm.$nextTick()
+
+      expect(
+        wrapper
+          .find('[data-testid="book-reading-content-new-block-confirm"]')
+          .exists()
+      ).toBe(false)
+      vi.useRealTimers()
+    })
   })
 })
