@@ -395,6 +395,14 @@ const bookReadingPage = () => {
         })
       return this
     },
+    confirmAiReorganizeSuggestion() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-layout-reorganize-preview-confirm"]')
+        .should('be.visible')
+        .click()
+      pageIsNotLoading()
+      return this
+    },
   }
 }
 

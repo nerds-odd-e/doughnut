@@ -1232,6 +1232,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/BookLayoutReorganizationSuggestion"
+  /api/notebooks/{notebook}/book/reorganize-layout/apply:
+    post:
+      tags:
+      - notebook-books-controller
+      summary: Apply AI-suggested depth changes to the book layout
+      operationId: applyBookLayoutReorganization
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookLayoutReorganizationSuggestion"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/BookMutationResponse"
   /api/notebooks/{notebook}/book/blocks:
     post:
       tags:

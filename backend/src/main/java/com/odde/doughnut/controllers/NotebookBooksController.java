@@ -173,6 +173,20 @@ class NotebookBooksController {
   }
 
   @Operation(
+      operationId = "applyBookLayoutReorganization",
+      summary = "Apply AI-suggested depth changes to the book layout")
+  @PostMapping("/{notebook}/book/reorganize-layout/apply")
+  @Transactional
+  public BookMutationResponse applyBookLayoutReorganization(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestBody @Valid BookLayoutReorganizationSuggestion suggestion)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    Book book = bookService.applyLayoutReorganization(notebook, suggestion);
+    return BookMutationResponseMapper.fromBook(book, Set.of());
+  }
+
+  @Operation(
       operationId = "createBookBlockFromContent",
       summary = "Create a child book block by splitting at an imported content row")
   @PostMapping("/{notebook}/book/blocks")

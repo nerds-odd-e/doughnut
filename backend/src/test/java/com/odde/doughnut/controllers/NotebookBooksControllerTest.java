@@ -1700,6 +1700,85 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class ApplyBookLayoutReorganization {
+
+    private Notebook nb;
+    private final byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+
+    @BeforeEach
+    void setupBook() throws Exception {
+      nb = myNotebook();
+      controller.attachBook(
+          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(pdfBytes));
+    }
+
+    private BookLayoutReorganizationSuggestion flatSuggestion() {
+      Book book = bookOf(nb);
+      var suggestion = new BookLayoutReorganizationSuggestion();
+      List<BlockDepthSuggestion> items = new ArrayList<>();
+      for (BookBlock b : book.getBlocks()) {
+        var e = new BlockDepthSuggestion();
+        e.setId(b.getId());
+        e.setDepth(
+            switch (b.getStructuralTitle()) {
+              case "A" -> 0;
+              case "B" -> 1;
+              case "C" -> 2;
+              case "D" -> 0;
+              default -> throw new IllegalStateException();
+            });
+        items.add(e);
+      }
+      suggestion.setBlocks(items);
+      return suggestion;
+    }
+
+    @Test
+    void appliesDepthChangesAndReturnsMutation() throws Exception {
+      BookMutationResponse result = controller.applyBookLayoutReorganization(nb, flatSuggestion());
+
+      assertThat(result.getBlocks(), hasSize(4));
+      Map<String, Integer> byTitle = new LinkedHashMap<>();
+      for (var row : result.getBlocks()) {
+        byTitle.put(row.getTitle(), row.getDepth());
+      }
+      assertThat(byTitle.get("A"), equalTo(0));
+      assertThat(byTitle.get("B"), equalTo(1));
+      assertThat(byTitle.get("C"), equalTo(2));
+      assertThat(byTitle.get("D"), equalTo(0));
+    }
+
+    @Test
+    void rejectsInvalidPreorderDepths() {
+      Book book = bookOf(nb);
+      var bad = new BookLayoutReorganizationSuggestion();
+      List<BlockDepthSuggestion> items = new ArrayList<>();
+      for (BookBlock b : book.getBlocks()) {
+        var e = new BlockDepthSuggestion();
+        e.setId(b.getId());
+        e.setDepth("A".equals(b.getStructuralTitle()) ? 0 : 2);
+        items.add(e);
+      }
+      bad.setBlocks(items);
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.applyBookLayoutReorganization(nb, bad));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void rejectsNotebookWithoutWriteAccess() {
+      Notebook otherNb = otherUsersNotebookWithBook();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.applyBookLayoutReorganization(otherNb, flatSuggestion()));
+    }
+  }
+
+  @Nested
   class CancelBookBlock {
 
     @Test

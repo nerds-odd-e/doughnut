@@ -235,6 +235,14 @@ Then(
   }
 )
 
+When(
+  'I confirm the AI suggestion',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().confirmAiReorganizeSuggestion()
+  }
+)
+
 Then(
   'I should see the book layout in the browser:',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

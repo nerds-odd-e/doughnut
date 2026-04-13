@@ -136,6 +136,14 @@
       <div class="daisy-modal-action">
         <button
           type="button"
+          class="daisy-btn daisy-btn-primary"
+          data-testid="book-layout-reorganize-preview-confirm"
+          @click="onConfirmAiReorganize"
+        >
+          Confirm
+        </button>
+        <button
+          type="button"
           class="daisy-btn"
           data-testid="book-layout-reorganize-preview-cancel"
           @click="dismissAiReorganizePreview"
@@ -262,6 +270,7 @@ const {
   suggestion: aiSuggestion,
   previewRows: aiPreviewRows,
   requestSuggest: requestAiReorganize,
+  confirmSuggest: confirmAiReorganize,
   dismiss: dismissAiReorganizePreview,
 } = useBookLayoutAiReorganize(notebookId, bookBlocks)
 
@@ -572,6 +581,12 @@ async function onCreateBlockFromContent(contentBlockId: number) {
   }
 }
 
+async function onConfirmAiReorganize() {
+  const mutation = await confirmAiReorganize()
+  if (mutation) {
+    emit("update:book", mergeBookMutationIntoFull(props.book, mutation))
+  }
+}
 
 async function onReadFromHere() {
   const block = currentBlockForNavBar.value

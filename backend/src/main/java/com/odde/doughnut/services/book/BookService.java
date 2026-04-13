@@ -260,6 +260,26 @@ public class BookService {
     }
   }
 
+  @Transactional
+  public Book applyLayoutReorganization(
+      Notebook notebook, BookLayoutReorganizationSuggestion suggestion) {
+    Book book = requireBook(notebook);
+    List<BookBlock> ordered = book.getBlocks();
+    validateSuggestedLayout(ordered, suggestion);
+    Map<Integer, Integer> idToDepth =
+        suggestion.getBlocks().stream()
+            .collect(
+                java.util.stream.Collectors.toMap(
+                    BlockDepthSuggestion::getId, BlockDepthSuggestion::getDepth));
+    for (BookBlock b : ordered) {
+      b.setDepth(idToDepth.get(b.getId()));
+      entityPersister.save(b);
+    }
+    entityPersister.flush();
+    book.getBlocks().size();
+    return book;
+  }
+
   private Book requireBook(Notebook notebook) {
     return bookRepository
         .findByNotebook_Id(notebook.getId())

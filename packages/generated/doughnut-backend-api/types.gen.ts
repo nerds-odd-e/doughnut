@@ -1959,6 +1959,24 @@ export type SuggestBookLayoutReorganizationResponses = {
 
 export type SuggestBookLayoutReorganizationResponse = SuggestBookLayoutReorganizationResponses[keyof SuggestBookLayoutReorganizationResponses];
 
+export type ApplyBookLayoutReorganizationData = {
+    body: BookLayoutReorganizationSuggestion;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/reorganize-layout/apply';
+};
+
+export type ApplyBookLayoutReorganizationResponses = {
+    /**
+     * OK
+     */
+    200: BookMutationResponse;
+};
+
+export type ApplyBookLayoutReorganizationResponse = ApplyBookLayoutReorganizationResponses[keyof ApplyBookLayoutReorganizationResponses];
+
 export type CreateBookBlockFromContentData = {
     body: CreateBookBlockFromContentRequestFull;
     path: {
