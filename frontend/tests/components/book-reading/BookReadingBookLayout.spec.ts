@@ -16,18 +16,22 @@ function mountLayout(
   options?: {
     pendingLayoutBlockId?: number | null
     selectedBlockId?: number | null
+    fullLayoutBusy?: boolean
+    isMdOrLarger?: boolean
+    opened?: boolean
   }
 ) {
   return helper
     .component(BookReadingBookLayout)
     .withProps({
-      opened: true,
+      opened: options?.opened ?? true,
       panelId,
-      isMdOrLarger: true,
+      isMdOrLarger: options?.isMdOrLarger ?? true,
       blocks,
       currentBlockId: null,
       selectedBlockId: options?.selectedBlockId ?? null,
       pendingLayoutBlockId: options?.pendingLayoutBlockId ?? null,
+      fullLayoutBusy: options?.fullLayoutBusy ?? false,
       dispositionForBlock: () => undefined,
     })
     .mount({ attachTo: document.body })
@@ -234,6 +238,79 @@ describe("BookReadingBookLayout", () => {
   it("does not emit blockClick when layout is locked", async () => {
     const block = blockStub({ id: 3, depth: 0, title: "C" })
     const wrapper = mountLayout([block], { pendingLayoutBlockId: 3 })
+    const row = wrapper.find('[data-testid="book-reading-book-block"]')
+    await row.trigger("click")
+    expect(wrapper.emitted("blockClick")).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it("shows full-layout busy overlay and spinner when fullLayoutBusy", () => {
+    const wrapper = mountLayout(undefined, { fullLayoutBusy: true })
+    const busy = wrapper.find('[data-testid="book-reading-layout-full-busy"]')
+    expect(busy.exists()).toBe(true)
+    expect(busy.find(".daisy-loading-spinner").exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it("shows aside busy overlay on small viewports when fullLayoutBusy and opened", () => {
+    const wrapper = mountLayout(undefined, {
+      fullLayoutBusy: true,
+      isMdOrLarger: false,
+      opened: true,
+    })
+    expect(
+      wrapper
+        .find('[data-testid="book-reading-layout-aside-full-busy"]')
+        .exists()
+    ).toBe(true)
+    wrapper.unmount()
+  })
+
+  it("disables AI Reorganize when fullLayoutBusy", () => {
+    const wrapper = mountLayout(undefined, { fullLayoutBusy: true })
+    const btn = wrapper.find(
+      '[data-testid="book-reading-ai-reorganize-layout"]'
+    ).element as HTMLButtonElement
+    expect(btn.disabled).toBe(true)
+    wrapper.unmount()
+  })
+
+  it("emits requestAiReorganize when AI Reorganize is clicked", async () => {
+    const wrapper = mountLayout()
+    await wrapper
+      .find('[data-testid="book-reading-ai-reorganize-layout"]')
+      .trigger("click")
+    expect(wrapper.emitted("requestAiReorganize")).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it("does not emit blockIndent when fullLayoutBusy", () => {
+    const block = blockStub({ id: 1, depth: 0, title: "A" })
+    const wrapper = mountLayout([block], { fullLayoutBusy: true })
+    const row = wrapper.find('[data-testid="book-reading-book-block"]')
+      .element as HTMLElement
+
+    const x0 = 200
+    const y0 = 120
+    pointerMouse(row, { type: "pointerdown", clientX: x0, clientY: y0 })
+    pointerMouse(row, {
+      type: "pointermove",
+      clientX: x0 + 30,
+      clientY: y0,
+    })
+    pointerMouse(row, {
+      type: "pointerup",
+      clientX: x0 + 30,
+      clientY: y0,
+    })
+
+    expect(wrapper.emitted("blockIndent")).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it("does not emit blockClick when fullLayoutBusy", async () => {
+    const block = blockStub({ id: 3, depth: 0, title: "C" })
+    const wrapper = mountLayout([block], { fullLayoutBusy: true })
     const row = wrapper.find('[data-testid="book-reading-book-block"]')
     await row.trigger("click")
     expect(wrapper.emitted("blockClick")).toBeUndefined()

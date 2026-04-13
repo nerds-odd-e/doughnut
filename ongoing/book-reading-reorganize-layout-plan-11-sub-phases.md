@@ -69,15 +69,21 @@ Use the existing `@usingMockedOpenAiService` infrastructure:
 Two endpoints (suggest and apply are separate so the user sees a preview before committing):
 
 | Verb | Path | Purpose |
-|------|------|---------|
+|------|------|------|
 | `POST` | `…/book/reorganize-layout/suggest` | Sends blocks to AI, returns `BookLayoutReorganizationSuggestion` |
 | `POST` | `…/book/reorganize-layout/apply` | Accepts the confirmed suggestion, applies depth changes, returns `BookMutationResponse` |
 
 The suggest endpoint is a read-from-AI operation (no DB mutation). The apply endpoint bulk-updates all block depths in one transaction and validates the tree invariant.
 
+### Suggest flow: loading, errors, dialog title
+
+- **While suggest is in flight:** The **entire book layout** UI is **masked**; a **spinner** is **centered in the visible layout region** (viewport of the layout panel, not the whole app chrome — align with whatever root element wraps the book layout sidebar/tree).
+- **When suggest fails** (network, 4xx/5xx, validation error from backend): **do not** swallow errors — let the existing API/error path **surface a toast** (same pattern as other book actions). No bespoke inline error panel for 11.2.x unless a later phase requires it.
+- **Preview dialog:** Use a **fixed, user-visible dialog title** string so E2E and a11y are stable. Canonical copy: **`Reorganize layout (preview)`** — use this exact string in the modal heading and in step definitions that assert the dialog is open.
+
 ### Preview UX
 
-A modal dialog showing the block list with before/after depth columns. Blocks whose depth changed are highlighted. Two buttons: **Confirm** (calls apply) and **Cancel** (closes dialog, discards suggestion).
+A modal dialog (title: **`Reorganize layout (preview)`**) showing the block list with before/after depth columns. Blocks whose depth changed are highlighted. Two buttons: **Confirm** (calls apply) and **Cancel** (closes dialog, discards suggestion).
 
 ---
 
@@ -115,11 +121,46 @@ Scenario: AI reorganizes the book layout depth
 
 ---
 
-### Sub-phase 11.2 — Frontend: trigger button and preview dialog (E2E)
+### Sub-phase 11.2.1 — Frontend: trigger, layout mask, spinner, error toast
 
 **Status:** planned
 
-**Behavior:** User clicks a button in the book layout sidebar. The app calls the suggest endpoint (AI is mocked via Mountebank), and a preview dialog appears showing the block list.
+**Behavior:** User clicks **AI Reorganize** (or the chosen sidebar label) in the book layout. The app calls the suggest endpoint. While the request is pending, the **book layout is fully masked** with a **spinner centered in the layout’s visible area**. If the request **fails**, the error propagates through the normal API path and the user sees a **toast** (no silent failure).
+
+**Tests:** Prefer **Vitest** (mounted book layout / composable) for mask + spinner + error path; optional narrow E2E later in 11.2.3 if a single failing mock is easy to maintain.
+
+**What changes:**
+
+- **Regenerate TS client:** `pnpm generateTypeScript` after sub-phase 11.1 (if not already current).
+- **Sidebar button** in the book layout triggers the suggest API call (via existing `apiCallWithLoading()` or equivalent so errors surface to toast).
+- **Loading UI:** Overlay on the layout root; centered spinner; dismiss overlay when the request settles (success or failure).
+
+**Out of scope for 11.2.1:** Opening the preview dialog on success (11.2.2).
+
+**Interim:** If 11.2.1 lands alone, a successful suggest only **clears the mask** and should **retain the suggestion in client state** for 11.2.2 — the user sees no dialog yet. Prefer **shipping 11.2.2 in the same release window** so the success path is not empty in production for long. If that is not possible, treat the empty success as **interim behavior** and remove it as soon as 11.2.2 merges (see planning rules on interim behavior).
+
+---
+
+### Sub-phase 11.2.2 — Frontend: preview dialog shell (exact title)
+
+**Status:** planned
+
+**Behavior:** When suggest **succeeds**, a **modal** opens. The dialog **heading** is exactly **`Reorganize layout (preview)`**. Body can be a **placeholder** (empty state or single line) — block list and depth diff are sub-phase **11.4**.
+
+**Tests:** Vitest that a successful suggest opens the modal and exposes the title text; or minimal component test.
+
+**What changes:**
+
+- **Modal/dialog** component or inline DaisyUI modal wired to success path from 11.2.1.
+- **Cancel / dismiss** closes the dialog and discards the in-memory suggestion (standard behavior).
+
+---
+
+### Sub-phase 11.2.3 — E2E: mock OpenAI + steps through visible dialog
+
+**Status:** planned
+
+**Behavior:** End-to-end proof: with **`@usingMockedOpenAiService`**, stub `POST /chat/completions`, click the trigger, assert the preview dialog with title **`Reorganize layout (preview)`** is visible.
 
 **E2E steps enabled:**
 
@@ -133,15 +174,14 @@ Then I should see a reorganization preview dialog
 
 **What changes:**
 
-- **Regenerate TS client:** `pnpm generateTypeScript` to pick up the new suggest endpoint from sub-phase 11.1.
-- **E2E mock:** New step definition stubs `POST /chat/completions` via `mock_services.openAi().chatCompletion().requestMessageMatches(…).stubJsonSchemaResponse(…)` with a canned `BookLayoutReorganizationSuggestion` JSON using the test fixture's block IDs.
-- **Frontend button:** In the book layout sidebar, a button (e.g. "AI Reorganize") triggers the suggest API call.
-- **Frontend dialog:** On successful response, a modal/dialog opens showing the suggestion. For this sub-phase, the dialog just needs to be visible (the next sub-phase asserts its content).
-- **E2E step definitions:** "When I request AI reorganization" clicks the button; "Then I should see a reorganization preview dialog" asserts the dialog element is visible.
+- **E2E mock:** Step (or background) stubs `POST /chat/completions` via `mock_services.openAi().chatCompletion().requestMessageMatches(…).stubJsonSchemaResponse(…)` with canned `BookLayoutReorganizationSuggestion` JSON using fixture block IDs.
+- **Step definitions:** “When I request AI reorganization…” clicks the sidebar button; “Then I should see a reorganization preview dialog” asserts an element with the exact title **`Reorganize layout (preview)`** (e.g. dialog heading / `role="dialog"` region).
+
+**Why separate from 11.2.1–11.2.2:** Mountebank predicates, fixture IDs, and Gherkin glue are a distinct chunk of work; frontend can be tested in isolation first.
 
 ---
 
-### Sub-phase 11.3 — Preview shows block-level depth suggestions
+### Sub-phase 11.4 — Preview shows block-level depth suggestions
 
 **Status:** planned
 
@@ -162,11 +202,11 @@ And the preview should show block "2. The Usual Definition Is Not Enough" with s
 - **Frontend dialog content:** Render the block list inside the preview dialog — each row shows the block title with visual indentation matching the suggested depth. Blocks whose depth changed from the current value are highlighted (e.g. different background or a change indicator).
 - **E2E step definition:** "And the preview should show block {string} with suggested depth {int}" asserts the dialog contains a row for that block at the expected depth level.
 
-**Why a separate sub-phase from 11.2:** Sub-phase 11.2 proves the vertical slice works end-to-end (button → API → mock → dialog visible). This sub-phase focuses on the dialog rendering the actual suggestion data correctly — a distinct aspect of the postcondition. Splitting keeps each red/green cycle small.
+**Why a separate sub-phase from 11.2.x:** 11.2.3 proves the vertical slice through a **visible dialog shell**. This sub-phase focuses on rendering **suggestion data** correctly — a distinct postcondition.
 
 ---
 
-### Sub-phase 11.4 — Confirm AI suggestion and apply depth changes
+### Sub-phase 11.5 — Confirm AI suggestion and apply depth changes
 
 **Status:** planned
 
@@ -194,6 +234,6 @@ Then the book block "2. The Usual Definition Is Not Enough" should be at depth 1
 ## Open questions (to resolve during implementation)
 
 1. **Prompt tuning:** The exact system prompt wording will need iteration. Start with a straightforward instruction and refine based on real AI output quality (outside E2E — E2E uses mocks).
-2. **Error UX:** What happens when the AI returns an invalid suggestion (bad IDs, invalid tree)? Simplest: show an error toast and let the user retry. Could be a follow-up sub-phase if it's never hit in practice, or handle inline with validation in the suggest endpoint (sub-phase 11.1 already validates).
+2. ~~**Error UX (suggest fails):**~~ **Resolved:** Errors propagate; **toast** is sufficient (no extra bespoke UI for 11.2.x).
 3. **Large books:** If a book has hundreds of blocks, the prompt may be long. For now, send all blocks. If token limits become an issue, consider pagination or summarization in a later phase.
-4. **Cancel:** Trivial — just close the dialog. Included implicitly in sub-phase 11.2's dialog (standard dismiss behavior). No separate sub-phase needed unless the team wants an explicit E2E assertion for cancel.
+4. **Cancel:** Trivial — close the dialog (11.2.2+). No separate sub-phase unless the team wants an explicit E2E assertion for cancel.

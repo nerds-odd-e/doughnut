@@ -5,16 +5,29 @@
     aria-hidden="true"
     @click="closeOverlay"
   />
-  <div class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative">
+  <div
+    class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative"
+    :aria-busy="fullLayoutBusy ? true : undefined"
+  >
+    <div
+      v-if="fullLayoutBusy"
+      class="book-reading-layout-full-busy daisy-absolute daisy-inset-0 daisy-z-50 daisy-flex daisy-items-center daisy-justify-center daisy-bg-base-100/70"
+      data-testid="book-reading-layout-full-busy"
+      aria-hidden="true"
+    >
+      <span
+        class="daisy-loading daisy-loading-spinner daisy-loading-lg"
+      />
+    </div>
     <aside
       :id="panelId"
       ref="asideRef"
       data-testid="book-reading-book-layout-aside"
       :class="[
-        'daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
+        'daisy-relative daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
         isMdOrLarger
           ? opened
-            ? 'daisy-relative daisy-shrink-0 daisy-border-r daisy-border-base-300'
+            ? 'daisy-shrink-0 daisy-border-r daisy-border-base-300'
             : 'daisy-hidden'
           : opened
             ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full daisy-pt-[env(safe-area-inset-top)]'
@@ -22,9 +35,28 @@
       ]"
     >
       <div
+        v-if="fullLayoutBusy && !isMdOrLarger && opened"
+        class="book-reading-layout-full-busy daisy-absolute daisy-inset-0 daisy-z-50 daisy-flex daisy-items-center daisy-justify-center daisy-bg-base-200/70"
+        data-testid="book-reading-layout-aside-full-busy"
+        aria-hidden="true"
+      >
+        <span
+          class="daisy-loading daisy-loading-spinner daisy-loading-lg"
+        />
+      </div>
+      <div
         data-testid="book-reading-book-layout"
         class="daisy-p-3 daisy-pb-8"
       >
+        <button
+          type="button"
+          data-testid="book-reading-ai-reorganize-layout"
+          class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-primary daisy-mb-3 daisy-w-full"
+          :disabled="layoutActionsLocked"
+          @click="emit('requestAiReorganize')"
+        >
+          AI Reorganize
+        </button>
         <button
           v-for="block in blocks"
           :key="block.id"
@@ -140,8 +172,9 @@ const props = withDefaults(
     dispositionForBlock: (
       blockId: number
     ) => BookBlockReadingDisposition | undefined
+    fullLayoutBusy?: boolean
   }>(),
-  { pendingLayoutBlockId: null }
+  { pendingLayoutBlockId: null, fullLayoutBusy: false }
 )
 
 const emit = defineEmits<{
@@ -149,11 +182,14 @@ const emit = defineEmits<{
   blockIndent: [block: BookBlockFull]
   blockOutdent: [block: BookBlockFull]
   blockCancel: [block: BookBlockFull]
+  requestAiReorganize: []
 }>()
 
 const asideRef = ref<HTMLElement | null>(null)
 
-const layoutActionsLocked = computed(() => props.pendingLayoutBlockId !== null)
+const layoutActionsLocked = computed(
+  () => props.pendingLayoutBlockId !== null || props.fullLayoutBusy
+)
 
 const dragThresholdOpts = { thresholdPx: BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX }
 

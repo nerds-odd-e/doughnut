@@ -41,11 +41,13 @@
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
     :pending-layout-block-id="pendingLayoutBlockId"
+    :full-layout-busy="aiReorganizeSuggestPending"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
     @block-indent="onBlockIndent"
     @block-outdent="onBlockOutdent"
     @block-cancel="onBlockCancel"
+    @request-ai-reorganize="onRequestAiReorganize"
   >
     <main
       ref="mainPaneRef"
@@ -109,7 +111,12 @@ import {
 } from "@/composables/useBookReadingSnapBack"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import type {
+  BookBlockFull,
+  BookFull,
+  BookLayoutReorganizationSuggestion,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
@@ -184,6 +191,9 @@ const bookBlocks = computed(() => props.book.blocks)
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
 const pendingLayoutBlockId = ref<number | null>(null)
+const aiReorganizeSuggestPending = ref(false)
+const aiLayoutReorganizationSuggestion =
+  ref<BookLayoutReorganizationSuggestion | null>(null)
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
@@ -467,6 +477,23 @@ async function onBlockCancel(block: BookBlockFull) {
     }
   } finally {
     pendingLayoutBlockId.value = null
+  }
+}
+
+async function onRequestAiReorganize() {
+  aiLayoutReorganizationSuggestion.value = null
+  aiReorganizeSuggestPending.value = true
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookBooksController.suggestBookLayoutReorganization({
+        path: { notebook: notebookId.value },
+      })
+    )
+    if (!error && data) {
+      aiLayoutReorganizationSuggestion.value = data
+    }
+  } finally {
+    aiReorganizeSuggestPending.value = false
   }
 }
 

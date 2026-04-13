@@ -272,6 +272,8 @@ Scenario: Create a book block from long content with a typed title
 
 ### Phase 11 — AI-assisted depth reorganization
 
+**Sub-phases:** [`ongoing/book-reading-reorganize-layout-plan-11-sub-phases.md`](book-reading-reorganize-layout-plan-11-sub-phases.md) — includes split **11.2.1–11.2.3** (trigger + mask/spinner + toast on error, dialog shell with fixed title, E2E mock), then **11.4** / **11.5** for preview content and apply.
+
 **User value:** User can ask AI to automatically fix/suggest the nesting structure for the entire book layout, saving manual block-by-block work.
 
 **Scenario (E2E):**
