@@ -50,8 +50,7 @@
     @request-ai-reorganize="onRequestAiReorganize"
   >
     <main
-      ref="mainPaneRef"
-      class="daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-relative"
+      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col"
     >
       <div
         v-if="pdfViewerLoadError"
@@ -60,31 +59,43 @@
       >
         {{ pdfViewerLoadError }}
       </div>
-      <template v-else>
-        <PdfBookViewer
-          ref="pdfViewerRef"
-          :pdf-bytes="bookPdfBytes"
-          :bottom-padding-px="READING_PANEL_OBSTRUCTION_PX"
-          @load-error="onPdfLoadError"
-          @viewport-anchor-page="onViewportAnchorPage"
-          @pages-ready="onPagesReady"
+      <div
+        v-else
+        class="daisy-flex daisy-min-h-0 daisy-min-w-0 daisy-flex-1 daisy-flex-col"
+      >
+        <div
+          ref="pdfPaneRef"
+          class="daisy-relative daisy-min-h-0 daisy-min-w-0 daisy-flex-1"
+        >
+          <PdfBookViewer
+            ref="pdfViewerRef"
+            :pdf-bytes="bookPdfBytes"
+            :bottom-padding-px="READING_PANEL_OBSTRUCTION_PX"
+            @load-error="onPdfLoadError"
+            @viewport-anchor-page="onViewportAnchorPage"
+            @pages-ready="onPagesReady"
+          />
+          <ReadingControlPanel
+            v-if="blockAwaitingConfirmation"
+            :selected-block-title="blockAwaitingConfirmation.title"
+            :snap-animation-key="snapAnimationKey"
+            :anchor-top-px="readingPanelAnchorTopPx"
+            @mark-as-read="() => markBlockDisposition('READ')"
+            @mark-as-skimmed="() => markBlockDisposition('SKIMMED')"
+            @mark-as-skipped="() => markBlockDisposition('SKIPPED')"
+          />
+          <CurrentBlockNavigationBar
+            v-if="currentBlockForNavBar"
+            :current-block-title="currentBlockForNavBar.title"
+            @read-from-here="onReadFromHere"
+            @back-to-selected="onBackToSelected"
+          />
+        </div>
+        <BookReadingContentStreamPanel
+          :content-blocks="selectedBookBlock?.contentBlocks ?? []"
+          :selected-block-title="selectedBookBlock?.title ?? null"
         />
-        <ReadingControlPanel
-          v-if="blockAwaitingConfirmation"
-          :selected-block-title="blockAwaitingConfirmation.title"
-          :snap-animation-key="snapAnimationKey"
-          :anchor-top-px="readingPanelAnchorTopPx"
-          @mark-as-read="() => markBlockDisposition('READ')"
-          @mark-as-skimmed="() => markBlockDisposition('SKIMMED')"
-          @mark-as-skipped="() => markBlockDisposition('SKIPPED')"
-        />
-        <CurrentBlockNavigationBar
-          v-if="currentBlockForNavBar"
-          :current-block-title="currentBlockForNavBar.title"
-          @read-from-here="onReadFromHere"
-          @back-to-selected="onBackToSelected"
-        />
-      </template>
+      </div>
     </main>
   </BookReadingBookLayout>
   <dialog
@@ -125,6 +136,7 @@
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
+import BookReadingContentStreamPanel from "@/components/book-reading/BookReadingContentStreamPanel.vue"
 import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
@@ -223,6 +235,12 @@ function onPdfLoadError(message: string) {
 const bookBlocks = computed(() => props.book.blocks)
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+
+const selectedBookBlock = computed<BookBlockFull | null>(() => {
+  const id = selectedBlockId.value
+  if (id === null) return null
+  return bookBlocks.value.find((b) => b.id === id) ?? null
+})
 const pendingLayoutBlockId = ref<number | null>(null)
 const aiReorganizeSuggestPending = ref(false)
 const aiLayoutReorganizationSuggestion =
@@ -262,7 +280,7 @@ const lastReadingForPatch = computed(() => {
 })
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
-const mainPaneRef = ref<HTMLElement | null>(null)
+const pdfPaneRef = ref<HTMLElement | null>(null)
 const readingPanelAnchorTopPx = ref<number | null>(null)
 
 const {
@@ -293,7 +311,7 @@ function commitCurrentBlockId(id: number | null): boolean {
 }
 
 function updateReadingPanelAnchor() {
-  const mainEl = mainPaneRef.value
+  const mainEl = pdfPaneRef.value
   const pdf = pdfViewerRef.value
   const block = blockAwaitingConfirmation.value
   if (!mainEl || !pdf || !block || !lastContentBottomVisible.value) {
