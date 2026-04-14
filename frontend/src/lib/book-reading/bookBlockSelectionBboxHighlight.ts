@@ -1,7 +1,15 @@
+const HOLD_THRESHOLD_MS = 500
+const HOLD_MOVE_TOLERANCE_PX = 10
+
 export function attachBookBlockSelectionBboxHighlight(
   pageLayer: HTMLElement,
   rect: { left: number; top: number; width: number; height: number },
-  contentBlockId?: number
+  contentBlockId?: number,
+  onLongPress?: (
+    contentBlockId: number,
+    clientX: number,
+    clientY: number
+  ) => void
 ): () => void {
   const overlay = document.createElement("div")
   overlay.dataset.testid = "book-block-selection-bbox-highlight"
@@ -17,9 +25,46 @@ export function attachBookBlockSelectionBboxHighlight(
     overlay.dataset.bookContentBlockId = String(contentBlockId)
   }
 
+  let holdTimer: ReturnType<typeof setTimeout> | null = null
+  let startX = 0
+  let startY = 0
+
+  function cancelTimer() {
+    if (holdTimer !== null) {
+      clearTimeout(holdTimer)
+      holdTimer = null
+    }
+  }
+
+  if (contentBlockId !== undefined && onLongPress) {
+    const id = contentBlockId
+    const cb = onLongPress
+    overlay.addEventListener("pointerdown", (e: PointerEvent) => {
+      startX = e.clientX
+      startY = e.clientY
+      cancelTimer()
+      holdTimer = setTimeout(() => {
+        holdTimer = null
+        cb(id, e.clientX, e.clientY)
+      }, HOLD_THRESHOLD_MS)
+    })
+    overlay.addEventListener("pointermove", (e: PointerEvent) => {
+      if (holdTimer === null) return
+      if (
+        Math.hypot(e.clientX - startX, e.clientY - startY) >
+        HOLD_MOVE_TOLERANCE_PX
+      ) {
+        cancelTimer()
+      }
+    })
+    overlay.addEventListener("pointerup", cancelTimer)
+    overlay.addEventListener("pointercancel", cancelTimer)
+  }
+
   pageLayer.appendChild(overlay)
 
   return () => {
+    cancelTimer()
     overlay.remove()
   }
 }

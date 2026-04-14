@@ -428,6 +428,35 @@ const bookReadingPage = () => {
         .should('exist')
       return this
     },
+    pressAndHoldOnContentBlockBboxOverlay() {
+      pageIsNotLoading()
+      cy.clock()
+      cy.get('[data-book-content-block-id]')
+        .first()
+        .trigger('pointerdown', { button: 0, bubbles: true, force: true })
+      cy.tick(600)
+      cy.clock().invoke('restore')
+      return this
+    },
+    expectNewBlockCallout() {
+      pageIsNotLoading()
+      cy.get('[data-testid="new-book-block-callout"]').should('be.visible')
+      return this
+    },
+    confirmNewBlockCallout() {
+      pageIsNotLoading()
+      cy.get('[data-testid="new-book-block-callout-confirm"]')
+        .should('be.visible')
+        .click()
+      return this
+    },
+    expectNewChildBlockInLayout() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-book-layout"]')
+        .find('[data-book-block-depth="1"]')
+        .should('have.length.greaterThan', 0)
+      return this
+    },
   }
 }
 

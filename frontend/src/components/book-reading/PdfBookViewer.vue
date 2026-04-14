@@ -7,6 +7,23 @@
   >
     <div ref="viewerRef" class="pdfViewer" />
   </div>
+  <div
+    v-if="holdCallout"
+    data-testid="new-book-block-callout"
+    class="new-block-callout"
+    :style="{ top: holdCallout.clientY + 'px', left: holdCallout.clientX + 'px' }"
+  >
+    <button
+      data-testid="new-book-block-callout-confirm"
+      class="daisy-btn daisy-btn-sm daisy-btn-primary"
+      @click="onConfirmNewBlock"
+    >
+      New block
+    </button>
+    <button class="daisy-btn daisy-btn-sm" @click="holdCallout = null">
+      Cancel
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -69,10 +86,25 @@ const emit = defineEmits<{
     },
   ]
   pagesReady: []
+  createBlockFromContent: [{ contentBlockId: number }]
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const viewerRef = ref<HTMLDivElement | null>(null)
+
+const holdCallout = ref<{
+  contentBlockId: number
+  clientX: number
+  clientY: number
+} | null>(null)
+
+function onConfirmNewBlock() {
+  const callout = holdCallout.value
+  holdCallout.value = null
+  if (callout) {
+    emit("createBlockFromContent", { contentBlockId: callout.contentBlockId })
+  }
+}
 
 let pdfViewer: PDFViewer | null = null
 let currentLoadingTask: ReturnType<typeof getDocument> | null = null
@@ -258,6 +290,7 @@ function clearBookBlockSelectionBboxHighlight() {
     c()
   }
   bookBlockSelectionBboxHighlightCancels = []
+  holdCallout.value = null
 }
 
 function appendBookBlockSelectionBboxHighlight(
@@ -273,8 +306,19 @@ function appendBookBlockSelectionBboxHighlight(
     pageView.viewport.width,
     pageView.viewport.height
   )
+  const onLongPress =
+    contentBlockId !== undefined
+      ? (id: number, cx: number, cy: number) => {
+          holdCallout.value = { contentBlockId: id, clientX: cx, clientY: cy }
+        }
+      : undefined
   bookBlockSelectionBboxHighlightCancels.push(
-    attachBookBlockSelectionBboxHighlight(pageView.div, rect, contentBlockId)
+    attachBookBlockSelectionBboxHighlight(
+      pageView.div,
+      rect,
+      contentBlockId,
+      onLongPress
+    )
   )
 }
 
@@ -754,5 +798,18 @@ onBeforeUnmount(async () => {
   position: absolute;
   inset: 0;
   background-color: #808080;
+}
+
+.new-block-callout {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--fallback-b1, oklch(var(--b1)));
+  border: 1px solid var(--fallback-bc, oklch(var(--bc) / 0.2));
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -110%);
 }
 </style>

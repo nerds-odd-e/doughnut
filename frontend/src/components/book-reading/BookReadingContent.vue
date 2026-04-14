@@ -74,6 +74,7 @@
             @load-error="onPdfLoadError"
             @viewport-anchor-page="onViewportAnchorPage"
             @pages-ready="onPagesReady"
+            @create-block-from-content="onCreateBlockFromContent"
           />
           <ReadingControlPanel
             v-if="blockAwaitingConfirmation"
@@ -566,6 +567,28 @@ async function onConfirmAiReorganize() {
   const mutation = await confirmAiReorganize()
   if (mutation) {
     emit("update:book", mergeBookMutationIntoFull(props.book, mutation))
+  }
+}
+
+async function onCreateBlockFromContent({
+  contentBlockId,
+}: {
+  contentBlockId: number
+}) {
+  const { data, error } = await apiCallWithLoading(() =>
+    NotebookBooksController.createBookBlockFromContent({
+      path: { notebook: notebookId.value },
+      body: { fromBookContentBlockId: contentBlockId },
+    })
+  )
+  if (!error && data) {
+    const newBlock = data.blocks.find(
+      (b) => !props.book.blocks.some((old) => old.id === b.id)
+    )
+    emit("update:book", data)
+    if (newBlock) {
+      selectedBlockId.value = newBlock.id
+    }
   }
 }
 

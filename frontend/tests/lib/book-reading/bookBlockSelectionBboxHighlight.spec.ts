@@ -1,5 +1,5 @@
 import { attachBookBlockSelectionBboxHighlight } from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
-import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("attachBookBlockSelectionBboxHighlight", () => {
   let host: HTMLDivElement
@@ -86,5 +86,114 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     expect(
       host.querySelector("[data-testid=book-block-selection-bbox-highlight]")
     ).toBeNull()
+  })
+
+  describe("long-press detection", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it("calls onLongPress after 500ms hold with no significant movement", () => {
+      const onLongPress = vi.fn()
+      attachBookBlockSelectionBboxHighlight(
+        host,
+        { left: 0, top: 0, width: 100, height: 100 },
+        7,
+        onLongPress
+      )
+      const el = host.querySelector(
+        "[data-testid=book-block-selection-bbox-highlight]"
+      ) as HTMLElement
+      el.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          clientX: 50,
+          clientY: 50,
+          bubbles: true,
+        })
+      )
+      vi.advanceTimersByTime(499)
+      expect(onLongPress).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(2)
+      expect(onLongPress).toHaveBeenCalledWith(7, 50, 50)
+    })
+
+    it("does not call onLongPress if pointerup fires before threshold", () => {
+      const onLongPress = vi.fn()
+      attachBookBlockSelectionBboxHighlight(
+        host,
+        { left: 0, top: 0, width: 100, height: 100 },
+        7,
+        onLongPress
+      )
+      const el = host.querySelector(
+        "[data-testid=book-block-selection-bbox-highlight]"
+      ) as HTMLElement
+      el.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          clientX: 50,
+          clientY: 50,
+          bubbles: true,
+        })
+      )
+      el.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+      vi.advanceTimersByTime(600)
+      expect(onLongPress).not.toHaveBeenCalled()
+    })
+
+    it("does not call onLongPress if pointer moves beyond tolerance", () => {
+      const onLongPress = vi.fn()
+      attachBookBlockSelectionBboxHighlight(
+        host,
+        { left: 0, top: 0, width: 100, height: 100 },
+        7,
+        onLongPress
+      )
+      const el = host.querySelector(
+        "[data-testid=book-block-selection-bbox-highlight]"
+      ) as HTMLElement
+      el.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          clientX: 50,
+          clientY: 50,
+          bubbles: true,
+        })
+      )
+      el.dispatchEvent(
+        new PointerEvent("pointermove", {
+          clientX: 65,
+          clientY: 50,
+          bubbles: true,
+        })
+      )
+      vi.advanceTimersByTime(600)
+      expect(onLongPress).not.toHaveBeenCalled()
+    })
+
+    it("cancel() clears any pending hold timer", () => {
+      const onLongPress = vi.fn()
+      const cancel = attachBookBlockSelectionBboxHighlight(
+        host,
+        { left: 0, top: 0, width: 100, height: 100 },
+        7,
+        onLongPress
+      )
+      const el = host.querySelector(
+        "[data-testid=book-block-selection-bbox-highlight]"
+      ) as HTMLElement
+      el.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          clientX: 50,
+          clientY: 50,
+          bubbles: true,
+        })
+      )
+      cancel()
+      vi.advanceTimersByTime(600)
+      expect(onLongPress).not.toHaveBeenCalled()
+    })
   })
 })

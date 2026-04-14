@@ -449,3 +449,35 @@ Then(
     return bookReadingPage().expectContentBlockBboxOverlaysVisible()
   }
 )
+
+When(
+  'I press and hold on a content block bbox overlay in the PDF',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressAndHoldOnContentBlockBboxOverlay()
+  }
+)
+
+Then(
+  'I should see the {string} callout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (_label: string) => {
+    return bookReadingPage().expectNewBlockCallout()
+  }
+)
+
+When(
+  'I confirm creating a new block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().confirmNewBlockCallout()
+  }
+)
+
+Then(
+  'the book layout should contain a new block as a child of the selected block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectNewChildBlockInLayout()
+  }
+)
