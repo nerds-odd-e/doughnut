@@ -301,30 +301,30 @@
       "linter": {
         "rules": {
           "correctness": {
-            "noConstAssign": "off",
+            "noConstAssign": "error",
             "noGlobalObjectCalls": "off",
             "noInvalidConstructorSuper": "off",
             "noSetterReturn": "off",
             "noUndeclaredVariables": "off",
-            "noUnreachable": "off",
-            "noUnreachableSuper": "off",
+            "noUnreachable": "warn",
+            "noUnreachableSuper": "warn",
             "noInvalidBuiltinInstantiation": "off"
           },
           "style": {
             "useConst": "error"
           },
           "suspicious": {
-            "noDuplicateClassMembers": "off",
-            "noDuplicateObjectKeys": "off",
-            "noDuplicateParameters": "off",
+            "noDuplicateClassMembers": "warn",
+            "noDuplicateObjectKeys": "warn",
+            "noDuplicateParameters": "warn",
             "noFunctionAssign": "off",
             "noImportAssign": "off",
             "noRedeclare": "off",
-            "noUnsafeNegation": "off",
+            "noUnsafeNegation": "warn",
             "useGetterReturn": "off",
             "noVar": "error",
             "noImportCycles": "warn",
-            "noDeprecatedImports": "warn",
+            "noDeprecatedImports": "error",
             "noUnusedExpressions": "error",
             "noEmptySource": "error",
             "noDuplicateDependencies": "error"
@@ -332,7 +332,7 @@
           "complexity": {
             "noArguments": "error",
             "noUselessUndefined": "error",
-            "useMaxParams": "warn",
+            "useMaxParams": "error",
             "noUselessCatchBinding": "error"
           }
         }
