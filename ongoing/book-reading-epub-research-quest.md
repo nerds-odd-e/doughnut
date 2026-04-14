@@ -159,11 +159,64 @@ Research should **not** be limited to the bullets below; they are **seeds**. Eac
 - Do we **virtualize “pages”** for EPUB to reuse **`pageIndex` + `normalizedY`**, or **replace** reading-position schema for non-PDF formats?
 - How do we implement **viewport → current block** when there is **no pixel bbox** (pure reflow HTML)?
 
+#### 2.3 Research findings (Apr 2026)
+
+**Sources:** [Readium Locator model](https://readium.org/architecture/models/locators), [HTML location extensions](https://readium.org/architecture/models/locators/extensions/html.html), [Best practices per format (EPUB)](https://readium.org/architecture/models/locators/best-practices/format.html); EPUB CFI spec (IDPF); public discussion of **renderer timing** after theme changes (e.g. epub.js issues — **implementation** caveats, not a rejection of CFI as a logical identifier).
+
+**Canonical on-the-wire shape (aligns with architecture roadmap + §2.2 Readium choice):** treat **[Readium `Locator`](https://readium.org/architecture/models/locators)** (JSON-serializable: `href`, `type`, optional `title`, `locations`, `text`) as the **format-native** replacement for PDF **`PageBbox`** for **EPUB reflow**. It is the same *conceptual* object as “where in the publication,” not a pixel rectangle.
+
+| Conceptual job (parity with PDF path) | PDF today | EPUB reflow (recommended) | EPUB fixed-layout (pre-paginated) |
+|--------|-----------|---------------------------|-------------------------------------|
+| **Block start** (layout → document) | `allBboxes[0]` (page + norm. bbox) | **`Locator`** with `href` + **precise** `locations.partialCfi` and/or **`fragments`** (`#id` when the author spine item has a stable id) + optional `locations.progression` | Same **logical** locator **or** geometry closer to PDF (see below) |
+| **Direct-content extent** | Further `PageBbox` entries / gap heuristics | **Derived** between consecutive block-start locators in reading order (same *idea* as architecture “gap”), backed by imported **`BookContentBlock`** stream; optional **ranges** for UI | DOM/region-based equivalents where layout is page-like |
+| **Reading position (resume)** | `pageIndex` + `normalizedY` + optional `selectedBookBlockId` | **`Locator`** with EPUB **minimum** fields per Readium: `href`, `type`, `locations.progression`; **should** add `partialCfi` / selector / range + `text` for robust re-entry (best practices) | Prefer **locator +** optional **page-like** fragment if the toolkit exposes it; still avoid MinerU-style norm bbox unless we deliberately map a **viewport rect** |
+| **Citation (`SourceSpan`)** | TBD; likely page + view rect | Readium **requires** one of `partialCfi`, `cssSelector`, or `domRange` for highlights/annotations **plus** `text` (per format best practices) | Same; fixed-layout may add **rect** fragments where the publication model allows |
+
+**Candidate mechanisms — stability (reflow, font size, user theme):**
+
+- **`locations.progression` / `totalProgression` / `position`:** **Coarse but robust** under reflow and theme; good for **approximate** resume and progress bars; **not** enough alone for precise citations or tight “jump to this paragraph.”
+- **`partialCfi` (EPUB CFI fragment side):** **Logical** pointer into the XHTML DOM (character / structural path). Intended to survive **reflow** because it is **not** tied to pixels. **Caveat:** consuming code must **re-resolve after layout** (fonts loaded, column/scroll reflow finished); some open-source viewers had **bugs** where `display(cfi)` ran before layout settled — product should follow Readium’s lifecycle (`relocate` / preferences applied) and re-apply the saved locator if needed.
+- **`href` + HTML `id` fragment (`fragments`):** **Stable** when the author’s markup includes persistent ids; **weak** when headings lack ids (then generate at import only if we **inject** or **pin** anchors deterministically and never rewrite them).
+- **`cssSelector` / serialized `domRange`:** **Powerful** for highlights; **sensitive** to **sanitization** and DOM normalization differences between extraction and renderer. Prefer **CFI** or **injected ids** for long-lived stored locators unless we control DOM identity end-to-end.
+- **Spine index + byte offset / plain “character index in flattened text”:** **Poor** for reflow EPUB — **avoid** as a canonical stored locator.
+- **XPath (non-standard in Readium locator):** Same fragility as selectors; **not** the first choice for interchange.
+
+**Virtual “pages” vs new schema:** For **reflow EPUB**, **do not** treat `pageIndex` + `normalizedY` as the **canonical** reading cursor (pixels move when font or margins change). Keep today’s columns for **PDF**; add a **parallel** representation for EPUB (e.g. JSON **`Locator`** on **`PATCH …/reading-position`**, or a nullable `epubLocator` / `formatSpecific` field) rather than overloading MinerU semantics. **Fixed-layout / pre-paginated** EPUB is the exception: **synthetic “page index” + region** (and even **normalized bbox** in a chosen coordinate space) can be **honest** because spread geometry is meaningful — closer to Readium’s PDF-style `page` + `viewrect` fragments than to reflow **`PageBbox`**.
+
+**Viewport → current block without pixel bbox:** Reuse the **same product idea** as PDF (single **current block** from the viewport), but the **implementation** is **DOM- and locator-based**: after the renderer lays out the spine item, resolve each **`BookBlock`**’s **start anchor** to an **element or range**, then choose the block whose start (or “reading progression”) best matches the visible viewport — e.g. **largest visible fraction**, **scroll anchor**, or **comparison of `progression`** to block boundaries. **Reading Control Panel** “geometry gating” (§UX roadmap) generalizes to **“bottom of the direct-content range in document order is above the panel obstruction zone”** using **layout boxes from the live DOM** (not precomputed MinerU bboxes).
+
+**Spike:** No separate standalone script is **required** for §2.3 if the **Readium** time-box in §2.2 runs: that spike should include **`relocate` → serialize `Locator` → `submitPreferences` (font) → re-open same `Locator`** and document any ordering workarounds. Optional **add-on:** during §2.1-style extraction, persist **per-block** `href` + first heading **`id`** or **computed `partialCfi`** so layout navigation does not depend on a second client-side inference pass.
+
 ### 2.4 Data model and API
 
 - Should **`BookContentBlock`** rows **reuse** the same persistence shape for EPUB (type, order, optional **pageIndex**/bbox analog, raw payload), or **introduce** a parallel/import-specific table?
 - Should **`allBboxes`** remain the **wire format** for EPUB, or should **`PageBbox`** be generalized (e.g. **union type**: PDF bbox vs EPUB CFI range)?
 - **`GET …/book/file`:** serve **raw `.epub`** only, or also **expanded** artifacts (security + caching implications)?
+
+#### 2.4 Research findings (Apr 2026)
+
+**Sources:** current backend entities and services (`BookContentBlock`, `BookBlockContentBboxes`, `BookBlockDirectContentPredicate`, `NotebookBooksController#getBookFile`), OpenAPI `BookBlock_Full` / `PageBbox_Full`, plus §2.1 (extraction shape) and §2.3 (Readium `Locator`).
+
+**`BookContentBlock` — reuse vs parallel table**
+
+- **Decision:** **Reuse** the existing **`book_content_block`** row shape for EPUB imports. The table already carries **`type`**, **`sibling_order`**, optional **`page_idx`**, and **`raw_data` (LONGTEXT)** — enough to persist an ordered imported stream analogous to MinerU **`content_list`** (EPUB: paragraph / image / table / etc.) with **format-specific JSON** in `rawData` (e.g. spine **`href`**, fragment **`#id`**, optional **`partialCfi`**, excerpt text for titles, serialized subtree if needed).
+- **Rationale:** One persisted concept — “imported body items owned by a **`BookBlock`**” — matches the architecture roadmap; avoids duplicating repositories, attach merge logic, and **`fromBookContentBlockId`** flows. A parallel table would split the same product concept across two code paths.
+- **Implementation note:** **`BookBlockDirectContentPredicate`** and **`BookBlockContentBboxes.fromRaw`** are **MinerU-oriented** today (e.g. `text` + `text_level`, `page_idx` + four-number **`bbox`**). EPUB needs **either** branching on **`Book.format`** (or equivalent) **or** EPUB-specific types / raw keys so direct-content and **`allBboxes`** derivation stay correct without pretending every book is PDF.
+
+**`allBboxes` / `PageBbox` on the wire**
+
+- **Decision (reflow EPUB):** **Do not** treat **`PageBbox`** (page index + normalized rectangle) as the **canonical** navigation contract — align with §2.3: surface **Readium-shaped `Locator` JSON** (or a thin Doughnut wrapper with **`href`**, **`type`**, **`locations`**, **`text`**) for block starts and, later, reading position / citations.
+- **Wire shape options (product + OpenAPI):**
+  - **Preferred:** Add **parallel** fields on each **`BookBlock`** (e.g. **`blockStartLocator`**, optional list of **direct-content boundary locators**, or **`navigationAnchors: Locator[]`**) while keeping **`allBboxes`** for PDF-only semantics; clients branch on **`book.format`**.
+  - **Alternative:** Replace **`allBboxes: PageBbox[]`** with a **discriminated union** (e.g. **`kind: "pdf"`** vs **`kind: "epub"`**) so one array name stays stable — slightly more coupling in the generator and frontend.
+- **Interim (no schema migration):** The §2.1 **placeholder** (spine index as **`page_idx`**, full-band **`bbox`**) still produces **`PageBbox`** entries via existing **`fromRaw`** rules so **layout → reader** can be wired **degraded**; ship-quality EPUB should still add **real locators** so reflow does not depend on fake boxes.
+
+**`GET …/book/file`**
+
+- **Decision:** Serve **one canonical blob per book** from object storage — **raw `.epub`** for EPUB (media type **`application/epub+zip`**, same **private + ETag** caching pattern as PDF today). **Do not** expose a **stable public API** for **server-expanded** packages (unzipped OPF/spine tree) as the default: larger surface for **path/confusion bugs**, extra **cache invalidation**, and **no** need for Readium if the client can fetch the archive and open it locally.
+- **Processing:** **Unpack / parse** during **attach** (or a dedicated internal job) only; persisted **`BookBlock`** / **`BookContentBlock`** rows are the **durable** derived data. If a future optimization caches expanded bytes privately, keep it **internal** to storage/workers, not **`GET …/book/file`** variants, unless product explicitly needs range requests on individual XHTML (then design **separate**, authenticated, sanitized resource endpoints — out of scope for first slice).
+
+**Spike:** Not required for §2.4 alone — **§2.1** (`scripts/epub-extraction-spike.mjs`) and the **§2.2 Readium** slice cover extraction + locator round-trip; §2.4 is **schema/API policy** grounded in existing code paths.
 
 ### 2.5 CLI and attach UX
 
