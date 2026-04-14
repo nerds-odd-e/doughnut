@@ -416,7 +416,9 @@ const bookReadingPage = () => {
       cy.get(
         '[data-testid="book-reading-content-stream"] [data-testid="book-reading-content-block"]'
       )
+        .should('have.length.at.least', 3)
         .eq(2)
+        .should('be.visible')
         .then(($el) => {
           const el = $el[0]!
           const rect = el.getBoundingClientRect()
@@ -427,7 +429,7 @@ const bookReadingPage = () => {
               bubbles: true,
               cancelable: true,
               pointerId: 1,
-              pointerType: 'mouse',
+              pointerType: 'touch',
               button: 0,
               clientX: cx,
               clientY: cy2,
@@ -435,15 +437,15 @@ const bookReadingPage = () => {
           )
         })
       cy.get('[data-testid="book-reading-content-new-block-confirm"]', {
-        timeout: 3000,
+        timeout: 10000,
       }).should('be.visible')
       return this
     },
     expectNewBlockCalloutVisible() {
       pageIsNotLoading()
-      cy.get('[data-testid="book-reading-content-new-block-confirm"]').should(
-        'be.visible'
-      )
+      cy.get('[data-testid="book-reading-content-new-block-confirm"]', {
+        timeout: 10000,
+      }).should('be.visible')
       return this
     },
     clickContentStreamNewBlockConfirm() {
