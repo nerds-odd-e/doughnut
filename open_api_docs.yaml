@@ -4023,11 +4023,8 @@ components:
         pageIdx:
           type: integer
           format: int32
-        raw:
-          type: string
       required:
       - id
-      - raw
       - type
     Book_Full:
       type: object

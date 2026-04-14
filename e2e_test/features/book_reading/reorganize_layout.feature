@@ -53,31 +53,3 @@ Feature: Reorganize book layout
       And the book block "A.1 First section" should be at depth 0 in the book layout
       And the book block "A.2 Second section" should be at depth 0 in the book layout
 
-  Rule: Create a new book block from a content block via long-press
-
-    Background:
-      Given I have a notebook with the head note "Refactoring Book"
-
-    Scenario: Create a new book block from a content block via long-press
-      When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Refactoring Book"
-      And I open the book attached to notebook "Refactoring Book"
-      Given the book layout shows block "1. Refactoring: Protecting Intention in Working Software" at depth 0
-      When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
-      And I press and hold the third imported content block in the reading stream
-      Then I should see the "New block" callout in the reading stream
-      When I confirm creating a new block from the reading stream
-      Then the book block "A more practical view is this:" should be at depth 1 in the book layout
-      And the book block "2. The Usual Defi nition Is Not Enough" should be at depth 0 in the book layout
-
-    Scenario: Create a book block from long content with a typed title
-      When I attach a fake blank pdf book with layout of "refactoring_long_block_title" to the notebook "Refactoring Book"
-      And I open the book attached to notebook "Refactoring Book"
-      Given the book layout shows block "1. Refactoring: Protecting Intention in Working Software" at depth 0
-      When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
-      And I press and hold the third imported content block in the reading stream
-      Then I should see the "New block" callout in the reading stream
-      When I confirm creating a new block from the reading stream
-      Then I should see the new block title entry dialog in the reading stream
-      When I enter "E2E Long Split Title" as the new block title and confirm
-      Then the book block "E2E Long Split Title" should be at depth 1 in the book layout
-      And the book block "2. The Usual Defi nition Is Not Enough" should be at depth 0 in the book layout

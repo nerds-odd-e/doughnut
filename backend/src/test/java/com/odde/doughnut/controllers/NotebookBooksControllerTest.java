@@ -415,8 +415,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(wireCbs.get(0).get("type").asText(), equalTo("text"));
       assertThat(wireCbs.get(1).get("type").asText(), equalTo("text"));
       assertThat(wireCbs.get(1).get("pageIdx").asInt(), equalTo(1));
-      assertThat(wireCbs.get(0).get("raw").asText().isBlank(), equalTo(false));
-      assertThat(wireCbs.get(1).get("raw").asText().isBlank(), equalTo(false));
+      assertThat(wireCbs.get(0).get("raw"), nullValue());
+      assertThat(wireCbs.get(1).get("raw"), nullValue());
 
       Book detailAgain = controller.getBook(nb);
       String jsonAgain =

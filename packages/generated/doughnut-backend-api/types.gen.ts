@@ -374,7 +374,6 @@ export type BookContentBlockFull = {
     id: number;
     type: string;
     pageIdx?: number;
-    raw: string;
 };
 
 export type BookFull = {

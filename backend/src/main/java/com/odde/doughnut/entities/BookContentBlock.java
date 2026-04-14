@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,7 +10,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "book_content_block")
-@JsonPropertyOrder({"id", "type", "pageIdx", "raw"})
+@JsonPropertyOrder({"id", "type", "pageIdx"})
 public class BookContentBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -43,9 +42,7 @@ public class BookContentBlock extends EntityIdentifiedByIdOnly {
   @Column(name = "raw_data", nullable = false, columnDefinition = "LONGTEXT")
   @Getter
   @Setter
-  @JsonProperty("raw")
-  @JsonView(BookViews.Full.class)
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonIgnore
   private String rawData;
 
   @Override

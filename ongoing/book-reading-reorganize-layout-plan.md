@@ -69,36 +69,15 @@ Returns the updated `Book` (same shape as `GET …/book`) so the client can repl
 | 9 (old) | Create a book block from content stream panel (long-press on text row) — **being replaced** |
 | 10 (old) | Title entry when source content is long (in stream panel) — **being replaced** |
 | 11 | AI-assisted depth reorganization |
+| 12 | Remove content stream panel and `raw` from the API |
 
 ---
 
 ## Phases
 
-### Phase 12 — Remove content stream panel and `raw` from the API
+### Phase 12 — Remove content stream panel and `raw` from the API — **shipped**
 
-**User value:** Cleaner API response (no bulky `raw` JSON string per content block shipped to every client), simpler reader layout (no extra panel below the PDF).
-
-**What to remove:**
-
-Frontend:
-- `BookReadingContentStreamPanel.vue` — the entire component
-- `contentBlockRawPreview.ts` — preview text helper (only used by stream panel)
-- `contentBlockStructuralTitleSource.ts` — title source helper (only used by stream panel)
-- `BookReadingContentStreamPanel.spec.ts` — unit tests for the panel
-- `contentBlockStructuralTitleSource.spec.ts` — unit tests for the title helper
-- All references in `BookReadingContent.vue`: the import, the `<BookReadingContentStreamPanel>` template usage, and the `onCreateBlockFromContent` handler
-- E2E scenarios in `reorganize_layout.feature` under "Rule: Create a new book block from a content block via long-press" (both scenarios)
-- E2E step definitions in `book_reading.ts` for long-press / callout / title dialog
-- E2E page object methods in `bookReadingPage.ts`: `pressAndHoldThirdContentStreamBlock`, `expectNewBlockCalloutVisible`, `clickContentStreamNewBlockConfirm`, `expectNewBlockTitleDialogVisible`, `enterNewBlockTitleAndConfirm`
-
-Backend:
-- Remove `raw` from the `BookContentBlock` JSON serialization (drop `@JsonProperty("raw")` / `@JsonView` on `rawData`, or exclude it from the `Full` view). Keep the DB column and server-side usage of `rawData` (bbox derivation, direct-content predicate, split title derivation all need it).
-- Update OpenAPI spec and regenerate TypeScript (`pnpm generateTypeScript`).
-
-Backend tests:
-- Update any controller test assertions that check for `contentBlocks[].raw` in the wire JSON.
-
-**Verification:** Existing E2E tests for depth changes, cancel, and AI reorg still pass. The two removed long-press scenarios no longer exist.
+Content stream panel, helpers, and specs deleted. `BookReadingContent.vue` no longer mounts the panel or owns the `onCreateBlockFromContent` handler. `BookContentBlock.rawData` is `@JsonIgnore`-d so the wire format no longer carries `raw`. OpenAPI spec and generated TS regenerated; 5 remaining E2E reorganize scenarios pass.
 
 ---
 

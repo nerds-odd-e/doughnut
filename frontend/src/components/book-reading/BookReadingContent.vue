@@ -91,12 +91,6 @@
             @back-to-selected="onBackToSelected"
           />
         </div>
-        <BookReadingContentStreamPanel
-          :content-blocks="selectedBookBlock?.contentBlocks ?? []"
-          :selected-block-title="selectedBookBlock?.title ?? null"
-          :disabled="pendingLayoutBlockId !== null"
-          @create-block-from-content="onCreateBlockFromContent"
-        />
       </div>
     </main>
   </BookReadingBookLayout>
@@ -163,7 +157,6 @@
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
-import BookReadingContentStreamPanel from "@/components/book-reading/BookReadingContentStreamPanel.vue"
 import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
@@ -260,11 +253,6 @@ const bookBlocks = computed(() => props.book.blocks)
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
 
-const selectedBookBlock = computed<BookBlockFull | null>(() => {
-  const id = selectedBlockId.value
-  if (id === null) return null
-  return bookBlocks.value.find((b) => b.id === id) ?? null
-})
 const pendingLayoutBlockId = ref<number | null>(null)
 const {
   suggestPending: aiSuggestPending,
@@ -567,37 +555,6 @@ async function onBlockCancel(block: BookBlockFull) {
       } else {
         selectedBlockId.value = null
         emit("update:book", merged)
-      }
-    }
-  } finally {
-    pendingLayoutBlockId.value = null
-  }
-}
-
-async function onCreateBlockFromContent(payload: {
-  contentBlockId: number
-  structuralTitle?: string
-}) {
-  if (pendingLayoutBlockId.value !== null) return
-  pendingLayoutBlockId.value = selectedBookBlock.value?.id ?? -1
-  try {
-    const oldIds = new Set(bookBlocks.value.map((b) => b.id))
-    const { data, error } =
-      await NotebookBooksController.createBookBlockFromContent({
-        path: { notebook: notebookId.value },
-        body: {
-          fromBookContentBlockId: payload.contentBlockId,
-          ...(payload.structuralTitle !== undefined &&
-          payload.structuralTitle.length > 0
-            ? { structuralTitle: payload.structuralTitle }
-            : {}),
-        },
-      })
-    if (!error && data) {
-      emit("update:book", data)
-      const newBlock = data.blocks.find((b) => !oldIds.has(b.id))
-      if (newBlock) {
-        await applyBookBlockSelection(newBlock)
       }
     }
   } finally {
