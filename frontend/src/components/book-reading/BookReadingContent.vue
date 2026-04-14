@@ -92,6 +92,7 @@
           />
         </div>
         <BookReadingContentStreamPanel
+          v-if="!blockAwaitingConfirmation"
           :content-blocks="selectedBookBlock?.contentBlocks ?? []"
           :selected-block-title="selectedBookBlock?.title ?? null"
           :disabled="pendingLayoutBlockId !== null"
