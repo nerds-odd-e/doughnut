@@ -164,12 +164,14 @@ const bookReadingPage = () => {
           assertPdfCanvasHasDarkPixels($canvas[0] as HTMLCanvasElement)
         })
       return {
-        expectVisibleOCRContains(marker: string) {
+        expectVisibleOCRContains(marker: string, screenshotKey?: string) {
+          const name =
+            screenshotKey ?? `book-reading-pdf-viewer-ocr-p${pageNumber}`
           return afterPageCanvasInk.then(() => {
             let screenshotPath = ''
             return cy
               .get('[data-testid="pdf-book-viewer"]')
-              .screenshot('book-reading-pdf-viewer-ocr', {
+              .screenshot(name, {
                 log: false,
                 overwrite: true,
                 onAfterScreenshot(_$el, props) {
