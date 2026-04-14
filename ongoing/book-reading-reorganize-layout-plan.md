@@ -14,9 +14,11 @@
 
 - Blocks are stored flat in preorder with `layout_sequence` (DB order) and `depth` (nesting level, root = 0).
 - Wire format (`GET …/book`): flat `blocks[]` array with `depth` per block; no `layout_sequence` exposed.
-- `BookReadingBookLayout.vue` renders a flat `v-for` list with `paddingLeft: depth * 0.75rem` for visual indentation. No tree lines, connectors, or other hierarchy cues beyond left padding.
-- **No API exists** to update block depth or order after attach. Layout is immutable once the book is attached.
-- No drag-and-drop or keyboard reorder support.
+- `BookReadingBookLayout.vue` renders a flat `v-for` list with `paddingLeft: depth * 0.75rem` for visual indentation.
+- Indent/outdent via Tab/Shift+Tab and horizontal drag are shipped (leaf + subtree).
+- Cancel (Backspace) is shipped.
+- **Create block from content (Phases 9–10)** was shipped with a **content stream panel** below the PDF — a textual list of imported `contentBlocks` with long-press on a text row. **This approach is being replaced:** long-press should happen on the **content block bbox overlay in the PDF viewer**, not on a separate text panel. The stream panel and the `raw` field on `BookContentBlock` in the API are being removed.
+- AI-assisted depth reorganization (Phase 11) is shipped.
 
 ---
 
@@ -31,11 +33,6 @@ A flat preorder block list is a valid tree when, for every consecutive pair (A, 
 
 Every depth mutation must preserve this invariant.
 
-### Single-block vs subtree operations
-
-- **Leaf block (no children):** Indent/outdent changes only the target block's depth by ±1. Rejected if it would violate the tree invariant with either the predecessor or successor. Phases 3–4 use this simpler case.
-- **Block with children (general case):** Indent/outdent **always** moves the target block **and all its descendants** (contiguous run of blocks with depth > target's current depth) by ±1 together, preserving internal relative depths. Rejected if the result violates invariant at the boundary. Phase 6 generalizes to this behavior — there is no separate "single-block" vs "subtree" toggle; descendants always follow the head.
-
 ### Backend API direction
 
 A single endpoint for depth change:
@@ -45,315 +42,130 @@ PUT /api/notebooks/{notebook}/book/blocks/{bookBlock}/depth
 Body: { "direction": "INDENT" | "OUTDENT" }
 ```
 
-Returns the updated `Book` (same shape as `GET …/book`) so the client can replace the layout in one round-trip. The backend always moves descendants with the head when they exist — no `withDescendants` flag needed.
+Returns the updated `Book` (same shape as `GET …/book`) so the client can replace the layout in one round-trip.
 
-### AI reorganization (Phase 11)
+### New approach for creating a book block from content
 
-Sends the current flat layout (titles + depths) to the AI, receives a suggested depth array, previews diff to the user, applies on confirm. Exact API shape deferred to Phase 11.
+**Trigger:** Long-press (click-and-hold) on a **content block bbox** rendered as an overlay in the **PDF viewer** (the semi-transparent rectangles that appear when a book block is selected). Not a separate text panel below the PDF.
+
+**Why:** The bboxes already show the user exactly where each imported content block sits on the page. Long-pressing on the actual content in context is more natural than finding a row in a separate list below the PDF.
+
+**Content block text for title:** When the user confirms "New block" and the source content is long enough to need a title prompt, the frontend queries the content block's text from the backend on demand (e.g. a lightweight endpoint or by including minimal text in the `allBboxes` / content block wire shape). The full `raw` JSON string does **not** need to be shipped to every client on `GET …/book`.
+
+---
+
+## Shipped phases (summary)
+
+| Phase | Description |
+|-------|-------------|
+| 1 | Improve book layout nesting visuals |
+| 2 | Focus the selected block in the book layout |
+| 3 | Indent a leaf block via keyboard (Tab) |
+| 4 | Outdent a leaf block via keyboard (Shift+Tab) |
+| 5 | Drag a block left/right to change depth |
+| 6 | Indent/outdent a block with its descendants (subtree move) |
+| 7 | Drag a block with its descendants |
+| 8 | Cancel a book block (merge content to previous) |
+| 9 (old) | Create a book block from content stream panel (long-press on text row) — **being replaced** |
+| 10 (old) | Title entry when source content is long (in stream panel) — **being replaced** |
+| 11 | AI-assisted depth reorganization |
 
 ---
 
 ## Phases
 
-### Phase 1 — Improve book layout nesting visuals
+### Phase 12 — Remove content stream panel and `raw` from the API
 
-**User value:** Every user sees clearer hierarchy in the book layout sidebar without any editing capability.
+**User value:** Cleaner API response (no bulky `raw` JSON string per content block shipped to every client), simpler reader layout (no extra panel below the PDF).
+
+**What to remove:**
+
+Frontend:
+- `BookReadingContentStreamPanel.vue` — the entire component
+- `contentBlockRawPreview.ts` — preview text helper (only used by stream panel)
+- `contentBlockStructuralTitleSource.ts` — title source helper (only used by stream panel)
+- `BookReadingContentStreamPanel.spec.ts` — unit tests for the panel
+- `contentBlockStructuralTitleSource.spec.ts` — unit tests for the title helper
+- All references in `BookReadingContent.vue`: the import, the `<BookReadingContentStreamPanel>` template usage, and the `onCreateBlockFromContent` handler
+- E2E scenarios in `reorganize_layout.feature` under "Rule: Create a new book block from a content block via long-press" (both scenarios)
+- E2E step definitions in `book_reading.ts` for long-press / callout / title dialog
+- E2E page object methods in `bookReadingPage.ts`: `pressAndHoldThirdContentStreamBlock`, `expectNewBlockCalloutVisible`, `clickContentStreamNewBlockConfirm`, `expectNewBlockTitleDialogVisible`, `enterNewBlockTitleAndConfirm`
+
+Backend:
+- Remove `raw` from the `BookContentBlock` JSON serialization (drop `@JsonProperty("raw")` / `@JsonView` on `rawData`, or exclude it from the `Full` view). Keep the DB column and server-side usage of `rawData` (bbox derivation, direct-content predicate, split title derivation all need it).
+- Update OpenAPI spec and regenerate TypeScript (`pnpm generateTypeScript`).
+
+Backend tests:
+- Update any controller test assertions that check for `contentBlocks[].raw` in the wire JSON.
+
+**Verification:** Existing E2E tests for depth changes, cancel, and AI reorg still pass. The two removed long-press scenarios no longer exist.
+
+---
+
+### Phase 13 — Make content block bboxes persistent overlays on selection
+
+**User value:** When a book block is selected, the user sees **persistent** bbox overlays on the PDF for each content block owned by that block — not just a brief highlight that fades out. These overlays are the interaction surface for the upcoming long-press.
+
+**Current state:** `attachBookBlockSelectionBboxHighlight` creates overlays that **fade out** after 2 seconds. For long-press, the overlays need to remain visible as long as the block is selected.
+
+**What changes:**
+
+- **Frontend (`PdfBookViewer.vue` / `bookBlockSelectionBboxHighlight.ts`):** When showing selection bbox highlights, keep them visible (no fade-out) until the selection changes or clears. Each overlay gets a `data-book-content-block-id` attribute so it can be identified for long-press events. The overlay `pointerEvents` changes from `none` to `auto` so pointer events can be captured.
+- **Wire shape:** Each entry in `allBboxes` needs to carry the `BookContentBlock.id` so the frontend can map an overlay to a content block id for the split API. Add `contentBlockId` to `PageBbox` on the wire (or a parallel field). The first bbox (structural heading) may have no content block id.
 
 **Scenario (E2E):**
 
 ```gherkin
-# Extend existing "See book layout" scenario in book_browsing.feature
-# Verify visual nesting cues are present (e.g. tree-line indicator or distinct indentation styling)
-Then each book block in the book layout should show a visual nesting indicator matching its depth
+Scenario: Content block bboxes are visible while a block is selected
+  When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+  Then I should see content block bbox overlays on the PDF
 ```
-
-**What changes:**
-
-- `BookReadingBookLayout.vue`: add tree-line or connector styling to make parent/child relationships visually obvious (e.g. a thin vertical rule per depth level, or a left-border step pattern). The current `paddingLeft` alone is hard to parse for deep or flat-then-deep transitions.
-- CSS only — no backend or API changes.
-
-**E2E:** Extend `book_browsing.feature` to assert depth-related visual cues (e.g. `data-book-block-depth` values already exist; verify a tree-line element or distinct visual pattern appears for nested blocks).
 
 ---
 
-### Phase 2 — Focus the selected block in the book layout
+### Phase 14 — Long-press on a content block bbox in the PDF to create a new block
 
-**Shipped:** [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature); `BookReadingBookLayout.vue` watches `selectedBlockId` and focuses the row with `data-current-selection="true"` after render (`requestAnimationFrame`, same pattern as current-block scroll-into-view).
+**User value:** User can click-and-hold on a content block bbox overlay in the PDF viewer, see a callout with "New block", confirm, and see the layout update — all without leaving the PDF reading surface.
 
-**User value:** User can focus a block in the book layout (e.g. by clicking it), and the focus persists while interacting with the block (keyboard shortcuts). Focus blurs only when it should — clicking outside the book layout, navigating away, etc. — not prematurely (e.g. not on every scroll or PDF interaction while the user is still editing layout).
+**What changes:**
+
+- **Frontend (`PdfBookViewer.vue`):** Pointer hold (same duration threshold / movement tolerance pattern) on a bbox overlay element. On hold completion, show a callout (popover / floating card) near the held overlay with "New block" + "Cancel". On confirm, call `NotebookBooksController.createBookBlockFromContent` with `{ fromBookContentBlockId }` from the overlay's `data-book-content-block-id`. Refresh the book and select the new block.
+- **Title prompt:** After "New block" confirm, the backend can respond with a flag or the frontend can query the content block's text to decide whether a title prompt is needed. Alternatively, the create-block API returns the new block's derived title and the frontend only prompts when the backend signals truncation. Details deferred to implementation.
 
 **Scenario (E2E):**
 
 ```gherkin
-Scenario: Focus a book block in the layout
-  When I choose the book block "2. The Usual Defi nition Is Not Enough"
-  Then the book block "2. The Usual Defi nition Is Not Enough" should be focused in the book layout
+Scenario: Create a new book block from a content block bbox via long-press
+  When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+  And I press and hold on a content block bbox overlay in the PDF
+  Then I should see the "New block" callout near the held overlay
+  When I confirm creating a new block
+  Then a new book block should appear as a child of the block that owned that content
 ```
-
-**What changes:**
-
-- **Frontend:** Ensure book block items in the layout are focusable (`tabindex` or native button/link). Clicking a block focuses it (DOM focus, not just "selected" highlight). Focus is retained while the user presses keyboard shortcuts (Tab, Shift+Tab) on the layout — it should not blur until the user explicitly moves focus elsewhere (click outside, tab out of the layout list, etc.).
-- No backend changes.
-
-**Why a separate phase:** Tab/Shift+Tab (Phases 3–4) rely on a focused block to know which block to indent/outdent. Getting focus management right (stable focus that survives API round-trips and re-renders) is its own testable behavior.
 
 ---
 
-### Phase 3 — Indent a leaf block via keyboard (tab)
+### Phase 15 — Title entry when source content is long (PDF bbox flow)
 
-**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 6 generalizes to always move descendants with the head.
+**User value:** Same as old Phase 10 but triggered from the PDF bbox long-press flow. When the content block text exceeds the title length threshold, the user is prompted to name the new block.
 
-**User value:** User can increase the nesting depth of a single leaf block by pressing Tab while it is focused, correcting flat structures one block at a time.
+**What changes:**
+
+- **Frontend:** After "New block" confirm on a long content block, show a title dialog (same UX as before — modal with pre-filled truncated text). The frontend gets the text either from a lightweight API call or from the create-block API response.
+- **Backend:** The create-block API already accepts optional `structuralTitle`. May need a small endpoint or response field to communicate the derived title / "needs override" signal when the source text is too long.
 
 **Scenario (E2E):**
 
 ```gherkin
-Scenario: Indent a leaf block in the book layout
-  # (uses existing background with attached refactoring.pdf)
-  # The block used here has no children in the test fixture
-  Given the book layout shows block "2. The Usual Defi nition Is Not Enough" at depth 0
-  When I select the book block "2. The Usual Defi nition Is Not Enough" in the book layout
-  And I press Tab on the book layout
-  Then the book block "2. The Usual Defi nition Is Not Enough" should be at depth 1 in the book layout
-```
-
-**What changes:**
-
-- **Backend:** New endpoint `PUT /api/notebooks/{notebook}/book/blocks/{bookBlock}/depth` accepting `{ "direction": "INDENT" }`. Validates depth constraint against predecessor and successor. Updates `depth` column. Returns updated `Book`.
-- **Frontend:** On `keydown.tab` (with `preventDefault`) while a block is focused in the layout, call the indent API and refresh the book data. Focus must remain on the same block after re-render.
-- **Validation:** Reject if the block is already at predecessor's depth + 1 (can't nest deeper), or if it is the first block (no predecessor to be child of).
-
-**Sub-phases (E2E-led):**
-
-1. Red: add the E2E scenario (indent step fails — no API). Green: implement backend endpoint + frontend tab handler for indent.
-
----
-
-### Phase 4 — Outdent a leaf block via keyboard (shift-tab)
-
-**Precondition:** The block has **no children**. This phase keeps the scenario simple; Phase 6 generalizes to always move descendants with the head.
-
-**User value:** User can decrease the nesting depth of a single leaf block by pressing Shift+Tab while it is focused, pulling it up in the hierarchy.
-
-**Scenario (E2E):**
-
-```gherkin
-Scenario: Outdent a leaf block in the book layout
-  # The block used here has no children in the test fixture
-  Given the book layout shows block "3.1 Can You Refactor Without Tests?" at depth 1
-  When I select the book block "3.1 Can You Refactor Without Tests?" in the book layout
-  And I press Shift+Tab on the book layout
-  Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 0 in the book layout
-```
-
-**What changes:**
-
-- **Backend:** Same endpoint, `{ "direction": "OUTDENT" }`. Validates: depth > 0, and successor's depth <= new depth + 1 (or reject).
-- **Frontend:** `keydown.tab` with `shiftKey` calls outdent. Focus must remain on the same block after re-render.
-
-**Sub-phases (E2E-led):**
-
-1. Red: add outdent scenario (fails — outdent not implemented). Green: extend endpoint + handler for outdent direction.
-
----
-
-### Phase 5 — Drag a block left/right to change depth
-
-**User value:** More discoverable and touch-friendly alternative to keyboard — user drags a block horizontally to indent (right) or outdent (left).
-
-**Unit tests (Vitest, no E2E for this phase):**
-
-- [`frontend/src/lib/book-reading/bookLayoutBlockDragIntent.ts`](../frontend/src/lib/book-reading/bookLayoutBlockDragIntent.ts) — classifies accumulated `dx`/`dy` as indent, outdent, or none (horizontal threshold + horizontal-over-vertical dominance so aside scrolling does not change depth). Covered by [`frontend/tests/lib/book-reading/bookLayoutBlockDragIntent.spec.ts`](../frontend/tests/lib/book-reading/bookLayoutBlockDragIntent.spec.ts).
-- [`frontend/src/components/book-reading/BookReadingBookLayout.vue`](../frontend/src/components/book-reading/BookReadingBookLayout.vue) — pointer events on each row emit `blockIndent` / `blockOutdent` after a qualifying horizontal drag; small movement still allows `blockClick`. Covered by [`frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts`](../frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts).
-
-**What changes:**
-
-- **Frontend:** Horizontal drag gesture on each book block row (pointer events, shared threshold with `bookLayoutBlockDragIntent`). On pointer-up past threshold, emit the same `blockIndent` / `blockOutdent` as Tab/Shift+Tab (parent still calls the depth API). `setPointerCapture` is used when the browser supports it; synthetic test pointers skip capture safely.
-- No backend changes — reuses the existing depth endpoint.
-
----
-
-### Phase 6 — Indent/outdent a block with its descendants (subtree move)
-
-**User value:** When a block has children, indenting or outdenting via Tab/Shift+Tab always moves the entire section together instead of requiring one-by-one adjustment. This is the general behavior — Phases 3–4 were the simple leaf-only introduction.
-
-**Scenario (E2E):**
-
-```gherkin
-Scenario: Indent a block and its children together
-  # Uses "subtree_indent" fixture: parent "Chapter A" at depth 0 with two children at depth 1,
-  # followed by a sibling "Chapter B" at depth 0 so the subtree boundary is clear.
-  Given the book layout shows block "Chapter A" at depth 0
-  When I choose the book block "Chapter A"
-  Then the book block "Chapter A" should be focused in the book layout
-  When I press "Tab" on the book layout
-  Then the book block "Chapter A" should be at depth 1 in the book layout
-  And the book block "A.1 First section" should be at depth 2 in the book layout
-  And the book block "A.2 Second section" should be at depth 2 in the book layout
-  And the book block "Chapter B" should be at depth 0 in the book layout
-```
-
-**What changes:**
-
-- **Backend:** Extend the depth endpoint: when the target block has descendants (contiguous run of blocks after the target whose depth > target's current depth), always shift all by ±1 together. Validates boundary invariant at predecessor of target and successor of last descendant.
-- **Frontend:** Tab/Shift+Tab now always moves descendants with the head. No separate "single-block" vs "subtree" toggle needed — descendants always follow.
-- **Fixture:** `e2e_test/fixtures/book_reading/mineru_output_for_subtree_indent.json` — minimal MinerU content list encoding the parent + two children + sibling layout above.
-
----
-
-### Phase 7 — Drag a block with its descendants
-
-**Shipped.** Drag on a parent block emits `blockIndent` / `blockOutdent` with the parent as the payload — the same path as Tab/Shift+Tab. `BookService.changeBlockDepth` already moves the contiguous subtree for both directions (Phase 6 backend). No new production code was required.
-
-**Tests:** [`frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts`](../frontend/tests/components/book-reading/BookReadingBookLayout.spec.ts) — "emits blockIndent with parent block when dragging right on a parent that has children" and "emits blockOutdent with parent block when dragging left on a parent that has children".
-
----
-
-### Phase 8 — Cancel a book block (merge content to previous)
-
-**Shipped.** [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature) — two scenarios (leaf block removal and parent block with children promotion). `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}` removes the block, reassigns its `BookContentBlock` rows to the predecessor, promotes descendants (depth -= 1), returns updated `Book`. Frontend: Backspace on a focused block row in the layout emits `blockCancel`; `BookReadingContent` calls `NotebookBooksController.cancelBookBlock` and replaces the book. First block is rejected by the backend (400).
-
----
-
-### Phase 9 — Create a book block from a content block (long-press)
-
-Phase 9 is **decomposed into sub-phases** below so each slice stays small, testable, and shippable. Together they deliver the same user story as before; **Phase 10** (title prompt when source text is long) still follows.
-
-**Overall user value:** User can add a finer structural boundary from the reading surface when the import missed a break — without hunting for a control in the sidebar list.
-
-**Overall UX (unchanged direction):**
-
-- **Trigger:** User **clicks and holds** on an imported **content block** in the book reading stream (not a row in the book layout drawer).
-- **After hold threshold:** A **callout** with **"New block"** (and dismiss so reading is not trapped).
-- **On confirm:** A new **`BookBlock`** is a **child** of the owner (`depth = owner.depth + 1`), with **`BookContentBlock`** rows from the split point onward reassigned. **Short-title path:** server derives **`structuralTitle`** from the first moved block’s text (trim / max length); **Phase 10** adds an explicit title step when that is insufficient.
-
-**End-state E2E (after sub-phases 9.1–9.5):**
-
-```gherkin
-Scenario: Create a new book block from a content block via long-press
-  When I press and hold on a content block in the book reading view
-  Then I should see a callout with "New block"
-  When I choose "New block" in the callout
-  Then a new book block should appear in the book layout as a child of the block that owned that content
-```
-
----
-
-#### Phase 9.1 — Expose imported `contentBlocks` on `GET …/book`
-
-**User value:** The reader (and tests) can see each layout block’s imported body stream with **stable ids**, without a second round-trip.
-
-**What changes:**
-
-- **Backend:** Extend each `BookBlock` in the `GET …/book` JSON with ordered **`contentBlocks`** (e.g. `id`, `type`, optional `pageIdx`, `raw` JSON string). Keep **`Book`** / OpenAPI / generated TS in sync (`pnpm generateTypeScript`).
-- **Loading:** Avoid N+1 and Hibernate **multiple-bag fetch** issues (e.g. fetch `blocks` with an entity graph and use **`@Fetch(SUBSELECT)`** or equivalent on `BookBlock.contentBlocks` so one extra query loads all content rows).
-- **Tests:** Controller or integration test: attached book returns non-empty `contentBlocks` where the fixture has body items; ids are stable across calls.
-
-**Out of scope for 9.1:** Split/mutation endpoint, any reader UI beyond what already consumes `GET …/book`.
-
----
-
-#### Phase 9.2 — Split API: create child block from a `BookContentBlock`
-
-**User value:** Persisted layout can gain a new child block and move tail content in one operation (still invokable from API/tests before the long-press UI lands).
-
-**What changes:**
-
-- **Backend:** `POST /api/notebooks/{notebook}/book/blocks` with body **`{ "fromBookContentBlockId": <int> }`** (name per OpenAPI). Resolve the row, verify it belongs to the notebook’s book, split the owning block’s ordered content at that row, insert a new **`BookBlock`** immediately after the owner in preorder with **`depth = owner.depth + 1`**, reassign **`BookContentBlock`** ownership and **`sibling_order`**, renumber **`layout_sequence`** globally, derive **`structuralTitle`** from the first moved block’s text (fallback title if no text). Return **`Book`** with `@JsonView(Full)` and **201** (or project-standard success shape).
-- **Tests:** [`NotebookBooksControllerTest`](../backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksControllerTest.java): happy path (depth, counts, ownership), unknown id / wrong book **404**, bad tree **400** if applicable, no write access on notebook.
-
-**Depends on:** 9.1 (clients need ids; implementation can ship 9.2 after 9.1 or in parallel if tests use DB ids from fixtures).
-
----
-
-#### Phase 9.3 — Reader: content stream panel (selected block)
-
-**User value:** In the book reading **main pane**, the user sees the **imported body** for the **currently selected** layout block — the surface long-press will attach to.
-
-**What changes:**
-
-- **Frontend:** New panel (e.g. under **`PdfBookViewer`**) listing **`contentBlocks`** for **`selectedBlockId`**: short preview from **`raw`** (parse `text` when present), stable hooks **`data-testid="book-reading-content-stream"`**, **`data-testid="book-reading-content-block"`**, **`data-book-content-block-id`**. **Layout:** flex column so PDF stays primary (`min-h-0`, capped height / scroll for the stream). No long-press yet.
-- **Tests:** Vitest on the component (rows, attributes) or minimal mount test; update **`BookBlockFull`** stubs in shared fixtures / specs to include **`contentBlocks: []`** where needed.
-
-**Depends on:** 9.1 (wire shape).
-
----
-
-#### Phase 9.4 — Reader: long-press, callout, and split integration
-
-**User value:** User can **hold** on a content row, see **"New block"**, confirm, and see the layout update.
-
-**What changes:**
-
-- **Frontend:** Pointer **hold** with duration threshold and **movement tolerance** (must not fight PDF scroll). **`CalloutCard`** (or equivalent) with **New block** + **Cancel** / dismiss (Escape, outside click). On confirm: call **`NotebookBooksController.createBookBlockFromContent`**, **`emit('update:book', data)`**, optionally **select** the new block and scroll PDF via existing selection helpers. Reuse **`pendingLayoutBlockId`** or a dedicated pending flag so layout ops don’t overlap.
-- **Tests:** Vitest for hold logic optional; behavior covered by 9.5 E2E.
-
-**Depends on:** 9.2, 9.3.
-
----
-
-#### Phase 9.5 — E2E: long-press creates child block
-
-**User value:** Regresses the full flow in CI.
-
-**What changes:**
-
-- **E2E:** Extend [`e2e_test/features/book_reading/reorganize_layout.feature`](../e2e_test/features/book_reading/reorganize_layout.feature) (or adjacent feature): attach a fixture where a block has **≥2** `contentBlocks`, open reader, long-press a row (page object + Cypress timing), assert callout, click **New block**, assert new layout row **child depth** relative to owner. Step definitions in [`book_reading.ts`](../e2e_test/step_definitions/book_reading.ts) + [`bookReadingPage`](../e2e_test/start/pageObjects/bookReadingPage.ts).
-
-**Depends on:** 9.4.
-
----
-
-### Phase 10 — Title entry when the source content block is long
-
-**User value:** When the content block the user long-pressed is **too long** to use as a **structural title** as-is, the user explicitly names the new block instead of silently truncating in a way that hides the choice.
-
-**Interaction (UX):**
-
-- After **"New block"** (or before persist, depending on implementation — single user-visible flow), if the source content exceeds a **maximum title length** suitable for **`BookBlock.structuralTitle`**, show a **title prompt** (modal or inline step).
-- **Default value** in the title field: **truncated content** from that block (characters/words capped to fit under the limit so the user sees a reasonable starting point).
-- **Implementation note:** The **UI threshold** for “long” may differ from **JCK / DB / API** max length if the stack enforces a **shorter** limit — align during implementation so the prompt appears whenever an untruncated title would be rejected or degraded.
-
-**Scenario (E2E):**
-
-```gherkin
-Scenario: Create a book block from long content with a typed title
-  Given a content block whose text exceeds the title length threshold
-  When I press and hold on that content block and choose "New block"
+Scenario: Create a book block from long content bbox with a typed title
+  When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+  And I press and hold on a long-text content block bbox overlay in the PDF
+  Then I should see the "New block" callout
+  When I confirm creating a new block
   Then I should be prompted to enter a title defaulting to truncated content
   When I confirm the title
   Then a new book block should appear with the supplied title as a child of the owning block
 ```
-
-**What changes:**
-
-- **Backend:** Create-block API accepts optional **`structuralTitle`** override when the client collected it from the title step; validate max length consistently with persistence.
-- **Frontend:** Branch after long-press **"New block"**: if content length > threshold → title field **pre-filled with truncated** source text; else keep Phase 9 inline title derivation without an extra step. **Non-text-heavy blocks** (e.g. image-only): can reuse the same prompt with an empty or generic default — defer detail to implementation if not product-critical in this phase.
-
----
-
-### Phase 11 — AI-assisted depth reorganization
-
-**Sub-phases:** [`ongoing/book-reading-reorganize-layout-plan-11-sub-phases.md`](book-reading-reorganize-layout-plan-11-sub-phases.md) — includes split **11.2.1–11.2.3** (trigger + mask/spinner + toast on error, dialog shell with fixed title, E2E mock), then **11.4** / **11.5** for preview content and apply.
-
-**User value:** User can ask AI to automatically fix/suggest the nesting structure for the entire book layout, saving manual block-by-block work.
-
-**Scenario (E2E):**
-
-```gherkin
-@usingMockedOpenAiService
-Scenario: AI reorganizes the book layout depth
-  When I request AI reorganization of the book layout
-  Then I should see a preview of the suggested depth changes
-  When I confirm the AI suggestion
-  Then the book layout should reflect the AI-suggested depths
-```
-
-**What changes:**
-
-- **Backend:** New endpoint (e.g. `POST /api/notebooks/{notebook}/book/reorganize-layout`) that sends block titles + current depths to the configured AI service, receives a suggested depth array, and returns it as a preview. A separate confirm endpoint (or the same with a flag) applies the changes.
-- **Frontend:** UI control (button in the layout sidebar or a menu option) to trigger AI reorg. Preview shows a diff of current vs suggested depths. Confirm applies; cancel discards.
-- Depends on the existing OpenAI service integration pattern used elsewhere in the codebase.
 
 ---
 

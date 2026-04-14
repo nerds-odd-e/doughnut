@@ -93,6 +93,20 @@ export function useBookReadingSnapBack(options: {
   const snapbackAttempts = new Map<number, number>()
   const snapAnimationKey = ref(0)
 
+  /**
+   * Trigger A: the user has seen the selected block's content geometry at
+   * some point and has since scrolled past the immediate successor — a
+   * "reminder" trigger that fires independently of snap-back.
+   */
+  function panelShownBecauseScrolledPastContent(
+    successor: BookBlockFull
+  ): boolean {
+    return (
+      geometryEverVisibleForSelection.value &&
+      successor.id !== currentBlockId.value
+    )
+  }
+
   function shouldSnapBack(proposedBlockId: number | null): boolean {
     if (proposedBlockId === null) return false
     const selId = selectedBlockId.value
@@ -189,11 +203,10 @@ export function useBookReadingSnapBack(options: {
     const { successor } = chain
     const lastBbox = lastContentBbox(target)
     if (lastBbox !== null) {
-      if (lastContentBottomVisible.value) return target
-      if (geometryEverVisibleForSelection.value) {
-        return successor.id === currentBlockId.value ? null : target
-      }
-      return null
+      const contentBottomVisible = lastContentBottomVisible.value
+      const scrolledPastContent =
+        panelShownBecauseScrolledPastContent(successor)
+      return contentBottomVisible || scrolledPastContent ? target : null
     }
     return successor.id === currentBlockId.value ? target : null
   })
