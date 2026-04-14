@@ -11,6 +11,7 @@ export type NormalizedPageBbox = readonly [number, number, number, number]
 export type BookNavigationTarget = {
   pageIndex: number
   bbox: NormalizedPageBbox | null
+  contentBlockId?: number
 }
 
 /** pdf.js scrollPageIntoView XYZ dest array shape. */
@@ -55,7 +56,11 @@ export function parseOptionalBbox(raw: unknown): NormalizedPageBbox | null {
  */
 export function wireItemsToNavigationTargets(
   items:
-    | ReadonlyArray<{ pageIndex: number; bbox?: ReadonlyArray<number> }>
+    | ReadonlyArray<{
+        pageIndex: number
+        bbox?: ReadonlyArray<number>
+        contentBlockId?: number
+      }>
     | undefined
 ): BookNavigationTarget[] {
   if (!items?.length) return []
@@ -70,12 +75,20 @@ export function wireItemsToNavigationTargets(
     }
     const rawBbox = it.bbox as unknown
     if (rawBbox === undefined || rawBbox === null) {
-      out.push({ pageIndex: it.pageIndex, bbox: null })
+      out.push({
+        pageIndex: it.pageIndex,
+        bbox: null,
+        contentBlockId: it.contentBlockId,
+      })
       continue
     }
     const bbox = parseOptionalBbox(it.bbox as unknown[])
     if (bbox === null) continue
-    out.push({ pageIndex: it.pageIndex, bbox })
+    out.push({
+      pageIndex: it.pageIndex,
+      bbox,
+      contentBlockId: it.contentBlockId,
+    })
   }
   return out
 }

@@ -1,8 +1,5 @@
-import {
-  attachBookBlockSelectionBboxHighlight,
-  BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS,
-} from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { attachBookBlockSelectionBboxHighlight } from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 describe("attachBookBlockSelectionBboxHighlight", () => {
   let host: HTMLDivElement
@@ -14,11 +11,9 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
 
   afterEach(() => {
     host.remove()
-    vi.useRealTimers()
   })
 
-  it("places overlay at the given pixel rect, fades to zero, then removes", () => {
-    vi.useFakeTimers()
+  it("places overlay at the given pixel rect and keeps it visible", () => {
     attachBookBlockSelectionBboxHighlight(host, {
       left: 80,
       top: 120,
@@ -32,20 +27,36 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     expect(el.style.top).toBe("120px")
     expect(el.style.width).toBe("160px")
     expect(el.style.height).toBe("120px")
-    expect(el.style.transition).toContain(
-      `${BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS}ms`
-    )
-    expect(el.style.opacity).toBe("1")
-    vi.advanceTimersByTime(0)
-    expect(el.style.opacity).toBe("0")
-    vi.advanceTimersByTime(BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
-    expect(
-      host.querySelector("[data-testid=book-block-selection-bbox-highlight]")
-    ).toBeNull()
+    expect(el.style.pointerEvents).toBe("auto")
+    expect(el).not.toBeNull()
   })
 
-  it("allows multiple simultaneous overlays until each is cancelled", () => {
-    vi.useFakeTimers()
+  it("sets data-book-content-block-id when contentBlockId is provided", () => {
+    attachBookBlockSelectionBboxHighlight(
+      host,
+      { left: 0, top: 0, width: 10, height: 10 },
+      42
+    )
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    expect(el.dataset.bookContentBlockId).toBe("42")
+  })
+
+  it("does not set data-book-content-block-id when contentBlockId is absent", () => {
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+    })
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    expect(el.dataset.bookContentBlockId).toBeUndefined()
+  })
+
+  it("allows multiple simultaneous overlays", () => {
     attachBookBlockSelectionBboxHighlight(host, {
       left: 0,
       top: 0,
@@ -62,15 +73,9 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
       host.querySelectorAll("[data-testid=book-block-selection-bbox-highlight]")
         .length
     ).toBe(2)
-    vi.advanceTimersByTime(BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
-    expect(
-      host.querySelectorAll("[data-testid=book-block-selection-bbox-highlight]")
-        .length
-    ).toBe(0)
   })
 
-  it("cancel() removes the highlight and pending timers", () => {
-    vi.useFakeTimers()
+  it("cancel() removes the overlay", () => {
     const cancel = attachBookBlockSelectionBboxHighlight(host, {
       left: 0,
       top: 0,
@@ -78,10 +83,6 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
       height: 100,
     })
     cancel()
-    expect(
-      host.querySelector("[data-testid=book-block-selection-bbox-highlight]")
-    ).toBeNull()
-    vi.advanceTimersByTime(BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
     expect(
       host.querySelector("[data-testid=book-block-selection-bbox-highlight]")
     ).toBeNull()

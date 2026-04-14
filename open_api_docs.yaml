@@ -3330,6 +3330,9 @@ components:
           items:
             type: number
             format: double
+        contentBlockId:
+          type: integer
+          format: int32
       required:
       - bbox
       - pageIndex
@@ -4067,6 +4070,9 @@ components:
           items:
             type: number
             format: double
+        contentBlockId:
+          type: integer
+          format: int32
       required:
       - bbox
       - pageIndex

@@ -22,6 +22,17 @@ Feature: Reorganize book layout
         | 2. The Usual Defi nition Is Not Enough  | 0           | Tab       | 1         |
         | 3.1 Can You Refactor Without Tests?     | 1           | Shift+Tab | 0         |
 
+  Rule: Content block bbox overlays
+
+    Background:
+      Given I have a notebook with the head note "Code Refactoring Book"
+      When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+      And I open the book attached to notebook "Code Refactoring Book"
+
+    Scenario: Content block bboxes are visible while a block is selected
+      When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+      Then I should see content block bbox overlays on the PDF
+
   Rule: Change depth of a block with its descendants or cancel a block
 
     Background:

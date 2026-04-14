@@ -262,7 +262,8 @@ function clearBookBlockSelectionBboxHighlight() {
 
 function appendBookBlockSelectionBboxHighlight(
   pageNumber: number,
-  bbox: NormalizedPageBbox
+  bbox: NormalizedPageBbox,
+  contentBlockId?: number
 ) {
   if (!pdfViewer) return
   const pageView = pdfViewer.getPageView(pageNumber - 1)
@@ -273,7 +274,7 @@ function appendBookBlockSelectionBboxHighlight(
     pageView.viewport.height
   )
   bookBlockSelectionBboxHighlightCancels.push(
-    attachBookBlockSelectionBboxHighlight(pageView.div, rect)
+    attachBookBlockSelectionBboxHighlight(pageView.div, rect, contentBlockId)
   )
 }
 
@@ -291,7 +292,11 @@ function showSelectionBboxHighlights(
     ) {
       continue
     }
-    appendBookBlockSelectionBboxHighlight(e.pageIndex + 1, e.bbox)
+    appendBookBlockSelectionBboxHighlight(
+      e.pageIndex + 1,
+      e.bbox,
+      e.contentBlockId
+    )
   }
 }
 

@@ -421,6 +421,13 @@ const bookReadingPage = () => {
       pageIsNotLoading()
       return this
     },
+    expectContentBlockBboxOverlaysVisible() {
+      pageIsNotLoading()
+      cy.get('[data-testid="pdf-book-viewer"]')
+        .find('[data-testid="book-block-selection-bbox-highlight"]')
+        .should('exist')
+      return this
+    },
   }
 }
 

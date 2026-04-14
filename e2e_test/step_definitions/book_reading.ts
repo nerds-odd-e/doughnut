@@ -441,3 +441,11 @@ Then(
     return bookReadingPage().expectBookBlockAtDepth(title, depth)
   }
 )
+
+Then(
+  'I should see content block bbox overlays on the PDF',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectContentBlockBboxOverlaysVisible()
+  }
+)

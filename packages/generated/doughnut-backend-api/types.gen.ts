@@ -50,6 +50,7 @@ export type BookMutationResponse = {
 export type PageBbox = {
     pageIndex: number;
     bbox: Array<number>;
+    contentBlockId?: number;
 };
 
 export type Circle = {
@@ -392,6 +393,7 @@ export type BookFull = {
 export type PageBboxFull = {
     pageIndex: number;
     bbox: Array<number>;
+    contentBlockId?: number;
 };
 
 export type AttachBookLayoutNodeRequestFull = {
