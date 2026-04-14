@@ -465,3 +465,19 @@ When(
     return bookReadingPage().clickContentStreamNewBlockConfirm()
   }
 )
+
+Then(
+  'I should see the new block title entry dialog in the reading stream',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectNewBlockTitleDialogVisible()
+  }
+)
+
+When(
+  'I enter {string} as the new block title and confirm',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().enterNewBlockTitleAndConfirm(title)
+  }
+)

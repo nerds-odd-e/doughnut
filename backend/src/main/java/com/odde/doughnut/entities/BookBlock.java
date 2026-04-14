@@ -43,7 +43,10 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
       description = "Nesting depth in the book layout; root-level blocks are 0.")
   private int depth;
 
-  @Column(name = "structural_title", nullable = false, length = 512)
+  @Column(
+      name = "structural_title",
+      nullable = false,
+      length = BookBlockTitleLimits.STRUCTURAL_MAX_CHARS)
   @Getter
   @Setter
   @JsonProperty("title")

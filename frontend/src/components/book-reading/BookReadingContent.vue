@@ -92,7 +92,6 @@
           />
         </div>
         <BookReadingContentStreamPanel
-          v-if="!blockAwaitingConfirmation"
           :content-blocks="selectedBookBlock?.contentBlocks ?? []"
           :selected-block-title="selectedBookBlock?.title ?? null"
           :disabled="pendingLayoutBlockId !== null"
@@ -560,7 +559,10 @@ async function onBlockCancel(block: BookBlockFull) {
   }
 }
 
-async function onCreateBlockFromContent(contentBlockId: number) {
+async function onCreateBlockFromContent(payload: {
+  contentBlockId: number
+  structuralTitle?: string
+}) {
   if (pendingLayoutBlockId.value !== null) return
   pendingLayoutBlockId.value = selectedBookBlock.value?.id ?? -1
   try {
@@ -568,7 +570,13 @@ async function onCreateBlockFromContent(contentBlockId: number) {
     const { data, error } =
       await NotebookBooksController.createBookBlockFromContent({
         path: { notebook: notebookId.value },
-        body: { fromBookContentBlockId: contentBlockId },
+        body: {
+          fromBookContentBlockId: payload.contentBlockId,
+          ...(payload.structuralTitle !== undefined &&
+          payload.structuralTitle.length > 0
+            ? { structuralTitle: payload.structuralTitle }
+            : {}),
+        },
       })
     if (!error && data) {
       emit("update:book", data)

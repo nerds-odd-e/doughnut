@@ -353,6 +353,10 @@ export type CreateBookBlockFromContentRequestFull = {
      * Split the owning book block at this imported content row; that row and following rows become a new child block.
      */
     fromBookContentBlockId: number;
+    /**
+     * When set, used as the new block structural title (trimmed, max length enforced). Otherwise the title is derived from the first moved content block.
+     */
+    structuralTitle?: string;
 };
 
 export type BookBlockFull = {

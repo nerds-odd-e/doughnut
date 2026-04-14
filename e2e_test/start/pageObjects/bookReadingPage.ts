@@ -453,6 +453,29 @@ const bookReadingPage = () => {
         .click()
       return this
     },
+    expectNewBlockTitleDialogVisible() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-new-block-title-dialog"]').should(
+        'have.class',
+        'daisy-modal-open'
+      )
+      cy.get('[data-testid="book-reading-new-block-title-input"]').should(
+        'be.visible'
+      )
+      return this
+    },
+    enterNewBlockTitleAndConfirm(title: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-new-block-title-input"]')
+        .should('be.visible')
+        .clear()
+        .type(title)
+      cy.get('[data-testid="book-reading-new-block-title-confirm"]')
+        .should('be.visible')
+        .click()
+      pageIsNotLoading()
+      return this
+    },
   }
 }
 

@@ -3,7 +3,7 @@
     data-testid="book-reading-content-stream"
     class="daisy-shrink-0 daisy-max-h-[30vh] daisy-min-h-0 daisy-overflow-y-auto daisy-border-t daisy-border-base-300 daisy-bg-base-200/80 daisy-px-2 daisy-py-2"
     :aria-label="ariaLabel"
-    @keydown.escape="onCalloutDismiss"
+    @keydown.escape="onEscape"
   >
     <p
       v-if="selectedBlockTitle"
@@ -67,11 +67,64 @@
       No imported body for this section.
     </p>
   </section>
+  <dialog
+    class="daisy-modal"
+    :class="{ 'daisy-modal-open': titleModal !== null }"
+    aria-labelledby="book-reading-new-block-title-heading"
+    data-testid="book-reading-new-block-title-dialog"
+  >
+    <div v-if="titleModal" class="daisy-modal-box">
+      <h2
+        id="book-reading-new-block-title-heading"
+        class="daisy-text-lg daisy-font-semibold daisy-mb-2"
+      >
+        Name the new block
+      </h2>
+      <label class="daisy-form-control daisy-w-full">
+        <span class="daisy-label daisy-text-sm">Title</span>
+        <input
+          v-model="titleModal.draft"
+          type="text"
+          class="daisy-input daisy-input-bordered daisy-w-full"
+          data-testid="book-reading-new-block-title-input"
+          :maxlength="BOOK_BLOCK_STRUCTURAL_TITLE_MAX_CHARS"
+        >
+      </label>
+      <div class="daisy-modal-action">
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary"
+          data-testid="book-reading-new-block-title-confirm"
+          @click="onTitleModalConfirm"
+        >
+          Confirm
+        </button>
+        <button
+          type="button"
+          class="daisy-btn"
+          data-testid="book-reading-new-block-title-cancel"
+          @click="onTitleModalDismiss"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="daisy-modal-backdrop">
+      <button type="button" @click="onTitleModalDismiss">
+        close
+      </button>
+    </form>
+  </dialog>
 </template>
 
 <script setup lang="ts">
 import CalloutCard from "@/components/book-reading/CalloutCard.vue"
 import { previewTextFromContentBlockRaw } from "@/lib/book-reading/contentBlockRawPreview"
+import {
+  BOOK_BLOCK_STRUCTURAL_TITLE_MAX_CHARS,
+  defaultStructuralTitleDraft,
+  structuralTitleSourceFromContentBlockRaw,
+} from "@/lib/book-reading/contentBlockStructuralTitleSource"
 import type { BookContentBlockFull } from "@generated/doughnut-backend-api"
 import { computed, ref } from "vue"
 
@@ -85,7 +138,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  createBlockFromContent: [contentBlockId: number]
+  createBlockFromContent: [
+    payload: { contentBlockId: number; structuralTitle?: string },
+  ]
 }>()
 
 const ariaLabel = computed(() => {
@@ -105,6 +160,7 @@ type HoldState = {
 
 const holdState = ref<HoldState | null>(null)
 const calloutBlockId = ref<number | null>(null)
+const titleModal = ref<{ contentBlockId: number; draft: string } | null>(null)
 
 function cancelHold() {
   if (holdState.value) {
@@ -113,11 +169,20 @@ function cancelHold() {
   }
 }
 
+function onEscape() {
+  if (titleModal.value !== null) {
+    onTitleModalDismiss()
+    return
+  }
+  onCalloutDismiss()
+}
+
 function onContentBlockPointerDown(
   block: BookContentBlockFull,
   e: PointerEvent
 ) {
   if (props.disabled || calloutBlockId.value !== null) return
+  if (titleModal.value !== null) return
   if (e.pointerType === "mouse" && e.button !== 0) return
   cancelHold()
   const timerId = setTimeout(() => {
@@ -164,8 +229,39 @@ function onContentBlockPointerCancel(
 function onNewBlockConfirm() {
   const id = calloutBlockId.value
   if (id === null) return
+  const block = props.contentBlocks.find((b) => b.id === id)
   calloutBlockId.value = null
-  emit("createBlockFromContent", id)
+  if (!block) return
+  const { fullText, exceedsMax } = structuralTitleSourceFromContentBlockRaw(
+    block.raw
+  )
+  if (exceedsMax) {
+    titleModal.value = {
+      contentBlockId: id,
+      draft: defaultStructuralTitleDraft(fullText),
+    }
+  } else {
+    emit("createBlockFromContent", { contentBlockId: id })
+  }
+}
+
+function onTitleModalConfirm() {
+  const m = titleModal.value
+  if (m === null) return
+  titleModal.value = null
+  const trimmed = m.draft.trim()
+  if (trimmed.length > 0) {
+    emit("createBlockFromContent", {
+      contentBlockId: m.contentBlockId,
+      structuralTitle: trimmed,
+    })
+  } else {
+    emit("createBlockFromContent", { contentBlockId: m.contentBlockId })
+  }
+}
+
+function onTitleModalDismiss() {
+  titleModal.value = null
 }
 
 function onCalloutDismiss() {

@@ -1,5 +1,6 @@
 import BookReadingContentStreamPanel from "@/components/book-reading/BookReadingContentStreamPanel.vue"
 import { BOOK_READING_CONTENT_BLOCK_PREVIEW_MAX_CHARS } from "@/lib/book-reading/contentBlockRawPreview"
+import { BOOK_BLOCK_STRUCTURAL_TITLE_MAX_CHARS } from "@/lib/book-reading/contentBlockStructuralTitleSource"
 import helper from "@tests/helpers"
 import type { BookContentBlockFull } from "@generated/doughnut-backend-api"
 import { describe, expect, it, vi } from "vitest"
@@ -263,7 +264,59 @@ describe("BookReadingContentStreamPanel", () => {
         .find('[data-testid="book-reading-content-new-block-confirm"]')
         .trigger("click")
 
-      expect(wrapper.emitted("createBlockFromContent")).toEqual([[20]])
+      expect(wrapper.emitted("createBlockFromContent")).toEqual([
+        [{ contentBlockId: 20 }],
+      ])
+      vi.useRealTimers()
+    })
+
+    it("opens title modal when New block is confirmed on long text, then emits with structuralTitle", async () => {
+      vi.useFakeTimers()
+      const longText = "Z".repeat(BOOK_BLOCK_STRUCTURAL_TITLE_MAX_CHARS + 8)
+      const wrapper = helper
+        .component(BookReadingContentStreamPanel)
+        .withProps({
+          contentBlocks: [
+            row({
+              id: 30,
+              type: "text",
+              raw: JSON.stringify({ text: longText }),
+            }),
+          ],
+        })
+        .mount({ attachTo: document.body })
+
+      const item = wrapper.find('[data-testid="book-reading-content-block"]')
+      pointerDown(item.element)
+      vi.advanceTimersByTime(500)
+      await wrapper.vm.$nextTick()
+
+      await wrapper
+        .find('[data-testid="book-reading-content-new-block-confirm"]')
+        .trigger("click")
+      await wrapper.vm.$nextTick()
+
+      const dialog = wrapper.find(
+        '[data-testid="book-reading-new-block-title-dialog"]'
+      )
+      expect(dialog.classes()).toContain("daisy-modal-open")
+      const input = wrapper.find(
+        '[data-testid="book-reading-new-block-title-input"]'
+      )
+      expect(input.element).toBeInstanceOf(HTMLInputElement)
+      expect((input.element as HTMLInputElement).value).toHaveLength(
+        BOOK_BLOCK_STRUCTURAL_TITLE_MAX_CHARS
+      )
+
+      await input.setValue("Short custom title")
+      await wrapper
+        .find('[data-testid="book-reading-new-block-title-confirm"]')
+        .trigger("click")
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.emitted("createBlockFromContent")).toEqual([
+        [{ contentBlockId: 30, structuralTitle: "Short custom title" }],
+      ])
       vi.useRealTimers()
     })
 

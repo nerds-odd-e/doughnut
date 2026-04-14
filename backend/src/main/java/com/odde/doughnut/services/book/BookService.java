@@ -19,6 +19,7 @@ import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion.Bloc
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
+import com.odde.doughnut.entities.BookBlockTitleLimits;
 import com.odde.doughnut.entities.BookContentBlock;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.Notebook;
@@ -505,7 +506,8 @@ public class BookService {
   }
 
   @Transactional
-  public Book createBookBlockFromContent(Notebook notebook, int fromBookContentBlockId) {
+  public Book createBookBlockFromContent(
+      Notebook notebook, int fromBookContentBlockId, String structuralTitleOverride) {
     Book book = requireBook(notebook);
     BookContentBlock pivot =
         bookContentBlockRepository
@@ -551,7 +553,11 @@ public class BookService {
     }
 
     BookBlock newBlock = new BookBlock();
-    newBlock.setStructuralTitle(structuralTitleFromFirstMovedContent(ordered.get(splitAt)));
+    String trimmedOverride = trimToNull(structuralTitleOverride);
+    newBlock.setStructuralTitle(
+        trimmedOverride != null
+            ? trimmedMax(trimmedOverride, BookBlockTitleLimits.STRUCTURAL_MAX_CHARS)
+            : structuralTitleFromFirstMovedContent(ordered.get(splitAt)));
     newBlock.setDepth(owner.getDepth() + 1);
     book.getBlocks().add(ownerIdx + 1, newBlock);
     newBlock.setBook(book);
@@ -595,7 +601,7 @@ public class BookService {
       JsonNode n = objectMapper.readTree(raw);
       JsonNode text = n.get("text");
       if (text != null && text.isTextual()) {
-        String t = trimmedMax(text.asText(), 512);
+        String t = trimmedMax(text.asText(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS);
         if (!t.isEmpty()) {
           return t;
         }
@@ -703,7 +709,7 @@ public class BookService {
           ApiError.ErrorType.BINDING_ERROR,
           "each node title must be non-empty");
     }
-    if (title.length() > 512) {
+    if (title.length() > BookBlockTitleLimits.STRUCTURAL_MAX_CHARS) {
       throw new ApiException(
           "title exceeds maximum length",
           ApiError.ErrorType.BINDING_ERROR,
@@ -731,7 +737,8 @@ public class BookService {
     }
 
     BookBlock block = new BookBlock();
-    block.setStructuralTitle(trimmedMax(node.getTitle(), 512));
+    block.setStructuralTitle(
+        trimmedMax(node.getTitle(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
     block.setLayoutSequence(layoutSeq[0]++);
     block.setDepth(level - 1);
     nodeToBlock.put(node, block);

@@ -206,7 +206,9 @@ class NotebookBooksController {
       @RequestBody @Valid CreateBookBlockFromContentRequest body)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    Book book = bookService.createBookBlockFromContent(notebook, body.getFromBookContentBlockId());
+    Book book =
+        bookService.createBookBlockFromContent(
+            notebook, body.getFromBookContentBlockId(), body.getStructuralTitle());
     return ResponseEntity.status(HttpStatus.CREATED).body(book);
   }
 

@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion.Bloc
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
+import com.odde.doughnut.entities.BookBlockTitleLimits;
 import com.odde.doughnut.entities.BookContentBlock;
 import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.BookViews;
@@ -27,6 +28,7 @@ import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
+import jakarta.validation.Validation;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -1383,8 +1385,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   class CreateBookBlockFromContent {
 
     private static CreateBookBlockFromContentRequest splitRequest(int contentBlockId) {
+      return splitRequest(contentBlockId, null);
+    }
+
+    private static CreateBookBlockFromContentRequest splitRequest(
+        int contentBlockId, String structuralTitle) {
       var req = new CreateBookBlockFromContentRequest();
       req.setFromBookContentBlockId(contentBlockId);
+      req.setStructuralTitle(structuralTitle);
       return req;
     }
 
@@ -1450,6 +1458,51 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(blocksNode.get(1).get("contentBlocks").size(), equalTo(1));
       assertThat(
           blocksNode.get(1).get("contentBlocks").get(0).get("id").asInt(), equalTo(secondId));
+    }
+
+    @Test
+    void createsChildBlockUsingStructuralTitleOverride() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "W".repeat(550));
+      bodyItem.put("page_idx", 1);
+      AttachBookLayoutNodeRequest n = node("Chapter 1");
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(headingBlock("Chapter 1", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)), bodyItem)));
+
+      ResponseEntity<Book> attachRes =
+          controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      assertThat(attachRes.getStatusCode(), equalTo(HttpStatus.CREATED));
+      Book created = attachRes.getBody();
+      assertThat(created, notNullValue());
+      BookBlock chapter =
+          rootBlocksSorted(created).stream()
+              .filter(b -> b.getStructuralTitle().equals("Chapter 1"))
+              .findFirst()
+              .orElseThrow();
+      List<BookContentBlock> cbsBefore =
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(chapter.getId());
+      int secondId = cbsBefore.get(1).getId();
+
+      ResponseEntity<Book> splitRes =
+          controller.createBookBlockFromContent(nb, splitRequest(secondId, "My custom title"));
+      assertThat(splitRes.getStatusCode(), equalTo(HttpStatus.CREATED));
+      Book after = splitRes.getBody();
+      assertThat(after, notNullValue());
+      List<BookBlock> ordered = blocksByLayoutOrder(after);
+      assertThat(ordered.get(1).getStructuralTitle(), equalTo("My custom title"));
+    }
+
+    @Test
+    void createBookBlockFromContentRequestRejectsStructuralTitleOverMax() {
+      var req = new CreateBookBlockFromContentRequest();
+      req.setFromBookContentBlockId(1);
+      req.setStructuralTitle("x".repeat(BookBlockTitleLimits.STRUCTURAL_MAX_CHARS + 1));
+      try (var factory = Validation.buildDefaultValidatorFactory()) {
+        assertThat(factory.getValidator().validate(req), not(empty()));
+      }
     }
 
     @Test

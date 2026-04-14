@@ -3977,6 +3977,13 @@ components:
           format: int32
           description: Split the owning book block at this imported content row; that
             row and following rows become a new child block.
+        structuralTitle:
+          type: string
+          description: "When set, used as the new block structural title (trimmed,\
+            \ max length enforced). Otherwise the title is derived from the first\
+            \ moved content block."
+          maxLength: 512
+          minLength: 0
       required:
       - fromBookContentBlockId
     BookBlock_Full:
