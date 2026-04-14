@@ -1,6 +1,6 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
-import { beforeEach, describe, it, expect } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { RouterLink } from "vue-router"
 import makeMe, {
   type NotebookCatalogEntry,
@@ -443,6 +443,43 @@ describe("Notebooks Page", () => {
   })
 
   describe("filter", () => {
+    it("focuses the filter input when the catalog has notebooks", async () => {
+      const focusedIds: string[] = []
+      const originalFocus = HTMLInputElement.prototype.focus
+      const focusSpy = vi
+        .spyOn(HTMLInputElement.prototype, "focus")
+        .mockImplementation(function (
+          this: HTMLInputElement,
+          ...args: Parameters<HTMLInputElement["focus"]>
+        ) {
+          focusedIds.push(this.id)
+          return originalFocus.apply(this, args)
+        })
+
+      try {
+        const catalogItems = makeMe.notebookCatalog
+          .notebook("Alpha notebook")
+          .please()
+
+        helper
+          .component(NotebooksPageView)
+          .withProps({
+            catalogItems,
+            subscriptions: [],
+            user: makeMe.aUser.please(),
+          })
+          .withCurrentUser(makeMe.aUser.please())
+          .withRouter()
+          .mount()
+
+        await flushPromises()
+
+        expect(focusedIds).toContain("notebook-filter-input")
+      } finally {
+        focusSpy.mockRestore()
+      }
+    })
+
     it("filters top-level notebooks by title", async () => {
       const catalogItems = makeMe.notebookCatalog
         .notebook("Alpha notebook")

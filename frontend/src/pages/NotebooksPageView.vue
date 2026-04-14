@@ -78,6 +78,7 @@
             <Search class="h-4 w-4 daisy-text-base-content/50" />
             <input
               id="notebook-filter-input"
+              ref="filterInputRef"
               v-model="filterText"
               type="text"
               class="daisy-grow"
@@ -181,6 +182,7 @@ const NOTEBOOKS_SORT_STORAGE_KEY = "doughnut.notebooksPage.sortOrder"
 const { notebooksLayout } = useNotebooksLayout()
 const notebooksSortOrder = ref<"created" | "alphabetical">("created")
 const filterText = ref("")
+const filterInputRef = ref<HTMLInputElement | null>(null)
 
 const filteredOnlyCatalogItems = computed(() => {
   const q = filterText.value.trim().toLowerCase()
@@ -225,6 +227,9 @@ onMounted(() => {
   const storedSort = localStorage.getItem(NOTEBOOKS_SORT_STORAGE_KEY)
   if (storedSort === "created" || storedSort === "alphabetical") {
     notebooksSortOrder.value = storedSort
+  }
+  if (props.catalogItems.length > 0) {
+    filterInputRef.value?.focus()
   }
 })
 
