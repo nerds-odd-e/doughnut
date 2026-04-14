@@ -105,6 +105,53 @@ Research should **not** be limited to the bullets below; they are **seeds**. Eac
 - **Pagination vs scroll:** does the product **simulate pages** (CSS columns) or **continuous scroll** — and how does that choice affect **reading position** and **sync with `BookBlock`**?
 - How do we render **user theme** (font, size, margins) without breaking **anchor** stability?
 
+#### 2.2 Research findings (Apr 2026)
+
+**Sources:** Context7 library IDs `/futurepress/epub.js`, `/readium/ts-toolkit`, `/johnfactotum/foliate-js`, `/vuejs/core` (queried via Context7); plus `npm view … dist.unpackedSize` for `epubjs`, `@readium/navigator`, `@readium/shared`.
+
+**Candidate renderers (main pane)**
+
+| Option | Shape | Vue3 fit | Notes |
+|--------|--------|-----------|--------|
+| **EPUB.js** | `ePub(url)` → `book.renderTo(elementId \| HTMLElement, { manager, flow, width, height, snap })` | Mount into a **single container** (`ref`); init in `onMounted`, tear down listeners/`book.destroy` in `onBeforeUnmount` | **Paginated** (`flow: "paginated"`) or **scrolled** (`flow: "scrolled"`). **Themes:** `rendition.themes.register` / `default` / `select` / `fontSize`. **Location:** `relocated` / CFI via `rendition.display(cfi)`. Mature examples; **medium** ecosystem maintenance risk (check license: BSD-style). |
+| **Readium Web** (`@readium/navigator` + `@readium/shared`) | `new EpubNavigator(container, publication, listeners, …, initialPosition, { preferences, defaults })` → `load()` / `destroy()` | Same pattern: **DOM container ref**; **`await navigator.destroy()`** on unmount | **First-class locators** (`Locator`, progression, positions, text snippets). **Reader prefs** (`submitPreferences`, `EpubPreferences`: font, columns, colors, `scroll: false`, etc.). **Higher** alignment with EPUB / accessibility standards; **TypeScript-first**. Snippet count in Context7 is smaller than EPUB.js — expect more reading of upstream docs for edge cases. |
+| **Foliate-js** | **`<foliate-view>`** custom element or low-level `EPUB` + paginator modules | Works as **native custom element** in template or `document.createElement` + mount; listen for `relocate` / `load` | **Modular** (parse without loading whole file); **`flow`** `paginated` \| `scrolled` on paginator; **CFI**, href, fraction, section index. Docs stress **CSP / XSS-hardening** for user EPUBs. README: pagination uses **CSS multi-column** (same *class* of approach as EPUB.js) with called-out **perf and CSS quirks**; bisection for visible range described as more accurate than EPUB.js. |
+
+**“Custom iframe + spine”** remains valid if we want **maximum control** (sanitizer, no third-party rendition lifecycle): higher engineering cost, duplicate problems (pagination, RTL, FXL) the libraries already partially solve.
+
+**Bundle size (npm `dist.unpackedSize`, indicative only)**
+
+- `epubjs` — **~6.4 MB** unpacked.
+- `@readium/navigator` — **~1.5 MB**; `@readium/shared` — **~0.84 MB** unpacked (plus whatever else the app pulls for loading publications).
+- Foliate-js: **not measured** here; modular imports may tree-shake better than a monolithic `epubjs` install — verify with the actual import graph in Vite.
+
+**Pagination vs continuous scroll (product)**
+
+- **Continuous scroll** matches the **PDF reader UX** direction (vertical reading as default; layout ↔ document sync via scroll). EPUB.js `flow: "scrolled"` and Readium `scroll: true` (preferences) / scroll-boundary APIs align with **viewport-derived “current block”** (see §2.3 for how to map without `PageBbox`).
+- **Paginated** (CSS columns / “page turns”) matches **print-like** EPUB expectations and can simplify **“page” chrome**, but **reading position** is still **logical** (CFI / progression), not a fixed PDF page index. Foliate and EPUB.js both expose **page-like** labels where the EPUB provides `page-list` metadata; many books lack it.
+- **Recommendation for parity with Story 2 scrolling:** bias toward **scrolled** reflow for v1; treat **paginated** as a user preference or FXL-only path after spikes on **mobile Safari** scroll + nested overflow.
+
+**Mobile Safari**
+
+- All three approaches ultimately render **HTML inside controlled surfaces** (iframes / shadow roots / in-document). Expect to **spike on real iOS**: `-webkit-overflow-scrolling`, nested scroll containers, **100vh** / dynamic viewport, and **gesture conflicts** with the **Reading Control Panel** (same class of issues as PDF pinch-zoom; EPUB may trade pinch for **text sizing** instead).
+
+**Accessibility**
+
+- Readium’s toolkit is positioned for **standards-aligned** reading systems (selection, locators, preferences API in snippets). EPUB.js exposes **keyboard** navigation in examples (`rendition.on("keyup")`). Foliate-js: verify **screen reader** behavior with the custom element in a prototype. **Live region** / “current title” patterns from the PDF reader should be re-used at the **shell** level, not inside the renderer if possible.
+
+**User theme (font, size, margins) vs anchor stability**
+
+- **Reflow EPUB:** **pixel** or **normalized-Y** anchors **cannot** stay stable under font/margin changes; **§2.3** should own the contract (**CFI**, Readium `Locator`, or **fragment + progression**). **Logical** locators are designed to survive reflow; **re-open** after theme change may still require **scroll-to-locator** to restore the same *reading position*.
+- **Theming APIs:** EPUB.js `rendition.themes.*`; Readium `submitPreferences`; Foliate `setStyles` / per-doc injection on `load`. All are compatible with **re-applying the last saved locator** after a theme commit.
+
+**Vue3 integration pattern (no spike committed)**
+
+- Use a **dedicated child component** with a **template ref** on the host `div`, **`onMounted`** to construct the navigator/rendition, **`onBeforeUnmount`** / **`onUnmounted`** to **`destroy()`**, remove listeners, and revoke blob URLs. Do **not** wrap library objects in `reactive()`; pass **plain callbacks** into the library. Matches Vue core guidance for **template refs** and lifecycle cleanup (Context7 `/vuejs/core`).
+
+**Spike (when EPUB is prioritized):** Time-box a **Readium-first** vertical slice in `frontend/` (sample `.epub`, dev-only route or Storybook): **scroll mode**, **locator round-trip** after theme/font change, **iOS Safari** scroll + control panel, **Vite bundle**. Revisit the library choice only if that spike misses acceptance.
+
+**Decision (Apr 2026):** **Readium Web** — packages from [`readium/ts-toolkit`](https://github.com/readium/ts-toolkit) (e.g. **`@readium/navigator`**, **`@readium/shared`**, plus whatever the publication loader requires) — for the **main-pane EPUB renderer**. EPUB.js and Foliate-js remain documented above as **fallback references** if Readium blocks on a must-have constraint.
+
 ### 2.3 Locators: “page + bbox” for EPUB (your topic)
 
 - PDF **`PageBbox`** is **page index + normalized bbox** in **MinerU 0–1000** space. What is the **canonical EPUB locator** for the **same conceptual jobs**: block start, direct-content regions, **reading position**, future **citation** (`SourceSpan`)?

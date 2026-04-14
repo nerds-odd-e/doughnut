@@ -198,6 +198,8 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 | **Chrome layout** | **Book layout** (`BookBlock` tree) lives in a **drawer sidebar** on the book reading page; the **PDF viewer occupies the main pane**. |
 | **Sync** | **Two-way:** (1) **Selecting / activating a book block** in the layout drives **pdf.js** to the corresponding anchors (page / region). (2) **Scrolling (and relevant zoom / page changes) in the PDF** updates which block is **highlighted** as current in the layout. |
 
+**EPUB (direction, Apr 2026):** Render EPUB in the **main pane** with **Readium Web** ([`readium/ts-toolkit`](https://github.com/readium/ts-toolkit): **`@readium/navigator`**, **`@readium/shared`**, and related loading/parsing packages as required). **Reading position** and future **citation** locators should align with Readium’s **`Locator`** model and §2.3 in [`ongoing/book-reading-epub-research-quest.md`](book-reading-epub-research-quest.md), not PDF **`PageBbox`**. Scroll vs paginated mode, **mobile Safari**, and **bundle** are **spike-gated** before ship.
+
 **Deletion:** Removing a book from the notebook (frontend flow) must **delete the persisted book record** and **remove the object** from the configured storage backend (GCS in prod, local/test store in dev).
 
 **Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).
