@@ -572,7 +572,7 @@ public class BookService {
     renumberLayoutSequences(book);
     book.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.save(book);
-    entityPersister.flush();
+    entityPersister.flushAndClear();
 
     return getBookForNotebook(notebook);
   }

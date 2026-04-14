@@ -441,3 +441,27 @@ Then(
     return bookReadingPage().expectBookBlockAtDepth(title, depth)
   }
 )
+
+When(
+  'I press and hold the third imported content block in the reading stream',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressAndHoldThirdContentStreamBlock()
+  }
+)
+
+Then(
+  'I should see the {string} callout in the reading stream',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (_label: string) => {
+    return bookReadingPage().expectNewBlockCalloutVisible()
+  }
+)
+
+When(
+  'I confirm creating a new block from the reading stream',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().clickContentStreamNewBlockConfirm()
+  }
+)
