@@ -186,6 +186,7 @@ import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookRead
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type ViewportPayload = {
@@ -494,10 +495,12 @@ async function onBlockIndent(block: BookBlockFull) {
   }
   pendingLayoutBlockId.value = block.id
   try {
-    const { data, error } = await NotebookBooksController.changeBookBlockDepth({
-      path: { notebook: notebookId.value, bookBlock: block.id },
-      body: { direction: "INDENT" },
-    })
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookBooksController.changeBookBlockDepth({
+        path: { notebook: notebookId.value, bookBlock: block.id },
+        body: { direction: "INDENT" },
+      })
+    )
     if (!error && data) {
       emit("update:book", mergeBookMutationIntoFull(props.book, data))
       selectedBlockId.value = block.id
@@ -513,10 +516,12 @@ async function onBlockOutdent(block: BookBlockFull) {
   }
   pendingLayoutBlockId.value = block.id
   try {
-    const { data, error } = await NotebookBooksController.changeBookBlockDepth({
-      path: { notebook: notebookId.value, bookBlock: block.id },
-      body: { direction: "OUTDENT" },
-    })
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookBooksController.changeBookBlockDepth({
+        path: { notebook: notebookId.value, bookBlock: block.id },
+        body: { direction: "OUTDENT" },
+      })
+    )
     if (!error && data) {
       emit("update:book", mergeBookMutationIntoFull(props.book, data))
       selectedBlockId.value = block.id
