@@ -198,12 +198,28 @@ const bookReadingPage = () => {
     },
     scrollPdfBookReaderToBringPage2IntoPrimaryView() {
       pageIsNotLoading()
-      cy.get(
+      const page2Sel =
         '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="2"]'
-      )
+      cy.get(page2Sel)
         .first()
         // @ts-expect-error Cypress ScrollIntoViewOptions omits DOM `block`
         .scrollIntoView({ block: 'start' })
+      // Block 2.2 starts at y0=89/1000 normalized on page 2. Scroll that extra
+      // amount so block 2.2 is at the container top, guaranteeing its y0 is below
+      // the viewport midpoint even with very short test viewports (e.g. 1200×280).
+      cy.get(page2Sel)
+        .first()
+        .then(($page) => {
+          const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
+            .height
+          const extra = Math.ceil((89 / 1000) * pageHeight)
+          cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+            cy.get('[data-testid="pdf-book-viewer"]').scrollTo(
+              0,
+              ($viewer[0] as HTMLElement).scrollTop + extra
+            )
+          })
+        })
       return this
     },
     /**
