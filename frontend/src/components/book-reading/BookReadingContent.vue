@@ -97,6 +97,42 @@
   </BookReadingBookLayout>
   <dialog
     class="daisy-modal"
+    :class="{ 'daisy-modal-open': pendingBlockCreation !== null }"
+    data-testid="new-block-title-dialog"
+  >
+    <div class="daisy-modal-box">
+      <h2 class="daisy-text-lg daisy-font-semibold">Name the new block</h2>
+      <input
+        v-if="pendingBlockCreation !== null"
+        v-model="pendingBlockTitleInput"
+        data-testid="new-block-title-input"
+        class="daisy-input daisy-input-bordered daisy-w-full daisy-mt-2"
+        type="text"
+      />
+      <div class="daisy-modal-action">
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary"
+          data-testid="new-block-title-confirm"
+          @click="onConfirmBlockTitle"
+        >
+          Confirm
+        </button>
+        <button
+          type="button"
+          class="daisy-btn"
+          @click="pendingBlockCreation = null"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="daisy-modal-backdrop">
+      <button type="button" @click="pendingBlockCreation = null">close</button>
+    </form>
+  </dialog>
+  <dialog
+    class="daisy-modal"
     :class="{ 'daisy-modal-open': aiSuggestion !== null }"
     aria-labelledby="book-layout-reorganize-preview-title"
     data-testid="book-layout-reorganize-preview-dialog"
@@ -570,15 +606,19 @@ async function onConfirmAiReorganize() {
   }
 }
 
-async function onCreateBlockFromContent({
-  contentBlockId,
-}: {
+const STRUCTURAL_TITLE_MAX_CHARS = 512
+
+const pendingBlockCreation = ref<{
   contentBlockId: number
-}) {
+  structuralTitle: string
+} | null>(null)
+const pendingBlockTitleInput = ref("")
+
+async function createBlock(contentBlockId: number, structuralTitle?: string) {
   const { data, error } = await apiCallWithLoading(() =>
     NotebookBooksController.createBookBlockFromContent({
       path: { notebook: notebookId.value },
-      body: { fromBookContentBlockId: contentBlockId },
+      body: { fromBookContentBlockId: contentBlockId, structuralTitle },
     })
   )
   if (!error && data) {
@@ -589,6 +629,38 @@ async function onCreateBlockFromContent({
     if (newBlock) {
       selectedBlockId.value = newBlock.id
     }
+  }
+}
+
+function onCreateBlockFromContent({
+  contentBlockId,
+  derivedTitle,
+}: {
+  contentBlockId: number
+  derivedTitle: string | undefined
+}) {
+  if (
+    derivedTitle !== undefined &&
+    derivedTitle.length >= STRUCTURAL_TITLE_MAX_CHARS
+  ) {
+    pendingBlockTitleInput.value = derivedTitle
+    pendingBlockCreation.value = {
+      contentBlockId,
+      structuralTitle: derivedTitle,
+    }
+  } else {
+    createBlock(contentBlockId)
+  }
+}
+
+async function onConfirmBlockTitle() {
+  const pending = pendingBlockCreation.value
+  pendingBlockCreation.value = null
+  if (pending) {
+    await createBlock(
+      pending.contentBlockId,
+      pendingBlockTitleInput.value || undefined
+    )
   }
 }
 

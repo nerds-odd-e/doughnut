@@ -39,6 +39,12 @@
   },
   {
     "type": "text",
+    "text": "Consider a method that computes a discount rate. It was written quickly under deadline and the logic is correct, but the variable names say nothing about what they represent. Three months later, a new developer reads it and cannot tell whether a particular multiplier is a tax adjustment, a promotional factor, or a rounding constant. The original developer has moved on. The tests pass, the system ships, and the confusion silently grows. Refactoring would give each variable a name that reveals its intent, extract the discount logic into a method named after what it does, and perhaps move that method to the class that owns the pricing rules. None of this changes the computed result. All of it changes how confidently the next person can read, extend, and trust the code.",
+    "bbox": [87, 560, 878, 720],
+    "page_idx": 1
+  },
+  {
+    "type": "text",
     "text": "2. The Usual Defi nition Is Not Enough",
     "text_level": 2,
     "bbox": [87, 577, 754, 607],

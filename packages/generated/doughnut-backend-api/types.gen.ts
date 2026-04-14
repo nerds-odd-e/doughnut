@@ -51,6 +51,7 @@ export type PageBbox = {
     pageIndex: number;
     bbox: Array<number>;
     contentBlockId?: number;
+    derivedTitle?: string;
 };
 
 export type Circle = {
@@ -394,6 +395,7 @@ export type PageBboxFull = {
     pageIndex: number;
     bbox: Array<number>;
     contentBlockId?: number;
+    derivedTitle?: string;
 };
 
 export type AttachBookLayoutNodeRequestFull = {

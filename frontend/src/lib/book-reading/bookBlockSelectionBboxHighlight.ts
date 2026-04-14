@@ -1,5 +1,6 @@
 const HOLD_THRESHOLD_MS = 500
 const HOLD_MOVE_TOLERANCE_PX = 10
+const STRUCTURAL_TITLE_MAX_CHARS = 512
 
 export function attachBookBlockSelectionBboxHighlight(
   pageLayer: HTMLElement,
@@ -8,8 +9,10 @@ export function attachBookBlockSelectionBboxHighlight(
   onLongPress?: (
     contentBlockId: number,
     clientX: number,
-    clientY: number
-  ) => void
+    clientY: number,
+    derivedTitle: string | undefined
+  ) => void,
+  derivedTitle?: string
 ): () => void {
   const overlay = document.createElement("div")
   overlay.dataset.testid = "book-block-selection-bbox-highlight"
@@ -23,6 +26,12 @@ export function attachBookBlockSelectionBboxHighlight(
   overlay.style.zIndex = "100"
   if (contentBlockId !== undefined) {
     overlay.dataset.bookContentBlockId = String(contentBlockId)
+  }
+  if (
+    derivedTitle !== undefined &&
+    derivedTitle.length >= STRUCTURAL_TITLE_MAX_CHARS
+  ) {
+    overlay.dataset.derivedTitleTruncated = "true"
   }
 
   let holdTimer: ReturnType<typeof setTimeout> | null = null
@@ -39,13 +48,14 @@ export function attachBookBlockSelectionBboxHighlight(
   if (contentBlockId !== undefined && onLongPress) {
     const id = contentBlockId
     const cb = onLongPress
+    const title = derivedTitle
     overlay.addEventListener("pointerdown", (e: PointerEvent) => {
       startX = e.clientX
       startY = e.clientY
       cancelTimer()
       holdTimer = setTimeout(() => {
         holdTimer = null
-        cb(id, e.clientX, e.clientY)
+        cb(id, e.clientX, e.clientY, title)
       }, HOLD_THRESHOLD_MS)
     })
     overlay.addEventListener("pointermove", (e: PointerEvent) => {

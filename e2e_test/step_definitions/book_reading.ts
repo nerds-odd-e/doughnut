@@ -458,6 +458,14 @@ When(
   }
 )
 
+When(
+  'I press and hold on a long-text content block bbox overlay in the PDF',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressAndHoldOnLongTextContentBlockBboxOverlay()
+  }
+)
+
 Then(
   'I should see the {string} callout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
@@ -479,5 +487,21 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().expectNewChildBlockInLayout()
+  }
+)
+
+Then(
+  'I should be prompted to enter a title defaulting to truncated content',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectTitlePromptWithDefaultTitle()
+  }
+)
+
+When(
+  'I confirm the title',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().confirmTitlePrompt()
   }
 )

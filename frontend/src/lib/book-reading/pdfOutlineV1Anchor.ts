@@ -12,6 +12,7 @@ export type BookNavigationTarget = {
   pageIndex: number
   bbox: NormalizedPageBbox | null
   contentBlockId?: number
+  derivedTitle?: string
 }
 
 /** pdf.js scrollPageIntoView XYZ dest array shape. */
@@ -60,6 +61,7 @@ export function wireItemsToNavigationTargets(
         pageIndex: number
         bbox?: ReadonlyArray<number>
         contentBlockId?: number
+        derivedTitle?: string
       }>
     | undefined
 ): BookNavigationTarget[] {
@@ -79,6 +81,7 @@ export function wireItemsToNavigationTargets(
         pageIndex: it.pageIndex,
         bbox: null,
         contentBlockId: it.contentBlockId,
+        derivedTitle: it.derivedTitle,
       })
       continue
     }
@@ -88,6 +91,7 @@ export function wireItemsToNavigationTargets(
       pageIndex: it.pageIndex,
       bbox,
       contentBlockId: it.contentBlockId,
+      derivedTitle: it.derivedTitle,
     })
   }
   return out

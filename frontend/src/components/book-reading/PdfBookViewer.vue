@@ -86,7 +86,9 @@ const emit = defineEmits<{
     },
   ]
   pagesReady: []
-  createBlockFromContent: [{ contentBlockId: number }]
+  createBlockFromContent: [
+    { contentBlockId: number; derivedTitle: string | undefined },
+  ]
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -96,13 +98,17 @@ const holdCallout = ref<{
   contentBlockId: number
   clientX: number
   clientY: number
+  derivedTitle: string | undefined
 } | null>(null)
 
 function onConfirmNewBlock() {
   const callout = holdCallout.value
   holdCallout.value = null
   if (callout) {
-    emit("createBlockFromContent", { contentBlockId: callout.contentBlockId })
+    emit("createBlockFromContent", {
+      contentBlockId: callout.contentBlockId,
+      derivedTitle: callout.derivedTitle,
+    })
   }
 }
 
@@ -296,7 +302,8 @@ function clearBookBlockSelectionBboxHighlight() {
 function appendBookBlockSelectionBboxHighlight(
   pageNumber: number,
   bbox: NormalizedPageBbox,
-  contentBlockId?: number
+  contentBlockId?: number,
+  derivedTitle?: string
 ) {
   if (!pdfViewer) return
   const pageView = pdfViewer.getPageView(pageNumber - 1)
@@ -308,8 +315,13 @@ function appendBookBlockSelectionBboxHighlight(
   )
   const onLongPress =
     contentBlockId !== undefined
-      ? (id: number, cx: number, cy: number) => {
-          holdCallout.value = { contentBlockId: id, clientX: cx, clientY: cy }
+      ? (id: number, cx: number, cy: number, title: string | undefined) => {
+          holdCallout.value = {
+            contentBlockId: id,
+            clientX: cx,
+            clientY: cy,
+            derivedTitle: title,
+          }
         }
       : undefined
   bookBlockSelectionBboxHighlightCancels.push(
@@ -317,7 +329,8 @@ function appendBookBlockSelectionBboxHighlight(
       pageView.div,
       rect,
       contentBlockId,
-      onLongPress
+      onLongPress,
+      derivedTitle
     )
   )
 }
@@ -339,7 +352,8 @@ function showSelectionBboxHighlights(
     appendBookBlockSelectionBboxHighlight(
       e.pageIndex + 1,
       e.bbox,
-      e.contentBlockId
+      e.contentBlockId,
+      e.derivedTitle
     )
   }
 }

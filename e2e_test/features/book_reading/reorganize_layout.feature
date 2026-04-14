@@ -40,6 +40,15 @@ Feature: Reorganize book layout
       When I confirm creating a new block
       Then the book layout should contain a new block as a child of the selected block
 
+    Scenario: Create a book block from long content bbox with a typed title
+      When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
+      And I press and hold on a long-text content block bbox overlay in the PDF
+      Then I should see the "New block" callout
+      When I confirm creating a new block
+      Then I should be prompted to enter a title defaulting to truncated content
+      When I confirm the title
+      Then the book layout should contain a new block as a child of the selected block
+
   Rule: Change depth of a block with its descendants or cancel a block
 
     Background:

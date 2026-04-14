@@ -2,6 +2,7 @@ package com.odde.doughnut.services.book;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.BookBlockTitleLimits;
 import com.odde.doughnut.entities.BookContentBlock;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +71,25 @@ public final class BookBlockContentBboxes {
       if (x0 >= x1 || y0 >= y1) {
         return null;
       }
-      return new PageBbox(pageIndex, List.copyOf(bbox), contentBlockId);
+      String derivedTitle = contentBlockId != null ? derivedTitleFromRaw(n) : null;
+      return new PageBbox(pageIndex, List.copyOf(bbox), contentBlockId, derivedTitle);
     } catch (Exception e) {
       return null;
     }
+  }
+
+  private static String derivedTitleFromRaw(JsonNode n) {
+    JsonNode text = n.get("text");
+    if (text == null || !text.isTextual()) {
+      return null;
+    }
+    String t = text.asText().strip();
+    if (t.isEmpty()) {
+      return null;
+    }
+    if (t.length() > BookBlockTitleLimits.STRUCTURAL_MAX_CHARS) {
+      return t.substring(0, BookBlockTitleLimits.STRUCTURAL_MAX_CHARS);
+    }
+    return t;
   }
 }

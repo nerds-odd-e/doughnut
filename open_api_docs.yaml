@@ -3333,6 +3333,8 @@ components:
         contentBlockId:
           type: integer
           format: int32
+        derivedTitle:
+          type: string
       required:
       - bbox
       - pageIndex
@@ -4073,6 +4075,8 @@ components:
         contentBlockId:
           type: integer
           format: int32
+        derivedTitle:
+          type: string
       required:
       - bbox
       - pageIndex

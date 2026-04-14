@@ -56,6 +56,61 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     expect(el.dataset.bookContentBlockId).toBeUndefined()
   })
 
+  it("sets data-derived-title-truncated when derivedTitle is at max length (>=512)", () => {
+    const longTitle = "a".repeat(512)
+    attachBookBlockSelectionBboxHighlight(
+      host,
+      { left: 0, top: 0, width: 10, height: 10 },
+      42,
+      undefined,
+      longTitle
+    )
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    expect(el.dataset.derivedTitleTruncated).toBe("true")
+  })
+
+  it("does not set data-derived-title-truncated when derivedTitle is short", () => {
+    attachBookBlockSelectionBboxHighlight(
+      host,
+      { left: 0, top: 0, width: 10, height: 10 },
+      42,
+      undefined,
+      "short title"
+    )
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    expect(el.dataset.derivedTitleTruncated).toBeUndefined()
+  })
+
+  it("passes derivedTitle to onLongPress callback", () => {
+    const onLongPress = vi.fn()
+    const title = "a".repeat(512)
+    attachBookBlockSelectionBboxHighlight(
+      host,
+      { left: 0, top: 0, width: 100, height: 100 },
+      7,
+      onLongPress,
+      title
+    )
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    vi.useFakeTimers()
+    el.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 50,
+        clientY: 50,
+        bubbles: true,
+      })
+    )
+    vi.advanceTimersByTime(501)
+    expect(onLongPress).toHaveBeenCalledWith(7, 50, 50, title)
+    vi.useRealTimers()
+  })
+
   it("allows multiple simultaneous overlays", () => {
     attachBookBlockSelectionBboxHighlight(host, {
       left: 0,
@@ -118,7 +173,7 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
       vi.advanceTimersByTime(499)
       expect(onLongPress).not.toHaveBeenCalled()
       vi.advanceTimersByTime(2)
-      expect(onLongPress).toHaveBeenCalledWith(7, 50, 50)
+      expect(onLongPress).toHaveBeenCalledWith(7, 50, 50, undefined)
     })
 
     it("does not call onLongPress if pointerup fires before threshold", () => {
