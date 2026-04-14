@@ -195,6 +195,13 @@ function applyGestureScaleFactor(
   })
 }
 
+/**
+ * Samples the current scroll position via `pdfViewerViewportTopYDown` and emits
+ * `viewportAnchorPage` when the anchor page or viewport midpoint changes.
+ *
+ * @see currentBlockIdFromVisiblePage — consumer of the emitted `ViewportYRange`
+ *      (called in BookReadingContent.onViewportAnchorPage).
+ */
 function emitViewportDescriptorIfChanged() {
   const container = containerRef.value
   if (!container || !pdfViewer) return

@@ -383,6 +383,16 @@ const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
     }),
 })
 
+/**
+ * Scroll → current-block pipeline:
+ *   PdfBookViewer emits `viewportAnchorPage` (via `pdfViewerViewportTopYDown`)
+ *   → here we call `currentBlockIdFromVisiblePage` to map anchor page + viewport Y-range to a block ID
+ *   → result is debounced through `currentBlockIdDebouncer`.
+ *
+ * @see currentBlockIdFromVisiblePage — midpoint rule: block whose `y0` is above viewport mid wins;
+ *      otherwise the previous block is returned (scrolling a page into view is not enough when `y0 > 0`).
+ * @see pdfViewerViewportTopYDown — produces the `ViewportYRange` consumed here.
+ */
 function onViewportAnchorPage(payload: ViewportPayload) {
   viewportPayload.value = payload
   const candidate = currentBlockIdFromVisiblePage(

@@ -17,24 +17,14 @@ export type BookBlockFirstBboxRow = {
 }
 
 /**
- * **Rule (in priority order):**
- * 1. Current = the **earliest** block on `visiblePageIndexZeroBased` whose first-bbox region is visible
- *    (`y0 < viewport.bottom AND y1 > viewport.top`).
- * 2. If that block's top (`y0`) has **not** passed the viewport midpoint (`y0 > viewport.mid`) →
- *    use the block **before** it (or `bestFromEarlierPages` if none on the page).
- * 3. If that block is **partially scrolled above** the viewport top (`y0 < viewport.top`) and the
- *    **next** block's top is within `SCROLL_PADDING_NORMALIZED` of the viewport top → use the next
- *    block (close-nodes transition).
- * 4. **Gap case** (no visible block on the page) → last block on the page with `y0 ≤ viewport.mid`
- *    (most recent section heading scrolled past); falls back to `bestFromEarlierPages`.
- * 5. `viewport === null` → last block on the page (scroll position unknown).
+ * Maps the anchor page + viewport Y-range (from `pdfViewerViewportTopYDown`) to the current block ID.
+ * Called by `BookReadingContent.onViewportAnchorPage` on every scroll/resize.
  *
- * Blocks on earlier pages contribute `bestFromEarlierPages` only when the current page has **no**
- * participating rows (`onCurrentPage` is empty).
+ * Key invariant: if the first visible block's `y0` is above the viewport midpoint, the previous
+ * block is returned. Scrolling page N to the container top is not sufficient to make a block at
+ * `y0 > 0` the current block in a short viewport — the scroll must reach at least `y0` pixels
+ * into the page so `viewport.mid >= y0`.
  *
- * `y0` / `y1` come from `bbox[1]` / `bbox[3]`; rows with a page index but no bbox (or omitted bbox)
- * are treated as a point at `y = 0` (never visible by the bbox check, but reachable as the "previous"
- * fallback). A bbox array that is **present** but fails validation skips the whole row.
  */
 export function currentBlockIdFromVisiblePage(
   orderedPreorderRows: readonly BookBlockFirstBboxRow[],

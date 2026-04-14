@@ -42,46 +42,11 @@ callers can pass an explicit `screenshotKey` when needed. `overwrite: true` is k
 
 ---
 
-### Phase 2 — Scroll → current-block hand-offs are discoverable in one hop  *(planned)*
+### Phase 2 — Scroll → current-block hand-offs are discoverable in one hop  *(shipped)*
 
-**Developer value:** A developer reading `onViewportAnchorPage` in `BookReadingContent.vue`
-immediately knows *where* the current block is calculated from the scroll position, without
-reading all five files. Same for the reverse direction: someone reading
-`currentBlockIdFromVisiblePage.ts` can find where it is called.
-
-**What changes:**
-
-- Add a JSDoc/inline cross-reference comment to `onViewportAnchorPage` in
-  `BookReadingContent.vue` that names `currentBlockIdFromVisiblePage` as the function that
-  maps the anchor page + viewport Y-range to a block ID, and describes the midpoint rule in
-  one sentence.
-
-- Add a `@see` annotation to `pdfViewerViewportTopYDown` in `PdfBookViewer.vue` pointing to
-  `currentBlockIdFromVisiblePage` as its consumer.
-
-- Optionally annotate `currentBlockIdFromVisiblePage.ts` with a note that its input
-  `viewport` comes from `pdfViewerViewportTopYDown` and that `y0 > mid` returns the
-  *preceding* block (the key invariant that caused the bug).
-
-**Important design knowledge (preserve in the comment):**
-
-> The `currentBlockIdFromVisiblePage` midpoint rule: if the first visible block's `y0` is
-> **above** the viewport midpoint, the algorithm returns the **previous** block. This means
-> scrolling page N to the container top is not sufficient to make a block at `y0 > 0` the
-> current block in a short viewport — the scroll must reach at least `y0` pixels into the
-> page so `viewport.mid ≥ y0`.
->
-> In `refactoring.pdf`, block 2.2 starts at `y0 = 89/1000` on page 2
-> (fixture: `e2e_test/fixtures/book_reading/mineru_output_for_refactoring.json` item #13).
-> `scrollPdfBookReaderToBringPage2IntoPrimaryView` therefore adds
-> `Math.ceil(89/1000 × pageHeight)` extra pixels after `scrollIntoView({ block: 'start' })`.
-
-**Test:** No behavioral change — run `book_browsing.feature` to confirm nothing regresses.
-
-**Files touched:**
-- `frontend/src/components/book-reading/BookReadingContent.vue`
-- `frontend/src/components/book-reading/PdfBookViewer.vue`
-- `frontend/src/lib/book-reading/currentBlockIdFromVisiblePage.ts`
+Cross-reference JSDoc comments added to `onViewportAnchorPage` (BookReadingContent),
+`emitViewportDescriptorIfChanged` (PdfBookViewer), and the `currentBlockIdFromVisiblePage`
+function header so the full pipeline is discoverable in one hop from any file in the chain.
 
 ---
 
