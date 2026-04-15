@@ -90,6 +90,21 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-attached-book"]').should('be.visible')
       return this
     },
+    attemptAttachEpubFixture(relativePath: string) {
+      cy.get('[data-testid="notebook-no-book"]')
+        .find('input[type="file"]')
+        .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
+      pageIsNotLoading()
+      return this
+    },
+    expectEpubAttachErrorContaining(messageSubstring: string) {
+      cy.contains('.Vue-Toastification__toast--error', messageSubstring, {
+        timeout: 10000,
+      }).should('be.visible')
+      cy.get('[data-testid="notebook-no-book"]').should('be.visible')
+      cy.get('[data-testid="notebook-attached-book"]').should('not.exist')
+      return this
+    },
     reindexNotebook() {
       cy.findByRole('button', { name: 'Update index' }).click()
       // Wait for the indexing to complete - toast notification will appear

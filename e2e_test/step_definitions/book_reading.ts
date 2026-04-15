@@ -107,19 +107,23 @@ When(
   }
 )
 
-When(
-  'I open the notebook settings for {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (notebookTitle: string) => {
-    start.navigateToNotebookPage(notebookTitle)
-  }
-)
+When('I open the notebook settings for {string}', (notebookTitle: string) => {
+  start.navigateToNotebookPage(notebookTitle)
+})
 
 When(
   'I attach the EPUB file {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (relativePath: string) => {
     return notebookPage().attachEpubFixture(relativePath)
+  }
+)
+
+When(
+  'I attempt to attach the EPUB file {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (relativePath: string) => {
+    return notebookPage().attemptAttachEpubFixture(relativePath)
   }
 )
 
@@ -136,6 +140,14 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (name: string) => {
     return bookReadingPage().expectEpubReadingViewShowsBookName(name)
+  }
+)
+
+Then(
+  'I should see an EPUB attach error containing {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (messageSubstring: string) => {
+    return notebookPage().expectEpubAttachErrorContaining(messageSubstring)
   }
 )
 
