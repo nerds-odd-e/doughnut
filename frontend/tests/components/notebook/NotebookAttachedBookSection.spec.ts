@@ -184,30 +184,13 @@ describe("NotebookAttachedBookSection", () => {
     ).toBe(true)
   })
 
-  it("calls attachBook with pdf metadata and minimal layout when a .pdf file is chosen", async () => {
-    const attached = makeMe.aBook
-      .bookName("Report")
-      .format("pdf")
-      .notebookId(String(notebookId))
-      .please()
-    vi.spyOn(NotebookBooksController, "getBook")
-      .mockResolvedValueOnce(
-        wrapSdkError("nf") as Awaited<
-          ReturnType<typeof NotebookBooksController.getBook>
-        >
-      )
-      .mockResolvedValueOnce(
-        wrapSdkResponse(attached) as Awaited<
-          ReturnType<typeof NotebookBooksController.getBook>
-        >
-      )
-    const attachSpy = vi
-      .spyOn(NotebookBooksController, "attachBook")
-      .mockResolvedValue(
-        wrapSdkResponse(attached) as Awaited<
-          ReturnType<typeof NotebookBooksController.attachBook>
-        >
-      )
+  it("does not call attachBook when a .pdf file is chosen (frontend EPUB only)", async () => {
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkError("nf") as Awaited<
+        ReturnType<typeof NotebookBooksController.getBook>
+      >
+    )
+    const attachSpy = vi.spyOn(NotebookBooksController, "attachBook")
 
     const wrapper = helper
       .component(NotebookAttachedBookSection)
@@ -226,17 +209,8 @@ describe("NotebookAttachedBookSection", () => {
     await wrapper.find('input[type="file"]').trigger("change")
     await flushPromises()
 
-    expect(attachSpy).toHaveBeenCalledWith({
-      path: { notebook: notebookId },
-      body: {
-        metadata: {
-          bookName: "Report",
-          format: "pdf",
-          layout: { roots: [{ title: "Report", children: [] }] },
-        },
-        file,
-      },
-    })
-    expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(2)
+    expect(attachSpy).not.toHaveBeenCalled()
+    expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('[data-testid="notebook-no-book"]').exists()).toBe(true)
   })
 })

@@ -37,14 +37,14 @@
     <div class="section-header">
       <h4 class="section-title">Attached book</h4>
       <p class="section-description">
-        No book attached to this notebook.
+        No book attached. You can attach an EPUB here; attach PDF books from the CLI.
       </p>
     </div>
     <input
       ref="attachFileInputRef"
       type="file"
       class="daisy-sr-only"
-      accept=".epub,.pdf,application/epub+zip,application/pdf"
+      accept=".epub,application/epub+zip"
       @change="onAttachFileSelected"
     />
     <button
@@ -80,34 +80,22 @@ const book = ref<BookFull | null>(null)
 const bookLoadFinished = ref(false)
 const attachFileInputRef = ref<HTMLInputElement | null>(null)
 
-const bookNameFromFile = (file: File): string => {
+const bookNameFromEpubFile = (file: File): string => {
   const n = file.name
   const l = n.toLowerCase()
   if (l.endsWith(".epub")) {
     return n.slice(0, -".epub".length)
-  }
-  if (l.endsWith(".pdf")) {
-    return n.slice(0, -".pdf".length)
   }
   return n
 }
 
 const attachMetadataForFile = (file: File): AttachBookRequestFull | null => {
   const l = file.name.toLowerCase()
-  const bookName = bookNameFromFile(file)
   const looksEpub = l.endsWith(".epub") || file.type === "application/epub+zip"
-  const looksPdf = l.endsWith(".pdf") || file.type === "application/pdf"
-  if (looksEpub) {
-    return { bookName, format: "epub" }
+  if (!looksEpub) {
+    return null
   }
-  if (looksPdf) {
-    return {
-      bookName,
-      format: "pdf",
-      layout: { roots: [{ title: bookName, children: [] }] },
-    }
-  }
-  return null
+  return { bookName: bookNameFromEpubFile(file), format: "epub" }
 }
 
 const onAttachFileSelected = async (event: Event) => {
