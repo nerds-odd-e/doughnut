@@ -438,12 +438,10 @@ const bookReadingPage = () => {
     },
     pressAndHoldOnContentBlockBboxOverlay() {
       pageIsNotLoading()
-      cy.clock()
       cy.get('[data-book-content-block-id]')
         .first()
         .trigger('pointerdown', { button: 0, bubbles: true, force: true })
       cy.tick(600)
-      cy.clock().invoke('restore')
       return this
     },
     pressAndHoldOnLongTextContentBlockBboxOverlay() {
@@ -453,14 +451,12 @@ const bookReadingPage = () => {
       )
         .first()
         .scrollIntoView()
-      cy.clock()
       cy.get(
         '[data-derived-title-truncated="true"][data-book-content-block-id]'
       )
         .first()
         .trigger('pointerdown', { button: 0, bubbles: true })
       cy.tick(600)
-      cy.clock().invoke('restore')
       return this
     },
     expectNewBlockCallout() {
