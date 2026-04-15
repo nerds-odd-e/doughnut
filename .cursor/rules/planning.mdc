@@ -30,6 +30,10 @@ alwaysApply: true
 | **E2E** | Each phase: tests that cover the **main user behavior** for that phase. |
 | **Unit tests** | Formatting, errors, invalid input, edge paths. Prefer **black-box** tests (inputs/outputs), minimal tests, full coverage of those concerns. |
 
+### Tests are owned by capability, phases only schedule work
+
+Phases decide **when** you add or extend tests, but tests are grouped and named by **what behavior they cover** — the domain capability, not the phase that introduced them. A phase may add scenarios to an existing capability-named feature file or create a new file named after the capability it introduces (e.g. `video_playback.feature`, `segment_export.feature` — never `phase_1.feature`).
+
 ### Observable behavior first (avoid structure-mapped tests)
 
 **Preference:** Tests should stand on **what a user or integrator can observe** (HTTP response, DOM, terminal output, exit code, public error text), not on how the code is factored inside.

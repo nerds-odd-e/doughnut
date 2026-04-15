@@ -47,7 +47,7 @@ For sub-decomposition of a single phase: `ongoing/<plan-name>-<phase-number>-sub
 
 **Big refactor:** If making the test pass needs a **large structural** change, plan **that structure as its own phase** before (or as the first slice of) the feature.
 
-**E2E-shaped phases:** Prefer phases that each map to an **end-to-end** scenario; different phases may use **different preconditions** (setup, role, data).
+**E2E-shaped phases:** Prefer phases that each map to an **end-to-end** scenario; different phases may use **different preconditions** (setup, role, data). Each phase adds or extends tests in **capability-named** feature files (e.g. `note_creation.feature`, `spaced_repetition.feature`). A phase may add scenarios to an existing file or create a new file named after the capability it introduces — **never** name files or scenarios after the phase itself.
 
 **Still too big:** If one precondition + one E2E story is still large, split by **one small part of the outcome** per phase (one aspect of the postcondition).
 
@@ -71,3 +71,5 @@ Include:
 - Phases with status (done / in-progress / planned)
 - Key design decisions and their rationale
 - Discoveries that affect remaining work
+
+**Naming rule for delegated work:** When a plan references feature files, test files, classes, or directories to create or modify, names must reflect the **domain capability** (e.g. `video_playback.feature`, `SegmentExportController`), not the phase or delivery order. Phase numbers belong only in the plan document itself, never in permanent artifact names.

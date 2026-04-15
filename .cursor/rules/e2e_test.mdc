@@ -77,6 +77,7 @@ The backend service log is located at `backend/logs/doughnut-e2e.log`. Please ma
 
 - Write features in Gherkin syntax focusing on business value
 - Group related features in domain-specific folders
+- **Name feature files and titles by domain/capability** (e.g. `note_creation.feature`, `spaced_repetition.feature`), **never by phase or delivery order** (no `phase_1_basics.feature`). A phase may add scenarios to an existing capability-named file or create a new file named after the capability it introduces.
 - Use tags (e.g., `@usingMockedOpenAiService`, `@mockBrowserTime`) to control test execution; see **Run E2E** → `@focus` / `@only` (temporary only, not for commit)
 - Keep scenarios focused and concise
 

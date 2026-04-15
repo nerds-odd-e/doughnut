@@ -96,7 +96,9 @@ It is the top priority to keep high cohesion all the time.
 - DO NOT follow the defensive programming style
 - Use the simplest solution and minimum code to achieve what the prompt asked to do.
 
-## Documentation
+## Name by capability, not by development history
+
+Permanent artifacts reflect **what the product does**, not **how or when it was built**. Phase numbers, sequence labels, and planning vocabulary must not appear in: file names, directories, test names, class names, Gherkin feature titles/files, or long-lived docs. Those markers belong only in `ongoing/` plans.
 
 - DO NOT add historical documentation, comments about past implementations, or completed task lists
 - Code readers only care about the current state, not development history
