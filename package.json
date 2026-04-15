@@ -78,7 +78,7 @@
     "@anev/ts-mountebank": "1.8.0",
     "@badeball/cypress-cucumber-preprocessor": "^24.0.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
-    "@biomejs/biome": "2.4.11",
+    "@biomejs/biome": "2.4.12",
     "@cucumber/cucumber": "^12.8.1",
     "@hey-api/openapi-ts": "0.96.0",
     "@hono/node-server": ">=1.19.14",
