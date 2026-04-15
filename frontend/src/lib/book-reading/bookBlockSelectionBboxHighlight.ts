@@ -37,7 +37,7 @@ export function attachBookBlockSelectionBboxHighlight(
   overlay.style.width = `${rect.width}px`
   overlay.style.height = `${rect.height}px`
   overlay.style.backgroundColor = "rgba(255, 0, 0, 0.3)"
-  overlay.style.pointerEvents = "auto"
+  overlay.style.pointerEvents = contentBlockId !== undefined ? "auto" : "none"
   overlay.style.zIndex = "100"
   if (contentBlockId !== undefined) {
     overlay.dataset.bookContentBlockId = String(contentBlockId)

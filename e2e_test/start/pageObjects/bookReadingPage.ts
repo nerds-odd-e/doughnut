@@ -174,8 +174,16 @@ const bookReadingPage = () => {
               .screenshot(name, {
                 log: false,
                 overwrite: true,
-                onAfterScreenshot(_$el, props) {
+                onBeforeScreenshot($el: JQuery<HTMLElement>) {
+                  $el
+                    .find('[data-testid="book-block-selection-bbox-highlight"]')
+                    .css('opacity', '0')
+                },
+                onAfterScreenshot($el: JQuery<HTMLElement>, props) {
                   screenshotPath = props.path
+                  $el
+                    .find('[data-testid="book-block-selection-bbox-highlight"]')
+                    .css('opacity', '')
                 },
               })
               .then(() => {

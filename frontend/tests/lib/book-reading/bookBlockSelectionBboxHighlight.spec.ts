@@ -27,7 +27,7 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     expect(el.style.top).toBe("120px")
     expect(el.style.width).toBe("160px")
     expect(el.style.height).toBe("120px")
-    expect(el.style.pointerEvents).toBe("auto")
+    expect(el.style.pointerEvents).toBe("none")
     expect(el).not.toBeNull()
   })
 
