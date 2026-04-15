@@ -48,6 +48,15 @@
         data-testid="book-reading-book-layout"
         class="daisy-p-3 daisy-pb-8"
       >
+        <template v-if="sideDrawerMode === 'titleOnly'">
+          <p
+            data-testid="book-reading-epub-drawer-title"
+            class="daisy-text-sm daisy-font-medium daisy-leading-snug"
+          >
+            {{ sideDrawerTitle }}
+          </p>
+        </template>
+        <template v-else>
         <button
           type="button"
           data-testid="book-reading-ai-reorganize-layout"
@@ -143,6 +152,7 @@
             </span>
           </span>
         </button>
+        </template>
       </div>
     </aside>
     <slot />
@@ -173,8 +183,15 @@ const props = withDefaults(
       blockId: number
     ) => BookBlockReadingDisposition | undefined
     fullLayoutBusy?: boolean
+    sideDrawerMode?: "blocks" | "titleOnly"
+    sideDrawerTitle?: string
   }>(),
-  { pendingLayoutBlockId: null, fullLayoutBusy: false }
+  {
+    pendingLayoutBlockId: null,
+    fullLayoutBusy: false,
+    sideDrawerMode: "blocks",
+    sideDrawerTitle: "",
+  }
 )
 
 const emit = defineEmits<{

@@ -5,7 +5,7 @@
   >
     <template v-if="book">
       <div
-        v-if="pdfLoading"
+        v-if="bookFileLoading"
         class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-flex-col"
       >
         <div class="daisy-px-2 daisy-py-2 sm:daisy-px-4 daisy-flex-1">
@@ -23,8 +23,12 @@
           {{ bookFileLoadError }}
         </div>
       </div>
+      <BookReadingEpubPlaceholder
+        v-else-if="book.format === 'epub' && bookPdfBytes !== null"
+        :book="book"
+      />
       <BookReadingContent
-        v-else-if="bookPdfBytes !== null"
+        v-else-if="book.format !== 'epub' && bookPdfBytes !== null"
         :book="book"
         :book-pdf-bytes="bookPdfBytes"
         :initial-last-read="initialLastRead"
@@ -37,6 +41,7 @@
 
 <script setup lang="ts">
 import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
+import BookReadingEpubPlaceholder from "@/components/book-reading/BookReadingEpubPlaceholder.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -52,7 +57,7 @@ function notebookBookFilePath(notebookId: number) {
 
 const book = ref<BookFull | null>(null)
 const bookPdfBytes = ref<ArrayBuffer | null>(null)
-const pdfLoading = ref(false)
+const bookFileLoading = ref(false)
 const bookFileLoadError = ref<string | null>(null)
 const initialLastRead = ref<{
   pageIndexZeroBased: number
@@ -67,7 +72,8 @@ onMounted(async () => {
   if (!error && data) {
     book.value = data
     const notebook = Number(data.notebookId)
-    pdfLoading.value = true
+    const isEpub = data.format === "epub"
+    bookFileLoading.value = true
     bookFileLoadError.value = null
     try {
       const [res, posResult] = await Promise.all([
@@ -83,6 +89,7 @@ onMounted(async () => {
         return
       }
       if (
+        !isEpub &&
         posResult !== null &&
         !posResult.error &&
         posResult.data &&
@@ -105,7 +112,7 @@ onMounted(async () => {
     } catch {
       bookFileLoadError.value = "Could not load the book file."
     } finally {
-      pdfLoading.value = false
+      bookFileLoading.value = false
     }
   }
 })
