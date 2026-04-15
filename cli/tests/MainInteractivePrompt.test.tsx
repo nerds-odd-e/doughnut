@@ -12,6 +12,7 @@ import { MainInteractivePrompt } from '../src/mainInteractivePrompt/index.js'
 import {
   extendInkRenderForInteractiveTests,
   inkCommandLineProbeUndelete,
+  pressEscape,
   stripAnsi,
   waitUntilInkLastFrameStripped,
 } from './inkTestHelpers.js'
@@ -486,7 +487,7 @@ describe('MainInteractivePrompt Esc dismiss (phase 5)', () => {
 
     stdin.write('/')
     await waitForLastFrameToInclude('→ /')
-    stdin.write('\x1b')
+    await pressEscape(stdin)
     await waitUntilLastFrame((f) => !lineWithMainPrompt(f).includes('/'))
     const promptLine = lineWithMainPrompt(lastStrippedFrame()).trimEnd()
     expect(promptLine).toContain('→')
@@ -500,7 +501,7 @@ describe('MainInteractivePrompt Esc dismiss (phase 5)', () => {
     await waitUntilLastFrame(
       (f) => f.includes('/help') && f.includes('List available commands')
     )
-    stdin.write('\x1b')
+    await pressEscape(stdin)
     await waitUntilLastFrame(
       (f) =>
         f.includes('/ commands') &&
