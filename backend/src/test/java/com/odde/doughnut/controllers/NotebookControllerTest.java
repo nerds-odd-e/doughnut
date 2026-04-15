@@ -214,6 +214,33 @@ class NotebookControllerTest extends ControllerTestBase {
               .orElseThrow();
       assertThat(subscribedRow.subscriptionId, equalTo(subscription.getId()));
     }
+
+    @Test
+    void myNotebooks_setsHasAttachedBookOnCatalogNotebooks() {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook withBook =
+          makeMe.aNotebook().creatorAndOwner(user).withBook("Attached Title").please();
+      Notebook withoutBook = makeMe.aNotebook().creatorAndOwner(user).please();
+      var view = controller.myNotebooks();
+      assertThat(view.notebooks.size(), equalTo(2));
+      NotebookCatalogNotebookItem withRow =
+          view.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .filter(n -> n.notebook.getId().equals(withBook.getId()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(withRow.notebook.getHasAttachedBook(), equalTo(true));
+      NotebookCatalogNotebookItem withoutRow =
+          view.catalogItems.stream()
+              .filter(NotebookCatalogNotebookItem.class::isInstance)
+              .map(NotebookCatalogNotebookItem.class::cast)
+              .filter(n -> n.notebook.getId().equals(withoutBook.getId()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(withoutRow.notebook.getHasAttachedBook(), equalTo(false));
+    }
   }
 
   private static Integer catalogItemNotebookId(

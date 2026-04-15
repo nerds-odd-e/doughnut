@@ -9,15 +9,24 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.repositories.BookRepository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotebookCatalogService {
+
+  private final BookRepository bookRepository;
+
+  public NotebookCatalogService(BookRepository bookRepository) {
+    this.bookRepository = bookRepository;
+  }
 
   /**
    * Sort keys for the notebooks page catalog (merged list of ungrouped notebooks and groups):
@@ -35,7 +44,41 @@ public class NotebookCatalogService {
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks;
     dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions);
+    fillHasAttachedBook(dto, subscriptions);
     return dto;
+  }
+
+  private void fillHasAttachedBook(NotebooksViewedByUser dto, List<Subscription> subscriptions) {
+    Set<Integer> ids = new HashSet<>();
+    dto.notebooks.forEach(n -> ids.add(n.getId()));
+    for (Subscription s : subscriptions) {
+      if (s.getNotebook() != null) {
+        ids.add(s.getNotebook().getId());
+      }
+    }
+    Set<Integer> withBook = new HashSet<>();
+    if (!ids.isEmpty()) {
+      withBook.addAll(bookRepository.findNotebookIdsWithAttachedBooksIn(ids));
+    }
+    for (Notebook n : dto.notebooks) {
+      n.setHasAttachedBook(withBook.contains(n.getId()));
+    }
+    for (Subscription s : subscriptions) {
+      Notebook nb = s.getNotebook();
+      if (nb != null) {
+        nb.setHasAttachedBook(withBook.contains(nb.getId()));
+      }
+    }
+    for (NotebookCatalogItem item : dto.catalogItems) {
+      switch (item) {
+        case NotebookCatalogNotebookItem ni ->
+            ni.notebook.setHasAttachedBook(withBook.contains(ni.notebook.getId()));
+        case NotebookCatalogSubscribedNotebookItem si ->
+            si.notebook.setHasAttachedBook(withBook.contains(si.notebook.getId()));
+        case NotebookCatalogGroupItem gi ->
+            gi.notebooks.forEach(n -> n.setHasAttachedBook(withBook.contains(n.getId())));
+      }
+    }
   }
 
   private static List<NotebookCatalogItem> buildCatalogItems(

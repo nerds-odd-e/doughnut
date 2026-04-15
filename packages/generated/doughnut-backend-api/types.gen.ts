@@ -192,6 +192,7 @@ export type Notebook = {
     circle?: Circle;
     headNoteId: number;
     shortDetails?: string;
+    hasAttachedBook?: boolean;
     updated_at: string;
 };
 

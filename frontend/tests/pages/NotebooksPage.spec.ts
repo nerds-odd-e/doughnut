@@ -1,7 +1,8 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { RouterLink } from "vue-router"
+import { createRouter, createWebHistory, RouterLink } from "vue-router"
+import routes from "@/routes/routes"
 import makeMe, {
   type NotebookCatalogEntry,
 } from "doughnut-test-fixtures/makeMe"
@@ -252,6 +253,120 @@ describe("Notebooks Page", () => {
       if (grp?.type === "notebookGroup") {
         expect(grp.notebooks[0]?.title).toBe("Renamed Member")
       }
+    })
+
+    it("preserves hasAttachedBook when notebook-updated payload omits it", async () => {
+      const originalNotebook = {
+        ...makeMe.aNotebook.please(),
+        title: "T",
+        hasAttachedBook: true,
+      }
+      const { hasAttachedBook, ...updatedNotebook } = {
+        ...originalNotebook,
+        title: "Updated",
+      }
+      expect(hasAttachedBook).toBe(true)
+
+      mockSdkService("myNotebooks", {
+        notebooks: [originalNotebook],
+        catalogItems: makeMe.notebookCatalog
+          .notebooks(originalNotebook)
+          .please(),
+        subscriptions: [],
+      })
+
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const vm = wrapper.vm as unknown as {
+        catalogItems: NotebookCatalogEntry[] | undefined
+      }
+
+      const notebookButtons = wrapper.findComponent({ name: "NotebookButtons" })
+      notebookButtons.vm.$emit("notebook-updated", updatedNotebook)
+      await flushPromises()
+
+      if (vm.catalogItems?.[0]?.type === "notebook") {
+        expect(vm.catalogItems[0].notebook.hasAttachedBook).toBe(true)
+        expect(vm.catalogItems[0].notebook.title).toBe("Updated")
+      }
+    })
+  })
+
+  describe("read book catalog button", () => {
+    it("shows read book control when hasAttachedBook is true", async () => {
+      const nb = {
+        ...makeMe.aNotebook.please(),
+        hasAttachedBook: true as const,
+      }
+      mockSdkService("myNotebooks", {
+        notebooks: [nb],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+      await flushPromises()
+      expect(
+        wrapper.find('[data-testid="notebook-catalog-read-book"]').exists()
+      ).toBe(true)
+    })
+
+    it("navigates to book reading when read book is clicked", async () => {
+      const nb = {
+        ...makeMe.aNotebook.please(),
+        hasAttachedBook: true as const,
+      }
+      mockSdkService("myNotebooks", {
+        notebooks: [nb],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      const router = createRouter({ history: createWebHistory(), routes })
+      const pushSpy = vi.spyOn(router, "push")
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter(router)
+        .mount()
+      await flushPromises()
+      await wrapper
+        .find('[data-testid="notebook-catalog-read-book"]')
+        .trigger("click")
+      expect(pushSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: "bookReading",
+          params: expect.objectContaining({
+            notebookId: nb.id,
+          }),
+        })
+      )
+    })
+
+    it("hides read book control when hasAttachedBook is false", async () => {
+      const nb = { ...makeMe.aNotebook.please(), hasAttachedBook: false }
+      mockSdkService("myNotebooks", {
+        notebooks: [nb],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+      await flushPromises()
+      expect(
+        wrapper.find('[data-testid="notebook-catalog-read-book"]').exists()
+      ).toBe(false)
     })
   })
 

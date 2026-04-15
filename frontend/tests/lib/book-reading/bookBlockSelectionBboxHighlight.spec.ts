@@ -32,11 +32,13 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
   })
 
   it("sets data-book-content-block-id when contentBlockId is provided", () => {
-    attachBookBlockSelectionBboxHighlight(
-      host,
-      { left: 0, top: 0, width: 10, height: 10 },
-      42
-    )
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+      contentBlockId: 42,
+    })
     const el = host.querySelector(
       "[data-testid=book-block-selection-bbox-highlight]"
     ) as HTMLElement
@@ -58,13 +60,14 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
 
   it("sets data-derived-title-truncated when derivedTitle is at max length (>=512)", () => {
     const longTitle = "a".repeat(512)
-    attachBookBlockSelectionBboxHighlight(
-      host,
-      { left: 0, top: 0, width: 10, height: 10 },
-      42,
-      undefined,
-      longTitle
-    )
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+      contentBlockId: 42,
+      derivedTitle: longTitle,
+    })
     const el = host.querySelector(
       "[data-testid=book-block-selection-bbox-highlight]"
     ) as HTMLElement
@@ -72,13 +75,14 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
   })
 
   it("does not set data-derived-title-truncated when derivedTitle is short", () => {
-    attachBookBlockSelectionBboxHighlight(
-      host,
-      { left: 0, top: 0, width: 10, height: 10 },
-      42,
-      undefined,
-      "short title"
-    )
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+      contentBlockId: 42,
+      derivedTitle: "short title",
+    })
     const el = host.querySelector(
       "[data-testid=book-block-selection-bbox-highlight]"
     ) as HTMLElement
@@ -88,13 +92,15 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
   it("passes derivedTitle to onLongPress callback", () => {
     const onLongPress = vi.fn()
     const title = "a".repeat(512)
-    attachBookBlockSelectionBboxHighlight(
-      host,
-      { left: 0, top: 0, width: 100, height: 100 },
-      7,
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      contentBlockId: 7,
       onLongPress,
-      title
-    )
+      derivedTitle: title,
+    })
     const el = host.querySelector(
       "[data-testid=book-block-selection-bbox-highlight]"
     ) as HTMLElement
@@ -154,12 +160,14 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
 
     it("calls onLongPress after 500ms hold with no significant movement", () => {
       const onLongPress = vi.fn()
-      attachBookBlockSelectionBboxHighlight(
-        host,
-        { left: 0, top: 0, width: 100, height: 100 },
-        7,
-        onLongPress
-      )
+      attachBookBlockSelectionBboxHighlight(host, {
+        left: 0,
+        top: 0,
+        width: 100,
+        height: 100,
+        contentBlockId: 7,
+        onLongPress,
+      })
       const el = host.querySelector(
         "[data-testid=book-block-selection-bbox-highlight]"
       ) as HTMLElement
@@ -178,12 +186,14 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
 
     it("does not call onLongPress if pointerup fires before threshold", () => {
       const onLongPress = vi.fn()
-      attachBookBlockSelectionBboxHighlight(
-        host,
-        { left: 0, top: 0, width: 100, height: 100 },
-        7,
-        onLongPress
-      )
+      attachBookBlockSelectionBboxHighlight(host, {
+        left: 0,
+        top: 0,
+        width: 100,
+        height: 100,
+        contentBlockId: 7,
+        onLongPress,
+      })
       const el = host.querySelector(
         "[data-testid=book-block-selection-bbox-highlight]"
       ) as HTMLElement
@@ -201,12 +211,14 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
 
     it("does not call onLongPress if pointer moves beyond tolerance", () => {
       const onLongPress = vi.fn()
-      attachBookBlockSelectionBboxHighlight(
-        host,
-        { left: 0, top: 0, width: 100, height: 100 },
-        7,
-        onLongPress
-      )
+      attachBookBlockSelectionBboxHighlight(host, {
+        left: 0,
+        top: 0,
+        width: 100,
+        height: 100,
+        contentBlockId: 7,
+        onLongPress,
+      })
       const el = host.querySelector(
         "[data-testid=book-block-selection-bbox-highlight]"
       ) as HTMLElement
@@ -230,12 +242,14 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
 
     it("cancel() clears any pending hold timer", () => {
       const onLongPress = vi.fn()
-      const cancel = attachBookBlockSelectionBboxHighlight(
-        host,
-        { left: 0, top: 0, width: 100, height: 100 },
-        7,
-        onLongPress
-      )
+      const cancel = attachBookBlockSelectionBboxHighlight(host, {
+        left: 0,
+        top: 0,
+        width: 100,
+        height: 100,
+        contentBlockId: 7,
+        onLongPress,
+      })
       const el = host.querySelector(
         "[data-testid=book-block-selection-bbox-highlight]"
       ) as HTMLElement

@@ -1,6 +1,17 @@
 <template>
   <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
+    <button
+      v-if="notebook.hasAttachedBook === true"
+      type="button"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      title="Read book"
+      aria-label="Read book"
+      data-testid="notebook-catalog-read-book"
+      @click="onReadBook"
+    >
+      <BookOpen class="h-5 w-5" />
+    </button>
     <details
       ref="actionsDropdown"
       class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
@@ -57,7 +68,7 @@
 <script setup lang="ts">
 import { computed, inject, ref, type ComputedRef } from "vue"
 import { useRouter } from "vue-router"
-import { MoreHorizontal } from "lucide-vue-next"
+import { BookOpen, MoreHorizontal } from "lucide-vue-next"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import Modal from "@/components/commons/Modal.vue"
@@ -106,6 +117,13 @@ const onEditNotebookSettings = () => {
   closeDropdown()
   router.push({
     name: "notebookEdit",
+    params: { notebookId: props.notebook.id },
+  })
+}
+
+const onReadBook = () => {
+  router.push({
+    name: "bookReading",
     params: { notebookId: props.notebook.id },
   })
 }

@@ -2,18 +2,33 @@ const HOLD_THRESHOLD_MS = 500
 const HOLD_MOVE_TOLERANCE_PX = 10
 const STRUCTURAL_TITLE_MAX_CHARS = 512
 
-export function attachBookBlockSelectionBboxHighlight(
-  pageLayer: HTMLElement,
-  rect: { left: number; top: number; width: number; height: number },
-  contentBlockId?: number,
+type PixelRect = { left: number; top: number; width: number; height: number }
+
+export type AttachBookBlockSelectionBboxHighlightOptions = PixelRect & {
+  contentBlockId?: number
   onLongPress?: (
     contentBlockId: number,
     clientX: number,
     clientY: number,
     derivedTitle: string | undefined
-  ) => void,
+  ) => void
   derivedTitle?: string
+}
+
+export function attachBookBlockSelectionBboxHighlight(
+  pageLayer: HTMLElement,
+  options: AttachBookBlockSelectionBboxHighlightOptions
 ): () => void {
+  const {
+    left,
+    top,
+    width,
+    height,
+    contentBlockId,
+    onLongPress,
+    derivedTitle,
+  } = options
+  const rect: PixelRect = { left, top, width, height }
   const overlay = document.createElement("div")
   overlay.dataset.testid = "book-block-selection-bbox-highlight"
   overlay.style.position = "absolute"

@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.utils.Randomizer;
@@ -24,7 +25,8 @@ import org.springframework.lang.NonNull;
   "title",
   "circle",
   "headNoteId",
-  "shortDetails"
+  "shortDetails",
+  "hasAttachedBook"
 })
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
@@ -89,6 +91,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private NotebookGroup notebookGroup;
+
+  @Transient
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Getter
+  @Setter
+  private Boolean hasAttachedBook;
 
   public boolean isCertifiable() {
     return notebookCertificateApproval != null

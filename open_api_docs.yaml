@@ -3654,6 +3654,8 @@ components:
           format: int32
         shortDetails:
           type: string
+        hasAttachedBook:
+          type: boolean
         updated_at:
           type: string
           format: date-time

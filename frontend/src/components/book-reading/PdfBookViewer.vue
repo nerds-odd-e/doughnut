@@ -325,13 +325,12 @@ function appendBookBlockSelectionBboxHighlight(
         }
       : undefined
   bookBlockSelectionBboxHighlightCancels.push(
-    attachBookBlockSelectionBboxHighlight(
-      pageView.div,
-      rect,
+    attachBookBlockSelectionBboxHighlight(pageView.div, {
+      ...rect,
       contentBlockId,
       onLongPress,
-      derivedTitle
-    )
+      derivedTitle,
+    })
   )
 }
 
