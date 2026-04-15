@@ -7,7 +7,7 @@
     <div class="section-header">
       <h4 class="section-title">{{ book.bookName }}</h4>
       <p class="section-description">
-        Open the book reader to browse this notebook's attached PDF structure.
+        Open the book reader to read and use this notebook's attached book.
       </p>
     </div>
     <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
@@ -37,7 +37,7 @@
     <div class="section-header">
       <h4 class="section-title">Attached book</h4>
       <p class="section-description">
-        No book attached. You can attach an EPUB here; attach PDF books from the CLI.
+        No book attached to this notebook.
       </p>
     </div>
     <input
@@ -140,7 +140,7 @@ const confirmRemoveBook = async () => {
   const name = current.bookName
   if (
     !(await popups.confirm(
-      `Remove "${name}" from this notebook? The PDF will be deleted from the server. This cannot be undone.`
+      `Remove "${name}" from this notebook? The attached book file will be removed from the server. This cannot be undone.`
     ))
   ) {
     return

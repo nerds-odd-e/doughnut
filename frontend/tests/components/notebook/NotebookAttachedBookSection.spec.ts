@@ -42,6 +42,24 @@ describe("NotebookAttachedBookSection", () => {
     expect(removeBtn.text()).toContain("Remove book")
   })
 
+  it("shows format-neutral attached description for an EPUB book", async () => {
+    const attached = makeMe.aBook.bookName("Chapters").format("epub").please()
+    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+      wrapSdkResponse(attached)
+    )
+
+    const wrapper = helper
+      .component(NotebookAttachedBookSection)
+      .withRouter()
+      .withProps({ notebookId })
+      .mount()
+    await flushPromises()
+
+    const desc = wrapper.find(".section-description")
+    expect(desc.text()).not.toMatch(/PDF/i)
+    expect(desc.text()).toContain("attached book")
+  })
+
   it("opens confirm popup when Remove book is clicked", async () => {
     const attached = makeMe.aBook.bookName("Linear").please()
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
@@ -62,7 +80,9 @@ describe("NotebookAttachedBookSection", () => {
     expect(stack?.length).toBe(1)
     expect(stack?.[0]?.type).toBe("confirm")
     expect(stack?.[0]?.message).toContain("Linear")
+    expect(stack?.[0]?.message).toContain("attached book file")
     expect(stack?.[0]?.message).toContain("cannot be undone")
+    expect(stack?.[0]?.message).not.toMatch(/PDF/i)
   })
 
   it("does not call delete when confirm is cancelled", async () => {
