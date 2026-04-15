@@ -229,6 +229,75 @@ describe("NoteEditableDetails", () => {
     wrapper.unmount()
   })
 
+  it("should show reverted details after undo when there is an unsaved edit on top of a saved version", async () => {
+    vi.useFakeTimers()
+
+    const noteId = 1
+    const realmAfterSave = makeMe.aNoteRealm
+      .title("Test")
+      .details("Edited details")
+      .please()
+    const realmAfterUndo = makeMe.aNoteRealm
+      .title("Test")
+      .details("Original details")
+      .please()
+
+    updateNoteDetailsSpy.mockImplementation((async (options) => {
+      if (options.body?.details === "Edited details") {
+        return wrapSdkResponse(realmAfterSave)
+      }
+      if (options.body?.details === "Original details") {
+        return wrapSdkResponse(realmAfterUndo)
+      }
+      return wrapSdkResponse(realmAfterSave)
+      // biome-ignore lint/suspicious/noExplicitAny: Vitest mock typing requires any for implementation functions
+    }) as any)
+
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withCleanStorage()
+      .withProps({
+        noteId,
+        noteDetails: "Original details",
+        readonly: false,
+        asMarkdown: true,
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+    detailsEl.value = "Edited details"
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    vi.advanceTimersByTime(1000)
+    await flushPromises()
+
+    await wrapper.setProps({
+      noteId,
+      noteDetails: "Edited details",
+      readonly: false,
+    })
+    await flushPromises()
+
+    detailsEl.value = "Edited details (draft)"
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    await wrapper.setProps({
+      noteId,
+      noteDetails: "Original details",
+      readonly: false,
+    })
+    await flushPromises()
+
+    expect(detailsEl.value).toBe("Original details")
+
+    vi.useRealTimers()
+    wrapper.unmount()
+  })
+
   it("should preserve second edit when first save response arrives after second edit", async () => {
     const noteId = 1
     let resolveFirstSave: (() => void) | undefined

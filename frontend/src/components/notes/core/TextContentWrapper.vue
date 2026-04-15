@@ -152,6 +152,21 @@ const handlePropChange = (newValue: string | undefined) => {
     // Check if this is navigation (value changed from current or last saved)
     const normalizedCurrentValue = localValue.value ?? ""
     const normalizedLastSaved = lastSavedValue.value ?? ""
+    if (field === "edit details") {
+      const normalizedNewForDetails = normalizeNoteDetails(normalizedNewValue)
+      const normalizedCurrentForDetails = normalizeNoteDetails(
+        normalizedCurrentValue
+      )
+      const normalizedLastSavedForDetails =
+        normalizeNoteDetails(normalizedLastSaved)
+      if (
+        normalizedNewForDetails === normalizedLastSavedForDetails &&
+        normalizedNewForDetails !== normalizedCurrentForDetails
+      ) {
+        handleNavigation(normalizedNewValue)
+        return
+      }
+    }
     if (
       normalizedNewValue !== normalizedCurrentValue &&
       normalizedNewValue !== normalizedLastSaved
