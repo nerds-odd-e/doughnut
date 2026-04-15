@@ -9,7 +9,7 @@
 - **Risk-first:** Burn down the highest product and architecture risks early, not after a large amount of EPUB-only code has accumulated.
 - **One behavior per phase:** Every phase must let the user do one more meaningful thing end to end.
 - **No wasted work:** If delivery stops after any phase, the shipped result is still coherent and worth keeping.
-- **High cohesion:** Reuse shared book-reading concepts and modules from the PDF path where the behavior is the same: attach orchestration, reader shell, block selection/current-block state, reading-position persistence, reading-record persistence.
+- **High cohesion:** Reuse shared book-reading concepts and modules from the PDF path where the behavior is the same: attach orchestration, reader shell, block selection/current-block state, reading-position persistence, reading-record persistence. Code that belongs to the same parsing pass should stay in the same phase.
 - **Low coupling:** Avoid abstract interface layers unless they are clearly paying for themselves. Prefer format-aware branching at the boundary modules and keep PDF/EPUB viewer internals separate.
 - **Shared domain vocabulary:** **BookBlock** and **BookContentBlock** remain the core domain concepts for both formats. EPUB should fit those concepts rather than introducing a second tree or second progress model.
 - **Primary upload surface:** Frontend upload is the primary EPUB path. CLI upload comes later and sends raw `.epub` bytes only, with no preprocessing and no layout/content payload.
@@ -33,51 +33,75 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - **Reading position:** one user-facing API surface with a format-specific payload branch.
 - **Reading records:** one reading-record concept and persistence flow; only geometry/content-boundary detection differs by format.
 
-## Phase 1: Upload a supported EPUB and see its structure (planned)
+## Phase 1: Upload a supported EPUB and see it attached (planned)
 
-**Why first:** This is the highest-risk backend slice and the first user-visible value. It proves we can parse the EPUB package on the server, persist the book, and map it into the existing `BookBlock` concept.
+**Why first:** This burns down the API-generalization and storage risk — the backbone that every later phase depends on. Today the backend is hardcoded PDF-only (`attachBookWithPdf`, `getBookPdfFile`, `APPLICATION_PDF`, `validateAttachRequest` rejects non-pdf). Additionally, there is no existing frontend attach UI — attach currently works only via CLI and E2E testability hooks. Making the system format-aware and building the upload surface is foundational work that should ship and stabilize before EPUB parsing is layered on.
 
 **Behavior:**
 - *Pre:* Notebook exists, has no attached book, user has a supported `.epub` file.
 - *Trigger:* User uploads the `.epub` in the notebook page.
-- *Post:* The notebook shows the attached EPUB, the reading page opens, and the layout sidebar shows the book structure. Unsupported EPUBs fail with a clear message instead of partial import.
+- *Post:* The notebook shows the attached EPUB book. The reading page opens and shows the book name. Unsupported or invalid EPUBs (DRM, bad container) fail with a clear user-visible error instead of partial import.
 
-**User value after this phase:** "I can upload a supported EPUB and browse its chapter structure in Doughnut."
+**User value after this phase:** "I can upload an EPUB into Doughnut and see it attached to my notebook, with clear feedback when the file is not supported."
 
 **Scope:**
 
 *Backend:*
-- Generalize attach orchestration from PDF-only to format-aware attach.
-- Accept `format: "epub"` with raw file upload and no client-provided `layout` or `contentList`.
-- Add server-side EPUB structure extraction: unzip, parse `container.xml`, OPF, manifest, spine, nav/heading fallback, and build the `BookBlock` tree.
-- Preserve shared `BookBlock` semantics, including synthetic `*beginning*` when content appears before the first structural heading.
-- Detect unsupported/invalid EPUB early and return clear user-visible errors.
-- Serve the raw `.epub` file with `application/epub+zip`.
+- Generalize attach orchestration from PDF-only to format-aware: rename/refactor `attachBookWithPdf` → format-dispatched attach, accept `format: "epub"` with raw file upload and no client-provided `layout` or `contentList`.
+- Detect unsupported/invalid EPUB early (DRM via `encryption.xml`, invalid container/package structure) and return clear user-visible errors.
+- Serve the raw `.epub` file with `application/epub+zip` and the correct filename from `GET …/book/file`.
+- Book deletion works for EPUB through the same storage flow.
 
 *Frontend:*
-- Allow `.epub` in the existing attach flow.
+- Build the frontend attach UI: file input accepting `.epub` (and `.pdf`), multipart upload to `attach-book`.
 - Make the attach UI and copy format-aware instead of PDF-specific.
-- Let the reading page load an EPUB book without crashing and show the structure drawer plus a temporary main-pane placeholder.
-- Verify book deletion works for EPUB through the same notebook/book flow.
+- Let the reading page load an EPUB book without crashing: show the book name and a temporary main-pane placeholder. The structure drawer is empty or shows just the book title (no chapter tree yet).
 
 *Fixture:*
 - Commit one small representative `.epub` fixture with a TOC or headings, a few chapters, paragraphs, and at least one image.
+- Commit one intentionally unsupported `.epub` fixture (e.g. DRM-flagged or invalid container) for error-path testing.
 
 **Testing:**
-- Backend controller test: attach EPUB and verify stored book format, file serving, and `BookBlock` structure.
-- Focused unit tests for EPUB structure extraction edge cases and fail-fast validation.
-- E2E: upload EPUB in the frontend, open the reading page, and see the structure in the layout sidebar.
+- Backend controller test: attach EPUB and verify stored book format, file serving with correct media type, and book record persistence. Attach unsupported EPUB and verify clear error response.
+- E2E: upload EPUB in the frontend and see it attached. Upload unsupported EPUB and see a clear error message.
 
-## Phase 2: Open the EPUB and read its content (planned)
+## Phase 2: See the EPUB chapter structure (planned)
 
-**Why now:** This burns down the renderer and security risk without coupling it to navigation behavior. If this phase ships and work stops, users still get meaningful value: the EPUB is attached, visible, and readable in Doughnut.
+**Why now:** This is the core EPUB parsing risk. It proves we can extract meaningful structure from an EPUB package and map it into the existing `BookBlock` and `BookContentBlock` domain concepts. The BookBlock tree and BookContentBlock stream come from the same parsing pass (ZIP → OPF → spine → XHTML), so extracting both together is higher cohesion than revisiting the parser later.
 
 **Behavior:**
-- *Pre:* EPUB book is attached to the notebook.
+- *Pre:* EPUB book is attached to the notebook (from Phase 1).
 - *Trigger:* User opens the reading page.
-- *Post:* EPUB content is visible in the main pane in a safe, readable scrolled view alongside the structure drawer.
+- *Post:* The layout sidebar shows the book's chapter structure. Blocks with and without direct content are correctly classified.
 
-**User value after this phase:** "I can open and read my EPUB in Doughnut."
+**User value after this phase:** "I can upload an EPUB and browse its chapter structure in Doughnut."
+
+**Scope:**
+
+*Backend:*
+- Add server-side EPUB structure extraction: unzip, parse `container.xml`, OPF, manifest, spine, nav document / heading fallback, and build the `BookBlock` tree.
+- In the same parsing pass, extract `BookContentBlock` rows from spine XHTML (paragraphs → `text`, images → `image`, tables → `table`, with EPUB-specific data in `rawData` including `href` and fragment `#id` for each block's start anchor).
+- Preserve shared `BookBlock` semantics, including synthetic `*beginning*` when content appears before the first structural heading.
+- Extend `BookBlockDirectContentPredicate` for EPUB-specific types (e.g. exclude `note`/`sidebar` asides from direct content, parallel to PDF's `header`/`footer`/`page_*` exclusions).
+
+*Frontend:*
+- Show the populated structure drawer on the reading page for EPUB books (replace the Phase 1 empty/title-only drawer).
+
+**Testing:**
+- Backend controller test: attach EPUB and verify `BookBlock` tree structure, `BookContentBlock` extraction, and `hasDirectContent` classification.
+- Focused unit tests for EPUB extraction edge cases: nav-only vs heading-fallback, `*beginning*` synthetic block, multi-level headings, EPUB-specific direct-content predicate rules.
+- E2E: upload EPUB, open reading page, see chapter list in the layout sidebar.
+
+## Phase 3: Open the EPUB and read its content (planned)
+
+**Why now:** This burns down the Readium renderer integration risk and the security/CSP risk — both are significant unknowns. Readium + Vue 3 integration, CSP for untrusted EPUB HTML, shadow DOM implications for testing, scroll behavior on mobile Safari, and bundle size all need to be validated. A time-boxed Readium spike should precede or be part of this phase.
+
+**Behavior:**
+- *Pre:* EPUB book is attached and has a chapter structure (from Phases 1–2).
+- *Trigger:* User opens the reading page.
+- *Post:* EPUB content is visible in the main pane in a safe, readable scrolled view alongside the structure drawer. User can click a chapter in the layout and the reader scrolls roughly to that chapter's spine document (interim navigation, upgraded to precise locators in Phase 4).
+
+**User value after this phase:** "I can open and read my EPUB in Doughnut and use the chapter list to jump around."
 
 **Scope:**
 
@@ -85,46 +109,49 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Add `EpubBookViewer.vue` using Readium in scrolled mode.
 - Replace the Phase 1 placeholder with real EPUB rendering.
 - Keep shared reader-shell logic together: book/file loading, file fetch, drawer behavior, and format-aware viewer selection.
+- Wire rough chapter navigation as interim behavior: clicking a block navigates to the start of the corresponding spine document using the `href` persisted in Phase 2. This is intentionally imprecise (spine-document level, not locator-precise); Phase 4 upgrades to the canonical locator contract.
 
 *Security and ops:*
-- Validate CSP behavior required for EPUB rendering.
+- Validate CSP behavior required for EPUB rendering (inline styles, blob URLs, embedded fonts).
 - Confirm user-uploaded EPUB scripting stays disabled.
+- If Readium uses shadow DOM, document the Cypress configuration needed (e.g. `includeShadowDom`).
 
 **Testing:**
-- E2E: open the EPUB reading page and assert known fixture text is visible in the main pane.
+- E2E: open the EPUB reading page and assert known fixture text is visible in the main pane. Click a chapter and verify content from that chapter becomes visible.
 - Focused frontend test for viewer mount/unmount lifecycle.
 
-## Phase 3: Click a chapter and jump to that place in the EPUB (planned)
+## Phase 4: Navigate precisely to any chapter or section (planned)
 
-**Why here:** Navigation is valuable on its own and should not be bundled with basic rendering. This phase is also where the canonical EPUB navigation contract should be fixed, before more EPUB reader behavior accumulates.
+**Why here:** Rough navigation from Phase 3 uses spine-document-level jumps. This phase establishes the canonical EPUB locator contract aligned with Readium `Locator` semantics, enabling precise navigation to sections within a spine document. This contract is needed before more reader behavior (scroll sync, resume) accumulates.
 
 **Behavior:**
 - *Pre:* EPUB is open in the reader and the structure drawer is visible.
 - *Trigger:* User clicks a `BookBlock` in the layout.
-- *Post:* The reader jumps to the corresponding chapter or section in the EPUB.
+- *Post:* The reader jumps precisely to the corresponding chapter or section in the EPUB, including sub-chapter sections within a spine document.
 
-**User value after this phase:** "I can use the structure to jump to where I want in the EPUB."
+**User value after this phase:** "I can use the structure to jump precisely to any section in my EPUB."
 
 **Scope:**
 
 *Contract and architecture:*
-- Adopt the EPUB block-start contract here: expose an EPUB-native block locator aligned with Readium `Locator` semantics.
+- Adopt the EPUB block-start contract: expose an EPUB-native block locator aligned with Readium `Locator` semantics (`href`, `type`, `locations` with `partialCfi` and/or `progression`, optional `text`).
 - Keep PDF navigation data unchanged and branch on `book.format` at the reader boundary.
+- Remove the Phase 3 interim rough navigation and replace with locator-based navigation.
 
 *Backend:*
-- Persist the minimal EPUB locator data needed for layout-to-content navigation.
+- Persist the EPUB locator data needed for layout-to-content navigation (from the extraction pass — extend the `rawData` or add locator fields on `BookBlock` for EPUB).
 - Extend `GET …/book` to expose that locator data for EPUB blocks.
 
 *Frontend:*
-- Wire `BookReadingContent.vue` so clicking a block uses the EPUB locator to navigate.
+- Wire `BookReadingContent.vue` so clicking a block uses the EPUB locator to navigate via Readium.
 - Reuse the existing selected-block flow rather than inventing an EPUB-specific selection model.
 
 **Testing:**
-- E2E: click a chapter in the EPUB layout and verify the target section becomes visible.
+- E2E: click a sub-chapter section in the EPUB layout and verify the target section becomes visible (not just the spine document start).
 
-## Phase 4: Scroll the EPUB and see where I am in the layout (planned)
+## Phase 5: Scroll the EPUB and see where I am in the layout (planned)
 
-**Why here:** This completes the core structure-to-reader sync after basic rendering and explicit navigation already work.
+**Why here:** This completes the core structure-to-reader sync after rendering and explicit navigation already work.
 
 **Behavior:**
 - *Pre:* EPUB is open in the reader.
@@ -142,7 +169,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - E2E: scroll the EPUB and verify the expected block becomes the current block in the layout.
 - Keep layout-side assertions the same style as PDF where possible.
 
-## Phase 5: Leave and return to the same EPUB position (planned)
+## Phase 6: Leave and return to the same EPUB position (planned)
 
 **Why here:** Once basic reading and navigation work, resume becomes a clean, valuable standalone slice with moderate technical risk.
 
@@ -154,7 +181,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 **User value after this phase:** "I can continue my EPUB where I left off."
 
 **Scope:**
-- Extend reading-position persistence with an EPUB-specific locator payload while keeping the existing PDF shape intact.
+- Extend reading-position persistence with an EPUB-specific locator payload while keeping the existing PDF shape (`pageIndex` + `normalizedY`) intact. This touches the API schema — `BookLastReadPosition` needs a format-specific branch or additional fields for the EPUB locator.
 - Reuse the same `GET/PATCH …/reading-position` user-facing flow.
 - Debounce EPUB position updates from reader relocation events.
 - Restore from the saved locator on load.
@@ -163,7 +190,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Backend test for EPUB reading-position round-trip.
 - E2E: navigate to a known EPUB section, leave, return, and verify the same section is shown again.
 
-## Phase 6: Mark an EPUB block as read, skimmed, or skipped (planned)
+## Phase 7: Mark an EPUB block as read, skimmed, or skipped (planned)
 
 **Why separate from direct-content automation:** Manual progress recording is meaningful on its own. It should not wait for the harder EPUB-specific direct-content geometry work.
 
@@ -176,7 +203,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **Scope:**
 - Reuse the existing reading-record API and reader-shell panel flow.
-- Support EPUB in the Reading Control Panel with a simple, safe placement strategy first, such as bottom-docked behavior.
+- Support EPUB in the Reading Control Panel with bottom-docked placement (interim — upgraded to content-aware geometry in Phase 8).
 - Reuse shared reading-record state management, snap-back rules, and layout presentation where they are format-agnostic.
 - Do not yet depend on EPUB `BookContentBlock` direct-content geometry for panel anchoring or auto-mark heuristics.
 
@@ -184,35 +211,30 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - E2E: mark an EPUB block as read and verify the layout shows the updated disposition.
 - Extend the same behavior with skimmed/skipped if the phase lands those together.
 
-## Phase 7: EPUB direct content and no-direct-content automation (planned)
+## Phase 8: EPUB direct-content boundaries and no-direct-content automation (planned)
 
-**Why later:** This is important shared-domain work, but it is not necessary to deliver the earlier reading slices. Shipping it later avoids overloading Phase 1 and keeps the workload more even.
+**Why here:** `BookContentBlock` rows are already persisted from Phase 2 and `hasDirectContent` is already correct on the backend. This phase is purely frontend: resolving those content boundaries in the live DOM for panel geometry and auto-mark behavior.
 
 **Behavior:**
 - *Pre:* EPUB is open and the book has blocks with and without direct content.
 - *Trigger:* User reads forward through the book, including blocks that have no direct content.
-- *Post:* No-direct-content blocks are auto-marked, and the Reading Control Panel can use EPUB-aware content boundaries rather than a permanent fallback placement.
+- *Post:* No-direct-content blocks are auto-marked, and the Reading Control Panel uses EPUB-aware content boundaries for anchoring rather than the Phase 7 bottom-docked fallback.
 
 **User value after this phase:** "EPUB reading progress behaves intelligently, including the blocks that are only structure."
 
 **Scope:**
 
-*Backend/domain:*
-- Reuse the existing `BookContentBlock` persistence concept for EPUB instead of introducing a parallel import model.
-- Add EPUB content-stream extraction for the types needed by direct-content logic, with EPUB-specific data in `rawData`.
-- Extend `BookBlockDirectContentPredicate` for EPUB-specific included and excluded content types while preserving the shared domain rule.
-
 *Frontend/viewer:*
-- Resolve EPUB direct-content boundaries in the live DOM.
-- Upgrade the panel from simple fallback placement to content-aware geometry where possible.
+- Resolve EPUB direct-content boundaries in the live DOM: map each `BookBlock`'s content range to elements/ranges using the locator data from Phase 4 and the `BookContentBlock` import data from Phase 2.
+- Upgrade the Reading Control Panel from bottom-docked fallback to content-aware geometry where possible (same product rule as PDF: panel anchors below the last direct-content bottom when it's above the obstruction zone).
 - Add no-direct-content auto-marking using the shared reading-order rule, fed by EPUB-specific boundary detection.
+- Remove the Phase 7 bottom-docked interim behavior where the content-aware path now applies.
 
 **Testing:**
-- Backend tests for EPUB `BookContentBlock` extraction and direct-content classification.
-- E2E: representative no-direct-content scenario for EPUB.
+- E2E: representative no-direct-content auto-mark scenario for EPUB.
 - Keep this focused on EPUB-specific progress behavior rather than re-testing the whole reading stack.
 
-## Phase 8: Attach an EPUB from the CLI with no preprocessing (planned)
+## Phase 9: Attach an EPUB from the CLI with no preprocessing (planned)
 
 **Why last:** CLI EPUB attach is valuable but lower risk and lower reach than the frontend path. It should reuse the server-side EPUB flow rather than create a second extraction path.
 
@@ -237,30 +259,32 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 ### E2E fixture and assertions
 
-- Reuse one small committed `.epub` fixture across phases.
-- Prefer DOM-text assertions for EPUB content instead of OCR.
+- Reuse one small committed `.epub` fixture across phases (happy path). Keep a second fixture for error-path testing (unsupported EPUB).
+- Prefer DOM-text assertions for EPUB content instead of OCR — EPUB renders to HTML, not canvas.
+- If Readium uses shadow DOM, configure Cypress with `includeShadowDom` or custom commands to pierce the shadow tree.
 - Reuse the same layout-side assertion hooks as PDF where the shell behavior is shared.
 
 ### OpenAPI and generated types
 
 - Regenerate TypeScript only in the phases that actually change the API surface.
-- Likely API-touching phases: 1, 2, and 4; phase 6 only if EPUB direct-content data needs new wire fields.
+- API-touching phases: 1 (format-aware attach + file serving), 2 (BookBlock structure with EPUB locator data), 4 (locator fields on blocks), 6 (reading-position schema extension for EPUB locator).
 
 ### Phase discipline
 
 - Each phase should be implemented and tested as its own completed slice.
-- Remove temporary fallback behavior as soon as the replacement phase lands.
+- Remove temporary fallback/interim behavior as soon as the replacement phase lands (Phase 3 rough navigation → Phase 4 precise locators; Phase 7 bottom-docked panel → Phase 8 content-aware geometry).
 - Keep PDF behavior fully working after every phase.
 
 ## Phase summary
 
 | Phase | User value | Primary risk | Size |
 |-------|-----------|-------------|------|
-| 1 | Upload EPUB and see structure | Server-side EPUB parsing and clear support boundary | Medium-large |
-| 2 | Open EPUB and read content | Readium integration, rendering, and safety model | Medium |
-| 3 | Jump from layout to EPUB section | Canonical EPUB locator contract | Medium |
-| 4 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Medium |
-| 5 | Resume EPUB reading position | Locator persistence and restore flow | Medium |
-| 6 | Mark EPUB blocks read/skimmed/skipped | Reusing reading-record UI and state without over-coupling to PDF | Medium |
-| 7 | Intelligent EPUB direct-content progress | `BookContentBlock` extraction and DOM-based boundary/geometry logic | Medium-large |
-| 8 | CLI EPUB attach | Raw upload transport only, no second extraction path | Small-medium |
+| 1 | Upload EPUB and see it attached | API generalization from PDF-only; frontend attach UI (none exists today) | Medium |
+| 2 | Browse EPUB chapter structure | Server-side EPUB parsing, BookBlock + BookContentBlock extraction | Medium |
+| 3 | Open EPUB and read content, jump to chapters | Readium integration, rendering, CSP/security, shadow DOM | Medium |
+| 4 | Precise navigation to any section | Canonical EPUB locator contract, Readium locator round-trip | Medium |
+| 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Medium |
+| 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Medium |
+| 7 | Mark EPUB blocks read/skimmed/skipped | Reusing reading-record UI and state without over-coupling to PDF | Small-medium |
+| 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |
+| 9 | CLI EPUB attach | Raw upload transport only, no second extraction path | Small-medium |
