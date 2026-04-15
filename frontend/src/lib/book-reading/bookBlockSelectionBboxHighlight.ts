@@ -1,6 +1,7 @@
 const HOLD_THRESHOLD_MS = 500
 const HOLD_MOVE_TOLERANCE_PX = 10
 const STRUCTURAL_TITLE_MAX_CHARS = 512
+export const BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS = 2000
 
 type PixelRect = { left: number; top: number; width: number; height: number }
 
@@ -88,8 +89,27 @@ export function attachBookBlockSelectionBboxHighlight(
 
   pageLayer.appendChild(overlay)
 
+  overlay.style.opacity = "1"
+  overlay.style.transition = `opacity ${BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS}ms ease-out`
+  let fadeStartTimer: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+    fadeStartTimer = null
+    overlay.style.opacity = "0"
+  }, 0)
+  let removalTimer: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+    removalTimer = null
+    overlay.remove()
+  }, BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
+
   return () => {
     cancelTimer()
+    if (fadeStartTimer !== null) {
+      clearTimeout(fadeStartTimer)
+      fadeStartTimer = null
+    }
+    if (removalTimer !== null) {
+      clearTimeout(removalTimer)
+      removalTimer = null
+    }
     overlay.remove()
   }
 }

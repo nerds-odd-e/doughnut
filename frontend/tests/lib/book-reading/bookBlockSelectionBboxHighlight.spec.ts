@@ -1,4 +1,7 @@
-import { attachBookBlockSelectionBboxHighlight } from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
+import {
+  attachBookBlockSelectionBboxHighlight,
+  BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS,
+} from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("attachBookBlockSelectionBboxHighlight", () => {
@@ -114,6 +117,51 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     )
     vi.advanceTimersByTime(501)
     expect(onLongPress).toHaveBeenCalledWith(7, 50, 50, title)
+    vi.useRealTimers()
+  })
+
+  it("fades out overlay without contentBlockId after fade timeout", () => {
+    vi.useFakeTimers()
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+    })
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    expect(el).not.toBeNull()
+
+    vi.advanceTimersByTime(1)
+    expect(el.style.opacity).toBe("0")
+
+    vi.advanceTimersByTime(BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
+    expect(
+      host.querySelector("[data-testid=book-block-selection-bbox-highlight]")
+    ).toBeNull()
+    vi.useRealTimers()
+  })
+
+  it("fades out overlay with contentBlockId after fade timeout", () => {
+    vi.useFakeTimers()
+    attachBookBlockSelectionBboxHighlight(host, {
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+      contentBlockId: 42,
+    })
+    vi.advanceTimersByTime(1)
+    const el = host.querySelector(
+      "[data-testid=book-block-selection-bbox-highlight]"
+    ) as HTMLElement
+    expect(el.style.opacity).toBe("0")
+
+    vi.advanceTimersByTime(BOOK_BLOCK_SELECTION_BBOX_HIGHLIGHT_FADE_MS)
+    expect(
+      host.querySelector("[data-testid=book-block-selection-bbox-highlight]")
+    ).toBeNull()
     vi.useRealTimers()
   })
 
