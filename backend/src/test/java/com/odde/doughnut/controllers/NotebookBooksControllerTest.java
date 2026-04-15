@@ -30,6 +30,8 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import jakarta.validation.Validation;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -108,6 +110,23 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   private static MultipartFile pdfFile(byte[] content) {
     return new MockMultipartFile("file", "book.pdf", "application/pdf", content);
+  }
+
+  private static MultipartFile epubFile(byte[] content) {
+    return new MockMultipartFile("file", "book.epub", "application/epub+zip", content);
+  }
+
+  private static byte[] phase1SupportedEpubBytes() throws Exception {
+    Path epubPath =
+        Path.of("..", "e2e_test", "fixtures", "book_reading", "phase1_epub_supported.epub");
+    return Files.readAllBytes(epubPath);
+  }
+
+  private static AttachBookRequest epubAttachRequest(String bookName) {
+    AttachBookRequest r = new AttachBookRequest();
+    r.setBookName(bookName);
+    r.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
+    return r;
   }
 
   private static ServletWebRequest webRequest() {
@@ -322,14 +341,36 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void rejectsEpubUntilSupported() {
+    void persistsEpubAttachWithFormatAndStorageRef() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = phase1SupportedEpubBytes();
+      AttachBookRequest req = epubAttachRequest("Phase 1 EPUB");
+
+      ResponseEntity<Book> res = controller.attachBook(nb, req, epubFile(epubBytes));
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.CREATED));
+      assertThat(res.getBody(), notNullValue());
+      Book created = res.getBody();
+      assertThat(created.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
+      assertThat(created.getBookName(), equalTo("Phase 1 EPUB"));
+      assertThat(created.getSourceFileRef(), notNullValue());
+      assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
+      assertThat(created.getBlocks(), empty());
+
+      Book detail = controller.getBook(nb);
+      assertThat(detail.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
+      assertThat(detail.getBlocks(), empty());
+    }
+
+    @Test
+    void rejectsEpubWhenLayoutIncluded() {
       Notebook nb = myNotebook();
       AttachBookRequest req = attachRequest(node("A"));
       req.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
       ApiException ex =
           assertThrows(
-              ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
-      assertThat(ex.getMessage(), equalTo("EPUB attach is not supported yet"));
+              ApiException.class, () -> controller.attachBook(nb, req, epubFile(STUB_PDF_BYTES)));
+      assertThat(ex.getMessage(), equalTo("EPUB attach must not include layout or contentList"));
     }
 
     @Test

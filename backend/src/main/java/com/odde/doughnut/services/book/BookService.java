@@ -100,11 +100,14 @@ public class BookService {
   }
 
   @Transactional
-  public Book attachBookWithPdf(Notebook notebook, AttachBookRequest request, byte[] pdfBytes) {
+  public Book attachBook(Notebook notebook, AttachBookRequest request, byte[] fileBytes) {
     validateAttachRequest(request);
     assertNotebookHasNoBook(notebook);
-    String ref = bookStorage.put(pdfBytes);
-    return persistNewBook(notebook, request, ref);
+    String ref = bookStorage.put(fileBytes);
+    if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
+      return persistNewEpubBook(notebook, request, ref);
+    }
+    return persistNewPdfBook(notebook, request, ref);
   }
 
   private void assertNotebookHasNoBook(Notebook notebook) {
@@ -116,7 +119,23 @@ public class BookService {
     }
   }
 
-  private Book persistNewBook(Notebook notebook, AttachBookRequest request, String sourceFileRef) {
+  private Book persistNewEpubBook(
+      Notebook notebook, AttachBookRequest request, String sourceFileRef) {
+    var book = new Book();
+    book.setNotebook(notebook);
+    book.setBookName(trimmedMax(request.getBookName(), 512));
+    book.setFormat(BOOK_FORMAT_EPUB);
+    book.setSourceFileRef(sourceFileRef);
+    var now = testabilitySettings.getCurrentUTCTimestamp();
+    book.setCreatedAt(now);
+    book.setUpdatedAt(now);
+    entityPersister.save(book);
+    entityPersister.flush();
+    return book;
+  }
+
+  private Book persistNewPdfBook(
+      Notebook notebook, AttachBookRequest request, String sourceFileRef) {
     var book = new Book();
     book.setNotebook(notebook);
     book.setBookName(trimmedMax(request.getBookName(), 512));
@@ -656,12 +675,29 @@ public class BookService {
           "format must be \"pdf\" or \"epub\"");
     }
     if (BOOK_FORMAT_EPUB.equals(format)) {
-      throw new ApiException(
-          "EPUB attach is not supported yet",
-          ApiError.ErrorType.BINDING_ERROR,
-          "EPUB attach is not supported yet");
+      validateEpubAttachRequest(request);
+    } else {
+      validatePdfAttachRequest(request);
     }
+  }
 
+  private void validateEpubAttachRequest(AttachBookRequest request) {
+    List<Object> contentList = request.getContentList();
+    boolean hasContentList = contentList != null && !contentList.isEmpty();
+    AttachBookLayoutRequest layout = request.getLayout();
+    List<AttachBookLayoutNodeRequest> layoutRoots =
+        layout != null && layout.getRoots() != null ? layout.getRoots() : null;
+    boolean hasLayoutRoots = layoutRoots != null && !layoutRoots.isEmpty();
+
+    if (hasContentList || hasLayoutRoots) {
+      throw new ApiException(
+          "EPUB attach must not include layout or contentList",
+          ApiError.ErrorType.BINDING_ERROR,
+          "EPUB attach must not include layout or contentList");
+    }
+  }
+
+  private void validatePdfAttachRequest(AttachBookRequest request) {
     List<Object> contentList = request.getContentList();
     boolean hasContentList = contentList != null && !contentList.isEmpty();
     AttachBookLayoutRequest layout = request.getLayout();

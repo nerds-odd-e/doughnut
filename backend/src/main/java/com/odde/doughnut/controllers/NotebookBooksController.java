@@ -80,7 +80,7 @@ class NotebookBooksController {
       throw new ApiException(
           "file is required", ApiError.ErrorType.BINDING_ERROR, "file is required");
     }
-    Book body = bookService.attachBookWithPdf(notebook, metadata, file.getBytes());
+    Book body = bookService.attachBook(notebook, metadata, file.getBytes());
     return ResponseEntity.status(HttpStatus.CREATED).body(body);
   }
 
