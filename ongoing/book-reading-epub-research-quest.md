@@ -222,15 +222,72 @@ Research should **not** be limited to the bullets below; they are **seeds**. Eac
 
 - **`/attach`**: same command with **format sniffing**, or **`/attach-epub`**? How does the CLI **run extraction** (local Node script, call backend pre-process, or upload-only)?
 
+#### 2.5 Research findings (Apr 2026)
+
+**Current behavior (PDF):** Interactive **`/attach`** reads a **`.pdf`**, runs **`runMineruOutlineSubprocess`** (Python **`cli/python/mineru_book_outline.py`** → MinerU `content_list` or layout), then **`attachNotebookBookWithPdf`** posts **multipart** `metadata` (JSON: `bookName`, `format: "pdf"`, `contentList` *or* `layout`) + **`file`** to **`POST /api/notebooks/{id}/attach-book`** (`cli/src/backendApi/doughnutBackendClient.ts`, `cli/src/commands/notebook/notebookAttachSlashCommand.tsx`). The CLI **rejects non-`.pdf`** today even though the same Python script documents **`.epub`** support (heading walk → `layout.roots`).
+
+**If EPUB extraction is server-side (aligned with §2.1 / §2.4):** The CLI should stay **one user-facing command** — extend **`/attach <path>`** with **extension-based routing** (`.pdf` vs `.epub`), not a separate **`/attach-epub`**, unless product later needs divergent UX (unlikely). For EPUB, the CLI becomes **upload-centric**: read bytes → multipart POST with **`format: "epub"`** and **`application/epub+zip`** (or octet-stream + magic-byte check server-side) — **no local extraction** for EPUB once the backend accepts **`metadata` without `layout`/`contentList`** and derives blocks from stored bytes (or a dedicated **`POST …/attach-epub`** that omits precomputed layout; still one CLI command can call it).
+
+**Avoid** keeping **Python EPUB outline** on the CLI **and** Java extraction on the server long term — two implementations of the same book structure will drift; keep Python for **PDF/MinerU** only unless EPUB stays CLI-only temporarily.
+
+**Frontend parity:** “Attach book” in the UI is the **same multipart contract** as the CLI (file + metadata). Today there is **no** first-class EPUB attach in product code paths until **`AttachBookRequest`** / **`BookService`** allow **`epub`** and optional server-derived layout; the **main incremental surface** for users who do not use the CLI is **file input + same API**.
+
 ### 2.6 Server vs client work split
 
 - Is **unpack + parse + normalize** done **server-side** (consistent with MinerU for PDF) or **client-side** (privacy, cost)? Implications for **tests**, **repeatability**, and **large files**.
+
+#### 2.6 Research findings (Apr 2026)
+
+**Decision (EPUB):** Do **unpack + parse + normalize on the server** during attach (same *phase* as persisting the blob), analogous to how the server is the **system of record** for stored PDF bytes and merged layout — but **unlike PDF**, do **not** depend on a **client-side** extractor for EPUB: MinerU does not eat EPUB, and a **ZIP + OPF + spine + XHTML** pass is cheap to run in Java (or a small internal library), test headlessly, and keep **one** canonical layout/content stream.
+
+| Concern | Server-side EPUB | Client-side EPUB extraction |
+|--------|------------------|-----------------------------|
+| **Repeatability** | Same bytes → same persisted `BookBlock` / `BookContentBlock` rows | Depends on browser/CLI/runtime and shipped parser versions |
+| **Tests** | Controller/service tests + fixtures; no MinerU | Extra E2E/CLI matrix; harder to assert parity with web upload |
+| **Large files** | Same multipart limits / streaming policy as PDF attach; memory bounds explicit in service | User device parses full ZIP before upload; duplicate work if they then upload the same file |
+| **Privacy** | File already uploaded for reading; extraction where the blob lives avoids shipping structure twice | Theoretical gain only if we ever supported “parse locally, never upload full EPUB” — **not** the current product model |
+
+**PDF stays a split brain by necessity:** **MinerU** is intentionally run **locally** in the CLI (heavy, Python env); the server **merges** `contentList`/`layout` + stores the PDF. **EPUB has no such constraint** — prefer **server-only** extraction for structure and `BookContentBlock` stream.
+
+**Spike:** Not required beyond **`scripts/epub-extraction-spike.mjs`** (§2.1) and eventual **Java** attach integration; no separate CLI spike unless prototyping **upload-only** attach before backend lands.
 
 ### 2.7 Parity gaps that are PDF-specific today
 
 - **Pinch/zoom vs reflow:** what is EPUB’s equivalent of **pdf.js `currentScale`** for **reading position** and **control panel geometry**?
 - **“Content block” hit targets:** PDF uses **overlay / MinerU geometry** for long-press; what is the EPUB **equivalent** (DOM range, paragraph id, CFI span)?
 - **E2E:** what replaces **canvas OCR** for **deterministic** assertions?
+
+#### 2.7 Research findings (Apr 2026)
+
+**Sources:** shipped PDF reader (`PdfBookViewer.vue`, `pdfViewerViewportTopYDown.ts`, `bookBlockSelectionBboxHighlight.ts`, `BookReadingContent.vue`), E2E page object `e2e_test/start/pageObjects/bookReadingPage.ts`, plus §2.2 (Readium) and §2.3 (Locator).
+
+**Pinch/zoom vs reflow — reading position**
+
+- **PDF today:** Resume uses **`pageIndex` + `normalizedY`** (MinerU **0–1000** vertical coordinate on the **anchor page**). The client derives this from **live layout**: `pdfViewerReadingPositionTopEdge` maps the scroll container’s top edge into that space using each page view’s **`getBoundingClientRect`** / viewport height (`frontend/src/lib/book-reading/pdfViewerViewportTopYDown.ts`). **Gesture zoom** mutates **`pdfViewer.currentScale`** and adjusts scroll so the focal point stays stable (`applyGestureScaleFactor` in `PdfBookViewer.vue`); viewport sampling runs again and **patches** reading position when the anchor/midpoint changes.
+- **EPUB parity:** There is **no** `currentScale` analogue that preserves a **pixel-normalized** Y on a fixed page grid. **Reflow** “zoom” is **font size / margins** (Readium preferences or CSS), which **moves** where text sits on screen. **Canonical resume** must be a **logical locator** (Readium **`Locator`**, §2.3) — **not** overload `pageIndex`/`normalizedY` for reflow EPUB. After a theme/font change, **re-`goTo`** the saved locator (same pattern as §2.2: serialize → change prefs → restore).
+- **Fixed-layout EPUB** is closer to PDF: a **spread/page** + **region** (or toolkit “page + viewrect”) can back **geometry-like** resume if product wants it; still prefer **`Locator`** on the wire for one API shape where possible.
+
+**Pinch/zoom vs reflow — Reading Control Panel geometry**
+
+- **PDF today:** “Content-anchored” panel placement compares the **last direct-content bbox bottom** in **client coordinates** to a **bottom obstruction band** (`isLastContentBottomVisible`, `readingPanelAnchorTopPx` in `PdfBookViewer.vue`), using **page div** rects and MinerU **y1/1000** of the bbox.
+- **EPUB parity:** Same **product rule**, different **measurement**: resolve the **DOM range or element** that corresponds to the end of direct content for the **selected** block (from imported stream + block boundaries or §2.3 boundary locators), then compare **`getBoundingClientRect().bottom`** to the same **obstruction** inset. No MinerU rectangle required — **live DOM boxes** after reflow. If the end cannot be resolved (bad anchor), fall back to **bottom-docked** panel (already in UX roadmap for PDF).
+
+**“Content block” hit targets (long-press → new block)**
+
+- **PDF today:** For selection highlights tied to **`BookContentBlock`**, the viewer appends **absolutely positioned overlays** on the pdf.js **page layer** with **`pointerEvents: auto`**, **`data-book-content-block-id`**, and a **500ms** hold with **10px** move tolerance (`bookBlockSelectionBboxHighlight.ts`). Coordinates come from **MinerU bbox** × **page viewport** (`normalizedBboxToPixelRect`).
+- **EPUB parity options (pick one for v1):**
+  1. **DOM attribution:** During render or post-process, tag elements that correspond to a persisted **`BookContentBlock`** (e.g. **`data-doughnut-content-block-id`** on the block’s root element). Long-press uses the **same** timer/tolerance pattern on those nodes (or thin transparent overlays aligned to their boxes if the DOM is not stable).
+  2. **Pointer → locator → id:** Use Readium’s **selection / hit-testing** to map `(x, y)` to a **CFI/range**, then map CFI back to the owning **`BookContentBlock`** via import-time stored **`partialCfi` / href+fragment** (heavier, but no DOM decoration if we control extraction alignment).
+  3. **Paragraph overlay layer:** Similar to PDF — draw hit rects from import geometry — but for reflow EPUB, rects must be **recomputed after layout** (ResizeObserver / relocate), so (1) is usually simpler.
+
+**E2E — replacing canvas OCR**
+
+- **PDF today:** Assertions use **Tesseract** on a **screenshot of the pdf viewer** (`expectVisibleOCRContains` in `bookReadingPage.ts`) because the reading surface is **canvas**, not selectable text.
+- **EPUB parity:** Prefer **`cy.contains` / `should('include.text')`** on the **reader container** or on elements with **stable test hooks** (fixture EPUB with known chapter titles). **No OCR** needed for a normal HTML/text rendering path.
+- **Caveats:** If Readium (or another renderer) puts content inside **shadow roots**, Cypress may need **`includeShadowDom: true`** or **custom commands** to pierce the shadow tree — **time-box in the §2.2 Readium spike** (single scenario: “visible passage X after navigate”).
+- **Hybrid:** Keep **layout-side** assertions (`data-current-block`, `data-testid` on book blocks) identical to PDF tests; only the **“text is visible in main pane”** strategy switches from OCR to DOM text.
+
+**Spike:** **Not a separate repo script.** Validate E2E strategy inside the **Readium vertical slice** (§2.2): one Cypress scenario on a **tiny fixture EPUB** proving **DOM text assertion** + **layout highlight** without Tesseract. If shadow DOM blocks queries, record the **minimal** pierce/config fix in the spike notes.
 
 ### 2.8 Product edge cases
 
@@ -241,6 +298,71 @@ Research should **not** be limited to the bullets below; they are **seeds**. Eac
 ### 2.9 Legal, storage, and ops
 
 - **Licensing** of third-party EPUB renderers; **CSP** if **iframe** or **inline HTML**; **sanitization** of XHTML to prevent XSS when rendering user-provided EPUBs.
+
+#### 2.8 Research findings (Apr 2026)
+
+**Sources:** [DAISY KB — Reading order / spine / `linear`](https://kb.daisy.org/publishing/docs/epub/reading-order.html), [IDPF a11y — Notes (`noteref`, `footnote`, `endnote`, `aside`)](https://idpf.github.io/a11y-guidelines/content/xhtml/notes.html), [W3C — EPUB Multiple-Rendition Publications 1.1](https://www.w3.org/TR/epub-multi-rend-11/) (note); current backend `BookBlockDirectContentPredicate` (MinerU-oriented defaults).
+
+**Footnotes, endnotes, sidebars — in stream vs linked**
+
+- **Markup (typical EPUB 3):** References use `<a epub:type="noteref" href="…#id">`; note bodies often live in `<aside epub:type="footnote">` / `endnote` / `rearnote` (same document or another spine item). **Sidebars** often use `<aside epub:type="sidebar">` or class-based patterns.
+- **Spine vs DOM:** Our **imported stream** and **direct-content gaps** (architecture roadmap) are defined along the **same linear path we use for structure**—by default **spine order** within each XHTML document’s **DOM reading order**. Footnote **asides** may appear **inline in the DOM** after the referencing paragraph (pop-up behavior is reading-system UI, not a guarantee we skip them in extraction).
+- **Linked-only notes:** If the note body is **only** reachable via `href` and lives in a **separate** spine item (e.g. endnotes chapter), that item still appears in **spine sequence** unless `linear="no"`. **Non-linear** spine items (`linear="no"`) are **not reliably skipped** while paging; DAISY explicitly warns behavior varies by reading system.
+- **Product impact:** For **v1 extraction**, pick explicit rules and document them:
+  - **Option A (simpler):** Emit **`BookContentBlock`** rows for footnote/sidebar **asides** with a dedicated **`type`** (e.g. `note`, `sidebar`) and extend **`BookBlockDirectContentPredicate`** for **`Book.format == epub`** to **exclude** those types from **direct content** (parallel to ignoring `header` / `footer` / `page_*` for PDF), so reading-order heuristics match “primary narrative” rather than boilerplate notes.
+  - **Option B:** Include notes in the stream as normal **`text`** and accept that **hasDirectContent** / panel geometry may treat notes as part of the gap (usually **noisier**).
+- **Reading order vs TOC:** Merged nav + headings (§2.1) still defines **book blocks**; footnotes rarely become their own **book blocks** unless we add special casing. **No spike-only dependency**—rules belong in the **Java extraction** design when EPUB attach lands.
+
+**Tables, code blocks, images — mapping and `hasDirectContent`**
+
+| EPUB / HTML pattern | Suggested `BookContentBlock.type` | `contributesDirectContent` (today’s Java) |
+|---------------------|-----------------------------------|-------------------------------------------|
+| `<table>` (and EPUB table vocab where used) | `table` | **Yes** (not excluded). |
+| `<img>`, `<figure>` with image | `image` | **Yes**. |
+| `<pre>`, `<code>` blocks | **`text`** with EPUB-specific **`rawData`** (e.g. `epub_kind: "code"`) **or** a dedicated `code` type | If `code` is a **new** type: **Yes** (predicate only excludes `header`, `footer`, `page_*`, and heading-like **`text`** with `text_level` 1–3). If stored as **`text`**: **Yes** unless `text_level` is wrongly set. |
+| Decorative / very small images | Product may later add EPUB **`role="presentation"`** / heuristic exclusions (similar to future MinerU image rules). | TBD in extraction. |
+
+- **Alignment:** Reusing **`BookContentBlock`** (§2.4) means EPUB extraction should **populate `type` + `rawData`** so the **same predicate** can be extended with **`format`-aware** branches rather than duplicating logic.
+
+**Multiple renditions in one EPUB**
+
+- **Spec:** [EPUB Multiple-Rendition 1.1](https://www.w3.org/TR/epub-multi-rend-11/) describes **`container.xml`** with multiple **`rootfile`** entries, optional **`META-INF/metadata.xml`**, and rendition selection by metadata (e.g. `rendition:layout`, `rendition:accessMode`). **Practical prevalence:** low in typical consumer files; most EPUBs are a **single** package document.
+- **Decision (v1):** Treat the **first** `rootfile` in **`META-INF/container.xml`** as the **canonical rendition** for attach + reader. If **more than one** `rootfile` is present, **log a structured warning** (ops) and still use the first unless/until product adds **explicit rendition choice** (e.g. prefer reflow over pre-paginated via `rendition:layout`).
+- **Spike:** **Not required** beyond a **fixture check** when Java extraction exists (multi-rootfile sample in tests).
+
+#### 2.9 Research findings (Apr 2026)
+
+**Sources:** [Readium `ts-toolkit` LICENSE](https://raw.githubusercontent.com/readium/ts-toolkit/develop/LICENSE) (BSD-3-Clause); [Snyk / CVE-2021-33040 (epub.js XSS)](https://security.snyk.io/vuln/SNYK-JS-EPUBJS-2342194); [epub.js security discussion](https://github.com/futurepress/epub.js/issues/987); repo scan: no **Content-Security-Policy** string in `frontend/` (app may still set CSP at **edge / LB / hosting**).
+
+**Licensing (renderers referenced in §2.2)**
+
+| Component | License | Notes |
+|-----------|---------|--------|
+| **Readium `ts-toolkit`** (`@readium/navigator`, `@readium/shared`, etc.) | **BSD-3-Clause** (Readium Foundation) | Permissive; retain copyright notice in distributions as required. |
+| **EPUB.js** | BSD-style (see npm `LICENSE`) | Permissive; track **security advisories** if ever used. |
+| **Foliate-js** | **MIT** (library repo) | Distinct from the **GPL** **Foliate** *desktop app*; do not conflate the two repos. |
+
+- **Ops:** Record third-party **NOTICE** / attribution in whatever mechanism the repo already uses for other BSD/MIT deps (no special copyleft obligations for the above).
+
+**CSP (iframe / inline HTML / blob URLs)**
+
+- EPUB content is **untrusted HTML/CSS** loaded inside the **reading surface** (iframe and/or shadow DOM, depending on toolkit). **CSP** interacts with: **`script-src`** (should block or omit user scripts for default trust model), **`style-src`** (`'unsafe-inline'` is often required for EPUB author styles unless rewritten), **`img-src`** / **`font-src`** (blob/data for embedded fonts and images).
+- **Deployment:** If the **hosting** stack adds a **strict global CSP**, the EPUB reader route may need **route-specific relaxation** or **nonce/hash** strategies only where unavoidable—**this must be validated in the §2.2 Readium integration spike** (one EPUB with embedded font + inline styles).
+- **Principle:** Prefer **default no scripted EPUBs**; align with reading-system practice (scripts off unless explicit trusted mode).
+
+**Sanitization and XSS**
+
+- **Threat:** Crafted EPUB XHTML with **`<script>`**, inline **event handlers**, **`javascript:`** URLs, or **SVG** script can lead to XSS if the renderer executes or merges content into the host origin without isolation.
+- **Defense in depth:**
+  1. **Renderer / toolkit policy:** Use APIs that **disable scripting** for user uploads; verify **Readium**’s defaults and toggles in the spike.
+  2. **Sandboxed iframe** where applicable (epub.js historically uses **`sandbox`** with limited flags; **`allow-scripts` + `allow-same-origin`** together weakens isolation—avoid for untrusted content).
+  3. **Server-side sanitization** of extracted fragments if we ever **echo** XHTML outside the reader or **share** HTML with other surfaces; for **Readium-only** display, prioritization is **toolkit + CSP + no script**.
+- **Spike:** During **§2.2**, confirm **whether Readium sanitizes** loaded documents, document **required CSP**, and add a **security checklist** to the EPUB attach/reader plan (no separate one-off script needed).
+
+**Storage and ops (brief)**
+
+- **Blob storage** for the canonical **`.epub`** matches §2.4; no extra **public** expanded tree.
+- **Optional enterprise:** malware scanning of uploads is **out of scope** unless org policy requires it; **encryption.xml** / DRM already covered in §2.1.
 
 ---
 
