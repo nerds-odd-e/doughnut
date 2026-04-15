@@ -399,7 +399,7 @@ export default class StoredApiCollection implements StoredApi {
       const old =
         field === "edit title"
           ? currentNote.noteTopology.title
-          : currentNote.details
+          : (currentNote.details ?? "")
       if (old === value) {
         return
       }
@@ -423,14 +423,11 @@ export default class StoredApiCollection implements StoredApi {
     const undone = this.noteEditingHistory.peekUndo()
     if (!undone) throw new Error("undo history is empty")
     this.noteEditingHistory.popUndoHistory()
-    if (
-      undone.type === "edit title" ||
-      (undone.type === "edit details" && undone.textContent !== undefined)
-    ) {
+    if (undone.type === "edit title" || undone.type === "edit details") {
       return this.updateTextContentWithoutUndo(
         undone.noteId,
         undone.type,
-        undone.textContent!
+        undone.textContent ?? ""
       )
     }
     if (undone.type === "create note") {

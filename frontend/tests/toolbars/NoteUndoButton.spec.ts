@@ -330,6 +330,31 @@ describe("NoteUndoButton", () => {
       })
     })
 
+    it("calls undo edit details when note had no prior details", async () => {
+      const note = makeMe.aNote.please()
+      const noteRealm = makeMe.aNoteRealm.please()
+      noteEditingHistory.addEditingToUndoHistory(
+        note.id,
+        "edit details",
+        undefined
+      )
+      mockSdkService("updateNoteDetails", noteRealm)
+      helper.component(NoteUndoButton).render()
+
+      const undoButton = screen.getByTitle("undo edit details")
+      await undoButton.click()
+      await flushPromises()
+
+      const okButton = screen.getByRole("button", { name: "OK" })
+      await okButton.click()
+      await flushPromises()
+
+      expect(mockedPush).toHaveBeenCalledWith({
+        name: "noteShow",
+        params: { noteId: noteRealm.id },
+      })
+    })
+
     it("calls undo when confirmation is accepted for create note", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
       const parentNoteRealm = makeMe.aNoteRealm.please()
