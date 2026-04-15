@@ -40,13 +40,31 @@
         No book attached to this notebook.
       </p>
     </div>
+    <input
+      ref="attachFileInputRef"
+      type="file"
+      class="daisy-sr-only"
+      accept=".epub,.pdf,application/epub+zip,application/pdf"
+      @change="onAttachFileSelected"
+    />
+    <button
+      type="button"
+      class="daisy-btn daisy-btn-primary daisy-btn-sm"
+      data-testid="notebook-attach-book"
+      @click="attachFileInputRef?.click()"
+    >
+      Attach book…
+    </button>
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
-import type { BookFull } from "@generated/doughnut-backend-api"
+import type {
+  AttachBookRequestFull,
+  BookFull,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -60,6 +78,59 @@ const { popups } = usePopups()
 
 const book = ref<BookFull | null>(null)
 const bookLoadFinished = ref(false)
+const attachFileInputRef = ref<HTMLInputElement | null>(null)
+
+const bookNameFromFile = (file: File): string => {
+  const n = file.name
+  const l = n.toLowerCase()
+  if (l.endsWith(".epub")) {
+    return n.slice(0, -".epub".length)
+  }
+  if (l.endsWith(".pdf")) {
+    return n.slice(0, -".pdf".length)
+  }
+  return n
+}
+
+const attachMetadataForFile = (file: File): AttachBookRequestFull | null => {
+  const l = file.name.toLowerCase()
+  const bookName = bookNameFromFile(file)
+  const looksEpub = l.endsWith(".epub") || file.type === "application/epub+zip"
+  const looksPdf = l.endsWith(".pdf") || file.type === "application/pdf"
+  if (looksEpub) {
+    return { bookName, format: "epub" }
+  }
+  if (looksPdf) {
+    return {
+      bookName,
+      format: "pdf",
+      layout: { roots: [{ title: bookName, children: [] }] },
+    }
+  }
+  return null
+}
+
+const onAttachFileSelected = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ""
+  if (!file) {
+    return
+  }
+  const metadata = attachMetadataForFile(file)
+  if (!metadata) {
+    return
+  }
+  const { error } = await apiCallWithLoading(() =>
+    NotebookBooksController.attachBook({
+      path: { notebook: props.notebookId },
+      body: { metadata, file },
+    })
+  )
+  if (!error) {
+    await loadBook()
+  }
+}
 
 const loadBook = async () => {
   bookLoadFinished.value = false

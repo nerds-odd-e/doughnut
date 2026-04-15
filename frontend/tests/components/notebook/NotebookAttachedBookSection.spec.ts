@@ -126,4 +126,117 @@ describe("NotebookAttachedBookSection", () => {
     expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(2)
     expect(wrapper.find('[data-testid="notebook-no-book"]').exists()).toBe(true)
   })
+
+  it("calls attachBook with epub metadata and reloads when a .epub file is chosen", async () => {
+    const attached = makeMe.aBook
+      .bookName("My Epub")
+      .format("epub")
+      .notebookId(String(notebookId))
+      .please()
+    vi.spyOn(NotebookBooksController, "getBook")
+      .mockResolvedValueOnce(
+        wrapSdkError("nf") as Awaited<
+          ReturnType<typeof NotebookBooksController.getBook>
+        >
+      )
+      .mockResolvedValueOnce(
+        wrapSdkResponse(attached) as Awaited<
+          ReturnType<typeof NotebookBooksController.getBook>
+        >
+      )
+    const attachSpy = vi
+      .spyOn(NotebookBooksController, "attachBook")
+      .mockResolvedValue(
+        wrapSdkResponse(attached) as Awaited<
+          ReturnType<typeof NotebookBooksController.attachBook>
+        >
+      )
+
+    const wrapper = helper
+      .component(NotebookAttachedBookSection)
+      .withRouter()
+      .withProps({ notebookId })
+      .mount()
+    await flushPromises()
+
+    const file = new File(["epub"], "My Epub.epub", {
+      type: "application/epub+zip",
+    })
+    const input = wrapper.find('input[type="file"]').element as HTMLInputElement
+    Object.defineProperty(input, "files", {
+      value: [file],
+      writable: false,
+      configurable: true,
+    })
+    await wrapper.find('input[type="file"]').trigger("change")
+    await flushPromises()
+
+    expect(attachSpy).toHaveBeenCalledWith({
+      path: { notebook: notebookId },
+      body: {
+        metadata: { bookName: "My Epub", format: "epub" },
+        file,
+      },
+    })
+    expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(2)
+    expect(
+      wrapper.find('[data-testid="notebook-attached-book"]').exists()
+    ).toBe(true)
+  })
+
+  it("calls attachBook with pdf metadata and minimal layout when a .pdf file is chosen", async () => {
+    const attached = makeMe.aBook
+      .bookName("Report")
+      .format("pdf")
+      .notebookId(String(notebookId))
+      .please()
+    vi.spyOn(NotebookBooksController, "getBook")
+      .mockResolvedValueOnce(
+        wrapSdkError("nf") as Awaited<
+          ReturnType<typeof NotebookBooksController.getBook>
+        >
+      )
+      .mockResolvedValueOnce(
+        wrapSdkResponse(attached) as Awaited<
+          ReturnType<typeof NotebookBooksController.getBook>
+        >
+      )
+    const attachSpy = vi
+      .spyOn(NotebookBooksController, "attachBook")
+      .mockResolvedValue(
+        wrapSdkResponse(attached) as Awaited<
+          ReturnType<typeof NotebookBooksController.attachBook>
+        >
+      )
+
+    const wrapper = helper
+      .component(NotebookAttachedBookSection)
+      .withRouter()
+      .withProps({ notebookId })
+      .mount()
+    await flushPromises()
+
+    const file = new File(["%PDF"], "Report.pdf", { type: "application/pdf" })
+    const input = wrapper.find('input[type="file"]').element as HTMLInputElement
+    Object.defineProperty(input, "files", {
+      value: [file],
+      writable: false,
+      configurable: true,
+    })
+    await wrapper.find('input[type="file"]').trigger("change")
+    await flushPromises()
+
+    expect(attachSpy).toHaveBeenCalledWith({
+      path: { notebook: notebookId },
+      body: {
+        metadata: {
+          bookName: "Report",
+          format: "pdf",
+          layout: { roots: [{ title: "Report", children: [] }] },
+        },
+        file,
+      },
+    })
+    expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(2)
+  })
 })
