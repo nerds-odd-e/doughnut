@@ -20,7 +20,7 @@
 
 - *Pre:* Notebook exists, no attached book, user has a **supported** `.epub`.
 - *Trigger:* User uploads `.epub` on the notebook page.
-- *Post:* Notebook shows attached EPUB; reading page opens with **book name** and a **temporary main-pane placeholder**; structure drawer is **empty or title-only**; unsupported/invalid EPUB fails with a **clear user-visible error**.
+- *Post:* Notebook shows attached EPUB; reading page opens with **book name** and a **temporary main-pane placeholder**; structure drawer is **empty or title-only**; unsupported/invalid EPUB fails with a **clear user-visible error**. **PDF** books already on the notebook (attached via **CLI + MinerU**) still **read** in the browser; the **browser does not upload PDFs**.
 
 **Proof:** Backend controller coverage for attach + file serving + errors; Cypress scenario for happy path + error path.
 
@@ -72,11 +72,11 @@ Each row is **one commit**. Adjust naming to match actual packages/controllers w
 - **Commit:** Only if any API change landed without regen; otherwise **skip** this sub-phase.
 - **Verify:** `pnpm frontend:test` smoke or `pnpm lint:all` per team habit.
 
-### 8 — Frontend: attach control on notebook page (multipart, `.epub` + `.pdf`)
+### 8 — Frontend: attach control on notebook page (multipart, **`.epub` only**)
 
-- **Post:** User can pick **`.epub` or `.pdf`**; request hits **`attach-book`** with correct **multipart** shape and `format` aligned with backend.
-- **Commit:** UI + wiring with `apiCallWithLoading` (or existing helper); strings may still say “book” generically.
-- **Verify:** Vitest for the component or composable at **HTTP boundary** (mocked SDK) if that is the project pattern; otherwise shortest existing UI test harness.
+- **Post:** User can pick a **`.epub`**; request hits **`attach-book`** with **`metadata` + `file`**, `format: "epub"`, and **no** `layout` / `contentList`. **PDF** is **not** offered in the file picker: PDF attach remains **CLI-only** (MinerU / outline pipeline). Copy may tell users to use the CLI for PDF.
+- **Commit:** UI + wiring with `apiCallWithLoading` (or existing helper).
+- **Verify:** Vitest at **HTTP boundary** (mocked SDK): EPUB happy path; **no** `attachBook` when a non-EPUB file is forced through the handler (e.g. `.pdf`) if tested.
 
 ### 9 — Frontend: user-visible copy is format-aware
 
@@ -123,7 +123,8 @@ Use these **only** when the parent sub-phase feels too large; **each still ends 
 ## Explicitly out of scope for Phase 1 (do not sneak into these commits)
 
 - Chapter tree, `BookBlock` extraction, Readium, reading-position / reading-record behavior beyond “page loads safely.”
-- CLI attach (Phase 9).
+- **Browser PDF upload** (MinerU belongs in the existing **CLI** PDF attach path).
+- **CLI EPUB** attach (roadmap **Phase 9** in the parent plan — separate from today’s **CLI PDF** attach).
 
 ---
 

@@ -12,7 +12,7 @@
 - **High cohesion:** Reuse shared book-reading concepts and modules from the PDF path where the behavior is the same: attach orchestration, reader shell, block selection/current-block state, reading-position persistence, reading-record persistence. Code that belongs to the same parsing pass should stay in the same phase.
 - **Low coupling:** Avoid abstract interface layers unless they are clearly paying for themselves. Prefer format-aware branching at the boundary modules and keep PDF/EPUB viewer internals separate.
 - **Shared domain vocabulary:** **BookBlock** and **BookContentBlock** remain the core domain concepts for both formats. EPUB should fit those concepts rather than introducing a second tree or second progress model.
-- **Primary upload surface:** Frontend upload is the primary EPUB path. CLI upload comes later and sends raw `.epub` bytes only, with no preprocessing and no layout/content payload.
+- **Upload vs reading:** **EPUB** attach in the browser is the primary EPUB path (raw upload; no client layout). **PDF** books are **read** in the web app like today, but **PDF attach is CLI-only:** the CLI runs **MinerU** (or equivalent) to produce `layout` / `contentList` for `attach-book`, which the browser does not do. Roadmap **Phase 9** adds CLI attach for **`.epub`** (no MinerU, no preprocessing).
 - **E2E strategy:** Shared reader-shell behaviors do not need a full EPUB duplicate matrix. EPUB still gets representative end-to-end proof in each shipped phase, and EPUB-specific behavior gets its own dedicated E2E coverage.
 
 ## Supported EPUB contract for v1
@@ -35,12 +35,12 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 ## Phase 1: Upload a supported EPUB and see it attached (planned)
 
-**Why first:** This burns down the API-generalization and storage risk — the backbone that every later phase depends on. Today the backend is hardcoded PDF-only (`attachBookWithPdf`, `getBookPdfFile`, `APPLICATION_PDF`, `validateAttachRequest` rejects non-pdf). Additionally, there is no existing frontend attach UI — attach currently works only via CLI and E2E testability hooks. Making the system format-aware and building the upload surface is foundational work that should ship and stabilize before EPUB parsing is layered on.
+**Why first:** This burns down the API-generalization and storage risk — the backbone that every later phase depends on. Today the backend is hardcoded PDF-only (`attachBookWithPdf`, `getBookPdfFile`, `APPLICATION_PDF`, `validateAttachRequest` rejects non-pdf). **PDF** attach already goes through the **CLI** (MinerU-backed layout). There is no EPUB attach in the browser yet — EPUB-related attach today is via testability / future CLI. Making the system format-aware and adding **browser EPUB attach** is foundational before EPUB parsing is layered on.
 
 **Behavior:**
 - *Pre:* Notebook exists, has no attached book, user has a supported `.epub` file.
 - *Trigger:* User uploads the `.epub` in the notebook page.
-- *Post:* The notebook shows the attached EPUB book. The reading page opens and shows the book name. Unsupported or invalid EPUBs (DRM, bad container) fail with a clear user-visible error instead of partial import.
+- *Post:* The notebook shows the attached EPUB book. The reading page opens and shows the book name. Unsupported or invalid EPUBs (DRM, bad container) fail with a clear user-visible error instead of partial import. **PDF** notebooks attached earlier (via CLI) still **open and read** in the browser unchanged.
 
 **User value after this phase:** "I can upload an EPUB into Doughnut and see it attached to my notebook, with clear feedback when the file is not supported."
 
@@ -53,8 +53,8 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Book deletion works for EPUB through the same storage flow.
 
 *Frontend:*
-- Build the frontend attach UI: file input accepting `.epub` (and `.pdf`), multipart upload to `attach-book`.
-- Make the attach UI and copy format-aware instead of PDF-specific.
+- Build the frontend attach UI for **`.epub` only** (multipart to `attach-book`). Do **not** offer PDF upload in the browser — PDF attach stays on the **CLI** because **MinerU** (or the same pipeline) is required to supply layout / `contentList`.
+- Make the attach UI and copy format-aware instead of PDF-only wording where it matters (EPUB vs “use CLI for PDF”).
 - Let the reading page load an EPUB book without crashing: show the book name and a temporary main-pane placeholder. The structure drawer is empty or shows just the book title (no chapter tree yet).
 
 *Fixture:*
@@ -249,7 +249,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Extend `/attach` to accept `.epub`.
 - Route EPUB attach as raw file upload with `format: "epub"` only.
 - Keep PDF CLI behavior unchanged.
-- Reuse the same backend attach flow already exercised by the frontend.
+- Reuse the same backend **EPUB** attach path already exercised by the frontend upload.
 
 **Testing:**
 - CLI test for `.epub` routing and multipart payload shape.
@@ -279,7 +279,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 | Phase | User value | Primary risk | Size |
 |-------|-----------|-------------|------|
-| 1 | Upload EPUB and see it attached | API generalization from PDF-only; frontend attach UI (none exists today) | Medium |
+| 1 | Upload EPUB and see it attached | API generalization from PDF-only; frontend EPUB attach (PDF attach stays CLI + MinerU) | Medium |
 | 2 | Browse EPUB chapter structure | Server-side EPUB parsing, BookBlock + BookContentBlock extraction | Medium |
 | 3 | Open EPUB and read content, jump to chapters | Readium integration, rendering, CSP/security, shadow DOM | Medium |
 | 4 | Precise navigation to any section | Canonical EPUB locator contract, Readium locator round-trip | Medium |
