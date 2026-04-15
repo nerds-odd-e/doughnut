@@ -1,3 +1,4 @@
+import { client } from "@generated/doughnut-backend-api/client.gen"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -147,7 +148,7 @@ describe("NotebookAttachedBookSection", () => {
     expect(wrapper.find('[data-testid="notebook-no-book"]').exists()).toBe(true)
   })
 
-  it("calls attachBook with epub metadata and reloads when a .epub file is chosen", async () => {
+  it("posts multipart attach-book with epub metadata and reloads when a .epub file is chosen", async () => {
     const attached = makeMe.aBook
       .bookName("My Epub")
       .format("epub")
@@ -164,12 +165,10 @@ describe("NotebookAttachedBookSection", () => {
           ReturnType<typeof NotebookBooksController.getBook>
         >
       )
-    const attachSpy = vi
-      .spyOn(NotebookBooksController, "attachBook")
+    const postSpy = vi
+      .spyOn(client, "post")
       .mockResolvedValue(
-        wrapSdkResponse(attached) as Awaited<
-          ReturnType<typeof NotebookBooksController.attachBook>
-        >
+        wrapSdkResponse(attached) as Awaited<ReturnType<typeof client.post>>
       )
 
     const wrapper = helper
@@ -191,26 +190,27 @@ describe("NotebookAttachedBookSection", () => {
     await wrapper.find('input[type="file"]').trigger("change")
     await flushPromises()
 
-    expect(attachSpy).toHaveBeenCalledWith({
-      path: { notebook: notebookId },
-      body: {
-        metadata: { bookName: "My Epub", format: "epub" },
-        file,
-      },
-    })
+    expect(postSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: "/api/notebooks/{notebook}/attach-book",
+        path: { notebook: notebookId },
+      })
+    )
+    const posted = postSpy.mock.calls[0]![0] as { body: FormData }
+    expect(posted.body).toBeInstanceOf(FormData)
     expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(2)
     expect(
       wrapper.find('[data-testid="notebook-attached-book"]').exists()
     ).toBe(true)
   })
 
-  it("does not call attachBook when a .pdf file is chosen (frontend EPUB only)", async () => {
+  it("does not post attach-book when a .pdf file is chosen (frontend EPUB only)", async () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkError("nf") as Awaited<
         ReturnType<typeof NotebookBooksController.getBook>
       >
     )
-    const attachSpy = vi.spyOn(NotebookBooksController, "attachBook")
+    const postSpy = vi.spyOn(client, "post")
 
     const wrapper = helper
       .component(NotebookAttachedBookSection)
@@ -229,7 +229,7 @@ describe("NotebookAttachedBookSection", () => {
     await wrapper.find('input[type="file"]').trigger("change")
     await flushPromises()
 
-    expect(attachSpy).not.toHaveBeenCalled()
+    expect(postSpy).not.toHaveBeenCalled()
     expect(NotebookBooksController.getBook).toHaveBeenCalledTimes(1)
     expect(wrapper.find('[data-testid="notebook-no-book"]').exists()).toBe(true)
   })

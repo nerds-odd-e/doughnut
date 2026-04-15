@@ -12,6 +12,7 @@ import bookReadingPage, {
   type BookLayoutRow,
 } from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
+import notebookPage from '../start/pageObjects/notebookPage'
 import start, { mock_services } from '../start'
 import testability from '../start/testability'
 
@@ -103,6 +104,38 @@ When(
     return cy.get<string>('@attachedBookPdfStem').then((stem) => {
       start.navigateToNotebookPage(notebookTitle).readBook(stem)
     })
+  }
+)
+
+When(
+  'I open the notebook settings for {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (notebookTitle: string) => {
+    start.navigateToNotebookPage(notebookTitle)
+  }
+)
+
+When(
+  'I attach the EPUB file {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (relativePath: string) => {
+    return notebookPage().attachEpubFixture(relativePath)
+  }
+)
+
+When(
+  'I open the reading view for the attached book {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (bookTitle: string) => {
+    return notebookPage().readBook(bookTitle)
+  }
+)
+
+Then(
+  'I should see the EPUB reading view with book name {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (name: string) => {
+    return bookReadingPage().expectEpubReadingViewShowsBookName(name)
   }
 )
 

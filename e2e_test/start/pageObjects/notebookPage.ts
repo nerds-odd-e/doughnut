@@ -82,6 +82,14 @@ const notebookPage = () => {
       pageIsNotLoading()
       return this
     },
+    attachEpubFixture(relativePath: string) {
+      cy.get('[data-testid="notebook-no-book"]')
+        .find('input[type="file"]')
+        .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
+      pageIsNotLoading()
+      cy.get('[data-testid="notebook-attached-book"]').should('be.visible')
+      return this
+    },
     reindexNotebook() {
       cy.findByRole('button', { name: 'Update index' }).click()
       // Wait for the indexing to complete - toast notification will appear

@@ -65,6 +65,7 @@ import type {
   AttachBookRequestFull,
   BookFull,
 } from "@generated/doughnut-backend-api"
+import { client } from "@generated/doughnut-backend-api/client.gen"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -109,10 +110,25 @@ const onAttachFileSelected = async (event: Event) => {
   if (!metadata) {
     return
   }
+  const formData = new FormData()
+  formData.append(
+    "metadata",
+    new Blob([JSON.stringify(metadata)], { type: "application/json" })
+  )
+  const fileBody =
+    file.type === "application/epub+zip"
+      ? file
+      : new File([file], file.name, { type: "application/epub+zip" })
+  formData.append("file", fileBody)
   const { error } = await apiCallWithLoading(() =>
-    NotebookBooksController.attachBook({
+    client.post({
+      url: "/api/notebooks/{notebook}/attach-book",
       path: { notebook: props.notebookId },
-      body: { metadata, file },
+      body: formData,
+      bodySerializer: (body) => body as FormData,
+      headers: {
+        "Content-Type": null,
+      },
     })
   )
   if (!error) {

@@ -39,6 +39,19 @@ const bookReadingPage = () => {
     cy.task('ocrCanvasImage', base64, { timeout: 60000 })
 
   return {
+    expectEpubReadingViewShowsBookName(name: string) {
+      pageIsNotLoading()
+      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.get('[data-testid="book-reading-page"]').should('exist')
+      cy.get('[data-testid="book-reading-epub-global-bar-title"]').should(
+        'contain',
+        name
+      )
+      cy.get('[data-testid="book-reading-epub-placeholder"]').should(
+        'be.visible'
+      )
+      return this
+    },
     expectBookLayoutRows(expected: BookLayoutRow[]) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
