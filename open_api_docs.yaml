@@ -1305,7 +1305,7 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: PDF file
+                  description: Book file
               required:
               - file
               - metadata
@@ -4119,6 +4119,10 @@ components:
           minLength: 0
         format:
           type: string
+          description: Book file format
+          enum:
+          - pdf
+          - epub
         layout:
           $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
         contentList:

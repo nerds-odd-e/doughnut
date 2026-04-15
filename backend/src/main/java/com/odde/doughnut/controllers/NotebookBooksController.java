@@ -73,7 +73,7 @@ class NotebookBooksController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Parameter(description = "Attach book metadata as JSON") @RequestPart("metadata") @Valid
           AttachBookRequest metadata,
-      @Parameter(description = "PDF file") @RequestPart("file") MultipartFile file)
+      @Parameter(description = "Book file") @RequestPart("file") MultipartFile file)
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(notebook);
     if (file == null || file.isEmpty()) {

@@ -18,7 +18,10 @@ public class AttachBookRequest {
   private String bookName;
 
   @NotBlank
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(
+      requiredMode = Schema.RequiredMode.REQUIRED,
+      allowableValues = {"pdf", "epub"},
+      description = "Book file format")
   private String format;
 
   /**

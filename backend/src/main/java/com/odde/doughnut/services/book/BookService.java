@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.book;
 
+import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_CONTENT_LIST_ITEMS;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
@@ -647,9 +648,18 @@ public class BookService {
   }
 
   private void validateAttachRequest(AttachBookRequest request) {
-    if (!BOOK_FORMAT_PDF.equals(request.getFormat())) {
+    String format = request.getFormat();
+    if (!BOOK_FORMAT_PDF.equals(format) && !BOOK_FORMAT_EPUB.equals(format)) {
       throw new ApiException(
-          "format must be \"pdf\"", ApiError.ErrorType.BINDING_ERROR, "format must be \"pdf\"");
+          "format must be \"pdf\" or \"epub\"",
+          ApiError.ErrorType.BINDING_ERROR,
+          "format must be \"pdf\" or \"epub\"");
+    }
+    if (BOOK_FORMAT_EPUB.equals(format)) {
+      throw new ApiException(
+          "EPUB attach is not supported yet",
+          ApiError.ErrorType.BINDING_ERROR,
+          "EPUB attach is not supported yet");
     }
 
     List<Object> contentList = request.getContentList();

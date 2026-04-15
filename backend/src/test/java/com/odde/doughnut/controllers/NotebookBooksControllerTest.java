@@ -322,12 +322,25 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void rejectsNonPdfFormat() {
+    void rejectsEpubUntilSupported() {
       Notebook nb = myNotebook();
       AttachBookRequest req = attachRequest(node("A"));
-      req.setFormat("epub");
-      assertThrows(
-          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+      req.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
+      ApiException ex =
+          assertThrows(
+              ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+      assertThat(ex.getMessage(), equalTo("EPUB attach is not supported yet"));
+    }
+
+    @Test
+    void rejectsUnknownBookFormat() {
+      Notebook nb = myNotebook();
+      AttachBookRequest req = attachRequest(node("A"));
+      req.setFormat("doc");
+      ApiException ex =
+          assertThrows(
+              ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+      assertThat(ex.getMessage(), equalTo("format must be \"pdf\" or \"epub\""));
     }
 
     @Test

@@ -416,7 +416,10 @@ export type AttachBookLayoutRequestFull = {
  */
 export type AttachBookRequestFull = {
     bookName: string;
-    format: string;
+    /**
+     * Book file format
+     */
+    format: 'pdf' | 'epub';
     layout?: AttachBookLayoutRequestFull;
     contentList?: Array<unknown>;
 };
@@ -2007,7 +2010,7 @@ export type AttachBookData = {
     body?: {
         metadata: AttachBookRequestFull;
         /**
-         * PDF file
+         * Book file
          */
         file: Blob | File;
     };
