@@ -2766,6 +2766,10 @@ paths:
               schema:
                 type: string
                 format: byte
+            application/epub+zip:
+              schema:
+                type: string
+                format: byte
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:

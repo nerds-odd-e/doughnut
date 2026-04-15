@@ -779,6 +779,31 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void returnsEpubZipWhenBookFormatIsEpub() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = readFixtureEpubValidMinimal();
+      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
+      makeMe.entityPersister.flushAndClear();
+      String ref = bookOf(nb).getSourceFileRef();
+      String expectedEtag =
+          "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
+
+      ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(res.getBody(), equalTo(epubBytes));
+      assertThat(
+          res.getHeaders().getContentType(),
+          equalTo(MediaType.parseMediaType("application/epub+zip")));
+      assertThat(res.getHeaders().getETag(), equalTo(expectedEtag));
+      assertThat(
+          res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
+          equalTo("inline; filename=\"Minimal EPUB.epub\""));
+      assertThat(res.getHeaders().getCacheControl(), containsString("private"));
+      assertThat(res.getHeaders().getCacheControl(), containsString("max-age="));
+    }
+
+    @Test
     void returns304WhenIfNoneMatchMatchesEtag() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};

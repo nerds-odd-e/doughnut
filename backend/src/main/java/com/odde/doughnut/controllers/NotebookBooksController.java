@@ -239,13 +239,15 @@ class NotebookBooksController {
     return BookMutationResponseMapper.fromBook(result.book(), Set.of(result.predecessorBlockId()));
   }
 
-  @GetMapping(value = "/{notebook}/book/file", produces = MediaType.APPLICATION_PDF_VALUE)
+  @GetMapping(
+      value = "/{notebook}/book/file",
+      produces = {MediaType.APPLICATION_PDF_VALUE, "application/epub+zip"})
   public ResponseEntity<byte[]> getBookFile(
       WebRequest request, @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    var pdf = bookService.getBookPdfFile(notebook);
-    String etag = pdf.etag();
+    var file = bookService.getNotebookBookFile(notebook);
+    String etag = file.etag();
     CacheControl cacheControl =
         CacheControl.maxAge(365, TimeUnit.DAYS).cachePrivate().mustRevalidate();
     if (request.checkNotModified(etag)) {
@@ -259,9 +261,9 @@ class NotebookBooksController {
         .cacheControl(cacheControl)
         .header(
             HttpHeaders.CONTENT_DISPOSITION,
-            "inline; filename=\"" + pdf.attachmentFileName() + "\"")
-        .contentType(MediaType.APPLICATION_PDF)
-        .body(pdf.bytes());
+            "inline; filename=\"" + file.attachmentFileName() + "\"")
+        .contentType(file.contentType())
+        .body(file.bytes());
   }
 
   @Operation(operationId = "deleteBook", summary = "Delete book")
