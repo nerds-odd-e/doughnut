@@ -851,6 +851,21 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void removesEpubBookRowAndStoredBytes() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = readFixtureEpubValidMinimal();
+      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
+      String ref = bookOf(nb).getSourceFileRef();
+
+      controller.deleteBook(nb);
+
+      assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
+      assertThat(bookStorage.get(ref).isEmpty(), equalTo(true));
+      assertThrows(ResponseStatusException.class, () -> controller.getBook(nb));
+      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
+    }
+
+    @Test
     void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
       Notebook nb = myNotebook();
       assertThrows(ResponseStatusException.class, () -> controller.deleteBook(nb));
