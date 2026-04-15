@@ -103,6 +103,9 @@ public class BookService {
   public Book attachBook(Notebook notebook, AttachBookRequest request, byte[] fileBytes) {
     validateAttachRequest(request);
     assertNotebookHasNoBook(notebook);
+    if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
+      EpubAttachValidator.validateAttachableEpub(fileBytes);
+    }
     String ref = bookStorage.put(fileBytes);
     if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
       return persistNewEpubBook(notebook, request, ref);

@@ -116,9 +116,16 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return new MockMultipartFile("file", "book.epub", "application/epub+zip", content);
   }
 
-  private static byte[] phase1SupportedEpubBytes() throws Exception {
+  private static byte[] readFixtureEpubValidMinimal() throws Exception {
     Path epubPath =
-        Path.of("..", "e2e_test", "fixtures", "book_reading", "phase1_epub_supported.epub");
+        Path.of("..", "e2e_test", "fixtures", "book_reading", "epub_valid_minimal.epub");
+    return Files.readAllBytes(epubPath);
+  }
+
+  private static byte[] readFixtureEpubInvalidDrmEncryptionXml() throws Exception {
+    Path epubPath =
+        Path.of(
+            "..", "e2e_test", "fixtures", "book_reading", "epub_invalid_drm_encryption_xml.epub");
     return Files.readAllBytes(epubPath);
   }
 
@@ -341,10 +348,22 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void rejectsEpubWhenMetaInfEncryptionXmlPresent() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = readFixtureEpubInvalidDrmEncryptionXml();
+      AttachBookRequest req = epubAttachRequest("DRM EPUB");
+      ApiException ex =
+          assertThrows(
+              ApiException.class, () -> controller.attachBook(nb, req, epubFile(epubBytes)));
+      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(ex.getErrorBody().getMessage(), containsString("encrypted or DRM-protected"));
+    }
+
+    @Test
     void persistsEpubAttachWithFormatAndStorageRef() throws Exception {
       Notebook nb = myNotebook();
-      byte[] epubBytes = phase1SupportedEpubBytes();
-      AttachBookRequest req = epubAttachRequest("Phase 1 EPUB");
+      byte[] epubBytes = readFixtureEpubValidMinimal();
+      AttachBookRequest req = epubAttachRequest("Minimal EPUB");
 
       ResponseEntity<Book> res = controller.attachBook(nb, req, epubFile(epubBytes));
 
@@ -352,7 +371,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(res.getBody(), notNullValue());
       Book created = res.getBody();
       assertThat(created.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
-      assertThat(created.getBookName(), equalTo("Phase 1 EPUB"));
+      assertThat(created.getBookName(), equalTo("Minimal EPUB"));
       assertThat(created.getSourceFileRef(), notNullValue());
       assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
       assertThat(created.getBlocks(), empty());
