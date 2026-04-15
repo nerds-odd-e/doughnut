@@ -107,7 +107,7 @@ public class BookService {
     if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
       EpubAttachValidator.validateAttachableEpub(fileBytes);
     }
-    String ref = bookStorage.put(fileBytes);
+    String ref = bookStorage.put(fileBytes, request.getFormat());
     if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
       return persistNewEpubBook(notebook, request, ref);
     }

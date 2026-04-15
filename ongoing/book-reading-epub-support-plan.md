@@ -33,7 +33,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - **Reading position:** one user-facing API surface with a format-specific payload branch.
 - **Reading records:** one reading-record concept and persistence flow; only geometry/content-boundary detection differs by format.
 
-## Phase 1: Upload a supported EPUB and see it attached (planned)
+## Phase 1: Upload a supported EPUB and see it attached (done)
 
 **Why first:** This burns down the API-generalization and storage risk — the backbone that every later phase depends on. Today the backend is hardcoded PDF-only (`attachBookWithPdf`, `getBookPdfFile`, `APPLICATION_PDF`, `validateAttachRequest` rejects non-pdf). **PDF** attach already goes through the **CLI** (MinerU-backed layout). There is no EPUB attach in the browser yet — EPUB-related attach today is via testability / future CLI. Making the system format-aware and adding **browser EPUB attach** is foundational before EPUB parsing is layered on.
 

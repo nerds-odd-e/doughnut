@@ -20,10 +20,12 @@ public class GcsBookStorage implements BookStorage {
   }
 
   @Override
-  public String put(byte[] data) {
-    String name = objectPrefix + UUID.randomUUID() + ".pdf";
+  public String put(byte[] data, String format) {
+    String ext = "epub".equals(format) ? ".epub" : ".pdf";
+    String contentType = "epub".equals(format) ? "application/epub+zip" : "application/pdf";
+    String name = objectPrefix + UUID.randomUUID() + ext;
     BlobId blobId = BlobId.of(bucket, name);
-    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/pdf").build();
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
     storage.create(blobInfo, data);
     return name;
   }

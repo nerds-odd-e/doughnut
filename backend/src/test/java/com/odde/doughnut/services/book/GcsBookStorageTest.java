@@ -21,12 +21,12 @@ import org.mockito.ArgumentCaptor;
 class GcsBookStorageTest {
 
   @Test
-  void put_uploadsWithBucketPrefixAndPdfContentType() {
+  void put_pdfUploadsWithPdfExtensionAndContentType() {
     Storage storage = mock(Storage.class);
     GcsBookStorage cut = new GcsBookStorage(storage, "my-bucket", "pre");
 
     byte[] data = "pdf".getBytes(StandardCharsets.UTF_8);
-    String ref = cut.put(data);
+    String ref = cut.put(data, "pdf");
 
     assertTrue(ref.startsWith("pre/"));
     assertTrue(ref.endsWith(".pdf"));
@@ -37,6 +37,25 @@ class GcsBookStorageTest {
     assertEquals("my-bucket", info.getBlobId().getBucket());
     assertEquals(ref, info.getBlobId().getName());
     assertEquals("application/pdf", info.getContentType());
+  }
+
+  @Test
+  void put_epubUploadsWithEpubExtensionAndContentType() {
+    Storage storage = mock(Storage.class);
+    GcsBookStorage cut = new GcsBookStorage(storage, "my-bucket", "pre");
+
+    byte[] data = "epub".getBytes(StandardCharsets.UTF_8);
+    String ref = cut.put(data, "epub");
+
+    assertTrue(ref.startsWith("pre/"));
+    assertTrue(ref.endsWith(".epub"));
+
+    ArgumentCaptor<BlobInfo> infoCaptor = ArgumentCaptor.forClass(BlobInfo.class);
+    verify(storage).create(infoCaptor.capture(), eq(data));
+    BlobInfo info = infoCaptor.getValue();
+    assertEquals("my-bucket", info.getBlobId().getBucket());
+    assertEquals(ref, info.getBlobId().getName());
+    assertEquals("application/epub+zip", info.getContentType());
   }
 
   @Test

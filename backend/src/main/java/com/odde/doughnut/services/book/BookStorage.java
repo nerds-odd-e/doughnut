@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface BookStorage {
 
-  String put(byte[] data);
+  String put(byte[] data, String format);
 
   Optional<byte[]> get(String ref);
 

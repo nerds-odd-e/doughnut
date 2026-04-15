@@ -24,13 +24,13 @@
         </div>
       </div>
       <BookReadingEpubPlaceholder
-        v-else-if="book.format === 'epub' && bookPdfBytes !== null"
+        v-else-if="book.format === 'epub' && bookFileBytes !== null"
         :book="book"
       />
       <BookReadingContent
-        v-else-if="book.format !== 'epub' && bookPdfBytes !== null"
+        v-else-if="book.format !== 'epub' && bookFileBytes !== null"
         :book="book"
-        :book-pdf-bytes="bookPdfBytes"
+        :book-pdf-bytes="bookFileBytes"
         :initial-last-read="initialLastRead"
         :initial-selected-block-id="initialSelectedBlockId"
         @update:book="(updated) => (book = updated)"
@@ -56,7 +56,7 @@ function notebookBookFilePath(notebookId: number) {
 }
 
 const book = ref<BookFull | null>(null)
-const bookPdfBytes = ref<ArrayBuffer | null>(null)
+const bookFileBytes = ref<ArrayBuffer | null>(null)
 const bookFileLoading = ref(false)
 const bookFileLoadError = ref<string | null>(null)
 const initialLastRead = ref<{
@@ -108,7 +108,7 @@ onMounted(async () => {
         initialLastRead.value = null
         initialSelectedBlockId.value = null
       }
-      bookPdfBytes.value = await res.arrayBuffer()
+      bookFileBytes.value = await res.arrayBuffer()
     } catch {
       bookFileLoadError.value = "Could not load the book file."
     } finally {

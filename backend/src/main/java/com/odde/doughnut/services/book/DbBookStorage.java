@@ -15,7 +15,7 @@ public class DbBookStorage implements BookStorage {
 
   @Override
   @Transactional
-  public String put(byte[] data) {
+  public String put(byte[] data, String format) {
     AttachmentBlob blob = new AttachmentBlob();
     blob.setData(data);
     attachmentBlobRepository.save(blob);

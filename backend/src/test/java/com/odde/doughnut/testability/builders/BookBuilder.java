@@ -58,7 +58,7 @@ public class BookBuilder extends EntityBuilder<Book> {
     entity.setUpdatedAt(now);
 
     byte[] toStore = pdfBytes == null || pdfBytes.length == 0 ? new byte[] {1} : pdfBytes;
-    entity.setSourceFileRef(makeMe.bookStorage.put(toStore));
+    entity.setSourceFileRef(makeMe.bookStorage.put(toStore, BOOK_FORMAT_PDF));
 
     BookBlock block = new BookBlock();
     block.setStructuralTitle(rootBlockTitle);

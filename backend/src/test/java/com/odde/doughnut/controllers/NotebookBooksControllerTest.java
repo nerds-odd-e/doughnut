@@ -760,7 +760,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void returnsPdfWhenSourceFileRefPointsAtBlob() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-      String ref = bookStorage.put(pdfBytes);
+      String ref = bookStorage.put(pdfBytes, "pdf");
       setSourceFileRef(nb, ref);
       String expectedEtag =
           "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
@@ -807,7 +807,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void returns304WhenIfNoneMatchMatchesEtag() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-      String ref = bookStorage.put(pdfBytes);
+      String ref = bookStorage.put(pdfBytes, "pdf");
       setSourceFileRef(nb, ref);
       String etag = "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
 
