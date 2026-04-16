@@ -55,29 +55,6 @@ function mockNotebookBookFilePdfOk(
   })
 }
 
-function mockNotebookBookFileEpubOk(
-  id: number,
-  epubBytes: ArrayBuffer,
-  options?: { assertSameOriginCredentials?: boolean }
-) {
-  const suffix = bookFileUrlSuffix(id)
-  vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
-    const url = fetchRequestUrl(input)
-    if (!url.endsWith(suffix)) {
-      return Promise.reject(new Error(`unexpected fetch: ${url}`))
-    }
-    if (options?.assertSameOriginCredentials) {
-      expect(init?.credentials).toBe("same-origin")
-    }
-    return Promise.resolve(
-      new Response(epubBytes.slice(0), {
-        status: 200,
-        headers: { "Content-Type": "application/epub+zip" },
-      })
-    )
-  })
-}
-
 function mountBookReadingPage(id: number) {
   return helper
     .component(BookReadingPage)
@@ -328,7 +305,7 @@ describe("BookReadingPage", () => {
     await waitForPdfViewer(wrapper)
   })
 
-  it("loads EPUB with placeholder, book title in bar and drawer, no PDF viewer", async () => {
+  it("loads EPUB with placeholder and book title in bar, no PDF viewer", async () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(
         makeMe.aBook
@@ -339,10 +316,8 @@ describe("BookReadingPage", () => {
           .please()
       )
     )
-    mockNotebookBookFileEpubOk(notebookId, new ArrayBuffer(8))
 
     const wrapper = mountBookReadingPage(notebookId)
-    await flushPromises()
     await vi.waitFor(
       () =>
         expect(
@@ -355,12 +330,6 @@ describe("BookReadingPage", () => {
     expect(
       wrapper.find('[data-testid="book-reading-epub-global-bar-title"]').text()
     ).toBe("My EPUB")
-    expect(
-      wrapper.find('[data-testid="book-reading-epub-drawer-title"]').text()
-    ).toBe("My EPUB")
-    expect(
-      wrapper.find('[data-testid="book-reading-ai-reorganize-layout"]').exists()
-    ).toBe(false)
   })
 
   it("shows error when PDF bytes are not valid", async () => {

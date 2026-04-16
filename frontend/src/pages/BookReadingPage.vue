@@ -24,11 +24,11 @@
         </div>
       </div>
       <BookReadingEpubPlaceholder
-        v-else-if="book.format === 'epub' && bookFileBytes !== null"
+        v-else-if="book.format === 'epub'"
         :book="book"
       />
       <BookReadingContent
-        v-else-if="book.format !== 'epub' && bookFileBytes !== null"
+        v-else-if="bookFileBytes !== null"
         :book="book"
         :book-pdf-bytes="bookFileBytes"
         :initial-last-read="initialLastRead"
@@ -71,8 +71,10 @@ onMounted(async () => {
   })
   if (!error && data) {
     book.value = data
+    if (data.format === "epub") {
+      return
+    }
     const notebook = Number(data.notebookId)
-    const isEpub = data.format === "epub"
     bookFileLoading.value = true
     bookFileLoadError.value = null
     try {
@@ -89,7 +91,6 @@ onMounted(async () => {
         return
       }
       if (
-        !isEpub &&
         posResult !== null &&
         !posResult.error &&
         posResult.data &&

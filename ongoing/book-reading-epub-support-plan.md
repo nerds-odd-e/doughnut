@@ -65,7 +65,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Backend controller test: attach EPUB and verify stored book format, file serving with correct media type, and book record persistence. Attach unsupported EPUB and verify clear error response.
 - E2E: upload EPUB in the frontend and see it attached. Upload unsupported EPUB and see a clear error message.
 
-## Phase 2: See the EPUB chapter structure (planned)
+## Phase 2: See the EPUB chapter structure (done)
 
 **Why now:** This is the core EPUB parsing risk. It proves we can extract meaningful structure from an EPUB package and map it into the existing `BookBlock` and `BookContentBlock` domain concepts. The BookBlock tree and BookContentBlock stream come from the same parsing pass (ZIP → OPF → spine → XHTML), so extracting both together is higher cohesion than revisiting the parser later.
 

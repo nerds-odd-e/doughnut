@@ -27,8 +27,6 @@
     :current-block-id="null"
     :selected-block-id="null"
     :disposition-for-block="noDisposition"
-    side-drawer-mode="titleOnly"
-    :side-drawer-title="book.bookName"
   >
     <main
       class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col daisy-items-center daisy-justify-center daisy-px-4 daisy-py-8"
