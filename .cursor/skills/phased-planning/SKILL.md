@@ -55,11 +55,11 @@ For sub-decomposition of a single phase: `ongoing/<plan-name>-<phase-number>-sub
 
 **When to use:** A planned **phase** still spans several user-visible beats (e.g. multi-step Gherkin). Prefer **sub-phases** that alternate **E2E red** and **minimal implementation green**, instead of front-loading backend or UI layers.
 
-**Pattern (repeat until the full scenario is uncommented and green):**
+**Pattern (repeat until the scenario passes and `@wip` is removed):**
 
-1. **Red sub-phase** — Add or extend the **real** E2E scenario with the **full** story text in the feature file. **Enable only the next step** toward the final outcome: **comment out** all **later** steps (`#` in Gherkin). **Earlier** steps stay **enabled** and should already **pass**. Run E2E; confirm **exactly one** failure for the **right reason** (behavior not implemented, not typos). **Do not** leave **multiple** newly added steps failing at once.
-2. **Green sub-phase** — Implement the **smallest** production change that makes the **currently enabled** prefix **pass**. **No dead code**; keep the change clean.
-3. **Next** — Uncomment the **next** Gherkin line and go back to **1**.
+1. **Red sub-phase** — Write the **full** E2E scenario in the feature file and tag it `@wip`. Run E2E locally; confirm the failure is for the **right reason** (behavior not implemented, not typos).
+2. **Green sub-phase** — Implement the **smallest** production change that makes progress toward passing the scenario. **No dead code**; keep the change clean.
+3. **Next** — Run E2E locally again. If the scenario still fails, go back to **2**. When all steps pass, remove the `@wip` tag.
 
 ---
 

@@ -74,9 +74,9 @@ Before closing a phase and starting the next:
 
 ### Test-driven workflow (when adding or changing behavior)
 
-For **multi-step** E2E scenarios split into **sub-phases**, prefer **E2E-led decomposition** (see phased-planning skill) instead of treating the whole scenario as one red/green swing.
+For **multi-step** E2E scenarios, prefer **E2E-led decomposition** (see phased-planning skill). Tag new E2E scenarios `@wip` while working toward making them pass.
 
-1. Add or change the **E2E or unit** test; **run it** and confirm it **fails** (tag new E2E scenarios `@wip` if they will not pass until a later sub-phase).
+1. Add or change the **E2E or unit** test; **run it** and confirm it **fails**.
 2. Confirm it fails for the **right reason** (not a typo or env issue).
 3. If the failure is unclear, **improve the assertion or message** so the next reader learns what was wrong.
 4. Implement the **smallest** change that makes the test pass.
