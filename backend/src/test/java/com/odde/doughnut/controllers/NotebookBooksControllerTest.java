@@ -393,6 +393,39 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(detailPreorder.get(1).getDepth(), equalTo(1));
       assertThat(detailPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
       assertThat(detailPreorder.get(2).getDepth(), equalTo(0));
+
+      BookBlock partOne = detailPreorder.get(0);
+      assertThat(partOne.getContentBlocks(), hasSize(1));
+      assertThat(partOne.getContentBlocks().getFirst().getType(), equalTo("text"));
+      JsonNode partOneRaw =
+          objectMapper.readTree(partOne.getContentBlocks().getFirst().getRawData());
+      assertThat(partOneRaw.get("href").asText(), equalTo("OEBPS/chapter1.xhtml"));
+      assertThat(partOneRaw.get("fragment").asText(), equalTo(""));
+      assertThat(partOneRaw.get("text").asText(), equalTo("Opening paragraph for part one."));
+
+      BookBlock chapterAlpha = detailPreorder.get(1);
+      assertThat(chapterAlpha.getContentBlocks(), hasSize(2));
+      assertThat(chapterAlpha.getContentBlocks().get(0).getType(), equalTo("text"));
+      assertThat(chapterAlpha.getContentBlocks().get(1).getType(), equalTo("image"));
+      JsonNode alphaTextRaw =
+          objectMapper.readTree(chapterAlpha.getContentBlocks().get(0).getRawData());
+      assertThat(alphaTextRaw.get("href").asText(), equalTo("OEBPS/chapter2.xhtml"));
+      assertThat(alphaTextRaw.get("fragment").asText(), equalTo(""));
+      assertThat(alphaTextRaw.get("text").asText(), equalTo("Body text with an illustration."));
+      JsonNode alphaImgRaw =
+          objectMapper.readTree(chapterAlpha.getContentBlocks().get(1).getRawData());
+      assertThat(alphaImgRaw.get("href").asText(), equalTo("OEBPS/chapter2.xhtml"));
+      assertThat(alphaImgRaw.get("src").asText(), equalTo("figure.png"));
+
+      BookBlock chapterBeta = detailPreorder.get(2);
+      assertThat(chapterBeta.getContentBlocks(), hasSize(2));
+      assertThat(chapterBeta.getContentBlocks().get(0).getType(), equalTo("text"));
+      assertThat(chapterBeta.getContentBlocks().get(1).getType(), equalTo("table"));
+      JsonNode betaTableRaw =
+          objectMapper.readTree(chapterBeta.getContentBlocks().get(1).getRawData());
+      assertThat(betaTableRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(betaTableRaw.get("fragment").asText(), equalTo("#beta-table"));
+      assertThat(betaTableRaw.get("text").asText(), equalTo("Cell One"));
     }
 
     @Test

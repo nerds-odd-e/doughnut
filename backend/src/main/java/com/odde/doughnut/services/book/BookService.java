@@ -134,14 +134,32 @@ public class BookService {
     book.setCreatedAt(now);
     book.setUpdatedAt(now);
 
-    List<EpubStructureExtractor.NavOutlineEntry> outline =
-        EpubStructureExtractor.extractNavOutline(epubBytes);
-    for (int i = 0; i < outline.size(); i++) {
-      EpubStructureExtractor.NavOutlineEntry e = outline.get(i);
+    List<EpubStructureExtractor.EpubLayoutBlock> layout =
+        EpubStructureExtractor.extractEpubLayoutWithContent(epubBytes);
+    for (int i = 0; i < layout.size(); i++) {
+      EpubStructureExtractor.EpubLayoutBlock row = layout.get(i);
       BookBlock block = new BookBlock();
-      block.setStructuralTitle(trimmedMax(e.title(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
-      block.setDepth(e.depth());
+      block.setStructuralTitle(trimmedMax(row.title(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
+      block.setDepth(row.depth());
       block.setLayoutSequence(i);
+      List<Map<String, Object>> payloads = row.contentPayloads();
+      for (int j = 0; j < payloads.size(); j++) {
+        Map<String, Object> raw = payloads.get(j);
+        BookContentBlock cb = new BookContentBlock();
+        cb.setBookBlock(block);
+        cb.setSiblingOrder(j);
+        cb.setType(String.valueOf(raw.getOrDefault("type", "")));
+        cb.setPageIdx(null);
+        try {
+          cb.setRawData(objectMapper.writeValueAsString(raw));
+        } catch (JsonProcessingException e) {
+          throw new ApiException(
+              "failed to serialize content block",
+              ApiError.ErrorType.BINDING_ERROR,
+              "failed to serialize content block");
+        }
+        block.getContentBlocks().add(cb);
+      }
       book.addBlock(block);
     }
 

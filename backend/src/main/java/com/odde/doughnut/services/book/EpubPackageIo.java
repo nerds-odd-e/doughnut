@@ -27,6 +27,9 @@ final class EpubPackageIo {
   static final int MAX_OPF_BYTES = 5 * 1024 * 1024;
   static final int MAX_NAV_BYTES = 5 * 1024 * 1024;
 
+  /** Upper bound for each spine XHTML document read during structure extraction. */
+  static final int MAX_SPINE_XHTML_BYTES = MAX_NAV_BYTES;
+
   private EpubPackageIo() {}
 
   static byte[] readEntryBytes(byte[] epubZip, String entryPath, int maxBytes) throws IOException {
