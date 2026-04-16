@@ -395,6 +395,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(detailPreorder.get(2).getDepth(), equalTo(0));
 
       BookBlock partOne = detailPreorder.get(0);
+      assertThat(partOne.getEpubStartHref(), equalTo("OEBPS/chapter1.xhtml"));
       assertThat(partOne.getContentBlocks(), hasSize(1));
       assertThat(partOne.getContentBlocks().getFirst().getType(), equalTo("text"));
       JsonNode partOneRaw =
@@ -404,6 +405,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(partOneRaw.get("text").asText(), equalTo("Opening paragraph for part one."));
 
       BookBlock chapterAlpha = detailPreorder.get(1);
+      assertThat(chapterAlpha.getEpubStartHref(), equalTo("OEBPS/chapter2.xhtml"));
       assertThat(chapterAlpha.getContentBlocks(), hasSize(2));
       assertThat(chapterAlpha.getContentBlocks().get(0).getType(), equalTo("text"));
       assertThat(chapterAlpha.getContentBlocks().get(1).getType(), equalTo("image"));
@@ -418,6 +420,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(alphaImgRaw.get("src").asText(), equalTo("figure.png"));
 
       BookBlock chapterBeta = detailPreorder.get(2);
+      assertThat(chapterBeta.getEpubStartHref(), equalTo("OEBPS/chapter3.xhtml"));
       assertThat(chapterBeta.getContentBlocks(), hasSize(2));
       assertThat(chapterBeta.getContentBlocks().get(0).getType(), equalTo("text"));
       assertThat(chapterBeta.getContentBlocks().get(1).getType(), equalTo("table"));

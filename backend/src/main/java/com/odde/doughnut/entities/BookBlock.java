@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.book.BookBlockContentBboxes;
+import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.PageBbox;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -17,8 +20,10 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({"id", "depth", "title", "allBboxes", "contentBlocks"})
+@JsonPropertyOrder({"id", "depth", "title", "allBboxes", "contentBlocks", "epubStartHref"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
+
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "book_id", nullable = false)
@@ -74,5 +79,38 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<BookContentBlock> getContentBlocks() {
     return contentBlocks;
+  }
+
+  /**
+   * Spine-document href from the first imported content row’s {@code rawData} ({@code href} only).
+   * Populated for EPUB books only; PDF and parse failures yield {@code null}.
+   */
+  @JsonProperty("epubStartHref")
+  @JsonView(BookViews.Full.class)
+  @Schema(
+      description =
+          "Interim EPUB-only spine document href for rough layout navigation; null for PDF or when"
+              + " unavailable. Replaced by a canonical locator in a later release.")
+  public String getEpubStartHref() {
+    if (book == null || !BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
+      return null;
+    }
+    if (contentBlocks == null || contentBlocks.isEmpty()) {
+      return null;
+    }
+    String rawData = contentBlocks.getFirst().getRawData();
+    if (rawData == null || rawData.isBlank()) {
+      return null;
+    }
+    try {
+      JsonNode n = MAPPER.readTree(rawData);
+      if (n == null || !n.has("href") || !n.get("href").isTextual()) {
+        return null;
+      }
+      String href = n.get("href").asText();
+      return href.isBlank() ? null : href;
+    } catch (Exception e) {
+      return null;
+    }
   }
 }

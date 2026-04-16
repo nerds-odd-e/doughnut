@@ -58,13 +58,11 @@ const bookReadingPage = () => {
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 })
         .should('be.visible')
         .find('iframe')
-        .first()
-        .should(($iframe) => {
-          const doc = $iframe[0]?.contentDocument
-          expect(
-            doc?.body?.innerText ?? '',
-            'EPUB iframe should contain fixture text'
-          ).to.contain(text)
+        .should(($iframes) => {
+          const found = [...$iframes].some((frame) =>
+            (frame.contentDocument?.body?.innerText ?? '').includes(text)
+          )
+          expect(found, 'EPUB iframe should contain fixture text').to.be.true
         })
       return this
     },

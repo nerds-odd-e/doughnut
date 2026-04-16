@@ -27,11 +27,16 @@
     :current-block-id="null"
     :selected-block-id="null"
     :disposition-for-block="noDisposition"
+    @block-click="onBookBlockClick"
   >
     <main
       class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col"
     >
-      <EpubBookViewer :epub-bytes="epubBytes" :book="book" />
+      <EpubBookViewer
+        ref="epubViewerRef"
+        :epub-bytes="epubBytes"
+        :book="book"
+      />
     </main>
   </BookReadingBookLayout>
 </template>
@@ -41,8 +46,10 @@ import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleBu
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { BookFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+
+type EpubViewerExposed = { displaySpineHref: (href: string) => void }
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
@@ -53,6 +60,8 @@ const props = defineProps<{
 }>()
 
 const notebookId = computed(() => Number(props.book.notebookId))
+
+const epubViewerRef = ref<EpubViewerExposed | null>(null)
 
 const bookLayoutOpened = ref(false)
 const windowWidth = ref(
@@ -71,6 +80,13 @@ const isMdOrLarger = computed(
 
 function noDisposition(_blockId: number) {
   return undefined
+}
+
+function onBookBlockClick(block: BookBlockFull) {
+  const href = block.epubStartHref
+  if (href) {
+    epubViewerRef.value?.displaySpineHref(href)
+  }
 }
 
 onMounted(() => {

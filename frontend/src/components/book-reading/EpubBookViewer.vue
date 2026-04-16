@@ -25,6 +25,16 @@ const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
 
+async function displaySpineHref(href: string) {
+  const h = href.trim()
+  if (!h || !rendition) {
+    return
+  }
+  await rendition.display(h).catch(() => undefined)
+}
+
+defineExpose({ displaySpineHref })
+
 function destroyEpub() {
   rendition?.destroy()
   rendition = null

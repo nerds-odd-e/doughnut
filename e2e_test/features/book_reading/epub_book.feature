@@ -12,7 +12,6 @@ Feature: EPUB book
       | 1 | Chapter Alpha   |
       | 0 | Chapter Beta    |
 
-  @wip
   Scenario: Read EPUB content and navigate to a chapter
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Reading Notebook"
