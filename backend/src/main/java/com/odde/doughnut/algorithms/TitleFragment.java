@@ -36,14 +36,81 @@ record TitleFragment(boolean suffix, String stem) {
   }
 
   public String replaceLiteralWords(String details, final String replacement) {
-    Pattern pattern = getClozePatternCreator().getPattern(stem);
-    return pattern.matcher(details).replaceAll(replacement);
+    return replaceEachMatchKeepingJapaneseAuxiliaryTail(
+        getClozePatternCreator().getPattern(stem),
+        details,
+        replacement,
+        replacement,
+        stem,
+        suffix,
+        false);
+  }
+
+  /**
+   * Like {@link #replaceLiteralWords} but when a suffix-title stem keeps a following auxiliary
+   * visible, use {@code partialWhenAuxiliaryTail} so the recall stem shows a partial cloze
+   * ([..~]) rather than a full one ([...]).
+   */
+  public String replaceLiteralWords(
+      String details, String fullReplacement, String partialWhenAuxiliaryTail) {
+    return replaceEachMatchKeepingJapaneseAuxiliaryTail(
+        getClozePatternCreator().getPattern(stem),
+        details,
+        fullReplacement,
+        partialWhenAuxiliaryTail,
+        stem,
+        suffix,
+        false);
   }
 
   public String replaceSimilar(String literal, String replacement) {
     String substring = stem.substring(0, (stem.length() + 1) * 3 / 4);
-    Pattern pattern = getClozePatternCreator().getPattern(substring);
-    return pattern.matcher(literal).replaceAll(replacement);
+    return replaceEachMatchKeepingJapaneseAuxiliaryTail(
+        getClozePatternCreator().getPattern(substring),
+        literal,
+        replacement,
+        replacement,
+        stem,
+        suffix,
+        true);
+  }
+
+  /**
+   * When the match is a strict prefix of the note title stem (partial match pass), or the title
+   * uses suffix mode ({@code ~stem}) on the literal pass, keep a following auxiliary visible (e.g.
+   * {@code 食べ} + {@code た}).
+   */
+  private static String replaceEachMatchKeepingJapaneseAuxiliaryTail(
+      Pattern pattern,
+      String details,
+      String defaultMaskReplacement,
+      String partialWhenAuxiliaryTail,
+      String fullStem,
+      boolean suffixTitle,
+      boolean fromSimilarPass) {
+    Matcher matcher = pattern.matcher(details);
+    StringBuilder out = new StringBuilder();
+    int lastAppend = 0;
+    while (matcher.find()) {
+      String matched = matcher.group();
+      int matchEnd = matcher.end();
+      String remainder = details.substring(matchEnd);
+      String auxiliaryTail = JapaneseAuxiliarySuffix.longestPrefixRemainder(remainder);
+      boolean allowAuxiliaryTail =
+          fromSimilarPass
+              ? matched.length() < fullStem.length()
+              : suffixTitle && !auxiliaryTail.isEmpty();
+      String tail = allowAuxiliaryTail ? auxiliaryTail : "";
+      String maskReplacement =
+          !tail.isEmpty() && suffixTitle && !fromSimilarPass
+              ? partialWhenAuxiliaryTail
+              : defaultMaskReplacement;
+      out.append(details, lastAppend, matcher.start());
+      out.append(maskReplacement).append(tail);
+      lastAppend = matchEnd + tail.length();
+    }
+    out.append(details, lastAppend, details.length());
+    return out.toString();
   }
 
   public int length() {

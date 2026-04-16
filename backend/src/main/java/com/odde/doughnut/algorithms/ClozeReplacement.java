@@ -19,7 +19,9 @@ record ClozeReplacement(
         replaceTitlesWithInternalPlaceholder(
             noteTitle.getTitles(),
             pronunciationMasked,
-            (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacement));
+            (p, t) ->
+                t.replaceLiteralWords(
+                    p, internalFullMatchReplacement, internalPartialMatchReplacement));
     String step2 =
         replaceTitlesWithInternalPlaceholder(
             noteTitle.getTitles(),
