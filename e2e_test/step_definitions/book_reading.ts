@@ -144,6 +144,14 @@ Then(
 )
 
 Then(
+  'I should see the text {string} in the EPUB reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (text: string) => {
+    return bookReadingPage().expectEpubContentTextVisible(text)
+  }
+)
+
+Then(
   'I should see an EPUB attach error containing {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (messageSubstring: string) => {

@@ -52,6 +52,15 @@ const bookReadingPage = () => {
       )
       return this
     },
+    expectEpubContentTextVisible(text: string) {
+      pageIsNotLoading()
+      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.get('[data-testid="book-reading-page"]').should('exist')
+      cy.get('[data-testid="book-reading-page"] main')
+        .should('be.visible')
+        .and('contain', text)
+      return this
+    },
     expectBookLayoutRows(expected: BookLayoutRow[]) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
