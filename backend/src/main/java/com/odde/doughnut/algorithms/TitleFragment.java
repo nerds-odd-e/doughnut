@@ -41,6 +41,12 @@ record TitleFragment(boolean suffix, String stem) {
   }
 
   public String replaceSimilar(String literal, String replacement) {
+    if (JapaneseLemmaStemMasker.isEligibleLemma(stem)) {
+      String masked = JapaneseLemmaStemMasker.maskConjugations(literal, stem, replacement);
+      if (!masked.equals(literal)) {
+        return masked;
+      }
+    }
     String substring = stem.substring(0, (stem.length() + 1) * 3 / 4);
     Pattern pattern = getClozePatternCreator().getPattern(substring);
     return pattern.matcher(literal).replaceAll(replacement);

@@ -59,6 +59,13 @@ class ClozeDescriptionTest {
     "6,               6year,                              [...]year",
     "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
     "～かたわら,        彼女は猫を可愛がる*かたわら*、犬に対してはなぜか冷たい。,  [...]",
+    "食べる,            昨日食べた,                          昨日[..~]た",
+    "鳴く,      鳴いて,                    [..~]て",
+    "鳴く,      鳴ける,                    [..~]ける",
+    "鳴く,      鳴かれる,                [..~]れる",
+    "鳴く,      鳴きます,                [..~]ます",
+    "高い,      高かった,                [..~]た",
+    "高い,      高くない,                [..~]ない",
   })
   void clozeDescription(String title, String details, String expectedClozeDescription) {
     assertThat(
