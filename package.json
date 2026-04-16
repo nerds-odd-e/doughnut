@@ -144,7 +144,7 @@
       "immutable": ">=5.1.5",
       "mailparser": ">=3.9.3",
       "@tootallnate/once": ">=3.0.1",
-      "dompurify": ">=3.3.2",
+      "dompurify": ">=3.4.0",
       "express-rate-limit": ">=8.2.2",
       "flatted": ">=3.4.2",
       "yauzl": ">=3.2.1",
