@@ -374,11 +374,25 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(created.getBookName(), equalTo("Minimal EPUB"));
       assertThat(created.getSourceFileRef(), notNullValue());
       assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
-      assertThat(created.getBlocks(), empty());
+      assertThat(created.getBlocks(), hasSize(3));
+      List<BookBlock> createdPreorder = blocksByLayoutOrder(created);
+      assertThat(createdPreorder.get(0).getStructuralTitle(), equalTo("Part One"));
+      assertThat(createdPreorder.get(0).getDepth(), equalTo(0));
+      assertThat(createdPreorder.get(1).getStructuralTitle(), equalTo("Chapter Alpha"));
+      assertThat(createdPreorder.get(1).getDepth(), equalTo(1));
+      assertThat(createdPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
+      assertThat(createdPreorder.get(2).getDepth(), equalTo(0));
 
       Book detail = controller.getBook(nb);
       assertThat(detail.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
-      assertThat(detail.getBlocks(), empty());
+      assertThat(detail.getBlocks(), hasSize(3));
+      List<BookBlock> detailPreorder = blocksByLayoutOrder(detail);
+      assertThat(detailPreorder.get(0).getStructuralTitle(), equalTo("Part One"));
+      assertThat(detailPreorder.get(0).getDepth(), equalTo(0));
+      assertThat(detailPreorder.get(1).getStructuralTitle(), equalTo("Chapter Alpha"));
+      assertThat(detailPreorder.get(1).getDepth(), equalTo(1));
+      assertThat(detailPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
+      assertThat(detailPreorder.get(2).getDepth(), equalTo(0));
     }
 
     @Test

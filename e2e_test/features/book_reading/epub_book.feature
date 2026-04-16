@@ -7,6 +7,10 @@ Feature: EPUB book
     And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
     When I open the reading view for the attached book "epub_valid_minimal"
     Then I should see the EPUB reading view with book name "epub_valid_minimal"
+    And I should see the book layout in the browser:
+      | 0 | Part One        |
+      | 1 | Chapter Alpha   |
+      | 0 | Chapter Beta    |
 
   Scenario: Upload DRM-flagged EPUB shows a clear attach error
     Given I am logged in as an existing user
