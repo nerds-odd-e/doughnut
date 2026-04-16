@@ -21,9 +21,18 @@ const props = defineProps<{
   book: BookFull
 }>()
 
+const emit = defineEmits<{
+  relocated: [payload: { href: string }]
+}>()
+
+type EpubJsRelocatedLocation = {
+  start: { href?: string }
+}
+
 const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
+let onRelocated: ((location: EpubJsRelocatedLocation) => void) | null = null
 
 async function displayEpubTarget(href: string) {
   const h = href.trim()
@@ -38,6 +47,10 @@ defineExpose({
 })
 
 function destroyEpub() {
+  if (rendition && onRelocated) {
+    rendition.off("relocated", onRelocated)
+    onRelocated = null
+  }
   rendition?.destroy()
   rendition = null
   bookInstance?.destroy()
@@ -63,6 +76,13 @@ async function openEpub() {
     allowScriptedContent: false,
   })
   rendition = r
+  onRelocated = (location: EpubJsRelocatedLocation) => {
+    const href = location.start?.href
+    if (typeof href === "string" && href.length > 0) {
+      emit("relocated", { href })
+    }
+  }
+  r.on("relocated", onRelocated)
   await r.display()
 }
 
