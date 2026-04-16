@@ -23,11 +23,9 @@
     v-model:opened="bookLayoutOpened"
     :panel-id="bookReadingBookLayoutPanelId"
     :is-md-or-larger="isMdOrLarger"
-    :blocks="emptyBlocks"
+    :blocks="book.blocks"
     :current-block-id="null"
     :selected-block-id="null"
-    side-drawer-mode="titleOnly"
-    :side-drawer-title="book.bookName"
     :disposition-for-block="noDisposition"
   >
     <main
@@ -47,7 +45,7 @@
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
+import type { BookFull } from "@generated/doughnut-backend-api"
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
@@ -73,8 +71,6 @@ function handleResize() {
 const isMdOrLarger = computed(
   () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
 )
-
-const emptyBlocks: BookBlockFull[] = []
 
 function noDisposition(_blockId: number) {
   return undefined
