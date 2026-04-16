@@ -700,11 +700,14 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
       e.preventDefault()
       return
     }
-    if (!(e.ctrlKey || e.metaKey)) return
-    if (!pdfViewer) return
-    e.preventDefault()
-    const factor = wheelDeltaYToScaleFactor(e.deltaY)
-    applyGestureScaleFactor(factor, e.clientX, e.clientY)
+    if (e.ctrlKey || e.metaKey) {
+      if (!pdfViewer) return
+      e.preventDefault()
+      const factor = wheelDeltaYToScaleFactor(e.deltaY)
+      applyGestureScaleFactor(factor, e.clientX, e.clientY)
+    } else {
+      holdCallout.value = null
+    }
   }
   container.addEventListener("wheel", onWheelForZoom, { passive: false })
 
@@ -722,7 +725,11 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     }
     const a = e.touches[0]
     const b = e.touches[1]
-    if (!a || !b || !pdfViewer) return
+    if (!b) {
+      holdCallout.value = null
+      return
+    }
+    if (!a || !pdfViewer) return
     e.preventDefault()
     const d = touchPairDistance(a, b)
     if (lastPinchDistance <= 0) {

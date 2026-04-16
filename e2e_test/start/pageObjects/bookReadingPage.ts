@@ -451,7 +451,9 @@ const bookReadingPage = () => {
     },
     clickContentBlockBboxOverlay() {
       pageIsNotLoading()
-      cy.get('[data-book-content-block-id]').first().click({ force: true })
+      cy.get('[data-book-content-block-id]')
+        .first()
+        .trigger('click', { bubbles: true, force: true })
       return this
     },
     clickLongTextContentBlockBboxOverlay() {
@@ -465,7 +467,7 @@ const bookReadingPage = () => {
         '[data-derived-title-truncated="true"][data-book-content-block-id]'
       )
         .first()
-        .click({ force: true })
+        .trigger('click', { bubbles: true, force: true })
       return this
     },
     expectNewBlockCallout() {
