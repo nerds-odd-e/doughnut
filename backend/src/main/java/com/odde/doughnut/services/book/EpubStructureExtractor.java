@@ -40,7 +40,12 @@ final class EpubStructureExtractor {
 
   record EpubLayoutBlock(String title, int depth, List<Map<String, Object>> contentPayloads) {}
 
-  private record NavRow(String title, int depth, String spineZipPath, String fragmentId) {}
+  private record NavRow(
+      String title,
+      int depth,
+      String spineZipPath,
+      String fragmentId,
+      Integer startPreorderIfNoFragment) {}
 
   private record SectionStart(int navIndex, int startPreorder) {}
 
@@ -51,10 +56,61 @@ final class EpubStructureExtractor {
     if (ctx == null) {
       return List.of();
     }
+    List<String> spineXhtmlPaths = spineXhtmlPaths(ctx);
+
+    List<NavRow> navRows = new ArrayList<>();
     String navHref = findNavManifestHref(ctx.packageEl());
-    if (navHref == null) {
+    if (navHref != null) {
+      navRows.addAll(navRowsFromNavDocument(epubBytes, ctx, navHref));
+    }
+    if (navRows.isEmpty()) {
+      navRows = navRowsFromHeadings(epubBytes, spineXhtmlPaths);
+    }
+    assertNavDepthWithinLimit(navRows);
+
+    if (navRows.isEmpty()) {
       return List.of();
     }
+
+    List<List<Map<String, Object>>> perBlock = new ArrayList<>();
+    for (int i = 0; i < navRows.size(); i++) {
+      perBlock.add(new ArrayList<>());
+    }
+    List<Map<String, Object>> orphans = new ArrayList<>();
+
+    for (String spinePath : spineXhtmlPaths) {
+      extractContentForSpineFile(epubBytes, spinePath, navRows, perBlock, orphans);
+    }
+
+    List<EpubLayoutBlock> out = new ArrayList<>();
+    if (!orphans.isEmpty()) {
+      List<Map<String, Object>> beginningPayloads = new ArrayList<>();
+      beginningPayloads.add(beginningAnchorPayload(orphans.getFirst()));
+      beginningPayloads.addAll(orphans);
+      out.add(new EpubLayoutBlock("*beginning*", 0, List.copyOf(beginningPayloads)));
+    }
+    for (int i = 0; i < navRows.size(); i++) {
+      NavRow row = navRows.get(i);
+      out.add(new EpubLayoutBlock(row.title(), row.depth(), List.copyOf(perBlock.get(i))));
+    }
+    return out;
+  }
+
+  private static void assertNavDepthWithinLimit(List<NavRow> navRows) {
+    for (NavRow row : navRows) {
+      if (row.depth() > BookReadingWireConstants.MAX_LAYOUT_DEPTH) {
+        throw new ApiException(
+            "EPUB table of contents exceeds maximum depth of "
+                + BookReadingWireConstants.MAX_LAYOUT_DEPTH,
+            ApiError.ErrorType.BINDING_ERROR,
+            "EPUB table of contents exceeds maximum depth of "
+                + BookReadingWireConstants.MAX_LAYOUT_DEPTH);
+      }
+    }
+  }
+
+  private static List<NavRow> navRowsFromNavDocument(
+      byte[] epubBytes, OpfContext ctx, String navHref) {
     String navZipPath = resolveAgainstOpf(ctx.opfEntryName(), navHref);
     byte[] navBytes;
     try {
@@ -84,33 +140,99 @@ final class EpubStructureExtractor {
     }
     List<NavRow> navRows = new ArrayList<>();
     walkOl(rootOl, 0, navZipPath, navRows);
-    for (NavRow row : navRows) {
-      if (row.depth() > BookReadingWireConstants.MAX_LAYOUT_DEPTH) {
-        throw new ApiException(
-            "EPUB table of contents exceeds maximum depth of "
-                + BookReadingWireConstants.MAX_LAYOUT_DEPTH,
-            ApiError.ErrorType.BINDING_ERROR,
-            "EPUB table of contents exceeds maximum depth of "
-                + BookReadingWireConstants.MAX_LAYOUT_DEPTH);
+    return navRows;
+  }
+
+  private static List<NavRow> navRowsFromHeadings(byte[] epubBytes, List<String> spineXhtmlPaths) {
+    List<NavRow> out = new ArrayList<>();
+    for (String spinePath : spineXhtmlPaths) {
+      Element body = loadBody(epubBytes, spinePath);
+      if (body == null) {
+        continue;
+      }
+      IdentityHashMap<Element, Integer> preorder = new IdentityHashMap<>();
+      int[] counter = {0};
+      assignPreorder(body, counter, preorder);
+      List<Integer> levelStack = new ArrayList<>();
+      NodeList children = body.getChildNodes();
+      for (int i = 0; i < children.getLength(); i++) {
+        Node n = children.item(i);
+        if (n instanceof Element child) {
+          walkElementForHeadings(child, spinePath, levelStack, out, preorder);
+        }
       }
     }
-
-    List<String> spineXhtmlPaths = spineXhtmlPaths(ctx);
-    List<List<Map<String, Object>>> perBlock = new ArrayList<>();
-    for (int i = 0; i < navRows.size(); i++) {
-      perBlock.add(new ArrayList<>());
-    }
-
-    for (String spinePath : spineXhtmlPaths) {
-      extractContentForSpineFile(epubBytes, spinePath, navRows, perBlock);
-    }
-
-    List<EpubLayoutBlock> out = new ArrayList<>(navRows.size());
-    for (int i = 0; i < navRows.size(); i++) {
-      NavRow row = navRows.get(i);
-      out.add(new EpubLayoutBlock(row.title(), row.depth(), List.copyOf(perBlock.get(i))));
-    }
     return out;
+  }
+
+  private static Element loadBody(byte[] epubBytes, String spineZipPath) {
+    byte[] xhtmlBytes;
+    try {
+      xhtmlBytes = readEntryBytes(epubBytes, spineZipPath, MAX_SPINE_XHTML_BYTES);
+    } catch (IOException e) {
+      throw readError();
+    }
+    if (xhtmlBytes == null) {
+      return null;
+    }
+    try {
+      Document doc = parseXmlSecure(xhtmlBytes);
+      return findBody(doc);
+    } catch (ParserConfigurationException | SAXException | IOException e) {
+      return null;
+    }
+  }
+
+  private static boolean isHeadingTag(String localName) {
+    if (localName == null || localName.length() != 2 || localName.charAt(0) != 'h') {
+      return false;
+    }
+    char c = localName.charAt(1);
+    return c >= '1' && c <= '6';
+  }
+
+  private static int headingLevel(String localName) {
+    return localName.charAt(1) - '0';
+  }
+
+  private static void walkElementForHeadings(
+      Element el,
+      String spineZipPath,
+      List<Integer> levelStack,
+      List<NavRow> out,
+      IdentityHashMap<Element, Integer> preorder) {
+    String local = el.getLocalName();
+    if (isHeadingTag(local)) {
+      int level = headingLevel(local);
+      while (!levelStack.isEmpty() && levelStack.getLast() >= level) {
+        levelStack.removeLast();
+      }
+      levelStack.add(level);
+      int depth = levelStack.size() - 1;
+      String title = textContent(el);
+      if (!title.isBlank()) {
+        String id = el.getAttribute("id");
+        String frag = (id != null && !id.isBlank()) ? id.trim() : null;
+        Integer startIfNoFrag = frag == null ? preorder.get(el) : null;
+        out.add(new NavRow(title.trim(), depth, spineZipPath, frag, startIfNoFrag));
+      }
+    }
+    NodeList children = el.getChildNodes();
+    for (int i = 0; i < children.getLength(); i++) {
+      Node n = children.item(i);
+      if (n instanceof Element child) {
+        walkElementForHeadings(child, spineZipPath, levelStack, out, preorder);
+      }
+    }
+  }
+
+  private static Map<String, Object> beginningAnchorPayload(Map<String, Object> firstOrphan) {
+    Map<String, Object> m = new LinkedHashMap<>();
+    m.put("type", "beginning_anchor");
+    m.put("kind", "beginning");
+    m.put("href", firstOrphan.get("href"));
+    m.put("fragment", firstOrphan.get("fragment"));
+    return m;
   }
 
   private record OpfContext(String opfEntryName, Element packageEl) {}
@@ -248,7 +370,8 @@ final class EpubStructureExtractor {
       byte[] epubBytes,
       String spineZipPath,
       List<NavRow> navRows,
-      List<List<Map<String, Object>>> perBlock) {
+      List<List<Map<String, Object>>> perBlock,
+      List<Map<String, Object>> orphans) {
     List<Integer> targeting = new ArrayList<>();
     for (int i = 0; i < navRows.size(); i++) {
       if (spineZipPath.equals(navRows.get(i).spineZipPath())) {
@@ -286,9 +409,10 @@ final class EpubStructureExtractor {
       NavRow row = navRows.get(navIdx);
       String frag = row.fragmentId();
       if (frag == null || frag.isEmpty()) {
-        sections.add(new SectionStart(navIdx, DOC_START_PREORDER));
+        Integer start = row.startPreorderIfNoFragment();
+        sections.add(new SectionStart(navIdx, start != null ? start : DOC_START_PREORDER));
       } else {
-        Element targetEl = doc.getElementById(frag);
+        Element targetEl = findElementByIdAttr(doc, frag);
         if (targetEl == null) {
           sections.add(new SectionStart(navIdx, DOC_START_PREORDER));
         } else {
@@ -301,7 +425,41 @@ final class EpubStructureExtractor {
         Comparator.comparingInt(SectionStart::startPreorder)
             .thenComparingInt(SectionStart::navIndex));
 
-    emitContentUnderBody(body, spineZipPath, preorder, sections, perBlock);
+    emitContentUnderBody(body, spineZipPath, preorder, sections, perBlock, orphans);
+  }
+
+  /**
+   * XHTML in EPUB often has no DTD declaring {@code id} as type ID, so {@link
+   * Document#getElementById} may return null; fall back to scanning {@code id} attributes.
+   */
+  private static Element findElementByIdAttr(Document doc, String id) {
+    if (id == null || id.isBlank()) {
+      return null;
+    }
+    Element dom = doc.getElementById(id);
+    if (dom != null) {
+      return dom;
+    }
+    Element root = doc.getDocumentElement();
+    return root == null ? null : findElementByIdAttrDepthFirst(root, id);
+  }
+
+  private static Element findElementByIdAttrDepthFirst(Element el, String id) {
+    String a = el.getAttribute("id");
+    if (id.equals(a != null ? a : "")) {
+      return el;
+    }
+    NodeList children = el.getChildNodes();
+    for (int i = 0; i < children.getLength(); i++) {
+      Node n = children.item(i);
+      if (n instanceof Element child) {
+        Element found = findElementByIdAttrDepthFirst(child, id);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   private static Element findBody(Document doc) {
@@ -332,12 +490,13 @@ final class EpubStructureExtractor {
       String spineZipPath,
       IdentityHashMap<Element, Integer> preorder,
       List<SectionStart> sections,
-      List<List<Map<String, Object>>> perBlock) {
+      List<List<Map<String, Object>>> perBlock,
+      List<Map<String, Object>> orphans) {
     NodeList children = body.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (n instanceof Element child) {
-        emitFromElement(child, spineZipPath, preorder, sections, perBlock);
+        emitFromElement(child, spineZipPath, preorder, sections, perBlock, orphans);
       }
     }
   }
@@ -347,25 +506,26 @@ final class EpubStructureExtractor {
       String spineZipPath,
       IdentityHashMap<Element, Integer> preorder,
       List<SectionStart> sections,
-      List<List<Map<String, Object>>> perBlock) {
+      List<List<Map<String, Object>>> perBlock,
+      List<Map<String, Object>> orphans) {
     String local = el.getLocalName();
     if ("p".equals(local)) {
-      emitParagraphIfNonEmpty(el, spineZipPath, preorder, sections, perBlock);
+      emitParagraphIfNonEmpty(el, spineZipPath, preorder, sections, perBlock, orphans);
       return;
     }
     if ("img".equals(local)) {
-      emitImage(el, spineZipPath, preorder, sections, perBlock);
+      emitImage(el, spineZipPath, preorder, sections, perBlock, orphans);
       return;
     }
     if ("table".equals(local)) {
-      emitTable(el, spineZipPath, preorder, sections, perBlock);
+      emitTable(el, spineZipPath, preorder, sections, perBlock, orphans);
       return;
     }
     NodeList children = el.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (n instanceof Element child) {
-        emitFromElement(child, spineZipPath, preorder, sections, perBlock);
+        emitFromElement(child, spineZipPath, preorder, sections, perBlock, orphans);
       }
     }
   }
@@ -375,14 +535,15 @@ final class EpubStructureExtractor {
       String spineZipPath,
       IdentityHashMap<Element, Integer> preorder,
       List<SectionStart> sections,
-      List<List<Map<String, Object>>> perBlock) {
+      List<List<Map<String, Object>>> perBlock,
+      List<Map<String, Object>> orphans) {
     String text = p.getTextContent() != null ? p.getTextContent().trim() : "";
     if (text.isEmpty()) {
       NodeList children = p.getChildNodes();
       for (int i = 0; i < children.getLength(); i++) {
         Node n = children.item(i);
         if (n instanceof Element child) {
-          emitFromElement(child, spineZipPath, preorder, sections, perBlock);
+          emitFromElement(child, spineZipPath, preorder, sections, perBlock, orphans);
         }
       }
       return;
@@ -393,6 +554,7 @@ final class EpubStructureExtractor {
     }
     int owner = ownerNavIndex(po, sections);
     if (owner < 0) {
+      orphans.add(contentMap("text", spineZipPath, fragmentFor(p), text, null, null));
       return;
     }
     perBlock.get(owner).add(contentMap("text", spineZipPath, fragmentFor(p), text, null, null));
@@ -400,7 +562,7 @@ final class EpubStructureExtractor {
     for (int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (n instanceof Element child) {
-        emitFromElement(child, spineZipPath, preorder, sections, perBlock);
+        emitFromElement(child, spineZipPath, preorder, sections, perBlock, orphans);
       }
     }
   }
@@ -410,13 +572,20 @@ final class EpubStructureExtractor {
       String spineZipPath,
       IdentityHashMap<Element, Integer> preorder,
       List<SectionStart> sections,
-      List<List<Map<String, Object>>> perBlock) {
+      List<List<Map<String, Object>>> perBlock,
+      List<Map<String, Object>> orphans) {
     Integer po = preorder.get(img);
     if (po == null) {
       return;
     }
     int owner = ownerNavIndex(po, sections);
     if (owner < 0) {
+      String srcOrphan = img.getAttribute("src");
+      if (srcOrphan == null) {
+        srcOrphan = "";
+      }
+      orphans.add(
+          contentMap("image", spineZipPath, fragmentFor(img), null, srcOrphan.trim(), null));
       return;
     }
     String src = img.getAttribute("src");
@@ -433,16 +602,18 @@ final class EpubStructureExtractor {
       String spineZipPath,
       IdentityHashMap<Element, Integer> preorder,
       List<SectionStart> sections,
-      List<List<Map<String, Object>>> perBlock) {
+      List<List<Map<String, Object>>> perBlock,
+      List<Map<String, Object>> orphans) {
     Integer po = preorder.get(table);
     if (po == null) {
       return;
     }
     int owner = ownerNavIndex(po, sections);
+    String text = table.getTextContent() != null ? table.getTextContent().trim() : "";
     if (owner < 0) {
+      orphans.add(contentMap("table", spineZipPath, fragmentFor(table), null, null, text));
       return;
     }
-    String text = table.getTextContent() != null ? table.getTextContent().trim() : "";
     perBlock
         .get(owner)
         .add(contentMap("table", spineZipPath, fragmentFor(table), null, null, text));
@@ -595,7 +766,7 @@ final class EpubStructureExtractor {
     if (title.isBlank()) {
       return null;
     }
-    return new NavRow(title.trim(), depth, spineZip, frag);
+    return new NavRow(title.trim(), depth, spineZip, frag, null);
   }
 
   private static Element findTocNavElement(Document doc) {
