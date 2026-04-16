@@ -109,7 +109,7 @@ public class BookService {
     }
     String ref = bookStorage.put(fileBytes, request.getFormat());
     if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
-      return persistNewEpubBook(notebook, request, ref);
+      return persistNewEpubBook(notebook, request, ref, fileBytes);
     }
     return persistNewPdfBook(notebook, request, ref);
   }
@@ -124,7 +124,7 @@ public class BookService {
   }
 
   private Book persistNewEpubBook(
-      Notebook notebook, AttachBookRequest request, String sourceFileRef) {
+      Notebook notebook, AttachBookRequest request, String sourceFileRef, byte[] epubBytes) {
     var book = new Book();
     book.setNotebook(notebook);
     book.setBookName(trimmedMax(request.getBookName(), 512));
@@ -133,6 +133,18 @@ public class BookService {
     var now = testabilitySettings.getCurrentUTCTimestamp();
     book.setCreatedAt(now);
     book.setUpdatedAt(now);
+
+    List<EpubStructureExtractor.NavOutlineEntry> outline =
+        EpubStructureExtractor.extractNavOutline(epubBytes);
+    for (int i = 0; i < outline.size(); i++) {
+      EpubStructureExtractor.NavOutlineEntry e = outline.get(i);
+      BookBlock block = new BookBlock();
+      block.setStructuralTitle(trimmedMax(e.title(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
+      block.setDepth(e.depth());
+      block.setLayoutSequence(i);
+      book.addBlock(block);
+    }
+
     entityPersister.save(book);
     entityPersister.flush();
     return book;

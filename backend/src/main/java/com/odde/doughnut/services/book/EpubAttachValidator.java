@@ -1,18 +1,23 @@
 package com.odde.doughnut.services.book;
 
+import static com.odde.doughnut.services.book.EpubPackageIo.MAX_CONTAINER_BYTES;
+import static com.odde.doughnut.services.book.EpubPackageIo.MAX_OPF_BYTES;
+import static com.odde.doughnut.services.book.EpubPackageIo.NS_OPF;
+import static com.odde.doughnut.services.book.EpubPackageIo.drain;
+import static com.odde.doughnut.services.book.EpubPackageIo.normalizeEntryName;
+import static com.odde.doughnut.services.book.EpubPackageIo.parseContainerRootfileFullPath;
+import static com.odde.doughnut.services.book.EpubPackageIo.parseXmlSecure;
+import static com.odde.doughnut.services.book.EpubPackageIo.readEntryBytes;
+
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.exceptions.ApiException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,11 +26,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 final class EpubAttachValidator {
-
-  private static final String NS_CONTAINER = "urn:oasis:names:tc:opendocument:xmlns:container";
-  private static final String NS_OPF = "http://www.idpf.org/2007/opf";
-  private static final int MAX_CONTAINER_BYTES = 256 * 1024;
-  private static final int MAX_OPF_BYTES = 5 * 1024 * 1024;
 
   private EpubAttachValidator() {}
 
@@ -128,75 +128,6 @@ final class EpubAttachValidator {
     return false;
   }
 
-  private static byte[] readEntryBytes(byte[] bytes, String entryPath, int maxBytes)
-      throws IOException {
-    String target = normalizeEntryName(entryPath);
-    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes))) {
-      ZipEntry entry;
-      while ((entry = zis.getNextEntry()) != null) {
-        if (entry.isDirectory()) {
-          zis.closeEntry();
-          continue;
-        }
-        String name = normalizeEntryName(entry.getName());
-        if (target.equals(name)) {
-          byte[] content = zis.readNBytes(maxBytes + 1);
-          zis.closeEntry();
-          if (content.length > maxBytes) {
-            throw new ApiException(
-                "EPUB metadata file is too large",
-                ApiError.ErrorType.BINDING_ERROR,
-                "EPUB metadata file is too large");
-          }
-          return content;
-        }
-        drain(zis);
-        zis.closeEntry();
-      }
-    }
-    return null;
-  }
-
-  private static void drain(InputStream in) throws IOException {
-    in.transferTo(OutputStream.nullOutputStream());
-  }
-
-  private static String normalizeEntryName(String raw) {
-    if (raw == null) {
-      return "";
-    }
-    return raw.replace('\\', '/');
-  }
-
-  private static String parseContainerRootfileFullPath(byte[] containerXml) {
-    try {
-      Document doc = parseXmlSecure(containerXml);
-      Element root = doc.getDocumentElement();
-      if (root == null) {
-        return null;
-      }
-      NodeList rootfiles = root.getElementsByTagNameNS(NS_CONTAINER, "rootfile");
-      if (rootfiles.getLength() == 0) {
-        rootfiles = doc.getElementsByTagName("rootfile");
-      }
-      for (int i = 0; i < rootfiles.getLength(); i++) {
-        Node n = rootfiles.item(i);
-        if (n instanceof Element el) {
-          String fullPath = el.getAttribute("full-path");
-          if (fullPath != null && !fullPath.isBlank()) {
-            return fullPath.trim();
-          }
-        }
-      }
-      return null;
-    } catch (ParserConfigurationException | SAXException | IOException e) {
-      throw new ApiException(
-          "EPUB META-INF/container.xml is invalid or unreadable",
-          ApiError.ErrorType.BINDING_ERROR,
-          "EPUB META-INF/container.xml is invalid or unreadable");
-    }
-  }
-
   private static void validateOpfPackage(byte[] opfBytes) {
     try {
       Document doc = parseXmlSecure(opfBytes);
@@ -244,18 +175,5 @@ final class EpubAttachValidator {
         "EPUB package document is invalid or unreadable",
         ApiError.ErrorType.BINDING_ERROR,
         "EPUB package document is invalid or unreadable");
-  }
-
-  private static Document parseXmlSecure(byte[] xml)
-      throws ParserConfigurationException, SAXException, IOException {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    dbf.setNamespaceAware(true);
-    dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-    dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-    dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-    dbf.setXIncludeAware(false);
-    dbf.setExpandEntityReferences(false);
-    return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(xml));
   }
 }
