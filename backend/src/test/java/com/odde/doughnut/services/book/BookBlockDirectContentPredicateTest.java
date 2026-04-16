@@ -71,6 +71,46 @@ class BookBlockDirectContentPredicateTest {
             new BlockSpec(
                 "text",
                 "{\"type\":\"text\",\"text_level\":2,\"text\":\"2.1 A heading\",\"page_idx\":0}"),
+            false),
+        Arguments.of(
+            "EPUB paragraph (href + fragment)",
+            new BlockSpec(
+                "text",
+                "{\"type\":\"text\",\"href\":\"OEBPS/ch.xhtml\",\"fragment\":\"#p1\",\"text\":\"body\"}"),
+            true),
+        Arguments.of(
+            "EPUB text aside (epub_semantic note)",
+            new BlockSpec(
+                "text",
+                "{\"type\":\"text\",\"href\":\"OEBPS/ch.xhtml\",\"fragment\":\"#n1\","
+                    + "\"text\":\"fn\",\"epub_semantic\":\"note\"}"),
+            false),
+        Arguments.of(
+            "EPUB text aside (epub_semantic sidebar)",
+            new BlockSpec(
+                "text",
+                "{\"type\":\"text\",\"href\":\"OEBPS/ch.xhtml\",\"fragment\":\"#s1\","
+                    + "\"text\":\"aside\",\"epub_semantic\":\"sidebar\"}"),
+            false),
+        Arguments.of(
+            "EPUB image aside (epub_semantic sidebar)",
+            new BlockSpec(
+                "image",
+                "{\"type\":\"image\",\"href\":\"OEBPS/ch.xhtml\",\"fragment\":\"#i1\","
+                    + "\"src\":\"fig.png\",\"epub_semantic\":\"sidebar\"}"),
+            false),
+        Arguments.of(
+            "EPUB type note",
+            new BlockSpec(
+                "note",
+                "{\"type\":\"note\",\"href\":\"OEBPS/ch.xhtml\",\"fragment\":\"#n1\",\"text\":\"n\"}"),
+            false),
+        Arguments.of(
+            "EPUB type sidebar",
+            new BlockSpec(
+                "sidebar",
+                "{\"type\":\"sidebar\",\"href\":\"OEBPS/ch.xhtml\",\"fragment\":\"#s1\","
+                    + "\"text\":\"s\"}"),
             false));
   }
 
