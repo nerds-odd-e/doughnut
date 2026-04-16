@@ -106,7 +106,9 @@ The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/d
 
 **Scripts:** **`pnpm local:lb`** — static from **`frontend/dist`** + Spring **9081** (no Vite). **`pnpm local:lb:vite`** — same LB with **`LOCAL_LB_VITE_UPSTREAM=http://127.0.0.1:5174`** for UI + HMR (**`frontend/vite.config.ts`** `server.port`). **CI** and **`pnpm test`** use **`local:lb`**; **`pnpm sut`** uses **`local:lb:vite`** + **`frontend:sut`**. Build static first when needed: **`pnpm frontend:build`** or **`pnpm bundle:all`**. **`/doughnut-cli-latest/doughnut`** is served from **`cli/dist/doughnut-cli.bundle.mjs`** (**`pnpm cli:bundle`** — **`pnpm sut`** / **`pnpm test`** run this after install). Full env list: header on **`scripts/local-lb.mjs`** (`LOCAL_LB_STATIC_ROOT`, `LOCAL_LB_BACKEND`, `LOCAL_LB_VITE_UPSTREAM`, `LOCAL_LB_LISTEN_PORT`, `LOCAL_LB_ROUTING_JSON`).
 
-**Verify the stack:** **`pnpm sut:healthcheck`**. If unhealthy or stray processes: **`pnpm sut:restart`** or start **`pnpm sut`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**.
+**Starting the stack:** **`pnpm sut`** starts all services in the background, waits until healthy (up to 120 s, configurable via `SUT_TIMEOUT_MS`), then exits 0. On failure it exits 1 with diagnostics and a tail of **`sut.log`** (repo root, gitignored). **`pnpm sut:restart`** kills listeners on 5173/5174/9081, then runs **`pnpm sut`**.
+
+**Verify the stack:** **`pnpm sut:healthcheck`**. With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** / **`… sut:restart`** — see **`CLAUDE.md`**.
 
 ## 7. Book PDF storage (GCS, prod)
 

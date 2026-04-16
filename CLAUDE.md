@@ -16,10 +16,15 @@ Doughnut is a Personal Knowledge Management (PKM) tool combining zettelkasten-st
 pnpm sut
 ```
 
-This starts all services with auto-reload:
-- Backend (Spring Boot with Gradle continuous build)
-- **Local LB** on **5173** (`pnpm local:lb:vite` inside `sut`) proxying to Vite on **5174** and Spring on **9081** — browser **http://localhost:5173** (ports, env, readiness: `docs/gcp/prod_env.md` Local dev / Cypress)
-- Mountebank (mock external services)
+This installs dependencies, bundles the CLI, starts all services **in the background**, waits until they are healthy, then **exits with code 0**. If any service fails to start within the timeout (default 120 s) the command exits with code 1 and prints diagnostics to stderr plus a tail of `sut.log`.
+
+Services started:
+- Backend (Spring Boot with Gradle continuous build on port **9081**)
+- **Local LB** on **5173** proxying to Vite on **5174** and Spring — browser **http://localhost:5173**
+- Mountebank (mock external services on **2525**)
+- Vite dev server on **5174**
+
+Service output is appended to **`sut.log`** (repo root, gitignored). The process-group ID is written to **`sut.pid`** (gitignored) so `pnpm sut:restart` can stop the group.
 
 **DO NOT restart services after code changes** - they auto-reload.
 
@@ -79,7 +84,7 @@ process-compose -f process-compose.yaml up -D redis
 ### Unsure if SUT is running?
 
 1. Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`** (agents and developers outside an active `nix develop` shell).
-2. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** in a terminal if nothing was listening.
+2. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`** or **`CURSOR_DEV=true nix develop -c pnpm sut`** to start fresh.
 3. Do **not** restart `pnpm sut` after normal code edits — services auto-reload (see above).
 
 **Cloud VM** (no Nix): run **`pnpm sut:healthcheck`** and **`pnpm sut:restart`** from the repo root; **`sut:restart`** needs **`lsof`** on `PATH`. See the `cloud-vm-setup` skill.
@@ -97,9 +102,9 @@ CURSOR_DEV=true nix develop -c <command>
 
 | Task | Command |
 |------|---------|
-| Start all services | `pnpm sut` |
+| Start services (background; exits 0 when healthy) | `pnpm sut` |
 | Check SUT (ports + LB readiness) | `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck` |
-| Stop stray listeners on 5173/5174/9081 and start SUT again | `CURSOR_DEV=true nix develop -c pnpm sut:restart` |
+| Stop stray listeners on 5173/5174/9081 and restart SUT | `CURSOR_DEV=true nix develop -c pnpm sut:restart` |
 | Local LB only (static + backend, no Vite) | `pnpm local:lb` |
 | Local LB with Vite upstream (as in `pnpm sut`) | `pnpm local:lb:vite` |
 | Run backend tests | `pnpm backend:verify` |

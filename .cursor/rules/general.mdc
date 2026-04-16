@@ -25,10 +25,13 @@ CURSOR_DEV=true nix develop -c <command>
 pnpm sut
 ```
 
-This command starts:
+This command installs dependencies, bundles the CLI, starts all services **in the background**, waits until they are healthy, then **exits with code 0** (or exits 1 with diagnostics on failure). Service output is appended to **`sut.log`** (repo root, gitignored).
+
+Services started:
 
 - Backend (with auto-reload on Java code changes via Gradle continuous build)
-- Frontend (with hot module replacement on Vue code changes)
+- Frontend Vite dev server (with hot module replacement on Vue code changes)
+- Local LB on **5173** proxying to Vite and backend
 - Mountebank (mock external services)
 
 **CRITICAL: All services automatically restart/reload when code changes are made.**
@@ -39,9 +42,9 @@ This command starts:
 - Frontend: Uses Vite with Hot Module Replacement (HMR) for instant Vue component updates
 - Developers should NEVER need to manually restart services during development
 
-**If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first. But once running, DO NOT suggest restarting after code changes.
+**If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` (it will return once healthy). But once running, DO NOT suggest restarting after code changes.
 
-**Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`**, or start **`pnpm sut`** if nothing was listening. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see the `cloud-vm-setup` skill.
+**Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`** or **`CURSOR_DEV=true nix develop -c pnpm sut`**. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see the `cloud-vm-setup` skill.
 
 ## Local MySQL and Redis (nix shell hook and process-compose)
 

@@ -146,3 +146,7 @@ frontend/vitest-test-results/
 frontend/.vitest-attachments/
 
 tt/
+
+# SUT background process artifacts
+sut.log
+sut.pid
