@@ -154,12 +154,12 @@ jobs:
             e2e_test/features/n*/**
           - |
             e2e_test/features/r*/**
+            e2e_test/features/w*/**
           - |
             e2e_test/features/t*/**
             e2e_test/features/u*/**
           - |
             e2e_test/features/c*/**
-            e2e_test/features/w*/**
     steps:
       - uses: actions/checkout@v6
       - uses: docker/login-action@v3
