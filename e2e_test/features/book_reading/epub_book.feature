@@ -8,9 +8,11 @@ Feature: EPUB book
     When I open the reading view for the attached book "epub_valid_minimal"
     Then I should see the EPUB reading view with book name "epub_valid_minimal"
     And I should see the book layout in the browser:
-      | 0 | Part One        |
-      | 1 | Chapter Alpha   |
-      | 0 | Chapter Beta    |
+      | 0 | Part One          |
+      | 1 | Chapter Alpha     |
+      | 0 | Chapter Beta      |
+      | 1 | Section Beta-One  |
+      | 1 | Section Beta-Two  |
 
   Scenario: Read EPUB content and navigate to a chapter
     Given I am logged in as an existing user

@@ -374,7 +374,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(created.getBookName(), equalTo("Minimal EPUB"));
       assertThat(created.getSourceFileRef(), notNullValue());
       assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
-      assertThat(created.getBlocks(), hasSize(3));
+      assertThat(created.getBlocks(), hasSize(5));
       List<BookBlock> createdPreorder = blocksByLayoutOrder(created);
       assertThat(createdPreorder.get(0).getStructuralTitle(), equalTo("Part One"));
       assertThat(createdPreorder.get(0).getDepth(), equalTo(0));
@@ -382,10 +382,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(createdPreorder.get(1).getDepth(), equalTo(1));
       assertThat(createdPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
       assertThat(createdPreorder.get(2).getDepth(), equalTo(0));
+      assertThat(createdPreorder.get(3).getStructuralTitle(), equalTo("Section Beta-One"));
+      assertThat(createdPreorder.get(3).getDepth(), equalTo(1));
+      assertThat(createdPreorder.get(4).getStructuralTitle(), equalTo("Section Beta-Two"));
+      assertThat(createdPreorder.get(4).getDepth(), equalTo(1));
 
       Book detail = controller.getBook(nb);
       assertThat(detail.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
-      assertThat(detail.getBlocks(), hasSize(3));
+      assertThat(detail.getBlocks(), hasSize(5));
       List<BookBlock> detailPreorder = blocksByLayoutOrder(detail);
       assertThat(detailPreorder.get(0).getStructuralTitle(), equalTo("Part One"));
       assertThat(detailPreorder.get(0).getDepth(), equalTo(0));
@@ -393,6 +397,10 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(detailPreorder.get(1).getDepth(), equalTo(1));
       assertThat(detailPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
       assertThat(detailPreorder.get(2).getDepth(), equalTo(0));
+      assertThat(detailPreorder.get(3).getStructuralTitle(), equalTo("Section Beta-One"));
+      assertThat(detailPreorder.get(3).getDepth(), equalTo(1));
+      assertThat(detailPreorder.get(4).getStructuralTitle(), equalTo("Section Beta-Two"));
+      assertThat(detailPreorder.get(4).getDepth(), equalTo(1));
 
       BookBlock partOne = detailPreorder.get(0);
       assertThat(partOne.getEpubStartHref(), equalTo("OEBPS/chapter1.xhtml"));
@@ -429,6 +437,28 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(betaTableRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
       assertThat(betaTableRaw.get("fragment").asText(), equalTo("#beta-table"));
       assertThat(betaTableRaw.get("text").asText(), equalTo("Cell One"));
+
+      BookBlock sectionBetaOne = detailPreorder.get(3);
+      assertThat(sectionBetaOne.getEpubStartHref(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(sectionBetaOne.getContentBlocks(), hasSize(1));
+      assertThat(sectionBetaOne.getContentBlocks().getFirst().getType(), equalTo("text"));
+      JsonNode sectionBetaOneRaw =
+          objectMapper.readTree(sectionBetaOne.getContentBlocks().getFirst().getRawData());
+      assertThat(sectionBetaOneRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(sectionBetaOneRaw.get("fragment").asText(), equalTo(""));
+      assertThat(
+          sectionBetaOneRaw.get("text").asText(), equalTo("Unique content in section beta-one."));
+
+      BookBlock sectionBetaTwo = detailPreorder.get(4);
+      assertThat(sectionBetaTwo.getEpubStartHref(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(sectionBetaTwo.getContentBlocks(), hasSize(1));
+      assertThat(sectionBetaTwo.getContentBlocks().getFirst().getType(), equalTo("text"));
+      JsonNode sectionBetaTwoRaw =
+          objectMapper.readTree(sectionBetaTwo.getContentBlocks().getFirst().getRawData());
+      assertThat(sectionBetaTwoRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(sectionBetaTwoRaw.get("fragment").asText(), equalTo(""));
+      assertThat(
+          sectionBetaTwoRaw.get("text").asText(), equalTo("Unique content in section beta-two."));
     }
 
     @Test
