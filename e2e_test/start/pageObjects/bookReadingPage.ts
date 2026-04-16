@@ -158,6 +158,17 @@ const bookReadingPage = () => {
       bookBlockRowByTitle(title).click()
       return this
     },
+    expectBookLayoutBlockEpubStartHrefContains(
+      title: string,
+      substring: string
+    ) {
+      pageIsNotLoading()
+      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      bookBlockRowByTitle(title)
+        .invoke('attr', 'data-epub-start-href')
+        .should('include', substring)
+      return this
+    },
     expectBookBlockIsCurrentSelectionByTitle(title: string) {
       pageIsNotLoading()
       bookBlockRowByTitle(title).should(

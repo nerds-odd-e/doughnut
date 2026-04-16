@@ -67,6 +67,7 @@
             'book-reading-book-block--pending':
               block.id === pendingLayoutBlockId,
           }"
+          :data-epub-start-href="block.epubStartHref"
           :data-book-block-depth="block.depth"
           :data-current-block="
             block.id === currentBlockId ? 'true' : undefined

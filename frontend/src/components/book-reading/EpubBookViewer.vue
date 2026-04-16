@@ -33,7 +33,10 @@ async function displaySpineHref(href: string) {
   await rendition.display(h).catch(() => undefined)
 }
 
-defineExpose({ displaySpineHref })
+defineExpose({
+  displaySpineHref,
+  getRenditionHost: () => renditionHostRef.value,
+})
 
 function destroyEpub() {
   rendition?.destroy()

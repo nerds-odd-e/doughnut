@@ -24,13 +24,13 @@ Feature: EPUB book
     When I click "Chapter Beta" in the book layout
     Then I should see the text "Cell One" in the EPUB reader
 
-  @wip
   Scenario: Navigate precisely to a sub-section within an EPUB chapter
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Precise Nav Notebook"
     When I open the notebook settings for "EPUB Precise Nav Notebook"
     And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
     When I open the reading view for the attached book "epub_valid_minimal"
+    Then the book layout block "Section Beta-Two" should have epub start href containing "#section-beta-two"
     When I click "Section Beta-Two" in the book layout
     Then I should see the text "Unique content in section beta-two." in the EPUB reader
 

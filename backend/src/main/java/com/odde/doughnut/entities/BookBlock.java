@@ -85,8 +85,8 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonView(BookViews.Full.class)
   @Schema(
       description =
-          "EPUB-only spine document href for rough layout navigation; null for PDF or when"
-              + " unavailable.")
+          "EPUB-only block-start locator for layout navigation: spine XHTML path, optionally with"
+              + " #fragment for a subsection anchor. Null for PDF or when unavailable.")
   public String getEpubStartHref() {
     if (book == null || !BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
       return null;
@@ -104,7 +104,17 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
         return null;
       }
       String href = n.get("href").asText();
-      return href.isBlank() ? null : href;
+      if (href.isBlank()) {
+        return null;
+      }
+      if (!n.has("fragment") || !n.get("fragment").isTextual()) {
+        return href;
+      }
+      String fragment = n.get("fragment").asText();
+      if (fragment.isBlank()) {
+        return href;
+      }
+      return href + fragment;
     } catch (Exception e) {
       return null;
     }

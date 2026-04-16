@@ -152,6 +152,17 @@ Then(
 )
 
 Then(
+  'the book layout block {string} should have epub start href containing {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string, substring: string) => {
+    return bookReadingPage().expectBookLayoutBlockEpubStartHrefContains(
+      title,
+      substring
+    )
+  }
+)
+
+Then(
   'I should see an EPUB attach error containing {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (messageSubstring: string) => {

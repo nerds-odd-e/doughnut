@@ -372,7 +372,7 @@ export type BookBlockFull = {
     allBboxes: Array<PageBboxFull>;
     contentBlocks: Array<BookContentBlockFull>;
     /**
-     * EPUB-only spine document href for rough layout navigation; null for PDF or when unavailable.
+     * EPUB-only block-start locator for layout navigation: spine XHTML path, optionally with #fragment for a subsection anchor. Null for PDF or when unavailable.
      */
     epubStartHref?: string;
 };

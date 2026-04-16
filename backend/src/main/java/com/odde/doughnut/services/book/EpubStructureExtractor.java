@@ -426,6 +426,18 @@ final class EpubStructureExtractor {
             .thenComparingInt(SectionStart::navIndex));
 
     emitContentUnderBody(body, spineZipPath, preorder, sections, perBlock, orphans);
+
+    for (int navIdx : targeting) {
+      String fragId = navRows.get(navIdx).fragmentId();
+      if (fragId == null || fragId.isBlank()) {
+        continue;
+      }
+      List<Map<String, Object>> payloads = perBlock.get(navIdx);
+      if (payloads.isEmpty()) {
+        continue;
+      }
+      payloads.getFirst().put("fragment", "#" + fragId.trim());
+    }
   }
 
   /**
