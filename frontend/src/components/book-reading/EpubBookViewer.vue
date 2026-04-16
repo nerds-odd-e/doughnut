@@ -25,7 +25,7 @@ const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
 
-async function displaySpineHref(href: string) {
+async function displayEpubTarget(href: string) {
   const h = href.trim()
   if (!h || !rendition) {
     return
@@ -34,7 +34,7 @@ async function displaySpineHref(href: string) {
 }
 
 defineExpose({
-  displaySpineHref,
+  displayEpubTarget,
   getRenditionHost: () => renditionHostRef.value,
 })
 

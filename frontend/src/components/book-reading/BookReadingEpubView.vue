@@ -50,7 +50,7 @@ import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue"
 
 type EpubViewerExposed = {
-  displaySpineHref: (href: string) => Promise<void>
+  displayEpubTarget: (href: string) => Promise<void>
   getRenditionHost?: () => HTMLElement | null
 }
 
@@ -189,7 +189,7 @@ async function onBookBlockClick(block: BookBlockFull) {
   if (!viewer) {
     return
   }
-  await viewer.displaySpineHref(href)
+  await viewer.displayEpubTarget(href)
   await nextTick()
   await new Promise<void>((r) => setTimeout(r, 150))
   const hash = href.indexOf("#")
