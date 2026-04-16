@@ -338,6 +338,14 @@ When(
 )
 
 When(
+  'I click {string} in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().clickBookLayoutBlockByTitle(title)
+  }
+)
+
+When(
   'I scroll the PDF until the book block {string} is the current block in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (blockTitle: string) => {

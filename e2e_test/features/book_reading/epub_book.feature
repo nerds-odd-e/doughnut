@@ -12,6 +12,7 @@ Feature: EPUB book
       | 1 | Chapter Alpha   |
       | 0 | Chapter Beta    |
 
+  @wip
   Scenario: Read EPUB content and navigate to a chapter
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Reading Notebook"
@@ -19,8 +20,8 @@ Feature: EPUB book
     And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
     When I open the reading view for the attached book "epub_valid_minimal"
     Then I should see the text "Opening paragraph for part one." in the EPUB reader
-    # When I click "Chapter Beta" in the book layout
-    # Then I should see the text "Cell One" in the EPUB reader
+    When I click "Chapter Beta" in the book layout
+    Then I should see the text "Cell One" in the EPUB reader
 
   Scenario: Upload DRM-flagged EPUB shows a clear attach error
     Given I am logged in as an existing user
