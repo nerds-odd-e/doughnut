@@ -47,18 +47,25 @@ const bookReadingPage = () => {
         'contain',
         name
       )
-      cy.get('[data-testid="book-reading-epub-placeholder"]').should(
-        'be.visible'
-      )
+      cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
       return this
     },
+    /** epub.js renders spine XHTML inside iframes; assert text inside the iframe body. */
     expectEpubContentTextVisible(text: string) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
-      cy.get('[data-testid="book-reading-page"] main')
+      cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 })
         .should('be.visible')
-        .and('contain', text)
+        .find('iframe')
+        .first()
+        .should(($iframe) => {
+          const doc = $iframe[0]?.contentDocument
+          expect(
+            doc?.body?.innerText ?? '',
+            'EPUB iframe should contain fixture text'
+          ).to.contain(text)
+        })
       return this
     },
     expectBookLayoutRows(expected: BookLayoutRow[]) {

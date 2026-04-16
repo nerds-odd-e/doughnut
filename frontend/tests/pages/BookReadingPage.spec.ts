@@ -8,6 +8,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import createFetchMock from "vitest-fetch-mock"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
+import epubMinimalUrl from "../../../e2e_test/fixtures/book_reading/epub_valid_minimal.epub?url"
 import topMathsUrl from "../../../e2e_test/fixtures/book_reading/top-maths.pdf?url"
 
 const fetchMock = createFetchMock(vi)
@@ -19,6 +20,7 @@ const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const notebookId = 7
 
 let topMathsPdfBytes!: ArrayBuffer
+let epubMinimalBytes!: ArrayBuffer
 
 function bookFileUrlSuffix(id: number) {
   return `/api/notebooks/${id}/book/file`
@@ -50,6 +52,23 @@ function mockNotebookBookFilePdfOk(
       new Response(pdfBytes.slice(0), {
         status: 200,
         headers: { "Content-Type": "application/pdf" },
+      })
+    )
+  })
+}
+
+function mockNotebookBookFileEpubOk(id: number, epubBytes: ArrayBuffer) {
+  const suffix = bookFileUrlSuffix(id)
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+    const url = fetchRequestUrl(input)
+    if (!url.endsWith(suffix)) {
+      return Promise.reject(new Error(`unexpected fetch: ${url}`))
+    }
+    expect(init?.credentials).toBe("same-origin")
+    return Promise.resolve(
+      new Response(epubBytes.slice(0), {
+        status: 200,
+        headers: { "Content-Type": "application/epub+zip" },
       })
     )
   })
@@ -193,6 +212,8 @@ describe("BookReadingPage", () => {
     fetchMock.disableMocks()
     const res = await fetch(topMathsUrl)
     topMathsPdfBytes = await res.arrayBuffer()
+    const epubRes = await fetch(epubMinimalUrl)
+    epubMinimalBytes = await epubRes.arrayBuffer()
     fetchMock.enableMocks()
     fetchMock.doMock()
   })
@@ -305,7 +326,7 @@ describe("BookReadingPage", () => {
     await waitForPdfViewer(wrapper)
   })
 
-  it("loads EPUB with placeholder and book title in bar, no PDF viewer", async () => {
+  it("loads EPUB into viewer with book title in bar, no PDF viewer", async () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(
         makeMe.aBook
@@ -316,14 +337,15 @@ describe("BookReadingPage", () => {
           .please()
       )
     )
+    mockNotebookBookFileEpubOk(notebookId, epubMinimalBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
     await vi.waitFor(
       () =>
-        expect(
-          wrapper.find('[data-testid="book-reading-epub-placeholder"]').exists()
-        ).toBe(true),
-      { timeout: 5000 }
+        expect(wrapper.find('[data-testid="epub-book-viewer"]').exists()).toBe(
+          true
+        ),
+      { timeout: 25000 }
     )
 
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)

@@ -23,9 +23,10 @@
           {{ bookFileLoadError }}
         </div>
       </div>
-      <BookReadingEpubPlaceholder
-        v-else-if="book.format === 'epub'"
+      <BookReadingEpubView
+        v-else-if="book.format === 'epub' && bookFileBytes !== null"
         :book="book"
+        :epub-bytes="bookFileBytes"
       />
       <BookReadingContent
         v-else-if="bookFileBytes !== null"
@@ -41,7 +42,7 @@
 
 <script setup lang="ts">
 import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
-import BookReadingEpubPlaceholder from "@/components/book-reading/BookReadingEpubPlaceholder.vue"
+import BookReadingEpubView from "@/components/book-reading/BookReadingEpubView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -71,13 +72,22 @@ onMounted(async () => {
   })
   if (!error && data) {
     book.value = data
-    if (data.format === "epub") {
-      return
-    }
     const notebook = Number(data.notebookId)
     bookFileLoading.value = true
     bookFileLoadError.value = null
     try {
+      if (data.format === "epub") {
+        const res = await fetch(notebookBookFilePath(notebook), {
+          credentials: "same-origin",
+        })
+        if (!res.ok) {
+          bookFileLoadError.value = "Could not load the book file."
+          return
+        }
+        bookFileBytes.value = await res.arrayBuffer()
+        return
+      }
+
       const [res, posResult] = await Promise.all([
         fetch(notebookBookFilePath(notebook), {
           credentials: "same-origin",

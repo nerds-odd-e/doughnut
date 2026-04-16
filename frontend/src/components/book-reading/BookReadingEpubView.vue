@@ -29,14 +29,9 @@
     :disposition-for-block="noDisposition"
   >
     <main
-      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col daisy-items-center daisy-justify-center daisy-px-4 daisy-py-8"
+      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col"
     >
-      <p
-        data-testid="book-reading-epub-placeholder"
-        class="daisy-text-center daisy-text-base-content/70 daisy-text-sm"
-      >
-        EPUB reading view is not available yet.
-      </p>
+      <EpubBookViewer :epub-bytes="epubBytes" :book="book" />
     </main>
   </BookReadingBookLayout>
 </template>
@@ -44,6 +39,7 @@
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
+import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { BookFull } from "@generated/doughnut-backend-api"
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
@@ -53,6 +49,7 @@ const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
 const props = defineProps<{
   book: BookFull
+  epubBytes: ArrayBuffer
 }>()
 
 const notebookId = computed(() => Number(props.book.notebookId))
