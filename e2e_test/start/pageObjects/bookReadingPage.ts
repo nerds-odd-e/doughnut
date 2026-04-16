@@ -51,9 +51,9 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * epub.js renders inside iframes; the visible reading area is the scrolled
-     * `.epub-book-viewer-host`. Require the text to intersect that host's on-screen rect (so
-     * content below the scroll position fails).
+     * epub.js renders inside iframes; the scrolled viewport is the inner `.epub-container`
+     * (see epub.js Stage), not the Vue root `.epub-book-viewer-host`. Require the text to
+     * intersect that container's on-screen rect (so content below the scroll position fails).
      */
     expectEpubContentTextVisible(text: string) {
       pageIsNotLoading()
@@ -69,9 +69,9 @@ const bookReadingPage = () => {
           expect(hasText, 'EPUB iframe should contain fixture text').to.be.true
         })
         .root()
-        .get('[data-testid="epub-book-viewer"] .epub-book-viewer-host')
+        .get('[data-testid="epub-book-viewer"] .epub-container')
         .should('be.visible')
-        .then(($host) => {
+        .should(($host) => {
           const host = $host.get(0) as HTMLElement
           const hostRect = host.getBoundingClientRect()
           const iframe = [...host.querySelectorAll('iframe')].find((f) =>

@@ -99,7 +99,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 **Behavior:**
 - *Pre:* EPUB book is attached and has a chapter structure (from Phases 1–2).
 - *Trigger:* User opens the reading page.
-- *Post:* EPUB content is visible in the main pane in a safe, readable scrolled view alongside the structure drawer. User can click a chapter in the layout and the reader scrolls roughly to that chapter's spine document (interim navigation, upgraded to precise locators in Phase 4).
+- *Post:* EPUB content is visible in the main pane in a safe, readable scrolled view alongside the structure drawer. User can click a chapter in the layout and the reader jumps using the block's spine `href` (Phase 4 adds `#fragment` for sub-sections in the same spine file).
 
 **User value after this phase:** "I can open and read my EPUB in Doughnut and use the chapter list to jump around."
 
@@ -109,7 +109,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Add `EpubBookViewer.vue` using Readium in scrolled mode.
 - Replace the Phase 1 placeholder with real EPUB rendering.
 - Keep shared reader-shell logic together: book/file loading, file fetch, drawer behavior, and format-aware viewer selection.
-- Wire rough chapter navigation as interim behavior: clicking a block navigates to the start of the corresponding spine document using the `href` persisted in Phase 2. This is intentionally imprecise (spine-document level, not locator-precise); Phase 4 upgrades to the canonical locator contract.
+- Wire chapter navigation: clicking a block calls epub.js `rendition.display` with `epubStartHref` (spine path from Phase 2; Phase 4 extends this to `path#id` for nav fragments).
 
 *Security and ops:*
 - Validate CSP behavior required for EPUB rendering (inline styles, blob URLs, embedded fonts).
@@ -120,34 +120,30 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - E2E: open the EPUB reading page and assert known fixture text is visible in the main pane. Click a chapter and verify content from that chapter becomes visible.
 - Focused frontend test for viewer mount/unmount lifecycle.
 
-## Phase 4: Navigate precisely to any chapter or section (planned)
+## Phase 4: Navigate precisely to any chapter or section (done)
 
-**Why here:** Rough navigation from Phase 3 uses spine-document-level jumps. This phase establishes the canonical EPUB locator contract aligned with Readium `Locator` semantics, enabling precise navigation to sections within a spine document. This contract is needed before more reader behavior (scroll sync, resume) accumulates.
+**Why here:** Spine-only `href` jumps every block in the same XHTML file to the same scroll position. This phase carries the nav fragment through extraction and API so layout clicks resolve to the correct in-file anchor.
 
 **Behavior:**
 - *Pre:* EPUB is open in the reader and the structure drawer is visible.
 - *Trigger:* User clicks a `BookBlock` in the layout.
-- *Post:* The reader jumps precisely to the corresponding chapter or section in the EPUB, including sub-chapter sections within a spine document.
+- *Post:* The reader jumps precisely to the corresponding chapter or section in the EPUB, including sub-sections that share a spine item with their parent.
 
 **User value after this phase:** "I can use the structure to jump precisely to any section in my EPUB."
 
-**Scope:**
-
-*Contract and architecture:*
-- Adopt the EPUB block-start contract: expose an EPUB-native block locator aligned with Readium `Locator` semantics (`href`, `type`, `locations` with `partialCfi` and/or `progression`, optional `text`).
-- Keep PDF navigation data unchanged and branch on `book.format` at the reader boundary.
-- Remove the Phase 3 interim rough navigation and replace with locator-based navigation.
+**Scope (shipped):**
 
 *Backend:*
-- Persist the EPUB locator data needed for layout-to-content navigation (from the extraction pass — extend the `rawData` or add locator fields on `BookBlock` for EPUB).
-- Extend `GET …/book` to expose that locator data for EPUB blocks.
+- During extraction, set the first content block's `fragment` in `rawData` from the nav row's fragment id (`#anchor`) when present.
+- `BookBlock.getEpubStartHref()` returns `href` + `fragment` for EPUB blocks (`GET …/book` exposes `epubStartHref` as today). No separate locator DTO or DB migration.
 
 *Frontend:*
-- Wire `BookReadingContent.vue` so clicking a block uses the EPUB locator to navigate via Readium.
-- Reuse the existing selected-block flow rather than inventing an EPUB-specific selection model.
+- `BookReadingEpubView` passes `block.epubStartHref` to `EpubBookViewer.displayEpubTarget` → epub.js `rendition.display(href#fragment)`.
 
-**Testing:**
-- E2E: click a sub-chapter section in the EPUB layout and verify the target section becomes visible (not just the spine document start).
+*E2E:*
+- Assert subsection text is visible; viewport checks use epub.js's `.epub-container` (the real scroll viewport), not only the Vue host wrapper.
+
+**Later phases:** Full Readium-style locator objects (CFI, progression), reading-position resume, and scroll-sync still build on this `epubStartHref` string or extend the API as needed.
 
 ## Phase 5: Scroll the EPUB and see where I am in the layout (planned)
 
@@ -267,7 +263,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 ### OpenAPI and generated types
 
 - Regenerate TypeScript only in the phases that actually change the API surface.
-- API-touching phases: 1 (format-aware attach + file serving), 2 (BookBlock structure with EPUB locator data), 4 (locator fields on blocks), 6 (reading-position schema extension for EPUB locator).
+- API-touching phases: 1 (format-aware attach + file serving), 2 (BookBlock structure + `epubStartHref` spine path), 4 (`epubStartHref` may include `#fragment`; still a single string field), 6 (reading-position schema extension for EPUB, if beyond `epubStartHref`).
 
 ### Phase discipline
 
@@ -282,7 +278,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | 1 | Upload EPUB and see it attached | API generalization from PDF-only; frontend EPUB attach (PDF attach stays CLI + MinerU) | Medium |
 | 2 | Browse EPUB chapter structure | Server-side EPUB parsing, BookBlock + BookContentBlock extraction | Medium |
 | ~~3~~ | ~~Open EPUB and read content, jump to chapters~~ | ~~Done~~ | ~~Done~~ |
-| 4 | Precise navigation to any section | Canonical EPUB locator contract, Readium locator round-trip | Medium |
+| 4 | Precise navigation to any section | `epubStartHref` path#fragment, epub.js `display` | Done |
 | 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Medium |
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Medium |
 | 7 | Mark EPUB blocks read/skimmed/skipped | Reusing reading-record UI and state without over-coupling to PDF | Small-medium |

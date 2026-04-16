@@ -35,7 +35,6 @@ async function displayEpubTarget(href: string) {
 
 defineExpose({
   displayEpubTarget,
-  getRenditionHost: () => renditionHostRef.value,
 })
 
 function destroyEpub() {
