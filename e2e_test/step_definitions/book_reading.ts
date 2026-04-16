@@ -496,18 +496,18 @@ Then(
 )
 
 When(
-  'I press and hold on a content block bbox overlay in the PDF',
+  'I click on a content block bbox overlay in the PDF',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
-    return bookReadingPage().pressAndHoldOnContentBlockBboxOverlay()
+    return bookReadingPage().clickContentBlockBboxOverlay()
   }
 )
 
 When(
-  'I press and hold on a long-text content block bbox overlay in the PDF',
+  'I click on a long-text content block bbox overlay in the PDF',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
-    return bookReadingPage().pressAndHoldOnLongTextContentBlockBboxOverlay()
+    return bookReadingPage().clickLongTextContentBlockBboxOverlay()
   }
 )
 

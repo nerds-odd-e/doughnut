@@ -313,7 +313,7 @@ function appendBookBlockSelectionBboxHighlight(
     pageView.viewport.width,
     pageView.viewport.height
   )
-  const onLongPress =
+  const onSelect =
     contentBlockId !== undefined
       ? (id: number, cx: number, cy: number, title: string | undefined) => {
           holdCallout.value = {
@@ -328,7 +328,7 @@ function appendBookBlockSelectionBboxHighlight(
     attachBookBlockSelectionBboxHighlight(pageView.div, {
       ...rect,
       contentBlockId,
-      onLongPress,
+      onSelect,
       derivedTitle,
     })
   )

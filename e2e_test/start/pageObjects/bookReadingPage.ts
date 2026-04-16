@@ -449,15 +449,12 @@ const bookReadingPage = () => {
         .should('exist')
       return this
     },
-    pressAndHoldOnContentBlockBboxOverlay() {
+    clickContentBlockBboxOverlay() {
       pageIsNotLoading()
-      cy.get('[data-book-content-block-id]')
-        .first()
-        .trigger('pointerdown', { button: 0, bubbles: true, force: true })
-      cy.tick(600)
+      cy.get('[data-book-content-block-id]').first().click({ force: true })
       return this
     },
-    pressAndHoldOnLongTextContentBlockBboxOverlay() {
+    clickLongTextContentBlockBboxOverlay() {
       pageIsNotLoading()
       cy.get(
         '[data-derived-title-truncated="true"][data-book-content-block-id]'
@@ -468,8 +465,7 @@ const bookReadingPage = () => {
         '[data-derived-title-truncated="true"][data-book-content-block-id]'
       )
         .first()
-        .trigger('pointerdown', { button: 0, bubbles: true })
-      cy.tick(600)
+        .click({ force: true })
       return this
     },
     expectNewBlockCallout() {
