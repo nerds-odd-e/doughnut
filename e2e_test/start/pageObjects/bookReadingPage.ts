@@ -50,7 +50,11 @@ const bookReadingPage = () => {
       cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
       return this
     },
-    /** epub.js renders spine XHTML inside iframes; assert text inside the iframe body. */
+    /**
+     * epub.js renders inside iframes; the visible reading area is the scrolled
+     * `.epub-book-viewer-host`. Require the text to intersect that host's on-screen rect (so
+     * content below the scroll position fails).
+     */
     expectEpubContentTextVisible(text: string) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
@@ -59,10 +63,49 @@ const bookReadingPage = () => {
         .should('be.visible')
         .find('iframe')
         .should(($iframes) => {
-          const found = [...$iframes].some((frame) =>
-            (frame.contentDocument?.body?.innerText ?? '').includes(text)
+          const hasText = [...$iframes].some((f) =>
+            (f.contentDocument?.body?.innerText ?? '').includes(text)
           )
-          expect(found, 'EPUB iframe should contain fixture text').to.be.true
+          expect(hasText, 'EPUB iframe should contain fixture text').to.be.true
+        })
+        .root()
+        .get('[data-testid="epub-book-viewer"] .epub-book-viewer-host')
+        .should('be.visible')
+        .then(($host) => {
+          const host = $host.get(0) as HTMLElement
+          const hostRect = host.getBoundingClientRect()
+          const iframe = [...host.querySelectorAll('iframe')].find((f) =>
+            (f.contentDocument?.body?.innerText ?? '').includes(text)
+          ) as HTMLIFrameElement | undefined
+          expect(iframe, 'EPUB host should contain an iframe with fixture text')
+            .to.exist
+          const doc = iframe!.contentDocument!
+          let best: HTMLElement | undefined
+          let bestLen = Number.POSITIVE_INFINITY
+          for (const node of doc.body.querySelectorAll('*')) {
+            const e = node as HTMLElement
+            const t = e.textContent ?? ''
+            if (!t.includes(text) || t.length > bestLen) continue
+            bestLen = t.length
+            best = e
+          }
+          expect(best, `EPUB should expose an element for "${text}"`).to.exist
+          const iframeRect = iframe!.getBoundingClientRect()
+          const local = best!.getBoundingClientRect()
+          const absTop = iframeRect.top + local.top
+          const absLeft = iframeRect.left + local.left
+          const absBottom = absTop + local.height
+          const absRight = absLeft + local.width
+          const hOverlap =
+            Math.min(absBottom, hostRect.bottom) -
+            Math.max(absTop, hostRect.top)
+          const wOverlap =
+            Math.min(absRight, hostRect.right) -
+            Math.max(absLeft, hostRect.left)
+          expect(
+            hOverlap > 8 && wOverlap > 8,
+            `EPUB text should intersect reader host viewport (overlap ${hOverlap}x${wOverlap}, absTop=${absTop}, hostTop=${hostRect.top}, hostBottom=${hostRect.bottom})`
+          ).to.be.true
         })
       return this
     },

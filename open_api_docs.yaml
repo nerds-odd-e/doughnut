@@ -4019,9 +4019,8 @@ components:
             $ref: "#/components/schemas/BookContentBlock_Full"
         epubStartHref:
           type: string
-          description: Interim EPUB-only spine document href for rough layout navigation;
-            null for PDF or when unavailable. Replaced by a canonical locator in a
-            later release.
+          description: EPUB-only spine document href for rough layout navigation;
+            null for PDF or when unavailable.
       required:
       - allBboxes
       - contentBlocks
