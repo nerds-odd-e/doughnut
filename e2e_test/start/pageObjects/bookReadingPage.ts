@@ -322,7 +322,7 @@ const bookReadingPage = () => {
     },
     /**
      * After PDF scroll updates the current block to a lower book block, the book layout aside should
-     * scroll so that row is not clipped (Phase 6.5). Expects a short viewport so the list overflows.
+     * scroll so that row is not clipped. Expects a short viewport so the list overflows.
      */
     expectCurrentBlockVisibleInBookLayoutAside(title: string) {
       this.expectBookBlockIsCurrentBlockByTitle(title)
@@ -369,7 +369,7 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * Reading Control Panel (Phase 2 reading record): bottom of PDF main pane.
+     * Reading Control Panel: bottom of PDF main pane.
      * Contract for production: data-testid book-reading-reading-control-panel + book-reading-mark-as-read.
      */
     markBookBlockAsReadInReadingControlPanel(blockTitle: string) {

@@ -382,7 +382,7 @@ describe("BookReadingPage", () => {
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
   })
 
-  it("updates current block while book layout drawer is closed (Phase 6.9)", async () => {
+  it("updates current block while book layout drawer is closed", async () => {
     const wrapper = await mountLoadedBookWithBlocks(notebookId, {
       innerWidth: 500,
     })
@@ -410,7 +410,7 @@ describe("BookReadingPage", () => {
     expect(current.text()).toBe("Section 3")
   })
 
-  it("zoom buttons exist with accessible names and page indicator shows via PdfControl (Phase 12)", async () => {
+  it("zoom buttons exist with accessible names and page indicator shows via PdfControl", async () => {
     const wrapper = await mountLoadedBookWithBlocks(notebookId)
     expect(
       wrapper.find('[data-testid="pdf-zoom-in"]').attributes("aria-label")
@@ -437,7 +437,7 @@ describe("BookReadingPage", () => {
     expect(indicator.text().trim()).toBe("1 / 5")
   })
 
-  it("debounces PATCH reading position on rapid viewport updates (Phase 1.3)", async () => {
+  it("debounces PATCH reading position on rapid viewport updates", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
     const viewport = { top: 200, mid: 500, bottom: 1000 }
@@ -462,7 +462,7 @@ describe("BookReadingPage", () => {
     })
   })
 
-  it("PATCH reading position uses last viewport top within debounce window (Phase 1.3)", async () => {
+  it("PATCH reading position uses last viewport top within debounce window", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
 
@@ -488,7 +488,7 @@ describe("BookReadingPage", () => {
     })
   })
 
-  it("does not PATCH reading position when viewport is null (Phase 1.3)", async () => {
+  it("does not PATCH reading position when viewport is null", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
 
@@ -510,7 +510,7 @@ describe("BookReadingPage", () => {
     expect(patchSpy).not.toHaveBeenCalled()
   })
 
-  it("restores reading position from stored snapshot on open (Phase 1.4)", async () => {
+  it("restores reading position from stored snapshot on open", async () => {
     stubGetBookPlain(notebookId)
     vi.spyOn(
       NotebookBooksController,
@@ -530,7 +530,7 @@ describe("BookReadingPage", () => {
     expect(spy).toHaveBeenCalledWith(2, 750)
   })
 
-  it("does not restore reading position when no snapshot exists (Phase 1.4)", async () => {
+  it("does not restore reading position when no snapshot exists", async () => {
     stubGetBookPlain(notebookId)
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
 
@@ -544,7 +544,7 @@ describe("BookReadingPage", () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
-  it("restores selected book block from stored reading snapshot (Phase 10)", async () => {
+  it("restores selected book block from stored reading snapshot", async () => {
     stubGetBookWithTopMathsBlocks(notebookId)
     vi.spyOn(
       NotebookBooksController,
@@ -567,7 +567,7 @@ describe("BookReadingPage", () => {
     )
   })
 
-  it("PATCH reading position includes selectedBookBlockId after layout click (Phase 10)", async () => {
+  it("PATCH reading position includes selectedBookBlockId after layout click", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const row = wrapper
       .findAll('[data-testid="book-reading-book-block"]')
@@ -599,7 +599,7 @@ describe("BookReadingPage", () => {
     })
   })
 
-  it("book layout toggle exposes aria-expanded and aria-controls (Phase 7.7)", async () => {
+  it("book layout toggle exposes aria-expanded and aria-controls", async () => {
     await withStubbedInnerWidth(1024, async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
 
@@ -766,7 +766,7 @@ describe("BookReadingPage", () => {
       ).toBeUndefined()
     })
 
-    it("defaults selection to the first book block in reading order on load (Phase 9)", async () => {
+    it("defaults selection to the first book block in reading order on load", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
@@ -775,7 +775,7 @@ describe("BookReadingPage", () => {
       )
     })
 
-    it("hides the Reading Control Panel when the default-selected first block is viewport current (Phase 9)", async () => {
+    it("hides the Reading Control Panel when the default-selected first block is viewport current", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
       await vi.waitFor(() =>
         expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
@@ -1267,7 +1267,7 @@ describe("BookReadingPage", () => {
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
-      it("Phase 11: anchors panel when last content bottom is visible and anchor px is returned", async () => {
+      it("anchors panel when last content bottom is visible and anchor px is returned", async () => {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)

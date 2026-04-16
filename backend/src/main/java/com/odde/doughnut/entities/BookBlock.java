@@ -81,16 +81,12 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
     return contentBlocks;
   }
 
-  /**
-   * Spine-document href from the first imported content row’s {@code rawData} ({@code href} only).
-   * Populated for EPUB books only; PDF and parse failures yield {@code null}.
-   */
   @JsonProperty("epubStartHref")
   @JsonView(BookViews.Full.class)
   @Schema(
       description =
-          "Interim EPUB-only spine document href for rough layout navigation; null for PDF or when"
-              + " unavailable. Replaced by a canonical locator in a later release.")
+          "EPUB-only spine document href for rough layout navigation; null for PDF or when"
+              + " unavailable.")
   public String getEpubStartHref() {
     if (book == null || !BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
       return null;

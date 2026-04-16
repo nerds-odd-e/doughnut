@@ -92,7 +92,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Focused unit tests for EPUB extraction edge cases: nav-only vs heading-fallback, `*beginning*` synthetic block, multi-level headings, EPUB-specific direct-content predicate rules.
 - E2E: upload EPUB, open reading page, see chapter list in the layout sidebar.
 
-## Phase 3: Open the EPUB and read its content (planned)
+## Phase 3: Open the EPUB and read its content (done)
 
 **Why now:** This burns down the Readium renderer integration risk and the security/CSP risk — both are significant unknowns. Readium + Vue 3 integration, CSP for untrusted EPUB HTML, shadow DOM implications for testing, scroll behavior on mobile Safari, and bundle size all need to be validated. A time-boxed Readium spike should precede or be part of this phase.
 
@@ -281,7 +281,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 |-------|-----------|-------------|------|
 | 1 | Upload EPUB and see it attached | API generalization from PDF-only; frontend EPUB attach (PDF attach stays CLI + MinerU) | Medium |
 | 2 | Browse EPUB chapter structure | Server-side EPUB parsing, BookBlock + BookContentBlock extraction | Medium |
-| 3 | Open EPUB and read content, jump to chapters | Readium integration, rendering, CSP/security, shadow DOM | Medium |
+| ~~3~~ | ~~Open EPUB and read content, jump to chapters~~ | ~~Done~~ | ~~Done~~ |
 | 4 | Precise navigation to any section | Canonical EPUB locator contract, Readium locator round-trip | Medium |
 | 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Medium |
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Medium |
