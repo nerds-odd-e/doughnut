@@ -67,18 +67,21 @@ Phases decide **when** you add or extend tests, but tests are grouped and named 
 Before closing a phase and starting the next:
 
 1. **Clean up** — Remove dead or unreachable code.
-2. **Deploy gate** — Commit, push, and let **CD deploy** before the next phase (unless the team explicitly agrees otherwise). Usually **manual** on the developer side.
-3. **Update the plan** — Reflect what is done and what remains; drop obsolete notes.
+2. **No failing tests** — All unit tests and existing E2E tests must pass. No test may be left in a failing state at the end of any phase or sub-phase.
+3. **`@wip` for not-yet-passing E2E scenarios** — When writing E2E scenarios test-first for behavior that is not yet implemented, tag them `@wip`. This tag runs normally in local development but is skipped in GitHub Actions CI. Remove the `@wip` tag once the scenario passes. CI enforces a maximum of 5 `@wip` scenarios across the entire E2E project to prevent accumulation.
+4. **Deploy gate** — Commit, push, and let **CD deploy** before the next phase (unless the team explicitly agrees otherwise). Usually **manual** on the developer side.
+5. **Update the plan** — Reflect what is done and what remains; drop obsolete notes.
 
 ### Test-driven workflow (when adding or changing behavior)
 
 For **multi-step** E2E scenarios split into **sub-phases**, prefer **E2E-led decomposition** (see phased-planning skill) instead of treating the whole scenario as one red/green swing.
 
-1. Add or change the **E2E or unit** test; **run it** and confirm it **fails**.
+1. Add or change the **E2E or unit** test; **run it** and confirm it **fails** (tag new E2E scenarios `@wip` if they will not pass until a later sub-phase).
 2. Confirm it fails for the **right reason** (not a typo or env issue).
 3. If the failure is unclear, **improve the assertion or message** so the next reader learns what was wrong.
 4. Implement the **smallest** change that makes the test pass.
 5. **Refactor** with tests green, then continue.
+6. Remove the `@wip` tag from any E2E scenario that now passes.
 
 ---
 

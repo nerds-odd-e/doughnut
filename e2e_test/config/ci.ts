@@ -4,7 +4,7 @@ import commonConfig from './common'
 export default defineConfig({
   ...commonConfig,
   env: {
-    TAGS: 'not @ignore',
+    TAGS: process.env.CI ? 'not @ignore and not @wip' : 'not @ignore',
   },
   video: false,
   watchForFileChanges: false,

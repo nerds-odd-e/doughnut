@@ -40,6 +40,8 @@ jobs:
       - uses: actions/checkout@v6
       - name: Check for @focus tags in e2e test feature files
         run: ./scripts/check_focus_tags.sh
+      - name: Check @wip scenario count limit
+        run: ./scripts/check_wip_tags.sh
       - uses: ./.github/setup_jdk_with_cache
         with:
           java_version: ${{ vars.JAVA_VERSION }}
