@@ -15,9 +15,19 @@ alwaysApply: true
 
 ## Phase principles
 
-1. **One behavior per phase** — Each phase ships a small, **user-visible** slice of value.
-2. **Many phases are good** — Split as finely as you can while **each phase still delivers user value** (not phases that only refactor or only "prepare").
-3. **Order by value** — Earlier phases = higher user value and usability first.
+Every phase is one of two types:
+
+| Type | What it does | Constraint |
+|------|-------------|------------|
+| **Behavior** | Delivers user value directly observable from the external perspective. | Must be externally observable and testable. |
+| **Structure** | Restructures internals to prepare for the **immediate next** behavior phase, without changing any external behavior. | All changes must be **verifiable from the external perspective** (existing tests still pass, no observable difference). No speculative prep for phases beyond the next behavior phase. |
+
+### Sequencing rules
+
+1. **Stop-safe ordering** — The user may decide to stop after **any** phase. The value delivered must be proportional to (or greater than) the number of completed phases, with close to **zero waste** if remaining phases are never implemented.
+2. **Order by value** — Earlier phases = higher user value and usability first.
+3. **Many phases are good** — Split as finely as you can while each phase still meets the type constraints above.
+4. **Structure phases only justify themselves through the next behavior phase** — A structure phase that is not immediately followed by the behavior phase it enables is speculative waste.
 
 **To decompose a task into phases**, use the **phased-planning** skill.
 

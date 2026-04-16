@@ -4,6 +4,7 @@
     data-testid="pdf-book-viewer"
     class="pdf-book-viewer-container"
     :style="{ paddingBottom: props.bottomPaddingPx + 'px' }"
+    @click="onContainerClick"
   >
     <div ref="viewerRef" class="pdfViewer" />
   </div>
@@ -290,12 +291,14 @@ type PendingNavigation = {
 
 let pendingNavigation: PendingNavigation | null = null
 let bookBlockSelectionBboxHighlightCancels: (() => void)[] = []
+let currentHighlightBboxes: ReadonlyArray<BookNavigationTarget> = []
 
 function clearBookBlockSelectionBboxHighlight() {
   for (const c of bookBlockSelectionBboxHighlightCancels) {
     c()
   }
   bookBlockSelectionBboxHighlightCancels = []
+  currentHighlightBboxes = []
   holdCallout.value = null
 }
 
@@ -313,22 +316,10 @@ function appendBookBlockSelectionBboxHighlight(
     pageView.viewport.width,
     pageView.viewport.height
   )
-  const onSelect =
-    contentBlockId !== undefined
-      ? (id: number, cx: number, cy: number, title: string | undefined) => {
-          holdCallout.value = {
-            contentBlockId: id,
-            clientX: cx,
-            clientY: cy,
-            derivedTitle: title,
-          }
-        }
-      : undefined
   bookBlockSelectionBboxHighlightCancels.push(
     attachBookBlockSelectionBboxHighlight(pageView.div, {
       ...rect,
       contentBlockId,
-      onSelect,
       derivedTitle,
     })
   )
@@ -338,6 +329,7 @@ function showSelectionBboxHighlights(
   highlightBboxes: ReadonlyArray<BookNavigationTarget>
 ) {
   clearBookBlockSelectionBboxHighlight()
+  currentHighlightBboxes = highlightBboxes
   if (!pdfViewer) return
   for (const e of highlightBboxes) {
     if (e.bbox === null) continue
@@ -354,6 +346,50 @@ function showSelectionBboxHighlights(
       e.contentBlockId,
       e.derivedTitle
     )
+  }
+}
+
+function contentBlockAtClientPoint(
+  clientX: number,
+  clientY: number
+): { contentBlockId: number; derivedTitle: string | undefined } | null {
+  if (!pdfViewer) return null
+  for (const e of currentHighlightBboxes) {
+    if (e.contentBlockId === undefined || e.bbox === null) continue
+    if (
+      !Number.isInteger(e.pageIndex) ||
+      e.pageIndex < 0 ||
+      e.pageIndex >= pdfViewer.pagesCount
+    )
+      continue
+    const pageView = pdfViewer.getPageView(e.pageIndex)
+    if (!pageView?.div) continue
+    const pageRect = pageView.div.getBoundingClientRect()
+    const left = pageRect.left + (e.bbox[0] / 1000) * pageRect.width
+    const top = pageRect.top + (e.bbox[1] / 1000) * pageRect.height
+    const right = pageRect.left + (e.bbox[2] / 1000) * pageRect.width
+    const bottom = pageRect.top + (e.bbox[3] / 1000) * pageRect.height
+    if (
+      clientX >= left &&
+      clientX <= right &&
+      clientY >= top &&
+      clientY <= bottom
+    ) {
+      return { contentBlockId: e.contentBlockId, derivedTitle: e.derivedTitle }
+    }
+  }
+  return null
+}
+
+function onContainerClick(e: MouseEvent) {
+  const hit = contentBlockAtClientPoint(e.clientX, e.clientY)
+  if (hit) {
+    holdCallout.value = {
+      contentBlockId: hit.contentBlockId,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      derivedTitle: hit.derivedTitle,
+    }
   }
 }
 
