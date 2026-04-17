@@ -111,7 +111,7 @@ export function useBookReadingSnapBack(options: {
     (v) => {
       unregisterScrollSuppression?.()
       unregisterScrollSuppression =
-        v?.registerScrollSuppression(scrollSuppression) ?? null
+        v?.registerScrollSuppression?.(scrollSuppression) ?? null
     },
     { immediate: true }
   )
