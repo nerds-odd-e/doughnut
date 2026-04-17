@@ -327,9 +327,15 @@ public class BookService {
       BookUserLastReadPosition row, BookLastReadPositionRequest request) {
     if (request.getLocator() != null) {
       BookFormat.forLocator(request.getLocator())
-          .writeLegacyColumnsFromLocator(row, request.getLocator(), objectMapper);
-    } else {
-      BookFormat.forReadingPositionPayload(request).writeLegacyColumns(row, request, objectMapper);
+          .writeReadingPositionLocator(row, request.getLocator(), objectMapper);
+      return;
+    }
+    String existing = row.getReadingPositionLocatorJson();
+    if (existing == null || existing.isBlank()) {
+      throw new ApiException(
+          "reading-position patch requires locator when none is stored yet",
+          ApiError.ErrorType.BINDING_ERROR,
+          "reading-position patch requires locator when none is stored yet");
     }
   }
 

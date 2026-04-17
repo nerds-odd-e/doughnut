@@ -40,19 +40,14 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -75,8 +70,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired BookContentBlockRepository bookContentBlockRepository;
   @Autowired BookStorage bookStorage;
   @Autowired ObjectMapper objectMapper;
-  @Autowired DataSource dataSource;
-  @Autowired JdbcTemplate jdbcTemplate;
   @Autowired EntityManager entityManager;
 
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -225,8 +218,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
   private static BookLastReadPositionRequest lastReadBody(int pageIndex, int normalizedY) {
     BookLastReadPositionRequest r = new BookLastReadPositionRequest();
-    r.setPageIndex(pageIndex);
-    r.setNormalizedY(normalizedY);
+    r.setLocator(
+        new PdfLocator(pageIndex, List.of(0.0, (double) normalizedY, 100.0, 600.0), null, null));
     return r;
   }
 
@@ -237,9 +230,23 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return r;
   }
 
-  private static BookLastReadPositionRequest lastReadEpubBody(String epubLocator) {
+  private static BookLastReadPositionRequest lastReadEpubBody(String epubLocatorWire) {
+    String t = epubLocatorWire.trim();
+    int hash = t.indexOf('#');
+    String hrefPart = hash < 0 ? t : t.substring(0, hash);
+    String fragPart = hash < 0 ? null : t.substring(hash + 1);
+    if (fragPart != null) {
+      fragPart = fragPart.trim();
+      if (fragPart.startsWith("#")) {
+        fragPart = fragPart.substring(1).trim();
+      }
+      if (fragPart.isEmpty()) {
+        fragPart = null;
+      }
+    }
+    hrefPart = hrefPart.trim();
     BookLastReadPositionRequest r = new BookLastReadPositionRequest();
-    r.setEpubLocator(epubLocator);
+    r.setLocator(new EpubLocator(hrefPart.isEmpty() ? null : hrefPart, fragPart));
     return r;
   }
 
@@ -1068,9 +1075,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
-      assertThat(stored.getEpubLocator(), nullValue());
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(
@@ -1089,8 +1093,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(fromJson, equalTo(new PdfLocator(5, List.of(0.0, 0.0, 100.0, 600.0), null, null)));
@@ -1151,8 +1153,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
       assertThat(stored.getSelectedBookBlockId(), equalTo(secondBlockId));
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
@@ -1185,8 +1185,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
       assertThat(stored.getSelectedBookBlockId(), equalTo(blockId));
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
@@ -1205,32 +1203,18 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getEpubLocator(), nullValue());
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
     }
 
     @Test
-    void rejectsPatchWithoutPdfFieldsOrEpubLocator() throws UnexpectedNoAccessRightException {
+    void rejectsPatchWhenEmptyAndNoStoredLocator() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       BookLastReadPositionRequest empty = new BookLastReadPositionRequest();
 
       ApiException ex =
           assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, empty));
-      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
-    }
-
-    @Test
-    void rejectsPatchWithBothEpubLocatorAndPdfPosition() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      BookLastReadPositionRequest both = lastReadBody(1, 500);
-      both.setEpubLocator("OEBPS/chapter1.xhtml");
-
-      ApiException ex =
-          assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, both));
       assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
     }
 
@@ -1245,9 +1229,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
-      assertThat(stored.getEpubLocator(), nullValue());
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(fromJson, equalTo(req.getLocator()));
@@ -1267,57 +1248,21 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getEpubLocator(), nullValue());
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(fromJson, equalTo(req.getLocator()));
     }
 
     @Test
-    void pdfLocatorOverridesConflictingLegacyFields() throws Exception {
+    void patchOverwritesReadingPositionLocatorJson() throws Exception {
       Notebook nb = notebookWithBook();
-      BookLastReadPositionRequest req = new BookLastReadPositionRequest();
-      req.setPageIndex(1);
-      req.setNormalizedY(100);
-      req.setEpubLocator("OEBPS/chapter1.xhtml");
-      req.setLocator(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null));
-      controller.patchReadingPosition(nb, req);
+      controller.patchReadingPosition(nb, lastReadBody(1, 100));
+      controller.patchReadingPosition(nb, lastReadBody(3, 420));
 
       var stored =
           bookUserLastReadPositionRepository
               .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
               .orElseThrow();
-      assertThat(stored.getPageIndex(), nullValue());
-      assertThat(stored.getNormalizedY(), nullValue());
-      assertThat(stored.getEpubLocator(), nullValue());
-      ContentLocator fromJson =
-          objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
-      assertThat(fromJson, equalTo(req.getLocator()));
-    }
-
-    @Test
-    void patchPersistsLocatorJsonWithoutWritingLegacyColumns() throws Exception {
-      Notebook nb = notebookWithBook();
-      controller.patchReadingPosition(nb, lastReadBody(1, 100));
-      int bookId = bookOf(nb).getId();
-      jdbcTemplate.update(
-          "UPDATE book_user_last_read_position SET page_index = 8, normalized_y = 88,"
-              + " epub_locator = 'legacy' WHERE book_id = ?",
-          bookId);
-      entityManager.flush();
-      entityManager.clear();
-
-      controller.patchReadingPosition(nb, lastReadBody(3, 420));
-
-      var stored =
-          bookUserLastReadPositionRepository
-              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
-              .orElseThrow();
-      assertThat(stored.getPageIndex(), equalTo(8));
-      assertThat(stored.getNormalizedY(), equalTo(88));
-      assertThat(stored.getEpubLocator(), equalTo("legacy"));
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(
@@ -1327,8 +1272,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), notNullValue());
       assertThat(res.getBody().locator(), equalTo(fromJson));
-      assertThat(res.getBody().pageIndex(), equalTo(3));
-      assertThat(res.getBody().normalizedY(), equalTo(420));
     }
   }
 
@@ -1343,8 +1286,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), notNullValue());
-      assertThat(res.getBody().pageIndex(), equalTo(3));
-      assertThat(res.getBody().normalizedY(), equalTo(420));
       assertThat(
           res.getBody().locator(),
           equalTo(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null)));
@@ -1357,27 +1298,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(
           fromJson, equalTo(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null)));
-    }
-
-    @Test
-    void getPrefersLocatorJsonOverStaleLegacyColumns() throws Exception {
-      Notebook nb = notebookWithBook();
-      controller.patchReadingPosition(nb, lastReadBody(3, 420));
-      int bookId = bookOf(nb).getId();
-      jdbcTemplate.update(
-          "UPDATE book_user_last_read_position SET page_index = 9, normalized_y = 999 WHERE"
-              + " book_id = ?",
-          bookId);
-
-      ResponseEntity<BookUserLastReadPositionResponse> res = controller.getReadingPosition(nb);
-
-      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
-      assertThat(res.getBody(), notNullValue());
-      assertThat(res.getBody().pageIndex(), equalTo(3));
-      assertThat(res.getBody().normalizedY(), equalTo(420));
-      assertThat(
-          res.getBody().locator(),
-          equalTo(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null)));
     }
 
     @Test
@@ -1428,9 +1348,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), notNullValue());
-      assertThat(res.getBody().epubLocator(), equalTo("OEBPS/chapter2.xhtml#section-beta-two"));
-      assertThat(res.getBody().pageIndex(), nullValue());
-      assertThat(res.getBody().normalizedY(), nullValue());
       assertThat(
           res.getBody().locator(),
           equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
@@ -1472,63 +1389,6 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
-    }
-  }
-
-  @Nested
-  class BackfillReadingPositionLocatorJson {
-    @Test
-    void migrationSqlRepairsPdfRowAfterJsonCleared() throws Exception {
-      Notebook nb = notebookWithBook();
-      controller.patchReadingPosition(nb, lastReadBody(3, 420));
-      int bookId = bookOf(nb).getId();
-      jdbcTemplate.update(
-          "UPDATE book_user_last_read_position SET reading_position_locator_json = NULL WHERE"
-              + " book_id = ?",
-          bookId);
-
-      var populator = new ResourceDatabasePopulator();
-      populator.addScript(
-          new ClassPathResource(
-              "db/migration/V300000145__backfill_reading_position_locator_json.sql"));
-      DatabasePopulatorUtils.execute(populator, dataSource);
-
-      var row =
-          bookUserLastReadPositionRepository
-              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
-              .orElseThrow();
-      ContentLocator fromJson =
-          objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
-      assertThat(
-          fromJson, equalTo(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null)));
-    }
-
-    @Test
-    void migrationSqlRepairsEpubRowAfterJsonCleared() throws Exception {
-      Notebook nb = myNotebook();
-      byte[] epubBytes = readFixtureEpubValidMinimal();
-      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
-      controller.patchReadingPosition(
-          nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
-      int bookId = bookOf(nb).getId();
-      jdbcTemplate.update(
-          "UPDATE book_user_last_read_position SET reading_position_locator_json = NULL WHERE"
-              + " book_id = ?",
-          bookId);
-
-      var populator = new ResourceDatabasePopulator();
-      populator.addScript(
-          new ClassPathResource(
-              "db/migration/V300000145__backfill_reading_position_locator_json.sql"));
-      DatabasePopulatorUtils.execute(populator, dataSource);
-
-      var row =
-          bookUserLastReadPositionRepository
-              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
-              .orElseThrow();
-      ContentLocator fromJson =
-          objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
-      assertThat(fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
     }
   }
 

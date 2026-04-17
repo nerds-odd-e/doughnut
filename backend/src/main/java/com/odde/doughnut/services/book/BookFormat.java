@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
-import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockTitleLimits;
@@ -100,20 +99,7 @@ public enum BookFormat {
     }
 
     @Override
-    public void writeLegacyColumns(
-        BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper) {
-      persistReadingPositionLocatorJson(
-          row,
-          objectMapper,
-          new PdfLocator(
-              req.getPageIndex(),
-              List.of(0.0, req.getNormalizedY().doubleValue(), 100.0, 600.0),
-              null,
-              null));
-    }
-
-    @Override
-    public void writeLegacyColumnsFromLocator(
+    public void writeReadingPositionLocator(
         BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper) {
       if (!(locator instanceof PdfLocator pdf)) {
         throw new ApiException(
@@ -170,23 +156,7 @@ public enum BookFormat {
     }
 
     @Override
-    public void writeLegacyColumns(
-        BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper) {
-      String raw = trimToNull(req.getEpubLocator());
-      int hash = raw.indexOf('#');
-      String hrefPart = hash < 0 ? raw : raw.substring(0, hash);
-      String fragPart = hash < 0 ? null : raw.substring(hash + 1);
-      fragPart = trimToNull(fragPart);
-      if (fragPart != null && fragPart.startsWith("#")) {
-        fragPart = fragPart.substring(1);
-        fragPart = trimToNull(fragPart);
-      }
-      persistReadingPositionLocatorJson(
-          row, objectMapper, new EpubLocator(trimToNull(hrefPart), fragPart));
-    }
-
-    @Override
-    public void writeLegacyColumnsFromLocator(
+    public void writeReadingPositionLocator(
         BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper) {
       if (!(locator instanceof EpubLocator epub)) {
         throw new ApiException(
@@ -221,10 +191,7 @@ public enum BookFormat {
 
   public abstract String bookFileExtension();
 
-  public abstract void writeLegacyColumns(
-      BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper);
-
-  public abstract void writeLegacyColumnsFromLocator(
+  public abstract void writeReadingPositionLocator(
       BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper);
 
   public static BookFormat forLocator(ContentLocator locator) {
@@ -232,24 +199,6 @@ public enum BookFormat {
       case EpubLocator e -> EPUB;
       case PdfLocator p -> PDF;
     };
-  }
-
-  public static BookFormat forReadingPositionPayload(BookLastReadPositionRequest req) {
-    boolean hasEpub = req.getEpubLocator() != null;
-    boolean hasPdf = req.getPageIndex() != null && req.getNormalizedY() != null;
-    if (!hasEpub && !hasPdf) {
-      throw new ApiException(
-          "reading-position payload requires locator, pageIndex+normalizedY, or epubLocator",
-          ApiError.ErrorType.BINDING_ERROR,
-          "reading-position payload requires locator, pageIndex+normalizedY, or epubLocator");
-    }
-    if (hasEpub && hasPdf) {
-      throw new ApiException(
-          "reading-position payload must not combine epubLocator with pageIndex and normalizedY",
-          ApiError.ErrorType.BINDING_ERROR,
-          "reading-position payload must not combine epubLocator with pageIndex and normalizedY");
-    }
-    return hasEpub ? EPUB : PDF;
   }
 
   public final ResponseEntity<Resource> streamFile(

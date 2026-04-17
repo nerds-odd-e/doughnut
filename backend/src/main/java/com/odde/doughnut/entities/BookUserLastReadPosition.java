@@ -24,15 +24,6 @@ public class BookUserLastReadPosition extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Book book;
 
-  @Column(name = "page_index")
-  private Integer pageIndex;
-
-  @Column(name = "normalized_y")
-  private Integer normalizedY;
-
-  @Column(name = "epub_locator", length = 512)
-  private String epubLocator;
-
   @JsonIgnore
   @Column(name = "reading_position_locator_json", columnDefinition = "TEXT")
   private String readingPositionLocatorJson;

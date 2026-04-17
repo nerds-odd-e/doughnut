@@ -355,6 +355,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase F6 — Drop legacy columns and API fields (cleanup)
 
+**Status: done**
+
 **Change:**
 - Flyway migration dropping `page_index`, `normalized_y`, `epub_locator` columns from `book_user_last_read_position`.
 - `BookLastReadPositionRequest` keeps only `locator` and `selectedBookBlockId`.

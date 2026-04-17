@@ -626,18 +626,6 @@ export type NoteAccessory = {
 export type BookLastReadPositionRequest = {
     locator?: ContentLocatorFull;
     /**
-     * 0-based PDF page index in the viewer; required together with normalizedY for PDF books
-     */
-    pageIndex?: number;
-    /**
-     * Vertical position within the page in MinerU-normalized space (0-1000); required together with pageIndex for PDF books
-     */
-    normalizedY?: number;
-    /**
-     * EPUB spine href locator (e.g. "OEBPS/chapter2.xhtml#section-beta-two") for EPUB books; mutually exclusive with pageIndex/normalizedY
-     */
-    epubLocator?: string;
-    /**
      * Selected book block id for reading UI; omit or null to leave the stored value unchanged
      */
     selectedBookBlockId?: number;
@@ -781,18 +769,6 @@ export type BookUserLastReadPosition = {
     id: number;
     locator: ContentLocatorFull;
     selectedBookBlockId?: number;
-    /**
-     * Derived from locator for API backward compatibility (PDF: page index)
-     */
-    pageIndex?: number;
-    /**
-     * Derived from locator for API backward compatibility (PDF: normalized Y)
-     */
-    normalizedY?: number;
-    /**
-     * Derived from locator for API backward compatibility (EPUB spine locator string)
-     */
-    epubLocator?: string;
 };
 
 export type NotebookCertificateApprovalDto = {
