@@ -26,11 +26,11 @@
     :blocks="book.blocks"
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
-    :disposition-for-block="noDisposition"
+    :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
   >
     <main
-      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col"
+      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col daisy-relative"
     >
       <EpubBookViewer
         ref="epubViewerRef"
@@ -38,6 +38,14 @@
         :book="book"
         :initial-locator="initialEpubLocator"
         @relocated="onEpubRelocated"
+      />
+      <ReadingControlPanel
+        v-if="blockAwaitingConfirmation"
+        :selected-block-title="blockAwaitingConfirmation.title"
+        :anchor-top-px="null"
+        @mark-as-read="() => markBlockDisposition('READ')"
+        @mark-as-skimmed="() => markBlockDisposition('SKIMMED')"
+        @mark-as-skipped="() => markBlockDisposition('SKIPPED')"
       />
     </main>
   </BookReadingBookLayout>
@@ -48,9 +56,13 @@ import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleBu
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
+import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
+import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -75,6 +87,7 @@ const props = withDefaults(
 )
 
 const notebookId = computed(() => Number(props.book.notebookId))
+const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const epubViewerRef = ref<EpubViewerExposed | null>(null)
 
@@ -138,7 +151,26 @@ const isMdOrLarger = computed(
   () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
 )
 
-const noDisposition = () => undefined
+const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
+  const selId = selectedBlockId.value
+  if (selId === null) return null
+  if (bookReading.hasRecordedDisposition(selId)) return null
+  return props.book.blocks.find((b) => b.id === selId) ?? null
+})
+
+async function markBlockDisposition(status: BookBlockReadingDisposition) {
+  const block = blockAwaitingConfirmation.value
+  if (!block) return
+  const ok = await bookReading.submitReadingDisposition(block.id, status)
+  if (!ok) return
+  const next = nextBookBlockAfter(props.book.blocks, block.id)
+  if (!next) return
+  selectedBlockId.value = next.id
+  if (next.epubStartHref) {
+    await epubViewerRef.value?.displayEpubTarget(next.epubStartHref)
+  }
+  currentBlockIdDebouncer.commitNow(next.id)
+}
 
 function onEpubRelocated(payload: { href: string }) {
   const id = currentBlockIdFromEpubLocation(props.book.blocks, payload.href)
@@ -165,11 +197,12 @@ async function onBookBlockClick(block: BookBlockFull) {
   currentBlockIdDebouncer.commitNow(block.id)
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener("resize", handleResize)
   if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
     bookLayoutOpened.value = true
   }
+  await bookReading.syncFromServer()
 })
 
 onBeforeUnmount(() => {

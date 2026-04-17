@@ -69,7 +69,6 @@ Feature: EPUB book
     Then I should see the text "Unique content in section beta-two." in the EPUB reader
     And the book block "Section Beta-Two" should be the current block in the book reader
 
-  @wip
   Scenario: Mark an EPUB block as read advances the selection
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Mark Read Notebook"
@@ -81,7 +80,6 @@ Feature: EPUB book
     Then I should see that book block "Chapter Alpha" is marked as read in the book layout
     And I should see that book block "Chapter Beta" is selected in the book layout
 
-  @wip
   Scenario: Mark an EPUB block as skimmed shows skimmed in layout
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Mark Skimmed Notebook"
@@ -92,7 +90,6 @@ Feature: EPUB book
     And I mark the book block "Chapter Alpha" as skimmed in the Reading Control Panel
     Then I should see that book block "Chapter Alpha" is marked as skimmed in the book layout
 
-  @wip
   Scenario: Mark an EPUB block as skipped shows skipped in layout
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Mark Skipped Notebook"
