@@ -59,15 +59,13 @@ import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
+import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
-import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
-import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type EpubViewerExposed = Pick<
@@ -79,8 +77,6 @@ type EpubViewerExposed = Pick<
 >
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
-const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
-const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
 const props = withDefaults(
@@ -99,18 +95,27 @@ const bookReading = useNotebookBookReadingRecords(notebookId)
 const epubViewerRef = ref<EpubViewerExposed | null>(null)
 const epubMainPaneRef = ref<HTMLElement | null>(null)
 
-const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
-  delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
-  commit: () => true,
-})
-const { currentBlockId } = currentBlockIdDebouncer
-
 const bookBlocks = computed(() => props.book.blocks)
+
+const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+const lastRelocateHref = ref<string | null>(null)
+
+const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
+  useBookReadingCurrentBlock({
+    notebookId,
+    commitCurrentBlock: () => true,
+    flushLastReadPositionPatchOnUnmount: true,
+    proposeReadingPosition: (debouncer) => () => {
+      const href = lastRelocateHref.value
+      if (href === null || href.length === 0) return
+      const sel = selectedBlockId.value
+      debouncer.proposeEpubLocator(href, sel === null ? undefined : sel)
+    },
+  })
 
 const refreshReadingPanelAnchorAfterSelection = ref<(() => void) | null>(null)
 
 const {
-  selectedBlockId,
   blockAwaitingConfirmation,
   applyBookBlockSelection,
   markSelectedBlockDisposition,
@@ -119,6 +124,7 @@ const {
   currentBlockId,
   hasRecordedDisposition: bookReading.hasRecordedDisposition,
   submitReadingDisposition: bookReading.submitReadingDisposition,
+  selectedBlockId,
   initialSelectedBlockId: props.initialSelectedBlockId ?? null,
   onAdvance: async (block) => {
     selectedBlockId.value = block.id
@@ -155,15 +161,6 @@ if (props.initialEpubLocator !== null && props.initialEpubLocator.length > 0) {
   currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
 }
 
-const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
-  delayMs: LAST_READ_POSITION_PATCH_DEBOUNCE_MS,
-  patch: (body) =>
-    NotebookBooksController.patchNotebookBookReadingPosition({
-      path: { notebook: notebookId.value },
-      body,
-    }),
-})
-
 const bookLayoutOpened = ref(false)
 const windowWidth = ref(
   typeof window !== "undefined"
@@ -189,15 +186,12 @@ const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
 refreshReadingPanelAnchorAfterSelection.value = updateReadingPanelAnchor
 
 function onEpubRelocated(payload: { href: string }) {
+  lastRelocateHref.value = payload.href
   const id = currentBlockIdFromEpubLocation(props.book.blocks, payload.href)
   if (id !== null) {
     currentBlockIdDebouncer.propose(id)
   }
-  const sel = selectedBlockId.value
-  lastReadPositionPatchDebouncer.proposeEpubLocator(
-    payload.href,
-    sel === null ? undefined : sel
-  )
+  proposeReadingPosition()
   updateReadingPanelAnchor()
 }
 
@@ -221,7 +215,5 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
-  currentBlockIdDebouncer.cancel()
-  lastReadPositionPatchDebouncer.flush()
 })
 </script>

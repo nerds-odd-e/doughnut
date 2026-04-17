@@ -184,6 +184,8 @@ Both views consume it and drop their local `blockAwaitingConfirmation` / `markSe
 
 ### Phase D2 — `useBookReadingCurrentBlock` composable (structure)
 
+**Status: done**
+
 **Change:** Create `frontend/src/composables/useBookReadingCurrentBlock.ts` owning `createCurrentBlockIdDebouncer(…)` and `createLastReadPositionPatchDebouncer(…)`, plus the wiring that proposes a last-read-position whenever `currentBlockId` changes. Input: `{ notebookId, resolveCurrentBlock, proposeReadingPosition }` — the resolver and proposer are format-specific strategies the views supply.
 
 PDF view supplies: resolver based on `currentBlockIdFromVisiblePage`, proposer using `pageIndex + normalizedY`.

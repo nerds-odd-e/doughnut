@@ -201,8 +201,6 @@ import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
-import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
@@ -213,6 +211,7 @@ import {
 } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
+import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
@@ -259,8 +258,6 @@ function bookFullAfterLayoutMutation(
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
-const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
-const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const SNAP_HOLD_MS = 500
 
 const props = withDefaults(
@@ -288,6 +285,26 @@ const pdfBarCurrentPage = computed(() => {
 const pdfBarPagesTotal = computed(() => {
   const p = viewportPayload.value
   return p && p.pagesCount > 0 ? p.pagesCount : null
+})
+
+const lastReadingForPatch = computed(() => {
+  const p = viewportPayload.value
+  if (!p) return null
+  let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
+    null
+  if (p.readingPosition !== undefined) {
+    reading = p.readingPosition
+  } else if (p.viewport !== null) {
+    reading = {
+      pageIndexZeroBased: p.anchorPageIndexZeroBased,
+      normalizedTop: p.viewport.top,
+    }
+  }
+  if (reading === null) return null
+  return {
+    pageIndex: reading.pageIndexZeroBased,
+    normalizedY: Math.round(reading.normalizedTop),
+  }
 })
 
 const bookLayoutOpened = ref(false)
@@ -323,37 +340,27 @@ const {
   dismiss: dismissAiReorganizePreview,
 } = useBookLayoutAiReorganize(notebookId, bookBlocks)
 
-const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
-  delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
-  commit: commitCurrentBlockId,
-})
-const { currentBlockId } = currentBlockIdDebouncer
+const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
+  useBookReadingCurrentBlock({
+    notebookId,
+    commitCurrentBlock: commitCurrentBlockId,
+    proposeReadingPosition: (debouncer) => () => {
+      const last = lastReadingForPatch.value
+      if (last === null) return
+      const sel = selectedBlockId.value
+      debouncer.propose(
+        last.pageIndex,
+        last.normalizedY,
+        sel === null ? undefined : sel
+      )
+    },
+  })
 
 const currentBlockForNavBar = computed(() => {
   const curId = currentBlockId.value
   const selId = selectedBlockId.value
   if (curId === null || selId === null || curId === selId) return null
   return bookBlocks.value.find((b) => b.id === curId) ?? null
-})
-
-const lastReadingForPatch = computed(() => {
-  const p = viewportPayload.value
-  if (!p) return null
-  let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
-    null
-  if (p.readingPosition !== undefined) {
-    reading = p.readingPosition
-  } else if (p.viewport !== null) {
-    reading = {
-      pageIndexZeroBased: p.anchorPageIndexZeroBased,
-      normalizedTop: p.viewport.top,
-    }
-  }
-  if (reading === null) return null
-  return {
-    pageIndex: reading.pageIndexZeroBased,
-    normalizedY: Math.round(reading.normalizedTop),
-  }
 })
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
@@ -426,15 +433,6 @@ const currentBlockLiveText = computed(() =>
   structuralTitleForBlockId(currentBlockId.value, bookBlocks.value)
 )
 
-const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
-  delayMs: LAST_READ_POSITION_PATCH_DEBOUNCE_MS,
-  patch: (body) =>
-    NotebookBooksController.patchNotebookBookReadingPosition({
-      path: { notebook: notebookId.value },
-      body,
-    }),
-})
-
 /**
  * Scroll → current-block pipeline:
  *   PdfBookViewer emits `viewportAnchorPage` (via `pdfViewerViewportTopYDown`)
@@ -464,24 +462,15 @@ function onViewportAnchorPage(payload: ViewportPayload) {
   currentBlockIdDebouncer.propose(candidate)
   updateLastDirectContentGeometry()
   updateReadingPanelAnchor()
-  const reading = lastReadingForPatch.value
-  if (reading !== null) {
-    const sel = selectedBlockId.value
-    lastReadPositionPatchDebouncer.propose(
-      reading.pageIndex,
-      reading.normalizedY,
-      sel === null ? undefined : sel
-    )
-  }
+  proposeReadingPosition()
 }
 
 watch(selectedBlockId, (id) => {
   readingPanelAnchorTopPx.value = null
-  const last = lastReadingForPatch.value
-  if (last === null || id === null) {
+  if (id === null) {
     return
   }
-  lastReadPositionPatchDebouncer.propose(last.pageIndex, last.normalizedY, id)
+  proposeReadingPosition()
 })
 
 function onPagesReady() {
@@ -658,7 +647,5 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
-  currentBlockIdDebouncer.cancel()
-  lastReadPositionPatchDebouncer.cancel()
 })
 </script>
