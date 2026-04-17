@@ -1,6 +1,6 @@
 {
   "name": "doughnut-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Doughnut CLI",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix",
-    "bundle": "([ -f .env.local ] && set -a && . ./.env.local && set +a) || true; OUTFILE=\"${CLI_BUNDLE_OUTFILE:-./dist/doughnut-cli.bundle.mjs}\"; pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=\"$OUTFILE\" --format=esm --conditions=mineru-bundle --loader:.py=text --alias:doughnut-api=../packages/doughnut-api/src/index.ts --alias:react-devtools-core=./src/shims/react-devtools-core-stub.ts --alias:react=./node_modules/react --alias:react/jsx-runtime=./node_modules/react/jsx-runtime.js --banner:js=\"$(printf '#!/usr/bin/env node\\nimport { createRequire } from \"module\"; const require = createRequire(import.meta.url);')\" --define:CLI_VERSION=\\\"${CLI_VERSION:-0.1.0}\\\" --define:process.env.GOOGLE_CLIENT_ID=\\\"${GOOGLE_CLIENT_ID:-}\\\" --define:process.env.GOOGLE_CLIENT_SECRET=\\\"${GOOGLE_CLIENT_SECRET:-}\\\" --define:process.env.NODE_ENV=\\\"production\\\"",
+    "bundle": "([ -f .env.local ] && set -a && . ./.env.local && set +a) || true; OUTFILE=\"${CLI_BUNDLE_OUTFILE:-./dist/doughnut-cli.bundle.mjs}\"; pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=\"$OUTFILE\" --format=esm --conditions=mineru-bundle --loader:.py=text --alias:doughnut-api=../packages/doughnut-api/src/index.ts --alias:react-devtools-core=./src/shims/react-devtools-core-stub.ts --alias:react=./node_modules/react --alias:react/jsx-runtime=./node_modules/react/jsx-runtime.js --banner:js=\"$(printf '#!/usr/bin/env node\\nimport { createRequire } from \"module\"; const require = createRequire(import.meta.url);')\" --define:CLI_VERSION=\\\"${CLI_VERSION:-0.2.0}\\\" --define:process.env.GOOGLE_CLIENT_ID=\\\"${GOOGLE_CLIENT_ID:-}\\\" --define:process.env.GOOGLE_CLIENT_SECRET=\\\"${GOOGLE_CLIENT_SECRET:-}\\\" --define:process.env.NODE_ENV=\\\"production\\\"",
     "test": "vitest run && pnpm test:mineru-python",
     "test:mineru-python": "python3 -c \"import unittest,sys; s=unittest.defaultTestLoader.discover('python','test_*.py'); r=unittest.TextTestRunner(verbosity=1).run(s); sys.exit(0 if r.wasSuccessful() else 1)\"",
     "test:mutation": "stryker run",
