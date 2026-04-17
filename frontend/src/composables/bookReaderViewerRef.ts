@@ -46,12 +46,8 @@ export type BookReadingPdfViewerRef = BookReaderViewerRef & {
     highlightBboxes?: ReadonlyArray<BookNavigationTarget>
   ) => void
   suppressScrollInput: (holdMs: number) => void
-  contentFitsFromBlockTop: (
-    pageIndex: number,
-    normalizedBlockTopY: number,
-    normalizedContentBottomY: number,
-    obstructionPx: number
-  ) => boolean
+  getPageRect: (pageIndex: number) => { height: number } | null
+  getScrollViewportHeightPx: () => number | null
   zoomIn: () => void
   zoomOut: () => void
 }

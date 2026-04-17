@@ -8,6 +8,47 @@ import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type Ref, ref, watch } from "vue"
 
+/** Whether the normalized vertical span on the page fits in the viewport minus obstruction. */
+export function snapBackNormalizedSpanFitsViewport(options: {
+  pageHeightPx: number
+  viewportHeightPx: number
+  normalizedBlockTopY: number
+  normalizedContentBottomY: number
+  obstructionPx: number
+}): boolean {
+  const spanPx =
+    ((options.normalizedContentBottomY - options.normalizedBlockTopY) / 1000) *
+    options.pageHeightPx
+  return spanPx <= options.viewportHeightPx - options.obstructionPx
+}
+
+function contentFitsFromBlockTop(options: {
+  viewer: BookReadingPdfViewerRef | null
+  pageIndex: number
+  normalizedBlockTopY: number
+  normalizedContentBottomY: number
+  obstructionPx: number
+}): boolean {
+  const {
+    viewer,
+    pageIndex,
+    normalizedBlockTopY,
+    normalizedContentBottomY,
+    obstructionPx,
+  } = options
+  if (!viewer) return false
+  const pageRect = viewer.getPageRect(pageIndex)
+  const viewportH = viewer.getScrollViewportHeightPx()
+  if (pageRect === null || viewportH === null) return false
+  return snapBackNormalizedSpanFitsViewport({
+    pageHeightPx: pageRect.height,
+    viewportHeightPx: viewportH,
+    normalizedBlockTopY,
+    normalizedContentBottomY,
+    obstructionPx,
+  })
+}
+
 function selectedIndexAndSuccessor(
   rows: readonly BookBlockFull[],
   selId: number
@@ -113,12 +154,13 @@ export function useBookReadingSnapBack(options: {
       samePage && parsedStart!.bbox !== null ? parsedStart!.bbox[1] : 0
     const fits =
       samePage &&
-      pdfViewerRef.value?.contentFitsFromBlockTop(
-        lastBbox.pageIndex,
-        blockTopY,
-        contentBottomY,
-        obstructionPx
-      ) === true
+      contentFitsFromBlockTop({
+        viewer: pdfViewerRef.value,
+        pageIndex: lastBbox.pageIndex,
+        normalizedBlockTopY: blockTopY,
+        normalizedContentBottomY: contentBottomY,
+        obstructionPx,
+      })
     if (fits) {
       pdfViewerRef.value
         ?.scrollToBookNavigationTarget(parsedStart!, navTargets)

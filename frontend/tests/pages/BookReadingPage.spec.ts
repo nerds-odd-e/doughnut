@@ -1247,22 +1247,25 @@ describe("BookReadingPage", () => {
         return vi.spyOn(exposed, "suppressScrollInput")
       }
 
-      function mockContentFitsFromBlockTop(
+      /** Matches stub bbox span vs viewport; `fits` mirrors old `contentFitsFromBlockTop` mock. */
+      function mockSnapBackContentFitsInViewport(
         wrapper: BookReadingPageWrapper,
-        returnValue: boolean
+        fits: boolean
       ) {
         const pdf = wrapper.findComponent(PdfBookViewer)
         const exposed = (
           pdf.vm as unknown as {
             $: {
               exposed: {
-                contentFitsFromBlockTop: () => boolean
+                getPageRect: (pageIndex: number) => { height: number } | null
+                getScrollViewportHeightPx: () => number | null
               }
             }
           }
         ).$.exposed
-        vi.spyOn(exposed, "contentFitsFromBlockTop").mockReturnValue(
-          returnValue
+        vi.spyOn(exposed, "getPageRect").mockReturnValue({ height: 1000 })
+        vi.spyOn(exposed, "getScrollViewportHeightPx").mockReturnValue(
+          fits ? 10_000 : 100
         )
       }
 
@@ -1406,7 +1409,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
         const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
 
@@ -1446,7 +1449,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1481,7 +1484,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1546,7 +1549,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1728,7 +1731,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1813,7 +1816,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, false)
+        mockSnapBackContentFitsInViewport(wrapper, false)
         const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1858,7 +1861,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1892,7 +1895,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -1947,7 +1950,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -2036,7 +2039,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        mockContentFitsFromBlockTop(wrapper, true)
+        mockSnapBackContentFitsInViewport(wrapper, true)
         const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         // --- exhaust Section 1's two snap budget ---

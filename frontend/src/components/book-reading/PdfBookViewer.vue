@@ -576,31 +576,23 @@ function readingPanelAnchorTopPx(
   return rect.bottom - containerRect.top + READING_PANEL_ANCHOR_GAP_PX
 }
 
-/**
- * Returns true when the span from `normalizedBlockTopY` to `normalizedContentBottomY` on the
- * given page fits within the visible container height minus `obstructionPx`. Used by snap-back
- * to decide whether scrolling to the block start would show all content above the panel.
- */
-function contentFitsFromBlockTop(
-  pageIndex: number,
-  normalizedBlockTopY: number,
-  normalizedContentBottomY: number,
-  obstructionPx: number
-): boolean {
-  const container = containerRef.value
-  if (!container || !pdfViewer) return false
+function getPageRect(pageIndex: number): { height: number } | null {
+  if (!pdfViewer) return null
   if (
     !Number.isInteger(pageIndex) ||
     pageIndex < 0 ||
     pageIndex >= pdfViewer.pagesCount
   )
-    return false
+    return null
   const pageView = pdfViewer.getPageView(pageIndex)
-  if (!pageView?.div) return false
-  const pageHeight = pageView.div.getBoundingClientRect().height
-  const spanPx =
-    ((normalizedContentBottomY - normalizedBlockTopY) / 1000) * pageHeight
-  return spanPx <= container.getBoundingClientRect().height - obstructionPx
+  if (!pageView?.div) return null
+  return { height: pageView.div.getBoundingClientRect().height }
+}
+
+function getScrollViewportHeightPx(): number | null {
+  const container = containerRef.value
+  if (!container) return null
+  return container.getBoundingClientRect().height
 }
 
 function suppressScrollInput(holdMs: number): void {
@@ -659,7 +651,8 @@ defineExpose({
   scrollToStoredReadingPosition,
   snapToContentBottomAndHold,
   suppressScrollInput,
-  contentFitsFromBlockTop,
+  getPageRect,
+  getScrollViewportHeightPx,
   zoomIn,
   zoomOut,
   isLocatorBottomVisible,

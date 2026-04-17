@@ -377,6 +377,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase G1 — Move `contentFitsFromBlockTop` into snap-back internals (structure)
 
+**Status: done**
+
 **Change:** Expose the geometry primitive the snap-back logic actually needs from the viewer (e.g. `getPageRect(pageIndex): { height } | null` or similar), and compute `contentFitsFromBlockTop` inside `useBookReadingSnapBack`. Remove the method from `BookReadingPdfViewerRef`.
 
 **Files:** `frontend/src/composables/bookReaderViewerRef.ts`, `PdfBookViewer.vue`, `useBookReadingSnapBack.ts`.
