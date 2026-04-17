@@ -1,10 +1,11 @@
 import type {
   BookBlockFull,
+  ContentLocatorFull,
   EpubLocatorFull,
 } from "@generated/doughnut-backend-api"
 
 export function asEpubLocator(
-  loc: BookBlockFull["contentLocators"][number] | undefined
+  loc: ContentLocatorFull | BookBlockFull["contentLocators"][number] | undefined
 ): EpubLocatorFull | null {
   if (!loc) {
     return null

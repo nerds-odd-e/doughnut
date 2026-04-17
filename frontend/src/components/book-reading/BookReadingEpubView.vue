@@ -56,6 +56,7 @@ import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayo
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import {
@@ -66,17 +67,17 @@ import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurren
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
-import type {
-  BookBlockFull,
-  BookFull,
-  EpubLocatorFull,
-} from "@generated/doughnut-backend-api"
+import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
-type EpubViewerExposed = {
-  displayLocator: (loc: EpubLocatorFull) => Promise<void>
-}
+type EpubViewerExposed = Pick<
+  BookReaderViewerRef,
+  | "displayLocator"
+  | "resolveLocatorRect"
+  | "isLocatorBottomVisible"
+  | "readingPanelAnchorTopPx"
+>
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120

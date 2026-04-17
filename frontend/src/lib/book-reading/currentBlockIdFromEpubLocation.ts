@@ -1,41 +1,14 @@
 import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
+import {
+  epubSpinePathMatches,
+  splitEpubHref,
+} from "@/lib/book-reading/epubHrefMatch"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
 
 export type BookBlockEpubLocationRow = Pick<
   BookBlockFull,
   "id" | "contentLocators"
 >
-
-/**
- * epub.js spine `href` is often manifest-relative (e.g. `chapter1.xhtml`) while our API stores
- * package-root paths (e.g. `OEBPS/chapter1.xhtml`).
- */
-function epubSpinePathMatches(
-  storedPath: string,
-  relocatedPath: string
-): boolean {
-  const a = storedPath.replace(/^\/+/, "").trim()
-  const b = relocatedPath.replace(/^\/+/, "").trim()
-  if (a === b) {
-    return true
-  }
-  return a.endsWith(`/${b}`) || b.endsWith(`/${a}`)
-}
-
-function splitEpubHref(href: string): {
-  path: string
-  fragment: string | null
-} {
-  const i = href.indexOf("#")
-  if (i === -1) {
-    return { path: href, fragment: null }
-  }
-  const fragment = href.slice(i + 1)
-  return {
-    path: href.slice(0, i),
-    fragment: fragment.length === 0 ? null : fragment,
-  }
-}
 
 /**
  * Maps an epub.js spine location (`location.start.href`, optionally with `#fragment`)
