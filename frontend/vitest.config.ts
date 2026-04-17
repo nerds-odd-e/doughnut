@@ -65,9 +65,8 @@ const config = defineConfig({
       "vue-toastification",
       "marked",
       "turndown-plugin-gfm",
-      "pdfjs-dist",
-      "pdfjs-dist/web/pdf_viewer.mjs",
     ],
+    exclude: ["pdfjs-dist"],
   },
   test: {
     globals: true,

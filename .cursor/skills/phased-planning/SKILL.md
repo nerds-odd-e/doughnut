@@ -57,9 +57,9 @@ For sub-decomposition of a single phase: `ongoing/<plan-name>-<phase-number>-sub
 
 **Pattern (repeat until the scenario passes and `@wip` is removed):**
 
-1. **Red sub-phase** — Write the **full** E2E scenario in the feature file and tag it `@wip`. Run E2E locally; confirm the failure is for the **right reason** (behavior not implemented, not typos).
+1. **Red sub-phase** — Write the **full** E2E scenario in the feature file and tag it `@wip`. Run E2E locally with **`cypress run --spec`** pointing at **that** feature file (not the whole suite); confirm the failure is for the **right reason** (behavior not implemented, not typos).
 2. **Green sub-phase** — Implement the **smallest** production change that makes progress toward passing the scenario. **No dead code**; keep the change clean.
-3. **Next** — Run E2E locally again. If the scenario still fails, go back to **2**. When all steps pass, remove the `@wip` tag.
+3. **Next** — Run the same **`--spec`** again. If the scenario still fails, go back to **2**. When all steps pass, remove the `@wip` tag.
 
 ---
 

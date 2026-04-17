@@ -33,7 +33,11 @@ All services automatically restart when code changes are made. The developer doe
 
 ## Run E2E Test in Terminal
 
-We usually don't run all the e2e tests locally, since it will take too much time. That still fits **phased planning** (`planning.mdc`): each phase should have E2E for **its** slice — run the **relevant** feature file(s), not necessarily the whole suite. To run one feature file:
+We usually don't run all the e2e tests locally, since it will take too much time. That still fits **phased planning** (`planning.mdc`): each phase should have E2E for **its** slice — run the **relevant** feature file(s), not necessarily the whole suite.
+
+**AI agents:** Default to **`pnpm cypress run --spec`** (one or more paths to `.feature` files) for capabilities tied to the change; add **adjacent** specs only when regression risk warrants it. Do **not** run bare `pnpm cypress run`, `pnpm verify`, or the whole suite **unless the user explicitly asks** for a full E2E run (or your instructions say CI must be reproduced). Human developers and CI still own the occasional full pass.
+
+To run one feature file:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature

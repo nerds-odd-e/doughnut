@@ -113,6 +113,8 @@ CURSOR_DEV=true nix develop -c <command>
 | Run single frontend test | `pnpm -C frontend test tests/path/to/TestFile.spec.ts` |
 | Run E2E test (single feature) | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature` |
 | Open Cypress IDE | `pnpm cy:open` |
+
+**E2E scope (agents):** Prefer one or more **`--spec`** paths for the behavior you changed; avoid running the **full** Cypress suite locally (slow). Run everything only when the user or CI workflow explicitly requires it (`pnpm verify` in `README.md`).
 | Format all code | `pnpm format:all` |
 | Lint all code | `pnpm lint:all` |
 | Format shared API test fixtures only (Biome) | `pnpm test-fixtures:format` |

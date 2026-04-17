@@ -67,7 +67,7 @@ Phases decide **when** you add or extend tests, but tests are grouped and named 
 Before closing a phase and starting the next:
 
 1. **Clean up** — Remove dead or unreachable code.
-2. **No failing tests** — All unit tests and existing E2E tests must pass. No test may be left in a failing state at the end of any phase or sub-phase.
+2. **No failing tests** — All unit tests and existing E2E tests must pass at the **merge / CI** gate. No test may be left in a failing state at the end of any phase or sub-phase. **Locally and for AI agents:** satisfy this by running **targeted** E2E (`cypress run --spec` for the feature(s) you touched and any clearly related features); do **not** run the **full** E2E suite unless CI, the workflow, or the user **explicitly** requires it.
 3. **`@wip` for not-yet-passing E2E scenarios** — When writing E2E scenarios test-first for behavior that is not yet implemented, tag them `@wip`. This tag runs normally in local development but is skipped in GitHub Actions CI. Remove the `@wip` tag once the scenario passes. CI enforces a maximum of 5 `@wip` scenarios across the entire E2E project to prevent accumulation.
 4. **Deploy gate** — Commit, push, and let **CD deploy** before the next phase (unless the team explicitly agrees otherwise). Usually **manual** on the developer side.
 5. **Update the plan** — Reflect what is done and what remains; drop obsolete notes.

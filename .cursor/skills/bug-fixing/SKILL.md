@@ -39,6 +39,7 @@ description: >-
 
 - Run the **new test** and confirm it passes.
 - Run **related tests** (same file / same feature) and confirm nothing else broke.
+- For Cypress E2E, use **`cypress run --spec`** for the **relevant** `.feature` file(s) only; do **not** run the full E2E suite unless explicitly requested.
 
 ## 6. Refactoring and clean up
 

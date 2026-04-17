@@ -22,7 +22,7 @@ const harness = vi.hoisted(() => {
   }
 })
 
-vi.mock("pdfjs-dist/legacy/build/pdf.mjs", () => ({
+vi.mock("pdfjs-dist/build/pdf.mjs", () => ({
   GlobalWorkerOptions: { workerSrc: "" },
   getDocument: vi.fn(() => ({
     promise: Promise.resolve(harness.mockPdf),
@@ -30,7 +30,7 @@ vi.mock("pdfjs-dist/legacy/build/pdf.mjs", () => ({
   })),
 }))
 
-vi.mock("pdfjs-dist/legacy/web/pdf_viewer.mjs", () => {
+vi.mock("pdfjs-dist/web/pdf_viewer.mjs", () => {
   class EventBus {
     private listeners = new Map<string, Set<(...args: unknown[]) => void>>()
 

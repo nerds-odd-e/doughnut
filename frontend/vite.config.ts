@@ -92,11 +92,9 @@ const config = defineConfig({
       'marked',
       'turndown',
       'es-toolkit',
-      'pdfjs-dist',
-      'pdfjs-dist/legacy/build/pdf.mjs',
-      'pdfjs-dist/legacy/web/pdf_viewer.mjs',
     ],
-    exclude: ['fsevents'],
+    // pdf.js must not be pre-bundled separately from pdf.worker.mjs or main/worker break (fake worker / no pages).
+    exclude: ['fsevents', 'pdfjs-dist'],
     force: true
   },
   base: '/',

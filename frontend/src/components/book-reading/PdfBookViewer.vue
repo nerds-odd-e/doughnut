@@ -53,16 +53,13 @@ import {
   type BookNavigationTarget,
   type NormalizedPageBbox,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import {
-  getDocument,
-  type PDFDocumentProxy,
-} from "pdfjs-dist/legacy/build/pdf.mjs"
+import { getDocument, type PDFDocumentProxy } from "pdfjs-dist/build/pdf.mjs"
 import {
   EventBus,
   PDFLinkService,
   PDFViewer,
-} from "pdfjs-dist/legacy/web/pdf_viewer.mjs"
-import "pdfjs-dist/legacy/web/pdf_viewer.css"
+} from "pdfjs-dist/web/pdf_viewer.mjs"
+import "pdfjs-dist/web/pdf_viewer.css"
 import { nextTick, onBeforeUnmount, ref, watch } from "vue"
 
 const props = withDefaults(
@@ -805,9 +802,18 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     userAdjustedScale = false
     pdfViewer.setDocument(pdf)
     linkService.setDocument(pdf)
-  } catch {
+  } catch (e) {
     if (currentLoadingTask === loadingTask) {
-      emit("loadError", "This file is not a valid PDF.")
+      const fallback = "This file is not a valid PDF."
+      if (e instanceof Error) {
+        if (e.name === "InvalidPDFException") {
+          emit("loadError", fallback)
+        } else {
+          emit("loadError", e.message || fallback)
+        }
+      } else {
+        emit("loadError", fallback)
+      }
     }
   }
 }

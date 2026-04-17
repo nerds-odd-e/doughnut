@@ -82,6 +82,8 @@ With only **`nix develop -c`**, set **`MYSQL_*`** / **`REDIS_*`** the same way a
 
 Always use `CURSOR_DEV=true nix develop -c` prefix for commands (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`).
 
+**E2E (Cypress):** Run only **relevant** feature files with `cypress run --spec …`. Do **not** run the full E2E suite (`pnpm verify` or bare `cypress run` without `--spec`) unless the user **explicitly** asks. Details: `e2e_test.mdc`.
+
 When deleting files, instead of using `rm -f` or `rm -rf` prefer to use `trash` instead provided by `trash-cli` from flake.nix packages.
 
 # Development preferences
