@@ -94,10 +94,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
       myNotebooksSpy.mockResolvedValue({
         data: { notebooks: [notebookWithTitle('Top Maths')] },
       } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
-      attachBookSpy = vi.spyOn(
-        doughnutBackendClient,
-        'attachNotebookBookWithPdf'
-      )
+      attachBookSpy = vi.spyOn(doughnutBackendClient, 'attachNotebookBookFile')
       runMineruOutlineSubprocess.mockResolvedValue({
         ok: true,
         outline: 'o',

@@ -1,0 +1,165 @@
+# EPUB Phase 9 — sub-phases plan
+
+**Parent plan:** [book-reading-epub-support-plan.md](book-reading-epub-support-plan.md) — Phase 9 "Attach an EPUB from the CLI with no preprocessing".
+
+**Goal of this plan:** break Phase 9 into small, each-a-complete-git-commit slices (~5 minutes of focused work each). Each slice either delivers externally observable CLI attach behavior or restructures the codebase specifically to enable the immediate next behavior slice — no speculative prep. Along the way, collapse the EPUB-vs-PDF duplication that is about to appear in the CLI attach path (upload helper, slash-command dispatcher, E2E page object) so the shared attach concept stays cohesive.
+
+## Guiding principles for these sub-phases
+
+- **Stop-safe:** after any sub-phase main is shippable. CLI PDF attach never regresses; EPUB attach is either absent or fully working.
+- **One behavior per behavior-slice; one enabling refactor per structure-slice.** Each structure slice is justified by the **next** behavior slice, not a later one.
+- **Cohesion over parallel stacks:** one upload helper, one `/attach` dispatcher, one CLI page-object attach helper — format is a parameter, not a duplicated module.
+- **Reuse server-side EPUB path:** no second extraction pipeline. The CLI just sends raw bytes with `format: "epub"` to the same `attach-book` endpoint the browser already drives (Phase 1–2).
+- **Observable tests first:** add tests from the CLI entry point (`InteractiveCliApp` via `renderInkWhenCommandLineReady`) for unit behavior; add one CLI E2E scenario for the end-to-end proof. Do not re-test the full EPUB browser matrix from the CLI side.
+- **`@wip` for scenarios that outrun the code.** Keep the budget well under 5.
+
+---
+
+## The central refactor: one attach pipeline, format is a parameter
+
+Today the CLI attach path is PDF-shaped end to end:
+
+| Layer | Today (PDF-only) | After Phase 9 (format-aware) |
+|---|---|---|
+| Upload helper in `doughnutBackendClient.ts` | `attachNotebookBookWithPdf(notebookId, metadata, pdfAbsolutePath)` hardcodes `application/pdf` Blob type | One helper that takes the absolute file path and derives `Content-Type` from `metadata.format` (`application/pdf` vs `application/epub+zip`) |
+| Slash-command entry in `notebookAttachSlashCommand.tsx` | `runNotebookAttachPdf(notebook, path)` rejects non-`.pdf`, runs MinerU unconditionally | `runNotebookAttach(notebook, path)` detects format by extension, dispatches to PDF branch (MinerU + layout) or EPUB branch (raw upload, no preprocessing) |
+| `CommandDoc` + spinner | Usage `"/attach <path to pdf>"`; spinner `"Attaching PDF…"` | Usage `"/attach <path to .pdf or .epub>"`; spinner `"Attaching book…"` |
+| CLI E2E page-object | `attachBookPdfToNotebookViaInteractiveCli(...)` (currently unused) | `attachBookToNotebookViaInteractiveCli({ fixtureFilename, notebookTitle })` usable for both formats |
+
+Nothing about the backend changes — `BookService.attachBook` and the `attach-book` controller are already format-aware from Phase 1. Phase 9 is pure CLI work plus one CLI E2E scenario.
+
+---
+
+## Architecture opportunities beyond Phase 9 (not scheduled)
+
+Noted here so future work can pick them up; Phase 9 behavior does not need them:
+
+- Generate the attach helper from the OpenAPI-described `attach-book` operation instead of hand-rolling `FormData` + `fetch` in `doughnutBackendClient.ts`. Today the generated SDK skips multipart; a future pass could replace the custom helper once the generator supports it.
+- Factor `runMineruOutlineSubprocess` + `truncateForBookOutlineAssistant` out of `notebookAttachSlashCommand.tsx` into a PDF-specific preprocessing module so the slash-command stays a thin dispatcher. Defer until a third format or a second PDF call site appears.
+- CLI error-mapping symmetry for EPUB-specific server errors (DRM, invalid container). The existing `readableClientErrorDetail` + `doughnutApiErrorFromThrowable` path already surfaces backend messages; keep a watching brief and only add CLI-specific copy if a real fixture shows a gap.
+
+---
+
+## Sub-phases
+
+Numbering is **9.N** and is plan-only bookkeeping — commit messages, test names, and any permanent artifact are named by **capability** (e.g. `notebook_attach_book.feature`, `attachNotebookBookFile`), never by sub-phase number.
+
+### 9.1 — Structure: generalize the upload helper to carry any book file
+
+**Why now:** The very next slice (9.2) extracts a format dispatcher inside the slash command; the slice after that (9.3) wires EPUB. Both depend on an upload helper that is not PDF-shaped. Doing this first keeps 9.3 small.
+
+**Scope:**
+- In `cli/src/backendApi/doughnutBackendClient.ts`, rename `attachNotebookBookWithPdf` → `attachNotebookBookFile`. Derive the multipart Blob `type` from `metadata.format` (`'pdf'` → `application/pdf`, `'epub'` → `application/epub+zip`). Signature stays `(notebookId, metadata: AttachBookRequestFull, absolutePath, signal?)`.
+- Update the only caller (`notebookAttachSlashCommand.tsx`) and its test (`cli/tests/InteractiveCliApp.useNotebook.test.tsx`) to the new name. No behavior change for PDF.
+
+**Tests:**
+- Existing `notebook stage /attach` PDF tests stay green unchanged (import name updated). No new tests in this slice.
+
+### 9.2 — Structure: extract a format dispatcher inside the slash command
+
+**Why now:** Needed by 9.3's EPUB branch so the PDF-specific MinerU work does not leak into the EPUB code path. Keeps 9.3 additive.
+
+**Scope:**
+- In `notebookAttachSlashCommand.tsx`, rename `runNotebookAttachPdf` → `runNotebookAttach(notebook, bookPath)`.
+- Introduce a small local helper `detectBookAttachFormat(path): 'pdf' | 'epub' | undefined` (lowercased extension match).
+- Split the existing PDF logic into a private `runNotebookAttachPdfPipeline(notebook, absPath, baseName)` that takes an already-resolved absolute path and filename stem; `runNotebookAttach` handles path validation, format detection, dispatch, and the `"Attach supports .pdf or .epub files."` rejection message for unknown extensions. (EPUB branch still rejects in this slice — dispatcher shape only.)
+- Update the stage's spinner label to `"Attaching book…"` (format-agnostic).
+
+**Tests:**
+- Update the existing "rejects attach when path is not a file" / "rejects attach when PDF path is missing" / spinner tests in `cli/tests/InteractiveCliApp.useNotebook.test.tsx` to the new wording (`"Attaching book"` instead of `"Attaching PDF"`, and the new unknown-extension error text if exercised).
+- All other PDF-pipeline tests stay green unchanged.
+
+### 9.3 — Behavior: `/attach <file.epub>` attaches an EPUB via the CLI
+
+**Why now:** First user-visible Phase 9 behavior. Rides entirely on 9.1 + 9.2.
+
+**Scope:**
+- In `notebookAttachSlashCommand.tsx`, add the EPUB branch inside `runNotebookAttach`: when `detectBookAttachFormat(path) === 'epub'`, resolve to an absolute path, `stat()` it (same file-not-found / is-a-directory checks as PDF), build `AttachBookRequestFull` with `bookName = basename(path, extname(path))`, `format: 'epub'`, no `layout`/`contentList`, and call `attachNotebookBookFile(notebook.id, metadata, absPath)`. Reuse `bookBlocksTreeLines` + `truncateForBookOutlineAssistant` to format the assistant response.
+- Update `CommandDoc` usage to `"/attach <path to .pdf or .epub>"` and refresh its description so it says `pdf` attach uses MinerU; `epub` attach is a raw upload (no Python, no preprocessing).
+- Update `notebookAttachSlashCommand.tsx`'s `argument` label to `"path to book file"` (or similar) so `/` guidance doesn't imply PDF-only.
+- Make sure MinerU is **not** invoked on the EPUB branch (no `runMineruOutlineSubprocess` call).
+
+**Tests:** extend the `notebook stage /attach` describe in `cli/tests/InteractiveCliApp.useNotebook.test.tsx`:
+- `attaches EPUB and shows structure excerpt from API book` — happy path: stub `attachNotebookBookFile` to return a book with `format: 'epub'` and a couple of EPUB blocks; assert the assistant shows `Attached "my-book" to this notebook.` and the block titles.
+- `EPUB attach does not invoke MinerU` — assert `runMineruOutlineSubprocess` is not called on `/attach foo.epub`.
+- `rejects attach when extension is neither .pdf nor .epub` — assert the `"Attach supports .pdf or .epub files."` error.
+- `rejects attach when EPUB path is missing` — symmetrical to the existing PDF missing-path case.
+
+Existing PDF tests remain green.
+
+### 9.4 — Structure: make the CLI E2E attach page-object helper format-agnostic
+
+**Why now:** Needed by 9.5, which uses this helper for the EPUB E2E scenario. Keeping a PDF-named helper next to a new EPUB-named helper would immediately re-introduce duplication.
+
+**Scope:**
+- In `e2e_test/start/pageObjects/cli/bookReadingCli.ts`, rename `attachBookPdfToNotebookViaInteractiveCli` → `attachBookToNotebookViaInteractiveCli`. Signature unchanged (`{ fixtureFilename, notebookTitle }`); body is already format-agnostic (it just sends `/attach <absolutePath>`).
+- Tweak the post-attach transcript assertion if needed so it does not rely on PDF-specific words (e.g. use the `Attached "…" to this notebook.` substring that both branches print, rather than `"Attaching PDF"` specific matches).
+- This helper has no callers today, so there is no cascade. (If a caller lands between now and this slice, follow it through.)
+
+**Tests:** no test changes. Dead-code-to-reused-code rename.
+
+### 9.5 — Behavior (E2E): CLI attach-EPUB end-to-end proof
+
+**Why now:** The single end-to-end proof Phase 9 calls out ("CLI attach to browser-visible result, without duplicating the full frontend EPUB matrix").
+
+**Scope:**
+- New capability-named CLI E2E feature `e2e_test/features/cli/notebook_attach_book.feature` with one EPUB scenario:
+  - Preconditions: logged-in user, an empty notebook.
+  - Trigger: open the installed interactive CLI, run `/use <notebook>` then `/attach <absolute path to e2e_test/fixtures/book_reading/epub_valid_minimal.epub>`.
+  - Postconditions: past CLI assistant messages contain `Attached "epub_valid_minimal" to this notebook.` and the chapter structure excerpt (at least `Part One` and `Chapter Alpha` from the existing fixture). Then, in the browser, opening the reading view for the notebook shows the EPUB with book name `epub_valid_minimal` (reuse the existing step from `epub_book.feature`).
+- Wire the step that already exists (`attach the EPUB file …` + interactive CLI steps) via `bookReadingCli().attachBookToNotebookViaInteractiveCli(...)`. Add thin glue step definitions in `e2e_test/step_definitions/` only if a capability-named step isn't already available.
+- Use the `@bundleCliE2eInstall` tag and run through the installed binary path, matching how the existing active CLI E2E scenario works.
+- If backend/CLI wiring still needs minutes to settle, tag the new scenario `@wip` in the first commit and remove the tag in a follow-up commit once it goes green; stay under the 5 `@wip` project budget.
+
+**Tests:** this slice *is* the test. Run targeted:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/notebook_attach_book.feature
+```
+
+Leave other CLI / EPUB E2E features untouched.
+
+### 9.6 — Cleanup, plan refresh, and interim-wording removal
+
+**Why now:** Phase-discipline gate for closing Phase 9.
+
+**Scope:**
+- Audit the CLI attach path for leftover PDF-only wording in user-facing strings (CommandDoc description, error messages, help output, argument label) that no longer fits now that EPUB is supported. Keep PDF-only wording only where it really is PDF-only (MinerU env vars, PDF preprocessing details).
+- Audit `ongoing/` docs:
+  - `book-reading-epub-support-plan.md`: flip Phase 9 to a "Scope (shipped)" section mirroring how Phases 4–7 document it; update the phase summary table.
+  - `book-reading-user-stories.md`: add a new sub-story under "Story: EPUB book" for "Attach EPUB from the CLI" (and mark it shipped).
+- Remove any `@wip` tag that's still on the 9.5 scenario.
+
+**Tests:** no new tests; all prior CLI PDF scenarios / units and the new EPUB CLI scenario must be green.
+
+---
+
+## Mapping back to parent Phase 9 scope
+
+| Parent Phase 9 bullet | Sub-phase(s) |
+|---|---|
+| Extend `/attach` to accept `.epub` | 9.2, 9.3 |
+| Route EPUB attach as raw file upload with `format: "epub"` only | 9.1, 9.3 |
+| Keep PDF CLI behavior unchanged | 9.1, 9.2 (rename-only refactors), 9.6 (audit) |
+| Reuse the same backend EPUB attach path already exercised by the frontend upload | 9.3 (no new backend call) |
+| CLI test for `.epub` routing and multipart payload shape | 9.3 (unit tests through `InteractiveCliApp`) |
+| One representative end-to-end proof from CLI attach to browser-visible result | 9.5 |
+
+## Stop-safety check per sub-phase
+
+| After… | Main branch state |
+|---|---|
+| 9.1 | PDF attach unchanged; upload helper renamed and format-aware under the hood |
+| 9.2 | PDF attach unchanged; `/attach` has a dispatcher; unknown extension gives a clearer error; EPUB still rejected |
+| 9.3 | **PDF attach unchanged; `/attach file.epub` now works in the CLI** (covered by unit tests) |
+| 9.4 | E2E page-object renamed; no E2E caller yet; behavior unchanged |
+| 9.5 | **One CLI E2E scenario proves the full CLI → backend → browser EPUB path** |
+| 9.6 | Cleanup only: wording, user-stories, plan doc |
+
+## Commit checklist per sub-phase
+
+1. Tests written or extended alongside the slice, failing for the right reason before the code change (for behavior slices; structure slices must keep existing tests green).
+2. `pnpm cli:test` for any `cli/` change; the single targeted `cypress run --spec` for the CLI E2E feature touched in 9.5 (not the full suite).
+3. Lint / format: `pnpm lint:all` (scope to touched files is usually enough).
+4. Commit with a capability-focused message (e.g. "CLI `/attach` supports .epub", "Unify CLI book attach upload helper"); no "Phase 9.x" in the message body.
+5. Push; let CD deploy before starting the next sub-phase.

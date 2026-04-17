@@ -279,10 +279,16 @@ export async function runDefaultBackendJson<T>(
   return (envelope as { data: T }).data
 }
 
-export async function attachNotebookBookWithPdf(
+function attachBookFileBlobType(
+  format: AttachBookRequestFull['format']
+): string {
+  return format === 'pdf' ? 'application/pdf' : 'application/epub+zip'
+}
+
+export async function attachNotebookBookFile(
   notebookId: number,
   metadata: AttachBookRequestFull,
-  pdfAbsolutePath: string,
+  absolutePath: string,
   signal?: AbortSignal
 ): Promise<BookFull> {
   const stored = loadStoredAccessToken()
@@ -291,7 +297,7 @@ export async function attachNotebookBookWithPdf(
   }
 
   const { apiBaseUrl } = getApiConfig()
-  const pdfBytes = await readFile(pdfAbsolutePath)
+  const fileBytes = await readFile(absolutePath)
   const form = new FormData()
   form.append(
     'metadata',
@@ -299,8 +305,8 @@ export async function attachNotebookBookWithPdf(
   )
   form.append(
     'file',
-    new Blob([pdfBytes], { type: 'application/pdf' }),
-    basename(pdfAbsolutePath)
+    new Blob([fileBytes], { type: attachBookFileBlobType(metadata.format) }),
+    basename(absolutePath)
   )
 
   return withBackendClient(stored.token, async () => {

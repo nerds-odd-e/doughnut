@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import { Box } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { BookBlockFull, Notebook } from 'doughnut-api'
-import { attachNotebookBookWithPdf } from '../../backendApi/doughnutBackendClient.js'
+import { attachNotebookBookFile } from '../../backendApi/doughnutBackendClient.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type {
   CommandDoc,
@@ -81,7 +81,7 @@ async function runNotebookAttachPdf(
   const bookName =
     ext.toLowerCase() === '.pdf' ? basename(path, ext) : basename(path)
 
-  const book = await attachNotebookBookWithPdf(
+  const book = await attachNotebookBookFile(
     notebook.id,
     hasContentList
       ? {
