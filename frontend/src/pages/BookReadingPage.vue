@@ -28,6 +28,7 @@
         :book="book"
         :epub-bytes="bookFileBytes"
         :initial-epub-locator="initialEpubLocator"
+        :initial-selected-block-id="initialSelectedBlockId"
       />
       <BookReadingContent
         v-else-if="bookFileBytes !== null"
@@ -100,7 +101,10 @@ onMounted(async () => {
             ? pos.epubLocator
             : null
         initialLastRead.value = null
-        initialSelectedBlockId.value = null
+        initialSelectedBlockId.value =
+          pos !== null && typeof pos.selectedBookBlockId === "number"
+            ? pos.selectedBookBlockId
+            : null
       } else if (
         pos !== null &&
         typeof pos.pageIndex === "number" &&

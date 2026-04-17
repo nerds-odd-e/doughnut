@@ -57,6 +57,18 @@ Feature: EPUB book
     When I click "Section Beta-Two" in the book layout
     Then I should see the text "Unique content in section beta-two." in the EPUB reader
 
+  Scenario: Resume EPUB at the last read position after leaving
+    Given I am logged in as an existing user
+    And I have a notebook with the head note "EPUB Resume Notebook"
+    When I open the notebook settings for "EPUB Resume Notebook"
+    And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
+    When I open the reading view for the attached book "epub_valid_minimal"
+    And I click "Section Beta-Two" in the book layout
+    Then I should see the text "Unique content in section beta-two." in the EPUB reader
+    When I leave the EPUB reading view and return to it
+    Then I should see the text "Unique content in section beta-two." in the EPUB reader
+    And the book block "Section Beta-Two" should be the current block in the book reader
+
   Scenario: Upload DRM-flagged EPUB shows a clear attach error
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Unsupported Attach E2E Notebook"

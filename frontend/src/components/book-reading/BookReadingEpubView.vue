@@ -49,9 +49,11 @@ import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayo
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
+import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
-import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type EpubViewerExposed = {
   displayEpubTarget: (href: string) => Promise<void>
@@ -59,6 +61,7 @@ type EpubViewerExposed = {
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
+const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
 const props = withDefaults(
@@ -66,8 +69,9 @@ const props = withDefaults(
     book: BookFull
     epubBytes: ArrayBuffer
     initialEpubLocator?: string | null
+    initialSelectedBlockId?: number | null
   }>(),
-  { initialEpubLocator: null }
+  { initialEpubLocator: null, initialSelectedBlockId: null }
 )
 
 const notebookId = computed(() => Number(props.book.notebookId))
@@ -80,7 +84,44 @@ const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
 })
 const { currentBlockId } = currentBlockIdDebouncer
 
-const selectedBlockId = ref<number | null>(null)
+const selectedBlockId = ref<number | null>(props.initialSelectedBlockId)
+
+/**
+ * When the page restores a saved EPUB position, the tiny continuous-scrolled viewport may
+ * already render the target section so epub.js never fires a fresh `relocated` event for it.
+ * Seed the current-block debouncer from the saved locator so the layout reflects where we
+ * just resumed before any scroll-driven event arrives.
+ */
+if (props.initialEpubLocator !== null && props.initialEpubLocator.length > 0) {
+  const seededId = currentBlockIdFromEpubLocation(
+    props.book.blocks,
+    props.initialEpubLocator
+  )
+  if (seededId !== null) {
+    currentBlockIdDebouncer.commitNow(seededId)
+  }
+}
+
+const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
+  delayMs: LAST_READ_POSITION_PATCH_DEBOUNCE_MS,
+  patch: (body) =>
+    NotebookBooksController.patchNotebookBookReadingPosition({
+      path: { notebook: notebookId.value },
+      body,
+    }),
+})
+
+function proposeEpubPositionForBlockId(blockId: number | null) {
+  if (blockId === null) return
+  const block = props.book.blocks.find((b) => b.id === blockId)
+  const href = block?.epubStartHref
+  if (!href) return
+  const sel = selectedBlockId.value
+  lastReadPositionPatchDebouncer.proposeEpubLocator(
+    href,
+    sel === null ? undefined : sel
+  )
+}
 
 const bookLayoutOpened = ref(false)
 const windowWidth = ref(
@@ -106,6 +147,14 @@ function onEpubRelocated(payload: { href: string }) {
   }
 }
 
+watch(currentBlockId, (id) => {
+  proposeEpubPositionForBlockId(id)
+})
+
+watch(selectedBlockId, () => {
+  proposeEpubPositionForBlockId(currentBlockId.value)
+})
+
 async function onBookBlockClick(block: BookBlockFull) {
   selectedBlockId.value = block.id
   const href = block.epubStartHref
@@ -126,5 +175,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
   currentBlockIdDebouncer.cancel()
+  lastReadPositionPatchDebouncer.flush()
 })
 </script>

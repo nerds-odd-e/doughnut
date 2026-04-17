@@ -93,6 +93,10 @@ async function openEpub() {
   r.on("relocated", onRelocated)
   r.on("displayed", onDisplayed)
   await r.display()
+  const target = (props.initialLocator ?? "").trim()
+  if (target.length > 0) {
+    await r.display(target).catch(() => undefined)
+  }
 }
 
 onMounted(() => {

@@ -169,6 +169,40 @@ const bookReadingPage = () => {
         })
       return cy.then(() => step(0))
     },
+    /**
+     * Navigate away from the EPUB reading view via the GlobalBar "Notebook" link, then
+     * revisit the same reading-page URL. Forces a full remount of BookReadingEpubView so
+     * any saved reading position is re-fetched on return.
+     */
+    /**
+     * Navigate away from the EPUB reading view via the GlobalBar "Notebook" link, then
+     * revisit the same reading-page URL. Waits for the pending reading-position PATCH to
+     * flush before reloading so the server state reflects the user's last position.
+     */
+    leaveEpubReadingViewAndReturn() {
+      pageIsNotLoading()
+      cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
+      cy.intercept('PATCH', '/api/notebooks/*/book/reading-position').as(
+        'patchReadingPosition'
+      )
+      cy.location('pathname')
+        .should('match', /^\/d\/notebooks\/\d+\/book$/)
+        .then((pathname) => {
+          const readingPath = pathname as unknown as string
+          cy.contains('a', 'Notebook').click()
+          cy.location('pathname').should(
+            'not.match',
+            /^\/d\/notebooks\/\d+\/book$/
+          )
+          cy.wait('@patchReadingPosition', { timeout: 5000 })
+          cy.visit(readingPath)
+          pageIsNotLoading()
+          cy.get('[data-testid="epub-book-viewer"]', {
+            timeout: 30000,
+          }).should('be.visible')
+        })
+      return this
+    },
     expectBookLayoutRows(expected: BookLayoutRow[]) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)

@@ -357,6 +357,14 @@ When(
 )
 
 When(
+  'I leave the EPUB reading view and return to it',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().leaveEpubReadingViewAndReturn()
+  }
+)
+
+When(
   'I scroll the EPUB reader until the text {string} is in the viewport',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (markerText: string) => {

@@ -25,6 +25,7 @@ export type LastReadPositionPatchDebouncer = {
     epubLocator: string,
     selectedBookBlockId?: number
   ) => void
+  flush: () => void
   cancel: () => void
 }
 
@@ -95,6 +96,9 @@ export function createLastReadPositionPatchDebouncer(options: {
           ? { epubLocator }
           : { epubLocator, selectedBookBlockId }
       debounced(next)
+    },
+    flush() {
+      debounced.flush()
     },
     cancel() {
       debounced.cancel()
