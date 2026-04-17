@@ -45,7 +45,7 @@
     "esbuild": "0.28.0",
     "ink-testing-library": "^4.0.0",
     "tsx": "4.21.0",
-    "typescript": "6.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.4"
   }
 }
