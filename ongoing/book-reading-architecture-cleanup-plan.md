@@ -209,6 +209,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase E1 — Extract `BookBlockContentLocatorAssembler` (structure)
 
+**Status: done**
+
 **Change:** Introduce `BookBlockContentLocatorAssembler` with `List<ContentLocator> assemble(String format, List<BookContentBlock> contentBlocks)`. Move the format branch currently inside `BookBlock.getContentLocators()` into it. `BookBlock.getContentLocators()` keeps its `@JsonProperty`/`@JsonView`/`@Schema` annotations and delegates with a single line.
 
 **Why:** Entity no longer makes format decisions; prep for E2.

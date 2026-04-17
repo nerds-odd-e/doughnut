@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.odde.doughnut.services.book.BookBlockEpubContentLocators;
-import com.odde.doughnut.services.book.BookBlockPdfContentLocators;
-import com.odde.doughnut.services.book.BookReadingWireConstants;
+import com.odde.doughnut.services.book.BookBlockContentLocatorAssembler;
 import com.odde.doughnut.services.book.ContentLocator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -68,10 +66,8 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @JsonView(BookViews.Full.class)
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<ContentLocator> getContentLocators() {
-    if (book != null && BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
-      return BookBlockEpubContentLocators.epubContentLocators(contentBlocks);
-    }
-    return BookBlockPdfContentLocators.pdfContentLocators(contentBlocks);
+    return BookBlockContentLocatorAssembler.assemble(
+        book != null ? book.getFormat() : null, contentBlocks);
   }
 
   @JsonProperty("contentBlocks")
