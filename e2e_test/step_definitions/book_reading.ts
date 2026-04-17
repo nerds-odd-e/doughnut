@@ -411,6 +411,14 @@ Then(
 )
 
 Then(
+  'the EPUB Reading Control Panel should be content-anchored',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectEpubReadingControlPanelContentAnchored()
+  }
+)
+
+Then(
   'I should see that book block {string} is selected in the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {

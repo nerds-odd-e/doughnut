@@ -30,6 +30,7 @@
     @block-click="onBookBlockClick"
   >
     <main
+      ref="epubMainPaneRef"
       class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col daisy-relative"
     >
       <EpubBookViewer
@@ -42,7 +43,7 @@
       <ReadingControlPanel
         v-if="blockAwaitingConfirmation"
         :selected-block-title="blockAwaitingConfirmation.title"
-        :anchor-top-px="null"
+        :anchor-top-px="readingPanelAnchorTopPx"
         :show-skim-and-skip="false"
         @mark-as-read="markSelectedBlockAsRead"
       />
@@ -66,10 +67,11 @@ import {
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
+import { lastDirectContentLocator } from "@/lib/book-reading/asPdfLocator"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type EpubViewerExposed = Pick<
   BookReaderViewerRef,
@@ -80,6 +82,8 @@ type EpubViewerExposed = Pick<
 >
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
+const READING_PANEL_OBSTRUCTION_PX = 80
+const MIN_READING_PANEL_RESERVE_PX = 88
 const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
@@ -98,6 +102,8 @@ const notebookId = computed(() => Number(props.book.notebookId))
 const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const epubViewerRef = ref<EpubViewerExposed | null>(null)
+const epubMainPaneRef = ref<HTMLElement | null>(null)
+const readingPanelAnchorTopPx = ref<number | null>(null)
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
@@ -162,6 +168,7 @@ const windowWidth = ref(
 
 function handleResize() {
   windowWidth.value = window.innerWidth
+  updateReadingPanelAnchor()
 }
 
 const isMdOrLarger = computed(
@@ -175,6 +182,32 @@ const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
   return props.book.blocks.find((b) => b.id === selId) ?? null
 })
 
+function updateReadingPanelAnchor() {
+  const mainEl = epubMainPaneRef.value
+  const viewer = epubViewerRef.value
+  const block = blockAwaitingConfirmation.value
+  if (!mainEl || !viewer || !block) {
+    readingPanelAnchorTopPx.value = null
+    return
+  }
+  const lastLocator = lastDirectContentLocator(block)
+  if (lastLocator === null) {
+    readingPanelAnchorTopPx.value = null
+    return
+  }
+  let top = viewer.readingPanelAnchorTopPx(
+    lastLocator,
+    READING_PANEL_OBSTRUCTION_PX
+  )
+  if (top !== null) {
+    const mainH = mainEl.getBoundingClientRect().height
+    if (mainH > 0 && top + MIN_READING_PANEL_RESERVE_PX > mainH - 8) {
+      top = null
+    }
+  }
+  readingPanelAnchorTopPx.value = top
+}
+
 async function applyBookBlockSelection(block: BookBlockFull) {
   selectedBlockId.value = block.id
   const loc = asEpubLocator(block.contentLocators[0])
@@ -182,6 +215,8 @@ async function applyBookBlockSelection(block: BookBlockFull) {
     await epubViewerRef.value?.displayLocator(loc)
   }
   currentBlockIdDebouncer.commitNow(block.id)
+  await nextTick()
+  updateReadingPanelAnchor()
 }
 
 async function markSelectedBlockAsRead() {
@@ -198,6 +233,7 @@ function onEpubRelocated(payload: { href: string }) {
   if (id !== null) {
     currentBlockIdDebouncer.propose(id)
   }
+  updateReadingPanelAnchor()
 }
 
 watch(currentBlockId, (id) => {
@@ -205,6 +241,7 @@ watch(currentBlockId, (id) => {
 })
 
 watch(selectedBlockId, () => {
+  readingPanelAnchorTopPx.value = null
   proposeEpubPositionForBlockId(currentBlockId.value)
 })
 
@@ -218,6 +255,8 @@ onMounted(async () => {
     bookLayoutOpened.value = true
   }
   await bookReading.syncFromServer()
+  await nextTick()
+  updateReadingPanelAnchor()
 })
 
 onBeforeUnmount(() => {

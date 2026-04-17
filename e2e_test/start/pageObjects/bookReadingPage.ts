@@ -542,6 +542,15 @@ const bookReadingPage = () => {
         .click()
       return this
     },
+    expectEpubReadingControlPanelContentAnchored() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-reading-control-panel"]', {
+        timeout: 10000,
+      })
+        .should('be.visible')
+        .and('have.attr', 'data-panel-placement', 'anchored')
+      return this
+    },
     /**
      * Book layout row marked as read: `data-direct-content-read="true"` plus success right border
      * and screen-reader “Marked as read” on the row.

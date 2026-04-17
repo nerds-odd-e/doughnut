@@ -81,6 +81,16 @@ Feature: EPUB book
     Then I should see that book block "Chapter Alpha" is marked as read in the book layout
     And I should see that book block "Chapter Beta" is selected in the book layout
 
+  Scenario: EPUB Reading Control Panel anchors below direct content for the selected block
+    Given I am logged in as an existing user
+    And I have a notebook with the head note "EPUB Panel Anchor Notebook"
+    When I open the notebook settings for "EPUB Panel Anchor Notebook"
+    And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
+    When I open the reading view for the attached book "epub_valid_minimal"
+    And I click "Chapter Alpha" in the book layout
+    Then I should see the text "Body text with an illustration." in the EPUB reader
+    And the EPUB Reading Control Panel should be content-anchored
+
   Scenario: Upload DRM-flagged EPUB shows a clear attach error
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Unsupported Attach E2E Notebook"
