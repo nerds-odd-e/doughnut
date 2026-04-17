@@ -68,7 +68,7 @@ import {
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
-import { lastDirectContentLocator } from "@/lib/book-reading/asPdfLocator"
+import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"

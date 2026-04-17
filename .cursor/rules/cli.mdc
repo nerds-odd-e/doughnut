@@ -98,7 +98,7 @@ Features: **`e2e_test/features/cli/`**. Steps: **`e2e_test/step_definitions/cli.
 ## Build output
 
 - Bundle: `cli/dist/doughnut-cli.bundle.mjs` (shebang)
-- Release: `gs://dough-01/doughnut-cli-latest/doughnut` (`cli-release.yml`)
+- Release: `gs://dough-frontend-01/doughnut-cli-latest/doughnut` (`cli-release.yml`)
 - Local install URL: local LB serves `/doughnut-cli-latest/doughnut` (see `scripts/local-lb.mjs`, `docs/gcp/prod_env.md`)
 
 **Ink + esbuild (`react-devtools-core`):** Ink may load `devtools.js`, which imports `react-devtools-core`. That package is optional in Ink (used when `DEV=true`; see Ink’s README). Esbuild still resolves the import when producing the single-file bundle, so `cli/package.json` `bundle` aliases `react-devtools-core` to `cli/src/shims/react-devtools-core-stub.ts`. The shipped bundle therefore does not depend on installing `react-devtools-core`. For React DevTools against an **unbundled** run (e.g. `pnpm -C cli exec tsx src/index.ts`), install `react-devtools-core` and use `DEV=true` as Ink documents.

@@ -199,10 +199,8 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
-import {
-  lastDirectContentLocator,
-  pdfLocatorsFromBlock,
-} from "@/lib/book-reading/asPdfLocator"
+import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
+import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"

@@ -1,8 +1,8 @@
 import {
   asPdfLocator,
-  lastDirectContentLocator,
   pdfLocatorsFromBlock,
 } from "@/lib/book-reading/asPdfLocator"
+import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"

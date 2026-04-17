@@ -11,7 +11,7 @@ import {
 } from './version.js'
 
 const BASE_URL =
-  process.env.BASE_URL ?? 'https://storage.googleapis.com/dough-01'
+  process.env.BASE_URL ?? 'https://storage.googleapis.com/dough-frontend-01'
 const DOWNLOAD_PATH = `${BASE_URL}/doughnut-cli-latest/doughnut`
 
 function exceptionText(e: unknown): string {

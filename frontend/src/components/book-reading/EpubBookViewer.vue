@@ -122,11 +122,11 @@ const onDisplayed = (section: { href?: string }) => emitIfHref(section.href)
 
 async function displayLocator(loc: ContentLocatorFull): Promise<void> {
   const epub = asEpubLocator(loc)
-  if (!epub) {
+  if (!epub || !rendition) {
     return
   }
-  const h = epubDisplayHref(epub).trim()
-  if (!h || !rendition) {
+  const h = epubDisplayHref(epub)
+  if (!h) {
     return
   }
   await rendition.display(h).catch(() => undefined)

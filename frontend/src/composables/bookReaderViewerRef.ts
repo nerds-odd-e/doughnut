@@ -59,8 +59,7 @@ export type BookReadingPdfViewerRef = BookReaderViewerRef & {
 export function locatorAsPdfNavigationTarget(
   locator: ContentLocatorFull
 ): BookNavigationTarget | null {
-  const tag = locator.type as string
-  if (tag !== "PdfLocator_Full" && tag !== "pdf") {
+  if (locator.type !== "PdfLocator_Full") {
     return null
   }
   const maybe = locator as {

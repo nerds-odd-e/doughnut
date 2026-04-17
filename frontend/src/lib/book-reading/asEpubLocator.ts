@@ -5,22 +5,19 @@ import type {
 } from "@generated/doughnut-backend-api"
 
 export function asEpubLocator(
-  loc: ContentLocatorFull | BookBlockFull["contentLocators"][number] | undefined
+  loc: ContentLocatorFull | undefined
 ): EpubLocatorFull | null {
-  if (!loc) {
+  if (!loc || loc.type !== "EpubLocator_Full") {
     return null
   }
-  const tag = loc.type as string
-  if (tag === "EpubLocator_Full" || tag === "epub") {
-    return loc as EpubLocatorFull
-  }
-  return null
+  return loc as EpubLocatorFull
 }
 
 export function epubDisplayHref(loc: EpubLocatorFull): string {
   const href = loc.href.trim()
   const frag = loc.fragment?.trim() ?? ""
-  return href + frag
+  if (frag.length === 0) return href
+  return frag.startsWith("#") ? href + frag : `${href}#${frag}`
 }
 
 export function blockStartEpubDisplayHref(

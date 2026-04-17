@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${BASE_URL:-https://storage.googleapis.com/dough-01}"
+BASE_URL="${BASE_URL:-https://storage.googleapis.com/dough-frontend-01}"
 INSTALL_PREFIX="${INSTALL_PREFIX:-$HOME/.local}"
 INSTALL_DIR="$INSTALL_PREFIX/bin"
 DOWNLOAD_URL="$BASE_URL/doughnut-cli-latest/doughnut"
