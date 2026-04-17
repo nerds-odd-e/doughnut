@@ -95,34 +95,24 @@ onMounted(async () => {
         posResult !== null && !posResult.error && posResult.data
           ? posResult.data
           : null
+      initialSelectedBlockId.value =
+        typeof pos?.selectedBookBlockId === "number"
+          ? pos.selectedBookBlockId
+          : null
       if (data.format === "epub") {
         initialEpubLocator.value =
-          pos !== null && typeof pos.epubLocator === "string"
-            ? pos.epubLocator
-            : null
+          typeof pos?.epubLocator === "string" ? pos.epubLocator : null
         initialLastRead.value = null
-        initialSelectedBlockId.value =
-          pos !== null && typeof pos.selectedBookBlockId === "number"
-            ? pos.selectedBookBlockId
-            : null
-      } else if (
-        pos !== null &&
-        typeof pos.pageIndex === "number" &&
-        typeof pos.normalizedY === "number"
-      ) {
-        initialLastRead.value = {
-          pageIndexZeroBased: pos.pageIndex,
-          normalizedY: pos.normalizedY,
-        }
-        initialSelectedBlockId.value =
-          typeof pos.selectedBookBlockId === "number"
-            ? pos.selectedBookBlockId
-            : null
-        initialEpubLocator.value = null
       } else {
-        initialLastRead.value = null
-        initialSelectedBlockId.value = null
         initialEpubLocator.value = null
+        initialLastRead.value =
+          typeof pos?.pageIndex === "number" &&
+          typeof pos?.normalizedY === "number"
+            ? {
+                pageIndexZeroBased: pos.pageIndex,
+                normalizedY: pos.normalizedY,
+              }
+            : null
       }
       bookFileBytes.value = await res.arrayBuffer()
     } catch {

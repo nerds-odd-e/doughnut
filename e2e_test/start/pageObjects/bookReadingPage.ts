@@ -170,14 +170,9 @@ const bookReadingPage = () => {
       return cy.then(() => step(0))
     },
     /**
-     * Navigate away from the EPUB reading view via the GlobalBar "Notebook" link, then
-     * revisit the same reading-page URL. Forces a full remount of BookReadingEpubView so
-     * any saved reading position is re-fetched on return.
-     */
-    /**
-     * Navigate away from the EPUB reading view via the GlobalBar "Notebook" link, then
-     * revisit the same reading-page URL. Waits for the pending reading-position PATCH to
-     * flush before reloading so the server state reflects the user's last position.
+     * Navigate away via the GlobalBar "Notebook" link, wait for the pending reading-position
+     * PATCH to flush so the server reflects the user's last position, then revisit the same
+     * reading-page URL to force a full remount of BookReadingEpubView.
      */
     leaveEpubReadingViewAndReturn() {
       pageIsNotLoading()

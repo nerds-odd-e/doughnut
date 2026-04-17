@@ -166,7 +166,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - `frontend/tests/lib/book-reading/currentBlockIdFromEpubLocation.spec.ts` covers exact/relative path matching, preorder tie-breaking, fragment matching, and fallback cases.
 - `e2e_test/features/book_reading/epub_book.feature` scenarios "Scrolling the EPUB updates the current block in the layout" and "EPUB current block updates on scroll; selection stays on explicit choice" exercise initial load, click-nav, and scroll-triggered updates along with the selected-vs-current distinction.
 
-## Phase 6: Leave and return to the same EPUB position (planned)
+## Phase 6: Leave and return to the same EPUB position (done)
 
 **Why here:** Once basic reading and navigation work, resume becomes a clean, valuable standalone slice with moderate technical risk.
 
@@ -177,15 +177,20 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **User value after this phase:** "I can continue my EPUB where I left off."
 
-**Scope:**
-- Extend reading-position persistence with an EPUB-specific locator payload while keeping the existing PDF shape (`pageIndex` + `normalizedY`) intact. This touches the API schema — `BookLastReadPosition` needs a format-specific branch or additional fields for the EPUB locator.
-- Reuse the same `GET/PATCH …/reading-position` user-facing flow.
-- Debounce EPUB position updates from reader relocation events.
-- Restore from the saved locator on load.
+**Scope (shipped):**
+- Reading-position storage widened with a nullable `epub_locator VARCHAR(512)` column (Flyway `V300000143`); PDF `page_index`/`normalized_y` became nullable so EPUB rows omit them.
+- `BookLastReadPositionRequest` accepts either `pageIndex`+`normalizedY` or `epubLocator`; `BookService.upsertLastReadPosition` rejects payloads with neither and clears the inactive variant on update.
+- `createLastReadPositionPatchDebouncer` widened to a discriminated union with a dedicated `proposeEpubLocator` entry point so the PDF call site is unchanged.
+- `BookReadingPage.vue` fetches the reading position for both formats and passes `initialEpubLocator` / `initialSelectedBlockId` into `BookReadingEpubView`.
+- `BookReadingEpubView.vue` saves the current block's `epubStartHref` on relocate and on selection changes, and flushes the debouncer on unmount so leaving the page persists the latest position. The viewer seeds the current-block debouncer from the saved locator so the layout is in sync before the first scroll-driven event.
+- `EpubBookViewer.vue` calls `r.display(initialLocator)` on first open when a saved locator is present, with a safe fallback to the default no-arg `display()`.
 
-**Testing:**
-- Backend test for EPUB reading-position round-trip.
-- E2E: navigate to a known EPUB section, leave, return, and verify the same section is shown again.
+**Testing (shipped):**
+- Backend `NotebookBooksControllerTest` covers EPUB round-trip, the missing-payload rejection, and that PDF fields are cleared when an `epubLocator` arrives.
+- `frontend/tests/lib/book-reading/debounceLastReadPositionPatch.spec.ts` covers EPUB and PDF dedupe and the variant switch.
+- E2E scenario "Resume EPUB at the last read position after leaving" in `epub_book.feature` proves the round-trip; `bookReadingPage.leaveEpubReadingViewAndReturn()` waits for the pending PATCH to flush before reload.
+
+**v1 locator format:** the epub.js spine href (e.g. `OEBPS/chapter2.xhtml#section-beta-two`) — same shape as `epubStartHref`. The schema is a plain `VARCHAR(512)` so a future CFI upgrade does not require another migration.
 
 ## Phase 7: Mark an EPUB block as read, skimmed, or skipped (planned)
 
@@ -281,7 +286,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | ~~3~~ | ~~Open EPUB and read content, jump to chapters~~ | ~~Done~~ | ~~Done~~ |
 | 4 | Precise navigation to any section | `epubStartHref` path#fragment, epub.js `display` | Done |
 | 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Done |
-| 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Medium |
+| 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Done |
 | 7 | Mark EPUB blocks read/skimmed/skipped | Reusing reading-record UI and state without over-coupling to PDF | Small-medium |
 | 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |
 | 9 | CLI EPUB attach | Raw upload transport only, no second extraction path | Small-medium |
