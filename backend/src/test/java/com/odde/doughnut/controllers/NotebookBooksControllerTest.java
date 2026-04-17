@@ -1195,6 +1195,17 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, empty));
       assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
     }
+
+    @Test
+    void rejectsPatchWithBothEpubLocatorAndPdfPosition() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      BookLastReadPositionRequest both = lastReadBody(1, 500);
+      both.setEpubLocator("OEBPS/chapter1.xhtml");
+
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, both));
+      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+    }
   }
 
   @Nested

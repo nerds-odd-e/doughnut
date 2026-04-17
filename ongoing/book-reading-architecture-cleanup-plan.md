@@ -271,6 +271,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase E3 — Move `applyReadingPositionFields` dispatch through `BookFormat` (structure)
 
+**Status: done**
+
 **Change:** Add `void writeLegacyColumns(BookUserLastReadPosition row, BookLastReadPositionRequest req)` to `BookFormat`. Each constant writes only its format's columns and clears the others. `BookService.applyReadingPositionFields` becomes two lines: resolve the format from the payload shape, delegate.
 
 **Why:** This is the final prep for the Track F unification.

@@ -11,10 +11,12 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockTitleLimits;
 import com.odde.doughnut.entities.BookContentBlock;
+import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -96,6 +98,13 @@ public enum BookFormat {
     public String bookFileExtension() {
       return ".pdf";
     }
+
+    @Override
+    public void writeLegacyColumns(BookUserLastReadPosition row, BookLastReadPositionRequest req) {
+      row.setPageIndex(req.getPageIndex());
+      row.setNormalizedY(req.getNormalizedY());
+      row.setEpubLocator(null);
+    }
   },
   EPUB {
     @Override
@@ -134,6 +143,13 @@ public enum BookFormat {
     public String bookFileExtension() {
       return ".epub";
     }
+
+    @Override
+    public void writeLegacyColumns(BookUserLastReadPosition row, BookLastReadPositionRequest req) {
+      row.setEpubLocator(req.getEpubLocator());
+      row.setPageIndex(null);
+      row.setNormalizedY(null);
+    }
   };
 
   public abstract List<ContentLocator> assembleContentLocators(
@@ -146,6 +162,27 @@ public enum BookFormat {
   public abstract MediaType bookFileMediaType();
 
   public abstract String bookFileExtension();
+
+  public abstract void writeLegacyColumns(
+      BookUserLastReadPosition row, BookLastReadPositionRequest req);
+
+  public static BookFormat forReadingPositionPayload(BookLastReadPositionRequest req) {
+    boolean hasEpub = req.getEpubLocator() != null;
+    boolean hasPdf = req.getPageIndex() != null && req.getNormalizedY() != null;
+    if (!hasEpub && !hasPdf) {
+      throw new ApiException(
+          "reading-position payload requires either pageIndex+normalizedY or epubLocator",
+          ApiError.ErrorType.BINDING_ERROR,
+          "reading-position payload requires either pageIndex+normalizedY or epubLocator");
+    }
+    if (hasEpub && hasPdf) {
+      throw new ApiException(
+          "reading-position payload must not combine epubLocator with pageIndex and normalizedY",
+          ApiError.ErrorType.BINDING_ERROR,
+          "reading-position payload must not combine epubLocator with pageIndex and normalizedY");
+    }
+    return hasEpub ? EPUB : PDF;
+  }
 
   public final ResponseEntity<Resource> streamFile(
       byte[] bytes, String baseName, String etag, CacheControl cacheControl) {

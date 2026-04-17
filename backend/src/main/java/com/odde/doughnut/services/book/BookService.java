@@ -295,15 +295,6 @@ public class BookService {
   public void upsertLastReadPosition(
       Notebook notebook, User user, BookLastReadPositionRequest request) {
     Book book = requireBook(notebook);
-    final boolean hasEpubLocator = request.getEpubLocator() != null;
-    final boolean hasPdfPosition =
-        request.getPageIndex() != null && request.getNormalizedY() != null;
-    if (!hasEpubLocator && !hasPdfPosition) {
-      throw new ApiException(
-          "reading-position payload requires either pageIndex+normalizedY or epubLocator",
-          ApiError.ErrorType.BINDING_ERROR,
-          "reading-position payload requires either pageIndex+normalizedY or epubLocator");
-    }
     final Optional<BookBlock> selectedBlockPatch =
         request.getSelectedBookBlockId() == null
             ? Optional.empty()
@@ -312,7 +303,7 @@ public class BookService {
         .findByUser_IdAndBook_Id(user.getId(), book.getId())
         .map(
             existing -> {
-              applyReadingPositionFields(existing, request, hasEpubLocator);
+              applyReadingPositionFields(existing, request);
               selectedBlockPatch.ifPresent(existing::setSelectedBookBlock);
               return entityPersister.save(existing);
             })
@@ -321,7 +312,7 @@ public class BookService {
               var row = new BookUserLastReadPosition();
               row.setUser(user);
               row.setBook(book);
-              applyReadingPositionFields(row, request, hasEpubLocator);
+              applyReadingPositionFields(row, request);
               selectedBlockPatch.ifPresent(row::setSelectedBookBlock);
               return entityPersister.save(row);
             });
@@ -329,15 +320,8 @@ public class BookService {
   }
 
   private static void applyReadingPositionFields(
-      BookUserLastReadPosition row, BookLastReadPositionRequest request, boolean hasEpubLocator) {
-    if (hasEpubLocator) {
-      row.setEpubLocator(request.getEpubLocator());
-      row.setPageIndex(null);
-      row.setNormalizedY(null);
-    } else {
-      row.setPageIndex(request.getPageIndex());
-      row.setNormalizedY(request.getNormalizedY());
-    }
+      BookUserLastReadPosition row, BookLastReadPositionRequest request) {
+    BookFormat.forReadingPositionPayload(request).writeLegacyColumns(row, request);
   }
 
   private BookBlock resolveBookBlockForBook(int bookBlockId, Book book) {
