@@ -402,47 +402,11 @@ When(
   }
 )
 
-When(
-  'I mark the book block {string} as skimmed in the Reading Control Panel',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string) => {
-    return bookReadingPage().markBookBlockAsSkimmedInReadingControlPanel(
-      blockTitle
-    )
-  }
-)
-
-When(
-  'I mark the book block {string} as skipped in the Reading Control Panel',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string) => {
-    return bookReadingPage().markBookBlockAsSkippedInReadingControlPanel(
-      blockTitle
-    )
-  }
-)
-
 Then(
   'I should see that book block {string} is marked as read in the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
     return bookReadingPage().expectBookBlockMarkedAsReadInBookLayout(title)
-  }
-)
-
-Then(
-  'I should see that book block {string} is marked as skimmed in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockMarkedAsSkimmedInBookLayout(title)
-  }
-)
-
-Then(
-  'I should see that book block {string} is marked as skipped in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockMarkedAsSkippedInBookLayout(title)
   }
 )
 
