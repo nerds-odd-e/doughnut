@@ -33,6 +33,7 @@ const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
 let onRelocated: ((location: EpubJsRelocatedLocation) => void) | null = null
+let onDisplayed: ((section: { href?: string }) => void) | null = null
 
 async function displayEpubTarget(href: string) {
   const h = href.trim()
@@ -40,6 +41,7 @@ async function displayEpubTarget(href: string) {
     return
   }
   await rendition.display(h).catch(() => undefined)
+  emit("relocated", { href: h })
 }
 
 defineExpose({
@@ -50,6 +52,10 @@ function destroyEpub() {
   if (rendition && onRelocated) {
     rendition.off("relocated", onRelocated)
     onRelocated = null
+  }
+  if (rendition && onDisplayed) {
+    rendition.off("displayed", onDisplayed)
+    onDisplayed = null
   }
   rendition?.destroy()
   rendition = null
@@ -83,6 +89,13 @@ async function openEpub() {
     }
   }
   r.on("relocated", onRelocated)
+  onDisplayed = (section: { href?: string }) => {
+    const href = section.href
+    if (typeof href === "string" && href.length > 0) {
+      emit("relocated", { href })
+    }
+  }
+  r.on("displayed", onDisplayed)
   await r.display()
 }
 

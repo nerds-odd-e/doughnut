@@ -6,6 +6,22 @@ export type BookBlockEpubLocationRow = {
   readonly epubStartHref?: string
 }
 
+/**
+ * epub.js spine `href` is often manifest-relative (e.g. `chapter1.xhtml`) while our API stores
+ * package-root paths (e.g. `OEBPS/chapter1.xhtml`).
+ */
+function epubSpinePathMatches(
+  storedPath: string,
+  relocatedPath: string
+): boolean {
+  const a = storedPath.replace(/^\/+/, "").trim()
+  const b = relocatedPath.replace(/^\/+/, "").trim()
+  if (a === b) {
+    return true
+  }
+  return a.endsWith(`/${b}`) || b.endsWith(`/${a}`)
+}
+
 function splitEpubHref(href: string): {
   path: string
   fragment: string | null
@@ -54,7 +70,7 @@ export function currentBlockIdFromEpubLocation(
     const { path: blockPath, fragment: blockFragment } = splitEpubHref(
       start.trim()
     )
-    if (blockPath !== relPath) {
+    if (!epubSpinePathMatches(blockPath, relPath)) {
       continue
     }
     lastPathMatchId = block.id

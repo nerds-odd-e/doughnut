@@ -4,7 +4,12 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { EventEmitter } from 'node:events'
 import { test } from 'node:test'
-import { spawnSutServices, waitForSutHealthy, writePidFile, runSutStart } from './sut-start.mjs'
+import {
+  spawnSutServices,
+  waitForSutHealthy,
+  writePidFile,
+  runSutStart,
+} from './sut-start.mjs'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -14,7 +19,7 @@ import { spawnSutServices, waitForSutHealthy, writePidFile, runSutStart } from '
 function makeMockChild(pid = 99999) {
   const child = new EventEmitter()
   child.pid = pid
-  child.unref = () => {}
+  child.unref = () => undefined
   return child
 }
 
@@ -32,12 +37,22 @@ function makeLogs() {
 
 /** A healthcheck function that returns ok=true immediately. */
 async function healthyOnce() {
-  return { ok: true, tcpResults: [], readinessResult: { ok: true }, exitCode: 0 }
+  return {
+    ok: true,
+    tcpResults: [],
+    readinessResult: { ok: true },
+    exitCode: 0,
+  }
 }
 
 /** A healthcheck function that always returns ok=false. */
 async function neverHealthy() {
-  return { ok: false, tcpResults: [], readinessResult: { ok: false }, exitCode: 1 }
+  return {
+    ok: false,
+    tcpResults: [],
+    readinessResult: { ok: false },
+    exitCode: 1,
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -79,7 +94,13 @@ test('spawnSutServices spawns a detached child and returns child + logFile', asy
     assert.strictEqual(spawnCalls.length, 1)
     assert.strictEqual(spawnCalls[0].cmd, 'pnpm')
     assert.deepStrictEqual(spawnCalls[0].args, [
-      'exec', 'run-p', '-clnr', 'backend:sut', 'start:mb', 'local:lb:vite', 'frontend:sut',
+      'exec',
+      'run-p',
+      '-clnr',
+      'backend:sut',
+      'start:mb',
+      'local:lb:vite',
+      'frontend:sut',
     ])
     assert.strictEqual(spawnCalls[0].opts.detached, true)
     assert.strictEqual(spawnCalls[0].opts.shell, false)
@@ -111,7 +132,10 @@ test('waitForSutHealthy returns ok=true when healthcheck passes immediately', as
 
     assert.strictEqual(result.ok, true)
     assert.strictEqual(result.exitCode, 0)
-    assert.ok(logs.out.some((s) => /healthy/i.test(s)), 'should log healthy message')
+    assert.ok(
+      logs.out.some((s) => /healthy/i.test(s)),
+      'should log healthy message'
+    )
   } finally {
     await rm(dir, { recursive: true, force: true })
   }
@@ -136,8 +160,14 @@ test('waitForSutHealthy returns ok=false when timeout expires', async () => {
 
     assert.strictEqual(result.ok, false)
     assert.strictEqual(result.exitCode, 1)
-    assert.ok(logs.err.some((s) => /timeout|did not become/i.test(s)), 'should log timeout error')
-    assert.ok(logs.err.some((s) => /sut\.log/i.test(s) || /log:/i.test(s)), 'should mention log file')
+    assert.ok(
+      logs.err.some((s) => /timeout|did not become/i.test(s)),
+      'should log timeout error'
+    )
+    assert.ok(
+      logs.err.some((s) => /sut\.log/i.test(s) || /log:/i.test(s)),
+      'should mention log file'
+    )
   } finally {
     await rm(dir, { recursive: true, force: true })
   }

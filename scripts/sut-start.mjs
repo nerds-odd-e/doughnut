@@ -57,14 +57,19 @@ async function tailFile(filePath, lines) {
  * @param {{ spawnFn?: typeof spawn, logFile?: string }} [opts]
  * @returns {{ child: import('node:child_process').ChildProcess, logFile: string }}
  */
-export function spawnSutServices({
-  spawnFn = spawn,
-  logFile = LOG_FILE,
-} = {}) {
+export function spawnSutServices({ spawnFn = spawn, logFile = LOG_FILE } = {}) {
   const logFd = openSync(logFile, 'a')
   const child = spawnFn(
     'pnpm',
-    ['exec', 'run-p', '-clnr', 'backend:sut', 'start:mb', 'local:lb:vite', 'frontend:sut'],
+    [
+      'exec',
+      'run-p',
+      '-clnr',
+      'backend:sut',
+      'start:mb',
+      'local:lb:vite',
+      'frontend:sut',
+    ],
     {
       cwd: repoRoot,
       detached: true,
@@ -106,8 +111,8 @@ export async function waitForSutHealthy({
   timeoutMs = TIMEOUT_MS,
   pollMs = POLL_MS,
   logFile = LOG_FILE,
-  log = (s) => process.stdout.write(s + '\n'),
-  errLog = (s) => process.stderr.write(s + '\n'),
+  log = (s) => process.stdout.write(`${s}\n`),
+  errLog = (s) => process.stderr.write(`${s}\n`),
   healthcheckFn = runSutHealthcheck,
 } = {}) {
   let childExitCode = null
@@ -140,15 +145,19 @@ export async function waitForSutHealthy({
 
     attempt++
     // Run healthcheck silently on every poll; only log progress dots or attempt number
-    const result = await healthcheckFn({ log: () => {} })
+    const result = await healthcheckFn({ log: () => undefined })
     if (result.ok) {
-      log(`SUT healthy after ${attempt} poll(s). Services running in background.`)
+      log(
+        `SUT healthy after ${attempt} poll(s). Services running in background.`
+      )
       log(`Log: ${logFile}`)
       return { ok: true, exitCode: 0 }
     }
 
     if (attempt === 1) {
-      log(`Waiting for SUT to become healthy (timeout: ${timeoutMs / 1000}s)...`)
+      log(
+        `Waiting for SUT to become healthy (timeout: ${timeoutMs / 1000}s)...`
+      )
     }
 
     const remaining = deadline - Date.now()
@@ -190,8 +199,8 @@ export async function runSutStart({
   pidFile = PID_FILE,
   timeoutMs = TIMEOUT_MS,
   pollMs = POLL_MS,
-  log = (s) => process.stdout.write(s + '\n'),
-  errLog = (s) => process.stderr.write(s + '\n'),
+  log = (s) => process.stdout.write(`${s}\n`),
+  errLog = (s) => process.stderr.write(`${s}\n`),
   healthcheckFn = runSutHealthcheck,
 } = {}) {
   log(`Starting SUT services... (log: ${logFile})`)
@@ -219,7 +228,7 @@ if (isMain) {
     const code = await runSutStart()
     process.exit(code)
   } catch (e) {
-    process.stderr.write((e instanceof Error ? e.message : String(e)) + '\n')
+    process.stderr.write(`${e instanceof Error ? e.message : String(e)}\n`)
     process.exit(1)
   }
 }

@@ -9,6 +9,11 @@ describe("currentBlockIdFromEpubLocation", () => {
     )
   })
 
+  it("matches epub.js manifest-relative href to stored package-root path", () => {
+    const blocks = [{ id: 10, epubStartHref: "OEBPS/chapter1.xhtml" }]
+    expect(currentBlockIdFromEpubLocation(blocks, "chapter1.xhtml")).toBe(10)
+  })
+
   it("returns the last block in preorder when the same spine path appears with different fragments", () => {
     const blocks = [
       { id: 1, epubStartHref: "OEBPS/chapter2.xhtml#part-one" },

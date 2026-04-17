@@ -150,7 +150,10 @@ const bookReadingPage = () => {
       )
       return this
     },
-    /** EPUB layout has no page indicator and no current-block wiring yet; click only. */
+    /**
+     * Book layout row click (EPUB and other flows without the PDF page indicator).
+     * Does not assert current block; use expectBookBlockIsCurrentBlockByTitle after navigation if needed.
+     */
     clickBookLayoutBlockByTitle(title: string) {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
