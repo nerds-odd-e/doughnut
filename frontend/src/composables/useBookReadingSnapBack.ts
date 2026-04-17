@@ -254,6 +254,5 @@ export function useBookReadingSnapBack(options: {
     performSnapBack,
     updateLastDirectContentGeometry,
     clearSnapbackAttemptsForBlock,
-    hasDirectContent,
   }
 }

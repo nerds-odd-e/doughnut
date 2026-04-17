@@ -213,6 +213,7 @@ import {
   useBookReadingSnapBack,
   type BookReadingPdfViewerRef,
 } from "@/composables/useBookReadingSnapBack"
+import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
@@ -347,7 +348,6 @@ const {
   performSnapBack,
   updateLastDirectContentGeometry,
   clearSnapbackAttemptsForBlock,
-  hasDirectContent,
 } = useBookReadingSnapBack({
   bookBlocks,
   selectedBlockId,
@@ -356,6 +356,13 @@ const {
   pdfViewerRef,
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
   snapHoldMs: SNAP_HOLD_MS,
+})
+
+useAutoMarkNoDirectContentPredecessor({
+  bookBlocks,
+  currentBlockId,
+  hasRecordedDisposition: bookReading.hasRecordedDisposition,
+  submitReadingDisposition: bookReading.submitReadingDisposition,
 })
 
 function commitCurrentBlockId(id: number | null): boolean {
@@ -458,21 +465,6 @@ watch(selectedBlockId, (id) => {
     return
   }
   lastReadPositionPatchDebouncer.propose(last.pageIndex, last.normalizedY, id)
-})
-
-watch(currentBlockId, async (blockId) => {
-  if (blockId === null) return
-  const rows = bookBlocks.value
-  const bIdx = rows.findIndex((r) => r.id === blockId)
-  if (bIdx <= 0) return
-  const predecessor = rows[bIdx - 1]!
-  if (
-    !hasDirectContent(predecessor) &&
-    predecessor.contentLocators.length > 0 &&
-    !bookReading.hasRecordedDisposition(predecessor.id)
-  ) {
-    await bookReading.submitReadingDisposition(predecessor.id, "READ")
-  }
 })
 
 watch(
