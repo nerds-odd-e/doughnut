@@ -235,6 +235,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase E2b — Move `validateAttachRequest` branching into `BookFormat` (structure)
 
+**Status: done**
+
 **Change:** Add `void validateAttachRequest(AttachBookRequest request)` to the enum. PDF constant enforces the existing MinerU-required `layout` + `contentList` rule; EPUB constant enforces "no layout or contentList". `BookService.validateAttachRequest` shrinks to `BookFormat.fromString(request.getFormat()).validateAttachRequest(request)` plus the pre-format string check.
 
 **Files:** `BookFormat.java`, `BookService.java`.
