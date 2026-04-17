@@ -34,6 +34,19 @@ Feature: EPUB book
     When I click "Section Beta-Two" in the book layout
     Then the book block "Section Beta-Two" should be the current block in the book reader
 
+  Scenario: EPUB current block updates on scroll; selection stays on explicit choice
+    Given I am logged in as an existing user
+    And I have a notebook with the head note "EPUB Current vs Selected Notebook"
+    When I open the notebook settings for "EPUB Current vs Selected Notebook"
+    And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
+    When I open the reading view for the attached book "epub_valid_minimal"
+    When I click "Chapter Alpha" in the book layout
+    Then the book block "Chapter Alpha" should be the current selection in the book reader
+    And the book block "Chapter Alpha" should be the current block in the book reader
+    When I scroll the EPUB reader until the text "Cell One" is in the viewport
+    Then the book block "Chapter Alpha" should be the current selection in the book reader
+    And the current block in the book layout should not be the selected block
+
   Scenario: Navigate precisely to a sub-section within an EPUB chapter
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Precise Nav Notebook"

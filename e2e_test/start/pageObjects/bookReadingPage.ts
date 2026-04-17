@@ -2,6 +2,44 @@ import { pageIsNotLoading } from '../pageBase'
 
 export type BookLayoutRow = { depth: number; title: string }
 
+/** Same geometry rule as `expectEpubContentTextVisible` (marker must intersect `.epub-container`). */
+function epubHostViewportIntersectsMarker(
+  host: HTMLElement,
+  text: string
+): boolean {
+  const hostRect = host.getBoundingClientRect()
+  const iframe = [...host.querySelectorAll('iframe')].find((f) =>
+    (f.contentDocument?.body?.innerText ?? '').includes(text)
+  ) as HTMLIFrameElement | undefined
+  if (!iframe?.contentDocument?.body) {
+    return false
+  }
+  const doc = iframe.contentDocument
+  let best: HTMLElement | undefined
+  let bestLen = Number.POSITIVE_INFINITY
+  for (const node of doc.body.querySelectorAll('*')) {
+    const e = node as HTMLElement
+    const t = e.textContent ?? ''
+    if (!t.includes(text) || t.length > bestLen) continue
+    bestLen = t.length
+    best = e
+  }
+  if (!best) {
+    return false
+  }
+  const iframeRect = iframe.getBoundingClientRect()
+  const local = best.getBoundingClientRect()
+  const absTop = iframeRect.top + local.top
+  const absLeft = iframeRect.left + local.left
+  const absBottom = absTop + local.height
+  const absRight = absLeft + local.width
+  const hOverlap =
+    Math.min(absBottom, hostRect.bottom) - Math.max(absTop, hostRect.top)
+  const wOverlap =
+    Math.min(absRight, hostRect.right) - Math.max(absLeft, hostRect.left)
+  return hOverlap > 8 && wOverlap > 8
+}
+
 const bookReadingPage = () => {
   const bookBlockRows = () =>
     cy
@@ -73,41 +111,63 @@ const bookReadingPage = () => {
         .should('be.visible')
         .should(($host) => {
           const host = $host.get(0) as HTMLElement
-          const hostRect = host.getBoundingClientRect()
-          const iframe = [...host.querySelectorAll('iframe')].find((f) =>
-            (f.contentDocument?.body?.innerText ?? '').includes(text)
-          ) as HTMLIFrameElement | undefined
-          expect(iframe, 'EPUB host should contain an iframe with fixture text')
-            .to.exist
-          const doc = iframe!.contentDocument!
-          let best: HTMLElement | undefined
-          let bestLen = Number.POSITIVE_INFINITY
-          for (const node of doc.body.querySelectorAll('*')) {
-            const e = node as HTMLElement
-            const t = e.textContent ?? ''
-            if (!t.includes(text) || t.length > bestLen) continue
-            bestLen = t.length
-            best = e
-          }
-          expect(best, `EPUB should expose an element for "${text}"`).to.exist
-          const iframeRect = iframe!.getBoundingClientRect()
-          const local = best!.getBoundingClientRect()
-          const absTop = iframeRect.top + local.top
-          const absLeft = iframeRect.left + local.left
-          const absBottom = absTop + local.height
-          const absRight = absLeft + local.width
-          const hOverlap =
-            Math.min(absBottom, hostRect.bottom) -
-            Math.max(absTop, hostRect.top)
-          const wOverlap =
-            Math.min(absRight, hostRect.right) -
-            Math.max(absLeft, hostRect.left)
           expect(
-            hOverlap > 8 && wOverlap > 8,
-            `EPUB text should intersect reader host viewport (overlap ${hOverlap}x${wOverlap}, absTop=${absTop}, hostTop=${hostRect.top}, hostBottom=${hostRect.bottom})`
+            epubHostViewportIntersectsMarker(host, text),
+            `EPUB text should intersect reader host viewport ("${text}")`
           ).to.be.true
         })
       return this
+    },
+    /**
+     * Scrolls the epub.js host (`.epub-book-viewer-host`, `overflow-auto`) in steps until
+     * marker text intersects `.epub-container` (same contract as `expectEpubContentTextVisible`),
+     * so `relocated` can advance past the initially displayed spine item without a layout click.
+     */
+    scrollEpubReaderUntilTextInViewport(markerText: string) {
+      pageIsNotLoading()
+      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.get('[data-testid="book-reading-page"]').should('exist')
+      cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
+        'be.visible'
+      )
+      const scrollSel =
+        '[data-testid="epub-book-viewer"] .epub-book-viewer-host'
+      const viewportSel = '[data-testid="epub-book-viewer"] .epub-container'
+      const maxSteps = 48
+      const step = (n: number): Cypress.Chainable =>
+        cy.get(scrollSel).then(($scrollEl) => {
+          const scrollEl = $scrollEl.get(0) as HTMLElement
+          return cy.get(viewportSel).then(($vp) => {
+            const viewport = $vp.get(0) as HTMLElement
+            if (epubHostViewportIntersectsMarker(viewport, markerText)) {
+              cy.wait(200)
+              return cy.wrap(null)
+            }
+            if (n >= maxSteps) {
+              throw new Error(
+                `scrollEpubReaderUntilTextInViewport: exceeded ${maxSteps} steps without "${markerText}" in viewport`
+              )
+            }
+            const maxTop = Math.max(
+              0,
+              scrollEl.scrollHeight - scrollEl.clientHeight
+            )
+            const chunk = Math.max(80, Math.ceil(scrollEl.clientHeight * 0.85))
+            const nextTop = Math.min(scrollEl.scrollTop + chunk, maxTop)
+            if (
+              nextTop <= scrollEl.scrollTop &&
+              scrollEl.scrollTop >= maxTop - 1
+            ) {
+              throw new Error(
+                `scrollEpubReaderUntilTextInViewport: scroll exhausted without "${markerText}" in viewport`
+              )
+            }
+            cy.wrap(scrollEl).scrollTo(0, nextTop)
+            cy.wait(200)
+            return step(n + 1)
+          })
+        })
+      return cy.then(() => step(0))
     },
     expectBookLayoutRows(expected: BookLayoutRow[]) {
       pageIsNotLoading()
@@ -151,8 +211,8 @@ const bookReadingPage = () => {
       return this
     },
     /**
-     * Book layout row click (EPUB and other flows without the PDF page indicator).
-     * Does not assert current block; use expectBookBlockIsCurrentBlockByTitle after navigation if needed.
+     * Book layout row click for flows without the PDF page indicator (no `book-reading-page-indicator`).
+     * Does not assert layout state; use `expectBookBlockIsCurrentBlockByTitle` / selection steps as needed.
      */
     clickBookLayoutBlockByTitle(title: string) {
       pageIsNotLoading()
@@ -181,6 +241,20 @@ const bookReadingPage = () => {
       )
       bookBlockRows()
         .filter('[data-current-selection="true"]')
+        .should('have.length', 1)
+      return this
+    },
+    /**
+     * No single layout row is both `data-current-selection` and `data-current-block` (reading
+     * position has moved away from the explicit selection).
+     */
+    expectBookLayoutCurrentBlockDiffersFromSelection() {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-book-layout"]')
+        .find('[data-current-selection="true"][data-current-block="true"]')
+        .should('not.exist')
+      bookBlockRows()
+        .filter('[data-current-block="true"]')
         .should('have.length', 1)
       return this
     },

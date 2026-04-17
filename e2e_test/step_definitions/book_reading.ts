@@ -357,6 +357,14 @@ When(
 )
 
 When(
+  'I scroll the EPUB reader until the text {string} is in the viewport',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (markerText: string) => {
+    return bookReadingPage().scrollEpubReaderUntilTextInViewport(markerText)
+  }
+)
+
+When(
   'I scroll the PDF until the book block {string} is the current block in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (blockTitle: string) => {
@@ -425,6 +433,14 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
     return bookReadingPage().expectBookBlockIsCurrentSelectionByTitle(title)
+  }
+)
+
+Then(
+  'the current block in the book layout should not be the selected block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectBookLayoutCurrentBlockDiffersFromSelection()
   }
 )
 
