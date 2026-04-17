@@ -542,6 +542,26 @@ const bookReadingPage = () => {
         .click()
       return this
     },
+    markBookBlockAsSkimmedInReadingControlPanel(blockTitle: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-reading-control-panel"]')
+        .should('be.visible')
+        .and('contain', blockTitle)
+      cy.get('[data-testid="book-reading-mark-as-skimmed"]')
+        .should('be.visible')
+        .click()
+      return this
+    },
+    markBookBlockAsSkippedInReadingControlPanel(blockTitle: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="book-reading-reading-control-panel"]')
+        .should('be.visible')
+        .and('contain', blockTitle)
+      cy.get('[data-testid="book-reading-mark-as-skipped"]')
+        .should('be.visible')
+        .click()
+      return this
+    },
     /**
      * Book layout row marked as read: `data-direct-content-read="true"` plus success right border
      * and screen-reader “Marked as read” on the row.
@@ -551,6 +571,24 @@ const bookReadingPage = () => {
       bookBlockRowByTitle(title).should(
         'have.attr',
         'data-direct-content-read',
+        'true'
+      )
+      return this
+    },
+    expectBookBlockMarkedAsSkimmedInBookLayout(title: string) {
+      pageIsNotLoading()
+      bookBlockRowByTitle(title).should(
+        'have.attr',
+        'data-direct-content-skimmed',
+        'true'
+      )
+      return this
+    },
+    expectBookBlockMarkedAsSkippedInBookLayout(title: string) {
+      pageIsNotLoading()
+      bookBlockRowByTitle(title).should(
+        'have.attr',
+        'data-direct-content-skipped',
         'true'
       )
       return this

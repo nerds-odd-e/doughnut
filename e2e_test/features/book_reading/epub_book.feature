@@ -69,6 +69,40 @@ Feature: EPUB book
     Then I should see the text "Unique content in section beta-two." in the EPUB reader
     And the book block "Section Beta-Two" should be the current block in the book reader
 
+  @wip
+  Scenario: Mark an EPUB block as read advances the selection
+    Given I am logged in as an existing user
+    And I have a notebook with the head note "EPUB Mark Read Notebook"
+    When I open the notebook settings for "EPUB Mark Read Notebook"
+    And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
+    When I open the reading view for the attached book "epub_valid_minimal"
+    And I click "Chapter Alpha" in the book layout
+    And I mark the book block "Chapter Alpha" as read in the Reading Control Panel
+    Then I should see that book block "Chapter Alpha" is marked as read in the book layout
+    And I should see that book block "Chapter Beta" is selected in the book layout
+
+  @wip
+  Scenario: Mark an EPUB block as skimmed shows skimmed in layout
+    Given I am logged in as an existing user
+    And I have a notebook with the head note "EPUB Mark Skimmed Notebook"
+    When I open the notebook settings for "EPUB Mark Skimmed Notebook"
+    And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
+    When I open the reading view for the attached book "epub_valid_minimal"
+    And I click "Chapter Alpha" in the book layout
+    And I mark the book block "Chapter Alpha" as skimmed in the Reading Control Panel
+    Then I should see that book block "Chapter Alpha" is marked as skimmed in the book layout
+
+  @wip
+  Scenario: Mark an EPUB block as skipped shows skipped in layout
+    Given I am logged in as an existing user
+    And I have a notebook with the head note "EPUB Mark Skipped Notebook"
+    When I open the notebook settings for "EPUB Mark Skipped Notebook"
+    And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
+    When I open the reading view for the attached book "epub_valid_minimal"
+    And I click "Chapter Alpha" in the book layout
+    And I mark the book block "Chapter Alpha" as skipped in the Reading Control Panel
+    Then I should see that book block "Chapter Alpha" is marked as skipped in the book layout
+
   Scenario: Upload DRM-flagged EPUB shows a clear attach error
     Given I am logged in as an existing user
     And I have a notebook with the head note "EPUB Unsupported Attach E2E Notebook"
