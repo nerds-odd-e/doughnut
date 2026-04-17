@@ -105,7 +105,7 @@ class EpubStructureExtractorTest {
     assertThat(anchor.get("type"), equalTo("beginning_anchor"));
     assertThat(anchor.get("kind"), equalTo("beginning"));
     assertThat(anchor.get("href"), equalTo("OEBPS/chapter.xhtml"));
-    assertThat(anchor.get("fragment"), equalTo("#lead"));
+    assertThat(anchor.get("fragment"), equalTo("lead"));
     assertThat(beginning.contentPayloads().get(1).get("text"), equalTo("Lead text."));
 
     EpubStructureExtractor.EpubLayoutBlock main = layout.get(1);

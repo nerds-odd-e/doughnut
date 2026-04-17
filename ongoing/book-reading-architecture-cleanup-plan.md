@@ -114,6 +114,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase B1 — Backend strips `#` at the read boundary (structure)
 
+**Status: done**
+
 **Change:** In `BookBlockEpubContentLocators.epubLocatorFromRaw`, strip any leading `#` from the fragment before constructing `EpubLocator`. In `EpubStructureExtractor.fragmentFor`, return the bare id (drop the `"#" + id` concatenation). Update its callers that currently expect `"#id"` (there is one place that prepends when writing the beginning-anchor payload; verify it does the same strip/normalize).
 
 **Why:** Canonical bare form downstream; legacy `"#id"` rows still normalize correctly on read, no data migration needed.

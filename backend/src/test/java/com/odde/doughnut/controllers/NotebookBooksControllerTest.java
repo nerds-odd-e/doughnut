@@ -452,7 +452,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       JsonNode betaTableRaw =
           objectMapper.readTree(chapterBeta.getContentBlocks().get(1).getRawData());
       assertThat(betaTableRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(betaTableRaw.get("fragment").asText(), equalTo("#beta-table"));
+      assertThat(betaTableRaw.get("fragment").asText(), equalTo("beta-table"));
       assertThat(betaTableRaw.get("text").asText(), equalTo("Cell One"));
 
       BookBlock sectionBetaOne = detailPreorder.get(3);
@@ -460,13 +460,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       EpubLocator sectionBetaOneStart =
           (EpubLocator) sectionBetaOne.getContentLocators().getFirst();
       assertThat(sectionBetaOneStart.href(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaOneStart.fragment(), equalTo("#section-beta-one"));
+      assertThat(sectionBetaOneStart.fragment(), equalTo("section-beta-one"));
       assertThat(sectionBetaOne.getContentBlocks(), hasSize(1));
       assertThat(sectionBetaOne.getContentBlocks().getFirst().getType(), equalTo("text"));
       JsonNode sectionBetaOneRaw =
           objectMapper.readTree(sectionBetaOne.getContentBlocks().getFirst().getRawData());
       assertThat(sectionBetaOneRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaOneRaw.get("fragment").asText(), equalTo("#section-beta-one"));
+      assertThat(sectionBetaOneRaw.get("fragment").asText(), equalTo("section-beta-one"));
       assertThat(
           sectionBetaOneRaw.get("text").asText(), equalTo("Unique content in section beta-one."));
 
@@ -475,13 +475,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       EpubLocator sectionBetaTwoStart =
           (EpubLocator) sectionBetaTwo.getContentLocators().getFirst();
       assertThat(sectionBetaTwoStart.href(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaTwoStart.fragment(), equalTo("#section-beta-two"));
+      assertThat(sectionBetaTwoStart.fragment(), equalTo("section-beta-two"));
       assertThat(sectionBetaTwo.getContentBlocks(), hasSize(1));
       assertThat(sectionBetaTwo.getContentBlocks().getFirst().getType(), equalTo("text"));
       JsonNode sectionBetaTwoRaw =
           objectMapper.readTree(sectionBetaTwo.getContentBlocks().getFirst().getRawData());
       assertThat(sectionBetaTwoRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaTwoRaw.get("fragment").asText(), equalTo("#section-beta-two"));
+      assertThat(sectionBetaTwoRaw.get("fragment").asText(), equalTo("section-beta-two"));
       assertThat(
           sectionBetaTwoRaw.get("text").asText(), equalTo("Unique content in section beta-two."));
     }
@@ -905,7 +905,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(chapterBeta.getContentLocators().get(1), instanceOf(EpubLocator.class));
       EpubLocator betaTable = (EpubLocator) chapterBeta.getContentLocators().get(1);
       assertThat(betaTable.href(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(betaTable.fragment(), equalTo("#beta-table"));
+      assertThat(betaTable.fragment(), equalTo("beta-table"));
     }
   }
 

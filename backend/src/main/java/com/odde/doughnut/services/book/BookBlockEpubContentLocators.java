@@ -52,12 +52,24 @@ public final class BookBlockEpubContentLocators {
       if (n.has("fragment") && n.get("fragment").isTextual()) {
         String f = n.get("fragment").asText();
         if (!f.isBlank()) {
-          fragment = f;
+          String bare = bareEpubFragmentId(f);
+          if (!bare.isEmpty()) {
+            fragment = bare;
+          }
         }
       }
       return new EpubLocator(href, fragment);
     } catch (Exception e) {
       return null;
     }
+  }
+
+  /** Strips URL fragment marker(s); EPUB wire form uses bare element ids. */
+  private static String bareEpubFragmentId(String rawFragment) {
+    String t = rawFragment.trim();
+    while (t.startsWith("#")) {
+      t = t.substring(1).trim();
+    }
+    return t;
   }
 }

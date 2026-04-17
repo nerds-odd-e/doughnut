@@ -436,7 +436,7 @@ final class EpubStructureExtractor {
       if (payloads.isEmpty()) {
         continue;
       }
-      payloads.getFirst().put("fragment", "#" + fragId.trim());
+      payloads.getFirst().put("fragment", fragId.trim());
     }
   }
 
@@ -653,7 +653,7 @@ final class EpubStructureExtractor {
     if (id == null || id.isBlank()) {
       return "";
     }
-    return "#" + id.trim();
+    return id.trim();
   }
 
   private static Map<String, Object> contentMap(
