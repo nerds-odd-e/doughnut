@@ -8,7 +8,7 @@ import {
 import { describe, expect, it } from "vitest"
 
 describe("wireItemsToNavigationTargets", () => {
-  it("maps allBboxes wire items to navigation targets", () => {
+  it("maps PDF locator wire items to navigation targets", () => {
     expect(
       wireItemsToNavigationTargets([
         { pageIndex: 0, bbox: [1, 2, 3, 4] },

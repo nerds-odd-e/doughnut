@@ -199,6 +199,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
@@ -373,11 +374,12 @@ function updateReadingPanelAnchor() {
     readingPanelAnchorTopPx.value = null
     return
   }
-  if (block.allBboxes.length < 2) {
+  const pdfs = pdfLocatorsFromBlock(block)
+  if (pdfs.length < 2) {
     readingPanelAnchorTopPx.value = null
     return
   }
-  const lastBbox = block.allBboxes[block.allBboxes.length - 1]!
+  const lastBbox = pdfs[pdfs.length - 1]!
   const target = {
     pageIndex: lastBbox.pageIndex,
     bbox: lastBbox.bbox as [number, number, number, number],
@@ -422,10 +424,15 @@ const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
 function onViewportAnchorPage(payload: ViewportPayload) {
   viewportPayload.value = payload
   const candidate = currentBlockIdFromVisiblePage(
-    bookBlocks.value.map((r) => ({
-      id: r.id,
-      firstBbox: r.allBboxes?.[0],
-    })),
+    bookBlocks.value.map((r) => {
+      const first = pdfLocatorsFromBlock(r)[0]
+      return {
+        id: r.id,
+        firstBbox: first
+          ? { pageIndex: first.pageIndex, bbox: first.bbox }
+          : undefined,
+      }
+    }),
     payload.anchorPageIndexZeroBased,
     payload.viewport,
     payload.pagesCount
@@ -461,7 +468,7 @@ watch(currentBlockId, async (blockId) => {
   const predecessor = rows[bIdx - 1]!
   if (
     !hasDirectContent(predecessor) &&
-    predecessor.allBboxes.length > 0 &&
+    predecessor.contentLocators.length > 0 &&
     !bookReading.hasRecordedDisposition(predecessor.id)
   ) {
     await bookReading.submitReadingDisposition(predecessor.id, "READ")
@@ -484,7 +491,7 @@ watch(
 )
 
 async function applyBookBlockSelection(block: BookBlockFull) {
-  const targets = wireItemsToNavigationTargets(block.allBboxes)
+  const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
   const parsed = targets[0] ?? null
   if (parsed === null) {
     return

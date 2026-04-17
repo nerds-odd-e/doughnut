@@ -10,7 +10,8 @@ public final class BookMutationResponseMapper {
 
   private BookMutationResponseMapper() {}
 
-  public static BookMutationResponse fromBook(Book book, Set<Integer> blockIdsIncludingAllBboxes) {
+  public static BookMutationResponse fromBook(
+      Book book, Set<Integer> blockIdsIncludingUpdatedLocators) {
     List<BookBlockMutationResponse> blocks =
         book.getBlocks().stream()
             .map(
@@ -19,7 +20,9 @@ public final class BookMutationResponseMapper {
                         b.getId(),
                         b.getDepth(),
                         b.getStructuralTitle(),
-                        blockIdsIncludingAllBboxes.contains(b.getId()) ? b.getAllBboxes() : null))
+                        blockIdsIncludingUpdatedLocators.contains(b.getId())
+                            ? b.getContentLocators()
+                            : null))
             .toList();
     Integer notebookId = book.getNotebookId();
     return new BookMutationResponse(

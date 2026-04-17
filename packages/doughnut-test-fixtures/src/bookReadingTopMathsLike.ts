@@ -1,6 +1,6 @@
 import type {
   BookBlockFull,
-  PageBboxFull,
+  PdfLocatorFull,
 } from '@generated/doughnut-backend-api'
 import {
   pageBboxPageIndexOnly,
@@ -9,7 +9,7 @@ import {
 
 export const TOP_MATHS_LIKE_BLOCK_IDS = [101, 102, 103, 104, 105, 106] as const
 
-const preorderFirstBboxes: PageBboxFull[] = [
+const preorderFirstLocators: PdfLocatorFull[] = [
   pageBboxPageIndexOnly(0),
   pageBboxWithNormalizedBbox(0, [48, 72, 564, 200]),
   pageBboxWithNormalizedBbox(0, [48, 520, 564, 756]),
@@ -18,21 +18,20 @@ const preorderFirstBboxes: PageBboxFull[] = [
   pageBboxPageIndexOnly(1),
 ]
 
-export function topMathsLikePreorderFirstBboxAt(index: number): PageBboxFull {
-  return preorderFirstBboxes[index]!
+export function topMathsLikePreorderFirstBboxAt(index: number): PdfLocatorFull {
+  return preorderFirstLocators[index]!
 }
 
 export function topMathsLikeBlockRows(options: {
   depth?: number
-  allBboxesForIndex: (index: number, blockId: number) => PageBboxFull[]
+  contentLocatorsForIndex: (index: number, blockId: number) => PdfLocatorFull[]
 }): BookBlockFull[] {
   const depth = options.depth ?? 0
   return TOP_MATHS_LIKE_BLOCK_IDS.map((id, i) => ({
     id,
     depth,
     title: `Section ${i + 1}`,
-    allBboxes: options.allBboxesForIndex(i, id),
-    contentLocators: [],
+    contentLocators: options.contentLocatorsForIndex(i, id),
     contentBlocks: [],
   }))
 }
@@ -43,7 +42,7 @@ export function topMathsLikeFlatBlocks(options?: {
 }): BookBlockFull[] {
   const lastIdx = TOP_MATHS_LIKE_BLOCK_IDS.length - 1
   return topMathsLikeBlockRows({
-    allBboxesForIndex: (i) => {
+    contentLocatorsForIndex: (i) => {
       if (i === 0) {
         return options?.firstBlockHasNoDirectContent
           ? [pageBboxWithNormalizedBbox(0, [0, 0, 0, 0])]

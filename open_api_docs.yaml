@@ -3283,12 +3283,14 @@ components:
           description: Nesting depth in the book layout; root-level blocks are 0.
         title:
           type: string
-        allBboxes:
+        contentLocators:
           type: array
-          description: PDF anchors; present only when anchors for this block changed
+          description: Locators for this block; present only when geometry changed
             (e.g. cancel merge).
           items:
-            $ref: "#/components/schemas/PageBbox"
+            oneOf:
+            - $ref: "#/components/schemas/EpubLocator"
+            - $ref: "#/components/schemas/PdfLocator"
       required:
       - depth
       - id
@@ -3323,22 +3325,46 @@ components:
       - format
       - id
       - notebookId
-    PageBbox:
-      type: object
+    ContentLocator:
+      discriminator:
+        propertyName: type
+        mapping:
+          pdf: "#/components/schemas/PdfLocator"
+          epub: "#/components/schemas/EpubLocator"
       properties:
-        pageIndex:
-          type: integer
-          format: int32
-        bbox:
-          type: array
-          items:
-            type: number
-            format: double
-        contentBlockId:
-          type: integer
-          format: int32
-        derivedTitle:
+        type:
           type: string
+      required:
+      - type
+    EpubLocator:
+      allOf:
+      - $ref: "#/components/schemas/ContentLocator"
+      - type: object
+        properties:
+          href:
+            type: string
+          fragment:
+            type: string
+      required:
+      - href
+    PdfLocator:
+      allOf:
+      - $ref: "#/components/schemas/ContentLocator"
+      - type: object
+        properties:
+          pageIndex:
+            type: integer
+            format: int32
+          bbox:
+            type: array
+            items:
+              type: number
+              format: double
+          contentBlockId:
+            type: integer
+            format: int32
+          derivedTitle:
+            type: string
       required:
       - bbox
       - pageIndex
@@ -4009,10 +4035,6 @@ components:
           description: Nesting depth in the book layout; root-level blocks are 0.
         title:
           type: string
-        allBboxes:
-          type: array
-          items:
-            $ref: "#/components/schemas/PageBbox_Full"
         contentLocators:
           type: array
           items:
@@ -4029,7 +4051,6 @@ components:
             \ XHTML path, optionally with #fragment for a subsection anchor. Null\
             \ for PDF or when unavailable."
       required:
-      - allBboxes
       - contentBlocks
       - contentLocators
       - depth
@@ -4090,15 +4111,6 @@ components:
           type: string
       required:
       - type
-    EpubLocator:
-      type: object
-      properties:
-        href:
-          type: string
-        fragment:
-          type: string
-      required:
-      - href
     EpubLocator_Full:
       allOf:
       - $ref: "#/components/schemas/ContentLocator_Full"
@@ -4110,39 +4122,6 @@ components:
             type: string
       required:
       - href
-    PageBbox_Full:
-      type: object
-      properties:
-        pageIndex:
-          type: integer
-          format: int32
-        bbox:
-          type: array
-          items:
-            type: number
-            format: double
-        contentBlockId:
-          type: integer
-          format: int32
-        derivedTitle:
-          type: string
-      required:
-      - bbox
-      - pageIndex
-    PdfLocator:
-      type: object
-      properties:
-        pageIndex:
-          type: integer
-          format: int32
-        bbox:
-          type: array
-          items:
-            type: number
-            format: double
-      required:
-      - bbox
-      - pageIndex
     PdfLocator_Full:
       allOf:
       - $ref: "#/components/schemas/ContentLocator_Full"
@@ -4156,6 +4135,11 @@ components:
             items:
               type: number
               format: double
+          contentBlockId:
+            type: integer
+            format: int32
+          derivedTitle:
+            type: string
       required:
       - bbox
       - pageIndex

@@ -1,7 +1,7 @@
 /**
  * MinerU / book-reading geometry: bboxes are `[x0,y0,x1,y1]` in 0–1000 normalized page space
- * (top-left origin, y downward), not PDF user space. `wireItemsToNavigationTargets` maps API
- * `allBboxes` (`PageBboxFull`) into scroll/highlight targets for pdf.js.
+ * (top-left origin, y downward), not PDF user space. `wireItemsToNavigationTargets` maps PDF
+ * `contentLocators` entries (`PdfLocatorFull`) into scroll/highlight targets for pdf.js.
  */
 const NORMALIZED_MAX = 1000
 const SCROLL_TOP_PADDING_PDF = 40
@@ -51,7 +51,7 @@ export function parseOptionalBbox(raw: unknown): NormalizedPageBbox | null {
 }
 
 /**
- * Convert `allBboxes` wire items (`PageBboxFull` from `BookBlockFull.allBboxes`) to navigation targets.
+ * Convert PDF locator wire items (`PdfLocatorFull` from `BookBlockFull.contentLocators`) to navigation targets.
  * The server pre-validates these; we still guard against malformed items defensively.
  * Missing `bbox` yields a page-only target (`bbox: null`).
  */

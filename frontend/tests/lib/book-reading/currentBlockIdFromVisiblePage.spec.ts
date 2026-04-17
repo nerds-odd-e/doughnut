@@ -5,7 +5,7 @@ import {
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import { describe, expect, it } from "vitest"
 
-/** Top-maths-like preorder: ids 101–106, `firstBbox` matches `allBboxes[0]` wire shape. */
+/** Top-maths-like preorder: ids 101–106, `firstBbox` matches first PDF `contentLocators` entry. */
 const topMathsLikePreorderRows: BookBlockFirstBboxRow[] = [
   { id: 101, firstBbox: { pageIndex: 0 } },
   { id: 102, firstBbox: { pageIndex: 0, bbox: [48, 72, 564, 200] } },

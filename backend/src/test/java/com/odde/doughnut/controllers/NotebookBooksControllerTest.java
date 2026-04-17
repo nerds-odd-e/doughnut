@@ -24,9 +24,11 @@ import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepositor
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.services.book.EpubLocator;
+import com.odde.doughnut.services.book.PageBbox;
 import com.odde.doughnut.services.book.PdfLocator;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
@@ -738,7 +740,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void allBboxesDerivesStartAnchorFromFirstContentBlock() throws Exception {
+    void pdfContentLocatorsDeriveStartAnchorFromFirstContentBlock() throws Exception {
       Notebook nb = myNotebook();
       AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
       n.setTitle("Headed Section");
@@ -749,13 +751,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getAllBboxes(), hasSize(1));
-      assertThat(block.getAllBboxes().getFirst().pageIndex(), equalTo(1));
-      assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(5.0, 10.0, 200.0, 50.0)));
+      assertThat(block.getContentLocators(), hasSize(1));
+      PdfLocator first = (PdfLocator) block.getContentLocators().getFirst();
+      assertThat(first.pageIndex(), equalTo(1));
+      assertThat(first.bbox(), equalTo(List.of(5.0, 10.0, 200.0, 50.0)));
     }
 
     @Test
-    void allBboxesIncludesHeadingBboxThenBodyBboxes() throws Exception {
+    void pdfContentLocatorsIncludeHeadingThenBody() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
@@ -773,15 +776,18 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getAllBboxes(), hasSize(2));
-      assertThat(block.getAllBboxes().getFirst().pageIndex(), equalTo(2));
-      assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
-      assertThat(block.getAllBboxes().get(1).pageIndex(), equalTo(2));
-      assertThat(block.getAllBboxes().get(1).bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
+      assertThat(block.getContentLocators(), hasSize(2));
+      PdfLocator loc0 = (PdfLocator) block.getContentLocators().get(0);
+      PdfLocator loc1 = (PdfLocator) block.getContentLocators().get(1);
+      assertThat(loc0.pageIndex(), equalTo(2));
+      assertThat(loc0.bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
+      assertThat(loc1.pageIndex(), equalTo(2));
+      assertThat(loc1.bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
     }
 
     @Test
-    void allBboxesSkipsHeaderFooterPageChromeAndStructuralHeadingsInBodyBlocks() throws Exception {
+    void pdfContentLocatorsSkipHeaderFooterPageChromeAndStructuralHeadingsInBodyBlocks()
+        throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> header = new LinkedHashMap<>();
       header.put("type", "header");
@@ -824,13 +830,15 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getAllBboxes(), hasSize(2));
-      assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
-      assertThat(block.getAllBboxes().get(1).bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
+      assertThat(block.getContentLocators(), hasSize(2));
+      PdfLocator noise0 = (PdfLocator) block.getContentLocators().get(0);
+      PdfLocator noise1 = (PdfLocator) block.getContentLocators().get(1);
+      assertThat(noise0.bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
+      assertThat(noise1.bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
     }
 
     @Test
-    void contentLocatorsForPdfMatchAllBboxes() throws Exception {
+    void pdfContentLocatorsMatchContentBlockBboxes() throws Exception {
       Notebook nb = myNotebook();
       Map<String, Object> bodyItem = new LinkedHashMap<>();
       bodyItem.put("type", "text");
@@ -848,13 +856,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      assertThat(block.getAllBboxes(), hasSize(2));
-      assertThat(block.getContentLocators(), hasSize(2));
-      for (int i = 0; i < 2; i++) {
+      List<PageBbox> expected = BookBlockContentBboxes.allBboxes(block.getContentBlocks());
+      assertThat(block.getContentLocators(), hasSize(expected.size()));
+      for (int i = 0; i < expected.size(); i++) {
         assertThat(block.getContentLocators().get(i), instanceOf(PdfLocator.class));
         PdfLocator loc = (PdfLocator) block.getContentLocators().get(i);
-        assertThat(loc.pageIndex(), equalTo(block.getAllBboxes().get(i).pageIndex()));
-        assertThat(loc.bbox(), equalTo(block.getAllBboxes().get(i).bbox()));
+        assertThat(loc.pageIndex(), equalTo(expected.get(i).pageIndex()));
+        assertThat(loc.bbox(), equalTo(expected.get(i).bbox()));
       }
     }
 
@@ -1652,7 +1660,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void changeBookBlockDepthJsonOmitsAllBboxesOnEveryBlock() throws Exception {
+    void changeBookBlockDepthJsonOmitsContentLocatorsOnEveryBlock() throws Exception {
       BookBlock b = blockByTitle("B");
       BookMutationResponse wire = controller.changeBookBlockDepth(nb, b, indent());
       String json = objectMapper.writeValueAsString(wire);
@@ -1660,7 +1668,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       JsonNode blocksNode = tree.get("blocks");
       assertThat(blocksNode.size(), equalTo(4));
       for (JsonNode block : blocksNode) {
-        assertThat(block.has("allBboxes"), equalTo(false));
+        assertThat(block.has("contentLocators"), equalTo(false));
       }
     }
 
@@ -2160,9 +2168,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       int aId = blockA.getId();
       for (JsonNode row : cancelTree.get("blocks")) {
         if (row.get("id").asInt() == aId) {
-          assertThat(row.has("allBboxes"), equalTo(true));
+          assertThat(row.has("contentLocators"), equalTo(true));
         } else {
-          assertThat(row.has("allBboxes"), equalTo(false));
+          assertThat(row.has("contentLocators"), equalTo(false));
         }
       }
 

@@ -8,7 +8,6 @@ import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.BookBlockEpubContentLocators;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.ContentLocator;
-import com.odde.doughnut.services.book.PageBbox;
 import com.odde.doughnut.services.book.PdfLocator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -21,15 +20,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({
-  "id",
-  "depth",
-  "title",
-  "allBboxes",
-  "contentLocators",
-  "contentBlocks",
-  "epubStartHref"
-})
+@JsonPropertyOrder({"id", "depth", "title", "contentLocators", "contentBlocks", "epubStartHref"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -74,13 +65,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Fetch(FetchMode.SUBSELECT)
   private List<BookContentBlock> contentBlocks = new ArrayList<>();
 
-  @JsonProperty("allBboxes")
-  @JsonView(BookViews.Full.class)
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  public List<PageBbox> getAllBboxes() {
-    return BookBlockContentBboxes.allBboxes(contentBlocks);
-  }
-
   @JsonProperty("contentLocators")
   @JsonView(BookViews.Full.class)
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
@@ -89,7 +73,11 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
       return BookBlockEpubContentLocators.epubContentLocators(contentBlocks);
     }
     return BookBlockContentBboxes.allBboxes(contentBlocks).stream()
-        .map(pb -> (ContentLocator) new PdfLocator(pb.pageIndex(), pb.bbox()))
+        .map(
+            pb ->
+                (ContentLocator)
+                    new PdfLocator(
+                        pb.pageIndex(), pb.bbox(), pb.contentBlockId(), pb.derivedTitle()))
         .toList();
   }
 

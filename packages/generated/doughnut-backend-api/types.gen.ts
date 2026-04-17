@@ -29,9 +29,9 @@ export type BookBlockMutationResponse = {
     depth: number;
     title: string;
     /**
-     * PDF anchors; present only when anchors for this block changed (e.g. cancel merge).
+     * Locators for this block; present only when geometry changed (e.g. cancel merge).
      */
-    allBboxes?: Array<PageBbox>;
+    contentLocators?: Array<EpubLocator | PdfLocator>;
 };
 
 export type BookMutationResponse = {
@@ -47,11 +47,22 @@ export type BookMutationResponse = {
     notebookId: string;
 };
 
-export type PageBbox = {
+export type ContentLocator = {
+    type: string;
+};
+
+export type EpubLocator = Omit<ContentLocator, 'type'> & {
+    href: string;
+    fragment?: string;
+    type: 'epub';
+};
+
+export type PdfLocator = Omit<ContentLocator, 'type'> & {
     pageIndex: number;
     bbox: Array<number>;
     contentBlockId?: number;
     derivedTitle?: string;
+    type: 'pdf';
 };
 
 export type Circle = {
@@ -369,7 +380,6 @@ export type BookBlockFull = {
      */
     depth: number;
     title: string;
-    allBboxes: Array<PageBboxFull>;
     contentLocators: Array<EpubLocatorFull | PdfLocatorFull>;
     contentBlocks: Array<BookContentBlockFull>;
     /**
@@ -401,32 +411,17 @@ export type ContentLocatorFull = {
     type: string;
 };
 
-export type EpubLocator = {
-    href: string;
-    fragment?: string;
-};
-
 export type EpubLocatorFull = Omit<ContentLocatorFull, 'type'> & {
     href: string;
     fragment?: string;
     type: 'EpubLocator_Full';
 };
 
-export type PageBboxFull = {
+export type PdfLocatorFull = Omit<ContentLocatorFull, 'type'> & {
     pageIndex: number;
     bbox: Array<number>;
     contentBlockId?: number;
     derivedTitle?: string;
-};
-
-export type PdfLocator = {
-    pageIndex: number;
-    bbox: Array<number>;
-};
-
-export type PdfLocatorFull = Omit<ContentLocatorFull, 'type'> & {
-    pageIndex: number;
-    bbox: Array<number>;
     type: 'PdfLocator_Full';
 };
 

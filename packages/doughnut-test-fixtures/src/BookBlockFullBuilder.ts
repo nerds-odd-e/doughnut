@@ -1,6 +1,6 @@
 import type {
   BookBlockFull,
-  PageBboxFull,
+  PdfLocatorFull,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 
@@ -13,7 +13,6 @@ class BookBlockFullBuilder extends Builder<BookBlockFull> {
       id: 0,
       depth: 0,
       title: '',
-      allBboxes: [],
       contentLocators: [],
       contentBlocks: [],
     }
@@ -34,8 +33,8 @@ class BookBlockFullBuilder extends Builder<BookBlockFull> {
     return this
   }
 
-  allBboxes(allBboxes: PageBboxFull[]): BookBlockFullBuilder {
-    this.data.allBboxes = allBboxes
+  contentLocators(contentLocators: PdfLocatorFull[]): BookBlockFullBuilder {
+    this.data.contentLocators = contentLocators
     return this
   }
 

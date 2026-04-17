@@ -7,7 +7,7 @@ import type { ViewportYRange } from "./pdfViewerViewportTopYDown"
  */
 const SCROLL_PADDING_NORMALIZED = 50
 
-/** First bbox per block may omit `bbox` (page-only); stricter than generated OpenAPI `PageBboxFull`. */
+/** First bbox per block may omit `bbox` (page-only); matches PDF anchor locator wire shape. */
 export type BookBlockFirstBboxRow = {
   readonly id: number
   readonly firstBbox?: {

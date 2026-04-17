@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.odde.doughnut.services.book.PageBbox;
+import com.odde.doughnut.services.book.ContentLocator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Getter;
@@ -23,13 +23,14 @@ public class BookBlockMutationResponse {
 
   @Schema(
       description =
-          "PDF anchors; present only when anchors for this block changed (e.g. cancel merge).")
-  private final List<PageBbox> allBboxes;
+          "Locators for this block; present only when geometry changed (e.g. cancel merge).")
+  private final List<ContentLocator> contentLocators;
 
-  public BookBlockMutationResponse(int id, int depth, String title, List<PageBbox> allBboxes) {
+  public BookBlockMutationResponse(
+      int id, int depth, String title, List<ContentLocator> contentLocators) {
     this.id = id;
     this.depth = depth;
     this.title = title;
-    this.allBboxes = allBboxes;
+    this.contentLocators = contentLocators;
   }
 }

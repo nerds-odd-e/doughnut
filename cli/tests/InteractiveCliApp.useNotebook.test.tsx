@@ -160,13 +160,13 @@ describe('InteractiveCliApp /use notebook integration', () => {
               .id(1)
               .depth(0)
               .title('Part One')
-              .allBboxes([])
+              .contentLocators([])
               .do(),
             makeMe.aBookBlock
               .id(2)
               .depth(1)
               .title('Part One Child')
-              .allBboxes([])
+              .contentLocators([])
               .do(),
           ])
           .do()
