@@ -216,7 +216,9 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 ## Phase 8: EPUB direct-content boundaries and no-direct-content automation (planned)
 
-**Why here:** `BookContentBlock` rows are already persisted from Phase 2 and `hasDirectContent` is already correct on the backend. This phase is purely frontend: resolving those content boundaries in the live DOM for panel geometry and auto-mark behavior.
+**Executable sub-phase plan:** see [book-reading-epub-phase-8-sub-phases.md](book-reading-epub-phase-8-sub-phases.md). That plan folds a domain-model generalization into Phase 8: `PageBbox` becomes a discriminated `ContentLocator` (PDF and EPUB variants) and `allBboxes` becomes `contentLocators`, so derived rules like `hasDirectContent` and the block-start / last-direct-content locators are one format-agnostic concept instead of parallel format-specific fields. The scope bullets below describe the end state; ordering and stop-safety live in the sub-phases plan.
+
+**Why here:** `BookContentBlock` rows are already persisted from Phase 2 and `BookBlockDirectContentPredicate` is already correct on the backend. This phase resolves those content boundaries in the live DOM for panel geometry and auto-mark behavior, and at the same time collapses PDF- and EPUB-specific content-location concepts onto one shared model.
 
 **Behavior:**
 - *Pre:* EPUB is open and the book has blocks with and without direct content.
@@ -270,7 +272,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 ### OpenAPI and generated types
 
 - Regenerate TypeScript only in the phases that actually change the API surface.
-- API-touching phases: 1 (format-aware attach + file serving), 2 (BookBlock structure + `epubStartHref` spine path), 4 (`epubStartHref` may include `#fragment`; still a single string field), 6 (reading-position schema extension for EPUB, if beyond `epubStartHref`).
+- API-touching phases: 1 (format-aware attach + file serving), 2 (BookBlock structure + `epubStartHref` spine path), 4 (`epubStartHref` may include `#fragment`; still a single string field), 6 (reading-position schema extension for EPUB, if beyond `epubStartHref`), 8 (generalize `allBboxes` / `PageBbox` / `epubStartHref` into `contentLocators` / `ContentLocator` — see the Phase 8 sub-phases plan for the migration order).
 
 ### Phase discipline
 

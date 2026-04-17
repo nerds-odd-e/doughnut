@@ -90,7 +90,7 @@ Content stream panel, helpers, and specs deleted. `BookReadingContent.vue` no lo
 **What changes:**
 
 - **Frontend (`PdfBookViewer.vue` / `bookBlockSelectionBboxHighlight.ts`):** When showing selection bbox highlights, keep them visible (no fade-out) until the selection changes or clears. Each overlay gets a `data-book-content-block-id` attribute so it can be identified for long-press events. The overlay `pointerEvents` changes from `none` to `auto` so pointer events can be captured.
-- **Wire shape:** Each entry in `allBboxes` needs to carry the `BookContentBlock.id` so the frontend can map an overlay to a content block id for the split API. Add `contentBlockId` to `PageBbox` on the wire (or a parallel field). The first bbox (structural heading) may have no content block id.
+- **Wire shape:** Each entry in `allBboxes` needs to carry the `BookContentBlock.id` so the frontend can map an overlay to a content block id for the split API. Add `contentBlockId` to `PageBbox` on the wire (or a parallel field). The first bbox (structural heading) may have no content block id. *(Target type may be the generalized `ContentLocator` / `contentLocators` once EPUB Phase 8 lands — see [`book-reading-epub-phase-8-sub-phases.md`](book-reading-epub-phase-8-sub-phases.md). The field name and semantics described here carry over.)*
 
 **Scenario (E2E):**
 
