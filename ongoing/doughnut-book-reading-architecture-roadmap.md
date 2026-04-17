@@ -200,6 +200,8 @@ These are **defaults** for consistency; revisiting them is a roadmap-level chang
 
 **EPUB (direction, Apr 2026):** Render EPUB in the **main pane** with **Readium Web** ([`readium/ts-toolkit`](https://github.com/readium/ts-toolkit): **`@readium/navigator`**, **`@readium/shared`**, and related loading/parsing packages as required). **Reading position** and future **citation** locators should align with Readium’s **`Locator`** model and §2.3 in [`ongoing/book-reading-epub-research-quest.md`](book-reading-epub-research-quest.md), not PDF **`PageBbox`**. Scroll vs paginated mode, **mobile Safari**, and **bundle** are **spike-gated** before ship.
 
+**EPUB reading-record seam (shipped):** The EPUB reader (`BookReadingEpubView`) goes through the **same** `useNotebookBookReadingRecords` composable and the **same** `BookReadingBookLayout.dispositionForBlock` prop as the PDF reader — there is no parallel records state or layout contract for EPUB. The `ReadingControlPanel` component is reused as-is; EPUB passes `:anchor-top-px="null"` (bottom-docked) until Phase 8 adds content-aware anchoring. The "mark and advance to the next block" rule is shared via `frontend/src/lib/book-reading/nextBookBlockAfter.ts`; the only format-specific piece is applying the advance (PDF scrolls to the bbox; EPUB calls `displayEpubTarget(epubStartHref)`).
+
 **Deletion:** Removing a book from the notebook (frontend flow) must **delete the persisted book record** and **remove the object** from the configured storage backend (GCS in prod, local/test store in dev).
 
 **Plan:** Phased delivery is spelled out in [`ongoing/book-reading-read-a-block-plan.md`](book-reading-read-a-block-plan.md).

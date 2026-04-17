@@ -192,26 +192,28 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **v1 locator format:** the epub.js spine href (e.g. `OEBPS/chapter2.xhtml#section-beta-two`) — same shape as `epubStartHref`. The schema is a plain `VARCHAR(512)` so a future CFI upgrade does not require another migration.
 
-## Phase 7: Mark an EPUB block as read, skimmed, or skipped (planned)
+## Phase 7: Mark an EPUB block as read (done)
 
 **Why separate from direct-content automation:** Manual progress recording is meaningful on its own. It should not wait for the harder EPUB-specific direct-content geometry work.
 
 **Behavior:**
 - *Pre:* EPUB is open and a block is selected.
-- *Trigger:* User marks the selected block as read, skimmed, or skipped in the Reading Control Panel.
-- *Post:* The block shows the chosen disposition in the layout.
+- *Trigger:* User marks the selected block as read in the Reading Control Panel.
+- *Post:* The block shows the read disposition in the layout, and the selection advances to the next block in preorder.
 
 **User value after this phase:** "I can record my reading progress in an EPUB the same way I do for a PDF."
 
-**Scope:**
-- Reuse the existing reading-record API and reader-shell panel flow.
-- Support EPUB in the Reading Control Panel with bottom-docked placement (interim — upgraded to content-aware geometry in Phase 8).
-- Reuse shared reading-record state management, snap-back rules, and layout presentation where they are format-agnostic.
-- Do not yet depend on EPUB `BookContentBlock` direct-content geometry for panel anchoring or auto-mark heuristics.
+**Scope (shipped):**
+- `BookReadingEpubView.vue` uses the same `useNotebookBookReadingRecords(notebookId)` composable as the PDF view, calls `syncFromServer()` on mount, and feeds `bookReading.dispositionForBlock` straight into `BookReadingBookLayout`'s `dispositionForBlock` prop — no parallel records state or UI contract.
+- `ReadingControlPanel.vue` is reused as-is. EPUB drives it with `:anchor-top-px="null"` (bottom-docked) — the same component PDF uses, just without content-aware geometry. Phase 8 upgrades EPUB to anchored placement.
+- "Mark and advance": on a successful `submitReadingDisposition(blockId, status)`, the shared `nextBookBlockAfter(blocks, blockId)` helper (`frontend/src/lib/book-reading/nextBookBlockAfter.ts`) picks the successor; EPUB applies it by updating `selectedBlockId`, calling `epubViewerRef.displayEpubTarget(next.epubStartHref)`, and committing the current-block debouncer.
+- Skimmed and skipped dispositions are intentionally **not** wired in the EPUB panel: the disposition API supports them for PDF, but the EPUB UI currently surfaces only "mark as read". Adding them is a later decision once content-aware anchoring lands in Phase 8.
 
-**Testing:**
-- E2E: mark an EPUB block as read and verify the layout shows the updated disposition.
-- Extend the same behavior with skimmed/skipped if the phase lands those together.
+**Testing (shipped):**
+- `frontend/tests/lib/book-reading/nextBookBlockAfter.spec.ts` covers the shared helper (middle/last/missing/empty cases).
+- E2E scenario "Mark an EPUB block as read advances the selection" in `e2e_test/features/book_reading/epub_book.feature` proves the full user path: click a block, mark as read in the Reading Control Panel, see the row marked as read in the layout, and the next block selected.
+
+**Out of scope (deferred to Phase 8):** EPUB-specific content-aware panel anchoring, no-direct-content auto-mark, and any EPUB UI for skimmed/skipped.
 
 ## Phase 8: EPUB direct-content boundaries and no-direct-content automation (planned)
 
@@ -287,6 +289,6 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | 4 | Precise navigation to any section | `epubStartHref` path#fragment, epub.js `display` | Done |
 | 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Done |
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Done |
-| 7 | Mark EPUB blocks read/skimmed/skipped | Reusing reading-record UI and state without over-coupling to PDF | Small-medium |
+| 7 | Mark EPUB block as read | Reusing reading-record UI and state without over-coupling to PDF | Done |
 | 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |
 | 9 | CLI EPUB attach | Raw upload transport only, no second extraction path | Small-medium |

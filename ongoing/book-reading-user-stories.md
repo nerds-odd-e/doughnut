@@ -104,6 +104,17 @@ _(Sub-stories to be added.)_
 
 ## Story: EPUB book
 
-_(Sub-stories to be added.)_
+### Mark an EPUB block as read
+
+Given an EPUB is open in the reader
+When I click a block in the book layout
+And I mark that block as read in the Reading Control Panel
+Then I should see that block marked as read in the book layout
+And I should see the next block selected in the book layout
+
+### Sub-stories (to be added)
+
+- Skimmed / skipped dispositions for EPUB (pending Phase 8 content-aware anchoring).
+- Auto-mark blocks with no direct content on EPUB (pending Phase 8).
 
 ## User splits a book block further.
