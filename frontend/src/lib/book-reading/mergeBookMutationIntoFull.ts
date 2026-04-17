@@ -3,18 +3,32 @@ import type {
   BookFull,
   BookMutationResponse,
   EpubLocator,
+  EpubLocatorFull,
   PdfLocator,
+  PdfLocatorFull,
 } from "@generated/doughnut-backend-api"
 
+type BookMutationLocator =
+  | EpubLocator
+  | PdfLocator
+  | EpubLocatorFull
+  | PdfLocatorFull
+
 function contentLocatorsAfterMutation(
-  rowLocators: Array<EpubLocator | PdfLocator> | undefined,
+  rowLocators: Array<BookMutationLocator> | undefined,
   prev: BookBlockFull
 ): BookBlockFull["contentLocators"] {
   if (!rowLocators) {
     return prev.contentLocators
   }
-  return rowLocators.map((loc) =>
-    loc.type === "epub"
+  return rowLocators.map((loc) => {
+    if (loc.type === "EpubLocator_Full") {
+      return loc
+    }
+    if (loc.type === "PdfLocator_Full") {
+      return loc
+    }
+    return loc.type === "epub"
       ? {
           href: loc.href,
           fragment: loc.fragment,
@@ -27,7 +41,7 @@ function contentLocatorsAfterMutation(
           derivedTitle: loc.derivedTitle,
           type: "PdfLocator_Full" as const,
         }
-  )
+  })
 }
 
 export function mergeBookMutationIntoFull(
@@ -54,7 +68,7 @@ export function mergeBookMutationIntoFull(
         depth: row.depth,
         title: row.title,
         contentLocators: contentLocatorsAfterMutation(
-          row.contentLocators,
+          row.contentLocators as Array<BookMutationLocator> | undefined,
           prev
         ),
       }

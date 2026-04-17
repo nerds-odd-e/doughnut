@@ -53,6 +53,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase A1 — Make `mergeBookMutationIntoFull` idempotent (structure)
 
+**Status: done**
+
 **Change:** Teach the mapper to pass through locators whose `type` is already `EpubLocator_Full` / `PdfLocator_Full`. Add a unit case to `mergeBookMutationIntoFull.spec.ts` for the pass-through path.
 
 **Why:** Lets the backend emit `_Full` tags without breaking the frontend in the next phase.
