@@ -4928,19 +4928,28 @@ components:
         id:
           type: integer
           format: int32
-        pageIndex:
-          type: integer
-          format: int32
-        normalizedY:
-          type: integer
-          format: int32
-        epubLocator:
-          type: string
+        locator:
+          $ref: "#/components/schemas/ContentLocator_Full"
         selectedBookBlockId:
           type: integer
           format: int32
+        pageIndex:
+          type: integer
+          format: int32
+          description: "Derived from locator for API backward compatibility (PDF:\
+            \ page index)"
+        normalizedY:
+          type: integer
+          format: int32
+          description: "Derived from locator for API backward compatibility (PDF:\
+            \ normalized Y)"
+        epubLocator:
+          type: string
+          description: Derived from locator for API backward compatibility (EPUB spine
+            locator string)
       required:
       - id
+      - locator
     NotebookCertificateApprovalDTO:
       type: object
       properties:

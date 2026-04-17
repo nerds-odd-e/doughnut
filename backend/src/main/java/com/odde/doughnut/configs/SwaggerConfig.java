@@ -68,6 +68,16 @@ public class SwaggerConfig {
       }
     }
 
+    Schema bookUserLastReadPosition = schemas.get("BookUserLastReadPosition");
+    if (bookUserLastReadPosition != null && bookUserLastReadPosition.getProperties() != null) {
+      Object locatorRaw = bookUserLastReadPosition.getProperties().get("locator");
+      if (locatorRaw instanceof Schema) {
+        Schema locatorRef = new Schema<>();
+        locatorRef.set$ref("#/components/schemas/ContentLocator_Full");
+        bookUserLastReadPosition.getProperties().put("locator", locatorRef);
+      }
+    }
+
     schemas.remove("ContentLocator");
   }
 }

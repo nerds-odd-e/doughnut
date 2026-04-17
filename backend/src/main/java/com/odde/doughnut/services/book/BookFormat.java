@@ -102,9 +102,6 @@ public enum BookFormat {
     @Override
     public void writeLegacyColumns(
         BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper) {
-      row.setPageIndex(req.getPageIndex());
-      row.setNormalizedY(req.getNormalizedY());
-      row.setEpubLocator(null);
       persistReadingPositionLocatorJson(
           row,
           objectMapper,
@@ -131,10 +128,6 @@ public enum BookFormat {
             ApiError.ErrorType.BINDING_ERROR,
             "PdfLocator_Full bbox must have four numbers");
       }
-      row.setPageIndex(pdf.pageIndex());
-      double y0 = bbox.get(1);
-      row.setNormalizedY((int) Math.round(Math.max(0, Math.min(1000, y0))));
-      row.setEpubLocator(null);
       persistReadingPositionLocatorJson(row, objectMapper, locator);
     }
   },
@@ -179,9 +172,6 @@ public enum BookFormat {
     @Override
     public void writeLegacyColumns(
         BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper) {
-      row.setEpubLocator(req.getEpubLocator());
-      row.setPageIndex(null);
-      row.setNormalizedY(null);
       String raw = trimToNull(req.getEpubLocator());
       int hash = raw.indexOf('#');
       String hrefPart = hash < 0 ? raw : raw.substring(0, hash);
@@ -216,9 +206,6 @@ public enum BookFormat {
         frag = frag.substring(1);
       }
       frag = trimToNull(frag);
-      row.setEpubLocator(href + (frag == null ? "" : "#" + frag));
-      row.setPageIndex(null);
-      row.setNormalizedY(null);
       persistReadingPositionLocatorJson(row, objectMapper, new EpubLocator(href, frag));
     }
   };

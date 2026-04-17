@@ -14,6 +14,7 @@ import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion.BlockDepthSuggestion;
+import com.odde.doughnut.controllers.dto.BookUserLastReadPositionResponse;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
@@ -286,9 +287,12 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public Optional<BookUserLastReadPosition> getLastReadPosition(Notebook notebook, User user) {
+  public Optional<BookUserLastReadPositionResponse> getLastReadPosition(
+      Notebook notebook, User user) {
     Book book = requireBook(notebook);
-    return bookUserLastReadPositionRepository.findByUser_IdAndBook_Id(user.getId(), book.getId());
+    return bookUserLastReadPositionRepository
+        .findByUser_IdAndBook_Id(user.getId(), book.getId())
+        .map(row -> BookUserLastReadPositionResponse.from(row, objectMapper));
   }
 
   @Transactional

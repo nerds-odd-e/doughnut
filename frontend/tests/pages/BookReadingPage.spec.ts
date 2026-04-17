@@ -451,14 +451,21 @@ describe("BookReadingPage", () => {
         })
       }
       expect(patchSpy).not.toHaveBeenCalled()
-      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
+      vi.advanceTimersByTime(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
     })
 
     expect(patchSpy).toHaveBeenCalledTimes(1)
     expect(patchSpy).toHaveBeenCalledWith({
       path: { notebook: notebookId },
-      body: { pageIndex: 2, normalizedY: 200, selectedBookBlockId: 101 },
+      body: {
+        locator: {
+          type: "PdfLocator_Full",
+          pageIndex: 2,
+          bbox: [0, 200, 0, 200],
+        },
+        selectedBookBlockId: 101,
+      },
     })
   })
 
@@ -477,14 +484,21 @@ describe("BookReadingPage", () => {
         viewport: { top: 150, mid: 250, bottom: 300 },
         pagesCount: 10,
       })
-      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
+      vi.advanceTimersByTime(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
     })
 
     expect(patchSpy).toHaveBeenCalledTimes(1)
     expect(patchSpy.mock.calls[0]?.[0]).toEqual({
       path: { notebook: notebookId },
-      body: { pageIndex: 0, normalizedY: 150, selectedBookBlockId: 101 },
+      body: {
+        locator: {
+          type: "PdfLocator_Full",
+          pageIndex: 0,
+          bbox: [0, 150, 0, 150],
+        },
+        selectedBookBlockId: 101,
+      },
     })
   })
 
@@ -516,7 +530,16 @@ describe("BookReadingPage", () => {
       NotebookBooksController,
       "getNotebookBookReadingPosition"
     ).mockResolvedValue(
-      wrapSdkResponse({ id: 1, pageIndex: 2, normalizedY: 750 })
+      wrapSdkResponse({
+        id: 1,
+        locator: {
+          type: "PdfLocator_Full",
+          pageIndex: 2,
+          bbox: [0, 750, 100, 600],
+          contentBlockId: null,
+          derivedTitle: null,
+        },
+      })
     )
     mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
 
@@ -552,8 +575,13 @@ describe("BookReadingPage", () => {
     ).mockResolvedValue(
       wrapSdkResponse({
         id: 1,
-        pageIndex: 2,
-        normalizedY: 750,
+        locator: {
+          type: "PdfLocator_Full",
+          pageIndex: 2,
+          bbox: [0, 750, 100, 600],
+          contentBlockId: null,
+          derivedTitle: null,
+        },
         selectedBookBlockId: 102,
       })
     )
@@ -583,7 +611,7 @@ describe("BookReadingPage", () => {
         viewport: { top: 100, mid: 200, bottom: 300 },
         pagesCount: 10,
       })
-      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
+      vi.advanceTimersByTime(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
     })
 
@@ -592,8 +620,11 @@ describe("BookReadingPage", () => {
     expect(lastCall).toEqual({
       path: { notebook: notebookId },
       body: {
-        pageIndex: 1,
-        normalizedY: 100,
+        locator: {
+          type: "PdfLocator_Full",
+          pageIndex: 1,
+          bbox: [0, 100, 0, 100],
+        },
         selectedBookBlockId: 103,
       },
     })

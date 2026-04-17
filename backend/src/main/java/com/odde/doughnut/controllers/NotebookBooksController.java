@@ -9,11 +9,11 @@ import com.odde.doughnut.controllers.dto.BookBlockReadingRecordPutRequest;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.BookMutationResponse;
+import com.odde.doughnut.controllers.dto.BookUserLastReadPositionResponse;
 import com.odde.doughnut.controllers.dto.CreateBookBlockFromContentRequest;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockReadingRecord;
-import com.odde.doughnut.entities.BookUserLastReadPosition;
 import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.ApiException;
@@ -111,14 +111,14 @@ class NotebookBooksController {
         content =
             @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = BookUserLastReadPosition.class))),
+                schema = @Schema(implementation = BookUserLastReadPositionResponse.class))),
     @ApiResponse(
         responseCode = "204",
         description = "No saved position yet (book exists; user has not stored a snapshot)")
   })
   @GetMapping("/{notebook}/book/reading-position")
   @Transactional(readOnly = true)
-  public ResponseEntity<BookUserLastReadPosition> getReadingPosition(
+  public ResponseEntity<BookUserLastReadPositionResponse> getReadingPosition(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);

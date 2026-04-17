@@ -779,10 +779,20 @@ export type NotebooksViewedByUser = {
 
 export type BookUserLastReadPosition = {
     id: number;
-    pageIndex?: number;
-    normalizedY?: number;
-    epubLocator?: string;
+    locator: ContentLocatorFull;
     selectedBookBlockId?: number;
+    /**
+     * Derived from locator for API backward compatibility (PDF: page index)
+     */
+    pageIndex?: number;
+    /**
+     * Derived from locator for API backward compatibility (PDF: normalized Y)
+     */
+    normalizedY?: number;
+    /**
+     * Derived from locator for API backward compatibility (EPUB spine locator string)
+     */
+    epubLocator?: string;
 };
 
 export type NotebookCertificateApprovalDto = {

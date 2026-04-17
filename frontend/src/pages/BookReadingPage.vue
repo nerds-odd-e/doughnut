@@ -46,9 +46,47 @@
 import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
 import BookReadingEpubView from "@/components/book-reading/BookReadingEpubView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type { BookFull } from "@generated/doughnut-backend-api"
+import { epubDisplayHref } from "@/lib/book-reading/asEpubLocator"
+import type {
+  BookFull,
+  BookUserLastReadPosition,
+  EpubLocatorFull,
+  PdfLocatorFull,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { onMounted, ref } from "vue"
+
+function initialReadingStateFromSavedPosition(pos: BookUserLastReadPosition): {
+  initialLastRead: {
+    pageIndexZeroBased: number
+    normalizedY: number
+  } | null
+  initialEpubLocator: string | null
+} {
+  const loc = pos.locator
+  if (!loc) {
+    return { initialLastRead: null, initialEpubLocator: null }
+  }
+  if (loc.type === "EpubLocator_Full") {
+    const s = epubDisplayHref(loc as EpubLocatorFull)
+    return {
+      initialLastRead: null,
+      initialEpubLocator: s.length > 0 ? s : null,
+    }
+  }
+  if (loc.type === "PdfLocator_Full") {
+    const pdf = loc as PdfLocatorFull
+    const y = pdf.bbox?.[1] ?? 0
+    return {
+      initialLastRead: {
+        pageIndexZeroBased: pdf.pageIndex,
+        normalizedY: Math.round(y),
+      },
+      initialEpubLocator: null,
+    }
+  }
+  return { initialLastRead: null, initialEpubLocator: null }
+}
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -99,21 +137,9 @@ onMounted(async () => {
         typeof pos?.selectedBookBlockId === "number"
           ? pos.selectedBookBlockId
           : null
-      if (data.format === "epub") {
-        initialEpubLocator.value =
-          typeof pos?.epubLocator === "string" ? pos.epubLocator : null
-        initialLastRead.value = null
-      } else {
-        initialEpubLocator.value = null
-        initialLastRead.value =
-          typeof pos?.pageIndex === "number" &&
-          typeof pos?.normalizedY === "number"
-            ? {
-                pageIndexZeroBased: pos.pageIndex,
-                normalizedY: pos.normalizedY,
-              }
-            : null
-      }
+      const fromLoc = pos ? initialReadingStateFromSavedPosition(pos) : null
+      initialEpubLocator.value = fromLoc?.initialEpubLocator ?? null
+      initialLastRead.value = fromLoc?.initialLastRead ?? null
       bookFileBytes.value = await res.arrayBuffer()
     } catch {
       bookFileLoadError.value = "Could not load the book file."

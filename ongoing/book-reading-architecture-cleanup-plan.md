@@ -343,6 +343,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase F5 — Backend reads from JSON column (structure)
 
+**Status: done**
+
 **Change:** `getLastReadPosition` and `patchNotebookBookReadingPosition` read from `reading_position_locator_json` first. `BookFormat` stops writing legacy columns. Legacy columns become read-only rollback insurance.
 
 **Files:** `BookService.java`, `BookFormat.java`, the response DTOs (GetNotebookBookReadingPosition response now exposes `locator`).
