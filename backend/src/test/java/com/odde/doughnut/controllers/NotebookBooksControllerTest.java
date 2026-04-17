@@ -26,6 +26,7 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
+import com.odde.doughnut.services.book.EpubLocator;
 import com.odde.doughnut.services.book.PdfLocator;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
@@ -858,22 +859,34 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void fullViewJsonHasEmptyContentLocatorsForEveryEpubBlock() throws Exception {
+    void epubContentLocatorsMatchAnchorAndDirectContentOnFixture() throws Exception {
       Notebook nb = myNotebook();
       byte[] epubBytes = readFixtureEpubValidMinimal();
       controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
       makeMe.entityPersister.flushAndClear();
 
       Book detail = controller.getBook(nb);
-      String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
-      JsonNode tree = objectMapper.readTree(json);
-      JsonNode blocks = tree.get("blocks");
-      assertThat(blocks.isArray(), equalTo(true));
-      for (JsonNode b : blocks) {
-        JsonNode locs = b.get("contentLocators");
-        assertThat(locs.isArray(), equalTo(true));
-        assertThat(locs.size(), equalTo(0));
-      }
+      List<BookBlock> preorder = blocksByLayoutOrder(detail);
+
+      BookBlock partOne = preorder.getFirst();
+      assertThat(partOne.getContentLocators(), hasSize(1));
+      assertThat(partOne.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
+      EpubLocator partOneAnchor = (EpubLocator) partOne.getContentLocators().getFirst();
+      assertThat(partOneAnchor.href(), equalTo("OEBPS/chapter1.xhtml"));
+      assertThat(partOneAnchor.fragment(), nullValue());
+      assertThat(partOne.getEpubStartHref(), equalTo("OEBPS/chapter1.xhtml"));
+
+      BookBlock chapterBeta = preorder.get(2);
+      assertThat(chapterBeta.getStructuralTitle(), equalTo("Chapter Beta"));
+      assertThat(chapterBeta.getContentLocators(), hasSize(2));
+      assertThat(chapterBeta.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
+      EpubLocator betaFirst = (EpubLocator) chapterBeta.getContentLocators().getFirst();
+      assertThat(betaFirst.href(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(betaFirst.fragment(), nullValue());
+      assertThat(chapterBeta.getContentLocators().get(1), instanceOf(EpubLocator.class));
+      EpubLocator betaTable = (EpubLocator) chapterBeta.getContentLocators().get(1);
+      assertThat(betaTable.href(), equalTo("OEBPS/chapter3.xhtml"));
+      assertThat(betaTable.fragment(), equalTo("#beta-table"));
     }
   }
 

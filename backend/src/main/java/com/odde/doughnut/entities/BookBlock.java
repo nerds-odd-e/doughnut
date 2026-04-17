@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.book.BookBlockContentBboxes;
+import com.odde.doughnut.services.book.BookBlockEpubContentLocators;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.ContentLocator;
 import com.odde.doughnut.services.book.PageBbox;
@@ -32,8 +31,6 @@ import org.hibernate.annotations.FetchMode;
   "epubStartHref"
 })
 public class BookBlock extends EntityIdentifiedByIdOnly {
-
-  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "book_id", nullable = false)
@@ -89,7 +86,7 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<ContentLocator> getContentLocators() {
     if (book != null && BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
-      return List.of();
+      return BookBlockEpubContentLocators.epubContentLocators(contentBlocks);
     }
     return BookBlockContentBboxes.allBboxes(contentBlocks).stream()
         .map(pb -> (ContentLocator) new PdfLocator(pb.pageIndex(), pb.bbox()))
@@ -113,32 +110,6 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
     if (book == null || !BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
       return null;
     }
-    if (contentBlocks == null || contentBlocks.isEmpty()) {
-      return null;
-    }
-    String rawData = contentBlocks.getFirst().getRawData();
-    if (rawData == null || rawData.isBlank()) {
-      return null;
-    }
-    try {
-      JsonNode n = MAPPER.readTree(rawData);
-      if (n == null || !n.has("href") || !n.get("href").isTextual()) {
-        return null;
-      }
-      String href = n.get("href").asText();
-      if (href.isBlank()) {
-        return null;
-      }
-      if (!n.has("fragment") || !n.get("fragment").isTextual()) {
-        return href;
-      }
-      String fragment = n.get("fragment").asText();
-      if (fragment.isBlank()) {
-        return href;
-      }
-      return href + fragment;
-    } catch (Exception e) {
-      return null;
-    }
+    return BookBlockEpubContentLocators.epubStartHrefFromFirstContentBlock(contentBlocks);
   }
 }
