@@ -199,7 +199,10 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
-import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
+import {
+  lastDirectContentLocator,
+  pdfLocatorsFromBlock,
+} from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
@@ -380,12 +383,11 @@ function updateReadingPanelAnchor() {
     readingPanelAnchorTopPx.value = null
     return
   }
-  const pdfs = pdfLocatorsFromBlock(block)
-  if (pdfs.length < 2) {
+  const lastLocator = lastDirectContentLocator(block)
+  if (lastLocator === null) {
     readingPanelAnchorTopPx.value = null
     return
   }
-  const lastLocator = pdfs[pdfs.length - 1]!
   let top = pdf.readingPanelAnchorTopPx(
     lastLocator,
     READING_PANEL_OBSTRUCTION_PX

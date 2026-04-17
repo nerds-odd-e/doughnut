@@ -1,13 +1,14 @@
-import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
+import {
+  asPdfLocator,
+  lastDirectContentLocator,
+  pdfLocatorsFromBlock,
+} from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import type {
   BookReaderViewerRef,
   BookReadingPdfViewerRef,
 } from "@/composables/bookReaderViewerRef"
-import type {
-  BookBlockFull,
-  PdfLocatorFull,
-} from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type Ref, ref, watch } from "vue"
 
 function selectedIndexAndSuccessor(
@@ -31,12 +32,6 @@ function selectedIndexAndSuccessor(
 
 function hasDirectContent(row: BookBlockFull): boolean {
   return row.contentLocators.length > 1
-}
-
-function lastContentPdfLocator(row: BookBlockFull): PdfLocatorFull | null {
-  if (!hasDirectContent(row)) return null
-  const pdfs = pdfLocatorsFromBlock(row)
-  return pdfs.length > 0 ? pdfs[pdfs.length - 1]! : null
 }
 
 export function useBookReadingSnapBack(options: {
@@ -109,7 +104,9 @@ export function useBookReadingSnapBack(options: {
     const rows = bookBlocks.value
     const sel = rows.find((r) => r.id === selId)
     if (!sel) return
-    const lastBbox = lastContentPdfLocator(sel)
+    const lastLoc = lastDirectContentLocator(sel)
+    if (lastLoc === null) return
+    const lastBbox = asPdfLocator(lastLoc)
     if (lastBbox === null) return
     snapbackAttempts.set(selId, (snapbackAttempts.get(selId) ?? 0) + 1)
     const navTargets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(sel))
@@ -173,8 +170,7 @@ export function useBookReadingSnapBack(options: {
         : null
     }
     const { successor } = chain
-    const lastBbox = lastContentPdfLocator(target)
-    if (lastBbox !== null) {
+    if (lastDirectContentLocator(target) !== null) {
       const contentBottomVisible = lastContentBottomVisible.value
       const scrolledPastContent =
         panelShownBecauseScrolledPastContent(successor)
@@ -186,7 +182,7 @@ export function useBookReadingSnapBack(options: {
   function updateLastDirectContentGeometry(): void {
     const target = confirmationTargetBlock.value
     const lastLocatorForGeometry =
-      target !== null ? lastContentPdfLocator(target) : null
+      target !== null ? lastDirectContentLocator(target) : null
     if (lastLocatorForGeometry === null) return
     const geometryVisible =
       viewerRef.value?.isLocatorBottomVisible(
