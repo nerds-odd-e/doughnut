@@ -67,6 +67,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase A2 — Backend emits `_Full` tags on mutation responses (structure)
 
+**Status: done**
+
 **Change:** Add the `contentLocators` field on `BookMutationResponse` (or whichever DTO carries updated blocks) to the `BookViews.Full.class` JSON view so Jackson emits `EpubLocator_Full` / `PdfLocator_Full`. Regenerate TypeScript (`pnpm generateTypeScript`).
 
 **Why:** The frontend normalizer from A1 now receives already-Full locators and passes them through.

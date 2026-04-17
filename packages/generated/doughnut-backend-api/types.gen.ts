@@ -17,11 +17,11 @@ export type BookBlockReadingRecordListItem = {
     completedAt: string;
 };
 
-export type BookBlockDepthRequest = {
+export type BookBlockDepthRequestFull = {
     direction: 'INDENT' | 'OUTDENT';
 };
 
-export type BookBlockMutationResponse = {
+export type BookBlockMutationResponseFull = {
     id: number;
     /**
      * Nesting depth in the book layout; root-level blocks are 0.
@@ -31,10 +31,10 @@ export type BookBlockMutationResponse = {
     /**
      * Locators for this block; present only when geometry changed (e.g. cancel merge).
      */
-    contentLocators?: Array<EpubLocator | PdfLocator>;
+    contentLocators?: Array<EpubLocatorFull | PdfLocatorFull>;
 };
 
-export type BookMutationResponse = {
+export type BookMutationResponseFull = {
     id: number;
     bookName: string;
     format: string;
@@ -43,26 +43,38 @@ export type BookMutationResponse = {
     /**
      * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
      */
-    blocks: Array<BookBlockMutationResponse>;
+    blocks: Array<BookBlockMutationResponseFull>;
     notebookId: string;
 };
 
-export type ContentLocator = {
+export type ContentLocatorFull = {
     type: string;
 };
 
-export type EpubLocator = Omit<ContentLocator, 'type'> & {
+export type EpubLocator = {
     href: string;
     fragment?: string;
-    type: 'epub';
 };
 
-export type PdfLocator = Omit<ContentLocator, 'type'> & {
+export type EpubLocatorFull = Omit<ContentLocatorFull, 'type'> & {
+    href: string;
+    fragment?: string;
+    type: 'EpubLocator_Full';
+};
+
+export type PdfLocator = {
     pageIndex: number;
     bbox: Array<number>;
     contentBlockId?: number;
     derivedTitle?: string;
-    type: 'pdf';
+};
+
+export type PdfLocatorFull = Omit<ContentLocatorFull, 'type'> & {
+    pageIndex: number;
+    bbox: Array<number>;
+    contentBlockId?: number;
+    derivedTitle?: string;
+    type: 'PdfLocator_Full';
 };
 
 export type Circle = {
@@ -362,6 +374,21 @@ export type BookLayoutReorganizationSuggestion = {
     blocks: Array<BlockDepthSuggestion>;
 };
 
+/**
+ * Suggested depth for a single block
+ */
+export type BlockDepthSuggestionFull = {
+    id: number;
+    depth: number;
+};
+
+/**
+ * AI suggestion for reorganizing book block depths
+ */
+export type BookLayoutReorganizationSuggestionFull = {
+    blocks: Array<BlockDepthSuggestionFull>;
+};
+
 export type CreateBookBlockFromContentRequestFull = {
     /**
      * Split the owning book block at this imported content row; that row and following rows become a new child block.
@@ -401,24 +428,6 @@ export type BookFull = {
      */
     blocks: Array<BookBlockFull>;
     notebookId: string;
-};
-
-export type ContentLocatorFull = {
-    type: string;
-};
-
-export type EpubLocatorFull = Omit<ContentLocatorFull, 'type'> & {
-    href: string;
-    fragment?: string;
-    type: 'EpubLocator_Full';
-};
-
-export type PdfLocatorFull = Omit<ContentLocatorFull, 'type'> & {
-    pageIndex: number;
-    bbox: Array<number>;
-    contentBlockId?: number;
-    derivedTitle?: string;
-    type: 'PdfLocator_Full';
 };
 
 export type AttachBookLayoutNodeRequestFull = {
@@ -981,7 +990,7 @@ export type PutNotebookBookBlockReadingRecordResponses = {
 export type PutNotebookBookBlockReadingRecordResponse = PutNotebookBookBlockReadingRecordResponses[keyof PutNotebookBookBlockReadingRecordResponses];
 
 export type ChangeBookBlockDepthData = {
-    body: BookBlockDepthRequest;
+    body: BookBlockDepthRequestFull;
     path: {
         notebook: number;
         bookBlock: number;
@@ -994,7 +1003,7 @@ export type ChangeBookBlockDepthResponses = {
     /**
      * OK
      */
-    200: BookMutationResponse;
+    200: BookMutationResponseFull;
 };
 
 export type ChangeBookBlockDepthResponse = ChangeBookBlockDepthResponses[keyof ChangeBookBlockDepthResponses];
@@ -1998,7 +2007,7 @@ export type SuggestBookLayoutReorganizationResponses = {
 export type SuggestBookLayoutReorganizationResponse = SuggestBookLayoutReorganizationResponses[keyof SuggestBookLayoutReorganizationResponses];
 
 export type ApplyBookLayoutReorganizationData = {
-    body: BookLayoutReorganizationSuggestion;
+    body: BookLayoutReorganizationSuggestionFull;
     path: {
         notebook: number;
     };
@@ -2010,7 +2019,7 @@ export type ApplyBookLayoutReorganizationResponses = {
     /**
      * OK
      */
-    200: BookMutationResponse;
+    200: BookMutationResponseFull;
 };
 
 export type ApplyBookLayoutReorganizationResponse = ApplyBookLayoutReorganizationResponses[keyof ApplyBookLayoutReorganizationResponses];
@@ -3840,7 +3849,7 @@ export type CancelBookBlockResponses = {
     /**
      * OK
      */
-    200: BookMutationResponse;
+    200: BookMutationResponseFull;
 };
 
 export type CancelBookBlockResponse = CancelBookBlockResponses[keyof CancelBookBlockResponses];

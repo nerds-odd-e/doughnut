@@ -1,18 +1,26 @@
 import type {
   BookBlockFull,
   BookFull,
-  BookMutationResponse,
-  EpubLocator,
+  BookMutationResponseFull,
   EpubLocatorFull,
-  PdfLocator,
   PdfLocatorFull,
 } from "@generated/doughnut-backend-api"
 
+/** Short `type` discriminator (`epub` / `pdf`) from older responses; normalized to `*_Full`. */
+type LegacyShortEpubLocator = { type: "epub"; href: string; fragment?: string }
+type LegacyShortPdfLocator = {
+  type: "pdf"
+  pageIndex: number
+  bbox: number[]
+  contentBlockId?: number
+  derivedTitle?: string
+}
+
 type BookMutationLocator =
-  | EpubLocator
-  | PdfLocator
   | EpubLocatorFull
   | PdfLocatorFull
+  | LegacyShortEpubLocator
+  | LegacyShortPdfLocator
 
 function contentLocatorsAfterMutation(
   rowLocators: Array<BookMutationLocator> | undefined,
@@ -46,7 +54,7 @@ function contentLocatorsAfterMutation(
 
 export function mergeBookMutationIntoFull(
   previous: BookFull,
-  mutation: BookMutationResponse
+  mutation: BookMutationResponseFull
 ): BookFull {
   const prevById = new Map(previous.blocks.map((b) => [b.id, b]))
   return {

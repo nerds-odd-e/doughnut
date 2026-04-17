@@ -177,6 +177,7 @@ class NotebookBooksController {
       summary = "Apply AI-suggested depth changes to the book layout")
   @PostMapping("/{notebook}/book/reorganize-layout/apply")
   @Transactional
+  @JsonView(BookViews.Full.class)
   public BookMutationResponse applyBookLayoutReorganization(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @RequestBody @Valid BookLayoutReorganizationSuggestion suggestion)
@@ -215,6 +216,7 @@ class NotebookBooksController {
   @Operation(operationId = "changeBookBlockDepth", summary = "Change depth of a book block")
   @PutMapping("/{notebook}/book/blocks/{bookBlock}/depth")
   @Transactional
+  @JsonView(BookViews.Full.class)
   public BookMutationResponse changeBookBlockDepth(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock,
@@ -230,6 +232,7 @@ class NotebookBooksController {
       summary = "Cancel a book block (merge content to previous)")
   @DeleteMapping("/{notebook}/book/blocks/{bookBlock}")
   @Transactional
+  @JsonView(BookViews.Full.class)
   public BookMutationResponse cancelBookBlock(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("bookBlock") @Schema(type = "integer") BookBlock bookBlock)

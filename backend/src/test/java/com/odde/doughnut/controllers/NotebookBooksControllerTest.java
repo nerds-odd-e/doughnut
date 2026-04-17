@@ -1674,7 +1674,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     void changeBookBlockDepthJsonOmitsContentLocatorsOnEveryBlock() throws Exception {
       BookBlock b = blockByTitle("B");
       BookMutationResponse wire = controller.changeBookBlockDepth(nb, b, indent());
-      String json = objectMapper.writeValueAsString(wire);
+      String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(wire);
       JsonNode tree = objectMapper.readTree(json);
       JsonNode blocksNode = tree.get("blocks");
       assertThat(blocksNode.size(), equalTo(4));
@@ -2174,7 +2174,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
               .orElseThrow();
 
       BookMutationResponse cancelWire = controller.cancelBookBlock(nb, blockB);
-      String cancelJson = objectMapper.writeValueAsString(cancelWire);
+      String cancelJson =
+          objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(cancelWire);
       JsonNode cancelTree = objectMapper.readTree(cancelJson);
       int aId = blockA.getId();
       for (JsonNode row : cancelTree.get("blocks")) {

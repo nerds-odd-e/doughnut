@@ -1,13 +1,13 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.odde.doughnut.entities.BookViews;
 import com.odde.doughnut.services.book.ContentLocator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.Getter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
 public class BookBlockMutationResponse {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
@@ -32,5 +32,22 @@ public class BookBlockMutationResponse {
     this.depth = depth;
     this.title = title;
     this.contentLocators = contentLocators;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public int getDepth() {
+    return depth;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  @JsonView(BookViews.Full.class)
+  public List<ContentLocator> getContentLocators() {
+    return contentLocators;
   }
 }

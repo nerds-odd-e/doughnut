@@ -2,7 +2,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type {
   BookBlockFull,
   BookLayoutReorganizationSuggestion,
-  BookMutationResponse,
+  BookMutationResponseFull,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
@@ -49,7 +49,9 @@ export function useBookLayoutAiReorganize(
     }
   }
 
-  async function confirmSuggest(): Promise<BookMutationResponse | undefined> {
+  async function confirmSuggest(): Promise<
+    BookMutationResponseFull | undefined
+  > {
     if (!suggestion.value) return
     const { data, error } = await apiCallWithLoading(() =>
       NotebookBooksController.applyBookLayoutReorganization({

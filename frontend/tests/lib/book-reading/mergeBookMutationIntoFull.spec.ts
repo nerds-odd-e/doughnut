@@ -1,5 +1,5 @@
 import { mergeBookMutationIntoFull } from "@/lib/book-reading/mergeBookMutationIntoFull"
-import type { BookMutationResponse } from "@generated/doughnut-backend-api"
+import type { BookMutationResponseFull } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, expect, it } from "vitest"
 
@@ -12,7 +12,7 @@ describe("mergeBookMutationIntoFull", () => {
       ])
       .do()
     const book = makeMe.aBook.blocks([block]).do()
-    const mutation: BookMutationResponse = {
+    const mutation = {
       ...book,
       blocks: [
         {
@@ -30,7 +30,7 @@ describe("mergeBookMutationIntoFull", () => {
           ],
         },
       ],
-    }
+    } as unknown as BookMutationResponseFull
     const merged = mergeBookMutationIntoFull(book, mutation)
     expect(merged.blocks).toHaveLength(1)
     expect(merged.blocks[0]!.contentLocators).toEqual([
@@ -70,7 +70,7 @@ describe("mergeBookMutationIntoFull", () => {
           contentLocators: [epubFull, pdfFull],
         },
       ],
-    } as unknown as BookMutationResponse
+    } as unknown as BookMutationResponseFull
     const merged = mergeBookMutationIntoFull(book, mutation)
     expect(merged.blocks).toHaveLength(1)
     const locators = merged.blocks[0]!.contentLocators
@@ -85,7 +85,7 @@ describe("mergeBookMutationIntoFull", () => {
     ]
     const block = makeMe.aBookBlock.id(1).contentLocators(prevLocators).do()
     const book = makeMe.aBook.blocks([block]).do()
-    const mutation: BookMutationResponse = {
+    const mutation: BookMutationResponseFull = {
       ...book,
       blocks: [{ id: 1, depth: 0, title: "New" }],
     }

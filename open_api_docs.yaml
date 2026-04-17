@@ -57,7 +57,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BookBlockDepthRequest"
+              $ref: "#/components/schemas/BookBlockDepthRequest_Full"
         required: true
       responses:
         "200":
@@ -65,7 +65,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/BookMutationResponse"
+                $ref: "#/components/schemas/BookMutationResponse_Full"
   /api/user:
     get:
       tags:
@@ -1248,7 +1248,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BookLayoutReorganizationSuggestion"
+              $ref: "#/components/schemas/BookLayoutReorganizationSuggestion_Full"
         required: true
       responses:
         "200":
@@ -1256,7 +1256,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/BookMutationResponse"
+                $ref: "#/components/schemas/BookMutationResponse_Full"
   /api/notebooks/{notebook}/book/blocks:
     post:
       tags:
@@ -3200,7 +3200,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/BookMutationResponse"
+                $ref: "#/components/schemas/BookMutationResponse_Full"
   /api/memory-trackers/{memoryTracker}/recall-prompts/unanswered:
     delete:
       tags:
@@ -3260,7 +3260,7 @@ components:
       - bookBlockId
       - completedAt
       - status
-    BookBlockDepthRequest:
+    BookBlockDepthRequest_Full:
       type: object
       properties:
         direction:
@@ -3271,7 +3271,7 @@ components:
           pattern: INDENT|OUTDENT
       required:
       - direction
-    BookBlockMutationResponse:
+    BookBlockMutationResponse_Full:
       type: object
       properties:
         id:
@@ -3289,13 +3289,13 @@ components:
             (e.g. cancel merge).
           items:
             oneOf:
-            - $ref: "#/components/schemas/EpubLocator"
-            - $ref: "#/components/schemas/PdfLocator"
+            - $ref: "#/components/schemas/EpubLocator_Full"
+            - $ref: "#/components/schemas/PdfLocator_Full"
       required:
       - depth
       - id
       - title
-    BookMutationResponse:
+    BookMutationResponse_Full:
       type: object
       properties:
         id:
@@ -3316,7 +3316,7 @@ components:
           description: "Book blocks in depth-first preorder (parent before descendants,\
             \ then siblings). Order matches ascending layout_sequence in persistence."
           items:
-            $ref: "#/components/schemas/BookBlockMutationResponse"
+            $ref: "#/components/schemas/BookBlockMutationResponse_Full"
         notebookId:
           type: string
       required:
@@ -3325,20 +3325,29 @@ components:
       - format
       - id
       - notebookId
-    ContentLocator:
+    ContentLocator_Full:
       discriminator:
         propertyName: type
         mapping:
-          pdf: "#/components/schemas/PdfLocator"
-          epub: "#/components/schemas/EpubLocator"
+          PdfLocator_Full: "#/components/schemas/PdfLocator"
+          EpubLocator_Full: "#/components/schemas/EpubLocator"
       properties:
         type:
           type: string
       required:
       - type
     EpubLocator:
+      type: object
+      properties:
+        href:
+          type: string
+        fragment:
+          type: string
+      required:
+      - href
+    EpubLocator_Full:
       allOf:
-      - $ref: "#/components/schemas/ContentLocator"
+      - $ref: "#/components/schemas/ContentLocator_Full"
       - type: object
         properties:
           href:
@@ -3348,8 +3357,27 @@ components:
       required:
       - href
     PdfLocator:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          format: int32
+        bbox:
+          type: array
+          items:
+            type: number
+            format: double
+        contentBlockId:
+          type: integer
+          format: int32
+        derivedTitle:
+          type: string
+      required:
+      - bbox
+      - pageIndex
+    PdfLocator_Full:
       allOf:
-      - $ref: "#/components/schemas/ContentLocator"
+      - $ref: "#/components/schemas/ContentLocator_Full"
       - type: object
         properties:
           pageIndex:
@@ -4006,6 +4034,29 @@ components:
             $ref: "#/components/schemas/BlockDepthSuggestion"
       required:
       - blocks
+    BlockDepthSuggestion_Full:
+      type: object
+      description: Suggested depth for a single block
+      properties:
+        id:
+          type: integer
+          format: int32
+        depth:
+          type: integer
+          format: int32
+      required:
+      - depth
+      - id
+    BookLayoutReorganizationSuggestion_Full:
+      type: object
+      description: AI suggestion for reorganizing book block depths
+      properties:
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockDepthSuggestion_Full"
+      required:
+      - blocks
     CreateBookBlockFromContentRequest_Full:
       type: object
       properties:
@@ -4095,49 +4146,6 @@ components:
       - format
       - id
       - notebookId
-    ContentLocator_Full:
-      discriminator:
-        propertyName: type
-        mapping:
-          pdf: "#/components/schemas/PdfLocator"
-          epub: "#/components/schemas/EpubLocator"
-      properties:
-        type:
-          type: string
-      required:
-      - type
-    EpubLocator_Full:
-      allOf:
-      - $ref: "#/components/schemas/ContentLocator_Full"
-      - type: object
-        properties:
-          href:
-            type: string
-          fragment:
-            type: string
-      required:
-      - href
-    PdfLocator_Full:
-      allOf:
-      - $ref: "#/components/schemas/ContentLocator_Full"
-      - type: object
-        properties:
-          pageIndex:
-            type: integer
-            format: int32
-          bbox:
-            type: array
-            items:
-              type: number
-              format: double
-          contentBlockId:
-            type: integer
-            format: int32
-          derivedTitle:
-            type: string
-      required:
-      - bbox
-      - pageIndex
     AttachBookLayoutNodeRequest_Full:
       type: object
       properties:
