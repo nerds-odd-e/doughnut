@@ -30,6 +30,13 @@ function pdfEndPageFromMineruEnv(): number | undefined {
   return n
 }
 
+function detectBookAttachFormat(path: string): 'pdf' | 'epub' | undefined {
+  const ext = extname(path).toLowerCase()
+  if (ext === '.pdf') return 'pdf'
+  if (ext === '.epub') return 'epub'
+  return undefined
+}
+
 function bookBlocksTreeLines(blocks: BookBlockFull[] | undefined): string {
   if (blocks === undefined || blocks.length === 0) {
     return ''
@@ -37,29 +44,11 @@ function bookBlocksTreeLines(blocks: BookBlockFull[] | undefined): string {
   return blocks.map((b) => `${'  '.repeat(b.depth)}${b.title}`).join('\n')
 }
 
-async function runNotebookAttachPdf(
+async function runNotebookAttachPdfPipeline(
   notebook: Notebook,
-  bookPath: string
+  path: string,
+  absPath: string
 ): Promise<{ assistantMessage: string }> {
-  const path = bookPath.trim()
-  if (!path) {
-    throw new Error(`Missing path to PDF. Usage: ${attachNotebookDoc.usage}`)
-  }
-  if (!path.toLowerCase().endsWith('.pdf')) {
-    throw new Error('Attach only supports .pdf files.')
-  }
-
-  const absPdf = resolve(process.cwd(), path)
-  let st: Stats
-  try {
-    st = await stat(absPdf)
-  } catch {
-    throw new Error(`file not found or not readable: ${absPdf}`)
-  }
-  if (!st.isFile()) {
-    throw new Error('Attach expects a PDF file path, not a directory.')
-  }
-
   const minerResult = await runMineruOutlineSubprocess({
     bookPath: path,
     pdfEndPage: pdfEndPageFromMineruEnv(),
@@ -94,7 +83,7 @@ async function runNotebookAttachPdf(
           format: 'pdf',
           layout: minerResult.layout,
         },
-    absPdf
+    absPath
   )
 
   const tree = bookBlocksTreeLines(book.blocks)
@@ -104,6 +93,37 @@ async function runNotebookAttachPdf(
   return {
     assistantMessage: `Attached "${book.bookName}" to this notebook.\n\n${excerpt}`,
   }
+}
+
+async function runNotebookAttach(
+  notebook: Notebook,
+  bookPath: string
+): Promise<{ assistantMessage: string }> {
+  const trimmed = bookPath.trim()
+  if (!trimmed) {
+    throw new Error(`Missing path to PDF. Usage: ${attachNotebookDoc.usage}`)
+  }
+
+  const format = detectBookAttachFormat(trimmed)
+  if (format === undefined) {
+    throw new Error('Attach supports .pdf or .epub files.')
+  }
+  if (format === 'epub') {
+    throw new Error('EPUB attach from the CLI is not available yet.')
+  }
+
+  const absPath = resolve(process.cwd(), trimmed)
+  let st: Stats
+  try {
+    st = await stat(absPath)
+  } catch {
+    throw new Error(`file not found or not readable: ${absPath}`)
+  }
+  if (!st.isFile()) {
+    throw new Error('Attach expects a book file path, not a directory.')
+  }
+
+  return runNotebookAttachPdfPipeline(notebook, trimmed, absPath)
 }
 
 export function attachNotebookSlashCommandFor(
@@ -121,7 +141,7 @@ export function attachNotebookSlashCommandFor(
 
     useEffect(() => {
       let cancelled = false
-      runNotebookAttachPdf(notebook, argument ?? '').then(
+      runNotebookAttach(notebook, argument ?? '').then(
         ({ assistantMessage }) => {
           if (!cancelled) onSettledRef.current(assistantMessage)
         },
@@ -139,7 +159,7 @@ export function attachNotebookSlashCommandFor(
 
     return (
       <Box>
-        <Spinner label="Attaching PDF…" />
+        <Spinner label="Attaching book…" />
       </Box>
     )
   }

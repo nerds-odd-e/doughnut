@@ -128,7 +128,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
       stdin.write('/use Top Maths\r')
       await waitForFramesToInclude('Active notebook: Top Maths')
       stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('Attaching PDF')
+      await waitForFramesToInclude('Attaching book')
     })
 
     test('blocks input while attach spinner is visible', async () => {
@@ -140,10 +140,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
       stdin.write('/use Top Maths\r')
       await waitForFramesToInclude('Active notebook: Top Maths')
       stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('Attaching PDF')
+      await waitForFramesToInclude('Attaching book')
 
       stdin.write('should-not-appear\r')
-      await waitForLastFrameToInclude('Attaching PDF')
+      await waitForLastFrameToInclude('Attaching book')
     })
 
     test('attaches PDF and shows structure excerpt from API book', async () => {
@@ -295,8 +295,21 @@ describe('InteractiveCliApp /use notebook integration', () => {
       await waitForFramesToInclude('Active notebook: Top Maths')
       stdin.write(`/attach ${dirNamedPdf}\r`)
       await waitForFramesToInclude(
-        'Attach expects a PDF file path, not a directory.'
+        'Attach expects a book file path, not a directory.'
       )
+    })
+
+    test('rejects attach when extension is neither .pdf nor .epub', async () => {
+      const txtPath = join(attachWorkDir, 'notes.txt')
+      fs.writeFileSync(txtPath, 'x')
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${txtPath}\r`)
+      await waitForFramesToInclude('Attach supports .pdf or .epub files.')
     })
 
     test('rejects attach when PDF path is missing', async () => {
