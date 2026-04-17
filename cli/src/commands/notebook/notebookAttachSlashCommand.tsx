@@ -17,9 +17,9 @@ import { truncateForBookOutlineAssistant } from '../mineruOutline/outlineAssista
 
 const attachNotebookDoc: CommandDoc = {
   name: '/attach',
-  usage: '/attach <path to pdf>',
+  usage: '/attach <path to .pdf or .epub>',
   description:
-    'Attach a PDF to the active notebook (outline extraction and POST attach-book). Set DOUGHNUT_MINERU_PDF_END_PAGE to an inclusive last page index to cap large PDFs. Python: DOUGHNUT_MINERU_PYTHON; script: DOUGHNUT_MINERU_OUTLINE_SCRIPT.',
+    'Attach a book file to the active notebook (POST attach-book). PDF: MinerU outline extraction, then upload. EPUB: raw upload (no Python or preprocessing). PDF options — DOUGHNUT_MINERU_PDF_END_PAGE (inclusive last page), DOUGHNUT_MINERU_PYTHON, DOUGHNUT_MINERU_OUTLINE_SCRIPT.',
 }
 
 function pdfEndPageFromMineruEnv(): number | undefined {
@@ -95,21 +95,42 @@ async function runNotebookAttachPdfPipeline(
   }
 }
 
+async function runNotebookAttachEpubPipeline(
+  notebook: Notebook,
+  trimmedPath: string,
+  absPath: string
+): Promise<{ assistantMessage: string }> {
+  const ext = extname(trimmedPath)
+  const bookName = basename(trimmedPath, ext)
+  const book = await attachNotebookBookFile(
+    notebook.id,
+    { bookName, format: 'epub' },
+    absPath
+  )
+
+  const tree = bookBlocksTreeLines(book.blocks)
+  const excerpt = truncateForBookOutlineAssistant(
+    tree === '' ? book.bookName : tree
+  )
+  return {
+    assistantMessage: `Attached "${book.bookName}" to this notebook.\n\n${excerpt}`,
+  }
+}
+
 async function runNotebookAttach(
   notebook: Notebook,
   bookPath: string
 ): Promise<{ assistantMessage: string }> {
   const trimmed = bookPath.trim()
   if (!trimmed) {
-    throw new Error(`Missing path to PDF. Usage: ${attachNotebookDoc.usage}`)
+    throw new Error(
+      `Missing path to book file. Usage: ${attachNotebookDoc.usage}`
+    )
   }
 
   const format = detectBookAttachFormat(trimmed)
   if (format === undefined) {
     throw new Error('Attach supports .pdf or .epub files.')
-  }
-  if (format === 'epub') {
-    throw new Error('EPUB attach from the CLI is not available yet.')
   }
 
   const absPath = resolve(process.cwd(), trimmed)
@@ -123,6 +144,9 @@ async function runNotebookAttach(
     throw new Error('Attach expects a book file path, not a directory.')
   }
 
+  if (format === 'epub') {
+    return runNotebookAttachEpubPipeline(notebook, trimmed, absPath)
+  }
   return runNotebookAttachPdfPipeline(notebook, trimmed, absPath)
 }
 
@@ -167,7 +191,7 @@ export function attachNotebookSlashCommandFor(
   return {
     literal: '/attach',
     doc: attachNotebookDoc,
-    argument: { name: 'path to PDF', optional: false },
+    argument: { name: 'path to book file', optional: false },
     stageComponent: NotebookAttachStage,
     stageIndicator: 'Attach',
   }

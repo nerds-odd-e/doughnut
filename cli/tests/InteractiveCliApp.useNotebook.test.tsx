@@ -1,4 +1,4 @@
-import { describe, test, vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const { runMineruOutlineSubprocess } = vi.hoisted(() => ({
   runMineruOutlineSubprocess: vi.fn(),
@@ -57,8 +57,9 @@ describe('InteractiveCliApp /use notebook integration', () => {
     stdin.write('/use Top Maths\r')
     await waitForFramesToInclude('Active notebook: Top Maths')
     stdin.write('/')
-    await waitForLastFrameToInclude('/attach <path to pdf>')
-    await waitForLastFrameToInclude('Attach a PDF to the active notebook')
+    await waitForLastFrameToInclude('/attach <path to .pdf or .epub>')
+    await waitForLastFrameToInclude('Attach a book file to the active notebook')
+    await waitForLastFrameToInclude('(POST attach-book)')
     await waitForLastFrameToInclude('/exit, exit')
     await waitForLastFrameToInclude('Leave notebook context')
   })
@@ -86,11 +87,14 @@ describe('InteractiveCliApp /use notebook integration', () => {
     let attachBookSpy: ReturnType<typeof vi.spyOn>
     let attachWorkDir: string
     let attachPdfPath: string
+    let attachEpubPath: string
 
     beforeEach(() => {
       attachWorkDir = fs.mkdtempSync(join(tmpdir(), 'cli-attach-test-'))
       attachPdfPath = join(attachWorkDir, 'stub.pdf')
+      attachEpubPath = join(attachWorkDir, 'my-book.epub')
       fs.writeFileSync(attachPdfPath, '')
+      fs.writeFileSync(attachEpubPath, '')
       myNotebooksSpy.mockResolvedValue({
         data: { notebooks: [notebookWithTitle('Top Maths')] },
       } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
@@ -178,6 +182,55 @@ describe('InteractiveCliApp /use notebook integration', () => {
       await waitForFramesToInclude('Attached "top-maths" to this notebook.')
       await waitForFramesToInclude('Part One')
       await waitForFramesToInclude('Part One Child')
+    })
+
+    test('attaches EPUB and shows structure excerpt from API book', async () => {
+      attachBookSpy.mockResolvedValue(
+        makeMe.aBook
+          .id(100)
+          .bookName('my-book')
+          .format('epub')
+          .blocks([
+            makeMe.aBookBlock
+              .id(1)
+              .depth(0)
+              .title('Chapter Alpha')
+              .contentLocators([])
+              .do(),
+            makeMe.aBookBlock
+              .id(2)
+              .depth(0)
+              .title('Chapter Beta')
+              .contentLocators([])
+              .do(),
+          ])
+          .do()
+      )
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachEpubPath}\r`)
+      await waitForFramesToInclude('Attached "my-book" to this notebook.')
+      await waitForFramesToInclude('Chapter Alpha')
+      await waitForFramesToInclude('Chapter Beta')
+    })
+
+    test('EPUB attach does not invoke MinerU', async () => {
+      attachBookSpy.mockResolvedValue(
+        makeMe.aBook.id(101).bookName('only-epub').format('epub').do()
+      )
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachEpubPath}\r`)
+      await waitForFramesToInclude('Attached "only-epub" to this notebook.')
+      expect(runMineruOutlineSubprocess).not.toHaveBeenCalled()
     })
 
     test('shows user-visible error when attach-book fails', async () => {
@@ -314,6 +367,18 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
     test('rejects attach when PDF path is missing', async () => {
       const missing = join(attachWorkDir, 'missing.pdf')
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${missing}\r`)
+      await waitForFramesToInclude('file not found or not readable:')
+    })
+
+    test('rejects attach when EPUB path is missing', async () => {
+      const missing = join(attachWorkDir, 'missing.epub')
 
       const { stdin, waitForFramesToInclude } =
         await renderInkWhenCommandLineReady(<InteractiveCliApp />)
