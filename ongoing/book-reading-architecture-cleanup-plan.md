@@ -259,6 +259,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase E2d — Move `streamBookFile` branching into `BookFormat` (structure)
 
+**Status: done**
+
 **Change:** Add `ResponseEntity<Resource> streamFile(byte[] bytes, String baseName, String etag)` to the enum. Each constant supplies its `MediaType` and filename extension. `BookService.streamBookFile` shrinks to a dispatcher.
 
 **Files:** `BookFormat.java`, `BookService.java`.

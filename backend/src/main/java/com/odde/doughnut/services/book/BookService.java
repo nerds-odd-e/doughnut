@@ -46,8 +46,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -625,9 +628,6 @@ public class BookService {
     bookStorage.delete(ref);
   }
 
-  private static final MediaType APPLICATION_EPUB_ZIP =
-      MediaType.parseMediaType("application/epub+zip");
-
   @Transactional(readOnly = true)
   public NotebookBookFile getNotebookBookFile(Notebook notebook) {
     Book book = requireBook(notebook);
@@ -638,17 +638,22 @@ public class BookService {
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
     String format = book.getFormat();
+    if (!BOOK_FORMAT_PDF.equals(format) && !BOOK_FORMAT_EPUB.equals(format)) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "unsupported book format: " + format);
+    }
     String baseName = sanitizeFileName(book.getBookName());
-    if (BOOK_FORMAT_PDF.equals(format)) {
-      return new NotebookBookFile(
-          bytes, baseName + ".pdf", etagForSourceRef(ref), MediaType.APPLICATION_PDF);
-    }
-    if (BOOK_FORMAT_EPUB.equals(format)) {
-      return new NotebookBookFile(
-          bytes, baseName + ".epub", etagForSourceRef(ref), APPLICATION_EPUB_ZIP);
-    }
-    throw new ResponseStatusException(
-        HttpStatus.INTERNAL_SERVER_ERROR, "unsupported book format: " + format);
+    return new NotebookBookFile(
+        bytes, baseName, etagForSourceRef(ref), BookFormat.fromString(format));
+  }
+
+  public ResponseEntity<byte[]> streamBookFile(NotebookBookFile file, CacheControl cacheControl) {
+    ResponseEntity<Resource> streamed =
+        file.format().streamFile(file.bytes(), file.baseName(), file.etag(), cacheControl);
+    ByteArrayResource body = (ByteArrayResource) streamed.getBody();
+    return ResponseEntity.status(streamed.getStatusCode())
+        .headers(streamed.getHeaders())
+        .body(body.getByteArray());
   }
 
   private static String etagForSourceRef(String ref) {

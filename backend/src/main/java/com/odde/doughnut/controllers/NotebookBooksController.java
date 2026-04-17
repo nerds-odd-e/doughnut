@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -259,14 +258,7 @@ class NotebookBooksController {
           .cacheControl(cacheControl)
           .build();
     }
-    return ResponseEntity.ok()
-        .eTag(etag)
-        .cacheControl(cacheControl)
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            "inline; filename=\"" + file.attachmentFileName() + "\"")
-        .contentType(file.contentType())
-        .body(file.bytes());
+    return bookService.streamBookFile(file, cacheControl);
   }
 
   @Operation(operationId = "deleteBook", summary = "Delete book")

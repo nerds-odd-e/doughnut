@@ -23,6 +23,12 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 public enum BookFormat {
   PDF {
@@ -80,6 +86,16 @@ public enum BookFormat {
     public Book persistNewBook(BookService.PersistContext ctx) {
       return persistNewPdfBook(ctx);
     }
+
+    @Override
+    public MediaType bookFileMediaType() {
+      return MediaType.APPLICATION_PDF;
+    }
+
+    @Override
+    public String bookFileExtension() {
+      return ".pdf";
+    }
   },
   EPUB {
     @Override
@@ -108,6 +124,16 @@ public enum BookFormat {
     public Book persistNewBook(BookService.PersistContext ctx) {
       return persistNewEpubBook(ctx);
     }
+
+    @Override
+    public MediaType bookFileMediaType() {
+      return MediaType.parseMediaType("application/epub+zip");
+    }
+
+    @Override
+    public String bookFileExtension() {
+      return ".epub";
+    }
   };
 
   public abstract List<ContentLocator> assembleContentLocators(
@@ -116,6 +142,22 @@ public enum BookFormat {
   public abstract void validateAttachRequest(AttachBookRequest request);
 
   public abstract Book persistNewBook(BookService.PersistContext ctx);
+
+  public abstract MediaType bookFileMediaType();
+
+  public abstract String bookFileExtension();
+
+  public final ResponseEntity<Resource> streamFile(
+      byte[] bytes, String baseName, String etag, CacheControl cacheControl) {
+    return ResponseEntity.ok()
+        .eTag(etag)
+        .cacheControl(cacheControl)
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "inline; filename=\"" + baseName + bookFileExtension() + "\"")
+        .contentType(bookFileMediaType())
+        .body(new ByteArrayResource(bytes));
+  }
 
   public static BookFormat fromString(String format) {
     if (BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(format)) {
