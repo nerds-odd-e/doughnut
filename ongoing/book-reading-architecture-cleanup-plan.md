@@ -168,6 +168,8 @@ Replace the duplicated `updateReadingPanelAnchor` functions in `BookReadingConte
 
 ### Phase D1 — `useBookReadingSelection` composable (structure)
 
+**Status: done**
+
 **Change:** Create `frontend/src/composables/useBookReadingSelection.ts` owning `selectedBlockId`, `blockAwaitingConfirmation`, `markSelectedBlockDisposition`, and the "mark and advance to next block" rule. Input: `{ bookBlocks, bookReading, onAdvance(block) }` where `onAdvance` is a format-specific callback (PDF scrolls, EPUB calls `viewerRef.displayLocator(block.contentLocators[0])`). Keeps `useAutoMarkNoDirectContentPredecessor` invocation.
 
 Both views consume it and drop their local `blockAwaitingConfirmation` / `markSelectedBlockDisposition` / `applyBookBlockSelection` declarations.

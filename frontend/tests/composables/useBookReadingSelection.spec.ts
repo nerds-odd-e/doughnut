@@ -1,4 +1,4 @@
-import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
+import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type {
   BookBlockFull,
@@ -29,7 +29,7 @@ function stubBlock(
   }
 }
 
-describe("useAutoMarkNoDirectContentPredecessor", () => {
+describe("useBookReadingSelection", () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
@@ -41,17 +41,21 @@ describe("useAutoMarkNoDirectContentPredecessor", () => {
       bookBlockId: number,
       status: BookBlockReadingDisposition
     ) => Promise<boolean>
+    initialSelectedBlockId?: number | null
   }) {
     const currentBlockId = ref<number | null>(null)
     const bookBlocks = computed(() => options.blocks)
+    const onAdvance = vi.fn().mockResolvedValue(undefined)
 
     const Root = defineComponent({
       setup() {
-        useAutoMarkNoDirectContentPredecessor({
+        useBookReadingSelection({
           bookBlocks,
           currentBlockId,
           hasRecordedDisposition: options.hasRecordedDisposition,
           submitReadingDisposition: options.submitReadingDisposition,
+          onAdvance,
+          initialSelectedBlockId: options.initialSelectedBlockId ?? null,
         })
         return { currentBlockId }
       },
@@ -59,10 +63,10 @@ describe("useAutoMarkNoDirectContentPredecessor", () => {
     })
 
     const wrapper = mount(Root)
-    return { wrapper, currentBlockId }
+    return { wrapper, currentBlockId, onAdvance }
   }
 
-  it("does not call submit when predecessor has direct content (multiple locators)", async () => {
+  it("auto-mark: does not call submit when predecessor has direct content (multiple locators)", async () => {
     const submit = vi
       .fn<
         (
@@ -86,7 +90,7 @@ describe("useAutoMarkNoDirectContentPredecessor", () => {
     expect(submit).not.toHaveBeenCalled()
   })
 
-  it("does not call submit when predecessor has one locator but already has a disposition", async () => {
+  it("auto-mark: does not call submit when predecessor has one locator but already has a disposition", async () => {
     const submit = vi
       .fn<
         (
@@ -110,7 +114,7 @@ describe("useAutoMarkNoDirectContentPredecessor", () => {
     expect(submit).not.toHaveBeenCalled()
   })
 
-  it("calls submit with READ when predecessor has one locator and no record", async () => {
+  it("auto-mark: calls submit with READ when predecessor has one locator and no record", async () => {
     const submit = vi
       .fn<
         (
@@ -135,7 +139,7 @@ describe("useAutoMarkNoDirectContentPredecessor", () => {
     expect(submit).toHaveBeenCalledWith(1, "READ")
   })
 
-  it("does not call submit when predecessor has empty contentLocators", async () => {
+  it("auto-mark: does not call submit when predecessor has empty contentLocators", async () => {
     const submit = vi
       .fn<
         (
@@ -157,5 +161,42 @@ describe("useAutoMarkNoDirectContentPredecessor", () => {
     await flushPromises()
 
     expect(submit).not.toHaveBeenCalled()
+  })
+
+  it("mark disposition advances via onAdvance to the next block when present", async () => {
+    const submit = vi.fn().mockResolvedValue(true)
+    const b1 = stubBlock(1, [epubLoc("a.xhtml")])
+    const b2 = stubBlock(2, [epubLoc("b.xhtml")])
+    const onAdvance = vi.fn().mockResolvedValue(undefined)
+
+    const Root = defineComponent({
+      setup() {
+        const currentBlockId = ref<number | null>(2)
+        const bookBlocks = computed(() => [b1, b2])
+        const { markSelectedBlockDisposition } = useBookReadingSelection({
+          bookBlocks,
+          currentBlockId,
+          hasRecordedDisposition: () => false,
+          submitReadingDisposition: submit,
+          onAdvance,
+          initialSelectedBlockId: 1,
+        })
+        return { markSelectedBlockDisposition }
+      },
+      template: "<div />",
+    })
+
+    const wrapper = mount(Root)
+    const vm = wrapper.vm as {
+      markSelectedBlockDisposition: (
+        s: BookBlockReadingDisposition
+      ) => Promise<void>
+    }
+    await vm.markSelectedBlockDisposition("READ")
+    await flushPromises()
+
+    expect(submit).toHaveBeenCalledWith(1, "READ")
+    expect(onAdvance).toHaveBeenCalledTimes(1)
+    expect(onAdvance).toHaveBeenCalledWith(b2)
   })
 })

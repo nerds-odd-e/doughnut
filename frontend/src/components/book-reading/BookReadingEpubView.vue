@@ -60,14 +60,12 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
-import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
+import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
-import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
-import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -109,14 +107,32 @@ const { currentBlockId } = currentBlockIdDebouncer
 
 const bookBlocks = computed(() => props.book.blocks)
 
-useAutoMarkNoDirectContentPredecessor({
+const refreshReadingPanelAnchorAfterSelection = ref<(() => void) | null>(null)
+
+const {
+  selectedBlockId,
+  blockAwaitingConfirmation,
+  applyBookBlockSelection,
+  markSelectedBlockDisposition,
+} = useBookReadingSelection({
   bookBlocks,
   currentBlockId,
   hasRecordedDisposition: bookReading.hasRecordedDisposition,
   submitReadingDisposition: bookReading.submitReadingDisposition,
+  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
+  onAdvance: async (block) => {
+    selectedBlockId.value = block.id
+    const loc = asEpubLocator(block.contentLocators[0])
+    if (loc) {
+      await epubViewerRef.value?.displayLocator(loc)
+    }
+    currentBlockIdDebouncer.commitNow(block.id)
+  },
+  afterAdvance: async () => {
+    await nextTick()
+    refreshReadingPanelAnchorAfterSelection.value?.()
+  },
 })
-
-const selectedBlockId = ref<number | null>(props.initialSelectedBlockId)
 
 /**
  * When the page restores a saved EPUB position, the tiny continuous-scrolled viewport may
@@ -164,41 +180,13 @@ const isMdOrLarger = computed(
   () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
 )
 
-const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
-  const selId = selectedBlockId.value
-  if (selId === null) return null
-  if (bookReading.hasRecordedDisposition(selId)) return null
-  return props.book.blocks.find((b) => b.id === selId) ?? null
-})
-
 const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
   useReadingPanelAnchor({
     viewerRef: epubViewerRef,
     blockRef: blockAwaitingConfirmation,
     mainPaneRef: epubMainPaneRef,
   })
-
-async function applyBookBlockSelection(block: BookBlockFull) {
-  selectedBlockId.value = block.id
-  const loc = asEpubLocator(block.contentLocators[0])
-  if (loc) {
-    await epubViewerRef.value?.displayLocator(loc)
-  }
-  currentBlockIdDebouncer.commitNow(block.id)
-  await nextTick()
-  updateReadingPanelAnchor()
-}
-
-async function markSelectedBlockDisposition(
-  status: BookBlockReadingDisposition
-) {
-  const block = blockAwaitingConfirmation.value
-  if (!block) return
-  const ok = await bookReading.submitReadingDisposition(block.id, status)
-  if (!ok) return
-  const next = nextBookBlockAfter(props.book.blocks, block.id)
-  if (next) await applyBookBlockSelection(next)
-}
+refreshReadingPanelAnchorAfterSelection.value = updateReadingPanelAnchor
 
 function onEpubRelocated(payload: { href: string }) {
   const id = currentBlockIdFromEpubLocation(props.book.blocks, payload.href)

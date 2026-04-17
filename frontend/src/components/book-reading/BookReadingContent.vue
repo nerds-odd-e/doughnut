@@ -81,9 +81,9 @@
             :selected-block-title="blockAwaitingConfirmation.title"
             :snap-animation-key="snapAnimationKey"
             :anchor-top-px="readingPanelAnchorTopPx"
-            @mark-as-read="() => markBlockDisposition('READ')"
-            @mark-as-skimmed="() => markBlockDisposition('SKIMMED')"
-            @mark-as-skipped="() => markBlockDisposition('SKIPPED')"
+            @mark-as-read="() => markSelectedBlockDisposition('READ')"
+            @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
+            @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
           />
           <CurrentBlockNavigationBar
             v-if="currentBlockForNavBar"
@@ -205,7 +205,6 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
-import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
@@ -214,10 +213,9 @@ import {
 } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
-import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
+import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
-import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type {
   BookBlockFull,
   BookFull,
@@ -363,7 +361,7 @@ const pdfPaneRef = ref<HTMLElement | null>(null)
 
 const {
   snapAnimationKey,
-  blockAwaitingConfirmation,
+  blockAwaitingConfirmation: snapBlockAwaitingConfirmation,
   lastContentBottomVisible,
   shouldSnapBack,
   performSnapBack,
@@ -379,6 +377,32 @@ const {
   snapHoldMs: SNAP_HOLD_MS,
 })
 
+const {
+  blockAwaitingConfirmation,
+  applyBookBlockSelection,
+  markSelectedBlockDisposition,
+} = useBookReadingSelection({
+  bookBlocks,
+  currentBlockId,
+  hasRecordedDisposition: bookReading.hasRecordedDisposition,
+  submitReadingDisposition: bookReading.submitReadingDisposition,
+  selectedBlockId,
+  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
+  repairSelectionWhenBlocksChange: true,
+  overrideBlockAwaitingConfirmation: snapBlockAwaitingConfirmation,
+  onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
+  onAdvance: async (block) => {
+    const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
+    const parsed = targets[0] ?? null
+    if (parsed === null) {
+      return
+    }
+    selectedBlockId.value = block.id
+    await pdfViewerRef.value?.scrollToBookNavigationTarget(parsed, targets)
+    currentBlockIdDebouncer.commitNow(block.id)
+  },
+})
+
 const readingPanelBlockRef = computed(() =>
   lastContentBottomVisible.value ? blockAwaitingConfirmation.value : null
 )
@@ -389,13 +413,6 @@ const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
     blockRef: readingPanelBlockRef,
     mainPaneRef: pdfPaneRef,
   })
-
-useAutoMarkNoDirectContentPredecessor({
-  bookBlocks,
-  currentBlockId,
-  hasRecordedDisposition: bookReading.hasRecordedDisposition,
-  submitReadingDisposition: bookReading.submitReadingDisposition,
-})
 
 function commitCurrentBlockId(id: number | null): boolean {
   if (shouldSnapBack(id)) {
@@ -466,50 +483,6 @@ watch(selectedBlockId, (id) => {
   }
   lastReadPositionPatchDebouncer.propose(last.pageIndex, last.normalizedY, id)
 })
-
-watch(
-  bookBlocks,
-  (blocks) => {
-    if (blocks.length === 0) {
-      selectedBlockId.value = null
-      return
-    }
-    const id = selectedBlockId.value
-    if (id === null || !blocks.some((r) => r.id === id)) {
-      selectedBlockId.value = blocks[0]!.id
-    }
-  },
-  { immediate: true }
-)
-
-async function applyBookBlockSelection(block: BookBlockFull) {
-  const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
-  const parsed = targets[0] ?? null
-  if (parsed === null) {
-    return
-  }
-  selectedBlockId.value = block.id
-  await pdfViewerRef.value?.scrollToBookNavigationTarget(parsed, targets)
-  currentBlockIdDebouncer.commitNow(block.id)
-}
-
-async function markBlockDisposition(status: BookBlockReadingDisposition) {
-  const block = blockAwaitingConfirmation.value
-  if (!block) {
-    return
-  }
-  const ok = await bookReading.submitReadingDisposition(block.id, status)
-  if (!ok) {
-    return
-  }
-  if (status === "READ") {
-    clearSnapbackAttemptsForBlock(block.id)
-  }
-  const next = nextBookBlockAfter(bookBlocks.value, block.id)
-  if (next) {
-    await applyBookBlockSelection(next)
-  }
-}
 
 function onPagesReady() {
   const snap = props.initialLastRead
