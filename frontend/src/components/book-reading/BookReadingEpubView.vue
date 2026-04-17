@@ -56,6 +56,7 @@ import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayo
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import {
   asEpubLocator,
@@ -102,6 +103,15 @@ const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   commit: () => true,
 })
 const { currentBlockId } = currentBlockIdDebouncer
+
+const bookBlocks = computed(() => props.book.blocks)
+
+useAutoMarkNoDirectContentPredecessor({
+  bookBlocks,
+  currentBlockId,
+  hasRecordedDisposition: bookReading.hasRecordedDisposition,
+  submitReadingDisposition: bookReading.submitReadingDisposition,
+})
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId)
 

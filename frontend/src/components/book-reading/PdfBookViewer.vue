@@ -53,6 +53,11 @@ import {
   type BookNavigationTarget,
   type NormalizedPageBbox,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
+import {
+  locatorAsPdfNavigationTarget,
+  type ViewerLocatorRect,
+} from "@/composables/bookReaderViewerRef"
+import type { ContentLocatorFull } from "@generated/doughnut-backend-api"
 import { getDocument, type PDFDocumentProxy } from "pdfjs-dist/build/pdf.mjs"
 import {
   EventBus,
@@ -470,6 +475,14 @@ async function scrollToStoredReadingPosition(
   queueMicrotask(() => emitViewportDescriptorIfChanged())
 }
 
+async function displayLocator(locator: ContentLocatorFull): Promise<void> {
+  const target = locatorAsPdfNavigationTarget(locator)
+  if (target === null) {
+    return
+  }
+  await scrollToBookNavigationTarget(target)
+}
+
 const ZOOM_STEP = 1.25
 
 function zoomIn() {
@@ -492,54 +505,15 @@ function highlightBlockSelection(
   showSelectionBboxHighlights(highlightBboxes)
 }
 
-/**
- * Returns true when the bottom edge of the given bbox (0–1000 MinerU normalized, page-local) is
- * both visible in the scroll container's viewport and above `obstructionPx` from the container's
- * bottom edge (so the Reading Control Panel does not obscure it).
- */
-function isLastContentBottomVisible(
-  target: BookNavigationTarget,
-  obstructionPx: number
-): boolean {
-  const container = containerRef.value
-  if (!container || !pdfViewer) return false
-  const { pageIndex, bbox } = target
-  if (
-    bbox === null ||
-    !Number.isInteger(pageIndex) ||
-    pageIndex < 0 ||
-    pageIndex >= pdfViewer.pagesCount
-  ) {
-    return false
-  }
-  const pageView = pdfViewer.getPageView(pageIndex)
-  if (!pageView?.div) return false
-  const pageRect = pageView.div.getBoundingClientRect()
-  const containerRect = container.getBoundingClientRect()
-  const bboxBottomClient = pageRect.top + (bbox[3] / 1000) * pageRect.height
-  const panelTop = containerRect.bottom - obstructionPx
-  return bboxBottomClient < panelTop && bboxBottomClient > containerRect.top
-}
-
-const READING_PANEL_ANCHOR_GAP_PX = 8
-
-/**
- * When `isLastContentBottomVisible` is true, distance from `mainEl`'s top padding edge to place
- * the Reading Control Panel wrapper immediately below the last direct-content bbox bottom.
- */
-function readingPanelAnchorTopPx(
-  mainEl: HTMLElement,
-  target: BookNavigationTarget,
-  obstructionPx: number
-): number | null {
-  if (!isLastContentBottomVisible(target, obstructionPx)) {
-    return null
-  }
+function resolveLocatorRect(
+  locator: ContentLocatorFull
+): ViewerLocatorRect | null {
   const container = containerRef.value
   if (!container || !pdfViewer) return null
+  const target = locatorAsPdfNavigationTarget(locator)
+  if (target === null || target.bbox === null) return null
   const { pageIndex, bbox } = target
   if (
-    bbox === null ||
     !Number.isInteger(pageIndex) ||
     pageIndex < 0 ||
     pageIndex >= pdfViewer.pagesCount
@@ -549,9 +523,69 @@ function readingPanelAnchorTopPx(
   const pageView = pdfViewer.getPageView(pageIndex)
   if (!pageView?.div) return null
   const pageRect = pageView.div.getBoundingClientRect()
-  const bboxBottomClient = pageRect.top + (bbox[3] / 1000) * pageRect.height
-  const mainRect = mainEl.getBoundingClientRect()
-  return bboxBottomClient - mainRect.top + READING_PANEL_ANCHOR_GAP_PX
+  const top = pageRect.top + (bbox[1] / 1000) * pageRect.height
+  const bottom = pageRect.top + (bbox[3] / 1000) * pageRect.height
+  const left = pageRect.left + (bbox[0] / 1000) * pageRect.width
+  const right = pageRect.left + (bbox[2] / 1000) * pageRect.width
+  return {
+    top,
+    bottom,
+    left,
+    right,
+    width: Math.max(0, right - left),
+    height: Math.max(0, bottom - top),
+  }
+}
+
+/**
+ * Returns true when the bottom edge of the given bbox (0–1000 MinerU normalized, page-local) is
+ * both visible in the scroll container's viewport and above `obstructionPx` from the container's
+ * bottom edge (so the Reading Control Panel does not obscure it).
+ */
+function isLocatorBottomVisible(
+  locator: ContentLocatorFull,
+  obstructionPx: number
+): boolean {
+  const container = containerRef.value
+  if (!container || !pdfViewer) return false
+  const rect = resolveLocatorRect(locator)
+  if (rect === null) return false
+  const containerRect = container.getBoundingClientRect()
+  const panelTop = containerRect.bottom - obstructionPx
+  return rect.bottom < panelTop && rect.bottom > containerRect.top
+}
+
+function isLastContentBottomVisible(
+  target: BookNavigationTarget,
+  obstructionPx: number
+): boolean {
+  const locator = {
+    type: "pdf",
+    pageIndex: target.pageIndex,
+    bbox: target.bbox,
+  } as ContentLocatorFull
+  return isLocatorBottomVisible(locator, obstructionPx)
+}
+
+const READING_PANEL_ANCHOR_GAP_PX = 8
+
+/**
+ * When `isLocatorBottomVisible` is true, distance from the viewer top edge to place
+ * the Reading Control Panel wrapper immediately below the last direct-content bbox bottom.
+ */
+function readingPanelAnchorTopPx(
+  locator: ContentLocatorFull,
+  obstructionPx: number
+): number | null {
+  if (!isLocatorBottomVisible(locator, obstructionPx)) {
+    return null
+  }
+  const container = containerRef.value
+  if (!container || !pdfViewer) return null
+  const rect = resolveLocatorRect(locator)
+  if (rect === null) return null
+  const containerRect = container.getBoundingClientRect()
+  return rect.bottom - containerRect.top + READING_PANEL_ANCHOR_GAP_PX
 }
 
 /**
@@ -630,6 +664,8 @@ function snapToContentBottomAndHold(
 }
 
 defineExpose({
+  displayLocator,
+  resolveLocatorRect,
   scrollToBookNavigationTarget,
   highlightBlockSelection,
   scrollToStoredReadingPosition,
@@ -639,6 +675,7 @@ defineExpose({
   zoomIn,
   zoomOut,
   isLastContentBottomVisible,
+  isLocatorBottomVisible,
   readingPanelAnchorTopPx,
 })
 

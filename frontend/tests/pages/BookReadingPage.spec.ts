@@ -639,12 +639,22 @@ describe("BookReadingPage", () => {
       const pdf = wrapper.findComponent(PdfBookViewer)
       const exposed = (
         pdf.vm as unknown as {
-          $: { exposed: { isLastContentBottomVisible: () => boolean } }
+          $: {
+            exposed: {
+              isLastContentBottomVisible?: () => boolean
+              isLocatorBottomVisible?: () => boolean
+            }
+          }
         }
       ).$.exposed
-      vi.spyOn(exposed, "isLastContentBottomVisible").mockReturnValue(
-        returnValue
-      )
+      if (typeof exposed.isLastContentBottomVisible === "function") {
+        vi.spyOn(exposed, "isLastContentBottomVisible").mockReturnValue(
+          returnValue
+        )
+      }
+      if (typeof exposed.isLocatorBottomVisible === "function") {
+        vi.spyOn(exposed, "isLocatorBottomVisible").mockReturnValue(returnValue)
+      }
     }
 
     function mockReadingPanelAnchorTopPx(

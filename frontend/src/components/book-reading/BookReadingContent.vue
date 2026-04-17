@@ -209,10 +209,8 @@ import { mergeBookMutationIntoFull } from "@/lib/book-reading/mergeBookMutationI
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import {
-  useBookReadingSnapBack,
-  type BookReadingPdfViewerRef,
-} from "@/composables/useBookReadingSnapBack"
+import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
+import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
@@ -353,6 +351,7 @@ const {
   selectedBlockId,
   currentBlockId,
   hasRecordedDisposition: bookReading.hasRecordedDisposition,
+  viewerRef: pdfViewerRef,
   pdfViewerRef,
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
   snapHoldMs: SNAP_HOLD_MS,
@@ -386,14 +385,9 @@ function updateReadingPanelAnchor() {
     readingPanelAnchorTopPx.value = null
     return
   }
-  const lastBbox = pdfs[pdfs.length - 1]!
-  const target = {
-    pageIndex: lastBbox.pageIndex,
-    bbox: lastBbox.bbox as [number, number, number, number],
-  }
+  const lastLocator = pdfs[pdfs.length - 1]!
   let top = pdf.readingPanelAnchorTopPx(
-    mainEl,
-    target,
+    lastLocator,
     READING_PANEL_OBSTRUCTION_PX
   )
   if (top !== null) {

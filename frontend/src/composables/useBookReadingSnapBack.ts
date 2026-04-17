@@ -1,50 +1,14 @@
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import type { BookNavigationTarget } from "@/lib/book-reading/pdfOutlineV1Anchor"
+import type {
+  BookReaderViewerRef,
+  BookReadingPdfViewerRef,
+} from "@/composables/bookReaderViewerRef"
 import type {
   BookBlockFull,
   PdfLocatorFull,
 } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type Ref, ref, watch } from "vue"
-
-export type BookReadingPdfViewerRef = {
-  scrollToBookNavigationTarget: (
-    target: BookNavigationTarget,
-    highlightBboxes?: ReadonlyArray<BookNavigationTarget>
-  ) => Promise<void>
-  highlightBlockSelection: (
-    highlightBboxes: ReadonlyArray<BookNavigationTarget>
-  ) => void
-  scrollToStoredReadingPosition: (
-    pageIndexZeroBased: number,
-    normalizedY: number
-  ) => Promise<void>
-  snapToContentBottomAndHold: (
-    pageIndex: number,
-    normalizedBboxBottom: number,
-    obstructionPx: number,
-    holdMs: number,
-    highlightBboxes?: ReadonlyArray<BookNavigationTarget>
-  ) => void
-  suppressScrollInput: (holdMs: number) => void
-  contentFitsFromBlockTop: (
-    pageIndex: number,
-    normalizedBlockTopY: number,
-    normalizedContentBottomY: number,
-    obstructionPx: number
-  ) => boolean
-  zoomIn: () => void
-  zoomOut: () => void
-  isLastContentBottomVisible: (
-    target: BookNavigationTarget,
-    obstructionPx: number
-  ) => boolean
-  readingPanelAnchorTopPx: (
-    mainEl: HTMLElement,
-    target: BookNavigationTarget,
-    obstructionPx: number
-  ) => number | null
-}
 
 function selectedIndexAndSuccessor(
   rows: readonly BookBlockFull[],
@@ -80,6 +44,7 @@ export function useBookReadingSnapBack(options: {
   selectedBlockId: Ref<number | null>
   currentBlockId: Readonly<Ref<number | null>>
   hasRecordedDisposition: (id: number) => boolean
+  viewerRef: Ref<BookReaderViewerRef | null>
   pdfViewerRef: Ref<BookReadingPdfViewerRef | null>
   obstructionPx: number
   snapHoldMs: number
@@ -89,6 +54,7 @@ export function useBookReadingSnapBack(options: {
     selectedBlockId,
     currentBlockId,
     hasRecordedDisposition,
+    viewerRef,
     pdfViewerRef,
     obstructionPx,
     snapHoldMs,
@@ -219,15 +185,12 @@ export function useBookReadingSnapBack(options: {
 
   function updateLastDirectContentGeometry(): void {
     const target = confirmationTargetBlock.value
-    const lastBboxForGeometry =
+    const lastLocatorForGeometry =
       target !== null ? lastContentPdfLocator(target) : null
-    if (lastBboxForGeometry === null) return
+    if (lastLocatorForGeometry === null) return
     const geometryVisible =
-      pdfViewerRef.value?.isLastContentBottomVisible(
-        {
-          pageIndex: lastBboxForGeometry.pageIndex,
-          bbox: lastBboxForGeometry.bbox as [number, number, number, number],
-        },
+      viewerRef.value?.isLocatorBottomVisible(
+        lastLocatorForGeometry,
         obstructionPx
       ) ?? false
     lastContentBottomVisible.value = geometryVisible
