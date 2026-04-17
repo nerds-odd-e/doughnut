@@ -205,6 +205,7 @@ import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurren
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import { mergeBookMutationIntoFull } from "@/lib/book-reading/mergeBookMutationIntoFull"
+import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
@@ -505,10 +506,9 @@ async function markBlockDisposition(status: BookBlockReadingDisposition) {
   if (status === "READ") {
     clearSnapbackAttemptsForBlock(block.id)
   }
-  const rows = bookBlocks.value
-  const selIdx = rows.findIndex((r) => r.id === block.id)
-  if (selIdx >= 0 && selIdx < rows.length - 1) {
-    await applyBookBlockSelection(rows[selIdx + 1]!)
+  const next = nextBookBlockAfter(bookBlocks.value, block.id)
+  if (next) {
+    await applyBookBlockSelection(next)
   }
 }
 
