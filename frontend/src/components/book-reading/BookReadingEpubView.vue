@@ -44,8 +44,9 @@
         v-if="blockAwaitingConfirmation"
         :selected-block-title="blockAwaitingConfirmation.title"
         :anchor-top-px="readingPanelAnchorTopPx"
-        :show-skim-and-skip="false"
-        @mark-as-read="markSelectedBlockAsRead"
+        @mark-as-read="() => markSelectedBlockDisposition('READ')"
+        @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
+        @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
       />
     </main>
   </BookReadingBookLayout>
@@ -69,6 +70,7 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { lastDirectContentLocator } from "@/lib/book-reading/asPdfLocator"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
+import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -219,10 +221,12 @@ async function applyBookBlockSelection(block: BookBlockFull) {
   updateReadingPanelAnchor()
 }
 
-async function markSelectedBlockAsRead() {
+async function markSelectedBlockDisposition(
+  status: BookBlockReadingDisposition
+) {
   const block = blockAwaitingConfirmation.value
   if (!block) return
-  const ok = await bookReading.submitReadingDisposition(block.id, "READ")
+  const ok = await bookReading.submitReadingDisposition(block.id, status)
   if (!ok) return
   const next = nextBookBlockAfter(props.book.blocks, block.id)
   if (next) await applyBookBlockSelection(next)
