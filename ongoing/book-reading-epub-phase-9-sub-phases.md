@@ -97,17 +97,18 @@ Existing PDF tests remain green.
 
 If the team later wants proof on the **installed** binary specifically, reintroduce a thin Cypress spec rather than expanding the EPUB matrix.
 
-### 9.6 — Cleanup, plan refresh, and interim-wording removal
+### 9.6 — Cleanup, plan refresh, and interim-wording removal (done)
 
 **Why now:** Phase-discipline gate for closing Phase 9.
 
-**Scope:**
-- Audit the CLI attach path for leftover PDF-only wording in user-facing strings (CommandDoc description, error messages, help output, argument label) that no longer fits now that EPUB is supported. Keep PDF-only wording only where it really is PDF-only (MinerU env vars, PDF preprocessing details).
-- Audit `ongoing/` docs:
-  - `book-reading-epub-support-plan.md`: flip Phase 9 to a "Scope (shipped)" section mirroring how Phases 4–7 document it; update the phase summary table.
-  - `book-reading-user-stories.md`: add a new sub-story under "Story: EPUB book" for "Attach EPUB from the CLI" (and mark it shipped).
+**Scope (shipped):**
+- CLI attach user-facing strings audited; remaining PDF-specific wording only where it is genuinely PDF-only (MinerU env vars and the MinerU pipeline error text).
+- Upload-too-large error wording generalized now that the multipart endpoint serves both formats: backend `ControllerSetup.handleMultipartException` returns `"The uploaded file exceeds the maximum upload size (100 MB)."`; CLI `http413PayloadTooLarge` fallback reads `"The file exceeds the maximum upload size the server accepts. Try a smaller file."`; matching test updated.
+- `notebookAttachSlashCommand.tsx` cleaned up: dead `.pdf` conditional removed (dispatcher already guarantees the extension in `runPdfAttach`); assistant-message formatting extracted to `attachedBookAssistantMessage`; book-name derivation unified via `bookNameFromPath`; `runEpubAttach` no longer takes the redundant trimmed path.
+- `ongoing/book-reading-epub-support-plan.md`: Phase 9 flipped to "Scope (shipped)" / "Testing (shipped)" style matching Phases 4–7; phase summary table updated.
+- `ongoing/book-reading-user-stories.md`: added "Attach an EPUB from the CLI (shipped)" sub-story under "Story: EPUB book".
 
-**Tests:** no new tests; all prior CLI PDF E2E scenarios, EPUB browser E2E, and EPUB CLI Vitest cases must be green.
+**Tests:** no new tests; all prior CLI PDF E2E scenarios, EPUB browser E2E, and EPUB CLI Vitest cases stay green.
 
 ---
 

@@ -4,7 +4,7 @@ import { basename, extname, resolve } from 'node:path'
 import { useEffect, useRef } from 'react'
 import { Box } from 'ink'
 import { Spinner } from '@inkjs/ui'
-import type { BookBlockFull, Notebook } from 'doughnut-api'
+import type { BookBlockFull, BookFull, Notebook } from 'doughnut-api'
 import { attachNotebookBookFile } from '../../backendApi/doughnutBackendClient.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type {
@@ -44,7 +44,19 @@ function bookBlocksTreeLines(blocks: BookBlockFull[] | undefined): string {
   return blocks.map((b) => `${'  '.repeat(b.depth)}${b.title}`).join('\n')
 }
 
-async function runNotebookAttachPdfPipeline(
+function attachedBookAssistantMessage(book: BookFull): string {
+  const tree = bookBlocksTreeLines(book.blocks)
+  const excerpt = truncateForBookOutlineAssistant(
+    tree === '' ? book.bookName : tree
+  )
+  return `Attached "${book.bookName}" to this notebook.\n\n${excerpt}`
+}
+
+function bookNameFromPath(path: string): string {
+  return basename(path, extname(path))
+}
+
+async function runPdfAttach(
   notebook: Notebook,
   path: string,
   absPath: string
@@ -66,55 +78,27 @@ async function runNotebookAttachPdfPipeline(
     )
   }
 
-  const ext = extname(path)
-  const bookName =
-    ext.toLowerCase() === '.pdf' ? basename(path, ext) : basename(path)
-
+  const bookName = bookNameFromPath(absPath)
   const book = await attachNotebookBookFile(
     notebook.id,
     hasContentList
-      ? {
-          bookName,
-          format: 'pdf',
-          contentList: minerResult.contentList,
-        }
-      : {
-          bookName,
-          format: 'pdf',
-          layout: minerResult.layout,
-        },
+      ? { bookName, format: 'pdf', contentList: minerResult.contentList }
+      : { bookName, format: 'pdf', layout: minerResult.layout },
     absPath
   )
-
-  const tree = bookBlocksTreeLines(book.blocks)
-  const excerpt = truncateForBookOutlineAssistant(
-    tree === '' ? book.bookName : tree
-  )
-  return {
-    assistantMessage: `Attached "${book.bookName}" to this notebook.\n\n${excerpt}`,
-  }
+  return { assistantMessage: attachedBookAssistantMessage(book) }
 }
 
-async function runNotebookAttachEpubPipeline(
+async function runEpubAttach(
   notebook: Notebook,
-  trimmedPath: string,
   absPath: string
 ): Promise<{ assistantMessage: string }> {
-  const ext = extname(trimmedPath)
-  const bookName = basename(trimmedPath, ext)
   const book = await attachNotebookBookFile(
     notebook.id,
-    { bookName, format: 'epub' },
+    { bookName: bookNameFromPath(absPath), format: 'epub' },
     absPath
   )
-
-  const tree = bookBlocksTreeLines(book.blocks)
-  const excerpt = truncateForBookOutlineAssistant(
-    tree === '' ? book.bookName : tree
-  )
-  return {
-    assistantMessage: `Attached "${book.bookName}" to this notebook.\n\n${excerpt}`,
-  }
+  return { assistantMessage: attachedBookAssistantMessage(book) }
 }
 
 async function runNotebookAttach(
@@ -145,9 +129,9 @@ async function runNotebookAttach(
   }
 
   if (format === 'epub') {
-    return runNotebookAttachEpubPipeline(notebook, trimmed, absPath)
+    return runEpubAttach(notebook, absPath)
   }
-  return runNotebookAttachPdfPipeline(notebook, trimmed, absPath)
+  return runPdfAttach(notebook, trimmed, absPath)
 }
 
 export function attachNotebookSlashCommandFor(

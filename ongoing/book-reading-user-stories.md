@@ -104,6 +104,13 @@ _(Sub-stories to be added.)_
 
 ## Story: EPUB book
 
+### Attach an EPUB from the CLI (shipped)
+
+Given I have selected a notebook in the CLI and an `.epub` file on disk
+When I run `/attach <file.epub>`
+Then the EPUB is uploaded as-is (no MinerU, no client preprocessing)
+And the notebook shows the attached EPUB with its chapter structure
+
 ### Mark an EPUB block as read
 
 Given an EPUB is open in the reader

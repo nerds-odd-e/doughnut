@@ -47,7 +47,7 @@ const authenticatedBackendCallFailureAdvice = {
   http409Conflict:
     'This action conflicts with the current state on the server. Contact support if you need help.',
   http413PayloadTooLarge:
-    'The PDF exceeds the maximum upload size the server accepts. Try a smaller file or split the document.',
+    'The file exceeds the maximum upload size the server accepts. Try a smaller file.',
 } as const
 
 type SdkThrowable = unknown

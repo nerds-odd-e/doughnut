@@ -239,9 +239,9 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - E2E: representative no-direct-content auto-mark scenario for EPUB.
 - Keep this focused on EPUB-specific progress behavior rather than re-testing the whole reading stack.
 
-## Phase 9: Attach an EPUB from the CLI with no preprocessing (planned)
+## Phase 9: Attach an EPUB from the CLI with no preprocessing (done)
 
-**Why last:** CLI EPUB attach is valuable but lower risk and lower reach than the frontend path. It should reuse the server-side EPUB flow rather than create a second extraction path.
+**Why last:** CLI EPUB attach is valuable but lower risk and lower reach than the frontend path. It reuses the server-side EPUB flow rather than a second extraction path.
 
 **Behavior:**
 - *Pre:* User has selected a notebook in the CLI and has an `.epub` file.
@@ -250,15 +250,15 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **User value after this phase:** "I can attach an EPUB from the CLI without Python or MinerU."
 
-**Scope:**
-- Extend `/attach` to accept `.epub`.
-- Route EPUB attach as raw file upload with `format: "epub"` only.
-- Keep PDF CLI behavior unchanged.
-- Reuse the same backend **EPUB** attach path already exercised by the frontend upload.
+**Scope (shipped):**
+- `/attach` detects format from the file extension (`detectBookAttachFormat` in `cli/src/commands/notebook/notebookAttachSlashCommand.tsx`) and rejects anything other than `.pdf` or `.epub` with a clear error.
+- One shared upload helper `attachNotebookBookFile(notebookId, metadata, absolutePath)` in `cli/src/backendApi/doughnutBackendClient.ts` derives the multipart Blob `Content-Type` from `metadata.format` (`application/pdf` vs `application/epub+zip`). No second attach endpoint or extraction path.
+- EPUB branch (`runEpubAttach`) sends raw bytes with `{ bookName, format: 'epub' }` and no `layout`/`contentList`; MinerU is not invoked. PDF branch (`runPdfAttach`) keeps the existing MinerU outline pipeline unchanged.
+- User-facing strings are format-agnostic where the path is shared: CommandDoc usage is `/attach <path to .pdf or .epub>`, spinner label is "Attaching book…", HTTP 413 reads as a generic upload-too-large message.
 
-**Testing:**
-- **Vitest (CLI):** `cli/tests/InteractiveCliApp.useNotebook.test.tsx` — EPUB happy path and structure excerpt, extension and missing-file errors, no MinerU on EPUB, and an assertion that `attachNotebookBookFile` is invoked with `{ bookName, format: 'epub' }` and the resolved file path.
-- **No dedicated Cypress scenario for CLI EPUB attach:** browser EPUB reading and structure are already covered by `e2e_test/features/book_reading/epub_book.feature` (upload path). Sub-phase detail and rationale: [book-reading-epub-phase-9-sub-phases.md](book-reading-epub-phase-9-sub-phases.md) §9.4–9.5.
+**Testing (shipped):**
+- `cli/tests/InteractiveCliApp.useNotebook.test.tsx` exercises the full flow through `InteractiveCliApp`: EPUB happy path and structure excerpt, EPUB call to `attachNotebookBookFile` with epub metadata and the resolved absolute path, "no MinerU on EPUB", unknown-extension rejection, and missing-file rejection for both `.pdf` and `.epub`. PDF scenarios remain green unchanged.
+- No dedicated Cypress scenario for CLI EPUB attach — browser EPUB reading and structure are already covered by `e2e_test/features/book_reading/epub_book.feature` (upload path). Rationale: [book-reading-epub-phase-9-sub-phases.md](book-reading-epub-phase-9-sub-phases.md) §9.4–9.5.
 
 ## Cross-cutting concerns
 
@@ -292,4 +292,4 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Done |
 | 7 | Mark EPUB block as read | Reusing reading-record UI and state without over-coupling to PDF | Done |
 | 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |
-| 9 | CLI EPUB attach | Raw upload transport only; Vitest CLI coverage, no CLI EPUB E2E | Small |
+| 9 | CLI EPUB attach | Raw upload transport only; Vitest CLI coverage, no CLI EPUB E2E | Done |
