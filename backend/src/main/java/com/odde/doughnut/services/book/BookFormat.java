@@ -105,6 +105,28 @@ public enum BookFormat {
       row.setNormalizedY(req.getNormalizedY());
       row.setEpubLocator(null);
     }
+
+    @Override
+    public void writeLegacyColumnsFromLocator(
+        BookUserLastReadPosition row, ContentLocator locator) {
+      if (!(locator instanceof PdfLocator pdf)) {
+        throw new ApiException(
+            "PdfLocator_Full required for PDF reading-position locator",
+            ApiError.ErrorType.BINDING_ERROR,
+            "PdfLocator_Full required for PDF reading-position locator");
+      }
+      List<Double> bbox = pdf.bbox();
+      if (bbox == null || bbox.size() != 4) {
+        throw new ApiException(
+            "PdfLocator_Full bbox must have four numbers",
+            ApiError.ErrorType.BINDING_ERROR,
+            "PdfLocator_Full bbox must have four numbers");
+      }
+      row.setPageIndex(pdf.pageIndex());
+      double y0 = bbox.get(1);
+      row.setNormalizedY((int) Math.round(Math.max(0, Math.min(1000, y0))));
+      row.setEpubLocator(null);
+    }
   },
   EPUB {
     @Override
@@ -150,6 +172,32 @@ public enum BookFormat {
       row.setPageIndex(null);
       row.setNormalizedY(null);
     }
+
+    @Override
+    public void writeLegacyColumnsFromLocator(
+        BookUserLastReadPosition row, ContentLocator locator) {
+      if (!(locator instanceof EpubLocator epub)) {
+        throw new ApiException(
+            "EpubLocator_Full required for EPUB reading-position locator",
+            ApiError.ErrorType.BINDING_ERROR,
+            "EpubLocator_Full required for EPUB reading-position locator");
+      }
+      String href = trimToNull(epub.href());
+      if (href == null) {
+        throw new ApiException(
+            "EpubLocator_Full href is required",
+            ApiError.ErrorType.BINDING_ERROR,
+            "EpubLocator_Full href is required");
+      }
+      String frag = epub.fragment();
+      if (frag != null && frag.startsWith("#")) {
+        frag = frag.substring(1);
+      }
+      frag = trimToNull(frag);
+      row.setEpubLocator(href + (frag == null ? "" : "#" + frag));
+      row.setPageIndex(null);
+      row.setNormalizedY(null);
+    }
   };
 
   public abstract List<ContentLocator> assembleContentLocators(
@@ -166,14 +214,24 @@ public enum BookFormat {
   public abstract void writeLegacyColumns(
       BookUserLastReadPosition row, BookLastReadPositionRequest req);
 
+  public abstract void writeLegacyColumnsFromLocator(
+      BookUserLastReadPosition row, ContentLocator locator);
+
+  public static BookFormat forLocator(ContentLocator locator) {
+    return switch (locator) {
+      case EpubLocator e -> EPUB;
+      case PdfLocator p -> PDF;
+    };
+  }
+
   public static BookFormat forReadingPositionPayload(BookLastReadPositionRequest req) {
     boolean hasEpub = req.getEpubLocator() != null;
     boolean hasPdf = req.getPageIndex() != null && req.getNormalizedY() != null;
     if (!hasEpub && !hasPdf) {
       throw new ApiException(
-          "reading-position payload requires either pageIndex+normalizedY or epubLocator",
+          "reading-position payload requires locator, pageIndex+normalizedY, or epubLocator",
           ApiError.ErrorType.BINDING_ERROR,
-          "reading-position payload requires either pageIndex+normalizedY or epubLocator");
+          "reading-position payload requires locator, pageIndex+normalizedY, or epubLocator");
     }
     if (hasEpub && hasPdf) {
       throw new ApiException(

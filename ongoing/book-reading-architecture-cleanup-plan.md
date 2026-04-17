@@ -291,6 +291,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase F1 — Backend accepts `locator` alongside legacy fields (structure)
 
+**Status: done**
+
 **Change:** Add `ContentLocator locator` as an optional field on `BookLastReadPositionRequest`. If present, it wins over the legacy fields. `BookFormat.writeLegacyColumns` gains a sibling `writeLegacyColumnsFromLocator(row, locator)` that derives the existing column values from the locator shape. Validation: at least one of (`locator`, legacy fields) must be present.
 
 **Files:** `BookLastReadPositionRequest.java`, `BookService.java`, `BookFormat.java`, regenerated TS.

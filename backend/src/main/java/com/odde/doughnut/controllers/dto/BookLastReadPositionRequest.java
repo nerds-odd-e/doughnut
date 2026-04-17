@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.services.book.ContentLocator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BookLastReadPositionRequest {
+
+  @Schema(
+      nullable = true,
+      description =
+          "Reading position as EpubLocator_Full or PdfLocator_Full. When set, overrides"
+              + " pageIndex, normalizedY, and epubLocator.")
+  private ContentLocator locator;
 
   @Schema(
       nullable = true,

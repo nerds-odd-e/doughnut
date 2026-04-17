@@ -4529,6 +4529,8 @@ components:
     BookLastReadPositionRequest:
       type: object
       properties:
+        locator:
+          $ref: "#/components/schemas/ContentLocator_Full"
         pageIndex:
           type: integer
           format: int32

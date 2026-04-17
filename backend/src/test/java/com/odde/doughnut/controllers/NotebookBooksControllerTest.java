@@ -1206,6 +1206,60 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, both));
       assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
     }
+
+    @Test
+    void persistsPdfReadingPositionFromPdfLocator() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      BookLastReadPositionRequest req = new BookLastReadPositionRequest();
+      req.setLocator(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null));
+      controller.patchReadingPosition(nb, req);
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      assertThat(stored.getPageIndex(), equalTo(3));
+      assertThat(stored.getNormalizedY(), equalTo(420));
+      assertThat(stored.getEpubLocator(), nullValue());
+    }
+
+    @Test
+    void persistsEpubReadingPositionFromEpubLocator() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = readFixtureEpubValidMinimal();
+      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
+
+      BookLastReadPositionRequest req = new BookLastReadPositionRequest();
+      req.setLocator(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two"));
+      controller.patchReadingPosition(nb, req);
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      assertThat(stored.getEpubLocator(), equalTo("OEBPS/chapter2.xhtml#section-beta-two"));
+      assertThat(stored.getPageIndex(), nullValue());
+      assertThat(stored.getNormalizedY(), nullValue());
+    }
+
+    @Test
+    void pdfLocatorOverridesConflictingLegacyFields() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      BookLastReadPositionRequest req = new BookLastReadPositionRequest();
+      req.setPageIndex(1);
+      req.setNormalizedY(100);
+      req.setEpubLocator("OEBPS/chapter1.xhtml");
+      req.setLocator(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null));
+      controller.patchReadingPosition(nb, req);
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      assertThat(stored.getPageIndex(), equalTo(3));
+      assertThat(stored.getNormalizedY(), equalTo(420));
+      assertThat(stored.getEpubLocator(), nullValue());
+    }
   }
 
   @Nested

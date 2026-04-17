@@ -624,6 +624,7 @@ export type NoteAccessory = {
 };
 
 export type BookLastReadPositionRequest = {
+    locator?: ContentLocatorFull;
     /**
      * 0-based PDF page index in the viewer; required together with normalizedY for PDF books
      */

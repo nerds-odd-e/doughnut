@@ -321,7 +321,12 @@ public class BookService {
 
   private static void applyReadingPositionFields(
       BookUserLastReadPosition row, BookLastReadPositionRequest request) {
-    BookFormat.forReadingPositionPayload(request).writeLegacyColumns(row, request);
+    if (request.getLocator() != null) {
+      BookFormat.forLocator(request.getLocator())
+          .writeLegacyColumnsFromLocator(row, request.getLocator());
+    } else {
+      BookFormat.forReadingPositionPayload(request).writeLegacyColumns(row, request);
+    }
   }
 
   private BookBlock resolveBookBlockForBook(int bookBlockId, Book book) {

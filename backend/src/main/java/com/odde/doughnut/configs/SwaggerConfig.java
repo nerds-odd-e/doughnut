@@ -57,5 +57,17 @@ public class SwaggerConfig {
     }
     schemas.remove("EpubLocator");
     schemas.remove("PdfLocator");
+
+    Schema bookLastRead = schemas.get("BookLastReadPositionRequest");
+    if (bookLastRead != null && bookLastRead.getProperties() != null) {
+      Object locatorRaw = bookLastRead.getProperties().get("locator");
+      if (locatorRaw instanceof Schema) {
+        Schema locatorRef = new Schema<>();
+        locatorRef.set$ref("#/components/schemas/ContentLocator_Full");
+        bookLastRead.getProperties().put("locator", locatorRef);
+      }
+    }
+
+    schemas.remove("ContentLocator");
   }
 }
