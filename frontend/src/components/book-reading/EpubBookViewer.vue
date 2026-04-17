@@ -16,10 +16,14 @@ import type { BookFull } from "@generated/doughnut-backend-api"
 import ePub, { type Book as EpubJsBook, type Rendition } from "epubjs"
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
-const props = defineProps<{
-  epubBytes: ArrayBuffer
-  book: BookFull
-}>()
+const props = withDefaults(
+  defineProps<{
+    epubBytes: ArrayBuffer
+    book: BookFull
+    initialLocator?: string | null
+  }>(),
+  { initialLocator: null }
+)
 
 const emit = defineEmits<{
   relocated: [payload: { href: string }]

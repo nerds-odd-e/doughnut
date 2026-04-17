@@ -27,6 +27,7 @@
         v-else-if="book.format === 'epub' && bookFileBytes !== null"
         :book="book"
         :epub-bytes="bookFileBytes"
+        :initial-epub-locator="initialEpubLocator"
       />
       <BookReadingContent
         v-else-if="bookFileBytes !== null"
@@ -65,6 +66,7 @@ const initialLastRead = ref<{
   normalizedY: number
 } | null>(null)
 const initialSelectedBlockId = ref<number | null>(null)
+const initialEpubLocator = ref<string | null>(null)
 
 onMounted(async () => {
   const { data, error } = await NotebookBooksController.getBook({
@@ -76,18 +78,6 @@ onMounted(async () => {
     bookFileLoading.value = true
     bookFileLoadError.value = null
     try {
-      if (data.format === "epub") {
-        const res = await fetch(notebookBookFilePath(notebook), {
-          credentials: "same-origin",
-        })
-        if (!res.ok) {
-          bookFileLoadError.value = "Could not load the book file."
-          return
-        }
-        bookFileBytes.value = await res.arrayBuffer()
-        return
-      }
-
       const [res, posResult] = await Promise.all([
         fetch(notebookBookFilePath(notebook), {
           credentials: "same-origin",
@@ -100,24 +90,35 @@ onMounted(async () => {
         bookFileLoadError.value = "Could not load the book file."
         return
       }
-      if (
-        posResult !== null &&
-        !posResult.error &&
-        posResult.data &&
-        typeof posResult.data.pageIndex === "number" &&
-        typeof posResult.data.normalizedY === "number"
+      const pos =
+        posResult !== null && !posResult.error && posResult.data
+          ? posResult.data
+          : null
+      if (data.format === "epub") {
+        initialEpubLocator.value =
+          pos !== null && typeof pos.epubLocator === "string"
+            ? pos.epubLocator
+            : null
+        initialLastRead.value = null
+        initialSelectedBlockId.value = null
+      } else if (
+        pos !== null &&
+        typeof pos.pageIndex === "number" &&
+        typeof pos.normalizedY === "number"
       ) {
         initialLastRead.value = {
-          pageIndexZeroBased: posResult.data.pageIndex,
-          normalizedY: posResult.data.normalizedY,
+          pageIndexZeroBased: pos.pageIndex,
+          normalizedY: pos.normalizedY,
         }
         initialSelectedBlockId.value =
-          typeof posResult.data.selectedBookBlockId === "number"
-            ? posResult.data.selectedBookBlockId
+          typeof pos.selectedBookBlockId === "number"
+            ? pos.selectedBookBlockId
             : null
+        initialEpubLocator.value = null
       } else {
         initialLastRead.value = null
         initialSelectedBlockId.value = null
+        initialEpubLocator.value = null
       }
       bookFileBytes.value = await res.arrayBuffer()
     } catch {

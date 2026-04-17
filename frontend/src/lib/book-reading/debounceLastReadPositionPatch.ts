@@ -1,10 +1,19 @@
 import { debounce } from "es-toolkit"
 
-export type LastReadPositionPatchBody = {
+export type LastReadPositionPdfBody = {
   pageIndex: number
   normalizedY: number
   selectedBookBlockId?: number
 }
+
+export type LastReadPositionEpubBody = {
+  epubLocator: string
+  selectedBookBlockId?: number
+}
+
+export type LastReadPositionPatchBody =
+  | LastReadPositionPdfBody
+  | LastReadPositionEpubBody
 
 export type LastReadPositionPatchDebouncer = {
   propose: (
@@ -12,7 +21,17 @@ export type LastReadPositionPatchDebouncer = {
     normalizedY: number,
     selectedBookBlockId?: number
   ) => void
+  proposeEpubLocator: (
+    epubLocator: string,
+    selectedBookBlockId?: number
+  ) => void
   cancel: () => void
+}
+
+function isEpubBody(
+  body: LastReadPositionPatchBody
+): body is LastReadPositionEpubBody {
+  return "epubLocator" in body
 }
 
 export function createLastReadPositionPatchDebouncer(options: {
@@ -23,10 +42,24 @@ export function createLastReadPositionPatchDebouncer(options: {
   let lastSent: LastReadPositionPatchBody | null = null
 
   function same(a: LastReadPositionPatchBody, b: LastReadPositionPatchBody) {
-    if (a.pageIndex !== b.pageIndex || a.normalizedY !== b.normalizedY) {
+    if (isEpubBody(a) !== isEpubBody(b)) {
       return false
     }
-    return a.selectedBookBlockId === b.selectedBookBlockId
+    if (isEpubBody(a) && isEpubBody(b)) {
+      return (
+        a.epubLocator === b.epubLocator &&
+        a.selectedBookBlockId === b.selectedBookBlockId
+      )
+    }
+    const pdfA = a as LastReadPositionPdfBody
+    const pdfB = b as LastReadPositionPdfBody
+    if (
+      pdfA.pageIndex !== pdfB.pageIndex ||
+      pdfA.normalizedY !== pdfB.normalizedY
+    ) {
+      return false
+    }
+    return pdfA.selectedBookBlockId === pdfB.selectedBookBlockId
   }
 
   const sendIfNeeded = (next: LastReadPositionPatchBody) => {
@@ -40,16 +73,9 @@ export function createLastReadPositionPatchDebouncer(options: {
       .catch(() => undefined)
   }
 
-  const debounced = debounce(
-    (pageIndex: number, normalizedY: number, selectedBookBlockId?: number) => {
-      const next: LastReadPositionPatchBody =
-        selectedBookBlockId === undefined
-          ? { pageIndex, normalizedY }
-          : { pageIndex, normalizedY, selectedBookBlockId }
-      sendIfNeeded(next)
-    },
-    delayMs
-  )
+  const debounced = debounce((next: LastReadPositionPatchBody) => {
+    sendIfNeeded(next)
+  }, delayMs)
 
   return {
     propose(
@@ -57,7 +83,18 @@ export function createLastReadPositionPatchDebouncer(options: {
       normalizedY: number,
       selectedBookBlockId?: number
     ) {
-      debounced(pageIndex, normalizedY, selectedBookBlockId)
+      const next: LastReadPositionPdfBody =
+        selectedBookBlockId === undefined
+          ? { pageIndex, normalizedY }
+          : { pageIndex, normalizedY, selectedBookBlockId }
+      debounced(next)
+    },
+    proposeEpubLocator(epubLocator: string, selectedBookBlockId?: number) {
+      const next: LastReadPositionEpubBody =
+        selectedBookBlockId === undefined
+          ? { epubLocator }
+          : { epubLocator, selectedBookBlockId }
+      debounced(next)
     },
     cancel() {
       debounced.cancel()

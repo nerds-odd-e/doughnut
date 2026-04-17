@@ -99,7 +99,7 @@ The key assertions: after the reader persists the position, leaving and returnin
 
 ---
 
-## Sub-phase 6.3 — Structure: Widen frontend reading-position plumbing for EPUB
+## Sub-phase 6.3 — Structure: Widen frontend reading-position plumbing for EPUB (done)
 
 **Type:** Structure (new props/arguments wired through but unused by the EPUB viewer UI)
 

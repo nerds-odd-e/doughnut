@@ -36,6 +36,7 @@
         ref="epubViewerRef"
         :epub-bytes="epubBytes"
         :book="book"
+        :initial-locator="initialEpubLocator"
         @relocated="onEpubRelocated"
       />
     </main>
@@ -60,10 +61,14 @@ const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
-const props = defineProps<{
-  book: BookFull
-  epubBytes: ArrayBuffer
-}>()
+const props = withDefaults(
+  defineProps<{
+    book: BookFull
+    epubBytes: ArrayBuffer
+    initialEpubLocator?: string | null
+  }>(),
+  { initialEpubLocator: null }
+)
 
 const notebookId = computed(() => Number(props.book.notebookId))
 
