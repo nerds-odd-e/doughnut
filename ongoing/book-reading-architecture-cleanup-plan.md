@@ -405,6 +405,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase H1 — Extract bootstrap composable (structure)
 
+**Status: done**
+
 **Change:** Move `BookReadingPage.vue`'s `onMounted` block (fetch book, fetch file bytes, fetch reading position, derive initial state) into `frontend/src/composables/useBookReadingBootstrap.ts`. The composable returns `Ref<BookReadingBootstrap | null>` where
 
 ```ts

@@ -37,7 +37,7 @@
         ref="epubViewerRef"
         :epub-bytes="epubBytes"
         :book="book"
-        :initial-locator="initialEpubLocator"
+        :initial-locator="initialLocatorDisplayHref"
         @relocated="onEpubRelocated"
       />
       <ReadingControlPanel
@@ -63,12 +63,16 @@ import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentB
 import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
-import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
+import {
+  asEpubLocator,
+  epubDisplayHref,
+} from "@/lib/book-reading/asEpubLocator"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { splitEpubHref } from "@/lib/book-reading/epubHrefMatch"
 import type {
   BookBlockFull,
   BookFull,
+  ContentLocatorFull,
   EpubLocatorFull,
 } from "@generated/doughnut-backend-api"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -88,11 +92,20 @@ const props = withDefaults(
   defineProps<{
     book: BookFull
     epubBytes: ArrayBuffer
-    initialEpubLocator?: string | null
+    initialLocator?: ContentLocatorFull | null
     initialSelectedBlockId?: number | null
   }>(),
-  { initialEpubLocator: null, initialSelectedBlockId: null }
+  { initialLocator: null, initialSelectedBlockId: null }
 )
+
+const initialLocatorDisplayHref = computed(() => {
+  const epub = asEpubLocator(props.initialLocator ?? undefined)
+  if (!epub) {
+    return null
+  }
+  const s = epubDisplayHref(epub)
+  return s.length > 0 ? s : null
+})
 
 const notebookId = computed(() => Number(props.book.notebookId))
 const bookReading = useNotebookBookReadingRecords(notebookId)
@@ -159,11 +172,9 @@ const {
  * just resumed before any scroll-driven event arrives. Fall back to the saved selection if
  * the href cannot be mapped.
  */
-if (props.initialEpubLocator !== null && props.initialEpubLocator.length > 0) {
-  const seededId = currentBlockIdFromEpubLocation(
-    props.book.blocks,
-    props.initialEpubLocator
-  )
+const seedHref = initialLocatorDisplayHref.value
+if (seedHref !== null && seedHref.length > 0) {
+  const seededId = currentBlockIdFromEpubLocation(props.book.blocks, seedHref)
   if (seededId !== null) {
     currentBlockIdDebouncer.commitNow(seededId)
   } else if (props.initialSelectedBlockId !== null) {
