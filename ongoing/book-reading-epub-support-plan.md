@@ -145,7 +145,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **Later phases:** Full Readium-style locator objects (CFI, progression), reading-position resume, and scroll-sync still build on this `epubStartHref` string or extend the API as needed.
 
-## Phase 5: Scroll the EPUB and see where I am in the layout (planned)
+## Phase 5: Scroll the EPUB and see where I am in the layout (done)
 
 **Why here:** This completes the core structure-to-reader sync after rendering and explicit navigation already work.
 
@@ -156,14 +156,15 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **User value after this phase:** "As I read, Doughnut keeps the structure synced with where I am."
 
-**Scope:**
-- Use Readium relocation events and EPUB locator progression to derive the current block.
-- Reuse shared shell behavior from the PDF reader where the behavior is format-agnostic: debounce, current-block state, selected-vs-current distinction, live region announcement, layout scroll-into-view.
-- Keep EPUB-specific logic limited to mapping the current Readium location to the owning `BookBlock`.
+**Scope (shipped):**
+- `EpubBookViewer.vue` listens to epub.js `relocated` and `displayed` events and emits a single `relocated` payload `{ href }`. `displayed` is kept because epub.js does not reliably fire `relocated` on the initial `display()` call in continuous/scrolled mode.
+- `currentBlockIdFromEpubLocation(blocks, href)` maps the spine href (plus optional `#fragment`) to the owning `BookBlock.id`, preferring the last in-preorder match with a matching fragment, falling back to the last path-only match. It tolerates manifest-relative vs package-root path differences.
+- `BookReadingEpubView.vue` feeds each relocation through the shared `createCurrentBlockIdDebouncer` (120 ms) and passes the resulting `currentBlockId` to `BookReadingBookLayout`. Clicks `commitNow` immediately with the clicked block id so the layout never flickers through a transient scroll-derived id.
+- `selectedBlockId` is tracked independently of `currentBlockId` so the layout distinguishes the two after a scroll moves past the selection.
 
-**Testing:**
-- E2E: scroll the EPUB and verify the expected block becomes the current block in the layout.
-- Keep layout-side assertions the same style as PDF where possible.
+**Testing (shipped):**
+- `frontend/tests/lib/book-reading/currentBlockIdFromEpubLocation.spec.ts` covers exact/relative path matching, preorder tie-breaking, fragment matching, and fallback cases.
+- `e2e_test/features/book_reading/epub_book.feature` scenarios "Scrolling the EPUB updates the current block in the layout" and "EPUB current block updates on scroll; selection stays on explicit choice" exercise initial load, click-nav, and scroll-triggered updates along with the selected-vs-current distinction.
 
 ## Phase 6: Leave and return to the same EPUB position (planned)
 
@@ -279,7 +280,7 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | 2 | Browse EPUB chapter structure | Server-side EPUB parsing, BookBlock + BookContentBlock extraction | Medium |
 | ~~3~~ | ~~Open EPUB and read content, jump to chapters~~ | ~~Done~~ | ~~Done~~ |
 | 4 | Precise navigation to any section | `epubStartHref` path#fragment, epub.js `display` | Done |
-| 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Medium |
+| 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Done |
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Medium |
 | 7 | Mark EPUB blocks read/skimmed/skipped | Reusing reading-record UI and state without over-coupling to PDF | Small-medium |
 | 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |

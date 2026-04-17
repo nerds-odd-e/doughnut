@@ -25,15 +25,24 @@ const emit = defineEmits<{
   relocated: [payload: { href: string }]
 }>()
 
-type EpubJsRelocatedLocation = {
-  start: { href?: string }
-}
-
 const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
-let onRelocated: ((location: EpubJsRelocatedLocation) => void) | null = null
-let onDisplayed: ((section: { href?: string }) => void) | null = null
+
+function emitIfHref(href: string | undefined) {
+  if (typeof href === "string" && href.length > 0) {
+    emit("relocated", { href })
+  }
+}
+
+/**
+ * epub.js's `relocated` does not always fire on the initial `display()` in continuous/scrolled
+ * mode, so we also listen to `displayed` (fires when a section first mounts) to guarantee the
+ * initial current block is reported. Both deliver the spine href we need.
+ */
+const onRelocated = (location: { start?: { href?: string } }) =>
+  emitIfHref(location.start?.href)
+const onDisplayed = (section: { href?: string }) => emitIfHref(section.href)
 
 async function displayEpubTarget(href: string) {
   const h = href.trim()
@@ -41,7 +50,6 @@ async function displayEpubTarget(href: string) {
     return
   }
   await rendition.display(h).catch(() => undefined)
-  emit("relocated", { href: h })
 }
 
 defineExpose({
@@ -49,13 +57,9 @@ defineExpose({
 })
 
 function destroyEpub() {
-  if (rendition && onRelocated) {
+  if (rendition) {
     rendition.off("relocated", onRelocated)
-    onRelocated = null
-  }
-  if (rendition && onDisplayed) {
     rendition.off("displayed", onDisplayed)
-    onDisplayed = null
   }
   rendition?.destroy()
   rendition = null
@@ -82,19 +86,7 @@ async function openEpub() {
     allowScriptedContent: false,
   })
   rendition = r
-  onRelocated = (location: EpubJsRelocatedLocation) => {
-    const href = location.start?.href
-    if (typeof href === "string" && href.length > 0) {
-      emit("relocated", { href })
-    }
-  }
   r.on("relocated", onRelocated)
-  onDisplayed = (section: { href?: string }) => {
-    const href = section.href
-    if (typeof href === "string" && href.length > 0) {
-      emit("relocated", { href })
-    }
-  }
   r.on("displayed", onDisplayed)
   await r.display()
 }

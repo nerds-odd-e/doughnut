@@ -24,7 +24,7 @@
     :panel-id="bookReadingBookLayoutPanelId"
     :is-md-or-larger="isMdOrLarger"
     :blocks="book.blocks"
-    :current-block-id="displayCurrentBlockId"
+    :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
     :disposition-for-block="noDisposition"
     @block-click="onBookBlockClick"
@@ -50,7 +50,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
-import { computed, onBeforeUnmount, onMounted, ref, unref } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 
 type EpubViewerExposed = {
   displayEpubTarget: (href: string) => Promise<void>
@@ -75,9 +75,6 @@ const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
 })
 const { currentBlockId } = currentBlockIdDebouncer
 
-/** Explicit unwrap so the layout always receives a plain `number | null` from the debouncer ref. */
-const displayCurrentBlockId = computed(() => unref(currentBlockId))
-
 const selectedBlockId = ref<number | null>(null)
 
 const bookLayoutOpened = ref(false)
@@ -95,9 +92,7 @@ const isMdOrLarger = computed(
   () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
 )
 
-function noDisposition(_blockId: number) {
-  return undefined
-}
+const noDisposition = () => undefined
 
 function onEpubRelocated(payload: { href: string }) {
   const id = currentBlockIdFromEpubLocation(props.book.blocks, payload.href)
@@ -108,19 +103,12 @@ function onEpubRelocated(payload: { href: string }) {
 
 async function onBookBlockClick(block: BookBlockFull) {
   selectedBlockId.value = block.id
-  try {
-    const href = block.epubStartHref
-    if (!href) {
-      return
-    }
-    const viewer = epubViewerRef.value
-    if (!viewer) {
-      return
-    }
+  const href = block.epubStartHref
+  const viewer = epubViewerRef.value
+  if (href && viewer) {
     await viewer.displayEpubTarget(href)
-  } finally {
-    currentBlockIdDebouncer.commitNow(block.id)
   }
+  currentBlockIdDebouncer.commitNow(block.id)
 }
 
 onMounted(() => {

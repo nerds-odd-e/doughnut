@@ -50,11 +50,7 @@ export function currentBlockIdFromEpubLocation(
   blocks: readonly BookBlockEpubLocationRow[],
   href: string
 ): number | null {
-  if (typeof href !== "string" || href.length === 0) {
-    return null
-  }
-  const trimmed = href.trim()
-  const { path: relPath, fragment: relFragment } = splitEpubHref(trimmed)
+  const { path: relPath, fragment: relFragment } = splitEpubHref(href.trim())
   if (relPath.length === 0) {
     return null
   }
@@ -63,22 +59,17 @@ export function currentBlockIdFromEpubLocation(
   let lastFragmentMatchId: number | null = null
 
   for (const block of blocks) {
-    const start = block.epubStartHref
-    if (start === undefined || start === null || start === "") {
+    if (!block.epubStartHref) {
       continue
     }
     const { path: blockPath, fragment: blockFragment } = splitEpubHref(
-      start.trim()
+      block.epubStartHref.trim()
     )
     if (!epubSpinePathMatches(blockPath, relPath)) {
       continue
     }
     lastPathMatchId = block.id
-    if (
-      relFragment !== null &&
-      blockFragment !== null &&
-      blockFragment === relFragment
-    ) {
+    if (relFragment !== null && blockFragment === relFragment) {
       lastFragmentMatchId = block.id
     }
   }
