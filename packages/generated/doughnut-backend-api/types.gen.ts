@@ -51,22 +51,10 @@ export type ContentLocatorFull = {
     type: string;
 };
 
-export type EpubLocator = {
-    href: string;
-    fragment?: string;
-};
-
 export type EpubLocatorFull = Omit<ContentLocatorFull, 'type'> & {
     href: string;
     fragment?: string;
     type: 'EpubLocator_Full';
-};
-
-export type PdfLocator = {
-    pageIndex: number;
-    bbox: Array<number>;
-    contentBlockId?: number;
-    derivedTitle?: string;
 };
 
 export type PdfLocatorFull = Omit<ContentLocatorFull, 'type'> & {

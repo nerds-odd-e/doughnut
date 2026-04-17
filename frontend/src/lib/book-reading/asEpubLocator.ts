@@ -10,7 +10,7 @@ export function asEpubLocator(
   if (!loc) {
     return null
   }
-  if (loc.type === "EpubLocator_Full" || loc.type === "epub") {
+  if (loc.type === "EpubLocator_Full") {
     return loc as EpubLocatorFull
   }
   return null

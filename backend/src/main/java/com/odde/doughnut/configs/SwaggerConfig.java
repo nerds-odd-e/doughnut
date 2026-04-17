@@ -2,8 +2,11 @@ package com.odde.doughnut.configs;
 
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.Discriminator;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.List;
+import java.util.Map;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +29,33 @@ public class SwaggerConfig {
           get.getResponses().get("204").setContent(null);
         }
       }
+
+      dropLegacyContentLocatorAliasSchemas(openApi);
     };
+  }
+
+  /**
+   * Springdoc registers both the polymorphic {@code EpubLocator_Full} / {@code PdfLocator_Full}
+   * schemas and bare {@code EpubLocator} / {@code PdfLocator} duplicates for discriminator mapping
+   * targets. The API only needs the {@code *_Full} shapes; drop the aliases and point the
+   * discriminator at the canonical schemas.
+   */
+  private static void dropLegacyContentLocatorAliasSchemas(
+      io.swagger.v3.oas.models.OpenAPI openApi) {
+    if (openApi.getComponents() == null || openApi.getComponents().getSchemas() == null) {
+      return;
+    }
+    Map<String, Schema> schemas = openApi.getComponents().getSchemas();
+    Schema contentLocatorFull = schemas.get("ContentLocator_Full");
+    if (contentLocatorFull != null && contentLocatorFull.getDiscriminator() != null) {
+      Discriminator discriminator = contentLocatorFull.getDiscriminator();
+      Map<String, String> mapping = discriminator.getMapping();
+      if (mapping != null) {
+        mapping.put("EpubLocator_Full", "#/components/schemas/EpubLocator_Full");
+        mapping.put("PdfLocator_Full", "#/components/schemas/PdfLocator_Full");
+      }
+    }
+    schemas.remove("EpubLocator");
+    schemas.remove("PdfLocator");
   }
 }

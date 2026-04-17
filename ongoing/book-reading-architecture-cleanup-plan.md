@@ -96,6 +96,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase A4 — Remove non-Full locator schemas (structure)
 
+**Status: done**
+
 **Change:** Drop the non-Full `EpubLocator` / `PdfLocator` schemas from the backend (they are no longer referenced by any DTO). Regenerate TypeScript. Verify `types.gen.ts` no longer contains the `type: 'epub' | 'pdf'` variants.
 
 **Files:** backend DTOs referencing the old schemas (none should remain), regenerated TS.

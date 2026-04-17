@@ -3329,22 +3329,13 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          PdfLocator_Full: "#/components/schemas/PdfLocator"
-          EpubLocator_Full: "#/components/schemas/EpubLocator"
+          PdfLocator_Full: "#/components/schemas/PdfLocator_Full"
+          EpubLocator_Full: "#/components/schemas/EpubLocator_Full"
       properties:
         type:
           type: string
       required:
       - type
-    EpubLocator:
-      type: object
-      properties:
-        href:
-          type: string
-        fragment:
-          type: string
-      required:
-      - href
     EpubLocator_Full:
       allOf:
       - $ref: "#/components/schemas/ContentLocator_Full"
@@ -3356,25 +3347,6 @@ components:
             type: string
       required:
       - href
-    PdfLocator:
-      type: object
-      properties:
-        pageIndex:
-          type: integer
-          format: int32
-        bbox:
-          type: array
-          items:
-            type: number
-            format: double
-        contentBlockId:
-          type: integer
-          format: int32
-        derivedTitle:
-          type: string
-      required:
-      - bbox
-      - pageIndex
     PdfLocator_Full:
       allOf:
       - $ref: "#/components/schemas/ContentLocator_Full"
