@@ -389,6 +389,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase G2 — Move `snapToContentBottomAndHold` + `suppressScrollInput` into snap-back (structure)
 
+**Status: done**
+
 **Change:** Replace the pair with a single viewer primitive `scrollToNormalizedPoint(pageIndex, normalizedY)` (or similar) plus an external hold/suppress mechanism owned by `useBookReadingSnapBack`. The composable manages the hold timer, the "don't re-emit viewport updates during the hold" gate, and the highlight handoff.
 
 **Files:** `bookReaderViewerRef.ts`, `PdfBookViewer.vue`, `useBookReadingSnapBack.ts`.

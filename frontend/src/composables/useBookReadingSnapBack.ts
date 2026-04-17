@@ -3,10 +3,18 @@ import {
   pdfLocatorsFromBlock,
 } from "@/lib/book-reading/asPdfLocator"
 import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
+import { createIntervalScrollSuppression } from "@/lib/book-reading/intervalScrollSuppression"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
-import { computed, type ComputedRef, type Ref, ref, watch } from "vue"
+import {
+  computed,
+  type ComputedRef,
+  onScopeDispose,
+  type Ref,
+  ref,
+  watch,
+} from "vue"
 
 /** Whether the normalized vertical span on the page fits in the viewport minus obstruction. */
 export function snapBackNormalizedSpanFitsViewport(options: {
@@ -95,6 +103,24 @@ export function useBookReadingSnapBack(options: {
   const geometryEverVisibleForSelection = ref(false)
   const snapbackAttempts = new Map<number, number>()
   const snapAnimationKey = ref(0)
+  const scrollSuppression = createIntervalScrollSuppression()
+  let unregisterScrollSuppression: (() => void) | null = null
+
+  watch(
+    pdfViewerRef,
+    (v) => {
+      unregisterScrollSuppression?.()
+      unregisterScrollSuppression =
+        v?.registerScrollSuppression(scrollSuppression) ?? null
+    },
+    { immediate: true }
+  )
+
+  onScopeDispose(() => {
+    unregisterScrollSuppression?.()
+    unregisterScrollSuppression = null
+    scrollSuppression.reset()
+  })
 
   /**
    * Trigger A: the user has seen the selected block's content geometry at
@@ -161,19 +187,25 @@ export function useBookReadingSnapBack(options: {
         normalizedContentBottomY: contentBottomY,
         obstructionPx,
       })
+    const viewer = pdfViewerRef.value
+    if (viewer === null) return
     if (fits) {
-      pdfViewerRef.value
-        ?.scrollToBookNavigationTarget(parsedStart!, navTargets)
-        .then(() => pdfViewerRef.value?.suppressScrollInput(snapHoldMs))
+      viewer
+        .scrollToBookNavigationTarget(parsedStart!, navTargets)
+        .then(() => {
+          scrollSuppression.activate(snapHoldMs)
+        })
         .catch(() => undefined)
     } else {
-      pdfViewerRef.value?.snapToContentBottomAndHold(
+      scrollSuppression.activate(snapHoldMs)
+      viewer.scrollPageNormalizedYToReadingClearance(
         lastBbox.pageIndex,
         contentBottomY,
-        obstructionPx,
-        snapHoldMs,
-        navTargets
+        obstructionPx
       )
+      viewer.afterNextViewUpdate(() => {
+        pdfViewerRef.value?.highlightBlockSelection(navTargets)
+      })
     }
   }
 

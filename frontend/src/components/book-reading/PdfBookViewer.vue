@@ -55,6 +55,7 @@ import {
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
   locatorAsPdfNavigationTarget,
+  type PdfViewerScrollSuppressionApi,
   type ViewerLocatorRect,
 } from "@/composables/bookReaderViewerRef"
 import type { ContentLocatorFull } from "@generated/doughnut-backend-api"
@@ -134,7 +135,17 @@ let userAdjustedScale = false
 let onWheelForZoom: ((e: WheelEvent) => void) | null = null
 let onTouchStartForPinch: ((e: TouchEvent) => void) | null = null
 let onTouchMoveForPinch: ((e: TouchEvent) => void) | null = null
-const scrollSuppression = createIntervalScrollSuppression()
+let scrollSuppression: PdfViewerScrollSuppressionApi =
+  createIntervalScrollSuppression()
+
+function registerScrollSuppression(
+  api: PdfViewerScrollSuppressionApi
+): () => void {
+  scrollSuppression = api
+  return () => {
+    scrollSuppression = createIntervalScrollSuppression()
+  }
+}
 let onTouchEndForPinch: ((e: TouchEvent) => void) | null = null
 let lastPinchDistance = 0
 
@@ -246,6 +257,9 @@ function applyGestureScaleFactor(
 function emitViewportDescriptorIfChanged() {
   const container = containerRef.value
   if (!container || !pdfViewer) return
+  if (scrollSuppression.isHoldWindowActive()) {
+    return
+  }
   const sample = pdfViewerViewportTopYDown(container, pdfViewer)
   const midQ =
     sample.viewport === null
@@ -595,24 +609,10 @@ function getScrollViewportHeightPx(): number | null {
   return container.getBoundingClientRect().height
 }
 
-function suppressScrollInput(holdMs: number): void {
-  scrollSuppression.activate(holdMs)
-}
-
-/**
- * Scrolls so the bottom of the given bbox sits just above `obstructionPx` from the container
- * bottom, then suppresses wheel/touch-move scroll input for `holdMs` milliseconds so trailing
- * gesture events cannot immediately undo the snap.
- *
- * When `highlightBboxes` is set, overlays run on the next `updateviewarea` so pdf.js does not
- * clear them on the scroll-driven viewer update.
- */
-function snapToContentBottomAndHold(
+function scrollPageNormalizedYToReadingClearance(
   pageIndex: number,
-  normalizedBboxBottom: number,
-  obstructionPx: number,
-  holdMs: number,
-  highlightBboxes?: ReadonlyArray<BookNavigationTarget>
+  normalizedY: number,
+  obstructionPx: number
 ): void {
   const container = containerRef.value
   if (!container || !pdfViewer) return
@@ -627,20 +627,17 @@ function snapToContentBottomAndHold(
   const pageDiv = (pageView as { div: HTMLDivElement }).div
   const pageRect = pageDiv.getBoundingClientRect()
   const containerRect = container.getBoundingClientRect()
-  const bboxBottomClient =
-    pageRect.top + (normalizedBboxBottom / 1000) * pageRect.height
+  const pointClientY = pageRect.top + (normalizedY / 1000) * pageRect.height
   const targetClient = containerRect.bottom - obstructionPx
-  container.scrollTop += bboxBottomClient - targetClient
-  suppressScrollInput(holdMs)
-  if (highlightBboxes && highlightBboxes.length > 0) {
-    pdfViewer.eventBus.on(
-      "updateviewarea",
-      () => {
-        showSelectionBboxHighlights(highlightBboxes)
-      },
-      { once: true }
-    )
+  container.scrollTop += pointClientY - targetClient
+}
+
+function afterNextViewUpdate(fn: () => void): void {
+  if (!pdfViewer) {
+    queueMicrotask(fn)
+    return
   }
+  pdfViewer.eventBus.on("updateviewarea", fn, { once: true })
 }
 
 defineExpose({
@@ -649,8 +646,9 @@ defineExpose({
   scrollToBookNavigationTarget,
   highlightBlockSelection,
   scrollToStoredReadingPosition,
-  snapToContentBottomAndHold,
-  suppressScrollInput,
+  scrollPageNormalizedYToReadingClearance,
+  afterNextViewUpdate,
+  registerScrollSuppression,
   getPageRect,
   getScrollViewportHeightPx,
   zoomIn,

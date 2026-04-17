@@ -19,6 +19,33 @@ const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const notebookId = 7
 
+const snapHoldActivateMock = vi.hoisted(() => ({
+  fn: vi.fn<(ms: number) => void>(),
+}))
+
+vi.mock(
+  "@/lib/book-reading/intervalScrollSuppression",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/lib/book-reading/intervalScrollSuppression")
+      >()
+    return {
+      ...actual,
+      createIntervalScrollSuppression: () => {
+        const real = actual.createIntervalScrollSuppression()
+        return {
+          ...real,
+          activate: (ms: number) => {
+            snapHoldActivateMock.fn(ms)
+            real.activate(ms)
+          },
+        }
+      },
+    }
+  }
+)
+
 let topMathsPdfBytes!: ArrayBuffer
 let epubMinimalBytes!: ArrayBuffer
 
@@ -1201,6 +1228,10 @@ describe("BookReadingPage", () => {
     describe("geometry-gated panel (last PDF content locator)", () => {
       const contentBbox = makeMe.pdfLocator.withBbox(0, [10, 700, 500, 750])
 
+      beforeEach(() => {
+        snapHoldActivateMock.fn.mockClear()
+      })
+
       function stubGetBookWithFirstBlockHavingBbox() {
         const blocks = makeMe.bookReading.topMathsLikeBlockRows({
           contentLocatorsForIndex: (i) =>
@@ -1215,7 +1246,7 @@ describe("BookReadingPage", () => {
         )
       }
 
-      function spyOnSnapToContentBottomAndHold(
+      function spyOnScrollPageNormalizedYToReadingClearance(
         wrapper: BookReadingPageWrapper
       ) {
         const pdf = wrapper.findComponent(PdfBookViewer)
@@ -1223,28 +1254,16 @@ describe("BookReadingPage", () => {
           pdf.vm as unknown as {
             $: {
               exposed: {
-                snapToContentBottomAndHold: (
+                scrollPageNormalizedYToReadingClearance: (
                   pageIndex: number,
-                  normalizedBboxBottom: number,
-                  obstructionPx: number,
-                  holdMs: number,
-                  highlightBboxes?: ReadonlyArray<unknown>
+                  normalizedY: number,
+                  obstructionPx: number
                 ) => void
               }
             }
           }
         ).$.exposed
-        return vi.spyOn(exposed, "snapToContentBottomAndHold")
-      }
-
-      function spyOnSuppressScrollInput(wrapper: BookReadingPageWrapper) {
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        const exposed = (
-          pdf.vm as unknown as {
-            $: { exposed: { suppressScrollInput: (holdMs: number) => void } }
-          }
-        ).$.exposed
-        return vi.spyOn(exposed, "suppressScrollInput")
+        return vi.spyOn(exposed, "scrollPageNormalizedYToReadingClearance")
       }
 
       /** Matches stub bbox span vs viewport; `fits` mirrors old `contentFitsFromBlockTop` mock. */
@@ -1410,8 +1429,8 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
-        const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const snapToBottomSpy =
+          spyOnScrollPageNormalizedYToReadingClearance(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1437,7 +1456,7 @@ describe("BookReadingPage", () => {
         })
 
         // same-page: scrolls to block start via scrollToBookNavigationTarget, then suppresses scroll
-        expect(suppressSpy).toHaveBeenCalledWith(500)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledWith(500)
         // cross-page snap-to-bottom path not used
         expect(snapToBottomSpy).not.toHaveBeenCalled()
         expect(readingControlPanel(wrapper).exists()).toBe(true)
@@ -1450,7 +1469,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1474,7 +1492,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        expect(suppressSpy).toHaveBeenCalledWith(500)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledWith(500)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
@@ -1485,7 +1503,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1508,7 +1525,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(1)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
 
         // first snap hold expires
@@ -1523,7 +1540,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
 
         // second snap hold expires
@@ -1539,7 +1556,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
         expect(readingControlPanel(wrapper).exists()).toBe(false)
       })
 
@@ -1550,7 +1567,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1595,7 +1611,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
         expect(readingControlPanel(wrapper).exists()).toBe(false)
 
         // fourth crossing → still no snap
@@ -1604,7 +1620,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
       })
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
@@ -1652,7 +1668,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         // geometry never becomes true
         mockIsLastContentBottomVisible(wrapper, false)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1668,7 +1683,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        expect(suppressSpy).not.toHaveBeenCalled()
+        expect(snapHoldActivateMock.fn).not.toHaveBeenCalled()
         // current block commits normally via fallback
         expect(wrapper.find('[data-current-block="true"]').text()).toBe(
           "Section 2"
@@ -1693,7 +1708,6 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         // Block 1 is READ so its text is "Section 1 Marked as read"; click directly
         const section1Row = wrapper
@@ -1719,7 +1733,7 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        expect(suppressSpy).not.toHaveBeenCalled()
+        expect(snapHoldActivateMock.fn).not.toHaveBeenCalled()
         expect(wrapper.find('[data-current-block="true"]').text()).toBe(
           "Section 2"
         )
@@ -1732,7 +1746,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1753,7 +1766,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(1)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
 
         // Select Section 2 (resets snap state), geometry passes, then Section 3 crossing
         await clickBookBlockByTitle(wrapper, "Section 2")
@@ -1763,7 +1776,7 @@ describe("BookReadingPage", () => {
           )
         )
         // Section 2 has no PDF locators so no snap for it — just confirm state cleared
-        expect(suppressSpy).toHaveBeenCalledTimes(1)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
       })
 
       it("snaps to last bbox bottom when start anchor and last content bbox are on different pages", async () => {
@@ -1772,7 +1785,8 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
-        const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const snapToBottomSpy =
+          spyOnScrollPageNormalizedYToReadingClearance(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1796,17 +1810,8 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        // cross-page: snapToContentBottomAndHold called with last bbox (pageIndex=1, bottom=150)
-        expect(snapToBottomSpy).toHaveBeenCalledWith(
-          1,
-          150,
-          80,
-          500,
-          expect.any(Array)
-        )
-        expect(
-          (snapToBottomSpy.mock.calls[0]?.[4] as unknown[]).length
-        ).toBeGreaterThan(0)
+        // cross-page: scroll last bbox bottom into reading clearance (pageIndex=1, bottom=150)
+        expect(snapToBottomSpy).toHaveBeenCalledWith(1, 150, 80)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
@@ -1817,7 +1822,8 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, false)
-        const snapToBottomSpy = spyOnSnapToContentBottomAndHold(wrapper)
+        const snapToBottomSpy =
+          spyOnScrollPageNormalizedYToReadingClearance(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1841,17 +1847,8 @@ describe("BookReadingPage", () => {
           pagesCount: 10,
         })
 
-        // same-page-too-tall: snapToContentBottomAndHold called with last bbox (pageIndex=0, bottom=750)
-        expect(snapToBottomSpy).toHaveBeenCalledWith(
-          0,
-          750,
-          80,
-          500,
-          expect.any(Array)
-        )
-        expect(
-          (snapToBottomSpy.mock.calls[0]?.[4] as unknown[]).length
-        ).toBeGreaterThan(0)
+        // same-page-too-tall: scroll last bbox bottom into reading clearance (pageIndex=0, bottom=750)
+        expect(snapToBottomSpy).toHaveBeenCalledWith(0, 750, 80)
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
@@ -1862,7 +1859,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1896,7 +1892,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1951,7 +1946,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         await clickBookBlockByTitle(wrapper, "Section 1")
         await vi.waitFor(() =>
@@ -1974,7 +1968,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(1)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
 
         // mark as READ → selection advances to Section 2
         await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsRead")
@@ -2008,7 +2002,7 @@ describe("BookReadingPage", () => {
         })
 
         // suppress count stays at 1 — no new snap for Section 1 after READ
-        expect(suppressSpy).toHaveBeenCalledTimes(1)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
       })
 
       it("different unread blocks get independent snap budgets", async () => {
@@ -2040,7 +2034,6 @@ describe("BookReadingPage", () => {
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
-        const suppressSpy = spyOnSuppressScrollInput(wrapper)
 
         // --- exhaust Section 1's two snap budget ---
         await clickBookBlockByTitle(wrapper, "Section 1")
@@ -2079,7 +2072,7 @@ describe("BookReadingPage", () => {
           await flushPromises()
         })
 
-        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
 
         // third crossing: no snap, current block commits to Section 2
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -2087,7 +2080,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        expect(suppressSpy).toHaveBeenCalledTimes(2)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
 
         // --- Section 2 gets its own fresh snap budget ---
         await clickBookBlockByTitle(wrapper, "Section 2")
@@ -2125,7 +2118,7 @@ describe("BookReadingPage", () => {
         })
 
         // Section 2 gets both its own snaps regardless of Section 1's exhausted budget
-        expect(suppressSpy).toHaveBeenCalledTimes(4)
+        expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(4)
       })
     })
 

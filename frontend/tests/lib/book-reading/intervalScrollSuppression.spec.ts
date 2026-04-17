@@ -54,4 +54,20 @@ describe("createIntervalScrollSuppression", () => {
       vi.useRealTimers()
     }
   })
+
+  it("isHoldWindowActive is true only during the initial holdMs window", () => {
+    vi.useFakeTimers()
+    try {
+      const suppression = createIntervalScrollSuppression()
+      expect(suppression.isHoldWindowActive()).toBe(false)
+      suppression.activate(500)
+      expect(suppression.isHoldWindowActive()).toBe(true)
+      vi.advanceTimersByTime(499)
+      expect(suppression.isHoldWindowActive()).toBe(true)
+      vi.advanceTimersByTime(1)
+      expect(suppression.isHoldWindowActive()).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

@@ -27,6 +27,11 @@ export function createIntervalScrollSuppression() {
       lastEventTime = now
       return true
     },
+    /** True during the initial `holdMs` window after `activate` (read-only). */
+    isHoldWindowActive(): boolean {
+      if (!active) return false
+      return Date.now() - startTime < maxMs
+    },
     reset() {
       active = false
     },
