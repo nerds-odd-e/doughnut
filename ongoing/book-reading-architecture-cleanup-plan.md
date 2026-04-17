@@ -315,6 +315,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase F3 — Add `reading_position_locator_json` column and dual-write (structure)
 
+**Status: done**
+
 **Change:**
 - Flyway migration `backend/src/main/resources/db/migration/V…__book_user_last_read_position_locator_json.sql` adding a `reading_position_locator_json TEXT NULL` column to `book_user_last_read_position`.
 - `BookUserLastReadPosition` entity gains the new field.

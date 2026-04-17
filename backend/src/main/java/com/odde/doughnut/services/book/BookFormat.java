@@ -100,15 +100,24 @@ public enum BookFormat {
     }
 
     @Override
-    public void writeLegacyColumns(BookUserLastReadPosition row, BookLastReadPositionRequest req) {
+    public void writeLegacyColumns(
+        BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper) {
       row.setPageIndex(req.getPageIndex());
       row.setNormalizedY(req.getNormalizedY());
       row.setEpubLocator(null);
+      persistReadingPositionLocatorJson(
+          row,
+          objectMapper,
+          new PdfLocator(
+              req.getPageIndex(),
+              List.of(0.0, req.getNormalizedY().doubleValue(), 100.0, 600.0),
+              null,
+              null));
     }
 
     @Override
     public void writeLegacyColumnsFromLocator(
-        BookUserLastReadPosition row, ContentLocator locator) {
+        BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper) {
       if (!(locator instanceof PdfLocator pdf)) {
         throw new ApiException(
             "PdfLocator_Full required for PDF reading-position locator",
@@ -126,6 +135,7 @@ public enum BookFormat {
       double y0 = bbox.get(1);
       row.setNormalizedY((int) Math.round(Math.max(0, Math.min(1000, y0))));
       row.setEpubLocator(null);
+      persistReadingPositionLocatorJson(row, objectMapper, locator);
     }
   },
   EPUB {
@@ -167,15 +177,27 @@ public enum BookFormat {
     }
 
     @Override
-    public void writeLegacyColumns(BookUserLastReadPosition row, BookLastReadPositionRequest req) {
+    public void writeLegacyColumns(
+        BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper) {
       row.setEpubLocator(req.getEpubLocator());
       row.setPageIndex(null);
       row.setNormalizedY(null);
+      String raw = trimToNull(req.getEpubLocator());
+      int hash = raw.indexOf('#');
+      String hrefPart = hash < 0 ? raw : raw.substring(0, hash);
+      String fragPart = hash < 0 ? null : raw.substring(hash + 1);
+      fragPart = trimToNull(fragPart);
+      if (fragPart != null && fragPart.startsWith("#")) {
+        fragPart = fragPart.substring(1);
+        fragPart = trimToNull(fragPart);
+      }
+      persistReadingPositionLocatorJson(
+          row, objectMapper, new EpubLocator(trimToNull(hrefPart), fragPart));
     }
 
     @Override
     public void writeLegacyColumnsFromLocator(
-        BookUserLastReadPosition row, ContentLocator locator) {
+        BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper) {
       if (!(locator instanceof EpubLocator epub)) {
         throw new ApiException(
             "EpubLocator_Full required for EPUB reading-position locator",
@@ -197,6 +219,7 @@ public enum BookFormat {
       row.setEpubLocator(href + (frag == null ? "" : "#" + frag));
       row.setPageIndex(null);
       row.setNormalizedY(null);
+      persistReadingPositionLocatorJson(row, objectMapper, new EpubLocator(href, frag));
     }
   };
 
@@ -212,10 +235,10 @@ public enum BookFormat {
   public abstract String bookFileExtension();
 
   public abstract void writeLegacyColumns(
-      BookUserLastReadPosition row, BookLastReadPositionRequest req);
+      BookUserLastReadPosition row, BookLastReadPositionRequest req, ObjectMapper objectMapper);
 
   public abstract void writeLegacyColumnsFromLocator(
-      BookUserLastReadPosition row, ContentLocator locator);
+      BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper);
 
   public static BookFormat forLocator(ContentLocator locator) {
     return switch (locator) {
@@ -295,6 +318,18 @@ public enum BookFormat {
     }
     String t = s.trim();
     return t.isEmpty() ? null : t;
+  }
+
+  private static void persistReadingPositionLocatorJson(
+      BookUserLastReadPosition row, ObjectMapper objectMapper, ContentLocator locator) {
+    try {
+      row.setReadingPositionLocatorJson(objectMapper.writeValueAsString(locator));
+    } catch (JsonProcessingException e) {
+      throw new ApiException(
+          "failed to serialize reading position locator",
+          ApiError.ErrorType.BINDING_ERROR,
+          "failed to serialize reading position locator");
+    }
   }
 
   private static Book persistNewEpubBook(BookService.PersistContext ctx) {

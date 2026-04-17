@@ -33,6 +33,10 @@ public class BookUserLastReadPosition extends EntityIdentifiedByIdOnly {
   @Column(name = "epub_locator", length = 512)
   private String epubLocator;
 
+  @JsonIgnore
+  @Column(name = "reading_position_locator_json", columnDefinition = "TEXT")
+  private String readingPositionLocatorJson;
+
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "selected_book_block_id")
   @Getter(AccessLevel.NONE)

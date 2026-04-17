@@ -26,6 +26,7 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
+import com.odde.doughnut.services.book.ContentLocator;
 import com.odde.doughnut.services.book.EpubLocator;
 import com.odde.doughnut.services.book.PdfLocator;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -1208,7 +1209,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void persistsPdfReadingPositionFromPdfLocator() throws UnexpectedNoAccessRightException {
+    void persistsPdfReadingPositionFromPdfLocator() throws Exception {
       Notebook nb = notebookWithBook();
       BookLastReadPositionRequest req = new BookLastReadPositionRequest();
       req.setLocator(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null));
@@ -1221,6 +1222,9 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(stored.getPageIndex(), equalTo(3));
       assertThat(stored.getNormalizedY(), equalTo(420));
       assertThat(stored.getEpubLocator(), nullValue());
+      ContentLocator fromJson =
+          objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(fromJson, equalTo(req.getLocator()));
     }
 
     @Test
@@ -1240,10 +1244,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(stored.getEpubLocator(), equalTo("OEBPS/chapter2.xhtml#section-beta-two"));
       assertThat(stored.getPageIndex(), nullValue());
       assertThat(stored.getNormalizedY(), nullValue());
+      ContentLocator fromJson =
+          objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(fromJson, equalTo(req.getLocator()));
     }
 
     @Test
-    void pdfLocatorOverridesConflictingLegacyFields() throws UnexpectedNoAccessRightException {
+    void pdfLocatorOverridesConflictingLegacyFields() throws Exception {
       Notebook nb = notebookWithBook();
       BookLastReadPositionRequest req = new BookLastReadPositionRequest();
       req.setPageIndex(1);
@@ -1259,13 +1266,16 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(stored.getPageIndex(), equalTo(3));
       assertThat(stored.getNormalizedY(), equalTo(420));
       assertThat(stored.getEpubLocator(), nullValue());
+      ContentLocator fromJson =
+          objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(fromJson, equalTo(req.getLocator()));
     }
   }
 
   @Nested
   class GetReadingPosition {
     @Test
-    void returnsSavedSnapshotAfterPatch() throws UnexpectedNoAccessRightException {
+    void returnsSavedSnapshotAfterPatch() throws Exception {
       Notebook nb = notebookWithBook();
       controller.patchReadingPosition(nb, lastReadBody(3, 420));
 
@@ -1275,6 +1285,15 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(res.getBody(), notNullValue());
       assertThat(res.getBody().getPageIndex(), equalTo(3));
       assertThat(res.getBody().getNormalizedY(), equalTo(420));
+
+      var row =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      ContentLocator fromJson =
+          objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(
+          fromJson, equalTo(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null)));
     }
 
     @Test
@@ -1315,7 +1334,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void returnsSavedEpubLocatorAfterPatch() throws UnexpectedNoAccessRightException {
+    void returnsSavedEpubLocatorAfterPatch() throws Exception {
       Notebook nb = notebookWithBook();
       controller.patchReadingPosition(
           nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
@@ -1327,6 +1346,14 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(res.getBody().getEpubLocator(), equalTo("OEBPS/chapter2.xhtml#section-beta-two"));
       assertThat(res.getBody().getPageIndex(), nullValue());
       assertThat(res.getBody().getNormalizedY(), nullValue());
+
+      var row =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      ContentLocator fromJson =
+          objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
     }
 
     @Test

@@ -319,13 +319,13 @@ public class BookService {
     entityPersister.flush();
   }
 
-  private static void applyReadingPositionFields(
+  private void applyReadingPositionFields(
       BookUserLastReadPosition row, BookLastReadPositionRequest request) {
     if (request.getLocator() != null) {
       BookFormat.forLocator(request.getLocator())
-          .writeLegacyColumnsFromLocator(row, request.getLocator());
+          .writeLegacyColumnsFromLocator(row, request.getLocator(), objectMapper);
     } else {
-      BookFormat.forReadingPositionPayload(request).writeLegacyColumns(row, request);
+      BookFormat.forReadingPositionPayload(request).writeLegacyColumns(row, request, objectMapper);
     }
   }
 
