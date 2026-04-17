@@ -18,6 +18,8 @@ import checker from 'vite-plugin-checker'
 const isTest = process.env.VITEST !== undefined
 
 const config = defineConfig({
+  // pdf.js uses `new Worker(src, { type: 'module' })`; match that in dev and build.
+  worker: { format: 'es' },
   resolve: {
     tsconfigPaths: true,
     alias: [
