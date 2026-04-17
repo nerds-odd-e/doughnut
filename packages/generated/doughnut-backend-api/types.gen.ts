@@ -761,6 +761,7 @@ export type BookUserLastReadPosition = {
     id: number;
     pageIndex?: number;
     normalizedY?: number;
+    epubLocator?: string;
     selectedBookBlockId?: number;
 };
 

@@ -4903,6 +4903,8 @@ components:
         normalizedY:
           type: integer
           format: int32
+        epubLocator:
+          type: string
         selectedBookBlockId:
           type: integer
           format: int32

@@ -24,11 +24,14 @@ public class BookUserLastReadPosition extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Book book;
 
-  @Column(name = "page_index", nullable = false)
-  private int pageIndex;
+  @Column(name = "page_index")
+  private Integer pageIndex;
 
-  @Column(name = "normalized_y", nullable = false)
-  private int normalizedY;
+  @Column(name = "normalized_y")
+  private Integer normalizedY;
+
+  @Column(name = "epub_locator", length = 512)
+  private String epubLocator;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "selected_book_block_id")

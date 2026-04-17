@@ -52,7 +52,7 @@ The key assertions: after the reader persists the position, leaving and returnin
 
 ---
 
-## Sub-phase 6.1 — Structure: Persist `epub_locator` on the reading-position row
+## Sub-phase 6.1 — Structure: Persist `epub_locator` on the reading-position row (done)
 
 **Type:** Structure (no observable behavior change; PDF round-trip unchanged)
 
