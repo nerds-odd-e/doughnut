@@ -293,17 +293,13 @@ describe("BookReadingPage", () => {
         .id(101)
         .depth(0)
         .title("Parent Section")
-        .contentLocators([
-          makeMe.pageBbox.withNormalizedBbox(0, [48, 72, 564, 200]),
-        ])
+        .contentLocators([makeMe.pdfLocator.withBbox(0, [48, 72, 564, 200])])
         .please(),
       makeMe.aBookBlock
         .id(102)
         .depth(1)
         .title("Child Section")
-        .contentLocators([
-          makeMe.pageBbox.withNormalizedBbox(0, [48, 200, 564, 400]),
-        ])
+        .contentLocators([makeMe.pdfLocator.withBbox(0, [48, 200, 564, 400])])
         .please(),
     ]
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
@@ -641,20 +637,12 @@ describe("BookReadingPage", () => {
         pdf.vm as unknown as {
           $: {
             exposed: {
-              isLastContentBottomVisible?: () => boolean
-              isLocatorBottomVisible?: () => boolean
+              isLocatorBottomVisible: () => boolean
             }
           }
         }
       ).$.exposed
-      if (typeof exposed.isLastContentBottomVisible === "function") {
-        vi.spyOn(exposed, "isLastContentBottomVisible").mockReturnValue(
-          returnValue
-        )
-      }
-      if (typeof exposed.isLocatorBottomVisible === "function") {
-        vi.spyOn(exposed, "isLocatorBottomVisible").mockReturnValue(returnValue)
-      }
+      vi.spyOn(exposed, "isLocatorBottomVisible").mockReturnValue(returnValue)
     }
 
     function mockReadingPanelAnchorTopPx(
@@ -891,7 +879,7 @@ describe("BookReadingPage", () => {
           },
         ])
       )
-      const section2ContentBbox = makeMe.pageBbox.withNormalizedBbox(
+      const section2ContentBbox = makeMe.pdfLocator.withBbox(
         0,
         [48, 72, 564, 200]
       )
@@ -904,10 +892,16 @@ describe("BookReadingPage", () => {
                 contentLocatorsForIndex: (i) =>
                   i === 1
                     ? [
-                        makeMe.bookReading.topMathsLikePreorderFirstBboxAt(1),
+                        makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(
+                          1
+                        ),
                         section2ContentBbox,
                       ]
-                    : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+                    : [
+                        makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(
+                          i
+                        ),
+                      ],
               })
             )
             .please()
@@ -968,7 +962,7 @@ describe("BookReadingPage", () => {
           },
         ])
       )
-      const section2ContentBbox = makeMe.pageBbox.withNormalizedBbox(
+      const section2ContentBbox = makeMe.pdfLocator.withBbox(
         0,
         [48, 72, 564, 200]
       )
@@ -981,10 +975,16 @@ describe("BookReadingPage", () => {
                 contentLocatorsForIndex: (i) =>
                   i === 1
                     ? [
-                        makeMe.bookReading.topMathsLikePreorderFirstBboxAt(1),
+                        makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(
+                          1
+                        ),
                         section2ContentBbox,
                       ]
-                    : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+                    : [
+                        makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(
+                          i
+                        ),
+                      ],
               })
             )
             .please()
@@ -1168,17 +1168,14 @@ describe("BookReadingPage", () => {
     })
 
     describe("geometry-gated panel (last PDF content locator)", () => {
-      const contentBbox = makeMe.pageBbox.withNormalizedBbox(
-        0,
-        [10, 700, 500, 750]
-      )
+      const contentBbox = makeMe.pdfLocator.withBbox(0, [10, 700, 500, 750])
 
       function stubGetBookWithFirstBlockHavingBbox() {
         const blocks = makeMe.bookReading.topMathsLikeBlockRows({
           contentLocatorsForIndex: (i) =>
             i === 0
-              ? [makeMe.pageBbox.pageIndexOnly(0), contentBbox]
-              : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+              ? [makeMe.pdfLocator.pageIndexOnly(0), contentBbox]
+              : [makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(i)],
         })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
@@ -1239,15 +1236,15 @@ describe("BookReadingPage", () => {
       }
 
       function stubGetBookWithFirstBlockHavingCrossPageBbox() {
-        const crossPageContentBbox = makeMe.pageBbox.withNormalizedBbox(
+        const crossPageContentBbox = makeMe.pdfLocator.withBbox(
           1,
           [10, 100, 500, 150]
         )
         const blocks = makeMe.bookReading.topMathsLikeBlockRows({
           contentLocatorsForIndex: (i) =>
             i === 0
-              ? [makeMe.pageBbox.pageIndexOnly(0), crossPageContentBbox]
-              : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+              ? [makeMe.pdfLocator.pageIndexOnly(0), crossPageContentBbox]
+              : [makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(i)],
         })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
@@ -1581,7 +1578,7 @@ describe("BookReadingPage", () => {
           .topMathsLikeFlatBlocks()
           .map((b, i) =>
             i === 0
-              ? { ...b, contentLocators: [makeMe.pageBbox.pageIndexOnly(0)] }
+              ? { ...b, contentLocators: [makeMe.pdfLocator.pageIndexOnly(0)] }
               : b
           )
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
@@ -1984,20 +1981,20 @@ describe("BookReadingPage", () => {
         // Section 2 anchor: page 0, bbox [48,72,564,200]; Section 3 anchor: page 0, bbox [48,520,564,756]
         // To propose Section 3 as current, viewport.top must exceed Section 2's y1=200 so block 102 is
         // no longer visible, leaving block 103 as the first visible.
-        const section2ContentBbox = makeMe.pageBbox.withNormalizedBbox(
+        const section2ContentBbox = makeMe.pdfLocator.withBbox(
           0,
           [48, 200, 564, 500]
         )
         const blocks = makeMe.bookReading.topMathsLikeBlockRows({
           contentLocatorsForIndex: (i) =>
             i === 0
-              ? [makeMe.pageBbox.pageIndexOnly(0), contentBbox]
+              ? [makeMe.pdfLocator.pageIndexOnly(0), contentBbox]
               : i === 1
                 ? [
-                    makeMe.pageBbox.withNormalizedBbox(0, [48, 72, 564, 200]),
+                    makeMe.pdfLocator.withBbox(0, [48, 72, 564, 200]),
                     section2ContentBbox,
                   ]
-                : [makeMe.bookReading.topMathsLikePreorderFirstBboxAt(i)],
+                : [makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(i)],
         })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(

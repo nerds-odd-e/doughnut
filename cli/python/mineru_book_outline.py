@@ -159,7 +159,7 @@ def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dic
     """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order.
 
     The heading record is stored as contentBlocks[0] (the structural title block whose raw
-    data becomes allBboxes[0] on the server after attach). Layout nodes do not carry a
+    data becomes contentLocators[0] on the server after attach). Layout nodes do not carry a
     separate navigation field beyond title, children, and contentBlocks.
     """
     roots: list[dict[str, Any]] = []

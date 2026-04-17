@@ -6,12 +6,9 @@ import {
   TOP_MATHS_LIKE_BLOCK_IDS,
   topMathsLikeBlockRows,
   topMathsLikeFlatBlocks,
-  topMathsLikePreorderFirstBboxAt,
+  topMathsLikePreorderFirstLocatorAt,
 } from './bookReadingTopMathsLike'
-import {
-  pageBboxPageIndexOnly,
-  pageBboxWithNormalizedBbox,
-} from './pageBboxFull'
+import { pdfLocatorPageIndexOnly, pdfLocatorWithBbox } from './pdfLocatorFull'
 import AnsweredQuestionBuilder from './AnsweredQuestionBuilder'
 import AssessmentAttemptBuilder from './AssessmentAttemptBuilder'
 import AssessmentQuestionInstanceBuilder from './AssessmentQuestionInstanceBuilder'
@@ -129,16 +126,16 @@ class MakeMe {
     return new BookBlockFullBuilder()
   }
 
-  static readonly pageBbox = {
-    pageIndexOnly: pageBboxPageIndexOnly,
-    withNormalizedBbox: pageBboxWithNormalizedBbox,
+  static readonly pdfLocator = {
+    pageIndexOnly: pdfLocatorPageIndexOnly,
+    withBbox: pdfLocatorWithBbox,
   }
 
   static readonly bookReading = {
     TOP_MATHS_LIKE_BLOCK_IDS,
     topMathsLikeBlockRows,
     topMathsLikeFlatBlocks,
-    topMathsLikePreorderFirstBboxAt,
+    topMathsLikePreorderFirstLocatorAt,
   }
 
   static get bazaarNotebooks(): BazaarNotebooksBuilder {

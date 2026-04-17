@@ -354,7 +354,6 @@ const {
   selectedBlockId,
   currentBlockId,
   hasRecordedDisposition: bookReading.hasRecordedDisposition,
-  viewerRef: pdfViewerRef,
   pdfViewerRef,
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
   snapHoldMs: SNAP_HOLD_MS,

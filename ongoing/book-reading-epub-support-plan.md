@@ -214,30 +214,34 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **Out of scope (deferred to Phase 8):** EPUB-specific content-aware panel anchoring, no-direct-content auto-mark, and any EPUB UI for skimmed/skipped.
 
-## Phase 8: EPUB direct-content boundaries and no-direct-content automation (planned)
-
-**Executable sub-phase plan:** see [book-reading-epub-phase-8-sub-phases.md](book-reading-epub-phase-8-sub-phases.md). That plan folds a domain-model generalization into Phase 8: `PageBbox` becomes a discriminated `ContentLocator` (PDF and EPUB variants) and `allBboxes` becomes `contentLocators`, so derived rules like `hasDirectContent` and the block-start / last-direct-content locators are one format-agnostic concept instead of parallel format-specific fields. The scope bullets below describe the end state; ordering and stop-safety live in the sub-phases plan.
+## Phase 8: EPUB direct-content boundaries and no-direct-content automation (done)
 
 **Why here:** `BookContentBlock` rows are already persisted from Phase 2 and `BookBlockDirectContentPredicate` is already correct on the backend. This phase resolves those content boundaries in the live DOM for panel geometry and auto-mark behavior, and at the same time collapses PDF- and EPUB-specific content-location concepts onto one shared model.
 
 **Behavior:**
 - *Pre:* EPUB is open and the book has blocks with and without direct content.
 - *Trigger:* User reads forward through the book, including blocks that have no direct content.
-- *Post:* No-direct-content blocks are auto-marked, and the Reading Control Panel uses EPUB-aware content boundaries for anchoring rather than the Phase 7 bottom-docked fallback.
+- *Post:* No-direct-content blocks are auto-marked, and the Reading Control Panel anchors below the last direct-content locator instead of the Phase 7 bottom-docked fallback. EPUB also supports Skim / Skip dispositions alongside Read.
 
-**User value after this phase:** "EPUB reading progress behaves intelligently, including the blocks that are only structure."
+**User value after this phase:** "EPUB reading progress behaves intelligently, including the blocks that are only structure, and supports Skim / Skip like PDF."
 
-**Scope:**
+**Scope (shipped):**
+
+*Backend:*
+- Generalized `PageBbox` + `allBboxes` and `epubStartHref` into a discriminated `ContentLocator` (`PdfLocator` + `EpubLocator` variants) exposed as `BookBlock.contentLocators` on `GET …/book`. Derived rules like `hasDirectContent := contentLocators.length > 1` and block-start / last-direct-content locators are now format-agnostic.
+- EPUB extraction emits `EpubLocator` entries for each `BookContentBlock` that `contributesDirectContent` alongside the anchor entry.
 
 *Frontend/viewer:*
-- Resolve EPUB direct-content boundaries in the live DOM: map each `BookBlock`'s content range to elements/ranges using the locator data from Phase 4 and the `BookContentBlock` import data from Phase 2.
-- Upgrade the Reading Control Panel from bottom-docked fallback to content-aware geometry where possible (same product rule as PDF: panel anchors below the last direct-content bottom when it's above the obstruction zone).
-- Add no-direct-content auto-marking using the shared reading-order rule, fed by EPUB-specific boundary detection.
-- Remove the Phase 7 bottom-docked interim behavior where the content-aware path now applies.
+- Unified viewer contract `BookReaderViewerRef` (`displayLocator`, `resolveLocatorRect`, `isLocatorBottomVisible`, `readingPanelAnchorTopPx`) implemented by both `PdfBookViewer` and `EpubBookViewer`. PDF-only geometry (snap-back, zoom, stored-position scroll) stays on a PDF sub-interface.
+- `EpubBookViewer` resolves EPUB locators to the section iframe's DOM element by spine href + `#fragment`, returning rects in the rendition host's coordinate space so the panel-anchor consumer code is identical to PDF.
+- `BookReadingEpubView` anchors `ReadingControlPanel` below the last direct-content locator via the unified API, falling back to bottom-dock only when the locator cannot be resolved, and wires Skim / Skip through the same mark-and-advance path as Read.
+- Auto-mark-no-direct-content-predecessor is a shared composable (`useAutoMarkNoDirectContentPredecessor`) driven by `contentLocators.length === 1`; both `BookReadingContent` (PDF) and `BookReadingEpubView` (EPUB) install it.
+- `useBookReadingSnapBack` reads `block.contentLocators[last]` through the viewer's `readingPanelAnchorTopPx(locator, obstructionPx)` — no PDF-only panel-anchor reads remain.
 
-**Testing:**
-- E2E: representative no-direct-content auto-mark scenario for EPUB.
-- Keep this focused on EPUB-specific progress behavior rather than re-testing the whole reading stack.
+**Testing (shipped):**
+- Backend controller tests cover `contentLocators` shape for both PDF (anchor + direct entries from `BookContentBlock` rawData) and EPUB (anchor + per-direct-content-block `EpubLocator` on the minimal fixture, including `#fragment` carry-through).
+- Frontend unit tests cover the shared auto-mark composable and the PDF / EPUB locator helpers.
+- E2E `epub_book.feature` scenarios prove "structural-only predecessor auto-marks on entry", "Reading Control Panel anchors below direct content for the selected block", and "Skim advances the selection". PDF `reading_record.feature` + `book_browsing.feature` remain green unchanged.
 
 ## Phase 9: Attach an EPUB from the CLI with no preprocessing (done)
 
@@ -291,5 +295,5 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | 5 | Scroll EPUB and see current block | Viewport-to-block mapping without PDF bbox geometry | Done |
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Done |
 | 7 | Mark EPUB block as read | Reusing reading-record UI and state without over-coupling to PDF | Done |
-| 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |
+| 8 | Intelligent EPUB direct-content progress; EPUB Skim / Skip | DOM-based boundary resolution and content-aware panel geometry | Done |
 | 9 | CLI EPUB attach | Raw upload transport only; Vitest CLI coverage, no CLI EPUB E2E | Done |

@@ -7,27 +7,27 @@ import com.odde.doughnut.entities.BookContentBlock;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class BookBlockContentBboxes {
+public final class BookBlockPdfContentLocators {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private BookBlockContentBboxes() {}
+  private BookBlockPdfContentLocators() {}
 
-  public static List<PageBbox> allBboxes(List<BookContentBlock> orderedBlocks) {
+  public static List<ContentLocator> pdfContentLocators(List<BookContentBlock> orderedBlocks) {
     if (orderedBlocks == null || orderedBlocks.isEmpty()) {
       return List.of();
     }
-    List<PageBbox> out = new ArrayList<>();
-    PageBbox anchorItem = fromRaw(orderedBlocks.getFirst().getRawData(), null);
-    if (anchorItem != null) {
-      out.add(anchorItem);
+    List<ContentLocator> out = new ArrayList<>();
+    PdfLocator anchor = pdfLocatorFromRaw(orderedBlocks.getFirst().getRawData(), null);
+    if (anchor != null) {
+      out.add(anchor);
     }
     for (int i = 1; i < orderedBlocks.size(); i++) {
       BookContentBlock cb = orderedBlocks.get(i);
       if (!BookBlockDirectContentPredicate.contributesDirectContent(cb)) {
         continue;
       }
-      PageBbox item = fromRaw(cb.getRawData(), cb.getId());
+      PdfLocator item = pdfLocatorFromRaw(cb.getRawData(), cb.getId());
       if (item != null) {
         out.add(item);
       }
@@ -35,7 +35,7 @@ public final class BookBlockContentBboxes {
     return List.copyOf(out);
   }
 
-  private static PageBbox fromRaw(String rawData, Integer contentBlockId) {
+  private static PdfLocator pdfLocatorFromRaw(String rawData, Integer contentBlockId) {
     if (rawData == null || rawData.isBlank()) {
       return null;
     }
@@ -72,7 +72,7 @@ public final class BookBlockContentBboxes {
         return null;
       }
       String derivedTitle = contentBlockId != null ? derivedTitleFromRaw(n) : null;
-      return new PageBbox(pageIndex, List.copyOf(bbox), contentBlockId, derivedTitle);
+      return new PdfLocator(pageIndex, List.copyOf(bbox), contentBlockId, derivedTitle);
     } catch (Exception e) {
       return null;
     }

@@ -4,10 +4,7 @@ import {
   pdfLocatorsFromBlock,
 } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import type {
-  BookReaderViewerRef,
-  BookReadingPdfViewerRef,
-} from "@/composables/bookReaderViewerRef"
+import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type Ref, ref, watch } from "vue"
 
@@ -39,7 +36,6 @@ export function useBookReadingSnapBack(options: {
   selectedBlockId: Ref<number | null>
   currentBlockId: Readonly<Ref<number | null>>
   hasRecordedDisposition: (id: number) => boolean
-  viewerRef: Ref<BookReaderViewerRef | null>
   pdfViewerRef: Ref<BookReadingPdfViewerRef | null>
   obstructionPx: number
   snapHoldMs: number
@@ -49,7 +45,6 @@ export function useBookReadingSnapBack(options: {
     selectedBlockId,
     currentBlockId,
     hasRecordedDisposition,
-    viewerRef,
     pdfViewerRef,
     obstructionPx,
     snapHoldMs,
@@ -185,7 +180,7 @@ export function useBookReadingSnapBack(options: {
       target !== null ? lastDirectContentLocator(target) : null
     if (lastLocatorForGeometry === null) return
     const geometryVisible =
-      viewerRef.value?.isLocatorBottomVisible(
+      pdfViewerRef.value?.isLocatorBottomVisible(
         lastLocatorForGeometry,
         obstructionPx
       ) ?? false

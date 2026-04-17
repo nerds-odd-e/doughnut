@@ -555,18 +555,6 @@ function isLocatorBottomVisible(
   return rect.bottom < panelTop && rect.bottom > containerRect.top
 }
 
-function isLastContentBottomVisible(
-  target: BookNavigationTarget,
-  obstructionPx: number
-): boolean {
-  const locator = {
-    type: "pdf",
-    pageIndex: target.pageIndex,
-    bbox: target.bbox,
-  } as ContentLocatorFull
-  return isLocatorBottomVisible(locator, obstructionPx)
-}
-
 const READING_PANEL_ANCHOR_GAP_PX = 8
 
 /**
@@ -674,7 +662,6 @@ defineExpose({
   contentFitsFromBlockTop,
   zoomIn,
   zoomOut,
-  isLastContentBottomVisible,
   isLocatorBottomVisible,
   readingPanelAnchorTopPx,
 })

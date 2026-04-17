@@ -26,10 +26,8 @@ export function useAutoMarkNoDirectContentPredecessor(options: {
       const bIdx = rows.findIndex((r) => r.id === blockId)
       if (bIdx <= 0) return
       const predecessor = rows[bIdx - 1]!
-      const locs = predecessor.contentLocators
       if (
-        locs.length > 0 &&
-        locs.length <= 1 &&
+        predecessor.contentLocators.length === 1 &&
         !hasRecordedDisposition(predecessor.id)
       ) {
         await submitReadingDisposition(predecessor.id, "READ")

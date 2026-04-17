@@ -24,11 +24,9 @@ import com.odde.doughnut.entities.repositories.BookUserLastReadPositionRepositor
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.book.BookBlockContentBboxes;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.services.book.EpubLocator;
-import com.odde.doughnut.services.book.PageBbox;
 import com.odde.doughnut.services.book.PdfLocator;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
@@ -871,14 +869,13 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
-      List<PageBbox> expected = BookBlockContentBboxes.allBboxes(block.getContentBlocks());
-      assertThat(block.getContentLocators(), hasSize(expected.size()));
-      for (int i = 0; i < expected.size(); i++) {
-        assertThat(block.getContentLocators().get(i), instanceOf(PdfLocator.class));
-        PdfLocator loc = (PdfLocator) block.getContentLocators().get(i);
-        assertThat(loc.pageIndex(), equalTo(expected.get(i).pageIndex()));
-        assertThat(loc.bbox(), equalTo(expected.get(i).bbox()));
-      }
+      assertThat(block.getContentLocators(), hasSize(2));
+      PdfLocator anchor = (PdfLocator) block.getContentLocators().get(0);
+      assertThat(anchor.pageIndex(), equalTo(2));
+      assertThat(anchor.bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
+      PdfLocator body = (PdfLocator) block.getContentLocators().get(1);
+      assertThat(body.pageIndex(), equalTo(2));
+      assertThat(body.bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
     }
 
     @Test

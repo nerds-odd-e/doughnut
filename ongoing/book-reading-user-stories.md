@@ -119,9 +119,17 @@ And I mark that block as read in the Reading Control Panel
 Then I should see that block marked as read in the book layout
 And I should see the next block selected in the book layout
 
-### Sub-stories (to be added)
+### Skim or skip an EPUB block (shipped)
 
-- Skimmed / skipped dispositions for EPUB (pending Phase 8 content-aware anchoring).
-- Auto-mark blocks with no direct content on EPUB (pending Phase 8).
+Given an EPUB is open in the reader and a block with direct content is selected
+When I mark that block as skimmed (or skipped) in the Reading Control Panel
+Then I should see that block marked as skimmed (or skipped) in the book layout
+And I should see the next block selected in the book layout
+
+### Auto-mark a structural-only EPUB block on entering its successor (shipped)
+
+Given an EPUB block has no direct content and its successor does
+When I scroll (or click) into the successor block
+Then the structural-only predecessor is marked as read in the book layout
 
 ## User splits a book block further.
