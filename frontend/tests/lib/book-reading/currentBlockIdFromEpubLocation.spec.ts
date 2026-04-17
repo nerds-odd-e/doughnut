@@ -30,8 +30,8 @@ describe("currentBlockIdFromEpubLocation", () => {
 
   it("returns the last block in preorder when the same spine path appears with different fragments", () => {
     const blocks = [
-      row(1, epubLoc("OEBPS/chapter2.xhtml", "#part-one")),
-      row(2, epubLoc("OEBPS/chapter2.xhtml", "#section-beta")),
+      row(1, epubLoc("OEBPS/chapter2.xhtml", "part-one")),
+      row(2, epubLoc("OEBPS/chapter2.xhtml", "section-beta")),
     ]
     expect(currentBlockIdFromEpubLocation(blocks, "OEBPS/chapter2.xhtml")).toBe(
       2
@@ -54,9 +54,9 @@ describe("currentBlockIdFromEpubLocation", () => {
   it("prefers the last fragment match in preorder when the relocated href includes a fragment", () => {
     const blocks = [
       row(1, epubLoc("OEBPS/ch.xhtml")),
-      row(2, epubLoc("OEBPS/ch.xhtml", "#early")),
-      row(3, epubLoc("OEBPS/ch.xhtml", "#early")),
-      row(4, epubLoc("OEBPS/ch.xhtml", "#target")),
+      row(2, epubLoc("OEBPS/ch.xhtml", "early")),
+      row(3, epubLoc("OEBPS/ch.xhtml", "early")),
+      row(4, epubLoc("OEBPS/ch.xhtml", "target")),
     ]
     expect(
       currentBlockIdFromEpubLocation(blocks, "OEBPS/ch.xhtml#target")
@@ -65,8 +65,8 @@ describe("currentBlockIdFromEpubLocation", () => {
 
   it("falls back to last path match when the relocated fragment does not match any block", () => {
     const blocks = [
-      row(1, epubLoc("OEBPS/ch.xhtml", "#a")),
-      row(2, epubLoc("OEBPS/ch.xhtml", "#b")),
+      row(1, epubLoc("OEBPS/ch.xhtml", "a")),
+      row(2, epubLoc("OEBPS/ch.xhtml", "b")),
     ]
     expect(
       currentBlockIdFromEpubLocation(blocks, "OEBPS/ch.xhtml#unknown")

@@ -130,6 +130,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase B2 — Frontend joins with a single `#` (structure)
 
+**Status: done**
+
 **Change:** Simplify `epubDisplayHref` to `frag.length === 0 ? href : `${href}#${frag}`` (drop the tolerance branch we added earlier). Update test fixtures in `currentBlockIdFromEpubLocation.spec.ts` and any other EPUB spec that still builds fragments with `"#"` prefix. Verify `useAutoMarkNoDirectContentPredecessor.spec.ts` does not depend on the fragment form.
 
 **Files:** `frontend/src/lib/book-reading/asEpubLocator.ts`, relevant specs.

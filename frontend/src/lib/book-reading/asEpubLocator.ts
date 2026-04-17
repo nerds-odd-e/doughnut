@@ -19,8 +19,7 @@ export function asEpubLocator(
 export function epubDisplayHref(loc: EpubLocatorFull): string {
   const href = loc.href.trim()
   const frag = loc.fragment?.trim() ?? ""
-  if (frag.length === 0) return href
-  return frag.startsWith("#") ? href + frag : `${href}#${frag}`
+  return frag.length === 0 ? href : `${href}#${frag}`
 }
 
 export function blockStartEpubDisplayHref(
