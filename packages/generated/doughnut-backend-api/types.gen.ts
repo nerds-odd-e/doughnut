@@ -370,6 +370,7 @@ export type BookBlockFull = {
     depth: number;
     title: string;
     allBboxes: Array<PageBboxFull>;
+    contentLocators: Array<EpubLocatorFull | PdfLocatorFull>;
     contentBlocks: Array<BookContentBlockFull>;
     /**
      * EPUB-only block-start locator for layout navigation: spine XHTML path, optionally with #fragment for a subsection anchor. Null for PDF or when unavailable.
@@ -396,11 +397,37 @@ export type BookFull = {
     notebookId: string;
 };
 
+export type ContentLocatorFull = {
+    type: string;
+};
+
+export type EpubLocator = {
+    href: string;
+    fragment?: string;
+};
+
+export type EpubLocatorFull = Omit<ContentLocatorFull, 'type'> & {
+    href: string;
+    fragment?: string;
+    type: 'EpubLocator_Full';
+};
+
 export type PageBboxFull = {
     pageIndex: number;
     bbox: Array<number>;
     contentBlockId?: number;
     derivedTitle?: string;
+};
+
+export type PdfLocator = {
+    pageIndex: number;
+    bbox: Array<number>;
+};
+
+export type PdfLocatorFull = Omit<ContentLocatorFull, 'type'> & {
+    pageIndex: number;
+    bbox: Array<number>;
+    type: 'PdfLocator_Full';
 };
 
 export type AttachBookLayoutNodeRequestFull = {

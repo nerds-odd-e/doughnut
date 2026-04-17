@@ -26,6 +26,7 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
+import com.odde.doughnut.services.book.PdfLocator;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import jakarta.validation.Validation;
@@ -825,6 +826,54 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(block.getAllBboxes(), hasSize(2));
       assertThat(block.getAllBboxes().getFirst().bbox(), equalTo(List.of(1.0, 2.0, 100.0, 15.0)));
       assertThat(block.getAllBboxes().get(1).bbox(), equalTo(List.of(10.0, 20.0, 300.0, 400.0)));
+    }
+
+    @Test
+    void contentLocatorsForPdfMatchAllBboxes() throws Exception {
+      Notebook nb = myNotebook();
+      Map<String, Object> bodyItem = new LinkedHashMap<>();
+      bodyItem.put("type", "text");
+      bodyItem.put("text", "Body paragraph");
+      bodyItem.put("page_idx", 2);
+      bodyItem.put("bbox", new ArrayList<>(List.of(10.0, 20.0, 300.0, 400.0)));
+      AttachBookLayoutNodeRequest n = new AttachBookLayoutNodeRequest();
+      n.setTitle("Section With Bbox");
+      n.setContentBlocks(
+          new ArrayList<>(
+              List.of(
+                  headingBlock("Section With Bbox", 1, 2, List.of(1.0, 2.0, 100.0, 15.0)),
+                  bodyItem)));
+      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      makeMe.entityPersister.flushAndClear();
+
+      BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
+      assertThat(block.getAllBboxes(), hasSize(2));
+      assertThat(block.getContentLocators(), hasSize(2));
+      for (int i = 0; i < 2; i++) {
+        assertThat(block.getContentLocators().get(i), instanceOf(PdfLocator.class));
+        PdfLocator loc = (PdfLocator) block.getContentLocators().get(i);
+        assertThat(loc.pageIndex(), equalTo(block.getAllBboxes().get(i).pageIndex()));
+        assertThat(loc.bbox(), equalTo(block.getAllBboxes().get(i).bbox()));
+      }
+    }
+
+    @Test
+    void fullViewJsonHasEmptyContentLocatorsForEveryEpubBlock() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = readFixtureEpubValidMinimal();
+      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
+      makeMe.entityPersister.flushAndClear();
+
+      Book detail = controller.getBook(nb);
+      String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
+      JsonNode tree = objectMapper.readTree(json);
+      JsonNode blocks = tree.get("blocks");
+      assertThat(blocks.isArray(), equalTo(true));
+      for (JsonNode b : blocks) {
+        JsonNode locs = b.get("contentLocators");
+        assertThat(locs.isArray(), equalTo(true));
+        assertThat(locs.size(), equalTo(0));
+      }
     }
   }
 

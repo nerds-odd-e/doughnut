@@ -8,7 +8,7 @@ const panelId = "book-reading-book-layout-panel-test"
 function blockStub(
   p: Pick<BookBlockFull, "id" | "depth" | "title">
 ): BookBlockFull {
-  return { ...p, allBboxes: [], contentBlocks: [] }
+  return { ...p, allBboxes: [], contentLocators: [], contentBlocks: [] }
 }
 
 function mountLayout(
