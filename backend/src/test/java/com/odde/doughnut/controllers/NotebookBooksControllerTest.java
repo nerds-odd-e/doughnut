@@ -40,14 +40,19 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -70,6 +75,8 @@ class NotebookBooksControllerTest extends ControllerTestBase {
   @Autowired BookContentBlockRepository bookContentBlockRepository;
   @Autowired BookStorage bookStorage;
   @Autowired ObjectMapper objectMapper;
+  @Autowired DataSource dataSource;
+  @Autowired JdbcTemplate jdbcTemplate;
 
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -1384,6 +1391,63 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       Notebook nb = notebookWithBook();
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
+    }
+  }
+
+  @Nested
+  class BackfillReadingPositionLocatorJson {
+    @Test
+    void migrationSqlRepairsPdfRowAfterJsonCleared() throws Exception {
+      Notebook nb = notebookWithBook();
+      controller.patchReadingPosition(nb, lastReadBody(3, 420));
+      int bookId = bookOf(nb).getId();
+      jdbcTemplate.update(
+          "UPDATE book_user_last_read_position SET reading_position_locator_json = NULL WHERE"
+              + " book_id = ?",
+          bookId);
+
+      var populator = new ResourceDatabasePopulator();
+      populator.addScript(
+          new ClassPathResource(
+              "db/migration/V300000145__backfill_reading_position_locator_json.sql"));
+      DatabasePopulatorUtils.execute(populator, dataSource);
+
+      var row =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
+              .orElseThrow();
+      ContentLocator fromJson =
+          objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(
+          fromJson, equalTo(new PdfLocator(3, List.of(0.0, 420.0, 100.0, 600.0), null, null)));
+    }
+
+    @Test
+    void migrationSqlRepairsEpubRowAfterJsonCleared() throws Exception {
+      Notebook nb = myNotebook();
+      byte[] epubBytes = readFixtureEpubValidMinimal();
+      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
+      controller.patchReadingPosition(
+          nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
+      int bookId = bookOf(nb).getId();
+      jdbcTemplate.update(
+          "UPDATE book_user_last_read_position SET reading_position_locator_json = NULL WHERE"
+              + " book_id = ?",
+          bookId);
+
+      var populator = new ResourceDatabasePopulator();
+      populator.addScript(
+          new ClassPathResource(
+              "db/migration/V300000145__backfill_reading_position_locator_json.sql"));
+      DatabasePopulatorUtils.execute(populator, dataSource);
+
+      var row =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
+              .orElseThrow();
+      ContentLocator fromJson =
+          objectMapper.readValue(row.getReadingPositionLocatorJson(), ContentLocator.class);
+      assertThat(fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
     }
   }
 

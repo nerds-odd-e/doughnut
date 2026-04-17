@@ -331,6 +331,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase F4 — Backfill existing rows into the JSON column (migration)
 
+**Status: done**
+
 **Change:** Flyway migration that populates `reading_position_locator_json` for every existing row where it is still `NULL`, by constructing either an EPUB locator (`{type: 'EpubLocator_Full', href, fragment}` — split on `#` if needed) or a PDF locator from legacy columns. Use SQL JSON functions (MySQL `JSON_OBJECT`) or a one-shot Java migration if JSON building in SQL is awkward.
 
 **Files:** Flyway SQL (new).
