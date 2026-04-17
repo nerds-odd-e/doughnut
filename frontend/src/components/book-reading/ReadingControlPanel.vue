@@ -21,22 +21,24 @@
         >
           Read
         </button>
-        <button
-          type="button"
-          data-testid="book-reading-mark-as-skimmed"
-          class="daisy-btn daisy-btn-outline daisy-btn-sm"
-          @click="emit('markAsSkimmed')"
-        >
-          Skim
-        </button>
-        <button
-          type="button"
-          data-testid="book-reading-mark-as-skipped"
-          class="daisy-btn daisy-btn-outline daisy-btn-sm"
-          @click="emit('markAsSkipped')"
-        >
-          Skip
-        </button>
+        <template v-if="showSkimAndSkip">
+          <button
+            type="button"
+            data-testid="book-reading-mark-as-skimmed"
+            class="daisy-btn daisy-btn-outline daisy-btn-sm"
+            @click="emit('markAsSkimmed')"
+          >
+            Skim
+          </button>
+          <button
+            type="button"
+            data-testid="book-reading-mark-as-skipped"
+            class="daisy-btn daisy-btn-outline daisy-btn-sm"
+            @click="emit('markAsSkipped')"
+          >
+            Skip
+          </button>
+        </template>
       </div>
     </CalloutCard>
   </div>
@@ -51,8 +53,9 @@ const props = withDefaults(
     selectedBlockTitle: string
     snapAnimationKey?: number
     anchorTopPx?: number | null
+    showSkimAndSkip?: boolean
   }>(),
-  { snapAnimationKey: 0, anchorTopPx: null }
+  { snapAnimationKey: 0, anchorTopPx: null, showSkimAndSkip: true }
 )
 
 const panelPlacement = computed(() =>

@@ -205,9 +205,8 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 
 **Scope (shipped):**
 - `BookReadingEpubView.vue` uses the same `useNotebookBookReadingRecords(notebookId)` composable as the PDF view, calls `syncFromServer()` on mount, and feeds `bookReading.dispositionForBlock` straight into `BookReadingBookLayout`'s `dispositionForBlock` prop — no parallel records state or UI contract.
-- `ReadingControlPanel.vue` is reused as-is. EPUB drives it with `:anchor-top-px="null"` (bottom-docked) — the same component PDF uses, just without content-aware geometry. Phase 8 upgrades EPUB to anchored placement.
-- "Mark and advance": on a successful `submitReadingDisposition(blockId, status)`, the shared `nextBookBlockAfter(blocks, blockId)` helper (`frontend/src/lib/book-reading/nextBookBlockAfter.ts`) picks the successor; EPUB applies it by updating `selectedBlockId`, calling `epubViewerRef.displayEpubTarget(next.epubStartHref)`, and committing the current-block debouncer.
-- Skimmed and skipped dispositions are intentionally **not** wired in the EPUB panel: the disposition API supports them for PDF, but the EPUB UI currently surfaces only "mark as read". Adding them is a later decision once content-aware anchoring lands in Phase 8.
+- `ReadingControlPanel.vue` is reused. EPUB drives it with `:anchor-top-px="null"` (bottom-docked) and `:show-skim-and-skip="false"` so only the "Read" button is rendered; PDF keeps the full Read/Skim/Skip panel via the default. Phase 8 upgrades EPUB to anchored placement and decides whether to surface Skim/Skip.
+- "Mark and advance": on a successful `submitReadingDisposition(blockId, "READ")`, the shared `nextBookBlockAfter(blocks, blockId)` helper (`frontend/src/lib/book-reading/nextBookBlockAfter.ts`) picks the successor; EPUB applies it by updating `selectedBlockId`, calling `epubViewerRef.displayEpubTarget(next.epubStartHref)`, and committing the current-block debouncer.
 
 **Testing (shipped):**
 - `frontend/tests/lib/book-reading/nextBookBlockAfter.spec.ts` covers the shared helper (middle/last/missing/empty cases).

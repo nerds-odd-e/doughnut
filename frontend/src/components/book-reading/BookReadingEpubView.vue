@@ -43,9 +43,8 @@
         v-if="blockAwaitingConfirmation"
         :selected-block-title="blockAwaitingConfirmation.title"
         :anchor-top-px="null"
-        @mark-as-read="() => markBlockDisposition('READ')"
-        @mark-as-skimmed="() => markBlockDisposition('SKIMMED')"
-        @mark-as-skipped="() => markBlockDisposition('SKIPPED')"
+        :show-skim-and-skip="false"
+        @mark-as-read="markSelectedBlockAsRead"
       />
     </main>
   </BookReadingBookLayout>
@@ -62,7 +61,6 @@ import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurren
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
-import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -158,18 +156,21 @@ const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
   return props.book.blocks.find((b) => b.id === selId) ?? null
 })
 
-async function markBlockDisposition(status: BookBlockReadingDisposition) {
+async function applyBookBlockSelection(block: BookBlockFull) {
+  selectedBlockId.value = block.id
+  if (block.epubStartHref) {
+    await epubViewerRef.value?.displayEpubTarget(block.epubStartHref)
+  }
+  currentBlockIdDebouncer.commitNow(block.id)
+}
+
+async function markSelectedBlockAsRead() {
   const block = blockAwaitingConfirmation.value
   if (!block) return
-  const ok = await bookReading.submitReadingDisposition(block.id, status)
+  const ok = await bookReading.submitReadingDisposition(block.id, "READ")
   if (!ok) return
   const next = nextBookBlockAfter(props.book.blocks, block.id)
-  if (!next) return
-  selectedBlockId.value = next.id
-  if (next.epubStartHref) {
-    await epubViewerRef.value?.displayEpubTarget(next.epubStartHref)
-  }
-  currentBlockIdDebouncer.commitNow(next.id)
+  if (next) await applyBookBlockSelection(next)
 }
 
 function onEpubRelocated(payload: { href: string }) {
@@ -188,13 +189,7 @@ watch(selectedBlockId, () => {
 })
 
 async function onBookBlockClick(block: BookBlockFull) {
-  selectedBlockId.value = block.id
-  const href = block.epubStartHref
-  const viewer = epubViewerRef.value
-  if (href && viewer) {
-    await viewer.displayEpubTarget(href)
-  }
-  currentBlockIdDebouncer.commitNow(block.id)
+  await applyBookBlockSelection(block)
 }
 
 onMounted(async () => {
