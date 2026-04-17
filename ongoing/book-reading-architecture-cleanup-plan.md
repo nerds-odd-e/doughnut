@@ -303,6 +303,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase F2 — Frontend debouncer collapses to `propose(locator, sel?)` (structure)
 
+**Status: done**
+
 **Change:** Replace `propose(pageIndex, normalizedY, sel?)` and `proposeEpubLocator(epubLocator, sel?)` with a single `propose(locator: ContentLocatorFull, sel?: number)`. Both reader views construct the locator (PDF: `{ type: 'PdfLocator_Full', pageIndex, bbox, contentBlockId: null, derivedTitle: null }` or a dedicated reading-position shape, see F3; EPUB: `{ type: 'EpubLocator_Full', href, fragment }` from the live relocation). Update `useBookReadingCurrentBlock` to accept a `locator` proposer. Delete the discriminated-union body types.
 
 **Files:** `frontend/src/lib/book-reading/debounceLastReadPositionPatch.ts`, `frontend/tests/lib/book-reading/debounceLastReadPositionPatch.spec.ts`, `useBookReadingCurrentBlock`, both views.

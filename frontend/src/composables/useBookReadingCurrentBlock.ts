@@ -23,8 +23,9 @@ export function useBookReadingCurrentBlock(options: {
   notebookId: MaybeRefOrGetter<number>
   commitCurrentBlock: (id: number | null) => boolean
   /**
-   * Format-specific: receives the PATCH debouncer, returns the function to run when the
-   * reading position should be sent (viewport/relocate updates and when `currentBlockId` changes).
+   * Format-specific: receives the PATCH debouncer (single `propose(locator, selectedBookBlockId?)`),
+   * returns the function to run when the reading position should be sent (viewport/relocate updates
+   * and when `currentBlockId` changes).
    */
   proposeReadingPosition: (
     debouncer: LastReadPositionPatchDebouncer

@@ -4,6 +4,21 @@ import {
 } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
+function epubLoc(href: string, fragment?: string) {
+  return fragment === undefined
+    ? { type: "EpubLocator_Full" as const, href }
+    : { type: "EpubLocator_Full" as const, href, fragment }
+}
+
+function pdfLoc(pageIndex: number, normalizedY: number) {
+  const y = Math.max(0, Math.min(1000, normalizedY))
+  return {
+    type: "PdfLocator_Full" as const,
+    pageIndex,
+    bbox: [0, y, 0, y],
+  }
+}
+
 describe("createLastReadPositionPatchDebouncer", () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -27,64 +42,70 @@ describe("createLastReadPositionPatchDebouncer", () => {
   describe("EPUB branch", () => {
     it("debounces rapid epub proposes into one PATCH with the latest body", () => {
       const { d, sent } = setup()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml")
-      d.proposeEpubLocator("OEBPS/ch2.xhtml")
-      d.proposeEpubLocator("OEBPS/ch3.xhtml#sec")
+      d.propose(epubLoc("OEBPS/ch1.xhtml"))
+      d.propose(epubLoc("OEBPS/ch2.xhtml"))
+      d.propose(epubLoc("OEBPS/ch3.xhtml", "sec"))
       expect(sent).toEqual([])
       vi.advanceTimersByTime(100)
-      expect(sent).toEqual([{ epubLocator: "OEBPS/ch3.xhtml#sec" }])
+      expect(sent).toEqual([{ locator: epubLoc("OEBPS/ch3.xhtml", "sec") }])
     })
 
     it("includes selectedBookBlockId when supplied", () => {
       const { d, sent } = setup()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml#a", 42)
+      d.propose(epubLoc("OEBPS/ch1.xhtml", "a"), 42)
       vi.advanceTimersByTime(100)
       expect(sent).toEqual([
-        { epubLocator: "OEBPS/ch1.xhtml#a", selectedBookBlockId: 42 },
+        {
+          locator: epubLoc("OEBPS/ch1.xhtml", "a"),
+          selectedBookBlockId: 42,
+        },
       ])
     })
 
     it("dedupes the second identical epub propose after a successful send", async () => {
       const { d, sent } = setup()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml", 7)
+      d.propose(epubLoc("OEBPS/ch1.xhtml"), 7)
       vi.advanceTimersByTime(100)
       await Promise.resolve()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml", 7)
+      d.propose(epubLoc("OEBPS/ch1.xhtml"), 7)
       vi.advanceTimersByTime(100)
       expect(sent).toEqual([
-        { epubLocator: "OEBPS/ch1.xhtml", selectedBookBlockId: 7 },
+        {
+          locator: epubLoc("OEBPS/ch1.xhtml"),
+          selectedBookBlockId: 7,
+        },
       ])
     })
 
     it("treats different selectedBookBlockId as a distinct body", async () => {
       const { d, sent } = setup()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml", 1)
+      d.propose(epubLoc("OEBPS/ch1.xhtml"), 1)
       vi.advanceTimersByTime(100)
       await Promise.resolve()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml", 2)
+      d.propose(epubLoc("OEBPS/ch1.xhtml"), 2)
       vi.advanceTimersByTime(100)
       expect(sent).toEqual([
-        { epubLocator: "OEBPS/ch1.xhtml", selectedBookBlockId: 1 },
-        { epubLocator: "OEBPS/ch1.xhtml", selectedBookBlockId: 2 },
+        { locator: epubLoc("OEBPS/ch1.xhtml"), selectedBookBlockId: 1 },
+        { locator: epubLoc("OEBPS/ch1.xhtml"), selectedBookBlockId: 2 },
       ])
     })
 
     it("treats epub and pdf bodies as distinct (no dedupe across variants)", async () => {
       const { d, sent } = setup()
-      d.propose(1, 0.5)
+      d.propose(pdfLoc(1, 500))
       vi.advanceTimersByTime(100)
       await Promise.resolve()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml")
+      d.propose(epubLoc("OEBPS/ch1.xhtml"))
       vi.advanceTimersByTime(100)
       expect(sent).toEqual([
-        { pageIndex: 1, normalizedY: 0.5 },
-        { epubLocator: "OEBPS/ch1.xhtml" },
+        { locator: pdfLoc(1, 500) },
+        { locator: epubLoc("OEBPS/ch1.xhtml") },
       ])
     })
 
     it("cancel() drops a pending epub propose", () => {
       const { d, sent } = setup()
-      d.proposeEpubLocator("OEBPS/ch1.xhtml")
+      d.propose(epubLoc("OEBPS/ch1.xhtml"))
       d.cancel()
       vi.advanceTimersByTime(100)
       expect(sent).toEqual([])
@@ -104,19 +125,19 @@ describe("createLastReadPositionPatchDebouncer", () => {
         },
       })
 
-      d.proposeEpubLocator("OEBPS/ch1.xhtml")
+      d.propose(epubLoc("OEBPS/ch1.xhtml"))
       vi.advanceTimersByTime(100)
       await Promise.resolve()
       await Promise.resolve()
 
       shouldFail = false
-      d.proposeEpubLocator("OEBPS/ch2.xhtml")
+      d.propose(epubLoc("OEBPS/ch2.xhtml"))
       vi.advanceTimersByTime(100)
       await Promise.resolve()
 
       expect(sent).toEqual([
-        { epubLocator: "OEBPS/ch1.xhtml" },
-        { epubLocator: "OEBPS/ch2.xhtml" },
+        { locator: epubLoc("OEBPS/ch1.xhtml") },
+        { locator: epubLoc("OEBPS/ch2.xhtml") },
       ])
     })
   })
@@ -124,12 +145,15 @@ describe("createLastReadPositionPatchDebouncer", () => {
   describe("PDF branch (existing behavior)", () => {
     it("debounces rapid pdf proposes and sends the last", () => {
       const { d, sent } = setup()
-      d.propose(1, 0.1)
-      d.propose(1, 0.2)
-      d.propose(2, 0.3, 5)
+      d.propose(pdfLoc(1, 100))
+      d.propose(pdfLoc(1, 200))
+      d.propose(pdfLoc(2, 300), 5)
       vi.advanceTimersByTime(100)
       expect(sent).toEqual([
-        { pageIndex: 2, normalizedY: 0.3, selectedBookBlockId: 5 },
+        {
+          locator: pdfLoc(2, 300),
+          selectedBookBlockId: 5,
+        },
       ])
     })
   })

@@ -1,38 +1,56 @@
 import { debounce } from "es-toolkit"
+import type {
+  ContentLocatorFull,
+  EpubLocatorFull,
+  PdfLocatorFull,
+} from "@generated/doughnut-backend-api"
 
-export type LastReadPositionPdfBody = {
-  pageIndex: number
-  normalizedY: number
+export type LastReadPositionPatchBody = {
+  locator: ContentLocatorFull
   selectedBookBlockId?: number
 }
-
-export type LastReadPositionEpubBody = {
-  epubLocator: string
-  selectedBookBlockId?: number
-}
-
-export type LastReadPositionPatchBody =
-  | LastReadPositionPdfBody
-  | LastReadPositionEpubBody
 
 export type LastReadPositionPatchDebouncer = {
-  propose: (
-    pageIndex: number,
-    normalizedY: number,
-    selectedBookBlockId?: number
-  ) => void
-  proposeEpubLocator: (
-    epubLocator: string,
-    selectedBookBlockId?: number
-  ) => void
+  propose: (locator: ContentLocatorFull, selectedBookBlockId?: number) => void
   flush: () => void
   cancel: () => void
 }
 
-function isEpubBody(
-  body: LastReadPositionPatchBody
-): body is LastReadPositionEpubBody {
-  return "epubLocator" in body
+function sameLocator(a: ContentLocatorFull, b: ContentLocatorFull): boolean {
+  if (a.type !== b.type) {
+    return false
+  }
+  if (a.type === "EpubLocator_Full") {
+    const ea = a as EpubLocatorFull
+    const eb = b as EpubLocatorFull
+    const fa = ea.fragment?.trim() ?? ""
+    const fb = eb.fragment?.trim() ?? ""
+    return ea.href === eb.href && fa === fb
+  }
+  if (a.type === "PdfLocator_Full") {
+    const pa = a as PdfLocatorFull
+    const pb = b as PdfLocatorFull
+    if (pa.pageIndex !== pb.pageIndex) {
+      return false
+    }
+    if (pa.bbox.length !== pb.bbox.length) {
+      return false
+    }
+    for (let i = 0; i < pa.bbox.length; i++) {
+      if (pa.bbox[i] !== pb.bbox[i]) {
+        return false
+      }
+    }
+    return true
+  }
+  return false
+}
+
+function sameBody(a: LastReadPositionPatchBody, b: LastReadPositionPatchBody) {
+  if (a.selectedBookBlockId !== b.selectedBookBlockId) {
+    return false
+  }
+  return sameLocator(a.locator, b.locator)
 }
 
 export function createLastReadPositionPatchDebouncer(options: {
@@ -42,29 +60,8 @@ export function createLastReadPositionPatchDebouncer(options: {
   const { delayMs, patch } = options
   let lastSent: LastReadPositionPatchBody | null = null
 
-  function same(a: LastReadPositionPatchBody, b: LastReadPositionPatchBody) {
-    if (isEpubBody(a) !== isEpubBody(b)) {
-      return false
-    }
-    if (isEpubBody(a) && isEpubBody(b)) {
-      return (
-        a.epubLocator === b.epubLocator &&
-        a.selectedBookBlockId === b.selectedBookBlockId
-      )
-    }
-    const pdfA = a as LastReadPositionPdfBody
-    const pdfB = b as LastReadPositionPdfBody
-    if (
-      pdfA.pageIndex !== pdfB.pageIndex ||
-      pdfA.normalizedY !== pdfB.normalizedY
-    ) {
-      return false
-    }
-    return pdfA.selectedBookBlockId === pdfB.selectedBookBlockId
-  }
-
   const sendIfNeeded = (next: LastReadPositionPatchBody) => {
-    if (lastSent !== null && same(lastSent, next)) {
+    if (lastSent !== null && sameBody(lastSent, next)) {
       return
     }
     patch(next)
@@ -79,22 +76,11 @@ export function createLastReadPositionPatchDebouncer(options: {
   }, delayMs)
 
   return {
-    propose(
-      pageIndex: number,
-      normalizedY: number,
-      selectedBookBlockId?: number
-    ) {
-      const next: LastReadPositionPdfBody =
+    propose(locator: ContentLocatorFull, selectedBookBlockId?: number) {
+      const next: LastReadPositionPatchBody =
         selectedBookBlockId === undefined
-          ? { pageIndex, normalizedY }
-          : { pageIndex, normalizedY, selectedBookBlockId }
-      debounced(next)
-    },
-    proposeEpubLocator(epubLocator: string, selectedBookBlockId?: number) {
-      const next: LastReadPositionEpubBody =
-        selectedBookBlockId === undefined
-          ? { epubLocator }
-          : { epubLocator, selectedBookBlockId }
+          ? { locator }
+          : { locator, selectedBookBlockId }
       debounced(next)
     },
     flush() {

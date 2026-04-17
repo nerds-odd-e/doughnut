@@ -219,6 +219,7 @@ import type {
   BookBlockFull,
   BookFull,
   BookMutationResponseFull,
+  PdfLocatorFull,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -348,11 +349,13 @@ const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
       const last = lastReadingForPatch.value
       if (last === null) return
       const sel = selectedBlockId.value
-      debouncer.propose(
-        last.pageIndex,
-        last.normalizedY,
-        sel === null ? undefined : sel
-      )
+      const y = Math.max(0, Math.min(1000, last.normalizedY))
+      const locator: PdfLocatorFull = {
+        type: "PdfLocator_Full",
+        pageIndex: last.pageIndex,
+        bbox: [0, y, 0, y],
+      }
+      debouncer.propose(locator, sel === null ? undefined : sel)
     },
   })
 

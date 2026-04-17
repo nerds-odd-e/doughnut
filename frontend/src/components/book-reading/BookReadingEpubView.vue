@@ -65,7 +65,12 @@ import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
-import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
+import { splitEpubHref } from "@/lib/book-reading/epubHrefMatch"
+import type {
+  BookBlockFull,
+  BookFull,
+  EpubLocatorFull,
+} from "@generated/doughnut-backend-api"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type EpubViewerExposed = Pick<
@@ -106,10 +111,17 @@ const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
     commitCurrentBlock: () => true,
     flushLastReadPositionPatchOnUnmount: true,
     proposeReadingPosition: (debouncer) => () => {
-      const href = lastRelocateHref.value
-      if (href === null || href.length === 0) return
+      const raw = lastRelocateHref.value
+      if (raw === null || raw.length === 0) return
+      const { path, fragment } = splitEpubHref(raw.trim())
+      if (path.length === 0) return
+      const locator: EpubLocatorFull = {
+        type: "EpubLocator_Full",
+        href: path,
+        ...(fragment !== null ? { fragment } : {}),
+      }
       const sel = selectedBlockId.value
-      debouncer.proposeEpubLocator(href, sel === null ? undefined : sel)
+      debouncer.propose(locator, sel === null ? undefined : sel)
     },
   })
 
