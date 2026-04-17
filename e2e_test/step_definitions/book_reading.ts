@@ -171,53 +171,6 @@ Then(
 )
 
 Given(
-  'OpenAI returns the current book block depths as the layout suggestion for notebook {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (notebookTitle: string) => {
-    return testability()
-      .getInjectedNoteIdByTitle(notebookTitle)
-      .then((noteId) =>
-        cy.wrap(NoteController.showNote({ path: { note: noteId } }), {
-          log: false,
-        })
-      )
-      .then((showResponse) => {
-        const realm = unwrapData<NoteRealm>(showResponse)
-        const notebookId = realm.notebook?.id
-        expect(notebookId, 'head note must belong to a notebook').to.be.a(
-          'number'
-        )
-        return cy
-          .wrap(
-            NotebookBooksController.getBook({ path: { notebook: notebookId } }),
-            { log: false }
-          )
-          .then((bookResponse) => {
-            const book = unwrapData<BookFull>(bookResponse)
-            expect(book.blocks, 'book must have blocks').to.be.an('array')
-            const suggestion = {
-              blocks: book.blocks.map((b) => ({
-                id: b.id,
-                depth: b.depth,
-              })),
-            }
-            const reply = JSON.stringify(suggestion)
-            return cy.then(async () => {
-              await mock_services
-                .openAi()
-                .chatCompletion()
-                .requestMessageMatches({
-                  role: 'system',
-                  content: '.*You reorganize the outline nesting.*',
-                })
-                .stubJsonSchemaResponse(reply)
-            })
-          })
-      })
-  }
-)
-
-Given(
   'OpenAI returns a layout suggestion that indents block {string} for notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (blockTitle: string, notebookTitle: string) => {
@@ -369,16 +322,6 @@ When(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (markerText: string) => {
     return bookReadingPage().scrollEpubReaderUntilTextInViewport(markerText)
-  }
-)
-
-When(
-  'I scroll the PDF until the book block {string} is the current block in the book reader',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string) => {
-    return bookReadingPage().scrollPdfBookReaderToMakeBookBlockCurrent(
-      blockTitle
-    )
   }
 )
 
