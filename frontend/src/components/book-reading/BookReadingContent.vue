@@ -200,7 +200,6 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
-import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
@@ -209,6 +208,10 @@ import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockId
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import {
+  READING_PANEL_OBSTRUCTION_PX,
+  useReadingPanelAnchor,
+} from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
@@ -260,10 +263,6 @@ const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
-/** Vertical space (px) reserved at the bottom of the PDF main pane by ReadingControlPanel. */
-const READING_PANEL_OBSTRUCTION_PX = 80
-/** Fallback to bottom-docked panel if anchored top would leave too little main-pane height. */
-const MIN_READING_PANEL_RESERVE_PX = 88
 const SNAP_HOLD_MS = 500
 
 const props = withDefaults(
@@ -361,7 +360,6 @@ const lastReadingForPatch = computed(() => {
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
 const pdfPaneRef = ref<HTMLElement | null>(null)
-const readingPanelAnchorTopPx = ref<number | null>(null)
 
 const {
   snapAnimationKey,
@@ -381,6 +379,17 @@ const {
   snapHoldMs: SNAP_HOLD_MS,
 })
 
+const readingPanelBlockRef = computed(() =>
+  lastContentBottomVisible.value ? blockAwaitingConfirmation.value : null
+)
+
+const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
+  useReadingPanelAnchor({
+    viewerRef: pdfViewerRef,
+    blockRef: readingPanelBlockRef,
+    mainPaneRef: pdfPaneRef,
+  })
+
 useAutoMarkNoDirectContentPredecessor({
   bookBlocks,
   currentBlockId,
@@ -394,32 +403,6 @@ function commitCurrentBlockId(id: number | null): boolean {
     return false
   }
   return true
-}
-
-function updateReadingPanelAnchor() {
-  const mainEl = pdfPaneRef.value
-  const pdf = pdfViewerRef.value
-  const block = blockAwaitingConfirmation.value
-  if (!mainEl || !pdf || !block || !lastContentBottomVisible.value) {
-    readingPanelAnchorTopPx.value = null
-    return
-  }
-  const lastLocator = lastDirectContentLocator(block)
-  if (lastLocator === null) {
-    readingPanelAnchorTopPx.value = null
-    return
-  }
-  let top = pdf.readingPanelAnchorTopPx(
-    lastLocator,
-    READING_PANEL_OBSTRUCTION_PX
-  )
-  if (top !== null) {
-    const mainH = mainEl.getBoundingClientRect().height
-    if (mainH > 0 && top + MIN_READING_PANEL_RESERVE_PX > mainH - 8) {
-      top = null
-    }
-  }
-  readingPanelAnchorTopPx.value = top
 }
 
 const currentBlockLiveText = computed(() =>

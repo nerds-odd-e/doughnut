@@ -59,13 +59,13 @@ import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
+import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
 import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
-import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
@@ -81,8 +81,6 @@ type EpubViewerExposed = Pick<
 >
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
-const READING_PANEL_OBSTRUCTION_PX = 80
-const MIN_READING_PANEL_RESERVE_PX = 88
 const CURRENT_BLOCK_ID_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
@@ -102,7 +100,6 @@ const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const epubViewerRef = ref<EpubViewerExposed | null>(null)
 const epubMainPaneRef = ref<HTMLElement | null>(null)
-const readingPanelAnchorTopPx = ref<number | null>(null)
 
 const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
   delayMs: CURRENT_BLOCK_ID_DEBOUNCE_MS,
@@ -174,31 +171,12 @@ const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
   return props.book.blocks.find((b) => b.id === selId) ?? null
 })
 
-function updateReadingPanelAnchor() {
-  const mainEl = epubMainPaneRef.value
-  const viewer = epubViewerRef.value
-  const block = blockAwaitingConfirmation.value
-  if (!mainEl || !viewer || !block) {
-    readingPanelAnchorTopPx.value = null
-    return
-  }
-  const lastLocator = lastDirectContentLocator(block)
-  if (lastLocator === null) {
-    readingPanelAnchorTopPx.value = null
-    return
-  }
-  let top = viewer.readingPanelAnchorTopPx(
-    lastLocator,
-    READING_PANEL_OBSTRUCTION_PX
-  )
-  if (top !== null) {
-    const mainH = mainEl.getBoundingClientRect().height
-    if (mainH > 0 && top + MIN_READING_PANEL_RESERVE_PX > mainH - 8) {
-      top = null
-    }
-  }
-  readingPanelAnchorTopPx.value = top
-}
+const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
+  useReadingPanelAnchor({
+    viewerRef: epubViewerRef,
+    blockRef: blockAwaitingConfirmation,
+    mainPaneRef: epubMainPaneRef,
+  })
 
 async function applyBookBlockSelection(block: BookBlockFull) {
   selectedBlockId.value = block.id

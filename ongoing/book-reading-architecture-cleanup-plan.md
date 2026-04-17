@@ -146,6 +146,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase C1 — `useReadingPanelAnchor` composable (structure)
 
+**Status: done**
+
 **Change:** Create `frontend/src/composables/useReadingPanelAnchor.ts` exporting a composable that takes `{ viewerRef, blockRef, mainPaneRef, obstructionPx?, minReservePx? }` and returns `Ref<number | null>`. The composable encapsulates: resolve `lastDirectContentLocator(block)`, ask the viewer for `readingPanelAnchorTopPx`, clamp against `mainPane` height minus reserve. Default constants live inside the composable.
 
 Replace the duplicated `updateReadingPanelAnchor` functions in `BookReadingContent.vue` and `BookReadingEpubView.vue` with consumption of this composable. Both views stop declaring `READING_PANEL_OBSTRUCTION_PX` and `MIN_READING_PANEL_RESERVE_PX`.
