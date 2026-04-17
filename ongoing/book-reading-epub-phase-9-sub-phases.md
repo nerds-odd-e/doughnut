@@ -2,7 +2,7 @@
 
 **Parent plan:** [book-reading-epub-support-plan.md](book-reading-epub-support-plan.md) — Phase 9 "Attach an EPUB from the CLI with no preprocessing".
 
-**Goal of this plan:** break Phase 9 into small, each-a-complete-git-commit slices (~5 minutes of focused work each). Each slice either delivers externally observable CLI attach behavior or restructures the codebase specifically to enable the immediate next behavior slice — no speculative prep. Along the way, collapse the EPUB-vs-PDF duplication that is about to appear in the CLI attach path (upload helper, slash-command dispatcher, E2E page object) so the shared attach concept stays cohesive.
+**Goal of this plan:** break Phase 9 into small, each-a-complete-git-commit slices (~5 minutes of focused work each). Each slice either delivers externally observable CLI attach behavior or restructures the codebase specifically to enable the immediate next behavior slice — no speculative prep. Along the way, collapse the EPUB-vs-PDF duplication in the CLI attach path (upload helper, slash-command dispatcher) so the shared attach concept stays cohesive.
 
 ## Guiding principles for these sub-phases
 
@@ -10,7 +10,7 @@
 - **One behavior per behavior-slice; one enabling refactor per structure-slice.** Each structure slice is justified by the **next** behavior slice, not a later one.
 - **Cohesion over parallel stacks:** one upload helper, one `/attach` dispatcher, one CLI page-object attach helper — format is a parameter, not a duplicated module.
 - **Reuse server-side EPUB path:** no second extraction pipeline. The CLI just sends raw bytes with `format: "epub"` to the same `attach-book` endpoint the browser already drives (Phase 1–2).
-- **Observable tests first:** add tests from the CLI entry point (`InteractiveCliApp` via `renderInkWhenCommandLineReady`) for unit behavior; add one CLI E2E scenario for the end-to-end proof. Do not re-test the full EPUB browser matrix from the CLI side.
+- **Observable tests first:** add tests from the CLI entry point (`InteractiveCliApp` via `renderInkWhenCommandLineReady`) for unit behavior, including assertions on `attachNotebookBookFile` arguments for EPUB (`format`, `bookName`, resolved path). **No dedicated CLI EPUB Cypress scenario:** the browser EPUB stack stays covered by existing `epub_book.feature` (upload); duplicating install-PTY → browser for CLI attach was dropped as redundant. Do not re-test the full EPUB browser matrix from the CLI side.
 - **`@wip` for scenarios that outrun the code.** Keep the budget well under 5.
 
 ---
@@ -24,9 +24,8 @@ Today the CLI attach path is PDF-shaped end to end:
 | Upload helper in `doughnutBackendClient.ts` | `attachNotebookBookWithPdf(notebookId, metadata, pdfAbsolutePath)` hardcodes `application/pdf` Blob type | One helper that takes the absolute file path and derives `Content-Type` from `metadata.format` (`application/pdf` vs `application/epub+zip`) |
 | Slash-command entry in `notebookAttachSlashCommand.tsx` | `runNotebookAttachPdf(notebook, path)` rejects non-`.pdf`, runs MinerU unconditionally | `runNotebookAttach(notebook, path)` detects format by extension, dispatches to PDF branch (MinerU + layout) or EPUB branch (raw upload, no preprocessing) |
 | `CommandDoc` + spinner | Usage `"/attach <path to pdf>"`; spinner `"Attaching PDF…"` | Usage `"/attach <path to .pdf or .epub>"`; spinner `"Attaching book…"` |
-| CLI E2E page-object | `attachBookPdfToNotebookViaInteractiveCli(...)` (currently unused) | `attachBookToNotebookViaInteractiveCli({ fixtureFilename, notebookTitle })` usable for both formats |
 
-Nothing about the backend changes — `BookService.attachBook` and the `attach-book` controller are already format-aware from Phase 1. Phase 9 is pure CLI work plus one CLI E2E scenario.
+Nothing about the backend changes — `BookService.attachBook` and the `attach-book` controller are already format-aware from Phase 1. Phase 9 is pure CLI work; proof is **Vitest** through `InteractiveCliApp` (no dedicated CLI EPUB E2E).
 
 ---
 
@@ -42,7 +41,7 @@ Noted here so future work can pick them up; Phase 9 behavior does not need them:
 
 ## Sub-phases
 
-Numbering is **9.N** and is plan-only bookkeeping — commit messages, test names, and any permanent artifact are named by **capability** (e.g. `notebook_attach_book.feature`, `attachNotebookBookFile`), never by sub-phase number.
+Numbering is **9.N** and is plan-only bookkeeping — commit messages, test names, and any permanent artifact are named by **capability** (e.g. `InteractiveCliApp.useNotebook`, `attachNotebookBookFile`), never by sub-phase number.
 
 ### 9.1 — Structure: generalize the upload helper to carry any book file
 
@@ -81,43 +80,22 @@ Numbering is **9.N** and is plan-only bookkeeping — commit messages, test name
 
 **Tests:** extend the `notebook stage /attach` describe in `cli/tests/InteractiveCliApp.useNotebook.test.tsx`:
 - `attaches EPUB and shows structure excerpt from API book` — happy path: stub `attachNotebookBookFile` to return a book with `format: 'epub'` and a couple of EPUB blocks; assert the assistant shows `Attached "my-book" to this notebook.` and the block titles.
+- `EPUB attach calls attachNotebookBookFile with epub metadata and resolved path` — after `/attach` on an `.epub` file, assert the spy was called with `{ bookName, format: 'epub' }` and the resolved absolute path (wires the EPUB branch to the upload helper).
 - `EPUB attach does not invoke MinerU` — assert `runMineruOutlineSubprocess` is not called on `/attach foo.epub`.
 - `rejects attach when extension is neither .pdf nor .epub` — assert the `"Attach supports .pdf or .epub files."` error.
 - `rejects attach when EPUB path is missing` — symmetrical to the existing PDF missing-path case.
 
 Existing PDF tests remain green.
 
-### 9.4 — Structure: make the CLI E2E attach page-object helper format-agnostic
+### 9.4 — Dropped: CLI E2E attach page-object
 
-**Why now:** Needed by 9.5, which uses this helper for the EPUB E2E scenario. Keeping a PDF-named helper next to a new EPUB-named helper would immediately re-introduce duplication.
+**Status:** Not pursued. A format-agnostic `bookReadingCli` page object was considered for a Cypress scenario; the project **chose not to keep** a dedicated CLI EPUB E2E. No `e2e_test/start/pageObjects/cli/bookReadingCli.ts` in tree; PDF+CLI flows continue to use `notebookInteractiveCliSession` / existing steps as before.
 
-**Scope:**
-- In `e2e_test/start/pageObjects/cli/bookReadingCli.ts`, rename `attachBookPdfToNotebookViaInteractiveCli` → `attachBookToNotebookViaInteractiveCli`. Signature unchanged (`{ fixtureFilename, notebookTitle }`); body is already format-agnostic (it just sends `/attach <absolutePath>`).
-- Tweak the post-attach transcript assertion if needed so it does not rely on PDF-specific words (e.g. use the `Attached "…" to this notebook.` substring that both branches print, rather than `"Attaching PDF"` specific matches).
-- This helper has no callers today, so there is no cascade. (If a caller lands between now and this slice, follow it through.)
+### 9.5 — Dropped: CLI attach-EPUB Cypress E2E
 
-**Tests:** no test changes. Dead-code-to-reused-code rename.
+**Status:** Intentionally **not** implemented. Rationale: `InteractiveCliApp.useNotebook` Vitest coverage already exercises the CLI attach UX and EPUB branch; asserting `attachNotebookBookFile` closes the main gap versus a full E2E. Browser EPUB reading remains proven by `e2e_test/features/book_reading/epub_book.feature` (upload path). A separate `@bundleCliE2eInstall` scenario would mostly duplicate those concerns at higher cost.
 
-### 9.5 — Behavior (E2E): CLI attach-EPUB end-to-end proof
-
-**Why now:** The single end-to-end proof Phase 9 calls out ("CLI attach to browser-visible result, without duplicating the full frontend EPUB matrix").
-
-**Scope:**
-- New capability-named CLI E2E feature `e2e_test/features/cli/notebook_attach_book.feature` with one EPUB scenario:
-  - Preconditions: logged-in user, an empty notebook.
-  - Trigger: open the installed interactive CLI, run `/use <notebook>` then `/attach <absolute path to e2e_test/fixtures/book_reading/epub_valid_minimal.epub>`.
-  - Postconditions: past CLI assistant messages contain `Attached "epub_valid_minimal" to this notebook.` and the chapter structure excerpt (at least `Part One` and `Chapter Alpha` from the existing fixture). Then, in the browser, opening the reading view for the notebook shows the EPUB with book name `epub_valid_minimal` (reuse the existing step from `epub_book.feature`).
-- Wire the step that already exists (`attach the EPUB file …` + interactive CLI steps) via `bookReadingCli().attachBookToNotebookViaInteractiveCli(...)`. Add thin glue step definitions in `e2e_test/step_definitions/` only if a capability-named step isn't already available.
-- Use the `@bundleCliE2eInstall` tag and run through the installed binary path, matching how the existing active CLI E2E scenario works.
-- If backend/CLI wiring still needs minutes to settle, tag the new scenario `@wip` in the first commit and remove the tag in a follow-up commit once it goes green; stay under the 5 `@wip` project budget.
-
-**Tests:** this slice *is* the test. Run targeted:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/notebook_attach_book.feature
-```
-
-Leave other CLI / EPUB E2E features untouched.
+If the team later wants proof on the **installed** binary specifically, reintroduce a thin Cypress spec rather than expanding the EPUB matrix.
 
 ### 9.6 — Cleanup, plan refresh, and interim-wording removal
 
@@ -128,9 +106,8 @@ Leave other CLI / EPUB E2E features untouched.
 - Audit `ongoing/` docs:
   - `book-reading-epub-support-plan.md`: flip Phase 9 to a "Scope (shipped)" section mirroring how Phases 4–7 document it; update the phase summary table.
   - `book-reading-user-stories.md`: add a new sub-story under "Story: EPUB book" for "Attach EPUB from the CLI" (and mark it shipped).
-- Remove any `@wip` tag that's still on the 9.5 scenario.
 
-**Tests:** no new tests; all prior CLI PDF scenarios / units and the new EPUB CLI scenario must be green.
+**Tests:** no new tests; all prior CLI PDF E2E scenarios, EPUB browser E2E, and EPUB CLI Vitest cases must be green.
 
 ---
 
@@ -142,8 +119,8 @@ Leave other CLI / EPUB E2E features untouched.
 | Route EPUB attach as raw file upload with `format: "epub"` only | 9.1, 9.3 |
 | Keep PDF CLI behavior unchanged | 9.1, 9.2 (rename-only refactors), 9.6 (audit) |
 | Reuse the same backend EPUB attach path already exercised by the frontend upload | 9.3 (no new backend call) |
-| CLI test for `.epub` routing and multipart payload shape | 9.3 (unit tests through `InteractiveCliApp`) |
-| One representative end-to-end proof from CLI attach to browser-visible result | 9.5 |
+| CLI test for `.epub` routing and multipart payload shape | 9.3 (unit tests through `InteractiveCliApp`, including `attachNotebookBookFile` args) |
+| Optional E2E: CLI attach → browser (installed binary) | **Dropped** — see §9.5; browser EPUB covered by `epub_book.feature` |
 
 ## Stop-safety check per sub-phase
 
@@ -152,14 +129,14 @@ Leave other CLI / EPUB E2E features untouched.
 | 9.1 | PDF attach unchanged; upload helper renamed and format-aware under the hood |
 | 9.2 | PDF attach unchanged; `/attach` has a dispatcher; unknown extension gives a clearer error; EPUB still rejected |
 | 9.3 | **PDF attach unchanged; `/attach file.epub` now works in the CLI** (covered by unit tests) |
-| 9.4 | E2E page-object renamed; no E2E caller yet; behavior unchanged |
-| 9.5 | **One CLI E2E scenario proves the full CLI → backend → browser EPUB path** |
+| 9.4 | *Skipped* (no CLI EPUB E2E page object) |
+| 9.5 | *Skipped* (Vitest + existing browser EPUB E2E instead of dedicated CLI EPUB Cypress) |
 | 9.6 | Cleanup only: wording, user-stories, plan doc |
 
 ## Commit checklist per sub-phase
 
 1. Tests written or extended alongside the slice, failing for the right reason before the code change (for behavior slices; structure slices must keep existing tests green).
-2. `pnpm cli:test` for any `cli/` change; the single targeted `cypress run --spec` for the CLI E2E feature touched in 9.5 (not the full suite).
+2. `pnpm cli:test` for any `cli/` change; targeted Cypress `--spec` only when a CLI **browser** scenario is added or changed (not required for Phase 9 EPUB attach if only Vitest changes).
 3. Lint / format: `pnpm lint:all` (scope to touched files is usually enough).
 4. Commit with a capability-focused message (e.g. "CLI `/attach` supports .epub", "Unify CLI book attach upload helper"); no "Phase 9.x" in the message body.
 5. Push; let CD deploy before starting the next sub-phase.

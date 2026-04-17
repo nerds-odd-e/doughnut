@@ -10,7 +10,7 @@ vi.mock('../src/commands/mineruOutline/mineruOutlineSubprocess.js', () => ({
 
 import * as fs from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve as pathResolve } from 'node:path'
 import { NotebookController } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import * as doughnutBackendClient from '../src/backendApi/doughnutBackendClient.js'
@@ -216,6 +216,27 @@ describe('InteractiveCliApp /use notebook integration', () => {
       await waitForFramesToInclude('Attached "my-book" to this notebook.')
       await waitForFramesToInclude('Chapter Alpha')
       await waitForFramesToInclude('Chapter Beta')
+    })
+
+    test('EPUB attach calls attachNotebookBookFile with epub metadata and resolved path', async () => {
+      attachBookSpy.mockResolvedValue(
+        makeMe.aBook.id(102).bookName('my-book').format('epub').do()
+      )
+
+      const { stdin, waitForFramesToInclude } =
+        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+
+      stdin.write('/use Top Maths\r')
+      await waitForFramesToInclude('Active notebook: Top Maths')
+      stdin.write(`/attach ${attachEpubPath}\r`)
+      await waitForFramesToInclude('Attached "my-book" to this notebook.')
+
+      const expectedAbsPath = pathResolve(process.cwd(), attachEpubPath)
+      expect(attachBookSpy).toHaveBeenCalledWith(
+        expect.any(Number),
+        { bookName: 'my-book', format: 'epub' },
+        expectedAbsPath
+      )
     })
 
     test('EPUB attach does not invoke MinerU', async () => {

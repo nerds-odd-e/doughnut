@@ -257,8 +257,8 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 - Reuse the same backend **EPUB** attach path already exercised by the frontend upload.
 
 **Testing:**
-- CLI test for `.epub` routing and multipart payload shape.
-- One representative end-to-end proof from CLI attach to browser-visible result, without duplicating the full frontend EPUB matrix.
+- **Vitest (CLI):** `cli/tests/InteractiveCliApp.useNotebook.test.tsx` — EPUB happy path and structure excerpt, extension and missing-file errors, no MinerU on EPUB, and an assertion that `attachNotebookBookFile` is invoked with `{ bookName, format: 'epub' }` and the resolved file path.
+- **No dedicated Cypress scenario for CLI EPUB attach:** browser EPUB reading and structure are already covered by `e2e_test/features/book_reading/epub_book.feature` (upload path). Sub-phase detail and rationale: [book-reading-epub-phase-9-sub-phases.md](book-reading-epub-phase-9-sub-phases.md) §9.4–9.5.
 
 ## Cross-cutting concerns
 
@@ -292,4 +292,4 @@ These are the places where EPUB should reuse the existing book-reading flow inst
 | 6 | Resume EPUB reading position | Locator persistence, reading-position schema extension | Done |
 | 7 | Mark EPUB block as read | Reusing reading-record UI and state without over-coupling to PDF | Done |
 | 8 | Intelligent EPUB direct-content progress | DOM-based boundary resolution and content-aware panel geometry | Medium |
-| 9 | CLI EPUB attach | Raw upload transport only, no second extraction path | Small-medium |
+| 9 | CLI EPUB attach | Raw upload transport only; Vitest CLI coverage, no CLI EPUB E2E | Small |
