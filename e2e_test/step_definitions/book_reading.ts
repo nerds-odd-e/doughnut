@@ -326,6 +326,14 @@ When(
 )
 
 When(
+  'I scroll the EPUB reader host to the top',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().scrollEpubReaderHostToTop()
+  }
+)
+
+When(
   'I scroll the PDF book reader until the Reading Control Panel shows for {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (selectedBlockTitle: string) => {

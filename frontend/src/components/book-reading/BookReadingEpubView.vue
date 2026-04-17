@@ -61,10 +61,7 @@ import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.v
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
-import {
-  asEpubLocator,
-  blockStartEpubDisplayHref,
-} from "@/lib/book-reading/asEpubLocator"
+import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
@@ -128,7 +125,8 @@ const selectedBlockId = ref<number | null>(props.initialSelectedBlockId)
  * When the page restores a saved EPUB position, the tiny continuous-scrolled viewport may
  * already render the target section so epub.js never fires a fresh `relocated` event for it.
  * Seed the current-block debouncer from the saved locator so the layout reflects where we
- * just resumed before any scroll-driven event arrives.
+ * just resumed before any scroll-driven event arrives. Fall back to the saved selection if
+ * the href cannot be mapped.
  */
 if (props.initialEpubLocator !== null && props.initialEpubLocator.length > 0) {
   const seededId = currentBlockIdFromEpubLocation(
@@ -137,7 +135,11 @@ if (props.initialEpubLocator !== null && props.initialEpubLocator.length > 0) {
   )
   if (seededId !== null) {
     currentBlockIdDebouncer.commitNow(seededId)
+  } else if (props.initialSelectedBlockId !== null) {
+    currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
   }
+} else if (props.initialSelectedBlockId !== null) {
+  currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
 }
 
 const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
@@ -148,18 +150,6 @@ const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
       body,
     }),
 })
-
-function proposeEpubPositionForBlockId(blockId: number | null) {
-  if (blockId === null) return
-  const block = props.book.blocks.find((b) => b.id === blockId)
-  const href = block ? blockStartEpubDisplayHref(block) : null
-  if (!href) return
-  const sel = selectedBlockId.value
-  lastReadPositionPatchDebouncer.proposeEpubLocator(
-    href,
-    sel === null ? undefined : sel
-  )
-}
 
 const bookLayoutOpened = ref(false)
 const windowWidth = ref(
@@ -237,16 +227,16 @@ function onEpubRelocated(payload: { href: string }) {
   if (id !== null) {
     currentBlockIdDebouncer.propose(id)
   }
+  const sel = selectedBlockId.value
+  lastReadPositionPatchDebouncer.proposeEpubLocator(
+    payload.href,
+    sel === null ? undefined : sel
+  )
   updateReadingPanelAnchor()
 }
 
-watch(currentBlockId, (id) => {
-  proposeEpubPositionForBlockId(id)
-})
-
 watch(selectedBlockId, () => {
   readingPanelAnchorTopPx.value = null
-  proposeEpubPositionForBlockId(currentBlockId.value)
 })
 
 async function onBookBlockClick(block: BookBlockFull) {

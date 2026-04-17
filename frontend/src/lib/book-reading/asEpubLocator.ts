@@ -7,10 +7,13 @@ import type {
 export function asEpubLocator(
   loc: ContentLocatorFull | undefined
 ): EpubLocatorFull | null {
-  if (!loc || loc.type !== "EpubLocator_Full") {
+  if (!loc) {
     return null
   }
-  return loc as EpubLocatorFull
+  if (loc.type === "EpubLocator_Full" || loc.type === "epub") {
+    return loc as EpubLocatorFull
+  }
+  return null
 }
 
 export function epubDisplayHref(loc: EpubLocatorFull): string {

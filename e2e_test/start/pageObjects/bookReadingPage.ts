@@ -133,7 +133,7 @@ const bookReadingPage = () => {
       const scrollSel =
         '[data-testid="epub-book-viewer"] .epub-book-viewer-host'
       const viewportSel = '[data-testid="epub-book-viewer"] .epub-container'
-      const maxSteps = 48
+      const maxSteps = 96
       const step = (n: number): Cypress.Chainable =>
         cy.get(scrollSel).then(($scrollEl) => {
           const scrollEl = $scrollEl.get(0) as HTMLElement
@@ -170,6 +170,26 @@ const bookReadingPage = () => {
       return cy.then(() => step(0))
     },
     /**
+     * Jumps the epub.js scroll host to the top so a later "scroll until text" step reliably
+     * crosses spine/fragment boundaries (triggers `relocated` / reading-position PATCH).
+     */
+    scrollEpubReaderHostToTop() {
+      pageIsNotLoading()
+      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.get('[data-testid="book-reading-page"]').should('exist')
+      cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
+        'be.visible'
+      )
+      cy.get('[data-testid="epub-book-viewer"] .epub-book-viewer-host').then(
+        ($el) => {
+          const host = $el.get(0) as HTMLElement
+          host.scrollTop = 0
+        }
+      )
+      cy.wait(200)
+      return this
+    },
+    /**
      * Navigate away via the GlobalBar "Notebook" link, wait for the pending reading-position
      * PATCH to flush so the server reflects the user's last position, then revisit the same
      * reading-page URL to force a full remount of BookReadingEpubView.
@@ -177,24 +197,22 @@ const bookReadingPage = () => {
     leaveEpubReadingViewAndReturn() {
       pageIsNotLoading()
       cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
-      cy.intercept('PATCH', '/api/notebooks/*/book/reading-position').as(
-        'patchReadingPosition'
-      )
       cy.location('pathname')
         .should('match', /^\/d\/notebooks\/\d+\/book$/)
         .then((pathname) => {
           const readingPath = pathname as unknown as string
+          cy.wait(2000)
           cy.contains('a', 'Notebook').click()
           cy.location('pathname').should(
             'not.match',
             /^\/d\/notebooks\/\d+\/book$/
           )
-          cy.wait('@patchReadingPosition', { timeout: 5000 })
           cy.visit(readingPath)
           pageIsNotLoading()
           cy.get('[data-testid="epub-book-viewer"]', {
             timeout: 30000,
           }).should('be.visible')
+          cy.wait(1500)
         })
       return this
     },

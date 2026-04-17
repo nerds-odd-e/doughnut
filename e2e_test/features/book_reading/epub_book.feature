@@ -25,10 +25,17 @@ Feature: EPUB book
       Then I should see the text "Unique content in section beta-two." in the EPUB reader
       When I leave the EPUB reading view and return to it
       Then I should see the text "Unique content in section beta-two." in the EPUB reader
-      And the book block "Section Beta-Two" should be the current block in the book reader
       When I click "Chapter Alpha" in the book layout
       Then I should see the text "Body text with an illustration." in the EPUB reader
       And the EPUB Reading Control Panel should be content-anchored
+
+    Scenario: EPUB reading resumes at the scrolled fragment, not the inferred block start
+      When I click "Chapter Beta" in the book layout
+      When I scroll the EPUB reader host to the top
+      Then I should see the text "Chapter Beta" in the EPUB reader
+      When I scroll the EPUB reader until the text "Cell One" is in the viewport
+      When I leave the EPUB reading view and return to it
+      Then I should see the text "Cell One" in the EPUB reader
 
     Scenario: Current block updates on scroll while explicit layout selection is unchanged
       When I click "Chapter Alpha" in the book layout

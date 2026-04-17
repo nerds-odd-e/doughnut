@@ -31,6 +31,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase P1 — EPUB resumes at the actual scroll fragment (behavior)
 
+**Status: done**
+
 **Why now:** Small, isolated, ships actual user value before any refactor. Currently `BookReadingEpubView.proposeEpubPositionForBlockId` stores the *block-start* href, not the user's live scroll location, so resume is always block-aligned. The relocation event already carries the real href.
 
 **Change:** Swap `blockStartEpubDisplayHref(block)` for the live `payload.href` that `onEpubRelocated` already receives. Propose the live href (plus current `selectedBlockId`) into `lastReadPositionPatchDebouncer.proposeEpubLocator`.
