@@ -84,6 +84,8 @@ These apply across all phases. They are fixed going into execution.
 
 ### Phase A3 — Delete `mergeBookMutationIntoFull` (structure)
 
+**Status: done**
+
 **Change:** Replace the two call sites (currently in `BookReadingContent.vue`; verify for any other) with a direct `{ ...prev, blocks: updatedBlocks }` merge since updated blocks are now wire-compatible with `BookFull.blocks`. Remove the helper and its spec. Remove the `EpubLocator` / `PdfLocator` (non-Full) type imports wherever they become dead.
 
 **Files:** `frontend/src/lib/book-reading/mergeBookMutationIntoFull.ts` (delete), `frontend/tests/lib/book-reading/mergeBookMutationIntoFull.spec.ts` (delete), call sites.

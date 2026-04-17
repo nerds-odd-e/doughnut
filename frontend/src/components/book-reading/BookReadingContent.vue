@@ -206,7 +206,6 @@ import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounc
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
-import { mergeBookMutationIntoFull } from "@/lib/book-reading/mergeBookMutationIntoFull"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
@@ -216,7 +215,11 @@ import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMark
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
+import type {
+  BookBlockFull,
+  BookFull,
+  BookMutationResponseFull,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -231,6 +234,27 @@ type ViewportPayload = {
 const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
+
+function bookFullAfterLayoutMutation(
+  previous: BookFull,
+  mutation: BookMutationResponseFull
+): BookFull {
+  const prevById = new Map(previous.blocks.map((b) => [b.id, b]))
+  const updatedBlocks = mutation.blocks.map((row) => {
+    const prev = prevById.get(row.id)
+    if (!prev) {
+      throw new Error(`book layout mutation: unknown block id ${row.id}`)
+    }
+    return {
+      ...prev,
+      id: row.id,
+      depth: row.depth,
+      title: row.title,
+      contentLocators: row.contentLocators ?? prev.contentLocators,
+    }
+  })
+  return { ...previous, ...mutation, blocks: updatedBlocks }
+}
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
@@ -529,7 +553,7 @@ async function onBlockIndent(block: BookBlockFull) {
       })
     )
     if (!error && data) {
-      emit("update:book", mergeBookMutationIntoFull(props.book, data))
+      emit("update:book", bookFullAfterLayoutMutation(props.book, data))
       selectedBlockId.value = block.id
     }
   } finally {
@@ -550,7 +574,7 @@ async function onBlockOutdent(block: BookBlockFull) {
       })
     )
     if (!error && data) {
-      emit("update:book", mergeBookMutationIntoFull(props.book, data))
+      emit("update:book", bookFullAfterLayoutMutation(props.book, data))
       selectedBlockId.value = block.id
     }
   } finally {
@@ -572,7 +596,7 @@ async function onBlockCancel(block: BookBlockFull) {
       path: { notebook: notebookId.value, bookBlock: block.id },
     })
     if (!error && data) {
-      const merged = mergeBookMutationIntoFull(props.book, data)
+      const merged = bookFullAfterLayoutMutation(props.book, data)
       if (
         predecessorId !== null &&
         merged.blocks.some((b) => b.id === predecessorId)
@@ -594,7 +618,7 @@ async function onBlockCancel(block: BookBlockFull) {
 async function onConfirmAiReorganize() {
   const mutation = await confirmAiReorganize()
   if (mutation) {
-    emit("update:book", mergeBookMutationIntoFull(props.book, mutation))
+    emit("update:book", bookFullAfterLayoutMutation(props.book, mutation))
   }
 }
 
