@@ -57,16 +57,24 @@ import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
+import {
+  asEpubLocator,
+  blockStartEpubDisplayHref,
+} from "@/lib/book-reading/asEpubLocator"
 import { createCurrentBlockIdDebouncer } from "@/lib/book-reading/debounceCurrentBlockId"
 import { createLastReadPositionPatchDebouncer } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
-import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
+import type {
+  BookBlockFull,
+  BookFull,
+  EpubLocatorFull,
+} from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type EpubViewerExposed = {
-  displayEpubTarget: (href: string) => Promise<void>
+  displayLocator: (loc: EpubLocatorFull) => Promise<void>
 }
 
 const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
@@ -125,7 +133,7 @@ const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
 function proposeEpubPositionForBlockId(blockId: number | null) {
   if (blockId === null) return
   const block = props.book.blocks.find((b) => b.id === blockId)
-  const href = block?.epubStartHref
+  const href = block ? blockStartEpubDisplayHref(block) : null
   if (!href) return
   const sel = selectedBlockId.value
   lastReadPositionPatchDebouncer.proposeEpubLocator(
@@ -158,8 +166,9 @@ const blockAwaitingConfirmation = computed<BookBlockFull | null>(() => {
 
 async function applyBookBlockSelection(block: BookBlockFull) {
   selectedBlockId.value = block.id
-  if (block.epubStartHref) {
-    await epubViewerRef.value?.displayEpubTarget(block.epubStartHref)
+  const loc = asEpubLocator(block.contentLocators[0])
+  if (loc) {
+    await epubViewerRef.value?.displayLocator(loc)
   }
   currentBlockIdDebouncer.commitNow(block.id)
 }

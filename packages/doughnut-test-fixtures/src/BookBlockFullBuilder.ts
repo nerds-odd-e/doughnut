@@ -1,5 +1,6 @@
 import type {
   BookBlockFull,
+  EpubLocatorFull,
   PdfLocatorFull,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
@@ -33,7 +34,9 @@ class BookBlockFullBuilder extends Builder<BookBlockFull> {
     return this
   }
 
-  contentLocators(contentLocators: PdfLocatorFull[]): BookBlockFullBuilder {
+  contentLocators(
+    contentLocators: Array<EpubLocatorFull | PdfLocatorFull>
+  ): BookBlockFullBuilder {
     this.data.contentLocators = contentLocators
     return this
   }

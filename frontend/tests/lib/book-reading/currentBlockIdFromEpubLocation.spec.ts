@@ -1,23 +1,37 @@
+import type { BookBlockEpubLocationRow } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
+import type { EpubLocatorFull } from "@generated/doughnut-backend-api"
 import { describe, expect, it } from "vitest"
+
+function epubLoc(href: string, fragment?: string): EpubLocatorFull {
+  return {
+    type: "EpubLocator_Full",
+    href,
+    ...(fragment !== undefined ? { fragment } : {}),
+  }
+}
+
+function row(id: number, ...locs: EpubLocatorFull[]): BookBlockEpubLocationRow {
+  return { id, contentLocators: locs }
+}
 
 describe("currentBlockIdFromEpubLocation", () => {
   it("returns the block id when the relocated href exactly matches a single block path", () => {
-    const blocks = [{ id: 10, epubStartHref: "OEBPS/chapter1.xhtml" }]
+    const blocks = [row(10, epubLoc("OEBPS/chapter1.xhtml"))]
     expect(currentBlockIdFromEpubLocation(blocks, "OEBPS/chapter1.xhtml")).toBe(
       10
     )
   })
 
   it("matches epub.js manifest-relative href to stored package-root path", () => {
-    const blocks = [{ id: 10, epubStartHref: "OEBPS/chapter1.xhtml" }]
+    const blocks = [row(10, epubLoc("OEBPS/chapter1.xhtml"))]
     expect(currentBlockIdFromEpubLocation(blocks, "chapter1.xhtml")).toBe(10)
   })
 
   it("returns the last block in preorder when the same spine path appears with different fragments", () => {
     const blocks = [
-      { id: 1, epubStartHref: "OEBPS/chapter2.xhtml#part-one" },
-      { id: 2, epubStartHref: "OEBPS/chapter2.xhtml#section-beta" },
+      row(1, epubLoc("OEBPS/chapter2.xhtml", "#part-one")),
+      row(2, epubLoc("OEBPS/chapter2.xhtml", "#section-beta")),
     ]
     expect(currentBlockIdFromEpubLocation(blocks, "OEBPS/chapter2.xhtml")).toBe(
       2
@@ -25,24 +39,24 @@ describe("currentBlockIdFromEpubLocation", () => {
   })
 
   it("returns null when no block path matches", () => {
-    const blocks = [{ id: 1, epubStartHref: "OEBPS/a.xhtml" }]
+    const blocks = [row(1, epubLoc("OEBPS/a.xhtml"))]
     expect(currentBlockIdFromEpubLocation(blocks, "OEBPS/b.xhtml")).toBe(null)
   })
 
-  it("skips blocks without epubStartHref", () => {
-    const blocks = [
-      { id: 1, title: "x" },
-      { id: 2, epubStartHref: "OEBPS/only.xhtml" },
-    ] as Array<{ id: number; epubStartHref?: string; title?: string }>
+  it("skips blocks with no EPUB block-start locator", () => {
+    const blocks: BookBlockEpubLocationRow[] = [
+      { id: 1, contentLocators: [] },
+      row(2, epubLoc("OEBPS/only.xhtml")),
+    ]
     expect(currentBlockIdFromEpubLocation(blocks, "OEBPS/only.xhtml")).toBe(2)
   })
 
   it("prefers the last fragment match in preorder when the relocated href includes a fragment", () => {
     const blocks = [
-      { id: 1, epubStartHref: "OEBPS/ch.xhtml" },
-      { id: 2, epubStartHref: "OEBPS/ch.xhtml#early" },
-      { id: 3, epubStartHref: "OEBPS/ch.xhtml#early" },
-      { id: 4, epubStartHref: "OEBPS/ch.xhtml#target" },
+      row(1, epubLoc("OEBPS/ch.xhtml")),
+      row(2, epubLoc("OEBPS/ch.xhtml", "#early")),
+      row(3, epubLoc("OEBPS/ch.xhtml", "#early")),
+      row(4, epubLoc("OEBPS/ch.xhtml", "#target")),
     ]
     expect(
       currentBlockIdFromEpubLocation(blocks, "OEBPS/ch.xhtml#target")
@@ -51,8 +65,8 @@ describe("currentBlockIdFromEpubLocation", () => {
 
   it("falls back to last path match when the relocated fragment does not match any block", () => {
     const blocks = [
-      { id: 1, epubStartHref: "OEBPS/ch.xhtml#a" },
-      { id: 2, epubStartHref: "OEBPS/ch.xhtml#b" },
+      row(1, epubLoc("OEBPS/ch.xhtml", "#a")),
+      row(2, epubLoc("OEBPS/ch.xhtml", "#b")),
     ]
     expect(
       currentBlockIdFromEpubLocation(blocks, "OEBPS/ch.xhtml#unknown")
@@ -60,7 +74,7 @@ describe("currentBlockIdFromEpubLocation", () => {
   })
 
   it("returns null for empty href", () => {
-    const blocks = [{ id: 1, epubStartHref: "OEBPS/a.xhtml" }]
+    const blocks = [row(1, epubLoc("OEBPS/a.xhtml"))]
     expect(currentBlockIdFromEpubLocation(blocks, "")).toBe(null)
   })
 })

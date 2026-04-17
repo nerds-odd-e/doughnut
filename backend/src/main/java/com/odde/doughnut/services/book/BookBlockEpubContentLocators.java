@@ -35,17 +35,6 @@ public final class BookBlockEpubContentLocators {
     return List.copyOf(out);
   }
 
-  public static String epubStartHrefFromFirstContentBlock(List<BookContentBlock> orderedBlocks) {
-    if (orderedBlocks == null || orderedBlocks.isEmpty()) {
-      return null;
-    }
-    EpubLocator loc = epubLocatorFromRaw(orderedBlocks.getFirst().getRawData());
-    if (loc == null) {
-      return null;
-    }
-    return toEpubStartHrefString(loc);
-  }
-
   private static EpubLocator epubLocatorFromRaw(String rawData) {
     if (rawData == null || rawData.isBlank()) {
       return null;
@@ -70,12 +59,5 @@ public final class BookBlockEpubContentLocators {
     } catch (Exception e) {
       return null;
     }
-  }
-
-  private static String toEpubStartHrefString(EpubLocator loc) {
-    if (loc.fragment() == null || loc.fragment().isBlank()) {
-      return loc.href();
-    }
-    return loc.href() + loc.fragment();
   }
 }

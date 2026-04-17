@@ -12,7 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import type { BookFull } from "@generated/doughnut-backend-api"
+import { epubDisplayHref } from "@/lib/book-reading/asEpubLocator"
+import type { BookFull, EpubLocatorFull } from "@generated/doughnut-backend-api"
 import ePub, { type Book as EpubJsBook, type Rendition } from "epubjs"
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
@@ -48,8 +49,8 @@ const onRelocated = (location: { start?: { href?: string } }) =>
   emitIfHref(location.start?.href)
 const onDisplayed = (section: { href?: string }) => emitIfHref(section.href)
 
-async function displayEpubTarget(href: string) {
-  const h = href.trim()
+async function displayLocator(loc: EpubLocatorFull) {
+  const h = epubDisplayHref(loc).trim()
   if (!h || !rendition) {
     return
   }
@@ -57,7 +58,7 @@ async function displayEpubTarget(href: string) {
 }
 
 defineExpose({
-  displayEpubTarget,
+  displayLocator,
 })
 
 function destroyEpub() {

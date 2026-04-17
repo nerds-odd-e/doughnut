@@ -1,10 +1,10 @@
-/**
- * Minimal block shape for EPUB current-location mapping (OpenAPI `BookBlockFull` is compatible).
- */
-export type BookBlockEpubLocationRow = {
-  readonly id: number
-  readonly epubStartHref?: string
-}
+import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
+import type { BookBlockFull } from "@generated/doughnut-backend-api"
+
+export type BookBlockEpubLocationRow = Pick<
+  BookBlockFull,
+  "id" | "contentLocators"
+>
 
 /**
  * epub.js spine `href` is often manifest-relative (e.g. `chapter1.xhtml`) while our API stores
@@ -41,7 +41,7 @@ function splitEpubHref(href: string): {
  * Maps an epub.js spine location (`location.start.href`, optionally with `#fragment`)
  * to the owning `BookBlock.id`. `blocks` must be depth-first preorder (same order as the API).
  *
- * Rule: among blocks with a non-null `epubStartHref` whose path (before `#`) equals the
+ * Rule: among blocks with a resolvable EPUB start locator whose path (before `#`) equals the
  * relocated path, take the last in preorder. If the relocated href includes a fragment,
  * prefer the last in preorder whose stored fragment matches; if none match, fall back to
  * the last path-only match.
@@ -59,11 +59,12 @@ export function currentBlockIdFromEpubLocation(
   let lastFragmentMatchId: number | null = null
 
   for (const block of blocks) {
-    if (!block.epubStartHref) {
+    const displayHref = blockStartEpubDisplayHref(block)
+    if (!displayHref) {
       continue
     }
     const { path: blockPath, fragment: blockFragment } = splitEpubHref(
-      block.epubStartHref.trim()
+      displayHref.trim()
     )
     if (!epubSpinePathMatches(blockPath, relPath)) {
       continue

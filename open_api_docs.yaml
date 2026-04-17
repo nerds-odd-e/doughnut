@@ -4045,11 +4045,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BookContentBlock_Full"
-        epubStartHref:
-          type: string
-          description: "EPUB-only block-start locator for layout navigation: spine\
-            \ XHTML path, optionally with #fragment for a subsection anchor. Null\
-            \ for PDF or when unavailable."
       required:
       - contentBlocks
       - contentLocators

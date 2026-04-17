@@ -20,7 +20,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "book_block")
-@JsonPropertyOrder({"id", "depth", "title", "contentLocators", "contentBlocks", "epubStartHref"})
+@JsonPropertyOrder({"id", "depth", "title", "contentLocators", "contentBlocks"})
 public class BookBlock extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -86,18 +86,5 @@ public class BookBlock extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public List<BookContentBlock> getContentBlocks() {
     return contentBlocks;
-  }
-
-  @JsonProperty("epubStartHref")
-  @JsonView(BookViews.Full.class)
-  @Schema(
-      description =
-          "EPUB-only block-start locator for layout navigation: spine XHTML path, optionally with"
-              + " #fragment for a subsection anchor. Null for PDF or when unavailable.")
-  public String getEpubStartHref() {
-    if (book == null || !BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(book.getFormat())) {
-      return null;
-    }
-    return BookBlockEpubContentLocators.epubStartHrefFromFirstContentBlock(contentBlocks);
   }
 }

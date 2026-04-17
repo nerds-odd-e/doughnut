@@ -382,10 +382,6 @@ export type BookBlockFull = {
     title: string;
     contentLocators: Array<EpubLocatorFull | PdfLocatorFull>;
     contentBlocks: Array<BookContentBlockFull>;
-    /**
-     * EPUB-only block-start locator for layout navigation: spine XHTML path, optionally with #fragment for a subsection anchor. Null for PDF or when unavailable.
-     */
-    epubStartHref?: string;
 };
 
 export type BookContentBlockFull = {

@@ -67,7 +67,7 @@
             'book-reading-book-block--pending':
               block.id === pendingLayoutBlockId,
           }"
-          :data-epub-start-href="block.epubStartHref"
+          :data-epub-start-href="blockStartEpubDisplayHref(block) ?? undefined"
           :data-book-block-depth="block.depth"
           :data-current-block="
             block.id === currentBlockId ? 'true' : undefined
@@ -151,6 +151,7 @@
 </template>
 
 <script setup lang="ts">
+import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
 import {
   BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX,
   bookLayoutBlockDragIntent,
