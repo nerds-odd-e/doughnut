@@ -223,6 +223,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase E2a — `BookFormat` enum scaffold with `assembleContentLocators` (structure)
 
+**Status: done**
+
 **Change:** Create `BookFormat` enum with `PDF` and `EPUB` constants, a static `fromString(String format)` factory, and one abstract method: `List<ContentLocator> assembleContentLocators(List<BookContentBlock> contentBlocks)`. Wire `BookBlockContentLocatorAssembler` through the enum. Remove `BookBlock`'s reference to the raw string format constants and replace with `BookFormat.fromString(book.getFormat())`.
 
 **Files:** `backend/src/main/java/com/odde/doughnut/services/book/BookFormat.java` (new), updates to `BookBlockContentLocatorAssembler` and `BookBlock`.

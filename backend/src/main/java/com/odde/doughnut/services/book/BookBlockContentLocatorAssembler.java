@@ -7,10 +7,12 @@ public final class BookBlockContentLocatorAssembler {
 
   private BookBlockContentLocatorAssembler() {}
 
+  public static List<ContentLocator> assemble(
+      BookFormat format, List<BookContentBlock> contentBlocks) {
+    return format.assembleContentLocators(contentBlocks);
+  }
+
   public static List<ContentLocator> assemble(String format, List<BookContentBlock> contentBlocks) {
-    if (BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(format)) {
-      return BookBlockEpubContentLocators.epubContentLocators(contentBlocks);
-    }
-    return BookBlockPdfContentLocators.pdfContentLocators(contentBlocks);
+    return assemble(BookFormat.fromString(format), contentBlocks);
   }
 }
