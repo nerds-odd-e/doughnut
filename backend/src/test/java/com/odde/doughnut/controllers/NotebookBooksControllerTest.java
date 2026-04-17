@@ -226,6 +226,12 @@ class NotebookBooksControllerTest extends ControllerTestBase {
     return r;
   }
 
+  private static BookLastReadPositionRequest lastReadEpubBody(String epubLocator) {
+    BookLastReadPositionRequest r = new BookLastReadPositionRequest();
+    r.setEpubLocator(epubLocator);
+    return r;
+  }
+
   @Nested
   class AttachBook {
     @Test
@@ -1082,6 +1088,32 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(stored.getNormalizedY(), equalTo(600));
       assertThat(stored.getSelectedBookBlockId(), equalTo(blockId));
     }
+
+    @Test
+    void persistsEpubLocatorAndClearsPdfFields() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+
+      controller.patchReadingPosition(
+          nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
+
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      assertThat(stored.getEpubLocator(), equalTo("OEBPS/chapter2.xhtml#section-beta-two"));
+      assertThat(stored.getPageIndex(), nullValue());
+      assertThat(stored.getNormalizedY(), nullValue());
+    }
+
+    @Test
+    void rejectsPatchWithoutPdfFieldsOrEpubLocator() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      BookLastReadPositionRequest empty = new BookLastReadPositionRequest();
+
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, empty));
+      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+    }
   }
 
   @Nested
@@ -1134,6 +1166,21 @@ class NotebookBooksControllerTest extends ControllerTestBase {
           "selectedBookBlock entity must not appear in JSON (causes 500 via Hibernate proxy)",
           json.has("selectedBookBlock"),
           is(false));
+    }
+
+    @Test
+    void returnsSavedEpubLocatorAfterPatch() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      controller.patchReadingPosition(
+          nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
+
+      ResponseEntity<BookUserLastReadPosition> res = controller.getReadingPosition(nb);
+
+      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(res.getBody(), notNullValue());
+      assertThat(res.getBody().getEpubLocator(), equalTo("OEBPS/chapter2.xhtml#section-beta-two"));
+      assertThat(res.getBody().getPageIndex(), nullValue());
+      assertThat(res.getBody().getNormalizedY(), nullValue());
     }
 
     @Test

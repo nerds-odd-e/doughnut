@@ -610,13 +610,17 @@ export type NoteAccessory = {
 
 export type BookLastReadPositionRequest = {
     /**
-     * 0-based PDF page index in the viewer
+     * 0-based PDF page index in the viewer; required together with normalizedY for PDF books
      */
-    pageIndex: number;
+    pageIndex?: number;
     /**
-     * Vertical position within the page in MinerU-normalized space (0-1000)
+     * Vertical position within the page in MinerU-normalized space (0-1000); required together with pageIndex for PDF books
      */
-    normalizedY: number;
+    normalizedY?: number;
+    /**
+     * EPUB spine href locator (e.g. "OEBPS/chapter2.xhtml#section-beta-two") for EPUB books; mutually exclusive with pageIndex/normalizedY
+     */
+    epubLocator?: string;
     /**
      * Selected book block id for reading UI; omit or null to leave the stored value unchanged
      */

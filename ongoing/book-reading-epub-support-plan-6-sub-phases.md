@@ -73,7 +73,7 @@ The key assertions: after the reader persists the position, leaving and returnin
 
 ---
 
-## Sub-phase 6.2 — Structure: Accept and return `epubLocator` on the reading-position API
+## Sub-phase 6.2 — Structure: Accept and return `epubLocator` on the reading-position API (done)
 
 **Type:** Structure (existing PDF clients keep sending the same shape; new optional field for EPUB)
 

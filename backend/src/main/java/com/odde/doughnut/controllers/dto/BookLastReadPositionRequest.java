@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,17 +8,25 @@ import lombok.Setter;
 @Setter
 public class BookLastReadPositionRequest {
 
-  @NotNull
   @Schema(
-      requiredMode = Schema.RequiredMode.REQUIRED,
-      description = "0-based PDF page index in the viewer")
+      nullable = true,
+      description =
+          "0-based PDF page index in the viewer; required together with normalizedY for PDF books")
   private Integer pageIndex;
 
-  @NotNull
   @Schema(
-      requiredMode = Schema.RequiredMode.REQUIRED,
-      description = "Vertical position within the page in MinerU-normalized space (0-1000)")
+      nullable = true,
+      description =
+          "Vertical position within the page in MinerU-normalized space (0-1000); required"
+              + " together with pageIndex for PDF books")
   private Integer normalizedY;
+
+  @Schema(
+      nullable = true,
+      description =
+          "EPUB spine href locator (e.g. \"OEBPS/chapter2.xhtml#section-beta-two\") for EPUB"
+              + " books; mutually exclusive with pageIndex/normalizedY")
+  private String epubLocator;
 
   @Schema(
       nullable = true,
