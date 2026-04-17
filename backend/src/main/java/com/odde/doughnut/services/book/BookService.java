@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
-import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.doughnut.controllers.dto.BookLastReadPositionRequest;
@@ -39,11 +38,9 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +57,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class BookService {
 
   public record CancelBlockResult(Book book, int predecessorBlockId) {}
+
+  public record PersistContext(
+      Notebook notebook,
+      AttachBookRequest request,
+      String sourceFileRef,
+      byte[] fileBytes,
+      EntityPersister entityPersister,
+      ObjectMapper objectMapper,
+      TestabilitySettings testabilitySettings) {}
 
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
@@ -106,10 +112,10 @@ public class BookService {
       EpubAttachValidator.validateAttachableEpub(fileBytes);
     }
     String ref = bookStorage.put(fileBytes, request.getFormat());
-    if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
-      return persistNewEpubBook(notebook, request, ref, fileBytes);
-    }
-    return persistNewPdfBook(notebook, request, ref);
+    var ctx =
+        new PersistContext(
+            notebook, request, ref, fileBytes, entityPersister, objectMapper, testabilitySettings);
+    return BookFormat.fromString(request.getFormat()).persistNewBook(ctx);
   }
 
   private void assertNotebookHasNoBook(Notebook notebook) {
@@ -119,83 +125,6 @@ public class BookService {
           ApiError.ErrorType.RESOURCE_CONFLICT,
           "This notebook already has a book attached");
     }
-  }
-
-  private Book persistNewEpubBook(
-      Notebook notebook, AttachBookRequest request, String sourceFileRef, byte[] epubBytes) {
-    var book = new Book();
-    book.setNotebook(notebook);
-    book.setBookName(trimmedMax(request.getBookName(), 512));
-    book.setFormat(BOOK_FORMAT_EPUB);
-    book.setSourceFileRef(sourceFileRef);
-    var now = testabilitySettings.getCurrentUTCTimestamp();
-    book.setCreatedAt(now);
-    book.setUpdatedAt(now);
-
-    List<EpubStructureExtractor.EpubLayoutBlock> layout =
-        EpubStructureExtractor.extractEpubLayoutWithContent(epubBytes);
-    for (int i = 0; i < layout.size(); i++) {
-      EpubStructureExtractor.EpubLayoutBlock row = layout.get(i);
-      BookBlock block = new BookBlock();
-      block.setStructuralTitle(trimmedMax(row.title(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
-      block.setDepth(row.depth());
-      block.setLayoutSequence(i);
-      List<Map<String, Object>> payloads = row.contentPayloads();
-      for (int j = 0; j < payloads.size(); j++) {
-        Map<String, Object> raw = payloads.get(j);
-        BookContentBlock cb = new BookContentBlock();
-        cb.setBookBlock(block);
-        cb.setSiblingOrder(j);
-        cb.setType(String.valueOf(raw.getOrDefault("type", "")));
-        cb.setPageIdx(null);
-        try {
-          cb.setRawData(objectMapper.writeValueAsString(raw));
-        } catch (JsonProcessingException e) {
-          throw new ApiException(
-              "failed to serialize content block",
-              ApiError.ErrorType.BINDING_ERROR,
-              "failed to serialize content block");
-        }
-        block.getContentBlocks().add(cb);
-      }
-      book.addBlock(block);
-    }
-
-    entityPersister.save(book);
-    entityPersister.flush();
-    return book;
-  }
-
-  private Book persistNewPdfBook(
-      Notebook notebook, AttachBookRequest request, String sourceFileRef) {
-    var book = new Book();
-    book.setNotebook(notebook);
-    book.setBookName(trimmedMax(request.getBookName(), 512));
-    book.setFormat(BOOK_FORMAT_PDF);
-    book.setSourceFileRef(sourceFileRef);
-    var now = testabilitySettings.getCurrentUTCTimestamp();
-    book.setCreatedAt(now);
-    book.setUpdatedAt(now);
-
-    List<AttachBookLayoutNodeRequest> roots = request.getLayout().getRoots();
-    IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock = new IdentityHashMap<>();
-    int[] seq = {0};
-    for (AttachBookLayoutNodeRequest root : roots) {
-      preorderAttachBlock(book, root, 1, seq, nodeToBlock);
-    }
-
-    entityPersister.save(book);
-    entityPersister.flush();
-
-    List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks = new ArrayList<>();
-    for (AttachBookLayoutNodeRequest root : roots) {
-      postorderCollectPending(root, nodeToBlock, pendingContentBlocks);
-    }
-    for (var entry : pendingContentBlocks) {
-      persistContentBlocks(entry.getKey(), entry.getValue());
-    }
-
-    return book;
   }
 
   @Transactional(readOnly = true)
@@ -741,70 +670,6 @@ public class BookService {
     BookFormat.fromString(format).validateAttachRequest(request);
   }
 
-  private void preorderAttachBlock(
-      Book book,
-      AttachBookLayoutNodeRequest node,
-      int level,
-      int[] layoutSeq,
-      IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock) {
-    if (level > MAX_LAYOUT_DEPTH) {
-      throw new ApiException(
-          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
-          ApiError.ErrorType.BINDING_ERROR,
-          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
-    }
-
-    BookBlock block = new BookBlock();
-    block.setStructuralTitle(
-        trimmedMax(node.getTitle(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
-    block.setLayoutSequence(layoutSeq[0]++);
-    block.setDepth(level - 1);
-    nodeToBlock.put(node, block);
-    book.addBlock(block);
-
-    List<AttachBookLayoutNodeRequest> children =
-        node.getChildren() == null ? List.of() : node.getChildren();
-    for (AttachBookLayoutNodeRequest child : children) {
-      preorderAttachBlock(book, child, level + 1, layoutSeq, nodeToBlock);
-    }
-  }
-
-  private static void postorderCollectPending(
-      AttachBookLayoutNodeRequest node,
-      IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock,
-      List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks) {
-    List<AttachBookLayoutNodeRequest> children =
-        node.getChildren() == null ? List.of() : node.getChildren();
-    for (AttachBookLayoutNodeRequest child : children) {
-      postorderCollectPending(child, nodeToBlock, pendingContentBlocks);
-    }
-    List<Map<String, Object>> cbs = node.getContentBlocks();
-    if (cbs != null && !cbs.isEmpty()) {
-      pendingContentBlocks.add(new AbstractMap.SimpleEntry<>(nodeToBlock.get(node), cbs));
-    }
-  }
-
-  private void persistContentBlocks(BookBlock block, List<Map<String, Object>> cbs) {
-    for (int i = 0; i < cbs.size(); i++) {
-      Map<String, Object> raw = cbs.get(i);
-      BookContentBlock cb = new BookContentBlock();
-      cb.setBookBlock(block);
-      cb.setSiblingOrder(i);
-      cb.setType(String.valueOf(raw.getOrDefault("type", "")));
-      Object pi = raw.get("page_idx");
-      cb.setPageIdx(pi instanceof Number n ? n.intValue() : null);
-      try {
-        cb.setRawData(objectMapper.writeValueAsString(raw));
-      } catch (JsonProcessingException e) {
-        throw new ApiException(
-            "failed to serialize content block",
-            ApiError.ErrorType.BINDING_ERROR,
-            "failed to serialize content block");
-      }
-      entityPersister.save(cb);
-    }
-  }
-
   private String stripTextLevel(String rawData) {
     if (rawData == null) {
       return rawData;
@@ -827,7 +692,7 @@ public class BookService {
     return t.isEmpty() ? null : t;
   }
 
-  private static String trimmedMax(String s, int max) {
+  static String trimmedMax(String s, int max) {
     String t = s.trim();
     if (t.length() > max) {
       return t.substring(0, max);

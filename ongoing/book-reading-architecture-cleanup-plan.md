@@ -247,6 +247,8 @@ Both views drop their local debouncer creation and the `proposeEpubPositionForBl
 
 ### Phase E2c — Move `persistNewBook` branching into `BookFormat` (structure)
 
+**Status: done**
+
 **Change:** Add `Book persistNewBook(BookService.PersistContext ctx)` (or similar) to the enum, where `PersistContext` carries the notebook, request, source ref, file bytes, and the persistence collaborators (repositories, entity persister). PDF and EPUB constants implement their respective persist flow (`persistNewPdfBook` / `persistNewEpubBook`). `BookService.attachBook` becomes a small dispatcher.
 
 **Files:** `BookFormat.java`, `BookService.java`.

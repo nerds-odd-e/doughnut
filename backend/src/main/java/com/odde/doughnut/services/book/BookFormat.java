@@ -1,16 +1,28 @@
 package com.odde.doughnut.services.book;
 
+import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
+import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_CONTENT_LIST_ITEMS;
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.doughnut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
+import com.odde.doughnut.entities.Book;
+import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.BookBlockTitleLimits;
 import com.odde.doughnut.entities.BookContentBlock;
 import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 public enum BookFormat {
   PDF {
@@ -63,6 +75,11 @@ public enum BookFormat {
         validateLayoutNode(root, 1);
       }
     }
+
+    @Override
+    public Book persistNewBook(BookService.PersistContext ctx) {
+      return persistNewPdfBook(ctx);
+    }
   },
   EPUB {
     @Override
@@ -86,12 +103,19 @@ public enum BookFormat {
             "EPUB attach must not include layout or contentList");
       }
     }
+
+    @Override
+    public Book persistNewBook(BookService.PersistContext ctx) {
+      return persistNewEpubBook(ctx);
+    }
   };
 
   public abstract List<ContentLocator> assembleContentLocators(
       List<BookContentBlock> contentBlocks);
 
   public abstract void validateAttachRequest(AttachBookRequest request);
+
+  public abstract Book persistNewBook(BookService.PersistContext ctx);
 
   public static BookFormat fromString(String format) {
     if (BookReadingWireConstants.BOOK_FORMAT_EPUB.equals(format)) {
@@ -134,5 +158,158 @@ public enum BookFormat {
     }
     String t = s.trim();
     return t.isEmpty() ? null : t;
+  }
+
+  private static Book persistNewEpubBook(BookService.PersistContext ctx) {
+    EntityPersister entityPersister = ctx.entityPersister();
+    ObjectMapper objectMapper = ctx.objectMapper();
+    TestabilitySettings testabilitySettings = ctx.testabilitySettings();
+    AttachBookRequest request = ctx.request();
+    byte[] epubBytes = ctx.fileBytes();
+
+    var book = new Book();
+    book.setNotebook(ctx.notebook());
+    book.setBookName(BookService.trimmedMax(request.getBookName(), 512));
+    book.setFormat(BOOK_FORMAT_EPUB);
+    book.setSourceFileRef(ctx.sourceFileRef());
+    var now = testabilitySettings.getCurrentUTCTimestamp();
+    book.setCreatedAt(now);
+    book.setUpdatedAt(now);
+
+    List<EpubStructureExtractor.EpubLayoutBlock> layout =
+        EpubStructureExtractor.extractEpubLayoutWithContent(epubBytes);
+    for (int i = 0; i < layout.size(); i++) {
+      EpubStructureExtractor.EpubLayoutBlock row = layout.get(i);
+      BookBlock block = new BookBlock();
+      block.setStructuralTitle(
+          BookService.trimmedMax(row.title(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
+      block.setDepth(row.depth());
+      block.setLayoutSequence(i);
+      List<Map<String, Object>> payloads = row.contentPayloads();
+      for (int j = 0; j < payloads.size(); j++) {
+        Map<String, Object> raw = payloads.get(j);
+        BookContentBlock cb = new BookContentBlock();
+        cb.setBookBlock(block);
+        cb.setSiblingOrder(j);
+        cb.setType(String.valueOf(raw.getOrDefault("type", "")));
+        cb.setPageIdx(null);
+        try {
+          cb.setRawData(objectMapper.writeValueAsString(raw));
+        } catch (JsonProcessingException e) {
+          throw new ApiException(
+              "failed to serialize content block",
+              ApiError.ErrorType.BINDING_ERROR,
+              "failed to serialize content block");
+        }
+        block.getContentBlocks().add(cb);
+      }
+      book.addBlock(block);
+    }
+
+    entityPersister.save(book);
+    entityPersister.flush();
+    return book;
+  }
+
+  private static Book persistNewPdfBook(BookService.PersistContext ctx) {
+    EntityPersister entityPersister = ctx.entityPersister();
+    AttachBookRequest request = ctx.request();
+    TestabilitySettings testabilitySettings = ctx.testabilitySettings();
+
+    var book = new Book();
+    book.setNotebook(ctx.notebook());
+    book.setBookName(BookService.trimmedMax(request.getBookName(), 512));
+    book.setFormat(BOOK_FORMAT_PDF);
+    book.setSourceFileRef(ctx.sourceFileRef());
+    var now = testabilitySettings.getCurrentUTCTimestamp();
+    book.setCreatedAt(now);
+    book.setUpdatedAt(now);
+
+    List<AttachBookLayoutNodeRequest> roots = request.getLayout().getRoots();
+    IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock = new IdentityHashMap<>();
+    int[] seq = {0};
+    for (AttachBookLayoutNodeRequest root : roots) {
+      preorderAttachBlock(book, root, 1, seq, nodeToBlock);
+    }
+
+    entityPersister.save(book);
+    entityPersister.flush();
+
+    List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks = new ArrayList<>();
+    for (AttachBookLayoutNodeRequest root : roots) {
+      postorderCollectPending(root, nodeToBlock, pendingContentBlocks);
+    }
+    for (var entry : pendingContentBlocks) {
+      persistContentBlocks(ctx, entry.getKey(), entry.getValue());
+    }
+
+    return book;
+  }
+
+  private static void preorderAttachBlock(
+      Book book,
+      AttachBookLayoutNodeRequest node,
+      int level,
+      int[] layoutSeq,
+      IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock) {
+    if (level > MAX_LAYOUT_DEPTH) {
+      throw new ApiException(
+          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH,
+          ApiError.ErrorType.BINDING_ERROR,
+          "layout exceeds maximum depth of " + MAX_LAYOUT_DEPTH);
+    }
+
+    BookBlock block = new BookBlock();
+    block.setStructuralTitle(
+        BookService.trimmedMax(node.getTitle(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS));
+    block.setLayoutSequence(layoutSeq[0]++);
+    block.setDepth(level - 1);
+    nodeToBlock.put(node, block);
+    book.addBlock(block);
+
+    List<AttachBookLayoutNodeRequest> children =
+        node.getChildren() == null ? List.of() : node.getChildren();
+    for (AttachBookLayoutNodeRequest child : children) {
+      preorderAttachBlock(book, child, level + 1, layoutSeq, nodeToBlock);
+    }
+  }
+
+  private static void postorderCollectPending(
+      AttachBookLayoutNodeRequest node,
+      IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock,
+      List<Map.Entry<BookBlock, List<Map<String, Object>>>> pendingContentBlocks) {
+    List<AttachBookLayoutNodeRequest> children =
+        node.getChildren() == null ? List.of() : node.getChildren();
+    for (AttachBookLayoutNodeRequest child : children) {
+      postorderCollectPending(child, nodeToBlock, pendingContentBlocks);
+    }
+    List<Map<String, Object>> cbs = node.getContentBlocks();
+    if (cbs != null && !cbs.isEmpty()) {
+      pendingContentBlocks.add(new AbstractMap.SimpleEntry<>(nodeToBlock.get(node), cbs));
+    }
+  }
+
+  private static void persistContentBlocks(
+      BookService.PersistContext ctx, BookBlock block, List<Map<String, Object>> cbs) {
+    EntityPersister entityPersister = ctx.entityPersister();
+    ObjectMapper objectMapper = ctx.objectMapper();
+    for (int i = 0; i < cbs.size(); i++) {
+      Map<String, Object> raw = cbs.get(i);
+      BookContentBlock cb = new BookContentBlock();
+      cb.setBookBlock(block);
+      cb.setSiblingOrder(i);
+      cb.setType(String.valueOf(raw.getOrDefault("type", "")));
+      Object pi = raw.get("page_idx");
+      cb.setPageIdx(pi instanceof Number n ? n.intValue() : null);
+      try {
+        cb.setRawData(objectMapper.writeValueAsString(raw));
+      } catch (JsonProcessingException e) {
+        throw new ApiException(
+            "failed to serialize content block",
+            ApiError.ErrorType.BINDING_ERROR,
+            "failed to serialize content block");
+      }
+      entityPersister.save(cb);
+    }
   }
 }
