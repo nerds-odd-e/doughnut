@@ -6,7 +6,7 @@ import { interactiveCli } from './interactiveCli'
  */
 export function bookReadingCli() {
   return {
-    attachBookPdfToNotebookViaInteractiveCli(opts: {
+    attachBookToNotebookViaInteractiveCli(opts: {
       fixtureFilename: string
       notebookTitle: string
     }): void {
@@ -14,7 +14,7 @@ export function bookReadingCli() {
       cy.task<string>(
         'getE2eFixtureAbsolutePath',
         `book_reading/${fixtureFilename}`
-      ).then((absPdfPath) => {
+      ).then((absBookPath) => {
         const ic = interactiveCli()
         ic.enterSlashCommandInInteractiveCli(`/use ${notebookTitle}`)
           .then(() => {
@@ -23,7 +23,7 @@ export function bookReadingCli() {
             )
           })
           .then(() =>
-            ic.enterSlashCommandInInteractiveCli(`/attach ${absPdfPath}`)
+            ic.enterSlashCommandInInteractiveCli(`/attach ${absBookPath}`)
           )
           .then(() => {
             ic.pastCliAssistantMessages().expectContains('Attaching book...')
