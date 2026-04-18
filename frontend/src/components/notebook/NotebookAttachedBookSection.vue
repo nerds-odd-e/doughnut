@@ -56,6 +56,7 @@
       Attach book…
     </button>
   </section>
+  <LoadingModal :show="isAttachingBook" message="Uploading book…" />
 </template>
 
 <script setup lang="ts">
@@ -67,6 +68,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { client } from "@generated/doughnut-backend-api/client.gen"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import LoadingModal from "@/components/commons/LoadingModal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
@@ -80,6 +82,7 @@ const { popups } = usePopups()
 const book = ref<BookFull | null>(null)
 const bookLoadFinished = ref(false)
 const attachFileInputRef = ref<HTMLInputElement | null>(null)
+const isAttachingBook = ref(false)
 
 const bookNameFromEpubFile = (file: File): string => {
   const n = file.name
@@ -120,19 +123,24 @@ const onAttachFileSelected = async (event: Event) => {
       ? file
       : new File([file], file.name, { type: "application/epub+zip" })
   formData.append("file", fileBody)
-  const { error } = await apiCallWithLoading(() =>
-    client.post({
-      url: "/api/notebooks/{notebook}/attach-book",
-      path: { notebook: props.notebookId },
-      body: formData,
-      bodySerializer: (body) => body as FormData,
-      headers: {
-        "Content-Type": null,
-      },
-    })
-  )
-  if (!error) {
-    await loadBook()
+  isAttachingBook.value = true
+  try {
+    const { error } = await apiCallWithLoading(() =>
+      client.post({
+        url: "/api/notebooks/{notebook}/attach-book",
+        path: { notebook: props.notebookId },
+        body: formData,
+        bodySerializer: (body) => body as FormData,
+        headers: {
+          "Content-Type": null,
+        },
+      })
+    )
+    if (!error) {
+      await loadBook()
+    }
+  } finally {
+    isAttachingBook.value = false
   }
 }
 
