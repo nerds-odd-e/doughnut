@@ -629,7 +629,11 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public NotebookBookFile getNotebookBookFile(Notebook notebook) {
-    Book book = requireBook(notebook);
+    return notebookBookFileFromBook(requireBook(notebook));
+  }
+
+  @Transactional(readOnly = true)
+  public NotebookBookFile notebookBookFileFromBook(Book book) {
     String ref = book.getSourceFileRef();
     byte[] bytes =
         bookStorage

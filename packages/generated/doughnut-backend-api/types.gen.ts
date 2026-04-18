@@ -3693,6 +3693,24 @@ export type ShowCircleResponses = {
 
 export type ShowCircleResponse = ShowCircleResponses[keyof ShowCircleResponses];
 
+export type GetBookFileByBookData = {
+    body?: never;
+    path: {
+        book: number;
+    };
+    query?: never;
+    url: '/api/books/{book}/file';
+};
+
+export type GetBookFileByBookResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type GetBookFileByBookResponse = GetBookFileByBookResponses[keyof GetBookFileByBookResponses];
+
 export type BazaarData = {
     body?: never;
     path?: never;

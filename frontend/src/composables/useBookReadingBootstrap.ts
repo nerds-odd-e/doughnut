@@ -28,8 +28,8 @@ export type BookReadingBootstrap =
       initialSelectedBlockId: number | null
     }
 
-function notebookBookFilePath(notebookId: number) {
-  return `/api/notebooks/${notebookId}/book/file`
+function bookSourceFilePath(bookId: number) {
+  return `/api/books/${bookId}/file`
 }
 
 function epubInitialLocatorFromSaved(
@@ -80,11 +80,12 @@ export function useBookReadingBootstrap(notebookId: number) {
     }
     book.value = data
     const notebook = Number(data.notebookId)
+    const bookId = Number(data.id)
     fileLoading.value = true
     fileError.value = null
     try {
       const [res, posResult] = await Promise.all([
-        fetch(notebookBookFilePath(notebook), {
+        fetch(bookSourceFilePath(bookId), {
           credentials: "same-origin",
         }),
         NotebookBooksController.getNotebookBookReadingPosition({

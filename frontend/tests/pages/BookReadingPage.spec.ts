@@ -18,6 +18,8 @@ const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
 const notebookId = 7
+/** Source file fetch uses book id, not notebook id — keep in sync with mocked `getBook` payloads. */
+const bookId = 701
 
 const snapHoldActivateMock = vi.hoisted(() => ({
   fn: vi.fn<(ms: number) => void>(),
@@ -50,7 +52,7 @@ let topMathsPdfBytes!: ArrayBuffer
 let epubMinimalBytes!: ArrayBuffer
 
 function bookFileUrlSuffix(id: number) {
-  return `/api/notebooks/${id}/book/file`
+  return `/api/books/${id}/file`
 }
 
 function fetchRequestUrl(input: RequestInfo | URL): string {
@@ -153,7 +155,9 @@ function stubGetBookPlain(notebookId: number) {
   return vi
     .spyOn(NotebookBooksController, "getBook")
     .mockResolvedValue(
-      wrapSdkResponse(makeMe.aBook.notebookId(String(notebookId)).please())
+      wrapSdkResponse(
+        makeMe.aBook.id(bookId).notebookId(String(notebookId)).please()
+      )
     )
 }
 
@@ -167,6 +171,7 @@ function stubGetBookWithTopMathsBlocks(
   return vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
     wrapSdkResponse(
       makeMe.aBook
+        .id(bookId)
         .notebookId(String(notebookId))
         .blocks(
           makeMe.bookReading.topMathsLikeFlatBlocks({
@@ -192,7 +197,7 @@ async function mountLoadedBookWithBlocks(
     firstBlockHasNoDirectContent: options?.firstBlockHasNoDirectContent,
     lastBlockHasDirectContent: options?.lastBlockHasDirectContent,
   })
-  mockNotebookBookFilePdfOk(id, topMathsPdfBytes, {
+  mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes, {
     assertSameOriginCredentials: options?.assertSameOriginCredentials,
   })
   const mount = async () => {
@@ -225,7 +230,7 @@ function pdfScrollRestoreSpy(wrapper: BookReadingPageWrapper) {
 
 async function mountPatchDebounceScenario() {
   stubGetBookWithTopMathsBlocks(notebookId)
-  mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+  mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
   const patchSpy = vi
     .spyOn(NotebookBooksController, "patchNotebookBookReadingPosition")
     .mockResolvedValue(wrapSdkResponse(undefined))
@@ -331,10 +336,14 @@ describe("BookReadingPage", () => {
     ]
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(
-        makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+        makeMe.aBook
+          .id(bookId)
+          .notebookId(String(notebookId))
+          .blocks(blocks)
+          .please()
       )
     )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
     const wrapper = mountBookReadingPage(notebookId)
     await waitForPdfViewer(wrapper)
     const rows = wrapper.findAll('[data-testid="book-reading-book-block"]')
@@ -345,7 +354,7 @@ describe("BookReadingPage", () => {
 
   it("loads PDF into viewer", async () => {
     stubGetBookPlain(notebookId)
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes, {
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes, {
       assertSameOriginCredentials: true,
     })
 
@@ -357,6 +366,7 @@ describe("BookReadingPage", () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(
         makeMe.aBook
+          .id(bookId)
           .notebookId(String(notebookId))
           .format("epub")
           .blocks([])
@@ -364,7 +374,7 @@ describe("BookReadingPage", () => {
           .please()
       )
     )
-    mockNotebookBookFileEpubOk(notebookId, epubMinimalBytes)
+    mockNotebookBookFileEpubOk(bookId, epubMinimalBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
     await vi.waitFor(
@@ -568,7 +578,7 @@ describe("BookReadingPage", () => {
         },
       })
     )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
     await waitForPdfViewer(wrapper)
@@ -582,7 +592,7 @@ describe("BookReadingPage", () => {
 
   it("does not restore reading position when no snapshot exists", async () => {
     stubGetBookPlain(notebookId)
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
     await waitForPdfViewer(wrapper)
@@ -612,7 +622,7 @@ describe("BookReadingPage", () => {
         selectedBookBlockId: 102,
       })
     )
-    mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
     await waitForPdfViewer(wrapper)
@@ -944,6 +954,7 @@ describe("BookReadingPage", () => {
       vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
         wrapSdkResponse(
           makeMe.aBook
+            .id(bookId)
             .notebookId(String(notebookId))
             .blocks(
               makeMe.bookReading.topMathsLikeBlockRows({
@@ -965,7 +976,7 @@ describe("BookReadingPage", () => {
             .please()
         )
       )
-      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+      mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
       const wrapper = mountBookReadingPage(notebookId)
       await waitForPdfViewer(wrapper)
       mockIsLastContentBottomVisible(wrapper, true)
@@ -1027,6 +1038,7 @@ describe("BookReadingPage", () => {
       vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
         wrapSdkResponse(
           makeMe.aBook
+            .id(bookId)
             .notebookId(String(notebookId))
             .blocks(
               makeMe.bookReading.topMathsLikeBlockRows({
@@ -1048,7 +1060,7 @@ describe("BookReadingPage", () => {
             .please()
         )
       )
-      mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+      mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
       const wrapper = mountBookReadingPage(notebookId)
       await waitForPdfViewer(wrapper)
       mockIsLastContentBottomVisible(wrapper, true)
@@ -1241,7 +1253,11 @@ describe("BookReadingPage", () => {
         })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
-            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+            makeMe.aBook
+              .id(bookId)
+              .notebookId(String(notebookId))
+              .blocks(blocks)
+              .please()
           )
         )
       }
@@ -1301,14 +1317,18 @@ describe("BookReadingPage", () => {
         })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
-            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+            makeMe.aBook
+              .id(bookId)
+              .notebookId(String(notebookId))
+              .blocks(blocks)
+              .please()
           )
         )
       }
 
       it("shows the panel when last content bottom is visible and above obstruction", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1333,7 +1353,7 @@ describe("BookReadingPage", () => {
 
       it("anchors panel when last content bottom is visible and anchor px is returned", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1363,7 +1383,7 @@ describe("BookReadingPage", () => {
 
       it("hides the panel when last content bottom is not yet above obstruction", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, false)
@@ -1388,7 +1408,7 @@ describe("BookReadingPage", () => {
 
       it("keeps panel visible after geometry becomes false while successor is not yet current", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1424,7 +1444,7 @@ describe("BookReadingPage", () => {
 
       it("snaps back and keeps panel visible on first boundary crossing (same-page: scrolls to block start)", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1464,7 +1484,7 @@ describe("BookReadingPage", () => {
 
       it("snaps back when scrolling lands two or more blocks ahead (not just immediate successor)", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1498,7 +1518,7 @@ describe("BookReadingPage", () => {
 
       it("snaps back on second crossing, then allows normal scrolling on third", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1562,7 +1582,7 @@ describe("BookReadingPage", () => {
 
       it("does not snap on fourth and later crossings after budget exhausted", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1633,10 +1653,14 @@ describe("BookReadingPage", () => {
           )
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
-            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+            makeMe.aBook
+              .id(bookId)
+              .notebookId(String(notebookId))
+              .blocks(blocks)
+              .please()
           )
         )
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
 
@@ -1663,7 +1687,7 @@ describe("BookReadingPage", () => {
 
       it("does not snap when geometry was never visible for the selection", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         // geometry never becomes true
@@ -1704,7 +1728,7 @@ describe("BookReadingPage", () => {
           ])
         )
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1741,7 +1765,7 @@ describe("BookReadingPage", () => {
 
       it("snap state resets when selection changes to a different block", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1781,7 +1805,7 @@ describe("BookReadingPage", () => {
 
       it("snaps to last bbox bottom when start anchor and last content bbox are on different pages", async () => {
         stubGetBookWithFirstBlockHavingCrossPageBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1817,7 +1841,7 @@ describe("BookReadingPage", () => {
 
       it("same-page-too-tall: snaps to last content bottom when content does not fit with panel", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1854,7 +1878,7 @@ describe("BookReadingPage", () => {
 
       it("sets data-snap-animating on panel when snap fires", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1887,7 +1911,7 @@ describe("BookReadingPage", () => {
 
       it("clears data-snap-animating after animationend on the inner card", async () => {
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -1941,7 +1965,7 @@ describe("BookReadingPage", () => {
           ])
         )
         stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
@@ -2026,10 +2050,14 @@ describe("BookReadingPage", () => {
         })
         vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
           wrapSdkResponse(
-            makeMe.aBook.notebookId(String(notebookId)).blocks(blocks).please()
+            makeMe.aBook
+              .id(bookId)
+              .notebookId(String(notebookId))
+              .blocks(blocks)
+              .please()
           )
         )
-        mockNotebookBookFilePdfOk(notebookId, topMathsPdfBytes)
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
         mockIsLastContentBottomVisible(wrapper, true)
