@@ -21,6 +21,7 @@ import {
   epubSpinePathMatches,
   splitEpubHref,
 } from "@/lib/book-reading/epubHrefMatch"
+import { epubRenditionResizeDimensions } from "@/lib/book-reading/epubRenditionHostSize"
 import type {
   BookFull,
   ContentLocatorFull,
@@ -118,11 +119,11 @@ function resizeRenditionToHost(): void {
   if (!host || !r) {
     return
   }
-  const w = Math.floor(host.clientWidth)
-  const h = Math.floor(host.clientHeight)
-  if (w < 1 || h < 1) {
+  const dims = epubRenditionResizeDimensions(host)
+  if (dims === null) {
     return
   }
+  const { width: w, height: h } = dims
   if (
     Math.abs(w - lastAppliedRenditionWidth) < RENDITION_RESIZE_MIN_DELTA_PX &&
     Math.abs(h - lastAppliedRenditionHeight) < RENDITION_RESIZE_MIN_DELTA_PX
@@ -132,6 +133,41 @@ function resizeRenditionToHost(): void {
   lastAppliedRenditionWidth = w
   lastAppliedRenditionHeight = h
   r.resize(w, h)
+}
+
+function renditionHasLocation(r: Rendition): boolean {
+  const loc = (r as unknown as { location?: { start?: unknown } }).location
+  return Boolean(loc?.start)
+}
+
+/**
+ * epub.js resize clears all views; `onResized` only redisplays when `rendition.location`
+ * is set, but `reportLocation` runs after the display promise resolves (queue + rAF).
+ * Defer host-driven resize until a location exists so we never clear without a redisplay.
+ */
+function waitUntilRenditionLocation(r: Rendition): Promise<void> {
+  if (renditionHasLocation(r)) {
+    return Promise.resolve()
+  }
+  return new Promise((resolve) => {
+    let done = false
+    const finish = () => {
+      if (done) {
+        return
+      }
+      done = true
+      r.off("relocated", onRelocated)
+      window.clearTimeout(tid)
+      resolve()
+    }
+    const onRelocated = () => {
+      if (renditionHasLocation(r)) {
+        finish()
+      }
+    }
+    r.on("relocated", onRelocated)
+    const tid = window.setTimeout(finish, 500)
+  })
 }
 
 function teardownRenditionResizeObserver(): void {
@@ -150,6 +186,13 @@ function setupRenditionResizeObserver(): void {
   const host = renditionHostRef.value
   if (!host || typeof ResizeObserver === "undefined") {
     return
+  }
+  // Prime from current host size so we only call r.resize() when the host actually changes.
+  // epub.js was initialized with width/height = "100%" of this same host.
+  const primed = epubRenditionResizeDimensions(host)
+  if (primed !== null) {
+    lastAppliedRenditionWidth = primed.width
+    lastAppliedRenditionHeight = primed.height
   }
   renditionResizeObserver = new ResizeObserver(() => {
     if (renditionResizeDebounceTimer !== null) {
@@ -295,13 +338,14 @@ async function openEpub() {
   rendition = r
   r.on("relocated", onRelocated)
   r.on("displayed", onDisplayed)
-  setupRenditionResizeObserver()
   const target = (props.initialLocator ?? "").trim()
   if (target.length > 0) {
     await r.display(target).catch(() => r.display().catch(() => undefined))
   } else {
     await r.display().catch(() => undefined)
   }
+  await waitUntilRenditionLocation(r)
+  setupRenditionResizeObserver()
 }
 
 onMounted(() => {

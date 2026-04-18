@@ -1,4 +1,5 @@
 import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
+import { BOOK_READING_LAYOUT_BREAKPOINT_PX } from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "@/managedApi/clientSetup"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -14,8 +15,6 @@ const mockToast = {
 vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
 }))
-
-const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 
 describe("BookReadingContent AI reorganize suggest", () => {
   const apiStatus: ApiStatus = { states: [] }

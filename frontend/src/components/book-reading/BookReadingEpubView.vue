@@ -67,6 +67,10 @@ import {
   asEpubLocator,
   epubDisplayHref,
 } from "@/lib/book-reading/asEpubLocator"
+import {
+  BOOK_READING_LAYOUT_BREAKPOINT_PX,
+  bookLayoutAsideInitiallyOpen,
+} from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { splitEpubHref } from "@/lib/book-reading/epubHrefMatch"
 import type {
@@ -85,7 +89,6 @@ type EpubViewerExposed = Pick<
   | "readingPanelAnchorTopPx"
 >
 
-const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
 const props = withDefaults(
@@ -184,12 +187,18 @@ if (seedHref !== null && seedHref.length > 0) {
   currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
 }
 
-const bookLayoutOpened = ref(false)
 const windowWidth = ref(
   typeof window !== "undefined"
     ? window.innerWidth
     : BOOK_READING_LAYOUT_BREAKPOINT_PX
 )
+/**
+ * Initialize synchronously so the book layout aside is rendered in its final open/closed
+ * state before `EpubBookViewer` mounts. Otherwise epub.js sizes the rendition to the full
+ * main width, then the aside appears and our resize observer triggers a `clear() + redisplay`
+ * which can land on the wrong section for beginning-of-book saved positions.
+ */
+const bookLayoutOpened = ref(bookLayoutAsideInitiallyOpen(windowWidth.value))
 
 function handleResize() {
   windowWidth.value = window.innerWidth
@@ -228,9 +237,6 @@ async function onBookBlockClick(block: BookBlockFull) {
 
 onMounted(async () => {
   window.addEventListener("resize", handleResize)
-  if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
-    bookLayoutOpened.value = true
-  }
   await bookReading.syncFromServer()
   await nextTick()
   updateReadingPanelAnchor()

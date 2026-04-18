@@ -199,6 +199,10 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import {
+  BOOK_READING_LAYOUT_BREAKPOINT_PX,
+  bookLayoutAsideInitiallyOpen,
+} from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
@@ -258,7 +262,6 @@ function bookFullAfterLayoutMutation(
 }
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
-const BOOK_READING_LAYOUT_BREAKPOINT_PX = 768
 const SNAP_HOLD_MS = 500
 
 const props = withDefaults(
@@ -308,12 +311,12 @@ const lastReadingForPatch = computed(() => {
   }
 })
 
-const bookLayoutOpened = ref(false)
 const windowWidth = ref(
   typeof window !== "undefined"
     ? window.innerWidth
     : BOOK_READING_LAYOUT_BREAKPOINT_PX
 )
+const bookLayoutOpened = ref(bookLayoutAsideInitiallyOpen(windowWidth.value))
 
 function handleResize() {
   windowWidth.value = window.innerWidth
@@ -642,9 +645,6 @@ async function onBackToSelected() {
 
 onMounted(async () => {
   window.addEventListener("resize", handleResize)
-  if (windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX) {
-    bookLayoutOpened.value = true
-  }
   await bookReading.syncFromServer()
 })
 
