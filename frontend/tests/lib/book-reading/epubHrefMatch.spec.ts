@@ -1,5 +1,6 @@
 import {
   epubSpinePathMatches,
+  resolveSpineHrefForStoredPath,
   splitEpubHref,
 } from "@/lib/book-reading/epubHrefMatch"
 import { describe, expect, it } from "vitest"
@@ -43,5 +44,38 @@ describe("epubSpinePathMatches", () => {
 
   it("rejects unrelated paths", () => {
     expect(epubSpinePathMatches("OEBPS/a.xhtml", "other/b.xhtml")).toBe(false)
+  })
+})
+
+describe("resolveSpineHrefForStoredPath", () => {
+  const spine = [
+    { href: "chapter1.xhtml" },
+    { href: "chapter2.xhtml" },
+    { href: "chapter3.xhtml" },
+  ]
+
+  it("returns the spine href when package-root path matches a manifest-relative section", () => {
+    expect(resolveSpineHrefForStoredPath(spine, "OEBPS/chapter3.xhtml")).toBe(
+      "chapter3.xhtml"
+    )
+  })
+
+  it("returns the spine href when stored path already matches a section href", () => {
+    expect(resolveSpineHrefForStoredPath(spine, "chapter2.xhtml")).toBe(
+      "chapter2.xhtml"
+    )
+  })
+
+  it("returns null when no section matches", () => {
+    expect(resolveSpineHrefForStoredPath(spine, "other/missing.xhtml")).toBe(
+      null
+    )
+  })
+
+  it("returns null when spine is missing or empty", () => {
+    expect(resolveSpineHrefForStoredPath(undefined, "OEBPS/ch.xhtml")).toBe(
+      null
+    )
+    expect(resolveSpineHrefForStoredPath([], "OEBPS/ch.xhtml")).toBe(null)
   })
 })

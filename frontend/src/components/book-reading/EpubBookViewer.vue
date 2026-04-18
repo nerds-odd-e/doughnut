@@ -13,12 +13,10 @@
 
 <script setup lang="ts">
 import type { ViewerLocatorRect } from "@/composables/bookReaderViewerRef"
-import {
-  asEpubLocator,
-  epubDisplayHref,
-} from "@/lib/book-reading/asEpubLocator"
+import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import {
   epubSpinePathMatches,
+  resolveSpineHrefForStoredPath,
   splitEpubHref,
 } from "@/lib/book-reading/epubHrefMatch"
 import { epubRenditionResizeDimensions } from "@/lib/book-reading/epubRenditionHostSize"
@@ -221,16 +219,42 @@ const onRelocated = (location: { start?: { href?: string } }) =>
   emitIfHref(location.start?.href)
 const onDisplayed = (section: { href?: string }) => emitIfHref(section.href)
 
+type EpubSpineItem = { href?: string }
+
+function spineItems(b: EpubJsBook | null): ReadonlyArray<EpubSpineItem> {
+  const raw = (
+    b as unknown as { spine?: { spineItems?: ReadonlyArray<EpubSpineItem> } }
+  )?.spine?.spineItems
+  return Array.isArray(raw) ? raw : []
+}
+
+/**
+ * Resolve a stored locator to an epub.js display target. The backend stores package-root
+ * paths (e.g. `OEBPS/chapter3.xhtml`) while epub.js indexes sections by the raw manifest
+ * href (e.g. `chapter3.xhtml`), so we must translate before calling `rendition.display`.
+ */
+function epubDisplayTarget(epub: EpubLocatorFull): string | null {
+  const storedPath = splitEpubHref(epub.href.trim()).path
+  if (storedPath.length === 0) {
+    return null
+  }
+  const spineHref =
+    resolveSpineHrefForStoredPath(spineItems(bookInstance), storedPath) ??
+    storedPath
+  const frag = epub.fragment?.trim() ?? ""
+  return frag.length === 0 ? spineHref : `${spineHref}#${frag}`
+}
+
 async function displayLocator(loc: ContentLocatorFull): Promise<void> {
   const epub = asEpubLocator(loc)
   if (!epub || !rendition) {
     return
   }
-  const h = epubDisplayHref(epub)
-  if (!h) {
+  const target = epubDisplayTarget(epub)
+  if (!target) {
     return
   }
-  await rendition.display(h).catch(() => undefined)
+  await rendition.display(target).catch(() => undefined)
 }
 
 function resolveLocatorRect(
@@ -338,8 +362,14 @@ async function openEpub() {
   rendition = r
   r.on("relocated", onRelocated)
   r.on("displayed", onDisplayed)
-  const target = (props.initialLocator ?? "").trim()
-  if (target.length > 0) {
+  const rawInitial = (props.initialLocator ?? "").trim()
+  if (rawInitial.length > 0) {
+    const { path, fragment } = splitEpubHref(rawInitial)
+    const spineHref = resolveSpineHrefForStoredPath(spineItems(b), path) ?? path
+    const target =
+      fragment !== null && fragment.length > 0
+        ? `${spineHref}#${fragment}`
+        : spineHref
     await r.display(target).catch(() => r.display().catch(() => undefined))
   } else {
     await r.display().catch(() => undefined)
