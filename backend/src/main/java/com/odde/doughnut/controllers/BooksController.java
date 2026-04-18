@@ -1,12 +1,12 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.configs.BookFileDownloadCacheControl;
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.book.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.concurrent.TimeUnit;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,10 +25,15 @@ class BooksController {
 
   private final AuthorizationService authorizationService;
   private final BookService bookService;
+  private final BookFileDownloadCacheControl bookFileDownloadCacheControl;
 
-  BooksController(AuthorizationService authorizationService, BookService bookService) {
+  BooksController(
+      AuthorizationService authorizationService,
+      BookService bookService,
+      BookFileDownloadCacheControl bookFileDownloadCacheControl) {
     this.authorizationService = authorizationService;
     this.bookService = bookService;
+    this.bookFileDownloadCacheControl = bookFileDownloadCacheControl;
   }
 
   @Operation(operationId = "getBookFileByBook", summary = "Download book source file")
@@ -41,8 +46,7 @@ class BooksController {
     authorizationService.assertReadAuthorization(book.getNotebook());
     var file = bookService.notebookBookFileFromBook(book);
     String etag = file.etag();
-    CacheControl cacheControl =
-        CacheControl.maxAge(365, TimeUnit.DAYS).cachePrivate().mustRevalidate();
+    CacheControl cacheControl = bookFileDownloadCacheControl.value();
     if (request.checkNotModified(etag)) {
       return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
           .eTag(etag)

@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.odde.doughnut.configs.BookFileDownloadCacheControl;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.AttachBookRequest;
 import com.odde.doughnut.controllers.dto.BookBlockDepthRequest;
@@ -31,7 +32,6 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,10 +49,15 @@ class NotebookBooksController {
 
   private final AuthorizationService authorizationService;
   private final BookService bookService;
+  private final BookFileDownloadCacheControl bookFileDownloadCacheControl;
 
-  NotebookBooksController(AuthorizationService authorizationService, BookService bookService) {
+  NotebookBooksController(
+      AuthorizationService authorizationService,
+      BookService bookService,
+      BookFileDownloadCacheControl bookFileDownloadCacheControl) {
     this.authorizationService = authorizationService;
     this.bookService = bookService;
+    this.bookFileDownloadCacheControl = bookFileDownloadCacheControl;
   }
 
   @Operation(operationId = "attachBook", summary = "Attach book")
@@ -250,8 +255,7 @@ class NotebookBooksController {
     authorizationService.assertReadAuthorization(notebook);
     var file = bookService.getNotebookBookFile(notebook);
     String etag = file.etag();
-    CacheControl cacheControl =
-        CacheControl.maxAge(365, TimeUnit.DAYS).cachePrivate().mustRevalidate();
+    CacheControl cacheControl = bookFileDownloadCacheControl.value();
     if (request.checkNotModified(etag)) {
       return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
           .eTag(etag)

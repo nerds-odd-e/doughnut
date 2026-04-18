@@ -959,8 +959,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(
           res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
           equalTo("inline; filename=\"Linear Algebra.pdf\""));
-      assertThat(res.getHeaders().getCacheControl(), containsString("private"));
-      assertThat(res.getHeaders().getCacheControl(), containsString("max-age="));
+      assertThat(res.getHeaders().getCacheControl(), containsString("no-store"));
     }
 
     @Test
@@ -984,8 +983,7 @@ class NotebookBooksControllerTest extends ControllerTestBase {
       assertThat(
           res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
           equalTo("inline; filename=\"Minimal EPUB.epub\""));
-      assertThat(res.getHeaders().getCacheControl(), containsString("private"));
-      assertThat(res.getHeaders().getCacheControl(), containsString("max-age="));
+      assertThat(res.getHeaders().getCacheControl(), containsString("no-store"));
     }
 
     @Test
