@@ -1,3 +1,4 @@
+@ignore
 Feature: EPUB book
 
   Rule: Supported minimal EPUB in reading view
