@@ -6,7 +6,7 @@
   >
     <div
       ref="renditionHostRef"
-      class="epub-book-viewer-host daisy-absolute daisy-inset-0 daisy-overflow-auto"
+      class="epub-book-viewer-host daisy-absolute daisy-inset-0 daisy-overflow-hidden"
     />
   </div>
 </template>
@@ -28,6 +28,9 @@ import type {
 } from "@generated/doughnut-backend-api"
 import ePub, { type Book as EpubJsBook, type Rendition } from "epubjs"
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
+
+const RENDITION_RESIZE_DEBOUNCE_MS = 100
+const RENDITION_RESIZE_MIN_DELTA_PX = 2
 
 const READING_PANEL_ANCHOR_GAP_PX = 8
 
@@ -104,6 +107,61 @@ const emit = defineEmits<{
 const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
+let renditionResizeObserver: ResizeObserver | null = null
+let renditionResizeDebounceTimer: ReturnType<typeof setTimeout> | null = null
+let lastAppliedRenditionWidth = 0
+let lastAppliedRenditionHeight = 0
+
+function resizeRenditionToHost(): void {
+  const host = renditionHostRef.value
+  const r = rendition
+  if (!host || !r) {
+    return
+  }
+  const w = Math.floor(host.clientWidth)
+  const h = Math.floor(host.clientHeight)
+  if (w < 1 || h < 1) {
+    return
+  }
+  if (
+    Math.abs(w - lastAppliedRenditionWidth) < RENDITION_RESIZE_MIN_DELTA_PX &&
+    Math.abs(h - lastAppliedRenditionHeight) < RENDITION_RESIZE_MIN_DELTA_PX
+  ) {
+    return
+  }
+  lastAppliedRenditionWidth = w
+  lastAppliedRenditionHeight = h
+  r.resize(w, h)
+}
+
+function teardownRenditionResizeObserver(): void {
+  if (renditionResizeDebounceTimer !== null) {
+    clearTimeout(renditionResizeDebounceTimer)
+    renditionResizeDebounceTimer = null
+  }
+  renditionResizeObserver?.disconnect()
+  renditionResizeObserver = null
+  lastAppliedRenditionWidth = 0
+  lastAppliedRenditionHeight = 0
+}
+
+function setupRenditionResizeObserver(): void {
+  teardownRenditionResizeObserver()
+  const host = renditionHostRef.value
+  if (!host || typeof ResizeObserver === "undefined") {
+    return
+  }
+  renditionResizeObserver = new ResizeObserver(() => {
+    if (renditionResizeDebounceTimer !== null) {
+      clearTimeout(renditionResizeDebounceTimer)
+    }
+    renditionResizeDebounceTimer = setTimeout(() => {
+      renditionResizeDebounceTimer = null
+      resizeRenditionToHost()
+    }, RENDITION_RESIZE_DEBOUNCE_MS)
+  })
+  renditionResizeObserver.observe(host)
+}
 
 function emitIfHref(href: string | undefined) {
   if (typeof href === "string" && href.length > 0) {
@@ -203,6 +261,7 @@ defineExpose({
 })
 
 function destroyEpub() {
+  teardownRenditionResizeObserver()
   if (rendition) {
     rendition.off("relocated", onRelocated)
     rendition.off("displayed", onDisplayed)
@@ -229,11 +288,14 @@ async function openEpub() {
   const r = b.renderTo(host, {
     flow: "scrolled",
     manager: "continuous",
+    width: "100%",
+    height: "100%",
     allowScriptedContent: false,
   })
   rendition = r
   r.on("relocated", onRelocated)
   r.on("displayed", onDisplayed)
+  setupRenditionResizeObserver()
   const target = (props.initialLocator ?? "").trim()
   if (target.length > 0) {
     await r.display(target).catch(() => r.display().catch(() => undefined))
