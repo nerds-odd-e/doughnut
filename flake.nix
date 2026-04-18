@@ -62,6 +62,7 @@
         linuxPackages = with pkgs; lib.optionals (!stdenv.isDarwin) [
           psmisc
           xclip
+          libuuid
         ];
 
         linuxCypressPackages = with pkgs; lib.optionals (!stdenv.isDarwin) [
@@ -96,17 +97,20 @@
           cairo
         ];
 
+        shellBuildInputs = basePackages ++ darwinPackages ++ linuxPackages ++ pythonPackages;
+
       in {
         devShells.default = pkgs.mkShell {
           name = "doughnut";
           nativeBuildInputs = with pkgs; [ autoPatchelfHook ];
-          buildInputs = basePackages ++ darwinPackages ++ linuxPackages ++ pythonPackages;
+          buildInputs = shellBuildInputs;
 
           # Force binary substitutes for the shell
           preferLocalBuild = false;
           allowSubstitutes = true;
 
           shellHook = ''
+            export LD_LIBRARY_PATH="${lib.makeLibraryPath shellBuildInputs}''${LD_LIBRARY_PATH:+:}''$LD_LIBRARY_PATH"
             export PATH="${pythonWithTools}/bin:${poetryPath}:$PATH"
             source ./scripts/nix_shell_hook.sh "${pkgs.fzf}" "${pkgs.mysql84}" "${pkgs.redis}" "${poetryPath}"
           '';
