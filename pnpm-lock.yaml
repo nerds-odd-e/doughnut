@@ -160,16 +160,13 @@ importers:
     dependencies:
       '@inkjs/ui':
         specifier: 2.0.0
-        version: 2.0.0(ink@7.0.0(@types/react@19.2.14)(react@19.2.5))
+        version: 2.0.0(ink@7.0.1(@types/react@19.2.14)(react@19.2.5))
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
       doughnut-api:
         specifier: workspace:*
         version: link:../packages/doughnut-api
-      ink:
-        specifier: ^7.0.0
-        version: 7.0.0(@types/react@19.2.14)(react@19.2.5)
       markdansi:
         specifier: 0.2.1
         version: 0.2.1
@@ -204,6 +201,9 @@ importers:
       esbuild:
         specifier: 0.28.0
         version: 0.28.0
+      ink:
+        specifier: ^7.0.1
+        version: 7.0.1(@types/react@19.2.14)(react@19.2.5)
       ink-testing-library:
         specifier: ^4.0.0
         version: 4.0.0(@types/react@19.2.14)
@@ -4175,8 +4175,8 @@ packages:
       '@types/react':
         optional: true
 
-  ink@7.0.0:
-    resolution: {integrity: sha512-fMie5/VwIYXofMyND0s+fOVhwVBBPYx+uuqJ6V6rUBGjui+2UYp+0fWtvhSeKT4z+X1uH98a4ge5Vj3aTlL6mg==}
+  ink@7.0.1:
+    resolution: {integrity: sha512-o6LAC268PLawlGVYrXTyaTfke4VtJftEheuwbgkQf7yvSXyWp1nRwBbAyKEkWXFZZsW/la5wrMuNbuBvZK2C1w==}
     engines: {node: '>=22'}
     peerDependencies:
       '@types/react': '>=19.2.0'
@@ -8194,13 +8194,13 @@ snapshots:
 
   '@humanwhocodes/momoa@2.0.4': {}
 
-  '@inkjs/ui@2.0.0(ink@7.0.0(@types/react@19.2.14)(react@19.2.5))':
+  '@inkjs/ui@2.0.0(ink@7.0.1(@types/react@19.2.14)(react@19.2.5))':
     dependencies:
       chalk: 5.6.2
       cli-spinners: 3.4.0
       deepmerge: 4.3.1
       figures: 6.1.0
-      ink: 7.0.0(@types/react@19.2.14)(react@19.2.5)
+      ink: 7.0.1(@types/react@19.2.14)(react@19.2.5)
 
   '@inquirer/ansi@2.0.4': {}
 
@@ -11455,7 +11455,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  ink@7.0.0(@types/react@19.2.14)(react@19.2.5):
+  ink@7.0.1(@types/react@19.2.14)(react@19.2.5):
     dependencies:
       '@alcalzone/ansi-tokenize': 0.3.0
       ansi-escapes: 7.3.0
