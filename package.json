@@ -85,7 +85,7 @@
     "@hono/node-server": ">=1.19.14",
     "@mbtest/mountebank": "2.9.4",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@redocly/cli": "^2.28.0",
+    "@redocly/cli": "^2.28.1",
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5",
