@@ -9,16 +9,19 @@
 ---
 
 1. **Doughnut UI:** Wiki-style `[[link]]` in note **details** are **clickable**. Treat the tree like **Wikipedia-style subpages**: within a notebook, the path from the **head note** down the hierarchy maps to link paths (top-level notes are the first segment; children extend the path).
-   - **1.1** In **markdown** mode, users edit raw wiki syntax; in **rich** mode, links render as clickable links (not bracket literals).
-   - **1.2** In **rich** mode, edits round-trip to **markdown** as well-formed wiki links (`[[…]]`).
-   - **1.3** Support **pipe syntax** for alternate display text: `[[note title|display text]]`.
-   - **1.4** Allow links to notes that **do not exist yet** (“red link”); clicking **creates** the target note.
-   - **1.5** Support **cross-notebook** links, e.g. `[[notebook title:note title/child title]]` (exact grammar as defined by the product).
+   - **1.1** As a note taker, I want to edit wiki links as raw syntax in **markdown** mode and see them as clickable links in **rich** mode (not bracket literals).
+   - **1.2** As a note taker, I want **rich**-mode edits to round-trip to **markdown** as well-formed wiki links (`[[…]]`).
+   - **1.3** As a note taker, I want **pipe** syntax for alternate display text: `[[note title|display text]]`.
+   - **1.4** As a note taker, I want links to notes that do not exist yet ("red link") and to **create** the target when I click.
+   - **1.5** As a note taker, I want **cross-notebook** links (e.g. `[[notebook title:note title/child title]]`; grammar per product).
+   - **1.6** As a note taker, I want an **insert link** helper (e.g. button or command) to pick a target and insert a wiki link into **details**.
+   - **1.7** As a note taker, I want inline **autocomplete** when typing a wiki link in **markdown** mode.
+   - **1.8** As a note taker, I want inline **autocomplete** when creating or editing a wiki link in **rich** mode.
 
 2. **Doughnut UI:** **Auto-update** `[[link]]` display text (and/or target path where applicable) when the **link target** changes.
-   - **2.1** The target’s **title** changes.
-   - **2.2** The target note is **moved** (e.g. reparented or path in the hierarchy changes).
-   - **2.3** The target note is **deleted** (broken link handling / prompt—behavior defined in implementation).
+   - **2.1** As a note taker, I want `[[link]]` display (and path if needed) to update when the target’s **title** changes.
+   - **2.2** As a note taker, I want links to stay correct when the target note **moves** (e.g. **reparent** or path change).
+   - **2.3** As a note taker, I want clear behavior when the target note is **deleted** (broken link / prompt—defined in implementation).
 
 3. User runs CLI to **init** a folder as the bound root for a notebook; the path is stored so **`/use notebook`** can show it in the status bar.
 
@@ -52,17 +55,20 @@
 
 ---
 
-1. **Doughnut UI:** ノート **details** 内の wiki 形式 **`[[link]]`** をクリック可能にする。**notebook** 内のツリーは **Wikipedia** の **subpage** に近い考え方で扱う：**head note** から下る階層が **link** のパスに対応し、最上位ノートがパスの先頭セグメント、子がパスを延ばす。
-   - **1.1** **markdown** モードでは生の wiki 記法を編集し、**rich** モードでは **link** をクリック可能な要素として表示する（括弧の生テキストのままにしない）。
-   - **1.2** **rich** モードでの編集は、保存時に正しい wiki 形式の **markdown**（`[[…]]`）へ **round-trip** する。
-   - **1.3** 表示名の差し替えに **pipe** 記法をサポートする：`[[note title|display text]]`。
-   - **1.4** まだ存在しないノートへの **link**（いわゆる **red link**）を許可し、クリックで対象ノートを**新規作成**する。
-   - **1.5** **cross-notebook** の **link** をサポートする（例: `[[notebook title:note title/child title]]`。**grammar** はプロダクトで定義）。
+1. **Doughnut UI:** ノート **details** 内の wiki 形式 `[[link]]` をクリック可能にする。**notebook** 内のツリーは **Wikipedia** の **subpage** に近い考え方で扱う：**head note** から下る階層が **link** のパスに対応し、最上位ノートがパスの先頭セグメント、子がパスを延ばす。
+   - **1.1** ノート利用者として、**markdown** モードでは wiki 記法をそのまま編集し、**rich** モードでは **link** をクリック可能に表示したい（括弧の生テキストのままにしない）。
+   - **1.2** ノート利用者として、**rich** モードの編集を、保存時に正しい wiki 形式の **markdown**（`[[…]]`）へ **round-trip** したい。
+   - **1.3** ノート利用者として、表示名の差し替えに **pipe** 記法を使いたい：`[[note title|display text]]`。
+   - **1.4** ノート利用者として、未作成ノートへの **link**（**red link**）を張り、クリックで対象を**新規作成**したい。
+   - **1.5** ノート利用者として、**cross-notebook** の **link** を使いたい（例: `[[notebook title:note title/child title]]`。**grammar** はプロダクトで定義）。
+   - **1.6** ノート利用者として、**insert link** ヘルパー（例: **button** やコマンド）で対象を選び、**details** に wiki **link** を挿入したい。
+   - **1.7** ノート利用者として、**markdown** モードで wiki **link** を入力するときにインライン **autocomplete** が欲しい。
+   - **1.8** ノート利用者として、**rich** モードで wiki **link** を新規・編集するときにインライン **autocomplete** が欲しい。
 
 2. **Doughnut UI:** **link** の**表示**や、必要に応じて**参照先のパス**を、**link target** の変化に合わせて **auto-update** する。
-   - **2.1** 対象の **title** が変わったとき。
-   - **2.2** 対象ノートが**移動**したとき（例: **reparent** や階層上のパス変更）。
-   - **2.3** 対象ノートが**削除**されたとき（壊れた **link** の扱い／確認は実装で定義）。
+   - **2.1** ノート利用者として、対象の **title** が変わったときに `[[link]]` の表示（必要ならパスも）を更新したい。
+   - **2.2** ノート利用者として、対象ノートが**移動**しても（**reparent** やパス変更）**link** が追従したい。
+   - **2.3** ノート利用者として、対象ノートが**削除**されたとき壊れた **link** をどう扱うか分かりたい（実装で定義）。
 
 3. **CLI** で **`init`** し、フォルダを **notebook** に紐づけた **root** とする。パスを記憶し、**`/use notebook`** 時に **status bar** に表示できる。
 
@@ -76,7 +82,7 @@
 
 8. 適用前に **dry run** できる。
 
-9. **download** した **markdown** に **parent** を書き込める（例: **`[[parent]]`** 形式のプロパティ）。**parent** の変更を **Doughnut → local** に反映できる。
+9. **download** した **markdown** に **parent** を書き込める（例: `[[parent]]` 形式のプロパティ）。**parent** の変更を **Doughnut → local** に反映できる。
 
 10. **remote** に新規ノートが現れたら、（**changed-only** の **pull** モデルの範囲で）**Doughnut → local** に新規ノートを **sync** できる。
 
