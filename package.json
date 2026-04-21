@@ -94,7 +94,7 @@
     "cypress": "15.14.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.8",
-    "got": "^15.0.2",
+    "got": "^15.0.3",
     "hono": "4.12.14",
     "npm-run-all2": "^8.0.4",
     "process": "^0.11.10",
