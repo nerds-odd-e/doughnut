@@ -179,6 +179,11 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.get('textarea').clear().type(markdown)
       return this
     },
+    expectNoteDetailsMarkdown(expectedMarkdown: string) {
+      this.toolbarButton('Edit as markdown').click()
+      cy.get('textarea').should('have.value', expectedMarkdown)
+      return this
+    },
     expectRichDetails(elements: Record<string, string>[]) {
       elements.forEach((element) => {
         cy.get(element.Tag as string).should('contain', element.Content)

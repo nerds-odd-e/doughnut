@@ -614,3 +614,10 @@ When('I promote the point {string} to a child note', (pointText: string) => {
 When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
 })
+
+Then(
+  'the note details markdown should be {string}',
+  (expectedMarkdown: string) => {
+    start.assumeNotePage().expectNoteDetailsMarkdown(expectedMarkdown)
+  }
+)

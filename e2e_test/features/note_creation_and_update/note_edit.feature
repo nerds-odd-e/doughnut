@@ -90,3 +90,11 @@ Feature: Note Edit
     Then I should see "Hello" in the page
     And I should see "World" in the page
     And the note details should contain a line break
+
+  @ignore
+  # WIP
+  Scenario: Double brackets entered in rich editor are preserved unescaped in markdown
+      When I update note "LeSS in Action" to become:
+        | Title    | Details      |
+        | Doughnut | [[WikiLink]] |
+      Then the note details markdown should be "[[WikiLink]]"
