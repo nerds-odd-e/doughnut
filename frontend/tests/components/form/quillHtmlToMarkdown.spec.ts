@@ -47,4 +47,16 @@ describe("quillHtmlToMarkdown", () => {
     const result = htmlToMarkdown(html)
     expect(result).toBe("text \\[ alone \\]")
   })
+
+  it("still escapes lone opening double bracket", () => {
+    const html = "<p>[[ alone</p>"
+    const result = htmlToMarkdown(html)
+    expect(result).toBe("\\[\\[ alone")
+  })
+
+  it("still escapes lone closing double bracket", () => {
+    const html = "<p>alone ]]</p>"
+    const result = htmlToMarkdown(html)
+    expect(result).toBe("alone \\]\\]")
+  })
 })
