@@ -7,6 +7,25 @@ export const turndownService = new TurndownService({
 
 turndownService.use(gfm)
 
+// Turndown escapes [ and ] to prevent markdown link syntax conflicts,
+// but Quill manages links as <a> elements, so plain-text brackets need no escaping.
+turndownService.escape = (string: string) =>
+  (
+    [
+      [/\\/g, "\\\\"],
+      [/\*/g, "\\*"],
+      [/^-/g, "\\-"],
+      [/^\+ /g, "\\+ "],
+      [/^(=+)/g, "\\$1"],
+      [/^(#{1,6}) /g, "\\$1 "],
+      [/`/g, "\\`"],
+      [/^~~~/g, "\\~~~"],
+      [/^>/g, "\\>"],
+      [/_/g, "\\_"],
+      [/^(\d+)\. /g, "$1\\. "],
+    ] as [RegExp, string][]
+  ).reduce((acc, [pattern, replacement]) => acc.replace(pattern, replacement), string)
+
 turndownService.addRule("quillListItem", {
   filter(node) {
     return node.nodeName === "LI" && node.getAttribute("data-list") != null

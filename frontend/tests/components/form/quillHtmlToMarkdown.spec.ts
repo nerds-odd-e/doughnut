@@ -2,6 +2,12 @@ import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 
 describe("quillHtmlToMarkdown", () => {
+  it("does not escape square brackets in plain text", () => {
+    const html = "<p>Use [this] notation</p>"
+    const result = htmlToMarkdown(html)
+    expect(result).toBe("Use [this] notation")
+  })
+
   it("converts HTML with escaped angle brackets", () => {
     const html = "<p>raw &lt;span&gt; is ok.</p>"
     const result = htmlToMarkdown(html)
