@@ -41,4 +41,10 @@ describe("quillHtmlToMarkdown", () => {
     // Should not merge A and B into a single code block
     expect(result).not.toContain("```\nA\nB\n```")
   })
+
+  it("escapes opening bracket in current behavior", () => {
+    const html = "<p>text [ alone ]</p>"
+    const result = htmlToMarkdown(html)
+    expect(result).toBe("text \\[ alone \\]")
+  })
 })
