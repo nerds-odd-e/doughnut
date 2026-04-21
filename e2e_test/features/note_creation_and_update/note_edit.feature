@@ -91,8 +91,6 @@ Feature: Note Edit
     And I should see "World" in the page
     And the note details should contain a line break
 
-  @ignore
-  # WIP
   Scenario: Double brackets entered in rich editor are preserved unescaped in markdown
       When I update note "LeSS in Action" to become:
         | Title    | Details      |

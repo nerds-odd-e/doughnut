@@ -301,5 +301,6 @@ export default function htmlToMarkdown(html: string) {
   // Normalize table cells by removing <p> tags inside them
   normalizeTableCells(tempDiv)
   mergeConsecutiveHeaders(tempDiv)
-  return turndownService.turndown(tempDiv.innerHTML)
+  const markdown = turndownService.turndown(tempDiv.innerHTML)
+  return markdown.replace(/\\\[\\\[(.+?)\\\]\\\]/g, "[[$1]]")
 }

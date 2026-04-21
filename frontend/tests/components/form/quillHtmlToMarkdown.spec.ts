@@ -59,4 +59,10 @@ describe("quillHtmlToMarkdown", () => {
     const result = htmlToMarkdown(html)
     expect(result).toBe("alone \\]\\]")
   })
+
+  it("preserves complete double brackets as WikiLink syntax", () => {
+    const html = "<p>[[WikiLink]]</p>"
+    const result = htmlToMarkdown(html)
+    expect(result).toBe("[[WikiLink]]")
+  })
 })
