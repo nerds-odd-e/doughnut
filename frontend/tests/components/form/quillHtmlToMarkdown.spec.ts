@@ -2,12 +2,6 @@ import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 
 describe("quillHtmlToMarkdown", () => {
-  it("converts HTML with escaped angle brackets", () => {
-    const html = "<p>raw &lt;span&gt; is ok.</p>"
-    const result = htmlToMarkdown(html)
-    expect(result).toBe("raw <span> is ok.")
-  })
-
   it("preserves escaped HTML entities in markdown output", () => {
     const html = '<p>emit <span class="s1">&lt;br&gt;</span>.</p>'
     const result = htmlToMarkdown(html)
@@ -42,22 +36,19 @@ describe("quillHtmlToMarkdown", () => {
     expect(result).not.toContain("```\nA\nB\n```")
   })
 
-  it("escapes opening bracket in current behavior", () => {
-    const html = "<p>text [ alone ]</p>"
-    const result = htmlToMarkdown(html)
-    expect(result).toBe("text \\[ alone \\]")
-  })
+  /** Punctuation / Turndown escaping: given Quill HTML → then markdown. */
+  const whenHtmlIsConvertedToMarkdown = "htmlToMarkdown"
 
-  it("still escapes lone opening double bracket", () => {
-    const html = "<p>[[ alone</p>"
-    const result = htmlToMarkdown(html)
-    expect(result).toBe("\\[\\[ alone")
-  })
-
-  it("still escapes lone closing double bracket", () => {
-    const html = "<p>alone ]]</p>"
-    const result = htmlToMarkdown(html)
-    expect(result).toBe("alone \\]\\]")
+  it.each`
+    label             | given                | when                             | then
+    ${"< via entity"} | ${"<p>&lt;test</p>"} | ${whenHtmlIsConvertedToMarkdown} | ${"<test"}
+    ${"> via entity"} | ${"<p>test&gt;</p>"} | ${whenHtmlIsConvertedToMarkdown} | ${"test>"}
+    ${"["}            | ${"<p>[test</p>"}    | ${whenHtmlIsConvertedToMarkdown} | ${"\\[test"}
+    ${"]"}            | ${"<p>test]</p>"}    | ${whenHtmlIsConvertedToMarkdown} | ${"test\\]"}
+    ${"[[ with text"} | ${"<p>[[test</p>"}   | ${whenHtmlIsConvertedToMarkdown} | ${"\\[\\[test"}
+    ${"]] with text"} | ${"<p>test]]</p>"}   | ${whenHtmlIsConvertedToMarkdown} | ${"test\\]\\]"}
+  `("$label (when: $when)", ({ given, then }) => {
+    expect(htmlToMarkdown(given)).toBe(then)
   })
 
   it("preserves complete double brackets as WikiLink syntax", () => {
