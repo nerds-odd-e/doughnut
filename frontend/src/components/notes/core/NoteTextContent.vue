@@ -12,7 +12,7 @@
   />
   <div role="details" class="note-details">
     <NoteEditableDetails
-      v-bind="{ readonly, noteId: note.id, noteDetails: note.details, asMarkdown }"
+      v-bind="{ readonly, noteId: note.id, noteDetails: note.details, asMarkdown, wikiTitles }"
     />
   </div>
 </template>
@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { type PropType } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "../../form/markdownToQuillHtml"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteTitleAsPredicate from "./NoteTitleAsPredicate.vue"
 import NoteEditableDetails from "./NoteEditableDetails.vue"
@@ -28,5 +29,6 @@ defineProps({
   note: { type: Object as PropType<Note>, required: true },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
+  wikiTitles: { type: Array as PropType<WikiTitle[]>, default: undefined },
 })
 </script>

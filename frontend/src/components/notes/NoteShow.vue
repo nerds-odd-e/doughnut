@@ -27,6 +27,7 @@
                     note: noteRealm.note,
                     asMarkdown,
                     readonly: readonly(noteRealm),
+                    wikiTitles: getWikiTitles(noteRealm),
                   }"
                 />
                 <NoteAccessoryAsync
@@ -99,6 +100,7 @@ import type {
   NoteRealm,
   User,
 } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
@@ -106,6 +108,7 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
+import type { WikiTitle } from "../form/markdownToQuillHtml"
 
 defineProps({
   noteId: { type: Number, required: true },
@@ -124,6 +127,33 @@ const onNoteAccessoryUpdated = () => {
   reloadKey.value += 1
 }
 const asMarkdown = ref(false)
+
+const wikiTitles = ref<WikiTitle[]>([])
+const lastFetchedHeadNoteId = ref<number | undefined>(undefined)
+
+const fetchWikiTitles = async (headNoteId: number) => {
+  if (headNoteId === lastFetchedHeadNoteId.value) return
+  lastFetchedHeadNoteId.value = headNoteId
+  const { data, error } = await NoteController.getDescendants({
+    path: { note: headNoteId },
+  })
+  if (!error && data) {
+    wikiTitles.value = (data.relatedNotes ?? [])
+      .filter((note) => !!note.title && !!note.uri)
+      .map((note) => ({
+        title: note.title!,
+        noteId: parseInt(note.uri!.replace("/n", ""), 10),
+      }))
+  }
+}
+
+const getWikiTitles = (noteRealm: NoteRealm) => {
+  const headNoteId = noteRealm.notebook?.headNoteId
+  if (headNoteId) {
+    fetchWikiTitles(headNoteId)
+  }
+  return wikiTitles.value
+}
 
 const toLocalDateString = (date: string) => new Date(date).toLocaleDateString()
 </script>

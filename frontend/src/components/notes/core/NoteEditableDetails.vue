@@ -22,6 +22,7 @@
         scope-name="note"
         :model-value="value"
         :readonly="readonly"
+        :wiki-titles="wikiTitles"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
@@ -31,17 +32,19 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from "vue"
+import { nextTick, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
+import type { WikiTitle } from "../../form/markdownToQuillHtml"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
   noteDetails: { type: String, required: false },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
+  wikiTitles: { type: Array as PropType<WikiTitle[]>, default: undefined },
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)

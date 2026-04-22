@@ -10,11 +10,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import markdownizer from "./markdownizer"
+import type { WikiTitle } from "./markdownToQuillHtml"
 
-const { modelValue } = defineProps({
+const { modelValue, wikiTitles } = defineProps({
   multipleLine: Boolean,
   modelValue: String,
   scopeName: String,
@@ -22,6 +23,7 @@ const { modelValue } = defineProps({
   title: String,
   errors: Object,
   readonly: Boolean,
+  wikiTitles: { type: Array as PropType<WikiTitle[]>, default: undefined },
 })
 
 const emits = defineEmits<{
@@ -37,7 +39,7 @@ const htmlValue = computed(() => {
   if (modelValue === currentIntervalMarkdown) {
     return currentIntervalHtml!
   }
-  return markdownizer.markdownToHtml(modelValue)
+  return markdownizer.markdownToHtml(modelValue, { wikiTitles })
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {

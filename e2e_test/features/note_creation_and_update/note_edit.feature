@@ -123,7 +123,11 @@ Feature: Note Edit
 
   Scenario Outline: Edit a note's details with a wiki link in markdown
     Given I have a notebook with the head note "TDD"
-    And I have a notebook with the head note "Odd-e CSD"
+    And there are some notes:
+      | Title          | Parent Title |
+      | LeSS in Action | TDD          |
+      | Odd-e CSD      | TDD          |
+      | AI Driven      | TDD          |
     When I update note "TDD" details using markdown to become:
       """
       [[<linked note>]]
@@ -138,6 +142,7 @@ Feature: Note Edit
       | linked note    |
       | LeSS in Action |
       | Odd-e CSD      |
+      | AI Driven      |
 
   @wip
   Scenario: Click a wiki link in note details shows navigation confirmation
