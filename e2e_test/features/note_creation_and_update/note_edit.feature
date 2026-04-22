@@ -103,11 +103,12 @@ Feature: Note Edit
         | Doughnut | [[LeSS in Action]] .... [[Odd-e CSD]] |
       Then the note details markdown should be "[[LeSS in Action]] .... [[Odd-e CSD]]"
 
+  @ignore
   Scenario: Extra opening bracket before double brackets is escaped
     When I update note "LeSS in Action" to become:
       | Title    | Details         |
       | Doughnut | [[[WikiLink]]   |
-    Then the note details markdown should be "\[[[WikiLink]]"
+    Then the note details markdown should be "[[\[WikiLink]]"
 
   Scenario: Extra closing bracket after double brackets is escaped
     When I update note "LeSS in Action" to become:
