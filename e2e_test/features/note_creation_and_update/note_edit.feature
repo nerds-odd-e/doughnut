@@ -103,7 +103,6 @@ Feature: Note Edit
         | Doughnut | [[LeSS in Action]] .... [[Odd-e CSD]] |
       Then the note details markdown should be "[[LeSS in Action]] .... [[Odd-e CSD]]"
 
-  @ignore
   Scenario: Extra opening bracket before double brackets is escaped
     When I update note "LeSS in Action" to become:
       | Title    | Details         |

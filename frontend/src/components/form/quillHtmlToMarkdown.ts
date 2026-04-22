@@ -302,5 +302,5 @@ export default function htmlToMarkdown(html: string) {
   normalizeTableCells(tempDiv)
   mergeConsecutiveHeaders(tempDiv)
   const markdown = turndownService.turndown(tempDiv.innerHTML)
-  return markdown.replace(/\\\[\\\[([^\\\]]+?)\\\]\\\]/g, "[[$1]]")
+  return markdown.replace(/\\\[\\\[((?:[^\\\[\]]|\\\[)+?)\\\]\\\]/g, "[[$1]]")
 }
