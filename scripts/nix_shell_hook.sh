@@ -75,25 +75,51 @@ if [ "$CURSOR_DEV_MODE" != "true" ]; then
   setup_pnpm_and_biome
   setup_cypress
 
-  # Start MySQL if not running
+  # Decide which services need to be started
+  needs_mysql=false
+  needs_redis=false
   if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
-    log "Starting MySQL server..."
-    export PC_DISABLE_TUI=1
-    process-compose -f "${PWD}/process-compose.yaml" up -D mysql
-    check_mysql_ready
-    "${MYSQL_BASEDIR}/bin/mysql" -u root -S "${MYSQL_UNIX_SOCKET}" < "${PWD}/scripts/sql/init_doughnut_db.sql"
+    needs_mysql=true
   else
     log "MySQL is running on port 3309 & ready to go! 🐬"
   fi
-
-  # Start Redis if not running
   if ! lsof -i :6380 -sTCP:LISTEN >/dev/null 2>&1; then
-    log "Starting Redis server..."
-    export PC_DISABLE_TUI=1
-    process-compose -f "${PWD}/process-compose.yaml" up -D redis
-    check_redis_ready
+    needs_redis=true
   else
     log "Redis is running on port 6380 & ready to go! 🗄️"
+  fi
+
+  # Start the required services via process-compose.
+  # Notes:
+  #   - `process-compose up <name>` launches a new server where only <name> is
+  #     enabled and all other processes are marked Disabled. Calling it a second
+  #     time fails silently because port 8080 is already in use, which is what
+  #     previously caused redis to hang on startup.
+  #   - If a process-compose server is already running (port 8080 taken), start
+  #     additional services with `process start <name>` instead of `up`.
+  if [ "$needs_mysql" = true ] || [ "$needs_redis" = true ]; then
+    export PC_DISABLE_TUI=1
+    services_to_start=()
+    [ "$needs_mysql" = true ] && services_to_start+=("mysql")
+    [ "$needs_redis" = true ] && services_to_start+=("redis")
+
+    if lsof -i :8080 -sTCP:LISTEN >/dev/null 2>&1; then
+      for svc in "${services_to_start[@]}"; do
+        log "Starting ${svc} via existing process-compose server..."
+        process-compose process start "$svc"
+      done
+    else
+      log "Starting process-compose with: ${services_to_start[*]}..."
+      process-compose -f "${PWD}/process-compose.yaml" up -D "${services_to_start[@]}"
+    fi
+
+    if [ "$needs_mysql" = true ]; then
+      check_mysql_ready
+      "${MYSQL_BASEDIR}/bin/mysql" -u root -S "${MYSQL_UNIX_SOCKET}" < "${PWD}/scripts/sql/init_doughnut_db.sql"
+    fi
+    if [ "$needs_redis" = true ]; then
+      check_redis_ready
+    fi
   fi
 
   # Print environment information
