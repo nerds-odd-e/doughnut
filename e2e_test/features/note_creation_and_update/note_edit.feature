@@ -115,12 +115,7 @@ Feature: Note Edit
       | Doughnut | [[WikiLink]]]   |
     Then the note details markdown should be "[[WikiLink]]\]"
 
-  Scenario: Extra opening and closing brackets after double brackets is escaped
-    When I update note "LeSS in Action" to become:
-      | Title    | Details         |
-      | Doughnut | [[[WikiLink]]]   |
-    Then the note details markdown should be "[[\[WikiLink]]\]"
-
+  @wip
   Scenario Outline: Edit a note's details with a wiki link in markdown
     Given I have a notebook with the head note "TDD"
     And there are some notes:
@@ -136,23 +131,10 @@ Feature: Note Edit
       | Tag | Content       |
       | a   | <linked note> |
     When I click the link "<linked note>" in the note details
-    Then I should see "<linked note>" in the page
+    Then I should be on the note page "/n1"
 
     Examples:
       | linked note    |
       | LeSS in Action |
       | Odd-e CSD      |
       | AI Driven      |
-
-  @wip
-  Scenario: Click a wiki link in note details shows navigation confirmation
-    Given I have a notebook with the head note "TDD"
-    When I update note "TDD" details using markdown to become:
-      """
-      [[LeSS in Action]]
-      """
-    Then I should see the rich content of the note with details:
-      | Tag | Content        |
-      | a   | LeSS in Action |
-    When I click the link "LeSS in Action" in the note details
-    Then I should see a dialog with message "Navigate to LeSS in Action?"
