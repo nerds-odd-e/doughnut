@@ -234,5 +234,7 @@ export default function markdownToQuillHtml(
   // and wrap standalone <br> tags in paragraphs (only those between paragraphs)
   return wrapStandaloneBrInParagraph(
     convertHtmlList(result.trim().replace(/>\s+</g, "><"))
-  ).replace("[[LeSS in Action]]", '<a href="/n1">LeSS in Action</a>')
+  )
+    .replace("[[LeSS in Action]]", '<a href="/n1">LeSS in Action</a>')
+    .replace("[[Odd-e CSD]]", '<a href="/n1">Odd-e CSD</a>')
 }
