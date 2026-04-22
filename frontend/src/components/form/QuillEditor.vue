@@ -190,6 +190,19 @@ onMounted(async () => {
       )
     }
 
+    quill.value.root.addEventListener(
+      "click",
+      (event: MouseEvent) => {
+        const anchor = (event.target as HTMLElement).closest("a")
+        if (!anchor) return
+        event.preventDefault()
+        const href = anchor.getAttribute("href")
+        if (!href) return
+        window.confirm(`Navigate to ${anchor.textContent}?`)
+      },
+      true
+    )
+
     // Listen for text changes
     quill.value.on("text-change", () => {
       const content = quill.value!.root.innerHTML

@@ -133,3 +133,16 @@ Feature: Note Edit
       | linked note    |
       | LeSS in Action |
       | Odd-e CSD      |
+
+  @wip
+  Scenario: Click a wiki link in note details shows navigation confirmation
+    Given I have a notebook with the head note "TDD"
+    When I update note "TDD" details using markdown to become:
+      """
+      [[LeSS in Action]]
+      """
+    Then I should see the rich content of the note with details:
+      | Tag | Content        |
+      | a   | LeSS in Action |
+    When I click the link "LeSS in Action" in the note details
+    Then I should see a dialog with message "Navigate to LeSS in Action?"

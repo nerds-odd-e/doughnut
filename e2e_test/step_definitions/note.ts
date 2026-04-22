@@ -623,5 +623,14 @@ Then(
 )
 
 When('I click the link {string} in the note details', (linkText: string) => {
+  const confirmSpy = cy.spy().as('confirmSpy')
+  cy.on('window:confirm', confirmSpy)
   cy.get('[role=details]').find('a').contains(linkText).click()
 })
+
+Then(
+  'I should see a dialog with message {string}',
+  (expectedMessage: string) => {
+    cy.get('@confirmSpy').should('have.been.calledWith', expectedMessage)
+  }
+)
