@@ -36,8 +36,8 @@ doughnut_needs_pnpm_install() {
 setup_pnpm_and_biome() {
   log "Setting up PNPM..."
   if doughnut_needs_pnpm_install; then
-    corepack prepare pnpm@10.33.0 --activate
-    corepack use pnpm@10.33.0
+    corepack prepare pnpm@10.33.1 --activate
+    corepack use pnpm@10.33.1
     pnpm --frozen-lockfile recursive install && doughnut_workspace_deps_fingerprint >"${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}"
   else
     log "Skipping corepack/pnpm (workspace fingerprint unchanged). Set DOUGHNUT_SHELL_HOOK_FORCE_PNPM=1 to force."
