@@ -97,6 +97,12 @@ Feature: Note Edit
         | Doughnut | [[WikiLink]] |
       Then the note details markdown should be "[[WikiLink]]"
 
+  Scenario: Two wiki links in note details are treated as separate links
+      When I update note "LeSS in Action" to become:
+        | Title    | Details      |
+        | Doughnut | [[LeSS in Action]] .... [[Odd-e CSD]] |
+      Then the note details markdown should be "[[LeSS in Action]] .... [[Odd-e CSD]]"
+
   Scenario Outline: Edit a note's details with a wiki link in markdown
     Given I have a notebook with the head note "TDD"
     And I have a notebook with the head note "Odd-e CSD"
