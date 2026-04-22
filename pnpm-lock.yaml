@@ -93,8 +93,8 @@ importers:
         specifier: ^1.29.0
         version: 1.29.0(zod@4.3.6)
       '@redocly/cli':
-        specifier: ^2.29.0
-        version: 2.29.0(@opentelemetry/api@1.9.0)(core-js@3.46.0)
+        specifier: ^2.29.1
+        version: 2.29.1(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.14.1)
@@ -1852,8 +1852,8 @@ packages:
   '@redocly/cli-otel@0.1.2':
     resolution: {integrity: sha512-Bg7BoO5t1x3lVK+KhA5aGPmeXpQmdf6WtTYHhelKJCsQ+tRMiJoFAQoKHoBHAoNxXrhlS3K9lKFLHGmtxsFQfA==}
 
-  '@redocly/cli@2.29.0':
-    resolution: {integrity: sha512-O4lQTgvOhM4Afo4Gm44+KaxzwlPBLtXinqA5NVL7OQcabesindPeSHBdGIBA+KoyCP3KK7ofmCPB71bRyiaYGg==}
+  '@redocly/cli@2.29.1':
+    resolution: {integrity: sha512-n85tU21emkYc1k7IZhOFqIrEQizvQuHzHMOwcMZ503XNhzf9OYLLQ8AEcQl1hjpUGtJWsMeSJbpuEwewgb4T0Q==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1867,12 +1867,12 @@ packages:
     resolution: {integrity: sha512-/oy8sXi5xK4+HvcFR7xS1A74zJ5aS6rtacNEr91SczLqvtxz79opxp7yYpdYtfGQAp6igx9eU9alwSC/R/X3Cg==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.29.0':
-    resolution: {integrity: sha512-hIbOw1ZY01NhjEGwAuG/OXy19EAY31W7J7b061aNpCzJ8+mFyyy52X4CTrpF2c0rbemSLobXowvAEddVSX1QzQ==}
+  '@redocly/openapi-core@2.29.1':
+    resolution: {integrity: sha512-T9FeS2+lpXR9V/XHqiJ53uGjoF1Hs80nRA9ACEXpTLF9a4jzzSANO92/f9HKuQvl0bHgyaIbP5OsBgVU3EP1KQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.29.0':
-    resolution: {integrity: sha512-9AFUHOwr0ICGHYiSsfcnQO2XVd1qOG3NZx0kk/KBGX4w+PIBMhwjcGP0vyeqtTLz20bpbaChrCGrgiCWsEe55Q==}
+  '@redocly/respect-core@2.29.1':
+    resolution: {integrity: sha512-TklpmSho4nSp2ySXWRUJlFQaHoN4BtSTTWabzQPetblAJ6KRVZtgFk6x8eD8KwWUaJj8c7ed4/KAIHOqTdNVxg==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.16':
@@ -8696,15 +8696,15 @@ snapshots:
     dependencies:
       ulid: 2.4.0
 
-  '@redocly/cli@2.29.0(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
+  '@redocly/cli@2.29.1(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
       '@redocly/cli-otel': 0.1.2
-      '@redocly/openapi-core': 2.29.0
-      '@redocly/respect-core': 2.29.0
+      '@redocly/openapi-core': 2.29.1
+      '@redocly/respect-core': 2.29.1
       abort-controller: 3.0.0
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
@@ -8756,7 +8756,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.29.0':
+  '@redocly/openapi-core@2.29.1':
     dependencies:
       '@redocly/ajv': 8.18.0
       '@redocly/config': 0.48.0
@@ -8769,12 +8769,12 @@ snapshots:
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
 
-  '@redocly/respect-core@2.29.0':
+  '@redocly/respect-core@2.29.1':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.18.0
-      '@redocly/openapi-core': 2.29.0
+      '@redocly/openapi-core': 2.29.1
       ajv: 8.18.0
       better-ajv-errors: 1.2.0(ajv@8.18.0)
       colorette: 2.0.20
@@ -9327,7 +9327,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@opentelemetry/api@1.9.0)(@types/node@25.6.0)(@vitest/browser-playwright@4.1.5)(@vitest/ui@4.1.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(canvas@3.2.3))(vite@8.0.9(@types/node@25.6.0)(esbuild@0.28.0)(jiti@1.21.7)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+      vitest: 4.1.5(@opentelemetry/api@1.9.0)(@types/node@25.6.0)(@vitest/browser-playwright@4.1.5)(@vitest/ui@4.1.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(canvas@3.2.3))(vite@8.0.9(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
 
   '@vitest/utils@3.2.4':
     dependencies:
