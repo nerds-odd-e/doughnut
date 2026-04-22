@@ -46,8 +46,8 @@
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vitest/browser-playwright": "4.1.5",
     "@vitest/ui": "4.1.5",
-    "@vue/compiler-core": "3.5.32",
-    "@vue/server-renderer": "^3.5.32",
+    "@vue/compiler-core": "3.5.33",
+    "@vue/server-renderer": "^3.5.33",
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.5.0",
     "daisyui": "4.12.24",
@@ -75,8 +75,8 @@
     "vitest-browser-vue": "^2.1.0",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
-    "vue": "3.5.32",
-    "vue-router": "5.0.4",
+    "vue": "3.5.33",
+    "vue-router": "5.0.5",
     "vue-tsc": "3.2.7"
   },
   "overrides": {
