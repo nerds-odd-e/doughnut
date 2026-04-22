@@ -634,7 +634,3 @@ Then(
     cy.get('@confirmSpy').should('have.been.calledWith', expectedMessage)
   }
 )
-
-Then('I should be on the note page {string}', (expectedPath: string) => {
-  cy.url().should('include', expectedPath)
-})

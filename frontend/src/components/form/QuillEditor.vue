@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { nextTick, ref, onMounted, watch } from "vue"
-import { useRouter } from "vue-router"
 import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
@@ -81,7 +80,6 @@ const { modelValue, readonly } = defineProps({
 
 const emits = defineEmits(["update:modelValue", "blur", "pasteComplete"])
 
-const router = useRouter()
 const localValue = ref(modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
@@ -200,7 +198,7 @@ onMounted(async () => {
         event.preventDefault()
         const href = anchor.getAttribute("href")
         if (!href) return
-        router.push(href)
+        window.confirm(`Navigate to ${anchor.textContent}?`)
       },
       true
     )

@@ -21,9 +21,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     findNoteTitle(noteTopology)
   }
   return {
-    expectNotePageUrl: () => {
-      cy.url().should('include', '/n1')
-    },
     moreOptions: () => {
       return makeSureNoteMoreOptionsDialogIsOpen()
     },
