@@ -621,3 +621,7 @@ Then(
     start.assumeNotePage().expectNoteDetailsMarkdown(expectedMarkdown)
   }
 )
+
+When('I click the link {string} in the note details', (linkText: string) => {
+  cy.get('[role=details]').find('a').contains(linkText).click()
+})
