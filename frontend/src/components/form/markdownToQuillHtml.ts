@@ -220,6 +220,14 @@ export default function markdownToQuillHtml(
     return result
   }
 
+  const replaceFixedWikiLinks = (html: string, titles: string[]): string => {
+    let result = html
+    titles.forEach((title) => {
+      result = result.replace(`[[${title}]]`, `<a href="/n1">${title}</a>`)
+    })
+    return result
+  }
+
   // Set up the parser with the custom renderer
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser
@@ -230,11 +238,18 @@ export default function markdownToQuillHtml(
   // Parse the tokens into HTML
   const result = parser.parse(tokens)
 
+  const apply = (html: string, funcs: ((html: string) => string)[]): string =>
+    funcs.reduce((html, func) => func(html), html)
+
+  const removeWhitespaceBetweenTags = (html: string) =>
+    html.trim().replace(/>\s+</g, "><")
+
   // Modify the final return to handle any remaining HTML list conversions
   // and wrap standalone <br> tags in paragraphs (only those between paragraphs)
-  return wrapStandaloneBrInParagraph(
-    convertHtmlList(result.trim().replace(/>\s+</g, "><"))
-  )
-    .replace("[[LeSS in Action]]", '<a href="/n1">LeSS in Action</a>')
-    .replace("[[Odd-e CSD]]", '<a href="/n1">Odd-e CSD</a>')
+  return apply(result, [
+    removeWhitespaceBetweenTags,
+    convertHtmlList,
+    wrapStandaloneBrInParagraph,
+    (html) => replaceFixedWikiLinks(html, ["LeSS in Action", "Odd-e CSD"]),
+  ])
 }
