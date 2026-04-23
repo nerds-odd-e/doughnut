@@ -23,7 +23,7 @@ const { modelValue, wikiTitles } = defineProps({
   title: String,
   errors: Object,
   readonly: Boolean,
-  wikiTitles: { type: Array as PropType<WikiTitle[]>, default: undefined },
+  wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
 
 const emits = defineEmits<{
@@ -39,9 +39,7 @@ const htmlValue = computed(() => {
   if (modelValue === currentIntervalMarkdown) {
     return currentIntervalHtml!
   }
-  return markdownizer.markdownToHtml(modelValue, {
-    wikiTitles: wikiTitles ?? [],
-  })
+  return markdownizer.markdownToHtml(modelValue, { wikiTitles })
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {

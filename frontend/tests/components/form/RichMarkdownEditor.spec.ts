@@ -17,6 +17,7 @@ describe("RichMarkdownEditor", () => {
       .withRouter()
       .withProps({
         modelValue: initialValue,
+        wikiTitles: [],
         ...options,
       })
       .mount({ attachTo: document.body })
