@@ -635,6 +635,8 @@ Then(
   }
 )
 
-Then('I should be on the note page {string}', (expectedPath: string) => {
-  cy.url().should('include', expectedPath)
+Then('I should be on the note page of {string}', (noteTitle: string) => {
+  start.testability().getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
+    cy.url().should('include', `/n${noteId}`)
+  })
 })
