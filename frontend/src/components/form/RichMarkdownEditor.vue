@@ -39,7 +39,9 @@ const htmlValue = computed(() => {
   if (modelValue === currentIntervalMarkdown) {
     return currentIntervalHtml!
   }
-  return markdownizer.markdownToHtml(modelValue, { wikiTitles })
+  return markdownizer.markdownToHtml(modelValue, {
+    wikiTitles: wikiTitles ?? [],
+  })
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {

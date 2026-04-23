@@ -11,7 +11,7 @@ export interface WikiTitle {
 
 export interface MarkdownToHtmlOptions {
   preserve_pre?: boolean
-  wikiTitles?: WikiTitle[]
+  wikiTitles: WikiTitle[]
 }
 
 export default function markdownToQuillHtml(
@@ -259,7 +259,6 @@ export default function markdownToQuillHtml(
     removeWhitespaceBetweenTags,
     convertHtmlList,
     wrapStandaloneBrInParagraph,
-    (html) =>
-      options?.wikiTitles ? replaceWikiLinks(html, options.wikiTitles) : html,
+    (html) => replaceWikiLinks(html, options?.wikiTitles ?? []),
   ])
 }
