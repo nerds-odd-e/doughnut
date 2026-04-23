@@ -1,6 +1,6 @@
-# @xmldom/xmldom and fast-xml-parser are only present as pnpm overrides (see
-# package.json pnpm.overrides). Version bumps are applied with pnpm there;
-# Dependabot’s npm job often errors on override-only transitive packages.
+# @xmldom/xmldom and fast-xml-parser: pnpm overrides only. uuid: lockfile
+# transitive only. Bumps for these are done with pnpm; Dependabot’s npm job
+# often errors on them.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -10,3 +10,4 @@ updates:
     ignore:
       - dependency-name: "@xmldom/xmldom"
       - dependency-name: "fast-xml-parser"
+      - dependency-name: "uuid"
