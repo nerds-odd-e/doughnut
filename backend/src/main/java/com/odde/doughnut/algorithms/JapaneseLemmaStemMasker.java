@@ -260,6 +260,8 @@ final class JapaneseLemmaStemMasker {
 
     if ("た".equals(spec.visibleSuffix) || "て".equals(spec.visibleSuffix)) {
       if (cp == 'い' || cp == 'お') return false;
+      // ～て/～た + auxiliary (e.g. 試みてみる); next kana is not a particle
+      if (sc == Character.UnicodeScript.HIRAGANA) return true;
     }
     return isParticleStart(cp);
   }
