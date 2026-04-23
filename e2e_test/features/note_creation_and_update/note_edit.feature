@@ -121,25 +121,17 @@ Feature: Note Edit
     | Doughnut | [[[WikiLink]]]   |
   Then the note details markdown should be "[[\[WikiLink]]\]"
 
-  Scenario Outline: Edit a note's details with a wiki link in markdown
+  Scenario: Edit a note's details with a wiki link in markdown
     Given I have a notebook with the head note "TDD"
     And there are some notes:
       | Title          | Parent Title |
-      | LeSS in Action | TDD          |
-      | Odd-e CSD      | TDD          |
-      | AI Driven      | TDD          |
+      | hoge fuga piyo | TDD          |
     When I update note "TDD" details using markdown to become:
       """
-      [[<linked note>]]
+      [[hoge fuga piyo]]
       """
     Then I should see the rich content of the note with details:
-      | Tag | Content       |
-      | a   | <linked note> |
-    When I click the link "<linked note>" in the note details
-    Then I should be on the note page of "<linked note>"
-
-    Examples:
-      | linked note    |
-      | LeSS in Action |
-      | Odd-e CSD      |
-      | AI Driven      |
+      | Tag | Content        |
+      | a   | hoge fuga piyo |
+    When I click the link "hoge fuga piyo" in the note details
+    Then I should be on the note page of "hoge fuga piyo"

@@ -20,6 +20,7 @@ describe("in place edit on title", () => {
     wrapper = helper
       .component(NoteTextContent)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         readonly,
         note: n,

@@ -3,6 +3,10 @@ import QuillEditor from "@/components/form/QuillEditor.vue"
 import { nextTick } from "vue"
 import type Quill from "quill"
 import { describe, it, expect, afterEach } from "vitest"
+import routes from "@/routes/routes"
+import { createRouter, createWebHistory } from "vue-router"
+
+const router = createRouter({ history: createWebHistory(), routes })
 
 describe("QuillEditor.vue", () => {
   let wrapper: VueWrapper
@@ -17,6 +21,7 @@ describe("QuillEditor.vue", () => {
     wrapper = mount(QuillEditor, {
       props: { modelValue: html },
       attachTo: document.body,
+      global: { plugins: [router] },
     })
     await nextTick()
     await vi.waitUntil(() => document.querySelector(".ql-editor h1"))
@@ -28,6 +33,7 @@ describe("QuillEditor.vue", () => {
     wrapper = mount(QuillEditor, {
       props: { modelValue: "" },
       attachTo: document.body,
+      global: { plugins: [router] },
     })
     await nextTick()
     await nextTick() // Wait for Quill to fully initialize
@@ -71,6 +77,7 @@ describe("QuillEditor.vue", () => {
     wrapper = mount(QuillEditor, {
       props: { modelValue: "", readonly: false },
       attachTo: document.body,
+      global: { plugins: [router] },
     })
     await nextTick()
     await nextTick() // Wait for Quill to fully initialize

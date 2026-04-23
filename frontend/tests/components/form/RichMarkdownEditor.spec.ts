@@ -14,6 +14,7 @@ describe("RichMarkdownEditor", () => {
   const mountEditor = async (initialValue: string, options = {}) => {
     wrapper = helper
       .component(RichMarkdownEditor)
+      .withRouter()
       .withProps({
         modelValue: initialValue,
         ...options,

@@ -46,6 +46,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId: firstNoteId,
         noteDetails: "First note details",
@@ -101,6 +102,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId: 1,
         noteDetails: "First note details",
@@ -129,6 +131,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId,
         noteDetails,
@@ -169,6 +172,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId: firstNoteId,
         noteDetails: "First note details",
@@ -199,6 +203,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId,
         noteDetails: "Original details",
@@ -256,6 +261,7 @@ describe("NoteEditableDetails", () => {
     const wrapper = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId,
         noteDetails: "Original",
@@ -292,6 +298,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId: firstNoteId,
         noteDetails: "This is the first note's details",
@@ -333,6 +340,7 @@ describe("NoteEditableDetails", () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId: 1,
         noteDetails: "existing text",
@@ -363,6 +371,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId: 1,
           noteDetails: "",
@@ -394,6 +403,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId: 1,
           noteDetails: "[existing link](https://existing.com) ",
@@ -424,6 +434,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId: 1,
           noteDetails: "plain text",
@@ -453,6 +464,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId: 1,
           noteDetails: "plain text",
@@ -484,6 +496,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId: 1,
           noteDetails: "plain text",
@@ -513,6 +526,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId,
           noteDetails: "",
@@ -544,6 +558,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId,
           noteDetails: "Original details",
@@ -578,6 +593,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId,
           noteDetails: "Original details",
@@ -609,6 +625,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId,
           noteDetails: "Original details",
@@ -643,6 +660,7 @@ describe("NoteEditableDetails", () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
+        .withRouter()
         .withProps({
           noteId,
           noteDetails: "Original details",

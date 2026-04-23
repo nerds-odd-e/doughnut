@@ -24,6 +24,7 @@ describe("undo editing", () => {
     const updatedTitle = "updated"
     wrapper = helper
       .component(NoteTextContent)
+      .withRouter()
       .withProps({
         readonly: false,
         note: noteRealm.note,
