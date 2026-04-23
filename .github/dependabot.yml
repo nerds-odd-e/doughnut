@@ -1,0 +1,11 @@
+# @xmldom/xmldom is only present as a pnpm override (see package.json pnpm.overrides).
+# Version bumps are applied with pnpm there; Dependabot’s npm job often errors on
+# override-only transitive packages.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "@xmldom/xmldom"
