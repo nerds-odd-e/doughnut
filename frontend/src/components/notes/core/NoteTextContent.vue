@@ -29,6 +29,6 @@ defineProps({
   note: { type: Object as PropType<Note>, required: true },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
-  wikiTitles: { type: Array as PropType<WikiTitle[]>, default: undefined },
+  wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
 </script>

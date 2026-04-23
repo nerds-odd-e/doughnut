@@ -22,7 +22,7 @@
         scope-name="note"
         :model-value="value"
         :readonly="readonly"
-        :wiki-titles="wikiTitles ?? []"
+        :wiki-titles="wikiTitles"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
@@ -44,7 +44,7 @@ const props = defineProps({
   noteDetails: { type: String, required: false },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
-  wikiTitles: { type: Array as PropType<WikiTitle[]>, default: undefined },
+  wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)

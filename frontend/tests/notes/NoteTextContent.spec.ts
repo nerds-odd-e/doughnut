@@ -24,6 +24,7 @@ describe("in place edit on title", () => {
       .withProps({
         readonly,
         note: n,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
     return wrapper

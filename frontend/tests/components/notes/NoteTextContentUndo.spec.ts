@@ -28,6 +28,7 @@ describe("undo editing", () => {
       .withProps({
         readonly: false,
         note: noteRealm.note,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 

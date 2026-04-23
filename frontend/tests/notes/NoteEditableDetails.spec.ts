@@ -52,6 +52,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "First note details",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -108,6 +109,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "First note details",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -137,6 +139,7 @@ describe("NoteEditableDetails", () => {
         noteDetails,
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -178,6 +181,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "First note details",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -209,6 +213,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "Original details",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -267,6 +272,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "Original",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -304,6 +310,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "This is the first note's details",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -346,6 +353,7 @@ describe("NoteEditableDetails", () => {
         noteDetails: "existing text",
         readonly: false,
         asMarkdown: true,
+        wikiTitles: [],
       })
       .mount({ attachTo: document.body })
 
@@ -377,6 +385,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -409,6 +418,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "[existing link](https://existing.com) ",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -440,6 +450,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "plain text",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -470,6 +481,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "plain text",
           readonly: false,
           asMarkdown: false,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -502,6 +514,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "plain text",
           readonly: false,
           asMarkdown: false,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -532,6 +545,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -564,6 +578,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "Original details",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -599,6 +614,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "Original details",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -631,6 +647,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "Original details",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
@@ -666,6 +683,7 @@ describe("NoteEditableDetails", () => {
           noteDetails: "Original details",
           readonly: false,
           asMarkdown: true,
+          wikiTitles: [],
         })
         .mount({ attachTo: document.body })
 
