@@ -234,6 +234,10 @@ export default function markdownToQuillHtml(
         `<a href="/n${noteId}">${title}</a>`
       )
     })
+    result = result.replace(
+      /\[\[([^\]]+)\]\]/g,
+      (_match, title) => `<a href="#">${title}</a>`
+    )
     return result
   }
 

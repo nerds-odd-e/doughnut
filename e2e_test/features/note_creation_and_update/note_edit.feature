@@ -136,7 +136,6 @@ Feature: Note Edit
     When I click the link "hoge fuga piyo" in the note details
     Then I should be on the note page of "hoge fuga piyo"
 
-  @wip
   Scenario: Edit a note's details with a dead wiki link in markdown
     Given I have a notebook with the head note "TDD"
     And there are some notes:
