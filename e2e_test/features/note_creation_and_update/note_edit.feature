@@ -135,3 +135,17 @@ Feature: Note Edit
       | a   | hoge fuga piyo |
     When I click the link "hoge fuga piyo" in the note details
     Then I should be on the note page of "hoge fuga piyo"
+
+  @wip
+  Scenario: Edit a note's details with a dead wiki link in markdown
+    Given I have a notebook with the head note "TDD"
+    And there are some notes:
+      | Title          | Parent Title |
+      | hoge fuga piyo | TDD          |
+    When I update note "TDD" details using markdown to become:
+      """
+      [[foo bar]]
+      """
+    Then I should see the rich content of the note with details:
+      | Tag | Content        |
+      | a   | foo bar        |
