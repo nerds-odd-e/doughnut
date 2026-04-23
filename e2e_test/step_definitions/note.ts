@@ -14,6 +14,7 @@ import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
 import { submittableForm } from '../start/forms'
+import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
 
 defineParameterType({
   name: 'notepath',
@@ -557,6 +558,10 @@ When(
   }
 )
 
+When('I switch to rich content view', () => {
+  start.assumeNotePage().switchToRichContent()
+})
+
 Then(
   'I should see the rich content of the note with details:',
   (data: DataTable) => {
@@ -628,6 +633,61 @@ When('I click the link {string} in the note details', (linkText: string) => {
   cy.on('window:confirm', confirmSpy)
   cy.get('[role=details]').find('a').contains(linkText).click()
 })
+
+Given(
+  /^I have a note that includes deadlink \[\[(.+?)\]\]$/,
+  (concept: string) => {
+    start
+      .jumpToNotePage('LeSS in Action')
+      .updateDetailsAsMarkdown(`[[${concept}]]`)
+      .switchToRichContent()
+  }
+)
+
+When(
+  'I click the dead link {string} in the note details',
+  (linkText: string) => {
+    start.assumeNotePage().clickDeadLink(linkText)
+  }
+)
+
+Then('I should see a note creation form', () => {
+  noteCreationForm.expectFormVisible()
+})
+
+Then('the title is {string} pre-filled', (title: string) => {
+  noteCreationForm.expectPrefilledTitle(title)
+})
+
+Then(
+  'I should see a note creation form with {string} pre-filled as the title',
+  (title: string) => {
+    noteCreationForm.expectPrefilledTitle(title)
+  }
+)
+
+When('I create the note from the dead link dialog', () => {
+  noteCreationForm.submit()
+})
+
+When(
+  /^I create the note \[\[(.+?)\]\] from the dead link dialog$/,
+  (concept: string) => {
+    start.assumeNotePage().clickDeadLink(concept)
+    noteCreationForm.submit()
+  }
+)
+
+When('I navigate to note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle)
+})
+
+Then(
+  'the note details should contain a live link {string}',
+  (linkText: string) => {
+    start.assumeNotePage().expectLiveLink(linkText)
+  }
+)
 
 Then(
   'I should see a dialog with message {string}',

@@ -85,6 +85,20 @@
             name="note-conversation"
             :note-realm="noteRealm"
           />
+
+          <Modal
+            v-if="pendingDeadLinkTitle !== null"
+            @close_request="onDeadLinkDialogClose"
+          >
+            <template #body>
+              <NoteNewDialog
+                :reference-note="noteRealm.note"
+                :insert-mode="noteRealm.note.id === noteRealm.notebook?.headNoteId ? 'as-child' : 'after'"
+                :initial-title="pendingDeadLinkTitle"
+                @close-dialog="onDeadLinkDialogClose"
+              />
+            </template>
+          </Modal>
         </template>
       </template>
     </NoteRealmLoader>
@@ -92,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, type Ref } from "vue"
+import { inject, provide, ref, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type {
@@ -106,6 +120,9 @@ import ChildrenNotes from "./ChildrenNotes.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
+import Modal from "@/components/commons/Modal.vue"
+import NoteNewDialog from "./NoteNewDialog.vue"
+import { openDeadLinkCreationKey } from "./deadLinkCreationContext"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
 import type { WikiTitle } from "../form/markdownToQuillHtml"
@@ -121,6 +138,12 @@ const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>
   !currentUser?.value || noteRealm?.fromBazaar === true
 
+const pendingDeadLinkTitle = ref<string | null>(null)
+
+provide(openDeadLinkCreationKey, (title: string) => {
+  pendingDeadLinkTitle.value = title
+})
+
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const reloadKey = ref(0)
 const onNoteAccessoryUpdated = () => {
@@ -130,6 +153,11 @@ const asMarkdown = ref(false)
 
 const wikiTitles = ref<WikiTitle[]>([])
 const lastFetchedHeadNoteId = ref<number | undefined>(undefined)
+
+const onDeadLinkDialogClose = () => {
+  lastFetchedHeadNoteId.value = undefined
+  pendingDeadLinkTitle.value = null
+}
 
 const fetchWikiTitles = async (headNoteId: number) => {
   if (headNoteId === lastFetchedHeadNoteId.value) return

@@ -148,3 +148,14 @@ Feature: Note Edit
     Then I should see the rich content of the note with details:
       | Tag         | Content |
       | a.dead-link | foo bar |
+
+  Scenario: Clicking dead wiki link opens note creation form with pre-filled title
+    Given I have a note that includes deadlink [[new concept]]
+    When I click the dead link "new concept" in the note details
+    Then I should see a note creation form
+    And the title is "new concept" pre-filled
+
+  Scenario: Creating note from dead wiki link navigates to the new note
+    Given I have a note that includes deadlink [[new concept]]
+    When I create the note [[new concept]] from the dead link dialog
+    Then I should see "new concept" in the page

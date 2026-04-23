@@ -61,6 +61,7 @@ const storageAccessor = useStorageAccessor()
 const props = defineProps<{
   referenceNote: Note
   insertMode: InsertMode
+  initialTitle?: string
 }>()
 
 const noteRealm = computed(
@@ -75,7 +76,7 @@ const emit = defineEmits<{
 
 // Reactive state
 const creationData = ref<NoteCreationDto>({
-  newTitle: "Untitled",
+  newTitle: props.initialTitle ?? "Untitled",
   wikidataId: "",
 })
 
@@ -85,7 +86,7 @@ const noteFormErrors = ref({
 })
 
 const processing = ref(false)
-const hasTitleBeenEdited = ref(false)
+const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
 
 // Computed property to determine effective search key
 const effectiveSearchKey = computed(() => {

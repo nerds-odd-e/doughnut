@@ -192,6 +192,14 @@ export const assumeNotePage = (noteTopology?: string) => {
         cy.get(element.Tag as string).should('contain', element.Content)
       })
     },
+    clickDeadLink(linkText: string) {
+      cy.get('[role=details]').find('a.dead-link').contains(linkText).click()
+    },
+    expectLiveLink(linkText: string) {
+      cy.get('[role=details]')
+        .find('a:not(.dead-link)')
+        .should('contain', linkText)
+    },
 
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)
