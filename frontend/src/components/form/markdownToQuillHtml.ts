@@ -236,7 +236,7 @@ export default function markdownToQuillHtml(
     })
     result = result.replace(
       /\[\[([^\]]+)\]\]/g,
-      (_match, title) => `<a href="#">${title}</a>`
+      (_match, title) => `<a href="#" class="dead-link">${title}</a>`
     )
     return result
   }

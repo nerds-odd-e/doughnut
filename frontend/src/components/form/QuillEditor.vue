@@ -259,6 +259,8 @@ const onUpdateContent = () => {
     margin: inherit !important
     white-space: pre-wrap
     word-wrap: break-word
+  a.dead-link
+    color: red
 .ql-container.ql-bubble
   border: none
   font-size: inherit !important

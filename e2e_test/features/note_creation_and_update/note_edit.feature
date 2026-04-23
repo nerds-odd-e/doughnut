@@ -146,5 +146,5 @@ Feature: Note Edit
       [[foo bar]]
       """
     Then I should see the rich content of the note with details:
-      | Tag | Content        |
-      | a   | foo bar        |
+      | Tag         | Content |
+      | a.dead-link | foo bar |
