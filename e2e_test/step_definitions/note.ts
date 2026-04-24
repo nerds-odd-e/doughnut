@@ -13,6 +13,7 @@ import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
+import { submittableForm } from '../start/forms'
 
 defineParameterType({
   name: 'notepath',
@@ -643,3 +644,39 @@ Then('I should be on the note page of {string}', (noteTitle: string) => {
       cy.url().should('include', `/n${noteId}`)
     })
 })
+
+Given(
+  'note {string} has a dead wiki link titled {string}',
+  (noteTitle: string, missingNoteTitle: string) => {
+    start
+      .jumpToNotePage(noteTitle)
+      .updateDetailsAsMarkdown(`[[${missingNoteTitle}]]`)
+      .switchToRichContent()
+  }
+)
+
+When('I follow the link {string} in the note body', (linkTitle: string) => {
+  cy.get('[role=details]').find('a').contains(linkTitle).click()
+})
+
+Then('I should see the sibling note creation form', () => {
+  cy.findByLabelText('Title').should('be.visible')
+})
+
+Then(
+  'note {string} is created as a sibling of {string} under {string}',
+  (newNoteTitle: string, referenceNoteTitle: string, parentTitle: string) => {
+    submittableForm.submitWith({ Title: newNoteTitle })
+    start.assumeNotePage(newNoteTitle)
+    start
+      .pageIsNotLoading()
+      .navigateToNotebooksPage()
+      .navigateToPath(new NotePath(parentTitle))
+      .expectChildren([
+        { 'note-title': 'team' },
+        { 'note-title': 'tech' },
+        { 'note-title': referenceNoteTitle },
+        { 'note-title': newNoteTitle },
+      ])
+  }
+)

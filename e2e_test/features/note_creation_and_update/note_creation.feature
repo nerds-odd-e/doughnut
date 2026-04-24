@@ -47,3 +47,13 @@ Feature: Nested Note creation
       | note-title |
       | team       |
       | tech       |
+
+  @wip
+  Scenario: Open sibling note creation from a dead link
+    Given there are some notes:
+      | Title      | Parent Title   |
+      | Alpha Note | LeSS in Action |
+    And note "Alpha Note" has a dead wiki link titled "Ghost Topic"
+    When I follow the link "Ghost Topic" in the note body
+    Then I should see the sibling note creation form
+    And note "Ghost Topic" is created as a sibling of "Alpha Note" under "LeSS in Action"
