@@ -269,9 +269,12 @@ const onUpdateContent = () => {
     margin: inherit !important
     white-space: pre-wrap
     word-wrap: break-word
+  a
+    cursor: pointer
+  a:not(.dead-link)
+    color: oklch(var(--p))
   a.dead-link
     color: red
-    cursor: pointer
 .ql-container.ql-bubble
   border: none
   font-size: inherit !important
