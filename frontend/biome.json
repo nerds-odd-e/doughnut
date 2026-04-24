@@ -1,6 +1,6 @@
 {
   "root": false,
-  "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
   "vcs": {
     "clientKind": "git",
     "enabled": true,
@@ -274,21 +274,6 @@
             "noUndeclaredVariables": "off"
           }
         }
-      }
-    },
-    {
-      "includes": [
-        "**/*.config.js",
-        "**/*.config.ts"
-      ],
-      "linter": {
-        "rules": {}
-      }
-    },
-    {
-      "includes": [],
-      "linter": {
-        "rules": {}
       }
     },
     {
