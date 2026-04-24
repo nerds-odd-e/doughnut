@@ -10,20 +10,24 @@
   "files": {
     "includes": [
       "**",
+      "!**/.github",
+      "!**/dist",
       "!**/node_modules",
+      "!**/public",
       "!**/*.cjs",
       "!**/*.json",
-      "!**/farm.config.ts",
-      "!**/vite.config.ts",
+      "!**/*.md",
       "!**/auto-imports.d.ts",
       "!**/components.d.ts",
-      "!**/typed-router.d.ts",
-      "!**/src/@types/doughnut/index.d.ts",
+      "!**/farm.config.ts",
+      "!**/index.d.ts",
+      "!**/index.html",
       "!**/packages/generated/doughnut-backend-api/**",
+      "!**/shims-vue.d.ts",
       "!**/storyFiles.generated.ts",
       "!**/tests/**/*.js",
-      "!**/tests/shims-vue.d.ts",
-      "!**/public"
+      "!**/typed-router.d.ts",
+      "!**/vite.config.ts"
     ],
     "ignoreUnknown": true
   },
@@ -219,29 +223,7 @@
         "noWith": "error",
         "noVar": "error"
       }
-    },
-    "includes": [
-      "**",
-      "!**/.git",
-      "!**/.github",
-      "!**/dist",
-      "!**/node_modules",
-      "!**/*.md",
-      "!**/index.html",
-      "!**/tsconfig.json",
-      "!**/tsconfig.node.json",
-      "!**/.eslintrc.cjs",
-      "!**/vite.config.ts",
-      "!**/farm.config.ts",
-      "!**/components.d.ts",
-      "!**/index.d.ts",
-      "!**/shims-vue.d.ts",
-      "!**/vitest.config.ts",
-      "!**/setupVitest.js",
-      "!**/typed-router.d.ts",
-      "!**/src/assets/daisyui.css",
-      "!**/public"
-    ]
+    }
   },
   "javascript": {
     "formatter": {
@@ -250,6 +232,15 @@
     }
   },
   "overrides": [
+    {
+      "includes": [
+        "**/vitest.config.ts",
+        "**/src/assets/daisyui.css"
+      ],
+      "linter": {
+        "enabled": false
+      }
+    },
     {
       "includes": [
         "**/*.vue"
