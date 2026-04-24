@@ -2,6 +2,14 @@
 // Note: vitest-dom/extend-expect doesn't work in Browser Mode (uses Node.js APIs)
 // Browser Mode has built-in DOM matchers, so we don't need vitest-dom here
 
+// TODO(@vue/test-utils): re-bump to 2.4.9+ once
+// https://github.com/vuejs/test-utils/pull/2830 ("fix: tolerate duplicate
+// attachTo cleanup") ships. 2.4.7 / 2.4.8 break @testing-library/vue's render()
+// (unwrapNode detaches VTU's wrapper <div>) and any double-unmount pattern:
+// Vue's app.onUnmount callback throws NotFoundError from to.removeChild(el),
+// which surfaces here via console.warn("[Vue warn] Unhandled error during
+// execution of app unmount cleanup function") and fails every affected test.
+
 // Polyfill process.env for libraries that expect Node.js environment
 if (typeof process === "undefined") {
   // @ts-expect-error - process is not defined in browser

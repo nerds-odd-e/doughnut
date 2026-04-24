@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 
 describe("FullScreen", () => {
-  let wrapper: VueWrapper
+  let wrapper: VueWrapper | undefined
 
   beforeEach(() => {
     // Browser Mode: Use real Fullscreen API and Pointer Lock API!
@@ -58,7 +58,10 @@ describe("FullScreen", () => {
   })
 
   afterEach(() => {
-    wrapper?.unmount()
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = undefined
+    }
     document.body.innerHTML = ""
     vi.restoreAllMocks()
   })
@@ -163,9 +166,10 @@ describe("FullScreen", () => {
       }
     )
 
-    // Unmount component (should trigger exitFullscreen)
-    wrapper.unmount()
-    await wrapper.vm.$nextTick()
+    const unmountingWrapper = wrapper
+    wrapper = undefined
+    unmountingWrapper.unmount()
+    await flushPromises()
 
     // Browser Mode: Wait for overlay to disappear
     await vi.waitUntil(
