@@ -11,3 +11,4 @@ updates:
       - dependency-name: "@xmldom/xmldom"
       - dependency-name: "fast-xml-parser"
       - dependency-name: "uuid"
+      - dependency-name: "tailwindcss"
