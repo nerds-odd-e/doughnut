@@ -271,6 +271,7 @@ const onUpdateContent = () => {
     word-wrap: break-word
   a.dead-link
     color: red
+    cursor: pointer
 .ql-container.ql-bubble
   border: none
   font-size: inherit !important
