@@ -11,7 +11,7 @@ export function pythonAsTextVitePlugin(): Plugin {
     enforce: 'pre',
     resolveId(source, importer) {
       if (!source.endsWith('.py') || source.includes('\0')) {
-        return undefined
+        return
       }
       const absolute = isAbsolute(source)
         ? source
@@ -20,7 +20,7 @@ export function pythonAsTextVitePlugin(): Plugin {
     },
     load(id) {
       if (!id.startsWith(virtualPrefix)) {
-        return undefined
+        return
       }
       const absolutePath = id.slice(virtualPrefix.length)
       const text = readFileSync(absolutePath, 'utf8')

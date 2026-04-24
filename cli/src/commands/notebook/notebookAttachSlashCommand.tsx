@@ -24,9 +24,9 @@ const attachNotebookDoc: CommandDoc = {
 
 function pdfEndPageFromMineruEnv(): number | undefined {
   const raw = process.env.DOUGHNUT_MINERU_PDF_END_PAGE?.trim()
-  if (raw === undefined || raw === '') return undefined
+  if (raw === undefined || raw === '') return
   const n = Number.parseInt(raw, 10)
-  if (!Number.isFinite(n) || n < 0) return undefined
+  if (!Number.isFinite(n) || n < 0) return
   return n
 }
 
@@ -34,7 +34,7 @@ function detectBookAttachFormat(path: string): 'pdf' | 'epub' | undefined {
   const ext = extname(path).toLowerCase()
   if (ext === '.pdf') return 'pdf'
   if (ext === '.epub') return 'epub'
-  return undefined
+  return
 }
 
 function bookBlocksTreeLines(blocks: BookBlockFull[] | undefined): string {

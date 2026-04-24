@@ -9,7 +9,7 @@ function getAbsoluteBorderPosition(
   let y = 0
   while (currentNode?.parentNode) {
     if (!currentNode.yogaNode) {
-      return undefined
+      return
     }
     x += currentNode.yogaNode.getComputedLeft()
     y += currentNode.yogaNode.getComputedTop()
@@ -22,10 +22,10 @@ function getAbsoluteBorderPosition(
 export function getAbsoluteContentPosition(
   node: DOMElement | null | undefined
 ): { x: number; y: number } | undefined {
-  if (!node) return undefined
+  if (!node) return
   const borderPosition = getAbsoluteBorderPosition(node)
   if (!(borderPosition && node.yogaNode)) {
-    return undefined
+    return
   }
   return {
     x:

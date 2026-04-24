@@ -23,11 +23,11 @@ function pickLegacyToken(parsed: LegacyFile): StoredAccessToken | undefined {
     }
   }
   const tokens = parsed.tokens
-  if (!Array.isArray(tokens) || tokens.length === 0) return undefined
+  if (!Array.isArray(tokens) || tokens.length === 0) return
   const asEntry = (e: unknown): StoredAccessToken | undefined => {
-    if (!e || typeof e !== 'object') return undefined
+    if (!e || typeof e !== 'object') return
     const o = e as LegacyTokenEntry
-    if (typeof o.token !== 'string' || o.token === '') return undefined
+    if (typeof o.token !== 'string' || o.token === '') return
     return {
       token: o.token,
       label: typeof o.label === 'string' ? o.label : undefined,
@@ -46,7 +46,7 @@ function pickLegacyToken(parsed: LegacyFile): StoredAccessToken | undefined {
     const r = asEntry(t)
     if (r) return r
   }
-  return undefined
+  return
 }
 
 function getConfigPath(): string {
@@ -60,7 +60,7 @@ export function loadStoredAccessToken(): StoredAccessToken | undefined {
     const parsed = JSON.parse(data) as LegacyFile
     return pickLegacyToken(parsed)
   } catch {
-    return undefined
+    return
   }
 }
 

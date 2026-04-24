@@ -42,7 +42,7 @@ export function resolveInteractiveSlashCommand(
       ? 'exit'
       : undefined
 
-  if (body === undefined) return undefined
+  if (body === undefined) return
 
   const exact = byLiteral.get(body)
   if (exact) return { command: exact, argument: undefined, line }
@@ -50,7 +50,7 @@ export function resolveInteractiveSlashCommand(
   const prefix = [...slashCommands]
     .sort((a, b) => b.literal.length - a.literal.length)
     .find((c) => body.startsWith(`${c.literal.slice(1)} `))
-  if (!prefix) return undefined
+  if (!prefix) return
 
   const cmdBody = prefix.literal.slice(1)
   const rest = body.slice(cmdBody.length + 1).trim()

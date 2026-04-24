@@ -94,7 +94,7 @@ const browser = {
             return {} as AudioNode
           }
           disconnect() {
-            return undefined
+            return
           }
         }
         ;(win as Window & typeof globalThis).AudioWorkletNode =

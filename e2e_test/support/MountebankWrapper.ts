@@ -18,7 +18,9 @@ class MountebankWrapper {
     try {
       // just try to delete in case an imposter is there
       await this.mountebank.deleteImposter(this.port)
-    } catch (_error) {} // eslint-disable-line
+    } catch {
+      // swallow; just attempt a best-effort cleanup
+    }
   }
 
   public async createImposter(): Promise<void> {

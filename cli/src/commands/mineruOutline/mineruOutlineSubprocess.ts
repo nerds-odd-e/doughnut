@@ -126,7 +126,7 @@ function errnoCode(err: unknown): string | undefined {
     const c = (err as { code: unknown }).code
     return typeof c === 'string' ? c : undefined
   }
-  return undefined
+  return
 }
 
 function messageForPythonSpawnFailure(

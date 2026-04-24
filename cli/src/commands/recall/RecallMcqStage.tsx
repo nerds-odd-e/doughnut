@@ -94,7 +94,7 @@ function recallAnsweredMcqInk(args: {
     if (!correct && itemIndex === sel) {
       return 'red'
     }
-    return undefined
+    return
   }
 
   return (

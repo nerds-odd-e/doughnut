@@ -55,7 +55,7 @@ type SdkThrowable = unknown
 const MAX_CLIENT_ERROR_DETAIL_CHARS = 500
 
 function readableClientErrorDetail(cause: SdkThrowable): string | undefined {
-  if (typeof cause !== 'object' || cause === null) return undefined
+  if (typeof cause !== 'object' || cause === null) return
   const o = cause as Record<string, unknown>
   for (const key of ['message', 'detail'] as const) {
     const raw = o[key]
@@ -66,7 +66,7 @@ function readableClientErrorDetail(cause: SdkThrowable): string | undefined {
       ? `${t.slice(0, MAX_CLIENT_ERROR_DETAIL_CHARS)}…`
       : t
   }
-  return undefined
+  return
 }
 
 const backendApiErrorTypes = new Set([
@@ -84,7 +84,7 @@ const backendApiErrorTypes = new Set([
 ])
 
 function httpStatusFromSdkThrowable(cause: SdkThrowable): number | undefined {
-  if (typeof cause !== 'object' || cause === null) return undefined
+  if (typeof cause !== 'object' || cause === null) return
   const o = cause as Record<string, unknown>
   if (typeof o.status === 'number' && Number.isFinite(o.status)) {
     return o.status
@@ -94,17 +94,17 @@ function httpStatusFromSdkThrowable(cause: SdkThrowable): number | undefined {
     const s = (res as Record<string, unknown>).status
     if (typeof s === 'number' && Number.isFinite(s)) return s
   }
-  return undefined
+  return
 }
 
 function doughnutApiErrorFromThrowable(
   cause: SdkThrowable
 ): { errorType: string; message?: string } | undefined {
-  if (typeof cause !== 'object' || cause === null) return undefined
+  if (typeof cause !== 'object' || cause === null) return
   const o = cause as Record<string, unknown>
   const errorType = o.errorType
   if (typeof errorType !== 'string' || !backendApiErrorTypes.has(errorType)) {
-    return undefined
+    return
   }
   const raw = o.message
   const message =
