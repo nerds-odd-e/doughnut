@@ -263,12 +263,52 @@ jobs:
       ]
     if: always() && contains(needs.*.result, 'failure')
     steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Compute short SHA, URLs, and sanitized commit subject
+        id: ctx
+        run: |
+          echo "short_sha=${GITHUB_SHA:0:8}" >> "$GITHUB_OUTPUT"
+          echo "commit_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
+          echo "subject=$(git log -1 --format=%s "$GITHUB_SHA" | tr -d '"')" >> "$GITHUB_OUTPUT"
       - uses: slackapi/slack-github-action@v3.0.2
         with:
           webhook: ${{ env.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: "CI/CD failure: ${{ github.repository }} | workflow: ${{ github.workflow }} | commit: ${{ github.sha }} | author: ${{ github.actor }}"
+            text: "CI/CD failure on ${{ github.repository }} @ ${{ steps.ctx.outputs.short_sha }}"
+            attachments:
+              - color: "#E01E5A"
+                blocks:
+                  - type: header
+                    text:
+                      type: plain_text
+                      text: "Failed GitHub Actions"
+                  - type: section
+                    fields:
+                      - type: mrkdwn
+                        text: "*repo*\n<${{ steps.ctx.outputs.repo_url }}|${{ github.repository }}>"
+                      - type: mrkdwn
+                        text: "*message*\n${{ steps.ctx.outputs.subject }}"
+                      - type: mrkdwn
+                        text: "*commit*\n<${{ steps.ctx.outputs.commit_url }}|${{ steps.ctx.outputs.short_sha }}>"
+                      - type: mrkdwn
+                        text: "*author*\n${{ github.event.head_commit.author.name }} <${{ github.event.head_commit.author.email }}>"
+                      - type: mrkdwn
+                        text: "*workflow*\n<${{ steps.ctx.outputs.run_url }}|${{ github.workflow }}>"
+                      - type: mrkdwn
+                        text: "*event*\n${{ github.event_name }} on `${{ github.ref_name }}`"
+                  - type: actions
+                    elements:
+                      - type: button
+                        style: danger
+                        text:
+                          type: plain_text
+                          text: "View failed run"
+                        url: "${{ steps.ctx.outputs.run_url }}"
       # - uses: nobrayner/discord-webhook@v1
       #   with:
       #     github-token: ${{ env.GITHUB_TOKEN }}
