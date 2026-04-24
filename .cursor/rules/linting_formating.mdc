@@ -1,5 +1,5 @@
 ---
-description: Linting, formatting, code quality, Biome, Redocly, OpenAPI validation, code style, fix formatting errors
+description: Linting, formatting, code quality, Biome (2.4.x), Redocly, OpenAPI validation, code style, fix formatting errors, biome.json config, Vue SFC project-domain rule limitation, multi-file analysis (MFA)
 alwaysApply: false
 ---
 # Linting and Formatting in Doughnut Project
@@ -83,6 +83,88 @@ After API changes, also run frontend unit tests and fix call sites — see the `
 - **Biome**: Configured in `biome.json` (root) and `frontend/biome.json`
 - **Redocly**: Configured in `redocly.yaml`
 - **Backend**: Configured in `backend/build.gradle` (Spotless for formatting, custom linting rules)
+
+## Biome Configuration (2.4.x)
+
+This project uses `@biomejs/biome@2.4.x` across the workspace (`package.json`, `frontend/package.json`, `packages/doughnut-test-fixtures/package.json`). Keep those versions pinned and in sync — `syncpack fix` runs on `postinstall` to help.
+
+### Monorepo config layout
+
+- **`biome.json`** (workspace root) — governs `e2e_test/`, `cli/`, `mcp-server/`, `scripts/`, `infra/`, `packages/doughnut-test-fixtures/`, etc. Implicit `root: true`.
+- **`frontend/biome.json`** — sets `"root": false`; governs `frontend/` only. Uses Vue-specific rules (`noVueReservedProps`, `noVueDuplicateKeys`, `noVueSetupPropsReactivityLoss`, etc.).
+
+When running `pnpm biome check` from the workspace root, Biome walks up from each file to find the nearest config. The frontend subtree uses the frontend config; everything else uses the root config.
+
+### Keep the `$schema` URL in sync with the CLI version
+
+Both configs must pin `$schema` to the exact CLI version. A mismatch emits a `deserialize` warning on every run:
+
+```
+i The configuration schema version does not match the CLI version 2.4.x
+```
+
+When upgrading `@biomejs/biome`, run `pnpx @biomejs/biome migrate --write` from both the repo root and `frontend/` to bump the schema URLs (and auto-apply any rule renames / config restructuring).
+
+### Ignore quirk: `biome migrate` suggesting `root: false` in the root config
+
+Running `biome migrate` from inside `frontend/` sometimes suggests adding `"root": false` to **the workspace root** `biome.json`. **Do not apply it.** The workspace root must remain the root. This is a known artifact of the migrator walking up from a nested package.
+
+### Path scoping: use `files.includes`, not separate `linter.includes`
+
+- `files.includes` is the canonical include/exclude list; it scopes **both** formatter and linter.
+- `linter.includes` and `formatter.includes` exist but further narrow each tool's scope and are easy to get wrong (and desynced from `files.includes`). Prefer `files.includes` plus scoped overrides when a specific tool needs different treatment.
+- To express "format but don't lint this file", use an override with `linter: { enabled: false }` scoped via `includes`, e.g. for `vitest.config.ts` and `src/assets/daisyui.css` in `frontend/biome.json`. **Do not** rely on a hidden-in-`linter.includes` exclusion — that pattern is opaque.
+
+### CRITICAL: Project-domain (MFA) rules and Vue SFCs
+
+Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.4.x, **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Every `import X from "./X.vue"` in the frontend is flagged as unresolved once MFA activates.
+
+Project-domain rules include (non-exhaustive):
+- `correctness/noUnresolvedImports`
+- `suspicious/noDeprecatedImports`
+- `suspicious/noImportCycles`
+- `correctness/noFloatingPromises`
+- `correctness/noMisusedPromises`
+- `correctness/noPrivateImports`
+
+**Rule**: Do NOT enable any of these in the workspace root `biome.json`. Enabling them anywhere the project graph reaches Vue SFCs (which includes the root config, since it delegates to `frontend/biome.json` via MFA) produces 400+ false-positive `noUnresolvedImports` errors even in pure `.ts` files that import from `.vue`.
+
+- `frontend/biome.json` currently has `noUnresolvedImports: "error"`. It is silently a no-op today because MFA is not activated (no project-domain rule is triggering it). If you add one of the rules above at the root, `frontend:lint` will break even though `frontend/biome.json` hasn't changed.
+- Safe alternative for TS-only subtrees: put project-domain rules in a TS-only override, or in a scoped nested config (e.g. `cli/biome.json`) — but test carefully, since MFA scope is workspace-wide.
+- Revisit this restriction once Biome releases proper Vue SFC module resolution. See Biome issues on `<script setup>` default-export detection.
+
+### `noUnusedExpressions` and Chai/Cypress assertions
+
+`suspicious/noUnusedExpressions` is enabled at the root but **turned off for `e2e_test/**`**. Chai's property-chain assertions (e.g. `expect(x).to.not.be.null`, `expect(x).to.be.true`) look like unused expressions to Biome but are real assertions that throw. The override lives in the existing `e2e_test` block inside root `biome.json`.
+
+### Suppression comment format
+
+Biome 2.x expects:
+
+```ts
+// biome-ignore lint/<GROUP>/<RULE>: reason
+```
+
+The 1.9.x form `// biome-ignore lint(<GROUP>/<RULE>): reason` no longer parses. `biome migrate --write` handles existing comments; new suppressions must use the slash form.
+
+Bulk variants new in 2.x:
+- `// biome-ignore-all lint/suspicious/noConsole: allowed in this file`
+- `// biome-ignore-start lint/complexity/noForEach: legacy block`
+- `// biome-ignore-end lint/complexity/noForEach:`
+
+### Empty overrides / includes: delete them
+
+`{ "includes": [], "linter": { "rules": {} } }` and overrides whose `rules` object is empty do nothing and only obscure intent. Clean them up during any biome-config edit.
+
+### Running `pnpm lint:all` non-interactively
+
+The `lint:all` script's first step is `pnpm --frozen-lockfile --silent recursive install`. Outside an interactive TTY, pnpm refuses to purge stale `node_modules` and aborts with:
+
+```
+ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY
+```
+
+Export `CI=true` (or set `"confirmModulesPurge": false` in `.npmrc`) before running `pnpm lint:all` in agents / scripts / non-TTY shells. CI already sets `CI=true`.
 
 ## Integration with CI/CD
 
