@@ -261,17 +261,15 @@ jobs:
         E2E-tests,
         Deploy,
       ]
-    if: always()
+    if: always() && contains(needs.*.result, 'failure')
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
-        id: conclusion
-      - uses: 8398a7/action-slack@v3
-        if: steps.conclusion.outputs.conclusion == 'failure'
+      - uses: slackapi/slack-github-action@v3.0.2
         with:
-          status: failure
-          fields: repo,commit,message,author,action,workflow,eventName
+          webhook: ${{ env.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "CI/CD failure: ${{ github.repository }} | workflow: ${{ github.workflow }} | commit: ${{ github.sha }} | author: ${{ github.actor }}"
       # - uses: nobrayner/discord-webhook@v1
-      #   if: steps.conclusion.outputs.conclusion == 'failure'
       #   with:
       #     github-token: ${{ env.GITHUB_TOKEN }}
       #     discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
