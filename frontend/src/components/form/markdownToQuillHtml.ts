@@ -14,6 +14,24 @@ export interface MarkdownToHtmlOptions {
   wikiTitles: WikiTitle[]
 }
 
+export function replaceWikiLinksInHtml(
+  html: string,
+  wikiTitles: WikiTitle[]
+): string {
+  let result = html
+  wikiTitles.forEach(({ title, noteId }) => {
+    result = result.replace(
+      `[[${title}]]`,
+      `<a href="/n${noteId}">${title}</a>`
+    )
+  })
+  result = result.replace(
+    /\[\[([^\]]+)\]\]/g,
+    (_match, title) => `<a href="#" class="dead-link">${title}</a>`
+  )
+  return result
+}
+
 export default function markdownToQuillHtml(
   markdown: string | undefined,
   options?: MarkdownToHtmlOptions
@@ -226,21 +244,6 @@ export default function markdownToQuillHtml(
     return result
   }
 
-  const replaceWikiLinks = (html: string, wikiTitles: WikiTitle[]): string => {
-    let result = html
-    wikiTitles.forEach(({ title, noteId }) => {
-      result = result.replace(
-        `[[${title}]]`,
-        `<a href="/n${noteId}">${title}</a>`
-      )
-    })
-    result = result.replace(
-      /\[\[([^\]]+)\]\]/g,
-      (_match, title) => `<a href="#" class="dead-link">${title}</a>`
-    )
-    return result
-  }
-
   // Set up the parser with the custom renderer
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser
@@ -263,6 +266,6 @@ export default function markdownToQuillHtml(
     removeWhitespaceBetweenTags,
     convertHtmlList,
     wrapStandaloneBrInParagraph,
-    (html) => replaceWikiLinks(html, options?.wikiTitles ?? []),
+    (html) => replaceWikiLinksInHtml(html, options?.wikiTitles ?? []),
   ])
 }

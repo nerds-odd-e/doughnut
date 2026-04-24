@@ -1,4 +1,5 @@
 import markdownizer from "@/components/form/markdownizer"
+import { replaceWikiLinksInHtml } from "@/components/form/markdownToQuillHtml"
 import { describe, it, expect } from "vitest"
 
 const toHtml = (markdown: string | undefined) =>
@@ -459,5 +460,21 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(markdown).toMatch(/\|[\s\S]*C[\s\S]*\|[\s\S]*9[\s\S]*\|/)
       expect(markdown).toMatch(/\|[\s\S]*D[\s\S]*\|[\s\S]*28[\s\S]*\|/)
     })
+  })
+})
+
+describe("replaceWikiLinksInHtml", () => {
+  it("replaces known wikilink text with a note href", () => {
+    expect(
+      replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
+        { title: "MyNote", noteId: 9 },
+      ])
+    ).toBe('<p><a href="/n9">MyNote</a></p>')
+  })
+
+  it("marks unknown wikilinks as dead links", () => {
+    expect(replaceWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toContain(
+      'class="dead-link"'
+    )
   })
 })

@@ -292,6 +292,29 @@ const normalizeTableCells = (tempDiv: HTMLElement): void => {
   })
 }
 
+turndownService.addRule("doughnutWikiNoteLink", {
+  filter(node) {
+    if (node.nodeName !== "A") return false
+    const href = (node as HTMLElement).getAttribute("href") || ""
+    return /^\/n\d+$/.test(href)
+  },
+  replacement(_content, node) {
+    const text = (node as HTMLElement).textContent?.trim() ?? ""
+    return `[[${text}]]`
+  },
+})
+
+turndownService.addRule("doughnutDeadWikiLink", {
+  filter(node) {
+    if (node.nodeName !== "A") return false
+    return (node as HTMLElement).classList.contains("dead-link")
+  },
+  replacement(_content, node) {
+    const text = (node as HTMLElement).textContent?.trim() ?? ""
+    return `[[${text}]]`
+  },
+})
+
 export default function htmlToMarkdown(html: string) {
   // Pre-process HTML to preserve code block content before DOM parsing
   const processedHtml = preserveCodeBlockContent(html)

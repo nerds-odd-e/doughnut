@@ -56,4 +56,16 @@ describe("quillHtmlToMarkdown", () => {
     const result = htmlToMarkdown(html)
     expect(result).toBe("[[WikiLink]]")
   })
+
+  it("converts internal note wiki anchors to wikilink markdown", () => {
+    expect(htmlToMarkdown('<p><a href="/n123">MyNote</a></p>')).toBe(
+      "[[MyNote]]"
+    )
+  })
+
+  it("converts dead wiki anchors to wikilink markdown", () => {
+    expect(
+      htmlToMarkdown('<p><a href="#" class="dead-link">Unknown</a></p>')
+    ).toBe("[[Unknown]]")
+  })
 })

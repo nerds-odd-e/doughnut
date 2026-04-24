@@ -106,4 +106,18 @@ describe("RichMarkdownEditor", () => {
 
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
   })
+
+  it("linkifies wikilinks in Quill HTML while model matches the interval", async () => {
+    const wikiTitles = [{ title: "MyNote", noteId: 9 }]
+    await mountEditor("", { wikiTitles })
+    await flushPromises()
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    quill.vm.$emit("update:modelValue", "<p>[[MyNote]]</p>")
+    await wrapper.setProps({ modelValue: "[[MyNote]]" })
+    await nextTick()
+    await flushPromises()
+
+    expect(String(quill.props("modelValue"))).toContain('<a href="/n9">')
+  })
 })
