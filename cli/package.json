@@ -31,7 +31,7 @@
     "doughnut-api": "workspace:*",
     "markdansi": "0.2.1",
     "react": ">=19.2.5",
-    "string-width": "^8.2.0",
+    "string-width": "^8.2.1",
     "turndown": "^7.2.4",
     "yoga-layout": "~3.2.1"
   },
