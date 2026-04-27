@@ -1,5 +1,6 @@
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
+import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
@@ -9,10 +10,15 @@ fetchMock.enableMocks()
 
 const mockToast = {
   error: vi.fn(),
+  warning: vi.fn(),
 }
 
 vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
+}))
+
+vi.mock("@/managedApi/window/loginOrRegisterAndHaltThisThread", () => ({
+  default: vi.fn(),
 }))
 
 describe("clientSetup", () => {
@@ -23,6 +29,8 @@ describe("clientSetup", () => {
     fetchMock.resetMocks()
     apiStatus.states = []
     mockToast.error.mockClear()
+    mockToast.warning.mockClear()
+    vi.mocked(loginOrRegisterAndHaltThisThread).mockClear()
     // Setup global client before each test
     setupGlobalClient(apiStatus)
   })
@@ -200,6 +208,43 @@ describe("clientSetup", () => {
 
       // All should be cleared
       expect(apiStatus.states.length).toBe(0)
+    })
+  })
+
+  describe("401 unauthorized — redirect to sign-in", () => {
+    it("shows warning toast with API path then redirects on GET 401", async () => {
+      const confirmSpy = vi.spyOn(window, "confirm").mockImplementation(() => {
+        throw new Error("confirm must not be used for GET")
+      })
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 401,
+      })
+
+      await UserController.getUserProfile({})
+
+      expect(mockToast.warning).toHaveBeenCalledWith(
+        expect.stringContaining("GET /api/user"),
+        expect.objectContaining({ timeout: 8000 })
+      )
+      expect(loginOrRegisterAndHaltThisThread).toHaveBeenCalled()
+      confirmSpy.mockRestore()
+    })
+
+    it("does not redirect when user declines login on mutating 401", async () => {
+      vi.spyOn(window, "confirm").mockReturnValue(false)
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 401,
+        method: "POST",
+      })
+
+      await UserController.createUser({
+        body: { name: "x" } as never,
+      })
+
+      expect(mockToast.warning).not.toHaveBeenCalled()
+      expect(loginOrRegisterAndHaltThisThread).not.toHaveBeenCalled()
     })
   })
 })

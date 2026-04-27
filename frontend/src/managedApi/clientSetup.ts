@@ -9,6 +9,16 @@ import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
 import { useToast } from "vue-toastification"
 
+function apiRequestLabel(request: Request): string {
+  const method = request.method?.toUpperCase() ?? "?"
+  try {
+    const u = new URL(request.url)
+    return `${method} ${u.pathname}${u.search}`
+  } catch {
+    return `${method} ${request.url}`
+  }
+}
+
 // Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined
 
@@ -82,13 +92,19 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   globalClient.interceptors.response.use((response, request) => {
     if (response.status === 401) {
       const method = request.method
-      if (
+      const willRedirect =
         method === "GET" ||
         // eslint-disable-next-line no-alert
         window.confirm(
           "You are logged out. Do you want to log in (and lose the current changes)?"
         )
-      ) {
+      if (willRedirect) {
+        const apiName = apiRequestLabel(request)
+        const toast = useToast()
+        toast.warning(
+          `This page will reload to sign you in again. Reason: unauthorized response from ${apiName}.`,
+          { timeout: 8000, pauseOnFocusLoss: true, pauseOnHover: true }
+        )
         loginOrRegisterAndHaltThisThread()
       }
     }
