@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.ConversationListItem;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -59,9 +60,9 @@ public class ConversationMessageController {
   }
 
   @GetMapping("/all")
-  public List<Conversation> getConversationsOfCurrentUser() {
+  public List<ConversationListItem> getConversationsOfCurrentUser() {
     authorizationService.assertLoggedIn();
-    return conversationService.conversationRelatedToUser(authorizationService.getCurrentUser());
+    return conversationService.conversationListForUser(authorizationService.getCurrentUser());
   }
 
   @PatchMapping("/{conversationId}/read")

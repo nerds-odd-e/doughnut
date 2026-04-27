@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.User;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -27,7 +28,8 @@ public interface ConversationRepository extends CrudRepository<Conversation, Int
           + " "
           + "GROUP BY c "
           + "ORDER BY MAX(m.createdAt) DESC, c.createdAt DESC")
-  List<Conversation> findByUserInSubjectOwnershipOrConversationInitiator(@Param("user") User user);
+  List<Conversation> findByUserInSubjectOwnershipOrConversationInitiator(
+      @Param("user") User user, Pageable pageable);
 
   @Query(
       "SELECT cm FROM ConversationMessage cm "

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.ConversationListItem;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
@@ -69,7 +70,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
         .from(currentUser.getUser())
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<Conversation> conversations = controller.getConversationsOfCurrentUser();
+    List<ConversationListItem> conversations = controller.getConversationsOfCurrentUser();
     assertEquals(1, conversations.size());
   }
 
@@ -80,7 +81,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
         .owner(currentUser.getUser())
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<Conversation> conversations = controller.getConversationsOfCurrentUser();
+    List<ConversationListItem> conversations = controller.getConversationsOfCurrentUser();
     assertEquals(1, conversations.size());
   }
 
@@ -92,7 +93,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
         .owner(myCircle)
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<Conversation> conversations = controller.getConversationsOfCurrentUser();
+    List<ConversationListItem> conversations = controller.getConversationsOfCurrentUser();
     assertEquals(1, conversations.size());
   }
 
@@ -262,9 +263,11 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .createdAt(makeMe.aTimestamp().of(1, 3).please())
           .please();
 
-      List<Conversation> orderedConversations = controller.getConversationsOfCurrentUser();
+      List<ConversationListItem> orderedConversations = controller.getConversationsOfCurrentUser();
 
-      assertIterableEquals(List.of(conv3, conv2, conv1), orderedConversations);
+      assertIterableEquals(
+          List.of(conv3.getId(), conv2.getId(), conv1.getId()),
+          orderedConversations.stream().map(ConversationListItem::id).toList());
     }
 
     @Test
@@ -288,9 +291,31 @@ class ConversationMessageControllerTest extends ControllerTestBase {
               .createdAt(makeMe.aTimestamp().of(1, 3).please())
               .please();
 
-      List<Conversation> orderedConversations = controller.getConversationsOfCurrentUser();
+      List<ConversationListItem> orderedConversations = controller.getConversationsOfCurrentUser();
 
-      assertIterableEquals(List.of(conv3, conv2, conv1), orderedConversations);
+      assertIterableEquals(
+          List.of(conv3.getId(), conv2.getId(), conv1.getId()),
+          orderedConversations.stream().map(ConversationListItem::id).toList());
+    }
+
+    @Test
+    void returnsAtMost50Conversations() {
+      Conversation oldest =
+          makeMe
+              .aConversation()
+              .from(currentUser.getUser())
+              .createdAt(makeMe.aTimestamp().of(1, 0).please())
+              .please();
+      for (int i = 2; i <= 51; i++) {
+        makeMe
+            .aConversation()
+            .from(currentUser.getUser())
+            .createdAt(makeMe.aTimestamp().of(i, 0).please())
+            .please();
+      }
+      List<ConversationListItem> list = controller.getConversationsOfCurrentUser();
+      assertEquals(50, list.size());
+      assertTrue(list.stream().noneMatch(item -> item.id().equals(oldest.getId())));
     }
   }
 

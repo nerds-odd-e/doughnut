@@ -33,7 +33,7 @@ describe("MessageCenterPage", () => {
   })
 
   it("should render no conversation selected by default", async () => {
-    const conversation = makeMe.aConversation.please()
+    const conversation = makeMe.aConversationListItem.please()
     mockSdkService("getConversationsOfCurrentUser", [conversation])
     helper
       .component(MessageCenterPage)
@@ -47,12 +47,16 @@ describe("MessageCenterPage", () => {
 
   describe("highlighting the selected conversation", () => {
     const conversations = [
-      makeMe.aConversation.please(),
-      makeMe.aConversation.please(),
+      makeMe.aConversationListItem.please(),
+      makeMe.aConversationListItem.please(),
     ]
     beforeEach(async () => {
       vi.clearAllMocks()
       mockSdkService("getConversationsOfCurrentUser", conversations)
+      mockSdkService(
+        "getConversation",
+        makeMe.aConversation.withId(conversations[1]!.id).please()
+      )
       await page.viewport(1200, 800)
     })
 

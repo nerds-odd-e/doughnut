@@ -798,6 +798,12 @@ export type GithubIssue = {
     body?: string;
 };
 
+export type ConversationListItem = {
+    id: number;
+    subject: string;
+    partnerName?: string;
+};
+
 export type CircleForUserView = {
     id: number;
     name: string;
@@ -3670,7 +3676,7 @@ export type GetConversationsOfCurrentUserResponses = {
     /**
      * OK
      */
-    200: Array<Conversation>;
+    200: Array<ConversationListItem>;
 };
 
 export type GetConversationsOfCurrentUserResponse = GetConversationsOfCurrentUserResponses[keyof GetConversationsOfCurrentUserResponses];

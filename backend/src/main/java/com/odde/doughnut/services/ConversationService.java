@@ -1,9 +1,11 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.ConversationListItem;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
@@ -13,6 +15,8 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -53,7 +57,38 @@ public class ConversationService {
   }
 
   public List<Conversation> conversationRelatedToUser(User user) {
-    return conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(user);
+    return conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(
+        user, Pageable.unpaged());
+  }
+
+  public List<ConversationListItem> conversationListForUser(User user) {
+    return conversationRepository
+        .findByUserInSubjectOwnershipOrConversationInitiator(user, PageRequest.of(0, 50))
+        .stream()
+        .map(conversation -> toListItem(conversation, user))
+        .toList();
+  }
+
+  private ConversationListItem toListItem(Conversation conversation, User currentUser) {
+    return new ConversationListItem(
+        conversation.getId(),
+        getConversationSubject(conversation),
+        partnerNameForList(conversation, currentUser));
+  }
+
+  private String partnerNameForList(Conversation conversation, User currentUser) {
+    User initiator = conversation.getConversationInitiator();
+    if (initiator != null && !Objects.equals(initiator.getId(), currentUser.getId())) {
+      return initiator.getName();
+    }
+    Ownership ownership = conversation.getSubjectOwnership();
+    if (ownership != null && ownership.getCircle() != null) {
+      return ownership.getCircle().getName();
+    }
+    if (ownership != null) {
+      return ownership.getOwnerName();
+    }
+    return null;
   }
 
   public ConversationMessage addMessageToConversation(

@@ -17,6 +17,7 @@ import BazaarNotebooksBuilder from './BazaarNotebooksBuilder'
 import CircleBuilder from './CircleBuilder'
 import CircleNoteBuilder from './CircleNoteBuilder'
 import ConversationBuilder from './ConversationBuilder'
+import ConversationListItemBuilder from './ConversationListItemBuilder'
 import DueMemoryTrackersBuilder from './DueMemoryTrackersBuilder'
 import {
   FailureReportBuilder,
@@ -160,6 +161,10 @@ class MakeMe {
 
   static get aConversation(): ConversationBuilder {
     return new ConversationBuilder()
+  }
+
+  static get aConversationListItem(): ConversationListItemBuilder {
+    return new ConversationListItemBuilder()
   }
 
   static get anApiError(): ApiErrorBuilder {

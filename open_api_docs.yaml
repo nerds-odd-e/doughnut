@@ -3043,7 +3043,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Conversation"
+                  $ref: "#/components/schemas/ConversationListItem"
   /api/circles/{circle}:
     get:
       tags:
@@ -4992,6 +4992,19 @@ components:
           type: string
         body:
           type: string
+    ConversationListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        subject:
+          type: string
+        partnerName:
+          type: string
+      required:
+      - id
+      - subject
     CircleForUserView:
       type: object
       properties:

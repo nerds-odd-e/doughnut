@@ -21,8 +21,8 @@
                 :class="{ 'daisy-active': conversationId === conversation.id }"
                 @click="selectConversation(conversation)"
               >
-                <div>{{ conversationTopic(conversation) }}</div>
-                <div>{{ conversationPartner(conversation) }}</div>
+                <div>{{ conversation.subject }}</div>
+                <div>{{ conversation.partnerName }}</div>
               </li>
             </ul>
           </div>
@@ -57,7 +57,11 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import { MessageCircle } from "lucide-vue-next"
-import type { Conversation, User } from "@generated/doughnut-backend-api"
+import type {
+  Conversation,
+  ConversationListItem,
+  User,
+} from "@generated/doughnut-backend-api"
 import { messageCenterConversations } from "@/store/messageStore"
 import { useRouter } from "vue-router"
 
@@ -67,22 +71,26 @@ const props = defineProps({
 
 const user = inject<Ref<User | undefined>>("currentUser")
 
-const conversations = ref<Conversation[] | undefined>(undefined)
+const conversations = ref<ConversationListItem[] | undefined>(undefined)
 const currentConversation = ref<Conversation | null>(null)
 
 const router = useRouter()
+
+const loadConversationById = async (id: number) => {
+  const { data: conversation, error } =
+    await ConversationMessageController.getConversation({
+      path: { conversationId: id },
+    })
+  if (!error) {
+    currentConversation.value = conversation!
+  }
+}
 
 watch(
   () => props.conversationId,
   async (newId) => {
     if (newId) {
-      const { data: conversation, error } =
-        await ConversationMessageController.getConversation({
-          path: { conversationId: newId },
-        })
-      if (!error) {
-        currentConversation.value = conversation!
-      }
+      await loadConversationById(Number(newId))
       return
     }
     currentConversation.value = null
@@ -95,11 +103,10 @@ const fetchData = async () => {
   if (!error) {
     conversations.value = userConversations!
 
-    if (props.conversationId && conversations.value) {
-      currentConversation.value =
-        conversations.value.find(
-          (c) => c.id === Number(props.conversationId)
-        ) || null
+    if (props.conversationId) {
+      await loadConversationById(Number(props.conversationId))
+    } else {
+      currentConversation.value = null
     }
   }
 }
@@ -118,24 +125,10 @@ onMounted(() => {
   fetchData()
 })
 
-const conversationTopic = (conversation: Conversation) =>
-  conversation.subject?.assessmentQuestionInstance?.multipleChoicesQuestion
-    ?.f0__stem || conversation.subject?.note?.noteTopology?.title
-
-const conversationPartner = (conversation: Conversation) => {
-  if (conversation.conversationInitiator?.name !== user?.value?.name) {
-    return conversation.conversationInitiator?.name
-  }
-  if (conversation.subjectOwnership?.circle?.name) {
-    return conversation.subjectOwnership.circle.name
-  }
-  return conversation.subjectOwnership?.ownerName
-}
-
 const showSidebarOnMobile = computed(() => !currentConversation.value)
 const showMainContentOnMobile = computed(() => currentConversation.value)
 
-const selectConversation = (conversation: Conversation) => {
+const selectConversation = (conversation: ConversationListItem) => {
   router.push({
     name: "messageCenter",
     params: { conversationId: conversation.id },
