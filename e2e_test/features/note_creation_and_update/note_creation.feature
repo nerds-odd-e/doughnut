@@ -48,7 +48,7 @@ Feature: Nested Note creation
       | team       |
       | tech       |
 
-  Scenario: Open sibling note creation from a dead link
+  Scenario: Create a new sibling note from a dead link
     Given note "tech" has a dead wiki link titled "continuous integration"
     When I follow the link "continuous integration" in the note body to create the missing note
     Then I should see "LeSS in Action" with these children
