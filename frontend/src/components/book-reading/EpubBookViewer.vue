@@ -58,7 +58,7 @@ function forEachRenditionView(
 function resolveEpubLocatorElement(
   r: Rendition,
   epub: EpubLocatorFull
-): Element | null {
+): HTMLElement | null {
   const storedPath = splitEpubHref(epub.href.trim()).path
   if (storedPath.length === 0) {
     return null
@@ -215,8 +215,18 @@ function emitIfHref(href: string | undefined) {
  * mode, so we also listen to `displayed` (fires when a section first mounts) to guarantee the
  * initial current block is reported. Both deliver the spine href we need.
  */
-const onRelocated = (location: { start?: { href?: string } }) =>
-  emitIfHref(location.start?.href)
+/**
+ * In continuous/scrolled mode, `start` is the topmost visible section and `end` the bottommost.
+ * Using `end` (when set) matches reading position when more than one spine item intersects
+ * the viewport (e.g. a tall window shows the tail of ch.N and the start of ch.N+1).
+ */
+const onRelocated = (location: {
+  start?: { href?: string }
+  end?: { href?: string }
+}) => {
+  const href = location.end?.href ?? location.start?.href
+  emitIfHref(href)
+}
 const onDisplayed = (section: { href?: string }) => emitIfHref(section.href)
 
 type EpubSpineItem = { href?: string }
@@ -254,7 +264,23 @@ async function displayLocator(loc: ContentLocatorFull): Promise<void> {
   if (!target) {
     return
   }
-  await rendition.display(target).catch(() => undefined)
+  const r = rendition
+  await r.display(target).catch(() => undefined)
+  await nextTick()
+  await new Promise<void>((r0) => setTimeout(r0, 100))
+  let el: HTMLElement | null = resolveEpubLocatorElement(r, epub)
+  if (el && /^H[1-6]$/i.test(el.tagName)) {
+    const next = el.nextElementSibling
+    if (
+      next instanceof HTMLElement &&
+      (next.textContent?.trim().length ?? 0) > 0
+    ) {
+      el = next
+    }
+  }
+  if (el) {
+    el.scrollIntoView({ block: "center", inline: "nearest" })
+  }
 }
 
 function resolveLocatorRect(

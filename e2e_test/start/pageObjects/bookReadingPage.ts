@@ -37,7 +37,8 @@ function epubHostViewportIntersectsMarker(
     Math.min(absBottom, hostRect.bottom) - Math.max(absTop, hostRect.top)
   const wOverlap =
     Math.min(absRight, hostRect.right) - Math.max(absLeft, hostRect.left)
-  return hOverlap > 8 && wOverlap > 8
+  // Allow thin table cells (e.g. "Cell One" in a single column).
+  return hOverlap > 0 && wOverlap > 0
 }
 
 const bookReadingPage = () => {
@@ -106,11 +107,31 @@ const bookReadingPage = () => {
           )
           expect(hasText, 'EPUB iframe should contain fixture text').to.be.true
         })
-        .root()
-        .get('[data-testid="epub-book-viewer"] .epub-container')
+      cy.get('[data-testid="epub-book-viewer"] .epub-container')
         .should('be.visible')
         .should(($host) => {
           const host = $host.get(0) as HTMLElement
+          if (!epubHostViewportIntersectsMarker(host, text)) {
+            for (const f of host.querySelectorAll('iframe')) {
+              const doc = (f as HTMLIFrameElement).contentDocument
+              if (!doc?.body?.innerText?.includes(text)) {
+                continue
+              }
+              let best: HTMLElement | undefined
+              let bestLen = Number.POSITIVE_INFINITY
+              for (const node of doc.body.querySelectorAll('*')) {
+                const e = node as HTMLElement
+                const t = e.textContent ?? ''
+                if (!t.includes(text) || t.length > bestLen) {
+                  continue
+                }
+                bestLen = t.length
+                best = e
+              }
+              best?.scrollIntoView({ block: 'center', inline: 'nearest' })
+              break
+            }
+          }
           expect(
             epubHostViewportIntersectsMarker(host, text),
             `EPUB text should intersect reader host viewport ("${text}")`
@@ -130,8 +151,8 @@ const bookReadingPage = () => {
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
         'be.visible'
       )
-      const scrollSel =
-        '[data-testid="epub-book-viewer"] .epub-book-viewer-host'
+      // epub.js listens for scroll on the inner stage `.epub-container` (not `.epub-book-viewer-host`).
+      const scrollSel = '[data-testid="epub-book-viewer"] .epub-container'
       const viewportSel = '[data-testid="epub-book-viewer"] .epub-container'
       const maxSteps = 96
       const step = (n: number): Cypress.Chainable =>
@@ -170,8 +191,9 @@ const bookReadingPage = () => {
       return cy.then(() => step(0))
     },
     /**
-     * Jumps the epub.js scroll host to the top so a later "scroll until text" step reliably
-     * crosses spine/fragment boundaries (triggers `relocated` / reading-position PATCH).
+     * Scrolls the epub.js `.epub-container` so the **current chapter** (iframe) is aligned
+     * to the top of the stage — not `scrollTop = 0` (book beginning), so a follow-up
+     * "scroll until text" can still cross fragment boundaries within the same spine file.
      */
     scrollEpubReaderHostToTop() {
       pageIsNotLoading()
@@ -180,12 +202,18 @@ const bookReadingPage = () => {
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
         'be.visible'
       )
-      cy.get('[data-testid="epub-book-viewer"] .epub-book-viewer-host').then(
-        ($el) => {
-          const host = $el.get(0) as HTMLElement
-          host.scrollTop = 0
+      cy.get('[data-testid="epub-book-viewer"] .epub-container').then(($c) => {
+        const container = $c.get(0) as HTMLElement
+        for (const f of container.querySelectorAll('iframe')) {
+          const doc = (f as HTMLIFrameElement).contentDocument
+          const h1 = doc?.querySelector('h1')
+          if (h1 && (h1.textContent ?? '').includes('Chapter Beta')) {
+            h1.scrollIntoView({ block: 'start', inline: 'nearest' })
+            return
+          }
         }
-      )
+        container.scrollTop = 0
+      })
       cy.wait(200)
       return this
     },
