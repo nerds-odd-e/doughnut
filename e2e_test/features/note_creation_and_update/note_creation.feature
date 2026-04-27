@@ -48,7 +48,6 @@ Feature: Nested Note creation
       | team       |
       | tech       |
 
-  @wip
   Scenario: Open sibling note creation from a dead link
     Given there are some notes:
       | Title      | Parent Title   |
