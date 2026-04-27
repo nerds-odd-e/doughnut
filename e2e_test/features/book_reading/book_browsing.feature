@@ -1,4 +1,3 @@
-@ignore
 @withCliConfig
 @interactiveCLI
 @mockMineruLib

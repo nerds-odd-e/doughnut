@@ -1,4 +1,3 @@
-@ignore
 Feature: Logged in status
 
   Background:
