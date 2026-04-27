@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
+import { replaceWikiLinksInHtml } from "@/components/form/markdownToQuillHtml"
 
 describe("quillHtmlToMarkdown", () => {
   it("preserves escaped HTML entities in markdown output", () => {
@@ -67,5 +68,38 @@ describe("quillHtmlToMarkdown", () => {
     expect(
       htmlToMarkdown('<p><a href="#" class="dead-link">Unknown</a></p>')
     ).toBe("[[Unknown]]")
+  })
+
+  it("linkified wikilinks: two wikilinks in one paragraph", () => {
+    const raw = "<p>[[LeSS in Action]] .... [[Odd-e CSD]]</p>"
+    const html = replaceWikiLinksInHtml(raw, [
+      { title: "LeSS in Action", noteId: 1 },
+      { title: "Odd-e CSD", noteId: 2 },
+    ])
+    expect(htmlToMarkdown(html)).toBe("[[LeSS in Action]] .... [[Odd-e CSD]]")
+  })
+
+  it("linkified wikilinks: extra [ before a resolved wikilink", () => {
+    const raw = "<p>[[[WikiLink]]</p>"
+    const html = replaceWikiLinksInHtml(raw, [
+      { title: "WikiLink", noteId: 99 },
+    ])
+    expect(htmlToMarkdown(html)).toBe(String.raw`\[[[WikiLink]]`)
+  })
+
+  it("linkified wikilinks: extra ] after a resolved wikilink", () => {
+    const raw = "<p>[[WikiLink]]]</p>"
+    const html = replaceWikiLinksInHtml(raw, [
+      { title: "WikiLink", noteId: 99 },
+    ])
+    expect(htmlToMarkdown(html)).toBe("[[WikiLink]]\\]")
+  })
+
+  it("linkified wikilinks: extra [ before and ] after a resolved wikilink", () => {
+    const raw = "<p>[[[WikiLink]]]</p>"
+    const html = replaceWikiLinksInHtml(raw, [
+      { title: "WikiLink", noteId: 99 },
+    ])
+    expect(htmlToMarkdown(html)).toBe(String.raw`\[[[WikiLink]]\]`)
   })
 })

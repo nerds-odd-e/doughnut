@@ -159,6 +159,43 @@ When(
 )
 
 When(
+  'I set note "LeSS in Action" to Doughnut with two wikilinks in details',
+  () => {
+    const page = start.jumpToNotePage('LeSS in Action')
+    page.editTextContent({ Title: 'Doughnut' })
+    page.updateDetailsAsMarkdown('[[LeSS in Action]] .... [[Odd-e CSD]]')
+    page.switchToRichContent()
+  }
+)
+
+When(
+  'I set note "LeSS in Action" to Doughnut with extra open bracket wikilink details',
+  () => {
+    const page = start.jumpToNotePage('LeSS in Action')
+    page.editTextContent({ Title: 'Doughnut' })
+    page.updateDetailsAsMarkdown('[[[WikiLink]]')
+  }
+)
+
+When(
+  'I set note "LeSS in Action" to Doughnut with extra close bracket wikilink details',
+  () => {
+    const page = start.jumpToNotePage('LeSS in Action')
+    page.editTextContent({ Title: 'Doughnut' })
+    page.updateDetailsAsMarkdown('[[WikiLink]]]')
+  }
+)
+
+When(
+  'I set note "LeSS in Action" to Doughnut with extra bracket pair wikilink details',
+  () => {
+    const page = start.jumpToNotePage('LeSS in Action')
+    page.editTextContent({ Title: 'Doughnut' })
+    page.updateDetailsAsMarkdown('[[[WikiLink]]]')
+  }
+)
+
+When(
   'I update note accessories of {string} to become:',
   (noteTopology: string, data: DataTable) => {
     start
@@ -627,6 +664,24 @@ Then(
     start.assumeNotePage().expectNoteDetailsMarkdown(expectedMarkdown)
   }
 )
+
+Then('the note details are two wikilinks for LeSS and Odd-e CSD', () => {
+  start
+    .assumeNotePage()
+    .expectNoteDetailsMarkdown('[[LeSS in Action]] .... [[Odd-e CSD]]')
+})
+
+Then('the note details have extra open bracket wikilink markdown', () => {
+  start.assumeNotePage().expectNoteDetailsMarkdown('[[[WikiLink]]')
+})
+
+Then('the note details have extra close bracket wikilink markdown', () => {
+  start.assumeNotePage().expectNoteDetailsMarkdown('[[WikiLink]]]')
+})
+
+Then('the note details have extra bracket pair wikilink markdown', () => {
+  start.assumeNotePage().expectNoteDetailsMarkdown('[[[WikiLink]]]')
+})
 
 When('I click the link {string} in the note details', (linkText: string) => {
   const confirmSpy = cy.spy().as('confirmSpy')

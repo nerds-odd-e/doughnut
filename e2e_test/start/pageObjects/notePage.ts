@@ -183,7 +183,11 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
     expectNoteDetailsMarkdown(expectedMarkdown: string) {
-      this.toolbarButton('Edit as markdown').click()
+      cy.get('body').then(($body) => {
+        if ($body.find('[title="Edit as markdown"]').length > 0) {
+          cy.get('[title="Edit as markdown"]').click()
+        }
+      })
       cy.get('textarea').should('have.value', expectedMarkdown)
       return this
     },

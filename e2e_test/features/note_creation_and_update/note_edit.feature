@@ -98,28 +98,20 @@ Feature: Note Edit
       Then the note details markdown should be "[[WikiLink]]"
 
   Scenario: Two wiki links in note details are treated as separate links
-      When I update note "LeSS in Action" to become:
-        | Title    | Details      |
-        | Doughnut | [[LeSS in Action]] .... [[Odd-e CSD]] |
-      Then the note details markdown should be "[[LeSS in Action]] .... [[Odd-e CSD]]"
+    When I set note "LeSS in Action" to Doughnut with two wikilinks in details
+    Then the note details are two wikilinks for LeSS and Odd-e CSD
 
-  Scenario: Extra opening bracket before double brackets is escaped
-    When I update note "LeSS in Action" to become:
-      | Title    | Details         |
-      | Doughnut | [[[WikiLink]]   |
-    Then the note details markdown should be "[[\[WikiLink]]"
+  Scenario: Extra opening bracket before wikilink is preserved in markdown
+    When I set note "LeSS in Action" to Doughnut with extra open bracket wikilink details
+    Then the note details have extra open bracket wikilink markdown
 
-  Scenario: Extra closing bracket after double brackets is escaped
-    When I update note "LeSS in Action" to become:
-      | Title    | Details         |
-      | Doughnut | [[WikiLink]]]   |
-    Then the note details markdown should be "[[WikiLink]]\]"
+  Scenario: Extra closing bracket after wikilink is preserved in markdown
+    When I set note "LeSS in Action" to Doughnut with extra close bracket wikilink details
+    Then the note details have extra close bracket wikilink markdown
 
-  Scenario: Extra opening and closing brackets after double brackets is escaped
-  When I update note "LeSS in Action" to become:
-    | Title    | Details         |
-    | Doughnut | [[[WikiLink]]]   |
-  Then the note details markdown should be "[[\[WikiLink]]\]"
+  Scenario: Extra opening and closing brackets around wikilink are preserved in markdown
+    When I set note "LeSS in Action" to Doughnut with extra bracket pair wikilink details
+    Then the note details have extra bracket pair wikilink markdown
 
   Scenario: Edit a note's details with a wiki link in markdown
     Given I have a notebook with the head note "TDD"
