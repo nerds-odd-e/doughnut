@@ -205,6 +205,15 @@ export const assumeNotePage = (noteTopology?: string) => {
     clickDeadLink(linkText: string) {
       cy.get('[role=details]').find('a.dead-link').contains(linkText).click()
     },
+    followDeadLink(linkTitle: string) {
+      this.clickDeadLink(linkTitle)
+      return {
+        createNote: () => {
+          noteCreationForm.expectFormVisible()
+          noteCreationForm.submit()
+        },
+      }
+    },
     expectLiveLink(linkText: string) {
       cy.get('[role=details]')
         .find('a:not(.dead-link)')

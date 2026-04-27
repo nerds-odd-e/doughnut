@@ -13,7 +13,6 @@ import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
-import { submittableForm } from '../start/forms'
 import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
 
 defineParameterType({
@@ -773,8 +772,6 @@ Given(
 When(
   'I follow the link {string} in the note body to create the missing note',
   (linkTitle: string) => {
-    cy.get('[role=details]').find('a').contains(linkTitle).click()
-    cy.findByLabelText('Title').should('be.visible')
-    submittableForm.submitWith({})
+    start.assumeNotePage().followDeadLink(linkTitle).createNote()
   }
 )
