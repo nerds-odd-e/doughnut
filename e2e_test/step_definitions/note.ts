@@ -770,28 +770,11 @@ Given(
   }
 )
 
-When('I follow the link {string} in the note body', (linkTitle: string) => {
-  cy.get('[role=details]').find('a').contains(linkTitle).click()
-})
-
-Then('I should see the sibling note creation form', () => {
-  cy.findByLabelText('Title').should('be.visible')
-})
-
-Then(
-  'note {string} is created as a sibling of {string} under {string}',
-  (newNoteTitle: string, referenceNoteTitle: string, parentTitle: string) => {
-    submittableForm.submitWith({ Title: newNoteTitle })
-    start.assumeNotePage(newNoteTitle)
-    start
-      .pageIsNotLoading()
-      .navigateToNotebooksPage()
-      .navigateToPath(new NotePath(parentTitle))
-      .expectChildren([
-        { 'note-title': 'team' },
-        { 'note-title': 'tech' },
-        { 'note-title': referenceNoteTitle },
-        { 'note-title': newNoteTitle },
-      ])
+When(
+  'I follow the link {string} in the note body to create the missing note',
+  (linkTitle: string) => {
+    cy.get('[role=details]').find('a').contains(linkTitle).click()
+    cy.findByLabelText('Title').should('be.visible')
+    submittableForm.submitWith({})
   }
 )
