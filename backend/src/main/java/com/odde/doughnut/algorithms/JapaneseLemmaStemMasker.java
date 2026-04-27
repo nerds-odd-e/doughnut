@@ -221,6 +221,50 @@ final class JapaneseLemmaStemMasker {
     for (String suf : suffixes) {
       addSpec(stem + suf, suf, out, seen);
     }
+    // Longer て/た + auxiliary chains (e.g. 熟していない); must beat bare て/た in length sort.
+    String[][] teTaChains = {
+      {"ていませんでした", "ました"},
+      {"ていません", "せん"},
+      {"ていました", "ました"},
+      {"ています", "ます"},
+      {"ていなければ", "ば"},
+      {"ていなくて", "て"},
+      {"ていなく", "く"},
+      {"ていなかった", "なかった"},
+      {"ていない", "ない"},
+      {"ていた", "いた"},
+      {"ている", "いる"},
+      {"ておきませんでした", "ました"},
+      {"ておきません", "せん"},
+      {"ておきました", "ました"},
+      {"ておきます", "ます"},
+      {"ておかなかった", "かった"},
+      {"ておかない", "ない"},
+      {"ておいた", "いた"},
+      {"ておいて", "て"},
+      {"ておく", "く"},
+      {"てみませんでした", "ました"},
+      {"てみません", "せん"},
+      {"てみました", "ました"},
+      {"てみます", "ます"},
+      {"てみなかった", "かった"},
+      {"てみない", "ない"},
+      {"てみた", "た"},
+      {"てみて", "て"},
+      {"てみる", "る"},
+      {"てしまいませんでした", "ました"},
+      {"てしまいません", "せん"},
+      {"てしまいました", "ました"},
+      {"てしまいます", "ます"},
+      {"てしまわなかった", "かった"},
+      {"てしまわない", "ない"},
+      {"てしまった", "った"},
+      {"てしまって", "って"},
+      {"てしまう", "う"},
+    };
+    for (String[] chain : teTaChains) {
+      addSpec(stem + chain[0], chain[1], out, seen);
+    }
   }
 
   private static void addSpec(
@@ -259,7 +303,9 @@ final class JapaneseLemmaStemMasker {
     if (sc == Character.UnicodeScript.HAN || sc == Character.UnicodeScript.KATAKANA) return true;
 
     if ("た".equals(spec.visibleSuffix) || "て".equals(spec.visibleSuffix)) {
-      if (cp == 'い' || cp == 'お') return false;
+      // Reject た+い… (desiderative ～たい); allow て+い… (e.g. している, していない).
+      if (cp == 'い' && "た".equals(spec.visibleSuffix)) return false;
+      if (cp == 'お') return false;
       // ～て/～た + auxiliary (e.g. 試みてみる); next kana is not a particle
       if (sc == Character.UnicodeScript.HIRAGANA) return true;
     }
