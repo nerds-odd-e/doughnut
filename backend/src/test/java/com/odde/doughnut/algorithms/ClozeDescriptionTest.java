@@ -67,6 +67,7 @@ class ClozeDescriptionTest {
     "高い,      高かった,                [..~]た",
     "高い,      高くない,                [..~]ない",
     "試みる,   わたしが試みてみよう。,  わたしが[..~]てみよう。",
+    "熟す,      この語はまだ熟していない。,  この語はまだ[..~]ない。",
   })
   void clozeDescription(String title, String details, String expectedClozeDescription) {
     assertThat(
