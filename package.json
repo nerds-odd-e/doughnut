@@ -158,7 +158,8 @@
       "gifencoder>canvas": ">=3.2.3",
       "follow-redirects": ">=1.16.0",
       "protobufjs": ">=7.5.5",
-      "uuid": ">=14.0.0"
+      "uuid": ">=14.0.0",
+      "postcss": ">=8.5.12"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
