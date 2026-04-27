@@ -31,8 +31,14 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.get('main').within(() => findChildNoteCard(noteTopology).click())
       return assumeNotePage(noteTopology)
     },
+    // After server-side logout the SPA still shows the old tree; the next click
+    // triggers auth/redirect and the card can be detached while Cypress waits
+    // for “actionable” in CI. force skips that wait.
     clickChildNote: (noteTopology: string) => {
-      cy.get('main').within(() => findChildNoteCard(noteTopology).click())
+      cy.get('main')
+        .find('.daisy-card-title .title-text')
+        .contains(noteTopology)
+        .click({ force: true })
     },
     collapseChildren: () => {
       cy.get('main').within(() => {
