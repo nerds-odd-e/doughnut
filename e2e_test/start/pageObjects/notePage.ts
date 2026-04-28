@@ -233,11 +233,6 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
 
-    updateNoteType(noteType: string) {
-      this.moreOptions().updateNoteType(noteType)
-      return this
-    },
-
     startSearchingAndAddRelationship() {
       this.toolbarButton('search and add relationship').click()
       return assumeNoteTargetSearchDialog()

@@ -10,7 +10,6 @@
         <NoteInfoComponent
           :note="note"
           :note-recall-info="noteRecallInfo"
-          @note-type-updated="onNoteTypeUpdated"
         />
       </div>
     </div>
@@ -126,7 +125,6 @@ import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ref, onMounted } from "vue"
 import NoteInfoComponent from "../NoteInfoComponent.vue"
-import type { NoteType } from "@/models/noteTypeOptions"
 
 const { note } = defineProps<{
   note: Note
@@ -155,10 +153,6 @@ const fetchNoteInfo = async () => {
 onMounted(() => {
   fetchNoteInfo()
 })
-
-const onNoteTypeUpdated = async (_newType: NoteType) => {
-  await fetchNoteInfo()
-}
 
 const closeDialog = () => {
   emit("close-dialog")

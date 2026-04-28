@@ -1,16 +1,4 @@
 <template>
-  <div
-    data-test="note-type-selection-dialog"
-    class="daisy-mb-4"
-  >
-    <Select
-      v-model="localNoteTypeForSelect"
-      :options="noteTypeOptionsWithEmpty"
-      scope-name="note"
-      field="noteType"
-      @update:model-value="updateNoteType"
-    />
-  </div>
   <NoteRecallSettingForm
     v-bind="{
       noteId: note.id,
@@ -53,57 +41,34 @@ import type {
   Note,
   NoteRecallInfo,
 } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { ref, computed, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
-import Select from "../form/Select.vue"
-import { noteTypeOptions } from "@/models/noteTypeOptions"
-import type { NoteType } from "@/models/noteTypeOptions"
 
-// Props - note from container (reactive), noteRecallInfo from API
 const props = defineProps<{
   note: Note
   noteRecallInfo: NoteRecallInfo
 }>()
 
-// Emits
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
-  (e: "noteTypeUpdated", noteType: NoteType): void
   (e: "rememberSpellingChanged", value: boolean): void
 }>()
 
-// Router
 const router = useRouter()
 
-// Reactive state
 const memoryTrackers = ref(props.noteRecallInfo.memoryTrackers ?? [])
-const localNoteType = ref<NoteType | undefined>(props.noteRecallInfo.noteType)
-
-// Computed
 const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
-const noteTypeOptionsWithEmpty = computed(
-  () => ["", ...noteTypeOptions] as string[]
-)
-const localNoteTypeForSelect = computed({
-  get: () => localNoteType.value ?? "",
-  set: (value: string) => {
-    localNoteType.value = value === "" ? undefined : (value as NoteType)
-  },
-})
 
-// Watch for external changes to noteRecallInfo.noteType
 watch(
-  () => props.noteRecallInfo.noteType,
-  (newNoteType) => {
-    localNoteType.value = newNoteType
-  }
+  () => props.noteRecallInfo.memoryTrackers,
+  (next) => {
+    memoryTrackers.value = next ?? []
+  },
+  { deep: true }
 )
 
-// Methods
 const updateMemoryTracker = (newTracker: MemoryTracker) => {
   const index = memoryTrackers.value.findIndex((t) => t.id === newTracker.id)
   if (index !== -1) {
@@ -116,32 +81,6 @@ const navigateToMemoryTracker = (memoryTrackerId: number) => {
     name: "memoryTrackerShow",
     params: { memoryTrackerId },
   })
-}
-
-const updateNoteType = async (newTypeString: string) => {
-  const previousValue = localNoteType.value
-  const newType = newTypeString === "" ? undefined : (newTypeString as NoteType)
-  localNoteType.value = newType
-
-  if (newType === props.noteRecallInfo.noteType) {
-    return
-  }
-
-  // Only send update if a type is selected (not empty/undefined)
-  if (newType !== undefined) {
-    const { error } = await apiCallWithLoading(() =>
-      NoteController.updateNoteType({
-        path: { note: props.note.id },
-        body: newType,
-      })
-    )
-
-    if (error) {
-      localNoteType.value = previousValue
-    } else {
-      emit("noteTypeUpdated", newType)
-    }
-  }
 }
 </script>
 

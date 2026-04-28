@@ -55,47 +55,4 @@ export const questionGenerationService = () => ({
         .stubQuestionEvaluation(JSON.stringify(record))
     })
   },
-
-  stubQuestionByNoteType: (noteTypeToQuestion: Record<string, string>) => {
-    cy.then(async () => {
-      await mock_services.openAi().restartImposter()
-
-      const noteTypeInstructionMap: Record<string, string> = {
-        concept: 'Special Instruction for Concept Note',
-        source: 'Special Instruction for Source Note',
-        person: 'Special Instruction for Person Note',
-        experience: 'Special Instruction for Experience Note',
-        initiative: 'Special Instruction for Initiative Note',
-        quest: 'Special Instruction for Quest Note',
-      }
-
-      for (const [noteType, question] of Object.entries(noteTypeToQuestion)) {
-        const instructionText = noteTypeInstructionMap[noteType.toLowerCase()]
-        if (!instructionText) {
-          throw new Error(`Unknown note type: ${noteType}`)
-        }
-
-        const mcqWithAnswer = createMcqWithAnswer(
-          question,
-          'Correct Answer',
-          'Incorrect Choice 1',
-          'Incorrect Choice 2'
-        )
-        const reply = JSON.stringify(mcqWithAnswer)
-
-        await mock_services
-          .openAi()
-          .chatCompletion()
-          .requestMatches({
-            messages: [
-              {
-                role: 'system',
-                content: `.*${instructionText}.*`,
-              },
-            ],
-          })
-          .stubJsonSchemaResponse(reply)
-      }
-    })
-  },
 })

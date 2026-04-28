@@ -11,7 +11,7 @@ class AiToolFactoryTest {
   @Test
   void shouldIncludeCustomPromptInInstruction() {
     String customPrompt = "Generate a True/False question with choices ['True', 'False']";
-    InstructionAndSchema result = AiToolFactory.questionAiTool(customPrompt, null, null);
+    InstructionAndSchema result = AiToolFactory.questionAiTool(customPrompt, null);
 
     assertThat(result.getMessageBody(), containsString(customPrompt));
     assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
@@ -20,7 +20,7 @@ class AiToolFactoryTest {
 
   @Test
   void shouldHandleNullCustomPrompt() {
-    InstructionAndSchema result = AiToolFactory.questionAiTool(null, null, null);
+    InstructionAndSchema result = AiToolFactory.questionAiTool(null, null);
 
     assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
@@ -28,7 +28,7 @@ class AiToolFactoryTest {
 
   @Test
   void shouldHandleBlankCustomPrompt() {
-    InstructionAndSchema result = AiToolFactory.questionAiTool("   ", null, null);
+    InstructionAndSchema result = AiToolFactory.questionAiTool("   ", null);
 
     assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
     assertThat(result.getMessageBody(), not(containsString("   \n")));

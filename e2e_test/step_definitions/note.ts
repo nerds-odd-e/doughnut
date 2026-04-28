@@ -634,21 +634,6 @@ Then('the note details should contain a line break', () => {
   start.assumeNotePage().expectNoteDetailsContainLineBreak()
 })
 
-Given('AI will generate question for note with type:', (data: DataTable) => {
-  const noteTypeToQuestion: Record<string, string> = {}
-  data.hashes().forEach((row) => {
-    noteTypeToQuestion[row['note type']!] = row.question!
-  })
-  start.questionGenerationService().stubQuestionByNoteType(noteTypeToQuestion)
-})
-
-When(
-  'I assign note type {string} for note {string}',
-  (noteType: string, noteName: string) => {
-    start.jumpToNotePage(noteName).updateNoteType(noteType)
-  }
-)
-
 When('I promote the point {string} to a child note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToChildNote(pointText)
 })

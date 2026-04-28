@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -54,9 +53,8 @@ public class NoteQuestionGenerationService {
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String customPrompt, String additionalMessage) {
     RelationType relationType = note.isRelation() ? note.getRelationType() : null;
-    NoteType noteType = note.getNoteType();
     String prompt = (customPrompt != null) ? customPrompt : AiToolFactory.getDefaultMcqPrompt();
-    InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt, relationType, noteType);
+    InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt, relationType);
     OpenAIChatRequestBuilder chatRequestBuilder =
         requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage);
 

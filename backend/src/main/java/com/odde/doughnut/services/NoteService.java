@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
-import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -244,12 +243,6 @@ public class NoteService {
                 targetNote.getRecallSetting().getLevel()));
 
     return note;
-  }
-
-  public void setNoteType(Note note, NoteType noteType) {
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.setNoteType(noteType);
-    entityPersister.merge(note);
   }
 
   public NoteAccessory updateNoteAccessories(

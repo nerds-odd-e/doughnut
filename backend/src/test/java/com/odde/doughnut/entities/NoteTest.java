@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired NoteService noteService;
 
   @Test
   void timeOrder() {
@@ -97,51 +95,6 @@ public class NoteTest {
       Note parent = makeMe.aNote().imageUrl("").inMemoryPlease();
       Note child = makeMe.aNote().under(parent).useParentImage().inMemoryPlease();
       assertNull(child.getImageWithMask());
-    }
-  }
-
-  @Nested
-  class NoteTypeField {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote().please();
-    }
-
-    @Test
-    void shouldSetNoteTypeToConcept() {
-      noteService.setNoteType(note, NoteType.CONCEPT);
-
-      makeMe.refresh(note);
-      assertThat(note.getNoteType(), equalTo(NoteType.CONCEPT));
-    }
-
-    @Test
-    void shouldSetNoteTypeToExperience() {
-      noteService.setNoteType(note, NoteType.EXPERIENCE);
-
-      makeMe.refresh(note);
-      assertThat(note.getNoteType(), equalTo(NoteType.EXPERIENCE));
-    }
-
-    @Test
-    void shouldUpdateExistingNoteType() {
-      noteService.setNoteType(note, NoteType.CONCEPT);
-      makeMe.refresh(note);
-
-      noteService.setNoteType(note, NoteType.SOURCE);
-
-      makeMe.refresh(note);
-      assertThat(note.getNoteType(), equalTo(NoteType.SOURCE));
-    }
-
-    @Test
-    void shouldPersistNoteTypeChange() {
-      noteService.setNoteType(note, NoteType.INITIATIVE);
-
-      Note retrievedNote = noteService.findById(note.getId()).orElseThrow();
-      assertThat(retrievedNote.getNoteType(), equalTo(NoteType.INITIATIVE));
     }
   }
 }

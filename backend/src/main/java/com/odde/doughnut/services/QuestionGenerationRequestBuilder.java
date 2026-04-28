@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -25,8 +24,7 @@ public class QuestionGenerationRequestBuilder {
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
     RelationType relationType = note.isRelation() ? note.getRelationType() : null;
-    NoteType noteType = note.getNoteType();
-    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType, noteType);
+    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType);
     return openAiChatRequestForQuestionGeneration(note, additionalMessage)
         .responseJsonSchema(tool)
         .build();

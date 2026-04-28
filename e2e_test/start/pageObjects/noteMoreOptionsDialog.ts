@@ -3,7 +3,6 @@ import { assumeAssimilationPage } from './assimilationPage'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
-import { form } from 'start/forms'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -68,12 +67,6 @@ const noteMoreOptionsDialog = () => {
       toolbarButton('Edit Note URL')
         .click()
         .submitWith(filterAttributes(attributes, ['Url']))
-    },
-    updateNoteType(noteType: string) {
-      form.fill({
-        'Note Type': noteType,
-      })
-      pageIsNotLoading()
     },
     generateImageWithDALLE() {
       toolbarButton('Generate Image with DALL-E').click()

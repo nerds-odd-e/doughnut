@@ -692,7 +692,6 @@ export type CurrentUserInfo = {
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     recallSetting?: NoteRecallSetting;
-    noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
 };
 
 export type BareNote = {
@@ -934,7 +933,6 @@ export type ConversationSubjectWritable = {
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
-    noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
 };
 
 export type NotebooksViewedByUserWritable = {
@@ -2794,24 +2792,6 @@ export type UndoDeleteNoteResponses = {
 };
 
 export type UndoDeleteNoteResponse = UndoDeleteNoteResponses[keyof UndoDeleteNoteResponses];
-
-export type UpdateNoteTypeData = {
-    body?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/note-type';
-};
-
-export type UpdateNoteTypeResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type UpdateNoteTypeResponse = UpdateNoteTypeResponses[keyof UpdateNoteTypeResponses];
 
 export type MoveToTopLevelData = {
     body?: never;

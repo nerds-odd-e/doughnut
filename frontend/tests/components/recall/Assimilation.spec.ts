@@ -38,11 +38,10 @@ afterEach(() => {
 beforeEach(() => {
   assimilateSpy = mockSdkService("assimilate", [])
   showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
-  mockSdkService("getNoteInfo", { noteType: undefined })
+  mockSdkService("getNoteInfo", {})
   mockSdkService("generateUnderstandingChecklist", {
     points: [],
   })
-  mockSdkService("updateNoteType", undefined)
 
   vi.mocked(useRecallData).mockReturnValue({
     totalAssimilatedCount: mockedTotalAssimilatedCount,
@@ -122,12 +121,12 @@ describe("Assimilation component", () => {
     })
   })
 
-  describe("note type selection via NoteInfoBar", () => {
-    it("displays note type selection in NoteInfoBar", async () => {
+  describe("NoteInfoBar", () => {
+    it("loads note recall info for settings", async () => {
       const wrapper = mount()
       await flushPromises()
       expect(
-        wrapper.find('[data-test="note-type-selection-dialog"]').exists()
+        wrapper.findComponent({ name: "NoteRecallSettingForm" }).exists()
       ).toBe(true)
     })
   })
@@ -135,7 +134,6 @@ describe("Assimilation component", () => {
   describe("SpellingVerificationPopup", () => {
     beforeEach(() => {
       mockSdkService("getNoteInfo", {
-        noteType: undefined,
         recallSetting: { rememberSpelling: true },
       })
     })
@@ -204,7 +202,6 @@ describe("Assimilation component", () => {
   describe("keep for repetition when note has memory trackers", () => {
     it("disables keep for repetition when note has memory trackers and no add-spelling-only mode", async () => {
       mockSdkService("getNoteInfo", {
-        noteType: undefined,
         memoryTrackers: [{ id: 1, spelling: false }],
       })
       const wrapper = mount()
@@ -216,7 +213,6 @@ describe("Assimilation component", () => {
 
     it("enables keep for repetition when remember spelling on and no spelling tracker", async () => {
       mockSdkService("getNoteInfo", {
-        noteType: undefined,
         recallSetting: { rememberSpelling: true },
         memoryTrackers: [{ id: 1, spelling: false }],
       })
@@ -229,7 +225,6 @@ describe("Assimilation component", () => {
 
     it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
       mockSdkService("getNoteInfo", {
-        noteType: undefined,
         recallSetting: { rememberSpelling: true },
         memoryTrackers: [{ id: 1, spelling: false }],
       })

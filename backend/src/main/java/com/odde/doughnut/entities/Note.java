@@ -11,7 +11,6 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.entities.converters.NoteTypeConverter;
 import com.odde.doughnut.entities.converters.RelationTypeConverter;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.validators.ValidateNoteTargetTitle;
@@ -117,13 +116,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   @Getter
   private Note parent;
-
-  @Convert(converter = NoteTypeConverter.class)
-  @Column(name = "note_type")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private NoteType noteType;
 
   @Convert(converter = RelationTypeConverter.class)
   @Column(name = "relation_type")

@@ -12,7 +12,6 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
     super()
     this.data = {
       memoryTrackers: [],
-      noteType: undefined,
     }
   }
 
@@ -23,11 +22,6 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
 
   recallSetting(value: NoteRecallSetting): NoteRecallInfoBuilder {
     this.data.recallSetting = value
-    return this
-  }
-
-  noteType(value: NoteRecallInfo['noteType']): NoteRecallInfoBuilder {
-    this.data.noteType = value
     return this
   }
 

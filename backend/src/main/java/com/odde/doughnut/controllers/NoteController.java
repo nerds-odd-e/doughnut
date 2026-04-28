@@ -125,7 +125,6 @@ class NoteController {
     noteRecallInfo.setMemoryTrackers(
         userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note));
     noteRecallInfo.setRecallSetting(note.getRecallSetting());
-    noteRecallInfo.setNoteType(note.getNoteType());
     return noteRecallInfo;
   }
 
@@ -181,17 +180,6 @@ class NoteController {
               entityPersister.save(relation);
             });
     return new RedirectToNoteResponse(note.getId());
-  }
-
-  @PatchMapping(value = "/{note}/note-type")
-  @Transactional
-  public NoteRealm updateNoteType(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestBody(required = false) NoteType noteType)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(note);
-    noteService.setNoteType(note, noteType);
-    return note.toNoteRealm(authorizationService.getCurrentUser());
   }
 
   @PostMapping(value = "/move_after/{note}/{targetNote}/{asFirstChild}")

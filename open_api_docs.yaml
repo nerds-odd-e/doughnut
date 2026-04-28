@@ -2148,36 +2148,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/notes/{note}/note-type:
-    patch:
-      tags:
-      - note-controller
-      operationId: updateNoteType
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-              enum:
-              - concept
-              - source
-              - person
-              - experience
-              - initiative
-              - quest
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/move-to-top-level:
     patch:
       tags:
@@ -4686,15 +4656,6 @@ components:
             $ref: "#/components/schemas/MemoryTracker"
         recallSetting:
           $ref: "#/components/schemas/NoteRecallSetting"
-        noteType:
-          type: string
-          enum:
-          - concept
-          - source
-          - person
-          - experience
-          - initiative
-          - quest
     BareNote:
       type: object
       properties:

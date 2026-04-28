@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
@@ -16,23 +15,17 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return questionAiTool(getDefaultMcqPrompt(), null, null);
+    return questionAiTool(getDefaultMcqPrompt(), null);
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool(RelationType relationType) {
-    return questionAiTool(getDefaultMcqPrompt(), relationType, null);
-  }
-
-  public static InstructionAndSchema mcqWithAnswerAiTool(
-      RelationType relationType, NoteType noteType) {
-    return questionAiTool(getDefaultMcqPrompt(), relationType, noteType);
+    return questionAiTool(getDefaultMcqPrompt(), relationType);
   }
 
   public static InstructionAndSchema questionAiTool(
-      String customPrompt, RelationType relationType, NoteType noteType) {
+      String customPrompt, RelationType relationType) {
     String baseInstruction = getBaseInstruction();
     String relationTypeInstruction = getRelationTypeInstruction(relationType);
-    String noteTypeInstruction = getNoteTypeInstruction(noteType);
 
     StringBuilder fullInstruction = new StringBuilder(baseInstruction);
 
@@ -41,9 +34,6 @@ public class AiToolFactory {
     }
     if (relationTypeInstruction != null) {
       fullInstruction.append("\n").append(relationTypeInstruction);
-    }
-    if (noteTypeInstruction != null) {
-      fullInstruction.append("\n").append(noteTypeInstruction);
     }
     return new InstructionAndSchema(
         fullInstruction.toString(), askSingleAnswerMultipleChoiceQuestion());
@@ -84,13 +74,6 @@ public class AiToolFactory {
       return null;
     }
     return relationType.getQuestionGenerationInstruction();
-  }
-
-  private static String getNoteTypeInstruction(NoteType noteType) {
-    if (noteType == null) {
-      return null;
-    }
-    return noteType.getQuestionGenerationInstruction();
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {

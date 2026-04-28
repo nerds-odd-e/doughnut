@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -17,13 +16,11 @@ import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.sql.Timestamp;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -210,60 +207,6 @@ class NoteQuestionGenerationServiceTests {
 
       assertThat(
           systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
-    }
-  }
-
-  @Nested
-  class NoteTypeInstructions {
-
-    static Stream<NoteType> noteTypesWithInstructions() {
-      return Stream.of(NoteType.values());
-    }
-
-    private Note createNoteWithType(NoteType noteType) {
-      Note note = makeMe.aNote().please();
-      note.setNoteType(noteType);
-      makeMe.aNote().under(note).please();
-      return note;
-    }
-
-    @ParameterizedTest
-    @MethodSource("noteTypesWithInstructions")
-    void shouldIncludeNoteTypeInstruction(NoteType noteType) {
-      Note note = createNoteWithType(noteType);
-
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(note, null);
-
-      assertThat(
-          "Request should contain instruction for " + noteType,
-          systemMessageContains(request, noteType.getQuestionGenerationInstruction().trim()),
-          is(true));
-    }
-
-    @Test
-    void shouldNotIncludeNoteTypeInstructionForUnassigned() {
-      Note note = makeMe.aNote().please();
-      note.setNoteType(null);
-      makeMe.aNote().under(note).please();
-
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(note, null);
-
-      assertThat(systemMessageContains(request, "Special Instruction for"), is(false));
-    }
-
-    @Test
-    void shouldIncludeBothRelationTypeAndNoteTypeInstructions() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.RELATED_TO).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      relationNote.setNoteType(NoteType.SOURCE);
-      makeMe.aNote().under(relationNote).please();
-
-      ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      assertThat(systemMessageContains(request, "Special Instruction for Relation Note"), is(true));
-      assertThat(systemMessageContains(request, "Special Instruction for Source Note"), is(true));
     }
   }
 

@@ -16,7 +16,6 @@ import routes from "@/routes/routes"
 let renderer: RenderingHelper<typeof NoteMoreOptionsDialog>
 let router: ReturnType<typeof createRouter>
 let getNoteInfoSpy: ReturnType<typeof mockSdkService<"getNoteInfo">>
-let updateNoteTypeSpy: ReturnType<typeof mockSdkService<"updateNoteType">>
 let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
 
 const defaultRecallSetting = {
@@ -35,7 +34,6 @@ afterEach(() => {
 
 beforeEach(() => {
   getNoteInfoSpy = mockSdkService("getNoteInfo", mockNoteInfo)
-  updateNoteTypeSpy = mockSdkService("updateNoteType", undefined)
   deleteNoteSpy = mockSdkService("deleteNote", undefined)
   router = createRouter({
     history: createWebHistory(),
@@ -61,68 +59,14 @@ describe("NoteMoreOptionsDialog", () => {
       })
     })
 
-    it("displays note type selector via NoteInfoComponent", async () => {
+    it("displays recall settings from NoteInfoComponent", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
-      const select = wrapper.find('select[id="note-noteType"]')
-      expect(select.exists()).toBe(true)
-    })
-
-    it("initializes note type from fetched noteInfo", async () => {
-      const noteInfoWithType = makeMe.aNoteRecallInfo
-        .recallSetting(defaultRecallSetting)
-        .noteType("concept")
-        .please()
-      getNoteInfoSpy.mockResolvedValue(wrapSdkResponse(noteInfoWithType))
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const select = wrapper.find('select[id="note-noteType"]')
-      expect((select.element as HTMLSelectElement).value).toBe("concept")
-    })
-
-    it("defaults to empty when noteType is not set", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const select = wrapper.find('select[id="note-noteType"]')
-      expect((select.element as HTMLSelectElement).value).toBe("")
-    })
-  })
-
-  describe("note type update via NoteInfoComponent", () => {
-    it("updates note type when user selects a new type", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const select = wrapper.find('select[id="note-noteType"]')
-      await select.setValue("source")
-      await flushPromises()
-
-      expect(updateNoteTypeSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: "source",
-      })
-    })
-
-    it("refetches note info after successful note type update", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-      getNoteInfoSpy.mockClear()
-
-      const select = wrapper.find('select[id="note-noteType"]')
-      await select.setValue("initiative")
-      await flushPromises()
-
-      expect(getNoteInfoSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-      })
+      expect(
+        wrapper.findComponent({ name: "NoteRecallSettingForm" }).exists()
+      ).toBe(true)
     })
   })
 
