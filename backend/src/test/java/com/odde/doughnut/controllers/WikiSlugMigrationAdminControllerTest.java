@@ -2,9 +2,11 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.WikiSlugMigrationBatchResult;
+import com.odde.doughnut.controllers.dto.WikiSlugMigrationStatus;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -81,6 +83,47 @@ class WikiSlugMigrationAdminControllerTest extends ControllerTestBase {
       WikiSlugMigrationBatchResult result = controller.batchMigrateFolders(10);
 
       assertThat(result.getProcessedInBatch(), equalTo(2L));
+    }
+
+    @Test
+    void repeatedSmallBatchesDrainAllRootFolders() throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.anAdmin().please());
+      User user = makeMe.aUser().please();
+      Note head = makeMe.aNote().creatorAndOwner(user).please();
+      Notebook notebook = head.getNotebook();
+      makeMe.aFolder().notebook(notebook).name("One").please();
+      makeMe.aFolder().notebook(notebook).name("Two").please();
+      makeMe.aFolder().notebook(notebook).name("Three").please();
+      makeMe.aFolder().notebook(notebook).name("Four").please();
+      makeMe.aFolder().notebook(notebook).name("Five").please();
+
+      int batchLimit = 2;
+      while (folderRepository.countFoldersMissingSlug() > 0) {
+        long missingBefore = folderRepository.countFoldersMissingSlug();
+        WikiSlugMigrationBatchResult result = controller.batchMigrateFolders(batchLimit);
+        long missingAfterRepo = folderRepository.countFoldersMissingSlug();
+        assertThat(missingAfterRepo, lessThanOrEqualTo(missingBefore));
+        assertThat(result.getStatus().getFoldersMissingSlug(), equalTo(missingAfterRepo));
+        WikiSlugMigrationStatus fromGetStatus = controller.getStatus();
+        assertThat(fromGetStatus.getFoldersMissingSlug(), equalTo(missingAfterRepo));
+        assertThat(missingBefore - missingAfterRepo, equalTo(result.getProcessedInBatch()));
+      }
+
+      WikiSlugMigrationBatchResult noOp = controller.batchMigrateFolders(batchLimit);
+      assertThat(noOp.getProcessedInBatch(), equalTo(0L));
+      assertThat(noOp.getStatus().getFoldersMissingSlug(), equalTo(0L));
+    }
+
+    @Test
+    void folderBatchIsNoOpWhenNothingMissing() throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.anAdmin().please());
+      User user = makeMe.aUser().please();
+      makeMe.aNote().creatorAndOwner(user).please();
+
+      WikiSlugMigrationBatchResult result = controller.batchMigrateFolders(10);
+
+      assertThat(result.getProcessedInBatch(), equalTo(0L));
+      assertThat(result.getStatus().getFoldersMissingSlug(), equalTo(0L));
     }
   }
 
@@ -198,6 +241,52 @@ class WikiSlugMigrationAdminControllerTest extends ControllerTestBase {
       WikiSlugMigrationBatchResult result = controller.batchMigrateNotes(10);
 
       assertThat(result.getProcessedInBatch(), equalTo(0L));
+    }
+
+    @Test
+    void repeatedSmallBatchesDrainAllNotesMissingSlug() throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.anAdmin().please());
+      User user = makeMe.aUser().please();
+      Note head = makeMe.aNote().creatorAndOwner(user).please();
+      head.setSlug("head");
+      noteRepository.save(head);
+      Notebook notebook = head.getNotebook();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("Shelf").please();
+      folder.setSlug("shelf");
+      folderRepository.save(folder);
+      makeMe.aNote().title("A").under(head).folder(folder).please();
+      makeMe.aNote().title("B").under(head).folder(folder).please();
+      makeMe.aNote().title("C").under(head).folder(folder).please();
+
+      int batchLimit = 2;
+      while (noteRepository.countNotesMissingSlug() > 0) {
+        long missingBefore = noteRepository.countNotesMissingSlug();
+        WikiSlugMigrationBatchResult result = controller.batchMigrateNotes(batchLimit);
+        long missingAfterRepo = noteRepository.countNotesMissingSlug();
+        assertThat(missingAfterRepo, lessThanOrEqualTo(missingBefore));
+        assertThat(result.getStatus().getNotesMissingSlug(), equalTo(missingAfterRepo));
+        WikiSlugMigrationStatus fromGetStatus = controller.getStatus();
+        assertThat(fromGetStatus.getNotesMissingSlug(), equalTo(missingAfterRepo));
+        assertThat(missingBefore - missingAfterRepo, equalTo(result.getProcessedInBatch()));
+      }
+
+      WikiSlugMigrationBatchResult noOp = controller.batchMigrateNotes(batchLimit);
+      assertThat(noOp.getProcessedInBatch(), equalTo(0L));
+      assertThat(noOp.getStatus().getNotesMissingSlug(), equalTo(0L));
+    }
+
+    @Test
+    void noteBatchIsNoOpWhenNothingMissing() throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.anAdmin().please());
+      User user = makeMe.aUser().please();
+      Note head = makeMe.aNote().creatorAndOwner(user).please();
+      head.setSlug("head");
+      noteRepository.save(head);
+
+      WikiSlugMigrationBatchResult result = controller.batchMigrateNotes(10);
+
+      assertThat(result.getProcessedInBatch(), equalTo(0L));
+      assertThat(result.getStatus().getNotesMissingSlug(), equalTo(0L));
     }
   }
 
