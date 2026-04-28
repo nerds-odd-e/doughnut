@@ -564,10 +564,6 @@ When(
   }
 )
 
-When('I switch to rich content view', () => {
-  start.assumeNotePage().switchToRichContent()
-})
-
 Then(
   'I should see the rich content of the note with details:',
   (data: DataTable) => {
@@ -625,16 +621,5 @@ Then(
   (linkTitle: string) => {
     start.assumeNotePage().followDeadLink(linkTitle).createNote()
     start.assumeNotePage(linkTitle)
-  }
-)
-
-When('I navigate to note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle)
-})
-
-Then(
-  'I should see a dialog with message {string}',
-  (expectedMessage: string) => {
-    cy.get('@confirmSpy').should('have.been.calledWith', expectedMessage)
   }
 )
