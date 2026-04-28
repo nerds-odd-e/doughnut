@@ -46,7 +46,7 @@ public class FailureReport {
   public GithubIssue getGithubIssue() {
     return new GithubIssue(
         getErrorName(),
-        "Find the detail at: https://doughnut.odd-e.com/failure-report-list/show/" + id);
+        "Find the detail at: https://doughnut.odd-e.com/d/failure-report-list/show/" + id);
   }
 
   public static class GithubIssue {

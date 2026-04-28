@@ -16,6 +16,6 @@ public class FailureReportTest {
     assertThat(githubIssue.getBody(), not(containsString("err detail")));
     assertThat(
         githubIssue.getBody(),
-        containsString("https://doughnut.odd-e.com/failure-report-list/show/null"));
+        containsString("https://doughnut.odd-e.com/d/failure-report-list/show/null"));
   }
 }
