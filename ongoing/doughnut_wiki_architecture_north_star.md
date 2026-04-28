@@ -104,7 +104,7 @@ A note is the core knowledge unit.
 A note belongs to a notebook and may belong to a folder. A note does not require a parent note.
 
 The note is referred to by slug in the frontend, not by internal ID.
-When a note is in a folder, its slug is folder-qualified as `folder_slug/note_title`.
+When a note is in a folder, its slug is folder-qualified as `folder-slug/note-title`.
 
 #### Final state
 
@@ -130,13 +130,13 @@ A note can refer to another note using wiki-style links.
 Example:
 
 ```markdown
-This idea is related to [[n1478-douyara|どうやら]].
+This idea is related to [[どうやら]].
 ```
 
-The displayed text may be different from the target slug.
+The default link text is the note title. The displayed text may be different from the target title when an alias is useful.
 
 ```markdown
-[[target-slug|display text]]
+[[note title|display text]]
 ```
 
 Doughnut may index these links for graph view, backlinks, search, and relationship discovery.
@@ -189,13 +189,15 @@ It is used for:
 Example:
 
 ```text
-n1478-douyara
+douyara
 ```
+
+File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules.
 
 For notes inside folders, the slug includes the folder slug:
 
 ```text
-folder_slug/note_title
+folder-slug/note-title
 ```
 
 ### Title
@@ -252,16 +254,25 @@ Example route:
 For a foldered note, `:noteSlug` includes the folder prefix:
 
 ```text
-folder_slug/note_title
+folder-slug/note-title
 ```
 
 If a note is inside nested folders, the same rule extends to the full folder path.
+
+A note may also be visited by note slug alone when the slug resolves to exactly one note among notebooks the user can access:
+
+```text
+/notes/:noteSlug
+```
+
+This route is primarily a testing and convenience path. It must not require a global unique index in the database; resolution can reject ambiguous slugs when more than one accessible note matches.
 
 Recommended final decision:
 
 ```text
 Slugs are unique within the same folder.
 Frontend note references use folder-qualified slugs when needed.
+Slug-only frontend references are allowed only when unambiguous for the current user.
 Internal resolution still maps to stable note ID.
 ```
 
@@ -323,14 +334,14 @@ Possible representation:
 
 ```markdown
 ---
-semanticParent: [[some-note-slug]]
+semanticParent: [[Some Note Title]]
 ---
 ```
 
 or simply:
 
 ```markdown
-Parent idea: [[some-note-slug]]
+Parent idea: [[Some Note Title]]
 ```
 
 ## Folder vs Parent
@@ -382,14 +393,14 @@ Example:
 ---
 type: relationship
 relation: confused-with
-source: "[[n23403-niwa-ataranai|〜にはあたらない]]"
-target: "[[n10102-te-tamaranai|〜てたまらない]]"
+source: "[[〜にはあたらない]]"
+target: "[[〜てたまらない]]"
 ---
 
 # 〜にはあたらない vs 〜てたまらない
 
-[[n23403-niwa-ataranai|〜にはあたらない]] is often confused with
-[[n10102-te-tamaranai|〜てたまらない]].
+[[〜にはあたらない]] is often confused with
+[[〜てたまらない]].
 
 ## Difference
 
@@ -403,19 +414,13 @@ Its filename/slug should be shorter and readable.
 Example:
 
 ```text
-n23943-niwa-ataranai-vs-te-tamaranai.md
-```
-
-or:
-
-```text
 niwa-ataranai-vs-te-tamaranai.md
 ```
 
 Recommended approach:
 
 ```text
-include internal ID in slug if long-term round-trip stability matters
+use slugified titles for migrated and newly created notes; keep internal IDs separate from slugs
 ```
 
 ## Obsidian Export Model
@@ -430,14 +435,14 @@ Doughnut Notebook/
 
   Journal/
     2026/
-      n3001-2026-04-28.md
+      2026-04-28.md
 
   Notes/
-    n1478-douyara.md
-    n28329-sekijitsu.md
+    douyara.md
+    sekijitsu.md
 
   Relationships/
-    n23943-niwa-ataranai-vs-te-tamaranai.md
+    niwa-ataranai-vs-te-tamaranai.md
 
   Maps/
     pkm-design.md
@@ -449,7 +454,7 @@ Each note may include frontmatter:
 ---
 id: n1478
 title: どうやら
-slug: n1478-douyara
+slug: douyara
 type: knowledge
 created: 2021-05-17
 updated: 2026-04-28
@@ -462,10 +467,10 @@ aliases:
 ...
 ```
 
-Links should prefer slug-based stable references with readable aliases:
+Links should prefer the default note-title format:
 
 ```markdown
-[[n1478-douyara|どうやら]]
+[[どうやら]]
 ```
 
 ## Import Model
@@ -499,14 +504,6 @@ Example:
 Journal/
   2026/
     2026-04-28.md
-```
-
-or with stable ID:
-
-```text
-Journal/
-  2026/
-    n3001-2026-04-28.md
 ```
 
 Recommended properties:
@@ -634,45 +631,19 @@ Derived indexes such as backlinks, graph edges, and relationship indexes should 
 
 ### Should note slug include internal ID?
 
-Option A:
+Decision:
 
 ```text
-n1478-douyara.md
+No. Use slugified titles for migrated notes and newly created notes.
 ```
 
-Pros:
-
-- stable
-- easier round trip
-- avoids collisions
-- good migration safety
-
-Cons:
-
-- less clean in Obsidian
-
-Option B:
+Example:
 
 ```text
 douyara.md
 ```
 
-Pros:
-
-- cleaner
-- more Obsidian-like
-
-Cons:
-
-- harder collision handling
-- harder long-term identity preservation
-
-Recommended default:
-
-```text
-Use ID-prefixed slugs for migrated notes.
-Allow clean slugs for newly created notes if uniqueness is safe.
-```
+Internal IDs remain stable in the database and frontmatter where needed. Slug collisions are handled by folder-scoped uniqueness and normal conflict resolution, not by embedding IDs in slugs.
 
 ### Should notebook content export as `_index.md` or `README.md`?
 

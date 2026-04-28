@@ -4,7 +4,7 @@
 
 This document proposes a phased migration plan for moving Doughnut toward the final wiki-style, Obsidian-compatible architecture.
 
-The goal is to implement ongoing/doughnut_wiki_architecture_north_start.md, phase by phase. With the learning from implementing each phase, the north start file will be updated to reflect the latest understanding.
+The goal is to implement ongoing/doughnut_wiki_architecture_north_star.md, phase by phase. With the learning from implementing each phase, the north star file will be updated to reflect the latest understanding.
 
 The plan intentionally excludes the safety baseline phase. It starts directly with architectural migration work.
 
@@ -60,11 +60,9 @@ Example:
 douyara
 ```
 
-or, for migrated notes:
+The same slugified style is used for migrated notes and newly created notes. Internal IDs stay separate from slugs.
 
-```text
-n1478-douyara
-```
+File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier rather than maintaining separate local slug rules.
 
 ### Folder Path
 
@@ -83,7 +81,7 @@ The full path is the notebook-local address of a note.
 Example:
 
 ```text
-japanese/vocabulary/n1478-douyara
+japanese/vocabulary/douyara
 ```
 
 ### Uniqueness Rule
@@ -241,6 +239,12 @@ fileSlug
 fullPath
 ```
 
+## Slug Generation
+
+Generate notebook, folder, and note file slugs with `com.github.slugify:slugify`.
+
+The same slugifier should be used anywhere Doughnut derives a file or folder slug, including migrations, note creation, folder creation, import, and export.
+
 ## Uniqueness Constraints
 
 Add:
@@ -270,10 +274,18 @@ Example URL:
 Example:
 
 ```text
-/notebooks/doughnut-wiki/japanese/vocabulary/n1478-douyara
+/notebooks/doughnut-wiki/japanese/vocabulary/douyara
 ```
 
 The frontend may still use internal IDs behind the scenes after route resolution.
+
+Support an additional note-slug-only route for unambiguous accessible notes:
+
+```text
+/notes/:fileSlug
+```
+
+This route is mostly to make E2E tests easier. It resolves only when exactly one note with that file slug is visible to the current user, so it does not require a global unique database index.
 
 ## Move Behavior
 
@@ -296,6 +308,7 @@ After this phase:
 - notes have file slugs and full paths
 - frontend note references can move away from internal IDs
 - note lookup by notebook + full path is possible
+- note lookup by file slug alone is possible when it is unambiguous among notebooks the user can access
 - moving a note requires uniqueness validation in the target folder
 
 ## Non-Goals
@@ -479,14 +492,14 @@ Example:
 ---
 type: relationship
 relation: confused-with
-source: "[[n23403-niwa-ataranai|〜にはあたらない]]"
-target: "[[n10102-te-tamaranai|〜てたまらない]]"
+source: "[[〜にはあたらない]]"
+target: "[[〜てたまらない]]"
 ---
 
 # 〜にはあたらない vs 〜てたまらない
 
-[[n23403-niwa-ataranai|〜にはあたらない]] is often confused with
-[[n10102-te-tamaranai|〜てたまらない]].
+[[〜にはあたらない]] is often confused with
+[[〜てたまらない]].
 
 ## Difference
 
@@ -500,16 +513,10 @@ Relationship notes should have shorter, readable names.
 Example:
 
 ```text
-n23943-niwa-ataranai-vs-te-tamaranai.md
-```
-
-or:
-
-```text
 niwa-ataranai-vs-te-tamaranai.md
 ```
 
-For migrated data, ID-prefixed slugs are safer.
+Use the same slugified naming style for migrated and newly created relationship notes. Keep internal IDs separate from filenames.
 
 ## Expected Result
 
@@ -534,9 +541,9 @@ Make wiki-style links in note content first-class.
 Support:
 
 ```markdown
-[[target-slug]]
-[[target-slug|display text]]
-[[folder/path/target-slug|display text]]
+[[note title]]
+[[note title|display text]]
+[[folder/path/note title|display text]]
 ```
 
 ## Rationale
@@ -678,14 +685,14 @@ Doughnut Notebook/
 
   Journal/
     2026/
-      n3001-2026-04-28.md
+      2026-04-28.md
 
   Notes/
-    n1478-douyara.md
-    n28329-sekijitsu.md
+    douyara.md
+    sekijitsu.md
 
   Relationships/
-    n23943-niwa-ataranai-vs-te-tamaranai.md
+    niwa-ataranai-vs-te-tamaranai.md
 
   Maps/
     pkm-design.md
@@ -705,7 +712,7 @@ With frontmatter:
 ---
 id: n1478
 title: どうやら
-slug: n1478-douyara
+slug: douyara
 type: knowledge
 created: 2021-05-17
 updated: 2026-04-28
@@ -720,16 +727,16 @@ aliases:
 
 ## Link Export
 
-Prefer readable but stable links:
+Prefer the default note-title link format:
 
 ```markdown
-[[japanese/vocabulary/n1478-douyara|どうやら]]
+[[どうやら]]
 ```
 
-If the target is in the same folder and unambiguous, shorter links may be allowed:
+If the target needs disambiguation, folder-qualified links may be allowed:
 
 ```markdown
-[[n1478-douyara|どうやら]]
+[[japanese/vocabulary/どうやら]]
 ```
 
 ## Notebook Content Export
