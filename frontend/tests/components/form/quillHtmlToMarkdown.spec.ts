@@ -52,60 +52,30 @@ describe("quillHtmlToMarkdown", () => {
     expect(htmlToMarkdown(given)).toBe(then)
   })
 
-  it("preserves complete double brackets as WikiLink syntax", () => {
-    const html = "<p>[[WikiLink]]</p>"
-    const result = htmlToMarkdown(html)
-    expect(result).toBe("[[WikiLink]]")
+  it.each`
+    label                                   | html                                                         | expected
+    ${"preserves complete double brackets"} | ${"<p>[[WikiLink]]</p>"}                                     | ${"[[WikiLink]]"}
+    ${"converts doughnut-link anchors"}     | ${'<p><a href="/n123" class="doughnut-link">MyNote</a></p>'} | ${"[[MyNote]]"}
+    ${"note href without doughnut-link"}    | ${'<p><a href="/n123">looks internal</a></p>'}               | ${"[looks internal](/n123)"}
+    ${"converts dead wiki anchors"}         | ${'<p><a href="#" class="dead-link">Unknown</a></p>'}        | ${"[[Unknown]]"}
+  `("wiki links: $label", ({ html, expected }) => {
+    expect(htmlToMarkdown(html)).toBe(expected)
   })
 
-  it("converts doughnut-link anchors to wikilink markdown", () => {
-    expect(
-      htmlToMarkdown('<p><a href="/n123" class="doughnut-link">MyNote</a></p>')
-    ).toBe("[[MyNote]]")
-  })
+  const linkifiedTwoNotes = [
+    { title: "LeSS in Action", noteId: 1 },
+    { title: "Odd-e CSD", noteId: 2 },
+  ] as const
+  const linkifiedWikiLink99 = [{ title: "WikiLink", noteId: 99 }] as const
 
-  it("does not treat note hrefs without doughnut-link as wikilinks", () => {
-    expect(htmlToMarkdown('<p><a href="/n123">looks internal</a></p>')).toBe(
-      "[looks internal](/n123)"
-    )
-  })
-
-  it("converts dead wiki anchors to wikilink markdown", () => {
-    expect(
-      htmlToMarkdown('<p><a href="#" class="dead-link">Unknown</a></p>')
-    ).toBe("[[Unknown]]")
-  })
-
-  it("linkified wikilinks: two wikilinks in one paragraph", () => {
-    const raw = "<p>[[LeSS in Action]] .... [[Odd-e CSD]]</p>"
-    const html = replaceWikiLinksInHtml(raw, [
-      { title: "LeSS in Action", noteId: 1 },
-      { title: "Odd-e CSD", noteId: 2 },
-    ])
-    expect(htmlToMarkdown(html)).toBe("[[LeSS in Action]] .... [[Odd-e CSD]]")
-  })
-
-  it("linkified wikilinks: extra [ before a resolved wikilink", () => {
-    const raw = "<p>[[[WikiLink]]</p>"
-    const html = replaceWikiLinksInHtml(raw, [
-      { title: "WikiLink", noteId: 99 },
-    ])
-    expect(htmlToMarkdown(html)).toBe(String.raw`\[[[WikiLink]]`)
-  })
-
-  it("linkified wikilinks: extra ] after a resolved wikilink", () => {
-    const raw = "<p>[[WikiLink]]]</p>"
-    const html = replaceWikiLinksInHtml(raw, [
-      { title: "WikiLink", noteId: 99 },
-    ])
-    expect(htmlToMarkdown(html)).toBe("[[WikiLink]]\\]")
-  })
-
-  it("linkified wikilinks: extra [ before and ] after a resolved wikilink", () => {
-    const raw = "<p>[[[WikiLink]]]</p>"
-    const html = replaceWikiLinksInHtml(raw, [
-      { title: "WikiLink", noteId: 99 },
-    ])
-    expect(htmlToMarkdown(html)).toBe(String.raw`\[[[WikiLink]]\]`)
+  it.each`
+    label                               | raw                                               | resolves               | expected
+    ${"two wikilinks in one paragraph"} | ${"<p>[[LeSS in Action]] .... [[Odd-e CSD]]</p>"} | ${linkifiedTwoNotes}   | ${"[[LeSS in Action]] .... [[Odd-e CSD]]"}
+    ${"extra [ before resolved"}        | ${"<p>[[[WikiLink]]</p>"}                         | ${linkifiedWikiLink99} | ${String.raw`\[[[WikiLink]]`}
+    ${"extra ] after resolved"}         | ${"<p>[[WikiLink]]]</p>"}                         | ${linkifiedWikiLink99} | ${"[[WikiLink]]\\]"}
+    ${"extra [ before and ] after"}     | ${"<p>[[[WikiLink]]]</p>"}                        | ${linkifiedWikiLink99} | ${String.raw`\[[[WikiLink]]\]`}
+  `("linkified wiki links: $label", ({ raw, resolves, expected }) => {
+    const html = replaceWikiLinksInHtml(raw, [...resolves])
+    expect(htmlToMarkdown(html)).toBe(expected)
   })
 })
