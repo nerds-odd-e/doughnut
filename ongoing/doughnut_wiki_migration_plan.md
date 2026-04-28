@@ -17,8 +17,8 @@ notebook = collection boundary
 folder = containment and navigation
 note = Markdown-like knowledge unit
 link = semantic connection
-fileSlug = local filename identity
-fullPath = notebook-local address
+note.slug = notebook-local address (full path within the notebook; see Phase 2)
+localSegment = suffix after the last "/" in note.slug (derivable basename within a folder)
 id = stable internal identity
 ```
 
@@ -50,57 +50,40 @@ Example:
 n1478
 ```
 
-### File Slug
+### Note slug (persisted)
 
-The file slug is the note's local filename-style identity.
+**`note.slug`** is the single persisted address for a note **within its notebook**: a path-like string built from the folder location (if any) plus a slugified **basename** derived from the note **`title`** (or equivalent). It is the notebook-local full path, not only the last segment.
 
-Example:
+Examples:
 
 ```text
 douyara
-```
-
-The same slugified style is used for migrated notes and newly created notes. Internal IDs stay separate from slugs.
-
-File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier rather than maintaining separate local slug rules.
-
-**Folder slugs** are derived from the folder **`name`**, not chosen as a separate arbitrary string (except explicit rename flows that re-slugify). **Note file slugs** are derived from the note **`title`** (or equivalent) in the same way.
-
-For **existing data** migrated from the former parent-note containment shape, each derived folder’s **`name`** equals the **title** of the parent note that defined that container.
-
-### Folder Path
-
-The folder path represents the note's location.
-
-Example:
-
-```text
-japanese/vocabulary
-```
-
-### Full Path
-
-The full path is the notebook-local address of a note.
-
-Example:
-
-```text
 japanese/vocabulary/douyara
 ```
 
-### Uniqueness Rule
+For **existing data** migrated from the former parent-note containment shape, each derived folder’s **`name`** equals the **title** of the parent note that defined that container (unchanged from Phase 1).
 
-The final uniqueness rule is:
+### Local segment (derived, not a column)
+
+The **basename** within a folder is **derivable** from **`note.slug`**: the substring after the last `/`, or the whole string when there is no `/`. Use it where you need “filename in this folder” behavior (for example export filenames or disambiguation), without persisting a second note column.
+
+File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier rather than maintaining separate local slug rules.
+
+**Folder slugs** are derived from the folder **`name`**, not chosen as a separate arbitrary string (except explicit rename flows that re-slugify). The **basename** part of **`note.slug`** follows the same slugify rules from the note **`title`** (or equivalent), unless a dedicated slug override exists (for example import frontmatter in a later phase).
+
+### Folder path (folders)
+
+Folder **`fullPath`** is the folder’s path segment chain within the notebook (see Phase 2). It is combined with the note basename when building **`note.slug`** for foldered notes.
+
+### Uniqueness rule
+
+Persisted invariant for notes:
 
 ```text
-unique(notebook_id, folder_id, file_slug)
+unique(notebook_id, slug)
 ```
 
-A denormalized full-path index may also be maintained:
-
-```text
-unique(notebook_id, full_path)
-```
+Folder-scoped “same title in the same folder” behavior is enforced because two notes in the same folder cannot share the same **`note.slug`** (same folder path prefix implies the same basename would collide).
 
 The display title does not need to be unique.
 
@@ -204,25 +187,22 @@ Phase 1 is **complete** in the codebase.
 
 ## Goal
 
-Introduce notebook slugs, folder slugs, note file slugs, and note full paths.
+Introduce notebook slugs, folder slugs and folder full paths, and **note slugs** where **`note.slug`** is the persisted notebook-local **full path** address (path-like string within the notebook). Do **not** persist separate `file_slug` and `full_path` columns on `Note`.
 
 ## Rationale
 
 The frontend should eventually refer to notes by location-style address rather than internal ID.
 
-The address is:
+Within a notebook:
 
 ```text
-notebookSlug + folderPath + fileSlug
+basename = slugified note title (or equivalent), unique among siblings in the same folder after collision handling
+
+note.slug = basename                           -- note at notebook root (no folder)
+note.slug = folder.fullPath + "/" + basename -- foldered note
 ```
 
-The note's slug should not include the folder path. Instead:
-
-```text
-fileSlug = local filename
-folderPath = location
-fullPath = folderPath + '/' + fileSlug
-```
+The **basename** within a folder is **derivable** from **`note.slug`** as the substring after the last `/`, or the whole string when there is no `/`.
 
 ## Model Additions
 
@@ -250,26 +230,28 @@ fullPath
 Add:
 
 ```text
-fileSlug
-fullPath
+slug
 ```
+
+**`note.slug`** stores the notebook-local address as above. One column replaces the older split between “file slug” and “full path.”
 
 ## Slug Generation
 
-Generate notebook, folder, and note file slugs with `com.github.slugify:slugify`.
+Generate notebook slugs, folder slugs, and note basenames with `com.github.slugify:slugify`.
 
-The same slugifier should be used anywhere Doughnut derives a file or folder slug, including migrations, note creation, folder creation, import, and export.
+The same slugifier should be used anywhere Doughnut derives a slug or basename, including migrations, note creation, folder creation, import, and export.
 
-**Folder:** `folder.slug` ← slugify(`folder.name`). **Note file:** `fileSlug` ← slugify(note title or the field that defines the filename), unless a dedicated slug override exists (e.g. import frontmatter).
+**Folder:** `folder.slug` ← slugify(`folder.name`). **Note:** compute **basename** from the note **`title`** (or the field that defines the filename), apply collision handling within the target folder, then set **`note.slug`** from **`folder.fullPath`** and **basename** as in the rationale.
 
 ## Uniqueness Constraints
 
-Add:
+Add for notes:
 
 ```text
-unique(notebook_id, folder_id, file_slug)
-unique(notebook_id, full_path)
+unique(notebook_id, slug)
 ```
+
+Folder-scoped basename uniqueness follows: two notes in the same folder cannot share the same **`note.slug`** when they share the same path prefix.
 
 For folders:
 
@@ -280,12 +262,12 @@ unique(notebook_id, folder_full_path)
 
 ## Frontend Rule
 
-The frontend should resolve notes by slug/path, not by internal ID.
+The frontend should resolve notes by slug path, not by internal ID.
 
-Example URL:
+Example URL shapes (exact encoding is an implementation detail):
 
 ```text
-/notebooks/:notebookSlug/:folderPath/:fileSlug
+/notebooks/:notebookSlug/... path segments matching note.slug ...
 ```
 
 Example:
@@ -296,13 +278,13 @@ Example:
 
 The frontend may still use internal IDs behind the scenes after route resolution.
 
-Support an additional note-slug-only route for unambiguous accessible notes:
+Support an additional **local segment** route for unambiguous accessible notes (basename only):
 
 ```text
-/notes/:fileSlug
+/notes/:localSegment
 ```
 
-This route is mostly to make E2E tests easier. It resolves only when exactly one note with that file slug is visible to the current user, so it does not require a global unique database index.
+This route is mostly to make E2E tests easier. It resolves only when exactly one note’s **basename** (derived **`note.slug`**) is visible to the current user among accessible notes, so it does not require a global unique database index.
 
 ## Move Behavior
 
@@ -310,10 +292,11 @@ When a note moves to another folder:
 
 ```text
 move(noteId, newFolderId)
-  check unique(newFolderId, note.fileSlug)
+  recompute basename in the target folder (same as today’s title semantics; resolve collisions)
+  recompute note.slug from new folder.fullPath + basename (or basename only at root)
+  check unique(notebook_id, note.slug)
   update note.folderId
-  recompute note.fullPath
-  optionally create redirect from old fullPath to new fullPath
+  optionally create redirect from old note.slug to new note.slug
 ```
 
 ## Expected Result
@@ -322,11 +305,11 @@ After this phase:
 
 - notebooks have slugs
 - folders have slugs and full paths
-- notes have file slugs and full paths
+- notes have a single **`slug`** column holding the notebook-local full path
 - frontend note references can move away from internal IDs
-- note lookup by notebook + full path is possible
-- note lookup by file slug alone is possible when it is unambiguous among notebooks the user can access
-- moving a note requires uniqueness validation in the target folder
+- note lookup by notebook + slug path is possible
+- note lookup by basename alone is possible when it is unambiguous among notebooks the user can access
+- moving a note requires uniqueness validation for the recomputed **`note.slug`**
 
 ## Non-Goals
 
@@ -542,7 +525,7 @@ After this phase:
 
 - relationship notes are ordinary notes
 - relationship fields are represented in content and/or frontmatter
-- relationship notes have folder locations and file slugs
+- relationship notes have folder locations and note slugs (`note.slug` as full path)
 - old relationship-note-specific behavior is deprecated
 - relationships become portable to Obsidian-style Markdown
 
@@ -718,10 +701,10 @@ Doughnut Notebook/
 
 ## Note Export
 
-Each note exports as:
+Each note exports as a file named from the **basename** (local segment of `note.slug`), for example:
 
 ```text
-fileSlug.md
+douyara.md
 ```
 
 With frontmatter:
@@ -828,7 +811,7 @@ Detect and report:
 ```text
 same id, changed full path
 same full path, different id
-duplicate fileSlug in same folder
+duplicate basename in same folder (same `note.slug` prefix)
 missing linked target
 renamed file
 changed title
@@ -904,8 +887,7 @@ Note
   id
   notebookId
   folderId optional
-  fileSlug
-  fullPath
+  slug
   title
   content
   properties
@@ -953,7 +935,7 @@ After this phase:
 
 ```text
 folder
-  -> fileSlug and fullPath
+  -> note.slug (notebook-local full path)
     -> notebook content without head note
       -> remove note parent (folders own placement)
         -> relationship notes as normal notes

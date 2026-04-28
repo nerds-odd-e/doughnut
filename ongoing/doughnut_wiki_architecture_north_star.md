@@ -95,6 +95,7 @@ Folder
   notebookId
   parentFolderId optional
   slug
+  fullPath
   name
   config
   createdAt
@@ -113,8 +114,9 @@ A note is the core knowledge unit.
 
 A note belongs to a notebook and may belong to a folder. Notes **do not** have a parent note in the final model—placement is folder-based only.
 
-The note is referred to by slug in the frontend, not by internal ID.
-When a note is in a folder, its slug is folder-qualified as `folder-slug/note-title`.
+The note is referred to by **`slug`** in the frontend, not by internal ID.
+
+**Persisted `note.slug`** is the notebook-local **full path**: a path-like string (`segment/segment/...`) within the notebook. At notebook root it may be a single segment (the **basename** derived from the title). When a note is in a folder, **`note.slug`** includes the folder path prefix, for example `folder-segment/title-basename`.
 
 #### Final state
 
@@ -123,7 +125,7 @@ Note
   id
   notebookId
   folderId optional
-  slug
+  slug   (notebook-local full path; basename = segment after last "/", or whole string if no "/")
   title
   content
   properties
@@ -189,6 +191,8 @@ n1478
 
 The slug is the frontend-facing and file-facing reference.
 
+For **notes**, the persisted **`slug`** is the notebook-local **full path** (see the Note model above). For navigation and exports you may use the **basename** (suffix after the last `/`) as the file-facing filename when a single segment is enough.
+
 It is used for:
 
 - frontend routes
@@ -196,19 +200,14 @@ It is used for:
 - exported filenames
 - Obsidian-compatible references
 
-Example:
+Examples:
 
 ```text
 douyara
+japanese/vocabulary/douyara
 ```
 
-File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules. **Folder slugs** are produced from the folder **`name`** (same rules as other slugified titles). **Note slugs** are produced from the note **`title`** (or equivalent naming field) unless a dedicated rename/slug workflow applies.
-
-For notes inside folders, the slug includes the folder slug:
-
-```text
-folder-slug/note-title
-```
+File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules. **Folder slugs** are produced from the folder **`name`** (same rules as other slugified titles). The **basename** portion of a **note `slug`** comes from the note **`title`** (or equivalent naming field) unless a dedicated rename/slug workflow applies; the **full `note.slug`** prefixes that basename with the folder **`fullPath`** when the note is foldered.
 
 ### Title
 
@@ -230,59 +229,51 @@ Example:
 
 ### Uniqueness Rule
 
-Within the same notebook and folder:
+Within the same notebook:
 
 ```text
-note filename/slug must be unique
+note.slug must be unique (slug is the full notebook-local path)
 ```
+
+Basenames (local segments) must be unique among notes that share the same folder path prefix, which follows from **`unique(notebookId, slug)`**.
 
 The display title does not necessarily need to be globally unique.
 
 Recommended invariant:
 
 ```text
-notebookId + folderId + slug = unique
-```
-
-Optional stronger invariant:
-
-```text
-notebookId + fullFolderPath + slug = unique
+notebookId + note.slug = unique
 ```
 
 ## Frontend Reference Rule
 
-In the frontend, a note is referred to by slug rather than internal ID.
-The containing notebook is still identified by notebook ID.
+In the frontend, a note is referred to by **`slug`** rather than internal ID.
+The containing notebook is identified by **notebook slug** (or internal id in interim routes; Phase 2 aligns on slug-based addressing).
 
 Example route:
 
 ```text
-/notebooks/:notebookId/notes/:noteSlug
+/notebooks/:notebookSlug/... note path matching note.slug ...
 ```
 
-For a foldered note, `:noteSlug` includes the folder prefix:
-
-```text
-folder-slug/note-title
-```
+For a foldered note, `:noteSlug` matches the persisted **`note.slug`** (folder path plus basename). Encode path segments as appropriate for the router.
 
 If a note is inside nested folders, the same rule extends to the full folder path.
 
-A note may also be visited by note slug alone when the slug resolves to exactly one note among notebooks the user can access:
+A note may also be visited by **basename alone** when it resolves to exactly one note among notebooks the user can access:
 
 ```text
-/notes/:noteSlug
+/notes/:basename
 ```
 
-This route is primarily a testing and convenience path. It must not require a global unique index in the database; resolution can reject ambiguous slugs when more than one accessible note matches.
+This route is primarily a testing and convenience path. It must not require a global unique index in the database; resolution can reject ambiguous basenames when more than one accessible note matches.
 
 Recommended final decision:
 
 ```text
-Slugs are unique within the same folder.
-Frontend note references use folder-qualified slugs when needed.
-Slug-only frontend references are allowed only when unambiguous for the current user.
+Persisted note.slug is unique within the notebook (full path).
+Frontend note references use full note.slug paths when folder-qualified addresses are needed.
+Basename-only frontend references are allowed only when unambiguous for the current user.
 Internal resolution still maps to stable note ID.
 ```
 
@@ -694,7 +685,7 @@ Recommended:
 No.
 ```
 
-Only filename/slug needs to be unique within the folder.
+Only the note **basename** (local segment of **`note.slug`**) needs to be unique within the same folder, which follows from **`notebookId + note.slug`** uniqueness.
 
 ## Final Architecture Summary
 
@@ -716,7 +707,7 @@ Folder
 Note
   is a Markdown-like knowledge unit
   has stable internal ID
-  has frontend/file-facing slug
+  has persisted slug (notebook-local full path)
   has human title
   may live in a folder (no note-parent field; folders replace parent-note containment)
   links to other notes
