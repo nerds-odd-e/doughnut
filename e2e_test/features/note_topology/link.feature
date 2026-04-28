@@ -27,8 +27,9 @@ Feature: Wiki links in notes
       We also rely on [[Technical Excellence]] as a core practice.
       """
     Then I should see the rich content of the note with details:
-      | Tag         | Content                       |
-      | a.dead-link | Continuous Integration System |
+      | Tag               | Content                       |
+      | a.dead-link       | Continuous Integration System |
+      | a:not(.dead-link) | Technical Excellence          |
     And I should be able to create a new note by following the dead link "Continuous Integration System"
     And I should see "LeSS in Action" with these children
       | note-title                    |

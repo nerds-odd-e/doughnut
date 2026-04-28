@@ -21,7 +21,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     findNoteTitle(noteTopology)
   }
   return {
-    /** Asserts the current note heading (main note title region) shows this text */
     expectNoteTitleDisplayed(title: string) {
       findNoteTitle(title)
       return this
@@ -30,9 +29,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     expectDetailsContaining(fragment: string) {
       this.findNoteDetails(fragment)
       return this
-    },
-    expectNotePageUrl: () => {
-      cy.url().should('include', '/n1')
     },
     moreOptions: () => {
       return makeSureNoteMoreOptionsDialogIsOpen()
@@ -208,17 +204,10 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.get('[role=details]').find('a.dead-link').contains(linkTitle).click()
       return {
         createNote: () => {
-          noteCreationForm.expectFormVisible()
           noteCreationForm.submit()
         },
       }
     },
-    expectLiveLink(linkText: string) {
-      cy.get('[role=details]')
-        .find('a:not(.dead-link)')
-        .should('contain', linkText)
-    },
-
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)
       cy.get('#note-image').should('not.exist')

@@ -2,12 +2,6 @@ import { form, submittableForm } from '../../forms'
 import { assumeAssociateWikidataDialog } from '../associateWikidataDialog'
 
 const noteCreationForm = {
-  expectFormVisible() {
-    cy.findByLabelText('Title').should('be.visible')
-  },
-  expectPrefilledTitle(title: string) {
-    cy.findByLabelText('Title').should('have.value', title)
-  },
   submit() {
     submittableForm.submit()
   },

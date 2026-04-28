@@ -633,13 +633,6 @@ When('I navigate to note {string}', (noteTitle: string) => {
 })
 
 Then(
-  'the note details should contain a live link {string}',
-  (linkText: string) => {
-    start.assumeNotePage().expectLiveLink(linkText)
-  }
-)
-
-Then(
   'I should see a dialog with message {string}',
   (expectedMessage: string) => {
     cy.get('@confirmSpy').should('have.been.calledWith', expectedMessage)
