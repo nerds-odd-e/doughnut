@@ -1,9 +1,6 @@
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 
-const findNoteCard = (title: string) =>
-  cy.findByText(title, { selector: '.daisy-card-title .title-text' })
-
 function searchNote(searchKey: string, options: string[]) {
   options?.forEach((option: string) => form.getField(option).check())
   cy.findByPlaceholderText('Search').clear().type(searchKey)
@@ -56,16 +53,10 @@ export const assumeNoteTargetSearchDialog = () => {
       pageIsNotLoading()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
-      findNoteCard(toNoteTopic).then(($card) => {
-        cy.wrap($card)
-          .parent()
-          .parent()
-          .parent()
-          .parent()
-          .parent()
-          .findByText('Add Relationship')
-          .click()
-      })
+      cy.contains('.search-result .daisy-card-title', toNoteTopic)
+        .closest('[role=card]')
+        .findByRole('button', { name: 'Add Relationship' })
+        .click()
       form.getField('Relation Type').clickOption(relationType)
     },
     createRelationshipToTopLevelNoteAs(

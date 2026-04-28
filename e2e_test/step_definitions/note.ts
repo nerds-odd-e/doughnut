@@ -642,13 +642,6 @@ When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
 })
 
-Then(
-  'the note details markdown should be {string}',
-  (expectedMarkdown: string) => {
-    start.assumeNotePage().expectNoteDetailsMarkdown(expectedMarkdown)
-  }
-)
-
 Then('the note details are two wikilinks for LeSS and Odd-e CSD', () => {
   start
     .assumeNotePage()

@@ -63,20 +63,20 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
     },
     addRelationshipTo: (target: string) => {
-      const findRelationship = () =>
+      const findRelationshipCard = () =>
         cy
-          .findByText(target, { selector: 'main .title-text' })
-          .parent()
-          .parent()
-          .parent()
+          .get('main')
+          .find('.daisy-card-title .title-text')
+          .contains(target)
+          .closest('[role=card]')
       return {
         relationType: (relationType: string) => {
-          findRelationship().findAllByText(relationType, {
+          findRelationshipCard().findAllByText(relationType, {
             selector: '.relation-type',
           })
         },
         goto: () => {
-          findRelationship().find('.relation-type').click()
+          findRelationshipCard().find('.relation-type').click()
         },
       }
     },
@@ -93,10 +93,8 @@ export const assumeNotePage = (noteTopology?: string) => {
       relationType: string,
       targetNoteTopics: string
     ) {
-      cy.get('main').within(() => {
-        commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
-          this.expectRelationshipTopic(relationType, target)
-        })
+      commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
+        this.expectRelationshipTopic(relationType, target)
       })
     },
     changeRelationType: function (relationType: string, target: string) {
