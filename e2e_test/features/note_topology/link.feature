@@ -1,6 +1,6 @@
-Feature: Note wiki links
-  As a learner, I want wiki-style links in note details to connect to other notes,
-  create missing notes from dead links, and see unresolved links clearly.
+Feature: Wiki links in notes
+  As a learner, I want wiki-style links in my note content so I can open related notes,
+  add a note when a link has no target, and see unresolved links clearly.
 
   Background:
     Given I am logged in as an existing user
@@ -10,23 +10,23 @@ Feature: Note wiki links
       | Technical Excellence   | LeSS in Action |
       | Continuous Integration | LeSS in Action |
 
-  Scenario: Edit a note's details with a wiki link in markdown
+  Scenario: A wiki link points to the note with the same title
     When I update note "Technical Excellence" details using markdown to become:
       """
-      Technical excellence is to support [[Continuous Integration]].
+      Technical excellence means supporting [[Continuous Integration]].
       """
     Then I should see the rich content of the note with details:
       | Tag | Content                |
       | a   | Continuous Integration |
     And the link "Continuous Integration" should link to the note with the same title
 
-  Scenario: Edit a note's details with a dead wiki link in markdown
+  Scenario: A dead wiki link is shown and can create the missing note
     When I update note "Continuous Integration" details using markdown to become:
       """
-      Continuous Integration is different from the [[Continuous Integration System]],
-      which is a good practice in [[Technical Excellence]].
+      Continuous integration is distinct from a [[Continuous Integration System]].
+      We also rely on [[Technical Excellence]] as a core practice.
       """
     Then I should see the rich content of the note with details:
-      | Tag         | Content |
+      | Tag         | Content                       |
       | a.dead-link | Continuous Integration System |
     And I should be able to create a new note by following the dead link "Continuous Integration System"
