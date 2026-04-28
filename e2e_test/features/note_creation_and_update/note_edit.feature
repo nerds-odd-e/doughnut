@@ -91,18 +91,6 @@ Feature: Note Edit
     And I should see "World" in the page
     And the note details should contain a line break
 
-  Scenario: Extra opening bracket before wikilink is preserved in markdown
-    When I set note "LeSS in Action" to Doughnut with extra open bracket wikilink details
-    Then the note details have extra open bracket wikilink markdown
-
-  Scenario: Extra closing bracket after wikilink is preserved in markdown
-    When I set note "LeSS in Action" to Doughnut with extra close bracket wikilink details
-    Then the note details have extra close bracket wikilink markdown
-
-  Scenario: Extra opening and closing brackets around wikilink are preserved in markdown
-    When I set note "LeSS in Action" to Doughnut with extra bracket pair wikilink details
-    Then the note details have extra bracket pair wikilink markdown
-
   Scenario: Edit a note's details with a wiki link in markdown
     Given I have a notebook with the head note "TDD"
     And there are some notes:

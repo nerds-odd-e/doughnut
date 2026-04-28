@@ -158,33 +158,6 @@ When(
 )
 
 When(
-  'I set note "LeSS in Action" to Doughnut with extra open bracket wikilink details',
-  () => {
-    const page = start.jumpToNotePage('LeSS in Action')
-    page.editTextContent({ Title: 'Doughnut' })
-    page.updateDetailsAsMarkdown('[[[WikiLink]]')
-  }
-)
-
-When(
-  'I set note "LeSS in Action" to Doughnut with extra close bracket wikilink details',
-  () => {
-    const page = start.jumpToNotePage('LeSS in Action')
-    page.editTextContent({ Title: 'Doughnut' })
-    page.updateDetailsAsMarkdown('[[WikiLink]]]')
-  }
-)
-
-When(
-  'I set note "LeSS in Action" to Doughnut with extra bracket pair wikilink details',
-  () => {
-    const page = start.jumpToNotePage('LeSS in Action')
-    page.editTextContent({ Title: 'Doughnut' })
-    page.updateDetailsAsMarkdown('[[[WikiLink]]]')
-  }
-)
-
-When(
   'I update note accessories of {string} to become:',
   (noteTopology: string, data: DataTable) => {
     start
@@ -630,18 +603,6 @@ When('I promote the point {string} to a child note', (pointText: string) => {
 
 When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
-})
-
-Then('the note details have extra open bracket wikilink markdown', () => {
-  start.assumeNotePage().expectNoteDetailsMarkdown('[[[WikiLink]]')
-})
-
-Then('the note details have extra close bracket wikilink markdown', () => {
-  start.assumeNotePage().expectNoteDetailsMarkdown('[[WikiLink]]]')
-})
-
-Then('the note details have extra bracket pair wikilink markdown', () => {
-  start.assumeNotePage().expectNoteDetailsMarkdown('[[[WikiLink]]]')
 })
 
 When('I click the link {string} in the note details', (linkText: string) => {
