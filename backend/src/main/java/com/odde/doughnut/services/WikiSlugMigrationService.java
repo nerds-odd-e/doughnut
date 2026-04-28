@@ -22,6 +22,8 @@ public class WikiSlugMigrationService {
 
   static final int DEFAULT_BATCH_LIMIT = 100;
   static final int MAX_BATCH_LIMIT = 500;
+  static final int FOLDER_NAME_MAX_LENGTH = 512;
+  static final String FOLDER_NAME_WHEN_BLANK = "Untitled";
 
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
@@ -39,6 +41,7 @@ public class WikiSlugMigrationService {
         folderRepository.findFoldersReadyForSlugMigration(PageRequest.of(0, capped));
     Map<NotebookParentKey, Set<String>> reservedBasenames = new HashMap<>();
     for (Folder folder : batch) {
+      normalizeFolderNameForPersist(folder);
       Integer notebookId = folder.getNotebook().getId();
       Integer parentFolderId =
           folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
@@ -102,6 +105,17 @@ public class WikiSlugMigrationService {
       return DEFAULT_BATCH_LIMIT;
     }
     return Math.min(limit, MAX_BATCH_LIMIT);
+  }
+
+  private static void normalizeFolderNameForPersist(Folder folder) {
+    String n = folder.getName();
+    if (n == null || n.isBlank()) {
+      folder.setName(FOLDER_NAME_WHEN_BLANK);
+      return;
+    }
+    if (n.length() > FOLDER_NAME_MAX_LENGTH) {
+      folder.setName(n.substring(0, FOLDER_NAME_MAX_LENGTH));
+    }
   }
 
   private static Set<String> basenamesFromSlugs(List<String> slugs) {

@@ -14,16 +14,20 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 class WikiSlugMigrationAdminControllerTest extends ControllerTestBase {
 
   @Autowired WikiSlugMigrationAdminController controller;
   @Autowired FolderRepository folderRepository;
   @Autowired NoteRepository noteRepository;
+  @Autowired JdbcTemplate jdbcTemplate;
+  @Autowired EntityManager entityManager;
 
   @Nested
   class FolderBatchMigration {
@@ -124,6 +128,25 @@ class WikiSlugMigrationAdminControllerTest extends ControllerTestBase {
 
       assertThat(result.getProcessedInBatch(), equalTo(0L));
       assertThat(result.getStatus().getFoldersMissingSlug(), equalTo(0L));
+    }
+
+    @Test
+    void migratesFolderWithLegacyEmptyName() throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.anAdmin().please());
+      User user = makeMe.aUser().please();
+      Note head = makeMe.aNote().creatorAndOwner(user).please();
+      Notebook notebook = head.getNotebook();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("placeholder").please();
+      int id = folder.getId();
+      jdbcTemplate.update("UPDATE folder SET name = '' WHERE id = ?", id);
+      entityManager.clear();
+
+      WikiSlugMigrationBatchResult result = controller.batchMigrateFolders(10);
+
+      assertThat(result.getProcessedInBatch(), equalTo(1L));
+      Folder reloaded = folderRepository.findById(id).orElseThrow();
+      assertThat(reloaded.getName(), equalTo("Untitled"));
+      assertThat(reloaded.getSlug(), equalTo("untitled"));
     }
   }
 
