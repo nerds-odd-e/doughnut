@@ -117,12 +117,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private Note parent;
 
-  @ManyToOne
-  @JoinColumn(name = "folder_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  private Folder folder;
-
   @Convert(converter = RelationTypeConverter.class)
   @Column(name = "relation_type")
   @JsonIgnore
@@ -187,11 +181,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setRelationType(RelationType relationType) {
     this.relationType = relationType;
-  }
-
-  @JsonIgnore
-  public void setFolder(Folder folder) {
-    this.folder = folder;
   }
 
   @JsonIgnore
