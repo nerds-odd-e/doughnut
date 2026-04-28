@@ -78,6 +78,14 @@ public class MakeMe extends MakeMeWithoutDB {
     return new BazaarNotebookBuilder(this, notebook);
   }
 
+  public FolderBuilder aFolder() {
+    return new FolderBuilder(this, null);
+  }
+
+  public FolderBuilder theFolder(Folder folder) {
+    return new FolderBuilder(this, folder);
+  }
+
   public CertificateBuilder aCertificate(Notebook notebook, User user, Timestamp startDate) {
 
     return new CertificateBuilder(notebook, user, startDate, this);
