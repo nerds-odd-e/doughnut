@@ -13,7 +13,6 @@ import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
-import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
 
 defineParameterType({
   name: 'notepath',
@@ -614,17 +613,9 @@ Then(
 )
 
 Then(
-  'I should see a note creation form with {string} pre-filled as the title',
-  (title: string) => {
-    noteCreationForm.expectPrefilledTitle(title)
-  }
-)
-
-Then(
   'I should be able to create a new note by following the dead link {string}',
   (linkTitle: string) => {
-    start.assumeNotePage().clickDeadLink(linkTitle)
-    noteCreationForm.submit()
+    start.assumeNotePage().followDeadLink(linkTitle).createNote()
     start.assumeNotePage(linkTitle)
   }
 )
@@ -644,22 +635,5 @@ Then(
   'I should see a dialog with message {string}',
   (expectedMessage: string) => {
     cy.get('@confirmSpy').should('have.been.calledWith', expectedMessage)
-  }
-)
-
-Given(
-  'note {string} has a dead wiki link titled {string}',
-  (noteTitle: string, missingNoteTitle: string) => {
-    start
-      .jumpToNotePage(noteTitle)
-      .updateDetailsAsMarkdown(`[[${missingNoteTitle}]]`)
-      .switchToRichContent()
-  }
-)
-
-When(
-  'I follow the link {string} in the note body to create the missing note',
-  (linkTitle: string) => {
-    start.assumeNotePage().followDeadLink(linkTitle).createNote()
   }
 )

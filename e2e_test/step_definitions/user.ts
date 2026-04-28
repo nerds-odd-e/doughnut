@@ -62,7 +62,7 @@ When('I save my profile with:', (data: DataTable) => {
 })
 
 Then('I should see {string} in the page', (content: string) => {
-  start.assumeNotePage(content)
+  cy.get('#app').should('contain', content)
 })
 
 Then('My name {string} is in the user action menu', (name: string) => {

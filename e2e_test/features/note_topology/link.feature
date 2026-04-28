@@ -30,3 +30,8 @@ Feature: Wiki links in notes
       | Tag         | Content                       |
       | a.dead-link | Continuous Integration System |
     And I should be able to create a new note by following the dead link "Continuous Integration System"
+    And I should see "LeSS in Action" with these children
+      | note-title                    |
+      | Technical Excellence          |
+      | Continuous Integration        |
+      | Continuous Integration System |
