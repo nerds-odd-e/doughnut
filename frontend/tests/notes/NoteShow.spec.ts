@@ -1,4 +1,5 @@
 import NoteShow from "@/components/notes/NoteShow.vue"
+import { nonReloadingClient } from "@/managedApi/clientSetup"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -20,6 +21,7 @@ describe("new/updated pink banner", () => {
 
   beforeEach(() => {
     mockShowNoteAccessory()
+    mockSdkService("getDescendants", { relatedNotes: [] } as never)
   })
 
   it.each([
@@ -57,6 +59,7 @@ describe("note wth children", () => {
 
   beforeEach(() => {
     mockShowNoteAccessory()
+    mockSdkService("getDescendants", { relatedNotes: [] } as never)
   })
 
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -86,6 +89,20 @@ describe("note wth children", () => {
 
     expect(showNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
+    })
+  })
+
+  it("fetches wiki title candidates without redirecting on unauthorized responses", async () => {
+    const getDescendantsSpy = mockSdkService("getDescendants", {
+      relatedNotes: [],
+    } as never)
+
+    render(note)
+    await flushPromises()
+
+    expect(getDescendantsSpy).toHaveBeenCalledWith({
+      path: { note: note.notebook!.headNoteId! },
+      client: nonReloadingClient,
     })
   })
 

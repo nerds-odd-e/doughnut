@@ -109,6 +109,7 @@
 import { inject, provide, ref, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
+import { nonReloadingClient } from "@/managedApi/clientSetup"
 import type {
   NoteAccessory,
   NoteRealm,
@@ -164,6 +165,7 @@ const fetchWikiTitles = async (headNoteId: number) => {
   lastFetchedHeadNoteId.value = headNoteId
   const { data, error } = await NoteController.getDescendants({
     path: { note: headNoteId },
+    client: nonReloadingClient,
   })
   if (!error && data) {
     wikiTitles.value = (data.relatedNotes ?? [])
