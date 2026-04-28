@@ -52,7 +52,7 @@ function setupDelayedSearchMocks() {
 
 async function waitForDebounce() {
   await nextTick()
-  vi.advanceTimersByTime(1100)
+  vi.advanceTimersByTime(400)
   await flushPromises()
 }
 

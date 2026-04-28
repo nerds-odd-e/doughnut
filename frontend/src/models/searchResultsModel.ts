@@ -211,19 +211,30 @@ export class SearchResultsModel {
     }
   }
 
+  /**
+   * Merges new result batches into the cache for this search key.
+   * Omit `literalResults` or `semanticResults` (leave undefined) when that
+   * request has not completed yet; pass an array (possibly empty) when it has.
+   */
   mergeAndCacheResults(opts: {
     trimmedSearchKey: string
     isGlobal: boolean
-    literalResults: NoteSearchResult[]
-    semanticResults: NoteSearchResult[]
+    literalResults?: NoteSearchResult[]
+    semanticResults?: NoteSearchResult[]
     currentNotebookId?: number
   }): void {
-    const combined = [...opts.literalResults, ...opts.semanticResults]
     const existing =
       this.getCachedResult(opts.trimmedSearchKey, opts.isGlobal) ?? []
+    const incoming: NoteSearchResult[] = []
+    if (opts.literalResults !== undefined) {
+      incoming.push(...opts.literalResults)
+    }
+    if (opts.semanticResults !== undefined) {
+      incoming.push(...opts.semanticResults)
+    }
     const merged = this.mergeUniqueAndSortByDistance(
       existing,
-      combined,
+      incoming,
       opts.currentNotebookId
     )
     this.setCachedResult(opts.trimmedSearchKey, opts.isGlobal, merged)

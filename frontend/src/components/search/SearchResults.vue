@@ -83,7 +83,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
+import { ref, computed, watch, onMounted, onBeforeUnmount, shallowRef } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import SearchResultCards from "./SearchResultCards.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
@@ -114,6 +114,8 @@ const oldSearchTerm = ref<SearchTerm>({
 
 const timeoutId = ref<ReturnType<typeof setTimeout>>()
 const model = new SearchResultsModel()
+/** Bumps when a new debounced search starts so late responses from an older run are ignored. */
+const searchGeneration = shallowRef(0)
 
 const trimmedSearchKey = computed(() => searchTerm.value.searchKey.trim())
 const isGlobalSearch = computed(
@@ -140,33 +142,8 @@ const displayState = computed(() =>
   })
 )
 
-const performSearch = async (noteId: number | undefined, term: SearchTerm) => {
-  const [literalRes, semanticRes] = await Promise.all([
-    noteId
-      ? SearchController.searchForRelationshipTargetWithin({
-          path: { note: noteId },
-          body: term,
-        })
-      : SearchController.searchForRelationshipTarget({
-          body: term,
-        }),
-    noteId
-      ? SearchController.semanticSearchWithin({
-          path: { note: noteId },
-          body: term,
-        })
-      : SearchController.semanticSearch({
-          body: term,
-        }),
-  ])
-
-  return {
-    literal: literalRes.error ? [] : literalRes.data || [],
-    semantic: semanticRes.error ? [] : semanticRes.data || [],
-  }
-}
-
-const debounced = debounce((callback) => callback(), 1000)
+const SEARCH_DEBOUNCE_MS = 350
+const debounced = debounce((callback) => callback(), SEARCH_DEBOUNCE_MS)
 
 const fetchRecentNotes = async () => {
   if (
@@ -195,17 +172,54 @@ const search = () => {
   }
 
   timeoutId.value = debounced(async () => {
-    const { literal, semantic } = await performSearch(
-      props.noteId,
-      searchTerm.value
-    )
-    model.mergeAndCacheResults({
-      trimmedSearchKey: trimmedSearchKey.value,
-      isGlobal: isGlobalSearch.value,
-      literalResults: literal,
-      semanticResults: semantic,
-      currentNotebookId: props.notebookId,
+    const gen = ++searchGeneration.value
+    const term = searchTerm.value
+    const snapshotTrimmed = term.searchKey.trim()
+    const snapshotGlobal = term.allMyNotebooksAndSubscriptions === true
+    const snapshotNotebookId = props.notebookId
+
+    const literalPromise = props.noteId
+      ? SearchController.searchForRelationshipTargetWithin({
+          path: { note: props.noteId },
+          body: term,
+        })
+      : SearchController.searchForRelationshipTarget({ body: term })
+    const semanticPromise = props.noteId
+      ? SearchController.semanticSearchWithin({
+          path: { note: props.noteId },
+          body: term,
+        })
+      : SearchController.semanticSearch({ body: term })
+
+    const applyIfCurrent = () =>
+      gen === searchGeneration.value &&
+      snapshotTrimmed === trimmedSearchKey.value &&
+      snapshotGlobal === isGlobalSearch.value
+
+    literalPromise.then((literalRes) => {
+      if (!applyIfCurrent()) return
+      const literal = literalRes.error ? [] : literalRes.data || []
+      model.mergeAndCacheResults({
+        trimmedSearchKey: snapshotTrimmed,
+        isGlobal: snapshotGlobal,
+        literalResults: literal,
+        currentNotebookId: snapshotNotebookId,
+      })
     })
+
+    semanticPromise.then((semanticRes) => {
+      if (!applyIfCurrent()) return
+      const semantic = semanticRes.error ? [] : semanticRes.data || []
+      model.mergeAndCacheResults({
+        trimmedSearchKey: snapshotTrimmed,
+        isGlobal: snapshotGlobal,
+        semanticResults: semantic,
+        currentNotebookId: snapshotNotebookId,
+      })
+    })
+
+    await Promise.all([literalPromise, semanticPromise])
+    if (!applyIfCurrent()) return
     model.completeSearch()
   })
 }
