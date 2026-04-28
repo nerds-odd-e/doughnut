@@ -14,7 +14,10 @@
 import { computed, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import markdownizer from "./markdownizer"
-import { replaceWikiLinksInHtml, type WikiTitle } from "./markdownToQuillHtml"
+import {
+  replaceWikiLinksInHtml,
+  type WikiTitle,
+} from "./replaceWikiLinksInHtml"
 
 const { modelValue, wikiTitles } = defineProps({
   multipleLine: Boolean,
@@ -44,7 +47,10 @@ const htmlValue = computed(() => {
   ) {
     return replaceWikiLinksInHtml(currentIntervalHtml, wikiTitles)
   }
-  return markdownizer.markdownToHtml(modelValue, { wikiTitles })
+  return replaceWikiLinksInHtml(
+    markdownizer.markdownToHtml(modelValue),
+    wikiTitles
+  )
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {

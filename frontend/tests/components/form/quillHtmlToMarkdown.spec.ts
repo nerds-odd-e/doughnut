@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
-import { replaceWikiLinksInHtml } from "@/components/form/markdownToQuillHtml"
+import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
 
 describe("quillHtmlToMarkdown", () => {
   it("preserves escaped HTML entities in markdown output", () => {

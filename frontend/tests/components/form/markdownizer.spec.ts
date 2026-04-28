@@ -1,5 +1,5 @@
 import markdownizer from "@/components/form/markdownizer"
-import { replaceWikiLinksInHtml } from "@/components/form/markdownToQuillHtml"
+import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
 import { describe, it, expect } from "vitest"
 
 const toHtml = (markdown: string | undefined) =>
@@ -18,7 +18,6 @@ describe("Markdown and HTML Conversion Tests", () => {
       const markdown = markdownizer.htmlToMarkdown(pastedHtml)
       const html = markdownizer.markdownToHtml(markdown, {
         preserve_pre: true,
-        wikiTitles: [],
       })
       const div = document.createElement("div")
       div.innerHTML = html
@@ -308,7 +307,6 @@ describe("Markdown and HTML Conversion Tests", () => {
       ])("with preserve_pre=%s, contains %s and not %s", (preservePre, expected, notExpected) => {
         const html = markdownizer.markdownToHtml("```\ncode content\n```", {
           preserve_pre: preservePre as boolean,
-          wikiTitles: [],
         })
         expect(html).toContain(expected)
         expect(html).toContain("code content")
@@ -318,7 +316,6 @@ describe("Markdown and HTML Conversion Tests", () => {
       it("escapes HTML tags in <pre> when preserve_pre is true", () => {
         const html = markdownizer.markdownToHtml("```\n<p>X</p>\n```", {
           preserve_pre: true,
-          wikiTitles: [],
         })
         expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
         const div = document.createElement("div")

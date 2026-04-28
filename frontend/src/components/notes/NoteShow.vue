@@ -126,7 +126,7 @@ import Modal from "@/components/commons/Modal.vue"
 import NoteNewDialog from "./NoteNewDialog.vue"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
-import type { WikiTitle } from "../form/markdownToQuillHtml"
+import type { WikiTitle } from "../form/replaceWikiLinksInHtml"
 
 defineProps({
   noteId: { type: Number, required: true },

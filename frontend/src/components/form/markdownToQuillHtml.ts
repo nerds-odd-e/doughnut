@@ -4,32 +4,8 @@ import { markedCjkUnderscoreExtension } from "./markedCjkUnderscoreExtension"
 // Apply the CJK underscore extension globally
 marked.use(markedCjkUnderscoreExtension)
 
-export interface WikiTitle {
-  title: string
-  noteId: number
-}
-
 export interface MarkdownToHtmlOptions {
   preserve_pre?: boolean
-  wikiTitles: WikiTitle[]
-}
-
-export function replaceWikiLinksInHtml(
-  html: string,
-  wikiTitles: WikiTitle[]
-): string {
-  let result = html
-  wikiTitles.forEach(({ title, noteId }) => {
-    result = result.replace(
-      `[[${title}]]`,
-      `<a href="/n${noteId}">${title}</a>`
-    )
-  })
-  result = result.replace(
-    /\[\[([^\]]+)\]\]/g,
-    (_match, title) => `<a href="#" class="dead-link">${title}</a>`
-  )
-  return result
 }
 
 export default function markdownToQuillHtml(
@@ -266,6 +242,5 @@ export default function markdownToQuillHtml(
     removeWhitespaceBetweenTags,
     convertHtmlList,
     wrapStandaloneBrInParagraph,
-    (html) => replaceWikiLinksInHtml(html, options?.wikiTitles ?? []),
   ])
 }

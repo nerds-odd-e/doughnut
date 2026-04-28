@@ -184,7 +184,6 @@ onMounted(async () => {
                 const markdown = markdownizer.htmlToMarkdown(htmlData)
                 return markdownizer.markdownToHtml(markdown, {
                   preserve_pre: true,
-                  wikiTitles: [],
                 })
               }
             }
