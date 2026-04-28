@@ -30,6 +30,7 @@ public class NoteConstructionService {
   private final EntityPersister entityPersister;
   private final NoteService noteService;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
+  private final WikiSlugPathService wikiSlugPathService;
 
   @Autowired
   public NoteConstructionService(
@@ -38,13 +39,15 @@ public class NoteConstructionService {
       NoteRepository noteRepository,
       EntityPersister entityPersister,
       NoteService noteService,
-      NoteChildContainerFolderService noteChildContainerFolderService) {
+      NoteChildContainerFolderService noteChildContainerFolderService,
+      WikiSlugPathService wikiSlugPathService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
+    this.wikiSlugPathService = wikiSlugPathService;
   }
 
   public Note createNote(Note parentNote, String title) {
@@ -55,6 +58,7 @@ public class NoteConstructionService {
     if (parentNote != null) {
       note.setFolder(noteChildContainerFolderService.resolveForParent(parentNote));
     }
+    wikiSlugPathService.assignSlugForNewNote(note);
     if (entityPersister != null) {
       entityPersister.save(note);
     }

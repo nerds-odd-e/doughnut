@@ -3130,6 +3130,18 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/admin/wiki-slug-migration:
+    get:
+      tags:
+      - wiki-slug-migration-admin-controller
+      operationId: getStatus
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WikiSlugMigrationStatus"
   /api/admin/users:
     get:
       tags:
@@ -5009,6 +5021,15 @@ components:
           minLength: 1
       required:
       - newTitle
+    WikiSlugMigrationStatus:
+      type: object
+      properties:
+        foldersMissingSlug:
+          type: integer
+          format: int64
+        notesMissingSlug:
+          type: integer
+          format: int64
     UserForListing:
       type: object
       properties:

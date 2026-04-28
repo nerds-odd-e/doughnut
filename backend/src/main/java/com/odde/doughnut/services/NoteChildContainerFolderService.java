@@ -17,16 +17,19 @@ public class NoteChildContainerFolderService {
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
+  private final WikiSlugPathService wikiSlugPathService;
 
   public NoteChildContainerFolderService(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      WikiSlugPathService wikiSlugPathService) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
+    this.wikiSlugPathService = wikiSlugPathService;
   }
 
   public Folder resolveForParent(Note parentNote) {
@@ -71,6 +74,7 @@ public class NoteChildContainerFolderService {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     folder.setCreatedAt(now);
     folder.setUpdatedAt(now);
+    wikiSlugPathService.assignSlugForNewFolder(folder);
     entityPersister.save(folder);
     return folder;
   }

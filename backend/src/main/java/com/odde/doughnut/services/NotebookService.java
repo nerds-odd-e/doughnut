@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.NotebookCertificateApproval;
 import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookAiAssistantRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
@@ -16,15 +15,15 @@ import org.springframework.stereotype.Service;
 public class NotebookService {
   private final EntityPersister entityPersister;
   private final NotebookAiAssistantRepository notebookAiAssistantRepository;
-  private final NoteRepository noteRepository;
+  private final WikiSlugPathService wikiSlugPathService;
 
   public NotebookService(
       EntityPersister entityPersister,
       NotebookAiAssistantRepository notebookAiAssistantRepository,
-      NoteRepository noteRepository) {
+      WikiSlugPathService wikiSlugPathService) {
     this.entityPersister = entityPersister;
     this.notebookAiAssistantRepository = notebookAiAssistantRepository;
-    this.noteRepository = noteRepository;
+    this.wikiSlugPathService = wikiSlugPathService;
   }
 
   public NotebookCertificateApproval requestNotebookApproval(Notebook notebook) {
@@ -44,7 +43,12 @@ public class NotebookService {
 
   public Note createNotebookForOwnership(
       Ownership ownership, User user, Timestamp currentUTCTimestamp, String titleConstructor) {
-    return ownership.createAndPersistNotebook(
-        user, currentUTCTimestamp, noteRepository, entityPersister, titleConstructor);
+    Note note =
+        ownership.prepareHeadNoteForNewNotebook(user, currentUTCTimestamp, titleConstructor);
+    entityPersister.save(note.getNotebook());
+    entityPersister.save(note);
+    wikiSlugPathService.assignSlugForNewNote(note);
+    entityPersister.save(note);
+    return note;
   }
 }

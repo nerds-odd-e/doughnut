@@ -2,18 +2,22 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
+import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookGroupService;
@@ -38,6 +42,7 @@ class NotebookControllerTest extends ControllerTestBase {
   com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
 
   @Autowired NotebookController controller;
+  @Autowired NoteRepository noteRepository;
   @Autowired NotebookGroupService notebookGroupService;
   private Note topNote;
   @MockitoBean EmbeddingService embeddingService;
@@ -59,6 +64,19 @@ class NotebookControllerTest extends ControllerTestBase {
 
     currentUser.setUser(makeMe.aUser().please());
     topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+  }
+
+  @Nested
+  class CreateNotebook {
+    @Test
+    void assignsSlugToHeadNoteFromTitle() throws UnexpectedNoAccessRightException {
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("My Notebook Title");
+      RedirectToNoteResponse response = controller.createNotebook(noteCreation);
+      Note head = noteRepository.findById(response.noteId).orElseThrow();
+      assertThat(head.getFolder(), nullValue());
+      assertThat(head.getSlug(), equalTo("my-notebook-title"));
+    }
   }
 
   @Nested

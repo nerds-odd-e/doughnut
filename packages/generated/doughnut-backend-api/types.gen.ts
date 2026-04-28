@@ -824,6 +824,11 @@ export type TitleReplacement = {
     newTitle: string;
 };
 
+export type WikiSlugMigrationStatus = {
+    foldersMissingSlug?: number;
+    notesMissingSlug?: number;
+};
+
 export type UserForListing = {
     id?: number;
     name?: string;
@@ -3778,6 +3783,22 @@ export type GetAvailableGptModelsResponses = {
 };
 
 export type GetAvailableGptModelsResponse = GetAvailableGptModelsResponses[keyof GetAvailableGptModelsResponses];
+
+export type GetStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/wiki-slug-migration';
+};
+
+export type GetStatusResponses = {
+    /**
+     * OK
+     */
+    200: WikiSlugMigrationStatus;
+};
+
+export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
 
 export type ListUsersData = {
     body?: never;

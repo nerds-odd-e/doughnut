@@ -106,6 +106,56 @@ class NoteCreationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void assignsSlugsToFolderAndNoteFromTitles()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      parent =
+          makeMe.aNote().title("ExplicitParent").creatorAndOwner(currentUser.getUser()).please();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      Note created = noteRepository.findById(response.getId()).orElseThrow();
+      assertThat(created.getFolder().getSlug(), equalTo("explicitparent"));
+      assertThat(created.getSlug(), equalTo("explicitparent/new-title"));
+    }
+
+    @Test
+    void assignsNestedSlugsForFolderPathAndNote()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      Note head = makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
+      NoteCreationDTO sectionDto = new NoteCreationDTO();
+      sectionDto.setNewTitle("Section");
+      Note section =
+          noteRepository
+              .findById(controller.createNoteUnderParent(head, sectionDto).getCreated().getId())
+              .orElseThrow();
+      noteCreation.setNewTitle("Leaf");
+      Note leaf =
+          noteRepository
+              .findById(
+                  controller.createNoteUnderParent(section, noteCreation).getCreated().getId())
+              .orElseThrow();
+      assertThat(section.getFolder().getSlug(), equalTo("bookhead"));
+      assertThat(leaf.getFolder().getSlug(), equalTo("bookhead/section"));
+      assertThat(leaf.getSlug(), equalTo("bookhead/section/leaf"));
+    }
+
+    @Test
+    void assignsUniqueNoteSlugWhenSameTitleUnderSameFolder()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      parent = makeMe.aNote().title("SharedParent").creatorAndOwner(currentUser.getUser()).please();
+      noteCreation.setNewTitle("dup");
+      Note n1 =
+          noteRepository
+              .findById(controller.createNoteUnderParent(parent, noteCreation).getCreated().getId())
+              .orElseThrow();
+      assertThat(n1.getSlug(), equalTo("sharedparent/dup"));
+      noteCreation.setNewTitle("dup");
+      Note n2 =
+          noteRepository
+              .findById(controller.createNoteUnderParent(parent, noteCreation).getCreated().getId())
+              .orElseThrow();
+      assertThat(n2.getSlug(), equalTo("sharedparent/dup-2"));
+    }
+
+    @Test
     void siblingsShareSameChildContainerFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent = makeMe.aNote().title("SharedParent").creatorAndOwner(currentUser.getUser()).please();
