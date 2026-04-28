@@ -11,7 +11,7 @@ export function replaceWikiLinksInHtml(
   wikiTitles.forEach(({ title, noteId }) => {
     result = result.replace(
       `[[${title}]]`,
-      `<a href="/n${noteId}">${title}</a>`
+      `<a href="/n${noteId}" class="doughnut-link">${title}</a>`
     )
   })
   result = result.replace(

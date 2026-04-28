@@ -58,9 +58,15 @@ describe("quillHtmlToMarkdown", () => {
     expect(result).toBe("[[WikiLink]]")
   })
 
-  it("converts internal note wiki anchors to wikilink markdown", () => {
-    expect(htmlToMarkdown('<p><a href="/n123">MyNote</a></p>')).toBe(
-      "[[MyNote]]"
+  it("converts doughnut-link anchors to wikilink markdown", () => {
+    expect(
+      htmlToMarkdown('<p><a href="/n123" class="doughnut-link">MyNote</a></p>')
+    ).toBe("[[MyNote]]")
+  })
+
+  it("does not treat note hrefs without doughnut-link as wikilinks", () => {
+    expect(htmlToMarkdown('<p><a href="/n123">looks internal</a></p>')).toBe(
+      "[looks internal](/n123)"
     )
   })
 

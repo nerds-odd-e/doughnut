@@ -466,7 +466,7 @@ describe("replaceWikiLinksInHtml", () => {
       replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
         { title: "MyNote", noteId: 9 },
       ])
-    ).toBe('<p><a href="/n9">MyNote</a></p>')
+    ).toBe('<p><a href="/n9" class="doughnut-link">MyNote</a></p>')
   })
 
   it("marks unknown wikilinks as dead links", () => {

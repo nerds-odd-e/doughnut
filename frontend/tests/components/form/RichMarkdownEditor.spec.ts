@@ -118,6 +118,8 @@ describe("RichMarkdownEditor", () => {
     await nextTick()
     await flushPromises()
 
-    expect(String(quill.props("modelValue"))).toContain('<a href="/n9">')
+    expect(String(quill.props("modelValue"))).toContain(
+      '<a href="/n9" class="doughnut-link">'
+    )
   })
 })
