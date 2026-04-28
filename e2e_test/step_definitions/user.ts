@@ -61,9 +61,12 @@ When('I save my profile with:', (data: DataTable) => {
   cy.get('input[value="Submit"]').click()
 })
 
-Then('I should see {string} in the page', (content: string) => {
-  cy.get('#app').should('contain', content)
-})
+Then(
+  'I should see the home welcome heading for user {string}',
+  (displayName: string) => {
+    start.assumeHomePage().expectWelcomeHeadingNamesUser(displayName)
+  }
+)
 
 Then('My name {string} is in the user action menu', (name: string) => {
   start.mainMenu().userOptions().userSettingsButton(name)

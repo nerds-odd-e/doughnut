@@ -260,6 +260,14 @@ Then('I should see {string} in breadcrumb', (noteTitles: string) => {
   start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
+Then('the note title should be {string}', (title: string) => {
+  start.assumeNotePage().expectNoteTitleDisplayed(title)
+})
+
+Then('the note details should include {string}', (fragment: string) => {
+  start.assumeNotePage().expectDetailsContaining(fragment)
+})
+
 When('I visit all my notebooks', () => {
   start.navigateToNotebooksPage()
 })

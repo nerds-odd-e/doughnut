@@ -7,6 +7,6 @@ Feature: new user
     When I save my profile with:
       | Name      |
       | Learner A |
-    Then I should see "Welcome Learner A" in the page
+    Then I should see the home welcome heading for user "Learner A"
     And My name "Learner A" is in the user action menu
 

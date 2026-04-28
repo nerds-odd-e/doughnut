@@ -5,5 +5,5 @@ Feature: user profile
 
   Scenario: Edit user profile
     When I edit user profile to change my name to "Barbie"
-    Then I should see "Barbie" in the page
+    Then My name "Barbie" is in the user action menu
 

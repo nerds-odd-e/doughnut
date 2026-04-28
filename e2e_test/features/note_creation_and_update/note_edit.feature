@@ -10,27 +10,27 @@ Feature: Note Edit
     And I update note "LeSS in Action" to become:
       | Title     | Details           |
       | Odd-e CSD | Our best training |
-    Then I should see "Odd-e CSD" in the page
+    Then the note title should be "Odd-e CSD"
     And I should see these notes belonging to the user at the top level of all my notes
       | Title     | Details           |
       | Odd-e CSD | Our best training |
 
   Scenario: Edit a note title and edit details and undo
     Given I update note title "LeSS in Action" to become "Odd-e CSD"
-    And I should see "Odd-e CSD" in the page
+    And the note title should be "Odd-e CSD"
     And I update note "Odd-e CSD" details from "An awesome training" to become "A super awesome training"
-    And I should see "A super awesome training" in the page
+    And the note details should include "A super awesome training"
     When I undo "edit details"
-    Then I should see "An awesome training" in the page
+    Then the note details should include "An awesome training"
     When I undo "edit title" again
-    Then I should see "LeSS in Action" in the page
+    Then the note title should be "LeSS in Action"
     And there should be no more undo to do
 
   Scenario: Edit a note details with bullet points
     When I update note "LeSS in Action" to become:
       | Title     | Details     |
       | Odd-e CSD | * must join |
-    Then I should see "must join" in the page
+    Then the note details should include "must join"
 
   Scenario: Edit a note's details as markdown
     When I update note "LeSS in Action" details using markdown to become:
@@ -87,6 +87,6 @@ Feature: Note Edit
     When I update note "LeSS in Action" to become:
       | Title     | Details              |
       | Odd-e CSD | Hello<Shift-Enter>World |
-    Then I should see "Hello" in the page
-    And I should see "World" in the page
+    Then the note details should include "Hello"
+    And the note details should include "World"
     And the note details should contain a line break

@@ -21,6 +21,16 @@ export const assumeNotePage = (noteTopology?: string) => {
     findNoteTitle(noteTopology)
   }
   return {
+    /** Asserts the current note heading (main note title region) shows this text */
+    expectNoteTitleDisplayed(title: string) {
+      findNoteTitle(title)
+      return this
+    },
+    /** Asserts the rendered note details body contains this substring (plain or rich) */
+    expectDetailsContaining(fragment: string) {
+      this.findNoteDetails(fragment)
+      return this
+    },
     expectNotePageUrl: () => {
       cy.url().should('include', '/n1')
     },
