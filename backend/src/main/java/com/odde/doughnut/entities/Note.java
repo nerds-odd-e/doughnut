@@ -46,6 +46,13 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private Notebook notebook;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "folder_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Folder folder;
+
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @JsonIgnore
   @Getter

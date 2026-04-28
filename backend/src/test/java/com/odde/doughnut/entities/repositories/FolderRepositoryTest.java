@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.Folder;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ class FolderRepositoryTest {
 
   @Autowired MakeMe makeMe;
   @Autowired FolderRepository folderRepository;
+  @Autowired NoteRepository noteRepository;
 
   @Test
   void persistsAndReloadsFolderInNotebook() {
@@ -48,5 +50,60 @@ class FolderRepositoryTest {
 
     assertThat(loaded.getParentFolder(), notNullValue());
     assertThat(loaded.getParentFolder().getId(), equalTo(parent.getId()));
+  }
+
+  @Test
+  void persistsNoteWithFolderReference() {
+    Notebook notebook = makeMe.aNotebook().please();
+    Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
+    Note note = makeMe.aNote().under(notebook.getHeadNote()).folder(folder).please();
+    makeMe.entityPersister.flush();
+
+    Note loaded = noteRepository.findById(note.getId()).orElseThrow();
+
+    assertThat(loaded.getFolder(), notNullValue());
+    assertThat(loaded.getFolder().getId(), equalTo(folder.getId()));
+  }
+
+  @Test
+  void persistsNoteWithoutFolderWhenUnset() {
+    Note note = makeMe.aNote().please();
+    makeMe.entityPersister.flush();
+
+    Note loaded = noteRepository.findById(note.getId()).orElseThrow();
+
+    assertThat(loaded.getFolder(), nullValue());
+  }
+
+  @Test
+  void nestedFoldersMirrorContainmentHierarchyForNotes() {
+    Notebook notebook = makeMe.aNotebook().please();
+    Note head = notebook.getHeadNote();
+    Folder folderForHeadChildren =
+        makeMe.aFolder().notebook(notebook).name(head.getTitle()).please();
+    Folder folderForSectionChildren =
+        makeMe
+            .aFolder()
+            .notebook(notebook)
+            .parentFolder(folderForHeadChildren)
+            .name("Section")
+            .please();
+
+    Note section =
+        makeMe.aNote().under(head).title("Section").folder(folderForHeadChildren).please();
+    Note leaf =
+        makeMe.aNote().under(section).title("Leaf").folder(folderForSectionChildren).please();
+    Long siblingOrder = leaf.getSiblingOrder();
+    makeMe.entityPersister.flush();
+
+    Note loadedSection = noteRepository.findById(section.getId()).orElseThrow();
+    Note loadedLeaf = noteRepository.findById(leaf.getId()).orElseThrow();
+
+    assertThat(loadedSection.getFolder().getId(), equalTo(folderForHeadChildren.getId()));
+    assertThat(loadedLeaf.getFolder().getId(), equalTo(folderForSectionChildren.getId()));
+    assertThat(
+        loadedLeaf.getFolder().getParentFolder().getId(), equalTo(folderForHeadChildren.getId()));
+    assertThat(loadedLeaf.getParent().getId(), equalTo(section.getId()));
+    assertThat(loadedLeaf.getSiblingOrder(), equalTo(siblingOrder));
   }
 }

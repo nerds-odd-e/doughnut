@@ -15,6 +15,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   List<NoteBuilder> relationBuilders = new ArrayList<>();
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
+  private Folder folder;
 
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
@@ -91,6 +92,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (entity.getNotebook().getId() == null && needPersist) {
       makeMe.entityPersister.save(entity.getNotebook());
     }
+    if (folder != null) {
+      entity.setFolder(folder);
+    }
   }
 
   @Override
@@ -113,6 +117,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder withNoDescription() {
     return details("");
+  }
+
+  public NoteBuilder folder(Folder folder) {
+    this.folder = folder;
+    return this;
   }
 
   public NoteBuilder title(String text) {
