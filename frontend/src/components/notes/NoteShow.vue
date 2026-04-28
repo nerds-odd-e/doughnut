@@ -29,6 +29,7 @@
                     readonly: readonly(noteRealm),
                     wikiTitles: getWikiTitles(noteRealm),
                   }"
+                  @dead-link-click="onDeadLinkClick"
                 />
                 <NoteAccessoryAsync
                   v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly: readonly(noteRealm) }"
@@ -106,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, provide, ref, type Ref } from "vue"
+import { inject, ref, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import { nonReloadingClient } from "@/managedApi/clientSetup"
@@ -123,7 +124,6 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import Modal from "@/components/commons/Modal.vue"
 import NoteNewDialog from "./NoteNewDialog.vue"
-import { openDeadLinkCreationKey } from "./deadLinkCreationContext"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
 import type { WikiTitle } from "../form/markdownToQuillHtml"
@@ -141,9 +141,9 @@ const readonly = (noteRealm: NoteRealm) =>
 
 const pendingDeadLinkTitle = ref<string | null>(null)
 
-provide(openDeadLinkCreationKey, (title: string) => {
+const onDeadLinkClick = (title: string) => {
   pendingDeadLinkTitle.value = title
-})
+}
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const reloadKey = ref(0)

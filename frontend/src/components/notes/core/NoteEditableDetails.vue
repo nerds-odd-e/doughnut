@@ -26,6 +26,7 @@
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
+        @dead-link-click="emit('deadLinkClick', $event)"
       />
     </template>
   </TextContentWrapper>
@@ -38,6 +39,10 @@ import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 import type { WikiTitle } from "../../form/markdownToQuillHtml"
+
+const emit = defineEmits<{
+  deadLinkClick: [title: string]
+}>()
 
 const props = defineProps({
   noteId: { type: Number, required: true },

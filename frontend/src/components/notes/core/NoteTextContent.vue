@@ -13,6 +13,7 @@
   <div role="details" class="note-details">
     <NoteEditableDetails
       v-bind="{ readonly, noteId: note.id, noteDetails: note.details, asMarkdown, wikiTitles }"
+      @dead-link-click="$emit('deadLinkClick', $event)"
     />
   </div>
 </template>
@@ -31,4 +32,6 @@ defineProps({
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
+
+defineEmits<{ deadLinkClick: [title: string] }>()
 </script>

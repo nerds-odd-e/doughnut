@@ -6,6 +6,7 @@
     @update:model-value="htmlValueUpdated"
     @blur="$emit('blur')"
     @paste-complete="onPasteComplete"
+    @dead-link-click="$emit('deadLinkClick', $event)"
   />
 </template>
 
@@ -30,6 +31,7 @@ const emits = defineEmits<{
   (e: "update:modelValue", value: string): void
   (e: "blur"): void
   (e: "pasteComplete", value: string): void
+  (e: "deadLinkClick", title: string): void
 }>()
 
 let currentIntervalMarkdown: string | undefined = undefined

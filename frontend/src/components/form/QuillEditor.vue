@@ -3,9 +3,8 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, onMounted, watch, inject } from "vue"
+import { nextTick, ref, onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
-import { openDeadLinkCreationKey } from "@/components/notes/deadLinkCreationContext"
 import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
@@ -80,10 +79,14 @@ const { modelValue, readonly } = defineProps({
   readonly: Boolean,
 })
 
-const emits = defineEmits(["update:modelValue", "blur", "pasteComplete"])
+const emits = defineEmits<{
+  "update:modelValue": [value: string]
+  blur: []
+  pasteComplete: [content: string]
+  deadLinkClick: [title: string]
+}>()
 
 const router = useRouter()
-const openDeadLinkCreation = inject(openDeadLinkCreationKey, null)
 const localValue = ref(modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
@@ -203,12 +206,8 @@ onMounted(async () => {
         event.preventDefault()
         const href = anchor.getAttribute("href")
         if (!href) return
-        if (
-          !readonly &&
-          anchor.classList.contains("dead-link") &&
-          openDeadLinkCreation
-        ) {
-          openDeadLinkCreation(anchor.textContent?.trim() ?? "")
+        if (!readonly && anchor.classList.contains("dead-link")) {
+          emits("deadLinkClick", anchor.textContent?.trim() ?? "")
           return
         }
         router.push(href)
@@ -252,7 +251,7 @@ watch(
 )
 
 const onUpdateContent = () => {
-  emits("update:modelValue", localValue.value)
+  emits("update:modelValue", localValue.value ?? "")
 }
 </script>
 
