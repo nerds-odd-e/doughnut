@@ -188,6 +188,8 @@ const methodToController: Record<string, any> = {
   triggerFailure: FailureReportController,
   listUsers: AdminUserController,
   getStatus: WikiSlugMigrationAdminController,
+  batchMigrateFolders: WikiSlugMigrationAdminController,
+  batchMigrateNotes: WikiSlugMigrationAdminController,
 }
 
 type SdkServiceName = keyof typeof methodToController
