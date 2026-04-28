@@ -53,6 +53,13 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Folder folder;
 
+  @Column(name = "slug")
+  @Size(max = 767)
+  @Getter
+  @Setter
+  @JsonIgnore
+  private String slug;
+
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @JsonIgnore
   @Getter

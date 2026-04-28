@@ -73,6 +73,43 @@ class FolderRepositoryTest {
     Note loaded = noteRepository.findById(note.getId()).orElseThrow();
 
     assertThat(loaded.getFolder(), nullValue());
+    assertThat(loaded.getSlug(), nullValue());
+  }
+
+  @Test
+  void persistsAndReloadsFolderSlug() {
+    Notebook notebook = makeMe.aNotebook().please();
+    Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
+    folder.setSlug("inbox");
+    makeMe.entityPersister.flush();
+
+    Folder loaded = folderRepository.findById(folder.getId()).orElseThrow();
+
+    assertThat(loaded.getSlug(), equalTo("inbox"));
+  }
+
+  @Test
+  void persistsFolderWithNullSlugByDefault() {
+    Notebook notebook = makeMe.aNotebook().please();
+    Folder folder = makeMe.aFolder().notebook(notebook).name("Drafts").please();
+    makeMe.entityPersister.flush();
+
+    Folder loaded = folderRepository.findById(folder.getId()).orElseThrow();
+
+    assertThat(loaded.getSlug(), nullValue());
+  }
+
+  @Test
+  void persistsAndReloadsNoteSlug() {
+    Notebook notebook = makeMe.aNotebook().please();
+    Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
+    Note note = makeMe.aNote().under(notebook.getHeadNote()).folder(folder).please();
+    note.setSlug("inbox/my-note");
+    makeMe.entityPersister.flush();
+
+    Note loaded = noteRepository.findById(note.getId()).orElseThrow();
+
+    assertThat(loaded.getSlug(), equalTo("inbox/my-note"));
   }
 
   @Test
