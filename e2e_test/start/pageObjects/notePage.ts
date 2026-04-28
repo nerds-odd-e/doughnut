@@ -63,20 +63,23 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
     },
     addRelationshipTo: (target: string) => {
-      const findRelationshipCard = () =>
+      // Related notes as child cards use .daisy-card-title .title-text; the note title
+      // predicate (NoteTitleAsPredicate) uses .title-text inside h2[role=title] when
+      // viewing the target side of a link — both must match for changeRelationType etc.
+      const findRelationshipScope = () =>
         cy
           .get('main')
-          .find('.daisy-card-title .title-text')
+          .find('.title-text')
           .contains(target)
-          .closest('[role=card]')
+          .closest('[role=card], [role=title]')
       return {
         relationType: (relationType: string) => {
-          findRelationshipCard().findAllByText(relationType, {
+          findRelationshipScope().findAllByText(relationType, {
             selector: '.relation-type',
           })
         },
         goto: () => {
-          findRelationshipCard().find('.relation-type').click()
+          findRelationshipScope().find('.relation-type').click()
         },
       }
     },

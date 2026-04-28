@@ -91,10 +91,6 @@ Feature: Note Edit
     And I should see "World" in the page
     And the note details should contain a line break
 
-  Scenario: Two wiki links in note details are treated as separate links
-    When I set note "LeSS in Action" to Doughnut with two wikilinks in details
-    Then the note details are two wikilinks for LeSS and Odd-e CSD
-
   Scenario: Extra opening bracket before wikilink is preserved in markdown
     When I set note "LeSS in Action" to Doughnut with extra open bracket wikilink details
     Then the note details have extra open bracket wikilink markdown

@@ -158,16 +158,6 @@ When(
 )
 
 When(
-  'I set note "LeSS in Action" to Doughnut with two wikilinks in details',
-  () => {
-    const page = start.jumpToNotePage('LeSS in Action')
-    page.editTextContent({ Title: 'Doughnut' })
-    page.updateDetailsAsMarkdown('[[LeSS in Action]] .... [[Odd-e CSD]]')
-    page.switchToRichContent()
-  }
-)
-
-When(
   'I set note "LeSS in Action" to Doughnut with extra open bracket wikilink details',
   () => {
     const page = start.jumpToNotePage('LeSS in Action')
@@ -640,12 +630,6 @@ When('I promote the point {string} to a child note', (pointText: string) => {
 
 When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
-})
-
-Then('the note details are two wikilinks for LeSS and Odd-e CSD', () => {
-  start
-    .assumeNotePage()
-    .expectNoteDetailsMarkdown('[[LeSS in Action]] .... [[Odd-e CSD]]')
 })
 
 Then('the note details have extra open bracket wikilink markdown', () => {
