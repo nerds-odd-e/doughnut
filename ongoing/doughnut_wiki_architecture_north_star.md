@@ -94,8 +94,7 @@ Folder
   id
   notebookId
   parentFolderId optional
-  slug
-  fullPath
+  slug   (notebook-local full path; basename = segment after last "/", or whole string if no "/")
   name
   config
   createdAt
@@ -105,7 +104,7 @@ Folder
 **Name and slug**
 
 - **`name`** is the human-facing folder label.
-- **`slug`** is always derived from **`name`** using the standard slugifier (`com.github.slugify:slugify`), not set as an independent arbitrary string except where product flows explicitly rename and re-slugify.
+- **`slug`** is the notebook-local full path. Its basename is derived from **`name`** using the standard slugifier (`com.github.slugify:slugify`), not set as an independent arbitrary string except where product flows explicitly rename and re-slugify. Nested folder slugs prefix that basename with the parent folder’s **`slug`**.
 - For **existing data** migrated from the former parent-note containment model, each derived folder’s **`name`** equals the **title** of the parent note that defined that container (the same value as that note’s `title`).
 
 ### Note
@@ -207,7 +206,7 @@ douyara
 japanese/vocabulary/douyara
 ```
 
-File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules. **Folder slugs** are produced from the folder **`name`** (same rules as other slugified titles). The **basename** portion of a **note `slug`** comes from the note **`title`** (or equivalent naming field) unless a dedicated rename/slug workflow applies; the **full `note.slug`** prefixes that basename with the folder **`fullPath`** when the note is foldered.
+File and folder slug segments should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules. **Folder `slug`** stores the folder’s notebook-local full path; its basename is produced from the folder **`name`** (same rules as other slugified titles). The **basename** portion of a **note `slug`** comes from the note **`title`** (or equivalent naming field) unless a dedicated rename/slug workflow applies; the **full `note.slug`** prefixes that basename with the folder **`slug`** when the note is foldered.
 
 ### Title
 
@@ -248,12 +247,12 @@ notebookId + note.slug = unique
 ## Frontend Reference Rule
 
 In the frontend, a note is referred to by **`slug`** rather than internal ID.
-The containing notebook is identified by **notebook slug** (or internal id in interim routes; Phase 2 aligns on slug-based addressing).
+The containing notebook is identified by internal **notebook ID** in endpoints.
 
 Example route:
 
 ```text
-/notebooks/:notebookSlug/... note path matching note.slug ...
+/notebooks/:notebookId/... note path matching note.slug ...
 ```
 
 For a foldered note, `:noteSlug` matches the persisted **`note.slug`** (folder path plus basename). Encode path segments as appropriate for the router.
@@ -601,6 +600,8 @@ order: 10
 ```
 
 But order should not be required for ordinary knowledge notes.
+
+The current sibling order concept belongs to the old parent-child note tree. It may remain during migration so existing navigation stays stable, but it should be removed in a relatively late cleanup phase after folder navigation, map notes, and any domain-specific ordering mechanisms have replaced it.
 
 ## Compatibility Principles
 

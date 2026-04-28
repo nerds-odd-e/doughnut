@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document decomposes **Phase 2 - Introduce Slugs and Full Paths** from `ongoing/doughnut_wiki_migration_plan.md` into small, closed sub-phases.
+This document decomposes **Phase 2 - Introduce Slug Paths** from `ongoing/doughnut_wiki_migration_plan.md` into small, closed sub-phases.
 
 Each sub-phase should be small enough to complete in about 5 minutes and commit independently. Do not start the next sub-phase until the current one is green, cleaned up, and commit-ready.
 
@@ -10,8 +10,7 @@ Each sub-phase should be small enough to complete in about 5 minutes and commit 
 
 After Phase 2:
 
-- notebooks have slugs
-- folders have slugs and full paths
+- folders have **`folder.slug`** as the persisted notebook-local full path
 - notes have **`note.slug`** as the persisted notebook-local full path (one column; basename is derivable as the suffix after the last `/`)
 - new data gets slugs as it is created
 - existing production data can be migrated through a temporary admin-only flow
@@ -21,8 +20,10 @@ After Phase 2:
 
 ## Key Decisions
 
-- Use `com.github.slugify:slugify` as the single slugifier for notebooks, folders, and note basenames (title-derived segments).
-- Persist **`note.slug` only** for note addressing: **`folder.fullPath + "/" + basename`** when foldered, or **`basename`** at notebook root. Do not persist a separate **`file_slug`** / **`full_path`** pair on **`Note`**.
+- Use `com.github.slugify:slugify` as the single slugifier for folder and note basenames (title-derived segments).
+- Persist **`folder.slug`** as the folder’s notebook-local full path: **`basename`** at notebook root, or **`parentFolder.slug + "/" + basename`** when nested.
+- Persist **`note.slug` only** for note addressing: **`folder.slug + "/" + basename`** when foldered, or **`basename`** at notebook root. Do not persist a separate **`file_slug`** / **`full_path`** pair on **`Note`**.
+- Notebook endpoints continue to identify notebooks by internal ID; do not add **`notebook.slug`** in Phase 2.
 - Add schema fields as nullable first so the deployment is safe before production backfill.
 - Make the data migration **idempotent and batched**. Production has about 30k notes, so no endpoint should try to migrate all rows in one long request or one long transaction.
 - Expose a temporary admin-only migration capability:
@@ -58,7 +59,7 @@ Create the shared slug-generation helper used by all later Phase 2 behavior.
 
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests "*Slug*"`
 
-### 2.2 Add Nullable Slug and Path Columns
+### 2.2 Add Nullable Slug Columns
 
 **Type:** Structure
 
@@ -66,32 +67,30 @@ Add persistence fields without changing observable behavior.
 
 **Commit includes:**
 
-- migration adding nullable `notebook.slug`
-- migration adding nullable `folder.slug` and `folder.full_path`
+- migration adding nullable `folder.slug` (notebook-local full path; basename is derivable from the suffix after the last `/`)
 - migration adding nullable `note.slug` (notebook-local full path; see main plan)
 - entity mappings for those fields
 
 **Verification:**
 
-- targeted backend repository/entity tests, or existing backend tests covering notebook, folder, and note persistence
+- targeted backend repository/entity tests, or existing backend tests covering folder and note persistence
 
 ### 2.3 Generate Slugs for Newly Created Data
 
 **Type:** Behavior
 
-New notebooks, folders, and notes created after this commit should already have slug/path data, even before old data is migrated.
+New folders and notes created after this commit should already have slug/path data, even before old data is migrated.
 
 **Commit includes:**
 
 - controller-level or high-level service tests through existing creation paths
-- notebook creation assigns `slug`
-- folder creation assigns `slug` and `fullPath`
-- note creation assigns **`note.slug`** from **`folder.fullPath`** and title-derived basename (or basename only at root)
+- folder creation assigns **`folder.slug`** from the parent folder slug and title-derived basename (or basename only at root)
+- note creation assigns **`note.slug`** from **`folder.slug`** and title-derived basename (or basename only at root)
 - no user-facing route changes yet
 
 **Verification:**
 
-- targeted backend tests for notebook, folder, and note creation paths
+- targeted backend tests for folder and note creation paths
 
 ### 2.4 Temporary Migration Status Endpoint
 
@@ -102,7 +101,7 @@ Admins can inspect whether slug migration is complete before running it.
 **Commit includes:**
 
 - temporary admin-only status endpoint, for example under `/api/admin/wiki-slug-migration`
-- response includes counts for missing notebook slugs, folder slugs, folder full paths, and **`note.slug`**
+- response includes counts for missing **`folder.slug`** and **`note.slug`**
 - access-control test proving non-admin users cannot call it
 - generated TypeScript client update
 
@@ -129,62 +128,29 @@ Admins can open a dashboard tab and see current slug migration status.
 - targeted frontend component test
 - relevant admin E2E spec if a scenario is added
 
-### 2.6 Batch-Migrate Notebook Slugs
+### 2.6 Batch-Migrate Folder Slugs
 
 **Type:** Behavior
 
-The temporary migration endpoint can fill missing notebook slugs in a bounded, idempotent batch.
-
-**Commit includes:**
-
-- backend batch operation for notebooks
-- endpoint returns processed count and remaining count
-- tests prove running the batch twice is safe
-- tests prove slug collisions are resolved deterministically
-
-**Verification:**
-
-- targeted backend controller/service tests
-
-### 2.7 Batch-Migrate Folder Slugs
-
-**Type:** Behavior
-
-The temporary migration endpoint can fill missing folder slugs from folder names.
+The temporary migration endpoint can fill missing **`folder.slug`** values: one string per folder, **`basename`** at root or **`parentFolder.slug + "/" + basename`** when nested.
 
 **Commit includes:**
 
 - backend batch operation for folders
-- folder slug derives from `folder.name`
-- sibling folder collisions are resolved within `(notebook, parentFolder)`
+- basename derives from `folder.name`; collision handling is scoped to sibling folders under the same parent
+- nested folder slugs are built from ancestor folder slugs
+- endpoint either skips or reports folders whose ancestors are not ready, without corrupting data
 - endpoint status reflects progress
 
 **Verification:**
 
-- targeted backend tests with nested folders and sibling collisions
+- targeted backend tests with root folders, nested folders, and sibling collisions
 
-### 2.8 Batch-Migrate Folder Full Paths
-
-**Type:** Behavior
-
-The temporary migration endpoint can fill missing folder full paths after folder slugs exist.
-
-**Commit includes:**
-
-- backend batch operation for folder full paths
-- nested folder paths are built from ancestor folder slugs
-- endpoint either skips or reports folders whose ancestors are not ready, without corrupting data
-- tests cover root folders and nested folders
-
-**Verification:**
-
-- targeted backend tests for folder path migration
-
-### 2.9 Batch-Migrate Note Slug (Full Path)
+### 2.7 Batch-Migrate Note Slug (Full Path)
 
 **Type:** Behavior
 
-The temporary migration endpoint can fill missing **`note.slug`** values: one string per note, **`basename`** at root or **`folder.fullPath + "/" + basename`** when foldered. This replaces separate “file slug then full path” passes.
+The temporary migration endpoint can fill missing **`note.slug`** values: one string per note, **`basename`** at root or **`folder.slug + "/" + basename`** when foldered. This replaces separate “file slug then full path” passes.
 
 **Commit includes:**
 
@@ -197,7 +163,7 @@ The temporary migration endpoint can fill missing **`note.slug`** values: one st
 
 - targeted backend tests for note slug migration
 
-### 2.10 Dashboard Button Runs Migration Batches
+### 2.8 Dashboard Button Runs Migration Batches
 
 **Type:** Behavior
 
@@ -216,7 +182,7 @@ Admins can trigger the migration from the dashboard without holding one long pro
 - targeted frontend component test
 - relevant admin E2E spec with a small test dataset
 
-### 2.11 Migration Resume and Production Safety
+### 2.9 Migration Resume and Production Safety
 
 **Type:** Behavior
 
@@ -237,17 +203,17 @@ An admin can safely resume migration after a timeout, page reload, or partial pr
 
 This is an operational checkpoint, not a code commit.
 
-After sub-phase 2.11 is deployed:
+After sub-phase 2.9 is deployed:
 
 1. An admin opens the `Slug Migration` dashboard tab.
 2. The admin starts the migration.
 3. The UI runs bounded batches until all remaining counts are zero.
 4. If the browser, request, or deployment interrupts the run, the admin reopens the tab and continues.
-5. Capture the final status showing zero remaining notebook, folder, and **`note.slug`** rows.
+5. Capture the final status showing zero remaining **`folder.slug`** and **`note.slug`** rows.
 
 Do not proceed to schema constraints or endpoint removal until production status is complete.
 
-### 2.12 Enforce Slug and Path Invariants
+### 2.10 Enforce Slug Invariants
 
 **Type:** Structure
 
@@ -256,9 +222,7 @@ Once production data is migrated, enforce the Phase 2 persistence invariants.
 **Commit includes:**
 
 - migration adding uniqueness constraints:
-  - notebook slug uniqueness where applicable
-  - `unique(notebook_id, parent_folder_id, folder_slug)`
-  - `unique(notebook_id, folder_full_path)`
+  - `unique(notebook_id, slug)` on folders (slug is the full notebook-local path)
   - `unique(notebook_id, slug)` on notes (slug is the full notebook-local path)
 - not-null constraints for slug/path fields that must now always exist
 - tests proving duplicate basenames in the same folder or duplicate **`note.slug`** fail through observable creation/move paths
@@ -267,7 +231,7 @@ Once production data is migrated, enforce the Phase 2 persistence invariants.
 
 - targeted backend tests and migrations locally
 
-### 2.13 Resolve Notes by Ambiguous-Friendly Basename
+### 2.11 Resolve Notes by Ambiguous-Friendly Basename
 
 **Type:** Behavior
 
@@ -286,16 +250,16 @@ Users can open the temporary/convenience route for an unambiguous accessible not
 - targeted frontend route/component tests
 - relevant Cypress spec only
 
-### 2.14 Resolve Notes by Notebook and Note Slug Path
+### 2.12 Resolve Notes by Notebook ID and Note Slug Path
 
 **Type:** Behavior
 
-Users can open a note by notebook slug plus **`note.slug`** path.
+Users can open a note by notebook ID plus **`note.slug`** path.
 
 **Commit includes:**
 
-- backend lookup by notebook slug and **`note.slug`**
-- frontend route for notebook slug plus note path (implementation may encode path segments)
+- backend lookup by notebook ID and **`note.slug`**
+- frontend route for notebook ID plus note path (implementation may encode path segments)
 - E2E scenario covering a nested folder note
 - existing ID-based internal loading may remain behind the route resolution
 
@@ -304,7 +268,7 @@ Users can open a note by notebook slug plus **`note.slug`** path.
 - targeted backend controller tests
 - relevant Cypress spec only
 
-### 2.15 Move Recomputes Note Slug and Rejects Collisions
+### 2.13 Move Recomputes Note Slug and Rejects Collisions
 
 **Type:** Behavior
 
@@ -322,7 +286,7 @@ Moving a note keeps **`note.slug`** consistent with the target folder.
 - targeted backend move tests
 - relevant Cypress spec if move behavior is already covered there
 
-### 2.16 Remove the Dashboard Migration Control
+### 2.14 Remove the Dashboard Migration Control
 
 **Type:** Behavior
 
@@ -339,7 +303,7 @@ After production migration is complete, admins no longer see the temporary slug 
 - targeted admin dashboard component tests
 - relevant admin E2E spec if touched
 
-### 2.17 Remove the Temporary Migration Endpoint
+### 2.15 Remove the Temporary Migration Endpoint
 
 **Type:** Structure
 
@@ -358,7 +322,7 @@ Remove the backend API that was only needed for production backfill.
 - `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 - targeted frontend tests if generated client usage changed
 
-### 2.18 Remove Migration-Only Fallbacks
+### 2.16 Remove Migration-Only Fallbacks
 
 **Type:** Structure
 
@@ -379,7 +343,7 @@ Clean up code that only existed while slug/path fields could be missing.
 Phase 2 is complete when:
 
 - all permanent slug behavior is covered by targeted backend, frontend, and E2E tests
-- production data has notebook, folder, and **`note.slug`** fields populated as required
+- production data has **`folder.slug`** and **`note.slug`** fields populated as required
 - database constraints enforce the intended uniqueness rules
 - slug-based note routes work
 - note moves maintain correct **`note.slug`**

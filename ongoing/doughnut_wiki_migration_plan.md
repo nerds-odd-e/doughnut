@@ -67,13 +67,13 @@ For **existing data** migrated from the former parent-note containment shape, ea
 
 The **basename** within a folder is **derivable** from **`note.slug`**: the substring after the last `/`, or the whole string when there is no `/`. Use it where you need “filename in this folder” behavior (for example export filenames or disambiguation), without persisting a second note column.
 
-File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier rather than maintaining separate local slug rules.
+File and folder slug segments should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier rather than maintaining separate local slug rules.
 
-**Folder slugs** are derived from the folder **`name`**, not chosen as a separate arbitrary string (except explicit rename flows that re-slugify). The **basename** part of **`note.slug`** follows the same slugify rules from the note **`title`** (or equivalent), unless a dedicated slug override exists (for example import frontmatter in a later phase).
+**Folder `slug`** stores the folder’s notebook-local full path. Its basename is derived from the folder **`name`**, not chosen as a separate arbitrary string (except explicit rename flows that re-slugify). The **basename** part of **`note.slug`** follows the same slugify rules from the note **`title`** (or equivalent), unless a dedicated slug override exists (for example import frontmatter in a later phase).
 
-### Folder path (folders)
+### Folder slug (persisted)
 
-Folder **`fullPath`** is the folder’s path segment chain within the notebook (see Phase 2). It is combined with the note basename when building **`note.slug`** for foldered notes.
+Folder **`slug`** is the folder’s path segment chain within the notebook. It is combined with the note basename when building **`note.slug`** for foldered notes.
 
 ### Uniqueness rule
 
@@ -128,11 +128,11 @@ Folder
   updatedAt
 ```
 
-At this phase, folder slug and full path may be deferred to Phase 2.
+At this phase, folder slug paths may be deferred to Phase 2.
 
 ## Migration Strategy
 
-Initially, folders can mirror the existing parent-note structure. For every backfilled folder that represents a former “parent holds children” node, set **`folder.name`** to that parent note’s **`title`** (the same string as `note.title` on the parent). When Phase 2 adds **`folder.slug`**, it is **slugify(`folder.name`)** per `ongoing/doughnut_wiki_architecture_north_star.md`.
+Initially, folders can mirror the existing parent-note structure. For every backfilled folder that represents a former “parent holds children” node, set **`folder.name`** to that parent note’s **`title`** (the same string as `note.title` on the parent). When Phase 2 adds **`folder.slug`**, it stores the folder’s notebook-local full path; its basename is **slugify(`folder.name`)** per `ongoing/doughnut_wiki_architecture_north_star.md`.
 
 Old model:
 
@@ -179,15 +179,15 @@ Phase 1 is **complete** in the codebase.
 - **Persistence:** `folder` rows (`notebook_id`, optional `parent_folder_id`, `name`, timestamps) and optional `note.folder_id`; migrations include `V300000148__create_folder.sql` and `V300000149__note_folder_backfill.sql`. The backfill derives folders from parent notes that have children (folder `name` equals parent `title`), nests folders to mirror the note tree, assigns child notes to the folder derived from each note’s parent, and leaves head notes and parents without a derived folder with null `folder_id` where applicable.
 - **Domain:** `Folder` entity and repository; `Note.folder` mapping.
 - **Keeping folders aligned with the tree:** `NoteChildContainerFolderService` finds or creates the child-container folder for a parent note (name matches that parent’s title, within the correct notebook and folder hierarchy). It runs when creating a child note and after note moves (`NoteMotionService`), including cross-notebook subtree moves and promoting a note to top level (new head has no folder; descendants follow the updated parent chain).
-- **Behavior:** `Note.parent` remains the source of truth for navigation, ordering, and creation/move semantics users see today; folder data is parallel containment for Phase 2 onward.
+- **Behavior:** `Note.parent` remains the source of truth for navigation, ordering, and creation/move semantics users see today; folder data is parallel containment for Phase 2 onward. The current sibling order concept is part of this legacy tree behavior and should be removed in a relatively late cleanup phase, after replacement navigation and meaningful ordering mechanisms are stable.
 
 ---
 
-# Phase 2 — Introduce Slugs and Full Paths
+# Phase 2 — Introduce Slug Paths
 
 ## Goal
 
-Introduce notebook slugs, folder slugs and folder full paths, and **note slugs** where **`note.slug`** is the persisted notebook-local **full path** address (path-like string within the notebook). Do **not** persist separate `file_slug` and `full_path` columns on `Note`.
+Introduce **folder slugs** and **note slugs** where both **`folder.slug`** and **`note.slug`** are persisted notebook-local **full path** addresses (path-like strings within the notebook). Do **not** add `notebook.slug`; notebook endpoints continue to identify notebooks by internal ID. Do **not** persist separate `file_slug` and `full_path` columns on `Note`.
 
 ## Rationale
 
@@ -199,20 +199,12 @@ Within a notebook:
 basename = slugified note title (or equivalent), unique among siblings in the same folder after collision handling
 
 note.slug = basename                           -- note at notebook root (no folder)
-note.slug = folder.fullPath + "/" + basename -- foldered note
+note.slug = folder.slug + "/" + basename     -- foldered note
 ```
 
 The **basename** within a folder is **derivable** from **`note.slug`** as the substring after the last `/`, or the whole string when there is no `/`.
 
 ## Model Additions
-
-### Notebook
-
-Add:
-
-```text
-slug
-```
 
 ### Folder
 
@@ -220,10 +212,9 @@ Add:
 
 ```text
 slug
-fullPath
 ```
 
-`slug` is always produced from the folder **`name`** with the standard slugifier. Collision handling and uniqueness apply at persistence time (see Uniqueness Constraints below).
+**`folder.slug`** stores the notebook-local full path. Its basename is produced from the folder **`name`** with the standard slugifier, with sibling collision handling before prefixing it with the parent folder’s **`slug`**.
 
 ### Note
 
@@ -237,11 +228,11 @@ slug
 
 ## Slug Generation
 
-Generate notebook slugs, folder slugs, and note basenames with `com.github.slugify:slugify`.
+Generate folder and note basenames with `com.github.slugify:slugify`.
 
 The same slugifier should be used anywhere Doughnut derives a slug or basename, including migrations, note creation, folder creation, import, and export.
 
-**Folder:** `folder.slug` ← slugify(`folder.name`). **Note:** compute **basename** from the note **`title`** (or the field that defines the filename), apply collision handling within the target folder, then set **`note.slug`** from **`folder.fullPath`** and **basename** as in the rationale.
+**Folder:** compute **basename** from `folder.name`, apply collision handling within sibling folders, then set **`folder.slug`** from the parent **`folder.slug`** and basename (or basename only at root). **Note:** compute **basename** from the note **`title`** (or the field that defines the filename), apply collision handling within the target folder, then set **`note.slug`** from **`folder.slug`** and **basename** as in the rationale.
 
 ## Uniqueness Constraints
 
@@ -256,8 +247,7 @@ Folder-scoped basename uniqueness follows: two notes in the same folder cannot s
 For folders:
 
 ```text
-unique(notebook_id, parent_folder_id, folder_slug)
-unique(notebook_id, folder_full_path)
+unique(notebook_id, slug)
 ```
 
 ## Frontend Rule
@@ -267,13 +257,7 @@ The frontend should resolve notes by slug path, not by internal ID.
 Example URL shapes (exact encoding is an implementation detail):
 
 ```text
-/notebooks/:notebookSlug/... path segments matching note.slug ...
-```
-
-Example:
-
-```text
-/notebooks/doughnut-wiki/japanese/vocabulary/douyara
+/notebooks/:notebookId/... path segments matching note.slug ...
 ```
 
 The frontend may still use internal IDs behind the scenes after route resolution.
@@ -293,7 +277,7 @@ When a note moves to another folder:
 ```text
 move(noteId, newFolderId)
   recompute basename in the target folder (same as today’s title semantics; resolve collisions)
-  recompute note.slug from new folder.fullPath + basename (or basename only at root)
+  recompute note.slug from new folder.slug + basename (or basename only at root)
   check unique(notebook_id, note.slug)
   update note.folderId
   optionally create redirect from old note.slug to new note.slug
@@ -303,11 +287,10 @@ move(noteId, newFolderId)
 
 After this phase:
 
-- notebooks have slugs
-- folders have slugs and full paths
+- folders have a single **`slug`** column holding the notebook-local full path
 - notes have a single **`slug`** column holding the notebook-local full path
 - frontend note references can move away from internal IDs
-- note lookup by notebook + slug path is possible
+- note lookup by notebook ID + slug path is possible
 - note lookup by basename alone is possible when it is unambiguous among notebooks the user can access
 - moving a note requires uniqueness validation for the recomputed **`note.slug`**
 
@@ -531,7 +514,46 @@ After this phase:
 
 ---
 
-# Phase 6 — Add Wiki-Link Parser and Link Index
+# Phase 6 — Move a Folder
+
+## Goal
+
+Support **moving or reparenting a folder** within a notebook: change `parentFolderId` (including moving to notebook root) while keeping **`folder.slug`** and every affected **`note.slug`** consistent with the path model from Phase 2.
+
+## Rationale
+
+Phase 2 establishes **`folder.slug`** and **`note.slug`** as notebook-local full paths and defines **note** move with slug recomputation. A **folder** move is the subtree case: the moved folder’s slug changes, so every **descendant folder** and every **note** under that folder must get updated slugs (or the operation fails if uniqueness would break).
+
+Final distinction from note-only move:
+
+```text
+note move = one note, new folder, recompute that note’s slug
+folder move = one folder, new parent, recompute that folder’s slug and all descendant folder and note slugs
+```
+
+## Model and Validation
+
+- Update the moved folder’s **`parentFolderId`** (or clear it for root) and recompute its **`folder.slug`** with the same slugify and sibling collision rules as folder creation.
+- Recursively update descendant **`folder.slug`** values and all **`note.slug`** values whose path prefix belonged to the old location.
+- Enforce **`unique(notebook_id, slug)`** on folders and notes after the move; reject or surface conflicts the same way as note move (Phase 2), without silent merges.
+
+## Non-Goals
+
+- Parsing wiki links in content (Phase 7)
+- Folder configuration templates (Phase 8)
+- Obsidian export/import (later phases)
+
+## Expected Result
+
+After this phase:
+
+- users (or the supported API) can move a folder to another parent or to the notebook root
+- descendant paths remain valid and addressable; broken partial updates are not left behind
+- folder move is the subtree counterpart to single-note move, not a duplicate of Phase 2 but an extension of the same slug invariants
+
+---
+
+# Phase 7 — Add Wiki-Link Parser and Link Index
 
 ## Goal
 
@@ -604,7 +626,7 @@ After this phase:
 
 ---
 
-# Phase 7 — Add Folder Configuration Behavior
+# Phase 8 — Add Folder Configuration Behavior
 
 ## Goal
 
@@ -670,7 +692,7 @@ After this phase:
 
 ---
 
-# Phase 8 — Export to Obsidian Markdown
+# Phase 9 — Export to Obsidian Markdown
 
 ## Goal
 
@@ -773,7 +795,7 @@ After this phase:
 
 ---
 
-# Phase 9 — Import and Round Trip from Obsidian
+# Phase 10 — Import and Round Trip from Obsidian
 
 ## Goal
 
@@ -842,7 +864,7 @@ After this phase:
 
 ---
 
-# Phase 10 — Remove Legacy Assumptions
+# Phase 11 — Remove Legacy Assumptions
 
 ## Goal
 
@@ -854,22 +876,22 @@ Remove dependency on:
 
 ```text
 note parent field for containment (folders replace it)
+current sibling order concept from the parent-child note tree
 head note as notebook root
 relationship note as special hidden structure
 tree-only navigation
-ID-based frontend routing as the normal path
+note-ID-based frontend routing as the normal note path
 ```
 
 ## Final Architecture
 
 The final model should be:
 
-Folder **`slug`** is derived from **`name`**. For legacy-derived folders, **`name`** matches the former container parent note’s **`title`** until the user renames the folder.
+Folder **`slug`** is the folder’s notebook-local full path. Its basename is derived from **`name`**. For legacy-derived folders, **`name`** matches the former container parent note’s **`title`** until the user renames the folder.
 
 ```text
 Notebook
   id
-  slug
   title
   content
   config
@@ -878,8 +900,7 @@ Folder
   id
   notebookId
   parentFolderId optional
-  slug
-  fullPath
+  slug   (notebook-local full path)
   name
   config
 
@@ -910,8 +931,8 @@ After this phase:
 - relationship notes are normal notes
 - folder structure handles containment
 - wiki links handle semantic connection
-- frontend uses slug/path-based addressing
-- internal ID remains stable but hidden from normal user-facing routes
+- frontend uses note slug/path-based addressing under notebook-ID endpoints
+- internal note ID remains stable but hidden from normal user-facing routes
 - Obsidian export/import is part of the architecture, not an afterthought
 
 ---
@@ -920,15 +941,16 @@ After this phase:
 
 ```text
 1. Introduce folder
-2. Introduce slugs and full paths
+2. Introduce slug paths
 3. Move head note content to notebook
 4. Remove note parent (folders replace containment)
 5. Convert relationship notes
-6. Add wiki-link parser and link index
-7. Add folder config behavior
-8. Export to Obsidian Markdown
-9. Import and round trip from Obsidian
-10. Remove legacy assumptions
+6. Move a folder
+7. Add wiki-link parser and link index
+8. Add folder config behavior
+9. Export to Obsidian Markdown
+10. Import and round trip from Obsidian
+11. Remove legacy assumptions
 ```
 
 ## Dependency Summary
@@ -939,11 +961,12 @@ folder
     -> notebook content without head note
       -> remove note parent (folders own placement)
         -> relationship notes as normal notes
-          -> wiki-link parser and link index
-            -> folder config
-              -> Obsidian export
-                -> Obsidian import / round trip
-                  -> legacy cleanup
+          -> move a folder (subtree slug updates)
+            -> wiki-link parser and link index
+              -> folder config
+                -> Obsidian export
+                  -> Obsidian import / round trip
+                    -> legacy cleanup
 ```
 
 ## Final Architectural Intention
