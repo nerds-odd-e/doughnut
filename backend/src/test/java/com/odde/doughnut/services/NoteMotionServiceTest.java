@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.testability.MakeMe;
@@ -74,6 +75,9 @@ public class NoteMotionServiceTest {
   void moveUnder() throws CyclicLinkDetectedException, MovementNotPossibleException {
     move(firstChild, secondChild, true);
     assertThat(firstChild.getParent(), equalTo(secondChild));
+    makeMe.refresh(firstChild);
+    assertThat(firstChild.getFolder(), notNullValue());
+    assertThat(firstChild.getFolder().getName(), equalTo(secondChild.getTitle()));
   }
 
   @Test
@@ -82,6 +86,23 @@ public class NoteMotionServiceTest {
     move(firstChild, secondChild, false);
     move(secondChild, firstChild, false);
     assertOrder(firstChild, secondChild);
+  }
+
+  @Test
+  void moveToTopLevelClearsHeadFolderAndAlignsDescendantFolders() {
+    User user = makeMe.aUser().please();
+    topNote = makeMe.aHeadNote("topNote").creatorAndOwner(user).please();
+    firstChild = makeMe.aNote("middle").under(topNote).please();
+    Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
+
+    noteMotionService.moveToTopLevel(firstChild, user);
+
+    makeMe.refresh(firstChild);
+    makeMe.refresh(grandChild);
+    assertThat(firstChild.getParent(), nullValue());
+    assertThat(firstChild.getFolder(), nullValue());
+    assertThat(grandChild.getFolder(), notNullValue());
+    assertThat(grandChild.getFolder().getName(), equalTo(firstChild.getTitle()));
   }
 
   @Nested
@@ -182,6 +203,16 @@ public class NoteMotionServiceTest {
       assertThat(firstChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
       assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
       assertThat(thirdLevel.getNotebook(), equalTo(otherNotebook.getNotebook()));
+
+      assertThat(firstChild.getFolder(), notNullValue());
+      assertThat(firstChild.getFolder().getName(), equalTo(otherNotebook.getTitle()));
+      assertThat(
+          firstChild.getFolder().getNotebook().getId(),
+          equalTo(otherNotebook.getNotebook().getId()));
+      assertThat(secondChild.getFolder(), notNullValue());
+      assertThat(secondChild.getFolder().getName(), equalTo(firstChild.getTitle()));
+      assertThat(thirdLevel.getFolder(), notNullValue());
+      assertThat(thirdLevel.getFolder().getName(), equalTo(secondChild.getTitle()));
     }
 
     @Test
@@ -198,6 +229,9 @@ public class NoteMotionServiceTest {
 
       assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
       assertThat(relationNote.getNotebook(), equalTo(otherNotebook.getNotebook()));
+
+      assertThat(relationNote.getFolder(), notNullValue());
+      assertThat(relationNote.getFolder().getName(), equalTo(secondChild.getTitle()));
     }
   }
 }

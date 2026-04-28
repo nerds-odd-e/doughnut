@@ -12,9 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteMotionService {
   private final EntityPersister entityPersister;
+  private final NoteChildContainerFolderService noteChildContainerFolderService;
 
-  public NoteMotionService(EntityPersister entityPersister) {
+  public NoteMotionService(
+      EntityPersister entityPersister,
+      NoteChildContainerFolderService noteChildContainerFolderService) {
     this.entityPersister = entityPersister;
+    this.noteChildContainerFolderService = noteChildContainerFolderService;
   }
 
   public void execute(Note subject, Note relativeToNote, boolean asFirstChildOfNote)
@@ -29,6 +33,7 @@ public class NoteMotionService {
       subject.setParentNote(relativeToNote.getParent());
     }
     subject.adjustPositionAsAChildOfParentInMemory();
+    alignFoldersForNoteAndDescendants(subject);
 
     // Save all descendants as their notebooks have changed
     subject.getAllDescendants().forEach(entityPersister::merge);
@@ -76,8 +81,23 @@ public class NoteMotionService {
   public void moveToTopLevel(Note note, User user) {
     note.restoreAsHeadNote(user.getOwnership(), user);
     entityPersister.save(note.getNotebook());
+    alignFoldersForNoteAndDescendants(note);
     note.getAllDescendants().forEach(entityPersister::merge);
     entityPersister.merge(note);
     entityPersister.flush();
+  }
+
+  private void alignFoldersForNoteAndDescendants(Note root) {
+    alignFolderForSingleNote(root);
+    root.getAllDescendants().forEach(this::alignFolderForSingleNote);
+  }
+
+  private void alignFolderForSingleNote(Note note) {
+    Note parent = note.getParent();
+    if (parent == null) {
+      note.setFolder(null);
+    } else {
+      note.setFolder(noteChildContainerFolderService.resolveForParent(parent));
+    }
   }
 }

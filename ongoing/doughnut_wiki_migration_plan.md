@@ -25,9 +25,9 @@ id = stable internal identity
 The most important shift is:
 
 ```text
-from tree-based knowledge
+from tree-based knowledge (note parent as containment)
 
-to folder-contained, link-connected wiki knowledge
+to folder-contained, link-connected wiki knowledge (note parent removed; folders replace it)
 ```
 
 ## Key Identity Rules
@@ -323,7 +323,7 @@ After this phase:
 
 This phase does not need to:
 
-- make parent optional
+- remove the note parent field from schema or APIs (that is a later phase, after folders own placement)
 - convert relationship notes
 - parse all wiki links
 - support Obsidian import/export
@@ -417,39 +417,41 @@ After this phase:
 
 ---
 
-# Phase 4 — Make Parent Optional
+# Phase 4 — Remove Note Parent (Folders Replace Containment)
 
 ## Goal
 
-Make note parenthood optional and remove parent note as the required containment mechanism.
+**Remove the note parent concept** from the model after containment has been migrated into folders. The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
 
 ## Rationale
 
-Once folders exist, notes do not need parent notes for containment.
+Once folders mirror former tree placement (including migrated relation-note layouts), parent-note edges duplicate folder semantics. Retaining an optional `parentNoteId` would keep two competing stories for containment.
 
 Final distinction:
 
 ```text
-folder = where the note lives
+folder = where the note lives (replaces parent-note containment)
 link = what the note means
-parent = optional semantic relation, if still needed
+(note parent as a system field — removed)
 ```
+
+If users want “semantic parent” for reading, it belongs in content (links, frontmatter), not as a structural parent pointer.
 
 ## Model Change
 
-Change note parent reference from required to optional, or deprecate it as a containment mechanism.
+Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and, where applicable, converted old relationship-note trees into folder + links).
 
-A note should be valid with:
+A valid note has:
 
 ```text
 notebookId
 folderId optional or required depending on root-folder policy
-parentNoteId optional
+(no parentNoteId — removed, not optional)
 ```
 
 ## UI Changes
 
-The note tree/navigation should be based on folders, not parent-note hierarchy.
+The note tree/navigation should be based on folders only, not parent-note hierarchy.
 
 Notes can appear:
 
@@ -463,11 +465,10 @@ Notes can appear:
 
 After this phase:
 
-- notes can exist without parent notes
-- note creation does not require a parent note
-- containment is folder-based
-- old parent references no longer control navigation
-- semantic parenthood, if needed, can be represented by links or properties
+- the product model has no structural parent note; placement is folder-based only
+- note creation does not offer or require a parent note for containment
+- old parent references are gone from persisted model and navigation
+- any “semantic parent” is expressed only via links or properties in content, not DB parent edges
 
 ---
 
@@ -860,7 +861,7 @@ Remove old model assumptions after the new model is stable.
 Remove dependency on:
 
 ```text
-required parent note
+note parent field for containment (folders replace it)
 head note as notebook root
 relationship note as special hidden structure
 tree-only navigation
@@ -899,6 +900,7 @@ Note
   title
   content
   properties
+  (no parentNoteId — removed from final model)
 
 LinkIndex
   sourceNoteId
@@ -912,7 +914,7 @@ LinkIndex
 
 After this phase:
 
-- parent note is no longer required
+- note parent is absent from the model; folders replace parent-note containment
 - head note is gone from the core model
 - relationship notes are normal notes
 - folder structure handles containment
@@ -929,7 +931,7 @@ After this phase:
 1. Introduce folder
 2. Introduce slugs and full paths
 3. Move head note content to notebook
-4. Make parent optional
+4. Remove note parent (folders replace containment)
 5. Convert relationship notes
 6. Add wiki-link parser and link index
 7. Add folder config behavior
@@ -944,7 +946,7 @@ After this phase:
 folder
   -> fileSlug and fullPath
     -> notebook content without head note
-      -> optional parent
+      -> remove note parent (folders own placement)
         -> relationship notes as normal notes
           -> wiki-link parser and link index
             -> folder config
@@ -962,6 +964,6 @@ The final principle is:
 ```text
 Doughnut owns stable identity and richer behavior.
 Markdown owns portability.
-Folders own containment.
+Folders own containment (replacing note-parent containment).
 Links own meaning.
 ```

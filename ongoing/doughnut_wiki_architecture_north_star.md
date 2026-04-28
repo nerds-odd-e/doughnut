@@ -17,6 +17,10 @@ The goal is not to make Doughnut identical to Obsidian, but to make Doughnut com
 
 Doughnut will move away from a strict parent-child note tree and toward a wiki-like model.
 
+The **final state removes the note parent concept from the product model.** Containment and navigation that today use parent-child edges migrate into **folders**. Notes are placed via `folderId` only; there is no parallel “parent note” field for structure.
+
+Interim migrations may still read legacy parent columns while backfilling folders. Once existing tree and relationship-note layouts are represented as folders (and links where appropriate), parent-note containment is **replaced by folders**, not weakened into optionality.
+
 The previous model overloaded `parent` with multiple meanings:
 
 ```text
@@ -107,7 +111,7 @@ Folder
 
 A note is the core knowledge unit.
 
-A note belongs to a notebook and may belong to a folder. A note does not require a parent note.
+A note belongs to a notebook and may belong to a folder. Notes **do not** have a parent note in the final model—placement is folder-based only.
 
 The note is referred to by slug in the frontend, not by internal ID.
 When a note is in a folder, its slug is folder-qualified as `folder-slug/note-title`.
@@ -320,21 +324,19 @@ README.md
 
 But internally, it is not modeled as an ordinary note.
 
-## Parent Note Optionality
+## Removal of the Note Parent Concept
 
-Notes do not require parent notes.
+In the final model there is **no** note-to-note parent field for containment or navigation.
 
 A note may be:
 
-- inside a folder
+- inside a folder (the only structural placement)
 - linked from other notes
 - included in a map note
 - connected through backlinks
 - related through explicit relationship notes
 
-But it does not need a parent note.
-
-If semantic parenthood is still useful, it should be represented explicitly, not as storage containment.
+If something like “semantic parent” is still useful for the reader, it belongs in **content**—links or frontmatter—not as a built-in parent pointer.
 
 Possible representation:
 
@@ -350,17 +352,19 @@ or simply:
 Parent idea: [[Some Note Title]]
 ```
 
-## Folder vs Parent
+That is ordinary wiki semantics, not the old parent-note hierarchy.
 
-The final distinction is:
+## Folder vs Former Parent
+
+After migration, the distinction is:
 
 ```text
-folder = where the note lives
+folder = where the note lives (replaces parent-note containment)
 link = what the note means
-parent = optional semantic relation, not required containment
+(note parent as a system concept — removed)
 ```
 
-A folder is operational structure. A parent note, when it exists conceptually, should be represented through links, properties, or relationship notes.
+A folder is operational structure. The legacy “parent holds children” tree is expressed as **folder hierarchy + note membership**, not as parent note records.
 
 ## Folder Configuration
 
@@ -714,7 +718,7 @@ Note
   has stable internal ID
   has frontend/file-facing slug
   has human title
-  may live in a folder
+  may live in a folder (no note-parent field; folders replace parent-note containment)
   links to other notes
 
 Relationship
@@ -731,15 +735,15 @@ Link Index
 The core architectural shift is:
 
 ```text
-from tree-based knowledge
-to folder-contained, link-connected wiki knowledge
+from tree-based knowledge (parent-child note edges)
+to folder-contained, link-connected wiki knowledge (parent-note containment removed, not optionalized)
 ```
 
 ## Desired End State
 
 After migration, Doughnut should be able to:
 
-- store notes without requiring parent notes
+- store and navigate notes using folders only—no note-parent field for containment
 - refer to notes in the frontend by slug
 - preserve stable internal IDs
 - export notebooks as Obsidian-friendly Markdown folders
