@@ -51,8 +51,8 @@ folder is introduced as parallel containment data
 - `Folder.parentFolder` represents folder nesting, not semantic note parenthood.
 - `Note.folder` is nullable during Phase 1 so every commit can be deployed safely while the backfill is introduced.
 - Existing `Note.parent` remains the source of truth for current behavior until a later phase replaces navigation.
-- For **existing data**, each backfilled folder’s **`name`** is the same as the **title** of the parent note that defined that child container (one string: the parent note’s title).
-- **`folder.slug`** is not introduced in Phase 1. When folder slugs are added (`ongoing/doughnut_wiki_architecture_north_star.md`), they are **derived from `folder.name`** via the standard slugifier; collision handling and routes remain Phase 2+.
+- For **existing data**, each backfilled folder’s `**name`** is the same as the **title** of the parent note that defined that child container (one string: the parent note’s title).
+- `**folder.slug`** is not introduced in Phase 1. When folder slugs are added (`ongoing/doughnut_wiki_architecture_north_star.md`), they are **derived from `folder.name`** via the standard slugifier; collision handling and routes remain Phase 2+.
 
 ## Discovered Current State
 
@@ -266,7 +266,7 @@ Goal: keep new notes aligned with folder data after the backfill.
 Implementation:
 
 - When a note is created under a parent note, assign it to the folder that represents that parent note's children.
-- If that folder does not exist, create or find it as part of the same note-creation transaction; the folder **`name`** must match the **parent note’s title** (same rule as backfill).
+- If that folder does not exist, create or find it as part of the same note-creation transaction; the folder `**name**` must match the **parent note’s title** (same rule as backfill).
 - Keep the note parent assignment unchanged.
 
 Tests:
@@ -317,53 +317,7 @@ Commit boundary:
 - Folder data remains current after moves.
 - Parent-based behavior and ordering remain unchanged.
 
-### 1.9 Expose Folder Data Where Existing Note Topology Already Travels
 
-Status: planned
-
-Type: behavior
-
-Goal: make folder containment observable to clients without changing navigation semantics.
-
-Pre-condition:
-
-- A user views or fetches notes through an existing note topology response.
-- Notes have folder data from creation, movement, or migration.
-
-Trigger:
-
-- The existing note topology endpoint or response is requested.
-
-Post-condition:
-
-- The response includes enough folder identity for clients to start rendering folder-aware navigation later.
-- Existing parent topology remains present and unchanged.
-
-Implementation:
-
-- Add folder identity to the existing note topology DTO only if that is the current stable surface for note navigation.
-- Prefer returning existing entity-derived values over adding a parallel endpoint.
-- Do not add slug, full path, or frontend route behavior.
-- Regenerate the TypeScript API client if the OpenAPI surface changes.
-
-Tests:
-
-- Add or extend a controller-level backend test for note topology serialization.
-- Assert folder identity appears for a note in a folder.
-- Assert existing parent or subject topology still appears as before.
-- If generated API types change, run the API client generation check required by the generated-client workflow.
-
-Verification:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
-```
-
-Commit boundary:
-
-- Folder containment is externally visible through an existing API response.
-- The UI can begin using folder data in later work.
-- No route or navigation behavior changes.
 
 ### 1.10 Update Phase 1 Plan State
 
@@ -405,3 +359,4 @@ Phase 1 is complete when:
 - Existing parent-based behavior still passes its current tests.
 - Folder identity is available through an existing backend surface for future UI work.
 - No slug, full path, import/export, or parent-removal work has been started.
+

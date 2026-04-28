@@ -72,6 +72,53 @@ class NoteCreationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void assignsFolderNamedAfterParentTitle()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      parent =
+          makeMe.aNote().title("ExplicitParent").creatorAndOwner(currentUser.getUser()).please();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      Note created = noteRepository.findById(response.getId()).orElseThrow();
+      assertThat(created.getFolder(), not(nullValue()));
+      assertThat(created.getFolder().getName(), equalTo("ExplicitParent"));
+      assertThat(created.getFolder().getNotebook().getId(), equalTo(parent.getNotebook().getId()));
+    }
+
+    @Test
+    void assignsNestedChildContainerWithParentFolder()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      Note head = makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
+      NoteCreationDTO sectionDto = new NoteCreationDTO();
+      sectionDto.setNewTitle("Section");
+      Note section =
+          noteRepository
+              .findById(controller.createNoteUnderParent(head, sectionDto).getCreated().getId())
+              .orElseThrow();
+      noteCreation.setNewTitle("Leaf");
+      Note leaf =
+          noteRepository
+              .findById(
+                  controller.createNoteUnderParent(section, noteCreation).getCreated().getId())
+              .orElseThrow();
+      assertThat(leaf.getFolder(), not(nullValue()));
+      assertThat(leaf.getFolder().getName(), equalTo("Section"));
+      assertThat(leaf.getFolder().getParentFolder(), not(nullValue()));
+      assertThat(leaf.getFolder().getParentFolder().getName(), equalTo("BookHead"));
+    }
+
+    @Test
+    void siblingsShareSameChildContainerFolder()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      parent = makeMe.aNote().title("SharedParent").creatorAndOwner(currentUser.getUser()).please();
+      noteCreation.setNewTitle("first child");
+      Integer id1 = controller.createNoteUnderParent(parent, noteCreation).getCreated().getId();
+      noteCreation.setNewTitle("second child");
+      Integer id2 = controller.createNoteUnderParent(parent, noteCreation).getCreated().getId();
+      Note n1 = noteRepository.findById(id1).orElseThrow();
+      Note n2 = noteRepository.findById(id2).orElseThrow();
+      assertThat(n1.getFolder().getId(), equalTo(n2.getFolder().getId()));
+    }
+
+    @Test
     void shouldBeAbleToSaveNoteWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();

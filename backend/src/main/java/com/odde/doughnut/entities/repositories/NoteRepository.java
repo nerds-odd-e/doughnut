@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -93,6 +94,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(value = selectFromNote + " WHERE n.parent.id = :parentId")
   List<Note> findAllByParentId(@Param("parentId") Integer parentId);
+
+  Optional<Note> findFirstByParent_IdAndFolderIsNotNullAndDeletedAtIsNullOrderByIdAsc(
+      Integer parentId);
 
   String recallWhereClause =
       " WHERE "

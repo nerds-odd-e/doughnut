@@ -26,16 +26,19 @@ public class NoteService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
+  private final NoteChildContainerFolderService noteChildContainerFolderService;
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteChildContainerFolderService noteChildContainerFolderService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
+    this.noteChildContainerFolderService = noteChildContainerFolderService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -222,6 +225,7 @@ public class NoteService {
       Timestamp currentUTCTimestamp) {
     if (type == null) return null;
     Note relation = buildARelation(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
     entityPersister.save(relation);
     return relation;
   }

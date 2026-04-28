@@ -29,6 +29,7 @@ public class NoteConstructionService {
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final NoteService noteService;
+  private final NoteChildContainerFolderService noteChildContainerFolderService;
 
   @Autowired
   public NoteConstructionService(
@@ -36,12 +37,14 @@ public class NoteConstructionService {
       TestabilitySettings testabilitySettings,
       NoteRepository noteRepository,
       EntityPersister entityPersister,
-      NoteService noteService) {
+      NoteService noteService,
+      NoteChildContainerFolderService noteChildContainerFolderService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.noteService = noteService;
+    this.noteChildContainerFolderService = noteChildContainerFolderService;
   }
 
   public Note createNote(Note parentNote, String title) {
@@ -49,6 +52,9 @@ public class NoteConstructionService {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.initialize(user, parentNote, currentUTCTimestamp, title);
+    if (parentNote != null) {
+      note.setFolder(noteChildContainerFolderService.resolveForParent(parentNote));
+    }
     if (entityPersister != null) {
       entityPersister.save(note);
     }
