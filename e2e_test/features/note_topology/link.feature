@@ -29,5 +29,4 @@ Feature: Note wiki links
     Then I should see the rich content of the note with details:
       | Tag         | Content |
       | a.dead-link | Continuous Integration System |
-    When I create the note [[Continuous Integration System]] from the dead link dialog
-    Then I should see "Continuous Integration System" in the page
+    And I should be able to create a new note by following the dead link "Continuous Integration System"

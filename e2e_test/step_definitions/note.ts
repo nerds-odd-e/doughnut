@@ -620,15 +620,12 @@ Then(
   }
 )
 
-When('I create the note from the dead link dialog', () => {
-  noteCreationForm.submit()
-})
-
-When(
-  /^I create the note \[\[(.+?)\]\] from the dead link dialog$/,
-  (concept: string) => {
-    start.assumeNotePage().clickDeadLink(concept)
+Then(
+  'I should be able to create a new note by following the dead link {string}',
+  (linkTitle: string) => {
+    start.assumeNotePage().clickDeadLink(linkTitle)
     noteCreationForm.submit()
+    start.assumeNotePage(linkTitle)
   }
 )
 
