@@ -19,7 +19,7 @@ Doughnut will move away from a strict parent-child note tree and toward a wiki-l
 
 The **final state removes the note parent concept from the product model.** Containment and navigation that today use parent-child edges migrate into **folders**. Notes are placed via `folderId` only; there is no parallel “parent note” field for structure.
 
-Interim migrations may still read legacy parent columns while backfilling folders. Once existing tree and relationship-note layouts are represented as folders (and links where appropriate), parent-note containment is **replaced by folders**, not weakened into optionality.
+Interim migrations may still read legacy parent columns while backfilling folders. **As implemented:** folders are stored and updated when child notes are created or notes are moved while `Note.parent` still drives observable tree behavior until parent-note containment is removed from the product model. Once existing tree and relationship-note layouts are represented as folders (and links where appropriate), parent-note containment is **replaced by folders**, not weakened into optionality.
 
 The previous model overloaded `parent` with multiple meanings:
 

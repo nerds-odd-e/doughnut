@@ -189,6 +189,15 @@ This phase does not need to:
 - support Obsidian export
 - support full wiki-link parsing
 
+## Status and implementation notes
+
+Phase 1 is **complete** in the codebase.
+
+- **Persistence:** `folder` rows (`notebook_id`, optional `parent_folder_id`, `name`, timestamps) and optional `note.folder_id`; migrations include `V300000148__create_folder.sql` and `V300000149__note_folder_backfill.sql`. The backfill derives folders from parent notes that have children (folder `name` equals parent `title`), nests folders to mirror the note tree, assigns child notes to the folder derived from each note’s parent, and leaves head notes and parents without a derived folder with null `folder_id` where applicable.
+- **Domain:** `Folder` entity and repository; `Note.folder` mapping.
+- **Keeping folders aligned with the tree:** `NoteChildContainerFolderService` finds or creates the child-container folder for a parent note (name matches that parent’s title, within the correct notebook and folder hierarchy). It runs when creating a child note and after note moves (`NoteMotionService`), including cross-notebook subtree moves and promoting a note to top level (new head has no folder; descendants follow the updated parent chain).
+- **Behavior:** `Note.parent` remains the source of truth for navigation, ordering, and creation/move semantics users see today; folder data is parallel containment for Phase 2 onward.
+
 ---
 
 # Phase 2 — Introduce Slugs and Full Paths
