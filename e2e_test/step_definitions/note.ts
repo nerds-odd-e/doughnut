@@ -605,11 +605,13 @@ When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
 })
 
-When('I click the link {string} in the note details', (linkText: string) => {
-  const confirmSpy = cy.spy().as('confirmSpy')
-  cy.on('window:confirm', confirmSpy)
-  cy.get('[role=details]').find('a').contains(linkText).click()
-})
+Then(
+  'the link {string} should link to the note with the same title',
+  (linkText: string) => {
+    cy.get('[role=details]').find('a').contains(linkText).click()
+    start.assumeNotePage(linkText)
+  }
+)
 
 Given(
   /^I have a note that includes deadlink \[\[(.+?)\]\]$/,
@@ -672,15 +674,6 @@ Then(
     cy.get('@confirmSpy').should('have.been.calledWith', expectedMessage)
   }
 )
-
-Then('I should be on the note page of {string}', (noteTitle: string) => {
-  start
-    .testability()
-    .getInjectedNoteIdByTitle(noteTitle)
-    .then((noteId) => {
-      cy.url().should('include', `/n${noteId}`)
-    })
-})
 
 Given(
   'note {string} has a dead wiki link titled {string}',

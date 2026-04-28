@@ -103,8 +103,7 @@ Feature: Note Edit
     Then I should see the rich content of the note with details:
       | Tag | Content        |
       | a   | hoge fuga piyo |
-    When I click the link "hoge fuga piyo" in the note details
-    Then I should be on the note page of "hoge fuga piyo"
+    And the link "hoge fuga piyo" should link to the note with the same title
 
   Scenario: Edit a note's details with a dead wiki link in markdown
     Given I have a notebook with the head note "TDD"
