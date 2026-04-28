@@ -169,10 +169,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(
       """
-      SELECT n FROM Note n
+      SELECT n FROM Note n LEFT JOIN n.folder fld
       WHERE n.slug IS NULL AND n.deletedAt IS NULL
-      AND (n.folder IS NULL
-           OR (n.folder.slug IS NOT NULL AND n.folder.slug <> ''))
+      AND (fld IS NULL OR (fld.slug IS NOT NULL AND fld.slug <> ''))
       ORDER BY n.id ASC
       """)
   List<Note> findNotesReadyForSlugMigration(Pageable pageable);

@@ -583,6 +583,16 @@ export type AiGeneratedImage = {
     b64encoded?: string;
 };
 
+export type WikiSlugMigrationBatchResult = {
+    processedInBatch?: number;
+    status?: WikiSlugMigrationStatus;
+};
+
+export type WikiSlugMigrationStatus = {
+    foldersMissingSlug?: number;
+    notesMissingSlug?: number;
+};
+
 export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
@@ -822,11 +832,6 @@ export type DummyForGeneratingTypes = {
 
 export type TitleReplacement = {
     newTitle: string;
-};
-
-export type WikiSlugMigrationStatus = {
-    foldersMissingSlug?: number;
-    notesMissingSlug?: number;
 };
 
 export type UserForListing = {
@@ -2671,6 +2676,42 @@ export type GenerateImageResponses = {
 };
 
 export type GenerateImageResponse = GenerateImageResponses[keyof GenerateImageResponses];
+
+export type BatchMigrateNotesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number;
+    };
+    url: '/api/admin/wiki-slug-migration/batch/notes';
+};
+
+export type BatchMigrateNotesResponses = {
+    /**
+     * OK
+     */
+    200: WikiSlugMigrationBatchResult;
+};
+
+export type BatchMigrateNotesResponse = BatchMigrateNotesResponses[keyof BatchMigrateNotesResponses];
+
+export type BatchMigrateFoldersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number;
+    };
+    url: '/api/admin/wiki-slug-migration/batch/folders';
+};
+
+export type BatchMigrateFoldersResponses = {
+    /**
+     * OK
+     */
+    200: WikiSlugMigrationBatchResult;
+};
+
+export type BatchMigrateFoldersResponse = BatchMigrateFoldersResponses[keyof BatchMigrateFoldersResponses];
 
 export type UpdateUserData = {
     body: UserDto;

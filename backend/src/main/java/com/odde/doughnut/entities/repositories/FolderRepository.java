@@ -37,10 +37,9 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
 
   @Query(
       """
-      SELECT f FROM Folder f
+      SELECT f FROM Folder f LEFT JOIN f.parentFolder p
       WHERE f.slug IS NULL
-      AND (f.parentFolder IS NULL
-           OR (f.parentFolder.slug IS NOT NULL AND f.parentFolder.slug <> ''))
+      AND (p IS NULL OR (p.slug IS NOT NULL AND p.slug <> ''))
       ORDER BY f.id ASC
       """)
   List<Folder> findFoldersReadyForSlugMigration(Pageable pageable);
