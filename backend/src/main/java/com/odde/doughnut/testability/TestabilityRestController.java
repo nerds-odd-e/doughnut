@@ -16,6 +16,7 @@ import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.EntityManagerFactory;
@@ -51,6 +52,7 @@ class TestabilityRestController {
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
   @Autowired NoteService noteService;
+  @Autowired WikiSlugPathService wikiSlugPathService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -178,8 +180,15 @@ class TestabilityRestController {
     }
 
     private void saveByOriginalOrder(
-        Map<String, Note> titleNoteMap, EntityPersister entityPersister) {
-      noteTestData.forEach((inject -> entityPersister.save(titleNoteMap.get(inject.title))));
+        Map<String, Note> titleNoteMap,
+        EntityPersister entityPersister,
+        WikiSlugPathService wikiSlugPathService) {
+      noteTestData.forEach(
+          inject -> {
+            Note note = titleNoteMap.get(inject.title);
+            wikiSlugPathService.assignSlugForNewNote(note);
+            entityPersister.save(note);
+          });
     }
   }
 
@@ -196,7 +205,7 @@ class TestabilityRestController {
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
     notesTestData.buildNoteTree(
         user, ownership, titleNoteMap, this.noteRepository, this.entityPersister);
-    notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
+    notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister, this.wikiSlugPathService);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));
   }

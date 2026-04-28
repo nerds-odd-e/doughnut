@@ -392,66 +392,13 @@ After this phase:
 
 ---
 
-# Phase 4 — Remove Note Parent (Folders Replace Containment)
-
-## Goal
-
-**Remove the note parent concept** from the model after containment has been migrated into folders. The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
-
-## Rationale
-
-Once folders mirror former tree placement (including migrated relation-note layouts), parent-note edges duplicate folder semantics. Retaining an optional `parentNoteId` would keep two competing stories for containment.
-
-Final distinction:
-
-```text
-folder = where the note lives (replaces parent-note containment)
-link = what the note means
-(note parent as a system field — removed)
-```
-
-If users want “semantic parent” for reading, it belongs in content (links, frontmatter), not as a structural parent pointer.
-
-## Model Change
-
-Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and, where applicable, converted old relationship-note trees into folder + links).
-
-A valid note has:
-
-```text
-notebookId
-folderId optional or required depending on root-folder policy
-(no parentNoteId — removed, not optional)
-```
-
-## UI Changes
-
-The note tree/navigation should be based on folders only, not parent-note hierarchy.
-
-Notes can appear:
-
-- directly inside a folder
-- directly inside the notebook root folder
-- linked from map notes
-- linked from journal notes
-- linked from relationship notes
-
-## Expected Result
-
-After this phase:
-
-- the product model has no structural parent note; placement is folder-based only
-- note creation does not offer or require a parent note for containment
-- old parent references are gone from persisted model and navigation
-- any “semantic parent” is expressed only via links or properties in content, not DB parent edges
-
----
-
-# Phase 5 — Convert Relationship Notes into Normal Notes
+# Phase 4 — Convert Relationship Notes into Normal Notes
 
 ## Goal
 
 Convert special structured relationship notes into ordinary Markdown-like notes.
+
+Relationship notes today depend on the **parent** pointer for structure; this phase runs **before** removing the note parent (Phase 5) so migration can read that structure reliably.
 
 ## Current Relationship Note
 
@@ -511,6 +458,61 @@ After this phase:
 - relationship notes have folder locations and note slugs (`note.slug` as full path)
 - old relationship-note-specific behavior is deprecated
 - relationships become portable to Obsidian-style Markdown
+
+---
+
+# Phase 5 — Remove Note Parent (Folders Replace Containment)
+
+## Goal
+
+**Remove the note parent concept** from the model after containment has been migrated into folders and relationship notes no longer depend on it (Phase 4). The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
+
+## Rationale
+
+Once relationship notes are converted and folders mirror former tree placement, parent-note edges duplicate folder semantics. Retaining an optional `parentNoteId` would keep two competing stories for containment.
+
+Final distinction:
+
+```text
+folder = where the note lives (replaces parent-note containment)
+link = what the note means
+(note parent as a system field — removed)
+```
+
+If users want “semantic parent” for reading, it belongs in content (links, frontmatter), not as a structural parent pointer.
+
+## Model Change
+
+Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and converted old relationship-note trees into folder + links in Phase 4).
+
+A valid note has:
+
+```text
+notebookId
+folderId optional or required depending on root-folder policy
+(no parentNoteId — removed, not optional)
+```
+
+## UI Changes
+
+The note tree/navigation should be based on folders only, not parent-note hierarchy.
+
+Notes can appear:
+
+- directly inside a folder
+- directly inside the notebook root folder
+- linked from map notes
+- linked from journal notes
+- linked from relationship notes
+
+## Expected Result
+
+After this phase:
+
+- the product model has no structural parent note; placement is folder-based only
+- note creation does not offer or require a parent note for containment
+- old parent references are gone from persisted model and navigation
+- any “semantic parent” is expressed only via links or properties in content, not DB parent edges
 
 ---
 
@@ -943,8 +945,8 @@ After this phase:
 1. Introduce folder
 2. Introduce slug paths
 3. Move head note content to notebook
-4. Remove note parent (folders replace containment)
-5. Convert relationship notes
+4. Convert relationship notes
+5. Remove note parent (folders replace containment)
 6. Move a folder
 7. Add wiki-link parser and link index
 8. Add folder config behavior
@@ -959,8 +961,8 @@ After this phase:
 folder
   -> note.slug (notebook-local full path)
     -> notebook content without head note
-      -> remove note parent (folders own placement)
-        -> relationship notes as normal notes
+      -> relationship notes as normal notes
+        -> remove note parent (folders own placement)
           -> move a folder (subtree slug updates)
             -> wiki-link parser and link index
               -> folder config

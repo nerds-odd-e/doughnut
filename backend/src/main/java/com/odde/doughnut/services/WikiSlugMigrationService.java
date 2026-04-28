@@ -124,7 +124,7 @@ public class WikiSlugMigrationService {
       if (s == null || s.isEmpty()) {
         continue;
       }
-      set.add(WikiSlugPathService.basenameOf(s));
+      set.add(WikiSlugPathAssignment.basenameOf(s));
     }
     return set;
   }

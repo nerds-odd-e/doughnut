@@ -53,8 +53,9 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Folder folder;
 
-  @Column(name = "slug")
-  @Size(max = 767)
+  @Column(name = "slug", nullable = false)
+  @NotNull
+  @Size(min = 1, max = 767)
   @Getter
   @Setter
   @JsonIgnore

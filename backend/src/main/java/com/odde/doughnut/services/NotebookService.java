@@ -46,7 +46,6 @@ public class NotebookService {
     Note note =
         ownership.prepareHeadNoteForNewNotebook(user, currentUTCTimestamp, titleConstructor);
     entityPersister.save(note.getNotebook());
-    entityPersister.save(note);
     wikiSlugPathService.assignSlugForNewNote(note);
     entityPersister.save(note);
     return note;

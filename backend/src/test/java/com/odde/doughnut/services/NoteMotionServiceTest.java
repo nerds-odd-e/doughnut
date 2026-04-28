@@ -185,6 +185,7 @@ public class NoteMotionServiceTest {
 
     @BeforeEach
     void setup() {
+      topNote = makeMe.aHeadNote("topForNotebookMove").please();
       otherNotebook = makeMe.aHeadNote("otherNotebook").please();
       firstChild = makeMe.aNote("firstChild").under(topNote).please();
       secondChild = makeMe.aNote("secondChild").under(firstChild).please();
@@ -200,9 +201,9 @@ public class NoteMotionServiceTest {
       makeMe.refresh(secondChild);
       makeMe.refresh(thirdLevel);
 
-      assertThat(firstChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
-      assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
-      assertThat(thirdLevel.getNotebook(), equalTo(otherNotebook.getNotebook()));
+      assertThat(firstChild.getNotebook().getId(), equalTo(otherNotebook.getNotebook().getId()));
+      assertThat(secondChild.getNotebook().getId(), equalTo(otherNotebook.getNotebook().getId()));
+      assertThat(thirdLevel.getNotebook().getId(), equalTo(otherNotebook.getNotebook().getId()));
 
       assertThat(firstChild.getFolder(), notNullValue());
       assertThat(firstChild.getFolder().getName(), equalTo(otherNotebook.getTitle()));
@@ -227,8 +228,8 @@ public class NoteMotionServiceTest {
       makeMe.refresh(secondChild);
       makeMe.refresh(relationNote);
 
-      assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
-      assertThat(relationNote.getNotebook(), equalTo(otherNotebook.getNotebook()));
+      assertThat(secondChild.getNotebook().getId(), equalTo(otherNotebook.getNotebook().getId()));
+      assertThat(relationNote.getNotebook().getId(), equalTo(otherNotebook.getNotebook().getId()));
 
       assertThat(relationNote.getFolder(), notNullValue());
       assertThat(relationNote.getFolder().getName(), equalTo(secondChild.getTitle()));

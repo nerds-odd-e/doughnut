@@ -1,11 +1,13 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.WikiSlugPathAssignment;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.util.Strings;
 
@@ -94,6 +96,36 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     if (folder != null) {
       entity.setFolder(folder);
+    }
+    if (needPersist) {
+      ensureParentNotesPersisted(entity);
+    }
+    if (entity.getSlug() == null || entity.getSlug().isEmpty()) {
+      fillNoteSlug(entity);
+    }
+  }
+
+  private void ensureParentNotesPersisted(Note note) {
+    Note parent = note.getParent();
+    if (parent == null) {
+      return;
+    }
+    ensureParentNotesPersisted(parent);
+    if (parent.getId() == null) {
+      if (parent.getSlug() == null || parent.getSlug().isEmpty()) {
+        fillNoteSlug(parent);
+      }
+      makeMe.entityPersister.save(parent);
+    }
+  }
+
+  private void fillNoteSlug(Note note) {
+    if (makeMe.wikiSlugPathService != null
+        && note.getNotebook() != null
+        && note.getNotebook().getId() != null) {
+      makeMe.wikiSlugPathService.assignSlugForNewNote(note);
+    } else {
+      WikiSlugPathAssignment.setNoteSlug(note, Set.of());
     }
   }
 
