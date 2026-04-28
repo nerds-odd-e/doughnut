@@ -236,7 +236,6 @@ describe("clientSetup", () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 401,
-        method: "POST",
       })
 
       await UserController.createUser({
