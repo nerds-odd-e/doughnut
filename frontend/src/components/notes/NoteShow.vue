@@ -87,19 +87,14 @@
             :note-realm="noteRealm"
           />
 
-          <Modal
-            v-if="pendingDeadLinkTitle !== null"
-            @close_request="onDeadLinkDialogClose"
-          >
-            <template #body>
-              <NoteNewDialog
-                :reference-note="noteRealm.note"
-                :insert-mode="noteRealm.note.id === noteRealm.notebook?.headNoteId ? 'as-child' : 'after'"
-                :initial-title="pendingDeadLinkTitle"
-                @close-dialog="onDeadLinkDialogClose"
-              />
-            </template>
-          </Modal>
+          <NoteDeadLinkCreateModal
+            v-model="pendingDeadLinkTitle"
+            :reference-note="noteRealm.note"
+            :insert-mode="
+              noteRealm.note.id === noteRealm.notebook?.headNoteId ? 'as-child' : 'after'
+            "
+            @closed="onDeadLinkCreateModalClosed"
+          />
         </template>
       </template>
     </NoteRealmLoader>
@@ -122,8 +117,7 @@ import ChildrenNotes from "./ChildrenNotes.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
-import Modal from "@/components/commons/Modal.vue"
-import NoteNewDialog from "./NoteNewDialog.vue"
+import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
 import type { WikiTitle } from "../form/replaceWikiLinksInHtml"
@@ -155,9 +149,8 @@ const asMarkdown = ref(false)
 const wikiTitles = ref<WikiTitle[]>([])
 const lastFetchedHeadNoteId = ref<number | undefined>(undefined)
 
-const onDeadLinkDialogClose = () => {
+const onDeadLinkCreateModalClosed = () => {
   lastFetchedHeadNoteId.value = undefined
-  pendingDeadLinkTitle.value = null
 }
 
 const fetchWikiTitles = async (headNoteId: number) => {
