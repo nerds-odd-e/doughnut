@@ -77,7 +77,7 @@ dependencies {
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
   compileOnly 'org.projectlombok:lombok:1.18.46'
-  annotationProcessor 'org.projectlombok:lombok:1.18.44'
+  annotationProcessor 'org.projectlombok:lombok:1.18.46'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   runtimeOnly 'com.mysql:mysql-connector-j:9.7.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
