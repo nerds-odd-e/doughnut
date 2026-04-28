@@ -21,25 +21,13 @@ Feature: Note wiki links
     And the link "Continuous Integration" should link to the note with the same title
 
   Scenario: Edit a note's details with a dead wiki link in markdown
-    Given I have a notebook with the head note "TDD"
-    And there are some notes:
-      | Title          | Parent Title |
-      | hoge fuga piyo | TDD          |
-    When I update note "TDD" details using markdown to become:
+    When I update note "Continuous Integration" details using markdown to become:
       """
-      [[foo bar]]
+      Continuous Integration is different from the [[Continuous Integration System]],
+      which is a good practice in [[Technical Excellence]].
       """
     Then I should see the rich content of the note with details:
       | Tag         | Content |
-      | a.dead-link | foo bar |
-
-  Scenario: Clicking dead wiki link opens note creation form with pre-filled title
-    Given I have a note that includes deadlink [[new concept]]
-    When I click the dead link "new concept" in the note details
-    Then I should see a note creation form
-    And the title is "new concept" pre-filled
-
-  Scenario: Creating note from dead wiki link navigates to the new note
-    Given I have a note that includes deadlink [[new concept]]
-    When I create the note [[new concept]] from the dead link dialog
-    Then I should see "new concept" in the page
+      | a.dead-link | Continuous Integration System |
+    When I create the note [[Continuous Integration System]] from the dead link dialog
+    Then I should see "Continuous Integration System" in the page

@@ -613,31 +613,6 @@ Then(
   }
 )
 
-Given(
-  /^I have a note that includes deadlink \[\[(.+?)\]\]$/,
-  (concept: string) => {
-    start
-      .jumpToNotePage('LeSS in Action')
-      .updateDetailsAsMarkdown(`[[${concept}]]`)
-      .switchToRichContent()
-  }
-)
-
-When(
-  'I click the dead link {string} in the note details',
-  (linkText: string) => {
-    start.assumeNotePage().clickDeadLink(linkText)
-  }
-)
-
-Then('I should see a note creation form', () => {
-  noteCreationForm.expectFormVisible()
-})
-
-Then('the title is {string} pre-filled', (title: string) => {
-  noteCreationForm.expectPrefilledTitle(title)
-})
-
 Then(
   'I should see a note creation form with {string} pre-filled as the title',
   (title: string) => {
