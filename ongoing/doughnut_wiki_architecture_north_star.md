@@ -97,6 +97,12 @@ Folder
   updatedAt
 ```
 
+**Name and slug**
+
+- **`name`** is the human-facing folder label.
+- **`slug`** is always derived from **`name`** using the standard slugifier (`com.github.slugify:slugify`), not set as an independent arbitrary string except where product flows explicitly rename and re-slugify.
+- For **existing data** migrated from the former parent-note containment model, each derived folder’s **`name`** equals the **title** of the parent note that defined that container (the same value as that note’s `title`).
+
 ### Note
 
 A note is the core knowledge unit.
@@ -192,7 +198,7 @@ Example:
 douyara
 ```
 
-File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules.
+File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier instead of maintaining separate local slug rules. **Folder slugs** are produced from the folder **`name`** (same rules as other slugified titles). **Note slugs** are produced from the note **`title`** (or equivalent naming field) unless a dedicated rename/slug workflow applies.
 
 For notes inside folders, the slug includes the folder slug:
 

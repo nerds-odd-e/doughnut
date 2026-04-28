@@ -64,6 +64,10 @@ The same slugified style is used for migrated notes and newly created notes. Int
 
 File and folder slugs should be generated with the Java library `com.github.slugify:slugify`. Doughnut should use this as the standard slugifier rather than maintaining separate local slug rules.
 
+**Folder slugs** are derived from the folder **`name`**, not chosen as a separate arbitrary string (except explicit rename flows that re-slugify). **Note file slugs** are derived from the note **`title`** (or equivalent) in the same way.
+
+For **existing data** migrated from the former parent-note containment shape, each derived folder’s **`name`** equals the **title** of the parent note that defined that container.
+
 ### Folder Path
 
 The folder path represents the note's location.
@@ -145,7 +149,7 @@ At this phase, folder slug and full path may be deferred to Phase 2.
 
 ## Migration Strategy
 
-Initially, folders can mirror the existing parent-note structure.
+Initially, folders can mirror the existing parent-note structure. For every backfilled folder that represents a former “parent holds children” node, set **`folder.name`** to that parent note’s **`title`** (the same string as `note.title` on the parent). When Phase 2 adds **`folder.slug`**, it is **slugify(`folder.name`)** per `ongoing/doughnut_wiki_architecture_north_star.md`.
 
 Old model:
 
@@ -230,6 +234,8 @@ slug
 fullPath
 ```
 
+`slug` is always produced from the folder **`name`** with the standard slugifier. Collision handling and uniqueness apply at persistence time (see Uniqueness Constraints below).
+
 ### Note
 
 Add:
@@ -244,6 +250,8 @@ fullPath
 Generate notebook, folder, and note file slugs with `com.github.slugify:slugify`.
 
 The same slugifier should be used anywhere Doughnut derives a file or folder slug, including migrations, note creation, folder creation, import, and export.
+
+**Folder:** `folder.slug` ← slugify(`folder.name`). **Note file:** `fileSlug` ← slugify(note title or the field that defines the filename), unless a dedicated slug override exists (e.g. import frontmatter).
 
 ## Uniqueness Constraints
 
@@ -862,6 +870,8 @@ ID-based frontend routing as the normal path
 ## Final Architecture
 
 The final model should be:
+
+Folder **`slug`** is derived from **`name`**. For legacy-derived folders, **`name`** matches the former container parent note’s **`title`** until the user renames the folder.
 
 ```text
 Notebook

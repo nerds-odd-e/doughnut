@@ -51,7 +51,8 @@ folder is introduced as parallel containment data
 - `Folder.parentFolder` represents folder nesting, not semantic note parenthood.
 - `Note.folder` is nullable during Phase 1 so every commit can be deployed safely while the backfill is introduced.
 - Existing `Note.parent` remains the source of truth for current behavior until a later phase replaces navigation.
-- Phase 1 folder names mirror existing parent-note titles only as migration scaffolding. Folder slugs and collision handling belong to Phase 2.
+- For **existing data**, each backfilled folder’s **`name`** is the same as the **title** of the parent note that defined that child container (one string: the parent note’s title).
+- **`folder.slug`** is not introduced in Phase 1. When folder slugs are added (`ongoing/doughnut_wiki_architecture_north_star.md`), they are **derived from `folder.name`** via the standard slugifier; collision handling and routes remain Phase 2+.
 
 ## Discovered Current State
 
@@ -169,8 +170,9 @@ Goal: create folder rows for existing parent notes that currently contain child 
 Implementation:
 
 - Add a migration that creates one folder per parent note that currently contains child notes.
-- Use parent note titles as folder names for now.
+- Set each new folder’s `name` to that parent note’s **title** (same value as `note.title` for that parent).
 - Do not update `note.folder_id` yet.
+- Do not add `slug`; when slugs exist, they will come from `name`.
 
 Tests:
 
@@ -264,7 +266,7 @@ Goal: keep new notes aligned with folder data after the backfill.
 Implementation:
 
 - When a note is created under a parent note, assign it to the folder that represents that parent note's children.
-- If that folder does not exist, create or find it as part of the same note-creation transaction.
+- If that folder does not exist, create or find it as part of the same note-creation transaction; the folder **`name`** must match the **parent note’s title** (same rule as backfill).
 - Keep the note parent assignment unchanged.
 
 Tests:
