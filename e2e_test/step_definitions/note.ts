@@ -567,6 +567,17 @@ Then(
   }
 )
 
+Then('I should not see rich note property {string}', (key: string) => {
+  start.assumeNotePage().expectRichNotePropertyAbsent(key)
+})
+
+When(
+  'I edit the rich note property with key {string} to key {string} and value {string}',
+  (oldKey: string, newKey: string, newValue: string) => {
+    start.assumeNotePage().editRichNoteProperty(oldKey, newKey, newValue)
+  }
+)
+
 When(
   'I update note {string} details using markdown to become:',
   (noteTopology: string, newDetails: string) => {
@@ -592,6 +603,13 @@ Then(
   'the note details markdown source should contain {string}',
   (fragment: string) => {
     start.assumeNotePage().expectMarkdownDetailsSourceContains(fragment)
+  }
+)
+
+Then(
+  'the note details markdown source should not contain {string}',
+  (fragment: string) => {
+    start.assumeNotePage().expectMarkdownDetailsSourceDoesNotContain(fragment)
   }
 )
 

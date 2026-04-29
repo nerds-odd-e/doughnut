@@ -207,6 +207,12 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
       return this
     },
+    expectMarkdownDetailsSourceDoesNotContain(fragment: string) {
+      cy.get('textarea').should(($ta) => {
+        expect($ta.val()).to.not.include(fragment)
+      })
+      return this
+    },
     updateDetailsAsMarkdown(markdown: string) {
       this.toolbarButton('Edit as markdown').click()
       cy.get('textarea').clear().type(markdown)
@@ -229,6 +235,25 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.get('[role=details]').within(() => {
         cy.contains('h4', 'Properties')
         cy.contains('dt', key).next('dd').should('contain', value)
+      })
+      return this
+    },
+    expectRichNotePropertyAbsent(key: string) {
+      cy.get('[role=details]').within(() => {
+        cy.contains('h4', 'Properties')
+        cy.contains('dt', key).should('not.exist')
+      })
+      return this
+    },
+    editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
+      cy.get('[role=details]').within(() => {
+        cy.contains('h4', 'Properties')
+        cy.contains('dt', oldKey)
+          .closest('dl')
+          .within(() => {
+            cy.get('input').eq(0).clear().type(newKey)
+            cy.get('input').eq(1).clear().type(newValue)
+          })
       })
       return this
     },

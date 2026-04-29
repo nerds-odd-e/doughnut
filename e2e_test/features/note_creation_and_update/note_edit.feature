@@ -111,3 +111,26 @@ Feature: Note Edit
     Then I should see rich note property "status" with value "draft"
     When I open the note details markdown editor
     Then the note details markdown source should contain "status: draft"
+
+  @wip
+  Scenario: Edit a note property in rich mode
+    When I update note "LeSS in Action" details using markdown to become:
+      """
+      ---
+      topic: training
+      ---
+
+      Workshop body.
+      """
+    And I flush pending note details save
+    And I reload the current page for note "LeSS in Action"
+    Given I open the note "LeSS in Action" for editing
+    When I view the note details as rich content
+    When I edit the rich note property with key "topic" to key "domain" and value "wiki"
+    And I flush pending note details save
+    And I reload the current page for note "LeSS in Action"
+    Then I should not see rich note property "topic"
+    And I should see rich note property "domain" with value "wiki"
+    When I open the note details markdown editor
+    Then the note details markdown source should contain "domain: wiki"
+    And the note details markdown source should not contain "topic: training"
