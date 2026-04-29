@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
@@ -159,11 +160,16 @@ public class NoteMotionServiceTest {
     topNote = makeMe.aHeadNote("topNote").creatorAndOwner(user).please();
     firstChild = makeMe.aNote("middle").under(topNote).please();
     Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
+    Integer notebookIdBefore = topNote.getNotebook().getId();
 
     noteMotionService.moveToTopLevel(firstChild, user);
 
     makeMe.refresh(firstChild);
     makeMe.refresh(grandChild);
+    makeMe.refresh(topNote);
+    Notebook notebook = makeMe.entityPersister.find(Notebook.class, notebookIdBefore);
+    assertThat(firstChild.getNotebook().getId(), equalTo(notebookIdBefore));
+    assertThat(notebook.getHeadNote(), equalTo(topNote));
     assertThat(firstChild.getParent(), nullValue());
     assertThat(firstChild.getFolder(), nullValue());
     assertThat(firstChild.getSlug(), equalTo("middle"));
@@ -178,12 +184,17 @@ public class NoteMotionServiceTest {
     topNote = makeMe.aHeadNote("topNote").creatorAndOwner(user).please();
     firstChild = makeMe.aNote("middle").under(topNote).please();
     Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
+    Integer notebookIdBefore = topNote.getNotebook().getId();
     makeMe.entityPersister.flush();
 
     noteMotionService.moveToTopLevel(firstChild, user);
     makeMe.entityPersister.flush();
     makeMe.refresh(firstChild);
     makeMe.refresh(grandChild);
+    makeMe.refresh(topNote);
+    Notebook notebook = makeMe.entityPersister.find(Notebook.class, notebookIdBefore);
+    assertThat(firstChild.getNotebook().getId(), equalTo(notebookIdBefore));
+    assertThat(notebook.getHeadNote(), equalTo(topNote));
 
     Integer notebookId = firstChild.getNotebook().getId();
     Long total =
@@ -285,6 +296,24 @@ public class NoteMotionServiceTest {
       firstChild = makeMe.aNote("firstChild").under(topNote).please();
       secondChild = makeMe.aNote("secondChild").under(firstChild).please();
       thirdLevel = makeMe.aNote("thirdLevel").under(secondChild).please();
+    }
+
+    @Test
+    void movingHeadNoteIntoAnotherNotebookClearsSourceHeadAndKeepsSourceNotebook()
+        throws CyclicLinkDetectedException, MovementNotPossibleException {
+      Integer sourceNotebookId = topNote.getNotebook().getId();
+      Integer destNotebookId = otherNotebook.getNotebook().getId();
+
+      move(topNote, otherNotebook, true);
+
+      makeMe.entityPersister.flush();
+      Notebook sourceNotebook = makeMe.entityPersister.find(Notebook.class, sourceNotebookId);
+      makeMe.refresh(topNote);
+      makeMe.refresh(firstChild);
+
+      assertThat(sourceNotebook.getHeadNote(), nullValue());
+      assertThat(topNote.getNotebook().getId(), equalTo(destNotebookId));
+      assertThat(firstChild.getNotebook().getId(), equalTo(destNotebookId));
     }
 
     @Test

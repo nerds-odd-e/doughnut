@@ -49,7 +49,8 @@ public class NoteMotionService {
     entityPersister.flush();
 
     if (notebook.getHeadNote() == subject) {
-      entityPersister.remove(notebook);
+      notebook.setHeadNote(null);
+      entityPersister.merge(notebook);
     }
   }
 
@@ -90,8 +91,10 @@ public class NoteMotionService {
   }
 
   public void moveToTopLevel(Note note, User user) {
-    note.restoreAsHeadNote(user.getOwnership(), user);
-    entityPersister.save(note.getNotebook());
+    note.detachFromParentInMemory();
+    note.setFolder(null);
+    assignUniquePlaceholderSlugsPendingFolderAlign(note);
+    entityPersister.flush();
     alignFoldersForNoteAndDescendants(note);
     entityPersister.flush();
     recomputeSlugPathsForNoteSubtree(note);

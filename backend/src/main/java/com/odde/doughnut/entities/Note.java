@@ -392,11 +392,16 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void restoreAsHeadNote(Ownership ownership, User creator) {
+  public void detachFromParentInMemory() {
     if (getParent() != null) {
       getParent().children.remove(this);
       this.parent = null;
     }
+  }
+
+  @JsonIgnore
+  public void restoreAsHeadNote(Ownership ownership, User creator) {
+    detachFromParentInMemory();
     buildNotebookForHeadNote(ownership, creator);
     getAllDescendants()
         .forEach(descendant -> descendant.setNotebookInRestoreAsHeadNote(getNotebook()));
