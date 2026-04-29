@@ -8,24 +8,13 @@
     </button>
   </GlobalBar>
   <div class="daisy-container daisy-mx-auto daisy-p-4 daisy-max-w-6xl">
-    <!-- Head Note Section -->
-    <div class="notebook-head-note-wrapper daisy-mb-6">
-      <div class="daisy-text-sm daisy-text-base-content/60">
-        Head note of notebook:
-      </div>
-      <router-link
-        :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
-        class="no-underline"
-      >
-        <div>
-          <h5 class="daisy-text-lg daisy-font-semibold">
-            {{ notebook.title }}
-          </h5>
-          <p v-if="notebook.description" class="note-short-details">
-            {{ notebook.description }}
-          </p>
-        </div>
-      </router-link>
+    <div class="notebook-page-summary daisy-mb-6" data-testid="notebook-page-summary">
+      <h1 class="daisy-text-xl daisy-font-semibold daisy-text-base-content">
+        {{ notebook.title }}
+      </h1>
+      <p v-if="notebook.description" class="notebook-page-summary-description">
+        {{ notebook.description }}
+      </p>
     </div>
 
     <NotebookAttachedBookSection :notebook-id="notebook.id" />
@@ -392,14 +381,14 @@ const updateIndexNotebook = async () => {
 </script>
 
 <style scoped>
-.notebook-head-note-wrapper {
+.notebook-page-summary {
   background: oklch(var(--b2) / 0.8);
   border-radius: 8px;
   margin-bottom: 1.5rem;
   padding: 1.5rem;
 }
 
-.note-short-details {
+.notebook-page-summary-description {
   color: oklch(var(--bc) / 0.6);
   line-height: 1.6;
   margin-top: 0.5rem;

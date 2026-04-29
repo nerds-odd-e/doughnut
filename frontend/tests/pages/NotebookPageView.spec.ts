@@ -27,6 +27,46 @@ describe("NotebookPageView.spec", () => {
     ...makeMe.aNotebook.please(),
   }
 
+  it("shows notebook name and description in summary without head-note navigation", async () => {
+    const nb: Notebook = {
+      ...makeMe.aNotebook.please(),
+      title: "My Notebook Title",
+      description: "A short message for the notebook.",
+      headNoteId: 99_901,
+    }
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook: nb })
+      .mount()
+
+    const summary = wrapper.find('[data-testid="notebook-page-summary"]')
+    expect(summary.exists()).toBe(true)
+    expect(summary.text()).toContain("My Notebook Title")
+    expect(summary.text()).toContain("A short message for the notebook.")
+    expect(summary.text()).not.toContain("Head note")
+    expect(summary.find("a").exists()).toBe(false)
+  })
+
+  it("shows notebook title in summary without description block when description is absent", async () => {
+    const nb: Notebook = {
+      ...makeMe.aNotebook.please(),
+      title: "Title Only NB",
+      description: undefined,
+    }
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook: nb })
+      .mount()
+
+    const summary = wrapper.find('[data-testid="notebook-page-summary"]')
+    expect(summary.text()).toContain("Title Only NB")
+    expect(summary.find(".notebook-page-summary-description").exists()).toBe(
+      false
+    )
+  })
+
   it("Renders the default certificate expiry", async () => {
     const wrapper = helper
       .component(NotebookPageView)
