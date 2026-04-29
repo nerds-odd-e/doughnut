@@ -211,6 +211,35 @@ describe("Sidebar", () => {
       expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
     })
 
+    it("shows Add Next Sibling Note when active note has a parent", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: firstGeneration,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      expect(
+        wrapper.find('button[title="Add Next Sibling Note"]').exists()
+      ).toBe(true)
+    })
+
+    it("hides Add Next Sibling Note when active note is notebook head", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: topNoteRealm,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
+      expect(
+        wrapper.find('button[title="Add Next Sibling Note"]').exists()
+      ).toBe(false)
+    })
+
     it("hides Add Child Note when no current user", async () => {
       wrapper = helper
         .component(Sidebar)

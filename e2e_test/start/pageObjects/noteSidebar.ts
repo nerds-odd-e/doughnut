@@ -14,6 +14,18 @@ const sidebarAddChildButton = () => {
   }
 }
 
+const sidebarAddNextSiblingButton = () => {
+  const getButton = () =>
+    cy.get('aside').findByRole('button', { name: 'Add Next Sibling Note' })
+  return {
+    click: () => {
+      getButton().click()
+      return { ...submittableForm }
+    },
+    shouldNotExist: () => getButton().should('not.exist'),
+  }
+}
+
 export const noteSidebar = () => {
   cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
     if (!$button.hasClass('sidebar-expanded')) {
@@ -62,6 +74,11 @@ export const noteSidebar = () => {
     },
     addingChildNote() {
       sidebarAddChildButton().click()
+      return noteCreationForm
+    },
+    addingNextSiblingNote() {
+      pageIsNotLoading()
+      sidebarAddNextSiblingButton().click()
       return noteCreationForm
     },
   }

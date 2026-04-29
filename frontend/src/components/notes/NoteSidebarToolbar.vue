@@ -10,13 +10,20 @@
       >
         <FolderPlus class="w-5 h-5" />
       </NoteNewButton>
+      <NoteNewButton
+        v-if="note.parentId"
+        button-title="Add Next Sibling Note"
+        v-bind="{ referenceNote: note, insertMode: 'after' }"
+      >
+        <Folders class="w-5 h-5" />
+      </NoteNewButton>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import { FolderPlus } from "lucide-vue-next"
+import { FolderPlus, Folders } from "lucide-vue-next"
 import NoteNewButton from "./core/NoteNewButton.vue"
 
 defineProps<{

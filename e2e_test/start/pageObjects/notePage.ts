@@ -232,9 +232,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return noteSidebar().addingChildNote()
     },
     addingNextSiblingNote() {
-      pageIsNotLoading()
-      this.toolbarButton('Add Next Sibling Note').click()
-      return noteCreationForm
+      return noteSidebar().addingNextSiblingNote()
     },
     aiGenerateImage() {
       this.moreOptions().generateImageWithDALLE()

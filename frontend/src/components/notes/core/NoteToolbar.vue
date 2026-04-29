@@ -1,14 +1,6 @@
 <template>
   <nav class="daisy-navbar daisy-bg-base-200">
     <div class="daisy-btn-group daisy-btn-group-sm">
-      <NoteNewButton
-        v-if="!readonly && note.parentId"
-        button-title="Add Next Sibling Note"
-        v-bind="{ referenceNote: note, insertMode: 'after' }"
-      >
-        <Folders class="w-5 h-5" />
-      </NoteNewButton>
-
       <PopButton v-if="!readonly" title="search and add relationship">
         <template #button_face>
           <SvgSearchForLink />
@@ -85,12 +77,10 @@
 import { ref, watch } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
-import NoteNewButton from "./NoteNewButton.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import AddRelationshipDialog from "../../links/AddRelationshipDialog.vue"
 import {
   FileCode,
-  Folders,
   LayoutTemplate,
   MessageCircle,
   Mic,
