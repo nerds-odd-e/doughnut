@@ -32,7 +32,6 @@ import {
   HealthCheckController,
   FailureReportController,
   AdminUserController,
-  WikiSlugMigrationAdminController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 
@@ -187,9 +186,6 @@ const methodToController: Record<string, any> = {
   deleteFailureReports: FailureReportController,
   triggerFailure: FailureReportController,
   listUsers: AdminUserController,
-  getStatus: WikiSlugMigrationAdminController,
-  batchMigrateFolders: WikiSlugMigrationAdminController,
-  batchMigrateNotes: WikiSlugMigrationAdminController,
 }
 
 type SdkServiceName = keyof typeof methodToController

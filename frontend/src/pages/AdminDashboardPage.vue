@@ -38,11 +38,11 @@
       @click.prevent="setActivePage('users')"
     >Users</a>
     <a
-      :class="`daisy-tab daisy-tab-lg ${activePage === 'slugMigration' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'dataMigration' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click.prevent="setActivePage('slugMigration')"
-    >Slug Migration</a>
+      @click.prevent="setActivePage('dataMigration')"
+    >Data migration</a>
   </div>
   <div class="daisy-container daisy-mx-auto">
     <FineTuningData v-if="activePage === 'fineTuningData'" />
@@ -51,7 +51,7 @@
     <ManageBazaar v-if="activePage === 'manageBazaar'" />
     <CertificateRequests v-if="activePage === 'certificateRequests'" />
     <UserListing v-if="activePage === 'users'" />
-    <SlugMigrationStatus v-if="activePage === 'slugMigration'" />
+    <DataMigrationPanel v-if="activePage === 'dataMigration'" />
   </div>
 </template>
 
@@ -65,7 +65,7 @@ import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import CertificateRequests from "../components/admin/CertificateRequests.vue"
 import UserListing from "../components/admin/UserListing.vue"
-import SlugMigrationStatus from "../components/admin/SlugMigrationStatus.vue"
+import DataMigrationPanel from "../components/admin/DataMigrationPanel.vue"
 
 type TabType =
   | "fineTuningData"
@@ -74,7 +74,7 @@ type TabType =
   | "manageBazaar"
   | "certificateRequests"
   | "users"
-  | "slugMigration"
+  | "dataMigration"
 
 const route = useRoute()
 const router = useRouter()
@@ -89,7 +89,7 @@ const activePage = computed({
       tab === "manageBazaar" ||
       tab === "certificateRequests" ||
       tab === "users" ||
-      tab === "slugMigration"
+      tab === "dataMigration"
     ) {
       return tab
     }
