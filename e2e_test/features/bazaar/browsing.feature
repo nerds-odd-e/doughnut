@@ -3,7 +3,7 @@ Feature: Bazaar browsing
   Part of the bazaar should be visible to everyone.
 
   Background:
-    Given there are some notes for existing user "old_learner"
+    Given there are some notes for existing user "old_learner" in notebook "Shape"
       | Title            | Details                          | Parent Title|
       | Shape            | The form of something            |             |
       | Rectangle        | four equal straight sides        | Shape       |

@@ -4,13 +4,12 @@ Feature: Manage Bazaar
   I want to manage the notebooks shared in the Bazaar
 
   Background:
-    Given there are some notes for existing user "another_old_learner"
-      | Title            |
-      | Romance          |
-      | Classics         |
+    Given I am logged in as "another_old_learner"
+    And I have a notebook "Romance" with a note "Romance"
+    And I have a notebook "Classics" with a note "Classics"
     And notebook "Romance" is shared to the Bazaar
     And notebook "Classics" is shared to the Bazaar
-    And I am logged in as an admin
+    And I am re-logged in as "admin"
 
   Scenario: Remove the notebook from Bazaar
     * I should see "Romance, Classics" shared in the Bazaar

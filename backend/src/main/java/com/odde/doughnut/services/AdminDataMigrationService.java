@@ -39,7 +39,7 @@ public class AdminDataMigrationService {
     return copy(lastSuccessfulStatus);
   }
 
-  @Transactional(timeout = 600)
+  @Transactional
   public synchronized AdminDataMigrationStatusDTO run() {
     AdminDataMigrationStatusDTO dto = idleStatus(new AdminDataMigrationStatusDTO());
 

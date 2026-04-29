@@ -14,20 +14,6 @@ import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
 
-function notebookNameForInjectNotes(hashes: Record<string, string>[]): string {
-  const head = hashes.find((n) => !(n['Parent Title'] ?? '').trim())
-  if (head?.Title) {
-    return head.Title
-  }
-  const parent = hashes[0]?.['Parent Title']?.trim()
-  if (!parent) {
-    throw new Error(
-      'Cannot infer notebookName for injectNotes: need a head row or Parent Title on the first row'
-    )
-  }
-  return parent
-}
-
 defineParameterType({
   name: 'notepath',
   regexp: /.*/,
@@ -54,10 +40,21 @@ Given('there are some notes:', (data: DataTable) => {
       throw new Error('Parent Title is required for all notes')
     }
   })
+  const head = hashes.find((n) => !(n['Parent Title'] ?? '').trim())
+  let notebookName: string
+  if (head?.Title) {
+    notebookName = head.Title
+  } else {
+    const parent = hashes[0]?.['Parent Title']?.trim()
+    if (!parent) {
+      throw new Error(
+        'Cannot infer notebookName for injectNotes: need a head row or Parent Title on the first row'
+      )
+    }
+    notebookName = parent
+  }
   cy.get<string>('@currentLoginUser').then((username) =>
-    start
-      .testability()
-      .injectNotes(hashes, username, notebookNameForInjectNotes(hashes))
+    start.testability().injectNotes(hashes, username, notebookName)
   )
 })
 
@@ -109,16 +106,10 @@ Given(
 )
 
 Given(
-  'there are some notes for existing user {string}',
-  (externalIdentifier: string, data: DataTable) => {
+  'there are some notes for existing user {string} in notebook {string}',
+  (externalIdentifier: string, notebookName: string, data: DataTable) => {
     const hashes = data.hashes()
-    start
-      .testability()
-      .injectNotes(
-        hashes,
-        externalIdentifier,
-        notebookNameForInjectNotes(hashes)
-      )
+    start.testability().injectNotes(hashes, externalIdentifier, notebookName)
   }
 )
 
