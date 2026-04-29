@@ -93,7 +93,7 @@ export interface StoredApi {
     data: WikidataAssociationCreation
   ): Promise<NoteRealm>
 
-  undo(router: Router): Promise<NoteRealm>
+  undo(router: Router): Promise<NoteRealm | undefined>
 
   deleteNote(
     router: Router,
@@ -454,26 +454,31 @@ export default class StoredApiCollection implements StoredApi {
     await this.updateTextField(noteId, "edit details", value.details)
   }
 
-  private async undoInner() {
+  private async undoInner(): Promise<{
+    noteRealm: NoteRealm | undefined
+    notebookFallbackId?: number
+  }> {
     const undone = this.noteEditingHistory.peekUndo()
     if (!undone) throw new Error("undo history is empty")
     this.noteEditingHistory.popUndoHistory()
     if (undone.type === "edit title" || undone.type === "edit details") {
-      return this.updateTextContentWithoutUndo(
+      const noteRealm = await this.updateTextContentWithoutUndo(
         undone.noteId,
         undone.type,
         undone.textContent ?? ""
       )
+      return { noteRealm }
     }
     if (undone.type === "create note") {
       return this.undoCreateNote(undone.noteId)
     }
     if (undone.type === "move note") {
-      return this.undoMoveNote(
+      const noteRealm = await this.undoMoveNote(
         undone.noteId,
         undone.originalParentId ?? null,
         undone.previousSiblingId ?? null
       )
+      return { noteRealm }
     }
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.undoDeleteNote({
@@ -483,7 +488,7 @@ export default class StoredApiCollection implements StoredApi {
     if (error || !noteRealm) {
       throw new Error(toErrorMessage(error, "Failed to undo delete note"))
     }
-    return noteRealm
+    return { noteRealm }
   }
 
   private async undoMoveNote(
@@ -538,7 +543,13 @@ export default class StoredApiCollection implements StoredApi {
     return updatedNotes
   }
 
-  private async undoCreateNote(noteId: Doughnut.ID) {
+  private async undoCreateNote(noteId: Doughnut.ID): Promise<{
+    noteRealm: NoteRealm | undefined
+    notebookFallbackId?: number
+  }> {
+    const cached = this.storage.refOfNoteRealm(noteId).value
+    const notebookFallbackId =
+      cached?.notebook?.id ?? cached?.note?.noteTopology?.notebookId
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
@@ -550,15 +561,26 @@ export default class StoredApiCollection implements StoredApi {
     this.storage.removeNoteRealm(noteId)
     if (res.length === 0) {
       return {
-        id: noteId,
-        note: { deletedAt: new Date().toISOString() },
-      } as NoteRealm
+        noteRealm: undefined,
+        ...(notebookFallbackId !== undefined ? { notebookFallbackId } : {}),
+      }
     }
-    return this.storage.refreshNoteRealm(res[0]!)
+    return { noteRealm: this.storage.refreshNoteRealm(res[0]!) }
   }
 
   async undo(router: Router) {
-    const noteRealm = await this.undoInner()
+    const { noteRealm, notebookFallbackId } = await this.undoInner()
+    if (!noteRealm) {
+      if (notebookFallbackId !== undefined) {
+        await router.push({
+          name: "notebookEdit",
+          params: { notebookId: notebookFallbackId },
+        })
+      } else {
+        await router.push({ name: "notebooks" })
+      }
+      return
+    }
     await router.push({
       name: "noteShow",
       params: { noteId: noteRealm.id },

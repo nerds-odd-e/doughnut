@@ -73,6 +73,23 @@ describe("storedApiCollection", () => {
         storageAccessor.value.refOfNoteRealm(note.id).value
       ).toBeUndefined()
     })
+
+    it("should navigate to notebook edit when delete returns no realms", async () => {
+      mockSdkService("deleteNote", [])
+      const noteEditingHistory = new NoteEditingHistory()
+      storageAccessor.value = createNoteStorage(noteEditingHistory)
+
+      storageAccessor.value.refreshNoteRealm(note)
+      noteEditingHistory.createNote(note.id)
+
+      const sa = storageAccessor.value.storedApi()
+      await sa.undo(router)
+
+      expect(routerPush).toHaveBeenCalledWith({
+        name: "notebookEdit",
+        params: { notebookId: note.notebook!.id },
+      })
+    })
   })
 
   describe("completeDetails", () => {

@@ -16,7 +16,11 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
 
   id(value: number): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
-      this.data.noteTopology = { id: value, slug: `s${value}`, title: 'Untitled' }
+      this.data.noteTopology = {
+        id: value,
+        slug: `s${value}`,
+        title: 'Untitled',
+      }
     } else {
       this.data.noteTopology.id = value
       this.data.noteTopology.slug = `s${value}`
