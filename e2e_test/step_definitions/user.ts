@@ -112,28 +112,8 @@ Then('The {string} page is displayed', (pageName) => {
   }
 })
 
-Then(
-  'I login as {string} I should see {string}',
-  (username: string, expectation: string) => {
-    cy.get('#username').type(username)
-    cy.get('#password').type('password')
-    cy.get('form').submit()
-    start.assumeNotePage(expectation)
-  }
-)
-
 Then('I edit user profile to change my name to {string}', (name: string) => {
   start.mainMenu().userOptions().userSettings('Old Learner').changeName(name)
-})
-
-Then('I logout via the UI', () => {
-  cy.visit('/')
-  start.mainMenu().userOptions().logout()
-})
-
-Then('I should be on the welcome page and asked to login', () => {
-  cy.contains('Welcome')
-  cy.findByRole('button', { name: 'Login via Github' }).click()
 })
 
 When(

@@ -388,17 +388,6 @@ Then(
   }
 )
 
-When(
-  'I should be asked to log in again when I click the link {string}',
-  (noteTopology: string) => {
-    cy.on('uncaught:exception', () => {
-      return false
-    })
-    start.assumeNotePage().clickChildNote(noteTopology)
-    cy.get('#username').should('exist')
-  }
-)
-
 Then(
   'I should see {string} is {string} than {string}',
   (left: string, aging: string, right: string) => {

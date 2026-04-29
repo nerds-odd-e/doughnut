@@ -11,10 +11,9 @@ export const loginActions = {
         method: 'POST',
         url: '/logout',
       })
-      .then((response) => {
-        expect(response.status).to.equal(204)
-        return cy.clearCookies()
-      })
+      .its('status')
+      .should('eq', 204)
+      .clearAllCookies()
   },
 
   loginAs(username: string) {

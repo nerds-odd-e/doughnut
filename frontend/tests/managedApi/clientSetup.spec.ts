@@ -245,5 +245,23 @@ describe("clientSetup", () => {
       expect(mockToast.warning).not.toHaveBeenCalled()
       expect(loginOrRegisterAndHaltThisThread).not.toHaveBeenCalled()
     })
+
+    it("shows warning toast and redirects when user accepts login on mutating 401", async () => {
+      vi.spyOn(window, "confirm").mockReturnValue(true)
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 401,
+      })
+
+      await UserController.createUser({
+        body: { name: "x" } as never,
+      })
+
+      expect(mockToast.warning).toHaveBeenCalledWith(
+        expect.stringContaining("POST /api/user"),
+        expect.objectContaining({ timeout: 8000 })
+      )
+      expect(loginOrRegisterAndHaltThisThread).toHaveBeenCalled()
+    })
   })
 })
