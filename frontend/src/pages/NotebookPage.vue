@@ -75,10 +75,9 @@
         ]"
       >
         <NoteSidebar
-          v-if="sidebarRealm"
-          v-bind="{
-            noteRealm: sidebarRealm,
-          }"
+          v-if="notebook"
+          :note-realm="sidebarRealm"
+          :notebook-id="notebook.id"
         />
       </aside>
       <main

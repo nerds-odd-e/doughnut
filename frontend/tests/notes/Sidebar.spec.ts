@@ -37,6 +37,7 @@ describe("Sidebar", () => {
       .component(Sidebar)
       .withProps({
         activeNoteRealm: n,
+        notebookId: n.notebook.id,
       })
       .mount({ attachTo: document.body })
     return wrapper
@@ -205,6 +206,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: firstGeneration,
+          notebookId: firstGeneration.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -217,6 +219,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: firstGeneration,
+          notebookId: firstGeneration.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -231,6 +234,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: topNoteRealm,
+          notebookId: topNoteRealm.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -245,6 +249,7 @@ describe("Sidebar", () => {
         .component(Sidebar)
         .withProps({
           activeNoteRealm: firstGeneration,
+          notebookId: firstGeneration.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -263,6 +268,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: bazaarRealm,
+          notebookId: bazaarRealm.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -282,19 +288,27 @@ describe("Sidebar", () => {
     ).toBe(true)
   })
 
-  it("should disable the menu and keep the content when loading", async () => {
-    mountSidebar(topNoteRealm)
+  it("shows notebook root add button when realm is cleared (loading) but sidebar stays on a notebook page", async () => {
+    wrapper = helper
+      .component(Sidebar)
+      .withCurrentUser(makeMe.aUser.please())
+      .withProps({
+        activeNoteRealm: topNoteRealm,
+        notebookId: topNoteRealm.notebook.id,
+      })
+      .mount({ attachTo: document.body })
     await flushPromises()
 
-    // Simulate loading/undefined prop as per original test (which used 'noteRealm' instead of 'activeNoteRealm')
-    // We replicate the behavior: effectively not changing activeNoteRealm, or passing an extra prop.
-    // Since wrapper is <any>, we can pass arbitrary props.
-    await wrapper.setProps({ noteRealm: undefined })
+    await wrapper.setProps({
+      activeNoteRealm: undefined,
+      notebookId: topNoteRealm.notebook.id,
+    })
     await flushPromises()
 
-    expect(
-      findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
-    ).toBe(true)
+    expect(findSidebarItem(topNoteRealm.note.noteTopology.title!)).toBe(
+      undefined
+    )
+    expect(wrapper.find(`button[title="Add note"]`).exists()).toBe(true)
   })
 
   describe("drag and drop functionality", () => {

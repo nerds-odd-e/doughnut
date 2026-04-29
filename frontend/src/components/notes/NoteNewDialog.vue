@@ -19,6 +19,7 @@
               </template>
             </NoteFormTitleOnly>
             <SearchResults
+              v-if="notebookRootNotebookId == null && referenceNote"
               v-bind="{
                 noteId: referenceNote.id,
                 inputSearchKey: effectiveSearchKey,
@@ -57,17 +58,22 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
-// Props
+// Props — referenceNote required unless creating first note via notebook-root API
 const props = defineProps<{
-  referenceNote: Note
-  insertMode: InsertMode
+  referenceNote?: Note
+  insertMode?: InsertMode
+  notebookRootNotebookId?: number
   initialTitle?: string
 }>()
 
-const noteRealm = computed(
-  () => storageAccessor.value.refOfNoteRealm(props.referenceNote.id).value
+const noteRealm = computed(() =>
+  props.referenceNote != null
+    ? storageAccessor.value.refOfNoteRealm(props.referenceNote.id).value
+    : undefined
 )
-const notebookId = computed(() => noteRealm.value?.notebook.id)
+const notebookId = computed(
+  () => props.notebookRootNotebookId ?? noteRealm.value?.notebook.id
+)
 
 // Emits
 const emit = defineEmits<{
@@ -106,7 +112,15 @@ const processForm = async () => {
 
   const api = storageAccessor.value.storedApi()
   try {
-    if (props.insertMode === "as-child") {
+    if (props.notebookRootNotebookId != null) {
+      await api.createRootNoteAtNotebook(
+        router,
+        props.notebookRootNotebookId,
+        creationData.value
+      )
+    } else if (props.referenceNote == null || props.insertMode == null) {
+      throw new Error("Invalid note creation mode")
+    } else if (props.insertMode === "as-child") {
       await api.createNote(router, props.referenceNote.id, creationData.value)
     } else {
       await api.createNoteAfter(

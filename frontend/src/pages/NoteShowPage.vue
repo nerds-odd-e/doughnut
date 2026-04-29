@@ -64,9 +64,8 @@
     >
       <NoteSidebar
         v-if="noteRealm"
-        v-bind="{
-          noteRealm,
-        }"
+        :note-realm="noteRealm"
+        :notebook-id="noteRealm.notebook.id"
       />
     </aside>
 

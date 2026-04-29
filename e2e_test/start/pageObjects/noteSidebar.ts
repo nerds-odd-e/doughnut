@@ -2,25 +2,15 @@ import { submittableForm } from '../forms'
 import { pageIsNotLoading } from '../pageBase'
 import noteCreationForm from './noteForms/noteCreationForm'
 
-const sidebarAddChildButton = () => {
+const sidebarAddNoteButton = (buttonName?: string) => {
   const getButton = () =>
-    cy.get('aside').findByRole('button', { name: 'Add Child Note' })
+    cy
+      .get('aside')
+      .findByRole('button', { name: buttonName ?? 'Add Child Note' })
   return {
     click: () => {
       getButton().click()
-      return { ...submittableForm }
-    },
-    shouldNotExist: () => getButton().should('not.exist'),
-  }
-}
-
-const sidebarAddNextSiblingButton = () => {
-  const getButton = () =>
-    cy.get('aside').findByRole('button', { name: 'Add Next Sibling Note' })
-  return {
-    click: () => {
-      getButton().click()
-      return { ...submittableForm }
+      return noteCreationForm
     },
     shouldNotExist: () => getButton().should('not.exist'),
   }
@@ -68,17 +58,21 @@ export const noteSidebar = () => {
         })
       })
     },
+    addingNoteButton() {
+      pageIsNotLoading()
+      return sidebarAddNoteButton('Add note')
+    },
     addingChildNoteButton() {
       pageIsNotLoading()
-      return sidebarAddChildButton()
+      return sidebarAddNoteButton()
     },
     addingChildNote() {
-      sidebarAddChildButton().click()
+      sidebarAddNoteButton().click()
       return noteCreationForm
     },
     addingNextSiblingNote() {
       pageIsNotLoading()
-      sidebarAddNextSiblingButton().click()
+      sidebarAddNoteButton('Add Next Sibling Note').click()
       return noteCreationForm
     },
   }
@@ -86,6 +80,9 @@ export const noteSidebar = () => {
 
 /** Page objects that show the note sidebar (note page, notebook page) share these. */
 export const sidebarChildNotePageMethods = () => ({
+  addingNoteButton() {
+    return noteSidebar().addingNoteButton()
+  },
   addingChildNoteButton() {
     return noteSidebar().addingChildNoteButton()
   },

@@ -1,18 +1,19 @@
 <template>
   <div class="daisy-ml-[-1rem]">
     <NoteSidebarToolbar
-      v-if="activeNoteRealm && headNoteId"
-      :note="activeNoteRealm.note"
-      :readonly="sidebarReadonly"
+      v-if="!sidebarReadonly"
+      :notebook-id="notebookId"
+      :note="activeNoteRealm?.note"
+      :topology-head-resolved="topologyHeadResolved"
     />
     <SidebarInner
       :class="{ 'is-disabled': !activeNoteRealm }"
-      v-if="activeNoteRealm && headNoteId"
+      v-if="activeNoteRealm && topologyHeadResolved"
       v-bind="{
-        noteId: headNoteId,
+        noteId: topologyHeadNoteId!,
         activeNoteRealm: activeNoteRealm,
       }"
-      :key="headNoteId"
+      :key="topologyHeadNoteId"
     />
   </div>
 </template>
@@ -25,25 +26,29 @@ import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 
 const props = defineProps({
-  activeNoteRealm: { type: Object as PropType<NoteRealm> },
+  /** When set with a loaded realm — sidebar listing for this notebook tree */
+  activeNoteRealm: { type: Object as PropType<NoteRealm>, required: false },
+  /** Opens root-note POST /api/notebooks/{id}/create-note whenever topology head is missing */
+  notebookId: { type: Number, required: true },
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const sidebarReadonly = computed(
   () =>
-    !props.activeNoteRealm ||
     !currentUser?.value ||
-    props.activeNoteRealm.fromBazaar === true
+    (props.activeNoteRealm != null && props.activeNoteRealm.fromBazaar === true)
 )
 
-const headNoteId = computed(() => {
-  if (!props.activeNoteRealm) return undefined
+const topologyHeadNoteId = computed(() => {
+  if (!props.activeNoteRealm?.note?.noteTopology) return undefined
   let cursor = props.activeNoteRealm.note.noteTopology
-  while (cursor.parentOrSubjectNoteTopology) {
+  while (cursor?.parentOrSubjectNoteTopology != null) {
     cursor = cursor.parentOrSubjectNoteTopology
   }
-  return cursor.id
+  return cursor?.id
 })
+
+const topologyHeadResolved = computed(() => topologyHeadNoteId.value != null)
 </script>
 
 <style scoped>
