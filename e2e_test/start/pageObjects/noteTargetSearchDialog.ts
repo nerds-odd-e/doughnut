@@ -1,6 +1,28 @@
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 
+const relationshipTargetListMaxAttempts = 5
+const relationshipTargetListRetryMs = 400
+
+function expectExactRelationshipTargetsWithRetry(targets: string[]) {
+  const tryMatch = (attempt: number) => {
+    cy.get('.search-result .daisy-card-title').then((elms) => {
+      const actual = Cypress._.map(elms, 'innerText')
+      if (Cypress._.isEqual(actual, targets)) {
+        return
+      }
+      if (attempt >= relationshipTargetListMaxAttempts - 1) {
+        throw new Error(
+          `expected ${JSON.stringify(actual)} to deeply equal ${JSON.stringify(targets)}`
+        )
+      }
+      cy.wait(relationshipTargetListRetryMs)
+      tryMatch(attempt + 1)
+    })
+  }
+  tryMatch(0)
+}
+
 function searchNote(searchKey: string, options: string[]) {
   options?.forEach((option: string) => form.getField(option).check())
   cy.findByPlaceholderText('Search').clear().type(searchKey)
@@ -28,9 +50,7 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByText('Search result', { selector: '.result-title' }).should(
         'be.visible'
       )
-      cy.get('.search-result .daisy-card-title')
-        .then((elms) => Cypress._.map(elms, 'innerText'))
-        .should('deep.equal', targets)
+      expectExactRelationshipTargetsWithRetry(targets)
     },
     expectExactDropdownTargets: (targets: string[]) => {
       if (targets.length === 0) {
