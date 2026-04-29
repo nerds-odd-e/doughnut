@@ -1,6 +1,6 @@
 <template>
   <router-link
-    :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
+    :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
     class="daisy-text-decoration-none"
   >
     <BookText class="me-1 w-4 h-4 inline-block" />

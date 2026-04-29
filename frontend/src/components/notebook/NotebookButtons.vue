@@ -116,7 +116,7 @@ const closeDropdown = () => {
 const onEditNotebookSettings = () => {
   closeDropdown()
   router.push({
-    name: "notebookEdit",
+    name: "notebookPage",
     params: { notebookId: props.notebook.id },
   })
 }

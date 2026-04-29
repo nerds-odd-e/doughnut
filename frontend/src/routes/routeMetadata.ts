@@ -1,13 +1,16 @@
-import type { RouteLocation } from "vue-router"
+import type { RouteLocation, RouteRecordRaw } from "vue-router"
 
 // Route metadata definitions (path, name, props, meta) without component imports
 // This allows Storybook to import route definitions without pulling in page components
 export interface RouteMetadata {
   path: string
-  name: string
+  /** Omitted when `redirect` is set (legacy URL only). */
+  name?: string
   alias?: string | string[]
   props?: boolean | ((route: RouteLocation) => Record<string, unknown>)
   meta?: Record<string, unknown>
+  /** When set, this entry is redirect-only (no `name` / page component). */
+  redirect?: RouteRecordRaw["redirect"]
 }
 
 export const routeMetadata: RouteMetadata[] = [
@@ -24,15 +27,22 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
-    path: "/d/notebooks/:notebookId/edit",
-    name: "notebookEdit",
-    props: (route: RouteLocation) => ({
-      notebookId: Number(route.params.notebookId),
+    path: "/d/notebooks/:notebookId(\\d+)/edit",
+    redirect: (to) => ({
+      name: "notebookPage",
+      params: { notebookId: to.params.notebookId },
     }),
   },
   {
     path: "/d/notebooks/:notebookId/book",
     name: "bookReading",
+    props: (route: RouteLocation) => ({
+      notebookId: Number(route.params.notebookId),
+    }),
+  },
+  {
+    path: "/d/notebooks/:notebookId(\\d+)",
+    name: "notebookPage",
     props: (route: RouteLocation) => ({
       notebookId: Number(route.params.notebookId),
     }),

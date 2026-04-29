@@ -55,8 +55,8 @@ const notebookPage = () => {
     },
     exportForObsidian() {
       cy.location('pathname').then((pathname) => {
-        const m = pathname.match(/\/notebooks\/(\d+)\//)
-        expect(m, 'on notebook edit page with id in URL').to.not.be.null
+        const m = pathname.match(/\/d\/notebooks\/(\d+)(?:\/|$)/)
+        expect(m, 'on notebook page with id in URL').to.not.be.null
         const notebookId = m![1]!
         cy.findByRole('button', { name: 'Export for Obsidian' }).click()
         const downloadsFolder = Cypress.config('downloadsFolder') as string

@@ -13,7 +13,7 @@
       "
     >
       <router-link
-        :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
+        :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
         class="notebook-list-row__main daisy-flex daisy-min-w-0 daisy-flex-1 daisy-flex-col daisy-justify-center daisy-gap-0.5 daisy-no-underline"
       >
         <h5

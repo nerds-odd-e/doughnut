@@ -86,7 +86,7 @@ describe("storedApiCollection", () => {
       await sa.undo(router)
 
       expect(routerPush).toHaveBeenCalledWith({
-        name: "notebookEdit",
+        name: "notebookPage",
         params: { notebookId: note.notebook!.id },
       })
     })

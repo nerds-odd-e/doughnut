@@ -162,3 +162,16 @@ Then('I should see popup {string}', (message: string) => {
     expect(text).to.equal(message)
   })
 })
+
+Then(
+  'I should be on a notebook page URL without the legacy edit segment',
+  () => {
+    cy.location('pathname').should('match', /^\/d\/notebooks\/\d+$/)
+  }
+)
+
+Then('the notebook page summary shows title {string}', (title: string) => {
+  cy.get('[data-testid="notebook-page-summary"]')
+    .find('h1')
+    .should('contain.text', title)
+})

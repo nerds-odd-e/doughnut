@@ -574,7 +574,7 @@ export default class StoredApiCollection implements StoredApi {
     if (!noteRealm) {
       if (notebookFallbackId !== undefined) {
         await router.push({
-          name: "notebookEdit",
+          name: "notebookPage",
           params: { notebookId: notebookFallbackId },
         })
       } else {

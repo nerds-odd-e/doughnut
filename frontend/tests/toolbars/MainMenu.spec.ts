@@ -167,8 +167,8 @@ describe("main menu", () => {
     expect(navItem).toHaveClass("daisy-text-primary")
   })
 
-  it("highlights the note link when on notebook edit page", async () => {
-    await router.push({ name: "notebookEdit", params: { notebookId: "1" } })
+  it("highlights the note link when on notebook page", async () => {
+    await router.push({ name: "notebookPage", params: { notebookId: "1" } })
     await flushPromises()
 
     await renderComponent()

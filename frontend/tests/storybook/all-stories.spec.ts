@@ -10,12 +10,20 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { storyFiles } from "../../storyFiles.generated"
 
 // Mock router for components that use vue-router (same as Storybook preview)
-const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => ({
-  ...metadata,
-  component: {
-    template: `<div>${metadata.name} (Mock)</div>`,
-  },
-}))
+const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
+  if (metadata.redirect !== undefined) {
+    return {
+      path: metadata.path,
+      redirect: metadata.redirect,
+    } as RouteRecordRaw
+  }
+  return {
+    ...metadata,
+    component: {
+      template: `<div>${metadata.name} (Mock)</div>`,
+    },
+  }
+}) as RouteRecordRaw[]
 
 const router = createRouter({
   history: createWebHistory("/"),

@@ -19,7 +19,7 @@ describe("NotebookPage.spec", () => {
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())
       .currentRoute({
-        name: "notebookEdit",
+        name: "notebookPage",
         params: { notebookId: String(notebook.id) },
       })
       .render()

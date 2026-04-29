@@ -50,14 +50,22 @@ const componentMap: Record<string, unknown> = {
   circles: CirclesPage,
   manageAccessTokens: ManageAccessTokensPage,
   memoryTrackerShow: MemoryTrackerPage,
-  notebookEdit: NotebookPage,
+  notebookPage: NotebookPage,
   bookReading: BookReadingPage,
 }
 
 // Combine route metadata with components
-const routes: RouteRecordRaw[] = routeMetadata.map((metadata) => ({
-  ...metadata,
-  component: componentMap[metadata.name],
-})) as RouteRecordRaw[]
+const routes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
+  if (metadata.redirect !== undefined) {
+    return {
+      path: metadata.path,
+      redirect: metadata.redirect,
+    } as RouteRecordRaw
+  }
+  return {
+    ...metadata,
+    component: componentMap[metadata.name!],
+  }
+}) as RouteRecordRaw[]
 
 export default routes

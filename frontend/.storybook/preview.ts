@@ -10,12 +10,20 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 
 // Reuse route metadata from production code without importing page components
 // This eliminates duplication - route definitions are defined once in routeMetadata.ts
-const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => ({
-  ...metadata,
-  component: {
-    template: `<div>${metadata.name} (Mock)</div>`,
-  },
-}))
+const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
+  if (metadata.redirect !== undefined) {
+    return {
+      path: metadata.path,
+      redirect: metadata.redirect,
+    } as RouteRecordRaw
+  }
+  return {
+    ...metadata,
+    component: {
+      template: `<div>${metadata.name} (Mock)</div>`,
+    },
+  }
+})
 
 // Mock router for components that use vue-router
 const router = createRouter({

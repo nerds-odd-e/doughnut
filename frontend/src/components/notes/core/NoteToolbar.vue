@@ -151,7 +151,7 @@ watch(
 const editNotebookSettings = () => {
   if (notebook) {
     router.push({
-      name: "notebookEdit",
+      name: "notebookPage",
       params: { notebookId: notebook.id },
     })
   }

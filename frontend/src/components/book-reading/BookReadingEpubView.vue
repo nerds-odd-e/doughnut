@@ -5,7 +5,7 @@
       :panel-id="bookReadingBookLayoutPanelId"
     />
     <router-link
-      :to="{ name: 'notebookEdit', params: { notebookId: notebookId } }"
+      :to="{ name: 'notebookPage', params: { notebookId: notebookId } }"
       class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0 daisy-no-underline"
     >
       Notebook

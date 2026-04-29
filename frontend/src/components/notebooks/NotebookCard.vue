@@ -3,7 +3,7 @@
     <div class="notebook-binding"></div>
     <slot name="cardHeader" />
     <router-link
-      :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
+      :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
       class="no-underline"
     >
       <div :class="compact ? 'daisy-p-2' : 'daisy-p-4'">
