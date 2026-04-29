@@ -98,7 +98,7 @@
             <NoteConversation
               :note-id="conversationRealm.id"
               :is-maximized="isContentMinimized"
-              @close-dialog="handleCloseConversation"
+              @close-dialog="handleCloseConversation(conversationRealm)"
               @toggle-maximize="toggleMaximize"
             />
           </div>
@@ -121,6 +121,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalBar from "../components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 const router = useRouter()
 const route = useRoute()
@@ -250,45 +251,12 @@ const toggleMaximize = () => {
   isContentMinimized.value = !isContentMinimized.value
 }
 
-const handleCloseConversation = () => {
-  const raw = route.params.noteId
-  const segment =
-    raw !== undefined && raw !== ""
-      ? String(Array.isArray(raw) ? raw[0] : raw)
-      : undefined
-  if (route.name === "noteShowByNotebookSlug") {
-    router.replace({ path: route.path, query: {} })
-    return
-  }
-  const realm = noteRealm.value
-  if (realm) {
-    router.replace({
-      ...noteShowByNotebookSlugLocationFromNoteRealm(realm),
-      query: {},
-    })
-    return
-  }
-  if (segment !== undefined && !/^\d+$/.test(segment)) {
-    router.replace({
-      name: "noteShow",
-      params: { noteId: segment },
-      query: {},
-    })
-    return
-  }
-  const routeNoteId =
-    segment !== undefined && /^\d+$/.test(segment)
-      ? segment
-      : resolvedNoteId.value != null
-        ? String(resolvedNoteId.value)
-        : undefined
-  if (routeNoteId !== undefined) {
-    router.replace({
-      name: "noteShow",
-      params: { noteId: routeNoteId },
-      query: {},
-    })
-  }
+const handleCloseConversation = (conversationRealm: NoteRealm) => {
+  isContentMinimized.value = false
+  router.replace({
+    ...noteShowByNotebookSlugLocationFromNoteRealm(conversationRealm),
+    query: {},
+  })
 }
 
 // Track window width so we can decide when to show sidebar by default
