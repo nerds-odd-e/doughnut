@@ -13,6 +13,7 @@ Feature: Nested Note creation
     When I create a note belonging to "LeSS in Action" with title "Re-quirement"
     Then I should see the note tree in the sidebar
       | note-title   |
+      | LeSS in Action |
       | team         |
       | tech         |
       | Re-quirement |
@@ -30,6 +31,7 @@ Feature: Nested Note creation
     When I create a note after "team" with title "coordination"
     Then I should see the note tree in the sidebar
       | note-title   |
+      | LeSS in Action |
       | team         |
       | coordination |
       | tech         |

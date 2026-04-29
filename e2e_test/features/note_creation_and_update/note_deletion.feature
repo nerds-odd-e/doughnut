@@ -56,7 +56,7 @@ Feature: Note deletion
     And there is "a part of" relationship between note "source" and "target"
     And I should see "source" has relationship "a part of" "target"
     When I delete note "target"
-    And I navigate to References Test note
+    And I navigate to References suite/References Test note
     Then I should see "References suite/References Test" with these children
       | note-title |
       | source     |

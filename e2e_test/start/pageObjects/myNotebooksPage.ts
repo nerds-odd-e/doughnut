@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
-import { navigationActions } from '../actions/navigationActions'
 import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
 import type NotePath from '../../support/NotePath'
 import { assumeNotePage } from './notePage'
+import { noteSidebar } from './noteSidebar'
 import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
@@ -39,8 +39,15 @@ const myNotebooksPage = () => {
       if (segments.length === 0) {
         return this as any
       }
-      const leafTitle = segments[segments.length - 1]!
-      navigationActions.jumpToNotePage(leafTitle)
+      const [notebookTitle, ...noteTitles] = segments
+      const notebook = notebookList().navigateToNotebook(notebookTitle!)
+      if (noteTitles.length === 0) {
+        return notebook
+      }
+      noteTitles.forEach((noteTitle) => {
+        noteSidebar().navigateToNote(noteTitle)
+      })
+      const leafTitle = noteTitles[noteTitles.length - 1]!
       return assumeNotePage(leafTitle)
     },
     creatingNotebook(notebookTopic: string, description?: string) {

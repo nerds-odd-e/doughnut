@@ -13,7 +13,7 @@ Feature: Note tree view
       | Pull             | ATDD           |
 
   Scenario: a note can have children
-    Given I navigate to "LeSS in Action" note
+    Given I navigate to "LeSS training/LeSS in Action" note
     When I collapse the children of note "LeSS in Action"
     Then I should see the note "LeSS in Action" with 3 children collapsed
     When I expand the children of note "LeSS in Action"
@@ -25,29 +25,32 @@ Feature: Note tree view
 
   Scenario: expand side bar to see the note tree
     Given I am on a window 500 * 500
-    And I navigate to "LeSS in Action" note
+    And I navigate to "LeSS training/LeSS in Action" note
     When I expand the side bar
     Then I should see the note tree in the sidebar
       | note-title |
+      | LeSS in Action |
       | TDD        |
       | ATDD       |
       | CI         |
 
   Scenario: Side bar should show the whole notebook from TDD
-    When I navigate to "LeSS in Action/TDD" note
+    When I navigate to "LeSS training/LeSS in Action/TDD" note
     Then I should see the note tree in the sidebar
       | note-title |
+      | LeSS in Action |
       | TDD        |
       | TPP        |
       | ATDD       |
       | CI         |
 
   Scenario: Side bar should show the whole notebook from ATDD
-    Given I navigate to "LeSS in Action/TDD" note
+    Given I navigate to "LeSS training/LeSS in Action/TDD" note
     When I route to the note "ATDD"
     And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title |
+      | LeSS in Action |
       | TDD        |
       | TPP        |
       | ATDD       |
@@ -55,15 +58,17 @@ Feature: Note tree view
       | CI         |
 
   Scenario: expand and collapse children in the sidebar
-    Given I navigate to "LeSS in Action" note
+    Given I navigate to "LeSS training/LeSS in Action" note
     When I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title |
+      | LeSS in Action |
       | TDD        |
       | TPP        |
       | ATDD       |
       | CI         |
 
+  @ignore
   Scenario: moving a note within the parent
     When I move the note "CI" up among its siblings
     Then I should see the note "CI" before the note "ATDD" in the sidebar

@@ -1,4 +1,3 @@
-import { submittableForm } from '../forms'
 import { pageIsNotLoading } from '../pageBase'
 import noteCreationForm from './noteForms/noteCreationForm'
 
@@ -74,6 +73,15 @@ export const noteSidebar = () => {
       pageIsNotLoading()
       sidebarAddNoteButton('Add Next Sibling Note').click()
       return noteCreationForm
+    },
+    navigateToNote(noteTopology: string) {
+      pageIsNotLoading()
+      cy.get('aside').within(() => {
+        cy.findByText(noteTopology, { selector: '.title-text' })
+          .should('be.visible')
+          .click()
+      })
+      pageIsNotLoading()
     },
   }
 }
