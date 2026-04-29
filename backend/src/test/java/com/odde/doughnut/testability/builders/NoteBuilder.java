@@ -156,6 +156,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
+  public NoteBuilder slug(String slug) {
+    entity.setSlug(slug);
+    return this;
+  }
+
   public NoteBuilder title(String text) {
     entity.setTitle(text);
     return this;

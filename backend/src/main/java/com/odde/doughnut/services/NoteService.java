@@ -28,6 +28,7 @@ public class NoteService {
   private final TestabilitySettings testabilitySettings;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
   private final WikiSlugPathService wikiSlugPathService;
+  private final AuthorizationService authorizationService;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -35,13 +36,15 @@ public class NoteService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiSlugPathService wikiSlugPathService) {
+      WikiSlugPathService wikiSlugPathService,
+      AuthorizationService authorizationService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
     this.wikiSlugPathService = wikiSlugPathService;
+    this.authorizationService = authorizationService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -50,6 +53,12 @@ public class NoteService {
 
   public Optional<Note> findById(Integer id) {
     return noteRepository.findById(id);
+  }
+
+  public List<Note> findNotesVisibleToUserBySlugBasename(User user, String basename) {
+    return noteRepository.findAllNonDeletedBySlugBasename(basename).stream()
+        .filter(n -> authorizationService.userMayReadNote(user, n))
+        .toList();
   }
 
   public void destroy(Note note) {

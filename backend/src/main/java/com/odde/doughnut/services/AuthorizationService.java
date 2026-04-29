@@ -115,16 +115,29 @@ public class AuthorizationService {
 
   private void assertReadAuthorizationNotebook(User user, Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    if (notebook != null) {
-      if (user != null && user.canReferTo(notebook)) {
-        return;
-      }
-      if (bazaarNotebookRepository.findByNotebook(notebook) != null) {
-        return;
-      }
+    if (userMayReadNotebook(user, notebook)) {
+      return;
     }
     assertLoggedIn(user);
     throw new UnexpectedNoAccessRightException();
+  }
+
+  /**
+   * Same visibility rule as {@link #assertReadAuthorization(Note)}: ownership, subscription, or
+   * bazaar.
+   */
+  public boolean userMayReadNotebook(User user, Notebook notebook) {
+    if (notebook == null) {
+      return false;
+    }
+    if (user != null && user.canReferTo(notebook)) {
+      return true;
+    }
+    return bazaarNotebookRepository.findByNotebook(notebook) != null;
+  }
+
+  public boolean userMayReadNote(User user, Note note) {
+    return userMayReadNotebook(user, note.getNotebook());
   }
 
   private void assertAuthorizationNotebook(User user, Notebook notebook)

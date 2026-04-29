@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -180,4 +181,23 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           "SELECT MAX(n.createdAt) FROM Note n WHERE n.creator.id = :userId AND n.deletedAt IS NULL")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
+
+  /**
+   * Basename is the segment after the last {@code /} in {@code slug}; use MySQL SUBSTRING_INDEX.
+   */
+  @Query(
+      value =
+          "SELECT id FROM note WHERE deleted_at IS NULL AND SUBSTRING_INDEX(slug, '/', -1) = :basename",
+      nativeQuery = true)
+  List<Integer> findIdsBySlugBasename(@Param("basename") String basename);
+
+  default List<Note> findAllNonDeletedBySlugBasename(String basename) {
+    List<Integer> ids = findIdsBySlugBasename(basename);
+    if (ids.isEmpty()) {
+      return List.of();
+    }
+    List<Note> out = new ArrayList<>();
+    findAllById(ids).forEach(out::add);
+    return out;
+  }
 }

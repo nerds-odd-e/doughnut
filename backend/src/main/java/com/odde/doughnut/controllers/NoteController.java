@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -221,6 +222,24 @@ class NoteController {
     return noteService.findRecentNotesByUser(authorizationService.getCurrentUser().getId()).stream()
         .map(note -> new NoteSearchResult(note.getNoteTopology(), null))
         .toList();
+  }
+
+  @GetMapping("/by-basename/{basename}")
+  public NoteRealm showNoteByBasename(@PathVariable String basename) {
+    authorizationService.assertLoggedIn();
+    if (basename == null || basename.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this name.");
+    }
+    User user = authorizationService.getCurrentUser();
+    List<Note> matches = noteService.findNotesVisibleToUserBySlugBasename(user, basename);
+    if (matches.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this name.");
+    }
+    if (matches.size() > 1) {
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "More than one note matches this name.");
+    }
+    return matches.get(0).toNoteRealm(user);
   }
 
   @GetMapping("/{note}/graph")

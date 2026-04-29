@@ -23,8 +23,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
+import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
@@ -65,6 +67,45 @@ class NoteControllerTests extends ControllerTestBase {
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getFromBazaar(), is(false));
+    }
+  }
+
+  @Nested
+  class showNoteByBasename {
+    @Test
+    void shouldReturnNoteWhenSlugBasenameMatchesExactlyOneVisibleNote() {
+      User user = currentUser.getUser();
+      Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
+      NoteRealm realm = controller.showNoteByBasename("foo");
+      assertThat(realm.getId(), equalTo(note.getId()));
+    }
+
+    @Test
+    void shouldYieldConflictWhenMoreThanOneAccessibleNoteSharesBasename() {
+      User user = currentUser.getUser();
+      makeMe.aNote().creatorAndOwner(user).slug("a/foo").please();
+      makeMe.aNote().creatorAndOwner(user).slug("b/foo").please();
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.showNoteByBasename("foo"));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+    }
+
+    @Test
+    void shouldYieldNotFoundWhenNoMatchingSlugBasenameForUser() {
+      makeMe.aNote().creatorAndOwner(currentUser.getUser()).slug("only/other").please();
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.showNoteByBasename("missing"));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void shouldTreatOtherUsersPrivateNoteMatchingBasenameAsNotAccessible() {
+      User otherUser = makeMe.aUser().please();
+      makeMe.aNote().creatorAndOwner(otherUser).slug("x/foo").please();
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.showNoteByBasename("foo"));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
   }
 

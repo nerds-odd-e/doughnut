@@ -3325,6 +3325,24 @@ export type GetRecentNotesResponses = {
 
 export type GetRecentNotesResponse = GetRecentNotesResponses[keyof GetRecentNotesResponses];
 
+export type ShowNoteByBasenameData = {
+    body?: never;
+    path: {
+        basename: string;
+    };
+    query?: never;
+    url: '/api/notes/by-basename/{basename}';
+};
+
+export type ShowNoteByBasenameResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type ShowNoteByBasenameResponse = ShowNoteByBasenameResponses[keyof ShowNoteByBasenameResponses];
+
 export type MyNotebooksData = {
     body?: never;
     path?: never;

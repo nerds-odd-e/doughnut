@@ -2692,6 +2692,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteSearchResult"
+  /api/notes/by-basename/{basename}:
+    get:
+      tags:
+      - note-controller
+      operationId: showNoteByBasename
+      parameters:
+      - name: basename
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/notebooks:
     get:
       tags:
