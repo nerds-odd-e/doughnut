@@ -1213,6 +1213,30 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/create-note:
+    post:
+      tags:
+      - notebook-controller
+      operationId: createNoteAtNotebookRoot
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteCreationDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteCreationResult"
   /api/notebooks/{notebook}/book/reorganize-layout/suggest:
     post:
       tags:
@@ -3983,7 +4007,6 @@ components:
           $ref: "#/components/schemas/NoteRealm"
       required:
       - created
-      - parent
     SpellingVerificationResult:
       type: object
       properties:

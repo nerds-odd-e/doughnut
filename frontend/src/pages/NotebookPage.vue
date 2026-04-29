@@ -90,6 +90,7 @@
           :approval="approval"
           :approval-loaded="approvalLoaded"
           :additional-instructions="aiAssistant?.additionalInstructionsToAi || ''"
+          :show-add-first-note="sidebarAnchorNoteId == null"
           @notebook-updated="handleNotebookUpdated"
         />
       </main>

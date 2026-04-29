@@ -76,7 +76,9 @@ Response Format:
 
     return jsonResponse({
       title: result.created.note.noteTopology.title,
-      message: `Added "${result.created.note.noteTopology.title}" to parent "${result.parent.note.noteTopology.title}"`,
+      message: result.parent
+        ? `Added "${result.created.note.noteTopology.title}" to parent "${result.parent.note.noteTopology.title}"`
+        : `Added "${result.created.note.noteTopology.title}" at notebook root`,
     })
   } catch (error) {
     if (error instanceof Error) {

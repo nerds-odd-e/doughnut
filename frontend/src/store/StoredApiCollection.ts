@@ -61,6 +61,12 @@ export interface StoredApi {
     data: NoteCreationDto
   ): Promise<NoteRealm>
 
+  createRootNoteAtNotebook(
+    router: Router,
+    notebookId: number,
+    data: NoteCreationDto
+  ): Promise<NoteRealm>
+
   createRelationship(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
@@ -286,7 +292,9 @@ export default class StoredApiCollection implements StoredApi {
       throw apiError
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
-    this.storage.refreshNoteRealm(nrwp.parent)
+    if (nrwp.parent) {
+      this.storage.refreshNoteRealm(nrwp.parent)
+    }
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus
@@ -321,7 +329,46 @@ export default class StoredApiCollection implements StoredApi {
       throw apiError
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
-    this.storage.refreshNoteRealm(nrwp.parent)
+    if (nrwp.parent) {
+      this.storage.refreshNoteRealm(nrwp.parent)
+    }
+    this.noteEditingHistory.createNote(focus.id)
+    await this.routerReplaceFocus(router, focus)
+    return focus
+  }
+
+  async createRootNoteAtNotebook(
+    router: Router,
+    notebookId: number,
+    data: NoteCreationDto
+  ) {
+    const { data: nrwp, error } = await apiCallWithLoading(() =>
+      NotebookController.createNoteAtNotebookRoot({
+        path: { notebook: notebookId },
+        body: data,
+      })
+    )
+    if (error || !nrwp) {
+      const apiError = new Error("Failed to create note") as Error & {
+        body?: unknown
+        status?: number
+        [key: string]: unknown
+      }
+      if (error) {
+        apiError.body = error
+        setErrorObjectForFieldErrors(apiError)
+        const errorObj = toOpenApiError(error)
+        apiError.message = errorObj.message || "Failed to create note"
+        if (errorObj.errors) {
+          apiError.status = 400
+        }
+      }
+      throw apiError
+    }
+    const focus = this.storage.refreshNoteRealm(nrwp.created)
+    if (nrwp.parent) {
+      this.storage.refreshNoteRealm(nrwp.parent)
+    }
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus

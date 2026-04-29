@@ -313,7 +313,7 @@ export type NoteCreationDto = {
 
 export type NoteCreationResult = {
     created: NoteRealm;
-    parent: NoteRealm;
+    parent?: NoteRealm;
 };
 
 export type SpellingVerificationResult = {
@@ -912,7 +912,7 @@ export type RecallPromptWritable = {
 
 export type NoteCreationResultWritable = {
     created: NoteRealmWritable;
-    parent: NoteRealmWritable;
+    parent?: NoteRealmWritable;
 };
 
 export type MemoryTrackerWritable = {
@@ -1978,6 +1978,24 @@ export type ImportObsidianResponses = {
      */
     200: unknown;
 };
+
+export type CreateNoteAtNotebookRootData = {
+    body: NoteCreationDto;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/create-note';
+};
+
+export type CreateNoteAtNotebookRootResponses = {
+    /**
+     * OK
+     */
+    200: NoteCreationResult;
+};
+
+export type CreateNoteAtNotebookRootResponse = CreateNoteAtNotebookRootResponses[keyof CreateNoteAtNotebookRootResponses];
 
 export type SuggestBookLayoutReorganizationData = {
     body?: never;

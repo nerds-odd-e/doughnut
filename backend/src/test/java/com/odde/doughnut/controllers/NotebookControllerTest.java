@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookControllerTest extends ControllerTestBase {
@@ -117,6 +119,49 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(response.noteId, nullValue());
       Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
       assertThat(nb.getDescription(), nullValue());
+    }
+  }
+
+  @Nested
+  class CreateNoteAtNotebookRoot {
+    @Test
+    void createsTopLevelNoteWithNullParentFolderAndResultParent()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("Notebook WithoutIndex");
+      RedirectToNoteResponse redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebookId).orElseThrow();
+      assertThat(nb.getHeadNote(), nullValue());
+      assertThat(noteRepository.countByNotebook_Id(nb.getId()), equalTo(0L));
+
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Root One");
+      NoteCreationResult result = controller.createNoteAtNotebookRoot(nb, noteCreation);
+
+      assertThat(result.getParent(), nullValue());
+      Note created = noteRepository.findById(result.getCreated().getId()).orElseThrow();
+      assertThat(created.getParent(), nullValue());
+      assertThat(created.getFolder(), nullValue());
+      assertThat(created.getNotebook().getId(), equalTo(nb.getId()));
+      assertThat(created.getSlug(), equalTo("root-one"));
+    }
+
+    @Test
+    void rejectsNotebookOwnedByAnotherUser()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      User owner = makeMe.aUser().please();
+      currentUser.setUser(owner);
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("Owners NB");
+      RedirectToNoteResponse redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebookId).orElseThrow();
+
+      currentUser.setUser(makeMe.aUser().please());
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Intruder");
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.createNoteAtNotebookRoot(nb, noteCreation));
     }
   }
 

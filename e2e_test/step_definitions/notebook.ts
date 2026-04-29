@@ -10,6 +10,7 @@ import {
   type DataTable,
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+import notebookPage from '../start/pageObjects/notebookPage'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
   start.navigateToNotebookPage(noteTopology).shareNotebookToBazaar()
@@ -162,6 +163,10 @@ When(
     start.navigateToNotebookPage(notebookTitle)
   }
 )
+
+When('I add the first note from the empty notebook page', () => {
+  notebookPage().addFirstRootNoteFromEmptyNotebookPage()
+})
 
 Then('I should see popup {string}', (message: string) => {
   // Wait for and verify alert message

@@ -171,7 +171,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      NoteCreationResult nr = controller.createNoteUnderParent(parent, noteCreation);
+      assertThat(nr.getParent(), not(nullValue()));
+      NoteRealm response = nr.getCreated();
       assertThat(response.getId(), not(nullValue()));
     }
 

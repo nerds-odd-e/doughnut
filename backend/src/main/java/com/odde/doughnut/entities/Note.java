@@ -370,6 +370,19 @@ public class Note extends EntityIdentifiedByIdOnly {
     setCreator(user);
   }
 
+  /** Top-level note in a notebook: no parent note, no folder (notebook root). */
+  public void initializeAsNotebookRoot(
+      Notebook notebook, User user, Timestamp currentUTCTimestamp, String title) {
+    Objects.requireNonNull(notebook, "notebook");
+    setNotebook(notebook);
+    this.parent = null;
+    setFolder(null);
+    setUpdatedAt(currentUTCTimestamp);
+    setTitle(title);
+    setCreatedAt(currentUTCTimestamp);
+    setCreator(user);
+  }
+
   public void buildNotebookForHeadNote(Ownership ownership, User creator) {
     final Notebook notebook = new Notebook();
     notebook.setCreatorEntity(creator);

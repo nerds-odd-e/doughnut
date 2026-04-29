@@ -9,6 +9,24 @@
       </p>
     </div>
 
+    <div
+      v-if="showAddFirstNote"
+      class="daisy-alert daisy-alert-info daisy-mb-6"
+      data-testid="notebook-add-first-note"
+    >
+      <div class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-3">
+        <span>This notebook has no index note yet. Add a top-level note to get started.</span>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          :disabled="addingRootNote"
+          @click="addFirstRootNote"
+        >
+          {{ addingRootNote ? "Adding…" : "Add note" }}
+        </button>
+      </div>
+    </div>
+
     <NotebookAttachedBookSection :notebook-id="notebook.id" />
 
     <!-- Notebook Management Section -->
@@ -198,6 +216,7 @@ import type { PropType } from "vue"
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -225,6 +244,7 @@ const props = defineProps({
   },
   approvalLoaded: { type: Boolean, default: false },
   additionalInstructions: { type: String, default: "" },
+  showAddFirstNote: { type: Boolean, default: false },
 })
 
 const emit = defineEmits<{
@@ -234,6 +254,22 @@ const emit = defineEmits<{
 const { showSuccessToast } = useToast()
 const router = useRouter()
 const { popups } = usePopups()
+const storageAccessor = useStorageAccessor()
+const addingRootNote = ref(false)
+
+const addFirstRootNote = async () => {
+  addingRootNote.value = true
+  try {
+    await storageAccessor.value
+      .storedApi()
+      .createRootNoteAtNotebook(router, props.notebook.id, {
+        newTitle: "Untitled",
+        wikidataId: "",
+      })
+  } finally {
+    addingRootNote.value = false
+  }
+}
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {

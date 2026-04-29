@@ -121,6 +121,13 @@ const notebookPage = () => {
       cy.findByRole('button', { name: 'Move to ...' }).click()
       return this
     },
+    addFirstRootNoteFromEmptyNotebookPage() {
+      cy.get('[data-testid="notebook-add-first-note"]')
+        .findByRole('button', { name: 'Add note' })
+        .click()
+      pageIsNotLoading()
+      return this
+    },
     readBook(bookTitle: string) {
       pageIsNotLoading()
       cy.get('[data-testid="notebook-attached-book"]').within(() => {

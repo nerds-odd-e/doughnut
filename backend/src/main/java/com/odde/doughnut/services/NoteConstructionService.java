@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -65,6 +66,18 @@ public class NoteConstructionService {
     return note;
   }
 
+  private Note createRootNote(Notebook notebook, String title) {
+    Note note = new Note();
+    User user = authorizationService.getCurrentUser();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    note.initializeAsNotebookRoot(notebook, user, currentUTCTimestamp, title);
+    wikiSlugPathService.assignSlugForNewNote(note);
+    if (entityPersister != null) {
+      entityPersister.save(note);
+    }
+    return note;
+  }
+
   public Note createNoteUnderParentId(Integer parentNoteId, String title)
       throws UnexpectedNoAccessRightException {
     Note parentNote =
@@ -79,6 +92,18 @@ public class NoteConstructionService {
       Note parentNote, WikidataIdWithApi wikidataIdWithApi, String title)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = createNote(parentNote, title);
+    return attachWikidataAndRefresh(note, wikidataIdWithApi);
+  }
+
+  private Note createRootNoteWithWikidataInfo(
+      Notebook notebook, WikidataIdWithApi wikidataIdWithApi, String title)
+      throws DuplicateWikidataIdException, IOException, InterruptedException {
+    Note note = createRootNote(notebook, title);
+    return attachWikidataAndRefresh(note, wikidataIdWithApi);
+  }
+
+  private Note attachWikidataAndRefresh(Note note, WikidataIdWithApi wikidataIdWithApi)
+      throws DuplicateWikidataIdException, IOException, InterruptedException {
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, noteService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
@@ -126,6 +151,23 @@ public class NoteConstructionService {
       Note note =
           createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
       return new NoteCreationResult(note.toNoteRealm(user), parentNote.toNoteRealm(user));
+    } catch (DuplicateWikidataIdException e) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
+      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
+      throw new BindException(bindingResult);
+    }
+  }
+
+  public NoteCreationResult createRootNoteWithWikidataService(
+      Notebook notebook,
+      NoteCreationDTO noteCreation,
+      User user,
+      WikidataIdWithApi wikidataIdWithApi)
+      throws InterruptedException, IOException, BindException {
+    try {
+      Note note =
+          createRootNoteWithWikidataInfo(notebook, wikidataIdWithApi, noteCreation.getNewTitle());
+      return new NoteCreationResult(note.toNoteRealm(user), null);
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");

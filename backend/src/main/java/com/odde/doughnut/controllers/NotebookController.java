@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
@@ -14,12 +15,14 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookGroupService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.ObsidianFormatService;
+import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,6 +35,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +59,8 @@ class NotebookController {
   private final NotebookRepository notebookRepository;
   private final NotebookCatalogService notebookCatalogService;
   private final NoteService noteService;
+  private final NoteConstructionService noteConstructionService;
+  private final WikidataService wikidataService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -68,7 +74,9 @@ class NotebookController {
       NotebookGroupService notebookGroupService,
       NotebookRepository notebookRepository,
       NotebookCatalogService notebookCatalogService,
-      NoteService noteService) {
+      NoteService noteService,
+      NoteConstructionService noteConstructionService,
+      WikidataService wikidataService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -81,6 +89,8 @@ class NotebookController {
     this.notebookRepository = notebookRepository;
     this.notebookCatalogService = notebookCatalogService;
     this.noteService = noteService;
+    this.noteConstructionService = noteConstructionService;
+    this.wikidataService = wikidataService;
   }
 
   @GetMapping("")
@@ -112,6 +122,21 @@ class NotebookController {
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
     return RedirectToNoteResponse.forNotebook(notebook.getId());
+  }
+
+  @PostMapping(value = "/{notebook}/create-note")
+  @Transactional
+  public NoteCreationResult createNoteAtNotebookRoot(
+      @PathVariable @Schema(type = "integer") Notebook notebook,
+      @Valid @RequestBody NoteCreationDTO noteCreation)
+      throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
+    authorizationService.assertAuthorization(notebook);
+    User user = authorizationService.getCurrentUser();
+    return noteConstructionService.createRootNoteWithWikidataService(
+        notebook,
+        noteCreation,
+        user,
+        wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
   }
 
   @PostMapping(value = "/{notebook}")
