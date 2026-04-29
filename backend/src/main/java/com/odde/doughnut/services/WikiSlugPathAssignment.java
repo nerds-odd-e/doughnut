@@ -19,12 +19,7 @@ public final class WikiSlugPathAssignment {
       folder.setSlug(basename);
       return;
     }
-    String parentSlug = parent.getSlug();
-    if (parentSlug == null || parentSlug.isEmpty()) {
-      folder.setSlug(basename);
-    } else {
-      folder.setSlug(parentSlug + "/" + basename);
-    }
+    folder.setSlug(parent.getSlug() + "/" + basename);
   }
 
   public static void setNoteSlug(Note note, Set<String> siblingBasenames) {
@@ -35,18 +30,13 @@ public final class WikiSlugPathAssignment {
       note.setSlug(basename);
       return;
     }
-    String folderSlug = folder.getSlug();
-    if (folderSlug == null || folderSlug.isEmpty()) {
-      note.setSlug(basename);
-    } else {
-      note.setSlug(folderSlug + "/" + basename);
-    }
+    note.setSlug(folder.getSlug() + "/" + basename);
   }
 
   public static Set<String> basenamesFromSlugs(List<String> slugs) {
     Set<String> set = new HashSet<>();
     for (String s : slugs) {
-      if (s == null || s.isEmpty()) {
+      if (s.isEmpty()) {
         continue;
       }
       set.add(basenameOf(s));
