@@ -47,7 +47,9 @@ public class NoteRealm {
     return note.getChildren();
   }
 
+  @NonNull
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public Notebook getNotebook() {
-    return note.getNotebook();
+    return Objects.requireNonNull(note.getNotebook());
   }
 }

@@ -20,7 +20,11 @@ public class NoteTopology {
   private RelationType relationType;
   private NoteTopology targetNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;
+
+  @NonNull
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer notebookId;
+
   private String notebookTitle;
 
   public int getId() {

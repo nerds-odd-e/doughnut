@@ -6,30 +6,37 @@ import Builder from './Builder'
 import generateId from './generateId'
 
 class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
-  data: Partial<NoteSearchResult> = {
-    noteTopology: (() => {
-      const id = generateId()
-      return { id, slug: `s${id}`, title: 'Untitled' }
-    })(),
-    notebookId: generateId(),
-  }
+  data: Partial<NoteSearchResult> = (() => {
+    const id = generateId()
+    const notebookId = generateId()
+    return {
+      noteTopology: { id, slug: `s${id}`, title: 'Untitled', notebookId },
+      notebookId,
+    }
+  })()
 
   id(value: number): NoteSearchResultBuilder {
+    const notebookId = this.data.notebookId ?? generateId()
     if (!this.data.noteTopology) {
       this.data.noteTopology = {
         id: value,
         slug: `s${value}`,
         title: 'Untitled',
+        notebookId,
       }
     } else {
       this.data.noteTopology.id = value
       this.data.noteTopology.slug = `s${value}`
+      this.data.noteTopology.notebookId = notebookId
     }
     return this
   }
 
   notebookId(value: number): NoteSearchResultBuilder {
     this.data.notebookId = value
+    if (this.data.noteTopology) {
+      this.data.noteTopology.notebookId = value
+    }
     return this
   }
 
@@ -39,9 +46,10 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
   }
 
   title(value: string): NoteSearchResultBuilder {
+    const notebookId = this.data.notebookId ?? generateId()
     if (!this.data.noteTopology) {
       const id = generateId()
-      this.data.noteTopology = { id, slug: `s${id}`, title: value }
+      this.data.noteTopology = { id, slug: `s${id}`, title: value, notebookId }
     } else {
       this.data.noteTopology.title = value
     }
@@ -55,18 +63,21 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
 
   noteTopology(value: NoteTopology): NoteSearchResultBuilder {
     this.data.noteTopology = value
+    this.data.notebookId = value.notebookId
     return this
   }
 
   do(): NoteSearchResult {
+    const notebookId = this.data.notebookId ?? generateId()
     const id = this.data.noteTopology?.id ?? generateId()
     return {
       noteTopology: this.data.noteTopology ?? {
         id,
         slug: `s${id}`,
         title: 'Untitled',
+        notebookId,
       },
-      notebookId: this.data.notebookId ?? generateId(),
+      notebookId,
       notebookTitle: this.data.notebookTitle,
       distance: this.data.distance,
     }

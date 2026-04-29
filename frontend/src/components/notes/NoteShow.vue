@@ -91,7 +91,7 @@
             v-model="pendingDeadLinkTitle"
             :reference-note="noteRealm.note"
             :insert-mode="
-              noteRealm.note.id === noteRealm.notebook?.headNoteId ? 'as-child' : 'after'
+              noteRealm.note.id === noteRealm.notebook.headNoteId ? 'as-child' : 'after'
             "
             @closed="onDeadLinkCreateModalClosed"
           />
@@ -171,7 +171,7 @@ const fetchWikiTitles = async (headNoteId: number) => {
 }
 
 const getWikiTitles = (noteRealm: NoteRealm) => {
-  const headNoteId = noteRealm.notebook?.headNoteId
+  const headNoteId = noteRealm.notebook.headNoteId
   if (headNoteId) {
     fetchWikiTitles(headNoteId)
   }

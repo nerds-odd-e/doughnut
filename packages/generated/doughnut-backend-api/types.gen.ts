@@ -191,7 +191,7 @@ export type NoteTopology = {
     relationType?: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
     targetNoteTopology?: NoteTopology;
     parentOrSubjectNoteTopology?: NoteTopology;
-    notebookId?: number;
+    notebookId: number;
     notebookTitle?: string;
 };
 
@@ -240,7 +240,7 @@ export type NoteRealm = {
     fromBazaar?: boolean;
     children?: Array<Note>;
     inboundReferences?: Array<Note>;
-    notebook?: Notebook;
+    notebook: Notebook;
 };
 
 export type NoteMoveDto = {
@@ -891,7 +891,7 @@ export type NoteRealmWritable = {
     fromBazaar?: boolean;
     children?: Array<NoteWritable>;
     inboundReferences?: Array<NoteWritable>;
-    notebook?: Notebook;
+    notebook: Notebook;
 };
 
 export type RecallPromptWritable = {

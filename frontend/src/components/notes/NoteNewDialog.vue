@@ -67,7 +67,7 @@ const props = defineProps<{
 const noteRealm = computed(
   () => storageAccessor.value.refOfNoteRealm(props.referenceNote.id).value
 )
-const notebookId = computed(() => noteRealm.value?.notebook?.id)
+const notebookId = computed(() => noteRealm.value?.notebook.id)
 
 // Emits
 const emit = defineEmits<{

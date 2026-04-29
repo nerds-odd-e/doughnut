@@ -3711,6 +3711,7 @@ components:
           type: string
       required:
       - id
+      - notebookId
       - slug
     Notebook:
       type: object
@@ -3834,6 +3835,7 @@ components:
       required:
       - id
       - note
+      - notebook
       - slug
     NoteMoveDTO:
       type: object

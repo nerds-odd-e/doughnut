@@ -549,7 +549,7 @@ export default class StoredApiCollection implements StoredApi {
   }> {
     const cached = this.storage.refOfNoteRealm(noteId).value
     const notebookFallbackId =
-      cached?.notebook?.id ?? cached?.note?.noteTopology?.notebookId
+      cached?.notebook.id ?? cached?.note.noteTopology.notebookId
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },

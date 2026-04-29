@@ -12,12 +12,14 @@ class NoteBuilder extends Builder<Note> {
   constructor() {
     super()
     const id = generateId()
+    const notebookId = generateId()
     this.data = {
       id,
       noteTopology: {
         id,
         slug: `s${id}`,
         title: 'Note1.1.1',
+        notebookId,
       },
       details: '<p>Desc</p>',
       wikidataId: '',
@@ -82,11 +84,13 @@ class NoteBuilder extends Builder<Note> {
     this.title(`:${value}`)
     // default target
     const targetId = generateId()
+    const targetNotebookId = generateId()
     this.data.noteTopology.targetNoteTopology = {
       id: targetId,
       slug: `s${targetId}`,
       relationType: value,
       title: 'a target',
+      notebookId: targetNotebookId,
     }
     return this
   }
