@@ -55,6 +55,14 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
+              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.folder IS NULL "
+              + " AND (n.slug = 'index' OR LOWER(n.title) = 'index') ORDER BY n.id ASC")
+  List<Note> findRootIndexNoteCandidatesForNotebook(
+      @Param("notebookId") Integer notebookId, Pageable pageable);
+
+  @Query(
+      value =
+          selectFromNote
               + " JOIN n.notebook.subscriptions s ON s.user.id = :userId "
               + searchForTitleLike)
   List<Note> searchForUserInAllMySubscriptions(
