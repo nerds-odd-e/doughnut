@@ -13,6 +13,7 @@ import {
   NoteController,
   NoteCreationController,
   TextContentController,
+  NotebookController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import {
   toOpenApiError,
@@ -41,6 +42,11 @@ export interface StoredApi {
   getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
 
   loadNoteByBasename(basename: string): Promise<NoteRealm>
+
+  loadNoteByNotebookSlug(
+    notebookId: number,
+    slugPath: string
+  ): Promise<NoteRealm>
 
   createNote(
     router: Router,
@@ -210,6 +216,21 @@ export default class StoredApiCollection implements StoredApi {
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.showNoteByBasename({
         path: { basename },
+      })
+    )
+    if (error || !noteRealm) {
+      throw new Error(toErrorMessage(error, "Failed to load note"))
+    }
+    return this.storage.refreshNoteRealm(noteRealm)
+  }
+
+  async loadNoteByNotebookSlug(
+    notebookId: number,
+    slugPath: string
+  ): Promise<NoteRealm> {
+    const { data: noteRealm, error } = await apiCallWithLoading(() =>
+      NotebookController.getNoteBySlug({
+        path: { notebook: notebookId, slug: slugPath },
       })
     )
     if (error || !noteRealm) {

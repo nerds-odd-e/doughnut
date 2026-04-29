@@ -2691,6 +2691,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/note/{slug}:
+    get:
+      tags:
+      - notebook-controller
+      summary: Get note by full slug path within notebook
+      operationId: getNoteBySlug
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: slug
+        in: path
+        description: Notebook-local note slug path (may contain '/')
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/notebooks/{notebook}/book:
     get:
       tags:

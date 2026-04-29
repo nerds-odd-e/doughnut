@@ -98,6 +98,40 @@ describe("all in note show page", () => {
     })
   })
 
+  describe("note show by notebook slug path", () => {
+    const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
+
+    beforeEach(() => {
+      mockSdkService("getNoteBySlug", noteRealm)
+      mockSdkService("showNote", noteRealm)
+    })
+
+    it("resolves slug path then loads note and passes stable id to NoteShow via storage", async () => {
+      const slugSpy = mockSdkService("getNoteBySlug", noteRealm)
+      const showNoteSpy = mockSdkService("showNote", noteRealm)
+
+      helper
+        .component(NoteShowPage)
+        .withCleanStorage()
+        .withProps({
+          notebookId: 99,
+          noteSlugPath: "outer/inner/leaf",
+        })
+        .withRouter(router)
+        .render()
+
+      await flushPromises()
+      await screen.findByText(noteRealm.note.noteTopology.title!)
+
+      expect(slugSpy).toHaveBeenCalledWith({
+        path: { notebook: 99, slug: "outer/inner/leaf" },
+      })
+      expect(showNoteSpy).toHaveBeenCalledWith({
+        path: { note: noteRealm.id },
+      })
+    })
+  })
+
   describe("conversation maximize/minimize", () => {
     const note = makeMe.aNoteRealm.please()
 

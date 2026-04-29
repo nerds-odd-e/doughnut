@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
@@ -13,6 +14,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookGroupService;
 import com.odde.doughnut.services.NotebookIndexingService;
@@ -52,6 +54,7 @@ class NotebookController {
   private final NotebookGroupService notebookGroupService;
   private final NotebookRepository notebookRepository;
   private final NotebookCatalogService notebookCatalogService;
+  private final NoteService noteService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -64,7 +67,8 @@ class NotebookController {
       NotebookGroupRepository notebookGroupRepository,
       NotebookGroupService notebookGroupService,
       NotebookRepository notebookRepository,
-      NotebookCatalogService notebookCatalogService) {
+      NotebookCatalogService notebookCatalogService,
+      NoteService noteService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -76,6 +80,7 @@ class NotebookController {
     this.notebookGroupService = notebookGroupService;
     this.notebookRepository = notebookRepository;
     this.notebookCatalogService = notebookCatalogService;
+    this.noteService = noteService;
   }
 
   @GetMapping("")
@@ -205,6 +210,36 @@ class NotebookController {
 
     authorizationService.assertAuthorization(notebook);
     return notebookService.findByNotebookId(notebook.getId());
+  }
+
+  @Operation(summary = "Get note by full slug path within notebook")
+  @GetMapping("/{notebook}/note/{slug}")
+  public NoteRealm getNoteBySlug(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @Parameter(description = "Notebook-local note slug path (may contain '/')")
+          @PathVariable("slug")
+          String slug)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(notebook);
+    if (slug == null || slug.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this slug.");
+    }
+    String trimmed = slug.trim();
+    String normalized = trimmed.startsWith("/") ? trimmed.substring(1) : trimmed;
+    if (normalized.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this slug.");
+    }
+    Note note =
+        noteService
+            .findNoteInNotebookBySlug(notebook.getId(), normalized)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No note found for this slug."));
+    authorizationService.assertReadAuthorization(note);
+    User user = authorizationService.getCurrentUser();
+    return note.toNoteRealm(user);
   }
 
   @GetMapping("/{notebook}/obsidian")

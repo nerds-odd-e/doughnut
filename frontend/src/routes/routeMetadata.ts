@@ -38,6 +38,24 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
+    path: "/d/notebooks/:notebookId(\\d+)/notes/:noteSlugPath(.*)",
+    name: "noteShowByNotebookSlug",
+    props: (route: RouteLocation) => {
+      const raw = route.params.noteSlugPath
+      const pathStr =
+        raw === undefined || raw === ""
+          ? ""
+          : Array.isArray(raw)
+            ? raw.join("/")
+            : String(raw)
+      return {
+        notebookId: Number(route.params.notebookId),
+        noteSlugPath: pathStr,
+      }
+    },
+    meta: { useNoteStorageAccessor: true },
+  },
+  {
     path: "/n:noteId(\\d+)",
     // Alias must use the same param name (`noteId`) as the primary path (Vue Router).
     // `/d/notes/:noteId` carries a slug segment; props distinguish digits vs basename.

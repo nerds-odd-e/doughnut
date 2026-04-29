@@ -3335,6 +3335,28 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
+export type GetNoteBySlugData = {
+    body?: never;
+    path: {
+        notebook: number;
+        /**
+         * Notebook-local note slug path (may contain '/')
+         */
+        slug: string;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/note/{slug}';
+};
+
+export type GetNoteBySlugResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type GetNoteBySlugResponse = GetNoteBySlugResponses[keyof GetNoteBySlugResponses];
+
 export type DeleteBookData = {
     body?: never;
     path: {

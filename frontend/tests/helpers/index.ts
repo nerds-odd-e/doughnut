@@ -113,6 +113,7 @@ const methodToController: Record<string, any> = {
   moveToCircle: NotebookController,
   getAiAssistant: NotebookController,
   updateAiAssistant: NotebookController,
+  getNoteBySlug: NotebookController,
   myNotebooks: NotebookController,
   approve: NotebookCertificateApprovalController,
   requestApprovalForNotebook: NotebookCertificateApprovalController,

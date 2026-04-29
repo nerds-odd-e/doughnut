@@ -11,6 +11,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
+
+  Optional<Note> findByNotebook_IdAndSlug(Integer notebookId, String slug);
+
   String selectFromNote = "SELECT n FROM Note n";
   String searchForTitleLike = " WHERE n.title LIKE :pattern AND n.deletedAt IS NULL ";
   String searchForTitleExact = " WHERE LOWER(n.title) = LOWER(:key) AND n.deletedAt IS NULL ";

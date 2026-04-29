@@ -75,11 +75,11 @@
       class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
     >
       <div
-        v-if="basenameError !== null"
+        v-if="loadError !== null"
         class="daisy-alert daisy-alert-error daisy-my-4"
         role="alert"
       >
-        {{ basenameError }}
+        {{ loadError }}
       </div>
       <ContentLoader v-else-if="resolvedNoteId === undefined" />
       <NoteShow
@@ -128,14 +128,31 @@ const storageAccessor = useStorageAccessor()
 const props = defineProps({
   noteId: { type: Number, required: false },
   basename: { type: String, required: false },
+  notebookId: { type: Number, required: false },
+  noteSlugPath: { type: String, required: false },
 })
 
 const basenameError = ref<string | null>(null)
 const basenameResolvedNoteId = ref<number | undefined>(undefined)
+const notebookSlugError = ref<string | null>(null)
+const notebookSlugResolvedNoteId = ref<number | undefined>(undefined)
+
+const isNotebookSlugEntry = computed(
+  () =>
+    props.notebookId != null &&
+    !Number.isNaN(props.notebookId) &&
+    props.noteSlugPath !== undefined &&
+    props.noteSlugPath !== ""
+)
+
+const loadError = computed(() => notebookSlugError.value ?? basenameError.value)
 
 watch(
   () => props.noteId,
   (noteId) => {
+    if (isNotebookSlugEntry.value) {
+      return
+    }
     if (
       noteId != null &&
       !Number.isNaN(noteId) &&
@@ -150,6 +167,9 @@ watch(
 watch(
   () => props.basename,
   async (b) => {
+    if (isNotebookSlugEntry.value) {
+      return
+    }
     basenameError.value = null
     basenameResolvedNoteId.value = undefined
     if (b === undefined || b === "") {
@@ -168,7 +188,36 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => [props.notebookId, props.noteSlugPath] as const,
+  async ([nb, path]) => {
+    notebookSlugError.value = null
+    notebookSlugResolvedNoteId.value = undefined
+    if (nb == null || Number.isNaN(nb) || path === undefined || path === "") {
+      return
+    }
+    try {
+      const realm = await storageAccessor.value
+        .storedApi()
+        .loadNoteByNotebookSlug(nb, path)
+      notebookSlugResolvedNoteId.value = realm.id
+    } catch (e: unknown) {
+      notebookSlugError.value =
+        e instanceof Error ? e.message : "Could not load note"
+    }
+  },
+  { immediate: true }
+)
+
 const resolvedNoteId = computed((): number | undefined => {
+  if (isNotebookSlugEntry.value) {
+    if (notebookSlugResolvedNoteId.value == null) {
+      return undefined
+    }
+    return storageAccessor.value.refOfNoteRealm(
+      notebookSlugResolvedNoteId.value
+    ).value?.id
+  }
   if (props.noteId != null && !Number.isNaN(props.noteId)) {
     return storageAccessor.value.refOfNoteRealm(props.noteId).value?.id
   }
@@ -202,6 +251,10 @@ const handleCloseConversation = () => {
     raw !== undefined && raw !== ""
       ? String(Array.isArray(raw) ? raw[0] : raw)
       : undefined
+  if (route.name === "noteShowByNotebookSlug") {
+    router.replace({ path: route.path, query: {} })
+    return
+  }
   if (segment !== undefined && !/^\d+$/.test(segment)) {
     router.replace({
       name: "noteShow",
