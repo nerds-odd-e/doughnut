@@ -115,6 +115,7 @@ const methodToController: Record<string, any> = {
   getAiAssistant: NotebookController,
   updateAiAssistant: NotebookController,
   getNoteBySlug: NotebookController,
+  listNotebookRootNotes: NotebookController,
   myNotebooks: NotebookController,
   approve: NotebookCertificateApprovalController,
   requestApprovalForNotebook: NotebookCertificateApprovalController,

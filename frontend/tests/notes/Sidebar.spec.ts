@@ -52,6 +52,7 @@ describe("Sidebar", () => {
       firstGenerationSibling
     storageAccessor.value.refOfNoteRealm(secondGeneration.id).value =
       secondGeneration
+    mockSdkService("listNotebookRootNotes", [topNoteRealm])
   })
 
   beforeEach(() => {

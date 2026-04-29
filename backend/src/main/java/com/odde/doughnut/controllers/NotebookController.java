@@ -265,6 +265,18 @@ class NotebookController {
     return note.toNoteRealm(user);
   }
 
+  @Operation(summary = "List top-level notes in the notebook (no parent)")
+  @GetMapping("/{notebook}/root-notes")
+  public List<NoteRealm> listNotebookRootNotes(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    User user = authorizationService.getCurrentUser();
+    return noteService.findNotebookRootNotes(notebook.getId()).stream()
+        .map(n -> n.toNoteRealm(user))
+        .toList();
+  }
+
   @GetMapping("/{notebook}/obsidian")
   public ResponseEntity<byte[]> downloadNotebookForObsidian(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)

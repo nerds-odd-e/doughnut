@@ -41,6 +41,7 @@
     <SidebarInner
       v-if="isExpanded"
       v-bind="{
+        notebookId,
         noteId: noteRealm.id,
         activeNoteRealm,
       }"
@@ -60,6 +61,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 const storageAccessor = useStorageAccessor()
 
 interface Props {
+  notebookId: number
   note: Note
   activeNoteRealm: NoteRealm
   expandedIds: number[]

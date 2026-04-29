@@ -1,12 +1,13 @@
 <template>
   <ul
-    v-if="(noteRealm?.children?.length ?? 0) > 0"
+    v-if="(displayNotes?.length ?? 0) > 0"
     class="daisy-list-group daisy-text-sm daisy-pl-[1rem]"
   >
     <SidebarNoteItem
-      v-for="note in noteRealm?.children"
+      v-for="note in displayNotes"
       :key="note.id"
       v-bind="{
+        notebookId,
         note,
         activeNoteRealm,
         expandedIds,
@@ -29,21 +30,57 @@
 <script setup lang="ts">
 import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
 
 interface Props {
-  noteId: number
+  notebookId: number
   activeNoteRealm: NoteRealm
+  /** When set, list this note's children. When omitted, list notebook root notes. */
+  noteId?: number
 }
 
 const props = defineProps<Props>()
 
-const noteRealm = storageAccessor.value
-  .storedApi()
-  .getNoteRealmRefAndLoadWhenNeeded(props.noteId)
+const subtreeRealmRef =
+  props.noteId !== undefined
+    ? storageAccessor.value
+        .storedApi()
+        .getNoteRealmRefAndLoadWhenNeeded(props.noteId)
+    : undefined
+
+const rootNotesList = ref<Note[]>([])
+
+async function loadNotebookRootNotesList() {
+  if (props.noteId !== undefined) return
+  try {
+    const realms = await storageAccessor.value
+      .storedApi()
+      .loadNotebookRootNotes(props.notebookId)
+    rootNotesList.value = realms.map((r) => r.note)
+  } catch {
+    rootNotesList.value = []
+  }
+}
+
+watch(
+  () => props.notebookId,
+  () => {
+    if (props.noteId === undefined) {
+      loadNotebookRootNotesList()
+    }
+  },
+  { immediate: true }
+)
+
+const displayNotes = computed(() => {
+  if (props.noteId !== undefined && subtreeRealmRef) {
+    return subtreeRealmRef.value?.children ?? []
+  }
+  return rootNotesList.value
+})
 
 const expandedIds = ref([props.activeNoteRealm.note.id])
 
@@ -158,6 +195,9 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
 
     if (dropMode.value === "asFirstChild") {
       toggleChildren(targetNote.id)
+    }
+    if (props.noteId === undefined) {
+      await loadNotebookRootNotesList()
     }
   } catch (error) {
     console.error("Failed to move note:", error)

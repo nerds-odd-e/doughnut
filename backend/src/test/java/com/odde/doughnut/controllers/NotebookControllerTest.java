@@ -196,6 +196,47 @@ class NotebookControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class ListNotebookRootNotes {
+    @Test
+    void returnsOnlyNotesWithNullParent()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB With Roots");
+      RedirectToNoteResponse redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebookId).orElseThrow();
+
+      NoteCreationDTO r1 = new NoteCreationDTO();
+      r1.setNewTitle("Root One");
+      Integer rootOneId = controller.createNoteAtNotebookRoot(nb, r1).getCreated().getId();
+
+      NoteCreationDTO r2 = new NoteCreationDTO();
+      r2.setNewTitle("Root Two");
+      Integer rootTwoId = controller.createNoteAtNotebookRoot(nb, r2).getCreated().getId();
+
+      Note rootOne = noteRepository.findById(rootOneId).orElseThrow();
+      Note child = makeMe.aNote("Under Root").under(rootOne).please();
+
+      List<NoteRealm> roots = controller.listNotebookRootNotes(nb);
+      assertEquals(2, roots.size());
+      assertEquals(
+          List.of(rootOneId, rootTwoId).stream().sorted().toList(),
+          roots.stream().map(NoteRealm::getId).sorted().toList());
+      assertFalse(roots.stream().anyMatch(r -> r.getId().equals(child.getId())));
+    }
+
+    @Test
+    void requiresReadAuthorization() {
+      User owner = makeMe.aUser().please();
+      currentUser.setUser(owner);
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+
+      currentUser.setUser(makeMe.aUser().please());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.listNotebookRootNotes(nb));
+    }
+  }
+
+  @Nested
   class UpdateNotebookIndexEndpoint {
     @Test
     void shouldCallServiceAndRequireAuthorization() throws UnexpectedNoAccessRightException {

@@ -3354,6 +3354,24 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
+export type ListNotebookRootNotesData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/root-notes';
+};
+
+export type ListNotebookRootNotesResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type ListNotebookRootNotesResponse = ListNotebookRootNotesResponses[keyof ListNotebookRootNotesResponses];
+
 export type GetNoteBySlugData = {
     body?: never;
     path: {

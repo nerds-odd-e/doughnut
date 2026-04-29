@@ -2715,6 +2715,27 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/root-notes:
+    get:
+      tags:
+      - notebook-controller
+      summary: List top-level notes in the notebook (no parent)
+      operationId: listNotebookRootNotes
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/notebooks/{notebook}/note/by-slug:
     get:
       tags:

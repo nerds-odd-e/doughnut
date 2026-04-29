@@ -59,6 +59,10 @@ public class NoteService {
     return noteRepository.findByNotebook_IdAndSlug(notebookId, slug);
   }
 
+  public List<Note> findNotebookRootNotes(Integer notebookId) {
+    return noteRepository.findNotebookRootNotesByNotebookId(notebookId);
+  }
+
   public List<Note> findNotesVisibleToUserBySlugBasename(User user, String basename) {
     return noteRepository.findAllBySlugBasenameIncludingDeleted(basename).stream()
         .filter(n -> authorizationService.userMayReadNote(user, n))

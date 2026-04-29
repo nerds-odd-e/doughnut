@@ -49,6 +49,8 @@ export interface StoredApi {
     slugPath: string
   ): Promise<NoteRealm>
 
+  loadNotebookRootNotes(notebookId: number): Promise<NoteRealm[]>
+
   createNote(
     router: Router,
     parentId: Doughnut.ID,
@@ -244,6 +246,21 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(toErrorMessage(error, "Failed to load note"))
     }
     return this.storage.refreshNoteRealm(noteRealm)
+  }
+
+  async loadNotebookRootNotes(notebookId: number): Promise<NoteRealm[]> {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.listNotebookRootNotes({
+        path: { notebook: notebookId },
+      })
+    )
+    if (error || !data) {
+      throw new Error(
+        toErrorMessage(error, "Failed to load notebook root notes")
+      )
+    }
+    this.refreshNoteRealms(data)
+    return data
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {

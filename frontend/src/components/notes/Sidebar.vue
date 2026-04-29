@@ -4,16 +4,16 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :note="activeNoteRealm?.note"
-      :topology-head-resolved="topologyHeadResolved"
+      :topology-head-resolved="noteContextResolved"
     />
     <SidebarInner
       :class="{ 'is-disabled': !activeNoteRealm }"
-      v-if="activeNoteRealm && topologyHeadResolved"
+      v-if="activeNoteRealm && noteContextResolved"
       v-bind="{
-        noteId: topologyHeadNoteId!,
+        notebookId: notebookId,
         activeNoteRealm: activeNoteRealm,
       }"
-      :key="topologyHeadNoteId"
+      :key="`${notebookId}-${activeNoteRealm.id}`"
     />
   </div>
 </template>
@@ -39,16 +39,9 @@ const sidebarReadonly = computed(
     (props.activeNoteRealm != null && props.activeNoteRealm.fromBazaar === true)
 )
 
-const topologyHeadNoteId = computed(() => {
-  if (!props.activeNoteRealm?.note?.noteTopology) return undefined
-  let cursor = props.activeNoteRealm.note.noteTopology
-  while (cursor?.parentOrSubjectNoteTopology != null) {
-    cursor = cursor.parentOrSubjectNoteTopology
-  }
-  return cursor?.id
-})
-
-const topologyHeadResolved = computed(() => topologyHeadNoteId.value != null)
+const noteContextResolved = computed(
+  () => props.activeNoteRealm?.note?.noteTopology != null
+)
 </script>
 
 <style scoped>
