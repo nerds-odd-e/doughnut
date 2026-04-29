@@ -148,12 +148,13 @@ Main content here.`
     expect(html).not.toContain("topic:")
   })
 
-  it("shows Properties insert chrome when editable details have no frontmatter", async () => {
+  it("shows add-only insert chrome when editable details have no frontmatter", async () => {
     await mountEditor("# Hello\n\nParagraph.")
     await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(true)
-    expect(wrapper.text()).toContain("Properties")
+    expect(wrapper.find("h4").exists()).toBe(false)
+    expect(wrapper.text()).not.toContain("Properties")
     expect(wrapper.text()).toContain("Add note property")
   })
 
@@ -164,7 +165,7 @@ Main content here.`
     expect(wrapper.find("section").exists()).toBe(false)
   })
 
-  it("shows Properties insert chrome when editable empty frontmatter block", async () => {
+  it("shows add-only insert chrome when editable empty frontmatter block", async () => {
     await mountEditor(`---
 
 
@@ -174,6 +175,8 @@ Body`)
     await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(true)
+    expect(wrapper.find("h4").exists()).toBe(false)
+    expect(wrapper.text()).not.toContain("Properties")
     expect(wrapper.text()).toContain("Add note property")
   })
 
@@ -317,5 +320,60 @@ Body`
       .findAll('[data-testid="rich-note-property-row"]')[1]!
       .find('[data-testid="rich-note-property-row-key-input"]')
     expect((betaKeyAfter.element as HTMLInputElement).value).toBe("beta")
+  })
+
+  it("removing one property row emits markdown without that key and retains the rest", async () => {
+    const details = `---
+alpha: one
+beta: two
+---
+
+Body line`
+    await mountEditor(details)
+    await flushPromises()
+
+    const removeBtns = wrapper.findAll(
+      '[data-testid="rich-note-property-row-remove"]'
+    )
+    expect(removeBtns.length).toBe(2)
+    await removeBtns[0]!.trigger("click")
+    await flushPromises()
+
+    const emitted = wrapper.emitted("update:modelValue")
+    expect(emitted?.length).toBeGreaterThan(0)
+    const last = emitted![emitted!.length - 1]![0] as string
+    expect(last).not.toContain("alpha:")
+    expect(last).toContain("beta:")
+    expect(last).toContain("Body line")
+  })
+
+  it("removing every property row emits body-only details and shows add-only chrome without Properties heading", async () => {
+    const details = `---
+only: x
+---
+
+Paragraph.\n`
+    await mountEditor(details)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Properties")
+
+    await wrapper
+      .find('[data-testid="rich-note-property-row-remove"]')
+      .trigger("click")
+    await flushPromises()
+
+    const emitted = wrapper.emitted("update:modelValue")
+    expect(emitted?.length).toBeGreaterThan(0)
+    const last = emitted![emitted!.length - 1]![0] as string
+    expect(last.startsWith("---")).toBe(false)
+    expect(last).toContain("Paragraph.")
+
+    await wrapper.setProps({ modelValue: last })
+    await flushPromises()
+
+    expect(wrapper.find("h4").exists()).toBe(false)
+    expect(wrapper.text()).not.toContain("Properties")
+    expect(wrapper.text()).toContain("Add note property")
   })
 })

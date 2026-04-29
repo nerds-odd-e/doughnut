@@ -187,6 +187,47 @@ describe("property rows compose / mutate", () => {
     const again = parseNoteDetailsMarkdown(md)
     expect(again.ok && again.properties).toEqual({ b: "2" })
   })
+
+  it("remove: dropping second sorted row keeps first key only", () => {
+    const parsed = parseNoteDetailsMarkdown("---\na: 1\nb: 2\n---\nRest\n")
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    rows = removePropertyRowAt(rows, 1)
+    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    const again = parseNoteDetailsMarkdown(md)
+    expect(again.ok && again.properties).toEqual({ a: "1" })
+    expect(again.ok && again.properties.b).toBeUndefined()
+  })
+
+  it("remove: clearing every row yields body-only details without frontmatter fence", () => {
+    const parsed = parseNoteDetailsMarkdown("---\na: 1\nb: 2\n---\nRest\n")
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    rows = removePropertyRowAt(rows, 0)
+    rows = removePropertyRowAt(rows, 0)
+    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    expect(md).toBe("Rest\n")
+    expect(md.startsWith("---")).toBe(false)
+    const again = parseNoteDetailsMarkdown(md)
+    expect(again.ok && again.properties).toEqual({})
+    if (again.ok) expect(again.body).toBe("Rest\n")
+  })
+
+  it("remove: dropping sole row yields omitted frontmatter and unchanged body", () => {
+    const parsed = parseNoteDetailsMarkdown("---\nonly: x\n---\nParagraph.\n")
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    rows = removePropertyRowAt(rows, 0)
+    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    expect(md).toBe("Paragraph.\n")
+    expect(md.startsWith("---")).toBe(false)
+    const again = parseNoteDetailsMarkdown(md)
+    expect(again.ok && again.properties).toEqual({})
+    if (again.ok) expect(again.body).toBe("Paragraph.\n")
+  })
 })
 
 describe("validatePropertyRowsForRichEdit", () => {

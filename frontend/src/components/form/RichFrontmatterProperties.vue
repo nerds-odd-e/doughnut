@@ -2,61 +2,65 @@
   <section
     v-if="showSection"
     class="daisy-mb-3"
-    :aria-labelledby="headingId"
+    :aria-labelledby="headingVisible ? headingId : undefined"
+    :aria-label="headingVisible ? undefined : 'Note properties'"
   >
     <h4
+      v-if="headingVisible"
       :id="headingId"
       class="daisy-text-sm daisy-font-semibold daisy-mb-2"
     >
       Properties
     </h4>
     <dl
-      v-if="propertyRows.length > 0"
-      :class="
-        isReadOnly
-          ? 'daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm'
-          : 'daisy-flex daisy-flex-col daisy-gap-2 daisy-text-sm'
-      "
+      v-if="propertyRows.length > 0 && isReadOnly"
+      class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm"
     >
-      <template v-if="isReadOnly">
-        <template v-for="row in propertyRows" :key="row.key">
-          <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
-          <dd class="daisy-m-0">{{ row.value }}</dd>
-        </template>
-      </template>
-      <template v-else>
-        <div
-          v-for="(row, idx) in propertyRows"
-          :key="idx"
-          class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-items-start"
-          data-testid="rich-note-property-row"
-          :data-property-key="row.key"
-        >
-          <dt class="daisy-font-medium daisy-m-0 daisy-text-base-content/80">
-            <input
-              v-model="propertyRows[idx]!.key"
-              type="text"
-              class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
-              :aria-label="`Existing note property key (row ${idx + 1})`"
-              data-testid="rich-note-property-row-key-input"
-              @focus="onRowFocus(idx)"
-              @blur="commitRow(idx)"
-            >
-          </dt>
-          <dd class="daisy-m-0">
-            <input
-              v-model="propertyRows[idx]!.value"
-              type="text"
-              class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
-              :aria-label="`Existing note property value (row ${idx + 1})`"
-              data-testid="rich-note-property-row-value-input"
-              @focus="onRowFocus(idx)"
-              @blur="commitRow(idx)"
-            >
-          </dd>
-        </div>
+      <template v-for="row in propertyRows" :key="row.key">
+        <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
+        <dd class="daisy-m-0">{{ row.value }}</dd>
       </template>
     </dl>
+    <div
+      v-else-if="propertyRows.length > 0"
+      class="daisy-flex daisy-flex-col daisy-gap-2 daisy-text-sm"
+    >
+      <div
+        v-for="(row, idx) in propertyRows"
+        :key="idx"
+        class="daisy-grid daisy-grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] daisy-gap-x-4 daisy-gap-y-1 daisy-items-center"
+        data-testid="rich-note-property-row"
+        :data-property-key="row.key"
+      >
+        <input
+          v-model="propertyRows[idx]!.key"
+          type="text"
+          class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
+          :aria-label="`Existing note property key (row ${idx + 1})`"
+          data-testid="rich-note-property-row-key-input"
+          @focus="onRowFocus(idx)"
+          @blur="commitRow(idx)"
+        >
+        <input
+          v-model="propertyRows[idx]!.value"
+          type="text"
+          class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+          :aria-label="`Existing note property value (row ${idx + 1})`"
+          data-testid="rich-note-property-row-value-input"
+          @focus="onRowFocus(idx)"
+          @blur="commitRow(idx)"
+        >
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-shrink-0"
+          :aria-label="`Remove note property ${row.key}`"
+          data-testid="rich-note-property-row-remove"
+          @click="removeRow(idx)"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
     <p
       v-if="validationMessage"
       role="alert"
@@ -108,6 +112,7 @@
 import { computed, ref, useId, watch } from "vue"
 import {
   parseNoteDetailsMarkdown,
+  removePropertyRowAt,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
@@ -157,6 +162,10 @@ watch(
   { immediate: true }
 )
 
+const headingVisible = computed(
+  () => propertyRows.value.length > 0 || isReadOnly.value
+)
+
 const showSection = computed(() => {
   if (!parsed.value.ok) return false
   if (isReadOnly.value) return propertyRows.value.length > 0
@@ -203,6 +212,12 @@ function onRowFocus(idx: number) {
   if (row) {
     rowSnapshots.value[idx] = { ...row }
   }
+}
+
+function removeRow(idx: number) {
+  propertyRows.value = removePropertyRowAt(propertyRows.value, idx)
+  validationMessage.value = ""
+  emits("properties-changed", [...propertyRows.value])
 }
 
 function commitRow(idx: number) {
