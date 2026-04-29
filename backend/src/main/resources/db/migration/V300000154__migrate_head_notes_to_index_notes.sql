@@ -1,5 +1,12 @@
-ALTER TABLE notebook
-  ADD COLUMN name VARCHAR(150) NULL;
+SET @__m154_add_notebook_name := (
+  SELECT IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'notebook' AND COLUMN_NAME = 'name') = 0,
+    'ALTER TABLE notebook ADD COLUMN name VARCHAR(150) NULL',
+    'DO 0'));
+PREPARE __m154_stmt FROM @__m154_add_notebook_name;
+EXECUTE __m154_stmt;
+DEALLOCATE PREPARE __m154_stmt;
 
 UPDATE notebook n
 INNER JOIN notebook_head_note nh ON nh.notebook_id = n.id
@@ -15,7 +22,8 @@ WHERE n.id <> nh.head_note_id
 
 UPDATE note hn
 INNER JOIN notebook_head_note nh ON nh.head_note_id = hn.id
-SET hn.title = 'index',
+SET hn.notebook_id = nh.notebook_id,
+    hn.title = 'index',
     hn.slug = 'index',
     hn.folder_id = NULL,
     hn.parent_id = NULL
