@@ -4,6 +4,7 @@ import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SE
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.utils.Randomizer;
@@ -93,9 +94,23 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   private NotebookGroup notebookGroup;
 
   @Column(name = "short_details")
-  @Getter
   @Setter
   private String shortDetails;
+
+  @JsonIgnore
+  public String getShortDetails() {
+    return shortDetails;
+  }
+
+  /** JSON value: stored blurb, or else {@link Note#getShortDetails()} for the head note. */
+  @JsonProperty("shortDetails")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String getShortDetailsForApi() {
+    if (shortDetails != null && !shortDetails.isBlank()) {
+      return shortDetails;
+    }
+    return headNote != null ? headNote.getShortDetails() : null;
+  }
 
   @Transient
   @JsonInclude(JsonInclude.Include.NON_NULL)
