@@ -48,8 +48,8 @@ export const notebookList = () => {
           const notebookId = match![1]
           const noteSlug = slugify(notebookTitle, { lower: true })
           cy.visit(`/d/notebooks/${notebookId}/notes/${noteSlug}`)
+          pageIsNotLoading()
         })
-      pageIsNotLoading()
       return assumeNotePage()
     },
   }

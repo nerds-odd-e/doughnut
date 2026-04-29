@@ -425,13 +425,69 @@ After this phase:
 
 ---
 
-# Phase 4 — Convert Relationship Notes into Normal Notes
+# Phase 4 — Introduce Note Properties
+
+## Goal
+
+Give each note an editable set of **properties** (key-value metadata) that:
+
+- in the **markdown** editing surface, appear as a **YAML frontmatter** block (`---` … `---`) at the top of the content and are included when the note is saved
+- are **persisted** in the backend with the note so all API consumers see the same values after reload
+- in the **rich text** editor, appear as **Properties** above the Quill body: a list of key-value pairs that can be edited inline, with the ability to add a new property or remove one
+
+Edits in either surface update the same logical property bag and must round-trip on save and reload.
+
+## Rationale
+
+The north-star architecture treats notes as Markdown-like units that may carry **frontmatter** (`ongoing/doughnut_wiki_architecture_north_star.md`). Keeping metadata in properties instead of ad hoc columns supports Obsidian-style Markdown, export/import, and later phases that put structured fields in content (for example relationship notes in **Phase 5** and note export in **Phase 10**).
+
+## Observable behavior
+
+**Pre-condition:** Users can open a note in markdown and rich editing modes; slugs and notebook boundaries behave as in prior phases.
+
+**Trigger:** The user edits the YAML header in markdown and/or edits the Properties list above Quill in rich mode, then saves.
+
+**Post-condition:** After save and reload, the persisted properties match what the user set; the markdown buffer shows the corresponding frontmatter; APIs expose the same properties for consistency across clients.
+
+## Persistence and surfaces
+
+- **Backend:** Persist properties with the note. Exact storage (for example JSON map, dedicated table, or defined merge with the stored body) is an implementation choice as long as reads, writes, and the markdown frontmatter stay consistent.
+- **Markdown editor:** When properties exist or the user starts adding them, the editing buffer includes a leading YAML frontmatter block; saving persists the note so that block is part of the stored representation users expect in source mode.
+- **Rich editor:** Show **Properties** as an editable key-value list above the Quill editing area; support inline key and value edits, adding a row, and removing a row; wire changes into the same save path as the note body.
+
+## Testing (phase-complete)
+
+- **E2E:** Assert the main user path for this capability—edit properties in rich mode (and, where product flows expose it, in markdown), save, reload, and see the same values—in a capability-named feature; prefer a targeted `--spec` rather than the full suite.
+- **Unit / controller-level:** Cover YAML/frontmatter serialization edges, invalid or ambiguous YAML handling, and validation at the public HTTP contract where that is the right black-box surface.
+
+## Non-goals
+
+This phase does not need to:
+
+- convert relationship notes into normal notes (**Phase 5**)
+- remove the note parent field (**Phase 6**)
+- parse wiki links in body content (**Phase 8**)
+- add folder-level `defaultProperties` or folder templates (**Phase 9**)
+- deliver full Obsidian export/import semantics for every conceivable frontmatter key (later phases build on persisted properties)
+
+## Expected Result
+
+After this phase:
+
+- notes have user-editable properties stored in the backend
+- markdown editing shows and saves YAML frontmatter for those properties
+- rich editing shows the same properties above Quill with inline add/edit/remove
+- both surfaces remain consistent after save and reload
+
+---
+
+# Phase 5 — Convert Relationship Notes into Normal Notes
 
 ## Goal
 
 Convert special structured relationship notes into ordinary Markdown-like notes.
 
-Relationship notes today depend on the **parent** pointer for structure; this phase runs **before** removing the note parent (Phase 5) so migration can read that structure reliably.
+Relationship notes today depend on the **parent** pointer for structure; this phase runs **before** removing the note parent (Phase 6) so migration can read that structure reliably.
 
 ## Current Relationship Note
 
@@ -494,11 +550,11 @@ After this phase:
 
 ---
 
-# Phase 5 — Remove Note Parent (Folders Replace Containment)
+# Phase 6 — Remove Note Parent (Folders Replace Containment)
 
 ## Goal
 
-**Remove the note parent concept** from the model after containment has been migrated into folders and relationship notes no longer depend on it (Phase 4). The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
+**Remove the note parent concept** from the model after containment has been migrated into folders and relationship notes no longer depend on it (Phase 5). The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
 
 ## Rationale
 
@@ -516,7 +572,7 @@ If users want “semantic parent” for reading, it belongs in content (links, f
 
 ## Model Change
 
-Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and converted old relationship-note trees into folder + links in Phase 4).
+Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and converted old relationship-note trees into folder + links in Phase 5).
 
 A valid note has:
 
@@ -549,7 +605,7 @@ After this phase:
 
 ---
 
-# Phase 6 — Move a Folder
+# Phase 7 — Move a Folder
 
 ## Goal
 
@@ -574,8 +630,8 @@ folder move = one folder, new parent, recompute that folder’s slug and all des
 
 ## Non-Goals
 
-- Parsing wiki links in content (Phase 7)
-- Folder configuration templates (Phase 8)
+- Parsing wiki links in content (Phase 8)
+- Folder configuration templates (Phase 9)
 - Obsidian export/import (later phases)
 
 ## Expected Result
@@ -588,7 +644,7 @@ After this phase:
 
 ---
 
-# Phase 7 — Add Wiki-Link Parser and Link Index
+# Phase 8 — Add Wiki-Link Parser and Link Index
 
 ## Goal
 
@@ -661,7 +717,7 @@ After this phase:
 
 ---
 
-# Phase 8 — Add Folder Configuration Behavior
+# Phase 9 — Add Folder Configuration Behavior
 
 ## Goal
 
@@ -727,7 +783,7 @@ After this phase:
 
 ---
 
-# Phase 9 — Export to Obsidian Markdown
+# Phase 10 — Export to Obsidian Markdown
 
 ## Goal
 
@@ -820,7 +876,7 @@ After this phase:
 
 ---
 
-# Phase 10 — Import and Round Trip from Obsidian
+# Phase 11 — Import and Round Trip from Obsidian
 
 ## Goal
 
@@ -889,7 +945,7 @@ After this phase:
 
 ---
 
-# Phase 11 — Remove Legacy Assumptions
+# Phase 12 — Remove Legacy Assumptions
 
 ## Goal
 
@@ -967,14 +1023,15 @@ After this phase:
 1. Introduce folder
 2. Introduce slug paths
 3. Replace head note with optional index note
-4. Convert relationship notes
-5. Remove note parent (folders replace containment)
-6. Move a folder
-7. Add wiki-link parser and link index
-8. Add folder config behavior
-9. Export to Obsidian Markdown
-10. Import and round trip from Obsidian
-11. Remove legacy assumptions
+4. Introduce note properties (YAML frontmatter, persisted)
+5. Convert relationship notes
+6. Remove note parent (folders replace containment)
+7. Move a folder
+8. Add wiki-link parser and link index
+9. Add folder config behavior
+10. Export to Obsidian Markdown
+11. Import and round trip from Obsidian
+12. Remove legacy assumptions
 ```
 
 ## Dependency Summary
@@ -983,14 +1040,15 @@ After this phase:
 folder
   -> note.slug (notebook-local full path)
     -> optional index note without head note
-      -> relationship notes as normal notes
-        -> remove note parent (folders own placement)
-          -> move a folder (subtree slug updates)
-            -> wiki-link parser and link index
-              -> folder config
-                -> Obsidian export
-                  -> Obsidian import / round trip
-                    -> legacy cleanup
+      -> note properties (YAML frontmatter, rich + markdown surfaces)
+        -> relationship notes as normal notes
+          -> remove note parent (folders own placement)
+            -> move a folder (subtree slug updates)
+              -> wiki-link parser and link index
+                -> folder config
+                  -> Obsidian export
+                    -> Obsidian import / round trip
+                      -> legacy cleanup
 ```
 
 ## Final Architectural Intention
