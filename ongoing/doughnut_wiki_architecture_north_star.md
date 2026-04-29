@@ -131,11 +131,13 @@ Note
   folderId optional
   slug   (notebook-local full path; basename = segment after last "/", or whole string if no "/")
   title
-  content
-  properties
+  content (Markdown details, including optional YAML frontmatter)
+  properties (derived editing view of content frontmatter)
   createdAt
   updatedAt
 ```
+
+Note properties are represented as leading YAML frontmatter in the note's Markdown content. The Markdown content is the portable source of truth; rich editing surfaces may parse the frontmatter and show it as editable property rows, then serialize changes back into the same leading frontmatter block. The backend does not need a separate property bag to preserve properties, though later indexing or import workflows may derive selected fields from frontmatter when there is a product need.
 
 ### Link
 
@@ -453,7 +455,7 @@ Doughnut Notebook/
     pkm-design.md
 ```
 
-Each note may include frontmatter:
+Each note may include frontmatter as part of the Markdown file content:
 
 ```markdown
 ---
@@ -485,6 +487,7 @@ When importing from Obsidian-style Markdown:
 - filename becomes slug if no explicit slug exists
 - frontmatter `id` is used if available
 - frontmatter `title` is used if available
+- the remaining frontmatter is preserved with the Markdown content
 - first heading may become title if no frontmatter title exists
 - folder path becomes folder
 - wiki links are parsed and indexed

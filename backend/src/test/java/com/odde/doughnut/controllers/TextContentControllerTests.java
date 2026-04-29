@@ -79,5 +79,27 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(response.getId(), equalTo(note.getId()));
       assertThat(response.getNote().getDetails(), equalTo("new details"));
     }
+
+    @Test
+    void preservesLeadingYamlFrontmatterInDetails() throws UnexpectedNoAccessRightException {
+      String detailsWithFrontmatter =
+          """
+          ---
+          key_one: alpha
+          key_two: beta
+          ---
+
+          # Body heading
+
+          Paragraph content.
+          """;
+      noteUpdateDetailsDTO.setDetails(detailsWithFrontmatter);
+
+      NoteRealm response = controller.updateNoteDetails(note, noteUpdateDetailsDTO);
+
+      assertThat(response.getNote().getDetails(), equalTo(detailsWithFrontmatter));
+      makeMe.refresh(note);
+      assertThat(note.getDetails(), equalTo(detailsWithFrontmatter));
+    }
   }
 }

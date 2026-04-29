@@ -432,14 +432,14 @@ After this phase:
 Give each note an editable set of **properties** (key-value metadata) that:
 
 - in the **markdown** editing surface, appear as a **YAML frontmatter** block (`---` … `---`) at the top of the content and are included when the note is saved
-- are **persisted** in the backend with the note so all API consumers see the same values after reload
+- are **persisted** as part of the note's Markdown details, without a separate backend property bag
 - in the **rich text** editor, appear as **Properties** above the Quill body: a list of key-value pairs that can be edited inline, with the ability to add a new property or remove one
 
-Edits in either surface update the same logical property bag and must round-trip on save and reload.
+Edits in either surface update the same leading frontmatter block and must round-trip on save and reload.
 
 ## Rationale
 
-The north-star architecture treats notes as Markdown-like units that may carry **frontmatter** (`ongoing/doughnut_wiki_architecture_north_star.md`). Keeping metadata in properties instead of ad hoc columns supports Obsidian-style Markdown, export/import, and later phases that put structured fields in content (for example relationship notes in **Phase 5** and note export in **Phase 10**).
+The north-star architecture treats notes as Markdown-like units that may carry **frontmatter** (`ongoing/doughnut_wiki_architecture_north_star.md`). Keeping metadata in the Markdown details instead of ad hoc columns supports Obsidian-style Markdown, export/import, and later phases that put structured fields in content (for example relationship notes in **Phase 5** and note export in **Phase 10**).
 
 ## Observable behavior
 
@@ -447,18 +447,18 @@ The north-star architecture treats notes as Markdown-like units that may carry *
 
 **Trigger:** The user edits the YAML header in markdown and/or edits the Properties list above Quill in rich mode, then saves.
 
-**Post-condition:** After save and reload, the persisted properties match what the user set; the markdown buffer shows the corresponding frontmatter; APIs expose the same properties for consistency across clients.
+**Post-condition:** After save and reload, the persisted note details contain the frontmatter the user set; the markdown buffer shows that frontmatter; rich mode shows the same values as property rows.
 
 ## Persistence and surfaces
 
-- **Backend:** Persist properties with the note. Exact storage (for example JSON map, dedicated table, or defined merge with the stored body) is an implementation choice as long as reads, writes, and the markdown frontmatter stay consistent.
-- **Markdown editor:** When properties exist or the user starts adding them, the editing buffer includes a leading YAML frontmatter block; saving persists the note so that block is part of the stored representation users expect in source mode.
-- **Rich editor:** Show **Properties** as an editable key-value list above the Quill editing area; support inline key and value edits, adding a row, and removing a row; wire changes into the same save path as the note body.
+- **Backend:** Persist note details as Markdown text, including any leading YAML frontmatter. The backend does not own or expose a separate property map in this phase.
+- **Markdown editor:** The editing buffer is the persisted Markdown details, including leading YAML frontmatter when present.
+- **Rich editor:** Parse leading frontmatter from the Markdown details, show it as an editable key-value list above the Quill editing area, and serialize row changes back into the leading frontmatter block before saving through the same details update path.
 
 ## Testing (phase-complete)
 
 - **E2E:** Assert the main user path for this capability—edit properties in rich mode (and, where product flows expose it, in markdown), save, reload, and see the same values—in a capability-named feature; prefer a targeted `--spec` rather than the full suite.
-- **Unit / controller-level:** Cover YAML/frontmatter serialization edges, invalid or ambiguous YAML handling, and validation at the public HTTP contract where that is the right black-box surface.
+- **Unit / controller-level:** Cover frontend YAML/frontmatter serialization edges, invalid or ambiguous YAML handling in rich mode, and backend preservation of opaque Markdown details where needed.
 
 ## Non-goals
 
@@ -468,14 +468,14 @@ This phase does not need to:
 - remove the note parent field (**Phase 6**)
 - parse wiki links in body content (**Phase 8**)
 - add folder-level `defaultProperties` or folder templates (**Phase 9**)
-- deliver full Obsidian export/import semantics for every conceivable frontmatter key (later phases build on persisted properties)
+- deliver full Obsidian export/import semantics for every conceivable frontmatter key (later phases build on persisted frontmatter)
 
 ## Expected Result
 
 After this phase:
 
-- notes have user-editable properties stored in the backend
-- markdown editing shows and saves YAML frontmatter for those properties
+- notes have user-editable properties stored as YAML frontmatter in Markdown details
+- markdown editing shows and saves that YAML frontmatter directly
 - rich editing shows the same properties above Quill with inline add/edit/remove
 - both surfaces remain consistent after save and reload
 
@@ -990,8 +990,8 @@ Note
   folderId optional
   slug
   title
-  content
-  properties
+  content (Markdown details, including optional YAML frontmatter)
+  properties (derived editing view of content frontmatter)
   (no parentNoteId — removed from final model)
 
 LinkIndex

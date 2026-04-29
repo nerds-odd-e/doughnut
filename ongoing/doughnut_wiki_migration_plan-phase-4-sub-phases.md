@@ -10,19 +10,19 @@ Each sub-phase should be small enough to complete in about 5 minutes and commit 
 
 After Phase 4:
 
-- notes have an editable property bag persisted with the note
-- markdown editing shows properties as leading YAML frontmatter and saves frontmatter changes back to the property bag
+- notes persist properties as leading YAML frontmatter in Markdown details
+- markdown editing shows and saves the persisted Markdown details directly, including frontmatter
 - rich editing shows the same properties above the Quill body as editable key-value rows
 - users can insert, remove, and edit properties in rich mode
-- saving and reloading from either editing surface keeps properties and body content consistent
-- API consumers see one consistent property representation
+- saving and reloading from either editing surface keeps frontmatter and body content consistent
+- API consumers continue to use the existing note details representation
 
 ## Key Decisions
 
-- Store properties as a `Map<String, String>`-shaped value on `Note` and expose the same shape through the existing note read/update contracts. This phase does not attempt full YAML type fidelity.
-- Support simple scalar frontmatter values in Phase 4. Nested maps, arrays, duplicate keys, and ambiguous YAML should be rejected or surfaced through the public save contract rather than silently misrepresented.
-- Keep `details` as the markdown body content without frontmatter in the persisted note body. The markdown editor composes frontmatter plus body for editing and splits it on save. This keeps the new property concept separate from body content while still giving markdown users an Obsidian-like source view.
-- Do not introduce a separate note-properties endpoint unless the existing note update path makes a closed slice impossible. Properties belong to the same note save experience as title/details editing.
+- Do not add a backend properties column or API field in Phase 4. The persisted `details` text is the source of truth and may include leading YAML frontmatter.
+- The backend should preserve frontmatter as opaque Markdown details. Frontend rich editing derives property rows from the leading frontmatter and writes changes back into that same Markdown text.
+- Support simple scalar frontmatter values in the rich property UI for Phase 4. Nested maps, arrays, duplicate keys, and ambiguous YAML should be rejected or surfaced before rich-mode property editing silently misrepresents them.
+- Do not introduce a separate note-properties endpoint. Properties belong to the same note save experience as title/details editing through the existing details update path.
 - Extend the existing capability-owned note editing E2E coverage, for example `e2e_test/features/note_creation_and_update/note_edit.feature`; do not create phase-named feature files.
 - Keep page object additions capability-named, such as property editing helpers on `notePage`, not phase-specific helpers.
 - Run targeted specs only, normally `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`.
@@ -52,77 +52,75 @@ Define the markdown-mode user behavior before implementation.
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
 - confirm the scenario fails for missing property/frontmatter behavior, not a typo or selector issue
 
-### 4.2 Persist Empty Note Properties Through the Backend Contract
+### 4.2 Preserve Frontmatter Through the Existing Details Contract
 
 **Type:** Structure
 
-Add the backend field and API shape without changing visible editor behavior yet.
+Confirm the backend already persists frontmatter as opaque note details, without adding a separate property contract.
 
 **Commit includes:**
 
-- database migration adding a note properties column with an empty-object default or equivalent
-- `Note` exposes a non-null empty property map for existing notes
-- note read/update DTOs include properties without changing existing details/title behavior
-- controller-level or high-level backend test proves existing notes read back with empty properties and updates preserve them
-- regenerate the frontend TypeScript client
-
-**Verification:**
-
-- targeted backend controller/entity tests
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
-
-### 4.3 Save Properties Through the Note Update Path
-
-**Type:** Behavior
-
-API consumers can write and read note properties through the same logical note update path.
-
-**Commit includes:**
-
-- extend the update-details contract, or the smallest existing note update contract, to accept the property map
-- backend test updates a note with properties and reads the same values back through the public note response
-- preserve existing details editing behavior when properties are omitted
-- no frontend UI changes yet
+- no database migration
+- no new note read/update DTO property field
+- controller-level or high-level backend test proves updating note details with leading YAML frontmatter reads back the same Markdown text
+- existing title/details behavior remains unchanged
 
 **Verification:**
 
 - targeted backend note update/read tests
 
-### 4.4 Add Frontmatter Parsing and Serialization
+### 4.3 Add Frontmatter Parsing and Serialization
 
 **Type:** Structure
 
-Introduce the shared conversion rules used by the markdown editor without wiring them into the UI yet.
+Introduce the shared frontend conversion rules used by rich editing without wiring them into the UI yet.
 
 **Commit includes:**
 
-- a cohesive helper that composes `{ properties, body }` into markdown source with frontmatter and splits markdown source back into `{ properties, body }`
+- a cohesive helper that parses Markdown details into `{ properties, body }` and composes `{ properties, body }` back into Markdown details with leading frontmatter
 - unit tests for no frontmatter, simple scalar frontmatter, body beginning after frontmatter, empty frontmatter, duplicate keys, non-scalar values, and malformed YAML
-- invalid or unsupported frontmatter returns a public validation-shaped failure rather than silently dropping data
+- invalid or unsupported frontmatter returns a validation-shaped failure for the rich editing surface rather than silently dropping data
 - no production UI behavior change
 
 **Verification:**
 
-- targeted backend or frontend unit tests for the conversion helper, depending on where the helper lives
+- targeted frontend unit tests for the conversion helper
 
-### 4.5 Wire Markdown Editing to Properties
+### 4.4 Wire Rich Rendering to Body-Only Markdown
 
 **Type:** Behavior
 
-The markdown E2E scenario from 4.1 passes.
+The markdown E2E scenario from 4.1 passes for persisted frontmatter and rich body rendering.
 
 **Commit includes:**
 
-- markdown mode displays frontmatter composed from the note property map above the existing body
-- saving markdown splits frontmatter into properties and body before calling the update API
-- rich rendering continues to show only body content
+- markdown mode continues to display and save the full persisted details, including frontmatter
+- rich mode renders only the parsed body content, not the leading frontmatter
+- saving rich body edits preserves existing frontmatter by composing it back with the edited body before calling the existing update API
 - remove `@wip` from the markdown properties E2E scenario once it passes
-- keep the first implementation scoped to scalar string values
+- keep the first implementation scoped to scalar string values for rich property parsing
 
 **Verification:**
 
-- targeted frontend tests for markdown composition/splitting if needed
+- targeted frontend tests for body/frontmatter composition if needed
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
+
+### 4.5 Show Read-Only Rich Properties Above the Body
+
+**Type:** Behavior
+
+Users can see existing frontmatter properties in rich mode before editing them there.
+
+**Commit includes:**
+
+- render a `Properties` section above the rich markdown editor when the note details have supported frontmatter properties
+- display key and value text for each property
+- add or update a frontend component test around note details editing/rendering
+- no add/edit/remove controls yet
+
+**Verification:**
+
+- targeted frontend component test
 
 ### 4.6 Add the Rich Insert Property E2E Scenario
 
@@ -142,22 +140,22 @@ Define the rich-mode behavior for adding a new property row.
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
 - confirm the scenario fails because the rich properties UI does not exist yet
 
-### 4.7 Show Read-Only Rich Properties Above the Body
+### 4.7 Prepare Rich Property Editing State
 
-**Type:** Behavior
+**Type:** Structure
 
-Users can see existing properties in rich mode before editing them there.
+Prepare the property row state used by insert/edit/remove controls without adding controls yet.
 
 **Commit includes:**
 
-- render a `Properties` section above the rich markdown editor when the note has properties
-- display key and value text for each property
-- add or update a frontend component test around note details editing/rendering
-- no add/edit/remove controls yet
+- keep the rich details component's editable property rows derived from parsed frontmatter
+- compose property row changes back into the Markdown details draft with the existing body content
+- add focused frontend tests for composing inserted, renamed, and removed rows into frontmatter
+- no new visible controls yet
 
 **Verification:**
 
-- targeted frontend component test
+- targeted frontend component tests
 
 ### 4.8 Add Rich-Mode Property Insertion
 
@@ -168,7 +166,7 @@ The rich insert E2E scenario from 4.6 passes.
 **Commit includes:**
 
 - add an inline control for adding a property row in rich mode
-- new row edits update the same property map sent through the note save path
+- new row edits update the frontmatter in the same note details save path
 - save/reload shows the inserted property in rich mode and frontmatter in markdown mode
 - remove `@wip` from the rich insert E2E scenario once it passes
 
@@ -238,7 +236,7 @@ The rich remove E2E scenario from 4.11 passes.
 **Commit includes:**
 
 - add a remove control for each rich property row
-- removing a row updates the note property map and save path
+- removing a row updates the frontmatter in the same note details save path
 - remove the `Properties` section, or show an empty add-only state, when no properties remain
 - remove `@wip` from the rich remove E2E scenario once it passes
 
@@ -251,30 +249,29 @@ The rich remove E2E scenario from 4.11 passes.
 
 **Type:** Behavior
 
-Users get clear failures for property shapes this phase cannot safely persist.
+Users get clear failures for property shapes this phase cannot safely edit in rich mode.
 
 **Commit includes:**
 
-- public contract tests for unsupported YAML values, duplicate keys, empty keys, and malformed frontmatter
+- frontend tests for unsupported YAML values, duplicate keys, empty keys, and malformed frontmatter
 - frontend displays save errors near the markdown editor or properties list without corrupting existing note content
 - no new property value types beyond scalar strings
 
 **Verification:**
 
-- targeted backend validation tests
 - targeted frontend validation test if UI error handling changes
 
 ### 4.14 Include Properties in Obsidian Export
 
 **Type:** Behavior
 
-Exported markdown includes the same persisted property values in frontmatter.
+Exported markdown preserves the same persisted frontmatter from note details.
 
 **Commit includes:**
 
-- extend the existing notebook export behavior so note properties are included in exported frontmatter
-- keep existing export metadata that is still needed, unless a current test proves it should move into the property map
-- update the capability-owned notebook export E2E or backend export test to assert one persisted property appears in the exported markdown
+- extend or verify the existing notebook export behavior so note details frontmatter is included in exported Markdown
+- keep existing export metadata that is still needed without introducing a separate property map
+- update the capability-owned notebook export E2E or backend export test to assert one persisted frontmatter property appears in the exported markdown
 
 **Verification:**
 
