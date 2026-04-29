@@ -62,6 +62,7 @@
     "test:sut-healthcheck": "node --test scripts/sut-healthcheck.test.mjs",
     "test:sut-restart": "node --test scripts/sut-restart.test.mjs",
     "test:sut-start": "node --test scripts/sut-start.test.mjs",
+    "setupCursorDev": "node scripts/setup-cursor-dev.mjs",
     "verify": "pnpm format:all && pnpm test",
     "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cli:lint && pnpm test-fixtures:lint && pnpm cy:lint && pnpm test:path-routing && pnpm test:sut-healthcheck && pnpm test:sut-restart && pnpm test:sut-start && pnpm validate:path-routing && pnpm openapi:lint",
     "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm mcp-server:format && pnpm test-fixtures:format && pnpm cli:format && pnpm cy:format && pnpm openapi:lint",
