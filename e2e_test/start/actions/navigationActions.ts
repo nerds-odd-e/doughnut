@@ -1,19 +1,14 @@
 import router from '../router'
-import testability from '../testability'
 import { assumeNotePage } from '../pageObjects/notePage'
 import { mainMenu } from '../pageObjects/mainMenu'
+import { wikiBasenameFromTitle } from '../wikiSlug'
 
 export const navigationActions = {
-  // jumpToNotePage is faster than navigateToPage
-  //   it uses the note id memorized when creating them with testability api
   jumpToNotePage(noteTopology: string, forceLoadPage = false) {
-    testability()
-      .getInjectedNoteIdByTitle(noteTopology)
-      .then((noteId) => {
-        const url = `/n${noteId}`
-        if (forceLoadPage) cy.visit(url)
-        else router().push(url, 'noteShow', { noteId })
-      })
+    const basename = wikiBasenameFromTitle(noteTopology)
+    const url = `/d/notes/${encodeURIComponent(basename)}`
+    if (forceLoadPage) cy.visit(url)
+    else router().push(url, 'noteShow', { noteId: basename })
 
     return assumeNotePage(noteTopology)
   },

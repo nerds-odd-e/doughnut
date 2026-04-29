@@ -7,11 +7,7 @@ type CustomWindow = Omit<Cypress.AUTWindow, 'Infinity' | 'NaN'> & {
   Infinity: number
   NaN: number
   router?: {
-    push: (options: {
-      name: string
-      params: RouteParams
-      query: Record<string, string | number>
-    }) => Promise<unknown>
+    push: (options: Record<string, unknown>) => Promise<unknown>
   }
 }
 
@@ -22,18 +18,20 @@ const router = () => {
         (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
       return cy.window().then((win: CustomWindow) => {
         if (win.router && isFirstVisited) {
+          const noteId = params.noteId
+          const isBasenameNoteShow =
+            name === 'noteShow' &&
+            typeof noteId === 'string' &&
+            !/^\d+$/.test(noteId)
+          const location = isBasenameNoteShow
+            ? { path: fallback, query: { time: Date.now() } }
+            : { name, params, query: { time: Date.now() } }
           return cy.wrap(
-            win.router
-              .push({
-                name,
-                params,
-                query: { time: Date.now() },
-              })
-              .catch((error) => {
-                cy.log('router push failed')
-                cy.log(error as string)
-                throw error
-              })
+            win.router.push(location).catch((error) => {
+              cy.log('router push failed')
+              cy.log(error as string)
+              throw error
+            })
           )
         }
         cy.wrap('yes').as('firstVisited')

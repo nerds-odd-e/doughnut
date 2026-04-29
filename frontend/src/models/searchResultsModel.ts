@@ -249,9 +249,19 @@ export class SearchResultsModel {
     const byId = new Map<number, NoteSearchResult>()
     const getId = (r: NoteSearchResult) => r.noteTopology.id as number
 
+    /** Backend literal API uses 0 = exact title, 0.9 = substring; keep those over semantic embeddings. */
+    const isExactLiteralDistance = (d: number) => d === 0
+    const isPartialLiteralDistance = (d: number) => Math.abs(d - 0.9) < 1e-3
+
     const chooseBetter = (a: NoteSearchResult, b: NoteSearchResult) => {
       const da = a.distance ?? Infinity
       const db = b.distance ?? Infinity
+      if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return a
+      if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return b
+      if (isPartialLiteralDistance(da) && !isPartialLiteralDistance(db))
+        return a
+      if (!isPartialLiteralDistance(da) && isPartialLiteralDistance(db))
+        return b
       return db < da ? b : a
     }
 
@@ -265,10 +275,13 @@ export class SearchResultsModel {
     return Array.from(byId.values()).sort((a, b) => {
       const distDiff = (a.distance ?? Infinity) - (b.distance ?? Infinity)
       if (distDiff !== 0) return distDiff
-      if (currentNotebookId === undefined) return 0
-      const aSame = a.notebookId === currentNotebookId
-      const bSame = b.notebookId === currentNotebookId
-      return Number(bSame) - Number(aSame)
+      if (currentNotebookId !== undefined) {
+        const aSame = a.notebookId === currentNotebookId
+        const bSame = b.notebookId === currentNotebookId
+        const nb = Number(bSame) - Number(aSame)
+        if (nb !== 0) return nb
+      }
+      return (a.noteTopology.id as number) - (b.noteTopology.id as number)
     })
   }
 }

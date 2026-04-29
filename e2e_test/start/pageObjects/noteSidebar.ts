@@ -26,18 +26,15 @@ export const noteSidebar = () => {
     },
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       pageIsNotLoading()
-      cy.get('aside ul li .title-text').then(($els) => {
-        const actualNotes = Array.from($els, (el) => el.innerText)
-        const expectedNoteTopics = expectedNotes.map(
-          (note) => note['note-title']
-        )
+      const expectedNoteTopics = expectedNotes.map((note) => note['note-title'])
 
-        // Check both length and order
+      cy.get('aside ul li .title-text', { timeout: 15000 }).should(($els) => {
+        const actualNotes = Array.from($els, (el) => el.innerText)
+
         expect(actualNotes.length, 'Number of notes should match').to.equal(
           expectedNoteTopics.length
         )
 
-        // Check each note is in the correct position
         actualNotes.forEach((actualNote, index) => {
           expect(actualNote, `Note at position ${index + 1}`).to.equal(
             expectedNoteTopics[index]

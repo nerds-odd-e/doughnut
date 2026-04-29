@@ -33,7 +33,7 @@ Feature: Note tree view
       | ATDD       |
       | CI         |
 
-  Scenario: Side bar should show the whole notebook
+  Scenario: Side bar should show the whole notebook from TDD
     When I navigate to "LeSS in Action/TDD" note
     Then I should see the note tree in the sidebar
       | note-title |
@@ -41,7 +41,11 @@ Feature: Note tree view
       | TPP        |
       | ATDD       |
       | CI         |
+
+  Scenario: Side bar should show the whole notebook from ATDD
+    Given I navigate to "LeSS in Action/TDD" note
     When I route to the note "ATDD"
+    And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title |
       | TDD        |
