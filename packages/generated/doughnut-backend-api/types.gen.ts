@@ -235,6 +235,7 @@ export type RelationshipCreation = {
 
 export type NoteRealm = {
     id: number;
+    slug: string;
     note: Note;
     fromBazaar?: boolean;
     children?: Array<Note>;
@@ -885,6 +886,7 @@ export type SubscriptionWritable = {
 
 export type NoteRealmWritable = {
     id: number;
+    slug: string;
     note: NoteWritable;
     fromBazaar?: boolean;
     children?: Array<NoteWritable>;

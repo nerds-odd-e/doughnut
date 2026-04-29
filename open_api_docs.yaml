@@ -3815,6 +3815,8 @@ components:
         id:
           type: integer
           format: int32
+        slug:
+          type: string
         note:
           $ref: "#/components/schemas/Note"
         fromBazaar:
@@ -3832,6 +3834,7 @@ components:
       required:
       - id
       - note
+      - slug
     NoteMoveDTO:
       type: object
       properties:

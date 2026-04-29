@@ -35,6 +35,7 @@ import {
   AdminUserController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
+import makeMe from "doughnut-test-fixtures/makeMe"
 
 // Mapping of method names to their controller classes
 // biome-ignore lint/suspicious/noExplicitAny: Controller classes have different types and need any for dynamic access
@@ -224,14 +225,7 @@ export function mockShowNoteAccessory() {
  * in tests that use StoredApiCollection.loadNote (via storageAccessor).
  */
 export function mockShowNote(noteRealm?: NoteRealm) {
-  const defaultNote =
-    noteRealm ||
-    ({
-      id: 1,
-      note: { id: 1 },
-      children: [],
-    } as unknown as NoteRealm)
-  return mockSdkService("showNote", defaultNote)
+  return mockSdkService("showNote", noteRealm ?? makeMe.aNoteRealm.please())
 }
 
 /**

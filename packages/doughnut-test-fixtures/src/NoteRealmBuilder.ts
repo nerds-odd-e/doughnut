@@ -15,6 +15,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     const noteData = this.noteBuilder.data
     this.data = {
       id: noteData.id,
+      slug: noteData.noteTopology.slug,
       note: noteData,
       inboundReferences: [],
       children: [],
@@ -81,6 +82,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do()
+    this.data.id = this.data.note.id
+    this.data.slug = this.data.note.noteTopology.slug
     return this.data
   }
 }
