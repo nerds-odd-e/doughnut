@@ -8,7 +8,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -22,29 +24,59 @@ public class ObsidianFormatService {
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final NoteConstructionService noteConstructionService;
+  private final NotebookService notebookService;
   private final Set<String> usedPaths = new HashSet<>();
 
   public ObsidianFormatService(
       NoteRepository noteRepository,
       EntityPersister entityPersister,
-      NoteConstructionService noteConstructionService) {
+      NoteConstructionService noteConstructionService,
+      NotebookService notebookService) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.noteConstructionService = noteConstructionService;
+    this.notebookService = notebookService;
   }
 
-  public byte[] exportToObsidian(Note headNote) throws IOException {
+  public byte[] exportToObsidian(Notebook notebook) throws IOException {
     try (var baos = new ByteArrayOutputStream();
         var zos = new ZipOutputStream(baos)) {
 
-      // Clear the used paths set before starting a new export
       usedPaths.clear();
 
-      writeNoteToZip(headNote, zos, "");
+      Optional<Note> indexNote = notebookService.findOptionalIndexNote(notebook);
+      List<Note> roots = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId());
+
+      if (indexNote.isPresent()) {
+        Note index = indexNote.get();
+        writeIndexMarkdownAtZipRoot(index, zos);
+        for (Note child : index.getChildren()) {
+          writeNoteToZip(child, zos, "");
+        }
+      }
+
+      Integer indexId = indexNote.map(Note::getId).orElse(null);
+      for (Note root : roots) {
+        if (indexId != null && root.getId().equals(indexId)) {
+          continue;
+        }
+        writeNoteToZip(root, zos, "");
+      }
 
       zos.close();
       return baos.toByteArray();
     }
+  }
+
+  private void writeIndexMarkdownAtZipRoot(Note indexNote, ZipOutputStream zos) throws IOException {
+    String filePath = "index.md";
+    if (usedPaths.contains(filePath)) {
+      return;
+    }
+    usedPaths.add(filePath);
+    String fileContent = generateMarkdownContent(indexNote);
+    zos.putNextEntry(new ZipEntry(filePath));
+    zos.write(fileContent.getBytes());
   }
 
   private void writeNoteToZip(Note note, ZipOutputStream zos, String path) throws IOException {

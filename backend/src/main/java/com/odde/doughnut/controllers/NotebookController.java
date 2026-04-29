@@ -270,13 +270,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(notebook);
-    Note head = notebook.getHeadNote();
-    if (head == null) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND, "This notebook has no export root note yet.");
-    }
-
-    byte[] zipBytes = obsidianFormatService.exportToObsidian(head);
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
 
     return ResponseEntity.ok()
         .header(

@@ -3,9 +3,11 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
@@ -58,10 +60,11 @@ class ObsidianFormatServiceTest {
     Note note1 = makeMe.aNote("Parent Note").under(headNote).details("Parent Content").please();
     Note note2 = makeMe.aNote("Child Note").under(note1).details("Child Content").please();
     Note note3 = makeMe.aNote("Leaf Note").under(note1).details("Leaf Content").please();
-    makeMe.refresh(headNote.getNotebook());
+    Notebook notebook = headNote.getNotebook();
+    makeMe.refresh(notebook);
 
     // Act
-    byte[] zipBytes = obsidianFormatService.exportToObsidian(headNote);
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
 
     // Assert
     Map<String, String> zipContents = extractZipContents(zipBytes);
@@ -121,13 +124,11 @@ class ObsidianFormatServiceTest {
     makeMe.aRelation().between(tagger1, targetNote, RelationType.TAGGED_BY).please();
     makeMe.aRelation().between(tagger1, targetNote, RelationType.TAGGED_BY).please();
 
-    makeMe.refresh(headNote.getNotebook());
+    Notebook notebook = headNote.getNotebook();
+    makeMe.refresh(notebook);
 
-    // Act & Assert
-    // This should throw a ZipException for duplicate entry
-    byte[] zipBytes = obsidianFormatService.exportToObsidian(headNote);
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
 
-    // The test should never reach this point because of the exception
     Map<String, String> zipContents = extractZipContents(zipBytes);
     assertThat(zipContents.size(), org.hamcrest.Matchers.greaterThan(0));
   }
@@ -144,12 +145,11 @@ class ObsidianFormatServiceTest {
     makeMe.aRelation().between(childWithTags, targetNote, RelationType.TAGGED_BY).please();
     makeMe.aRelation().between(childWithTags, targetNote, RelationType.TAGGED_BY).please();
 
-    makeMe.refresh(headNote.getNotebook());
+    Notebook notebook = headNote.getNotebook();
+    makeMe.refresh(notebook);
 
-    // Act & Assert
-    byte[] zipBytes = obsidianFormatService.exportToObsidian(headNote);
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
 
-    // The test should pass now with our fix
     Map<String, String> zipContents = extractZipContents(zipBytes);
     assertThat(zipContents.size(), org.hamcrest.Matchers.greaterThan(0));
 
@@ -161,5 +161,36 @@ class ObsidianFormatServiceTest {
             headNoteTitle + "/__index.md",
             headNoteTitle + "/Tagger 1/__index.md",
             headNoteTitle + "/Tagger 1/_tagged by.md"));
+  }
+
+  @Test
+  void export_withRootIndexNote_emitsIndexMdAtRoot() throws IOException {
+    makeMe.theNote(headNote).title("Landing").slug("index").details("Index body").please();
+    makeMe.aNote("Parent Note").under(headNote).details("Parent Content").please();
+    Notebook notebook = headNote.getNotebook();
+    makeMe.refresh(notebook);
+
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
+    Map<String, String> zipContents = extractZipContents(zipBytes);
+
+    assertThat(zipContents.containsKey("index.md"), is(true));
+    assertThat(zipContents.get("index.md"), containsString("Index body"));
+    assertThat(zipContents.keySet(), hasItems("index.md", "Parent Note.md"));
+    assertThat(zipContents.get("Parent Note.md"), containsString("# Parent Note\nParent Content"));
+  }
+
+  @Test
+  void export_withoutIndexNote_omitsIndexMd() throws IOException {
+    headNote.setTitle("Root Note");
+    headNote.setDetails("Root Content");
+    makeMe.aNote("Solo").under(headNote).please();
+    Notebook notebook = headNote.getNotebook();
+    makeMe.refresh(notebook);
+
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
+    Map<String, String> zipContents = extractZipContents(zipBytes);
+
+    assertThat(zipContents.containsKey("index.md"), is(false));
+    assertThat(zipContents.keySet(), hasItems("Root Note/__index.md"));
   }
 }

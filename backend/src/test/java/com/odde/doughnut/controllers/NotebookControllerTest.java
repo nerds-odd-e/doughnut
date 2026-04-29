@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,17 +28,22 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
@@ -650,13 +656,40 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void whenNotebookHasNoHeadNote() throws UnexpectedNoAccessRightException {
+    void whenNotebookHasNoHeadNote_returnsEmptyZip()
+        throws UnexpectedNoAccessRightException, IOException {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Obsidian Empty Nb");
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
       Notebook blank = notebookRepository.findById(response.notebookId).orElseThrow();
-      assertThrows(
-          ResponseStatusException.class, () -> controller.downloadNotebookForObsidian(blank));
+      ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(blank);
+      assertThat(entity.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(entity.getBody(), notNullValue());
+      assertThat(entity.getBody().length > 0, is(true));
+      List<String> names = zipEntryNames(entity.getBody());
+      assertThat(names.isEmpty(), is(true));
+    }
+
+    @Test
+    void download_whenNotebookHasIndexNote_includesIndexMd()
+        throws UnexpectedNoAccessRightException, IOException {
+      Note head = notebook.getHeadNote();
+      makeMe.theNote(head).title("Overview").slug("index").details("Notebook intro").please();
+      makeMe.refresh(notebook);
+      ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(notebook);
+      assertThat(entity.getStatusCode(), equalTo(HttpStatus.OK));
+      assertThat(zipEntryNames(entity.getBody()), org.hamcrest.Matchers.hasItem("index.md"));
+    }
+
+    private static List<String> zipEntryNames(byte[] zipBytes) throws IOException {
+      List<String> names = new ArrayList<>();
+      try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+          names.add(entry.getName());
+        }
+      }
+      return names;
     }
   }
 
