@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteMotionServiceTest {
   @Autowired NoteMotionService noteMotionService;
   @Autowired NoteChildContainerFolderService noteChildContainerFolderService;
+  @Autowired JdbcTemplate jdbcTemplate;
 
   @Autowired MakeMe makeMe;
   Note topNote;
@@ -168,6 +170,34 @@ public class NoteMotionServiceTest {
     assertThat(grandChild.getFolder(), notNullValue());
     assertThat(grandChild.getFolder().getName(), equalTo(firstChild.getTitle()));
     assertThat(grandChild.getSlug(), startsWith(grandChild.getFolder().getSlug() + "/"));
+  }
+
+  @Test
+  void moveToTopLevel_slugsStayUniqueWithinNotebook() {
+    User user = makeMe.aUser().please();
+    topNote = makeMe.aHeadNote("topNote").creatorAndOwner(user).please();
+    firstChild = makeMe.aNote("middle").under(topNote).please();
+    Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
+    makeMe.entityPersister.flush();
+
+    noteMotionService.moveToTopLevel(firstChild, user);
+    makeMe.entityPersister.flush();
+    makeMe.refresh(firstChild);
+    makeMe.refresh(grandChild);
+
+    Integer notebookId = firstChild.getNotebook().getId();
+    Long total =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM note WHERE notebook_id = ? AND deleted_at IS NULL",
+            Long.class,
+            notebookId);
+    Long distinctSlugs =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(DISTINCT slug) FROM note WHERE notebook_id = ? AND deleted_at IS NULL",
+            Long.class,
+            notebookId);
+    assertThat(total, equalTo(distinctSlugs));
+    assertThat(grandChild.getSlug(), startsWith(firstChild.getSlug() + "/"));
   }
 
   @Nested

@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -67,7 +68,10 @@ class RelationController {
       @PathVariable @Schema(type = "integer") Note targetNote,
       @RequestBody @Valid NoteMoveDTO noteMoveDTO,
       BindingResult bindingResult)
-      throws UnexpectedNoAccessRightException, BindException, CyclicLinkDetectedException {
+      throws UnexpectedNoAccessRightException,
+          BindException,
+          CyclicLinkDetectedException,
+          MovementNotPossibleException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetNote);

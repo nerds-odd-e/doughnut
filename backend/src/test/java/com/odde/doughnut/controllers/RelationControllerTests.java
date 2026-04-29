@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -45,11 +46,27 @@ class RelationControllerTests extends ControllerTestBase {
 
     @Test
     void moveNoteSuccessfully()
-        throws BindException, UnexpectedNoAccessRightException, CyclicLinkDetectedException {
+        throws BindException,
+            UnexpectedNoAccessRightException,
+            CyclicLinkDetectedException,
+            MovementNotPossibleException {
       Note note3 = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       noteMoveDTO.asFirstChild = false;
       var result = controller.moveNote(note3, note2, noteMoveDTO, makeMe.successfulBindingResult());
       assertThat(result, hasSize(2));
+    }
+
+    @Test
+    void shouldRejectMovingAsFirstChildWhenSubjectIsAlreadyFirstChildOfTarget() {
+      Note parentNote = makeMe.aNote("parent").creatorAndOwner(currentUser.getUser()).please();
+      Note onlyChild =
+          makeMe.aNote("only").creatorAndOwner(currentUser.getUser()).under(parentNote).please();
+      noteMoveDTO.asFirstChild = true;
+      assertThrows(
+          MovementNotPossibleException.class,
+          () ->
+              controller.moveNote(
+                  onlyChild, parentNote, noteMoveDTO, makeMe.successfulBindingResult()));
     }
 
     @Test

@@ -75,14 +75,17 @@ public class NoteMotionService {
   }
 
   public void executeMoveUnder(Note sourceNote, Note targetNote, Boolean asFirstChild)
-      throws CyclicLinkDetectedException {
+      throws CyclicLinkDetectedException, MovementNotPossibleException {
     if (!asFirstChild) {
       List<Note> children = targetNote.getChildren();
       if (!children.isEmpty()) {
-        execute(sourceNote, children.getLast(), false);
+        Note lastChild = children.getLast();
+        validate(sourceNote, lastChild, false);
+        execute(sourceNote, lastChild, false);
         return;
       }
     }
+    validate(sourceNote, targetNote, true);
     execute(sourceNote, targetNote, true);
   }
 
