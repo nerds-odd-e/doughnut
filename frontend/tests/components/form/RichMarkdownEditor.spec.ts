@@ -148,14 +148,23 @@ Main content here.`
     expect(html).not.toContain("topic:")
   })
 
-  it("does not show Properties section when details have no frontmatter", async () => {
+  it("shows Properties insert chrome when editable details have no frontmatter", async () => {
     await mountEditor("# Hello\n\nParagraph.")
+    await flushPromises()
+
+    expect(wrapper.find("section").exists()).toBe(true)
+    expect(wrapper.text()).toContain("Properties")
+    expect(wrapper.text()).toContain("Add note property")
+  })
+
+  it("does not show Properties section when details have no frontmatter (readonly)", async () => {
+    await mountEditor("# Hello\n\nParagraph.", { readonly: true })
     await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(false)
   })
 
-  it("does not show Properties section when frontmatter block is empty", async () => {
+  it("shows Properties insert chrome when editable empty frontmatter block", async () => {
     await mountEditor(`---
 
 
@@ -164,7 +173,49 @@ Main content here.`
 Body`)
     await flushPromises()
 
+    expect(wrapper.find("section").exists()).toBe(true)
+    expect(wrapper.text()).toContain("Add note property")
+  })
+
+  it("does not show Properties section when frontmatter block is empty (readonly)", async () => {
+    await mountEditor(
+      `---
+
+
+---
+
+Body`,
+      { readonly: true }
+    )
+    await flushPromises()
+
     expect(wrapper.find("section").exists()).toBe(false)
+  })
+
+  it("inserting a property emits composed frontmatter and preserves body", async () => {
+    await mountEditor("# Hello Body")
+    await flushPromises()
+
+    const addBtn = wrapper
+      .findAll("button")
+      .find((w) => w.text().includes("Add note property"))
+    expect(addBtn).toBeDefined()
+    await addBtn!.trigger("click")
+    await flushPromises()
+
+    const keyInput = wrapper.find('[aria-label="Property key"]')
+    const valInput = wrapper.find('[aria-label="Property value"]')
+    await keyInput.setValue("status")
+    await valInput.setValue("draft")
+    await valInput.trigger("blur")
+    await flushPromises()
+
+    const emitted = wrapper.emitted()["update:modelValue"]
+    expect(emitted?.length).toBeGreaterThan(0)
+    const last = emitted![emitted!.length - 1]![0] as string
+    expect(last).toContain("---")
+    expect(last).toContain("status: draft")
+    expect(last).toContain("Hello Body")
   })
 
   it("does not show Properties section when frontmatter fails to parse", async () => {

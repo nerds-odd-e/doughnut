@@ -3,6 +3,8 @@
     <RichFrontmatterProperties
       ref="frontmatterPropertiesRef"
       :details-markdown="modelValue ?? ''"
+      :read-only="readonly"
+      @properties-changed="onPropertiesChanged"
     />
     <QuillEditor
       v-bind="{ multipleLine, scopeName, field, title, errors }"
@@ -28,6 +30,7 @@ import {
 import {
   composeNoteDetailsFromPropertyRows,
   parseNoteDetailsMarkdown,
+  type PropertyRow,
 } from "@/utils/noteDetailsFrontmatter"
 
 const props = defineProps({
@@ -110,6 +113,18 @@ const htmlValueUpdated = (newHtmlValue: string) => {
 
   if (bodyMarkdown === prevFull) return
   emits("update:modelValue", bodyMarkdown)
+}
+
+const onPropertiesChanged = (rows: PropertyRow[]) => {
+  const p = parsedDetails.value
+  if (!p.ok) return
+  const prevFull = props.modelValue ?? ""
+  const bodyMarkdown =
+    currentIntervalBodyMarkdown !== undefined
+      ? currentIntervalBodyMarkdown
+      : p.body
+  const composed = composeNoteDetailsFromPropertyRows(rows, bodyMarkdown)
+  if (composed !== prevFull) emits("update:modelValue", composed)
 }
 
 const onPasteComplete = (html: string) => {

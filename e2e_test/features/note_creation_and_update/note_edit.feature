@@ -103,7 +103,6 @@ Feature: Note Edit
       | Tag | Content       |
       | h1  | Workshop Body |
 
-  @wip
   Scenario: Insert a note property in rich mode
     Given I open the note "LeSS in Action" for editing
     When I add a rich note property with key "status" and value "draft"
