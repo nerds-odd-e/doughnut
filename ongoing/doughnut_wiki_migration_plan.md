@@ -14,8 +14,10 @@ Doughnut will move from a strict parent-child note model toward a wiki-style mod
 
 ```text
 notebook = collection boundary
+notebook.name = notebook-owned display name
 folder = containment and navigation
 note = Markdown-like knowledge unit
+index note = optional ordinary root note titled `index` for notebook page content
 link = semantic connection
 note.slug = notebook-local address (full path within the notebook; see Phase 2)
 localSegment = suffix after the last "/" in note.slug (derivable basename within a folder)
@@ -305,11 +307,11 @@ This phase does not need to:
 
 ---
 
-# Phase 3 — Move Head Note Content to Notebook
+# Phase 3 — Replace Head Note with Optional Index Note
 
 ## Goal
 
-Remove the conceptual dependency on the head note by moving its content into the notebook.
+Remove the conceptual dependency on the head note by converting it into an ordinary optional root note titled `index`.
 
 ## Rationale
 
@@ -320,7 +322,7 @@ notebook identity
 notebook content
 ```
 
-In the final model, the notebook owns its own content.
+In the final model, the notebook owns its own name. Notebook page content comes from an optional ordinary `index` note.
 
 Old model:
 
@@ -335,60 +337,76 @@ New model:
 
 ```text
 Notebook
-  content
+  name
+  config
   folders
   notes
+    index (optional ordinary root note)
 ```
 
 ## Model Changes
 
-Add to notebook:
+Keep on notebook:
 
 ```text
-content
+name
 ```
 
-Possibly also:
+Do not add a notebook content field. The former head note becomes a normal note:
 
 ```text
-properties
+Note
+  title = "index"
+  slug = "index"
+  folderId = null
+  content = former head note content
 ```
+
+Assume there is no current production data with the title `index`, so the migration can use the `index` title and slug without resolving existing-note collisions.
+
+An `index` note is optional. New notebooks do not need to create one until the user writes notebook page content.
 
 ## Migration Strategy
 
 For each notebook:
 
-1. Read the current head note content.
-2. Copy or move the content to `Notebook.content`.
-3. Preserve the head note ID during the transition if needed.
-4. Stop creating new head notes.
-5. Update UI to display notebook content from the notebook itself.
+1. Preserve the notebook's own name independently of note title/content.
+2. Rename the current head note to title `index` and slug `index`, or otherwise migrate its content into a normal root note with those values.
+3. Prefer preserving the former head note ID if feasible, because the migrated `index` note is still a normal note with stable identity.
+4. Clear notebook/head-note coupling so notebook lookup no longer requires a head note.
+5. Stop creating head notes for new notebooks. Create the `index` note only when notebook page content is saved.
+
+## UI Changes
+
+The notebook UI should shift from head-note/settings editing to a notebook page:
+
+- remove “edit notebook settings”
+- remove the `edit` segment from the notebook page path
+- clicking a notebook goes directly to the notebook page
+- at the top of the notebook page, show the rich editor for the `index` note content instead of the head note summary
+- show the empty rich editor even if the `index` note does not exist yet; saving content creates the normal `index` note
+- notebook page should have the same sidebar behavior as the note show page
 
 ## Export Implication
 
-When exporting to Markdown, notebook content may become:
+When exporting to Markdown, the optional `index` note exports like a normal note at the notebook root:
 
 ```text
-_index.md
+index.md
 ```
 
-or:
-
-```text
-README.md
-```
-
-This should be export configuration, not an internal note model requirement.
+If the notebook has no `index` note, export omits `index.md`.
 
 ## Expected Result
 
 After this phase:
 
-- notebook has its own content
-- UI can display and edit notebook content directly
+- notebook keeps its own name
+- the former head note is represented as a normal root note titled `index`
+- an `index` note is optional for each notebook
+- UI can display and edit notebook page content through the `index` note rich editor
 - first-layer notes no longer need to be children of a head note
-- new notebooks do not require head notes
-- legacy head notes may still exist temporarily for compatibility
+- new notebooks do not require head notes or pre-created `index` notes
 
 ---
 
@@ -706,7 +724,7 @@ Example:
 
 ```text
 Doughnut Notebook/
-  _index.md
+  index.md
 
   Journal/
     2026/
@@ -764,25 +782,15 @@ If the target needs disambiguation, folder-qualified links may be allowed:
 [[japanese/vocabulary/どうやら]]
 ```
 
-## Notebook Content Export
+## Notebook Index Export
 
-Notebook content exports as either:
-
-```text
-_index.md
-```
-
-or:
+The optional root `index` note exports as:
 
 ```text
-README.md
+index.md
 ```
 
-Recommended default:
-
-```text
-_index.md
-```
+If the notebook has no `index` note, export omits this file.
 
 ## Expected Result
 
@@ -894,8 +902,7 @@ Folder **`slug`** is the folder’s notebook-local full path. Its basename is de
 ```text
 Notebook
   id
-  title
-  content
+  name
   config
 
 Folder
@@ -929,7 +936,7 @@ LinkIndex
 After this phase:
 
 - note parent is absent from the model; folders replace parent-note containment
-- head note is gone from the core model
+- head note is gone from the core model; optional notebook page content is a normal `index` note
 - relationship notes are normal notes
 - folder structure handles containment
 - wiki links handle semantic connection
@@ -944,7 +951,7 @@ After this phase:
 ```text
 1. Introduce folder
 2. Introduce slug paths
-3. Move head note content to notebook
+3. Replace head note with optional index note
 4. Convert relationship notes
 5. Remove note parent (folders replace containment)
 6. Move a folder
@@ -960,7 +967,7 @@ After this phase:
 ```text
 folder
   -> note.slug (notebook-local full path)
-    -> notebook content without head note
+    -> optional index note without head note
       -> relationship notes as normal notes
         -> remove note parent (folders own placement)
           -> move a folder (subtree slug updates)

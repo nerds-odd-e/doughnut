@@ -11,7 +11,7 @@ The goal is not to make Doughnut identical to Obsidian, but to make Doughnut com
 - Links provide knowledge relationships.
 - Filenames/slugs provide human-facing references.
 - Internal IDs remain stable technical identities.
-- Notebooks are collection boundaries with their own content and configuration.
+- Notebooks are collection boundaries with their own name and configuration.
 
 ## Design Direction
 
@@ -47,25 +47,30 @@ A notebook is the top-level boundary of a knowledge collection.
 
 A notebook may contain:
 
-- notebook title
-- notebook content
+- notebook name
 - notebook-level configuration
+- optional `index` note
 - folders
 - notes
 
-The notebook itself may have content. This replaces the old “head note” concept.
+The notebook keeps its own name. Notebook page content comes from an optional ordinary note titled `index`, not from a notebook-owned content field.
 
 #### Final state
 
 ```text
 Notebook
   id
-  title
-  content
+  name
   config
   createdAt
   updatedAt
 ```
+
+#### Index note
+
+A notebook may have an ordinary root-level note titled `index` with slug `index`.
+
+The `index` note supplies the notebook page body content when it exists. It is optional: a notebook page can render an empty rich editor before the note exists, and saving content can create the `index` note. Apart from this notebook-page presentation role, the `index` note is used as a normal note: it has a stable note ID, a normal title, a normal slug, normal content, links, backlinks, properties, and export/import behavior.
 
 ### Folder
 
@@ -293,26 +298,26 @@ Final model:
 
 ```text
 Notebook
-  content
+  name
+  config
   folders
   notes
+    index (optional ordinary root note)
 ```
 
-The notebook itself owns its top-level content.
+The current head note becomes the notebook's optional `index` note. During migration, assume there is no current production data with the title `index`, so the former head note can be renamed to title `index` and slug `index` without colliding with existing user notes.
 
-For Obsidian export, notebook content may be represented as:
+The notebook keeps its own name separately from the `index` note. The `index` note is otherwise a normal note, and a notebook may have no `index` note at all.
+
+For Obsidian export, the `index` note may be represented as:
 
 ```text
-_index.md
+index.md
 ```
 
-or:
+If a notebook has no `index` note, export may omit `index.md`.
 
-```text
-README.md
-```
-
-But internally, it is not modeled as an ordinary note.
+Internally, the `index` note is modeled as an ordinary note.
 
 ## Removal of the Note Parent Concept
 
@@ -431,7 +436,7 @@ Example:
 
 ```text
 Doughnut Notebook/
-  _index.md
+  index.md
 
   Journal/
     2026/
@@ -647,36 +652,15 @@ douyara.md
 
 Internal IDs remain stable in the database and frontmatter where needed. Slug collisions are handled by folder-scoped uniqueness and normal conflict resolution, not by embedding IDs in slugs.
 
-### Should notebook content export as `_index.md` or `README.md`?
+### Should the notebook `index` note export as `index.md`?
 
-Option A:
-
-```text
-_index.md
-```
-
-Pros:
-
-- clearly index-like
-- common in static site systems
-
-Option B:
+Decision:
 
 ```text
-README.md
+Yes. Export the optional root `index` note as index.md.
 ```
 
-Pros:
-
-- familiar in GitHub/file systems
-- natural folder introduction
-
-Recommended:
-
-```text
-Use _index.md by default.
-Allow configurable export filename.
-```
+If the notebook has no `index` note, there is no notebook-introduction file to export.
 
 ### Should display title be unique?
 
@@ -694,10 +678,11 @@ The final Doughnut architecture should look like this:
 
 ```text
 Notebook
-  owns content
+  owns name
   owns folders
   owns notes
   owns config
+  may have an optional ordinary root note named index
 
 Folder
   provides containment
@@ -738,6 +723,7 @@ After migration, Doughnut should be able to:
 - store and navigate notes using folders only—no note-parent field for containment
 - refer to notes in the frontend by slug
 - preserve stable internal IDs
+- keep notebook names on notebooks while using an optional normal `index` note for notebook page content
 - export notebooks as Obsidian-friendly Markdown folders
 - import Obsidian-style Markdown folders
 - represent relationships as ordinary linked notes
