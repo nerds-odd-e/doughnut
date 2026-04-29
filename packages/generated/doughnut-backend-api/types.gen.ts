@@ -593,6 +593,17 @@ export type AiGeneratedImage = {
     b64encoded?: string;
 };
 
+export type AdminDataMigrationStatusDto = {
+    completedOnce?: boolean;
+    lastCompletedAt?: string;
+    message?: string;
+    detachedChildFoldersFromIndexFolder?: number;
+    updatedNormalNotesDetachedFromIndex?: number;
+    updatedRelationNotesClearedFolder?: number;
+    deletedObsoleteNotebookNameRootFolders?: number;
+    notebookCountSlugScan?: number;
+};
+
 export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
@@ -2706,8 +2717,10 @@ export type RunDataMigrationResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AdminDataMigrationStatusDto;
 };
+
+export type RunDataMigrationResponse = RunDataMigrationResponses[keyof RunDataMigrationResponses];
 
 export type UpdateUserData = {
     body: UserDto;
@@ -3898,6 +3911,22 @@ export type ListUsersResponses = {
 };
 
 export type ListUsersResponse = ListUsersResponses[keyof ListUsersResponses];
+
+export type GetAdminDataMigrationStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/data-migration/status';
+};
+
+export type GetAdminDataMigrationStatusResponses = {
+    /**
+     * OK
+     */
+    200: AdminDataMigrationStatusDto;
+};
+
+export type GetAdminDataMigrationStatusResponse = GetAdminDataMigrationStatusResponses[keyof GetAdminDataMigrationStatusResponses];
 
 export type DeleteTokenData = {
     body?: never;

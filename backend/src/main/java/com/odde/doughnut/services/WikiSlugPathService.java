@@ -49,6 +49,23 @@ public class WikiSlugPathService {
     WikiSlugPathAssignment.setNoteSlug(note, Set.of());
   }
 
+  /**
+   * Reassigns a note slug after bulk placeholders, considering both active and soft-deleted notes
+   * in the sibling set so uniqueness matches {@code uk_note_notebook_slug}.
+   */
+  public void assignSlugDuringDataMigration(Note note) {
+    Integer notebookId = note.getNotebook().getId();
+    Folder folder = note.getFolder();
+    Integer folderId = folder == null ? null : folder.getId();
+    Integer excludeNoteId = note.getId();
+    Set<String> siblingBasenames =
+        notebookId == null
+            ? Set.of()
+            : WikiSlugPathAssignment.basenamesFromSlugs(
+                findNoteSlugsInFolderScopeForMigrationJdbc(notebookId, folderId, excludeNoteId));
+    WikiSlugPathAssignment.setNoteSlug(note, siblingBasenames);
+  }
+
   private List<String> findFolderSlugsOfSiblingsJdbc(Integer notebookId, Integer parentFolderId) {
     if (parentFolderId == null) {
       return jdbcTemplate.queryForList(
@@ -90,6 +107,36 @@ public class WikiSlugPathService {
     return jdbcTemplate.queryForList(
         "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL AND folder_id = ? AND"
             + " id <> ?",
+        String.class,
+        notebookId,
+        folderId,
+        excludeNoteId);
+  }
+
+  private List<String> findNoteSlugsInFolderScopeForMigrationJdbc(
+      Integer notebookId, Integer folderId, Integer excludeNoteId) {
+    if (folderId == null) {
+      if (excludeNoteId == null) {
+        return jdbcTemplate.queryForList(
+            "SELECT slug FROM note WHERE notebook_id = ? AND folder_id IS NULL",
+            String.class,
+            notebookId);
+      }
+      return jdbcTemplate.queryForList(
+          "SELECT slug FROM note WHERE notebook_id = ? AND folder_id IS NULL AND id <> ?",
+          String.class,
+          notebookId,
+          excludeNoteId);
+    }
+    if (excludeNoteId == null) {
+      return jdbcTemplate.queryForList(
+          "SELECT slug FROM note WHERE notebook_id = ? AND folder_id = ?",
+          String.class,
+          notebookId,
+          folderId);
+    }
+    return jdbcTemplate.queryForList(
+        "SELECT slug FROM note WHERE notebook_id = ? AND folder_id = ? AND id <> ?",
         String.class,
         notebookId,
         folderId,

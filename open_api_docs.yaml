@@ -2022,11 +2022,15 @@ paths:
     post:
       tags:
       - admin-data-migration-controller
-      summary: Run admin data migration (stub)
+      summary: Run wiki index-folder data migration
       operationId: runDataMigration
       responses:
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminDataMigrationStatusDTO"
   /api/user/{user}:
     patch:
       tags:
@@ -3254,6 +3258,19 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserListingPage"
+  /api/admin/data-migration/status:
+    get:
+      tags:
+      - admin-data-migration-controller
+      summary: Get last admin migration status
+      operationId: getAdminDataMigrationStatus
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminDataMigrationStatusDTO"
   /api/user/token/{tokenId}:
     delete:
       tags:
@@ -4568,6 +4585,31 @@ components:
       properties:
         b64encoded:
           type: string
+    AdminDataMigrationStatusDTO:
+      type: object
+      properties:
+        completedOnce:
+          type: boolean
+        lastCompletedAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+        detachedChildFoldersFromIndexFolder:
+          type: integer
+          format: int32
+        updatedNormalNotesDetachedFromIndex:
+          type: integer
+          format: int32
+        updatedRelationNotesClearedFolder:
+          type: integer
+          format: int32
+        deletedObsoleteNotebookNameRootFolders:
+          type: integer
+          format: int32
+        notebookCountSlugScan:
+          type: integer
+          format: int64
     UserDTO:
       type: object
       properties:

@@ -191,6 +191,7 @@ const methodToController: Record<string, any> = {
   deleteFailureReports: FailureReportController,
   triggerFailure: FailureReportController,
   listUsers: AdminUserController,
+  getAdminDataMigrationStatus: AdminDataMigrationController,
   runDataMigration: AdminDataMigrationController,
 }
 
