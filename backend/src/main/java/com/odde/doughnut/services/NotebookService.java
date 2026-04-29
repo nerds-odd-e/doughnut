@@ -57,6 +57,15 @@ public class NotebookService {
     Note note =
         ownership.prepareHeadNoteForNewNotebook(user, currentUTCTimestamp, titleConstructor);
     Notebook notebook = note.getNotebook();
+    if (titleConstructor != null) {
+      String trimmed = titleConstructor.trim();
+      if (!trimmed.isEmpty()) {
+        notebook.setPersistedNotebookName(
+            trimmed.length() > Note.MAX_TITLE_LENGTH
+                ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
+                : trimmed);
+      }
+    }
     if (description != null && !description.isBlank()) {
       notebook.setDescription(description.trim());
     }

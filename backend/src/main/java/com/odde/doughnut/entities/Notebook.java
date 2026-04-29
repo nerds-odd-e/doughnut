@@ -97,6 +97,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private String description;
 
+  @Column(name = "name")
+  @Getter
+  @Setter
+  @JsonIgnore
+  private String persistedNotebookName;
+
   @Transient
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Getter
@@ -157,7 +163,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @NonNull
   public String getTitle() {
-    return headNote.getTitle();
+    if (persistedNotebookName != null && !persistedNotebookName.isBlank()) {
+      return persistedNotebookName;
+    }
+    String fromHead = headNote.getTitle();
+    return fromHead != null && !fromHead.isBlank() ? fromHead : "";
   }
 
   @NonNull
