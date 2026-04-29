@@ -19,7 +19,7 @@ Then("there shouldn't be any note edit button", () => {
 })
 
 When('I open the notebook {string} in the Bazaar', (noteTopology: string) => {
-  start.navigateToBazaar().navigateToChild(noteTopology)
+  start.navigateToBazaar().navigateToNotebook(noteTopology)
 })
 
 When(

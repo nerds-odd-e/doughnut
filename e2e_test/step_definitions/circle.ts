@@ -60,7 +60,7 @@ When(
   (noteTopology: string, parentNoteTitle: string) => {
     start
       .assumeCirclePage()
-      .navigateToChild(parentNoteTitle)
+      .navigateToNotebook(parentNoteTitle)
       .addingChildNote()
       .createNoteWithTitle(noteTopology)
   }

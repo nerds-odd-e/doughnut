@@ -1,6 +1,7 @@
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import bookReadingPage from './bookReadingPage'
+import { sidebarChildNotePageMethods } from './noteSidebar'
 
 const notebookPage = () => {
   const clickButton = (name: string) =>
@@ -121,6 +122,7 @@ const notebookPage = () => {
       cy.findByRole('button', { name: 'Move to ...' }).click()
       return this
     },
+    ...sidebarChildNotePageMethods(),
     addFirstRootNoteFromEmptyNotebookPage() {
       cy.get('[data-testid="notebook-add-first-note"]')
         .findByRole('button', { name: 'Add note' })

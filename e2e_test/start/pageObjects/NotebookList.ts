@@ -2,6 +2,7 @@ import slugify from 'slugify'
 import { commonSenseSplit } from '../../support/string_util'
 import { pageIsNotLoading } from '../pageBase'
 import { assumeNotePage } from './notePage'
+import notebookPage from './notebookPage'
 
 export const notebookList = () => {
   pageIsNotLoading()
@@ -27,41 +28,16 @@ export const notebookList = () => {
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
     },
-    navigateToChild(notebookTitle: string) {
+    navigateToNotebook(notebookTitle: string) {
       pageIsNotLoading()
       cy.get('.notebook-card').should('be.visible')
       cy.findByText(notebookTitle, {
         selector: '.notebook-card h5',
       })
         .should('be.visible')
-        .closest('a')
-        .invoke('attr', 'href')
-        .then((href) => {
-          if (!href) {
-            throw new Error('Notebook card title has no link href')
-          }
-          const pathname = href.startsWith('http')
-            ? new URL(href).pathname
-            : href.split('?')[0]!
-          const match = pathname.match(/\/d\/notebooks\/(\d+)\/?$/)
-          expect(match, `notebook id from href ${pathname}`).not.to.be.null
-          const notebookId = match![1]
-          const noteSlug = slugify(notebookTitle, { lower: true })
-          const targetPath = `/d/notebooks/${notebookId}/notes/${noteSlug}`
-          return cy.window().then((win) => {
-            const w = win as {
-              router?: { push: (loc: unknown) => Promise<unknown> }
-            }
-            if (!w.router) {
-              return cy.visit(targetPath)
-            }
-            return cy.wrap(
-              w.router.push({ path: targetPath, query: { time: Date.now() } })
-            )
-          })
-        })
+        .click()
       pageIsNotLoading()
-      return assumeNotePage()
+      return notebookPage()
     },
   }
 }

@@ -83,3 +83,16 @@ export const noteSidebar = () => {
     },
   }
 }
+
+/** Page objects that show the note sidebar (note page, notebook page) share these. */
+export const sidebarChildNotePageMethods = () => ({
+  addingChildNoteButton() {
+    return noteSidebar().addingChildNoteButton()
+  },
+  addingChildNote() {
+    return noteSidebar().addingChildNote()
+  },
+  addingNextSiblingNote() {
+    return noteSidebar().addingNextSiblingNote()
+  },
+})

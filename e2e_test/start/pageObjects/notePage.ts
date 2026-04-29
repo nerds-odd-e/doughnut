@@ -5,7 +5,7 @@ import audioToolsPage from './audioToolsPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
-import { noteSidebar } from './noteSidebar'
+import { noteSidebar, sidebarChildNotePageMethods } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
@@ -299,15 +299,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       this.toolbarButton('search and add relationship').click()
       return assumeNoteTargetSearchDialog()
     },
-    addingChildNoteButton() {
-      return noteSidebar().addingChildNoteButton()
-    },
-    addingChildNote() {
-      return noteSidebar().addingChildNote()
-    },
-    addingNextSiblingNote() {
-      return noteSidebar().addingNextSiblingNote()
-    },
+    ...sidebarChildNotePageMethods(),
     aiGenerateImage() {
       this.moreOptions().generateImageWithDALLE()
     },
