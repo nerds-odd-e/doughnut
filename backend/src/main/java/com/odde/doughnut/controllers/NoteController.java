@@ -225,7 +225,7 @@ class NoteController {
   }
 
   @GetMapping("/by-basename/{basename}")
-  public NoteRealm showNoteByBasename(@PathVariable String basename) {
+  public NoteRealm showNoteByAmbiguousBasename(@PathVariable String basename) {
     authorizationService.assertLoggedIn();
     if (basename == null || basename.isBlank()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this name.");

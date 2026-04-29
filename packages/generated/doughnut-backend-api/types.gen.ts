@@ -3304,7 +3304,7 @@ export type GetRecentNotesResponses = {
 
 export type GetRecentNotesResponse = GetRecentNotesResponses[keyof GetRecentNotesResponses];
 
-export type ShowNoteByBasenameData = {
+export type ShowNoteByAmbiguousBasenameData = {
     body?: never;
     path: {
         basename: string;
@@ -3313,14 +3313,14 @@ export type ShowNoteByBasenameData = {
     url: '/api/notes/by-basename/{basename}';
 };
 
-export type ShowNoteByBasenameResponses = {
+export type ShowNoteByAmbiguousBasenameResponses = {
     /**
      * OK
      */
     200: NoteRealm;
 };
 
-export type ShowNoteByBasenameResponse = ShowNoteByBasenameResponses[keyof ShowNoteByBasenameResponses];
+export type ShowNoteByAmbiguousBasenameResponse = ShowNoteByAmbiguousBasenameResponses[keyof ShowNoteByAmbiguousBasenameResponses];
 
 export type MyNotebooksData = {
     body?: never;

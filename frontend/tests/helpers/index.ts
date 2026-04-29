@@ -91,7 +91,7 @@ const methodToController: Record<string, any> = {
   deleteNote: NoteController,
   moveAfter: NoteController,
   showNote: NoteController,
-  showNoteByBasename: NoteController,
+  showNoteByAmbiguousBasename: NoteController,
   updateNoteAccessories: NoteController,
   undoDeleteNote: NoteController,
   getNoteInfo: NoteController,

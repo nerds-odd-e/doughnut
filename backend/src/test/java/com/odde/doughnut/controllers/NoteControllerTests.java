@@ -74,12 +74,12 @@ class NoteControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class showNoteByBasename {
+  class showNoteByAmbiguousBasename {
     @Test
     void shouldReturnNoteWhenSlugBasenameMatchesExactlyOneVisibleNote() {
       User user = currentUser.getUser();
       Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
-      NoteRealm realm = controller.showNoteByBasename("foo");
+      NoteRealm realm = controller.showNoteByAmbiguousBasename("foo");
       assertThat(realm.getId(), equalTo(note.getId()));
     }
 
@@ -88,7 +88,7 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Note note = makeMe.aNote().creatorAndOwner(user).slug("a/tdd").please();
       noteService.destroy(note);
-      NoteRealm realm = controller.showNoteByBasename("tdd");
+      NoteRealm realm = controller.showNoteByAmbiguousBasename("tdd");
       assertThat(realm.getId(), equalTo(note.getId()));
       assertThat(realm.getNote().getDeletedAt(), notNullValue());
     }
@@ -99,7 +99,8 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.aNote().creatorAndOwner(user).slug("a/foo").please();
       makeMe.aNote().creatorAndOwner(user).slug("b/foo").please();
       ResponseStatusException ex =
-          assertThrows(ResponseStatusException.class, () -> controller.showNoteByBasename("foo"));
+          assertThrows(
+              ResponseStatusException.class, () -> controller.showNoteByAmbiguousBasename("foo"));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
     }
 
@@ -108,7 +109,8 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.aNote().creatorAndOwner(currentUser.getUser()).slug("only/other").please();
       ResponseStatusException ex =
           assertThrows(
-              ResponseStatusException.class, () -> controller.showNoteByBasename("missing"));
+              ResponseStatusException.class,
+              () -> controller.showNoteByAmbiguousBasename("missing"));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
 
@@ -117,7 +119,8 @@ class NoteControllerTests extends ControllerTestBase {
       User otherUser = makeMe.aUser().please();
       makeMe.aNote().creatorAndOwner(otherUser).slug("x/foo").please();
       ResponseStatusException ex =
-          assertThrows(ResponseStatusException.class, () -> controller.showNoteByBasename("foo"));
+          assertThrows(
+              ResponseStatusException.class, () -> controller.showNoteByAmbiguousBasename("foo"));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
   }

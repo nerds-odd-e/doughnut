@@ -52,12 +52,15 @@ describe("all in note show page", () => {
     const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
 
     beforeEach(() => {
-      mockSdkService("showNoteByBasename", noteRealm)
+      mockSdkService("showNoteByAmbiguousBasename", noteRealm)
       mockSdkService("showNote", noteRealm)
     })
 
     it("resolves basename then loads note and passes stable id to NoteShow via storage", async () => {
-      const basenameSpy = mockSdkService("showNoteByBasename", noteRealm)
+      const basenameSpy = mockSdkService(
+        "showNoteByAmbiguousBasename",
+        noteRealm
+      )
       const showNoteSpy = mockSdkService("showNote", noteRealm)
 
       helper
@@ -79,7 +82,7 @@ describe("all in note show page", () => {
     })
 
     it("shows error when basename lookup fails", async () => {
-      vi.spyOn(NoteController, "showNoteByBasename").mockResolvedValue(
+      vi.spyOn(NoteController, "showNoteByAmbiguousBasename").mockResolvedValue(
         wrapSdkError({
           message: "More than one note matches this name.",
         }) as never

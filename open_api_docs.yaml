@@ -2665,7 +2665,7 @@ paths:
     get:
       tags:
       - note-controller
-      operationId: showNoteByBasename
+      operationId: showNoteByAmbiguousBasename
       parameters:
       - name: basename
         in: path

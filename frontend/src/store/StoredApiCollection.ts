@@ -41,7 +41,7 @@ export interface StoredApi {
 
   getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
 
-  loadNoteByBasename(basename: string): Promise<NoteRealm>
+  loadNoteByAmbiguousBasename(basename: string): Promise<NoteRealm>
 
   loadNoteByNotebookSlug(
     notebookId: number,
@@ -219,9 +219,9 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
-  async loadNoteByBasename(basename: string): Promise<NoteRealm> {
+  async loadNoteByAmbiguousBasename(basename: string): Promise<NoteRealm> {
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NoteController.showNoteByBasename({
+      NoteController.showNoteByAmbiguousBasename({
         path: { basename },
       })
     )

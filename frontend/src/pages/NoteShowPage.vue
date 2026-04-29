@@ -179,7 +179,7 @@ watch(
     try {
       const realm = await storageAccessor.value
         .storedApi()
-        .loadNoteByBasename(b)
+        .loadNoteByAmbiguousBasename(b)
       basenameResolvedNoteId.value = realm.id
     } catch (e: unknown) {
       basenameError.value =
