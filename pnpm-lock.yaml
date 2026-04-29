@@ -254,6 +254,9 @@ importers:
       vue-toastification:
         specifier: 2.0.0-rc.5
         version: 2.0.0-rc.5(vue@3.5.33(typescript@6.0.3))
+      yaml:
+        specifier: ^2.8.3
+        version: 2.8.3
     devDependencies:
       '@biomejs/biome':
         specifier: 2.4.13
@@ -9351,7 +9354,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@opentelemetry/api@1.9.0)(@types/node@25.6.0)(@vitest/browser-playwright@4.1.5)(@vitest/ui@4.1.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(canvas@3.2.3))(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3))
+      vitest: 4.1.5(@opentelemetry/api@1.9.0)(@types/node@25.6.0)(@vitest/browser-playwright@4.1.5)(@vitest/ui@4.1.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(canvas@3.2.3))(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@1.21.7)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3))
 
   '@vitest/utils@3.2.4':
     dependencies:
