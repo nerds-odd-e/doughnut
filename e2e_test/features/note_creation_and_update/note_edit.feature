@@ -83,7 +83,7 @@ Feature: Note Edit
     And the note details should include "World"
     And the note details should contain a line break
 
-  Scenario: Edit note properties in markdown mode
+  Scenario: Note YAML properties round-trip through markdown and rich editing
     When I update note "LeSS in Action" details using markdown to become:
       """
       ---
@@ -103,33 +103,18 @@ Feature: Note Edit
     And I should see the rich content elements in the note details:
       | Tag | Content       |
       | h1  | Workshop Body |
-
-  Scenario: Insert a note property in rich mode
-    Given I open the note "LeSS in Action" for editing
     When I add a rich note property with key "status" and value "draft"
     And I flush pending note details save
     And I reload the current page for note "LeSS in Action"
     Then I should see rich note property "status" with value "draft"
-    When I open the note details markdown editor
-    Then the note details markdown source should contain "status: draft"
-
-  Scenario: Edit a note property in rich mode
-    When I update note "LeSS in Action" details using markdown to become:
-      """
-      ---
-      topic: training
-      ---
-
-      Workshop body.
-      """
-    And I flush pending note details save
-    And I reload the current page for note "LeSS in Action"
-    Given I open the note "LeSS in Action" for editing
     When I edit the rich note property with key "topic" to key "domain" and value "wiki"
     And I flush pending note details save
     And I reload the current page for note "LeSS in Action"
     Then I should not see rich note property "topic"
     And I should see rich note property "domain" with value "wiki"
+    And I should see rich note property "status" with value "draft"
     When I open the note details markdown editor
     Then the note details markdown source should contain "domain: wiki"
+    And the note details markdown source should contain "diligence: high"
+    And the note details markdown source should contain "status: draft"
     And the note details markdown source should not contain "topic: training"

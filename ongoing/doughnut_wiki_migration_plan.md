@@ -479,6 +479,19 @@ After this phase:
 - rich editing shows the same properties above Quill with inline add/edit/remove
 - both surfaces remain consistent after save and reload
 
+## Status and implementation notes
+
+Phase 4 is **complete** in the codebase.
+
+- **Persistence:** Note details remain Markdown text with optional leading YAML frontmatter; no separate properties column or API field ([ongoing/doughnut_wiki_architecture_north_star.md](ongoing/doughnut_wiki_architecture_north_star.md)).
+- **Markdown editing:** The editing buffer is the full persisted details, including frontmatter.
+- **Rich editing:** Properties appear above the Quill body via `RichMarkdownEditor` / `RichFrontmatterProperties`; scalar YAML is edited as rows. Unsupported shapes (nested YAML, duplicate keys in source, etc.) surface an error and keep rich body editing read-only until fixed in Markdown mode.
+- **Testing:** E2E [`e2e_test/features/note_creation_and_update/note_edit.feature`](e2e_test/features/note_creation_and_update/note_edit.feature) covers YAML round-trip across markdown and rich flows; Vitests cover parsing/composition and editor wiring.
+
+## Deferred / follow-up
+
+- **Obsidian export and user-authored frontmatter:** Export behavior was not changed as part of Phase 4. [`ObsidianFormatService`](backend/src/main/java/com/odde/doughnut/services/ObsidianFormatService.java) currently emits exporter-owned YAML plus a `# title` line and appends raw `details`; reconciling that with user-authored leading YAML in `details` so exported files are coherent belongs in **Phase 10 — Export to Obsidian Markdown** (see the follow-up note there).
+
 ---
 
 # Phase 5 — Convert Relationship Notes into Normal Notes
@@ -838,6 +851,10 @@ aliases:
 
 ...
 ```
+
+### Persisted YAML vs export layout (Phase 4 deferral)
+
+Phase 4 stores optional properties as leading YAML inside note `details`. Until Phase 10 export explicitly merges that with exporter metadata, [`ObsidianFormatService`](backend/src/main/java/com/odde/doughnut/services/ObsidianFormatService.java) may emit overlapping structure (`generateFrontMatter` plus `# title` and raw `details`). Delivering single coherent Markdown files per note (including user frontmatter) is part of completing Phase 10 export semantics.
 
 ## Link Export
 
