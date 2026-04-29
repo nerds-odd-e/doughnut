@@ -270,8 +270,20 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
     editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
+      // Edit value before key: changing the key updates `data-property-key` on the row,
+      // which breaks a single `.within()` chain that queries by `oldKey` then touches both inputs.
       cy.get('[role=details]').within(() => {
         cy.contains('h4', 'Properties')
+        cy.get(
+          `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
+          { timeout: 15000 }
+        ).within(() => {
+          cy.get('[data-testid="rich-note-property-row-value-input"]')
+            .clear()
+            .type(newValue)
+        })
+      })
+      cy.get('[role=details]').within(() => {
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
           { timeout: 15000 }
@@ -279,9 +291,6 @@ export const assumeNotePage = (noteTopology?: string) => {
           cy.get('[data-testid="rich-note-property-row-key-input"]')
             .clear()
             .type(newKey)
-          cy.get('[data-testid="rich-note-property-row-value-input"]')
-            .clear()
-            .type(newValue)
         })
       })
       cy.findByRole('details').within(() => {
