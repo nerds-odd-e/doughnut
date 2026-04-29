@@ -7,18 +7,22 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteMotionService {
   private final EntityPersister entityPersister;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
+  private final WikiSlugPathService wikiSlugPathService;
 
   public NoteMotionService(
       EntityPersister entityPersister,
-      NoteChildContainerFolderService noteChildContainerFolderService) {
+      NoteChildContainerFolderService noteChildContainerFolderService,
+      WikiSlugPathService wikiSlugPathService) {
     this.entityPersister = entityPersister;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
+    this.wikiSlugPathService = wikiSlugPathService;
   }
 
   public void execute(Note subject, Note relativeToNote, boolean asFirstChildOfNote)
@@ -33,7 +37,11 @@ public class NoteMotionService {
       subject.setParentNote(relativeToNote.getParent());
     }
     subject.adjustPositionAsAChildOfParentInMemory();
+    assignUniquePlaceholderSlugsPendingFolderAlign(subject);
+    entityPersister.flush();
     alignFoldersForNoteAndDescendants(subject);
+    entityPersister.flush();
+    recomputeSlugPathsForNoteSubtree(subject);
 
     // Save all descendants as their notebooks have changed
     subject.getAllDescendants().forEach(entityPersister::merge);
@@ -82,9 +90,22 @@ public class NoteMotionService {
     note.restoreAsHeadNote(user.getOwnership(), user);
     entityPersister.save(note.getNotebook());
     alignFoldersForNoteAndDescendants(note);
+    entityPersister.flush();
+    recomputeSlugPathsForNoteSubtree(note);
     note.getAllDescendants().forEach(entityPersister::merge);
     entityPersister.merge(note);
     entityPersister.flush();
+  }
+
+  private void recomputeSlugPathsForNoteSubtree(Note root) {
+    Stream.concat(Stream.of(root), root.getAllDescendants())
+        .forEach(wikiSlugPathService::assignSlugForNewNote);
+  }
+
+  private void assignUniquePlaceholderSlugsPendingFolderAlign(Note root) {
+    Stream.concat(Stream.of(root), root.getAllDescendants())
+        .filter(n -> n.getId() != null)
+        .forEach(n -> n.setSlug("z-wip-mv-" + n.getId()));
   }
 
   private void alignFoldersForNoteAndDescendants(Note root) {
