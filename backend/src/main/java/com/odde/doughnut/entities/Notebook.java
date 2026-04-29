@@ -25,7 +25,7 @@ import org.springframework.lang.NonNull;
   "title",
   "circle",
   "headNoteId",
-  "shortDetails",
+  "description",
   "hasAttachedBook"
 })
 public class Notebook extends EntityIdentifiedByIdOnly {
@@ -92,10 +92,10 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private NotebookGroup notebookGroup;
 
-  @Column(name = "short_details")
+  @Column(name = "description")
   @Getter
   @Setter
-  private String shortDetails;
+  private String description;
 
   @Transient
   @JsonInclude(JsonInclude.Include.NON_NULL)

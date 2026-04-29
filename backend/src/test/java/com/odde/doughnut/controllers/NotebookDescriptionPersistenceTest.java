@@ -10,23 +10,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class NotebookShortDetailsPersistenceTest extends ControllerTestBase {
+class NotebookDescriptionPersistenceTest extends ControllerTestBase {
 
   @Autowired JdbcTemplate jdbcTemplate;
 
   @Test
-  void notebookTableHasShortDetailsColumn() {
+  void notebookTableHasDescriptionColumn() {
     Long count =
         jdbcTemplate.queryForObject(
             """
             SELECT COUNT(*) FROM information_schema.columns
             WHERE table_schema = DATABASE() AND table_name = 'notebook'
-            AND column_name = 'short_details'
+            AND column_name = 'description'
             """,
             Long.class);
     assertTrue(
         count != null && count >= 1L,
-        "Run backend/gradlew -p backend migrateTestDB so V300000152 applies (notebook.short_details).");
+        "Run backend/gradlew -p backend migrateTestDB so V300000153 applies (notebook.description).");
   }
 
   @Test
@@ -42,7 +42,7 @@ class NotebookShortDetailsPersistenceTest extends ControllerTestBase {
         UPDATE notebook n
         INNER JOIN notebook_head_note nh ON nh.notebook_id = n.id
         INNER JOIN note hn ON nh.head_note_id = hn.id AND hn.deleted_at IS NULL
-        SET n.short_details = CASE
+        SET n.description = CASE
           WHEN hn.details IS NULL THEN NULL
           WHEN TRIM(REGEXP_REPLACE(hn.details, '<[^>]*>', '')) = '' THEN NULL
           WHEN CHAR_LENGTH(TRIM(REGEXP_REPLACE(hn.details, '<[^>]*>', ''))) <= 500
@@ -55,7 +55,7 @@ class NotebookShortDetailsPersistenceTest extends ControllerTestBase {
 
     String stored =
         jdbcTemplate.queryForObject(
-            "SELECT short_details FROM notebook WHERE id = ?", String.class, notebook.getId());
+            "SELECT description FROM notebook WHERE id = ?", String.class, notebook.getId());
     assertThat(stored, equalTo("Hello world"));
   }
 }

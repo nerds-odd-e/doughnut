@@ -93,22 +93,22 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void persistsShortDetailsOnCreate() throws UnexpectedNoAccessRightException {
+    void persistsDescriptionOnCreate() throws UnexpectedNoAccessRightException {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Notebook With Blurb");
-      noteCreation.setShortDetails("  Catalog blurb  ");
+      noteCreation.setDescription("  Catalog blurb  ");
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
       Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getNotebook().getShortDetails(), equalTo("Catalog blurb"));
+      assertThat(head.getNotebook().getDescription(), equalTo("Catalog blurb"));
     }
 
     @Test
-    void leavesShortDetailsNullWhenUnset() throws UnexpectedNoAccessRightException {
+    void leavesDescriptionNullWhenUnset() throws UnexpectedNoAccessRightException {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Notebook No Blurb");
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
       Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getNotebook().getShortDetails(), nullValue());
+      assertThat(head.getNotebook().getDescription(), nullValue());
     }
   }
 
@@ -348,35 +348,35 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldPersistShortDetailsOnUpdate() throws UnexpectedNoAccessRightException {
+    void shouldPersistDescriptionOnUpdate() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      request.setShortDetails("Notebook blurb");
+      request.setDescription("Notebook blurb");
       controller.updateNotebook(note.getNotebook(), request);
-      assertThat(note.getNotebook().getShortDetails(), equalTo("Notebook blurb"));
+      assertThat(note.getNotebook().getDescription(), equalTo("Notebook blurb"));
     }
 
     @Test
-    void shouldClearShortDetailsWhenEmptyString() throws UnexpectedNoAccessRightException {
+    void shouldClearDescriptionWhenEmptyString() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      note.getNotebook().setShortDetails("was set");
+      note.getNotebook().setDescription("was set");
       var setRequest = new NotebookUpdateRequest();
       setRequest.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      setRequest.setShortDetails("");
+      setRequest.setDescription("");
       controller.updateNotebook(note.getNotebook(), setRequest);
-      assertThat(note.getNotebook().getShortDetails(), nullValue());
+      assertThat(note.getNotebook().getDescription(), nullValue());
     }
 
     @Test
-    void shouldLeaveShortDetailsUnchangedWhenShortDetailsOmitted()
+    void shouldLeaveDescriptionUnchangedWhenDescriptionOmitted()
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      note.getNotebook().setShortDetails("unchanged");
+      note.getNotebook().setDescription("unchanged");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
       controller.updateNotebook(note.getNotebook(), request);
-      assertThat(note.getNotebook().getShortDetails(), equalTo("unchanged"));
+      assertThat(note.getNotebook().getDescription(), equalTo("unchanged"));
     }
   }
 

@@ -69,16 +69,16 @@ class CircleControllerTest extends ControllerTestBase {
   @Nested
   class CreateNotebookInCircle {
     @Test
-    void persistsShortDetailsWhenMember() throws UnexpectedNoAccessRightException {
+    void persistsDescriptionWhenMember() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Circle circle = makeMe.aCircle().please();
       circleService.joinAndSave(circle, user);
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Circle Owned Nb");
-      noteCreation.setShortDetails("Circle catalog blurb");
+      noteCreation.setDescription("Circle catalog blurb");
       RedirectToNoteResponse response = controller.createNotebookInCircle(circle, noteCreation);
       Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getNotebook().getShortDetails(), equalTo("Circle catalog blurb"));
+      assertThat(head.getNotebook().getDescription(), equalTo("Circle catalog blurb"));
     }
   }
 

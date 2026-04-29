@@ -53,12 +53,12 @@ public class NotebookService {
       User user,
       Timestamp currentUTCTimestamp,
       String titleConstructor,
-      String shortDetails) {
+      String description) {
     Note note =
         ownership.prepareHeadNoteForNewNotebook(user, currentUTCTimestamp, titleConstructor);
     Notebook notebook = note.getNotebook();
-    if (shortDetails != null && !shortDetails.isBlank()) {
-      notebook.setShortDetails(shortDetails.trim());
+    if (description != null && !description.isBlank()) {
+      notebook.setDescription(description.trim());
     }
     entityPersister.save(notebook);
     wikiSlugPathService.assignSlugForNewNote(note);

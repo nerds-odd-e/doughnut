@@ -29,6 +29,7 @@ After Phase 3:
 - Treat `index` as a normal note after migration: `title = "index"`, `slug = "index"`, `folderId = null`, content copied from the former head note.
 - Assume production has no existing user note titled/sluggified as `index`, as stated in the main migration plan.
 - Later sub-phases that need the notebook index page or the optional root `index` note load it via the notebook-scoped slug path **`/notebooks/:notebookId/index`** (matching `note.slug = "index"` per the north-star routing rule). Do not add **`indexNoteId`** (or similar) on the notebook API for that purpose.
+- `NoteRealm` identifies the notebook boundary with **`notebookId`** only; it does not embed the full `Notebook` object once **3.17** is done—notebook fields come from the notebook get path or store.
 - Introduce nullable/optional runtime behavior before removing required head-note assumptions, so deployed code can read both migrated and not-yet-migrated notebooks during rollout.
 - Keep tests named by capability, such as notebook page, notebook creation, note navigation, and Obsidian export. Do not create phase-named permanent test files.
 
@@ -316,7 +317,28 @@ Permanent API contracts stop exposing `headNoteId` / `headNote` as notebook iden
 - `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 - targeted frontend tests for notebook cards/lists/routes
 
-### 3.17 Remove Notebook Head Note Mapping
+### 3.17 NoteRealm Exposes notebookId Instead of Embedded Notebook
+
+**Type:** Structure
+
+Align show-note payloads with the north-star model: the notebook is a **collection boundary** identified by id, while `NoteRealm` stays note-centric (note graph, topology, children, references). The API stops embedding the full `Notebook` on `NoteRealm`; callers resolve notebook name, circle, settings, and index routing via `notebookId` and the existing notebook get endpoint or cached store entry.
+
+**Commit includes:**
+
+- backend DTO / OpenAPI: `NoteRealm` carries `notebookId` matching the note’s notebook; nested `notebook` is removed from the documented contract (use a single rollout step rather than indefinitely returning both shapes)
+- every endpoint that returns `NoteRealm` (`showNote`, slug/basename resolution paths, batch note loads, etc.) is updated consistently; controller tests assert `notebookId` and no longer depend on embedded notebook fields for the same assertions
+- frontend replaces `noteRealm.notebook` reads with data loaded by `notebookId` (storage refresh, parallel fetch, or route context—follow existing patterns and avoid redundant hot-path fetches where the notebook is already in memory)
+- `makeMe.aNoteRealm`, mocks, and generated client types updated; `pnpm generateTypeScript` after OpenAPI change
+
+**Verification:**
+
+- targeted backend controller tests for note-realm payloads
+- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
+- targeted frontend note-show, sidebar, and toolbar tests that previously relied on embedded `notebook` on the realm
+
+**Sequencing:** Prefer landing after **3.16** so slimmed notebook contracts are not duplicated inside every note response; complete before **3.18** if embedded notebook was the last carrier of `headNoteId` in client code paths.
+
+### 3.18 Remove Notebook Head Note Mapping
 
 **Type:** Structure
 
@@ -333,7 +355,7 @@ After all runtime behavior no longer needs it, remove the `notebook_head_note` a
 
 - targeted backend tests for notebook creation, notebook page, note creation, note movement, and export
 
-### 3.18 Clean Up Head-Note Test Language and Fixtures
+### 3.19 Clean Up Head-Note Test Language and Fixtures
 
 **Type:** Structure
 
@@ -350,7 +372,7 @@ Remove permanent test and fixture vocabulary that still describes notebooks as h
 - targeted E2E specs touched by renamed steps
 - targeted frontend/backend tests touched by fixture renames
 
-### 3.19 Remove Legacy Notebook Edit Route
+### 3.20 Remove Legacy Notebook Edit Route
 
 **Type:** Structure
 
@@ -366,7 +388,7 @@ Delete the obsolete notebook edit route once notebook page content editing is fu
 
 - targeted frontend route/menu tests
 
-### 3.20 Final Head-Note Reference Sweep
+### 3.21 Final Head-Note Reference Sweep
 
 **Type:** Structure
 
@@ -391,6 +413,7 @@ Phase 3 is complete when:
 - notebooks can exist without an index note
 - notebooks expose editable `shortDetails`, backfilled from truncated existing head note details
 - optional root `index` note identity is reached via **`/notebooks/:notebookId/index`**, not via an `indexNoteId` field on the notebook API; the current `Notebook` object stays the existing get shape without a separate notebook-page get DTO
+- show-note and related payloads use **`notebookId` on `NoteRealm`**, not an embedded `notebook`, per **3.17**
 - saving notebook page content creates or updates the optional root `index` note
 - migrated notebooks preserve their old head-note content through the normal `index` note
 - new notebooks are not created with head notes or pre-created index notes

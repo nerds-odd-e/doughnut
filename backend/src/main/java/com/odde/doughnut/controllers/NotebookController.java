@@ -110,7 +110,7 @@ class NotebookController {
             userEntity,
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
-            noteCreation.getShortDetails());
+            noteCreation.getDescription());
     return new RedirectToNoteResponse(note.getId());
   }
 
@@ -122,9 +122,8 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     notebook.getNotebookSettings().update(request.getNotebookSettings());
-    if (request.getShortDetails() != null) {
-      notebook.setShortDetails(
-          request.getShortDetails().isBlank() ? null : request.getShortDetails());
+    if (request.getDescription() != null) {
+      notebook.setDescription(request.getDescription().isBlank() ? null : request.getDescription());
     }
     entityPersister.save(notebook);
     return notebook;

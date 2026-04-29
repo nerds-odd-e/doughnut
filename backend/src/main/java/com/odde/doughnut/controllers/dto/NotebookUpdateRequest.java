@@ -14,5 +14,5 @@ public class NotebookUpdateRequest {
   @JsonUnwrapped @Valid private NotebookSettings notebookSettings = new NotebookSettings();
 
   @Size(max = 500)
-  private String shortDetails;
+  private String description;
 }

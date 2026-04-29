@@ -14,5 +14,5 @@ public class NoteCreationDTO extends NoteUpdateTitleDTO {
   @Getter
   @Setter
   @Size(max = 500)
-  private String shortDetails;
+  private String description;
 }

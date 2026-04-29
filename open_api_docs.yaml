@@ -3731,7 +3731,7 @@ components:
         headNoteId:
           type: integer
           format: int32
-        shortDetails:
+        description:
           type: string
         hasAttachedBook:
           type: boolean
@@ -3967,7 +3967,7 @@ components:
         wikidataId:
           type: string
           pattern: ^$|Q\d+
-        shortDetails:
+        description:
           type: string
           maxLength: 500
           minLength: 0
@@ -4051,7 +4051,7 @@ components:
           type: string
           default: 1y
           example: 1y 6m
-        shortDetails:
+        description:
           type: string
           maxLength: 500
           minLength: 0

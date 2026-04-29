@@ -122,7 +122,7 @@ class CircleController {
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
-            noteCreation.getShortDetails());
+            noteCreation.getDescription());
     return new RedirectToNoteResponse(note.getId());
   }
 }
