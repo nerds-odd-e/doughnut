@@ -163,12 +163,6 @@ const resolveSidebarRealm = async (nb: Notebook) => {
   } catch {
     // No root index note for this slug path
   }
-  if (nb.headNoteId != null && !Number.isNaN(Number(nb.headNoteId))) {
-    storageAccessor.value
-      .storedApi()
-      .getNoteRealmRefAndReloadPosition(nb.headNoteId)
-    sidebarAnchorNoteId.value = nb.headNoteId
-  }
 }
 
 const fetchNotebook = async () => {

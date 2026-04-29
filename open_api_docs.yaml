@@ -3753,9 +3753,6 @@ components:
           type: string
         circle:
           $ref: "#/components/schemas/Circle"
-        headNoteId:
-          type: integer
-          format: int32
         description:
           type: string
         hasAttachedBook:

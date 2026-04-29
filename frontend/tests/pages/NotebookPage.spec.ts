@@ -4,28 +4,7 @@ import NotebookPage from "@/pages/NotebookPage.vue"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
-import type { NoteRealm, Notebook } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-
-function noteRealmForNotebookHead(notebook: Notebook): NoteRealm {
-  const headId = notebook.headNoteId!
-  const r = makeMe.aNoteRealm.please()
-  return {
-    ...r,
-    id: headId,
-    note: {
-      ...r.note,
-      id: headId,
-      noteTopology: {
-        ...r.note.noteTopology,
-        id: headId,
-        notebookId: notebook.id,
-      },
-    },
-    notebook: { ...notebook },
-    children: [],
-  }
-}
 
 describe("NotebookPage.spec", () => {
   beforeEach(() => {
@@ -39,7 +18,6 @@ describe("NotebookPage.spec", () => {
     vi.spyOn(NotebookController, "getNoteBySlug").mockResolvedValue(
       wrapSdkError("no index") as never
     )
-    mockSdkService("showNote", noteRealmForNotebookHead(notebook))
     helper
       .component(NotebookPage)
       .withCleanStorage()
@@ -81,14 +59,13 @@ describe("NotebookPage.spec", () => {
     )
   })
 
-  it("falls back to head note realm when index slug is missing", async () => {
+  it("does not load sidebar via showNote when index slug is missing", async () => {
     const notebook = makeMe.aNotebook.please()
-    const headRealm = noteRealmForNotebookHead(notebook)
     mockSdkService("get", notebook)
     vi.spyOn(NotebookController, "getNoteBySlug").mockResolvedValue(
       wrapSdkError("not found") as never
     )
-    const showSpy = mockSdkService("showNote", headRealm)
+    const showSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
     helper
       .component(NotebookPage)
       .withCleanStorage()
@@ -101,10 +78,7 @@ describe("NotebookPage.spec", () => {
       .render()
     await flushPromises()
     expect(screen.getByTitle("toggle sidebar")).toBeInTheDocument()
-    expect(showSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: { note: notebook.headNoteId },
-      })
-    )
+    expect(showSpy).not.toHaveBeenCalled()
+    expect(screen.getByTestId("notebook-add-first-note")).toBeInTheDocument()
   })
 })

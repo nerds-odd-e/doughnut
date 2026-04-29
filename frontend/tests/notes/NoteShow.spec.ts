@@ -54,6 +54,14 @@ describe("new/updated pink banner", () => {
   })
 })
 
+function rootTopologyId(realm: NoteRealm): number {
+  let cursor = realm.note.noteTopology
+  while (cursor.parentOrSubjectNoteTopology) {
+    cursor = cursor.parentOrSubjectNoteTopology
+  }
+  return cursor.id
+}
+
 describe("note wth children", () => {
   const note = makeMe.aNoteRealm.please()
 
@@ -101,7 +109,7 @@ describe("note wth children", () => {
     await flushPromises()
 
     expect(getDescendantsSpy).toHaveBeenCalledWith({
-      path: { note: note.notebook!.headNoteId! },
+      path: { note: rootTopologyId(note) },
       client: nonReloadingClient,
     })
   })

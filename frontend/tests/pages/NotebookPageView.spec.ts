@@ -32,7 +32,6 @@ describe("NotebookPageView.spec", () => {
       ...makeMe.aNotebook.please(),
       title: "My Notebook Title",
       description: "A short message for the notebook.",
-      headNoteId: 99_901,
     }
     const wrapper = helper
       .component(NotebookPageView)

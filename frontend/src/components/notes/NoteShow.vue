@@ -90,7 +90,7 @@
             v-model="pendingDeadLinkTitle"
             :reference-note="noteRealm.note"
             :insert-mode="
-              noteRealm.note.id === noteRealm.notebook.headNoteId ? 'as-child' : 'after'
+              isNotebookIndexRootNote(noteRealm) ? 'as-child' : 'after'
             "
             @closed="onDeadLinkCreateModalClosed"
           />
@@ -108,6 +108,7 @@ import { nonReloadingClient } from "@/managedApi/clientSetup"
 import type {
   NoteAccessory,
   NoteRealm,
+  NoteTopology,
   User,
 } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -146,17 +147,30 @@ const onNoteAccessoryUpdated = () => {
 const asMarkdown = ref(false)
 
 const wikiTitles = ref<WikiTitle[]>([])
-const lastFetchedHeadNoteId = ref<number | undefined>(undefined)
+const lastFetchedWikiRootNoteId = ref<number | undefined>(undefined)
 
-const onDeadLinkCreateModalClosed = () => {
-  lastFetchedHeadNoteId.value = undefined
+function isNotebookIndexRootNote(noteRealm: NoteRealm): boolean {
+  const t = noteRealm.note.noteTopology
+  return t.slug === "index" && !t.parentOrSubjectNoteTopology
 }
 
-const fetchWikiTitles = async (headNoteId: number) => {
-  if (headNoteId === lastFetchedHeadNoteId.value) return
-  lastFetchedHeadNoteId.value = headNoteId
+function rootNoteTopologyId(noteRealm: NoteRealm): number | undefined {
+  let cursor: NoteTopology | undefined = noteRealm.note.noteTopology
+  while (cursor?.parentOrSubjectNoteTopology) {
+    cursor = cursor.parentOrSubjectNoteTopology
+  }
+  return cursor?.id
+}
+
+const onDeadLinkCreateModalClosed = () => {
+  lastFetchedWikiRootNoteId.value = undefined
+}
+
+const fetchWikiTitles = async (rootNoteId: number) => {
+  if (rootNoteId === lastFetchedWikiRootNoteId.value) return
+  lastFetchedWikiRootNoteId.value = rootNoteId
   const { data, error } = await NoteController.getDescendants({
-    path: { note: headNoteId },
+    path: { note: rootNoteId },
     client: nonReloadingClient,
   })
   if (!error && data) {
@@ -170,9 +184,9 @@ const fetchWikiTitles = async (headNoteId: number) => {
 }
 
 const getWikiTitles = (noteRealm: NoteRealm) => {
-  const headNoteId = noteRealm.notebook.headNoteId
-  if (headNoteId) {
-    fetchWikiTitles(headNoteId)
+  const rootId = rootNoteTopologyId(noteRealm)
+  if (rootId != null) {
+    fetchWikiTitles(rootId)
   }
   return wikiTitles.value
 }

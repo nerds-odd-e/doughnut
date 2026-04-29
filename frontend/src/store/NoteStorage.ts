@@ -35,7 +35,6 @@ export class StorageImplementation implements NoteStorage {
         id: note.noteTopology.notebookId,
         title: note.noteTopology.notebookTitle ?? "",
         notebookSettings: {},
-        headNoteId: note.id,
         updated_at: note.updatedAt,
       }
       ref.value = {

@@ -12,7 +12,6 @@ class NotebookBuilder extends Builder<Notebook> {
     super()
     this.data = {
       id: generateId(),
-      headNoteId: this.notebuilder.data.noteTopology.id,
       title: this.notebuilder.data.noteTopology.title ?? '',
       notebookSettings: {
         skipMemoryTrackingEntirely: false,
@@ -37,9 +36,9 @@ class NotebookBuilder extends Builder<Notebook> {
   }
 
   do(): Notebook {
-    this.data.headNoteId = this.notebuilder.do().noteTopology.id
-    this.data.title = this.notebuilder.do().noteTopology.title ?? ''
-    this.data.description = this.notebuilder.do().noteTopology.shortDetails
+    const built = this.notebuilder.do()
+    this.data.title = built.noteTopology.title ?? ''
+    this.data.description = built.noteTopology.shortDetails
     return this.data
   }
 }

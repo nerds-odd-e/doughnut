@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.utils.Randomizer;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import org.springframework.lang.NonNull;
   "creatorId",
   "title",
   "circle",
-  "headNoteId",
   "description",
   "hasAttachedBook"
 })
@@ -172,6 +172,8 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     return fromHead != null && !fromHead.isBlank() ? fromHead : "";
   }
 
+  @Hidden
+  @JsonIgnore
   public Integer getHeadNoteId() {
     return headNote != null ? headNote.getId() : null;
   }

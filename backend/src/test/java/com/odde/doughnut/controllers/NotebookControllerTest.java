@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -59,6 +61,7 @@ class NotebookControllerTest extends ControllerTestBase {
   @Autowired NotebookRepository notebookRepository;
   @Autowired NoteService noteService;
   @Autowired NotebookGroupService notebookGroupService;
+  @Autowired ObjectMapper objectMapper;
   private Note topNote;
   @MockitoBean EmbeddingService embeddingService;
 
@@ -125,6 +128,27 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(response.noteId, nullValue());
       Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
       assertThat(nb.getDescription(), nullValue());
+    }
+  }
+
+  @Nested
+  class NotebookApiSerialization {
+    @Test
+    void getNotebookJsonExposesIdentityFieldsNotHeadNoteId() throws Exception {
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("API Shape NB");
+      noteCreation.setDescription("Blurb");
+      RedirectToNoteResponse response = controller.createNotebook(noteCreation);
+      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
+
+      Notebook wire = controller.get(nb);
+      String json = objectMapper.writeValueAsString(wire);
+      JsonNode tree = objectMapper.readTree(json);
+
+      assertThat(tree.has("headNoteId"), is(false));
+      assertThat(tree.get("id").asInt(), equalTo(nb.getId()));
+      assertThat(tree.get("title").asText(), equalTo("API Shape NB"));
+      assertThat(tree.get("description").asText(), equalTo("Blurb"));
     }
   }
 
