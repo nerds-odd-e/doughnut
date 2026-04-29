@@ -221,7 +221,7 @@ Body`,
     expect(last).toContain("Hello Body")
   })
 
-  it("does not show Properties section when frontmatter fails to parse", async () => {
+  it("shows parse error and hides Properties when frontmatter fails to parse", async () => {
     const details = `---
 bad:
   nested: value
@@ -232,6 +232,34 @@ Still body`
     await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(false)
+
+    const alert = wrapper.find(
+      '[data-testid="rich-note-frontmatter-parse-error"]'
+    )
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toContain("string")
+    expect(alert.text()).toContain("Markdown mode")
+  })
+
+  it("forces Quill readonly and does not emit details updates when frontmatter fails to parse", async () => {
+    const details = `---
+bad:
+  nested: value
+---
+
+Still body`
+    await mountEditor(details)
+    await flushPromises()
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    expect(quill.props("readonly")).toBe(true)
+
+    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
+    quill.vm.$emit("update:modelValue", "<p>Edited without fixing YAML</p>")
+    await flushPromises()
+
+    const emitCountAfter = wrapper.emitted("update:modelValue")?.length ?? 0
+    expect(emitCountAfter).toBe(emitCountBefore)
   })
 
   it("composes edited body with existing frontmatter when emitting updates", async () => {

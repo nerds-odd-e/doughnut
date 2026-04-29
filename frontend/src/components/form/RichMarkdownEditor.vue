@@ -6,10 +6,22 @@
       :read-only="readonly"
       @properties-changed="onPropertiesChanged"
     />
+    <div
+      v-if="frontmatterParseErrorMessage !== null"
+      role="alert"
+      aria-live="polite"
+      data-testid="rich-note-frontmatter-parse-error"
+      class="daisy-alert daisy-alert-warning daisy-mb-3 daisy-text-sm"
+    >
+      <span>{{ frontmatterParseErrorMessage }}</span>
+      <span class="daisy-block daisy-mt-1 daisy-text-xs daisy-opacity-90">
+        Switch to Markdown mode to fix the frontmatter.
+      </span>
+    </div>
     <QuillEditor
       v-bind="{ multipleLine, scopeName, field, title, errors }"
       :model-value="htmlValue"
-      :readonly="readonly"
+      :readonly="effectiveReadonly"
       @update:model-value="htmlValueUpdated"
       @blur="$emit('blur')"
       @paste-complete="onPasteComplete"
@@ -63,6 +75,15 @@ const parsedDetails = computed(() =>
   parseNoteDetailsMarkdown(props.modelValue ?? "")
 )
 
+const frontmatterParseErrorMessage = computed(() => {
+  const p = parsedDetails.value
+  return p.ok ? null : p.message
+})
+
+const effectiveReadonly = computed(
+  () => Boolean(props.readonly) || !parsedDetails.value.ok
+)
+
 const markdownForRichDisplay = computed(() => {
   const p = parsedDetails.value
   if (p.ok) return p.body
@@ -94,25 +115,20 @@ const htmlValue = computed(() => {
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {
+  const p = parsedDetails.value
+  if (!p.ok) return
+
   const bodyMarkdown = markdownizer.htmlToMarkdown(newHtmlValue)
   currentIntervalBodyMarkdown = bodyMarkdown
   currentIntervalHtml = newHtmlValue
 
-  const p = parsedDetails.value
   const prevFull = props.modelValue ?? ""
-
-  if (p.ok) {
-    const composed = composeNoteDetailsFromPropertyRows(
-      frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
-      bodyMarkdown
-    )
-    if (composed === prevFull) return
-    emits("update:modelValue", composed)
-    return
-  }
-
-  if (bodyMarkdown === prevFull) return
-  emits("update:modelValue", bodyMarkdown)
+  const composed = composeNoteDetailsFromPropertyRows(
+    frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
+    bodyMarkdown
+  )
+  if (composed === prevFull) return
+  emits("update:modelValue", composed)
 }
 
 const onPropertiesChanged = (rows: PropertyRow[]) => {
