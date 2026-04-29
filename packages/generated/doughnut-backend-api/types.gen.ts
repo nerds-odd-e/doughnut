@@ -141,11 +141,10 @@ export type NoteTestData = {
     'Image Url'?: string;
     'Image Mask'?: string;
     'Wikidata Id'?: string;
-    'Notebook Name'?: string;
 };
 
 export type NotesTestData = {
-    [key: string]: unknown;
+    notebookName: string;
 };
 
 export type PredefinedQuestionTestData = {
@@ -872,6 +871,7 @@ export type NotesTestDataWritable = {
     noteTestData?: Array<NoteTestData>;
     externalIdentifier?: string;
     circleName?: string;
+    notebookName: string;
 };
 
 export type SubscriptionWritable = {

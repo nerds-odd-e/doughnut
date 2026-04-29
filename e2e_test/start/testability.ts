@@ -12,7 +12,7 @@ import type {
   AttachBookRequestFull,
   NoteRealm,
 } from '@generated/doughnut-backend-api'
-import type { NotesTestData } from '@generated/doughnut-backend-api'
+import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
   AssimilationController,
   NoteController,
@@ -149,10 +149,12 @@ const testability = () => {
     injectNotes(
       noteTestData: NoteTestData[],
       externalIdentifier: string,
+      notebookName: string,
       circleName: string | null = null
     ) {
-      const requestBody: NotesTestData = {
+      const requestBody: NotesTestDataWritable = {
         externalIdentifier,
+        notebookName,
         circleName: circleName ?? undefined,
         noteTestData,
       }
@@ -189,7 +191,7 @@ const testability = () => {
           'Parent Title': notebook,
         })),
       ]
-      return this.injectNotes(notes, creatorId)
+      return this.injectNotes(notes, creatorId, notebook)
     },
     injectPredefinedQuestionsToNotebook(
       predefinedQuestionsTestData: PredefinedQuestionsTestData

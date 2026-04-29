@@ -14,15 +14,22 @@ import start from '../start'
 Given('I have a notebook titled {string}', (notebookTitle: string) => {
   // Following the pattern from note.ts where notes are injected
   cy.get<string>('@currentLoginUser').then((username) => {
-    start.testability().injectNotes([{ Title: notebookTitle }], username)
+    start
+      .testability()
+      .injectNotes([{ Title: notebookTitle }], username, notebookTitle)
   })
 })
 
 Given('the notebook contains the following notes', (notesTable: DataTable) => {
-  const notes = notesTable.hashes()
-  // Using the injectNotes pattern from note.ts
+  const hashes = notesTable.hashes()
   cy.get<string>('@currentLoginUser').then((username) => {
-    start.testability().injectNotes(notes, username)
+    const notebookName = (hashes[0]?.['Parent Title'] ?? '').trim()
+    if (!notebookName) {
+      throw new Error(
+        'the notebook contains: first row must have Parent Title (head note title)'
+      )
+    }
+    start.testability().injectNotes(hashes, username, notebookName)
   })
 })
 

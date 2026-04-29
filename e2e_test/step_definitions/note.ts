@@ -14,6 +14,20 @@ import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
 
+function notebookNameForInjectNotes(hashes: Record<string, string>[]): string {
+  const head = hashes.find((n) => !(n['Parent Title'] ?? '').trim())
+  if (head?.Title) {
+    return head.Title
+  }
+  const parent = hashes[0]?.['Parent Title']?.trim()
+  if (!parent) {
+    throw new Error(
+      'Cannot infer notebookName for injectNotes: need a head row or Parent Title on the first row'
+    )
+  }
+  return parent
+}
+
 defineParameterType({
   name: 'notepath',
   regexp: /.*/,
@@ -26,21 +40,24 @@ Given(
   'I have a notebook {string} with a note {string} and notes:',
   (notebookName: string, headTitle: string, data: DataTable) => {
     const notes = data.hashes()
-    notes.unshift({ Title: headTitle, 'Notebook Name': notebookName })
+    notes.unshift({ Title: headTitle })
     cy.get<string>('@currentLoginUser').then((username) =>
-      start.testability().injectNotes(notes, username)
+      start.testability().injectNotes(notes, username, notebookName)
     )
   }
 )
 
 Given('there are some notes:', (data: DataTable) => {
-  data.hashes().forEach((note) => {
+  const hashes = data.hashes()
+  hashes.forEach((note) => {
     if (!note['Parent Title']) {
       throw new Error('Parent Title is required for all notes')
     }
   })
   cy.get<string>('@currentLoginUser').then((username) =>
-    start.testability().injectNotes(data.hashes(), username)
+    start
+      .testability()
+      .injectNotes(hashes, username, notebookNameForInjectNotes(hashes))
   )
 })
 
@@ -50,10 +67,7 @@ Given(
     cy.get<string>('@currentLoginUser').then((username) =>
       start
         .testability()
-        .injectNotes(
-          [{ Title: noteTitle, 'Notebook Name': notebookName }],
-          username
-        )
+        .injectNotes([{ Title: noteTitle }], username, notebookName)
     )
   }
 )
@@ -66,11 +80,11 @@ Given(
         [
           {
             Title: noteTitle,
-            'Notebook Name': notebookName,
             'Skip Memory Tracking': true,
           },
         ],
-        username
+        username,
+        notebookName
       )
     )
   }
@@ -84,11 +98,11 @@ Given(
         [
           {
             Title: noteTitle,
-            'Notebook Name': notebookName,
             Details: details,
           },
         ],
-        username
+        username,
+        notebookName
       )
     )
   }
@@ -97,7 +111,14 @@ Given(
 Given(
   'there are some notes for existing user {string}',
   (externalIdentifier: string, data: DataTable) => {
-    start.testability().injectNotes(data.hashes(), externalIdentifier)
+    const hashes = data.hashes()
+    start
+      .testability()
+      .injectNotes(
+        hashes,
+        externalIdentifier,
+        notebookNameForInjectNotes(hashes)
+      )
   }
 )
 
@@ -106,10 +127,7 @@ Given(
   (notebookName: string, noteTitle: string, externalIdentifier: string) => {
     start
       .testability()
-      .injectNotes(
-        [{ Title: noteTitle, 'Notebook Name': notebookName }],
-        externalIdentifier
-      )
+      .injectNotes([{ Title: noteTitle }], externalIdentifier, notebookName)
       .then(() => {
         return start.testability().shareToBazaar(noteTitle)
       })
@@ -125,7 +143,7 @@ Given(
         return { Title: `Note ${i + from}` }
       })
     cy.get<string>('@currentLoginUser').then((username) =>
-      start.testability().injectNotes(notes, username)
+      start.testability().injectNotes(notes, username, `Note ${from}`)
     )
   }
 )

@@ -19,6 +19,7 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,9 +120,6 @@ class TestabilityRestController {
     @Setter
     private String wikidataId;
 
-    @JsonProperty("Notebook Name")
-    public String notebookName;
-
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = new Note();
       note.initialize(user, null, currentUTCTimestamp, title);
@@ -144,10 +143,16 @@ class TestabilityRestController {
     }
   }
 
+  @Schema(name = "NotesTestData")
   static class NotesTestData {
     @Setter private List<NoteTestData> noteTestData;
     @Setter private String externalIdentifier;
     @Setter private String circleName; // optional
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
+    private String notebookName;
 
     private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
       return noteTestData.stream()
@@ -161,14 +166,16 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap,
         NoteRepository noteRepository,
         EntityPersister entityPersister) {
+      long headNoteCount =
+          noteTestData.stream().filter(injection -> Strings.isBlank(injection.parentTitle)).count();
       noteTestData.forEach(
           injection -> {
             Note note = titleNoteMap.get(injection.title);
 
             if (Strings.isBlank(injection.parentTitle)) {
               note.buildNotebookForHeadNote(ownership, user);
-              if (!Strings.isBlank(injection.notebookName)) {
-                note.getNotebook().setPersistedNotebookName(injection.notebookName);
+              if (headNoteCount == 1 && !Strings.isBlank(notebookName)) {
+                note.getNotebook().setPersistedNotebookName(notebookName);
               }
               entityPersister.save(note.getNotebook());
             } else {
@@ -203,6 +210,9 @@ class TestabilityRestController {
   public Map<String, Integer> injectNotes(@RequestBody NotesTestData notesTestData) {
     if (Strings.isEmpty(notesTestData.externalIdentifier)) {
       throw new RuntimeException("externalIdentifier is required and cannot be empty");
+    }
+    if (Strings.isEmpty(notesTestData.notebookName)) {
+      throw new RuntimeException("notebookName is required and cannot be empty");
     }
     final User user = getUserModelByExternalIdentifier(notesTestData.externalIdentifier);
     Ownership ownership = getOwnership(notesTestData, user);

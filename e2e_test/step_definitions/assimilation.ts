@@ -18,7 +18,9 @@ Then(
   'I added and learned one note {string} on day {int}',
   (noteTopology: string, day: number) => {
     cy.get<string>('@currentLoginUser').then((username) => {
-      start.testability().injectNotes([{ Title: noteTopology }], username)
+      start
+        .testability()
+        .injectNotes([{ Title: noteTopology }], username, noteTopology)
     })
     start.testability().backendTimeTravelTo(day, 8)
     start
