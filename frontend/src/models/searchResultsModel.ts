@@ -272,6 +272,8 @@ export class SearchResultsModel {
       byId.set(id, prev ? chooseBetter(prev, r) : r)
     })
 
+    const titleOf = (r: NoteSearchResult) => r.noteTopology.title ?? ""
+
     return Array.from(byId.values()).sort((a, b) => {
       const distDiff = (a.distance ?? Infinity) - (b.distance ?? Infinity)
       if (distDiff !== 0) return distDiff
@@ -280,6 +282,15 @@ export class SearchResultsModel {
         const bSame = b.notebookId === currentNotebookId
         const nb = Number(bSame) - Number(aSame)
         if (nb !== 0) return nb
+      }
+      const da = a.distance ?? Infinity
+      const db = b.distance ?? Infinity
+      if (isPartialLiteralDistance(da) && isPartialLiteralDistance(db)) {
+        const lenDiff = titleOf(a).length - titleOf(b).length
+        if (lenDiff !== 0) return lenDiff
+        return titleOf(a).localeCompare(titleOf(b), undefined, {
+          sensitivity: "base",
+        })
       }
       return (a.noteTopology.id as number) - (b.noteTopology.id as number)
     })
