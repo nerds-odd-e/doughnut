@@ -37,7 +37,8 @@ const storageAccessor = useStorageAccessor()
 
 interface Props {
   notebookId: number
-  activeNoteRealm: NoteRealm
+  /** When omitted (e.g. notebook overview with no `index` note), root notes still render without selection */
+  activeNoteRealm?: NoteRealm
   /** When set, list this note's children. When omitted, list notebook root notes. */
   noteId?: number
 }
@@ -82,20 +83,15 @@ const displayNotes = computed(() => {
   return rootNotesList.value
 })
 
-const expandedIds = ref([props.activeNoteRealm.note.id])
-
-const toggleChildren = (noteId: number) => {
-  const index = expandedIds.value.indexOf(noteId)
-  if (index === -1) {
-    expandedIds.value.push(noteId)
-  } else {
-    expandedIds.value.splice(index, 1)
-  }
-}
+const expandedIds = ref<number[]>([])
 
 watch(
-  () => props.activeNoteRealm.note.noteTopology.parentOrSubjectNoteTopology,
+  () => props.activeNoteRealm?.note?.noteTopology.parentOrSubjectNoteTopology,
   (parentNoteTopic) => {
+    if (!props.activeNoteRealm?.note) {
+      expandedIds.value = []
+      return
+    }
     const uniqueIds = new Set([
       ...expandedIds.value,
       props.activeNoteRealm.note.id,
@@ -109,6 +105,15 @@ watch(
   },
   { immediate: true }
 )
+
+const toggleChildren = (noteId: number) => {
+  const index = expandedIds.value.indexOf(noteId)
+  if (index === -1) {
+    expandedIds.value.push(noteId)
+  } else {
+    expandedIds.value.splice(index, 1)
+  }
+}
 
 // Drag and drop state
 const draggedNote = ref<Note | null>(null)

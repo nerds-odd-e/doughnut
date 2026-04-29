@@ -6,7 +6,7 @@ Feature: associate wikidata ID to note
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "TDD"
+    And I have a notebook "TDD study" with a note "TDD"
 
   @usingMockedWikidataService
   Scenario: Associate note to wikidata when the service is not available
@@ -37,7 +37,7 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
-    Given I have a notebook with head note "Animals" and notes:
+    Given I have a notebook "Wildlife deck" with a note "Animals" and notes:
       | Title            | Wikidata Id| Parent Title|
       | Dog              | Q123       | Animals     |
       | Canine           | Q456       | Animals     |

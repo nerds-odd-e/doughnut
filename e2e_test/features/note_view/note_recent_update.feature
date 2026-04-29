@@ -5,7 +5,7 @@ Feature: see recent note update
   Background:
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
-    And I have a notebook with head note "World" and notes:
+    And I have a notebook "World atlas" with a note "World" and notes:
       | Title   | Parent Title | Details           |
       | Germany | World        |                   |
       | Japan   | World        |                   |

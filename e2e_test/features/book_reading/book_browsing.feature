@@ -5,10 +5,10 @@ Feature: Book browsing
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "Code Refactoring Book"
+    And I have a notebook "Refactoring read" with a note "Code Refactoring Book"
     And I set the access token for "old_learner" in the interactive CLI
     When I attach book "refactoring.pdf" to the notebook "Code Refactoring Book" via the CLI
-    And I open the book attached to notebook "Code Refactoring Book"
+    And I open the book attached to notebook "Refactoring read"
 
   Scenario: See book layout and beginning of PDF in the browser
     Then I should see the book layout in the browser:

@@ -2,7 +2,7 @@ Feature: Note creation for a book
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "My Favourite Books"
+    And I have a notebook "Favorite reads" with a note "My Favourite Books"
 
   @usingMockedWikidataService
   Scenario: Create a new book note with multiple authors as children notes
@@ -14,7 +14,7 @@ Feature: Note creation for a book
       | Q45575          |
       | Q92608          |
     When I create a note belonging to "My Favourite Books" with title "The C Programming Language" and wikidata id "Q1137974"
-    Then I should see "My Favourite Books/The C Programming Language" with these children
+    Then I should see "Favorite reads/My Favourite Books/The C Programming Language" with these children
       | note-title      |
       | Dennis Ritchie  |
       | Brian Kernighan |

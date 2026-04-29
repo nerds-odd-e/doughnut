@@ -3623,6 +3623,8 @@ components:
           type: string
         Wikidata Id:
           type: string
+        Notebook Name:
+          type: string
     NotesTestData:
       type: object
       properties:

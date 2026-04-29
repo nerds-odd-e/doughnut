@@ -4,7 +4,7 @@ Feature: Conducting assessment
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with head note "Countries" and notes:
+    And I have a notebook "World facts" with a note "Countries" and notes:
       | Title     | Parent Title |
       | Singapore | Countries    |
       | Vietnam   | Countries    |
@@ -17,8 +17,8 @@ Feature: Conducting assessment
       | Japan      | What is the capital city of Japan? | Tokyo  | kyoto            | true     |
 
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
-    Given I set the number of questions per assessment of the notebook "Countries" to 3
-    When I do the assessment on "Countries" in the bazaar with the following answers:
+    Given I set the number of questions per assessment of the notebook "World facts" to 3
+    When I do the assessment on "World facts" in the bazaar with the following answers:
       | Question                           | Answer            | AnswerCorrect            |
       | Where in the world is Singapore?   | <SingaporeAnswer> | <SingaporeAnswerCorrect> |
       | Most famous food of Vietnam?       | <VietnamAnswer>   | <VietnamAnswerCorrect>   |
@@ -32,12 +32,12 @@ Feature: Conducting assessment
       | Asia            | true                   | Pho           | true                   | kyoto       | false                  | 2             |
 
   Scenario: Get immediate feedback on wrong answers while working on an assessment
-    Given in the assessment for notebook "Countries", I wrongly answered the first assessment question
+    Given in the assessment for notebook "World facts", I wrongly answered the first assessment question
     Then I should get immediate feedback by showing the wrong answer
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
-    Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
-    When I begin the assessment from the "Countries" notebook in the bazaar
+    Given I set the number of questions per assessment of the notebook "World facts" to <Questions Per Assessment>
+    When I begin the assessment from the "World facts" notebook in the bazaar
     Then I should see error message <Message>
 
     Examples:
@@ -47,5 +47,5 @@ Feature: Conducting assessment
 
   Scenario: Must login to generate assessment
     Given I haven't login
-    When I begin the assessment from the "Countries" notebook in the bazaar
+    When I begin the assessment from the "World facts" notebook in the bazaar
     Then I should see message that says "You need to be logged in to start an assessment."

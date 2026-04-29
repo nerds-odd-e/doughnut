@@ -6,10 +6,10 @@ Feature: Bazaar sharing
     Given I am logged in as an existing user
 
   Scenario: Contributing To Bazaar
-    Given I have a notebook with head note "Shape" and notes:
+    Given I have a notebook "Geometry set" with a note "Shape" and notes:
       | Title    | Details                   | Parent Title |
       | Square   | four equal straight sides | Shape        |
       | Triangle | three sides shape         | Shape        |
-    When I choose to share my notebook "Shape"
-    Then I should see "Shape" shared in the Bazaar
+    When I choose to share my notebook "Geometry set"
+    Then I should see "Geometry set" shared in the Bazaar
 

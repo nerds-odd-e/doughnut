@@ -141,6 +141,7 @@ export type NoteTestData = {
     'Image Url'?: string;
     'Image Mask'?: string;
     'Wikidata Id'?: string;
+    'Notebook Name'?: string;
 };
 
 export type NotesTestData = {

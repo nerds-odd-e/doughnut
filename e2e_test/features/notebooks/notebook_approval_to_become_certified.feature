@@ -18,12 +18,12 @@ Feature: Notebook approval to become certified
 
   Scenario: Apply for an approval for a notebook
     Given I am re-logged in as 'a_trainer'
-    And I have a notebook with the head note "TDD"
-    And I have a notebook with the head note "GIT"
-    Given I request for an approval for notebook "TDD"
-    And I request for an approval for notebook "GIT"
-    * I should see the status "Pending" of the approval for notebook "TDD"
+    And I have a notebook "TDD study" with a note "TDD"
+    And I have a notebook "Git guide" with a note "GIT"
+    Given I request for an approval for notebook "TDD study"
+    And I request for an approval for notebook "Git guide"
+    * I should see the status "Pending" of the approval for notebook "TDD study"
     When I am re-logged in as an admin
-    And I approve notebook "TDD" to become certified
+    And I approve notebook "TDD study" to become certified
     Then I should see following notebooks waiting for approval only:
-      | GIT |
+      | Git guide |

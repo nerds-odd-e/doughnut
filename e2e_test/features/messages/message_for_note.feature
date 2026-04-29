@@ -3,7 +3,7 @@ Feature: User having a conversation regarding a note
   so that trainers can improve the content and I can learn more about the subject.
 
   Scenario: User send message about a note shared to a bazaar
-    Given there is a notebook with head note "Rocket Science" from user "a_trainer" shared to the Bazaar
+    Given there is a notebook "Trainer demos" with a note "Rocket Science" from user "a_trainer" shared to the Bazaar
     When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
     Then "a_trainer" can see the conversation with "Old Learner" for the subject "Rocket Science" in the message center:
       | message |

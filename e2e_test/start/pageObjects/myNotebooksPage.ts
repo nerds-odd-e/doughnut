@@ -1,8 +1,9 @@
 /// <reference types="cypress" />
+import { navigationActions } from '../actions/navigationActions'
 import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
 import type NotePath from '../../support/NotePath'
-import type { assumeNotePage } from './notePage'
+import { assumeNotePage } from './notePage'
 import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
@@ -34,10 +35,13 @@ const myNotebooksPage = () => {
   return {
     ...notebookList(),
     navigateToPath(notePath: NotePath) {
-      return notePath.path.reduce<ReturnType<typeof assumeNotePage>>(
-        (page, noteTopology) => page.navigateToChild(noteTopology),
-        this as any
-      )
+      const segments = notePath.path
+      if (segments.length === 0) {
+        return this as any
+      }
+      const leafTitle = segments[segments.length - 1]!
+      navigationActions.jumpToNotePage(leafTitle)
+      return assumeNotePage(leafTitle)
     },
     creatingNotebook(notebookTopic: string, description?: string) {
       addNewNotebookButton().click()

@@ -4,7 +4,7 @@ Feature: Recall Quiz
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "English" which skips memory tracking
+    And I have a notebook "English practice" with a note "English" which skips memory tracking
     And there are some notes:
       | Title            | Details                        | Parent Title|
       | sedition         | Sedition means incite violence | English     |
@@ -14,7 +14,7 @@ Feature: Recall Quiz
     Given It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     When I am recalling my note on day 2
-    Then I should be asked spelling question "means incite violence" from notebook "English"
+    Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "asdf"
     Then I should see that my spelling answer "asdf" is incorrect
 
@@ -22,6 +22,6 @@ Feature: Recall Quiz
     Given It's day 1
     And I assimilate the note "sedition" with the option of remembering spelling
     When I am recalling my note on day 2
-    Then I should be asked spelling question "means incite violence" from notebook "English"
+    Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "Sedition"
     Then I should see that my answer is correct

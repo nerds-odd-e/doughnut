@@ -4,7 +4,7 @@ Feature: User Contests Question generation by AI
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "Scuba Diving"
+    And I have a notebook "Dive journal" with a note "Scuba Diving"
     And OpenAI generates this as first question:
       | Question Stem   | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | First question  | Rescue Diver   | Divemaster         | Open Water Diver   |

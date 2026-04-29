@@ -3,7 +3,7 @@ Feature: Note tree view
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with head note "LeSS in Action" and notes:
+    And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
       | Title            | Parent Title   |
       | TDD              | LeSS in Action |
       | ATDD             | LeSS in Action |

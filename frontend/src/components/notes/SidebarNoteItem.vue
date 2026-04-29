@@ -2,7 +2,9 @@
   <li
     class="daisy-list-group-item daisy-list-group-item-action daisy-py-2 daisy-pb-0 daisy-pe-0 daisy-border-0"
     :class="{
-      'active-item': noteRealm.id === activeNoteRealm.note.id,
+      'active-item':
+        activeNoteRealm != null &&
+        noteRealm.id === activeNoteRealm.note.id,
       'dragging': draggedNote?.id === noteRealm.id,
     }"
     draggable="true"
@@ -18,11 +20,15 @@
       @click="toggleChildren(noteRealm.id)"
     >
       <NoteTitleWithLink
-        :class="{ 'active-title': noteRealm.id === activeNoteRealm.note.id }"
+        :class="{
+          'active-title':
+            activeNoteRealm != null &&
+            noteRealm.id === activeNoteRealm.note.id,
+        }"
         v-bind="{ noteTopology: noteRealm.note.noteTopology }"
         @click.stop
       />
-      <ScrollTo v-if="noteRealm.id === activeNoteRealm.note.id" />
+      <ScrollTo v-if="activeNoteRealm != null && noteRealm.id === activeNoteRealm.note.id" />
       <span
         role="button"
         title="expand children"
@@ -63,7 +69,7 @@ const storageAccessor = useStorageAccessor()
 interface Props {
   notebookId: number
   note: Note
-  activeNoteRealm: NoteRealm
+  activeNoteRealm?: NoteRealm
   expandedIds: number[]
   onToggleExpand: (noteId: number) => void
   draggedNote: Note | null

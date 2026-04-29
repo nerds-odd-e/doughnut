@@ -3,7 +3,7 @@ Feature: User Doughnut Access Token
 
   Background:
     Given I am logged in as "old_learner"
-    And I have a notebook with the head note "Parent Note"
+    And I have a notebook "Parent demo" with a note "Parent Note"
 
   Scenario: Generate Doughnut Access Token
     When I generate a new Doughnut Access Token with label "Initial Token"

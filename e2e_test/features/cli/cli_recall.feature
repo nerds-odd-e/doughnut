@@ -5,7 +5,7 @@ Feature: CLI recall status and recall session
   Background:
     Given I am logged in as an existing user
     And I set the access token for "old_learner" in the interactive CLI
-    And I have a notebook with the head note "English" which skips memory tracking
+    And I have a notebook "English practice" with a note "English" which skips memory tracking
 
   Rule: English notebook with two notes (sedition vs sedation; markdown in details)
 

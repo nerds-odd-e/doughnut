@@ -4,7 +4,7 @@ Feature: Nested Note creation
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with head note "LeSS in Action" and notes:
+    And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
       | Title | Parent Title   |
       | team  | LeSS in Action |
       | tech  | LeSS in Action |
@@ -16,7 +16,7 @@ Feature: Nested Note creation
       | team         |
       | tech         |
       | Re-quirement |
-    And I should see "LeSS in Action" with these children
+    And I should see "LeSS training/LeSS in Action" with these children
       | note-title   |
       | team         |
       | tech         |
@@ -33,7 +33,7 @@ Feature: Nested Note creation
       | team         |
       | coordination |
       | tech         |
-    And I should see "LeSS in Action" with these children
+    And I should see "LeSS training/LeSS in Action" with these children
       | note-title   |
       | team         |
       | coordination |
@@ -43,7 +43,7 @@ Feature: Nested Note creation
     When I create a note belonging to "LeSS in Action" with title "New Note"
     And I undo "create note"
     Then I should see the note "New Note" is marked as deleted
-    And I should see "LeSS in Action" with these children
+    And I should see "LeSS training/LeSS in Action" with these children
       | note-title |
       | team       |
       | tech       |

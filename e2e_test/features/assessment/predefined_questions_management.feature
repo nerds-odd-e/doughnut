@@ -4,7 +4,7 @@ Feature: Quiz Question Management
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "The cow joke"
+    And I have a notebook "Cow jokes" with a note "The cow joke"
     And there are questions in the notebook "The cow joke" for the note:
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |

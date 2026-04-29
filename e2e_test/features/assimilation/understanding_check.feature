@@ -9,7 +9,7 @@ Feature: Understanding Check
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "Parent" and details ""
+    And I have a notebook "Sample tree" with a note "Parent" and details ""
     And there are some notes:
       | Title | Parent Title | Details     |
       | Sample | Parent      | A. B. C. D. E. |
@@ -42,7 +42,7 @@ Feature: Understanding Check
     When I am assimilating the note "Sample"
     And I should see an understanding checklist with 5 points
     And I promote the point "B" to a child note
-    Then I should see "Parent/Sample" with these children
+    Then I should see "Sample tree/Parent/Sample" with these children
       | note-title |
       | Point B    |
 
@@ -51,7 +51,7 @@ Feature: Understanding Check
     When I am assimilating the note "Sample"
     And I should see an understanding checklist with 5 points
     And I promote the point "B" to a sibling note
-    Then I should see "Parent" with these children
+    Then I should see "Sample tree/Parent" with these children
       | note-title |
       | Sample     |
       | Point B    |

@@ -7,13 +7,14 @@
       :topology-head-resolved="noteContextResolved"
     />
     <SidebarInner
-      :class="{ 'is-disabled': !activeNoteRealm }"
-      v-if="activeNoteRealm && noteContextResolved"
-      v-bind="{
-        notebookId: notebookId,
-        activeNoteRealm: activeNoteRealm,
-      }"
-      :key="`${notebookId}-${activeNoteRealm.id}`"
+      v-if="sidebarTreeShown"
+      :notebook-id="notebookId"
+      :active-note-realm="activeNoteRealm"
+      :key="
+        activeNoteRealm != null
+          ? `${notebookId}-${activeNoteRealm.id}`
+          : `${notebookId}-notebook-root`
+      "
     />
   </div>
 </template>
@@ -26,8 +27,11 @@ import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 
 const props = defineProps({
-  /** When set with a loaded realm — sidebar listing for this notebook tree */
-  activeNoteRealm: { type: Object as PropType<NoteRealm>, required: false },
+  /** When set, highlights the active note and expands its ancestors */
+  activeNoteRealm: {
+    type: Object as PropType<NoteRealm | undefined>,
+    required: false,
+  },
   /** Opens root-note POST /api/notebooks/{id}/create-note whenever topology head is missing */
   notebookId: { type: Number, required: true },
 })
@@ -42,11 +46,11 @@ const sidebarReadonly = computed(
 const noteContextResolved = computed(
   () => props.activeNoteRealm?.note?.noteTopology != null
 )
-</script>
 
-<style scoped>
-.is-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-</style>
+/** Notebook overview pages may load root notes without an anchor note (e.g. no `index` slug). */
+const sidebarTreeShown = computed(
+  () =>
+    props.activeNoteRealm === undefined ||
+    props.activeNoteRealm.note.noteTopology != null
+)
+</script>

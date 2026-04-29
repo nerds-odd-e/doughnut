@@ -4,7 +4,7 @@ Feature: Note Edit
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "LeSS in Action" and details "An awesome training"
+    And I have a notebook "LeSS training" with a note "LeSS in Action" and details "An awesome training"
 
   Scenario: Edit a note title and edit details and undo
     Given I update note title "LeSS in Action" to become "Odd-e CSD"

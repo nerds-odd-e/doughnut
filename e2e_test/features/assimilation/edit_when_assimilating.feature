@@ -2,8 +2,8 @@ Feature: Editing when assimilating
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "hard"
-    And I have a notebook with the head note "easy"
+    And I have a notebook "Hard deck" with a note "hard"
+    And I have a notebook "Easy deck" with a note "easy"
 
   Scenario: Update note
     When I am assimilating new note on day 1

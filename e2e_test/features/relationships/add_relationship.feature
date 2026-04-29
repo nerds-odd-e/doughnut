@@ -5,9 +5,9 @@ Feature: add relationship
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "Sedition" and details "Incite violence"
-    And I have a notebook with the head note "Sedation" and details "Put to sleep"
-    And I have a notebook with the head note "Sedative" and details "Sleep medicine"
+    And I have a notebook "Sedition law" with a note "Sedition" and details "Incite violence"
+    And I have a notebook "Sedation care" with a note "Sedation" and details "Put to sleep"
+    And I have a notebook "Sedative drugs" with a note "Sedative" and details "Sleep medicine"
 
   @mockBrowserTime
   Scenario: View all notes that can be related for a note when no relationship exists
@@ -32,7 +32,7 @@ Feature: add relationship
 
   @mockBrowserTime
   Scenario: Show recently updated notes before search results
-    Given I have a notebook with the head note "Recent Note" and details "Recently added"
+    Given I have a notebook "Recent scratch" with a note "Recent Note" and details "Recently added"
     When I am creating a relationship under note "Sedition"
     Then I should see "Recent Note" in the recently updated notes section
     When I search for "Sed" in all my notebooks

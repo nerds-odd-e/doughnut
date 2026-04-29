@@ -2,7 +2,7 @@ Feature: relationship edit and remove
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with head note "Space" and notes:
+    And I have a notebook "Space topics" with a note "Space" and notes:
       | Title | Parent Title |
       | Moon  | Space        |
       | Earth | Space        |

@@ -4,8 +4,8 @@ Feature: EPUB book
 
     Background:
       Given I am logged in as an existing user
-      And I have a notebook with the head note "EPUB E2E Notebook"
-      When I open the notebook settings for "EPUB E2E Notebook"
+      And I have a notebook "EPUB smoke" with a note "EPUB E2E Notebook"
+      When I open the notebook settings for "EPUB smoke"
       And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
       When I open the reading view for the attached book "epub_valid_minimal"
 
@@ -67,7 +67,7 @@ Feature: EPUB book
 
     Scenario: Upload DRM-flagged EPUB shows a clear attach error
       Given I am logged in as an existing user
-      And I have a notebook with the head note "EPUB Unsupported Attach E2E Notebook"
-      When I open the notebook settings for "EPUB Unsupported Attach E2E Notebook"
+      And I have a notebook "EPUB attach edge" with a note "EPUB Unsupported Attach E2E Notebook"
+      When I open the notebook settings for "EPUB attach edge"
       And I attempt to attach the EPUB file "book_reading/epub_invalid_drm_encryption_xml.epub"
       Then I should see an EPUB attach error containing "encrypted or DRM-protected"

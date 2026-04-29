@@ -4,7 +4,7 @@ Feature: Wiki links in notes
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "LeSS in Action" and details "An awesome training"
+    And I have a notebook "LeSS training" with a note "LeSS in Action" and details "An awesome training"
     And there are some notes:
       | Title                  | Parent Title   |
       | Technical Excellence   | LeSS in Action |
@@ -31,7 +31,7 @@ Feature: Wiki links in notes
       | a.dead-link       | Continuous Integration System |
       | a:not(.dead-link) | Technical Excellence          |
     And I should be able to create a new note by following the dead link "Continuous Integration System"
-    And I should see "LeSS in Action" with these children
+    And I should see "LeSS training/LeSS in Action" with these children
       | note-title                    |
       | Technical Excellence          |
       | Continuous Integration        |

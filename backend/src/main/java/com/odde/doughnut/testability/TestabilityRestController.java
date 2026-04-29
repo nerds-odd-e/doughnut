@@ -118,6 +118,9 @@ class TestabilityRestController {
     @Setter
     private String wikidataId;
 
+    @JsonProperty("Notebook Name")
+    public String notebookName;
+
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = new Note();
       note.initialize(user, null, currentUTCTimestamp, title);
@@ -164,6 +167,9 @@ class TestabilityRestController {
 
             if (Strings.isBlank(injection.parentTitle)) {
               note.buildNotebookForHeadNote(ownership, user);
+              if (!Strings.isBlank(injection.notebookName)) {
+                note.getNotebook().setPersistedNotebookName(injection.notebookName);
+              }
               entityPersister.save(note.getNotebook());
             } else {
               note.setParentNote(

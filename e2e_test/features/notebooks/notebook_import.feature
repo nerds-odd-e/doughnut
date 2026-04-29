@@ -10,37 +10,37 @@ Feature: Notebook Import
 
 
   Scenario: Import zip from Obsidian with one new child
-    Given  I have a notebook with head note "title 1" and notes:
+    Given  I have a notebook "Import fixture" with a note "title 1" and notes:
       | Title   | Details | Parent Title |
       | note 1  |         | title 1      |
     When I Import Obsidian data "import-one-child.zip" to note "title 1"
-    Then I should see "title 1/note 1" with these children
+    Then I should see "Import fixture/title 1/note 1" with these children
       | note-title |
       | note 2     |
     And I should see note "title 1/note 1/note 2" has details "content of note 2"
 
   Scenario: Import zip from Obsidian with two nested new child
-    Given I have a notebook with head note "title 1" and notes:
+    Given I have a notebook "Import fixture" with a note "title 1" and notes:
       | Title   | Details | Parent Title |
       | note 1  |         | title 1      |
       | note 2  |         | note 1       |
     When I Import Obsidian data "import-two-layer.zip" to note "title 1"
-    Then I should see "title 1/note 1/note 2" with these children
+    Then I should see "Import fixture/title 1/note 1/note 2" with these children
       | note-title |
       | note 3     |
     And I should see note "title 1/note 1/note 2/note 3" has details "Content of note 3"
 
 
   Scenario: Import zip from Obsidian with two nested new child
-    Given I have a notebook with head note "title 1" and notes:
+    Given I have a notebook "Import fixture" with a note "title 1" and notes:
       | Title   | Details | Parent Title |
       | note 1  |         | title 1      |
       | note 2  |         | note 1       |
     When I Import Obsidian data "import-multiple-layer.zip" to note "title 1"
-    Then I should see "title 1/note 1/note 2" with these children
+    Then I should see "Import fixture/title 1/note 1/note 2" with these children
       | note-title |
       | note 3     |
-    Then I should see "title 1/note 1" with these children
+    Then I should see "Import fixture/title 1/note 1" with these children
       | note-title |
       | note 2     |
       | note 4     |

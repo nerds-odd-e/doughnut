@@ -23,7 +23,7 @@ Feature: Bazaar subscription
   @mockBrowserTime
   Scenario: subscribe to a note and recall
     Given I am logged in as an existing user
-    And I have a notebook with the head note "My memo"
+    And I have a notebook "Memo pad" with a note "My memo"
     And my daily new notes to assimilate is set to 2
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     And the OpenAI service is unavailable due to invalid system token

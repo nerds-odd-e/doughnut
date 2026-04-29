@@ -10,7 +10,7 @@ Feature: Note creation should have details if wikidata is a person
     And Wikidata.org has an entity "Q4604" with label "Confucius"
     And Wikidata.org entity "Q706446" is a person from "Q22502" and birthday is "+1980-03-31T00:00:00Z"
     And Wikidata.org entity "Q4604" is a person from "Q736936" and birthday is "-0552-10-09T00:00:00Z"
-    And I have a notebook with head note "People" and notes:
+    And I have a notebook "Notable people" with a note "People" and notes:
       | Title  | Parent Title | Wikidata Id |
       | Taiwan | People       | Q22502      |
 
@@ -28,12 +28,12 @@ Feature: Note creation should have details if wikidata is a person
   @usingMockedWikidataService
   Scenario: Create a note for the country of origin when the person is created
     When I create a note belonging to "People" with title "Confucius" and wikidata id "Q4604"
-    Then I should see "People/Confucius" with these children
+    Then I should see "Notable people/People/Confucius" with these children
       | note-title |
       | Lu         |
 
   @usingMockedWikidataService
   Scenario: relate to the country of origin note if it already exists
     When I create a note belonging to "People" with title "Wang Chien-ming" and wikidata id "Q706446"
-    Then I should see note "People/Wang Chien-ming" has relationship "related to" "Taiwan"
+    Then I should see note "Notable people/People/Wang Chien-ming" has relationship "related to" "Taiwan"
 # this check is not sufficient, should check new note is not create for taiwan

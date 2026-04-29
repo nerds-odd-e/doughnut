@@ -2,7 +2,7 @@ Feature: Message Center with Unread Message Count
     As a user, I want to see the number of unread messages in the message center.
 
   Background:
-    Given there is a notebook with head note "Rocket Science" from user "a_trainer" shared to the Bazaar
+    Given there is a notebook "Trainer demos" with a note "Rocket Science" from user "a_trainer" shared to the Bazaar
     When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
 
   Scenario: Message receiver should have 1 unread message while sender has none

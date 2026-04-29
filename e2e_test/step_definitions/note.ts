@@ -23,10 +23,10 @@ defineParameterType({
 })
 
 Given(
-  'I have a notebook with head note {string} and notes:',
-  (notebookTitle: string, data: DataTable) => {
+  'I have a notebook {string} with a note {string} and notes:',
+  (notebookName: string, headTitle: string, data: DataTable) => {
     const notes = data.hashes()
-    notes.unshift({ Title: notebookTitle })
+    notes.unshift({ Title: headTitle, 'Notebook Name': notebookName })
     cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes(notes, username)
     )
@@ -45,22 +45,13 @@ Given('there are some notes:', (data: DataTable) => {
 })
 
 Given(
-  'I have a notebook with the head note {string}',
-  (noteTopology: string) => {
-    cy.get<string>('@currentLoginUser').then((username) =>
-      start.testability().injectNotes([{ Title: noteTopology }], username)
-    )
-  }
-)
-
-Given(
-  'I have a notebook with the head note {string} which skips memory tracking',
-  (noteTopology: string) => {
+  'I have a notebook {string} with a note {string}',
+  (notebookName: string, noteTitle: string) => {
     cy.get<string>('@currentLoginUser').then((username) =>
       start
         .testability()
         .injectNotes(
-          [{ Title: noteTopology, 'Skip Memory Tracking': true }],
+          [{ Title: noteTitle, 'Notebook Name': notebookName }],
           username
         )
     )
@@ -68,12 +59,37 @@ Given(
 )
 
 Given(
-  'I have a notebook with the head note {string} and details {string}',
-  (noteTopology: string, details: string) => {
+  'I have a notebook {string} with a note {string} which skips memory tracking',
+  (notebookName: string, noteTitle: string) => {
     cy.get<string>('@currentLoginUser').then((username) =>
-      start
-        .testability()
-        .injectNotes([{ Title: noteTopology, Details: details }], username)
+      start.testability().injectNotes(
+        [
+          {
+            Title: noteTitle,
+            'Notebook Name': notebookName,
+            'Skip Memory Tracking': true,
+          },
+        ],
+        username
+      )
+    )
+  }
+)
+
+Given(
+  'I have a notebook {string} with a note {string} and details {string}',
+  (notebookName: string, noteTitle: string, details: string) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
+      start.testability().injectNotes(
+        [
+          {
+            Title: noteTitle,
+            'Notebook Name': notebookName,
+            Details: details,
+          },
+        ],
+        username
+      )
     )
   }
 )
@@ -86,13 +102,16 @@ Given(
 )
 
 Given(
-  'there is a notebook with head note {string} from user {string} shared to the Bazaar',
-  (noteTopology: string, externalIdentifier: string) => {
+  'there is a notebook {string} with a note {string} from user {string} shared to the Bazaar',
+  (notebookName: string, noteTitle: string, externalIdentifier: string) => {
     start
       .testability()
-      .injectNotes([{ Title: noteTopology }], externalIdentifier)
+      .injectNotes(
+        [{ Title: noteTitle, 'Notebook Name': notebookName }],
+        externalIdentifier
+      )
       .then(() => {
-        return start.testability().shareToBazaar(noteTopology)
+        return start.testability().shareToBazaar(noteTitle)
       })
   }
 )

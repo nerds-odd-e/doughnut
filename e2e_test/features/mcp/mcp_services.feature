@@ -8,7 +8,7 @@ Feature: MCP (Model Context Protocol) Services
     Given I am logged in as "old_learner"
     And I have a valid Doughnut Access Token with label "For MCP services"
     And I connect to an MCP client that connects to Doughnut MCP service
-    And I have a notebook with head note "Programming Concepts" and notes:
+    And I have a notebook "CS concepts" with a note "Programming Concepts" and notes:
       | Title           | Parent Title         |
       | Object Oriented | Programming Concepts |
       | Functional      | Programming Concepts |
@@ -17,7 +17,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Scenario: Adding note to a known parent note
     When AI agent adds note via MCP tool to add note "Procedural" under "Programming Concepts"
-    Then I should see "Programming Concepts" with these children
+    Then I should see "CS concepts/Programming Concepts" with these children
       | note-title      |
       | Object Oriented |
       | Functional      |

@@ -289,7 +289,7 @@ describe("Sidebar", () => {
     ).toBe(true)
   })
 
-  it("shows notebook root add button when realm is cleared (loading) but sidebar stays on a notebook page", async () => {
+  it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {
     wrapper = helper
       .component(Sidebar)
       .withCurrentUser(makeMe.aUser.please())
@@ -306,9 +306,9 @@ describe("Sidebar", () => {
     })
     await flushPromises()
 
-    expect(findSidebarItem(topNoteRealm.note.noteTopology.title!)).toBe(
-      undefined
-    )
+    expect(
+      findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+    ).toBe(true)
     expect(wrapper.find(`button[title="Add note"]`).exists()).toBe(true)
   })
 
