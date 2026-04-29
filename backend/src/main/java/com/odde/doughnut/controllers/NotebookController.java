@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
@@ -111,10 +112,14 @@ class NotebookController {
   @Transactional
   public Notebook updateNotebook(
       @PathVariable @Schema(type = "integer") Notebook notebook,
-      @Valid @RequestBody NotebookSettings notebookSettings)
+      @Valid @RequestBody NotebookUpdateRequest request)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    notebook.getNotebookSettings().update(notebookSettings);
+    notebook.getNotebookSettings().update(request.getNotebookSettings());
+    if (request.getShortDetails() != null) {
+      notebook.setShortDetails(
+          request.getShortDetails().isBlank() ? null : request.getShortDetails());
+    }
     entityPersister.save(notebook);
     return notebook;
   }

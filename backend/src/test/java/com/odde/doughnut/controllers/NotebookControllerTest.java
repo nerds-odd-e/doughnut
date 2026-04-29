@@ -12,6 +12,7 @@ import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
+import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
@@ -46,6 +47,15 @@ class NotebookControllerTest extends ControllerTestBase {
   @Autowired NotebookGroupService notebookGroupService;
   private Note topNote;
   @MockitoBean EmbeddingService embeddingService;
+
+  private static NotebookSettings copyNotebookSettings(Notebook notebook) {
+    var s = new NotebookSettings();
+    var cur = notebook.getNotebookSettings();
+    s.setSkipMemoryTrackingEntirely(cur.getSkipMemoryTrackingEntirely());
+    s.setNumberOfQuestionsInAssessment(cur.getNumberOfQuestionsInAssessment());
+    s.setCertificateExpiry(cur.getCertificateExpiry());
+    return s;
+  }
 
   @BeforeEach
   void setup() {
@@ -298,7 +308,7 @@ class NotebookControllerTest extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateNotebook(note.getNotebook(), new NotebookSettings()));
+          () -> controller.updateNotebook(note.getNotebook(), new NotebookUpdateRequest()));
     }
 
     @Test
@@ -306,10 +316,44 @@ class NotebookControllerTest extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       var notebookSettings = new NotebookSettings();
       notebookSettings.setCertificateExpiry(Period.parse("P2Y3M"));
-      controller.updateNotebook(note.getNotebook(), notebookSettings);
+      var request = new NotebookUpdateRequest();
+      request.setNotebookSettings(notebookSettings);
+      controller.updateNotebook(note.getNotebook(), request);
       assertThat(
           note.getNotebook().getNotebookSettings().getCertificateExpiry(),
           equalTo(Period.parse("P2Y3M")));
+    }
+
+    @Test
+    void shouldPersistShortDetailsOnUpdate() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      var request = new NotebookUpdateRequest();
+      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+      request.setShortDetails("Notebook blurb");
+      controller.updateNotebook(note.getNotebook(), request);
+      assertThat(note.getNotebook().getShortDetails(), equalTo("Notebook blurb"));
+    }
+
+    @Test
+    void shouldClearShortDetailsWhenEmptyString() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      note.getNotebook().setShortDetails("was set");
+      var setRequest = new NotebookUpdateRequest();
+      setRequest.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+      setRequest.setShortDetails("");
+      controller.updateNotebook(note.getNotebook(), setRequest);
+      assertThat(note.getNotebook().getShortDetails(), nullValue());
+    }
+
+    @Test
+    void shouldLeaveShortDetailsUnchangedWhenShortDetailsOmitted()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      note.getNotebook().setShortDetails("unchanged");
+      var request = new NotebookUpdateRequest();
+      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+      controller.updateNotebook(note.getNotebook(), request);
+      assertThat(note.getNotebook().getShortDetails(), equalTo("unchanged"));
     }
   }
 

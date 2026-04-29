@@ -13,6 +13,7 @@ After Phase 3:
 - the notebook keeps its own name independently of note title/content
 - the former head note is represented as a normal root note titled `index` with `note.slug = "index"`
 - a notebook may have no `index` note
+- a notebook has editable plain-text `shortDetails` for a short notebook settings message
 - opening a notebook shows a notebook page with an editor for optional index content
 - saving notebook page content creates or updates the normal root `index` note
 - first-layer notes no longer need to be children of a head note
@@ -23,6 +24,8 @@ After Phase 3:
 
 - Preserve the former head note ID during migration where feasible. The migrated record becomes the ordinary `index` note so existing stable note identity is not thrown away.
 - Do not add a notebook content field. Notebook page body content belongs to the optional root `index` note.
+- Store the notebook's short settings message on `Notebook.shortDetails`, not on the optional `index` note.
+- Use the current notebook get endpoint and the generated `Notebook` object for notebook page data; do not introduce a separate notebook-page get endpoint or DTO.
 - Treat `index` as a normal note after migration: `title = "index"`, `slug = "index"`, `folderId = null`, content copied from the former head note.
 - Assume production has no existing user note titled/sluggified as `index`, as stated in the main migration plan.
 - Introduce nullable/optional runtime behavior before removing required head-note assumptions, so deployed code can read both migrated and not-yet-migrated notebooks during rollout.
@@ -67,24 +70,45 @@ Add a small backend capability for finding a notebook's root `index` note withou
 
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests "*Notebook*"`
 
-### 3.3 Return Notebook Page Data With Optional Index Content
+### 3.3 Add Notebook Short Details
 
 **Type:** Behavior
 
-The backend can serve a notebook page payload even when the notebook has no index note.
+Users can edit a short plain-text notebook message from notebook settings.
 
 **Commit includes:**
 
-- notebook page endpoint or existing notebook endpoint returns notebook identity plus optional index note content
-- controller test covers:
-  - notebook with an index note returns its content
-  - notebook without an index note returns an empty editable page state
-- generated TypeScript client update if the API contract changes
+- add `shortDetails` to the notebook entity, persistence, API object, and generated frontend type
+- notebook settings lets the user edit `shortDetails` as a plain-text short message
+- database migration copies existing head note details into `notebook.short_details`, truncated to the field limit
+- backend tests cover migration and notebook settings update/read behavior
+- frontend test covers editing and saving the short details field from notebook settings
+- no new notebook-page get endpoint or notebook-page DTO
+
+**Verification:**
+
+- targeted backend migration/controller tests
+- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
+- targeted frontend notebook settings test
+
+### 3.3.1 Expose Index Note Id On Notebook
+
+**Type:** Structure
+
+The existing notebook API object exposes the optional `indexNoteId` for later frontend consumption.
+
+**Commit includes:**
+
+- add a JSON-visible `indexNoteId` field on the notebook API object through the notebook/index-note association in the entity
+- return `null` when the notebook has no index note
+- backend controller test covers notebooks with and without an index note through the current get notebook endpoint
+- generated TypeScript client update
+- no new endpoint and no dedicated notebook page DTO
 
 **Verification:**
 
 - targeted backend controller tests
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` if OpenAPI changes
+- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 
 ### 3.4 Save Notebook Page Content Into Existing Index Note
 
@@ -123,11 +147,11 @@ Users can save content on a notebook that does not yet have an index note.
 
 **Type:** Behavior
 
-The frontend can render the notebook page with an empty editor when no index note exists.
+The frontend can render the notebook page with an empty editor when the current notebook has no index note.
 
 **Commit includes:**
 
-- notebook page component or page-level view loads the notebook page payload
+- notebook page component or page-level view loads the current `Notebook` object through the existing get endpoint
 - empty editor renders for missing index note
 - component test uses `mockSdkService()` and asserts notebook name plus empty editable body
 - no route replacement yet
@@ -140,14 +164,14 @@ The frontend can render the notebook page with an empty editor when no index not
 
 **Type:** Behavior
 
-The frontend saves notebook page editor content through the notebook page API.
+The frontend saves notebook page editor content while loading notebook identity through the current `Notebook` object.
 
 **Commit includes:**
 
 - save action calls the notebook page save endpoint
 - component test covers:
-  - saving into an existing index note payload
-  - saving when the initial payload has no index note
+  - saving when the current `Notebook` has `indexNoteId`
+  - saving when the current `Notebook` has no `indexNoteId`
 - user-visible loading/error handling follows existing `apiCallWithLoading()` patterns where applicable
 
 **Verification:**
@@ -300,7 +324,7 @@ Permanent API contracts stop exposing `headNoteId` / `headNote` as notebook iden
 **Commit includes:**
 
 - remove head-note fields from notebook DTOs used by frontend/generated clients
-- frontend switches remaining notebook links/display logic to notebook ID, notebook name, and optional notebook page data
+- frontend switches remaining notebook links/display logic to notebook ID, notebook name, `shortDetails`, and optional `indexNoteId` on the current `Notebook` object
 - regenerate TypeScript client
 - update tests and fixtures that build notebooks with `headNoteId` only for routing
 
@@ -383,6 +407,8 @@ Phase 3 is complete when:
 
 - notebooks can be opened, displayed, and edited without a head note
 - notebooks can exist without an index note
+- notebooks expose editable `shortDetails`, backfilled from truncated existing head note details
+- the current `Notebook` object exposes optional `indexNoteId` without a separate notebook-page get DTO
 - saving notebook page content creates or updates the optional root `index` note
 - migrated notebooks preserve their old head-note content through the normal `index` note
 - new notebooks are not created with head notes or pre-created index notes

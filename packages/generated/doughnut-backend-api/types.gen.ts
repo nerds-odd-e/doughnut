@@ -347,6 +347,13 @@ export type RedirectToNoteResponse = {
     noteId?: number;
 };
 
+export type NotebookUpdateRequest = {
+    skipMemoryTrackingEntirely?: boolean;
+    numberOfQuestionsInAssessment?: number;
+    certificateExpiry?: string;
+    shortDetails?: string;
+};
+
 /**
  * Suggested depth for a single block
  */
@@ -1858,7 +1865,7 @@ export type GetResponses = {
 export type GetResponse = GetResponses[keyof GetResponses];
 
 export type UpdateNotebookData = {
-    body: NotebookSettings;
+    body: NotebookUpdateRequest;
     path: {
         notebook: number;
     };

@@ -70,10 +70,24 @@
       <div class="section-header">
         <h4 class="section-title">Notebook Settings</h4>
         <p class="section-description">
-          Configure memory tracking, assessment, and certificate settings for this notebook.
+          Configure memory tracking, assessment, certificate settings, and an optional
+          short plain-text message for this notebook.
         </p>
       </div>
       <div class="settings-grid">
+        <div class="settings-item settings-item-full-width">
+          <TextArea
+            scope-name="notebook"
+            field="shortDetails"
+            v-model="formData.shortDetails"
+            :rows="3"
+            placeholder="Optional short plain-text message (shown on notebook cards)"
+          />
+          <p class="field-hint">
+            Plain text only, up to 500 characters. This is separate from notebook page body
+            content.
+          </p>
+        </div>
         <div class="settings-item">
           <CheckInput
             scope-name="notebook"
@@ -200,7 +214,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -214,6 +228,7 @@ import { GitMerge, Share2 } from "lucide-vue-next"
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
+import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import NotebookCertificateRequest from "@/components/notebook/NotebookCertificateRequest.vue"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
@@ -268,7 +283,23 @@ const formData = ref({
   skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
   certificateExpiry,
+  shortDetails: props.notebook.shortDetails ?? "",
 })
+
+watch(
+  () => props.notebook,
+  (nb) => {
+    formData.value = {
+      skipMemoryTrackingEntirely:
+        nb.notebookSettings.skipMemoryTrackingEntirely ?? false,
+      numberOfQuestionsInAssessment:
+        nb.notebookSettings.numberOfQuestionsInAssessment,
+      certificateExpiry: nb.notebookSettings.certificateExpiry ?? "1y",
+      shortDetails: nb.shortDetails ?? "",
+    }
+  },
+  { deep: true }
+)
 
 const errors = ref({
   skipMemoryTrackingEntirely: undefined as string | undefined,
@@ -414,6 +445,10 @@ const updateIndexNotebook = async () => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.settings-item-full-width {
+  grid-column: 1 / -1;
 }
 
 .field-hint {

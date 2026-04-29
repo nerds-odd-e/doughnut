@@ -1,8 +1,15 @@
 import type { Notebook } from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  NotebookBooksController,
+  NotebookController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageView from "@/pages/NotebookPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
 
@@ -47,6 +54,39 @@ describe("NotebookPageView.spec", () => {
       (wrapper.find("[name='certificateExpiry']").element as HTMLInputElement)
         .value
     ).toBe("2y 3m 4w 5d")
+  })
+
+  it("sends shortDetails when saving notebook settings", async () => {
+    const nb: Notebook = {
+      ...makeMe.aNotebook.please(),
+      shortDetails: "Initial blurb",
+    }
+    const updateSpy = vi
+      .spyOn(NotebookController, "updateNotebook")
+      .mockResolvedValue(
+        wrapSdkResponse({ ...nb, shortDetails: "Saved blurb" })
+      )
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook: nb })
+      .mount()
+
+    await wrapper.find("[name='shortDetails']").setValue("Saved blurb")
+    await wrapper.find("button.daisy-btn-primary.daisy-mt-4").trigger("click")
+    await flushPromises()
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { notebook: nb.id },
+        body: expect.objectContaining({
+          shortDetails: "Saved blurb",
+          skipMemoryTrackingEntirely:
+            nb.notebookSettings.skipMemoryTrackingEntirely,
+        }),
+      })
+    )
+    updateSpy.mockRestore()
   })
 
   it("shows no-book copy without Read when getBook has no book", async () => {

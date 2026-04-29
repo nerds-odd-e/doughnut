@@ -92,6 +92,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private NotebookGroup notebookGroup;
 
+  @Column(name = "short_details")
+  @Getter
+  @Setter
+  private String shortDetails;
+
   @Transient
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Getter
@@ -158,10 +163,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   public Integer getHeadNoteId() {
     return headNote.getId();
-  }
-
-  public String getShortDetails() {
-    return headNote.getShortDetails();
   }
 
   public Circle getCircle() {

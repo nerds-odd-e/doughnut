@@ -1111,7 +1111,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NotebookSettings"
+              $ref: "#/components/schemas/NotebookUpdateRequest"
         required: true
       responses:
         "200":
@@ -4004,6 +4004,22 @@ components:
         noteId:
           type: integer
           format: int32
+    NotebookUpdateRequest:
+      type: object
+      properties:
+        skipMemoryTrackingEntirely:
+          type: boolean
+        numberOfQuestionsInAssessment:
+          type: integer
+          format: int32
+        certificateExpiry:
+          type: string
+          default: 1y
+          example: 1y 6m
+        shortDetails:
+          type: string
+          maxLength: 500
+          minLength: 0
     BlockDepthSuggestion:
       type: object
       description: Suggested depth for a single block
