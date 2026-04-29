@@ -139,6 +139,8 @@ Note
 
 Note properties are represented as leading YAML frontmatter in the note's Markdown content. The Markdown content is the portable source of truth; rich editing surfaces may parse the frontmatter and show it as editable property rows, then serialize changes back into the same leading frontmatter block. The backend does not need a separate property bag to preserve properties, though later indexing or import workflows may derive selected fields from frontmatter when there is a product need.
 
+After the relationship-note migration, **`title`** is required for every note: it cannot be null or empty. Legacy title-less notes are migration input only and must be backfilled before the parent-note model is removed.
+
 ### Link
 
 Links are the primary mechanism for expressing knowledge relationships.
@@ -231,6 +233,12 @@ Example:
 
 ```text
 どうやら
+```
+
+Invariant after the relationship-note migration:
+
+```text
+note.title must be non-empty
 ```
 
 ### Uniqueness Rule
@@ -415,6 +423,8 @@ target: "[[〜てたまらない]]"
 ```
 
 The relationship note itself is a knowledge artifact.
+
+Its title is derived from the relationship itself: source note title, relationship label, and target note title. For migrated old relationship notes, persist that derived title and truncate it so it does not exceed the note title length limit before generating the note slug.
 
 Its filename/slug should be shorter and readable.
 

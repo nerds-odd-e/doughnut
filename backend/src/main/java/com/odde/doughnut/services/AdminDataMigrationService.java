@@ -202,6 +202,7 @@ public class AdminDataMigrationService {
       Folder folder = entityPersister.find(Folder.class, folderId);
       wikiSlugPathService.assignSlugForNewFolder(folder);
       entityPersister.merge(folder);
+      entityPersister.flush();
 
       List<Integer> childIds =
           jdbcTemplate.queryForList(
@@ -226,6 +227,7 @@ public class AdminDataMigrationService {
       Note note = entityPersister.find(Note.class, noteId);
       wikiSlugPathService.assignSlugDuringDataMigration(note);
       entityPersister.merge(note);
+      entityPersister.flush();
     }
   }
 

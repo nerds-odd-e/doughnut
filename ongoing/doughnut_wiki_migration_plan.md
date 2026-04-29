@@ -228,6 +228,8 @@ slug
 
 **`note.slug`** stores the notebook-local address as above. One column replaces the older split between “file slug” and “full path.”
 
+After **Phase 5**, every note has a required non-empty **`title`**. Legacy null or empty titles are migration-only input and must be backfilled before the Phase 5 closeout.
+
 ## Slug Generation
 
 Generate folder and note basenames with `com.github.slugify:slugify`.
@@ -551,6 +553,14 @@ niwa-ataranai-vs-te-tamaranai.md
 
 Use the same slugified naming style for migrated and newly created relationship notes. Keep internal IDs separate from filenames.
 
+For old relationship notes, derive the note **`title`** from the relationship itself: source note title, relationship label, and target note title. Persist the derived title on the relationship note and truncate it before saving so it does not exceed `Note.MAX_TITLE_LENGTH` (currently 150 characters). The note slug is then generated from that title with the existing slug path rules.
+
+This phase is also the point where the title invariant closes: after Phase 5, a note title cannot be null or empty in runtime behavior or persisted data.
+
+## Sub-Phase Plan
+
+Phase 5 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests.
+
 ## Expected Result
 
 After this phase:
@@ -558,6 +568,8 @@ After this phase:
 - relationship notes are ordinary notes
 - relationship fields are represented in content and/or frontmatter
 - relationship notes have folder locations and note slugs (`note.slug` as full path)
+- migrated relationship notes have derived, truncated, non-empty titles
+- note titles are required for all notes; null or empty note titles are no longer valid after Phase 5
 - old relationship-note-specific behavior is deprecated
 - relationships become portable to Obsidian-style Markdown
 
