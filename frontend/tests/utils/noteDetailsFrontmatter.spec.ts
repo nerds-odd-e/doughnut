@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest"
 import {
+  composeNoteDetailsFromPropertyRows,
   composeNoteDetailsMarkdown,
+  insertPropertyRowAt,
   parseNoteDetailsMarkdown,
+  removePropertyRowAt,
+  renamePropertyRowKeyAt,
+  sortedPropertyRowsFromRecord,
 } from "@/utils/noteDetailsFrontmatter"
 
 describe("parseNoteDetailsMarkdown", () => {
@@ -138,5 +143,47 @@ describe("composeNoteDetailsMarkdown", () => {
         body: parsed.body,
       })
     ).toBe("Only body\n")
+  })
+})
+
+describe("property rows compose / mutate", () => {
+  it("insert: composing first row yields parseable frontmatter with matching scalar props", () => {
+    const rows = insertPropertyRowAt([], 0, { key: "topic", value: "training" })
+    const md = composeNoteDetailsFromPropertyRows(rows, "# Hello\n")
+    const parsed = parseNoteDetailsMarkdown(md)
+    expect(parsed.ok && parsed.properties).toEqual({
+      topic: "training",
+    })
+    if (parsed.ok) {
+      expect(parsed.body).toContain("# Hello")
+    }
+  })
+
+  it("rename: composed markdown loses old key and exposes new key", () => {
+    const parsed = parseNoteDetailsMarkdown(
+      "---\nalpha: one\nbeta: two\n---\nBody\n"
+    )
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    rows = renamePropertyRowKeyAt(rows, 0, "alphaRenamed")
+    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    const again = parseNoteDetailsMarkdown(md)
+    expect(again.ok && again.properties).toEqual({
+      alphaRenamed: "one",
+      beta: "two",
+    })
+    expect(again.ok && again.properties.alpha).toBeUndefined()
+  })
+
+  it("remove: dropping one row leaves remaining props only", () => {
+    const parsed = parseNoteDetailsMarkdown("---\na: 1\nb: 2\n---\nRest\n")
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    rows = removePropertyRowAt(rows, 0)
+    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    const again = parseNoteDetailsMarkdown(md)
+    expect(again.ok && again.properties).toEqual({ b: "2" })
   })
 })

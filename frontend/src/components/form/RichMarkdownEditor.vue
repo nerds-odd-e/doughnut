@@ -14,9 +14,9 @@
       <dl
         class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm"
       >
-        <template v-for="row in readOnlyPropertyRows" :key="row[0]">
-          <dt class="daisy-font-medium daisy-text-base-content/80">{{ row[0] }}</dt>
-          <dd class="daisy-m-0">{{ row[1] }}</dd>
+        <template v-for="row in propertyRows" :key="row.key">
+          <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
+          <dd class="daisy-m-0">{{ row.value }}</dd>
         </template>
       </dl>
     </section>
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useId, type PropType } from "vue"
+import { computed, ref, useId, watch, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import markdownizer from "./markdownizer"
 import {
@@ -41,8 +41,10 @@ import {
   type WikiTitle,
 } from "./replaceWikiLinksInHtml"
 import {
-  composeNoteDetailsMarkdown,
+  composeNoteDetailsFromPropertyRows,
   parseNoteDetailsMarkdown,
+  sortedPropertyRowsFromRecord,
+  type PropertyRow,
 } from "@/utils/noteDetailsFrontmatter"
 
 const props = defineProps({
@@ -73,19 +75,22 @@ const parsedDetails = computed(() =>
   parseNoteDetailsMarkdown(props.modelValue ?? "")
 )
 
-const readOnlyPropertyRows = computed((): readonly [string, string][] => {
-  const p = parsedDetails.value
-  if (!p.ok) return []
-  const keys = Object.keys(p.properties)
-  if (keys.length === 0) return []
-  return keys
-    .sort((a, b) => a.localeCompare(b))
-    .map((k) => [k, p.properties[k]!] as const)
-})
+const propertyRows = ref<PropertyRow[]>([])
 
-const showReadOnlyProperties = computed(
-  () => readOnlyPropertyRows.value.length > 0
+watch(
+  () => props.modelValue,
+  () => {
+    const p = parseNoteDetailsMarkdown(props.modelValue ?? "")
+    if (p.ok) {
+      propertyRows.value = sortedPropertyRowsFromRecord(p.properties)
+    } else {
+      propertyRows.value = []
+    }
+  },
+  { immediate: true }
 )
+
+const showReadOnlyProperties = computed(() => propertyRows.value.length > 0)
 
 const markdownForRichDisplay = computed(() => {
   const p = parsedDetails.value
@@ -126,10 +131,10 @@ const htmlValueUpdated = (newHtmlValue: string) => {
   const prevFull = props.modelValue ?? ""
 
   if (p.ok) {
-    const composed = composeNoteDetailsMarkdown({
-      properties: p.properties,
-      body: bodyMarkdown,
-    })
+    const composed = composeNoteDetailsFromPropertyRows(
+      propertyRows.value,
+      bodyMarkdown
+    )
     if (composed === prevFull) return
     emits("update:modelValue", composed)
     return

@@ -145,8 +145,7 @@ export function composeNoteDetailsMarkdown(input: {
   properties: Record<string, string>
   body: string
 }): string {
-  const keys = Object.keys(input.properties)
-  if (keys.length === 0) {
+  if (Object.keys(input.properties).length === 0) {
     return input.body
   }
 
@@ -155,4 +154,55 @@ export function composeNoteDetailsMarkdown(input: {
   }).trimEnd()
 
   return `---\n${yamlBlock}\n---\n${input.body}`
+}
+
+/** One key/value row for rich property editing (order matches sorted keys). */
+export type PropertyRow = { key: string; value: string }
+
+/** Maps parsed scalar properties into sorted rows for stable UI state. */
+export function sortedPropertyRowsFromRecord(
+  properties: Record<string, string>
+): PropertyRow[] {
+  const keys = Object.keys(properties)
+  if (keys.length === 0) return []
+  return keys
+    .sort((a, b) => a.localeCompare(b))
+    .map((key) => ({ key, value: properties[key]! }))
+}
+
+/** Composes details from ordered rows; duplicate keys keep the last occurrence. */
+export function composeNoteDetailsFromPropertyRows(
+  rows: readonly PropertyRow[],
+  body: string
+): string {
+  const properties: Record<string, string> = {}
+  for (const row of rows) {
+    properties[row.key] = row.value
+  }
+  return composeNoteDetailsMarkdown({ properties, body })
+}
+
+export function insertPropertyRowAt(
+  rows: readonly PropertyRow[],
+  index: number,
+  row: PropertyRow
+): PropertyRow[] {
+  const next = [...rows]
+  next.splice(index, 0, row)
+  return next
+}
+
+export function renamePropertyRowKeyAt(
+  rows: readonly PropertyRow[],
+  index: number,
+  newKey: string
+): PropertyRow[] {
+  return rows.map((r, i) => (i === index ? { ...r, key: newKey } : r))
+}
+
+export function removePropertyRowAt(
+  rows: readonly PropertyRow[],
+  index: number
+): PropertyRow[] {
+  return rows.filter((_, i) => i !== index)
 }
