@@ -47,9 +47,20 @@ export const notebookList = () => {
           expect(match, `notebook id from href ${pathname}`).not.to.be.null
           const notebookId = match![1]
           const noteSlug = slugify(notebookTitle, { lower: true })
-          cy.visit(`/d/notebooks/${notebookId}/notes/${noteSlug}`)
-          pageIsNotLoading()
+          const targetPath = `/d/notebooks/${notebookId}/notes/${noteSlug}`
+          return cy.window().then((win) => {
+            const w = win as {
+              router?: { push: (loc: unknown) => Promise<unknown> }
+            }
+            if (!w.router) {
+              return cy.visit(targetPath)
+            }
+            return cy.wrap(
+              w.router.push({ path: targetPath, query: { time: Date.now() } })
+            )
+          })
         })
+      pageIsNotLoading()
       return assumeNotePage()
     },
   }
