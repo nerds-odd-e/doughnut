@@ -6,15 +6,6 @@ Feature: Note Edit
     Given I am logged in as an existing user
     And I have a notebook with the head note "LeSS in Action" and details "An awesome training"
 
-  Scenario: Edit a note
-    And I update note "LeSS in Action" to become:
-      | Title     | Details           |
-      | Odd-e CSD | Our best training |
-    Then the note title should be "Odd-e CSD"
-    And I should see these notes belonging to the user at the top level of all my notes
-      | Title     | Details           |
-      | Odd-e CSD | Our best training |
-
   Scenario: Edit a note title and edit details and undo
     Given I update note title "LeSS in Action" to become "Odd-e CSD"
     And the note title should be "Odd-e CSD"
