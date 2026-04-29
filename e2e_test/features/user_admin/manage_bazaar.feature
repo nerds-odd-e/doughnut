@@ -5,8 +5,8 @@ Feature: Manage Bazaar
 
   Background:
     Given I am logged in as "another_old_learner"
-    And I have a notebook "Romance" with a note "Romance"
-    And I have a notebook "Classics" with a note "Classics"
+    And I have a notebook "Romance" with a note "origin of romance"
+    And I have a notebook "Classics" with a note "origin of classics"
     And notebook "Romance" is shared to the Bazaar
     And notebook "Classics" is shared to the Bazaar
     And I am re-logged in as "admin"

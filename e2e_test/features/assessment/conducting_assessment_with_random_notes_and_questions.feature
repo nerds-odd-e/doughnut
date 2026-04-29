@@ -7,7 +7,7 @@ Feature: Self assessment with random notes and questions
       | Title     | Parent Title |
       | Singapore | Countries    |
       | Vietnam   | Countries    |
-    And notebook "Countries" is shared to the Bazaar
+    And notebook "World facts" is shared to the Bazaar
     And there are questions in the notebook "Countries" for the note:
       | Note Title | Question                         | Answer | One Wrong Choice | Approved |
       | Singapore  | Where in the world is Singapore? | Asia   | euro             | true     |

@@ -10,8 +10,8 @@ Then('I should see {string} shared in the Bazaar', (notebooks: string) => {
   start.navigateToBazaar().expectNotebooks(notebooks)
 })
 
-Then('notebook {string} is shared to the Bazaar', (noteTopology: string) => {
-  start.testability().shareToBazaar(noteTopology)
+Then('notebook {string} is shared to the Bazaar', (notebookName: string) => {
+  start.testability().shareToBazaar(notebookName)
 })
 
 Then("there shouldn't be any note edit button", () => {

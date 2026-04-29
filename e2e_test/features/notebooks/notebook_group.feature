@@ -18,7 +18,7 @@ Feature: Notebook group
     Given I have a notebook "Bazaar sub fixture" with a note "Sub E2E Bazaar" and notes:
       | Title | Parent Title |
       | leaf | Sub E2E Bazaar |
-    And notebook "Sub E2E Bazaar" is shared to the Bazaar
+    And notebook "Bazaar sub fixture" is shared to the Bazaar
     When I subscribe to notebook "Bazaar sub fixture" in the bazaar, with target of learning 5 notes per day
     When I create a notebook group named "E2E Subscribed Group" by moving subscribed notebook "Bazaar sub fixture" from the catalog
     Then I should see notebook group "E2E Subscribed Group" with a hint including "Bazaar sub fixture"

@@ -210,9 +210,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties:
-                type: string
+              $ref: "#/components/schemas/ShareToBazaarRequest"
         required: true
       responses:
         "200":
@@ -3556,6 +3554,13 @@ components:
       properties:
         travel_to:
           type: string
+    ShareToBazaarRequest:
+      type: object
+      properties:
+        notebookName:
+          type: string
+      required:
+      - notebookName
     Randomization:
       type: object
       properties:

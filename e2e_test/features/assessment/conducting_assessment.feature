@@ -9,7 +9,7 @@ Feature: Conducting assessment
       | Singapore | Countries    |
       | Vietnam   | Countries    |
       | Japan     | Countries    |
-    And notebook "Countries" is shared to the Bazaar
+    And notebook "World facts" is shared to the Bazaar
     And there are questions in the notebook "Countries" for the note:
       | Note Title | Question                           | Answer | One Wrong Choice | Approved |
       | Singapore  | Where in the world is Singapore?   | Asia   | europe           | true     |

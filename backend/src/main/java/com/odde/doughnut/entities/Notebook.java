@@ -165,11 +165,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     if (persistedNotebookName != null && !persistedNotebookName.isBlank()) {
       return persistedNotebookName;
     }
-    if (headNote == null) {
-      return "";
-    }
-    String fromHead = headNote.getTitle();
-    return fromHead != null && !fromHead.isBlank() ? fromHead : "";
+    return "";
   }
 
   @Hidden

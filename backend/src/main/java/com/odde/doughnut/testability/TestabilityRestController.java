@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.CircleRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.BazaarService;
@@ -43,6 +44,7 @@ class TestabilityRestController {
 
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
+  @Autowired NotebookRepository notebookRepository;
   @Autowired UserRepository userRepository;
   @Autowired CircleRepository circleRepository;
   @Autowired EntityPersister entityPersister;
@@ -163,26 +165,40 @@ class TestabilityRestController {
     private void buildNoteTree(
         User user,
         Ownership ownership,
+        String persistedNotebookName,
+        Notebook notebookFromRepositoryOrNull,
+        Timestamp currentUTCTimestamp,
         Map<String, Note> titleNoteMap,
         NoteRepository noteRepository,
         EntityPersister entityPersister) {
-      long headNoteCount =
-          noteTestData.stream().filter(injection -> Strings.isBlank(injection.parentTitle)).count();
-      noteTestData.forEach(
-          injection -> {
-            Note note = titleNoteMap.get(injection.title);
-
-            if (Strings.isBlank(injection.parentTitle)) {
-              note.buildNotebookForHeadNote(ownership, user);
-              if (headNoteCount == 1 && !Strings.isBlank(notebookName)) {
-                note.getNotebook().setPersistedNotebookName(notebookName);
-              }
-              entityPersister.save(note.getNotebook());
-            } else {
-              note.setParentNote(
-                  getParentNote(titleNoteMap, noteRepository, injection.parentTitle));
-            }
-          });
+      Note firstHeadCreatedInBatch = null;
+      for (NoteTestData injection : noteTestData) {
+        Note note = titleNoteMap.get(injection.title);
+        if (!Strings.isBlank(injection.parentTitle)) {
+          note.setParentNote(getParentNote(titleNoteMap, noteRepository, injection.parentTitle));
+          continue;
+        }
+        if (notebookFromRepositoryOrNull != null) {
+          Note head = notebookFromRepositoryOrNull.getHeadNote();
+          if (head == null) {
+            throw new RuntimeException(
+                "Notebook `"
+                    + persistedNotebookName
+                    + "` has no head note; cannot inject notes without Parent Title.");
+          }
+          note.setParentNote(head);
+          continue;
+        }
+        if (firstHeadCreatedInBatch == null) {
+          note.buildNotebookForHeadNote(ownership, user);
+          note.getNotebook().setPersistedNotebookName(persistedNotebookName);
+          note.getNotebook().setUpdated_at(currentUTCTimestamp);
+          entityPersister.save(note.getNotebook());
+          firstHeadCreatedInBatch = note;
+        } else {
+          note.setParentNote(firstHeadCreatedInBatch);
+        }
+      }
     }
 
     private Note getParentNote(
@@ -205,6 +221,14 @@ class TestabilityRestController {
     }
   }
 
+  @Schema(name = "ShareToBazaarRequest")
+  @Getter
+  @Setter
+  static class ShareToBazaarRequest {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String notebookName;
+  }
+
   @PostMapping("/inject_notes")
   @Transactional
   public Map<String, Integer> injectNotes(@RequestBody NotesTestData notesTestData) {
@@ -218,9 +242,31 @@ class TestabilityRestController {
     Ownership ownership = getOwnership(notesTestData, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
+    Notebook notebookFromRepository =
+        notebookRepository
+            .findFirstByPersistedNotebookNameAndDeletedAtIsNullOrderByIdAsc(
+                notesTestData.notebookName)
+            .map(
+                nb -> {
+                  if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
+                    throw new RuntimeException(
+                        "Notebook named `"
+                            + notesTestData.notebookName
+                            + "` exists but belongs to different ownership.");
+                  }
+                  return nb;
+                })
+            .orElse(null);
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
     notesTestData.buildNoteTree(
-        user, ownership, titleNoteMap, this.noteRepository, this.entityPersister);
+        user,
+        ownership,
+        notesTestData.notebookName,
+        notebookFromRepository,
+        currentUTCTimestamp,
+        titleNoteMap,
+        this.noteRepository,
+        this.entityPersister);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister, this.wikiSlugPathService);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));
@@ -277,9 +323,19 @@ class TestabilityRestController {
 
   @PostMapping("/share_to_bazaar")
   @Transactional
-  public String shareToBazaar(@RequestBody HashMap<String, String> map) {
-    Note note = noteRepository.findFirstByTitle(map.get("noteTopology"));
-    bazaarService.shareNotebook(note.getNotebook());
+  public String shareToBazaar(@RequestBody ShareToBazaarRequest request) {
+    if (Strings.isEmpty(request.getNotebookName())) {
+      throw new IllegalArgumentException("notebookName is required and cannot be empty");
+    }
+    Notebook notebook =
+        notebookRepository
+            .findFirstByPersistedNotebookNameAndDeletedAtIsNullOrderByIdAsc(
+                request.getNotebookName())
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "No notebook with name: " + request.getNotebookName()));
+    bazaarService.shareNotebook(notebook);
     return "OK";
   }
 

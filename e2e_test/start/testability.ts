@@ -384,8 +384,8 @@ const testability = () => {
       )
     },
 
-    shareToBazaar(noteTopology: string) {
-      const requestBody = { noteTopology }
+    shareToBazaar(notebookName: string) {
+      const requestBody = { notebookName }
 
       return cy.wrap(
         TestabilityRestController.shareToBazaar({

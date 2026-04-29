@@ -22,7 +22,7 @@ class Testability {
     expect((jsonDecode(response.body) as List).length, 1);
 
     http.Response response1 = await testabilityPost('share_to_bazaar',
-        bodyObject: {'noteTitle': notebookName});
+        bodyObject: {'notebookName': notebookName});
     expect(response1.body, 'OK');
   }
 

@@ -104,6 +104,10 @@ export type TimeTravel = {
     travel_to?: string;
 };
 
+export type ShareToBazaarRequest = {
+    notebookName: string;
+};
+
 export type Randomization = {
     choose?: 'first' | 'last' | 'seed';
     seed?: number;
@@ -1141,9 +1145,7 @@ export type TestabilityUpdateUserResponses = {
 export type TestabilityUpdateUserResponse = TestabilityUpdateUserResponses[keyof TestabilityUpdateUserResponses];
 
 export type ShareToBazaarData = {
-    body: {
-        [key: string]: string;
-    };
+    body: ShareToBazaarRequest;
     path?: never;
     query?: never;
     url: '/api/testability/share_to_bazaar';

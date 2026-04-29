@@ -120,7 +120,7 @@ Given(
       .testability()
       .injectNotes([{ Title: noteTitle }], externalIdentifier, notebookName)
       .then(() => {
-        return start.testability().shareToBazaar(noteTitle)
+        return start.testability().shareToBazaar(notebookName)
       })
   }
 )
