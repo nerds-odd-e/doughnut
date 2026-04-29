@@ -6,8 +6,11 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
+import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
@@ -27,6 +30,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
   @Autowired private SubscriptionRepository subscriptionRepository;
   @Autowired SubscriptionController controller;
   @Autowired NotebookGroupService notebookGroupService;
+  @Autowired ObjectMapper objectMapper;
   private Note topNote;
   private Notebook notebook;
 
@@ -44,6 +48,24 @@ class SubscriptionControllerTest extends ControllerTestBase {
     Subscription result = controller.createSubscription(notebook, subscription);
     assertEquals(topNote, result.getHeadNote());
     assertEquals(currentUser.getUser(), result.getUser());
+  }
+
+  @Test
+  void createdSubscriptionForCircleNotebookCanBeSerialized() throws Exception {
+    User user = currentUser.getUser();
+    Circle circle = makeMe.aCircle().hasMember(user).please();
+    Notebook circleNotebook =
+        makeMe
+            .refresh(makeMe.aNote("Circle notebook").creator(user).inCircle(circle).please())
+            .getNotebook();
+
+    SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
+    subscriptionDTO.setDailyTargetOfNewNotes(1);
+    Subscription result = controller.createSubscription(circleNotebook, subscriptionDTO);
+
+    JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(result));
+    assertThat(json.has("headNote"), equalTo(false));
+    assertThat(json.get("dailyTargetOfNewNotes").asInt(), equalTo(1));
   }
 
   @Test

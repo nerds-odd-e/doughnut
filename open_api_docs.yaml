@@ -3662,81 +3662,6 @@ components:
         dailyTargetOfNewNotes:
           type: integer
           format: int32
-    Note:
-      type: object
-      properties:
-        noteTopology:
-          $ref: "#/components/schemas/NoteTopology"
-        details:
-          type: string
-        parentId:
-          type: integer
-          format: int32
-        updatedAt:
-          type: string
-          format: date-time
-        id:
-          type: integer
-          format: int32
-        createdAt:
-          type: string
-          format: date-time
-        deletedAt:
-          type: string
-          format: date-time
-          readOnly: true
-        wikidataId:
-          type: string
-        notebookInRestoreAsHeadNote:
-          $ref: "#/components/schemas/Notebook"
-          writeOnly: true
-      required:
-      - createdAt
-      - id
-      - noteTopology
-      - updatedAt
-    NoteTopology:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        slug:
-          type: string
-        title:
-          type: string
-        shortDetails:
-          type: string
-        relationType:
-          type: string
-          enum:
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
-        targetNoteTopology:
-          $ref: "#/components/schemas/NoteTopology"
-        parentOrSubjectNoteTopology:
-          $ref: "#/components/schemas/NoteTopology"
-        notebookId:
-          type: integer
-          format: int32
-        notebookTitle:
-          type: string
-      required:
-      - id
-      - notebookId
-      - slug
     Notebook:
       type: object
       properties:
@@ -3780,8 +3705,6 @@ components:
     Subscription:
       type: object
       properties:
-        headNote:
-          $ref: "#/components/schemas/Note"
         title:
           type: string
         id:
@@ -3830,6 +3753,39 @@ components:
           - confused with
       required:
       - relationType
+    Note:
+      type: object
+      properties:
+        noteTopology:
+          $ref: "#/components/schemas/NoteTopology"
+        details:
+          type: string
+        parentId:
+          type: integer
+          format: int32
+        updatedAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        wikidataId:
+          type: string
+        notebookInRestoreAsHeadNote:
+          $ref: "#/components/schemas/Notebook"
+          writeOnly: true
+      required:
+      - createdAt
+      - id
+      - noteTopology
+      - updatedAt
     NoteRealm:
       type: object
       properties:
@@ -3856,6 +3812,48 @@ components:
       - id
       - note
       - notebook
+      - slug
+    NoteTopology:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        slug:
+          type: string
+        title:
+          type: string
+        shortDetails:
+          type: string
+        relationType:
+          type: string
+          enum:
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+        targetNoteTopology:
+          $ref: "#/components/schemas/NoteTopology"
+        parentOrSubjectNoteTopology:
+          $ref: "#/components/schemas/NoteTopology"
+        notebookId:
+          type: integer
+          format: int32
+        notebookTitle:
+          type: string
+      required:
+      - id
+      - notebookId
       - slug
     NoteMoveDTO:
       type: object

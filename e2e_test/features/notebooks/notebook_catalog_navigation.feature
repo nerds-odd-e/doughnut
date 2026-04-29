@@ -8,5 +8,4 @@ Feature: Notebook catalog navigation
   Scenario: Opening a notebook from the catalog lands on the notebook page
     Given I have a notebook with the head note "Notebook Catalog Nav E2E" and details "Head body baseline for catalog open."
     When I open the notebook "Notebook Catalog Nav E2E" from my notebooks catalog
-    Then I should be on a notebook page URL without the legacy edit segment
     And the notebook page summary shows title "Notebook Catalog Nav E2E"

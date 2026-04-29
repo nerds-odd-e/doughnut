@@ -15,7 +15,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "subscription")
-@JsonPropertyOrder({"headNote", "title", "shortDescription"})
+@JsonPropertyOrder({"title", "shortDescription"})
 public class Subscription extends EntityIdentifiedByIdOnly {
   @Column(name = "daily_target_of_new_notes")
   @Getter
@@ -45,6 +45,7 @@ public class Subscription extends EntityIdentifiedByIdOnly {
     return notebook.getTitle();
   }
 
+  @JsonIgnore
   public Note getHeadNote() {
     return notebook.getHeadNote();
   }

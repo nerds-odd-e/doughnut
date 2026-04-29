@@ -172,29 +172,6 @@ export type SubscriptionDto = {
     dailyTargetOfNewNotes?: number;
 };
 
-export type Note = {
-    noteTopology: NoteTopology;
-    details?: string;
-    parentId?: number;
-    updatedAt: string;
-    id: number;
-    createdAt: string;
-    readonly deletedAt?: string;
-    wikidataId?: string;
-};
-
-export type NoteTopology = {
-    id: number;
-    slug: string;
-    title?: string;
-    shortDetails?: string;
-    relationType?: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
-    targetNoteTopology?: NoteTopology;
-    parentOrSubjectNoteTopology?: NoteTopology;
-    notebookId: number;
-    notebookTitle?: string;
-};
-
 export type Notebook = {
     id: number;
     certifiable?: boolean;
@@ -214,7 +191,6 @@ export type NotebookSettings = {
 };
 
 export type Subscription = {
-    headNote?: Note;
     title?: string;
     id: number;
     dailyTargetOfNewNotes?: number;
@@ -232,6 +208,17 @@ export type RelationshipCreation = {
     relationType: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
 };
 
+export type Note = {
+    noteTopology: NoteTopology;
+    details?: string;
+    parentId?: number;
+    updatedAt: string;
+    id: number;
+    createdAt: string;
+    readonly deletedAt?: string;
+    wikidataId?: string;
+};
+
 export type NoteRealm = {
     id: number;
     slug: string;
@@ -240,6 +227,18 @@ export type NoteRealm = {
     children?: Array<Note>;
     inboundReferences?: Array<Note>;
     notebook: Notebook;
+};
+
+export type NoteTopology = {
+    id: number;
+    slug: string;
+    title?: string;
+    shortDetails?: string;
+    relationType?: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
+    targetNoteTopology?: NoteTopology;
+    parentOrSubjectNoteTopology?: NoteTopology;
+    notebookId: number;
+    notebookTitle?: string;
 };
 
 export type NoteMoveDto = {
@@ -863,6 +862,15 @@ export type NotesTestDataWritable = {
     circleName?: string;
 };
 
+export type SubscriptionWritable = {
+    title?: string;
+    id: number;
+    dailyTargetOfNewNotes?: number;
+    user?: User;
+    notebook?: Notebook;
+    fromDTO?: SubscriptionDto;
+};
+
 export type NoteWritable = {
     noteTopology: NoteTopology;
     details?: string;
@@ -872,16 +880,6 @@ export type NoteWritable = {
     createdAt: string;
     wikidataId?: string;
     notebookInRestoreAsHeadNote?: Notebook;
-};
-
-export type SubscriptionWritable = {
-    headNote?: NoteWritable;
-    title?: string;
-    id: number;
-    dailyTargetOfNewNotes?: number;
-    user?: User;
-    notebook?: Notebook;
-    fromDTO?: SubscriptionDto;
 };
 
 export type NoteRealmWritable = {

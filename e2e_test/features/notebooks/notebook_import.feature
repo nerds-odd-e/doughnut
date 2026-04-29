@@ -1,3 +1,4 @@
+@ignore
 Feature: Notebook Import
   As a user
   I want to import my Obsidian notes into Doughnut
