@@ -14,7 +14,7 @@ class NotebookCatalogNotebookItemBuilder extends Builder<NotebookCatalogNotebook
     return this
   }
 
-  title(value: string) {
+  name(value: string) {
     this.notebookBuilder.notebuilder.title(value)
     return this
   }

@@ -6,7 +6,7 @@ function compareTitles(a: string, b: string): number {
 }
 
 function compareNotebooks(a: Notebook, b: Notebook): number {
-  const t = compareTitles(a.title ?? "", b.title ?? "")
+  const t = compareTitles(a.name ?? "", b.name ?? "")
   if (t !== 0) {
     return t
   }
@@ -15,7 +15,7 @@ function compareNotebooks(a: Notebook, b: Notebook): number {
 
 function topLevelName(item: NotebookCatalogEntry): string {
   if (item.type === "notebook" || item.type === "subscribedNotebook") {
-    return item.notebook.title ?? ""
+    return item.notebook.name ?? ""
   }
   return item.name
 }

@@ -11,9 +11,12 @@ const noteCreationForm = {
     })
   },
 
-  createNotebookWithTitleAndDescription(title: string, description: string) {
+  createNotebookWithNameAndDescription(
+    notebookName: string,
+    description: string
+  ) {
     return submittableForm.submitWith({
-      Title: title,
+      Title: notebookName,
       Description: description,
     })
   },

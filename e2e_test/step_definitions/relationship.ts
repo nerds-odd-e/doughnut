@@ -100,10 +100,10 @@ When(
 
 Then(
   'I should see notebook {string} in search results',
-  (notebookTitle: string) => {
+  (notebookName: string) => {
     start
       .assumeNoteTargetSearchDialog()
-      .expectNotebookTitleInSearchResults(notebookTitle)
+      .expectNotebookNameInSearchResults(notebookName)
   }
 )
 

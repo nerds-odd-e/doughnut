@@ -19,7 +19,7 @@ import lombok.Setter;
   "totalQuestionCount",
   "answersCorrect",
   "notebookId",
-  "notebookTitle",
+  "notebookName",
   "submittedAt",
   "isPass",
   "isCertifiable"
@@ -52,8 +52,8 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
     return getNotebook().getId();
   }
 
-  public String getNotebookTitle() {
-    return getNotebook().getTitle();
+  public String getNotebookName() {
+    return getNotebook().getName();
   }
 
   public Boolean getIsPass() {

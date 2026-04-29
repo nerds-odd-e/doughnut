@@ -24,8 +24,8 @@ import {
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
-function notebookWithTitle(title: string) {
-  return makeMe.aNotebook.headNote(makeMe.aNote.title(title).please()).do()
+function notebookWithName(name: string) {
+  return makeMe.aNotebook.headNote(makeMe.aNote.title(name).please()).do()
 }
 
 function UseNotebookStageTestShell(props: { readonly argument?: string }) {
@@ -138,7 +138,7 @@ describe('useNotebookSlashCommand stage', () => {
 
   test('active stage /exit clears notebook shell and records assistant line', async () => {
     myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [notebookWithTitle('Top Maths')] },
+      data: { notebooks: [notebookWithName('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
     const { stdin, lastStrippedFrame, waitForFramesToInclude } =
@@ -150,9 +150,9 @@ describe('useNotebookSlashCommand stage', () => {
     expect(lastStrippedFrame()).not.toContain('Active notebook: Top Maths')
   })
 
-  test('unknown notebook title shows error and does not enter stage', async () => {
+  test('unknown notebook name shows error and does not enter stage', async () => {
     myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [notebookWithTitle('Other')] },
+      data: { notebooks: [notebookWithName('Other')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
     const result = render(notebookStageTestAppElement('Missing Notebook'))
@@ -161,10 +161,10 @@ describe('useNotebookSlashCommand stage', () => {
       ...extendInkRenderForInteractiveTests(result),
     }
 
-    await waitForFramesToInclude('No notebook found with that title.')
+    await waitForFramesToInclude('No notebook found with that name.')
 
     const combined = stripAnsi(frames.join('\n'))
-    expect(combined).toContain('No notebook found with that title.')
+    expect(combined).toContain('No notebook found with that name.')
     expect(combined).not.toContain('Active notebook: Missing Notebook')
     expect(lastStrippedFrame()).not.toContain('Active notebook:')
   })
@@ -220,10 +220,10 @@ describe('useNotebookSlashCommand stage', () => {
     expect(combined).toContain('Cancelled.')
   })
 
-  test('duplicate notebook titles show ambiguity error', async () => {
+  test('duplicate notebook names show ambiguity error', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithTitle('Same'), notebookWithTitle('Same')],
+        notebooks: [notebookWithName('Same'), notebookWithName('Same')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -240,7 +240,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('bare /use shows picker; Enter selects first notebook', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithTitle('Alpha'), notebookWithTitle('Beta')],
+        notebooks: [notebookWithName('Alpha'), notebookWithName('Beta')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -254,7 +254,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('bare /use picker: Down + Enter selects second notebook', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithTitle('Alpha'), notebookWithTitle('Beta')],
+        notebooks: [notebookWithName('Alpha'), notebookWithName('Beta')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -288,7 +288,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('bare /use Esc on picker settles Cancelled', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithTitle('Alpha'), notebookWithTitle('Beta')],
+        notebooks: [notebookWithName('Alpha'), notebookWithName('Beta')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -308,9 +308,9 @@ describe('useNotebookSlashCommand stage', () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
         notebooks: [
-          notebookWithTitle('Alpha'),
-          notebookWithTitle('Beta'),
-          notebookWithTitle('Alpaca'),
+          notebookWithName('Alpha'),
+          notebookWithName('Beta'),
+          notebookWithName('Alpaca'),
         ],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
@@ -340,9 +340,9 @@ describe('useNotebookSlashCommand stage', () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
         notebooks: [
-          notebookWithTitle('Alpha'),
-          notebookWithTitle('Beta'),
-          notebookWithTitle('Alpaca'),
+          notebookWithName('Alpha'),
+          notebookWithName('Beta'),
+          notebookWithName('Alpaca'),
         ],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)

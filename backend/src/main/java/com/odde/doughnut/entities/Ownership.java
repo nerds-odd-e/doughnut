@@ -72,7 +72,7 @@ public class Ownership {
     if (titleConstructor != null) {
       String trimmed = titleConstructor.trim();
       if (!trimmed.isEmpty()) {
-        notebook.setPersistedNotebookName(
+        notebook.setName(
             trimmed.length() > Note.MAX_TITLE_LENGTH
                 ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
                 : trimmed);

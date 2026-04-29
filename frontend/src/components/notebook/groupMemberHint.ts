@@ -34,12 +34,12 @@ export function groupCatalogMemberPreviewHint(args: {
     subtitle = total === 1 ? "1 notebook" : `${total} notebooks`
   }
 
-  const titles = notebooks.map((nb) => nb.title ?? "Untitled")
-  const titlesForAria =
-    titles.length <= 12
-      ? titles.join(", ")
-      : `${titles.slice(0, 12).join(", ")}, and ${titles.length - 12} more`
-  const ariaLabel = `${groupName} notebook group. ${subtitle}. Members: ${titlesForAria}.`
+  const names = notebooks.map((nb) => nb.name ?? "Untitled")
+  const namesForAria =
+    names.length <= 12
+      ? names.join(", ")
+      : `${names.slice(0, 12).join(", ")}, and ${names.length - 12} more`
+  const ariaLabel = `${groupName} notebook group. ${subtitle}. Members: ${namesForAria}.`
 
   return { subtitle, ariaLabel }
 }

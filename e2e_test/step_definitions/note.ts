@@ -143,7 +143,7 @@ Given(
   'there are questions in the notebook {string} for the note:',
   (notebook: string, data: DataTable) => {
     start.testability().injectPredefinedQuestionsToNotebook({
-      notebookTitle: notebook,
+      notebookName: notebook,
       predefinedQuestionTestData: data.hashes(),
     })
   }
@@ -171,8 +171,8 @@ Given(
 
 When(
   'I create a notebook with title {string} and description {string}',
-  (notebookTitle: string, description: string) => {
-    start.navigateToNotebooksPage().creatingNotebook(notebookTitle, description)
+  (notebookName: string, description: string) => {
+    start.navigateToNotebooksPage().creatingNotebook(notebookName, description)
   }
 )
 

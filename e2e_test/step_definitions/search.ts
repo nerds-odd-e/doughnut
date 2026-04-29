@@ -2,6 +2,6 @@
 import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-Given('I reindex the notebook {string}', (notebookTitle: string) => {
-  start.navigateToNotebookPage(notebookTitle).reindexNotebook()
+Given('I reindex the notebook {string}', (notebookName: string) => {
+  start.navigateToNotebookPage(notebookName).reindexNotebook()
 })

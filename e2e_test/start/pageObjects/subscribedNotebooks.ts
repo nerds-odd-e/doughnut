@@ -6,14 +6,14 @@ import { pageIsNotLoading } from '../pageBase'
 export const subscribedNotebooks = () => {
   pageIsNotLoading()
 
-  const openOverflowOnSubscribedCard = (notebookTitle: string) => {
+  const openOverflowOnSubscribedCard = (notebookName: string) => {
     cy.get('[data-cy="notebook-card"]')
       .filter((_index, card) => {
         const $card = Cypress.$(card)
         const titleMatch = $card
           .find('.notebook-card h5')
           .toArray()
-          .some((h) => h.textContent?.trim() === notebookTitle)
+          .some((h) => h.textContent?.trim() === notebookName)
         if (!titleMatch) return false
         return $card.find('button[title="Edit subscription"]').length > 0
       })
@@ -25,40 +25,40 @@ export const subscribedNotebooks = () => {
   }
 
   return {
-    card(notebookTitle: string) {
+    card(notebookName: string) {
       return {
         openMoveToGroupDialog() {
           pageIsNotLoading()
-          openOverflowOnSubscribedCard(notebookTitle)
+          openOverflowOnSubscribedCard(notebookName)
           cy.get('@subscribedCatalogCard')
             .findByRole('button', { name: 'Move to group…' })
             .click()
         },
       }
     },
-    expectNotebook(notebookTitle: string) {
+    expectNotebook(notebookName: string) {
       cy.get('main').within(() => {
-        cy.findByText(notebookTitle, {
+        cy.findByText(notebookName, {
           selector: '.notebook-card h5',
         }).should(($el) => {
           expect(
             $el.length,
-            `Expected to find subscribed notebook "${notebookTitle}" in the notebook catalog, but it was not found`
+            `Expected to find subscribed notebook "${notebookName}" in the notebook catalog, but it was not found`
           ).to.be.greaterThan(0)
         })
       })
     },
-    expectNotebookNotPresent(notebookTitle: string) {
+    expectNotebookNotPresent(notebookName: string) {
       cy.get('main').within(() => {
-        cy.findByText(notebookTitle, { selector: '.notebook-card h5' }).should(
+        cy.findByText(notebookName, { selector: '.notebook-card h5' }).should(
           'not.exist'
         )
       })
     },
-    openNotebook(notebookTitle: string) {
+    openNotebook(notebookName: string) {
       pageIsNotLoading()
       cy.get('main').within(() => {
-        cy.findByText(notebookTitle, {
+        cy.findByText(notebookName, {
           selector: '.notebook-card h5',
         })
           .should('be.visible')

@@ -25,7 +25,7 @@ public class NoteTopology {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer notebookId;
 
-  private String notebookTitle;
+  private String notebookName;
 
   public int getId() {
     return this.id;

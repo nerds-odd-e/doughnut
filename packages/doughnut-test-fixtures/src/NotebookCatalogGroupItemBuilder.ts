@@ -27,10 +27,10 @@ class NotebookCatalogGroupItemBuilder extends Builder<NotebookCatalogGroupItem> 
     return this
   }
 
-  titles(...memberTitles: string[]) {
-    for (const t of memberTitles) {
+  names(...memberNames: string[]) {
+    for (const n of memberNames) {
       const nb = new NotebookBuilder()
-      nb.notebuilder.title(t)
+      nb.notebuilder.title(n)
       this.memberNotebooks.push(nb.do())
     }
     return this

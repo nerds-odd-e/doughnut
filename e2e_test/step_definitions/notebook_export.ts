@@ -11,12 +11,12 @@ import start from '../start'
 //   start.loginAs('old_learner')
 // })
 
-Given('I have a notebook titled {string}', (notebookTitle: string) => {
+Given('I have a notebook named {string}', (notebookName: string) => {
   // Following the pattern from note.ts where notes are injected
   cy.get<string>('@currentLoginUser').then((username) => {
     start
       .testability()
-      .injectNotes([{ Title: notebookTitle }], username, notebookTitle)
+      .injectNotes([{ Title: notebookName }], username, notebookName)
   })
 })
 
@@ -34,8 +34,8 @@ Given('the notebook contains the following notes', (notesTable: DataTable) => {
 })
 
 // Additional steps needed for the feature
-When('I select the {string} notebook', (notebookTitle: string) => {
-  start.jumpToNotePage(notebookTitle)
+When('I select the {string} notebook', (notebookName: string) => {
+  start.jumpToNotePage(notebookName)
 })
 
 When(

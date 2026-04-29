@@ -69,8 +69,8 @@ When(
 
 When(
   'I subscribe to notebook {string} in the circle {string}, with target of learning {int} notes per day',
-  (notebookTitle: string, circleName: string, count: string) => {
-    start.navigateToCircle(circleName).subscribe(notebookTitle, count)
+  (notebookName: string, circleName: string, count: string) => {
+    start.navigateToCircle(circleName).subscribe(notebookName, count)
   }
 )
 
@@ -84,10 +84,10 @@ Then('I should see circle notebook catalog layout controls', () => {
 
 When(
   'I create a notebook group named {string} by moving notebook {string} from the circle catalog',
-  (groupName: string, notebookTitle: string) => {
+  (groupName: string, notebookName: string) => {
     start
       .assumeCirclePage()
-      .creatingNotebookGroupFromCatalogMove(notebookTitle, groupName)
+      .creatingNotebookGroupFromCatalogMove(notebookName, groupName)
   }
 )
 

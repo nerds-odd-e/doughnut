@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.utils.Randomizer;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import org.springframework.lang.NonNull;
   "certifiable",
   "notebookSettings",
   "creatorId",
-  "title",
+  "name",
   "circle",
   "description",
   "hasAttachedBook"
@@ -97,10 +98,16 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   private String description;
 
   @Column(name = "name")
-  @Getter
-  @Setter
-  @JsonIgnore
-  private String persistedNotebookName;
+  private String name;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  public String getName() {
+    return name == null ? "" : name;
+  }
+
+  public void setName(String name) {
+    this.name = name == null ? "" : name;
+  }
 
   @Transient
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -158,14 +165,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
           "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
     return questions;
-  }
-
-  @NonNull
-  public String getTitle() {
-    if (persistedNotebookName != null && !persistedNotebookName.isBlank()) {
-      return persistedNotebookName;
-    }
-    return "";
   }
 
   @Hidden

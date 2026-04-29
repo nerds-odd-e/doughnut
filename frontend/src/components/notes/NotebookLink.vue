@@ -4,7 +4,7 @@
     class="daisy-text-decoration-none"
   >
     <BookText class="me-1 w-4 h-4 inline-block" />
-    <span>{{ notebook.title }}</span>
+    <span>{{ notebook.name }}</span>
   </router-link>
 </template>
 

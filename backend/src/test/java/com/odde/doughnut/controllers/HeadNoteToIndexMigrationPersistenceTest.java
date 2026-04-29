@@ -65,7 +65,7 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
   }
 
   @Test
-  void headToIndexMigration_preservesNotebookTitleAndResolvesIndexSlug()
+  void headToIndexMigration_preservesNotebookNameAndResolvesIndexSlug()
       throws UnexpectedNoAccessRightException {
     User user = makeMe.aUser().please();
     currentUser.setUser(user);

@@ -31,11 +31,11 @@ describe("Notebooks Page", () => {
     it("should update notebook in the list when notebook-updated event is emitted", async () => {
       const originalNotebook = {
         ...makeMe.aNotebook.please(),
-        title: "Original Title",
+        name: "Original Title",
       }
       const updatedNotebook = {
         ...originalNotebook,
-        title: "Updated Title",
+        name: "Updated Title",
         notebookSettings: {
           ...originalNotebook.notebookSettings,
           numberOfQuestionsInAssessment: 10,
@@ -67,7 +67,7 @@ describe("Notebooks Page", () => {
       expect(vm.catalogItems).toHaveLength(1)
       expect(vm.catalogItems?.[0]?.type).toBe("notebook")
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.title).toBe("Original Title")
+        expect(vm.catalogItems[0].notebook.name).toBe("Original Title")
       }
 
       // Find and trigger the notebook-updated event
@@ -77,23 +77,23 @@ describe("Notebooks Page", () => {
 
       // Verify the notebook was updated
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.title).toBe("Updated Title")
+        expect(vm.catalogItems[0].notebook.name).toBe("Updated Title")
       }
     })
 
     it("should handle notebook-updated event when notebooks array is populated", async () => {
       const notebook1 = {
         ...makeMe.aNotebook.please(),
-        title: "Notebook 1",
+        name: "Notebook 1",
       }
       const notebook2 = {
         ...makeMe.aNotebook.please(),
-        title: "Notebook 2",
+        name: "Notebook 2",
       }
 
       const updatedNotebook1 = {
         ...notebook1,
-        title: "Updated Notebook 1",
+        name: "Updated Notebook 1",
       }
 
       mockSdkService("myNotebooks", {
@@ -119,7 +119,7 @@ describe("Notebooks Page", () => {
       expect(vm.catalogItems).toHaveLength(2)
       expect(vm.catalogItems?.[0]?.type).toBe("notebook")
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.title).toBe("Notebook 1")
+        expect(vm.catalogItems[0].notebook.name).toBe("Notebook 1")
       }
 
       // Emit notebook-updated event
@@ -133,10 +133,10 @@ describe("Notebooks Page", () => {
 
       expect(vm.catalogItems).toHaveLength(2)
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.title).toBe("Updated Notebook 1")
+        expect(vm.catalogItems[0].notebook.name).toBe("Updated Notebook 1")
       }
       if (vm.catalogItems?.[1]?.type === "notebook") {
-        expect(vm.catalogItems[1].notebook.title).toBe("Notebook 2")
+        expect(vm.catalogItems[1].notebook.name).toBe("Notebook 2")
       }
     })
 
@@ -170,11 +170,11 @@ describe("Notebooks Page", () => {
     it("should handle event from NotebookButtons", async () => {
       const originalNotebook = {
         ...makeMe.aNotebook.please(),
-        title: "Before Update",
+        name: "Before Update",
       }
       const updatedNotebook = {
         ...originalNotebook,
-        title: "After Update",
+        name: "After Update",
       }
 
       mockSdkService("myNotebooks", {
@@ -198,7 +198,7 @@ describe("Notebooks Page", () => {
       }
 
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.title).toBe("Before Update")
+        expect(vm.catalogItems[0].notebook.name).toBe("Before Update")
       }
 
       // Simulate event from NotebookButtons
@@ -207,14 +207,14 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.title).toBe("After Update")
+        expect(vm.catalogItems[0].notebook.name).toBe("After Update")
       }
     })
 
     it("patches grouped notebook in catalogItems when notebook-updated fires", async () => {
       const member = {
         ...makeMe.aNotebook.please(),
-        title: "Member Title",
+        name: "Member Title",
       }
       const catalogItems = [
         makeMe.notebookCatalogGroup
@@ -243,7 +243,7 @@ describe("Notebooks Page", () => {
         catalogItems: NotebookCatalogEntry[] | undefined
       }
 
-      const updated = { ...member, title: "Renamed Member" }
+      const updated = { ...member, name: "Renamed Member" }
       const buttons = wrapper.findComponent({ name: "NotebookButtons" })
       buttons.vm.$emit("notebook-updated", updated)
       await flushPromises()
@@ -251,19 +251,19 @@ describe("Notebooks Page", () => {
       const grp = vm.catalogItems?.[0]
       expect(grp?.type).toBe("notebookGroup")
       if (grp?.type === "notebookGroup") {
-        expect(grp.notebooks[0]?.title).toBe("Renamed Member")
+        expect(grp.notebooks[0]?.name).toBe("Renamed Member")
       }
     })
 
     it("preserves hasAttachedBook when notebook-updated payload omits it", async () => {
       const originalNotebook = {
         ...makeMe.aNotebook.please(),
-        title: "T",
+        name: "T",
         hasAttachedBook: true,
       }
       const { hasAttachedBook, ...updatedNotebook } = {
         ...originalNotebook,
-        title: "Updated",
+        name: "Updated",
       }
       expect(hasAttachedBook).toBe(true)
 
@@ -293,7 +293,7 @@ describe("Notebooks Page", () => {
 
       if (vm.catalogItems?.[0]?.type === "notebook") {
         expect(vm.catalogItems[0].notebook.hasAttachedBook).toBe(true)
-        expect(vm.catalogItems[0].notebook.title).toBe("Updated")
+        expect(vm.catalogItems[0].notebook.name).toBe("Updated")
       }
     })
   })
@@ -372,7 +372,7 @@ describe("Notebooks Page", () => {
 
   describe("catalog overflow menu", () => {
     it("offers move to group without edit notebook settings", async () => {
-      const nb = { ...makeMe.aNotebook.please(), title: "Owned Catalog" }
+      const nb = { ...makeMe.aNotebook.please(), name: "Owned Catalog" }
       mockSdkService("myNotebooks", {
         notebooks: [nb],
         catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
@@ -519,7 +519,7 @@ describe("Notebooks Page", () => {
           .name("Big Group")
           .id(1)
           .createdAt("2020-01-01T00:00:00.000Z")
-          .titles("Member Alpha", "Member Beta", "Member Gamma", "Member Delta")
+          .names("Member Alpha", "Member Beta", "Member Gamma", "Member Delta")
           .please(),
       ]
 
@@ -556,7 +556,7 @@ describe("Notebooks Page", () => {
           .id(42)
           .name("Nav Group")
           .createdAt("2020-01-01T00:00:00.000Z")
-          .titles("Member One")
+          .names("Member One")
           .please(),
       ]
 
@@ -779,10 +779,10 @@ describe("Notebooks Page", () => {
     it("shows subscription actions for a top-level subscribedNotebook row", async () => {
       const subNotebook = {
         ...makeMe.aNotebook.please(),
-        title: "Bazaar Shared",
+        name: "Bazaar Shared",
       }
       const catalogItems = [
-        makeMe.notebookCatalogNotebook.title("Owned").please(),
+        makeMe.notebookCatalogNotebook.name("Owned").please(),
         makeMe.notebookCatalogSubscribedNotebook
           .forNotebook(subNotebook)
           .subscriptionId(42)
@@ -820,11 +820,11 @@ describe("Notebooks Page", () => {
     it("shows subscription actions for a subscribed member inside a group", async () => {
       const ownedMember = {
         ...makeMe.aNotebook.please(),
-        title: "Owned In Group",
+        name: "Owned In Group",
       }
       const subMember = {
         ...makeMe.aNotebook.please(),
-        title: "Subscribed In Group",
+        name: "Subscribed In Group",
       }
       const catalogItems = [
         makeMe.notebookCatalogGroup

@@ -30,7 +30,7 @@ describe("NotebookPageView.spec", () => {
   it("shows notebook name and description in summary without head-note navigation", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
-      title: "My Notebook Title",
+      name: "My Notebook Title",
       description: "A short message for the notebook.",
     }
     const wrapper = helper
@@ -47,10 +47,10 @@ describe("NotebookPageView.spec", () => {
     expect(summary.find("a").exists()).toBe(false)
   })
 
-  it("shows notebook title in summary without description block when description is absent", async () => {
+  it("shows notebook name in summary without description block when description is absent", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
-      title: "Title Only NB",
+      name: "Title Only NB",
       description: undefined,
     }
     const wrapper = helper

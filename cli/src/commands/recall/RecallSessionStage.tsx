@@ -23,13 +23,13 @@ import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrol
 const RECALL_NOTEBOOK_LINE_EMOJI = '📓'
 
 function RecallSessionChrome({
-  notebookTitle,
+  notebookName,
   children,
 }: {
-  readonly notebookTitle?: string
+  readonly notebookName?: string
   readonly children: ReactNode
 }) {
-  const trimmed = notebookTitle?.trim()
+  const trimmed = notebookName?.trim()
   const showNotebook = trimmed !== undefined && trimmed.length > 0
   return (
     <Box flexDirection="column">
@@ -282,7 +282,7 @@ export function RecallSessionStage({
 
   if (card.variant === 'mcq') {
     return (
-      <RecallSessionChrome notebookTitle={card.payload.notebookTitle}>
+      <RecallSessionChrome notebookName={card.payload.notebookName}>
         <RecallMcqStage
           key={card.payload.recallPromptId}
           payload={card.payload}
@@ -299,7 +299,7 @@ export function RecallSessionStage({
 
   if (card.variant === 'spelling-session') {
     return (
-      <RecallSessionChrome notebookTitle={card.payload.notebookTitle}>
+      <RecallSessionChrome notebookName={card.payload.notebookName}>
         <SpellingRecallStage
           key={card.payload.memoryTrackerId}
           payload={card.payload}
@@ -313,7 +313,7 @@ export function RecallSessionStage({
   }
 
   return (
-    <RecallSessionChrome notebookTitle={card.payload.notebookTitle}>
+    <RecallSessionChrome notebookName={card.payload.notebookName}>
       <JustReviewRecallStage
         payload={card.payload}
         inputBlockedRef={submittingRef}

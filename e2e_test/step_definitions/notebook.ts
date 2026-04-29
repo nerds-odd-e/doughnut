@@ -159,8 +159,8 @@ When(
 
 When(
   'I open the notebook {string} from my notebooks catalog',
-  (notebookTitle: string) => {
-    start.navigateToNotebookPage(notebookTitle)
+  (notebookName: string) => {
+    start.navigateToNotebookPage(notebookName)
   }
 )
 
@@ -175,8 +175,8 @@ Then('I should see popup {string}', (message: string) => {
   })
 })
 
-Then('the notebook page summary shows title {string}', (title: string) => {
+Then('the notebook page summary shows name {string}', (name: string) => {
   cy.get('[data-testid="notebook-page-summary"]')
     .find('h1')
-    .should('contain.text', title)
+    .should('contain.text', name)
 })

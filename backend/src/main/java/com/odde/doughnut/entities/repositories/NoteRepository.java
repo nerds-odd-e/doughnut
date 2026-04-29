@@ -26,10 +26,11 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
-              + " WHERE n.notebook.id = ("
-              + "SELECT nhn.notebook_id FROM NotebookHeadNote nhn WHERE nhn.head_note_id = (SELECT rn.id FROM Note rn WHERE rn.title = :title)"
-              + ") AND n.title = :key")
-  Note findFirstInNotebookByTitle(@Param("title") String notebookTitle, @Param("key") String key);
+              + " WHERE n.notebook.id IN ("
+              + "SELECT nb.id FROM Notebook nb WHERE nb.name = :notebookName AND nb.deletedAt IS NULL)"
+              + " AND n.title = :key")
+  Note findFirstInNotebookByName(
+      @Param("notebookName") String notebookName, @Param("key") String key);
 
   @Query(
       value = selectFromNote + searchForTitleLike + "  AND n.notebook.ownership.user.id = :userId")

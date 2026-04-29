@@ -147,7 +147,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
       assertThat(tree.has("headNoteId"), is(false));
       assertThat(tree.get("id").asInt(), equalTo(nb.getId()));
-      assertThat(tree.get("title").asText(), equalTo("API Shape NB"));
+      assertThat(tree.get("name").asText(), equalTo("API Shape NB"));
       assertThat(tree.get("description").asText(), equalTo("Blurb"));
     }
   }

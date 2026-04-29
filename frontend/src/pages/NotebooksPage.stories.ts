@@ -102,7 +102,7 @@ export const WithNotebookGroup: Story = {
           .id(9001)
           .name("Reading list")
           .createdAt("2024-06-01T12:00:00.000Z")
-          .titles("Member Alpha", "Member Beta", "Member Gamma", "Member Delta")
+          .names("Member Alpha", "Member Beta", "Member Gamma", "Member Delta")
           .please()
       )
       .please(),

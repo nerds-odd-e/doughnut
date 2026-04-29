@@ -42,7 +42,7 @@ const fetchData = async () => {
 const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
   if (
     await popups.confirm(
-      `Are you sure you want to remove "${bazaarNotebook.notebook.title}" from the bazaar?`
+      `Are you sure you want to remove "${bazaarNotebook.notebook.name}" from the bazaar?`
     )
   ) {
     const { data: updatedNotebooks, error } = await apiCallWithLoading(() =>

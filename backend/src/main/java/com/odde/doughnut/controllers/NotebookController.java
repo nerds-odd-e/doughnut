@@ -287,7 +287,7 @@ class NotebookController {
     return ResponseEntity.ok()
         .header(
             HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"" + sanitizeFileName(notebook.getTitle()) + "-obsidian.zip\"")
+            "attachment; filename=\"" + sanitizeFileName(notebook.getName()) + "-obsidian.zip\"")
         .header(HttpHeaders.CONTENT_TYPE, "application/zip")
         .body(zipBytes);
   }

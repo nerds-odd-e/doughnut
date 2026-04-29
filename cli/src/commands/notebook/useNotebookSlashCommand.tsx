@@ -27,7 +27,7 @@ import { UseNotebookPickerStage } from './useNotebookPickerStage.js'
 
 const STAGE_PLACEHOLDER = '`/exit` to leave notebook context.'
 
-const NOTEBOOK_NOT_FOUND = 'No notebook found with that title.'
+const NOTEBOOK_NOT_FOUND = 'No notebook found with that name.'
 
 const NO_NOTEBOOKS_MESSAGE = 'No notebooks found.'
 
@@ -57,7 +57,7 @@ function UseNotebookActiveShell({
 
   return (
     <Box flexDirection="column">
-      <Text>Active notebook: {notebook.title}</Text>
+      <Text>Active notebook: {notebook.name}</Text>
       <SlashCommandShellHost
         onRunSuccess={onRunSuccess}
         slashCommands={notebookStageSlashCommandsFor(notebook)}
@@ -92,13 +92,13 @@ function UseNotebookStage({
         })
       )
 
-      const matches = view.notebooks.filter((n: Notebook) => n.title === title)
+      const matches = view.notebooks.filter((n: Notebook) => n.name === title)
       if (matches.length === 0) {
         throw new Error(NOTEBOOK_NOT_FOUND)
       }
       if (matches.length > 1) {
         throw new Error(
-          `Multiple notebooks match "${title}". Rename one in the web app so the title is unique.`
+          `Multiple notebooks match "${title}". Rename one in the web app so the name is unique.`
         )
       }
       resolvedNotebookRef.current = matches[0]
@@ -174,15 +174,15 @@ function UseNotebookStage({
 
 const useNotebookDoc: CommandDoc = {
   name: '/use',
-  usage: '/use [<notebook title>]',
+  usage: '/use [<notebook name>]',
   description:
-    'Set the active notebook for book commands. Run without a title to pick from a list (type to narrow by title, case-insensitive substring). With a title, it must match one of your notebooks exactly (case-sensitive). Not found, auth, and network errors are shown as assistant errors.',
+    'Set the active notebook for book commands. Run without a name to pick from a list (type to narrow by name, case-insensitive substring). With a name, it must match one of your notebooks exactly (case-sensitive). Not found, auth, and network errors are shown as assistant errors.',
 }
 
 export const useNotebookSlashCommand: InteractiveSlashCommand = {
   literal: '/use',
   doc: useNotebookDoc,
-  argument: { name: 'notebook title', optional: true },
+  argument: { name: 'notebook name', optional: true },
   stageComponent: UseNotebookStage,
   stageIndicator: 'Notebook',
 }

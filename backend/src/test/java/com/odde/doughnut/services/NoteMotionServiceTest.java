@@ -331,7 +331,7 @@ public class NoteMotionServiceTest {
       assertThat(thirdLevel.getNotebook().getId(), equalTo(otherNotebook.getNotebook().getId()));
 
       assertThat(firstChild.getFolder(), notNullValue());
-      assertThat(firstChild.getFolder().getName(), equalTo(otherNotebook.getTitle()));
+      assertThat(firstChild.getFolder().getName(), equalTo(otherNotebook.getNotebook().getName()));
       assertThat(
           firstChild.getFolder().getNotebook().getId(),
           equalTo(otherNotebook.getNotebook().getId()));

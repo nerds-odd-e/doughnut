@@ -11,7 +11,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
 
   forNotebook(notebook: Notebook) {
     this.data.notebookId = notebook.id
-    this.data.notebookTitle = notebook.title
+    this.data.notebookName = notebook.name
 
     return this
   }
@@ -38,7 +38,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
       notebookId: generateId(),
       id,
       submittedAt: '2021-09-01T00:00:00Z',
-      notebookTitle: `Notebook ${id}`,
+      notebookName: `Notebook ${id}`,
       ...this.data,
     }
   }

@@ -31,15 +31,15 @@ export const assumeCirclePage = () => ({
     return this as any
   },
   creatingNotebookGroupFromCatalogMove(
-    notebookTitle: string,
+    notebookName: string,
     groupName: string
   ) {
-    findNotebookCardButton(notebookTitle, 'Move to group…').click()
+    findNotebookCardButton(notebookName, 'Move to group…').click()
     completeMoveNotebookToNewGroupDialog(groupName)
     return this as any
   },
-  moveNotebook(notebookTitle: string) {
-    clickNotebookCardTitleToOpenNotebookPage(notebookTitle)
+  moveNotebook(notebookName: string) {
+    clickNotebookCardTitleToOpenNotebookPage(notebookName)
     notebookPage().moveNotebookToCircle()
     return {
       toCircle(circleName: string) {

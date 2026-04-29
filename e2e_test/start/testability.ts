@@ -80,7 +80,7 @@ const testability = () => {
     },
 
     attachBookToNotebook(
-      notebookTitle: string,
+      notebookName: string,
       bookName: string,
       contentList: Array<unknown>
     ) {
@@ -88,7 +88,7 @@ const testability = () => {
         pageCountFromContentList(contentList),
         `contentList page range must match blank_${BLANK_BOOK_FIXTURE_PAGE_COUNT}_pages.pdf`
       ).to.equal(BLANK_BOOK_FIXTURE_PAGE_COUNT)
-      return this.getInjectedNoteIdByTitle(notebookTitle).then((noteId) =>
+      return this.getInjectedNoteIdByTitle(notebookName).then((noteId) =>
         cy
           .wrap(NoteController.showNote({ path: { note: noteId } }), {
             log: false,
@@ -227,7 +227,7 @@ const testability = () => {
           Approved: 'true',
         }))
       return this.injectPredefinedQuestionsToNotebook({
-        notebookTitle: notebook,
+        notebookName: notebook,
         notebookCertifiable,
         predefinedQuestionTestData: predefinedQuestion,
       })

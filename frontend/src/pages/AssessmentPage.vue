@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentLoaded: loaded, title: `Assessment For ${ assessmentAttempt?.notebookTitle }`}">
+  <ContainerPage v-bind="{ contentLoaded: loaded, title: `Assessment For ${ assessmentAttempt?.notebookName }`}">
     <Assessment v-if="assessmentAttempt" :assessment-attempt="assessmentAttempt" />
   </ContainerPage>
   <div v-if="errors" class="daisy-alert daisy-alert-danger">{{ errors }}</div>

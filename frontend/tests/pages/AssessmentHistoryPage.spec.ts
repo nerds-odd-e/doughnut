@@ -46,9 +46,9 @@ describe("assessment and certificate history page", () => {
 
   it("filters by text", async () => {
     const filterInput = wrapper.find(
-      'input[placeholder="Filter by notebook title"]'
+      'input[placeholder="Filter by notebook name"]'
     )
-    await filterInput.setValue(assessmentForArt.notebookTitle)
+    await filterInput.setValue(assessmentForArt.notebookName)
     await nextTick()
     expect(wrapper.findAll("tr")).toHaveLength(2)
   })

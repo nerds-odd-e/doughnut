@@ -17,10 +17,10 @@ export type NotebookCatalogEntry =
 class NotebookCatalogBuilder extends Builder<NotebookCatalogEntry[]> {
   private items: NotebookCatalogEntry[] = []
 
-  notebook(title?: string) {
+  notebook(name?: string) {
     const b = new NotebookCatalogNotebookItemBuilder()
-    if (title !== undefined) {
-      b.title(title)
+    if (name !== undefined) {
+      b.name(name)
     }
     this.items.push(b.do())
     return this
@@ -35,11 +35,11 @@ class NotebookCatalogBuilder extends Builder<NotebookCatalogEntry[]> {
     return this
   }
 
-  group(name: string, ...memberTitles: string[]) {
+  group(name: string, ...memberNames: string[]) {
     this.items.push(
       new NotebookCatalogGroupItemBuilder()
         .name(name)
-        .titles(...memberTitles)
+        .names(...memberNames)
         .do()
     )
     return this

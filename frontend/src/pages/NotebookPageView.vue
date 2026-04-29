@@ -2,7 +2,7 @@
   <div class="daisy-container daisy-mx-auto daisy-py-4 daisy-max-w-6xl">
     <div class="notebook-page-summary daisy-mb-6" data-testid="notebook-page-summary">
       <h1 class="daisy-text-xl daisy-font-semibold daisy-text-base-content">
-        {{ notebook.title }}
+        {{ notebook.name }}
       </h1>
       <p v-if="notebook.description" class="notebook-page-summary-description">
         {{ notebook.description }}
@@ -344,7 +344,7 @@ const exportForObsidian = () => {
   const link = document.createElement("a")
   link.style.display = "none"
   link.href = `/api/notebooks/${props.notebook.id}/obsidian`
-  link.download = `${props.notebook.title}-obsidian.zip`
+  link.download = `${props.notebook.name}-obsidian.zip`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

@@ -50,7 +50,7 @@
               >{{ notebook.circle.name }}</router-link
             >
           </li>
-          <li>{{ notebook.title }}</li>
+          <li>{{ notebook.name }}</li>
         </ul>
       </div>
     </GlobalBar>

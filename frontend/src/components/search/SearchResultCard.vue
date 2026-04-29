@@ -10,8 +10,8 @@
           :note-topology="searchResult.noteTopology"
         />
       </h5>
-      <div v-if="searchResult.notebookTitle" class="notebook-title-label">
-        {{ searchResult.notebookTitle }}
+      <div v-if="searchResult.notebookName" class="notebook-name-label">
+        {{ searchResult.notebookName }}
       </div>
       <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
         <slot name="button" :search-result="searchResult" />
@@ -45,7 +45,7 @@ const isDifferentNotebook = computed(() => {
   border-style: solid !important;
 }
 
-.notebook-title-label {
+.notebook-name-label {
   font-size: 0.65rem;
   opacity: 0.7;
   margin-top: 0.125rem;

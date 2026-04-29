@@ -53,7 +53,7 @@ export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
   readonly detailsMarkdown: string
-  readonly notebookTitle?: string
+  readonly notebookName?: string
   readonly breadcrumbTitles: readonly string[]
 }
 
@@ -64,12 +64,12 @@ function recallJustReviewPayloadFromMemoryTracker(
   const topo = note?.noteTopology
   const noteTitle = topo?.title?.trim() || 'Note'
   const detailsMarkdown = (note?.details ?? '').trim()
-  const notebookTitle = topo?.notebookTitle?.trim()
+  const notebookName = topo?.notebookName?.trim()
   return {
     memoryTrackerId: mt.id,
     noteTitle,
     detailsMarkdown,
-    notebookTitle,
+    notebookName,
     breadcrumbTitles: noteBreadcrumbTrailTitles(note),
   }
 }
@@ -79,7 +79,7 @@ export type RecallMcqCardPayload = {
   readonly recallPromptId: number
   readonly stem: string
   readonly choices: readonly string[]
-  readonly notebookTitle: string
+  readonly notebookName: string
 }
 
 function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
@@ -99,7 +99,7 @@ export function recallMcqPayloadFromRecallPrompt(
     recallPromptId: prompt.id,
     stem: mq?.f0__stem?.trim() ?? '',
     choices,
-    notebookTitle: prompt.notebook.title.trim(),
+    notebookName: prompt.notebook.name.trim(),
   }
 }
 
@@ -135,7 +135,7 @@ async function tryLoadMcqPayload(
 /** Spelling memory tracker: server spelling question first (same order as web recall). */
 export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
-  readonly notebookTitle?: string
+  readonly notebookName?: string
   /** Cached from tracker load when available; answered scrollback prefers `note` on the submit response. */
   readonly detailsMarkdown: string
 }
@@ -162,7 +162,7 @@ export async function loadRecallCardForMemoryTrackerId(
       variant: 'spelling-session',
       payload: {
         memoryTrackerId,
-        notebookTitle: undefined,
+        notebookName: undefined,
         detailsMarkdown: '',
       },
     }

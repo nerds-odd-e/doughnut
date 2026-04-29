@@ -33,7 +33,7 @@ export class StorageImplementation implements NoteStorage {
     if (ref.value === undefined) {
       const notebook: Notebook = {
         id: note.noteTopology.notebookId,
-        title: note.noteTopology.notebookTitle ?? "",
+        name: note.noteTopology.notebookName ?? "",
         notebookSettings: {},
         updated_at: note.updatedAt,
       }

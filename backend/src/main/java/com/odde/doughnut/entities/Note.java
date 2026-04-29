@@ -308,7 +308,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteTopology.setRelationType(getRelationType());
     Notebook notebook = Objects.requireNonNull(getNotebook());
     noteTopology.setNotebookId(notebook.getId());
-    noteTopology.setNotebookTitle(notebook.getTitle());
+    noteTopology.setNotebookName(notebook.getName());
     if (getParent() != null) {
       noteTopology.setParentOrSubjectNoteTopology(getParent().getNoteTopology());
     }
@@ -389,6 +389,12 @@ public class Note extends EntityIdentifiedByIdOnly {
     notebook.setOwnership(ownership);
     notebook.setHeadNote(this);
     setNotebook(notebook);
+    String headTitle = getTitle();
+    if (headTitle != null && !headTitle.isBlank()) {
+      String trimmed = headTitle.trim();
+      notebook.setName(
+          trimmed.length() > MAX_TITLE_LENGTH ? trimmed.substring(0, MAX_TITLE_LENGTH) : trimmed);
+    }
   }
 
   @JsonIgnore

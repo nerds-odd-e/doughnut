@@ -25,10 +25,13 @@ const PICKER_PROMPT =
 const NO_MATCH_MESSAGE = 'No matching notebooks.'
 
 /** Case-insensitive substring match; empty / whitespace-only filter shows all notebooks. */
-function notebookTitleMatchesFilter(title: string, filter: string): boolean {
+function notebookNameMatchesFilter(
+  notebookName: string,
+  filter: string
+): boolean {
   const q = filter.trim().toLowerCase()
   if (q === '') return true
-  return title.toLowerCase().includes(q)
+  return notebookName.toLowerCase().includes(q)
 }
 
 export function UseNotebookPickerStage({
@@ -45,12 +48,14 @@ export function UseNotebookPickerStage({
 
   const filteredNotebooks = useMemo(
     () =>
-      notebooks.filter((n) => notebookTitleMatchesFilter(n.title, filterQuery)),
+      notebooks.filter((n) =>
+        notebookNameMatchesFilter(n.name ?? '', filterQuery)
+      ),
     [notebooks, filterQuery]
   )
 
   const filteredTitles = useMemo(
-    () => filteredNotebooks.map((n) => n.title),
+    () => filteredNotebooks.map((n) => n.name ?? ''),
     [filteredNotebooks]
   )
 

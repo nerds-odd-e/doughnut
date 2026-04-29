@@ -8,7 +8,7 @@
     <input
       type="text"
       v-model="filterText"
-      placeholder="Filter by notebook title"
+      placeholder="Filter by notebook name"
       class="daisy-form-control daisy-mb-2"
     />
     <input type="checkbox" v-model="filterByCertificate" class="daisy-check"
@@ -27,7 +27,7 @@
         </thead>
         <tbody>
           <tr v-for="assessmentAndCertificateHistory in filteredAssessmentHistories">
-            <td>{{ assessmentAndCertificateHistory.notebookTitle }}</td>
+            <td>{{ assessmentAndCertificateHistory.notebookName }}</td>
             <td>{{ toLocalDateString(assessmentAndCertificateHistory.submittedAt) }}</td>
             <td>{{ assessmentAndCertificateHistory.isPass ? "Pass" : "Fail" }}</td>
             <td>
@@ -72,7 +72,7 @@ const filteredAssessmentHistories = computed(() => {
     return []
   }
   return assessmentHistories.value.filter((assessmentAndCertificateHistory) => {
-    const matchesTitle = assessmentAndCertificateHistory.notebookTitle
+    const matchesTitle = assessmentAndCertificateHistory.notebookName
       ?.toLowerCase()
       .includes(filterText.value.toLowerCase())
     const matchesCertificate =

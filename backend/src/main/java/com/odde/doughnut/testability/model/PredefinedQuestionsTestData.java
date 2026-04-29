@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Data
 public class PredefinedQuestionsTestData {
-  private String notebookTitle;
+  private String notebookName;
   private Boolean notebookCertifiable;
   private List<PredefinedQuestionTestData> predefinedQuestionTestData;
 
@@ -51,7 +51,7 @@ public class PredefinedQuestionsTestData {
         .map(
             question ->
                 question.buildPredefinedQuestion(
-                    noteRepository.findFirstInNotebookByTitle(notebookTitle, question.noteTitle)))
+                    noteRepository.findFirstInNotebookByName(notebookName, question.noteTitle)))
         .collect(Collectors.toList());
   }
 }

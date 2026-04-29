@@ -160,7 +160,7 @@ export type PredefinedQuestionTestData = {
 };
 
 export type PredefinedQuestionsTestData = {
-    notebookTitle?: string;
+    notebookName?: string;
     notebookCertifiable?: boolean;
     predefinedQuestionTestData?: Array<PredefinedQuestionTestData>;
 };
@@ -181,7 +181,7 @@ export type Notebook = {
     certifiable?: boolean;
     notebookSettings: NotebookSettings;
     creatorId?: string;
-    title: string;
+    name: string;
     circle?: Circle;
     description?: string;
     hasAttachedBook?: boolean;
@@ -195,7 +195,7 @@ export type NotebookSettings = {
 };
 
 export type Subscription = {
-    title?: string;
+    name?: string;
     id: number;
     dailyTargetOfNewNotes?: number;
     user?: User;
@@ -242,7 +242,7 @@ export type NoteTopology = {
     targetNoteTopology?: NoteTopology;
     parentOrSubjectNoteTopology?: NoteTopology;
     notebookId: number;
-    notebookTitle?: string;
+    notebookName?: string;
 };
 
 export type NoteMoveDto = {
@@ -336,9 +336,9 @@ export type NoteSearchResult = {
     noteTopology: NoteTopology;
     notebookId: number;
     /**
-     * Title of the notebook this result belongs to
+     * Name of the notebook this result belongs to
      */
-    notebookTitle?: string;
+    notebookName?: string;
     distance?: number;
 };
 
@@ -569,7 +569,7 @@ export type AssessmentAttempt = {
     totalQuestionCount?: number;
     answersCorrect?: number;
     notebookId: number;
-    notebookTitle?: string;
+    notebookName?: string;
     submittedAt?: string;
     isPass?: boolean;
     assessmentQuestionInstances?: Array<AssessmentQuestionInstance>;
@@ -879,7 +879,7 @@ export type NotesTestDataWritable = {
 };
 
 export type SubscriptionWritable = {
-    title?: string;
+    name?: string;
     id: number;
     dailyTargetOfNewNotes?: number;
     user?: User;

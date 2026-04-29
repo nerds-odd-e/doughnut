@@ -7,19 +7,19 @@ import start from '../start'
 
 When(
   'I create a notebook group named {string} by moving owned notebook {string} from the catalog',
-  (groupName: string, notebookTitle: string) => {
+  (groupName: string, notebookName: string) => {
     start
       .navigateToNotebooksPage()
-      .creatingNotebookGroupFromCatalogMove(notebookTitle, groupName, false)
+      .creatingNotebookGroupFromCatalogMove(notebookName, groupName, false)
   }
 )
 
 When(
   'I create a notebook group named {string} by moving subscribed notebook {string} from the catalog',
-  (groupName: string, notebookTitle: string) => {
+  (groupName: string, notebookName: string) => {
     start
       .navigateToNotebooksPage()
-      .creatingNotebookGroupFromCatalogMove(notebookTitle, groupName, true)
+      .creatingNotebookGroupFromCatalogMove(notebookName, groupName, true)
   }
 )
 
@@ -45,27 +45,27 @@ Then(
 
 Then(
   'I should be on the notebook group page for {string} with notebook {string} listed',
-  (groupName: string, notebookTitle: string) => {
+  (groupName: string, notebookName: string) => {
     cy.url().should('match', /\/d\/notebooks\/groups\/\d+/)
     cy.contains('h1', groupName).should('be.visible')
     cy.get('main').within(() => {
-      cy.contains('h5', notebookTitle).should('be.visible')
+      cy.contains('h5', notebookName).should('be.visible')
     })
   }
 )
 
 When(
   'I set notebook {string} to ungrouped from the catalog',
-  (notebookTitle: string) => {
-    start.navigateToNotebooksPage().moveOwnedNotebookToUngrouped(notebookTitle)
+  (notebookName: string) => {
+    start.navigateToNotebooksPage().moveOwnedNotebookToUngrouped(notebookName)
   }
 )
 
 Then(
   'notebook {string} should appear at the top level of the notebook catalog',
-  (notebookTitle: string) => {
+  (notebookName: string) => {
     start
       .navigateToNotebooksPage()
-      .expectNotebookAtTopLevelOfCatalog(notebookTitle)
+      .expectNotebookAtTopLevelOfCatalog(notebookName)
   }
 )

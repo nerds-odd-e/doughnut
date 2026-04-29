@@ -40,8 +40,8 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return this
   }
 
-  notebookTitle(value: string): NoteSearchResultBuilder {
-    this.data.notebookTitle = value
+  notebookName(value: string): NoteSearchResultBuilder {
+    this.data.notebookName = value
     return this
   }
 
@@ -78,7 +78,7 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
         notebookId,
       },
       notebookId,
-      notebookTitle: this.data.notebookTitle,
+      notebookName: this.data.notebookName,
       distance: this.data.distance,
     }
   }

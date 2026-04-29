@@ -13,7 +13,7 @@
    - **1.2** As a note taker, I want **rich**-mode edits to round-trip to **markdown** as well-formed wiki links (`[[…]]`).
    - **1.3** As a note taker, I want **pipe** syntax for alternate display text: `[[note title|display text]]`.
    - **1.4** As a note taker, I want links to notes that do not exist yet ("red link") and to **create** the target when I click.
-   - **1.5** As a note taker, I want **cross-notebook** links (e.g. `[[notebook title:note title/child title]]`; grammar per product).
+   - **1.5** As a note taker, I want **cross-notebook** links (e.g. `[[notebook name:note title/child title]]`; grammar per product).
    - **1.6** As a note taker, I want an **insert link** helper (e.g. button or command) to pick a target and insert a wiki link into **details**.
    - **1.7** As a note taker, I want inline **autocomplete** when typing a wiki link in **markdown** mode.
    - **1.8** As a note taker, I want inline **autocomplete** when creating or editing a wiki link in **rich** mode.
@@ -60,7 +60,7 @@
    - **1.2** ノート利用者として、**rich** モードの編集を、保存時に正しい wiki 形式の **markdown**（`[[…]]`）へ **round-trip** したい。
    - **1.3** ノート利用者として、表示名の差し替えに **pipe** 記法を使いたい：`[[note title|display text]]`。
    - **1.4** ノート利用者として、未作成ノートへの **link**（**red link**）を張り、クリックで対象を**新規作成**したい。
-   - **1.5** ノート利用者として、**cross-notebook** の **link** を使いたい（例: `[[notebook title:note title/child title]]`。**grammar** はプロダクトで定義）。
+   - **1.5** ノート利用者として、**cross-notebook** の **link** を使いたい（例: `[[notebook name:note title/child title]]`。**grammar** はプロダクトで定義）。
    - **1.6** ノート利用者として、**insert link** ヘルパー（例: **button** やコマンド）で対象を選び、**details** に wiki **link** を挿入したい。
    - **1.7** ノート利用者として、**markdown** モードで wiki **link** を入力するときにインライン **autocomplete** が欲しい。
    - **1.8** ノート利用者として、**rich** モードで wiki **link** を新規・編集するときにインライン **autocomplete** が欲しい。

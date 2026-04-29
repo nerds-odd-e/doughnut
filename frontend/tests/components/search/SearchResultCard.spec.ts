@@ -66,22 +66,22 @@ describe("SearchResultCard", () => {
     expect(card.classes()).toContain("different-notebook-border")
   })
 
-  it("displays notebook title when provided", async () => {
+  it("displays notebook name when provided", async () => {
     const searchResult = makeMe.aNoteSearchResult
       .id(1)
       .title("Test Note")
       .notebookId(10)
-      .notebookTitle("My Notebook")
+      .notebookName("My Notebook")
       .please()
 
     helper.component(SearchResultCard).withProps({ searchResult }).render()
 
     await screen.findByText("My Notebook", {
-      selector: ".notebook-title-label",
+      selector: ".notebook-name-label",
     })
   })
 
-  it("does not display notebook title element when notebookTitle is not provided", async () => {
+  it("does not display notebook name element when notebookName is not provided", async () => {
     const searchResult = makeMe.aNoteSearchResult
       .id(1)
       .title("Test Note")
@@ -93,6 +93,6 @@ describe("SearchResultCard", () => {
       .withProps({ searchResult })
       .mount()
 
-    expect(wrapper.find(".notebook-title-label").exists()).toBe(false)
+    expect(wrapper.find(".notebook-name-label").exists()).toBe(false)
   })
 })

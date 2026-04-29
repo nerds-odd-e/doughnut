@@ -20,7 +20,7 @@
           class="daisy-font-semibold daisy-leading-snug daisy-text-base-content daisy-truncate"
           :class="compact ? 'daisy-text-sm' : 'daisy-text-base'"
         >
-          {{ notebook.title }}
+          {{ notebook.name }}
         </h5>
         <p
           v-if="notebook.description"

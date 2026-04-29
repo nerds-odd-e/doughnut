@@ -165,7 +165,7 @@ class TestabilityRestController {
     private void buildNoteTree(
         User user,
         Ownership ownership,
-        String persistedNotebookName,
+        String notebookName,
         Notebook notebookFromRepositoryOrNull,
         Timestamp currentUTCTimestamp,
         Map<String, Note> titleNoteMap,
@@ -183,7 +183,7 @@ class TestabilityRestController {
           if (head == null) {
             throw new RuntimeException(
                 "Notebook `"
-                    + persistedNotebookName
+                    + notebookName
                     + "` has no head note; cannot inject notes without Parent Title.");
           }
           note.setParentNote(head);
@@ -191,7 +191,7 @@ class TestabilityRestController {
         }
         if (firstHeadCreatedInBatch == null) {
           note.buildNotebookForHeadNote(ownership, user);
-          note.getNotebook().setPersistedNotebookName(persistedNotebookName);
+          note.getNotebook().setName(notebookName);
           note.getNotebook().setUpdated_at(currentUTCTimestamp);
           entityPersister.save(note.getNotebook());
           firstHeadCreatedInBatch = note;
@@ -244,8 +244,7 @@ class TestabilityRestController {
 
     Notebook notebookFromRepository =
         notebookRepository
-            .findFirstByPersistedNotebookNameAndDeletedAtIsNullOrderByIdAsc(
-                notesTestData.notebookName)
+            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(notesTestData.notebookName)
             .map(
                 nb -> {
                   if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
@@ -329,8 +328,7 @@ class TestabilityRestController {
     }
     Notebook notebook =
         notebookRepository
-            .findFirstByPersistedNotebookNameAndDeletedAtIsNullOrderByIdAsc(
-                request.getNotebookName())
+            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(request.getNotebookName())
             .orElseThrow(
                 () ->
                     new IllegalArgumentException(

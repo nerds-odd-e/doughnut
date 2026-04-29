@@ -39,8 +39,8 @@ const myNotebooksPage = () => {
       if (segments.length === 0) {
         return this as any
       }
-      const [notebookTitle, ...noteTitles] = segments
-      const notebook = notebookList().navigateToNotebook(notebookTitle!)
+      const [notebookName, ...noteTitles] = segments
+      const notebook = notebookList().navigateToNotebook(notebookName!)
       if (noteTitles.length === 0) {
         return notebook
       }
@@ -53,7 +53,7 @@ const myNotebooksPage = () => {
     creatingNotebook(notebookTopic: string, description?: string) {
       addNewNotebookButton().click()
       if (description !== undefined) {
-        return noteCreationForm.createNotebookWithTitleAndDescription(
+        return noteCreationForm.createNotebookWithNameAndDescription(
           notebookTopic,
           description
         )
@@ -66,35 +66,35 @@ const myNotebooksPage = () => {
     subscribedNotebooks() {
       return subscribedNotebooks()
     },
-    expectNotebookNotToExist(notebookTitle: string) {
+    expectNotebookNotToExist(notebookName: string) {
       cy.get('main').within(() =>
         cy
-          .findByText(notebookTitle, { selector: '.notebook-card h5' })
+          .findByText(notebookName, { selector: '.notebook-card h5' })
           .should('not.exist')
       )
     },
-    expectNotebookToExist(notebookTitle: string) {
+    expectNotebookToExist(notebookName: string) {
       cy.get('main').within(() =>
         cy
-          .findByText(notebookTitle, { selector: '.notebook-card h5' })
+          .findByText(notebookName, { selector: '.notebook-card h5' })
           .should('exist')
       )
     },
     creatingNotebookGroupFromCatalogMove(
-      notebookTitle: string,
+      notebookName: string,
       groupName: string,
       isSubscribed?: boolean
     ) {
       if (isSubscribed) {
-        subscribedNotebooks().card(notebookTitle).openMoveToGroupDialog()
+        subscribedNotebooks().card(notebookName).openMoveToGroupDialog()
       } else {
-        notebookCard(notebookTitle).openMoveToGroupDialog()
+        notebookCard(notebookName).openMoveToGroupDialog()
       }
       completeMoveNotebookToNewGroupDialog(groupName)
       return this as any
     },
-    moveOwnedNotebookToUngrouped(notebookTitle: string) {
-      notebookCard(notebookTitle).openMoveToGroupDialog()
+    moveOwnedNotebookToUngrouped(notebookName: string) {
+      notebookCard(notebookName).openMoveToGroupDialog()
       completeMoveNotebookToUngroupedDialog()
       return this as any
     },
@@ -115,9 +115,9 @@ const myNotebooksPage = () => {
       pageIsNotLoading()
       return this as any
     },
-    expectNotebookAtTopLevelOfCatalog(notebookTitle: string) {
+    expectNotebookAtTopLevelOfCatalog(notebookName: string) {
       cy.get('.notebook-catalog-section--list > [data-cy="notebook-card"]')
-        .contains('h5', notebookTitle)
+        .contains('h5', notebookName)
         .should('be.visible')
       return this as any
     },
@@ -130,5 +130,5 @@ export const navigateToNotebooksPage = () => {
   return myNotebooksPage()
 }
 
-export const navigateToNotebookPage = (notebookTitle: string) =>
-  navigateToNotebooksPage().notebookCard(notebookTitle).openNotebookPage()
+export const navigateToNotebookPage = (notebookName: string) =>
+  navigateToNotebooksPage().notebookCard(notebookName).openNotebookPage()

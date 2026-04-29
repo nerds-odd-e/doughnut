@@ -100,12 +100,12 @@ export const assumeNoteTargetSearchDialog = () => {
       return this
     },
 
-    expectNotebookTitleInSearchResults(notebookTitle: string) {
+    expectNotebookNameInSearchResults(notebookName: string) {
       cy.findByText('Search result', { selector: '.result-title' }).should(
         'be.visible'
       )
       cy.get('.search-result').within(() => {
-        cy.contains('.notebook-title-label', notebookTitle).should('be.visible')
+        cy.contains('.notebook-name-label', notebookName).should('be.visible')
       })
       return this
     },

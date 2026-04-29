@@ -8,6 +8,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
   List<Notebook> findByOwnership_IdAndDeletedAtIsNull(Integer ownershipId);
 
-  Optional<Notebook> findFirstByPersistedNotebookNameAndDeletedAtIsNullOrderByIdAsc(
-      String persistedNotebookName);
+  Optional<Notebook> findFirstByNameAndDeletedAtIsNullOrderByIdAsc(String name);
 }

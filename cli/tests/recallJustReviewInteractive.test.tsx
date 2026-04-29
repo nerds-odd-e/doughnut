@@ -128,7 +128,7 @@ describe('recall just-review (interactive)', () => {
   function alphaNoteRealm() {
     return makeMe.aNoteRealm
       .title('Alpha')
-      .notebookTitle('NB')
+      .notebookName('NB')
       .details('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
@@ -138,14 +138,14 @@ describe('recall just-review (interactive)', () => {
   function childNoteUnderEnglish() {
     const english = makeMe.aNoteRealm
       .title('English')
-      .notebookTitle('NB')
+      .notebookName('NB')
       .details('')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
     return makeMe.aNoteRealm
       .title('Sedition')
-      .notebookTitle('NB')
+      .notebookName('NB')
       .details('Sedition means incite violence')
       .under(english)
       .createdAt(baseNoteTimes.createdAt)
@@ -194,7 +194,7 @@ describe('recall just-review (interactive)', () => {
         const title = id === 1 ? 'Alpha' : 'Beta'
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .notebookTitle('NB')
+          .notebookName('NB')
           .details('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
@@ -314,7 +314,7 @@ describe('recall just-review (interactive)', () => {
     const noteRealmAlpha = alphaNoteRealm()
     const noteRealmBeta = makeMe.aNoteRealm
       .title('Beta')
-      .notebookTitle('NB')
+      .notebookName('NB')
       .details('body-beta')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
@@ -652,7 +652,7 @@ describe('recall just-review (interactive)', () => {
         const title = id === 1 ? 'Alpha' : 'Beta'
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .notebookTitle('NB')
+          .notebookName('NB')
           .details('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
@@ -818,7 +818,7 @@ describe('recall just-review (interactive)', () => {
               : `unexpected-${String(id)}`
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .notebookTitle('NB')
+          .notebookName('NB')
           .details('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)

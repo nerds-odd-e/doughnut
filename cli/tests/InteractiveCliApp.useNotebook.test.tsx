@@ -19,8 +19,8 @@ import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
-function notebookWithTitle(title: string) {
-  return makeMe.aNotebook.headNote(makeMe.aNote.title(title).please()).do()
+function notebookWithName(name: string) {
+  return makeMe.aNotebook.headNote(makeMe.aNote.title(name).please()).do()
 }
 
 describe('InteractiveCliApp /use notebook integration', () => {
@@ -48,7 +48,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
   test('full app: /use opens notebook stage; / shows nested slash guidance', async () => {
     myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [notebookWithTitle('Top Maths')] },
+      data: { notebooks: [notebookWithName('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
     const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
@@ -66,7 +66,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
 
   test('after nested plain line and /exit, root up-arrow recalls /exit not stale root prefix', async () => {
     myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [notebookWithTitle('Top Maths')] },
+      data: { notebooks: [notebookWithName('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
     const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
@@ -96,7 +96,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
       fs.writeFileSync(attachPdfPath, '')
       fs.writeFileSync(attachEpubPath, '')
       myNotebooksSpy.mockResolvedValue({
-        data: { notebooks: [notebookWithTitle('Top Maths')] },
+        data: { notebooks: [notebookWithName('Top Maths')] },
       } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
       attachBookSpy = vi.spyOn(doughnutBackendClient, 'attachNotebookBookFile')
       runMineruOutlineSubprocess.mockResolvedValue({

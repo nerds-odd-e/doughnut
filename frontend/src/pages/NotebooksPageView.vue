@@ -191,13 +191,13 @@ const filteredOnlyCatalogItems = computed(() => {
   }
   const rows = props.catalogItems.filter((item) => {
     if (item.type === "notebook" || item.type === "subscribedNotebook") {
-      return (item.notebook.title ?? "").toLowerCase().includes(q)
+      return (item.notebook.name ?? "").toLowerCase().includes(q)
     }
     if (item.name.toLowerCase().includes(q)) {
       return true
     }
     return item.notebooks.some((nb) =>
-      (nb.title ?? "").toLowerCase().includes(q)
+      (nb.name ?? "").toLowerCase().includes(q)
     )
   })
   return rows.map((item) => {

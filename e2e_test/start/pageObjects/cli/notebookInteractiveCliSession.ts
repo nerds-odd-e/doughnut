@@ -19,15 +19,15 @@ function notebookInteractiveCtx() {
 }
 
 export function useNotebook(
-  notebookTitle: string
+  notebookName: string
 ): Cypress.Chainable<ReturnType<typeof notebookInteractiveCtx>> {
   const ic = interactiveCli()
   return ic
-    .enterSlashCommandInInteractiveCli(`/use ${notebookTitle}`)
+    .enterSlashCommandInInteractiveCli(`/use ${notebookName}`)
     .then(() =>
       ic
         .pastCliAssistantMessages()
-        .expectContains(`Active notebook: ${notebookTitle}`)
+        .expectContains(`Active notebook: ${notebookName}`)
     )
     .then(() => cy.wrap(notebookInteractiveCtx()))
 }

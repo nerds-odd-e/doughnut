@@ -58,7 +58,7 @@ class SearchControllerTests extends ControllerTestBase {
       assertThat(result.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
       assertThat(
           result.stream()
-              .allMatch(r -> r.getNotebookTitle() != null && !r.getNotebookTitle().isEmpty()),
+              .allMatch(r -> r.getNotebookName() != null && !r.getNotebookName().isEmpty()),
           is(true));
     }
 

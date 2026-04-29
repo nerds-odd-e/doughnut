@@ -3679,7 +3679,7 @@ components:
     PredefinedQuestionsTestData:
       type: object
       properties:
-        notebookTitle:
+        notebookName:
           type: string
         notebookCertifiable:
           type: boolean
@@ -3721,7 +3721,7 @@ components:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
           type: string
-        title:
+        name:
           type: string
         circle:
           $ref: "#/components/schemas/Circle"
@@ -3734,8 +3734,8 @@ components:
           format: date-time
       required:
       - id
+      - name
       - notebookSettings
-      - title
       - updated_at
     NotebookSettings:
       type: object
@@ -3752,7 +3752,7 @@ components:
     Subscription:
       type: object
       properties:
-        title:
+        name:
           type: string
         id:
           type: integer
@@ -3896,7 +3896,7 @@ components:
         notebookId:
           type: integer
           format: int32
-        notebookTitle:
+        notebookName:
           type: string
       required:
       - id
@@ -4080,9 +4080,9 @@ components:
         notebookId:
           type: integer
           format: int32
-        notebookTitle:
+        notebookName:
           type: string
-          description: Title of the notebook this result belongs to
+          description: Name of the notebook this result belongs to
         distance:
           type: number
           format: float
@@ -4547,7 +4547,7 @@ components:
         notebookId:
           type: integer
           format: int32
-        notebookTitle:
+        notebookName:
           type: string
         submittedAt:
           type: string

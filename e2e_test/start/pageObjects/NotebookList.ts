@@ -1,7 +1,5 @@
-import slugify from 'slugify'
 import { commonSenseSplit } from '../../support/string_util'
 import { pageIsNotLoading } from '../pageBase'
-import { assumeNotePage } from './notePage'
 import notebookPage from './notebookPage'
 
 export const notebookList = () => {
@@ -28,10 +26,10 @@ export const notebookList = () => {
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
     },
-    navigateToNotebook(notebookTitle: string) {
+    navigateToNotebook(notebookName: string) {
       pageIsNotLoading()
       cy.get('.notebook-card').should('be.visible')
-      cy.findByText(notebookTitle, {
+      cy.findByText(notebookName, {
         selector: '.notebook-card h5',
       })
         .should('be.visible')
@@ -44,7 +42,7 @@ export const notebookList = () => {
 
 /** Opens the notebook page via the card title link (same as the user catalog path). */
 export const clickNotebookCardTitleToOpenNotebookPage = (
-  notebookTitle: string
+  notebookName: string
 ) => {
   pageIsNotLoading()
   cy.get('.notebook-card').should('be.visible')
@@ -54,11 +52,11 @@ export const clickNotebookCardTitleToOpenNotebookPage = (
       return $card
         .find('.notebook-card h5')
         .toArray()
-        .some((heading) => heading.textContent?.trim() === notebookTitle)
+        .some((heading) => heading.textContent?.trim() === notebookName)
     })
     .first()
     .within(() => {
-      cy.findByText(notebookTitle, { selector: 'h5' })
+      cy.findByText(notebookName, { selector: 'h5' })
         .should('be.visible')
         .closest('a')
         .click()

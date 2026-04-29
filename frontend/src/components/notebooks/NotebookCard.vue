@@ -11,7 +11,7 @@
           class="daisy-font-semibold"
           :class="compact ? 'daisy-text-sm' : 'daisy-text-lg'"
         >
-          {{ notebook.title }}
+          {{ notebook.name }}
         </h5>
         <p
           v-if="notebook.description"

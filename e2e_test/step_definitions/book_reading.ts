@@ -63,11 +63,11 @@ Given(
 When(
   'I attach book {string} to the notebook {string} via the CLI',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (fixtureFilename: string, notebookTitle: string) => {
+  (fixtureFilename: string, notebookName: string) => {
     const stem = pdfFixtureStem(fixtureFilename)
     cy.wrap(stem).as('attachedBookPdfStem')
     return cli
-      .useNotebook(notebookTitle)
+      .useNotebook(notebookName)
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
       .then((ctx) => {
         ctx.pastCliAssistantMessages().expectContains(`Attached "${stem}"`)
@@ -82,14 +82,14 @@ When(
 When(
   'I attach a fake blank pdf book with layout of {string} to the notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (fixtureStem: string, notebookTitle: string) => {
+  (fixtureStem: string, notebookName: string) => {
     const bookName = fixtureStem
     cy.wrap(bookName).as('attachedBookPdfStem')
     return cy
       .fixture(`book_reading/mineru_output_for_${fixtureStem}.json`)
       .then((contentList: unknown) => {
         return testability().attachBookToNotebook(
-          notebookTitle,
+          notebookName,
           bookName,
           contentList as Array<unknown>
         )
@@ -100,15 +100,15 @@ When(
 When(
   'I open the book attached to notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (notebookTitle: string) => {
+  (notebookName: string) => {
     return cy.get<string>('@attachedBookPdfStem').then((stem) => {
-      start.navigateToNotebookPage(notebookTitle).readBook(stem)
+      start.navigateToNotebookPage(notebookName).readBook(stem)
     })
   }
 )
 
-When('I open the notebook settings for {string}', (notebookTitle: string) => {
-  start.navigateToNotebookPage(notebookTitle)
+When('I open the notebook settings for {string}', (notebookName: string) => {
+  start.navigateToNotebookPage(notebookName)
 })
 
 When(
@@ -173,9 +173,9 @@ Then(
 Given(
   'OpenAI returns a layout suggestion that indents block {string} for notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string, notebookTitle: string) => {
+  (blockTitle: string, notebookName: string) => {
     return testability()
-      .getInjectedNoteIdByTitle(notebookTitle)
+      .getInjectedNoteIdByTitle(notebookName)
       .then((noteId) =>
         cy.wrap(NoteController.showNote({ path: { note: noteId } }), {
           log: false,

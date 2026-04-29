@@ -49,7 +49,7 @@ Lock down the user-visible behavior before replacing the head note route.
 **Commit includes:**
 
 - add or extend an existing notebook/navigation E2E scenario proving that clicking a notebook opens the current notebook entry content
-- assert the visible notebook title/content that currently comes through the head note
+- assert the visible notebook name/content that currently comes through the head note
 - keep the scenario capability-named, for example in a notebook navigation or notebook page feature
 - no production behavior change
 
