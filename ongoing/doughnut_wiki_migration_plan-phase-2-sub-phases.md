@@ -16,7 +16,7 @@ After Phase 2:
 - existing production data can be migrated through a temporary admin-only flow
 - notes can be resolved through slug/path routes
 - moves validate uniqueness via recomputed **`note.slug`**
-- the temporary migration endpoint and dashboard control are removed after production data is migrated
+- after production slug backfill, a **generalized** admin data-migration dashboard shell and admin-only HTTP surface remain (auth-checked stub; no slug-specific DTOs or migration logic)
 
 ## Key Decisions
 
@@ -32,7 +32,7 @@ After Phase 2:
   - admin dashboard tab shows progress and has a button to start or continue the migration
   - frontend may repeatedly call the batch endpoint while the admin watches progress
 - Add final uniqueness / not-null constraints only after production migration has completed.
-- Remove the temporary dashboard tab, button, endpoint, and migration-only API client after production data has been migrated and constraints are in place.
+- After slug backfill and constraints: **strip** slug-specific migration DTOs, batch/status implementation, and dead code; **retain** a generalized admin dashboard area (tab name and copy not tied to slugs) with a button and progress affordances, plus an admin-only migration endpoint that performs **only** authorization (empty or minimal handler body) for future DB migrations.
 
 ## Status
 
@@ -205,7 +205,7 @@ This is an operational checkpoint, not a code commit.
 
 After sub-phase 2.9 is deployed:
 
-1. An admin opens the `Slug Migration` dashboard tab.
+1. An admin opens the admin data migration dashboard tab (during backfill it may still be labeled for slug work until sub-phase 2.14 renames it).
 2. The admin starts the migration.
 3. The UI runs bounded batches until all remaining counts are zero.
 4. If the browser, request, or deployment interrupts the run, the admin reopens the tab and continues.
@@ -286,39 +286,41 @@ Moving a note keeps **`note.slug`** consistent with the target folder.
 - targeted backend move tests
 - relevant Cypress spec if move behavior is already covered there
 
-### 2.14 Remove the Dashboard Migration Control
+### 2.14 Generalize the Admin Data Migration Dashboard
 
-**Type:** Behavior
+**Type:** Structure
 
-After production migration is complete, admins no longer see the temporary slug migration tool.
+Keep the admin dashboard **data migration skeleton**: a tab (or equivalent surface) where an admin can click a button to trigger a DB migration and see progress. Remove **slug migration–specific** UI: labels, counts, polling logic, and types that only served folder/note slug backfill. The shell should read as a reusable **database / data migration** control, not a one-off slug tool.
 
 **Commit includes:**
 
-- remove the `Slug Migration` admin tab and button
-- remove frontend component tests and E2E steps that only exist for the temporary dashboard control
-- keep user-facing slug routes and permanent slug behavior
+- rename the tab and user-visible copy to a generalized capability (for example **Data migration** or **Database migration** — pick one name and use it consistently)
+- keep layout affordances: trigger control, progress or status area (may show idle, generic, or empty states once the backend stub has no work)
+- remove slug-only display fields, SDK calls, and props tied to slug status/batch DTOs
+- update component tests to cover the shell (loads for admin, button/progress wiring) without slug migration fixtures
+- trim or rewrite E2E steps that only asserted slug backfill; keep minimal admin coverage if it still adds value
 
 **Verification:**
 
 - targeted admin dashboard component tests
 - relevant admin E2E spec if touched
 
-### 2.15 Remove the Temporary Migration Endpoint
+### 2.15 Admin Data Migration Endpoint Stub (Auth Only)
 
 **Type:** Structure
 
-Remove the backend API that was only needed for production backfill.
+Remove slug migration **implementation** from the backend: batch processing, status counts, and **slug-specific DTOs** or services that exist only for that backfill. **Keep** an admin-only migration HTTP surface (path may be renamed to match the generalized dashboard purpose) whose handler is **empty except the admin authorization check** (for example returns 200 with no body or a minimal placeholder — no business logic).
 
 **Commit includes:**
 
-- remove temporary migration controller endpoints
-- remove migration-only DTOs/services that no permanent behavior uses
+- delete slug-migration-only controllers/handlers, DTOs, and unused services or repository helpers
+- add or narrow to a single admin-gated route used by the dashboard button; implementation = auth check only
 - regenerate the TypeScript API client
-- remove frontend test helpers/mocks tied only to the temporary endpoint
+- adjust frontend to call the stub as needed for the button; remove dead mocks/helpers for removed slug endpoints
 
 **Verification:**
 
-- targeted backend tests
+- targeted backend tests (prove non-admin cannot call the route; admin receives success with no slug-specific contract)
 - `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 - targeted frontend tests if generated client usage changed
 
@@ -331,7 +333,7 @@ Clean up code that only existed while slug/path fields could be missing.
 **Commit includes:**
 
 - remove null-handling branches for slug data that schema constraints now guarantee
-- remove status/count repository methods used only by the temporary migration
+- remove any **remaining** status/count or migration-only repository helpers not already deleted in 2.15
 - keep slug generation for new data and **`note.slug`** recomputation for moves
 
 **Verification:**
@@ -347,4 +349,4 @@ Phase 2 is complete when:
 - database constraints enforce the intended uniqueness rules
 - slug-based note routes work
 - note moves maintain correct **`note.slug`**
-- no temporary migration dashboard tab, button, endpoint, DTO, generated client method, or migration-only fallback remains
+- no slug-specific migration DTOs, batch/status endpoints, or migration-only fallback remains; a **generalized** admin data-migration UI shell and an **auth-only** admin migration endpoint stub may remain for future use

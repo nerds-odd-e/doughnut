@@ -110,22 +110,43 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
   })
 })
 
+function wrongAnswerChoiceForAssessmentStem(stem: string): string {
+  const normalized = stem.replace(/\s+/g, ' ').trim()
+  const byStem: Record<string, string> = {
+    'Where in the world is Singapore?': 'europe',
+    'Most famous food of Vietnam?': 'bread',
+    'What is the capital city of Japan?': 'kyoto',
+  }
+  const wrong = byStem[normalized]
+  expect(
+    wrong,
+    `No wrong-choice mapping for assessment stem: ${JSON.stringify(normalized)}`
+  ).to.be.a('string')
+  return wrong!
+}
+
 Given(
-  'in the assessment for notebook {string}, I wrongly answered the first assessment question with {string}',
-  (notebook: string, answer: string) => {
-    start
+  'in the assessment for notebook {string}, I wrongly answered the first assessment question',
+  (notebook: string) => {
+    const assessmentPage = start
       .navigateToBazaar()
       .beginAssessmentOnNotebook(notebook)
-      .assumeQuestionSection()
-      .answerIncorrectly(answer)
+    const questionSection = assessmentPage.assumeQuestionSection()
+    questionSection.getStemText().then((stem) => {
+      const wrong = wrongAnswerChoiceForAssessmentStem(stem)
+      cy.wrap(wrong).as('wrongAnswerForFeedback')
+      questionSection.answerIncorrectly(wrong)
+    })
   }
 )
 
 Then('I should get immediate feedback by showing the wrong answer', () => {
-  start
-    .assumeAssessmentPage()
-    .assumeWrongAnswerPage()
-    .highlightCurrentChoice('europe')
+  cy.get<string>('@wrongAnswerForFeedback').then((wrongAnswer) => {
+    start
+      .assumeAssessmentPage()
+      .assumeWrongAnswerPage()
+      .highlightCurrentChoice(wrongAnswer)
+  })
 })
 
 When(
