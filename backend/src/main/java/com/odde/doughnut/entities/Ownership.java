@@ -62,4 +62,25 @@ public class Ownership {
     note.buildNotebookForHeadNote(this, user);
     return note;
   }
+
+  public Notebook prepareNotebookForNewNotebook(
+      User creator, Timestamp currentUTCTimestamp, String titleConstructor, String description) {
+    Notebook notebook = new Notebook();
+    notebook.setCreatorEntity(creator);
+    notebook.setOwnership(this);
+    notebook.setUpdated_at(currentUTCTimestamp);
+    if (titleConstructor != null) {
+      String trimmed = titleConstructor.trim();
+      if (!trimmed.isEmpty()) {
+        notebook.setPersistedNotebookName(
+            trimmed.length() > Note.MAX_TITLE_LENGTH
+                ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
+                : trimmed);
+      }
+    }
+    if (description != null && !description.isBlank()) {
+      notebook.setDescription(description.trim());
+    }
+    return notebook;
+  }
 }

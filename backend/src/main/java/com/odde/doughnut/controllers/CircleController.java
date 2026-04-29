@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.User;
@@ -116,13 +115,13 @@ class CircleController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAuthorization(circle);
-    Note note =
+    Notebook notebook =
         notebookService.createNotebookForOwnership(
             circle.getOwnership(),
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
-    return new RedirectToNoteResponse(note.getId());
+    return RedirectToNoteResponse.forNotebook(notebook.getId());
   }
 }

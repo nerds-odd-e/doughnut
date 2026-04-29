@@ -202,7 +202,7 @@ export type Notebook = {
     creatorId?: string;
     title: string;
     circle?: Circle;
-    headNoteId: number;
+    headNoteId?: number;
     description?: string;
     hasAttachedBook?: boolean;
     updated_at: string;
@@ -348,6 +348,7 @@ export type NoteRecallSetting = {
 
 export type RedirectToNoteResponse = {
     noteId?: number;
+    notebookId?: number;
 };
 
 export type NotebookUpdateRequest = {

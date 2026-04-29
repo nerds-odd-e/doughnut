@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
+  long countByNotebook_Id(Integer notebookId);
+
   Optional<Note> findByNotebook_IdAndSlug(Integer notebookId, String slug);
 
   String selectFromNote = "SELECT n FROM Note n";

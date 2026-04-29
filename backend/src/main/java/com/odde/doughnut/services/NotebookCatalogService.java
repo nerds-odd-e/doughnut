@@ -32,12 +32,10 @@ public class NotebookCatalogService {
    * Sort keys for the notebooks page catalog (merged list of ungrouped notebooks and groups):
    *
    * <ul>
-   *   <li><b>Notebook</b> row: {@link Notebook#getHeadNote()} {@link Note#getCreatedAt()} — there
-   *       is no {@code notebook.created_at} column.
+   *   <li><b>Notebook</b> row: head note {@link Note#getCreatedAt()} when present, else {@link
+   *       Notebook#getUpdated_at()}.
    *   <li><b>Group</b> row: {@link NotebookGroup#getCreatedAt()}.
    * </ul>
-   *
-   * <p>Members inside a group row use the same head-note {@code created_at} ordering.
    */
   public NotebooksViewedByUser buildView(
       List<Notebook> allNotebooks, List<NotebookGroup> groups, List<Subscription> subscriptions) {
@@ -92,7 +90,7 @@ public class NotebookCatalogService {
       rows.add(
           new SortableRow(
               new NotebookCatalogNotebookItem(notebook),
-              notebook.getHeadNote().getCreatedAt(),
+              catalogSortTimestamp(notebook),
               0,
               notebook.getId()));
     }
@@ -105,7 +103,7 @@ public class NotebookCatalogService {
       rows.add(
           new SortableRow(
               new NotebookCatalogSubscribedNotebookItem(notebook, subscription.getId()),
-              notebook.getHeadNote().getCreatedAt(),
+              catalogSortTimestamp(notebook),
               0,
               notebook.getId()));
     }
@@ -118,7 +116,7 @@ public class NotebookCatalogService {
                       nb.getNotebookGroup() != null
                           && Objects.equals(nb.getNotebookGroup().getId(), group.getId()))
               .sorted(
-                  Comparator.comparing((Notebook nb) -> nb.getHeadNote().getCreatedAt())
+                  Comparator.comparing(NotebookCatalogService::catalogSortTimestamp)
                       .thenComparing(Notebook::getId))
               .toList();
       List<Notebook> subscribedMembers =
@@ -128,15 +126,14 @@ public class NotebookCatalogService {
                       s.getNotebookGroup() != null
                           && Objects.equals(s.getNotebookGroup().getId(), group.getId()))
               .sorted(
-                  Comparator.comparing(
-                          (Subscription s) -> s.getNotebook().getHeadNote().getCreatedAt())
+                  Comparator.comparing((Subscription s) -> catalogSortTimestamp(s.getNotebook()))
                       .thenComparing(s -> s.getNotebook().getId()))
               .map(Subscription::getNotebook)
               .toList();
       List<Notebook> allMembers = new ArrayList<>(members);
       allMembers.addAll(subscribedMembers);
       allMembers.sort(
-          Comparator.comparing((Notebook nb) -> nb.getHeadNote().getCreatedAt())
+          Comparator.comparing(NotebookCatalogService::catalogSortTimestamp)
               .thenComparing(Notebook::getId));
       rows.add(
           new SortableRow(
@@ -156,4 +153,9 @@ public class NotebookCatalogService {
   }
 
   private record SortableRow(NotebookCatalogItem item, Timestamp sortAt, int kind, int tieId) {}
+
+  private static Timestamp catalogSortTimestamp(Notebook notebook) {
+    Note head = notebook.getHeadNote();
+    return head != null ? head.getCreatedAt() : notebook.getUpdated_at();
+  }
 }

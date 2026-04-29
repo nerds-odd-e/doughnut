@@ -19,17 +19,14 @@ import org.springframework.stereotype.Service;
 public class NotebookService {
   private final EntityPersister entityPersister;
   private final NotebookAiAssistantRepository notebookAiAssistantRepository;
-  private final WikiSlugPathService wikiSlugPathService;
   private final NoteRepository noteRepository;
 
   public NotebookService(
       EntityPersister entityPersister,
       NotebookAiAssistantRepository notebookAiAssistantRepository,
-      WikiSlugPathService wikiSlugPathService,
       NoteRepository noteRepository) {
     this.entityPersister = entityPersister;
     this.notebookAiAssistantRepository = notebookAiAssistantRepository;
-    this.wikiSlugPathService = wikiSlugPathService;
     this.noteRepository = noteRepository;
   }
 
@@ -48,31 +45,17 @@ public class NotebookService {
     return notebookAiAssistantRepository.save(assistant);
   }
 
-  public Note createNotebookForOwnership(
+  public Notebook createNotebookForOwnership(
       Ownership ownership,
       User user,
       Timestamp currentUTCTimestamp,
       String titleConstructor,
       String description) {
-    Note note =
-        ownership.prepareHeadNoteForNewNotebook(user, currentUTCTimestamp, titleConstructor);
-    Notebook notebook = note.getNotebook();
-    if (titleConstructor != null) {
-      String trimmed = titleConstructor.trim();
-      if (!trimmed.isEmpty()) {
-        notebook.setPersistedNotebookName(
-            trimmed.length() > Note.MAX_TITLE_LENGTH
-                ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
-                : trimmed);
-      }
-    }
-    if (description != null && !description.isBlank()) {
-      notebook.setDescription(description.trim());
-    }
+    Notebook notebook =
+        ownership.prepareNotebookForNewNotebook(
+            user, currentUTCTimestamp, titleConstructor, description);
     entityPersister.save(notebook);
-    wikiSlugPathService.assignSlugForNewNote(note);
-    entityPersister.save(note);
-    return note;
+    return notebook;
   }
 
   public Optional<Note> findOptionalIndexNote(Notebook notebook) {

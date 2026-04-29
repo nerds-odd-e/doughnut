@@ -3740,7 +3740,6 @@ components:
           type: string
           format: date-time
       required:
-      - headNoteId
       - id
       - notebookSettings
       - title
@@ -4039,6 +4038,9 @@ components:
       type: object
       properties:
         noteId:
+          type: integer
+          format: int32
+        notebookId:
           type: integer
           format: int32
     NotebookUpdateRequest:

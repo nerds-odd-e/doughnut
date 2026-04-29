@@ -47,10 +47,9 @@ public class Notebook extends EntityIdentifiedByIdOnly {
       name = "notebook_head_note",
       joinColumns = {@JoinColumn(name = "notebook_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "head_note_id", referencedColumnName = "id")})
-  @OneToOne
+  @OneToOne(optional = true, fetch = FetchType.LAZY)
   @Getter
   @Setter
-  @NonNull
   @JsonIgnore
   private Note headNote;
 
@@ -166,13 +165,15 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     if (persistedNotebookName != null && !persistedNotebookName.isBlank()) {
       return persistedNotebookName;
     }
+    if (headNote == null) {
+      return "";
+    }
     String fromHead = headNote.getTitle();
     return fromHead != null && !fromHead.isBlank() ? fromHead : "";
   }
 
-  @NonNull
   public Integer getHeadNoteId() {
-    return headNote.getId();
+    return headNote != null ? headNote.getId() : null;
   }
 
   public Circle getCircle() {

@@ -104,14 +104,14 @@ class NotebookController {
   public RedirectToNoteResponse createNotebook(@Valid @RequestBody NoteCreationDTO noteCreation) {
     authorizationService.assertLoggedIn();
     User userEntity = authorizationService.getCurrentUser();
-    Note note =
+    Notebook notebook =
         notebookService.createNotebookForOwnership(
             userEntity.getOwnership(),
             userEntity,
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
-    return new RedirectToNoteResponse(note.getId());
+    return RedirectToNoteResponse.forNotebook(notebook.getId());
   }
 
   @PostMapping(value = "/{notebook}")
@@ -245,8 +245,13 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(notebook);
+    Note head = notebook.getHeadNote();
+    if (head == null) {
+      throw new ResponseStatusException(
+          HttpStatus.NOT_FOUND, "This notebook has no export root note yet.");
+    }
 
-    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook.getHeadNote());
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(head);
 
     return ResponseEntity.ok()
         .header(

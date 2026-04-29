@@ -21,6 +21,7 @@ import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteService;
@@ -47,6 +48,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
   @Autowired NotebookController controller;
   @Autowired NoteRepository noteRepository;
+  @Autowired NotebookRepository notebookRepository;
   @Autowired NoteService noteService;
   @Autowired NotebookGroupService notebookGroupService;
   private Note topNote;
@@ -83,13 +85,15 @@ class NotebookControllerTest extends ControllerTestBase {
   @Nested
   class CreateNotebook {
     @Test
-    void assignsSlugToHeadNoteFromTitle() throws UnexpectedNoAccessRightException {
+    void returnsNotebookIdAndDoesNotCreateNotes() throws UnexpectedNoAccessRightException {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("My Notebook Title");
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
-      Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getFolder(), nullValue());
-      assertThat(head.getSlug(), equalTo("my-notebook-title"));
+      assertThat(response.notebookId, notNullValue());
+      assertThat(response.noteId, nullValue());
+      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
+      assertThat(nb.getHeadNote(), nullValue());
+      assertThat(noteRepository.countByNotebook_Id(response.notebookId), equalTo(0L));
     }
 
     @Test
@@ -98,8 +102,10 @@ class NotebookControllerTest extends ControllerTestBase {
       noteCreation.setNewTitle("Notebook With Blurb");
       noteCreation.setDescription("  Catalog blurb  ");
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
-      Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getNotebook().getDescription(), equalTo("Catalog blurb"));
+      assertThat(response.notebookId, notNullValue());
+      assertThat(response.noteId, nullValue());
+      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
+      assertThat(nb.getDescription(), equalTo("Catalog blurb"));
     }
 
     @Test
@@ -107,8 +113,10 @@ class NotebookControllerTest extends ControllerTestBase {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Notebook No Blurb");
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
-      Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getNotebook().getDescription(), nullValue());
+      assertThat(response.notebookId, notNullValue());
+      assertThat(response.noteId, nullValue());
+      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
+      assertThat(nb.getDescription(), nullValue());
     }
   }
 
@@ -594,6 +602,16 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
+    }
+
+    @Test
+    void whenNotebookHasNoHeadNote() throws UnexpectedNoAccessRightException {
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Obsidian Empty Nb");
+      RedirectToNoteResponse response = controller.createNotebook(noteCreation);
+      Notebook blank = notebookRepository.findById(response.notebookId).orElseThrow();
+      assertThrows(
+          ResponseStatusException.class, () -> controller.downloadNotebookForObsidian(blank));
     }
   }
 

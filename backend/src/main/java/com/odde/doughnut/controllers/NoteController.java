@@ -180,7 +180,7 @@ class NoteController {
                           relation.getRecallSetting().getLevel(), noteRecallSetting.getLevel()));
               entityPersister.save(relation);
             });
-    return new RedirectToNoteResponse(note.getId());
+    return RedirectToNoteResponse.forNote(note.getId());
   }
 
   @PostMapping(value = "/move_after/{note}/{targetNote}/{asFirstChild}")

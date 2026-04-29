@@ -42,7 +42,7 @@ public class Subscription extends EntityIdentifiedByIdOnly {
   private NotebookGroup notebookGroup;
 
   public String getTitle() {
-    return notebook.getHeadNote().getTitle();
+    return notebook.getTitle();
   }
 
   public Note getHeadNote() {

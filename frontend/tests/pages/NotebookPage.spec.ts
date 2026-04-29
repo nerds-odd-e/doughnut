@@ -8,7 +8,7 @@ import type { NoteRealm, Notebook } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 
 function noteRealmForNotebookHead(notebook: Notebook): NoteRealm {
-  const headId = notebook.headNoteId
+  const headId = notebook.headNoteId!
   const r = makeMe.aNoteRealm.please()
   return {
     ...r,

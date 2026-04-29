@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,11 +15,11 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.NotebookGroupService;
@@ -34,6 +36,7 @@ class CircleControllerTest extends ControllerTestBase {
   @Autowired CircleController controller;
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired NoteRepository noteRepository;
+  @Autowired NotebookRepository notebookRepository;
 
   @BeforeEach
   void setup() {
@@ -77,8 +80,11 @@ class CircleControllerTest extends ControllerTestBase {
       noteCreation.setNewTitle("Circle Owned Nb");
       noteCreation.setDescription("Circle catalog blurb");
       RedirectToNoteResponse response = controller.createNotebookInCircle(circle, noteCreation);
-      Note head = noteRepository.findById(response.noteId).orElseThrow();
-      assertThat(head.getNotebook().getDescription(), equalTo("Circle catalog blurb"));
+      assertThat(response.notebookId, notNullValue());
+      assertThat(response.noteId, nullValue());
+      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
+      assertThat(nb.getDescription(), equalTo("Circle catalog blurb"));
+      assertThat(noteRepository.countByNotebook_Id(response.notebookId), equalTo(0L));
     }
   }
 
