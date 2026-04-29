@@ -7,7 +7,7 @@ Feature: Book browsing
     Given I am logged in as an existing user
     And I have a notebook "Refactoring read" with a note "Code Refactoring Book"
     And I set the access token for "old_learner" in the interactive CLI
-    When I attach book "refactoring.pdf" to the notebook "Code Refactoring Book" via the CLI
+    When I attach book "refactoring.pdf" to the notebook "Refactoring read" via the CLI
     And I open the book attached to notebook "Refactoring read"
 
   Scenario: See book layout and beginning of PDF in the browser
