@@ -193,6 +193,11 @@ describe("all in note show page", () => {
       await wrapper.find('[aria-label="Close dialog"]').trigger("click")
       await flushPromises()
 
+      expect(router.currentRoute.value.name).toBe("noteShowByNotebookSlug")
+      expect(router.currentRoute.value.params.notebookId).toBe(
+        String(note.notebook.id)
+      )
+      expect(router.currentRoute.value.params.noteSlugPath).toBe(note.slug)
       expect(router.currentRoute.value.query.conversation).toBeUndefined()
       expect(wrapper.find(".note-content-wrapper").exists()).toBe(true)
       expect(wrapper.find(".conversation-container").exists()).toBe(false)

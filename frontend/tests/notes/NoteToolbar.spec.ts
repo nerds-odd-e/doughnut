@@ -3,8 +3,10 @@ import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsD
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
-import { describe, it, expect, afterEach } from "vitest"
+import { describe, it, expect, afterEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
+import { createRouter, createWebHistory } from "vue-router"
+import routes from "@/routes/routes"
 
 describe("NoteToolbar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -13,6 +15,50 @@ describe("NoteToolbar", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+  })
+
+  it("routes to notebook slug when starting a conversation about the note", async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes,
+    })
+    const pushSpy = vi.spyOn(router, "push")
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    mockSdkService(
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
+
+    wrapper = helper
+      .component(NoteToolbar)
+      .withRouter(router)
+      .withCleanStorage()
+      .withProps({
+        note: noteRealm.note,
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    await wrapper
+      .find('[title="Star a conversation about this note"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: "noteShowByNotebookSlug",
+      params: {
+        notebookId: String(noteRealm.note.noteTopology.notebookId),
+        noteSlugPath: noteRealm.note.noteTopology.slug,
+      },
+      query: { conversation: "true" },
+    })
   })
 
   it("displays menu items when dropdown is open", async () => {

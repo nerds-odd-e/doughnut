@@ -20,6 +20,7 @@ import {
   setErrorObjectForFieldErrors,
 } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -116,22 +117,14 @@ export default class StoredApiCollection implements StoredApi {
     this.storage = storage
   }
 
-  private routerLocationForFocusedNote(noteRealm: NoteRealm) {
-    return {
-      name: "noteShowByNotebookSlug",
-      params: {
-        notebookId: String(noteRealm.notebook.id),
-        noteSlugPath: noteRealm.slug.trim(),
-      },
-    }
-  }
-
   // eslint-disable-next-line class-methods-use-this
   private async routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
     if (!focusOnNote) {
       return await router.replace({ name: "notebooks" })
     }
-    return await router.replace(this.routerLocationForFocusedNote(focusOnNote))
+    return await router.replace(
+      noteShowByNotebookSlugLocationFromNoteRealm(focusOnNote)
+    )
   }
 
   private async updateTextContentWithoutUndo(
@@ -589,7 +582,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       return
     }
-    await router.push(this.routerLocationForFocusedNote(noteRealm))
+    await router.push(noteShowByNotebookSlugLocationFromNoteRealm(noteRealm))
     return noteRealm
   }
 

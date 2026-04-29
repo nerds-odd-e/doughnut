@@ -6,13 +6,15 @@ import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 let renderer: RenderingHelper<typeof AssimilateSingleNotePage>
 let router: ReturnType<typeof createRouter>
 let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
+let noteRealm: NoteRealm
 
 beforeEach(() => {
-  const noteRealm = makeMe.aNoteRealm.please()
+  noteRealm = makeMe.aNoteRealm.please()
   showNoteSpy = mockSdkService("showNote", noteRealm)
   mockSdkService(
     "getNoteInfo",
@@ -75,8 +77,13 @@ describe("AssimilateSingleNotePage", () => {
 
       await flushPromises()
 
-      expect(router.currentRoute.value.name).toBe("noteShow")
-      expect(router.currentRoute.value.params.noteId).toBe(String(noteId))
+      expect(router.currentRoute.value.name).toBe("noteShowByNotebookSlug")
+      expect(router.currentRoute.value.params.notebookId).toBe(
+        String(noteRealm.note.noteTopology.notebookId)
+      )
+      expect(router.currentRoute.value.params.noteSlugPath).toBe(
+        noteRealm.note.noteTopology.slug
+      )
     })
   })
 

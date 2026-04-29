@@ -120,6 +120,7 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalBar from "../components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
+import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
 
 const router = useRouter()
 const route = useRoute()
@@ -257,6 +258,14 @@ const handleCloseConversation = () => {
       : undefined
   if (route.name === "noteShowByNotebookSlug") {
     router.replace({ path: route.path, query: {} })
+    return
+  }
+  const realm = noteRealm.value
+  if (realm) {
+    router.replace({
+      ...noteShowByNotebookSlugLocationFromNoteRealm(realm),
+      query: {},
+    })
     return
   }
   if (segment !== undefined && !/^\d+$/.test(segment)) {
