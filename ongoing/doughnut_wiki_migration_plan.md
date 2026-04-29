@@ -130,11 +130,11 @@ Folder
   updatedAt
 ```
 
-At this phase, folder slug paths may be deferred to Phase 2.
+At Phase 1, folder slug paths were intentionally deferred until Phase 2 (they are implemented now—see Phase 2 status below).
 
 ## Migration Strategy
 
-Initially, folders can mirror the existing parent-note structure. For every backfilled folder that represents a former “parent holds children” node, set **`folder.name`** to that parent note’s **`title`** (the same string as `note.title` on the parent). When Phase 2 adds **`folder.slug`**, it stores the folder’s notebook-local full path; its basename is **slugify(`folder.name`)** per `ongoing/doughnut_wiki_architecture_north_star.md`.
+Initially, folders can mirror the existing parent-note structure. For every backfilled folder that represents a former “parent holds children” node, set **`folder.name`** to that parent note’s **`title`** (the same string as `note.title` on the parent). **`folder.slug`** stores the folder’s notebook-local full path; its basename is **slugify(`folder.name`)** per `ongoing/doughnut_wiki_architecture_north_star.md`.
 
 Old model:
 
@@ -256,10 +256,10 @@ unique(notebook_id, slug)
 
 The frontend should resolve notes by slug path, not by internal ID.
 
-Example URL shapes (exact encoding is an implementation detail):
+Example URL shapes (exact encoding is an implementation detail; shipped paths use the app’s **`/d/`** prefix, e.g. **`/d/notebooks/:notebookId/notes/`** …):
 
 ```text
-/notebooks/:notebookId/... path segments matching note.slug ...
+/d/notebooks/:notebookId/... path segments matching note.slug ...
 ```
 
 The frontend may still use internal IDs behind the scenes after route resolution.
@@ -267,7 +267,7 @@ The frontend may still use internal IDs behind the scenes after route resolution
 Support an additional **local segment** route for unambiguous accessible notes (basename only):
 
 ```text
-/notes/:localSegment
+/d/notes/:localSegment   (aliases e.g. /n:id)
 ```
 
 This route is mostly to make E2E tests easier. It resolves only when exactly one note’s **basename** (derived **`note.slug`**) is visible to the current user among accessible notes, so it does not require a global unique database index.
@@ -304,6 +304,21 @@ This phase does not need to:
 - convert relationship notes
 - parse all wiki links
 - support Obsidian import/export
+
+## Status and implementation notes
+
+Phase 2 is **complete** in the codebase.
+
+- **Slugifier and assignment:** `com.github.slugify:slugify` via `WikiSlugGeneration` / `WikiSlugPathService` and `WikiSlugPathAssignment`; unit tests cover generation and collision suffixing.
+- **Persistence:** Migrations add nullable slug columns then enforce **not null** and **`unique(notebook_id, slug)`** on `folder` and `note` (e.g. `V300000150__folder_note_slug_nullable.sql`, `V300000151__folder_note_slug_not_null_unique.sql`). `Folder` and `Note` entities map **`slug`** as non-null.
+- **New data:** Folder and note creation paths assign **`folder.slug`** and **`note.slug`** on create.
+- **Backfill (historical):** Production-scale backfill was **idempotent and batched** via temporary admin endpoints; after backfill, slug-specific batch/status APIs and DTOs were **removed**. A generalized **Data migration** admin tab remains with **Run migration** calling an **admin-only stub** (`AdminDataMigrationController` at `/api/admin/data-migration/run`: authorization only, no slug business logic).
+- **Resolution:**
+  - **Notebook ID + full slug path:** API and frontend route (**`/d/notebooks/:notebookId/notes/:noteSlugPath`**); `NoteShowPage` resolves via `getNoteBySlug` then loads the note by id.
+  - **Ambiguous basename:** `showNoteByAmbiguousBasename` when exactly one accessible note matches; otherwise a user-visible error.
+  - **Internal id:** existing **`/n:noteId`** (and **`showNote`**) unchanged as a parallel entry.
+- **Moves:** `NoteMotionService` recomputes **`note.slug`** after folder alignment (note subtree); uniqueness follows **`unique(notebook_id, slug)`** (tests cover collisions where applicable).
+- **Tests:** Backend controller/service tests for migration-era behavior, basename lookup, slug path lookup, and motion; **`NoteShowPage.spec.ts`** covers id-, basename-, and slug-path-based resolution. E2E uses a shared **`wikiBasenameFromTitle`** helper aligned with slug rules for basename navigation; optional **Cypress coverage for navigating by full notebook-relative slug path** can be added if product owners want parity with backend behavior.
 
 ---
 

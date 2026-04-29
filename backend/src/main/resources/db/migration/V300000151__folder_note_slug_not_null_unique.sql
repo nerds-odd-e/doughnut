@@ -1,3 +1,7 @@
+UPDATE note
+SET slug = CONCAT('note-id-', id)
+WHERE slug IS NULL OR TRIM(slug) = '';
+
 ALTER TABLE folder
   MODIFY COLUMN slug VARCHAR(767) NOT NULL,
   ADD UNIQUE KEY uk_folder_notebook_slug (notebook_id, slug);
