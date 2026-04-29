@@ -123,7 +123,7 @@ describe("RichMarkdownEditor", () => {
     )
   })
 
-  it("renders only the parsed body in rich mode when details include YAML frontmatter", async () => {
+  it("shows read-only Properties above Quill when details include supported YAML frontmatter", async () => {
     const details = `---
 diligence: high
 topic: training
@@ -135,11 +135,49 @@ Main content here.`
     await mountEditor(details)
     await flushPromises()
 
+    expect(wrapper.text()).toContain("Properties")
+    expect(wrapper.text()).toContain("diligence")
+    expect(wrapper.text()).toContain("high")
+    expect(wrapper.text()).toContain("topic")
+    expect(wrapper.text()).toContain("training")
+
     const quill = wrapper.findComponent({ name: "QuillEditor" })
     const html = String(quill.props("modelValue"))
     expect(html).toContain("Workshop Body")
     expect(html).not.toContain("diligence:")
     expect(html).not.toContain("topic:")
+  })
+
+  it("does not show Properties section when details have no frontmatter", async () => {
+    await mountEditor("# Hello\n\nParagraph.")
+    await flushPromises()
+
+    expect(wrapper.find("section").exists()).toBe(false)
+  })
+
+  it("does not show Properties section when frontmatter block is empty", async () => {
+    await mountEditor(`---
+
+
+---
+
+Body`)
+    await flushPromises()
+
+    expect(wrapper.find("section").exists()).toBe(false)
+  })
+
+  it("does not show Properties section when frontmatter fails to parse", async () => {
+    const details = `---
+bad:
+  nested: value
+---
+
+Still body`
+    await mountEditor(details)
+    await flushPromises()
+
+    expect(wrapper.find("section").exists()).toBe(false)
   })
 
   it("composes edited body with existing frontmatter when emitting updates", async () => {
