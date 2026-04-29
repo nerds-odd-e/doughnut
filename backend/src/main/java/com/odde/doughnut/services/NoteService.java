@@ -56,7 +56,7 @@ public class NoteService {
   }
 
   public List<Note> findNotesVisibleToUserBySlugBasename(User user, String basename) {
-    return noteRepository.findAllNonDeletedBySlugBasename(basename).stream()
+    return noteRepository.findAllBySlugBasenameIncludingDeleted(basename).stream()
         .filter(n -> authorizationService.userMayReadNote(user, n))
         .toList();
   }

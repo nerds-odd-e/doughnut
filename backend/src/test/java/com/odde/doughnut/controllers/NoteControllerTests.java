@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
@@ -32,6 +33,7 @@ class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NoteController controller;
+  @Autowired NoteService noteService;
   @Autowired RecallService recallService;
   @Autowired MemoryTrackerService memoryTrackerService;
   @Autowired UserService userService;
@@ -78,6 +80,16 @@ class NoteControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
       NoteRealm realm = controller.showNoteByBasename("foo");
       assertThat(realm.getId(), equalTo(note.getId()));
+    }
+
+    @Test
+    void shouldStillResolveBasenameAfterSoftDeleteSoClientCanShowDeletedState() {
+      User user = currentUser.getUser();
+      Note note = makeMe.aNote().creatorAndOwner(user).slug("a/tdd").please();
+      noteService.destroy(note);
+      NoteRealm realm = controller.showNoteByBasename("tdd");
+      assertThat(realm.getId(), equalTo(note.getId()));
+      assertThat(realm.getNote().getDeletedAt(), notNullValue());
     }
 
     @Test

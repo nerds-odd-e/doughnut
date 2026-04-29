@@ -27,9 +27,9 @@ Given(
   (notebookTitle: string, data: DataTable) => {
     const notes = data.hashes()
     notes.unshift({ Title: notebookTitle })
-    cy.get<string>('@currentLoginUser').then((username) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes(notes, username)
-    })
+    )
   }
 )
 
@@ -39,42 +39,42 @@ Given('there are some notes:', (data: DataTable) => {
       throw new Error('Parent Title is required for all notes')
     }
   })
-  cy.get<string>('@currentLoginUser').then((username) => {
+  cy.get<string>('@currentLoginUser').then((username) =>
     start.testability().injectNotes(data.hashes(), username)
-  })
+  )
 })
 
 Given(
   'I have a notebook with the head note {string}',
   (noteTopology: string) => {
-    cy.get<string>('@currentLoginUser').then((username) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes([{ Title: noteTopology }], username)
-    })
+    )
   }
 )
 
 Given(
   'I have a notebook with the head note {string} which skips memory tracking',
   (noteTopology: string) => {
-    cy.get<string>('@currentLoginUser').then((username) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
       start
         .testability()
         .injectNotes(
           [{ Title: noteTopology, 'Skip Memory Tracking': true }],
           username
         )
-    })
+    )
   }
 )
 
 Given(
   'I have a notebook with the head note {string} and details {string}',
   (noteTopology: string, details: string) => {
-    cy.get<string>('@currentLoginUser').then((username) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
       start
         .testability()
         .injectNotes([{ Title: noteTopology, Details: details }], username)
-    })
+    )
   }
 )
 
@@ -105,9 +105,9 @@ Given(
       .map((_, i) => {
         return { Title: `Note ${i + from}` }
       })
-    cy.get<string>('@currentLoginUser').then((username) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes(notes, username)
-    })
+    )
   }
 )
 

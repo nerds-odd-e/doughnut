@@ -166,15 +166,15 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   /**
    * Basename is the segment after the last {@code /} in {@code slug}; use MySQL SUBSTRING_INDEX.
+   * Includes soft-deleted rows so note URLs by slug still resolve for deleted-note UI.
    */
   @Query(
-      value =
-          "SELECT id FROM note WHERE deleted_at IS NULL AND SUBSTRING_INDEX(slug, '/', -1) = :basename",
+      value = "SELECT id FROM note WHERE SUBSTRING_INDEX(slug, '/', -1) = :basename",
       nativeQuery = true)
-  List<Integer> findIdsBySlugBasename(@Param("basename") String basename);
+  List<Integer> findIdsBySlugBasenameIncludingDeleted(@Param("basename") String basename);
 
-  default List<Note> findAllNonDeletedBySlugBasename(String basename) {
-    List<Integer> ids = findIdsBySlugBasename(basename);
+  default List<Note> findAllBySlugBasenameIncludingDeleted(String basename) {
+    List<Integer> ids = findIdsBySlugBasenameIncludingDeleted(basename);
     if (ids.isEmpty()) {
       return List.of();
     }

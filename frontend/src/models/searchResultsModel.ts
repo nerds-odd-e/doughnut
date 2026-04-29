@@ -235,7 +235,8 @@ export class SearchResultsModel {
     const merged = this.mergeUniqueAndSortByDistance(
       existing,
       incoming,
-      opts.currentNotebookId
+      opts.currentNotebookId,
+      opts.trimmedSearchKey.trim().toLowerCase()
     )
     this.setCachedResult(opts.trimmedSearchKey, opts.isGlobal, merged)
     this.clearPreviousResult()
@@ -244,24 +245,20 @@ export class SearchResultsModel {
   private mergeUniqueAndSortByDistance(
     existing: NoteSearchResult[],
     incoming: NoteSearchResult[],
-    currentNotebookId?: number
+    currentNotebookId?: number,
+    searchKeyLower = ""
   ): NoteSearchResult[] {
     const byId = new Map<number, NoteSearchResult>()
     const getId = (r: NoteSearchResult) => r.noteTopology.id as number
 
-    /** Backend literal API uses 0 = exact title, 0.9 = substring; keep those over semantic embeddings. */
+    /** Backend literal matches use distance 0 for exact title equality; prefer over semantic rows. */
     const isExactLiteralDistance = (d: number) => d === 0
-    const isPartialLiteralDistance = (d: number) => Math.abs(d - 0.9) < 1e-3
 
     const chooseBetter = (a: NoteSearchResult, b: NoteSearchResult) => {
       const da = a.distance ?? Infinity
       const db = b.distance ?? Infinity
       if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return a
       if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return b
-      if (isPartialLiteralDistance(da) && !isPartialLiteralDistance(db))
-        return a
-      if (!isPartialLiteralDistance(da) && isPartialLiteralDistance(db))
-        return b
       return db < da ? b : a
     }
 
@@ -275,23 +272,33 @@ export class SearchResultsModel {
     const titleOf = (r: NoteSearchResult) => r.noteTopology.title ?? ""
 
     return Array.from(byId.values()).sort((a, b) => {
-      const distDiff = (a.distance ?? Infinity) - (b.distance ?? Infinity)
-      if (distDiff !== 0) return distDiff
+      const ta = titleOf(a).trim().toLowerCase()
+      const tb = titleOf(b).trim().toLowerCase()
+      const exactA = searchKeyLower !== "" && ta === searchKeyLower
+      const exactB = searchKeyLower !== "" && tb === searchKeyLower
+      if (exactA !== exactB) return exactA ? -1 : 1
+
+      const da = a.distance ?? Infinity
+      const db = b.distance ?? Infinity
+      const distDiff = da - db
+      if (!Number.isNaN(distDiff) && Math.abs(distDiff) > 1e-6) {
+        return distDiff
+      }
+
       if (currentNotebookId !== undefined) {
         const aSame = a.notebookId === currentNotebookId
         const bSame = b.notebookId === currentNotebookId
         const nb = Number(bSame) - Number(aSame)
         if (nb !== 0) return nb
       }
-      const da = a.distance ?? Infinity
-      const db = b.distance ?? Infinity
-      if (isPartialLiteralDistance(da) && isPartialLiteralDistance(db)) {
-        const lenDiff = titleOf(a).length - titleOf(b).length
-        if (lenDiff !== 0) return lenDiff
-        return titleOf(a).localeCompare(titleOf(b), undefined, {
-          sensitivity: "base",
-        })
-      }
+
+      const lenDiff = titleOf(a).length - titleOf(b).length
+      if (lenDiff !== 0) return lenDiff
+      const cmp = titleOf(a).localeCompare(titleOf(b), undefined, {
+        sensitivity: "base",
+      })
+      if (cmp !== 0) return cmp
+
       return (a.noteTopology.id as number) - (b.noteTopology.id as number)
     })
   }
