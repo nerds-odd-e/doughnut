@@ -1,25 +1,9 @@
 <template>
   <div>
-    <section
-      v-if="showReadOnlyProperties"
-      class="daisy-mb-3"
-      :aria-labelledby="propertiesHeadingId"
-    >
-      <h4
-        :id="propertiesHeadingId"
-        class="daisy-text-sm daisy-font-semibold daisy-mb-2"
-      >
-        Properties
-      </h4>
-      <dl
-        class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm"
-      >
-        <template v-for="row in propertyRows" :key="row.key">
-          <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
-          <dd class="daisy-m-0">{{ row.value }}</dd>
-        </template>
-      </dl>
-    </section>
+    <RichFrontmatterProperties
+      ref="frontmatterPropertiesRef"
+      :details-markdown="modelValue ?? ''"
+    />
     <QuillEditor
       v-bind="{ multipleLine, scopeName, field, title, errors }"
       :model-value="htmlValue"
@@ -33,8 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useId, watch, type PropType } from "vue"
+import { computed, ref, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
+import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
 import {
   replaceWikiLinksInHtml,
@@ -43,8 +28,6 @@ import {
 import {
   composeNoteDetailsFromPropertyRows,
   parseNoteDetailsMarkdown,
-  sortedPropertyRowsFromRecord,
-  type PropertyRow,
 } from "@/utils/noteDetailsFrontmatter"
 
 const props = defineProps({
@@ -69,28 +52,13 @@ const emits = defineEmits<{
 let currentIntervalBodyMarkdown: string | undefined
 let currentIntervalHtml: string | undefined
 
-const propertiesHeadingId = useId()
+const frontmatterPropertiesRef = ref<InstanceType<
+  typeof RichFrontmatterProperties
+> | null>(null)
 
 const parsedDetails = computed(() =>
   parseNoteDetailsMarkdown(props.modelValue ?? "")
 )
-
-const propertyRows = ref<PropertyRow[]>([])
-
-watch(
-  () => props.modelValue,
-  () => {
-    const p = parseNoteDetailsMarkdown(props.modelValue ?? "")
-    if (p.ok) {
-      propertyRows.value = sortedPropertyRowsFromRecord(p.properties)
-    } else {
-      propertyRows.value = []
-    }
-  },
-  { immediate: true }
-)
-
-const showReadOnlyProperties = computed(() => propertyRows.value.length > 0)
 
 const markdownForRichDisplay = computed(() => {
   const p = parsedDetails.value
@@ -132,7 +100,7 @@ const htmlValueUpdated = (newHtmlValue: string) => {
 
   if (p.ok) {
     const composed = composeNoteDetailsFromPropertyRows(
-      propertyRows.value,
+      frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
       bodyMarkdown
     )
     if (composed === prevFull) return
