@@ -1,4 +1,18 @@
+import { submittableForm } from '../forms'
 import { pageIsNotLoading } from '../pageBase'
+import noteCreationForm from './noteForms/noteCreationForm'
+
+const sidebarAddChildButton = () => {
+  const getButton = () =>
+    cy.get('aside').findByRole('button', { name: 'Add Child Note' })
+  return {
+    click: () => {
+      getButton().click()
+      return { ...submittableForm }
+    },
+    shouldNotExist: () => getButton().should('not.exist'),
+  }
+}
 
 export const noteSidebar = () => {
   cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
@@ -41,6 +55,14 @@ export const noteSidebar = () => {
           )
         })
       })
+    },
+    addingChildNoteButton() {
+      pageIsNotLoading()
+      return sidebarAddChildButton()
+    },
+    addingChildNote() {
+      sidebarAddChildButton().click()
+      return noteCreationForm
     },
   }
 }

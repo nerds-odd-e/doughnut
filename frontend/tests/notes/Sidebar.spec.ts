@@ -198,6 +198,51 @@ describe("Sidebar", () => {
     })
   })
 
+  describe("sidebar toolbar", () => {
+    it("shows Add Child Note when a user is present and notebook is not from bazaar", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: firstGeneration,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
+    })
+
+    it("hides Add Child Note when no current user", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withProps({
+          activeNoteRealm: firstGeneration,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(
+        false
+      )
+    })
+
+    it("hides Add Child Note when note realm is from bazaar", async () => {
+      const bazaarRealm = {
+        ...firstGeneration,
+        fromBazaar: true,
+      } as NoteRealm
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: bazaarRealm,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(
+        false
+      )
+    })
+  })
+
   it("should start from notebook top", async () => {
     mountSidebar(secondGeneration)
     await vi.waitUntil(() =>

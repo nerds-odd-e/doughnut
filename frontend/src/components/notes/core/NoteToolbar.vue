@@ -2,14 +2,6 @@
   <nav class="daisy-navbar daisy-bg-base-200">
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteNewButton
-        v-if="!readonly"
-        button-title="Add Child Note"
-        v-bind="{ referenceNote: note, insertMode: 'as-child' }"
-      >
-        <FolderPlus class="w-5 h-5" />
-      </NoteNewButton>
-
-      <NoteNewButton
         v-if="!readonly && note.parentId"
         button-title="Add Next Sibling Note"
         v-bind="{ referenceNote: note, insertMode: 'after' }"
@@ -98,7 +90,6 @@ import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import AddRelationshipDialog from "../../links/AddRelationshipDialog.vue"
 import {
   FileCode,
-  FolderPlus,
   Folders,
   LayoutTemplate,
   MessageCircle,

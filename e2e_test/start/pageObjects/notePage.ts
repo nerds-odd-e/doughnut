@@ -226,12 +226,10 @@ export const assumeNotePage = (noteTopology?: string) => {
       return assumeNoteTargetSearchDialog()
     },
     addingChildNoteButton() {
-      pageIsNotLoading()
-      return this.toolbarButton('Add Child Note')
+      return noteSidebar().addingChildNoteButton()
     },
     addingChildNote() {
-      this.addingChildNoteButton().click()
-      return noteCreationForm
+      return noteSidebar().addingChildNote()
     },
     addingNextSiblingNote() {
       pageIsNotLoading()
