@@ -40,7 +40,7 @@ class AiToolFactoryTest {
     InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool();
 
     assertThat(result.getMessageBody(), containsString("Multiple-Choice Question"));
-    assertThat(result.getMessageBody(), containsString("2 to 3 options"));
+    assertThat(result.getMessageBody(), containsString("Provide 3 options"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
 
