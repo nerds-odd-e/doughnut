@@ -203,7 +203,7 @@ export type Notebook = {
     title: string;
     circle?: Circle;
     headNoteId: number;
-    shortDetails?: string;
+    description?: string;
     hasAttachedBook?: boolean;
     updated_at: string;
 };
@@ -308,7 +308,7 @@ export type SuggestedQuestionForFineTuning = {
 export type NoteCreationDto = {
     newTitle: string;
     wikidataId?: string;
-    shortDetails?: string;
+    description?: string;
 };
 
 export type NoteCreationResult = {
@@ -354,7 +354,7 @@ export type NotebookUpdateRequest = {
     skipMemoryTrackingEntirely?: boolean;
     numberOfQuestionsInAssessment?: number;
     certificateExpiry?: string;
-    shortDetails?: string;
+    description?: string;
 };
 
 /**

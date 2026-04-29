@@ -6,10 +6,10 @@
     />
     <TextArea
       scope-name="notebook"
-      field="shortDetails"
-      v-model="noteFormData.shortDetails"
+      field="description"
+      v-model="noteFormData.description"
       :rows="3"
-      :error-message="errors.shortDetails"
+      :error-message="errors.description"
       placeholder="Optional short plain-text message (shown on notebook cards)"
     />
     <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
@@ -36,10 +36,10 @@ export default {
   },
   data() {
     return {
-      noteFormData: { newTitle: "", shortDetails: "" } as NoteCreationDto,
+      noteFormData: { newTitle: "", description: "" } as NoteCreationDto,
       errors: {
         newTitle: undefined as undefined | string,
-        shortDetails: undefined as undefined | string,
+        description: undefined as undefined | string,
       } as Record<string, string | undefined>,
     }
   },

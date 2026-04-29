@@ -39,12 +39,12 @@ const myNotebooksPage = () => {
         this as any
       )
     },
-    creatingNotebook(notebookTopic: string, shortDetails?: string) {
+    creatingNotebook(notebookTopic: string, description?: string) {
       addNewNotebookButton().click()
-      if (shortDetails !== undefined) {
-        return noteCreationForm.createNotebookWithTitleAndShortDetails(
+      if (description !== undefined) {
+        return noteCreationForm.createNotebookWithTitleAndDescription(
           notebookTopic,
-          shortDetails
+          description
         )
       }
       return noteCreationForm.createNoteWithTitle(notebookTopic)

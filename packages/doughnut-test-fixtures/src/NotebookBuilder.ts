@@ -39,7 +39,7 @@ class NotebookBuilder extends Builder<Notebook> {
   do(): Notebook {
     this.data.headNoteId = this.notebuilder.do().noteTopology.id
     this.data.title = this.notebuilder.do().noteTopology.title ?? ''
-    this.data.shortDetails = this.notebuilder.do().noteTopology.shortDetails
+    this.data.description = this.notebuilder.do().noteTopology.shortDetails
     return this.data
   }
 }

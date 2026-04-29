@@ -21,8 +21,8 @@
           <h5 class="daisy-text-lg daisy-font-semibold">
             {{ notebook.title }}
           </h5>
-          <p v-if="notebook.shortDetails" class="note-short-details">
-            {{ notebook.shortDetails }}
+          <p v-if="notebook.description" class="note-short-details">
+            {{ notebook.description }}
           </p>
         </div>
       </router-link>
@@ -78,8 +78,8 @@
         <div class="settings-item settings-item-full-width">
           <TextArea
             scope-name="notebook"
-            field="shortDetails"
-            v-model="formData.shortDetails"
+            field="description"
+            v-model="formData.description"
             :rows="3"
             placeholder="Optional short plain-text message (shown on notebook cards)"
           />
@@ -283,7 +283,7 @@ const formData = ref({
   skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
   certificateExpiry,
-  shortDetails: props.notebook.shortDetails ?? "",
+  description: props.notebook.description ?? "",
 })
 
 watch(
@@ -295,7 +295,7 @@ watch(
       numberOfQuestionsInAssessment:
         nb.notebookSettings.numberOfQuestionsInAssessment,
       certificateExpiry: nb.notebookSettings.certificateExpiry ?? "1y",
-      shortDetails: nb.shortDetails ?? "",
+      description: nb.description ?? "",
     }
   },
   { deep: true }

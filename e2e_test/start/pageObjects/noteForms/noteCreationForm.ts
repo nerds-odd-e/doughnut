@@ -11,10 +11,10 @@ const noteCreationForm = {
     })
   },
 
-  createNotebookWithTitleAndShortDetails(title: string, shortDetails: string) {
+  createNotebookWithTitleAndDescription(title: string, description: string) {
     return submittableForm.submitWith({
       Title: title,
-      'Short Details': shortDetails,
+      Description: description,
     })
   },
 

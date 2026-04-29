@@ -14,11 +14,11 @@
           {{ notebook.title }}
         </h5>
         <p
-          v-if="notebook.shortDetails"
+          v-if="notebook.description"
           class="note-short-details"
           :class="{ 'note-short-details--compact': compact }"
         >
-          {{ notebook.shortDetails }}
+          {{ notebook.description }}
         </p>
       </div>
     </router-link>

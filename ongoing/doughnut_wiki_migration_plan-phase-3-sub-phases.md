@@ -13,7 +13,7 @@ After Phase 3:
 - the notebook keeps its own name independently of note title/content
 - the former head note is represented as a normal root note titled `index` with `note.slug = "index"`
 - a notebook may have no `index` note
-- a notebook has editable plain-text `shortDetails` for a short notebook settings message
+- a notebook has editable plain-text `description` for a short notebook settings message
 - opening a notebook shows a notebook page with an editor for optional index content
 - saving notebook page content creates or updates the normal root `index` note
 - first-layer notes no longer need to be children of a head note
@@ -24,7 +24,7 @@ After Phase 3:
 
 - Preserve the former head note ID during migration where feasible. The migrated record becomes the ordinary `index` note so existing stable note identity is not thrown away.
 - Do not add a notebook content field. Notebook page body content belongs to the optional root `index` note.
-- Store the notebook's short settings message on `Notebook.shortDetails`, not on the optional `index` note.
+- Store the notebook's short settings message on `Notebook.description`, not on the optional `index` note.
 - Use the current notebook get endpoint and the generated `Notebook` object for notebook page data; do not introduce a separate notebook-page get endpoint or DTO.
 - Treat `index` as a normal note after migration: `title = "index"`, `slug = "index"`, `folderId = null`, content copied from the former head note.
 - Assume production has no existing user note titled/sluggified as `index`, as stated in the main migration plan.
@@ -72,7 +72,7 @@ Add a small backend capability for finding a notebook's root `index` note withou
 
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests "*Notebook*"`
 
-### 3.3 Add Notebook Short Details
+### 3.3 Add Notebook Description
 
 **Type:** Behavior
 
@@ -80,11 +80,11 @@ Users can edit a short plain-text notebook message from notebook settings.
 
 **Commit includes:**
 
-- add `shortDetails` to the notebook entity, persistence, API object, and generated frontend type
-- notebook settings lets the user edit `shortDetails` as a plain-text short message
-- database migration copies existing head note details into `notebook.short_details`, truncated to the field limit
+- add `description` to the notebook entity, persistence, API object, and generated frontend type
+- notebook settings lets the user edit `description` as a plain-text short message
+- database migration copies existing head note details into `notebook.description`, truncated to the field limit
 - backend tests cover migration and notebook settings update/read behavior
-- frontend test covers editing and saving the short details field from notebook settings
+- frontend test covers editing and saving the description field from notebook settings
 - no new notebook-page get endpoint or notebook-page DTO
 
 **Verification:**
@@ -307,7 +307,7 @@ Permanent API contracts stop exposing `headNoteId` / `headNote` as notebook iden
 **Commit includes:**
 
 - remove head-note fields from notebook DTOs used by frontend/generated clients
-- frontend switches remaining notebook links/display logic to notebook ID, notebook name, `shortDetails`, and the **`/notebooks/:notebookId/index`** path where the index note or notebook page body is needed
+- frontend switches remaining notebook links/display logic to notebook ID, notebook name, `description`, and the **`/notebooks/:notebookId/index`** path where the index note or notebook page body is needed
 - regenerate TypeScript client
 - update tests and fixtures that build notebooks with `headNoteId` only for routing
 
@@ -411,7 +411,7 @@ Phase 3 is complete when:
 
 - notebooks can be opened, displayed, and edited without a head note
 - notebooks can exist without an index note
-- notebooks expose editable `shortDetails`, backfilled from truncated existing head note details
+- notebooks expose editable `description`, backfilled from truncated existing head note details
 - optional root `index` note identity is reached via **`/notebooks/:notebookId/index`**, not via an `indexNoteId` field on the notebook API; the current `Notebook` object stays the existing get shape without a separate notebook-page get DTO
 - show-note and related payloads use **`notebookId` on `NoteRealm`**, not an embedded `notebook`, per **3.17**
 - saving notebook page content creates or updates the optional root `index` note

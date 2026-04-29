@@ -23,11 +23,11 @@
           {{ notebook.title }}
         </h5>
         <p
-          v-if="notebook.shortDetails"
+          v-if="notebook.description"
           class="daisy-m-0 daisy-line-clamp-2 daisy-leading-relaxed daisy-text-base-content/60"
           :class="compact ? 'daisy-text-xs' : 'daisy-text-sm'"
         >
-          {{ notebook.shortDetails }}
+          {{ notebook.description }}
         </p>
       </router-link>
       <div

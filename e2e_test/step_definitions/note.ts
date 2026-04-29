@@ -142,11 +142,9 @@ Given(
 )
 
 When(
-  'I create a notebook with title {string} and short details {string}',
-  (notebookTitle: string, shortDetails: string) => {
-    start
-      .navigateToNotebooksPage()
-      .creatingNotebook(notebookTitle, shortDetails)
+  'I create a notebook with title {string} and description {string}',
+  (notebookTitle: string, description: string) => {
+    start.navigateToNotebooksPage().creatingNotebook(notebookTitle, description)
   }
 )
 

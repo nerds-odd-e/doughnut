@@ -56,23 +56,21 @@ describe("NotebookPageView.spec", () => {
     ).toBe("2y 3m 4w 5d")
   })
 
-  it("sends shortDetails when saving notebook settings", async () => {
+  it("sends description when saving notebook settings", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
-      shortDetails: "Initial blurb",
+      description: "Initial blurb",
     }
     const updateSpy = vi
       .spyOn(NotebookController, "updateNotebook")
-      .mockResolvedValue(
-        wrapSdkResponse({ ...nb, shortDetails: "Saved blurb" })
-      )
+      .mockResolvedValue(wrapSdkResponse({ ...nb, description: "Saved blurb" }))
     const wrapper = helper
       .component(NotebookPageView)
       .withRouter()
       .withProps({ notebook: nb })
       .mount()
 
-    await wrapper.find("[name='shortDetails']").setValue("Saved blurb")
+    await wrapper.find("[name='description']").setValue("Saved blurb")
     await wrapper.find("button.daisy-btn-primary.daisy-mt-4").trigger("click")
     await flushPromises()
 
@@ -80,7 +78,7 @@ describe("NotebookPageView.spec", () => {
       expect.objectContaining({
         path: { notebook: nb.id },
         body: expect.objectContaining({
-          shortDetails: "Saved blurb",
+          description: "Saved blurb",
           skipMemoryTrackingEntirely:
             nb.notebookSettings.skipMemoryTrackingEntirely,
         }),
