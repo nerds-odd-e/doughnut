@@ -40,6 +40,8 @@ export interface StoredApi {
 
   getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
 
+  loadNoteByBasename(basename: string): Promise<NoteRealm>
+
   createNote(
     router: Router,
     parentId: Doughnut.ID,
@@ -196,6 +198,18 @@ export default class StoredApiCollection implements StoredApi {
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.showNote({
         path: { note: noteId },
+      })
+    )
+    if (error || !noteRealm) {
+      throw new Error(toErrorMessage(error, "Failed to load note"))
+    }
+    return this.storage.refreshNoteRealm(noteRealm)
+  }
+
+  async loadNoteByBasename(basename: string): Promise<NoteRealm> {
+    const { data: noteRealm, error } = await apiCallWithLoading(() =>
+      NoteController.showNoteByBasename({
+        path: { basename },
       })
     )
     if (error || !noteRealm) {

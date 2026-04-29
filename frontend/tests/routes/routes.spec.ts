@@ -44,5 +44,26 @@ describe("routes", () => {
         expect(props.noteId).toBe(noteId)
       }
     })
+
+    it("should match basename alias /d/notes/:noteId and pass basename prop", async () => {
+      await router.push("/d/notes/my-note-slug")
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteShow")
+      expect(route.params.noteId).toBe("my-note-slug")
+
+      const noteShowRoute = routes.find((r) => r.name === "noteShow")
+      expect(noteShowRoute).toBeDefined()
+      if (noteShowRoute && typeof noteShowRoute.props === "function") {
+        expect(noteShowRoute.props(route)).toEqual({
+          basename: "my-note-slug",
+        })
+      }
+    })
+
+    it("should not match noteShow when /n is not followed by digits only", () => {
+      const resolved = router.resolve("/nabc")
+      expect(resolved.matched.some((r) => r.name === "noteShow")).toBe(false)
+    })
   })
 })

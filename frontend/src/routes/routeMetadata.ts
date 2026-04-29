@@ -5,6 +5,7 @@ import type { RouteLocation } from "vue-router"
 export interface RouteMetadata {
   path: string
   name: string
+  alias?: string | string[]
   props?: boolean | ((route: RouteLocation) => Record<string, unknown>)
   meta?: Record<string, unknown>
 }
@@ -37,9 +38,32 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
-    path: "/n:noteId",
+    path: "/n:noteId(\\d+)",
+    // Alias must use the same param name (`noteId`) as the primary path (Vue Router).
+    // `/d/notes/:noteId` carries a slug segment; props distinguish digits vs basename.
+    alias: "/d/notes/:noteId",
     name: "noteShow",
-    props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
+    props: (route: RouteLocation) => {
+      const raw = route.params.noteId
+      if (raw === undefined || raw === "") {
+        return {}
+      }
+      const segment = Array.isArray(raw) ? String(raw[0] ?? "") : String(raw)
+      if (segment === "") {
+        return {}
+      }
+      if (/^\d+$/.test(segment)) {
+        const noteId = Number(segment)
+        if (!Number.isNaN(noteId)) {
+          return { noteId }
+        }
+      }
+      try {
+        return { basename: decodeURIComponent(segment) }
+      } catch {
+        return { basename: segment }
+      }
+    },
     meta: { useNoteStorageAccessor: true },
   },
   {

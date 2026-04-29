@@ -1,11 +1,16 @@
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockShowNoteAccessory, mockSdkService } from "@tests/helpers"
+import helper, {
+  mockShowNoteAccessory,
+  mockSdkService,
+  wrapSdkError,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import { describe, it, beforeEach, expect } from "vitest"
+import { describe, it, beforeEach, expect, vi } from "vitest"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 
 describe("all in note show page", () => {
   let router: ReturnType<typeof createRouter>
@@ -40,6 +45,56 @@ describe("all in note show page", () => {
       expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: noteRealm.id },
       })
+    })
+  })
+
+  describe("note show by basename", () => {
+    const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
+
+    beforeEach(() => {
+      mockSdkService("showNoteByBasename", noteRealm)
+      mockSdkService("showNote", noteRealm)
+    })
+
+    it("resolves basename then loads note and passes stable id to NoteShow via storage", async () => {
+      const basenameSpy = mockSdkService("showNoteByBasename", noteRealm)
+      const showNoteSpy = mockSdkService("showNote", noteRealm)
+
+      helper
+        .component(NoteShowPage)
+        .withCleanStorage()
+        .withProps({ basename: "my-note" })
+        .withRouter(router)
+        .render()
+
+      await flushPromises()
+      await screen.findByText(noteRealm.note.noteTopology.title!)
+
+      expect(basenameSpy).toHaveBeenCalledWith({
+        path: { basename: "my-note" },
+      })
+      expect(showNoteSpy).toHaveBeenCalledWith({
+        path: { note: noteRealm.id },
+      })
+    })
+
+    it("shows error when basename lookup fails", async () => {
+      vi.spyOn(NoteController, "showNoteByBasename").mockResolvedValue(
+        wrapSdkError({
+          message: "More than one note matches this name.",
+        }) as never
+      )
+
+      helper
+        .component(NoteShowPage)
+        .withCleanStorage()
+        .withProps({ basename: "ambiguous" })
+        .withRouter(router)
+        .render()
+
+      expect(
+        await screen.findByText(/More than one note matches this name/)
+      ).toBeTruthy()
     })
   })
 

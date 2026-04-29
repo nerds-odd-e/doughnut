@@ -36,7 +36,7 @@ After Phase 2:
 
 ## Status
 
-All sub-phases are **planned**.
+All sub-phases are **planned**. **Progress:** Sub-phase **2.11** backend deliverables (basename lookup API and access control) are implemented; **2.11.1** and **2.11.2** are the remaining frontend router/page consolidation and E2E alignment for that capability.
 
 ## Sub-Phases
 
@@ -237,18 +237,47 @@ Once production data is migrated, enforce the Phase 2 persistence invariants.
 
 Users can open the temporary/convenience route for an unambiguous accessible note when matching the **basename** (local segment of **`note.slug`**).
 
-**Commit includes:**
+**Commit includes (backend — done):**
 
 - backend lookup by basename among notes visible to the current user
 - ambiguous basename returns a user-visible not-found or ambiguity error
-- frontend `/notes/:localSegment` route resolves through the backend and opens the note
-- E2E scenario in a capability-named feature file
+
+Frontend router/page consolidation and E2E updates for this capability are **2.11.1** and **2.11.2**.
 
 **Verification:**
 
 - targeted backend controller tests
-- targeted frontend route/component tests
-- relevant Cypress spec only
+
+### 2.11.1 Single note show route and resolved note id on NoteShowPage
+
+**Type:** Behavior
+
+Opening a note by internal id and opening a note by ambiguous basename use the **same** note-show router configuration and the **same** `frontend/src/pages/NoteShowPage.vue`. The page waits until the note id is resolved from **`noteRealm`** (and related loading/error state) before passing a stable **`resolvedNoteId`** into **`NoteShow`**. **`resolvedNoteId`** is a **computed** value derived from realm state (not ad-hoc imperative timing).
+
+**Commit includes:**
+
+- one shared note-show route/path pattern for both id-based and basename-based entry (no duplicate note-show page components for the two cases)
+- `NoteShowPage` passes **`resolvedNoteId`** to **`NoteShow`** only once resolution is known; avoid flashing or wiring **`NoteShow`** with an unresolved id
+- high-level frontend tests (mounted page or router-level) that cover resolution and hand-off to **`NoteShow`**
+
+**Verification:**
+
+- targeted frontend tests only (no new E2E in this sub-phase)
+
+### 2.11.2 E2E sluggify and basename-first “jump to note”
+
+**Type:** Behavior
+
+E2E builds basename/slug expectations with the same slug rules the product uses, and navigation tests prefer the ambiguous note-show path instead of notebook list caches.
+
+**Commit includes:**
+
+- introduce **sluggify** (or an equivalent single helper aligned with backend slug rules) in the E2E layer for constructing basename/path expectations in steps and URLs
+- replace “jump to note” flows that looked up an internal id from a cached list with navigation to the ambiguous note-show page (basename route) where that matches the scenario intent
+
+**Verification:**
+
+- relevant Cypress spec(s) for the touched flows
 
 ### 2.12 Resolve Notes by Notebook ID and Note Slug Path
 

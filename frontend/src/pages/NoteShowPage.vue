@@ -74,20 +74,29 @@
     <main
       class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
     >
+      <div
+        v-if="basenameError !== null"
+        class="daisy-alert daisy-alert-error daisy-my-4"
+        role="alert"
+      >
+        {{ basenameError }}
+      </div>
+      <ContentLoader v-else-if="resolvedNoteId === undefined" />
       <NoteShow
+        v-else
         v-bind="{
-          noteId,
+          noteId: resolvedNoteId,
           expandChildren: true,
           isMinimized: isContentMinimized,
         }"
       >
-        <template #note-conversation="{ noteRealm }">
+        <template #note-conversation="{ noteRealm: conversationRealm }">
           <div
             v-if="Boolean(route.query.conversation)"
             class="conversation-wrapper daisy-border-t daisy-border-base-200 daisy-flex-1 daisy-flex daisy-flex-col daisy-bg-base-100/50"
           >
             <NoteConversation
-              :note-id="noteRealm.id"
+              :note-id="conversationRealm.id"
               :is-maximized="isContentMinimized"
               @close-dialog="handleCloseConversation"
               @toggle-maximize="toggleMaximize"
@@ -107,6 +116,7 @@ import { useRoute, useRouter } from "vue-router"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteSidebar from "../components/notes/NoteSidebar.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalBar from "../components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
@@ -116,12 +126,68 @@ const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
-  noteId: { type: Number, required: true },
+  noteId: { type: Number, required: false },
+  basename: { type: String, required: false },
 })
 
-const noteRealm = computed(
-  () => storageAccessor.value.refOfNoteRealm(props.noteId).value
+const basenameError = ref<string | null>(null)
+const basenameResolvedNoteId = ref<number | undefined>(undefined)
+
+watch(
+  () => props.noteId,
+  (noteId) => {
+    if (
+      noteId != null &&
+      !Number.isNaN(noteId) &&
+      props.basename === undefined
+    ) {
+      storageAccessor.value.storedApi().getNoteRealmRefAndReloadPosition(noteId)
+    }
+  },
+  { immediate: true }
 )
+
+watch(
+  () => props.basename,
+  async (b) => {
+    basenameError.value = null
+    basenameResolvedNoteId.value = undefined
+    if (b === undefined || b === "") {
+      return
+    }
+    try {
+      const realm = await storageAccessor.value
+        .storedApi()
+        .loadNoteByBasename(b)
+      basenameResolvedNoteId.value = realm.id
+    } catch (e: unknown) {
+      basenameError.value =
+        e instanceof Error ? e.message : "Could not load note"
+    }
+  },
+  { immediate: true }
+)
+
+const resolvedNoteId = computed((): number | undefined => {
+  if (props.noteId != null && !Number.isNaN(props.noteId)) {
+    return storageAccessor.value.refOfNoteRealm(props.noteId).value?.id
+  }
+  if (
+    props.basename !== undefined &&
+    props.basename !== "" &&
+    basenameResolvedNoteId.value != null
+  ) {
+    return storageAccessor.value.refOfNoteRealm(basenameResolvedNoteId.value)
+      .value?.id
+  }
+  return undefined
+})
+
+const noteRealm = computed(() => {
+  const id = resolvedNoteId.value
+  if (id == null) return undefined
+  return storageAccessor.value.refOfNoteRealm(id).value
+})
 
 const sidebarOpened = ref(false)
 const isContentMinimized = ref(false)
@@ -131,11 +197,32 @@ const toggleMaximize = () => {
 }
 
 const handleCloseConversation = () => {
-  router.replace({
-    name: "noteShow",
-    params: { noteId: props.noteId },
-    query: {},
-  })
+  const raw = route.params.noteId
+  const segment =
+    raw !== undefined && raw !== ""
+      ? String(Array.isArray(raw) ? raw[0] : raw)
+      : undefined
+  if (segment !== undefined && !/^\d+$/.test(segment)) {
+    router.replace({
+      name: "noteShow",
+      params: { noteId: segment },
+      query: {},
+    })
+    return
+  }
+  const routeNoteId =
+    segment !== undefined && /^\d+$/.test(segment)
+      ? segment
+      : resolvedNoteId.value != null
+        ? String(resolvedNoteId.value)
+        : undefined
+  if (routeNoteId !== undefined) {
+    router.replace({
+      name: "noteShow",
+      params: { noteId: routeNoteId },
+      query: {},
+    })
+  }
 }
 
 // Track window width so we can decide when to show sidebar by default
@@ -159,9 +246,9 @@ onBeforeUnmount(() => {
 
 const isMdOrLarger = computed(() => windowWidth.value >= 768)
 
-// Close sidebar automatically if noteId changes, to maintain a fresh state for each note
+// Close sidebar automatically when the resolved note changes, to maintain a fresh state for each note
 watch(
-  () => props.noteId,
+  () => resolvedNoteId.value,
   () => {
     if (!isMdOrLarger.value) {
       sidebarOpened.value = false
