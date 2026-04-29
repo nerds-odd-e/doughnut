@@ -56,6 +56,24 @@ async function waitForDebounce() {
   await flushPromises()
 }
 
+/** Note id from stubbed router-link `to` (see RenderingHelper); routes use slug `s{id}` from makeMe. */
+function noteIdFromStubbedLinkTo(toAttr: string): number | undefined {
+  try {
+    const to = JSON.parse(toAttr) as {
+      params?: { noteSlugPath?: string; noteId?: string | number }
+    }
+    const slug = to.params?.noteSlugPath
+    if (typeof slug === "string" && /^s\d+$/.test(slug)) {
+      return Number(slug.slice(1))
+    }
+    const nid = to.params?.noteId
+    if (nid != null) return Number(nid)
+    return
+  } catch {
+    return
+  }
+}
+
 function mountSearchResults(props: {
   inputSearchKey: string
   isDropdown?: boolean
@@ -191,14 +209,9 @@ describe("SearchResults.vue", () => {
       await waitForDebounce()
 
       const links = wrapper.findAll(".router-link")
-      const ids = links.map((a) => {
-        const to = a.attributes("to") ?? "{}"
-        try {
-          return JSON.parse(to).params.noteId as number
-        } catch {
-          return
-        }
-      })
+      const ids = links.map((a) =>
+        noteIdFromStubbedLinkTo(a.attributes("to") ?? "{}")
+      )
 
       expect(ids.filter((x) => x !== undefined)).toEqual([1, 2, 3])
       vi.useRealTimers()
@@ -242,14 +255,9 @@ describe("SearchResults.vue", () => {
       await waitForDebounce()
 
       const links = wrapper.findAll(".router-link")
-      const ids = links.map((a) => {
-        const to = a.attributes("to") ?? "{}"
-        try {
-          return JSON.parse(to).params.noteId as number
-        } catch {
-          return
-        }
-      })
+      const ids = links.map((a) =>
+        noteIdFromStubbedLinkTo(a.attributes("to") ?? "{}")
+      )
 
       expect(ids[0]).toBe(2)
       expect(ids[1]).toBe(1)

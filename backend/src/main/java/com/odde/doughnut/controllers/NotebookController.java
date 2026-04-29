@@ -219,7 +219,6 @@ class NotebookController {
           @RequestParam("slugPath")
           String slug)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(notebook);
     if (slug == null || slug.isBlank()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this slug.");

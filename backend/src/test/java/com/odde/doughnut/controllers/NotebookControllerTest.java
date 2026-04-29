@@ -734,6 +734,28 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void allowsAnonymousReadWhenNotebookInBazaar() throws UnexpectedNoAccessRightException {
+      User owner = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(owner).slug("public/path").please();
+      makeMe.aBazaarNotebook(note.getNotebook()).please();
+      currentUser.setUser(null);
+      NoteRealm realm = controller.getNoteBySlug(note.getNotebook(), "public/path");
+      assertThat(realm.getId(), equalTo(note.getId()));
+    }
+
+    @Test
+    void deniesAnonymousWhenNotebookNotInBazaar() {
+      User owner = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(owner).slug("private/path").please();
+      currentUser.setUser(null);
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.getNoteBySlug(note.getNotebook(), "private/path"));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
     void stillResolvesAfterSoftDelete() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note note = makeMe.aNote().creatorAndOwner(user).slug("a/tdd").please();
