@@ -7,18 +7,19 @@ import generateId from './generateId'
 
 class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
   data: Partial<NoteSearchResult> = {
-    noteTopology: {
-      id: generateId(),
-      title: 'Untitled',
-    },
+    noteTopology: (() => {
+      const id = generateId()
+      return { id, slug: `s${id}`, title: 'Untitled' }
+    })(),
     notebookId: generateId(),
   }
 
   id(value: number): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
-      this.data.noteTopology = { id: value, title: 'Untitled' }
+      this.data.noteTopology = { id: value, slug: `s${value}`, title: 'Untitled' }
     } else {
       this.data.noteTopology.id = value
+      this.data.noteTopology.slug = `s${value}`
     }
     return this
   }
@@ -35,7 +36,8 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
 
   title(value: string): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
-      this.data.noteTopology = { id: generateId(), title: value }
+      const id = generateId()
+      this.data.noteTopology = { id, slug: `s${id}`, title: value }
     } else {
       this.data.noteTopology.title = value
     }
@@ -57,6 +59,7 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return {
       noteTopology: this.data.noteTopology ?? {
         id,
+        slug: `s${id}`,
         title: 'Untitled',
       },
       notebookId: this.data.notebookId ?? generateId(),

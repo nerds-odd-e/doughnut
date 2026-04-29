@@ -3711,6 +3711,7 @@ components:
           type: string
       required:
       - id
+      - slug
     Notebook:
       type: object
       properties:

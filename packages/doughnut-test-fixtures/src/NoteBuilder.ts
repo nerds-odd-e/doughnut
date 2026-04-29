@@ -16,6 +16,7 @@ class NoteBuilder extends Builder<Note> {
       id,
       noteTopology: {
         id,
+        slug: `s${id}`,
         title: 'Note1.1.1',
       },
       details: '<p>Desc</p>',
@@ -80,8 +81,10 @@ class NoteBuilder extends Builder<Note> {
   relationType(value: NoteTopologyType['relationType']): NoteBuilder {
     this.title(`:${value}`)
     // default target
+    const targetId = generateId()
     this.data.noteTopology.targetNoteTopology = {
-      id: generateId(),
+      id: targetId,
+      slug: `s${targetId}`,
       relationType: value,
       title: 'a target',
     }
