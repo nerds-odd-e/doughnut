@@ -102,3 +102,13 @@ Feature: Note Edit
     And I should see the rich content elements in the note details:
       | Tag | Content       |
       | h1  | Workshop Body |
+
+  @wip
+  Scenario: Insert a note property in rich mode
+    Given I open the note "LeSS in Action" for editing
+    When I add a rich note property with key "status" and value "draft"
+    And I flush pending note details save
+    And I reload the current page for note "LeSS in Action"
+    Then I should see rich note property "status" with value "draft"
+    When I open the note details markdown editor
+    Then the note details markdown source should contain "status: draft"

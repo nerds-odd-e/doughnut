@@ -549,6 +549,24 @@ Then('the question in the form becomes:', (data: DataTable) => {
   )
 })
 
+Given('I open the note {string} for editing', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology)
+})
+
+When(
+  'I add a rich note property with key {string} and value {string}',
+  (key: string, value: string) => {
+    start.assumeNotePage().addRichNoteProperty(key, value)
+  }
+)
+
+Then(
+  'I should see rich note property {string} with value {string}',
+  (key: string, value: string) => {
+    start.assumeNotePage().expectRichNotePropertyDisplayed(key, value)
+  }
+)
+
 When(
   'I update note {string} details using markdown to become:',
   (noteTopology: string, newDetails: string) => {

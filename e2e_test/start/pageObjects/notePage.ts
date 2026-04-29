@@ -185,7 +185,14 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this.switchToRichContent()
     },
     flushPendingDetailsSave() {
-      cy.get('textarea').blur()
+      cy.get('[role=details]').then(($details) => {
+        const $textarea = $details.find('textarea').filter(':visible')
+        if ($textarea.length) {
+          cy.wrap($textarea.first()).blur()
+        } else {
+          cy.wrap($details).find('.ql-editor').first().blur()
+        }
+      })
       cy.get('.dirty').should('not.exist')
       pageIsNotLoading()
       return this
@@ -209,6 +216,21 @@ export const assumeNotePage = (noteTopology?: string) => {
       elements.forEach((element) => {
         cy.get(element.Tag as string).should('contain', element.Content)
       })
+    },
+    addRichNoteProperty(key: string, value: string) {
+      cy.get('[role=details]').within(() => {
+        cy.findByRole('button', { name: 'Add note property' }).click()
+        cy.findByLabelText('Property key').clear().type(key)
+        cy.findByLabelText('Property value').clear().type(value)
+      })
+      return this
+    },
+    expectRichNotePropertyDisplayed(key: string, value: string) {
+      cy.get('[role=details]').within(() => {
+        cy.contains('h4', 'Properties')
+        cy.contains('dt', key).next('dd').should('contain', value)
+      })
+      return this
     },
     followDeadLink(linkTitle: string) {
       cy.get('[role=details]').find('a.dead-link').contains(linkTitle).click()
