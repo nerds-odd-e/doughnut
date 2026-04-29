@@ -26,6 +26,7 @@ After Phase 4:
 - Extend the existing capability-owned note editing E2E coverage, for example `e2e_test/features/note_creation_and_update/note_edit.feature`; do not create phase-named feature files.
 - Keep page object additions capability-named, such as property editing helpers on `notePage`, not phase-specific helpers.
 - Run targeted specs only, normally `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`.
+- Sub-phases **4.11–4.14** do **not** add new E2E scenarios; cover removal, validation edge cases, and export frontmatter with **high-level unit tests** (frontend compose/UI and backend export assertions). **4.15** includes an **E2E dedup/simplify** pass on existing note-edit scenarios so the suite stays minimal relative to `ongoing/doughnut_wiki_architecture_north_star.md`.
 
 ## Status
 
@@ -210,40 +211,39 @@ The rich edit E2E scenario from 4.9 passes.
 - targeted frontend component test for editing key/value and duplicate-key validation
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
 
-### 4.11 Add the Rich Remove Property E2E Scenario
+### 4.11 Specify Rich Property Removal Behavior (High-Level UT)
 
 **Type:** Behavior
 
-Define the rich-mode behavior for removing a property row.
+Define removal behavior without adding a new E2E scenario. Earlier phases already exercise save/reload and markdown parity via `note_edit.feature`; removal is specified and locked with **high-level unit tests** (frontend: compose/remove paths, empty-properties UI state, frontmatter after removing one of several keys).
 
 **Commit includes:**
 
-- add an `@wip` scenario to the note editing feature for removing a property in rich mode
-- scenario shape: start with at least two properties, remove one in rich mode, save/reload, assert only the remaining property appears, then assert markdown frontmatter excludes the removed property
-- no production behavior change
+- high-level frontend tests: starting from parsed multi-property frontmatter, removing a row yields composed Markdown that excludes the removed key and retains the rest; empty row list matches empty or omitted frontmatter per product rules
+- no new `@wip` scenario and no new scenario rows in `note_edit.feature`
+- no production behavior change beyond what tests require to compile against public APIs
 
 **Verification:**
 
-- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
-- confirm the scenario fails because removal is not implemented yet
+- targeted frontend unit or focused component tests for removal composition (same layer as 4.3 / 4.7 helpers)
 
 ### 4.12 Add Rich-Mode Property Removal
 
 **Type:** Behavior
 
-The rich remove E2E scenario from 4.11 passes.
+Implement removal to satisfy the behavior captured in 4.11’s tests.
 
 **Commit includes:**
 
 - add a remove control for each rich property row
 - removing a row updates the frontmatter in the same note details save path
 - remove the `Properties` section, or show an empty add-only state, when no properties remain
-- remove `@wip` from the rich remove E2E scenario once it passes
+- extend high-level UT from 4.11 so they pass against the wired UI (still no new dedicated E2E for removal)
 
 **Verification:**
 
-- targeted frontend component test for removing a property
-- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
+- targeted frontend component test or high-level UT for the remove control and composed save payload
+- regression: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature` (existing scenarios only; confirms no regressions)
 
 ### 4.13 Close Property Validation Gaps
 
@@ -256,10 +256,11 @@ Users get clear failures for property shapes this phase cannot safely edit in ri
 - frontend tests for unsupported YAML values, duplicate keys, empty keys, and malformed frontmatter
 - frontend displays save errors near the markdown editor or properties list without corrupting existing note content
 - no new property value types beyond scalar strings
+- no new E2E scenarios; validation stays covered by unit/integration-style frontend tests
 
 **Verification:**
 
-- targeted frontend validation test if UI error handling changes
+- targeted frontend validation tests when UI error handling changes
 
 ### 4.14 Include Properties in Obsidian Export
 
@@ -271,27 +272,28 @@ Exported markdown preserves the same persisted frontmatter from note details.
 
 - extend or verify the existing notebook export behavior so note details frontmatter is included in exported Markdown
 - keep existing export metadata that is still needed without introducing a separate property map
-- update the capability-owned notebook export E2E or backend export test to assert one persisted frontmatter property appears in the exported markdown
+- assert export output with a **high-level backend export test** and/or a focused export-format unit test (Markdown string includes leading YAML from persisted details)—do **not** add a new notebook export E2E scenario for frontmatter; rely on UT unless an existing E2E already asserts export shape and only needs a narrow assertion tweak
 
 **Verification:**
 
-- targeted notebook export test or `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/notebooks/notebook_export.feature`
+- targeted backend or frontend export test (UT-level), not an expanded Cypress surface for this sub-phase
 
-### 4.15 Phase 4 Cleanup and Consistency Pass
+### 4.15 Phase 4 Cleanup, E2E Dedup, and Consistency Pass
 
 **Type:** Structure
 
-Remove interim duplication and verify the whole property capability is commit-ready.
+Remove interim duplication, simplify overlapping E2E, and verify the whole property capability is commit-ready.
 
 **Commit includes:**
 
 - delete dead helper code and any temporary compatibility paths not needed after 4.14
 - ensure markdown/rich property labels and page object names reflect the product capability, not this migration phase
+- **E2E cleanup:** dedupe or merge overlapping scenarios in `e2e_test/features/note_creation_and_update/note_edit.feature` (and related steps/page objects) where insert, edit, remove, and markdown frontmatter flows repeat the same setup—prefer fewer scenarios that still prove persistence and parity between markdown and rich surfaces; drop redundant assertions bundled into one stronger scenario where safe
 - update `ongoing/doughnut_wiki_migration_plan.md` and this plan with final Phase 4 status and any discoveries that affect Phase 5
-- no observable behavior change
+- no intentional product behavior change beyond test and harness simplification
 
 **Verification:**
 
 - targeted frontend tests touched by property components
-- targeted backend tests touched by property persistence/conversion
-- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature`
+- targeted backend tests touched by property persistence/export
+- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature` after dedup (and `--spec` any other features trimmed in the same pass)

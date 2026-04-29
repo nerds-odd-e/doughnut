@@ -60,7 +60,7 @@ public class AiToolFactory {
     return """
         **Multiple-Choice Question (MCQ) Guidelines**:
         - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
-        - Provide 2 to 3 options, with ONLY one correct answer.
+        - Provide 3 options, with ONLY one correct answer.
         - Vary the length of answer choices to avoid patterns where the correct answer is consistently the longest.
         - Use markdown for both the question stem and the answer choices.
         - Make sure correct choice index is accurate. The correct choice must be exclusive and plausible.
