@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 @Data
 public class NoteTopology {
   @NonNull private Integer id;
+  private String slug;
   private String title;
   private String shortDetails;
   private RelationType relationType;

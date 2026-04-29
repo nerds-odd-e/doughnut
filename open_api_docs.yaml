@@ -3677,6 +3677,8 @@ components:
         id:
           type: integer
           format: int32
+        slug:
+          type: string
         title:
           type: string
         shortDetails:

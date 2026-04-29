@@ -39,6 +39,7 @@ public class NoteTest {
     assertThat(
         note.getNoteTopology().getShortDetails(),
         equalTo("this is a very long sentence that contains very li..."));
+    assertThat(note.getNoteTopology().getSlug(), equalTo(note.getSlug()));
   }
 
   @Test
