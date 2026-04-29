@@ -13,6 +13,7 @@ export const loginActions = {
       })
       .then((response) => {
         expect(response.status).to.equal(204)
+        return cy.clearCookies()
       })
   },
 

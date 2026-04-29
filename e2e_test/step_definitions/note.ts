@@ -567,6 +567,38 @@ When(
   }
 )
 
+When('I flush pending note details save', () => {
+  start.assumeNotePage().flushPendingDetailsSave()
+})
+
+When('I reload the current page for note {string}', (noteTopology: string) => {
+  cy.reload()
+  start.pageIsNotLoading()
+  start.assumeNotePage(noteTopology)
+})
+
+When('I open the note details markdown editor', () => {
+  start.assumeNotePage().openMarkdownDetailsEditor()
+})
+
+Then(
+  'the note details markdown source should contain {string}',
+  (fragment: string) => {
+    start.assumeNotePage().expectMarkdownDetailsSourceContains(fragment)
+  }
+)
+
+When('I view the note details as rich content', () => {
+  start.assumeNotePage().switchToRichDetails()
+})
+
+Then(
+  'I should see the rich content elements in the note details:',
+  (data: DataTable) => {
+    start.assumeNotePage().expectRichDetails(data.hashes())
+  }
+)
+
 Then(
   'I should see the rich content of the note with details:',
   (data: DataTable) => {

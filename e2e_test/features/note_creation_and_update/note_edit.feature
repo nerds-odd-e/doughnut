@@ -81,3 +81,25 @@ Feature: Note Edit
     Then the note details should include "Hello"
     And the note details should include "World"
     And the note details should contain a line break
+
+  @wip
+  Scenario: Edit note properties in markdown mode
+    When I update note "LeSS in Action" details using markdown to become:
+      """
+      ---
+      diligence: high
+      topic: training
+      ---
+
+      # Workshop Body
+      Main content here.
+      """
+    And I flush pending note details save
+    And I reload the current page for note "LeSS in Action"
+    And I open the note details markdown editor
+    Then the note details markdown source should contain "diligence: high"
+    And the note details markdown source should contain "topic: training"
+    When I view the note details as rich content
+    And I should see the rich content elements in the note details:
+      | Tag | Content       |
+      | h1  | Workshop Body |

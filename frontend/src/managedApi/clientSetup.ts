@@ -100,11 +100,14 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
         )
       if (willRedirect) {
         const apiName = apiRequestLabel(request)
-        const toast = useToast()
-        toast.warning(
-          `This page will reload to sign you in again. Reason: unauthorized response from ${apiName}.`,
-          { timeout: 8000, pauseOnFocusLoss: true, pauseOnHover: true }
-        )
+        try {
+          useToast().warning(
+            `This page will reload to sign you in again. Reason: unauthorized response from ${apiName}.`,
+            { timeout: 8000, pauseOnFocusLoss: true, pauseOnHover: true }
+          )
+        } catch {
+          // useToast() needs component context; interceptors run outside setup()
+        }
         loginOrRegisterAndHaltThisThread()
       }
     }

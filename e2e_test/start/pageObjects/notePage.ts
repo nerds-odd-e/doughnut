@@ -40,11 +40,18 @@ export const assumeNotePage = (noteTopology?: string) => {
     // After server-side logout the SPA still shows the old tree; the next click
     // triggers auth/redirect and the card can be detached while Cypress waits
     // for “actionable” in CI. force skips that wait.
+    // Drive the click from cy.window() so a full-page redirect to /users/identify
+    // does not make Cypress retry cy.get('main') (login shell has no main).
     clickChildNote: (noteTopology: string) => {
-      cy.get('main')
-        .find('.daisy-card-title .title-text')
-        .contains(noteTopology)
-        .click({ force: true })
+      cy.window().then((win) => {
+        const main = win.document.querySelector('main')
+        if (!main) throw new Error('expected note page <main>')
+        const candidates = Array.from(
+          main.querySelectorAll('.daisy-card-title .title-text')
+        ).filter((el) => el.textContent?.trim() === noteTopology)
+        expect(candidates.length).to.be.greaterThan(0)
+        ;(candidates[0] as HTMLElement).click()
+      })
     },
     collapseChildren: () => {
       cy.get('main').within(() => {
@@ -188,6 +195,25 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     switchToRichContent() {
       this.toolbarButton('Edit as rich content').click()
+      return this
+    },
+    switchToRichDetails() {
+      return this.switchToRichContent()
+    },
+    flushPendingDetailsSave() {
+      cy.get('textarea').blur()
+      cy.get('.dirty').should('not.exist')
+      pageIsNotLoading()
+      return this
+    },
+    openMarkdownDetailsEditor() {
+      this.toolbarButton('Edit as markdown').click()
+      return this
+    },
+    expectMarkdownDetailsSourceContains(fragment: string) {
+      cy.get('textarea').should(($ta) => {
+        expect($ta.val()).to.include(fragment)
+      })
       return this
     },
     updateDetailsAsMarkdown(markdown: string) {
