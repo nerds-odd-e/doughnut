@@ -1,13 +1,5 @@
 <template>
-  <GlobalBar>
-    <button
-      class="daisy-btn daisy-btn-sm daisy-btn-ghost"
-      @click="goToNotebooks"
-    >
-      Back to Notebooks
-    </button>
-  </GlobalBar>
-  <div class="daisy-container daisy-mx-auto daisy-p-4 daisy-max-w-6xl">
+  <div class="daisy-container daisy-mx-auto daisy-py-4 daisy-max-w-6xl">
     <div class="notebook-page-summary daisy-mb-6" data-testid="notebook-page-summary">
       <h1 class="daisy-text-xl daisy-font-semibold daisy-text-base-content">
         {{ notebook.title }}
@@ -210,7 +202,6 @@ import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { GitMerge, Share2 } from "lucide-vue-next"
@@ -243,10 +234,6 @@ const emit = defineEmits<{
 const { showSuccessToast } = useToast()
 const router = useRouter()
 const { popups } = usePopups()
-
-const goToNotebooks = () => {
-  router.push({ name: "notebooks" })
-}
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
