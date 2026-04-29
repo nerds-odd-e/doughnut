@@ -152,32 +152,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   long countByCreator(@Param("userId") Integer userId);
 
   @Query(
-      """
-      SELECT n.slug FROM Note n WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL
-      AND (
-        (:folderId IS NULL AND n.folder IS NULL)
-        OR (n.folder IS NOT NULL AND n.folder.id = :folderId)
-      )
-      AND (:excludeNoteId IS NULL OR n.id <> :excludeNoteId)
-      """)
-  List<String> findSlugsOfNotesInFolderScope(
-      @Param("notebookId") Integer notebookId,
-      @Param("folderId") Integer folderId,
-      @Param("excludeNoteId") Integer excludeNoteId);
-
-  @Query("SELECT COUNT(n) FROM Note n WHERE n.slug IS NULL AND n.deletedAt IS NULL")
-  long countNotesMissingSlug();
-
-  @Query(
-      """
-      SELECT n FROM Note n LEFT JOIN n.folder fld
-      WHERE n.slug IS NULL AND n.deletedAt IS NULL
-      AND (fld IS NULL OR (fld.slug IS NOT NULL AND fld.slug <> ''))
-      ORDER BY n.id ASC
-      """)
-  List<Note> findNotesReadyForSlugMigration(Pageable pageable);
-
-  @Query(
       value =
           "SELECT MAX(n.createdAt) FROM Note n WHERE n.creator.id = :userId AND n.deletedAt IS NULL")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);

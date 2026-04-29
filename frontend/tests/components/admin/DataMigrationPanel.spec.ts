@@ -1,9 +1,16 @@
 import DataMigrationPanel from "@/components/admin/DataMigrationPanel.vue"
+import { AdminDataMigrationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import { describe, expect, it } from "vitest"
-import helper from "@tests/helpers"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 
 describe("DataMigrationPanel", () => {
+  let runDataMigrationSpy: ReturnType<typeof mockSdkService<"runDataMigration">>
+
+  beforeEach(() => {
+    runDataMigrationSpy = mockSdkService("runDataMigration", undefined as never)
+  })
+
   it("shows generalized intro about server-side batches and returning later", async () => {
     const wrapper = helper.component(DataMigrationPanel).mount()
     await flushPromises()
@@ -30,13 +37,28 @@ describe("DataMigrationPanel", () => {
     expect(btn.text()).toContain("Run migration")
   })
 
-  it("clicking Run migration completes without error", async () => {
+  it("clicking Run migration calls runDataMigration", async () => {
     const wrapper = helper.component(DataMigrationPanel).mount()
     await flushPromises()
 
     await wrapper.find("button.daisy-btn-primary").trigger("click")
     await flushPromises()
 
-    expect(wrapper.find("button.daisy-btn-primary").exists()).toBe(true)
+    expect(runDataMigrationSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("shows error when runDataMigration fails", async () => {
+    vi.spyOn(
+      AdminDataMigrationController,
+      "runDataMigration"
+    ).mockResolvedValue(wrapSdkError("Forbidden") as never)
+
+    const wrapper = helper.component(DataMigrationPanel).mount()
+    await flushPromises()
+
+    await wrapper.find("button.daisy-btn-primary").trigger("click")
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Forbidden")
   })
 })

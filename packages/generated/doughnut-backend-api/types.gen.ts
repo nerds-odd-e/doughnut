@@ -583,16 +583,6 @@ export type AiGeneratedImage = {
     b64encoded?: string;
 };
 
-export type WikiSlugMigrationBatchResult = {
-    processedInBatch?: number;
-    status?: WikiSlugMigrationStatus;
-};
-
-export type WikiSlugMigrationStatus = {
-    foldersMissingSlug?: number;
-    notesMissingSlug?: number;
-};
-
 export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
@@ -2677,41 +2667,19 @@ export type GenerateImageResponses = {
 
 export type GenerateImageResponse = GenerateImageResponses[keyof GenerateImageResponses];
 
-export type BatchMigrateNotesData = {
+export type RunDataMigrationData = {
     body?: never;
     path?: never;
-    query?: {
-        limit?: number;
-    };
-    url: '/api/admin/wiki-slug-migration/batch/notes';
+    query?: never;
+    url: '/api/admin/data-migration/run';
 };
 
-export type BatchMigrateNotesResponses = {
+export type RunDataMigrationResponses = {
     /**
      * OK
      */
-    200: WikiSlugMigrationBatchResult;
+    200: unknown;
 };
-
-export type BatchMigrateNotesResponse = BatchMigrateNotesResponses[keyof BatchMigrateNotesResponses];
-
-export type BatchMigrateFoldersData = {
-    body?: never;
-    path?: never;
-    query?: {
-        limit?: number;
-    };
-    url: '/api/admin/wiki-slug-migration/batch/folders';
-};
-
-export type BatchMigrateFoldersResponses = {
-    /**
-     * OK
-     */
-    200: WikiSlugMigrationBatchResult;
-};
-
-export type BatchMigrateFoldersResponse = BatchMigrateFoldersResponses[keyof BatchMigrateFoldersResponses];
 
 export type UpdateUserData = {
     body: UserDto;
@@ -3842,22 +3810,6 @@ export type GetAvailableGptModelsResponses = {
 };
 
 export type GetAvailableGptModelsResponse = GetAvailableGptModelsResponses[keyof GetAvailableGptModelsResponses];
-
-export type GetStatusData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/admin/wiki-slug-migration';
-};
-
-export type GetStatusResponses = {
-    /**
-     * OK
-     */
-    200: WikiSlugMigrationStatus;
-};
-
-export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
 
 export type ListUsersData = {
     body?: never;

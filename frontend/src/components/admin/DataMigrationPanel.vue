@@ -35,13 +35,22 @@
 
 <script lang="ts" setup>
 import { ref } from "vue"
+import { AdminDataMigrationController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { toOpenApiError } from "@/managedApi/openApiError"
 
 const error = ref<string | undefined>(undefined)
 
 const statusLine = "No migration job is running."
 const lastRunLabel = "—"
 
-const runMigration = () => {
-  // Stub until wired to admin-only migration endpoint.
+const runMigration = async () => {
+  error.value = undefined
+  const { error: apiError } = await apiCallWithLoading(() =>
+    AdminDataMigrationController.runDataMigration({})
+  )
+  if (apiError) {
+    error.value = toOpenApiError(apiError).message ?? "Request failed"
+  }
 }
 </script>
