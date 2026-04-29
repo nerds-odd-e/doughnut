@@ -2,7 +2,7 @@
   <span class="relationship-container daisy-inline-flex daisy-items-center daisy-gap-1">
     <RelationNob v-bind="{ noteTopology }" v-if="!!reverse" :inverse-icon="true" />
     <router-link
-      :to="{ name: 'noteShow', params: { noteId: note.id } }"
+      :to="noteShowLocation"
       class="relationship-title daisy-no-underline daisy-font-medium hover:daisy-underline daisy-transition-all"
     >
       <NoteTitleComponent v-if="noteTopology" v-bind="{ noteTopology }" />
@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
 import { computed } from "vue"
+import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
 import { colors } from "../../colors"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import RelationNob from "./RelationNob.vue"
@@ -27,6 +28,10 @@ const noteTopology = computed(() =>
   props.reverse
     ? props.note.noteTopology.parentOrSubjectNoteTopology!
     : props.note.noteTopology.targetNoteTopology!
+)
+
+const noteShowLocation = computed(() =>
+  noteShowByNotebookSlugLocationFromNoteTopology(props.note.noteTopology)
 )
 
 const fontColor = computed(() =>
