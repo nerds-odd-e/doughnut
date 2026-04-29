@@ -1,5 +1,9 @@
 import { pageIsNotLoading } from '../pageBase'
-import { findNotebookCardButton, notebookList } from './NotebookList'
+import {
+  clickNotebookCardTitleToOpenNotebookPage,
+  findNotebookCardButton,
+  notebookList,
+} from './NotebookList'
 import notebookPage from './notebookPage'
 
 export const notebookCard = (notebook: string) => ({
@@ -16,7 +20,7 @@ export const notebookCard = (notebook: string) => ({
     pageIsNotLoading()
   },
   openNotebookPage() {
-    findNotebookCardButton(notebook, 'Edit notebook settings').click()
+    clickNotebookCardTitleToOpenNotebookPage(notebook)
     return notebookPage()
   },
 })

@@ -74,7 +74,7 @@ describe("storedApiCollection", () => {
       ).toBeUndefined()
     })
 
-    it("should navigate to notebook edit when delete returns no realms", async () => {
+    it("should navigate to notebook page when delete returns no realms", async () => {
       mockSdkService("deleteNote", [])
       const noteEditingHistory = new NoteEditingHistory()
       storageAccessor.value = createNoteStorage(noteEditingHistory)

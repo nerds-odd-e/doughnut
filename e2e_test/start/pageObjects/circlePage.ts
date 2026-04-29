@@ -1,6 +1,9 @@
 import noteCreationForm from './noteForms/noteCreationForm'
 import { bazaarOrCircle } from './BazaarOrCircle'
-import { findNotebookCardButton } from './NotebookList'
+import {
+  clickNotebookCardTitleToOpenNotebookPage,
+  findNotebookCardButton,
+} from './NotebookList'
 import { pageIsNotLoading } from '../pageBase'
 import { navigateToMyCircles } from './myCirclesPage'
 import notebookPage from './notebookPage'
@@ -36,7 +39,7 @@ export const assumeCirclePage = () => ({
     return this as any
   },
   moveNotebook(notebookTitle: string) {
-    findNotebookCardButton(notebookTitle, 'Edit notebook settings').click()
+    clickNotebookCardTitleToOpenNotebookPage(notebookTitle)
     notebookPage().moveNotebookToCircle()
     return {
       toCircle(circleName: string) {

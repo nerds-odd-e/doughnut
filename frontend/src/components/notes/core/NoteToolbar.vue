@@ -1,15 +1,6 @@
 <template>
   <nav class="daisy-navbar daisy-bg-base-200">
     <div class="daisy-btn-group daisy-btn-group-sm">
-      <button
-        v-if="!readonly && isHeadNote"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Edit notebook settings"
-        @click="editNotebookSettings"
-      >
-        <BookText class="w-5 h-5" />
-      </button>
-
       <NoteNewButton
         v-if="!readonly"
         button-title="Add Child Note"
@@ -99,14 +90,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue"
-import type { Note, Notebook } from "@generated/doughnut-backend-api"
+import { ref, watch } from "vue"
+import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import AddRelationshipDialog from "../../links/AddRelationshipDialog.vue"
 import {
-  BookText,
   FileCode,
   FolderPlus,
   Folders,
@@ -122,9 +112,8 @@ import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialo
 import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
 import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
 
-const { note, notebook } = defineProps<{
+const { note } = defineProps<{
   note: Note
-  notebook?: Notebook
   asMarkdown?: boolean
   conversationButton?: boolean
   readonly?: boolean
@@ -137,25 +126,12 @@ const router = useRouter()
 
 const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
-const isHeadNote = computed(
-  () => notebook !== undefined && notebook.headNoteId === note.id
-)
-
 watch(
   () => note.id,
   () => {
     moreOptions.value = false
   }
 )
-
-const editNotebookSettings = () => {
-  if (notebook) {
-    router.push({
-      name: "notebookPage",
-      params: { notebookId: notebook.id },
-    })
-  }
-}
 
 const noteAccessoriesUpdated = (na: NoteAccessory) => {
   if (na) {

@@ -370,6 +370,31 @@ describe("Notebooks Page", () => {
     })
   })
 
+  describe("catalog overflow menu", () => {
+    it("offers move to group without edit notebook settings", async () => {
+      const nb = { ...makeMe.aNotebook.please(), title: "Owned Catalog" }
+      mockSdkService("myNotebooks", {
+        notebooks: [nb],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+      await flushPromises()
+      await wrapper
+        .find('[data-cy="notebook-catalog-overflow"]')
+        .trigger("click")
+      await flushPromises()
+      expect(
+        wrapper.find('button[title="Edit notebook settings"]').exists()
+      ).toBe(false)
+      expect(wrapper.find('button[title="Move to group"]').exists()).toBe(true)
+    })
+  })
+
   describe("catalog list", () => {
     it("renders catalog items in document order (list layout)", async () => {
       const catalogItems = makeMe.notebookCatalog

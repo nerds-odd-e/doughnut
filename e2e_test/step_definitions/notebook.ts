@@ -156,6 +156,13 @@ When(
   }
 )
 
+When(
+  'I open the notebook {string} from my notebooks catalog',
+  (notebookTitle: string) => {
+    start.navigateToNotebookPage(notebookTitle)
+  }
+)
+
 Then('I should see popup {string}', (message: string) => {
   // Wait for and verify alert message
   cy.on('window:alert', (text) => {

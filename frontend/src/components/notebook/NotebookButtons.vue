@@ -31,16 +31,6 @@
           <button
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
-            title="Edit notebook settings"
-            @click="onEditNotebookSettings"
-          >
-            Edit notebook settings
-          </button>
-        </li>
-        <li class="daisy-menu-item daisy-p-0">
-          <button
-            type="button"
-            class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
             title="Move to group"
             @click="openMoveToGroup"
           >
@@ -111,14 +101,6 @@ const closeDropdown = () => {
   if (actionsDropdown.value) {
     actionsDropdown.value.open = false
   }
-}
-
-const onEditNotebookSettings = () => {
-  closeDropdown()
-  router.push({
-    name: "notebookPage",
-    params: { notebookId: props.notebook.id },
-  })
 }
 
 const onReadBook = () => {
