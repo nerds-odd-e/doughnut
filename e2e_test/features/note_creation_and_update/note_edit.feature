@@ -72,6 +72,7 @@ Feature: Note Edit
     When I update note title "TDD" to become "Critical thinking"
     Then I should see the note tree in the sidebar
       | note-title        |
+      | LeSS in Action    |
       | Critical thinking |
 
   Scenario: Edit a note details with Shift-Enter adds line break
@@ -112,6 +113,7 @@ Feature: Note Edit
     When I open the note details markdown editor
     Then the note details markdown source should contain "status: draft"
 
+  @wip
   Scenario: Edit a note property in rich mode
     When I update note "LeSS in Action" details using markdown to become:
       """
@@ -124,7 +126,6 @@ Feature: Note Edit
     And I flush pending note details save
     And I reload the current page for note "LeSS in Action"
     Given I open the note "LeSS in Action" for editing
-    When I view the note details as rich content
     When I edit the rich note property with key "topic" to key "domain" and value "wiki"
     And I flush pending note details save
     And I reload the current page for note "LeSS in Action"

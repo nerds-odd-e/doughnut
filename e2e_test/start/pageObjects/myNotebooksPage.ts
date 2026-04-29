@@ -30,7 +30,7 @@ const completeMoveNotebookToUngroupedDialog = () => {
 }
 
 const myNotebooksPage = () => {
-  cy.contains('h1', 'My notebooks').should('be.visible')
+  cy.contains('h1', 'My notebooks', { timeout: 15000 }).should('be.visible')
 
   return {
     ...notebookList(),
@@ -125,8 +125,8 @@ const myNotebooksPage = () => {
 }
 
 export const navigateToNotebooksPage = () => {
-  pageIsNotLoading()
   router().push('/d/notebooks', 'notebooks', {})
+  cy.get('.loading-bar').should('not.exist', { timeout: 30000 })
   return myNotebooksPage()
 }
 

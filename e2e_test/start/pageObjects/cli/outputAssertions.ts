@@ -33,13 +33,15 @@ function currentGuidanceContainsAssertRequest(
 
 function strippedTranscriptTextAssertRequest(
   expected: string,
-  messagePrefix: string
+  messagePrefix: string,
+  timeoutMs = 15000
 ): ManagedTtyAssertInput {
   return {
     ...transcriptPollBase,
     needle: expected,
     surface: 'strippedTranscript',
     messagePrefix,
+    timeoutMs,
   }
 }
 

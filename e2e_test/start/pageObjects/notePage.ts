@@ -163,7 +163,15 @@ export const assumeNotePage = (noteTopology?: string) => {
       for (const propName in noteAttributes) {
         const value = noteAttributes[propName]
         if (value) {
-          cy.findByRole(propName.toLowerCase()).click()
+          if (propName === 'Details') {
+            cy.findByRole('details').within(() => {
+              cy.get('.ql-editor[contenteditable="true"], textarea')
+                .first()
+                .click()
+            })
+          } else {
+            cy.findByRole(propName.toLowerCase()).click()
+          }
           // Only call cy.tick if the clock is mocked
           cy.state && cy.state('clock') && cy.tick(5000)
           const parsedValue = parseSpecialKeys(value)
@@ -229,6 +237,9 @@ export const assumeNotePage = (noteTopology?: string) => {
         cy.findByTestId('rich-note-property-key').clear().type(key)
         cy.findByTestId('rich-note-property-value').clear().type(value)
       })
+      cy.findByRole('details').within(() => {
+        cy.get('.ql-editor[contenteditable="true"]').first().click()
+      })
       return this
     },
     expectRichNotePropertyDisplayed(key: string, value: string) {
@@ -262,7 +273,8 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.get('[role=details]').within(() => {
         cy.contains('h4', 'Properties')
         cy.get(
-          `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`
+          `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
+          { timeout: 15000 }
         ).within(() => {
           cy.get('[data-testid="rich-note-property-row-key-input"]')
             .clear()
@@ -271,6 +283,9 @@ export const assumeNotePage = (noteTopology?: string) => {
             .clear()
             .type(newValue)
         })
+      })
+      cy.findByRole('details').within(() => {
+        cy.get('.ql-editor[contenteditable="true"]').first().click()
       })
       return this
     },

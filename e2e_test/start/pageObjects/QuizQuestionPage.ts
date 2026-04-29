@@ -2,9 +2,10 @@ import { pageIsNotLoading } from '../pageBase'
 
 const assumeQuestionPage = (stem?: string) => {
   if (stem) {
-    cy.findByText(stem)
+    cy.get('[data-test="question-section"]')
+      .find('[data-test="stem"]')
+      .should('contain.text', stem)
   }
-  const _question = () => (stem ? cy.findByText(stem).parent().parent() : cy)
   const getQuestionSection = () => cy.get('[data-test="question-section"]')
 
   return {
