@@ -23,7 +23,7 @@ public class AdminDataMigrationService {
   private final WikiSlugPathService wikiSlugPathService;
   private final EntityPersister entityPersister;
 
-  private AdminDataMigrationStatusDTO lastSuccessfulStatus =
+  private volatile AdminDataMigrationStatusDTO lastSuccessfulStatus =
       idleStatus(new AdminDataMigrationStatusDTO());
 
   public AdminDataMigrationService(
@@ -35,7 +35,7 @@ public class AdminDataMigrationService {
     this.entityPersister = entityPersister;
   }
 
-  public synchronized AdminDataMigrationStatusDTO getStatus() {
+  public AdminDataMigrationStatusDTO getStatus() {
     return copy(lastSuccessfulStatus);
   }
 
