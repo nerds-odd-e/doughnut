@@ -141,9 +141,14 @@ Given(
   }
 )
 
-When('I create a notebook with the title {string}', (notebookTitle: string) => {
-  start.navigateToNotebooksPage().creatingNotebook(notebookTitle)
-})
+When(
+  'I create a notebook with title {string} and short details {string}',
+  (notebookTitle: string, shortDetails: string) => {
+    start
+      .navigateToNotebooksPage()
+      .creatingNotebook(notebookTitle, shortDetails)
+  }
+)
 
 When('I create a notebook with empty title', () => {
   start.navigateToNotebooksPage().creatingNotebook('')

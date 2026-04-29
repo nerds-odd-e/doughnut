@@ -11,6 +11,13 @@ const noteCreationForm = {
     })
   },
 
+  createNotebookWithTitleAndShortDetails(title: string, shortDetails: string) {
+    return submittableForm.submitWith({
+      Title: title,
+      'Short Details': shortDetails,
+    })
+  },
+
   createNoteWithTitleAndWikidataId(title: string, wikidataId: string) {
     const form = submittableForm.fill({
       Title: title,

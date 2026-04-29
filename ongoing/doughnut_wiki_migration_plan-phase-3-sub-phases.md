@@ -28,6 +28,7 @@ After Phase 3:
 - Use the current notebook get endpoint and the generated `Notebook` object for notebook page data; do not introduce a separate notebook-page get endpoint or DTO.
 - Treat `index` as a normal note after migration: `title = "index"`, `slug = "index"`, `folderId = null`, content copied from the former head note.
 - Assume production has no existing user note titled/sluggified as `index`, as stated in the main migration plan.
+- Later sub-phases that need the notebook index page or the optional root `index` note load it via the notebook-scoped slug path **`/notebooks/:notebookId/index`** (matching `note.slug = "index"` per the north-star routing rule). Do not add **`indexNoteId`** (or similar) on the notebook API for that purpose.
 - Introduce nullable/optional runtime behavior before removing required head-note assumptions, so deployed code can read both migrated and not-yet-migrated notebooks during rollout.
 - Keep tests named by capability, such as notebook page, notebook creation, note navigation, and Obsidian export. Do not create phase-named permanent test files.
 
@@ -91,25 +92,6 @@ Users can edit a short plain-text notebook message from notebook settings.
 - `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 - targeted frontend notebook settings test
 
-### 3.3.1 Expose Index Note Id On Notebook
-
-**Type:** Structure
-
-The existing notebook API object exposes the optional `indexNoteId` for later frontend consumption.
-
-**Commit includes:**
-
-- add a JSON-visible `indexNoteId` field on the notebook API object through the notebook/index-note association in the entity
-- return `null` when the notebook has no index note
-- backend controller test covers notebooks with and without an index note through the current get notebook endpoint
-- generated TypeScript client update
-- no new endpoint and no dedicated notebook page DTO
-
-**Verification:**
-
-- targeted backend controller tests
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
-
 ### 3.4 Save Notebook Page Content Into Existing Index Note
 
 **Type:** Behavior
@@ -170,8 +152,8 @@ The frontend saves notebook page editor content while loading notebook identity 
 
 - save action calls the notebook page save endpoint
 - component test covers:
-  - saving when the current `Notebook` has `indexNoteId`
-  - saving when the current `Notebook` has no `indexNoteId`
+  - saving when an `index` note already exists (same identity as resolving **`/notebooks/:notebookId/index`**)
+  - saving when the notebook has no `index` note yet
 - user-visible loading/error handling follows existing `apiCallWithLoading()` patterns where applicable
 
 **Verification:**
@@ -324,7 +306,7 @@ Permanent API contracts stop exposing `headNoteId` / `headNote` as notebook iden
 **Commit includes:**
 
 - remove head-note fields from notebook DTOs used by frontend/generated clients
-- frontend switches remaining notebook links/display logic to notebook ID, notebook name, `shortDetails`, and optional `indexNoteId` on the current `Notebook` object
+- frontend switches remaining notebook links/display logic to notebook ID, notebook name, `shortDetails`, and the **`/notebooks/:notebookId/index`** path where the index note or notebook page body is needed
 - regenerate TypeScript client
 - update tests and fixtures that build notebooks with `headNoteId` only for routing
 
@@ -408,7 +390,7 @@ Phase 3 is complete when:
 - notebooks can be opened, displayed, and edited without a head note
 - notebooks can exist without an index note
 - notebooks expose editable `shortDetails`, backfilled from truncated existing head note details
-- the current `Notebook` object exposes optional `indexNoteId` without a separate notebook-page get DTO
+- optional root `index` note identity is reached via **`/notebooks/:notebookId/index`**, not via an `indexNoteId` field on the notebook API; the current `Notebook` object stays the existing get shape without a separate notebook-page get DTO
 - saving notebook page content creates or updates the optional root `index` note
 - migrated notebooks preserve their old head-note content through the normal `index` note
 - new notebooks are not created with head notes or pre-created index notes

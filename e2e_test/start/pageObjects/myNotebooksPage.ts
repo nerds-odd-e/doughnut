@@ -39,8 +39,14 @@ const myNotebooksPage = () => {
         this as any
       )
     },
-    creatingNotebook(notebookTopic: string) {
+    creatingNotebook(notebookTopic: string, shortDetails?: string) {
       addNewNotebookButton().click()
+      if (shortDetails !== undefined) {
+        return noteCreationForm.createNotebookWithTitleAndShortDetails(
+          notebookTopic,
+          shortDetails
+        )
+      }
       return noteCreationForm.createNoteWithTitle(notebookTopic)
     },
     notebookCard(notebook: string) {

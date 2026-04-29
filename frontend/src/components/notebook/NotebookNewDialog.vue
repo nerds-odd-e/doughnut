@@ -4,12 +4,21 @@
       v-model="noteFormData.newTitle"
       :error-message="errors.newTitle"
     />
+    <TextArea
+      scope-name="notebook"
+      field="shortDetails"
+      v-model="noteFormData.shortDetails"
+      :rows="3"
+      :error-message="errors.shortDetails"
+      placeholder="Optional short plain-text message (shown on notebook cards)"
+    />
     <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
   </form>
 </template>
 
 <script lang="ts">
 import NoteFormTitleOnly from "@/components/notes/NoteFormTitleOnly.vue"
+import TextArea from "@/components/form/TextArea.vue"
 import type { Circle, NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
   CircleController,
@@ -23,14 +32,15 @@ export default {
   props: { circle: { type: Object as PropType<Circle> } },
   components: {
     NoteFormTitleOnly,
+    TextArea,
   },
   data() {
     return {
-      noteFormData: { newTitle: "" } as NoteCreationDto,
-      errors: { newTitle: undefined as undefined | string } as Record<
-        string,
-        string | undefined
-      >,
+      noteFormData: { newTitle: "", shortDetails: "" } as NoteCreationDto,
+      errors: {
+        newTitle: undefined as undefined | string,
+        shortDetails: undefined as undefined | string,
+      } as Record<string, string | undefined>,
     }
   },
   methods: {

@@ -87,6 +87,25 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(head.getFolder(), nullValue());
       assertThat(head.getSlug(), equalTo("my-notebook-title"));
     }
+
+    @Test
+    void persistsShortDetailsOnCreate() throws UnexpectedNoAccessRightException {
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Notebook With Blurb");
+      noteCreation.setShortDetails("  Catalog blurb  ");
+      RedirectToNoteResponse response = controller.createNotebook(noteCreation);
+      Note head = noteRepository.findById(response.noteId).orElseThrow();
+      assertThat(head.getNotebook().getShortDetails(), equalTo("Catalog blurb"));
+    }
+
+    @Test
+    void leavesShortDetailsNullWhenUnset() throws UnexpectedNoAccessRightException {
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Notebook No Blurb");
+      RedirectToNoteResponse response = controller.createNotebook(noteCreation);
+      Note head = noteRepository.findById(response.noteId).orElseThrow();
+      assertThat(head.getNotebook().getShortDetails(), nullValue());
+    }
   }
 
   @Nested

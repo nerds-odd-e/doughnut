@@ -306,6 +306,7 @@ export type SuggestedQuestionForFineTuning = {
 export type NoteCreationDto = {
     newTitle: string;
     wikidataId?: string;
+    shortDetails?: string;
 };
 
 export type NoteCreationResult = {

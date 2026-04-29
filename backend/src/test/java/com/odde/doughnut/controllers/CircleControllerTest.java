@@ -11,10 +11,13 @@ import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
+import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.NotebookGroupService;
@@ -30,6 +33,7 @@ class CircleControllerTest extends ControllerTestBase {
   @Autowired CircleService circleService;
   @Autowired CircleController controller;
   @Autowired NotebookGroupService notebookGroupService;
+  @Autowired NoteRepository noteRepository;
 
   @BeforeEach
   void setup() {
@@ -59,6 +63,22 @@ class CircleControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.createNotebookInCircle(circle, noteCreation));
+    }
+  }
+
+  @Nested
+  class CreateNotebookInCircle {
+    @Test
+    void persistsShortDetailsWhenMember() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Circle circle = makeMe.aCircle().please();
+      circleService.joinAndSave(circle, user);
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Circle Owned Nb");
+      noteCreation.setShortDetails("Circle catalog blurb");
+      RedirectToNoteResponse response = controller.createNotebookInCircle(circle, noteCreation);
+      Note head = noteRepository.findById(response.noteId).orElseThrow();
+      assertThat(head.getNotebook().getShortDetails(), equalTo("Circle catalog blurb"));
     }
   }
 

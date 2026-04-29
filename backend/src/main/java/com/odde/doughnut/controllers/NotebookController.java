@@ -104,7 +104,8 @@ class NotebookController {
             userEntity.getOwnership(),
             userEntity,
             testabilitySettings.getCurrentUTCTimestamp(),
-            noteCreation.getNewTitle());
+            noteCreation.getNewTitle(),
+            noteCreation.getShortDetails());
     return new RedirectToNoteResponse(note.getId());
   }
 

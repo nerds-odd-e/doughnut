@@ -49,10 +49,18 @@ public class NotebookService {
   }
 
   public Note createNotebookForOwnership(
-      Ownership ownership, User user, Timestamp currentUTCTimestamp, String titleConstructor) {
+      Ownership ownership,
+      User user,
+      Timestamp currentUTCTimestamp,
+      String titleConstructor,
+      String shortDetails) {
     Note note =
         ownership.prepareHeadNoteForNewNotebook(user, currentUTCTimestamp, titleConstructor);
-    entityPersister.save(note.getNotebook());
+    Notebook notebook = note.getNotebook();
+    if (shortDetails != null && !shortDetails.isBlank()) {
+      notebook.setShortDetails(shortDetails.trim());
+    }
+    entityPersister.save(notebook);
     wikiSlugPathService.assignSlugForNewNote(note);
     entityPersister.save(note);
     return note;

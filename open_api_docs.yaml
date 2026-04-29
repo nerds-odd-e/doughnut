@@ -3936,6 +3936,10 @@ components:
         wikidataId:
           type: string
           pattern: ^$|Q\d+
+        shortDetails:
+          type: string
+          maxLength: 500
+          minLength: 0
       required:
       - newTitle
     NoteCreationResult:
