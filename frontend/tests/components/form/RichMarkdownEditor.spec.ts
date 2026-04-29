@@ -122,4 +122,45 @@ describe("RichMarkdownEditor", () => {
       '<a href="/n9" class="doughnut-link">'
     )
   })
+
+  it("renders only the parsed body in rich mode when details include YAML frontmatter", async () => {
+    const details = `---
+diligence: high
+topic: training
+---
+
+# Workshop Body
+
+Main content here.`
+    await mountEditor(details)
+    await flushPromises()
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    const html = String(quill.props("modelValue"))
+    expect(html).toContain("Workshop Body")
+    expect(html).not.toContain("diligence:")
+    expect(html).not.toContain("topic:")
+  })
+
+  it("composes edited body with existing frontmatter when emitting updates", async () => {
+    const details = `---
+diligence: high
+topic: training
+---
+
+# Original`
+    await mountEditor(details)
+    await flushPromises()
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    quill.vm.$emit("update:modelValue", "<h1>Edited Heading</h1>")
+    await flushPromises()
+
+    const emitted = wrapper.emitted()["update:modelValue"]
+    expect(emitted?.length).toBeGreaterThan(0)
+    const last = emitted![emitted!.length - 1]![0] as string
+    expect(last).toContain("diligence:")
+    expect(last).toContain("topic:")
+    expect(last).toContain("Edited Heading")
+  })
 })

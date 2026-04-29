@@ -82,7 +82,6 @@ Feature: Note Edit
     And the note details should include "World"
     And the note details should contain a line break
 
-  @wip
   Scenario: Edit note properties in markdown mode
     When I update note "LeSS in Action" details using markdown to become:
       """

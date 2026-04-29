@@ -18,8 +18,12 @@ import {
   replaceWikiLinksInHtml,
   type WikiTitle,
 } from "./replaceWikiLinksInHtml"
+import {
+  composeNoteDetailsMarkdown,
+  parseNoteDetailsMarkdown,
+} from "@/utils/noteDetailsFrontmatter"
 
-const { modelValue, wikiTitles } = defineProps({
+const props = defineProps({
   multipleLine: Boolean,
   modelValue: String,
   scopeName: String,
@@ -37,32 +41,67 @@ const emits = defineEmits<{
   (e: "deadLinkClick", title: string): void
 }>()
 
-let currentIntervalMarkdown: string | undefined = undefined
-let currentIntervalHtml: string | undefined = undefined
+/** Body markdown (or full details when frontmatter could not be parsed). */
+let currentIntervalBodyMarkdown: string | undefined
+let currentIntervalHtml: string | undefined
+
+const parsedDetails = computed(() =>
+  parseNoteDetailsMarkdown(props.modelValue ?? "")
+)
+
+const markdownForRichDisplay = computed(() => {
+  const p = parsedDetails.value
+  if (p.ok) return p.body
+  return props.modelValue ?? ""
+})
 
 const htmlValue = computed(() => {
+  const p = parsedDetails.value
   if (
-    modelValue === currentIntervalMarkdown &&
-    currentIntervalHtml !== undefined
+    currentIntervalHtml !== undefined &&
+    currentIntervalBodyMarkdown !== undefined &&
+    p.ok &&
+    p.body === currentIntervalBodyMarkdown
   ) {
-    return replaceWikiLinksInHtml(currentIntervalHtml, wikiTitles)
+    return replaceWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
+  }
+  if (
+    currentIntervalHtml !== undefined &&
+    currentIntervalBodyMarkdown !== undefined &&
+    !p.ok &&
+    (props.modelValue ?? "") === currentIntervalBodyMarkdown
+  ) {
+    return replaceWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
   }
   return replaceWikiLinksInHtml(
-    markdownizer.markdownToHtml(modelValue),
-    wikiTitles
+    markdownizer.markdownToHtml(markdownForRichDisplay.value),
+    props.wikiTitles
   )
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {
-  const markdownValue = markdownizer.htmlToMarkdown(newHtmlValue)
-  currentIntervalMarkdown = markdownValue
+  const bodyMarkdown = markdownizer.htmlToMarkdown(newHtmlValue)
+  currentIntervalBodyMarkdown = bodyMarkdown
   currentIntervalHtml = newHtmlValue
-  if (markdownValue === modelValue) return
-  emits("update:modelValue", markdownValue)
+
+  const p = parsedDetails.value
+  const prevFull = props.modelValue ?? ""
+
+  if (p.ok) {
+    const composed = composeNoteDetailsMarkdown({
+      properties: p.properties,
+      body: bodyMarkdown,
+    })
+    if (composed === prevFull) return
+    emits("update:modelValue", composed)
+    return
+  }
+
+  if (bodyMarkdown === prevFull) return
+  emits("update:modelValue", bodyMarkdown)
 }
 
 const onPasteComplete = (html: string) => {
-  // Convert current HTML content to markdown and emit
   const markdown = markdownizer.htmlToMarkdown(html)
   emits("pasteComplete", markdown)
 }
