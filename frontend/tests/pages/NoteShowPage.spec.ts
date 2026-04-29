@@ -124,7 +124,8 @@ describe("all in note show page", () => {
       await screen.findByText(noteRealm.note.noteTopology.title!)
 
       expect(slugSpy).toHaveBeenCalledWith({
-        path: { notebook: 99, slug: "outer/inner/leaf" },
+        path: { notebook: 99 },
+        query: { slugPath: "outer/inner/leaf" },
       })
       expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: noteRealm.id },

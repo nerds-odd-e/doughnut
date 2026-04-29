@@ -299,8 +299,11 @@ describe("NoteUndoButton", () => {
       await flushPromises()
 
       expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: { noteId: noteRealm.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(noteRealm.notebook.id),
+          noteSlugPath: noteRealm.slug,
+        },
       })
     })
 
@@ -325,8 +328,11 @@ describe("NoteUndoButton", () => {
       await flushPromises()
 
       expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: { noteId: noteRealm.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(noteRealm.notebook.id),
+          noteSlugPath: noteRealm.slug,
+        },
       })
     })
 
@@ -350,8 +356,11 @@ describe("NoteUndoButton", () => {
       await flushPromises()
 
       expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: { noteId: noteRealm.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(noteRealm.notebook.id),
+          noteSlugPath: noteRealm.slug,
+        },
       })
     })
 
@@ -372,8 +381,11 @@ describe("NoteUndoButton", () => {
       await flushPromises()
 
       expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: { noteId: parentNoteRealm.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(parentNoteRealm.notebook.id),
+          noteSlugPath: parentNoteRealm.slug,
+        },
       })
     })
 

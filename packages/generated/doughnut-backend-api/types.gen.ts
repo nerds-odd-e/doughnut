@@ -3342,13 +3342,14 @@ export type GetNoteBySlugData = {
     body?: never;
     path: {
         notebook: number;
+    };
+    query: {
         /**
          * Notebook-local note slug path (may contain '/')
          */
-        slug: string;
+        slugPath: string;
     };
-    query?: never;
-    url: '/api/notebooks/{notebook}/note/{slug}';
+    url: '/api/notebooks/{notebook}/note/by-slug';
 };
 
 export type GetNoteBySlugResponses = {

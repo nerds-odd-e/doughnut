@@ -810,7 +810,7 @@ export class NotebookController {
      * Get note by full slug path within notebook
      */
     public static getNoteBySlug<ThrowOnError extends boolean = false>(options: Options<GetNoteBySlugData, ThrowOnError>) {
-        return (options.client ?? client).get<GetNoteBySlugResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/note/{slug}', ...options });
+        return (options.client ?? client).get<GetNoteBySlugResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/note/by-slug', ...options });
     }
 }
 

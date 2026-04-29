@@ -136,6 +136,7 @@ const basenameError = ref<string | null>(null)
 const basenameResolvedNoteId = ref<number | undefined>(undefined)
 const notebookSlugError = ref<string | null>(null)
 const notebookSlugResolvedNoteId = ref<number | undefined>(undefined)
+let notebookSlugLoadGeneration = 0
 
 const isNotebookSlugEntry = computed(
   () =>
@@ -192,6 +193,7 @@ watch(
   () => [props.notebookId, props.noteSlugPath] as const,
   async ([nb, path]) => {
     notebookSlugError.value = null
+    const generation = ++notebookSlugLoadGeneration
     notebookSlugResolvedNoteId.value = undefined
     if (nb == null || Number.isNaN(nb) || path === undefined || path === "") {
       return
@@ -200,8 +202,10 @@ watch(
       const realm = await storageAccessor.value
         .storedApi()
         .loadNoteByNotebookSlug(nb, path)
+      if (generation !== notebookSlugLoadGeneration) return
       notebookSlugResolvedNoteId.value = realm.id
     } catch (e: unknown) {
+      if (generation !== notebookSlugLoadGeneration) return
       notebookSlugError.value =
         e instanceof Error ? e.message : "Could not load note"
     }

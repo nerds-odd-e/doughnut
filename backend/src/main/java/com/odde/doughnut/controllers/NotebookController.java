@@ -212,11 +212,11 @@ class NotebookController {
   }
 
   @Operation(summary = "Get note by full slug path within notebook")
-  @GetMapping("/{notebook}/note/{slug}")
+  @GetMapping("/{notebook}/note/by-slug")
   public NoteRealm getNoteBySlug(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Parameter(description = "Notebook-local note slug path (may contain '/')")
-          @PathVariable("slug")
+          @RequestParam("slugPath")
           String slug)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();

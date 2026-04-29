@@ -19,16 +19,16 @@ import {
   toOpenApiError,
   setErrorObjectForFieldErrors,
 } from "@/managedApi/openApiError"
-
-function toErrorMessage(error: unknown, fallback: string): string {
-  if (typeof error === "string") return error
-  return error ? (toOpenApiError(error).message ?? fallback) : fallback
-}
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
+
+function toErrorMessage(error: unknown, fallback: string): string {
+  if (typeof error === "string") return error
+  return error ? (toOpenApiError(error).message ?? fallback) : fallback
+}
 
 export interface StoredApi {
   getNoteRealmRefAndReloadPosition(
@@ -116,15 +116,22 @@ export default class StoredApiCollection implements StoredApi {
     this.storage = storage
   }
 
+  private routerLocationForFocusedNote(noteRealm: NoteRealm) {
+    return {
+      name: "noteShowByNotebookSlug",
+      params: {
+        notebookId: String(noteRealm.notebook.id),
+        noteSlugPath: noteRealm.slug.trim(),
+      },
+    }
+  }
+
   // eslint-disable-next-line class-methods-use-this
   private async routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
     if (!focusOnNote) {
       return await router.replace({ name: "notebooks" })
     }
-    return await router.replace({
-      name: "noteShow",
-      params: { noteId: focusOnNote.id },
-    })
+    return await router.replace(this.routerLocationForFocusedNote(focusOnNote))
   }
 
   private async updateTextContentWithoutUndo(
@@ -230,7 +237,8 @@ export default class StoredApiCollection implements StoredApi {
   ): Promise<NoteRealm> {
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NotebookController.getNoteBySlug({
-        path: { notebook: notebookId, slug: slugPath },
+        path: { notebook: notebookId },
+        query: { slugPath },
       })
     )
     if (error || !noteRealm) {
@@ -581,10 +589,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       return
     }
-    await router.push({
-      name: "noteShow",
-      params: { noteId: noteRealm.id },
-    })
+    await router.push(this.routerLocationForFocusedNote(noteRealm))
     return noteRealm
   }
 
