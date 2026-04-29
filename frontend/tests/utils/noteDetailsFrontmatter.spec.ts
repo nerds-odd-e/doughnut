@@ -7,6 +7,7 @@ import {
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   sortedPropertyRowsFromRecord,
+  validatePropertyRowsForRichEdit,
 } from "@/utils/noteDetailsFrontmatter"
 
 describe("parseNoteDetailsMarkdown", () => {
@@ -185,5 +186,35 @@ describe("property rows compose / mutate", () => {
     const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
     const again = parseNoteDetailsMarkdown(md)
     expect(again.ok && again.properties).toEqual({ b: "2" })
+  })
+})
+
+describe("validatePropertyRowsForRichEdit", () => {
+  it("accepts distinct keys after trim", () => {
+    expect(
+      validatePropertyRowsForRichEdit([
+        { key: " a ", value: "x" },
+        { key: "b", value: " y " },
+      ])
+    ).toEqual({ ok: true })
+  })
+
+  it("rejects empty keys", () => {
+    const r = validatePropertyRowsForRichEdit([{ key: "   ", value: "x" }])
+    expect(r.ok).toBe(false)
+    if (!r.ok) {
+      expect(r.message).toContain("empty")
+    }
+  })
+
+  it("rejects duplicate keys after trim", () => {
+    const r = validatePropertyRowsForRichEdit([
+      { key: "same", value: "a" },
+      { key: "same", value: "b" },
+    ])
+    expect(r.ok).toBe(false)
+    if (!r.ok) {
+      expect(r.message).toContain("Duplicate")
+    }
   })
 })

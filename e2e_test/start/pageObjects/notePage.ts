@@ -226,34 +226,51 @@ export const assumeNotePage = (noteTopology?: string) => {
     addRichNoteProperty(key: string, value: string) {
       cy.get('[role=details]').within(() => {
         cy.findByRole('button', { name: 'Add note property' }).click()
-        cy.findByLabelText('Property key').clear().type(key)
-        cy.findByLabelText('Property value').clear().type(value)
+        cy.findByTestId('rich-note-property-key').clear().type(key)
+        cy.findByTestId('rich-note-property-value').clear().type(value)
       })
       return this
     },
     expectRichNotePropertyDisplayed(key: string, value: string) {
       cy.get('[role=details]').within(() => {
         cy.contains('h4', 'Properties')
-        cy.contains('dt', key).next('dd').should('contain', value)
+        cy.get(
+          `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
+        ).within(() => {
+          cy.get('[data-testid="rich-note-property-row-key-input"]').should(
+            'have.value',
+            key
+          )
+          cy.get('[data-testid="rich-note-property-row-value-input"]').should(
+            'have.value',
+            value
+          )
+        })
       })
       return this
     },
     expectRichNotePropertyAbsent(key: string) {
       cy.get('[role=details]').within(() => {
         cy.contains('h4', 'Properties')
-        cy.contains('dt', key).should('not.exist')
+        cy.get(
+          `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
+        ).should('not.exist')
       })
       return this
     },
     editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
       cy.get('[role=details]').within(() => {
         cy.contains('h4', 'Properties')
-        cy.contains('dt', oldKey)
-          .closest('dl')
-          .within(() => {
-            cy.get('input').eq(0).clear().type(newKey)
-            cy.get('input').eq(1).clear().type(newValue)
-          })
+        cy.get(
+          `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`
+        ).within(() => {
+          cy.get('[data-testid="rich-note-property-row-key-input"]')
+            .clear()
+            .type(newKey)
+          cy.get('[data-testid="rich-note-property-row-value-input"]')
+            .clear()
+            .type(newValue)
+        })
       })
       return this
     },

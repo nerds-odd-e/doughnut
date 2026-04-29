@@ -12,13 +12,60 @@
     </h4>
     <dl
       v-if="propertyRows.length > 0"
-      class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm"
+      :class="
+        isReadOnly
+          ? 'daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm'
+          : 'daisy-flex daisy-flex-col daisy-gap-2 daisy-text-sm'
+      "
     >
-      <template v-for="row in propertyRows" :key="row.key">
-        <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
-        <dd class="daisy-m-0">{{ row.value }}</dd>
+      <template v-if="isReadOnly">
+        <template v-for="row in propertyRows" :key="row.key">
+          <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
+          <dd class="daisy-m-0">{{ row.value }}</dd>
+        </template>
+      </template>
+      <template v-else>
+        <div
+          v-for="(row, idx) in propertyRows"
+          :key="idx"
+          class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-items-start"
+          data-testid="rich-note-property-row"
+          :data-property-key="row.key"
+        >
+          <dt class="daisy-font-medium daisy-m-0 daisy-text-base-content/80">
+            <input
+              v-model="propertyRows[idx]!.key"
+              type="text"
+              class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
+              :aria-label="`Existing note property key (row ${idx + 1})`"
+              data-testid="rich-note-property-row-key-input"
+              @focus="onRowFocus(idx)"
+              @blur="commitRow(idx)"
+            >
+          </dt>
+          <dd class="daisy-m-0">
+            <input
+              v-model="propertyRows[idx]!.value"
+              type="text"
+              class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+              :aria-label="`Existing note property value (row ${idx + 1})`"
+              data-testid="rich-note-property-row-value-input"
+              @focus="onRowFocus(idx)"
+              @blur="commitRow(idx)"
+            >
+          </dd>
+        </div>
       </template>
     </dl>
+    <p
+      v-if="validationMessage"
+      role="alert"
+      aria-live="polite"
+      class="daisy-text-error daisy-text-xs daisy-mt-1"
+      data-testid="rich-note-property-validation"
+    >
+      {{ validationMessage }}
+    </p>
     <div v-if="showInsertChrome" class="daisy-flex daisy-flex-col daisy-gap-2 daisy-mt-1">
       <button
         type="button"
@@ -62,6 +109,7 @@ import { computed, ref, useId, watch } from "vue"
 import {
   parseNoteDetailsMarkdown,
   sortedPropertyRowsFromRecord,
+  validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteDetailsFrontmatter"
 
@@ -88,6 +136,9 @@ const draftKey = ref("")
 const draftValue = ref("")
 const valueInputRef = ref<HTMLInputElement | null>(null)
 
+const validationMessage = ref("")
+const rowSnapshots = ref<Record<number, PropertyRow>>({})
+
 watch(
   () => props.detailsMarkdown,
   () => {
@@ -100,6 +151,8 @@ watch(
     insertOpen.value = false
     draftKey.value = ""
     draftValue.value = ""
+    validationMessage.value = ""
+    rowSnapshots.value = {}
   },
   { immediate: true }
 )
@@ -129,8 +182,49 @@ function tryCommitInsert() {
   const value = draftValue.value.trim()
   if (!key || !value) return
 
+  if (propertyRows.value.some((r) => r.key.trim() === key)) {
+    validationMessage.value = "Duplicate property keys are not allowed."
+    return
+  }
+
   const nextRows = rowsAfterAdding({ key, value })
+  const result = validatePropertyRowsForRichEdit(nextRows)
+  if (!result.ok) {
+    validationMessage.value = result.message
+    return
+  }
+
+  validationMessage.value = ""
   emits("properties-changed", nextRows)
+}
+
+function onRowFocus(idx: number) {
+  const row = propertyRows.value[idx]
+  if (row) {
+    rowSnapshots.value[idx] = { ...row }
+  }
+}
+
+function commitRow(idx: number) {
+  const snapshot = rowSnapshots.value[idx]
+  const rows = propertyRows.value.map((r, i) =>
+    i === idx ? { key: r.key.trim(), value: r.value.trim() } : r
+  )
+  propertyRows.value = rows
+
+  const result = validatePropertyRowsForRichEdit(propertyRows.value)
+  if (!result.ok) {
+    validationMessage.value = result.message
+    if (snapshot) {
+      propertyRows.value = propertyRows.value.map((r, i) =>
+        i === idx ? { ...snapshot } : r
+      )
+    }
+    return
+  }
+
+  validationMessage.value = ""
+  emits("properties-changed", [...propertyRows.value])
 }
 
 defineExpose({

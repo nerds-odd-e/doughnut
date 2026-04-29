@@ -112,7 +112,6 @@ Feature: Note Edit
     When I open the note details markdown editor
     Then the note details markdown source should contain "status: draft"
 
-  @wip
   Scenario: Edit a note property in rich mode
     When I update note "LeSS in Action" details using markdown to become:
       """

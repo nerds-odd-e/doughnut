@@ -132,7 +132,7 @@ topic: training
 # Workshop Body
 
 Main content here.`
-    await mountEditor(details)
+    await mountEditor(details, { readonly: true })
     await flushPromises()
 
     expect(wrapper.text()).toContain("Properties")
@@ -203,8 +203,8 @@ Body`,
     await addBtn!.trigger("click")
     await flushPromises()
 
-    const keyInput = wrapper.find('[aria-label="Property key"]')
-    const valInput = wrapper.find('[aria-label="Property value"]')
+    const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
+    const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue("status")
     await valInput.setValue("draft")
     await valInput.trigger("blur")
@@ -251,5 +251,71 @@ topic: training
     expect(last).toContain("diligence:")
     expect(last).toContain("topic:")
     expect(last).toContain("Edited Heading")
+  })
+
+  it("editing an existing property row emits renamed keys and updated values", async () => {
+    const details = `---
+topic: training
+---
+
+Workshop body.`
+    await mountEditor(details)
+    await flushPromises()
+
+    const keyInput = wrapper.find(
+      '[data-testid="rich-note-property-row-key-input"]'
+    )
+    const valInput = wrapper.find(
+      '[data-testid="rich-note-property-row-value-input"]'
+    )
+    await keyInput.setValue("domain")
+    await keyInput.trigger("blur")
+    await flushPromises()
+    await valInput.setValue("wiki")
+    await valInput.trigger("blur")
+    await flushPromises()
+
+    const emitted = wrapper.emitted()["update:modelValue"]
+    expect(emitted?.length).toBeGreaterThan(0)
+    const last = emitted![emitted!.length - 1]![0] as string
+    expect(last).toContain("domain:")
+    expect(last).toContain("wiki")
+    expect(last).not.toContain("topic:")
+    expect(last).toContain("Workshop body")
+  })
+
+  it("shows validation and does not emit corrupt duplicate keys when renaming a row", async () => {
+    const details = `---
+alpha: one
+beta: two
+---
+
+Body`
+    await mountEditor(details)
+    await flushPromises()
+
+    const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
+    expect(rows.length).toBe(2)
+    const betaKeyInput = rows[1]!.find(
+      '[data-testid="rich-note-property-row-key-input"]'
+    )
+    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
+
+    await betaKeyInput.trigger("focus")
+    await betaKeyInput.setValue("alpha")
+    await betaKeyInput.trigger("blur")
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="rich-note-property-validation"]').text()
+    ).toContain("Duplicate")
+
+    const emitCountAfter = wrapper.emitted("update:modelValue")?.length ?? 0
+    expect(emitCountAfter).toBe(emitCountBefore)
+
+    const betaKeyAfter = wrapper
+      .findAll('[data-testid="rich-note-property-row"]')[1]!
+      .find('[data-testid="rich-note-property-row-key-input"]')
+    expect((betaKeyAfter.element as HTMLInputElement).value).toBe("beta")
   })
 })

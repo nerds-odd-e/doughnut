@@ -182,6 +182,30 @@ export function composeNoteDetailsFromPropertyRows(
   return composeNoteDetailsMarkdown({ properties, body })
 }
 
+/** Validates rich property rows before persisting or emitting updates (trimmed keys). */
+export function validatePropertyRowsForRichEdit(
+  rows: readonly PropertyRow[]
+): { ok: true } | { ok: false; message: string } {
+  const trimmed = rows.map((r) => ({
+    key: r.key.trim(),
+    value: r.value.trim(),
+  }))
+  for (let i = 0; i < trimmed.length; i++) {
+    if (!trimmed[i]!.key) {
+      return { ok: false, message: "Property keys cannot be empty." }
+    }
+  }
+  const keys = trimmed.map((r) => r.key)
+  const seen = new Set<string>()
+  for (const k of keys) {
+    if (seen.has(k)) {
+      return { ok: false, message: "Duplicate property keys are not allowed." }
+    }
+    seen.add(k)
+  }
+  return { ok: true }
+}
+
 export function insertPropertyRowAt(
   rows: readonly PropertyRow[],
   index: number,
