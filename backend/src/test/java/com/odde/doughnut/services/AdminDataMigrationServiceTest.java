@@ -30,7 +30,7 @@ class AdminDataMigrationServiceTest {
     Note target = makeMe.aNote().title("Beta").under(parent).please();
     Note relation = makeMe.aRelation().between(parent, target, RelationType.PART).please();
 
-    jdbcTemplate.update("UPDATE note SET title = NULL WHERE id = ?", relation.getId());
+    jdbcTemplate.update("UPDATE note SET title = '' WHERE id = ?", relation.getId());
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(relation);
 
@@ -50,7 +50,7 @@ class AdminDataMigrationServiceTest {
     Note parent = makeMe.aNote().title("A").please();
     Note target = makeMe.aNote().title("B").under(parent).please();
     Note relation = makeMe.aRelation().between(parent, target, RelationType.RELATED_TO).please();
-    jdbcTemplate.update("UPDATE note SET title = NULL WHERE id = ?", relation.getId());
+    jdbcTemplate.update("UPDATE note SET title = '' WHERE id = ?", relation.getId());
     makeMe.entityPersister.flush();
 
     var dto = adminDataMigrationService.runBatch();
