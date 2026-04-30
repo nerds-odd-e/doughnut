@@ -2020,8 +2020,8 @@ paths:
     post:
       tags:
       - admin-data-migration-controller
-      summary: Run one wiki index-folder data migration batch - call again while moreBatchesRemain
-        is true
+      summary: Run one admin migration batch - stub endpoint; implementations should
+        replace service logic
       operationId: runDataMigrationBatch
       responses:
         "200":
@@ -3261,7 +3261,7 @@ paths:
     get:
       tags:
       - admin-data-migration-controller
-      summary: Get last admin migration status
+      summary: Get admin data migration status (stub until a migration is wired)
       operationId: getAdminDataMigrationStatus
       responses:
         "200":
@@ -4606,39 +4606,7 @@ components:
     AdminDataMigrationStatusDTO:
       type: object
       properties:
-        completedOnce:
-          type: boolean
-        lastCompletedAt:
-          type: string
-          format: date-time
         message:
-          type: string
-        detachedChildFoldersFromIndexFolder:
-          type: integer
-          format: int32
-        updatedNormalNotesDetachedFromIndex:
-          type: integer
-          format: int32
-        updatedRelationNotesClearedFolder:
-          type: integer
-          format: int32
-        deletedObsoleteNotebookNameRootFolders:
-          type: integer
-          format: int32
-        notebookCountSlugScan:
-          type: integer
-          format: int64
-        migrationInProgress:
-          type: boolean
-        moreBatchesRemain:
-          type: boolean
-        completedBatchOrdinal:
-          type: integer
-          format: int32
-        batchTotalPlanned:
-          type: integer
-          format: int32
-        batchPhaseSummary:
           type: string
     UserDTO:
       type: object

@@ -603,19 +603,7 @@ export type AiGeneratedImage = {
 };
 
 export type AdminDataMigrationStatusDto = {
-    completedOnce?: boolean;
-    lastCompletedAt?: string;
     message?: string;
-    detachedChildFoldersFromIndexFolder?: number;
-    updatedNormalNotesDetachedFromIndex?: number;
-    updatedRelationNotesClearedFolder?: number;
-    deletedObsoleteNotebookNameRootFolders?: number;
-    notebookCountSlugScan?: number;
-    migrationInProgress?: boolean;
-    moreBatchesRemain?: boolean;
-    completedBatchOrdinal?: number;
-    batchTotalPlanned?: number;
-    batchPhaseSummary?: string;
 };
 
 export type UserDto = {

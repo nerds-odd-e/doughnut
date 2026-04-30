@@ -1,4 +1,3 @@
-@ignore
 Feature: note move
   As a learner, I want to move a note to become a child of another note,   so that I can recall them in the
   future.
@@ -15,6 +14,7 @@ Feature: note move
     When I visit all my notebooks
     Then I should not see note "Sedition" at the top level of all my notes
 
+  @ignore
   @mockBrowserTime
   Scenario: Undo moving note
     Given I move note "Sedition" to be under note "Sedation"

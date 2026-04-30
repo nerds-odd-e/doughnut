@@ -1231,14 +1231,14 @@ export class AiController {
 
 export class AdminDataMigrationController {
     /**
-     * Run one wiki index-folder data migration batch - call again while moreBatchesRemain is true
+     * Run one admin migration batch â stub endpoint; implementations should replace service logic
      */
     public static runDataMigrationBatch<ThrowOnError extends boolean = false>(options?: Options<RunDataMigrationBatchData, ThrowOnError>) {
         return (options?.client ?? client).post<RunDataMigrationBatchResponses, unknown, ThrowOnError>({ url: '/api/admin/data-migration/run-batch', ...options });
     }
     
     /**
-     * Get last admin migration status
+     * Get admin data migration status (stub until a migration is wired)
      */
     public static getAdminDataMigrationStatus<ThrowOnError extends boolean = false>(options?: Options<GetAdminDataMigrationStatusData, ThrowOnError>) {
         return (options?.client ?? client).get<GetAdminDataMigrationStatusResponses, unknown, ThrowOnError>({ url: '/api/admin/data-migration/status', ...options });

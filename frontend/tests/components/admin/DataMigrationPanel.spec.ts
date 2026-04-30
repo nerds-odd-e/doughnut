@@ -11,18 +11,7 @@ import helper, {
 
 describe("DataMigrationPanel", () => {
   const idleDto: AdminDataMigrationStatusDto = {
-    completedOnce: false,
-    message: "No migration has completed in this server process yet.",
-    detachedChildFoldersFromIndexFolder: 0,
-    updatedNormalNotesDetachedFromIndex: 0,
-    updatedRelationNotesClearedFolder: 0,
-    deletedObsoleteNotebookNameRootFolders: 0,
-    notebookCountSlugScan: 0,
-    migrationInProgress: false,
-    moreBatchesRemain: false,
-    completedBatchOrdinal: 0,
-    batchTotalPlanned: 0,
-    batchPhaseSummary: "",
+    message: "stub message",
   }
 
   let runBatchSpy: ReturnType<typeof mockSdkService<"runDataMigrationBatch">>
@@ -33,75 +22,18 @@ describe("DataMigrationPanel", () => {
     runBatchSpy = mockSdkService("runDataMigrationBatch", idleDto)
   })
 
-  it("shows intro copy about migrating index-folder topology", async () => {
-    const wrapper = helper.component(DataMigrationPanel).mount()
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("index-folder")
-    expect(wrapper.text()).toContain("small HTTP batches")
-  })
-
-  it("loads status from the server when mounted", async () => {
+  it("loads status when mounted", async () => {
     const wrapper = helper.component(DataMigrationPanel).mount()
     await flushPromises()
 
     expect(getSpy).toHaveBeenCalled()
-    expect(wrapper.text()).toContain(
-      "No migration has completed in this server process yet."
-    )
-    expect(wrapper.text()).toContain("Last run:")
+    expect(wrapper.text()).toContain("stub message")
+    expect(wrapper.text()).toContain("Admin data migrations")
   })
 
-  it("renders Run migration primary control", async () => {
-    const wrapper = helper.component(DataMigrationPanel).mount()
-    await flushPromises()
-
-    const btn = wrapper.find('[data-testid="run-data-migration-button"]')
-    expect(btn.exists()).toBe(true)
-    expect(btn.text()).toContain("Run migration")
-  })
-
-  it("clicking Run migration chains runDataMigrationBatch until complete", async () => {
-    const midProgress: AdminDataMigrationStatusDto = {
-      migrationInProgress: true,
-      moreBatchesRemain: true,
-      completedBatchOrdinal: 1,
-      batchTotalPlanned: 3,
-      batchPhaseSummary: "Topology batch 1/2",
-      completedOnce: false,
-      message:
-        "Detached child folders 0; moved normal notes 0; cleared relation note folders 0;",
-      detachedChildFoldersFromIndexFolder: 0,
-      updatedNormalNotesDetachedFromIndex: 0,
-      updatedRelationNotesClearedFolder: 0,
-      deletedObsoleteNotebookNameRootFolders: 0,
-      notebookCountSlugScan: 0,
-    }
-    const migrated: AdminDataMigrationStatusDto = {
-      migrationInProgress: false,
-      moreBatchesRemain: false,
-      completedBatchOrdinal: 3,
-      batchTotalPlanned: 3,
-      batchPhaseSummary: "Done",
-      completedOnce: true,
-      lastCompletedAt: "2026-04-01T08:30:12.345Z",
-      message:
-        "Detached child folders 1; moved normal notes 2; cleared relation note folders 0; slug regen scanned 3 notebooks.",
-      detachedChildFoldersFromIndexFolder: 1,
-      updatedNormalNotesDetachedFromIndex: 2,
-      updatedRelationNotesClearedFolder: 0,
-      deletedObsoleteNotebookNameRootFolders: 0,
-      notebookCountSlugScan: 3,
-    }
-
-    let callIdx = 0
-    runBatchSpy.mockImplementation(async () => {
-      callIdx++
-      if (callIdx === 1) {
-        return wrapSdkResponse(midProgress)
-      }
-      return wrapSdkResponse(migrated)
-    })
+  it("clicking Run migration calls runDataMigrationBatch and updates summary", async () => {
+    const reply: AdminDataMigrationStatusDto = { message: "after run" }
+    runBatchSpy.mockResolvedValue(wrapSdkResponse(reply))
 
     const wrapper = helper.component(DataMigrationPanel).mount()
     await flushPromises()
@@ -111,11 +43,8 @@ describe("DataMigrationPanel", () => {
       .trigger("click")
     await flushPromises()
 
-    expect(runBatchSpy).toHaveBeenCalledTimes(2)
-    expect(wrapper.text()).toContain("slug regen scanned 3 notebooks")
-    expect(
-      wrapper.find('[data-testid="data-migration-progress"]').exists()
-    ).toBe(false)
+    expect(runBatchSpy).toHaveBeenCalledTimes(1)
+    expect(wrapper.text()).toContain("after run")
   })
 
   it("shows error when runDataMigrationBatch fails", async () => {

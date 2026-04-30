@@ -26,7 +26,7 @@ class AdminDataMigrationController {
 
   @Operation(
       operationId = "getAdminDataMigrationStatus",
-      summary = "Get last admin migration status")
+      summary = "Get admin data migration status (stub until a migration is wired)")
   @GetMapping("/status")
   public AdminDataMigrationStatusDTO getAdminDataMigrationStatus()
       throws UnexpectedNoAccessRightException {
@@ -38,7 +38,7 @@ class AdminDataMigrationController {
   @Operation(
       operationId = "runDataMigrationBatch",
       summary =
-          "Run one wiki index-folder data migration batch - call again while moreBatchesRemain is true")
+          "Run one admin migration batch — stub endpoint; implementations should replace service logic")
   @PostMapping("/run-batch")
   public AdminDataMigrationStatusDTO runDataMigrationBatch()
       throws UnexpectedNoAccessRightException {
