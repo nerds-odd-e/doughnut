@@ -14,6 +14,7 @@ import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -37,6 +38,7 @@ class NoteControllerTests extends ControllerTestBase {
   @Autowired RecallService recallService;
   @Autowired MemoryTrackerService memoryTrackerService;
   @Autowired UserService userService;
+  @Autowired WikiTitleCacheService wikiTitleCacheService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -82,6 +84,7 @@ class NoteControllerTests extends ControllerTestBase {
       Note matched = makeMe.aNote().title("LinkedPage").under(root).please();
       Note viewer =
           makeMe.aNote().under(root).details("Text [[LinkedPage]] and [[NoSuch]].").please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
       assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("LinkedPage"));
@@ -103,6 +106,7 @@ class NoteControllerTests extends ControllerTestBase {
               .under(headSource)
               .details("See [[Other Notebook:LinkedPage]] for more.")
               .please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
       assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("Other Notebook:LinkedPage"));
@@ -138,6 +142,7 @@ class NoteControllerTests extends ControllerTestBase {
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
       Note viewer = makeMe.aNote().under(root).details(details).please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
       assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("FrontmatterTarget"));

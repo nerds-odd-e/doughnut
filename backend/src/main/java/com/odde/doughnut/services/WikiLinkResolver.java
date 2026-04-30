@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -47,17 +46,6 @@ public class WikiLinkResolver {
       if (target != null) {
         out.add(new ResolvedWikiLink(token, target));
       }
-    }
-    return List.copyOf(out);
-  }
-
-  public List<WikiTitle> resolveWikiTitles(Note focusNote, User viewer) {
-    List<WikiTitle> out = new ArrayList<>();
-    for (ResolvedWikiLink link : resolveWikiLinksForCache(focusNote, viewer)) {
-      Note target = link.targetNote();
-      Notebook notebook =
-          target.getNotebook() != null ? target.getNotebook() : focusNote.getNotebook();
-      out.add(new WikiTitle(link.linkText(), notebook.getId(), target.getSlug()));
     }
     return List.copyOf(out);
   }

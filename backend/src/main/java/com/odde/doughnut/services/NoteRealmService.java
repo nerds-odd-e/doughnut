@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteRealmService {
 
-  private final WikiLinkResolver wikiLinkResolver;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
-  public NoteRealmService(WikiLinkResolver wikiLinkResolver) {
-    this.wikiLinkResolver = wikiLinkResolver;
+  public NoteRealmService(WikiTitleCacheService wikiTitleCacheService) {
+    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   public NoteRealm build(Note note, User viewer) {
-    var wikiTitles = wikiLinkResolver.resolveWikiTitles(note, viewer);
+    var wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(note, viewer);
     NoteRealm realm = new NoteRealm(note, wikiTitles);
     realm.setInboundReferences(
         note.getInboundReferences().stream()
