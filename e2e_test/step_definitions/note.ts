@@ -332,7 +332,7 @@ When('I delete note {string}', (noteTopology: string) => {
 })
 
 When('I should see that the note creation is not successful', () => {
-  start.form.getField('Title').expectError('size must be between 1 and 150')
+  start.form.getField('Title').expectError('must not be blank')
   cy.get('.Vue-Toastification__close-button').click()
 })
 
