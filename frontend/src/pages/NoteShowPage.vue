@@ -128,14 +128,13 @@ const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
-  noteId: { type: Number, required: false },
-  basename: { type: String, required: false },
+  slug: { type: String, required: false },
   notebookId: { type: Number, required: false },
   noteSlugPath: { type: String, required: false },
 })
 
-const basenameError = ref<string | null>(null)
-const basenameResolvedNoteId = ref<number | undefined>(undefined)
+const ambiguousSlugError = ref<string | null>(null)
+const ambiguousSlugResolvedNoteId = ref<number | undefined>(undefined)
 const notebookSlugError = ref<string | null>(null)
 const notebookSlugResolvedNoteId = ref<number | undefined>(undefined)
 let notebookSlugLoadGeneration = 0
@@ -148,43 +147,28 @@ const isNotebookSlugEntry = computed(
     props.noteSlugPath !== ""
 )
 
-const loadError = computed(() => notebookSlugError.value ?? basenameError.value)
-
-watch(
-  () => props.noteId,
-  (noteId) => {
-    if (isNotebookSlugEntry.value) {
-      return
-    }
-    if (
-      noteId != null &&
-      !Number.isNaN(noteId) &&
-      props.basename === undefined
-    ) {
-      storageAccessor.value.storedApi().getNoteRealmRefAndReloadPosition(noteId)
-    }
-  },
-  { immediate: true }
+const loadError = computed(
+  () => notebookSlugError.value ?? ambiguousSlugError.value
 )
 
 watch(
-  () => props.basename,
-  async (b) => {
+  () => props.slug,
+  async (s) => {
     if (isNotebookSlugEntry.value) {
       return
     }
-    basenameError.value = null
-    basenameResolvedNoteId.value = undefined
-    if (b === undefined || b === "") {
+    ambiguousSlugError.value = null
+    ambiguousSlugResolvedNoteId.value = undefined
+    if (s === undefined || s === "") {
       return
     }
     try {
       const realm = await storageAccessor.value
         .storedApi()
-        .loadNoteByAmbiguousBasename(b)
-      basenameResolvedNoteId.value = realm.id
+        .loadNoteByAmbiguousBasename(s)
+      ambiguousSlugResolvedNoteId.value = realm.id
     } catch (e: unknown) {
-      basenameError.value =
+      ambiguousSlugError.value =
         e instanceof Error ? e.message : "Could not load note"
     }
   },
@@ -224,16 +208,14 @@ const resolvedNoteId = computed((): number | undefined => {
       notebookSlugResolvedNoteId.value
     ).value?.id
   }
-  if (props.noteId != null && !Number.isNaN(props.noteId)) {
-    return storageAccessor.value.refOfNoteRealm(props.noteId).value?.id
-  }
   if (
-    props.basename !== undefined &&
-    props.basename !== "" &&
-    basenameResolvedNoteId.value != null
+    props.slug !== undefined &&
+    props.slug !== "" &&
+    ambiguousSlugResolvedNoteId.value != null
   ) {
-    return storageAccessor.value.refOfNoteRealm(basenameResolvedNoteId.value)
-      .value?.id
+    return storageAccessor.value.refOfNoteRealm(
+      ambiguousSlugResolvedNoteId.value
+    ).value?.id
   }
   return undefined
 })
@@ -326,13 +308,6 @@ watch(
 </script>
 
 <style scoped>
-/* Ensure the root container takes full height */
-.note-show-page {
-  height: 100%;
-  display: flex;
-  overflow: hidden;
-}
-
 /* Set max height for both sidebar and main content to enable independent scrolling */
 aside {
   max-height: 100%;

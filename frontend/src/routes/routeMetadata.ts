@@ -59,13 +59,10 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/n:noteId(\\d+)",
-    // Alias must use the same param name (`noteId`) as the primary path (Vue Router).
-    // `/d/notes/:noteId` carries a slug segment; props distinguish digits vs basename.
-    alias: "/d/notes/:noteId",
+    path: "/d/notes/:slug",
     name: "noteShow",
     props: (route: RouteLocation) => {
-      const raw = route.params.noteId
+      const raw = route.params.slug
       if (raw === undefined || raw === "") {
         return {}
       }
@@ -73,16 +70,10 @@ export const routeMetadata: RouteMetadata[] = [
       if (segment === "") {
         return {}
       }
-      if (/^\d+$/.test(segment)) {
-        const noteId = Number(segment)
-        if (!Number.isNaN(noteId)) {
-          return { noteId }
-        }
-      }
       try {
-        return { basename: decodeURIComponent(segment) }
+        return { slug: decodeURIComponent(segment) }
       } catch {
-        return { basename: segment }
+        return { slug: segment }
       }
     },
     meta: { useNoteStorageAccessor: true },

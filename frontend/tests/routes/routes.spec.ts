@@ -13,56 +13,38 @@ describe("routes", () => {
   })
 
   describe("noteShow route", () => {
-    it("should match path /n:noteId format (e.g., /n123)", async () => {
-      const noteId = 123
-      await router.push(`/n${noteId}`)
-
-      expect(router.currentRoute.value.name).toBe("noteShow")
-      expect(router.currentRoute.value.params.noteId).toBe(String(noteId))
-      expect(router.currentRoute.value.path).toBe(`/n${noteId}`)
-    })
-
-    it("should extract noteId from path", async () => {
-      const noteId = 456
-      await router.push(`/n${noteId}`)
-
-      const route = router.currentRoute.value
-      expect(route.name).toBe("noteShow")
-      expect(route.params.noteId).toBe(String(noteId))
-    })
-
-    it("should pass noteId as number prop to component", async () => {
-      const noteId = 789
-      await router.push(`/n${noteId}`)
-
-      const route = router.currentRoute.value
-      const noteShowRoute = routes.find((r) => r.name === "noteShow")
-      expect(noteShowRoute).toBeDefined()
-
-      if (noteShowRoute && typeof noteShowRoute.props === "function") {
-        const props = noteShowRoute.props(route)
-        expect(props.noteId).toBe(noteId)
-      }
-    })
-
-    it("should match basename alias /d/notes/:noteId and pass basename prop", async () => {
+    it("should match /d/notes/:slug and pass slug prop", async () => {
       await router.push("/d/notes/my-note-slug")
 
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
-      expect(route.params.noteId).toBe("my-note-slug")
+      expect(route.params.slug).toBe("my-note-slug")
 
       const noteShowRoute = routes.find((r) => r.name === "noteShow")
       expect(noteShowRoute).toBeDefined()
       if (noteShowRoute && typeof noteShowRoute.props === "function") {
         expect(noteShowRoute.props(route)).toEqual({
-          basename: "my-note-slug",
+          slug: "my-note-slug",
         })
       }
     })
 
-    it("should not match noteShow when /n is not followed by digits only", () => {
-      const resolved = router.resolve("/nabc")
+    it("should match slug that is digits only", async () => {
+      await router.push("/d/notes/123")
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteShow")
+      expect(route.params.slug).toBe("123")
+
+      const noteShowRoute = routes.find((r) => r.name === "noteShow")
+      expect(noteShowRoute).toBeDefined()
+      if (noteShowRoute && typeof noteShowRoute.props === "function") {
+        expect(noteShowRoute.props(route)).toEqual({ slug: "123" })
+      }
+    })
+
+    it("should not match legacy /n:id URLs", () => {
+      const resolved = router.resolve("/n123")
       expect(resolved.matched.some((r) => r.name === "noteShow")).toBe(false)
     })
   })

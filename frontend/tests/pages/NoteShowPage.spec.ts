@@ -24,36 +24,7 @@ describe("all in note show page", () => {
     mockShowNoteAccessory()
   })
 
-  describe("note show", () => {
-    const noteRealm = makeMe.aNoteRealm.please()
-
-    beforeEach(() => {
-      mockSdkService("showNote", noteRealm)
-      mockNotebookGetForNoteRealm(noteRealm, {
-        id: 101,
-        name: "a circle",
-      })
-    })
-
-    it(" should fetch API", async () => {
-      const showNoteSpy = mockSdkService("showNote", noteRealm)
-
-      helper
-        .component(NoteShowPage)
-        .withCleanStorage()
-        .withProps({ noteId: noteRealm.id })
-        .withRouter(router)
-        .render()
-
-      await screen.findByText(noteRealm.note.noteTopology.title!)
-
-      expect(showNoteSpy).toHaveBeenCalledWith({
-        path: { note: noteRealm.id },
-      })
-    })
-  })
-
-  describe("note show by basename", () => {
+  describe("note show by ambiguous slug", () => {
     const noteRealm = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
@@ -65,7 +36,7 @@ describe("all in note show page", () => {
       })
     })
 
-    it("resolves basename then loads note and passes stable id to NoteShow via storage", async () => {
+    it("resolves ambiguous slug then loads note and passes stable id to NoteShow via storage", async () => {
       const basenameSpy = mockSdkService(
         "showNoteByAmbiguousBasename",
         noteRealm
@@ -75,7 +46,7 @@ describe("all in note show page", () => {
       helper
         .component(NoteShowPage)
         .withCleanStorage()
-        .withProps({ basename: "my-note" })
+        .withProps({ slug: "my-note" })
         .withRouter(router)
         .render()
 
@@ -90,7 +61,7 @@ describe("all in note show page", () => {
       })
     })
 
-    it("shows error when basename lookup fails", async () => {
+    it("shows error when ambiguous slug lookup fails", async () => {
       vi.spyOn(NoteController, "showNoteByAmbiguousBasename").mockResolvedValue(
         wrapSdkError({
           message: "More than one note matches this name.",
@@ -100,7 +71,7 @@ describe("all in note show page", () => {
       helper
         .component(NoteShowPage)
         .withCleanStorage()
-        .withProps({ basename: "ambiguous" })
+        .withProps({ slug: "ambiguous" })
         .withRouter(router)
         .render()
 
@@ -153,6 +124,7 @@ describe("all in note show page", () => {
     const note = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
+      mockSdkService("getNoteBySlug", note)
       mockSdkService("showNote", note)
       mockSdkService("getConversationsAboutNote", [])
       mockNotebookGetForNoteRealm(note)
@@ -163,15 +135,21 @@ describe("all in note show page", () => {
         .component(NoteShowPage)
         .withCurrentUser(makeMe.aUser.please())
         .withCleanStorage()
-        .withProps({ noteId: note.id })
+        .withProps({
+          notebookId: note.notebookId,
+          noteSlugPath: note.slug,
+        })
         .withRouter(router)
         .mount()
 
       await flushPromises()
 
       await router.push({
-        name: "noteShow",
-        params: { noteId: note.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(note.notebookId),
+          noteSlugPath: note.slug,
+        },
         query: { conversation: "true" },
       })
       await flushPromises()
@@ -188,15 +166,21 @@ describe("all in note show page", () => {
         .component(NoteShowPage)
         .withCurrentUser(makeMe.aUser.please())
         .withCleanStorage()
-        .withProps({ noteId: note.id })
+        .withProps({
+          notebookId: note.notebookId,
+          noteSlugPath: note.slug,
+        })
         .withRouter(router)
         .mount()
 
       await flushPromises()
 
       await router.push({
-        name: "noteShow",
-        params: { noteId: note.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(note.notebookId),
+          noteSlugPath: note.slug,
+        },
         query: { conversation: "true" },
       })
       await flushPromises()
@@ -219,8 +203,11 @@ describe("all in note show page", () => {
 
     it("should open conversation when URL has conversation=true", async () => {
       router.push({
-        name: "noteShow",
-        params: { noteId: note.id },
+        name: "noteShowByNotebookSlug",
+        params: {
+          notebookId: String(note.notebookId),
+          noteSlugPath: note.slug,
+        },
         query: { conversation: "true" },
       })
       await flushPromises()
@@ -229,7 +216,10 @@ describe("all in note show page", () => {
         .component(NoteShowPage)
         .withCurrentUser(makeMe.aUser.please())
         .withCleanStorage()
-        .withProps({ noteId: note.id })
+        .withProps({
+          notebookId: note.notebookId,
+          noteSlugPath: note.slug,
+        })
         .withRouter(router)
         .mount()
 
