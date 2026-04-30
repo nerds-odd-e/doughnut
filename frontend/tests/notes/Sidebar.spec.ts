@@ -37,7 +37,7 @@ describe("Sidebar", () => {
       .component(Sidebar)
       .withProps({
         activeNoteRealm: n,
-        notebookId: n.notebook.id,
+        notebookId: n.notebookId,
       })
       .mount({ attachTo: document.body })
     return wrapper
@@ -207,7 +207,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: firstGeneration,
-          notebookId: firstGeneration.notebook.id,
+          notebookId: firstGeneration.notebookId,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -220,7 +220,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: firstGeneration,
-          notebookId: firstGeneration.notebook.id,
+          notebookId: firstGeneration.notebookId,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -235,7 +235,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: topNoteRealm,
-          notebookId: topNoteRealm.notebook.id,
+          notebookId: topNoteRealm.notebookId,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -250,7 +250,7 @@ describe("Sidebar", () => {
         .component(Sidebar)
         .withProps({
           activeNoteRealm: firstGeneration,
-          notebookId: firstGeneration.notebook.id,
+          notebookId: firstGeneration.notebookId,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -269,7 +269,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: bazaarRealm,
-          notebookId: bazaarRealm.notebook.id,
+          notebookId: bazaarRealm.notebookId,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -295,14 +295,14 @@ describe("Sidebar", () => {
       .withCurrentUser(makeMe.aUser.please())
       .withProps({
         activeNoteRealm: topNoteRealm,
-        notebookId: topNoteRealm.notebook.id,
+        notebookId: topNoteRealm.notebookId,
       })
       .mount({ attachTo: document.body })
     await flushPromises()
 
     await wrapper.setProps({
       activeNoteRealm: undefined,
-      notebookId: topNoteRealm.notebook.id,
+      notebookId: topNoteRealm.notebookId,
     })
     await flushPromises()
 

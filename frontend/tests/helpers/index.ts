@@ -305,7 +305,7 @@ export function mockSdkService<K extends SdkServiceName>(
 export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
   const notebook: Notebook = {
     id: realm.notebookId,
-    title: realm.note.noteTopology.notebookTitle ?? "Notebook",
+    name: realm.note.noteTopology.notebookName ?? "Notebook",
     notebookSettings: { skipMemoryTrackingEntirely: false },
     updated_at: realm.note.updatedAt,
     ...(circle ? { circle } : {}),
