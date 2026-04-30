@@ -705,8 +705,28 @@ When('I promote the point {string} to a sibling note', (pointText: string) => {
 Then(
   'the link {string} should link to the note with the same title',
   (linkText: string) => {
-    cy.get('[role=details]').find('a').contains(linkText).click()
+    cy.get('[role=details]')
+      .find('a.doughnut-link')
+      .contains(linkText)
+      .should('have.attr', 'href')
+      .and('match', /^\/n\d+$/)
+    cy.get('[role=details]').find('a.doughnut-link').contains(linkText).click()
+    cy.url({ timeout: 15000 }).should('match', /\/n\d+$/)
     start.assumeNotePage(linkText)
+  }
+)
+
+Then(
+  'the link {string} should open the note titled {string}',
+  (linkText: string, noteTitle: string) => {
+    cy.get('[role=details]')
+      .find('a.doughnut-link')
+      .contains(linkText)
+      .should('have.attr', 'href')
+      .and('match', /^\/n\d+$/)
+    cy.get('[role=details]').find('a.doughnut-link').contains(linkText).click()
+    cy.url({ timeout: 15000 }).should('match', /\/n\d+$/)
+    start.assumeNotePage(noteTitle)
   }
 )
 

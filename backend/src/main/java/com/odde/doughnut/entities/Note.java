@@ -9,7 +9,6 @@ import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.converters.RelationTypeConverter;
 import com.odde.doughnut.services.graphRAG.BareNote;
@@ -424,20 +423,5 @@ public class Note extends EntityIdentifiedByIdOnly {
       return null;
     }
     return notebookAiAssistant.getAdditionalInstructionsToAi();
-  }
-
-  public NoteRealm toNoteRealm(User viewer) {
-    NoteRealm nvb = new NoteRealm(this);
-    nvb.setInboundReferences(
-        getInboundReferences().stream().filter(l -> allowed(l, viewer)).toList());
-    nvb.setFromBazaar(viewer == null || !viewer.owns(getNotebook()));
-
-    return nvb;
-  }
-
-  private boolean allowed(Note l, User viewer) {
-    if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
-    if (viewer == null) return false;
-    return viewer.canReferTo(l.getParent().getNotebook());
   }
 }

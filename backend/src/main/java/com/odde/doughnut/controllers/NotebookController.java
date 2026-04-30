@@ -16,6 +16,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookGroupService;
@@ -61,6 +62,7 @@ class NotebookController {
   private final NoteService noteService;
   private final NoteConstructionService noteConstructionService;
   private final WikidataService wikidataService;
+  private final NoteRealmService noteRealmService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -76,7 +78,8 @@ class NotebookController {
       NotebookCatalogService notebookCatalogService,
       NoteService noteService,
       NoteConstructionService noteConstructionService,
-      WikidataService wikidataService) {
+      WikidataService wikidataService,
+      NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -91,6 +94,7 @@ class NotebookController {
     this.noteService = noteService;
     this.noteConstructionService = noteConstructionService;
     this.wikidataService = wikidataService;
+    this.noteRealmService = noteRealmService;
   }
 
   @GetMapping("")
@@ -262,7 +266,7 @@ class NotebookController {
                         HttpStatus.NOT_FOUND, "No note found for this slug."));
     authorizationService.assertReadAuthorization(note);
     User user = authorizationService.getCurrentUser();
-    return note.toNoteRealm(user);
+    return noteRealmService.build(note, user);
   }
 
   @Operation(summary = "List top-level notes in the notebook (no parent)")
@@ -273,7 +277,7 @@ class NotebookController {
     authorizationService.assertReadAuthorization(notebook);
     User user = authorizationService.getCurrentUser();
     return noteService.findNotebookRootNotes(notebook.getId()).stream()
-        .map(n -> n.toNoteRealm(user))
+        .map(n -> noteRealmService.build(n, user))
         .toList();
   }
 

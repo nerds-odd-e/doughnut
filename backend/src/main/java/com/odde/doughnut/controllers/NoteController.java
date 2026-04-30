@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
@@ -44,6 +45,7 @@ class NoteController {
   private final UserService userService;
   private final GraphRAGService graphRAGService;
   private final TestabilitySettings testabilitySettings;
+  private final NoteRealmService noteRealmService;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -53,7 +55,8 @@ class NoteController {
       AuthorizationService authorizationService,
       UserService userService,
       GraphRAGService graphRAGService,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
     this.wikidataService = wikidataService;
     this.noteMotionService = noteMotionService;
@@ -62,6 +65,7 @@ class NoteController {
     this.userService = userService;
     this.graphRAGService = graphRAGService;
     this.testabilitySettings = testabilitySettings;
+    this.noteRealmService = noteRealmService;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -87,7 +91,7 @@ class NoteController {
       }
     }
     entityPersister.save(note);
-    return note.toNoteRealm(authorizationService.getCurrentUser());
+    return noteRealmService.build(note, authorizationService.getCurrentUser());
   }
 
   @GetMapping("/{note}")
@@ -95,7 +99,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     User user = authorizationService.getCurrentUser();
-    return note.toNoteRealm(user);
+    return noteRealmService.build(note, user);
   }
 
   @PatchMapping(
@@ -138,7 +142,7 @@ class NoteController {
     entityPersister.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
-      return List.of(parentNote.toNoteRealm(authorizationService.getCurrentUser()));
+      return List.of(noteRealmService.build(parentNote, authorizationService.getCurrentUser()));
     }
     return List.of();
   }
@@ -151,7 +155,7 @@ class NoteController {
     noteService.restore(note);
     entityPersister.flush();
 
-    return note.toNoteRealm(authorizationService.getCurrentUser());
+    return noteRealmService.build(note, authorizationService.getCurrentUser());
   }
 
   @PostMapping(value = "/{note}/recall-setting")
@@ -202,7 +206,7 @@ class NoteController {
 
     return Stream.of(parentBefore, note.getParent())
         .distinct()
-        .map(parent -> parent.toNoteRealm(authorizationService.getCurrentUser()))
+        .map(parent -> noteRealmService.build(parent, authorizationService.getCurrentUser()))
         .toList();
   }
 
@@ -213,7 +217,7 @@ class NoteController {
     authorizationService.assertAuthorization(note);
     User user = authorizationService.getCurrentUser();
     noteMotionService.moveToTopLevel(note, user);
-    return note.toNoteRealm(user);
+    return noteRealmService.build(note, user);
   }
 
   @GetMapping("/recent")
@@ -239,7 +243,7 @@ class NoteController {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT, "More than one note matches this name.");
     }
-    return matches.get(0).toNoteRealm(user);
+    return noteRealmService.build(matches.get(0), user);
   }
 
   @GetMapping("/{note}/graph")

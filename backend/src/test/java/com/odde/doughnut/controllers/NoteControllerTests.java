@@ -87,6 +87,40 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldReturnWikiTitlesForQualifiedLinkToNoteInAnotherNotebook()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note headTarget = makeMe.aNote().creatorAndOwner(user).title("Other Notebook").please();
+      Note targetInOther = makeMe.aNote().title("LinkedPage").under(headTarget).please();
+      Note headSource = makeMe.aNote().creatorAndOwner(user).title("Main").please();
+      Note viewer =
+          makeMe
+              .aNote()
+              .under(headSource)
+              .details("See [[Other Notebook:LinkedPage]] for more.")
+              .please();
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("Other Notebook:LinkedPage"));
+      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(targetInOther.getId()));
+    }
+
+    @Test
+    void shouldOmitQualifiedWikiLinkWhenTargetNotebookIsNotReadable()
+        throws UnexpectedNoAccessRightException {
+      User otherUser = makeMe.aUser().please();
+      Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).title("Secret Notebook").please();
+      makeMe.aNote().title("Hidden Note").under(headSecret).please();
+
+      User viewerUser = currentUser.getUser();
+      Note headSource = makeMe.aNote().creatorAndOwner(viewerUser).title("My Notebook").please();
+      Note viewer =
+          makeMe.aNote().under(headSource).details("Try [[Secret Notebook:Hidden Note]].").please();
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), empty());
+    }
+
+    @Test
     void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note head = makeMe.aNote().creatorAndOwner(user).please();

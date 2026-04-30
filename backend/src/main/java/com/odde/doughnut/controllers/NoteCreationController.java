@@ -3,8 +3,10 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.*;
-import com.odde.doughnut.services.*;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.NoteRealmService;
+import com.odde.doughnut.services.WikidataService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -21,15 +23,18 @@ class NoteCreationController {
   private final WikidataService wikidataService;
   private final NoteConstructionService noteConstructionService;
   private final AuthorizationService authorizationService;
+  private final NoteRealmService noteRealmService;
 
   @Autowired
   public NoteCreationController(
       WikidataService wikidataService,
       NoteConstructionService noteConstructionService,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      NoteRealmService noteRealmService) {
     this.wikidataService = wikidataService;
     this.noteConstructionService = noteConstructionService;
     this.authorizationService = authorizationService;
+    this.noteRealmService = noteRealmService;
   }
 
   @PostMapping(value = "/{parentNote}/create")
@@ -65,7 +70,7 @@ class NoteCreationController {
             wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
     return new NoteCreationResult(
-        note.toNoteRealm(authorizationService.getCurrentUser()),
-        note.getParent().toNoteRealm(authorizationService.getCurrentUser()));
+        noteRealmService.build(note, authorizationService.getCurrentUser()),
+        noteRealmService.build(note.getParent(), authorizationService.getCurrentUser()));
   }
 }

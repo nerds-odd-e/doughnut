@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,18 +36,21 @@ class RelationController {
 
   private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
+  private final NoteRealmService noteRealmService;
 
   public RelationController(
       EntityPersister entityPersister,
       NoteService noteService,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
+    this.noteRealmService = noteRealmService;
   }
 
   @PostMapping(value = "/{relation}")
@@ -77,7 +81,8 @@ class RelationController {
     authorizationService.assertAuthorization(targetNote);
     noteMotionService.executeMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild);
     User user = authorizationService.getCurrentUser();
-    return List.of(sourceNote.toNoteRealm(user), targetNote.toNoteRealm(user));
+    return List.of(
+        noteRealmService.build(sourceNote, user), noteRealmService.build(targetNote, user));
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
@@ -106,6 +111,9 @@ class RelationController {
   private List<NoteRealm> getNoteRealm(Note relation, User user) {
     Note nt = entityPersister.find(Note.class, relation.getTargetNote().getId());
     Note np = entityPersister.find(Note.class, relation.getParent().getId());
-    return List.of(relation.toNoteRealm(user), nt.toNoteRealm(user), np.toNoteRealm(user));
+    return List.of(
+        noteRealmService.build(relation, user),
+        noteRealmService.build(nt, user),
+        noteRealmService.build(np, user));
   }
 }

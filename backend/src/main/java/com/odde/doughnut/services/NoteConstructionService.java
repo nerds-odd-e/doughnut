@@ -32,6 +32,7 @@ public class NoteConstructionService {
   private final NoteService noteService;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
   private final WikiSlugPathService wikiSlugPathService;
+  private final NoteRealmService noteRealmService;
 
   @Autowired
   public NoteConstructionService(
@@ -41,7 +42,8 @@ public class NoteConstructionService {
       EntityPersister entityPersister,
       NoteService noteService,
       NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiSlugPathService wikiSlugPathService) {
+      WikiSlugPathService wikiSlugPathService,
+      NoteRealmService noteRealmService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
@@ -49,6 +51,7 @@ public class NoteConstructionService {
     this.noteService = noteService;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
     this.wikiSlugPathService = wikiSlugPathService;
+    this.noteRealmService = noteRealmService;
   }
 
   public Note createNote(Note parentNote, String title) {
@@ -150,7 +153,8 @@ public class NoteConstructionService {
     try {
       Note note =
           createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
-      return new NoteCreationResult(note.toNoteRealm(user), parentNote.toNoteRealm(user));
+      return new NoteCreationResult(
+          noteRealmService.build(note, user), noteRealmService.build(parentNote, user));
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
@@ -167,7 +171,7 @@ public class NoteConstructionService {
     try {
       Note note =
           createRootNoteWithWikidataInfo(notebook, wikidataIdWithApi, noteCreation.getNewTitle());
-      return new NoteCreationResult(note.toNoteRealm(user), null);
+      return new NoteCreationResult(noteRealmService.build(note, user), null);
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
@@ -217,6 +221,7 @@ public class NoteConstructionService {
     originalNote.setDetails(aiResult.updatedParentDetails);
     entityPersister.save(originalNote);
 
-    return new NoteCreationResult(newNote.toNoteRealm(user), originalNote.toNoteRealm(user));
+    return new NoteCreationResult(
+        noteRealmService.build(newNote, user), noteRealmService.build(originalNote, user));
   }
 }
