@@ -324,6 +324,9 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getShortDetails() {
+    if (isRelation()) {
+      return null;
+    }
     return new HtmlOrMarkdown(getDetails()).beginning(50);
   }
 

@@ -69,6 +69,13 @@ public class NoteTest {
     }
 
     @Test
+    void relationshipNoteDoesNotUseDetailsForShortDetailsPreview() {
+      relationNote.setDetails(
+          "---\ntype: relationship\nrelation: similar-to\n---\n\n[[A]] similar to [[B]].");
+      assertThat(relationNote.getShortDetails(), nullValue());
+    }
+
+    @Test
     void relationOfRelation() {
       Note relationOfRelation = makeMe.aRelation().between(parent, relationNote).please();
       assertThat(

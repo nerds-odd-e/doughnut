@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.RelationshipNoteTitleFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -125,6 +126,10 @@ class RelationControllerTests extends ControllerTestBase {
           RelationshipNoteTitleFormatter.format(
               source.getTitle(), RelationType.APPLICATION.label, target.getTitle());
       assertThat(result.getFirst().getNote().getTitle(), equalTo(expected));
+      String expectedDetails =
+          RelationshipNoteMarkdownFormatter.format(
+              RelationType.APPLICATION, source.getTitle(), target.getTitle(), null);
+      assertThat(result.getFirst().getNote().getDetails(), equalTo(expectedDetails));
     }
   }
 }

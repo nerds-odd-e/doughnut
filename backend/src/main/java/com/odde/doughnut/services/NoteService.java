@@ -235,6 +235,9 @@ public class NoteService {
     relation.setTitle(
         RelationshipNoteTitleFormatter.format(
             sourceNote.getTitle(), type.label, targetNote.getTitle()));
+    relation.setDetails(
+        RelationshipNoteMarkdownFormatter.format(
+            type, sourceNote.getTitle(), targetNote.getTitle(), null));
     relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
     wikiSlugPathService.assignSlugForNewNote(relation);
     entityPersister.save(relation);

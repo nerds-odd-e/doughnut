@@ -125,13 +125,16 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.findByText(count, { selector: '[role=collapsed-children-count]' })
     },
     findNoteDetails: (expected: string, timeout?: number) => {
-      expected
-        .split('\\n')
-        .forEach((line) =>
-          timeout
-            ? cy.get('[role=details]', { timeout }).should('contain', line)
-            : cy.get('[role=details]').should('contain', line)
-        )
+      const lines = expected.split('\n').filter((line) => line.length > 0)
+      cy.get('[role=details]', timeout ? { timeout } : {}).should(($el) => {
+        const text = $el.text()
+        for (const line of lines) {
+          expect(
+            text,
+            `expected note details to include ${JSON.stringify(line)}`
+          ).to.contain(line)
+        }
+      })
     },
     expectNoteDetailsContainLineBreak: () => {
       cy.get('[role=details]').within(() => {
