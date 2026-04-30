@@ -5,8 +5,6 @@ import com.odde.doughnut.entities.WikiReferenceMigrationProgress;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.WikiReferenceMigrationProgressRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WikiReferenceMigrationProgressService {
-
-  @PersistenceContext private EntityManager entityManager;
 
   private final WikiReferenceMigrationProgressRepository progressRepository;
   private final NoteRepository noteRepository;
@@ -27,7 +23,7 @@ public class WikiReferenceMigrationProgressService {
     this.noteRepository = noteRepository;
   }
 
-  @Transactional(readOnly = true)
+  /** Joins the caller transaction so nested lookups are not wrapped in {@code readOnly=true}. */
   public Optional<WikiReferenceMigrationProgress> find(String stepName) {
     return progressRepository.findByStepName(stepName);
   }
@@ -61,7 +57,6 @@ public class WikiReferenceMigrationProgressService {
    * Note ids still to process for this step, in stable order, skipping ids {@code <=}
    * last-processed. Returns an empty list when the step is completed.
    */
-  @Transactional(readOnly = true)
   public List<Integer> pendingNoteIdsOrdered(String stepName, List<Integer> orderedCandidateIds) {
     Optional<WikiReferenceMigrationProgress> opt = progressRepository.findByStepName(stepName);
     if (opt.isEmpty()) {
@@ -104,7 +99,6 @@ public class WikiReferenceMigrationProgressService {
 
   @Transactional
   public void markFailed(String stepName, String message) {
-    entityManager.clear();
     WikiReferenceMigrationProgress p = progressRepository.findByStepName(stepName).orElseThrow();
     p.setStatus(WikiReferenceMigrationStepStatus.FAILED);
     p.setLastError(message);
