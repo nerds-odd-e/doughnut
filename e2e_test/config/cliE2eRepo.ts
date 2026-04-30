@@ -12,9 +12,15 @@ import {
 
 export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
 
+/** Subprocess `pnpm` from Cypress may inherit user config pointing at a missing project pnpmfile. */
+export const CLI_E2E_PNPM_SPAWN_ENV: NodeJS.ProcessEnv = {
+  pnpm_config_ignore_pnpmfile: 'true',
+}
+
 function envForDefaultE2eCliBundle(): NodeJS.ProcessEnv {
   return {
     ...process.env,
+    ...CLI_E2E_PNPM_SPAWN_ENV,
     GOOGLE_CLIENT_ID: GMAIL_E2E_GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: GMAIL_E2E_GOOGLE_CLIENT_SECRET,
   }
@@ -134,6 +140,7 @@ export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
     cwd: repoRoot,
     env: {
       ...process.env,
+      ...CLI_E2E_PNPM_SPAWN_ENV,
       ...env,
       CLI_BUNDLE_OUTFILE: CLI_E2E_INSTALL_BUNDLE_OUTFILE,
     },
