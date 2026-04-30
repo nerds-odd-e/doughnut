@@ -1,10 +1,11 @@
 import makeMe from "doughnut-test-fixtures/makeMe"
+import NotebookPageWithNotebookSidebarLayout from "@tests/fixtures/NotebookPageWithNotebookSidebarLayout.vue"
 import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
   wrapSdkError,
 } from "@tests/helpers"
-import NotebookPage from "@/pages/NotebookPage.vue"
+import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
@@ -12,6 +13,7 @@ import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 
 describe("NotebookPage.spec", () => {
   beforeEach(() => {
+    resetNotebookSidebarState()
     mockSdkService("getApprovalForNotebook", { approval: undefined })
     mockSdkService("getAiAssistant", { additionalInstructionsToAi: "" })
   })
@@ -23,7 +25,7 @@ describe("NotebookPage.spec", () => {
       wrapSdkError("no index") as never
     )
     helper
-      .component(NotebookPage)
+      .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())
@@ -45,7 +47,7 @@ describe("NotebookPage.spec", () => {
     mockSdkService("get", { notebook, hasAttachedBook: false })
     const slugSpy = mockSdkService("getNoteBySlug", indexRealm)
     helper
-      .component(NotebookPage)
+      .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())
@@ -91,7 +93,7 @@ describe("NotebookPage.spec", () => {
       return indexRealm
     })
     helper
-      .component(NotebookPage)
+      .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())
@@ -118,7 +120,7 @@ describe("NotebookPage.spec", () => {
     )
     const showSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
     helper
-      .component(NotebookPage)
+      .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())

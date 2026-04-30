@@ -1,4 +1,4 @@
-import NoteShowPage from "@/pages/NoteShowPage.vue"
+import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
@@ -7,6 +7,7 @@ import helper, {
   mockSdkService,
   wrapSdkError,
 } from "@tests/helpers"
+import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
@@ -17,6 +18,7 @@ describe("all in note show page", () => {
   let router: ReturnType<typeof createRouter>
 
   beforeEach(() => {
+    resetNotebookSidebarState()
     router = createRouter({
       history: createWebHistory(),
       routes,
@@ -44,7 +46,7 @@ describe("all in note show page", () => {
       const showNoteSpy = mockSdkService("showNote", noteRealm)
 
       helper
-        .component(NoteShowPage)
+        .component(NoteShowPageWithNotebookSidebarLayout)
         .withCleanStorage()
         .withProps({ slug: "my-note" })
         .withRouter(router)
@@ -69,7 +71,7 @@ describe("all in note show page", () => {
       )
 
       helper
-        .component(NoteShowPage)
+        .component(NoteShowPageWithNotebookSidebarLayout)
         .withCleanStorage()
         .withProps({ slug: "ambiguous" })
         .withRouter(router)
@@ -98,7 +100,7 @@ describe("all in note show page", () => {
       const showNoteSpy = mockSdkService("showNote", noteRealm)
 
       helper
-        .component(NoteShowPage)
+        .component(NoteShowPageWithNotebookSidebarLayout)
         .withCleanStorage()
         .withProps({
           notebookId: 99,
@@ -132,7 +134,7 @@ describe("all in note show page", () => {
 
     it("should maximize conversation when maximize button is clicked", async () => {
       const wrapper = helper
-        .component(NoteShowPage)
+        .component(NoteShowPageWithNotebookSidebarLayout)
         .withCurrentUser(makeMe.aUser.please())
         .withCleanStorage()
         .withProps({
@@ -163,7 +165,7 @@ describe("all in note show page", () => {
 
     it("should restore maximized state before closing conversation", async () => {
       const wrapper = helper
-        .component(NoteShowPage)
+        .component(NoteShowPageWithNotebookSidebarLayout)
         .withCurrentUser(makeMe.aUser.please())
         .withCleanStorage()
         .withProps({
@@ -213,7 +215,7 @@ describe("all in note show page", () => {
       await flushPromises()
 
       const wrapper = helper
-        .component(NoteShowPage)
+        .component(NoteShowPageWithNotebookSidebarLayout)
         .withCurrentUser(makeMe.aUser.please())
         .withCleanStorage()
         .withProps({
