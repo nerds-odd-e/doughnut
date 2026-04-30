@@ -244,6 +244,18 @@ public class NoteService {
     return relation;
   }
 
+  public void refreshRelationshipNoteTitle(Note relation) {
+    RelationType type = relation.getRelationType();
+    if (type == null) {
+      return;
+    }
+    Note source = relation.getParent();
+    Note target = relation.getTargetNote();
+    relation.setTitle(
+        RelationshipNoteTitleFormatter.format(source.getTitle(), type.label, target.getTitle()));
+    relation.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+  }
+
   public static Note buildARelation(
       Note sourceNote,
       Note targetNote,

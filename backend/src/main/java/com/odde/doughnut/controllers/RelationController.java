@@ -61,6 +61,7 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(relation);
     relation.setRelationType(relationshipCreation.relationType);
+    noteService.refreshRelationshipNoteTitle(relation);
     entityPersister.save(relation);
     return getNoteRealm(relation, authorizationService.getCurrentUser());
   }

@@ -132,4 +132,29 @@ class RelationControllerTests extends ControllerTestBase {
       assertThat(result.getFirst().getNote().getDetails(), equalTo(expectedDetails));
     }
   }
+
+  @Nested
+  class UpdateRelationshipTest {
+    RelationshipCreation relationshipCreation = new RelationshipCreation();
+
+    @Test
+    void updatesRelationshipNoteTitleWhenRelationTypeChanges()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      Note source = makeMe.aNote("Moon").creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Earth").creatorAndOwner(currentUser.getUser()).please();
+      relationshipCreation.relationType = RelationType.PART;
+      var created =
+          controller.addRelationshipFinalize(
+              source, target, relationshipCreation, makeMe.successfulBindingResult());
+      Note relationNote = created.getFirst().getNote();
+
+      relationshipCreation.relationType = RelationType.SPECIALIZE;
+      var after = controller.updateRelationship(relationNote, relationshipCreation);
+
+      String expected =
+          RelationshipNoteTitleFormatter.format(
+              source.getTitle(), RelationType.SPECIALIZE.label, target.getTitle());
+      assertThat(after.getFirst().getNote().getTitle(), equalTo(expected));
+    }
+  }
 }

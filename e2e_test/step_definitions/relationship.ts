@@ -180,6 +180,16 @@ Then(
 )
 
 Then(
+  'I should see the relationship note title reflects {string} {string} {string}',
+  (sourceTitle: string, relationType: string, targetTitle: string) => {
+    cy.findByRole('title')
+      .should('contain', sourceTitle)
+      .and('contain', relationType)
+      .and('contain', targetTitle)
+  }
+)
+
+Then(
   'I change the relationship from {string} to {string} to {string}',
   (noteTopology: string, targetTitle: string, relationType: string) => {
     start
