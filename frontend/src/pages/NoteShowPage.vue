@@ -45,6 +45,7 @@ import {
   currentActiveNoteId,
   currentNotebookId,
   notebookSidebarNotebookPageContext,
+  resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
@@ -76,6 +77,12 @@ const isNotebookSlugEntry = computed(
 const loadError = computed(
   () => notebookSlugError.value ?? ambiguousSlugError.value
 )
+
+watch(loadError, (err) => {
+  if (err != null) {
+    resetNotebookSidebarState()
+  }
+})
 
 watch(
   () => props.slug,
@@ -155,7 +162,9 @@ const noteRealm = computed(() => {
 watch(
   resolvedNoteId,
   (id) => {
-    currentActiveNoteId.value = id
+    if (id != null) {
+      currentActiveNoteId.value = id
+    }
   },
   { immediate: true }
 )
@@ -173,7 +182,9 @@ watch(
       return
     }
     if (slug !== undefined && slug !== "") {
-      currentNotebookId.value = realm?.notebookId
+      if (realm?.notebookId != null) {
+        currentNotebookId.value = realm.notebookId
+      }
       return
     }
     currentNotebookId.value = undefined

@@ -76,6 +76,26 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => ({
+    activeNoteId: props.activeNoteRealm?.note?.id,
+    parentTopic:
+      props.activeNoteRealm?.note?.noteTopology.parentOrSubjectNoteTopology,
+  }),
+  () => {
+    if (props.noteId !== undefined) return
+    if (!props.activeNoteRealm?.note) return
+    const storedApi = storageAccessor.value.storedApi()
+    let cursor =
+      props.activeNoteRealm.note.noteTopology.parentOrSubjectNoteTopology
+    while (cursor) {
+      storedApi.getNoteRealmRefAndLoadWhenNeeded(cursor.id)
+      cursor = cursor.parentOrSubjectNoteTopology
+    }
+  },
+  { immediate: true }
+)
+
 const displayNotes = computed(() => {
   if (props.noteId !== undefined && subtreeRealmRef) {
     return subtreeRealmRef.value?.children ?? []

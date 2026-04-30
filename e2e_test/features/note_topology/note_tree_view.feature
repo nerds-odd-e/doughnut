@@ -44,6 +44,18 @@ Feature: Note tree view
       | ATDD       |
       | CI         |
 
+  Scenario: Side bar shows the tree when opening a deep note directly
+    When I navigate to "LeSS training/LeSS in Action/TDD/TPP/Const" note
+    When I expand the side bar
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | LeSS in Action |
+      | TDD        |
+      | TPP        |
+      | Const      |
+      | ATDD       |
+      | CI         |
+
   Scenario: Side bar should show the whole notebook from ATDD
     Given I navigate to "LeSS training/LeSS in Action/TDD" note
     When I route to the note "ATDD"

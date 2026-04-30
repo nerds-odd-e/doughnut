@@ -160,6 +160,74 @@ describe("Sidebar", () => {
     ).toBe(true)
   })
 
+  describe("gradual ancestor population", () => {
+    beforeEach(() => {
+      storageAccessor.value = createNoteStorage()
+    })
+
+    it("loads ancestor branches for a deep note without pre-cached realms and does not load sibling subtrees via showNote", async () => {
+      const shallowTopRealm = {
+        ...topNoteRealm,
+        children: undefined,
+      } as NoteRealm
+      const rootSpy = mockSdkService("listNotebookRootNotes", [shallowTopRealm])
+      const fullRealmByNoteId: Record<number, NoteRealm> = {
+        [topNoteRealm.id]: topNoteRealm,
+        [firstGeneration.id]: firstGeneration,
+        [firstGenerationSibling.id]: firstGenerationSibling,
+        [secondGeneration.id]: secondGeneration,
+      }
+      const showNoteSpy = mockSdkServiceWithImplementation(
+        "showNote",
+        (options) => {
+          const id = (options as Options<ShowNoteData>).path.note
+          const realm = fullRealmByNoteId[id]
+          if (realm === undefined) {
+            throw new Error(`Sidebar.spec: unmocked showNote for note id ${id}`)
+          }
+          return realm
+        }
+      )
+
+      mountSidebar(secondGeneration)
+      await flushPromises()
+
+      expect(rootSpy).toHaveBeenCalledTimes(1)
+
+      const calledIds = showNoteSpy.mock.calls.map(
+        (call) => (call[0] as Options<ShowNoteData>).path.note
+      )
+      expect(calledIds).not.toContain(firstGenerationSibling.id)
+
+      for (const id of [firstGeneration.id, topNoteRealm.id]) {
+        expect(calledIds).toContain(id)
+      }
+
+      await vi.waitUntil(() =>
+        findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
+      )
+      expect(
+        findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+      ).toBe(true)
+      expect(
+        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      ).toBe(true)
+      expect(
+        findSidebarItem(
+          firstGenerationSibling.note.noteTopology.title!
+        )?.exists()
+      ).toBe(true)
+
+      const secondGenEl = findSidebarItem(
+        secondGeneration.note.noteTopology.title!
+      )!.element
+      const siblingEl = findSidebarItem(
+        firstGenerationSibling.note.noteTopology.title!
+      )!.element
+      expect(isBefore(secondGenEl, siblingEl)).toBe(true)
+    })
+  })
+
   describe("first generation", () => {
     it("should scroll to active note", async () => {
       mountSidebar(firstGeneration)
