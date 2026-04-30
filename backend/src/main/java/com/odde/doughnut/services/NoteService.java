@@ -232,6 +232,9 @@ public class NoteService {
       Timestamp currentUTCTimestamp) {
     if (type == null) return null;
     Note relation = buildARelation(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    relation.setTitle(
+        RelationshipNoteTitleFormatter.format(
+            sourceNote.getTitle(), type.label, targetNote.getTitle()));
     relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
     wikiSlugPathService.assignSlugForNewNote(relation);
     entityPersister.save(relation);

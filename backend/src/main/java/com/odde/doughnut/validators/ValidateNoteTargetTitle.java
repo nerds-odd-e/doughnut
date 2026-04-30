@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Constraint(validatedBy = ValidateNoteTargetTitleValidator.class)
 public @interface ValidateNoteTargetTitle {
-  String message() default "Note with targetNote must have null title";
+  String message() default "Note with targetNote must have a non-empty title";
 
   Class<?>[] groups() default {};
 

@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.RelationshipNoteTitleFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,22 @@ class RelationControllerTests extends ControllerTestBase {
           note3, note2, relationshipCreation, makeMe.successfulBindingResult());
       long afterThingCount = noteRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
+    }
+
+    @Test
+    void relationshipNoteHasDerivedTitle()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      Note source = makeMe.aNote("Tool").creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Task").creatorAndOwner(currentUser.getUser()).please();
+      relationshipCreation.relationType = RelationType.APPLICATION;
+      var result =
+          controller.addRelationshipFinalize(
+              source, target, relationshipCreation, makeMe.successfulBindingResult());
+      assertThat(result, hasSize(3));
+      String expected =
+          RelationshipNoteTitleFormatter.format(
+              source.getTitle(), RelationType.APPLICATION.label, target.getTitle());
+      assertThat(result.getFirst().getNote().getTitle(), equalTo(expected));
     }
   }
 }

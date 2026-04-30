@@ -169,11 +169,12 @@ Then(
 )
 
 Then(
-  'I should be on the relationship note page with relation {string} to {string}',
-  (relationType: string, targetTitle: string) => {
+  'I should be on the relationship note page from {string} with relation {string} to {string}',
+  (sourceTitle: string, relationType: string, targetTitle: string) => {
     cy.get('[role=details]').should('be.visible')
     cy.findByRole('title')
-      .should('contain', relationType)
+      .should('contain', sourceTitle)
+      .and('contain', relationType)
       .and('contain', targetTitle)
   }
 )

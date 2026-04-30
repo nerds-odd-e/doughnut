@@ -54,12 +54,12 @@ public class TextContentValidatorTest {
   }
 
   @Test
-  public void noteWithTargetNoteAndNullTitleIsValid() {
+  public void noteWithTargetNoteAndNullTitleIsInvalid() {
     Note parent = makeMe.aNote().inMemoryPlease();
     Note target = makeMe.aNote().inMemoryPlease();
     Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
     relationNote.setTitle(null);
-    assertThat(validator.validate(relationNote), is(empty()));
+    assertThat(validator.validate(relationNote), is(not(empty())));
   }
 
   @Test
@@ -74,26 +74,18 @@ public class TextContentValidatorTest {
         violations.stream()
             .anyMatch(
                 v ->
-                    v.getMessage().equals("Note with targetNote must have null title")
+                    v.getMessage().equals("Note with targetNote must have a non-empty title")
                         && v.getPropertyPath().toString().equals("title")),
         is(true));
   }
 
   @Test
-  public void noteWithTargetNoteAndNonEmptyTitleIsInvalid() {
+  public void noteWithTargetNoteAndNonEmptyTitleIsValid() {
     Note parent = makeMe.aNote().inMemoryPlease();
     Note target = makeMe.aNote().inMemoryPlease();
     Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
     relationNote.setTitle("Some Title");
-    Set<ConstraintViolation<Note>> violations = validator.validate(relationNote);
-    assertThat(violations, is(not(empty())));
-    assertThat(
-        violations.stream()
-            .anyMatch(
-                v ->
-                    v.getMessage().equals("Note with targetNote must have null title")
-                        && v.getPropertyPath().toString().equals("title")),
-        is(true));
+    assertThat(validator.validate(relationNote), is(empty()));
   }
 
   @Test

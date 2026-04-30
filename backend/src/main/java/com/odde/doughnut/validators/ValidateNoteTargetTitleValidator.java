@@ -16,10 +16,14 @@ public class ValidateNoteTargetTitleValidator
       return true;
     }
 
-    if (note.getTargetNote() != null && note.getTitle() != null) {
+    if (note.getTargetNote() == null) {
+      return true;
+    }
+    String title = note.getTitle();
+    if (title == null || title.trim().isEmpty()) {
       context.disableDefaultConstraintViolation();
       context
-          .buildConstraintViolationWithTemplate("Note with targetNote must have null title")
+          .buildConstraintViolationWithTemplate("Note with targetNote must have a non-empty title")
           .addPropertyNode("title")
           .addConstraintViolation();
       return false;

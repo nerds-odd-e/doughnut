@@ -160,7 +160,7 @@ class ObsidianFormatServiceTest {
         hasItems(
             rootNoteTitle + "/__index.md",
             rootNoteTitle + "/Tagger 1/__index.md",
-            rootNoteTitle + "/Tagger 1/_tagged by.md"));
+            rootNoteTitle + "/Tagger 1/Tagger 1 tagged by Tagged Note.md"));
   }
 
   @Test

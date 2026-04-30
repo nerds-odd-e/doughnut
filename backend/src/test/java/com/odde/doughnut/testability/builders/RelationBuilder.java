@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.NoteService;
+import com.odde.doughnut.services.RelationshipNoteTitleFormatter;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -20,6 +21,8 @@ public class RelationBuilder extends EntityBuilder<Note> {
     this.entity =
         NoteService.buildARelation(
             from, to, null, relationType, new Timestamp(System.currentTimeMillis()));
+    entity.setTitle(
+        RelationshipNoteTitleFormatter.format(from.getTitle(), relationType.label, to.getTitle()));
     return new NoteBuilder(entity, makeMe);
   }
 
