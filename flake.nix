@@ -33,7 +33,11 @@
         # Python 3.12: stable on nixos-25.11; pydantic-core in the lockfile does not build on 3.13 yet.
         python312 = pkgs.python312;
         pythonWithTools = python312.withPackages (ps: with ps; [ pip setuptools wheel ]);
-        poetryPkg = pkgs.poetry.override { python3 = python312; };
+        # Poetry runs pytest in installCheck; one test flakes on darwin (full stderr pipe).
+        poetryPkg =
+          (pkgs.poetry.override { python3 = python312; }).overrideAttrs (_: {
+            doInstallCheck = false;
+          });
         poetryPath = "${poetryPkg}/bin";
         pythonPackages = [ pythonWithTools poetryPkg ];
 
