@@ -92,6 +92,22 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
+    void unqualified_link_picks_lowest_note_id_when_duplicate_titles_exist_in_subtree() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note firstCreated = makeMe.aNote().title("Dup").under(root).please();
+      makeMe.aNote().title("Dup").under(root).please();
+      Note carrier = makeMe.aNote().under(root).details("[[Dup]]").please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(firstCreated.getId()));
+    }
+
+    @Test
     void omits_qualified_link_when_target_notebook_is_not_readable() {
       User otherUser = makeMe.aUser().please();
       Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).title("Secret Notebook").please();

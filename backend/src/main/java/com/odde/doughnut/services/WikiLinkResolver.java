@@ -5,9 +5,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,11 +36,11 @@ public class WikiLinkResolver {
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }
-    Map<String, Note> noteByExactTitle =
-        descendantNotesIndexedByExactTitle(withoutRelations(rootNote(focusNote)));
+    Note subtreeRoot = withoutRelations(rootNote(focusNote));
+    int subtreeRootId = subtreeRoot.getId();
     List<ResolvedWikiLink> out = new ArrayList<>();
     for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
-      Note target = resolveToken(token, noteByExactTitle, viewer, focusNote);
+      Note target = resolveToken(token, viewer, focusNote, subtreeRootId);
       if (target != null) {
         out.add(new ResolvedWikiLink(token, target));
       }
@@ -50,13 +48,18 @@ public class WikiLinkResolver {
     return List.copyOf(out);
   }
 
-  private Note resolveToken(
-      String token, Map<String, Note> noteByExactTitle, User viewer, Note focusNote) {
+  private Note resolveToken(String token, User viewer, Note focusNote, int subtreeRootNoteId) {
     Qualified qualified = Qualified.tryParse(token);
     if (qualified != null) {
       return firstReadableCandidate(qualified, viewer);
     }
-    Note target = noteByExactTitle.get(token);
+    Note target =
+        noteRepository
+            .findSmallestNonRelationSubtreeNoteIdByRootNoteIdAndTitle(subtreeRootNoteId, token)
+            .stream()
+            .findFirst()
+            .flatMap(noteRepository::findById)
+            .orElse(null);
     if (target != null) {
       Notebook notebook = target.getNotebook();
       if (notebook == null) {
@@ -119,22 +122,6 @@ public class WikiLinkResolver {
       }
     }
     return titles;
-  }
-
-  private static Map<String, Note> descendantNotesIndexedByExactTitle(Note root) {
-    Map<String, Note> byTitle = new LinkedHashMap<>();
-    mergeNoteByExactTitle(byTitle, root);
-    root.getAllDescendants().forEach(desc -> mergeNoteByExactTitle(byTitle, desc));
-    return byTitle;
-  }
-
-  /** One note per exact title: smallest id wins (stable, matches first in tree when ids grow). */
-  private static void mergeNoteByExactTitle(Map<String, Note> byTitle, Note candidate) {
-    if (candidate.isRelation()) {
-      return;
-    }
-    String key = candidate.getTitle() != null ? candidate.getTitle() : "";
-    byTitle.merge(key, candidate, (a, b) -> a.getId() <= b.getId() ? a : b);
   }
 
   private static List<String> dedupePreserveOrder(List<String> titles) {
