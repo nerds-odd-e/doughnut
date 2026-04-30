@@ -214,7 +214,7 @@ Then('I should be able to delete the relationship', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
 })
 
-Then(
+When(
   'I delete the relationship from {string} to {string}',
   (noteTopology: string, targetTitle: string) => {
     start
