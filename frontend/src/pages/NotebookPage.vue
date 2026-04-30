@@ -155,7 +155,7 @@ const fetchNotebook = async () => {
     path: { notebook: notebookId },
   })
   if (!error) {
-    notebook.value = result!
+    notebook.value = result!.notebook
   }
 }
 

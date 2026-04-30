@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
@@ -156,10 +157,10 @@ class NotebookController {
   }
 
   @GetMapping(value = "/{notebook}")
-  public Notebook get(@PathVariable @Schema(type = "integer") Notebook notebook)
+  public NotebookClientView get(@PathVariable @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
-    return notebook;
+    return notebookCatalogService.clientViewFor(notebook);
   }
 
   @PostMapping(value = "/{notebook}/share")

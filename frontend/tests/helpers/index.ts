@@ -310,7 +310,7 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
     updated_at: realm.note.updatedAt,
     ...(circle ? { circle } : {}),
   }
-  return mockSdkService("get", notebook)
+  return mockSdkService("get", { notebook, hasAttachedBook: false })
 }
 
 /**

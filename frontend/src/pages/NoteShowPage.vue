@@ -272,7 +272,7 @@ watch(
       path: { notebook: notebookId },
     })
     if (!error && data) {
-      notebookForBreadcrumb.value = data
+      notebookForBreadcrumb.value = data.notebook
     }
   },
   { immediate: true }

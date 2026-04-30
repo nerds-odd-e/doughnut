@@ -1891,7 +1891,7 @@ export type GetResponses = {
     /**
      * OK
      */
-    200: Notebook;
+    200: NotebookClientView;
 };
 
 export type GetResponse = GetResponses[keyof GetResponses];

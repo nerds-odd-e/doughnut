@@ -1094,7 +1094,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/Notebook"
+                $ref: "#/components/schemas/NotebookClientView"
     post:
       tags:
       - notebook-controller

@@ -141,14 +141,15 @@ class NotebookControllerTest extends ControllerTestBase {
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
       Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
 
-      Notebook wire = controller.get(nb);
+      NotebookClientView wire = controller.get(nb);
       String json = objectMapper.writeValueAsString(wire);
       JsonNode tree = objectMapper.readTree(json);
 
       assertThat(tree.has("headNoteId"), is(false));
-      assertThat(tree.get("id").asInt(), equalTo(nb.getId()));
-      assertThat(tree.get("name").asText(), equalTo("API Shape NB"));
-      assertThat(tree.get("description").asText(), equalTo("Blurb"));
+      JsonNode notebookPayload = tree.get("notebook");
+      assertThat(notebookPayload.get("id").asInt(), equalTo(nb.getId()));
+      assertThat(notebookPayload.get("name").asText(), equalTo("API Shape NB"));
+      assertThat(notebookPayload.get("description").asText(), equalTo("Blurb"));
     }
   }
 

@@ -14,7 +14,7 @@ describe("NotebookPage.spec", () => {
 
   it("shows the current number of questions in assessment if set", async () => {
     const notebook = makeMe.aNotebook.numberOfQuestionsInAssessment(4).please()
-    mockSdkService("get", notebook)
+    mockSdkService("get", { notebook, hasAttachedBook: false })
     vi.spyOn(NotebookController, "getNoteBySlug").mockResolvedValue(
       wrapSdkError("no index") as never
     )
@@ -38,7 +38,7 @@ describe("NotebookPage.spec", () => {
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookId = notebook.id
     indexRealm.note.noteTopology.notebookId = notebook.id
-    mockSdkService("get", notebook)
+    mockSdkService("get", { notebook, hasAttachedBook: false })
     const slugSpy = mockSdkService("getNoteBySlug", indexRealm)
     helper
       .component(NotebookPage)
@@ -62,7 +62,7 @@ describe("NotebookPage.spec", () => {
 
   it("does not load sidebar via showNote when index slug is missing", async () => {
     const notebook = makeMe.aNotebook.please()
-    mockSdkService("get", notebook)
+    mockSdkService("get", { notebook, hasAttachedBook: false })
     vi.spyOn(NotebookController, "getNoteBySlug").mockResolvedValue(
       wrapSdkError("not found") as never
     )

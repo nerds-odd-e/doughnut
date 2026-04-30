@@ -32,6 +32,12 @@ public class NotebookCatalogService {
     this.bookRepository = bookRepository;
   }
 
+  public NotebookClientView clientViewFor(Notebook notebook) {
+    boolean hasAttachedBook =
+        !bookRepository.findNotebookIdsWithAttachedBooksIn(List.of(notebook.getId())).isEmpty();
+    return NotebookClientView.of(notebook, hasAttachedBook);
+  }
+
   /**
    * Sort keys for the notebooks page catalog (merged list of ungrouped notebooks and groups):
    *
