@@ -134,7 +134,7 @@ class NotebookControllerTest extends ControllerTestBase {
   @Nested
   class NotebookApiSerialization {
     @Test
-    void getNotebookJsonExposesIdentityFieldsNotHeadNoteId() throws Exception {
+    void getNotebookJsonOmitsDeprecatedHeadNoteFields() throws Exception {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("API Shape NB");
       noteCreation.setDescription("Blurb");
@@ -741,8 +741,8 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void download_whenNotebookHasIndexNote_includesIndexMd()
         throws UnexpectedNoAccessRightException, IOException {
-      Note head = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-      makeMe.theNote(head).title("Overview").slug("index").details("Notebook intro").please();
+      Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+      makeMe.theNote(root).title("Overview").slug("index").details("Notebook intro").please();
       makeMe.refresh(notebook);
       ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(notebook);
       assertThat(entity.getStatusCode(), equalTo(HttpStatus.OK));

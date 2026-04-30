@@ -50,7 +50,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return aNote().title(title);
   }
 
-  public NoteBuilder aHeadNote(String title) {
+  public NoteBuilder aRootNote(String title) {
     return aNote().title(title);
   }
 

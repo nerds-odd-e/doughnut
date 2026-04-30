@@ -124,11 +124,11 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setUp() {
-      Note headNote =
-          makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser.getUser()).please();
-      makeMe.theNote(headNote).withNChildren(10).please();
+      Note rootNote =
+          makeMe.aRootNote("My reading list").creatorAndOwner(currentUser.getUser()).please();
+      makeMe.theNote(rootNote).withNChildren(10).please();
       noteWithoutQuestions =
-          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
+          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(rootNote).please();
       Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser.getUser()).please();
       noteWithQuestions = makeMe.theNote(lila).hasAnApprovedQuestion().please();
     }

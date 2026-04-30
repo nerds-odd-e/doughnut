@@ -118,18 +118,18 @@ class FolderRepositoryTest {
   void nestedFoldersMirrorContainmentHierarchyForNotes() {
     Notebook notebook = makeMe.aNotebook().please();
     Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    Folder folderForHeadChildren =
+    Folder folderForRootChildren =
         makeMe.aFolder().notebook(notebook).name(root.getTitle()).please();
     Folder folderForSectionChildren =
         makeMe
             .aFolder()
             .notebook(notebook)
-            .parentFolder(folderForHeadChildren)
+            .parentFolder(folderForRootChildren)
             .name("Section")
             .please();
 
     Note section =
-        makeMe.aNote().under(root).title("Section").folder(folderForHeadChildren).please();
+        makeMe.aNote().under(root).title("Section").folder(folderForRootChildren).please();
     Note leaf =
         makeMe.aNote().under(section).title("Leaf").folder(folderForSectionChildren).please();
     Long siblingOrder = leaf.getSiblingOrder();
@@ -138,10 +138,10 @@ class FolderRepositoryTest {
     Note loadedSection = noteRepository.findById(section.getId()).orElseThrow();
     Note loadedLeaf = noteRepository.findById(leaf.getId()).orElseThrow();
 
-    assertThat(loadedSection.getFolder().getId(), equalTo(folderForHeadChildren.getId()));
+    assertThat(loadedSection.getFolder().getId(), equalTo(folderForRootChildren.getId()));
     assertThat(loadedLeaf.getFolder().getId(), equalTo(folderForSectionChildren.getId()));
     assertThat(
-        loadedLeaf.getFolder().getParentFolder().getId(), equalTo(folderForHeadChildren.getId()));
+        loadedLeaf.getFolder().getParentFolder().getId(), equalTo(folderForRootChildren.getId()));
     assertThat(loadedLeaf.getParent().getId(), equalTo(section.getId()));
     assertThat(loadedLeaf.getSiblingOrder(), equalTo(siblingOrder));
   }

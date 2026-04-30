@@ -78,10 +78,10 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnWikiTitlesForLinksMatchingDescendantsUnderRoot()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Note head = makeMe.aNote().creatorAndOwner(user).title("root-head").please();
-      Note matched = makeMe.aNote().title("LinkedPage").under(head).please();
+      Note root = makeMe.aNote().creatorAndOwner(user).title("root-head").please();
+      Note matched = makeMe.aNote().title("LinkedPage").under(root).please();
       Note viewer =
-          makeMe.aNote().under(head).details("Text [[LinkedPage]] and [[NoSuch]].").please();
+          makeMe.aNote().under(root).details("Text [[LinkedPage]] and [[NoSuch]].").please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
       assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("LinkedPage"));
@@ -125,14 +125,14 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Note head = makeMe.aNote().creatorAndOwner(user).please();
-      Note fromFm = makeMe.aNote().title("FrontmatterTarget").under(head).please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note fromFm = makeMe.aNote().title("FrontmatterTarget").under(root).please();
       String details =
           "---\n"
               + "see: Summary with [[FrontmatterTarget]]\n"
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
-      Note viewer = makeMe.aNote().under(head).details(details).please();
+      Note viewer = makeMe.aNote().under(root).details(details).please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
       assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("FrontmatterTarget"));

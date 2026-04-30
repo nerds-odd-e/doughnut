@@ -86,12 +86,13 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void assignsNestedChildContainerWithParentFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Note head = makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
+      Note bookRoot =
+          makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
       NoteCreationDTO sectionDto = new NoteCreationDTO();
       sectionDto.setNewTitle("Section");
       Note section =
           noteRepository
-              .findById(controller.createNoteUnderParent(head, sectionDto).getCreated().getId())
+              .findById(controller.createNoteUnderParent(bookRoot, sectionDto).getCreated().getId())
               .orElseThrow();
       noteCreation.setNewTitle("Leaf");
       Note leaf =
@@ -119,12 +120,13 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void assignsNestedSlugsForFolderPathAndNote()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Note head = makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
+      Note bookRoot =
+          makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
       NoteCreationDTO sectionDto = new NoteCreationDTO();
       sectionDto.setNewTitle("Section");
       Note section =
           noteRepository
-              .findById(controller.createNoteUnderParent(head, sectionDto).getCreated().getId())
+              .findById(controller.createNoteUnderParent(bookRoot, sectionDto).getCreated().getId())
               .orElseThrow();
       noteCreation.setNewTitle("Leaf");
       Note leaf =

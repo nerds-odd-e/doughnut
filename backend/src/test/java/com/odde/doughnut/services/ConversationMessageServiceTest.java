@@ -43,7 +43,7 @@ class ConversationMessageServiceTest {
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
       topNote =
-          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
+          makeMe.aRootNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }

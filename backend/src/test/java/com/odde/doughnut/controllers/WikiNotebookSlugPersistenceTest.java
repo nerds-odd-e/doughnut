@@ -63,9 +63,9 @@ class WikiNotebookSlugPersistenceTest extends ControllerTestBase {
 
   @Test
   void duplicateNoteSlugInSameNotebook_isRejected() {
-    Note head = makeMe.aNote().title("Head").please();
-    Note a = makeMe.aNote().under(head).title("SlugDupA").please();
-    Note b = makeMe.aNote().under(head).title("SlugDupB").please();
+    Note root = makeMe.aNote().title("Head").please();
+    Note a = makeMe.aNote().under(root).title("SlugDupA").please();
+    Note b = makeMe.aNote().under(root).title("SlugDupB").please();
     makeMe.entityPersister.flush();
 
     assertThrows(

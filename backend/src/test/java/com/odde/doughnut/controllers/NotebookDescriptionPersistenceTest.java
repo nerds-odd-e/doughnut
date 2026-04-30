@@ -30,11 +30,11 @@ class NotebookDescriptionPersistenceTest extends ControllerTestBase {
   }
 
   @Test
-  void backfillFromHeadNoteDetails_matchesMigrationExpression() {
-    Note head = makeMe.aNote().title("Head").please();
-    Notebook notebook = head.getNotebook();
-    head.setDetails("<p>Hello world</p>");
-    makeMe.entityPersister.save(head);
+  void backfillFromLegacyRootNoteDetails_matchesMigrationExpression() {
+    Note rootNote = makeMe.aNote().title("Head").please();
+    Notebook notebook = rootNote.getNotebook();
+    rootNote.setDetails("<p>Hello world</p>");
+    makeMe.entityPersister.save(rootNote);
     makeMe.entityPersister.flush();
 
     jdbcTemplate.update(
@@ -50,7 +50,7 @@ class NotebookDescriptionPersistenceTest extends ControllerTestBase {
         END
         WHERE n.id = ?
         """,
-        head.getId(),
+        rootNote.getId(),
         notebook.getId());
 
     String stored =

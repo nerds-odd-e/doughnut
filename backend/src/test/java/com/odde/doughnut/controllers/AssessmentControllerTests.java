@@ -194,7 +194,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       Note topNote =
-          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
+          makeMe.aRootNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
     }

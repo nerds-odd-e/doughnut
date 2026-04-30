@@ -20,7 +20,7 @@ import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 function notebookWithName(name: string) {
-  return makeMe.aNotebook.headNote(makeMe.aNote.title(name).please()).do()
+  return makeMe.aNotebook.withSeedNote(makeMe.aNote.title(name).please()).do()
 }
 
 describe('InteractiveCliApp /use notebook integration', () => {

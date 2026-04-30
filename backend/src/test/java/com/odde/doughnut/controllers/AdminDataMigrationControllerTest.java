@@ -76,7 +76,7 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
     User user = makeMe.aUser().please();
     currentUser.setUser(makeMe.anAdmin().please());
 
-    Note index = makeMe.aHeadNote("WillBecomeIndex").creatorAndOwner(user).please();
+    Note index = makeMe.aRootNote("WillBecomeIndex").creatorAndOwner(user).please();
     int notebookId = index.getNotebook().getId();
     int indexId = index.getId();
 

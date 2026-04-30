@@ -39,25 +39,25 @@ class NotebookServiceTest {
   void findOptionalIndexNote_whenRootNoteSlugIsIndex_findsNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note head = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    makeMe.theNote(head).title("Overview").slug("index").please();
+    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    makeMe.theNote(root).title("Overview").slug("index").please();
 
     Optional<Note> result = notebookService.findOptionalIndexNote(notebook);
 
     assertThat(result.isPresent(), is(true));
-    assertThat(result.get().getId(), equalTo(head.getId()));
+    assertThat(result.get().getId(), equalTo(root.getId()));
   }
 
   @Test
   void findOptionalIndexNote_whenTitleIsIndexCaseInsensitiveAndSlugIsNot_findsNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note head = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    makeMe.theNote(head).title("Index").slug("notebook-landing").please();
+    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    makeMe.theNote(root).title("Index").slug("notebook-landing").please();
 
     Optional<Note> result = notebookService.findOptionalIndexNote(notebook);
 
     assertThat(result.isPresent(), is(true));
-    assertThat(result.get().getId(), equalTo(head.getId()));
+    assertThat(result.get().getId(), equalTo(root.getId()));
   }
 }

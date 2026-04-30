@@ -16,27 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NotebookTest {
   @Autowired MakeMe makeMe;
-  Note headNote;
+  Note rootNote;
   Notebook notebook;
 
   @BeforeEach
   void setup() {
-    headNote = makeMe.aNote().please();
-    notebook = headNote.getNotebook();
+    rootNote = makeMe.aNote().please();
+    notebook = rootNote.getNotebook();
   }
 
   @Nested
   class NotesManagementTests {
     @Test
     void shouldIncludeAllNonDeletedNotesInNotebook() {
-      makeMe.aNote().under(headNote).please();
+      makeMe.aNote().under(rootNote).please();
       makeMe.refresh(notebook);
       assertThat(notebook.getNotes().size()).isEqualTo(2);
     }
 
     @Test
     void shouldExcludeSoftDeletedNotesFromNotebook() {
-      makeMe.aNote().under(headNote).softDeleted().please();
+      makeMe.aNote().under(rootNote).softDeleted().please();
       makeMe.refresh(notebook);
       assertThat(notebook.getNotes().size()).isEqualTo(1);
     }

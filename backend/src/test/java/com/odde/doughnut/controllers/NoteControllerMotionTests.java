@@ -144,8 +144,8 @@ class NoteControllerMotionTests extends ControllerTestBase {
             CyclicLinkDetectedException,
             MovementNotPossibleException {
       currentUser.setUser(makeMe.aUser().please());
-      Note head = makeMe.aHeadNote("top").creatorAndOwner(currentUser.getUser()).please();
-      Note section = makeMe.aNote("Section").under(head).please();
+      Note root = makeMe.aRootNote("top").creatorAndOwner(currentUser.getUser()).please();
+      Note section = makeMe.aNote("Section").under(root).please();
       Note leaf = makeMe.aNote("leaf").under(section).please();
       Note siblingContainer = makeMe.aNote("container").under(section).please();
       makeMe.entityPersister.flush();
@@ -161,19 +161,19 @@ class NoteControllerMotionTests extends ControllerTestBase {
             CyclicLinkDetectedException,
             MovementNotPossibleException {
       currentUser.setUser(makeMe.aUser().please());
-      Note head = makeMe.aHeadNote("top").creatorAndOwner(currentUser.getUser()).please();
-      Note section = makeMe.aNote("Section").under(head).please();
+      Note root = makeMe.aRootNote("top").creatorAndOwner(currentUser.getUser()).please();
+      Note section = makeMe.aNote("Section").under(root).please();
       makeMe.aNote("dup").under(section).please();
       Note secondDup = makeMe.aNote("dup").under(section).please();
-      Note otherHead = makeMe.aHeadNote("otherNb").creatorAndOwner(currentUser.getUser()).please();
-      Note mover = makeMe.aNote("dup").under(otherHead).please();
+      Note otherRoot = makeMe.aRootNote("otherNb").creatorAndOwner(currentUser.getUser()).please();
+      Note mover = makeMe.aNote("dup").under(otherRoot).please();
       makeMe.entityPersister.flush();
-      alignFoldersForTestSubtree(head);
-      alignFoldersForTestSubtree(otherHead);
+      alignFoldersForTestSubtree(root);
+      alignFoldersForTestSubtree(otherRoot);
       makeMe.entityPersister.flush();
-      Stream.concat(Stream.of(head), head.getAllDescendants())
+      Stream.concat(Stream.of(root), root.getAllDescendants())
           .forEach(makeMe.wikiSlugPathService::assignSlugForNewNote);
-      Stream.concat(Stream.of(otherHead), otherHead.getAllDescendants())
+      Stream.concat(Stream.of(otherRoot), otherRoot.getAllDescendants())
           .forEach(makeMe.wikiSlugPathService::assignSlugForNewNote);
       makeMe.entityPersister.flush();
       makeMe.refresh(mover);

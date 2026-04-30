@@ -26,7 +26,7 @@ Given('the notebook contains the following notes', (notesTable: DataTable) => {
     const notebookName = (hashes[0]?.['Parent Title'] ?? '').trim()
     if (!notebookName) {
       throw new Error(
-        'the notebook contains: first row must have Parent Title (head note title)'
+        'the notebook contains: first row must have Parent Title (root note title)'
       )
     }
     start.testability().injectNotes(hashes, username, notebookName)

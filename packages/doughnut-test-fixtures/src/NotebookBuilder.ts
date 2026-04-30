@@ -20,8 +20,8 @@ class NotebookBuilder extends Builder<Notebook> {
     }
   }
 
-  headNote(headNote: Note | undefined) {
-    this.notebuilder.for(headNote)
+  withSeedNote(note: Note | undefined) {
+    this.notebuilder.for(note)
     return this
   }
 

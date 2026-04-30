@@ -24,9 +24,9 @@ defineParameterType({
 
 Given(
   'I have a notebook {string} with a note {string} and notes:',
-  (notebookName: string, headTitle: string, data: DataTable) => {
+  (notebookName: string, firstNoteTitle: string, data: DataTable) => {
     const notes = data.hashes()
-    notes.unshift({ Title: headTitle })
+    notes.unshift({ Title: firstNoteTitle })
     cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes(notes, username, notebookName)
     )
@@ -46,15 +46,15 @@ Given('there are some notes:', (data: DataTable) => {
       throw new Error('Parent Title is required for all notes')
     }
   })
-  const head = hashes.find((n) => !(n['Parent Title'] ?? '').trim())
+  const titleRow = hashes.find((n) => !(n['Parent Title'] ?? '').trim())
   let notebookName: string
-  if (head?.Title) {
-    notebookName = head.Title
+  if (titleRow?.Title) {
+    notebookName = titleRow.Title
   } else {
     const parent = hashes[0]?.['Parent Title']?.trim()
     if (!parent) {
       throw new Error(
-        'Cannot infer notebookName for injectNotes: need a head row or Parent Title on the first row'
+        'Cannot infer notebookName for injectNotes: need a first row with a Title (no Parent Title) or Parent Title on the first row'
       )
     }
     notebookName = parent

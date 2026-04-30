@@ -34,7 +34,7 @@ public class NoteMotionServiceTest {
 
   @BeforeEach
   void setup() {
-    topNote = makeMe.aHeadNote("topNote").please();
+    topNote = makeMe.aRootNote("topNote").please();
     firstChild = makeMe.aNote("firstChild").under(topNote).please();
     secondChild = makeMe.aNote("secondChild").under(topNote).please();
   }
@@ -79,7 +79,7 @@ public class NoteMotionServiceTest {
   @Test
   void moveSecondBehindFirstPreservesSlugWhenFolderUnchanged()
       throws CyclicLinkDetectedException, MovementNotPossibleException {
-    topNote = makeMe.aHeadNote("top").please();
+    topNote = makeMe.aRootNote("top").please();
     Note section = makeMe.aNote("Section").under(topNote).please();
     firstChild = makeMe.aNote("firstChild").under(section).please();
     secondChild = makeMe.aNote("secondChild").under(section).please();
@@ -122,19 +122,19 @@ public class NoteMotionServiceTest {
   @Test
   void moveIntoParentWhereBasenamesConflictGetsNextDisambiguatedSlug()
       throws CyclicLinkDetectedException, MovementNotPossibleException {
-    Note head = makeMe.aHeadNote("top").please();
-    Note section = makeMe.aNote("Section").under(head).please();
+    Note root = makeMe.aRootNote("top").please();
+    Note section = makeMe.aNote("Section").under(root).please();
     makeMe.aNote("dup").under(section).please();
     Note second = makeMe.aNote("dup").under(section).please();
-    Note otherHead = makeMe.aHeadNote("otherNb").please();
-    Note mover = makeMe.aNote("dup").under(otherHead).please();
+    Note otherRoot = makeMe.aRootNote("otherNb").please();
+    Note mover = makeMe.aNote("dup").under(otherRoot).please();
     makeMe.entityPersister.flush();
-    alignFoldersForTestSubtree(head);
-    alignFoldersForTestSubtree(otherHead);
+    alignFoldersForTestSubtree(root);
+    alignFoldersForTestSubtree(otherRoot);
     makeMe.entityPersister.flush();
-    Stream.concat(Stream.of(head), head.getAllDescendants())
+    Stream.concat(Stream.of(root), root.getAllDescendants())
         .forEach(makeMe.wikiSlugPathService::assignSlugForNewNote);
-    Stream.concat(Stream.of(otherHead), otherHead.getAllDescendants())
+    Stream.concat(Stream.of(otherRoot), otherRoot.getAllDescendants())
         .forEach(makeMe.wikiSlugPathService::assignSlugForNewNote);
     makeMe.entityPersister.flush();
 
@@ -154,9 +154,9 @@ public class NoteMotionServiceTest {
   }
 
   @Test
-  void moveToTopLevelClearsHeadFolderAndAlignsDescendantFolders() {
+  void moveToTopLevelClearsRootFolderAndAlignsDescendantFolders() {
     User user = makeMe.aUser().please();
-    topNote = makeMe.aHeadNote("topNote").creatorAndOwner(user).please();
+    topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
     firstChild = makeMe.aNote("middle").under(topNote).please();
     Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
     Integer notebookIdBefore = topNote.getNotebook().getId();
@@ -178,7 +178,7 @@ public class NoteMotionServiceTest {
   @Test
   void moveToTopLevel_slugsStayUniqueWithinNotebook() {
     User user = makeMe.aUser().please();
-    topNote = makeMe.aHeadNote("topNote").creatorAndOwner(user).please();
+    topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
     firstChild = makeMe.aNote("middle").under(topNote).please();
     Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
     Integer notebookIdBefore = topNote.getNotebook().getId();
@@ -286,8 +286,8 @@ public class NoteMotionServiceTest {
 
     @BeforeEach
     void setup() {
-      topNote = makeMe.aHeadNote("topForNotebookMove").please();
-      otherNotebook = makeMe.aHeadNote("otherNotebook").please();
+      topNote = makeMe.aRootNote("topForNotebookMove").please();
+      otherNotebook = makeMe.aRootNote("otherNotebook").please();
       firstChild = makeMe.aNote("firstChild").under(topNote).please();
       secondChild = makeMe.aNote("secondChild").under(firstChild).please();
       thirdLevel = makeMe.aNote("thirdLevel").under(secondChild).please();

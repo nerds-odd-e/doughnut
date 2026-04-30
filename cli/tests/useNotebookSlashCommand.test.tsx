@@ -25,7 +25,7 @@ import {
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 function notebookWithName(name: string) {
-  return makeMe.aNotebook.headNote(makeMe.aNote.title(name).please()).do()
+  return makeMe.aNotebook.withSeedNote(makeMe.aNote.title(name).please()).do()
 }
 
 function UseNotebookStageTestShell(props: { readonly argument?: string }) {
