@@ -14,6 +14,21 @@ export function noteShowByNotebookSlugLocation(
   }
 }
 
+/** Plain path for wiki links in HTML (matches `noteShowByNotebookSlug`). */
+export function noteShowByNotebookSlugHref(
+  notebookId: number,
+  noteSlugPath: string
+): string {
+  const tail =
+    noteSlugPath === ""
+      ? ""
+      : noteSlugPath
+          .split("/")
+          .map((seg) => encodeURIComponent(seg))
+          .join("/")
+  return `/d/notebooks/${notebookId}/notes/${tail}`
+}
+
 export function noteShowByNotebookSlugLocationFromNoteRealm(
   noteRealm: NoteRealm
 ): RouteLocationNamedRaw {

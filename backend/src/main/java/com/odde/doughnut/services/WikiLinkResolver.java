@@ -43,7 +43,9 @@ public class WikiLinkResolver {
     for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
       Note target = resolveToken(token, noteByExactTitle, viewer, focusNote);
       if (target != null) {
-        out.add(new WikiTitle(token, target.getId()));
+        Notebook notebook =
+            target.getNotebook() != null ? target.getNotebook() : focusNote.getNotebook();
+        out.add(new WikiTitle(token, notebook.getId(), target.getSlug()));
       }
     }
     return List.copyOf(out);

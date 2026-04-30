@@ -3905,11 +3905,14 @@ components:
       properties:
         title:
           type: string
-        noteId:
+        notebookId:
           type: integer
           format: int32
+        slug:
+          type: string
       required:
-      - noteId
+      - notebookId
+      - slug
       - title
     NoteMoveDTO:
       type: object
