@@ -6,6 +6,8 @@ import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WikiTitleCacheService {
+
+  @PersistenceContext private EntityManager entityManager;
 
   private final WikiLinkResolver wikiLinkResolver;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
@@ -45,6 +49,7 @@ public class WikiTitleCacheService {
   @Transactional
   public void refreshForNote(Note note, User viewer) {
     noteWikiTitleCacheRepository.deleteByNote_Id(note.getId());
+    entityManager.flush();
     for (WikiLinkResolver.ResolvedWikiLink link :
         wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
       NoteWikiTitleCache row = new NoteWikiTitleCache();
