@@ -247,7 +247,7 @@ export type NoteTopology = {
 };
 
 export type WikiTitle = {
-    title: string;
+    linkText: string;
     notebookId: number;
     slug: string;
 };

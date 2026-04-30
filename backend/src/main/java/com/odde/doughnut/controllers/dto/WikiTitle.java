@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class WikiTitle {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String title;
+  private String linkText;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer notebookId;

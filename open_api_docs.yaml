@@ -3903,7 +3903,7 @@ components:
     WikiTitle:
       type: object
       properties:
-        title:
+        linkText:
           type: string
         notebookId:
           type: integer
@@ -3911,9 +3911,9 @@ components:
         slug:
           type: string
       required:
+      - linkText
       - notebookId
       - slug
-      - title
     NoteMoveDTO:
       type: object
       properties:

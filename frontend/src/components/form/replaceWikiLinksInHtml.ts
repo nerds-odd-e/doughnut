@@ -6,10 +6,10 @@ export function replaceWikiLinksInHtml(
   wikiTitles: WikiTitle[]
 ): string {
   let result = html
-  wikiTitles.forEach(({ title, notebookId, slug }) => {
+  wikiTitles.forEach(({ linkText, notebookId, slug }) => {
     result = result.replace(
-      `[[${title}]]`,
-      `<a href="${noteShowByNotebookSlugHref(notebookId, slug)}" class="doughnut-link">${title}</a>`
+      `[[${linkText}]]`,
+      `<a href="${noteShowByNotebookSlugHref(notebookId, slug)}" class="doughnut-link">${linkText}</a>`
     )
   })
   result = result.replace(

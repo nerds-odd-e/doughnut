@@ -464,7 +464,7 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces known wikilink text with a note href", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
-        { title: "MyNote", notebookId: 9, slug: "my-note" },
+        { linkText: "MyNote", notebookId: 9, slug: "my-note" },
       ])
     ).toBe(
       '<p><a href="/d/notebooks/9/notes/my-note" class="doughnut-link">MyNote</a></p>'

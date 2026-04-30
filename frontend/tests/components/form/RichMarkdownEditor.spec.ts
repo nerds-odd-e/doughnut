@@ -108,7 +108,7 @@ describe("RichMarkdownEditor", () => {
   })
 
   it("linkifies wikilinks in Quill HTML while model matches the interval", async () => {
-    const wikiTitles = [{ title: "MyNote", notebookId: 9, slug: "my-note" }]
+    const wikiTitles = [{ linkText: "MyNote", notebookId: 9, slug: "my-note" }]
     await mountEditor("", { wikiTitles })
     await flushPromises()
 

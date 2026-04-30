@@ -63,11 +63,11 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   const linkifiedTwoNotes = [
-    { title: "LeSS in Action", notebookId: 1, slug: "less" },
-    { title: "Odd-e CSD", notebookId: 2, slug: "csd" },
+    { linkText: "LeSS in Action", notebookId: 1, slug: "less" },
+    { linkText: "Odd-e CSD", notebookId: 2, slug: "csd" },
   ] as const
   const linkifiedWikiLink99 = [
-    { title: "WikiLink", notebookId: 99, slug: "wikilink" },
+    { linkText: "WikiLink", notebookId: 99, slug: "wikilink" },
   ] as const
 
   it.each`

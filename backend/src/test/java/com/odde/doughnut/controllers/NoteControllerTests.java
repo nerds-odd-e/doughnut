@@ -84,7 +84,7 @@ class NoteControllerTests extends ControllerTestBase {
           makeMe.aNote().under(root).details("Text [[LinkedPage]] and [[NoSuch]].").please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
-      assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("LinkedPage"));
+      assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("LinkedPage"));
       assertThat(
           realm.getWikiTitles().get(0).getNotebookId(), equalTo(matched.getNotebook().getId()));
       assertThat(realm.getWikiTitles().get(0).getSlug(), equalTo(matched.getSlug()));
@@ -105,7 +105,7 @@ class NoteControllerTests extends ControllerTestBase {
               .please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
-      assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("Other Notebook:LinkedPage"));
+      assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("Other Notebook:LinkedPage"));
       assertThat(
           realm.getWikiTitles().get(0).getNotebookId(),
           equalTo(targetInOther.getNotebook().getId()));
@@ -140,7 +140,7 @@ class NoteControllerTests extends ControllerTestBase {
       Note viewer = makeMe.aNote().under(root).details(details).please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
-      assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("FrontmatterTarget"));
+      assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("FrontmatterTarget"));
       assertThat(
           realm.getWikiTitles().get(0).getNotebookId(), equalTo(fromFm.getNotebook().getId()));
       assertThat(realm.getWikiTitles().get(0).getSlug(), equalTo(fromFm.getSlug()));
