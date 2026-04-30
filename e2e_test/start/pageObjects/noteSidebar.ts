@@ -26,11 +26,14 @@ export const noteSidebar = () => {
   return {
     expand: (noteTopology: string) => {
       cy.get('aside').within(() => {
-        cy.findByText(noteTopology)
-          .parent()
-          .parent()
-          .within(() => {
-            cy.findByTitle('expand children').click()
+        cy.contains('.sidebar-folder-label', noteTopology)
+          .closest('li')
+          .then(($li) => {
+            if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
+              cy.wrap($li).within(() => {
+                cy.findByTitle('expand children').click()
+              })
+            }
           })
       })
     },
@@ -73,6 +76,22 @@ export const noteSidebar = () => {
       pageIsNotLoading()
       sidebarAddNoteButton('Add Next Sibling Note').click()
       return noteCreationForm
+    },
+    /** Expands a sidebar folder row by human **name** (not a note `.title-text` link). */
+    navigateExpandFolder(folderLabel: string) {
+      pageIsNotLoading()
+      cy.get('aside').within(() => {
+        cy.contains('.sidebar-folder-label', folderLabel)
+          .closest('li')
+          .then(($li) => {
+            if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
+              cy.wrap($li).within(() => {
+                cy.findByTitle('expand children').click()
+              })
+            }
+          })
+      })
+      pageIsNotLoading()
     },
     navigateToNote(noteTopology: string) {
       pageIsNotLoading()

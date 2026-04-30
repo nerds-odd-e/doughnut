@@ -3,29 +3,28 @@
     v-if="displayRows.length > 0"
     class="daisy-list-group daisy-text-sm daisy-pl-[1rem]"
   >
-    <SidebarNoteItem
-      v-for="row in displayRows"
-      :key="row.note.id"
-      v-bind="{
-        notebookId,
-        note: row.note,
-        mergedFolderId: row.mergedFolderId,
-        structuralChildCount: structuralChildCounts[row.note.id],
-        activeNoteRealm,
-        expandedIds,
-        onToggleExpand: toggleChildren,
-        draggedNote,
-        isDraggedOver,
-        dropMode,
-        dropIndicatorStyle,
-        onDragStart: handleDragStart,
-        onDragOver: handleDragOver,
-        onDragEnter: handleDragEnter,
-        onDragLeave: handleDragLeave,
-        onDrop: handleDrop,
-        onDragEnd: handleDragEnd,
-      }"
-    />
+    <template v-for="row in displayRows" :key="rowKey(row)">
+      <SidebarNoteItem
+        v-if="row.kind === 'note'"
+        v-bind="{
+          note: row.note,
+          activeNoteRealm,
+          draggedNote,
+          isDraggedOver,
+          dropMode,
+          dropIndicatorStyle,
+          onDragStart: handleDragStart,
+          onDragOver: handleDragOver,
+          onDragLeave: handleDragLeave,
+          onDrop: handleDrop,
+          onDragEnd: handleDragEnd,
+        }"
+      />
+      <SidebarFolderItem
+        v-else
+        v-bind="{ notebookId, folder: row.folder, activeNoteRealm }"
+      />
+    </template>
   </ul>
 </template>
 
@@ -35,19 +34,28 @@ import type {
   NoteRealm,
   NotebookRootFolder,
 } from "@generated/doughnut-backend-api"
+import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
-import { ancestorTopologyIds } from "./noteTopologyAncestors"
+import type { SidebarNoteDragState } from "./sidebarNoteDragContext"
+import { sidebarNoteDragStateKey } from "./sidebarNoteDragContext"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
-import { inject, provide, ref, watch } from "vue"
+import { inject, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-const storageAccessor = useStorageAccessor()
-const setSidebarStructuralChildCountKey = "setSidebarStructuralChildCount"
-
-type SidebarStructuralRow = {
-  note: Note
-  mergedFolderId?: number
+function createFallbackDragState(): SidebarNoteDragState {
+  return {
+    draggedNote: ref(null),
+    isDraggedOver: ref(null),
+    dropMode: ref("after"),
+    dropIndicatorStyle: ref({}),
+  }
 }
+
+const storageAccessor = useStorageAccessor()
+
+type SidebarStructuralRow =
+  | { kind: "note"; note: Note }
+  | { kind: "folder"; folder: NotebookRootFolder }
 
 function basename(path: string): string {
   const i = path.lastIndexOf("/")
@@ -59,27 +67,50 @@ function folderNumericId(folder: NotebookRootFolder): number | undefined {
   return Number(folder.id)
 }
 
-function mergeMatchingFoldersIntoNotes(
+function folderMatchesNote(folder: NotebookRootFolder, note: Note): boolean {
+  if (folderNumericId(folder) === undefined) return false
+  const slug = note.noteTopology.slug ?? ""
+  const title = note.noteTopology.title ?? ""
+  return (
+    folder.slug === slug ||
+    folder.name === title ||
+    basename(folder.slug) === basename(slug)
+  )
+}
+
+function buildStructuralRows(
   notes: Note[],
   folders: NotebookRootFolder[] | undefined
 ): SidebarStructuralRow[] {
   const unused = [...(folders ?? [])]
-  return notes.map((note) => {
-    const slug = note.noteTopology.slug ?? ""
-    const title = note.noteTopology.title ?? ""
-    const index = unused.findIndex((folder) => {
-      if (folderNumericId(folder) === undefined) return false
-      return (
-        folder.slug === slug ||
-        folder.name === title ||
-        basename(folder.slug) === basename(slug)
-      )
-    })
-    if (index === -1) return { note }
-    const [folder] = unused.splice(index, 1)
-    const mergedFolderId = folder ? folderNumericId(folder) : undefined
-    return mergedFolderId === undefined ? { note } : { note, mergedFolderId }
-  })
+  const rows: SidebarStructuralRow[] = []
+
+  for (const note of notes) {
+    rows.push({ kind: "note", note })
+    const index = unused.findIndex((folder) => folderMatchesNote(folder, note))
+    if (index !== -1) {
+      const [folder] = unused.splice(index, 1)
+      if (folder && folderNumericId(folder) !== undefined) {
+        rows.push({ kind: "folder", folder })
+      }
+    }
+  }
+
+  for (const folder of unused) {
+    if (folderNumericId(folder) !== undefined) {
+      rows.push({ kind: "folder", folder })
+    }
+  }
+
+  return rows
+}
+
+function rowKey(row: SidebarStructuralRow): string {
+  if (row.kind === "note") {
+    return `n-${row.note.id}`
+  }
+  const fid = folderNumericId(row.folder)
+  return fid != null ? `f-${fid}` : `f-slug:${row.folder.slug}`
 }
 
 interface Props {
@@ -88,27 +119,13 @@ interface Props {
   activeNoteRealm?: NoteRealm
   /** When set, list notes inside this folder. When omitted, list notebook root notes. */
   folderId?: number
-  /** Note row whose structural children this nested listing is rendering. */
-  parentRowNoteId?: number
+  /** Notifies enclosing folder row (when nested) how many peers this listing renders. */
+  onStructuralPeerCount?: (count: number) => void
 }
 
 const props = defineProps<Props>()
 
 const displayRows = ref<SidebarStructuralRow[]>([])
-const structuralChildCounts = ref<Record<number, number>>({})
-const reportStructuralChildCountToParent = inject<
-  ((parentNoteId: number, count: number) => void) | undefined
->(setSidebarStructuralChildCountKey, undefined)
-
-const setStructuralChildCount = (parentNoteId: number, count: number) => {
-  if (structuralChildCounts.value[parentNoteId] === count) return
-  structuralChildCounts.value = {
-    ...structuralChildCounts.value,
-    [parentNoteId]: count,
-  }
-}
-
-provide(setSidebarStructuralChildCountKey, setStructuralChildCount)
 
 async function refreshListing() {
   const api = storageAccessor.value.storedApi()
@@ -118,27 +135,17 @@ async function refreshListing() {
         ? await api.loadNotebookRootNotes(props.notebookId)
         : await api.loadFolderListing(props.notebookId, props.folderId)
     const notes = (listing.notes ?? []).map((r) => r.note)
-    displayRows.value = mergeMatchingFoldersIntoNotes(notes, listing.folders)
-    if (props.parentRowNoteId != null) {
-      reportStructuralChildCountToParent?.(
-        props.parentRowNoteId,
-        displayRows.value.length
-      )
-    }
+    displayRows.value = buildStructuralRows(notes, listing.folders)
+    props.onStructuralPeerCount?.(displayRows.value.length)
   } catch {
     displayRows.value = []
-    if (props.parentRowNoteId != null) {
-      reportStructuralChildCountToParent?.(props.parentRowNoteId, 0)
-    }
+    props.onStructuralPeerCount?.(0)
   }
 }
 
 watch(
   () => [props.notebookId, props.folderId] as const,
   () => {
-    if (props.folderId == null && props.parentRowNoteId == null) {
-      structuralChildCounts.value = {}
-    }
     refreshListing()
   },
   { immediate: true }
@@ -148,45 +155,8 @@ watch(sidebarStructuralRefreshKey, () => {
   refreshListing()
 })
 
-const expandedIds = ref<number[]>([])
-
-watch(
-  () => ({
-    activeNoteId: props.activeNoteRealm?.note?.id,
-    parentTopic:
-      props.activeNoteRealm?.note?.noteTopology.parentOrSubjectNoteTopology,
-  }),
-  () => {
-    if (!props.activeNoteRealm?.note) {
-      return
-    }
-    const note = props.activeNoteRealm.note
-    const parentTopic = note.noteTopology.parentOrSubjectNoteTopology
-
-    const uniqueIds = new Set([
-      ...expandedIds.value,
-      note.id,
-      ...ancestorTopologyIds(parentTopic),
-    ])
-    expandedIds.value = Array.from(uniqueIds)
-  },
-  { immediate: true }
-)
-
-const toggleChildren = (noteId: number) => {
-  const index = expandedIds.value.indexOf(noteId)
-  if (index === -1) {
-    expandedIds.value.push(noteId)
-  } else {
-    expandedIds.value.splice(index, 1)
-  }
-}
-
-// Drag and drop state
-const draggedNote = ref<Note | null>(null)
-const dropIndicatorStyle = ref({})
-const dropMode = ref<"after" | "asFirstChild">("after")
-const isDraggedOver = ref<number | null>(null)
+const dragState = inject(sidebarNoteDragStateKey) ?? createFallbackDragState()
+const { draggedNote, isDraggedOver, dropMode, dropIndicatorStyle } = dragState
 
 const handleDragStart = (event: DragEvent, note: Note) => {
   draggedNote.value = note
@@ -198,6 +168,7 @@ const handleDragStart = (event: DragEvent, note: Note) => {
 const handleDragOver = (event: DragEvent, targetNote: Note) => {
   event.preventDefault()
   if (!draggedNote.value || draggedNote.value.id === targetNote.id) {
+    isDraggedOver.value = null
     return
   }
 
@@ -232,21 +203,17 @@ const handleDragOver = (event: DragEvent, targetNote: Note) => {
           right: "0",
         }),
   }
-}
-
-const handleDragEnter = (_event: DragEvent, targetNote: Note) => {
-  if (!draggedNote.value || draggedNote.value.id === targetNote.id) {
-    return
-  }
   isDraggedOver.value = targetNote.id
 }
 
 const handleDragLeave = (event: DragEvent) => {
-  const relatedTarget = event.relatedTarget as HTMLElement
+  const relatedTarget = event.relatedTarget as HTMLElement | null
   const currentTarget = event.currentTarget as HTMLElement
-  if (!currentTarget.contains(relatedTarget)) {
-    isDraggedOver.value = null
+  const aside = currentTarget.closest("aside")
+  if (relatedTarget && aside?.contains(relatedTarget)) {
+    return
   }
+  isDraggedOver.value = null
 }
 
 const handleDrop = async (event: DragEvent, targetNote: Note) => {
@@ -265,9 +232,6 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
       .storedApi()
       .moveAfter(draggedNote.value.id, targetNote.id, dropMode.value)
 
-    if (dropMode.value === "asFirstChild") {
-      toggleChildren(targetNote.id)
-    }
     await refreshListing()
   } catch (error) {
     console.error("Failed to move note:", error)

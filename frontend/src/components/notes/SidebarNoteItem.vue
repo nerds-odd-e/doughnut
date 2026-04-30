@@ -10,14 +10,12 @@
     draggable="true"
     @dragstart="(e) => onDragStart(e, noteRealm.note)"
     @dragover.prevent="(e) => onDragOver(e, noteRealm.note)"
-    @dragenter="(e) => onDragEnter(e, noteRealm.note)"
     @dragleave="onDragLeave"
     @drop="(e) => onDrop(e, noteRealm.note)"
     @dragend="onDragEnd"
   >
     <div
       class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start note-content"
-      @click="toggleChildren(noteRealm.id)"
     >
       <NoteTitleWithLink
         :class="{
@@ -26,15 +24,8 @@
             noteRealm.id === activeNoteRealm.note.id,
         }"
         v-bind="{ noteTopology: noteRealm.note.noteTopology }"
-        @click.stop
       />
       <ScrollTo v-if="activeNoteRealm != null && noteRealm.id === activeNoteRealm.note.id" />
-      <span
-        role="button"
-        title="expand children"
-        class="daisy-badge daisy-cursor-pointer"
-        >{{ childrenCount ?? "..." }}</span
-      >
       <div
         v-if="isDraggedOver === noteRealm.id && draggedNote"
         class="drop-indicator"
@@ -44,16 +35,6 @@
         :style="dropIndicatorStyle"
       ></div>
     </div>
-    <SidebarInner
-      v-if="isExpanded && mergedFolderId != null"
-      v-bind="{
-        notebookId,
-        folderId: mergedFolderId,
-        parentRowNoteId: noteRealm.id,
-        activeNoteRealm,
-      }"
-      :key="`${noteRealm.id}-${mergedFolderId}`"
-    />
   </li>
 </template>
 
@@ -61,27 +42,19 @@
 import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
-import SidebarInner from "./SidebarInner.vue"
-import { computed } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
 
 interface Props {
-  notebookId: number
   note: Note
-  mergedFolderId?: number
-  structuralChildCount?: number
   activeNoteRealm?: NoteRealm
-  expandedIds: number[]
-  onToggleExpand: (noteId: number) => void
   draggedNote: Note | null
   isDraggedOver: number | null
   dropMode: "after" | "asFirstChild"
   dropIndicatorStyle: Record<string, string>
   onDragStart: (event: DragEvent, note: Note) => void
   onDragOver: (event: DragEvent, note: Note) => void
-  onDragEnter: (event: DragEvent, note: Note) => void
   onDragLeave: (event: DragEvent) => void
   onDrop: (event: DragEvent, note: Note) => void
   onDragEnd: () => void
@@ -90,20 +63,6 @@ interface Props {
 const props = defineProps<Props>()
 
 const noteRealm = storageAccessor.value.refOfNoteRealmWithFallback(props.note)
-const isExpanded = computed(() =>
-  props.expandedIds.some((id) => id === props.note.id)
-)
-
-const childrenCount = computed(() => {
-  if (props.mergedFolderId != null) {
-    return props.structuralChildCount
-  }
-  return undefined
-})
-
-const toggleChildren = (noteId: number) => {
-  props.onToggleExpand(noteId)
-}
 </script>
 
 <style lang="scss" scoped>
@@ -119,16 +78,6 @@ const toggleChildren = (noteId: number) => {
   position: relative;
   border-radius: 0 !important;
   min-height: 24px; // Ensure minimum height for drag target
-}
-
-.note-item {
-  cursor: move;
-  padding: 4px;
-  transition: background-color 0.2s;
-}
-
-.note-item.dragging {
-  opacity: 0.5;
 }
 
 .note-content {

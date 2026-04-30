@@ -9,14 +9,25 @@ export function navigateAlongNotebookCatalogPath(segments: string[]) {
   if (segments.length === 0) {
     return
   }
-  const [notebookName, ...noteTitles] = segments
+  const [notebookName, ...titles] = segments
   const notebook = notebookList().navigateToNotebook(notebookName!)
-  if (noteTitles.length === 0) {
+  if (titles.length === 0) {
     return notebook
   }
-  noteTitles.forEach((noteTitle) => {
-    noteSidebar().navigateToNote(noteTitle)
-  })
-  const leafTitle = noteTitles[noteTitles.length - 1]!
-  return assumeNotePage(leafTitle)
+
+  const sidebar = noteSidebar()
+
+  if (titles.length === 1) {
+    sidebar.navigateToNote(titles[0]!)
+    return assumeNotePage(titles[0]!)
+  }
+
+  const folderLabels = titles.slice(0, -1)
+  const leafNoteTitle = titles[titles.length - 1]!
+
+  for (const folderLabel of folderLabels) {
+    sidebar.navigateExpandFolder(folderLabel)
+  }
+  sidebar.navigateToNote(leafNoteTitle)
+  return assumeNotePage(leafNoteTitle)
 }

@@ -11,7 +11,7 @@ import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
-import { type VueWrapper, flushPromises } from "@vue/test-utils"
+import { type VueWrapper, DOMWrapper, flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 
 function isBefore(node1: Node, node2: Node) {
@@ -21,32 +21,37 @@ function isBefore(node1: Node, node2: Node) {
   )
 }
 
-function topFolderFor(noteRealm: NoteRealm) {
+/** Distinct from note ids — folder listing API uses folder entity ids. */
+const FOLDER_TOP_NOTE_CHILDREN_ID = 77001
+const FOLDER_FIRST_GEN_CHILDREN_ID = 77002
+
+function structuralFolder(folderId: number, noteRealm: NoteRealm) {
   return {
-    id: String(noteRealm.id),
+    id: String(folderId),
     name: noteRealm.note.noteTopology.title!,
     slug: noteRealm.note.noteTopology.slug!,
   }
 }
 
 function stubFolderListingForTree(
-  topNoteRealm: NoteRealm,
   firstGeneration: NoteRealm,
   firstGenerationSibling: NoteRealm,
   secondGeneration: NoteRealm
 ) {
   return mockSdkServiceWithImplementation("listFolderListing", (options) => {
     const folderId = (options as { path: { folder: number } }).path.folder
-    if (folderId === topNoteRealm.id) {
+    if (folderId === FOLDER_TOP_NOTE_CHILDREN_ID) {
       return {
         notes: [
           { ...firstGeneration, children: undefined } as NoteRealm,
           { ...firstGenerationSibling, children: undefined } as NoteRealm,
         ],
-        folders: [topFolderFor(firstGeneration)],
+        folders: [
+          structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
+        ],
       }
     }
-    if (folderId === firstGeneration.id) {
+    if (folderId === FOLDER_FIRST_GEN_CHILDREN_ID) {
       return {
         notes: [{ ...secondGeneration, children: undefined } as NoteRealm],
         folders: [],
@@ -101,10 +106,9 @@ describe("Sidebar", () => {
     } as NoteRealm
     mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
-      folders: [topFolderFor(topNoteRealm)],
+      folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     })
     stubFolderListingForTree(
-      topNoteRealm,
       firstGeneration,
       firstGenerationSibling,
       secondGeneration
@@ -166,11 +170,14 @@ describe("Sidebar", () => {
     vi.restoreAllMocks()
   })
 
-  // Helper to find sidebar item by text content
-  const findSidebarItem = (text: string) => {
-    return wrapper
-      .findAll("a, span") // Sidebar items are usually links or spans
+  // Note titles appear in `.title-text`; folder rows use `.sidebar-folder-label`.
+  const findSidebarItem = (text: string): DOMWrapper<Element> | undefined => {
+    const inner = wrapper
+      .findAll(".title-text")
       .find((el) => el.text().includes(text))
+    if (!inner) return
+    const li = inner.element.closest("li")
+    return li ? new DOMWrapper(li) : undefined
   }
 
   it("should call the api once if top note", async () => {
@@ -187,7 +194,7 @@ describe("Sidebar", () => {
     } as NoteRealm
     const rootSpy = mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
-      folders: [topFolderFor(topNoteRealm)],
+      folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     })
     mountSidebar(firstGeneration)
     await flushPromises()
@@ -219,10 +226,9 @@ describe("Sidebar", () => {
       } as NoteRealm
       const rootSpy = mockSdkService("listNotebookRootNotes", {
         notes: [shallowTopRealm],
-        folders: [topFolderFor(topNoteRealm)],
+        folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
       })
       const folderListingSpy = stubFolderListingForTree(
-        topNoteRealm,
         firstGeneration,
         firstGenerationSibling,
         secondGeneration
@@ -239,8 +245,8 @@ describe("Sidebar", () => {
       const listedFolderIds = folderListingSpy.mock.calls.map(
         (call) => (call[0] as { path: { folder: number } }).path.folder
       )
-      expect(listedFolderIds).toContain(topNoteRealm.id)
-      expect(listedFolderIds).toContain(firstGeneration.id)
+      expect(listedFolderIds).toContain(FOLDER_TOP_NOTE_CHILDREN_ID)
+      expect(listedFolderIds).toContain(FOLDER_FIRST_GEN_CHILDREN_ID)
       expect(listedFolderIds).not.toContain(firstGenerationSibling.id)
 
       await vi.waitUntil(() =>
@@ -560,6 +566,10 @@ describe("Sidebar", () => {
       ).toBe(false)
 
       await dropTarget!.trigger("dragenter")
+      dropTarget!.element.dispatchEvent(
+        new MouseEvent("dragover", { clientX: 50, bubbles: true })
+      )
+      await flushPromises()
       expect(
         wrapper.find('[aria-label="Drop position indicator"]').isVisible()
       ).toBe(true)
@@ -624,6 +634,10 @@ describe("Sidebar", () => {
 
       await draggedNote!.trigger("dragstart")
       await dropTarget!.trigger("dragenter")
+      dropTarget!.element.dispatchEvent(
+        new MouseEvent("dragover", { clientX: 50, bubbles: true })
+      )
+      await flushPromises()
 
       const dropIndicator = wrapper.find(
         '[aria-label="Drop position indicator"]'
@@ -690,6 +704,10 @@ describe("Sidebar", () => {
 
       await draggedNote!.trigger("dragstart")
       await dropTarget!.trigger("dragenter")
+      dropTarget!.element.dispatchEvent(
+        new MouseEvent("dragover", { clientX: 50, bubbles: true })
+      )
+      await flushPromises()
 
       const dropIndicator = wrapper.find(
         '[aria-label="Drop position indicator"]'
@@ -803,7 +821,7 @@ describe("Sidebar", () => {
 
       expect(moveAfterSpy).toHaveBeenCalledWith({
         path: {
-          note: firstGeneration.id,
+          note: secondGeneration.id,
           targetNote: firstGenerationSibling.id,
           asFirstChild: "true",
         },

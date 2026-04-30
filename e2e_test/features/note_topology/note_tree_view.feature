@@ -64,6 +64,7 @@ Feature: Note tree view
       | note-title     |
       | LeSS in Action |
       | TDD            |
+      | TPP            |
       | ATDD           |
       | Pull           |
       | CI             |
