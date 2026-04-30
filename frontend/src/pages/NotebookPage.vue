@@ -86,7 +86,9 @@
         <NotebookPageView
           :notebook="notebook"
           :user="user"
-          :show-add-first-note="sidebarAnchorNoteId == null"
+          :show-add-first-note="indexSlugStatus === 'absent'"
+          :index-slug-status="indexSlugStatus"
+          :index-note-id="sidebarAnchorNoteId"
           @notebook-updated="handleNotebookUpdated"
         />
       </main>
@@ -120,6 +122,9 @@ const notebook = ref<Notebook | undefined>(undefined)
 
 const sidebarOpened = ref(false)
 const sidebarAnchorNoteId = ref<number | undefined>()
+/** Resolves optional root `index` slug; separate from `sidebarAnchorNoteId` during async load. */
+const indexSlugStatus = ref<"pending" | "present" | "absent">("pending")
+let indexSlugResolveGeneration = 0
 const windowWidth = ref(
   typeof window !== "undefined" ? window.innerWidth : 1024
 )
@@ -137,15 +142,19 @@ const handleResize = () => {
 }
 
 const resolveSidebarRealm = async (nb: Notebook) => {
+  const gen = ++indexSlugResolveGeneration
   sidebarAnchorNoteId.value = undefined
+  indexSlugStatus.value = "pending"
   try {
     const realm = await storageAccessor.value
       .storedApi()
       .loadNoteByNotebookSlug(nb.id, "index")
+    if (gen !== indexSlugResolveGeneration) return
     sidebarAnchorNoteId.value = realm.id
-    return
+    indexSlugStatus.value = "present"
   } catch {
-    // No root index note for this slug path
+    if (gen !== indexSlugResolveGeneration) return
+    indexSlugStatus.value = "absent"
   }
 }
 
@@ -168,6 +177,7 @@ watch(notebook, async (nb) => {
     await resolveSidebarRealm(nb)
   } else {
     sidebarAnchorNoteId.value = undefined
+    indexSlugStatus.value = "pending"
   }
 })
 

@@ -1,5 +1,9 @@
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkError,
+} from "@tests/helpers"
 import NotebookPage from "@/pages/NotebookPage.vue"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -58,6 +62,52 @@ describe("NotebookPage.spec", () => {
         query: { slugPath: "index" },
       })
     )
+    const edit = screen.getByTestId("notebook-index-edit")
+    const toAttr = edit.getAttribute("to")
+    expect(toAttr).toBeTruthy()
+    expect(JSON.parse(toAttr!)).toEqual(
+      expect.objectContaining({
+        name: "noteShowByNotebookSlug",
+        params: expect.objectContaining({
+          notebookId: String(notebook.id),
+          noteSlugPath: "index",
+        }),
+      })
+    )
+  })
+
+  it("does not show empty-index prompt while index slug is still loading", async () => {
+    const notebook = makeMe.aNotebook.please()
+    const indexRealm = makeMe.aNoteRealm.title("index").please()
+    indexRealm.notebookId = notebook.id
+    indexRealm.note.noteTopology.notebookId = notebook.id
+    mockSdkService("get", notebook)
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    mockSdkServiceWithImplementation("getNoteBySlug", async () => {
+      await gate
+      return indexRealm
+    })
+    helper
+      .component(NotebookPage)
+      .withCleanStorage()
+      .withRouter()
+      .withCurrentUser(makeMe.aUser.please())
+      .currentRoute({
+        name: "notebookPage",
+        params: { notebookId: String(notebook.id) },
+      })
+      .render()
+    await flushPromises()
+    expect(screen.queryByTestId("notebook-add-first-note")).toBeNull()
+    expect(screen.getByTestId("notebook-index-loading")).toBeInTheDocument()
+    release()
+    await flushPromises()
+    expect(screen.queryByTestId("notebook-index-loading")).toBeNull()
+    expect(screen.queryByTestId("notebook-add-first-note")).toBeNull()
+    expect(screen.getByTestId("notebook-index-edit")).toBeInTheDocument()
   })
 
   it("does not load sidebar via showNote when index slug is missing", async () => {

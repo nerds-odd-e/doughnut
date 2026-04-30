@@ -10,6 +10,43 @@
     </div>
 
     <div
+      v-if="indexSlugStatus === 'pending'"
+      class="notebook-page-index-details daisy-mb-6 daisy-flex daisy-items-center daisy-gap-2"
+      data-testid="notebook-index-loading"
+    >
+      <span class="daisy-loading daisy-loading-spinner daisy-loading-sm" />
+      <span class="daisy-text-sm daisy-text-base-content/70">Loading index…</span>
+    </div>
+
+    <div
+      v-else-if="indexSlugStatus === 'present'"
+      class="notebook-page-index-details daisy-mb-6"
+      data-testid="notebook-index-details"
+    >
+      <div
+        class="daisy-flex daisy-justify-between daisy-items-start daisy-gap-3 daisy-mb-1"
+      >
+        <h2 class="daisy-text-lg daisy-font-semibold daisy-text-base-content">
+          {{ indexDisplayTitle }}
+        </h2>
+        <router-link
+          :to="indexNoteEditLocation"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-shrink-0"
+          title="Edit index note"
+          data-testid="notebook-index-edit"
+        >
+          <Pencil class="h-5 w-5" />
+        </router-link>
+      </div>
+      <p
+        v-if="indexSummaryLine"
+        class="notebook-page-index-details-summary daisy-text-sm daisy-text-base-content/80"
+      >
+        {{ indexSummaryLine }}
+      </p>
+    </div>
+
+    <div
       v-if="showAddFirstNote"
       class="daisy-alert daisy-alert-info daisy-mb-6"
       data-testid="notebook-add-first-note"
@@ -215,6 +252,7 @@
 import type { PropType } from "vue"
 import { ref, watch, computed } from "vue"
 import { useRouter } from "vue-router"
+import { noteShowByNotebookSlugLocation } from "@/routes/noteShowLocation"
 import type {
   Notebook,
   User,
@@ -231,7 +269,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { GitMerge, Share2 } from "lucide-vue-next"
+import { GitMerge, Pencil, Share2 } from "lucide-vue-next"
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
@@ -244,7 +282,40 @@ const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
   showAddFirstNote: { type: Boolean, default: false },
+  indexSlugStatus: {
+    type: String as PropType<"pending" | "present" | "absent">,
+    default: "absent",
+  },
+  indexNoteId: { type: Number, required: false },
 })
+
+const storageAccessor = useStorageAccessor()
+
+const indexRealm = computed(() => {
+  if (props.indexSlugStatus !== "present" || props.indexNoteId == null) {
+    return undefined
+  }
+  return storageAccessor.value.refOfNoteRealm(props.indexNoteId).value
+})
+
+const indexDisplayTitle = computed(() => {
+  const t = indexRealm.value?.note.noteTopology.title?.trim()
+  return t && t.length > 0 ? t : "Index"
+})
+
+const indexSummaryLine = computed(() => {
+  const r = indexRealm.value
+  if (!r) return ""
+  const short = r.note.noteTopology.shortDetails?.trim()
+  if (short) return short
+  const d = r.note.details?.trim()
+  if (!d) return ""
+  return d.length > 160 ? `${d.slice(0, 157)}…` : d
+})
+
+const indexNoteEditLocation = computed(() =>
+  noteShowByNotebookSlugLocation(props.notebook.id, "index")
+)
 
 const approval = ref<NotebookCertificateApproval | undefined>(undefined)
 const approvalLoaded = ref(false)
@@ -295,7 +366,6 @@ const emit = defineEmits<{
 const { showSuccessToast } = useToast()
 const router = useRouter()
 const { popups } = usePopups()
-const storageAccessor = useStorageAccessor()
 const addingRootNote = ref(false)
 
 const addFirstRootNote = async () => {
@@ -456,6 +526,17 @@ const updateIndexNotebook = async () => {
   color: oklch(var(--bc) / 0.6);
   line-height: 1.6;
   margin-top: 0.5rem;
+}
+
+.notebook-page-index-details {
+  background: oklch(var(--b2) / 0.8);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.notebook-page-index-details-summary {
+  line-height: 1.5;
+  margin-top: 0.25rem;
 }
 
 .settings-section {
