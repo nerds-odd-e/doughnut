@@ -4622,6 +4622,20 @@ components:
       properties:
         message:
           type: string
+        wikiReferenceMigrationComplete:
+          type: boolean
+        currentStepName:
+          type: string
+        stepStatus:
+          type: string
+        processedCount:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32
+        lastError:
+          type: string
     UserDTO:
       type: object
       properties:

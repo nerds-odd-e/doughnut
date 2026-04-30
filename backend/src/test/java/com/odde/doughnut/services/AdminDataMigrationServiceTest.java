@@ -3,9 +3,12 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
+import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
+import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.WikiSlugGeneration;
 import org.junit.jupiter.api.Test;
@@ -24,6 +27,19 @@ class AdminDataMigrationServiceTest {
   @Autowired AdminDataMigrationService adminDataMigrationService;
   @Autowired JdbcTemplate jdbcTemplate;
 
+  private void runWikiReferenceMigrationToCompletion() {
+    for (int i = 0; i < 100; i++) {
+      AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch();
+      if (dto.isWikiReferenceMigrationComplete()) {
+        return;
+      }
+      if (WikiReferenceMigrationStepStatus.FAILED.name().equals(dto.getStepStatus())) {
+        throw new AssertionError("migration failed: " + dto.getLastError());
+      }
+    }
+    throw new AssertionError("migration did not complete in max iterations");
+  }
+
   @Test
   void runBatch_backfillsNullRelationshipTitleThenSlugReflectsTitle() {
     Note parent = makeMe.aNote().title("Alpha").please();
@@ -34,7 +50,7 @@ class AdminDataMigrationServiceTest {
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(relation);
 
-    adminDataMigrationService.runBatch();
+    runWikiReferenceMigrationToCompletion();
 
     Note updated = makeMe.entityPersister.find(Note.class, relation.getId());
     String expectedTitle =
@@ -53,9 +69,11 @@ class AdminDataMigrationServiceTest {
     jdbcTemplate.update("UPDATE note SET title = '' WHERE id = ?", relation.getId());
     makeMe.entityPersister.flush();
 
-    var dto = adminDataMigrationService.runBatch();
+    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch();
 
-    assertThat(dto.getMessage(), containsString("1 relationship note title(s), 1 relationship"));
+    assertThat(dto.getMessage(), containsString("Title backfill"));
+    assertThat(dto.getMessage(), containsString("1 note"));
+    assertThat(dto.isWikiReferenceMigrationComplete(), is(false));
   }
 
   @Test
@@ -70,7 +88,7 @@ class AdminDataMigrationServiceTest {
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(relation);
 
-    adminDataMigrationService.runBatch();
+    runWikiReferenceMigrationToCompletion();
 
     Note updated = makeMe.entityPersister.find(Note.class, relation.getId());
     assertThat(
@@ -86,10 +104,10 @@ class AdminDataMigrationServiceTest {
     Note target = makeMe.aNote().title("Q").under(parent).please();
     makeMe.aRelation().between(parent, target, RelationType.PART).please();
 
-    var first = adminDataMigrationService.runBatch();
-    assertThat(first.getMessage(), containsString("0 relationship note title(s), 1 relationship"));
+    runWikiReferenceMigrationToCompletion();
 
-    var second = adminDataMigrationService.runBatch();
-    assertThat(second.getMessage(), containsString("0 relationship note title(s), 0 relationship"));
+    AdminDataMigrationStatusDTO second = adminDataMigrationService.runBatch();
+    assertThat(second.isWikiReferenceMigrationComplete(), is(true));
+    assertThat(second.getMessage(), containsString("already complete"));
   }
 }

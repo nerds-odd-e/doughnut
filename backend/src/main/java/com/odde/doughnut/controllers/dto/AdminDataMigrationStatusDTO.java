@@ -9,4 +9,16 @@ public class AdminDataMigrationStatusDTO {
 
   /** Human-readable migration status placeholder for admin UI. */
   private String message;
+
+  private boolean wikiReferenceMigrationComplete;
+
+  /** Capability-named step, e.g. relationship_title_backfill. */
+  private String currentStepName;
+
+  /** Values: PENDING, RUNNING, COMPLETED, FAILED (see WikiReferenceMigrationStepStatus). */
+  private String stepStatus;
+
+  private int processedCount;
+  private int totalCount;
+  private String lastError;
 }

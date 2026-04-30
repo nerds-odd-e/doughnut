@@ -614,6 +614,12 @@ export type AiGeneratedImage = {
 
 export type AdminDataMigrationStatusDto = {
     message?: string;
+    wikiReferenceMigrationComplete?: boolean;
+    currentStepName?: string;
+    stepStatus?: string;
+    processedCount?: number;
+    totalCount?: number;
+    lastError?: string;
 };
 
 export type UserDto = {

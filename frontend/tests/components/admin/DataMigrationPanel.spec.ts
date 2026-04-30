@@ -28,11 +28,14 @@ describe("DataMigrationPanel", () => {
 
     expect(getSpy).toHaveBeenCalled()
     expect(wrapper.text()).toContain("stub message")
-    expect(wrapper.text()).toContain("server-side wiki data backfills")
+    expect(wrapper.text()).toContain("bounded batches")
   })
 
   it("clicking Run migration calls runDataMigrationBatch and updates summary", async () => {
-    const reply: AdminDataMigrationStatusDto = { message: "after run" }
+    const reply: AdminDataMigrationStatusDto = {
+      message: "after run",
+      wikiReferenceMigrationComplete: true,
+    }
     runBatchSpy.mockResolvedValue(wrapSdkResponse(reply))
 
     const wrapper = helper.component(DataMigrationPanel).mount()
@@ -45,6 +48,43 @@ describe("DataMigrationPanel", () => {
 
     expect(runBatchSpy).toHaveBeenCalledTimes(1)
     expect(wrapper.text()).toContain("after run")
+  })
+
+  it("continues batches until migration reports complete", async () => {
+    const inProgress: AdminDataMigrationStatusDto = {
+      message: "Title backfill: processed 1 note(s) in this batch.",
+      wikiReferenceMigrationComplete: false,
+      currentStepName: "relationship_title_backfill",
+      stepStatus: "RUNNING",
+      processedCount: 1,
+      totalCount: 2,
+    }
+    const complete: AdminDataMigrationStatusDto = {
+      message: "Regenerated slug paths for all non-deleted notes.",
+      wikiReferenceMigrationComplete: true,
+      stepStatus: "COMPLETED",
+      processedCount: 3,
+      totalCount: 3,
+    }
+    runBatchSpy.mockReset()
+    runBatchSpy
+      .mockResolvedValueOnce(wrapSdkResponse(inProgress))
+      .mockResolvedValueOnce(wrapSdkResponse(complete))
+      .mockResolvedValue(wrapSdkResponse(complete))
+
+    const wrapper = helper.component(DataMigrationPanel).mount()
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="run-data-migration-button"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(runBatchSpy).toHaveBeenCalledTimes(2)
+    expect(
+      wrapper.get('[data-testid="data-migration-counts"]').text()
+    ).toContain("3 / 3")
+    expect(wrapper.text()).toContain("Regenerated slug paths")
   })
 
   it("shows error when runDataMigrationBatch fails", async () => {
