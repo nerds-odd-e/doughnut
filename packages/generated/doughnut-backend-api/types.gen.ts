@@ -462,6 +462,15 @@ export type AttachBookRequestFull = {
     contentList?: Array<unknown>;
 };
 
+/**
+ * Notebook entity plus optional client-only fields (e.g. catalog attachment hints).
+ */
+export type NotebookClientView = {
+    notebook: Notebook;
+    hasAttachedBook?: boolean;
+    readonly?: boolean;
+};
+
 export type NotebookCertificateApproval = {
     id: number;
     notebook: Notebook;
@@ -781,15 +790,6 @@ export type NotebookCatalogSubscribedNotebookItem = Omit<NotebookCatalogItem, 't
     subscriptionId: number;
     hasAttachedBook?: boolean;
     type: 'subscribedNotebook';
-};
-
-/**
- * Notebook entity plus optional client-only fields (e.g. catalog attachment hints).
- */
-export type NotebookClientView = {
-    notebook: Notebook;
-    hasAttachedBook?: boolean;
-    readonly?: boolean;
 };
 
 export type NotebooksViewedByUser = {
@@ -2102,7 +2102,7 @@ export type CreateNotebookResponses = {
     /**
      * OK
      */
-    200: RedirectToNoteResponse;
+    200: NotebookClientView;
 };
 
 export type CreateNotebookResponse = CreateNotebookResponses[keyof CreateNotebookResponses];
@@ -2446,7 +2446,7 @@ export type CreateNotebookInCircleResponses = {
     /**
      * OK
      */
-    200: RedirectToNoteResponse;
+    200: NotebookClientView;
 };
 
 export type CreateNotebookInCircleResponse = CreateNotebookInCircleResponses[keyof CreateNotebookInCircleResponses];

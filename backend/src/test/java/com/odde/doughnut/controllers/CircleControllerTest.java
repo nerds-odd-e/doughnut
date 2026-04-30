@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,7 +12,7 @@ import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
-import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
+import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
@@ -79,12 +78,11 @@ class CircleControllerTest extends ControllerTestBase {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Circle Owned Nb");
       noteCreation.setDescription("Circle catalog blurb");
-      RedirectToNoteResponse response = controller.createNotebookInCircle(circle, noteCreation);
-      assertThat(response.notebookId, notNullValue());
-      assertThat(response.noteId, nullValue());
-      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
+      NotebookClientView response = controller.createNotebookInCircle(circle, noteCreation);
+      assertThat(response.notebook().getId(), notNullValue());
+      Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), equalTo("Circle catalog blurb"));
-      assertThat(noteRepository.countByNotebook_Id(response.notebookId), equalTo(0L));
+      assertThat(noteRepository.countByNotebook_Id(response.notebook().getId()), equalTo(0L));
     }
   }
 

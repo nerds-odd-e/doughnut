@@ -1355,7 +1355,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RedirectToNoteResponse"
+                $ref: "#/components/schemas/NotebookClientView"
   /api/notebook_certificate_approvals/{notebookCertificateApproval}/approve:
     post:
       tags:
@@ -1715,7 +1715,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RedirectToNoteResponse"
+                $ref: "#/components/schemas/NotebookClientView"
   /api/circles/join:
     post:
       tags:
@@ -2020,8 +2020,6 @@ paths:
     post:
       tags:
       - admin-data-migration-controller
-      summary: Run one admin migration batch - stub endpoint; implementations should
-        replace service logic
       operationId: runDataMigrationBatch
       responses:
         "200":
@@ -4319,6 +4317,19 @@ components:
       required:
       - bookName
       - format
+    NotebookClientView:
+      type: object
+      description: Notebook entity plus optional client-only fields (e.g. catalog
+        attachment hints).
+      properties:
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        hasAttachedBook:
+          type: boolean
+        readonly:
+          type: boolean
+      required:
+      - notebook
     NotebookCertificateApproval:
       type: object
       properties:
@@ -5039,19 +5050,6 @@ components:
       required:
       - notebook
       - subscriptionId
-    NotebookClientView:
-      type: object
-      description: Notebook entity plus optional client-only fields (e.g. catalog
-        attachment hints).
-      properties:
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        hasAttachedBook:
-          type: boolean
-        readonly:
-          type: boolean
-      required:
-      - notebook
     NotebooksViewedByUser:
       type: object
       properties:

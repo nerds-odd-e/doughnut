@@ -1230,9 +1230,6 @@ export class AiController {
 }
 
 export class AdminDataMigrationController {
-    /**
-     * Run one admin migration batch â stub endpoint; implementations should replace service logic
-     */
     public static runDataMigrationBatch<ThrowOnError extends boolean = false>(options?: Options<RunDataMigrationBatchData, ThrowOnError>) {
         return (options?.client ?? client).post<RunDataMigrationBatchResponses, unknown, ThrowOnError>({ url: '/api/admin/data-migration/run-batch', ...options });
     }

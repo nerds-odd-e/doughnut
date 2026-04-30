@@ -56,18 +56,10 @@ export default {
             })
       )
       if (!error) {
-        const notebookId = result!.notebookId
-        if (notebookId != null) {
-          await this.$router.push({
-            name: "notebookPage",
-            params: { notebookId: String(notebookId) },
-          })
-        } else {
-          await this.$router.push({
-            name: "noteShow",
-            params: { noteId: result!.noteId },
-          })
-        }
+        await this.$router.push({
+          name: "notebookPage",
+          params: { notebookId: String(result!.notebook.id) },
+        })
       } else {
         // Error is handled by global interceptor (toast notification)
         // Extract field-level errors if available (for 400 validation errors)

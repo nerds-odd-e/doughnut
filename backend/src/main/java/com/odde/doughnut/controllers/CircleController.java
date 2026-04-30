@@ -3,8 +3,8 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
-import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
@@ -110,19 +110,20 @@ class CircleController {
 
   @PostMapping({"/{circle}/notebooks"})
   @Transactional
-  public RedirectToNoteResponse createNotebookInCircle(
+  public NotebookClientView createNotebookInCircle(
       @PathVariable @Schema(type = "integer") Circle circle,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAuthorization(circle);
+    User user = authorizationService.getCurrentUser();
     Notebook notebook =
         notebookService.createNotebookForOwnership(
             circle.getOwnership(),
-            authorizationService.getCurrentUser(),
+            user,
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
-    return RedirectToNoteResponse.forNotebook(notebook.getId());
+    return notebookCatalogService.clientViewFor(notebook, user);
   }
 }

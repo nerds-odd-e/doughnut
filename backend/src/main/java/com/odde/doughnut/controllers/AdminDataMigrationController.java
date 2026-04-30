@@ -35,10 +35,7 @@ class AdminDataMigrationController {
     return adminDataMigrationService.getStatus();
   }
 
-  @Operation(
-      operationId = "runDataMigrationBatch",
-      summary =
-          "Run one admin migration batch — stub endpoint; implementations should replace service logic")
+  @Operation(operationId = "runDataMigrationBatch")
   @PostMapping("/run-batch")
   public AdminDataMigrationStatusDTO runDataMigrationBatch()
       throws UnexpectedNoAccessRightException {
