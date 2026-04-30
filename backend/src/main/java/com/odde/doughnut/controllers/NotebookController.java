@@ -295,6 +295,32 @@ class NotebookController {
     return new FolderListing(notes, folders);
   }
 
+  @Operation(
+      summary = "List folder scope: notes in folder and direct child folders",
+      description =
+          "Notes are those assigned to the folder. Folders are immediate children of the given"
+              + " folder.")
+  @GetMapping("/{notebook}/folders/{folder}/listing")
+  public FolderListing listFolderListing(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    if (!folder.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    }
+    User user = authorizationService.getCurrentUser();
+    List<NoteRealm> notes =
+        noteService.findNotesInFolderScope(folder.getId()).stream()
+            .map(n -> noteRealmService.buildForNotebookRootListing(n, user))
+            .toList();
+    List<NotebookRootFolder> childFolders =
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
+            .map(NotebookRootFolder::from)
+            .toList();
+    return new FolderListing(notes, childFolders);
+  }
+
   @GetMapping("/{notebook}/obsidian")
   public ResponseEntity<byte[]> downloadNotebookForObsidian(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)

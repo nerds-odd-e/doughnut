@@ -349,6 +349,94 @@ class NotebookControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class ListFolderListing {
+    @Test
+    void returnsOnlyNotesAssignedToFolder()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Folder Notes");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
+      Folder other = makeMe.aFolder().notebook(nb).name("Other").please();
+
+      Note a =
+          makeMe
+              .aNote("In Scope A")
+              .inNotebook(nb)
+              .creatorAndOwner(currentUser.getUser())
+              .folder(scope)
+              .please();
+      Note b =
+          makeMe
+              .aNote("In Scope B")
+              .inNotebook(nb)
+              .creatorAndOwner(currentUser.getUser())
+              .folder(scope)
+              .please();
+      Note elsewhere =
+          makeMe
+              .aNote("Elsewhere")
+              .inNotebook(nb)
+              .creatorAndOwner(currentUser.getUser())
+              .folder(other)
+              .please();
+      Note atRoot =
+          makeMe.aNote("At Root").inNotebook(nb).creatorAndOwner(currentUser.getUser()).please();
+
+      FolderListing listing = controller.listFolderListing(nb, scope);
+      assertEquals(
+          List.of(a.getId(), b.getId()).stream().sorted().toList(),
+          listing.notes().stream().map(NoteRealm::getId).sorted().toList());
+      assertTrue(listing.notes().stream().noneMatch(r -> r.getId().equals(elsewhere.getId())));
+      assertTrue(listing.notes().stream().noneMatch(r -> r.getId().equals(atRoot.getId())));
+    }
+
+    @Test
+    void returnsDirectChildFolders()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Nested Folders");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+
+      FolderListing listing = controller.listFolderListing(nb, parent);
+      assertEquals(1, listing.folders().size());
+      assertEquals("Nested", listing.folders().getFirst().name());
+      assertEquals("parent/nested", listing.folders().getFirst().slug());
+    }
+
+    @Test
+    void requiresReadAuthorization() {
+      User owner = makeMe.aUser().please();
+      currentUser.setUser(owner);
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Secured").please();
+
+      currentUser.setUser(makeMe.aUser().please());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.listFolderListing(nb, folder));
+    }
+
+    @Test
+    void folderNotInNotebookReturns404()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(user).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(user).please();
+      Folder folderInB = makeMe.aFolder().notebook(nbB).name("Only B").please();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.listFolderListing(nbA, folderInB));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+  }
+
+  @Nested
   class UpdateNotebookIndexEndpoint {
     @Test
     void shouldCallServiceAndRequireAuthorization() throws UnexpectedNoAccessRightException {

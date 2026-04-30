@@ -2763,6 +2763,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/notebooks/{notebook}/folders/{folder}/listing:
+    get:
+      tags:
+      - notebook-controller
+      summary: "List folder scope: notes in folder and direct child folders"
+      description: Notes are those assigned to the folder. Folders are immediate children
+        of the given folder.
+      operationId: listFolderListing
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FolderListing"
   /api/notebooks/{notebook}/book:
     get:
       tags:

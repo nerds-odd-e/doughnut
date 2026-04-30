@@ -3448,6 +3448,25 @@ export type GetNoteBySlugResponses = {
 
 export type GetNoteBySlugResponse = GetNoteBySlugResponses[keyof GetNoteBySlugResponses];
 
+export type ListFolderListingData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}/listing';
+};
+
+export type ListFolderListingResponses = {
+    /**
+     * OK
+     */
+    200: FolderListing;
+};
+
+export type ListFolderListingResponse = ListFolderListingResponses[keyof ListFolderListingResponses];
+
 export type DeleteBookData = {
     body?: never;
     path: {

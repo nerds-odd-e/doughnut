@@ -63,6 +63,10 @@ public class NoteService {
     return noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebookId);
   }
 
+  public List<Note> findNotesInFolderScope(Integer folderId) {
+    return noteRepository.findNotesInFolderOrderByIdAsc(folderId);
+  }
+
   public List<Note> findNotesVisibleToUserBySlugBasename(User user, String basename) {
     return noteRepository.findAllBySlugBasenameIncludingDeleted(basename).stream()
         .filter(n -> authorizationService.userMayReadNote(user, n))
