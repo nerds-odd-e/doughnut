@@ -1,4 +1,5 @@
 import type {
+  FolderListing,
   NoteDetailsCompletion,
   NoteMoveDto,
   NoteRealm,
@@ -21,6 +22,7 @@ import {
 } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -49,7 +51,12 @@ export interface StoredApi {
     slugPath: string
   ): Promise<NoteRealm>
 
-  loadNotebookRootNotes(notebookId: number): Promise<NoteRealm[]>
+  loadNotebookRootNotes(notebookId: number): Promise<FolderListing>
+
+  loadFolderListing(
+    notebookId: number,
+    folderId: number
+  ): Promise<FolderListing>
 
   createNote(
     router: Router,
@@ -248,7 +255,7 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
-  async loadNotebookRootNotes(notebookId: number): Promise<NoteRealm[]> {
+  async loadNotebookRootNotes(notebookId: number): Promise<FolderListing> {
     const { data, error } = await apiCallWithLoading(() =>
       NotebookController.listNotebookRootNotes({
         path: { notebook: notebookId },
@@ -261,7 +268,24 @@ export default class StoredApiCollection implements StoredApi {
     }
     const notes = data.notes ?? []
     this.refreshNoteRealms(notes)
-    return notes
+    return data
+  }
+
+  async loadFolderListing(
+    notebookId: number,
+    folderId: number
+  ): Promise<FolderListing> {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.listFolderListing({
+        path: { notebook: notebookId, folder: folderId },
+      })
+    )
+    if (error || !data) {
+      throw new Error(toErrorMessage(error, "Failed to load folder listing"))
+    }
+    const notes = data.notes ?? []
+    this.refreshNoteRealms(notes)
+    return data
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
@@ -313,6 +337,7 @@ export default class StoredApiCollection implements StoredApi {
     if (nrwp.parent) {
       this.storage.refreshNoteRealm(nrwp.parent)
     }
+    refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus
@@ -350,6 +375,7 @@ export default class StoredApiCollection implements StoredApi {
     if (nrwp.parent) {
       this.storage.refreshNoteRealm(nrwp.parent)
     }
+    refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus
@@ -387,6 +413,7 @@ export default class StoredApiCollection implements StoredApi {
     if (nrwp.parent) {
       this.storage.refreshNoteRealm(nrwp.parent)
     }
+    refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
     return focus

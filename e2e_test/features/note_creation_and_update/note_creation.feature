@@ -5,9 +5,9 @@ Feature: Nested Note creation
   Background:
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
-      | Title | Parent Title   |
-      | team  | LeSS in Action |
-      | tech  | LeSS in Action |
+      | Title | Parent Title   | Folder         |
+      | team  | LeSS in Action | LeSS in Action |
+      | tech  | LeSS in Action | LeSS in Action |
 
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action" with title "Re-quirement"

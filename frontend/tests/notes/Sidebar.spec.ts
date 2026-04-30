@@ -21,6 +21,41 @@ function isBefore(node1: Node, node2: Node) {
   )
 }
 
+function topFolderFor(noteRealm: NoteRealm) {
+  return {
+    id: String(noteRealm.id),
+    name: noteRealm.note.noteTopology.title!,
+    slug: noteRealm.note.noteTopology.slug!,
+  }
+}
+
+function stubFolderListingForTree(
+  topNoteRealm: NoteRealm,
+  firstGeneration: NoteRealm,
+  firstGenerationSibling: NoteRealm,
+  secondGeneration: NoteRealm
+) {
+  return mockSdkServiceWithImplementation("listFolderListing", (options) => {
+    const folderId = (options as { path: { folder: number } }).path.folder
+    if (folderId === topNoteRealm.id) {
+      return {
+        notes: [
+          { ...firstGeneration, children: undefined } as NoteRealm,
+          { ...firstGenerationSibling, children: undefined } as NoteRealm,
+        ],
+        folders: [topFolderFor(firstGeneration)],
+      }
+    }
+    if (folderId === firstGeneration.id) {
+      return {
+        notes: [{ ...secondGeneration, children: undefined } as NoteRealm],
+        folders: [],
+      }
+    }
+    return { notes: [], folders: [] }
+  })
+}
+
 describe("Sidebar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
@@ -66,8 +101,14 @@ describe("Sidebar", () => {
     } as NoteRealm
     mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
-      folders: [],
+      folders: [topFolderFor(topNoteRealm)],
     })
+    stubFolderListingForTree(
+      topNoteRealm,
+      firstGeneration,
+      firstGenerationSibling,
+      secondGeneration
+    )
 
     const fullRealmByNoteId: Record<number, NoteRealm> = {
       [topNoteRealm.id]: topNoteRealm,
@@ -146,7 +187,7 @@ describe("Sidebar", () => {
     } as NoteRealm
     const rootSpy = mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
-      folders: [],
+      folders: [topFolderFor(topNoteRealm)],
     })
     mountSidebar(firstGeneration)
     await flushPromises()
@@ -171,46 +212,36 @@ describe("Sidebar", () => {
       storageAccessor.value = createNoteStorage()
     })
 
-    it("loads ancestor branches for a deep note without pre-cached realms and does not load sibling subtrees via showNote", async () => {
+    it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
       const shallowTopRealm = {
         ...topNoteRealm,
         children: undefined,
       } as NoteRealm
       const rootSpy = mockSdkService("listNotebookRootNotes", {
         notes: [shallowTopRealm],
-        folders: [],
+        folders: [topFolderFor(topNoteRealm)],
       })
-      const fullRealmByNoteId: Record<number, NoteRealm> = {
-        [topNoteRealm.id]: topNoteRealm,
-        [firstGeneration.id]: firstGeneration,
-        [firstGenerationSibling.id]: firstGenerationSibling,
-        [secondGeneration.id]: secondGeneration,
-      }
-      const showNoteSpy = mockSdkServiceWithImplementation(
-        "showNote",
-        (options) => {
-          const id = (options as Options<ShowNoteData>).path.note
-          const realm = fullRealmByNoteId[id]
-          if (realm === undefined) {
-            throw new Error(`Sidebar.spec: unmocked showNote for note id ${id}`)
-          }
-          return realm
-        }
+      const folderListingSpy = stubFolderListingForTree(
+        topNoteRealm,
+        firstGeneration,
+        firstGenerationSibling,
+        secondGeneration
       )
+      const showNoteSpy = mockSdkServiceWithImplementation("showNote", () => {
+        throw new Error("Sidebar must not use showNote for structural branches")
+      })
 
       mountSidebar(secondGeneration)
       await flushPromises()
 
       expect(rootSpy).toHaveBeenCalledTimes(1)
-
-      const calledIds = showNoteSpy.mock.calls.map(
-        (call) => (call[0] as Options<ShowNoteData>).path.note
+      expect(showNoteSpy).not.toHaveBeenCalled()
+      const listedFolderIds = folderListingSpy.mock.calls.map(
+        (call) => (call[0] as { path: { folder: number } }).path.folder
       )
-      expect(calledIds).not.toContain(firstGenerationSibling.id)
-
-      for (const id of [firstGeneration.id, topNoteRealm.id]) {
-        expect(calledIds).toContain(id)
-      }
+      expect(listedFolderIds).toContain(topNoteRealm.id)
+      expect(listedFolderIds).toContain(firstGeneration.id)
+      expect(listedFolderIds).not.toContain(firstGenerationSibling.id)
 
       await vi.waitUntil(() =>
         findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()

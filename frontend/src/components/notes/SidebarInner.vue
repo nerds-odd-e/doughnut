@@ -1,14 +1,16 @@
 <template>
   <ul
-    v-if="(displayNotes?.length ?? 0) > 0"
+    v-if="displayRows.length > 0"
     class="daisy-list-group daisy-text-sm daisy-pl-[1rem]"
   >
     <SidebarNoteItem
-      v-for="note in displayNotes"
-      :key="note.id"
+      v-for="row in displayRows"
+      :key="row.note.id"
       v-bind="{
         notebookId,
-        note,
+        note: row.note,
+        mergedFolderId: row.mergedFolderId,
+        structuralChildCount: structuralChildCounts[row.note.id],
         activeNoteRealm,
         expandedIds,
         onToggleExpand: toggleChildren,
@@ -28,60 +30,122 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
+import type {
+  Note,
+  NoteRealm,
+  NotebookRootFolder,
+} from "@generated/doughnut-backend-api"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { ancestorTopologyIds } from "./noteTopologyAncestors"
-import { computed, ref, watch } from "vue"
+import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
+import { inject, provide, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
+const setSidebarStructuralChildCountKey = "setSidebarStructuralChildCount"
+
+type SidebarStructuralRow = {
+  note: Note
+  mergedFolderId?: number
+}
+
+function basename(path: string): string {
+  const i = path.lastIndexOf("/")
+  return i === -1 ? path : path.slice(i + 1)
+}
+
+function folderNumericId(folder: NotebookRootFolder): number | undefined {
+  if (folder.id == null || folder.id === "") return undefined
+  return Number(folder.id)
+}
+
+function mergeMatchingFoldersIntoNotes(
+  notes: Note[],
+  folders: NotebookRootFolder[] | undefined
+): SidebarStructuralRow[] {
+  const unused = [...(folders ?? [])]
+  return notes.map((note) => {
+    const slug = note.noteTopology.slug ?? ""
+    const title = note.noteTopology.title ?? ""
+    const index = unused.findIndex((folder) => {
+      if (folderNumericId(folder) === undefined) return false
+      return (
+        folder.slug === slug ||
+        folder.name === title ||
+        basename(folder.slug) === basename(slug)
+      )
+    })
+    if (index === -1) return { note }
+    const [folder] = unused.splice(index, 1)
+    const mergedFolderId = folder ? folderNumericId(folder) : undefined
+    return mergedFolderId === undefined ? { note } : { note, mergedFolderId }
+  })
+}
 
 interface Props {
   notebookId: number
   /** When omitted (e.g. notebook overview with no `index` note), root notes still render without selection */
   activeNoteRealm?: NoteRealm
-  /** When set, list this note's children. When omitted, list notebook root notes. */
-  noteId?: number
+  /** When set, list notes inside this folder. When omitted, list notebook root notes. */
+  folderId?: number
+  /** Note row whose structural children this nested listing is rendering. */
+  parentRowNoteId?: number
 }
 
 const props = defineProps<Props>()
 
-const subtreeRealmRef =
-  props.noteId !== undefined
-    ? storageAccessor.value
-        .storedApi()
-        .getNoteRealmRefAndLoadWhenNeeded(props.noteId)
-    : undefined
+const displayRows = ref<SidebarStructuralRow[]>([])
+const structuralChildCounts = ref<Record<number, number>>({})
+const reportStructuralChildCountToParent = inject<
+  ((parentNoteId: number, count: number) => void) | undefined
+>(setSidebarStructuralChildCountKey, undefined)
 
-const rootNotesList = ref<Note[]>([])
+const setStructuralChildCount = (parentNoteId: number, count: number) => {
+  if (structuralChildCounts.value[parentNoteId] === count) return
+  structuralChildCounts.value = {
+    ...structuralChildCounts.value,
+    [parentNoteId]: count,
+  }
+}
 
-async function loadNotebookRootNotesList() {
-  if (props.noteId !== undefined) return
+provide(setSidebarStructuralChildCountKey, setStructuralChildCount)
+
+async function refreshListing() {
+  const api = storageAccessor.value.storedApi()
   try {
-    const realms = await storageAccessor.value
-      .storedApi()
-      .loadNotebookRootNotes(props.notebookId)
-    rootNotesList.value = realms.map((r) => r.note)
+    const listing =
+      props.folderId == null
+        ? await api.loadNotebookRootNotes(props.notebookId)
+        : await api.loadFolderListing(props.notebookId, props.folderId)
+    const notes = (listing.notes ?? []).map((r) => r.note)
+    displayRows.value = mergeMatchingFoldersIntoNotes(notes, listing.folders)
+    if (props.parentRowNoteId != null) {
+      reportStructuralChildCountToParent?.(
+        props.parentRowNoteId,
+        displayRows.value.length
+      )
+    }
   } catch {
-    rootNotesList.value = []
+    displayRows.value = []
+    if (props.parentRowNoteId != null) {
+      reportStructuralChildCountToParent?.(props.parentRowNoteId, 0)
+    }
   }
 }
 
 watch(
-  () => props.notebookId,
+  () => [props.notebookId, props.folderId] as const,
   () => {
-    if (props.noteId === undefined) {
-      loadNotebookRootNotesList()
+    if (props.folderId == null && props.parentRowNoteId == null) {
+      structuralChildCounts.value = {}
     }
+    refreshListing()
   },
   { immediate: true }
 )
 
-const displayNotes = computed(() => {
-  if (props.noteId !== undefined && subtreeRealmRef) {
-    return subtreeRealmRef.value?.children ?? []
-  }
-  return rootNotesList.value.filter((n) => n.parentId == null)
+watch(sidebarStructuralRefreshKey, () => {
+  refreshListing()
 })
 
 const expandedIds = ref<number[]>([])
@@ -98,13 +162,6 @@ watch(
     }
     const note = props.activeNoteRealm.note
     const parentTopic = note.noteTopology.parentOrSubjectNoteTopology
-
-    if (props.noteId === undefined) {
-      const storedApi = storageAccessor.value.storedApi()
-      for (const id of ancestorTopologyIds(parentTopic)) {
-        storedApi.getNoteRealmRefAndLoadWhenNeeded(id)
-      }
-    }
 
     const uniqueIds = new Set([
       ...expandedIds.value,
@@ -211,9 +268,7 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
     if (dropMode.value === "asFirstChild") {
       toggleChildren(targetNote.id)
     }
-    if (props.noteId === undefined) {
-      await loadNotebookRootNotesList()
-    }
+    await refreshListing()
   } catch (error) {
     console.error("Failed to move note:", error)
   }

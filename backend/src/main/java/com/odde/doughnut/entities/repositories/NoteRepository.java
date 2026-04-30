@@ -88,7 +88,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           selectFromNote
               + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.folder IS NULL"
-              + " ORDER BY n.id ASC")
+              + " ORDER BY n.siblingOrder ASC, n.id ASC")
   List<Note> findNotesInNotebookRootFolderScopeByNotebookId(
       @Param("notebookId") Integer notebookId);
 
@@ -96,8 +96,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           selectFromNote
               + " WHERE n.folder.id = :folderId AND n.deletedAt IS NULL"
-              + " ORDER BY n.id ASC")
-  List<Note> findNotesInFolderOrderByIdAsc(@Param("folderId") Integer folderId);
+              + " ORDER BY n.siblingOrder ASC, n.id ASC")
+  List<Note> findNotesInFolderOrderBySiblingOrder(@Param("folderId") Integer folderId);
 
   @Query(
       value =

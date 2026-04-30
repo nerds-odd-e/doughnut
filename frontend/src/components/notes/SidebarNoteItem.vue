@@ -45,13 +45,14 @@
       ></div>
     </div>
     <SidebarInner
-      v-if="isExpanded"
+      v-if="isExpanded && mergedFolderId != null"
       v-bind="{
         notebookId,
-        noteId: noteRealm.id,
+        folderId: mergedFolderId,
+        parentRowNoteId: noteRealm.id,
         activeNoteRealm,
       }"
-      :key="noteRealm.id"
+      :key="`${noteRealm.id}-${mergedFolderId}`"
     />
   </li>
 </template>
@@ -69,6 +70,8 @@ const storageAccessor = useStorageAccessor()
 interface Props {
   notebookId: number
   note: Note
+  mergedFolderId?: number
+  structuralChildCount?: number
   activeNoteRealm?: NoteRealm
   expandedIds: number[]
   onToggleExpand: (noteId: number) => void
@@ -92,9 +95,10 @@ const isExpanded = computed(() =>
 )
 
 const childrenCount = computed(() => {
-  const noteRef = storageAccessor.value.refOfNoteRealm(props.note.id)
-  if (!noteRef.value) return undefined
-  return noteRef.value.children?.length ?? undefined
+  if (props.mergedFolderId != null) {
+    return props.structuralChildCount
+  }
+  return undefined
 })
 
 const toggleChildren = (noteId: number) => {

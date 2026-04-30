@@ -64,7 +64,7 @@ public class NoteService {
   }
 
   public List<Note> findNotesInFolderScope(Integer folderId) {
-    return noteRepository.findNotesInFolderOrderByIdAsc(folderId);
+    return noteRepository.findNotesInFolderOrderBySiblingOrder(folderId);
   }
 
   public List<Note> findNotesVisibleToUserBySlugBasename(User user, String basename) {
