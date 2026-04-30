@@ -86,12 +86,17 @@ const displayNotes = computed(() => {
 const expandedIds = ref<number[]>([])
 
 watch(
-  () => props.activeNoteRealm?.note?.noteTopology.parentOrSubjectNoteTopology,
-  (parentNoteTopic) => {
+  () => ({
+    activeNoteId: props.activeNoteRealm?.note?.id,
+    parentTopic:
+      props.activeNoteRealm?.note?.noteTopology.parentOrSubjectNoteTopology,
+  }),
+  () => {
     if (!props.activeNoteRealm?.note) {
-      expandedIds.value = []
       return
     }
+    const parentNoteTopic =
+      props.activeNoteRealm.note.noteTopology.parentOrSubjectNoteTopology
     const uniqueIds = new Set([
       ...expandedIds.value,
       props.activeNoteRealm.note.id,

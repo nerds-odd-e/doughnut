@@ -8,13 +8,9 @@
     />
     <SidebarInner
       v-if="sidebarTreeShown"
+      :key="notebookId"
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
-      :key="
-        activeNoteRealm != null
-          ? `${notebookId}-${activeNoteRealm.id}`
-          : `${notebookId}-notebook-root`
-      "
     />
   </div>
 </template>

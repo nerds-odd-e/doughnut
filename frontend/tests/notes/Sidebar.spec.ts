@@ -136,6 +136,30 @@ describe("Sidebar", () => {
     )
   })
 
+  it("does not reload notebook root notes when active note changes within the same notebook", async () => {
+    const shallowTopRealm = {
+      ...topNoteRealm,
+      children: undefined,
+    } as NoteRealm
+    const rootSpy = mockSdkService("listNotebookRootNotes", [shallowTopRealm])
+    mountSidebar(firstGeneration)
+    await flushPromises()
+    expect(rootSpy).toHaveBeenCalledTimes(1)
+    expect(
+      findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+    ).toBe(true)
+
+    await wrapper.setProps({
+      activeNoteRealm: secondGeneration,
+      notebookId: firstGeneration.notebookId,
+    })
+    await flushPromises()
+    expect(rootSpy).toHaveBeenCalledTimes(1)
+    expect(
+      findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+    ).toBe(true)
+  })
+
   describe("first generation", () => {
     it("should scroll to active note", async () => {
       mountSidebar(firstGeneration)
