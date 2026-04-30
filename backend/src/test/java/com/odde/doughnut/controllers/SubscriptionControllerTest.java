@@ -51,7 +51,8 @@ class SubscriptionControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void createdSubscriptionForCircleNotebookCanBeSerialized() throws Exception {
+  void createdSubscriptionForCircleNotebookSerializesWithoutLegacyNotebookFields()
+      throws Exception {
     User user = currentUser.getUser();
     Circle circle = makeMe.aCircle().hasMember(user).please();
     Notebook circleNotebook =

@@ -31,7 +31,7 @@ describe("NotebookPageView.spec", () => {
     ...makeMe.aNotebook.please(),
   }
 
-  it("shows notebook name and description in summary without head-note navigation", async () => {
+  it("shows notebook name and description in summary with no link row in the summary", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
       name: "My Notebook Title",

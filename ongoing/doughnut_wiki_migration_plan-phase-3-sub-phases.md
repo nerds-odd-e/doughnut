@@ -14,7 +14,7 @@ After Phase 3:
 - the former head note is represented as a normal root note titled `index` with `note.slug = "index"`
 - a notebook may have no `index` note
 - a notebook has editable plain-text `description` for a short notebook settings message
-- opening a notebook shows a notebook page without head-note identity (name, `description`, navigation); optional sub-phases **3.19–3.22** may add an integrated editor that saves into the root `index` note—otherwise users edit `index` like any other note after data migration (**3.8**)
+- opening a notebook shows a notebook page without head-note identity (name, `description`, navigation); **3.19** refines how the notebook page treats the optional root `index` note (loading UX and a link to edit it on the normal note route); integrated notebook-page body editor (**formerly optional 3.19–3.22**) is **skipped**—users edit `index` on **`/notebooks/:notebookId/index`** after data migration (**3.8**)
 - after production head-note migration (**3.8**), the root `index` note is an ordinary note; notebook page chrome does not treat it as a head note
 - first-layer notes no longer need to be children of a head note
 - new notebooks are created without pre-created head notes or index notes
@@ -30,13 +30,20 @@ After Phase 3:
 - Assume production has no existing user note titled/sluggified as `index`, as stated in the main migration plan.
 - Later sub-phases that need the notebook index page or the optional root `index` note load it via the notebook-scoped slug path **`/notebooks/:notebookId/index`** (matching `note.slug = "index"` per the north-star routing rule). Do not add **`indexNoteId`** (or similar) on the notebook API for that purpose.
 - `NoteRealm` identifies the notebook boundary with **`notebookId`** only; it does not embed the full `Notebook` object once **3.14** is done—notebook fields come from the notebook get path or store.
-- Integrated notebook-page body editing (save into `index` from the notebook page without opening note show) is **optional** and deferred to **3.19–3.22** after the main migration path; the default product path is to treat `index` as a normal note.
+- Integrated notebook-page body editing (save into `index` from the notebook page without opening note show) was planned as optional **3.19–3.22** and is **skipped**; **3.19** instead adds correct loading assumptions for optional index content and an edit affordance to the index note page.
 - Introduce nullable/optional runtime behavior before removing required head-note assumptions, so deployed code can read both migrated and not-yet-migrated notebooks during rollout.
 - Keep tests named by capability, such as notebook page, notebook creation, note navigation, and Obsidian export. Do not create phase-named permanent test files.
 
 ## Status
 
-All sub-phases are **planned**.
+- **3.18** (final head-note reference sweep): **complete**. Runtime code and generated clients contain no `headNote` / `head_note` surface; literal wire keys `headNoteId` / `headNote` appear only in tests that assert those keys are absent from JSON. Historical SQL in Flyway migrations and the baseline schema unchanged.
+
+All other sub-phases are **planned**.
+
+### Discoveries from 3.18 (for Phase 4)
+
+- No dead services, DTO fields, or generated types remained to remove; the sweep was vocabulary and test naming plus [ongoing/obsidian_sync.md](ongoing/obsidian_sync.md) terminology.
+- Keep JSON key assertions in controller tests: they guard against accidentally reintroducing removed notebook identity fields on the wire.
 
 ## Sub-Phases
 
@@ -105,7 +112,7 @@ The notebook page no longer depends on or surfaces head-note identity: no head-n
 - remove `headNoteId` / `headNote` usage from notebook page layout, loaders, and copy where that page is the entry surface
 - notebook page reads notebook name and `description` from the `Notebook` object and normal navigation; link or navigate to the optional root `index` note only via the normal note path **`/notebooks/:notebookId/index`** when showing index content, not via head-note coupling
 - tests updated so the notebook page scenario does not assert head-note-specific UI or data shapes
-- no requirement in this sub-phase for an embedded notebook-page body editor or a notebook-page save endpoint (those remain optional in **3.19–3.22**)
+- no requirement in this sub-phase for an embedded notebook-page body editor or a notebook-page save endpoint (skipped former optional integrated editor; see **3.19** for index UX on the notebook page)
 
 **Verification:**
 
@@ -185,7 +192,7 @@ Existing notebooks get their former head note converted into the ordinary root `
 
 **Type:** Behavior
 
-Creating a notebook creates the notebook boundary only; no automatic root `index` note. Index body exists only when the user creates or edits that note like any other note (unless the team ships optional **3.19–3.22**).
+Creating a notebook creates the notebook boundary only; no automatic root `index` note. Index body exists only when the user creates or edits that note like any other note (integrated notebook-page create/save **3.19–3.22** skipped).
 
 **Commit includes:**
 
@@ -327,7 +334,7 @@ Remove permanent test and fixture vocabulary that still describes notebooks as h
 
 **Type:** Structure
 
-Delete the obsolete notebook edit route when nothing in the shipped product path needs it for notebook body content (index is edited on the normal note route, or optional **3.19–3.22** have landed).
+Delete the obsolete notebook edit route when nothing in the shipped product path needs it for notebook body content (index is edited on the normal note route; **3.19** links there from the notebook page).
 
 **Commit includes:**
 
@@ -343,6 +350,8 @@ Delete the obsolete notebook edit route when nothing in the shipped product path
 
 **Type:** Structure
 
+**Status:** Complete.
+
 Remove remaining head-note references that are no longer justified by Phase 4/5 dependencies.
 
 **Commit includes:**
@@ -356,76 +365,26 @@ Remove remaining head-note references that are no longer justified by Phase 4/5 
 - targeted backend and frontend tests for touched areas
 - `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` if API surface changed
 
-## Optional Sub-Phases (after **3.8**)
-
-These phases are **optional**. After production data migration (**3.8**), the root `index` note is already a normal note; the main Phase 3 path does not require a dedicated notebook-page body editor or notebook-page save API. Implement **3.19–3.22** only if the product wants an integrated editor on the notebook page that writes the same `index` note.
-
-### 3.19 (Optional) Save Notebook Page Content Into Existing Index Note
+### 3.19 Notebook Page Index Loading and Edit Entry Point
 
 **Type:** Behavior
 
-Users can edit notebook page content when an index note already exists.
+The notebook page reflects the **optional** root `index` note honestly while async loads are in flight, and gives a clear path to edit that note on the normal note route.
 
 **Commit includes:**
 
-- backend save/update path for notebook page content updates the existing root `index` note
-- controller test proves the notebook name is unchanged and only index content changes
-- frontend API client regeneration if needed
+- do **not** assume the index note (or index page) is absent **before** the relevant async resolution returns; avoid UI that implies “no index” or an incorrect empty index state while loading when an index may exist once the call completes (use explicit loading / neutral chrome, or preserve prior resolved state per existing app patterns—minimal code, no spurious flash)
+- in the notebook page region that shows **index** details (summary, excerpt, or whatever the page already surfaces for optional index content), add an **edit** icon in the **upper right** of that index-details block; the control navigates to the index note on **`/notebooks/:notebookId/index`** (same slug route as the north star)
+- component test and/or Cypress scenario asserts stable loading behavior where an index exists, and that the edit control reaches the index note route
 
 **Verification:**
 
-- targeted backend controller tests
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` if OpenAPI changes
+- targeted frontend notebook page tests
+- relevant Cypress spec if touched
 
-### 3.20 (Optional) Save Notebook Page Content Creates Index Note
+## Skipped sub-phases (formerly optional 3.19–3.22)
 
-**Type:** Behavior
-
-Users can save content on a notebook that does not yet have an index note.
-
-**Commit includes:**
-
-- backend save path creates a normal root note with `title = "index"`, `slug = "index"`, and `folderId = null`
-- created index note belongs to the notebook and uses the normal note persistence rules
-- controller test covers first save and later update using the same note
-
-**Verification:**
-
-- targeted backend controller tests
-
-### 3.21 (Optional) Notebook Page Component Shows Empty Editor
-
-**Type:** Behavior
-
-The frontend can render the notebook page with an empty editor when the current notebook has no index note.
-
-**Commit includes:**
-
-- notebook page component or page-level view loads the current `Notebook` object through the existing get endpoint
-- empty editor renders for missing index note
-- component test uses `mockSdkService()` and asserts notebook name plus empty editable body
-
-**Verification:**
-
-- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/<notebook-page-test>.spec.ts`
-
-### 3.22 (Optional) Notebook Page Component Saves Content
-
-**Type:** Behavior
-
-The frontend saves notebook page editor content while loading notebook identity through the current `Notebook` object.
-
-**Commit includes:**
-
-- save action calls the notebook page save endpoint
-- component test covers:
-  - saving when an `index` note already exists (same identity as resolving **`/notebooks/:notebookId/index`**)
-  - saving when the notebook has no `index` note yet
-- user-visible loading/error handling follows existing `apiCallWithLoading()` patterns where applicable
-
-**Verification:**
-
-- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/<notebook-page-test>.spec.ts`
+The following integrated notebook-page body editor work is **not** pursued: saving index body from the notebook page without opening the note route, dedicated notebook-page save API, and empty embedded editor for notebooks without an index. Users rely on sub-phase **3.19** (index loading and edit entry point) plus normal navigation to **`/notebooks/:notebookId/index`** for editing the optional `index` note.
 
 ## Completion Criteria
 
@@ -436,7 +395,7 @@ Phase 3 is complete when:
 - notebooks expose editable `description`, backfilled from truncated existing head note details
 - optional root `index` note identity is reached via **`/notebooks/:notebookId/index`**, not via an `indexNoteId` field on the notebook API; the current `Notebook` object stays the existing get shape without a separate notebook-page get DTO
 - show-note and related payloads use **`notebookId` on `NoteRealm`**, not an embedded `notebook`, per **3.14**
-- the optional root `index` note is created and updated like any other note on the normal note path; optional **3.19–3.22** may additionally provide integrated notebook-page save into the same note
+- the optional root `index` note is created and updated like any other note on the normal note path; **3.19** improves notebook-page handling of optional index presence and links to that note for editing; integrated notebook-page save (**skipped** former optional **3.19–3.22**) is out of scope
 - migrated notebooks preserve their old head-note content through the normal `index` note
 - new notebooks are not created with head notes or pre-created index notes
 - top-level notes are not children of a head note

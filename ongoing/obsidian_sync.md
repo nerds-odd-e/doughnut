@@ -1,6 +1,6 @@
 # User stories — Obsidian ↔ Doughnut (CLI)
 
-**Pull:** Full tree from the notebook head, but fetch/write **only what changed** (e.g. compare last-modified or equivalent timestamps on server vs local).
+**Pull:** Full tree from the notebook (optional root `index` note and the rest of the tree), but fetch/write **only what changed** (e.g. compare last-modified or equivalent timestamps on server vs local).
 
 **Attachments:** Not downloaded; they stay in Doughnut.
 
@@ -8,7 +8,7 @@
 
 ---
 
-1. **Doughnut UI:** Wiki-style `[[link]]` in note **details** are **clickable**. Treat the tree like **Wikipedia-style subpages**: within a notebook, the path from the **head note** down the hierarchy maps to link paths (top-level notes are the first segment; children extend the path).
+1. **Doughnut UI:** Wiki-style `[[link]]` in note **details** are **clickable**. Treat the tree like **Wikipedia-style subpages**: within a notebook, the path from the notebook’s root notes down the hierarchy maps to link paths (top-level notes are the first segment; children extend the path).
    - **1.1** As a note taker, I want to edit wiki links as raw syntax in **markdown** mode and see them as clickable links in **rich** mode (not bracket literals).
    - **1.2** As a note taker, I want **rich**-mode edits to round-trip to **markdown** as well-formed wiki links (`[[…]]`).
    - **1.3** As a note taker, I want **pipe** syntax for alternate display text: `[[note title|display text]]`.
@@ -25,9 +25,9 @@
 
 3. User runs CLI to **init** a folder as the bound root for a notebook; the path is stored so **`/use notebook`** can show it in the status bar.
 
-4. User can **download** the head note and **download/sync children** per the rules above.
+4. User can **download** the optional root **`index`** note (when present) and **download/sync children** per the rules above.
 
-5. User can **upload** head note body (details) from local to Doughnut.
+5. User can **upload** the optional root **`index`** note body (details) from local to Doughnut.
 
 6. User can **push** local edits for notes that have ids in frontmatter (title, details, and related fields as defined by the sync contract).
 
@@ -47,7 +47,7 @@
 
 ## ユーザーストーリー（日本語）— Obsidian ↔ Doughnut（CLI）
 
-**Pull:** **notebook** の **head note** から **full tree** を対象にするが、取得・書き込みは **変更分のみ**（例: **server** と **local** の **last-modified** や同等のタイムスタンプで比較）。
+**Pull:** **notebook** 全体（ルートの **`index`** ノートがあればそれを含む）を **full tree** の対象にするが、取得・書き込みは **変更分のみ**（例: **server** と **local** の **last-modified** や同等のタイムスタンプで比較）。
 
 **Attachments:** ダウンロードしない。**Doughnut** 上に残す。
 
@@ -55,7 +55,7 @@
 
 ---
 
-1. **Doughnut UI:** ノート **details** 内の wiki 形式 `[[link]]` をクリック可能にする。**notebook** 内のツリーは **Wikipedia** の **subpage** に近い考え方で扱う：**head note** から下る階層が **link** のパスに対応し、最上位ノートがパスの先頭セグメント、子がパスを延ばす。
+1. **Doughnut UI:** ノート **details** 内の wiki 形式 `[[link]]` をクリック可能にする。**notebook** 内のツリーは **Wikipedia** の **subpage** に近い考え方で扱う：**notebook** のルートから下る階層が **link** のパスに対応し、最上位ノートがパスの先頭セグメント、子がパスを延ばす。
    - **1.1** ノート利用者として、**markdown** モードでは wiki 記法をそのまま編集し、**rich** モードでは **link** をクリック可能に表示したい（括弧の生テキストのままにしない）。
    - **1.2** ノート利用者として、**rich** モードの編集を、保存時に正しい wiki 形式の **markdown**（`[[…]]`）へ **round-trip** したい。
    - **1.3** ノート利用者として、表示名の差し替えに **pipe** 記法を使いたい：`[[note title|display text]]`。
@@ -72,9 +72,9 @@
 
 3. **CLI** で **`init`** し、フォルダを **notebook** に紐づけた **root** とする。パスを記憶し、**`/use notebook`** 時に **status bar** に表示できる。
 
-4. **download** で **head note** を取得し、上記ルールに従い **children** の **download**／**sync** ができる。
+4. **download** でルートの **`index`** ノート（存在する場合）を取得し、上記ルールに従い **children** の **download**／**sync** ができる。
 
-5. **upload** で **head note** の本文（**details**）を **local** → **Doughnut** に送れる。
+5. **upload** でルートの **`index`** ノートの本文（**details**）を **local** → **Doughnut** に送れる。
 
 6. **frontmatter** に **id** のあるノートについて、**local** の編集を **push** できる（**title**、**details**、および **sync contract** で定めた関連フィールド）。
 

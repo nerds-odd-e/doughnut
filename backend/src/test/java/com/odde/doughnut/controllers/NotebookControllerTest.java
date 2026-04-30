@@ -134,7 +134,7 @@ class NotebookControllerTest extends ControllerTestBase {
   @Nested
   class NotebookApiSerialization {
     @Test
-    void getNotebookJsonOmitsDeprecatedHeadNoteFields() throws Exception {
+    void getNotebookJsonDoesNotExposeLegacyNotebookIdentityWireKeys() throws Exception {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("API Shape NB");
       noteCreation.setDescription("Blurb");

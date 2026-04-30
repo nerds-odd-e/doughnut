@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
+class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
 
   @Autowired JdbcTemplate jdbcTemplate;
   @Autowired NotebookController notebookController;
@@ -28,7 +28,7 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
       WHERE hn.id = ?
       """;
 
-  private static final String DISAMBIGUATE_NON_HEAD_INDEX_SLUGS =
+  private static final String DISAMBIGUATE_OTHER_INDEX_SLUGS_IN_NOTEBOOK =
       """
       UPDATE note n
       SET n.slug = CONCAT('legacy-index-', n.id)
@@ -38,7 +38,7 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
         AND n.deleted_at IS NULL
       """;
 
-  private static final String HEAD_NOTES_TO_INDEX =
+  private static final String RENAME_ROOT_NOTE_TO_INDEX_SLUG_AND_TITLE =
       """
       UPDATE note hn
       SET hn.title = 'index',
@@ -65,7 +65,7 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
   }
 
   @Test
-  void headToIndexMigration_preservesNotebookNameAndResolvesIndexSlug()
+  void legacyRootBecomesIndexNote_preservesNotebookNameAndResolvesIndexSlug()
       throws UnexpectedNoAccessRightException {
     User user = makeMe.aUser().please();
     currentUser.setUser(user);
@@ -77,13 +77,13 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
             .creatorAndOwner(user)
             .details("Notebook body")
             .please();
-    int headId = legacyRoot.getId();
+    int rootNoteId = legacyRoot.getId();
     int notebookId = notebook.getId();
     makeMe.entityPersister.flush();
 
-    jdbcTemplate.update(BACKFILL_NOTEBOOK_NAME, headId);
-    jdbcTemplate.update(DISAMBIGUATE_NON_HEAD_INDEX_SLUGS, headId, notebookId);
-    jdbcTemplate.update(HEAD_NOTES_TO_INDEX, headId);
+    jdbcTemplate.update(BACKFILL_NOTEBOOK_NAME, rootNoteId);
+    jdbcTemplate.update(DISAMBIGUATE_OTHER_INDEX_SLUGS_IN_NOTEBOOK, rootNoteId, notebookId);
+    jdbcTemplate.update(RENAME_ROOT_NOTE_TO_INDEX_SLUG_AND_TITLE, rootNoteId);
     entityManager.clear();
 
     String storedName =
@@ -92,14 +92,15 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
     assertThat(storedName, equalTo("LegacyCap"));
 
     String storedTitle =
-        jdbcTemplate.queryForObject("SELECT title FROM note WHERE id = ?", String.class, headId);
+        jdbcTemplate.queryForObject(
+            "SELECT title FROM note WHERE id = ?", String.class, rootNoteId);
     String storedSlug =
-        jdbcTemplate.queryForObject("SELECT slug FROM note WHERE id = ?", String.class, headId);
+        jdbcTemplate.queryForObject("SELECT slug FROM note WHERE id = ?", String.class, rootNoteId);
     assertThat(storedTitle, equalTo("index"));
     assertThat(storedSlug, equalTo("index"));
 
     NoteRealm realm = notebookController.getNoteBySlug(notebook, "index");
-    assertThat(realm.getId(), equalTo(headId));
+    assertThat(realm.getId(), equalTo(rootNoteId));
     assertThat(realm.getNote().getDetails(), equalTo("Notebook body"));
   }
 }
