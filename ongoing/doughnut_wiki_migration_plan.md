@@ -508,9 +508,11 @@ Phase 4 is **complete** in the codebase.
 
 ## Goal
 
-Convert special structured relationship notes into ordinary Markdown-like notes.
+Convert special structured relationship notes into ordinary Markdown-like notes, and move relationship/reference behavior onto frontmatter plus a persisted wiki-title cache.
 
 Relationship notes today depend on the **parent** pointer for structure; this phase runs **before** folder-first containment UX (**Phase 6**) and **before** removing the note parent from schema (**Phase 7**) so migration can read that structure reliably.
+
+The expanded Phase 5 also removes the relationship-specific `relation_type` / link-type and `target_note_id` fields after the frontmatter/cache representation can serve current relationship, reference, and graph behavior.
 
 ## Current Relationship Note
 
@@ -565,6 +567,14 @@ For old relationship notes, derive the note **`title`** from the relationship it
 
 This phase is also the point where the title invariant closes: after Phase 5, a note title cannot be null or empty in runtime behavior or persisted data.
 
+## Wiki Title Cache
+
+Phase 5 introduces a persisted cache of wiki-title references derived from note details and frontmatter. The cache is refreshed when a note's details are updated and backfilled during migration.
+
+The cache is used to populate `NoteRealm.wikiTitles`, incoming references, and note graph relationships. For existing non-relationship notes, migration adds a `parent: "[[Parent Title]]"` frontmatter property when a legacy parent exists, then refreshes the cache. New notes do not get this property by default.
+
+When a note title changes, the cache identifies notes that reference the old title so their wiki references can be updated to the new title and refreshed.
+
 ## Sub-Phase Plan
 
 Phase 5 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests.
@@ -577,6 +587,10 @@ After this phase:
 - relationship fields are represented in content and/or frontmatter
 - relationship notes have folder locations and note slugs (`note.slug` as full path)
 - migrated relationship notes have derived, truncated, non-empty titles
+- `NoteRealm.wikiTitles`, incoming references, and note graph relationship lookup use the persisted wiki-title cache
+- existing non-relationship notes preserve legacy parent semantics as migration-only `parent` frontmatter wiki links
+- relationship `relation` and `target` behavior no longer depends on note-level `relation_type` / link-type or `target_note_id` fields
+- graph retrieval no longer treats children or child relationship notes as the source of incoming references for existing notes, and its reference quota is increased for cache-backed wiki references
 - note titles are required for all notes; null or empty note titles are no longer valid after Phase 5
 - old relationship-note-specific behavior is deprecated
 - relationships become portable to Obsidian-style Markdown

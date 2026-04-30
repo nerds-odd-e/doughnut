@@ -6,20 +6,26 @@ Phase 5 of `ongoing/doughnut_wiki_migration_plan.md`: Convert Relationship Notes
 
 ## Goal
 
-Convert relationship notes from special notes identified by `target_note_id` / `relation_type` / `parent_id` into ordinary notes whose title, details, folder, slug, and frontmatter carry the relationship meaning.
+Convert relationship notes from special notes identified by `target_note_id` / `relation_type` / `parent_id` into ordinary notes whose title, details, folder, slug, frontmatter, and cached wiki-title references carry the relationship meaning.
 
 By the end of Phase 5:
 
 - every relationship note has a non-empty title derived from its relationship and truncated to `Note.MAX_TITLE_LENGTH` (currently 150 characters)
 - relationship note details include relationship frontmatter and readable Markdown content
 - relationship notes remain visible in existing relationship UI flows while becoming portable Markdown notes
+- wiki-title references are persisted in a cache derived from note details/frontmatter
+- `NoteRealm.wikiTitles`, reference lists, and graph retrieval use the cached wiki-title references instead of legacy `target_note_id` / child relationship notes
+- legacy non-relationship notes have a migration-only `parent: "[[...]]"` frontmatter property that preserves the old semantic parent as a wiki reference
+- relationship `relation` and `target` data come from frontmatter/cache instead of `relation_type` / `target_note_id`
 - no note title may be null or empty after the Phase 5 data migration and schema/API tightening
 
 ## Design Decisions
 
 - **Relationship title:** derive the title from the source note title, relation label, and target note title. Keep it human-readable first; the slug is derived separately from the truncated title by the existing slug service.
 - **Title length:** truncate the derived relationship title before persistence so it never exceeds `Note.MAX_TITLE_LENGTH`. Prefer truncating at the title boundary over adding IDs or hashes.
-- **Source of truth during Phase 5:** write relationship frontmatter into note details while keeping legacy columns long enough for existing screens and until note-parent removal (**Phase 7**). Removing those columns belongs to **Phase 7** or later cleanup.
+- **Reference source of truth during Phase 5:** note details/frontmatter are the source of truth for wiki-style references. The persisted wiki-title cache is derived data, refreshed whenever note details are updated and backfilled during migration.
+- **Legacy relationship columns:** keep `relation_type` / `target_note_id` only until relationship UI, `NoteRealm`, references, and graph retrieval read from frontmatter/cache. Remove those columns before Phase 5 closes.
+- **Legacy parent semantics:** for existing non-relationship notes only, migrate the old semantic parent into a `parent: "[[Parent Title]]"` frontmatter property and update the wiki-title cache. New notes do not receive this frontmatter by default.
 - **Title invariant:** Phase 5 is the last phase that may tolerate legacy null or empty note titles. After Phase 5, production code and schema should treat note title as required.
 
 ## Sizing Rule
@@ -218,11 +224,187 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One delete-compatibility commit.
 
-## Sub-Phase 5.13 - Phase 5 Closeout and Plan Update
+## Sub-Phase 5.13 - Wiki Title Cache Persistence
+
+**Type:** Structure for the next behavior.
+
+**Pre-condition:** Relationship and ordinary note details may contain wiki links or frontmatter wiki-link values.
+
+**Trigger:** A note's details are parsed for wiki-title references.
+
+**Post-condition:** The parsed wiki-title references can be persisted as cache rows owned by the note, with ordering preserved for stable API output.
+
+**Work:** Add the cache table/entity/repository and a cohesive parser/refresher service that extracts wiki titles from Markdown body and frontmatter values such as `source`, `target`, and `parent`.
+
+**Verify:** Focused backend tests for parser/refresher behavior and persistence replacement semantics.
+
+**Commit boundary:** One cache persistence commit.
+
+## Sub-Phase 5.14 - Details Updates Refresh Wiki Title Cache
+
+**Type:** Behavior.
+
+**Pre-condition:** Wiki-title cache persistence exists.
+
+**Trigger:** A user updates a note's details.
+
+**Post-condition:** The note's cached wiki-title references match the saved details.
+
+**Work:** Wire the details update path through the cache refresher and add a controller-level test that updates details, reloads the note realm, and observes the changed wiki titles.
+
+**Verify:** Focused controller/service tests for details update.
+
+**Commit boundary:** One cache-refresh-on-update commit.
+
+## Sub-Phase 5.15 - NoteRealm Uses Persisted Wiki Titles
+
+**Type:** Behavior.
+
+**Pre-condition:** Details updates refresh the persisted wiki-title cache.
+
+**Trigger:** Any supported endpoint builds a `NoteRealm`.
+
+**Post-condition:** `NoteRealm.wikiTitles` comes from the persisted cache instead of reparsing note details during DTO construction.
+
+**Work:** Move `NoteRealmService` wiki-title population to the cache query path while keeping authorization and resolution behavior equivalent.
+
+**Verify:** Focused `NoteRealmService` / controller tests that prove cached values are used and stale details-only values are not surfaced without a refresh.
+
+**Commit boundary:** One NoteRealm cache-read commit.
+
+## Sub-Phase 5.16 - Backfill Relationship Wiki Title Cache
+
+**Type:** Behavior.
+
+**Pre-condition:** Migrated relationship notes contain `source` and `target` frontmatter.
+
+**Trigger:** The admin data migration runs.
+
+**Post-condition:** Existing relationship notes with source and target have cache rows for those wiki titles.
+
+**Work:** Extend the migration test for old relationship notes, then refresh the cache after relationship frontmatter/details are backfilled.
+
+**Verify:** Focused backend migration test through `AdminDataMigrationService.run()`.
+
+**Commit boundary:** One relationship-cache-backfill commit.
+
+## Sub-Phase 5.17 - Migrate Legacy Parent to Frontmatter Reference
+
+**Type:** Behavior.
+
+**Pre-condition:** Existing non-relationship notes may still have a parent note that expresses semantic context.
+
+**Trigger:** The admin data migration runs.
+
+**Post-condition:** Existing non-relationship notes with a parent have `parent: "[[Parent Title]]"` in frontmatter, and their wiki-title cache includes that parent title.
+
+**Work:** Add a migration test for an ordinary child note, serialize or merge frontmatter without overwriting existing properties, and refresh the note's cache. Do not add this frontmatter in new-note creation paths.
+
+**Verify:** Focused backend migration test and a note-creation regression showing new notes do not receive default `parent` frontmatter.
+
+**Commit boundary:** One legacy-parent-frontmatter commit.
+
+## Sub-Phase 5.18 - Relationship UI Reads Relation From Frontmatter
+
+**Type:** Behavior.
+
+**Pre-condition:** Relationship notes store `relation` in frontmatter and existing notes are migrated.
+
+**Trigger:** A user views, edits, or deletes a relationship.
+
+**Post-condition:** Relationship behavior no longer needs `Note.relationType` / `linkType`; it reads and writes the `relation` frontmatter property.
+
+**Work:** Update relationship read/edit paths to use the frontmatter representation, keeping existing relation UI behavior stable.
+
+**Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/relationships/relationship_edit_and_remove.feature`.
+
+**Commit boundary:** One relation-frontmatter-runtime commit.
+
+## Sub-Phase 5.19 - Remove Relationship Link Type Field
+
+**Type:** Persistence cleanup.
+
+**Pre-condition:** Runtime relationship behavior reads relation from frontmatter.
+
+**Trigger:** Database migrations and generated API are applied.
+
+**Post-condition:** The `relation_type` / link-type field is removed from the note model, schema, OpenAPI, generated client, and frontend/backend references.
+
+**Work:** Drop the column, remove entity/DTO/API references, regenerate TypeScript if OpenAPI changes, and delete obsolete converter code.
+
+**Verify:** Focused backend tests plus affected frontend compile/test target; run relationship E2E if wire behavior changed.
+
+**Commit boundary:** One link-type-removal commit.
+
+## Sub-Phase 5.20 - References Use Cached Wiki Titles
+
+**Type:** Behavior.
+
+**Pre-condition:** Relationship and parent references are present in the wiki-title cache.
+
+**Trigger:** A note realm is built for a note that is referenced by other notes.
+
+**Post-condition:** Incoming references are resolved by cached wiki-title entries that point at the note's current title, not by `target_note_id` or relationship child notes.
+
+**Work:** Replace `NoteRealm.inboundReferences` population and related reference lookup paths with cache-backed queries, preserving existing authorization behavior.
+
+**Verify:** Focused controller/service tests for same-notebook and cross-notebook visible references.
+
+**Commit boundary:** One cache-backed-references commit.
+
+## Sub-Phase 5.21 - Remove Relationship Target Field
+
+**Type:** Persistence cleanup.
+
+**Pre-condition:** Runtime reference behavior and relationship displays no longer read `Note.targetNote`.
+
+**Trigger:** Database migrations and generated API are applied.
+
+**Post-condition:** The `target_note_id` field is removed from the note model, schema, OpenAPI, generated client, and frontend/backend references.
+
+**Work:** Drop the column, remove `targetNote` mappings and repository methods used only by the legacy column, and route remaining target behavior through frontmatter/cache.
+
+**Verify:** Focused backend tests and targeted relationship E2E specs.
+
+**Commit boundary:** One target-field-removal commit.
+
+## Sub-Phase 5.22 - Title Rename Updates Cached Wiki References
+
+**Type:** Behavior.
+
+**Pre-condition:** Incoming references are discoverable from the wiki-title cache.
+
+**Trigger:** A note's title changes.
+
+**Post-condition:** Notes that reference the old title are reverse-updated to reference the new title, and their cache rows are refreshed.
+
+**Work:** Add a title-update test that creates at least one referencing note, changes the target title, and verifies both the source details/frontmatter and cache use the new wiki title.
+
+**Verify:** Focused controller/service tests for note title update.
+
+**Commit boundary:** One reverse-reference-title-update commit.
+
+## Sub-Phase 5.23 - Note Graph Uses Cached Wiki References
+
+**Type:** Behavior.
+
+**Pre-condition:** Cached wiki-title references replace legacy inbound relationship lookup.
+
+**Trigger:** A user or AI flow requests a note graph.
+
+**Post-condition:** The graph gets related notes through cache-backed wiki references and no longer traverses children, child relationship notes, or target-child relationship handlers as incoming references for existing notes. The reference quota is increased to account for the broader wiki-reference source.
+
+**Work:** Replace graph relationship handlers that depend on `children`, relationship children, or `targetNote` with cache-backed outgoing/incoming reference handlers; adjust the quota in the graph retrieval policy.
+
+**Verify:** Focused graph retrieval tests showing cached references are included and legacy child-only relationships are not required.
+
+**Commit boundary:** One cache-backed-graph commit.
+
+## Sub-Phase 5.24 - Phase 5 Closeout and Plan Update
 
 **Type:** Structure / cleanup.
 
-**Pre-condition:** Relationship creation, migration, edit, delete, and title invariants are passing.
+**Pre-condition:** Relationship creation, migration, edit, delete, cache-backed references, graph retrieval, and title invariants are passing.
 
 **Trigger:** Final targeted verification for Phase 5.
 
@@ -232,7 +414,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 - Remove any `@wip` tags introduced while driving Phase 5 behavior.
 - Update `ongoing/doughnut_wiki_migration_plan.md` with Phase 5 status and any discoveries.
-- Remove obsolete relationship-note-specific code only when no current behavior uses it; otherwise leave explicit cleanup for Phase 7 or later.
+- Remove obsolete relationship-note-specific code that depended on `relation_type`, `target_note_id`, child relationship notes, or child-derived incoming references.
 - Run the relationship specs touched in this phase with targeted `--spec` commands.
 
 **Commit boundary:** One cleanup/docs commit that leaves Phase 5 closed and ready for Phase 6 (folder-first listing and removal of note **`shortDetails`**).
