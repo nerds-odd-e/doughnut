@@ -6,19 +6,19 @@ packages:
   - packages/doughnut-test-fixtures
   - packages/generated/doughnut-backend-api
 
-strictDepBuilds: true
+onlyBuiltDependencies:
+  - '@badeball/cypress-cucumber-preprocessor'
+  - '@biomejs/biome'
+  - '@parcel/watcher'
+  - canvas
+  - core-js
+  - core-js-pure
+  - cypress
+  - ejs
+  - esbuild
+  - github_action_sound
+  - protobufjs
+  - tesseract.js
 
-allowBuilds:
-  '@badeball/cypress-cucumber-preprocessor': true
-  '@biomejs/biome': true
-  '@parcel/watcher': true
-  canvas: true
-  core-js: true
-  core-js-pure: true
-  cypress: true
-  ejs: true
-  es5-ext: false
-  esbuild: true
-  github_action_sound: true
-  protobufjs: true
-  tesseract.js: true
+ignoredBuiltDependencies:
+  - es5-ext
