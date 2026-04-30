@@ -8,6 +8,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteRealmService;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -25,16 +26,19 @@ class TextContentController {
 
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
   public TextContentController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      NoteRealmService noteRealmService) {
+      NoteRealmService noteRealmService,
+      WikiTitleCacheService wikiTitleCacheService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
+    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -43,7 +47,7 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateTitleDTO titleDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()));
+    return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()), false);
   }
 
   @PatchMapping(path = "/{note}/details")
@@ -52,16 +56,20 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateDetailsDTO detailsDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNote(note, n -> n.setDetails(detailsDTO.getDetails()));
+    return updateNote(note, n -> n.setDetails(detailsDTO.getDetails()), true);
   }
 
-  private NoteRealm updateNote(Note note, Consumer<Note> updateFunction)
+  private NoteRealm updateNote(
+      Note note, Consumer<Note> updateFunction, boolean refreshWikiTitleCache)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     entityPersister.save(note);
+    if (refreshWikiTitleCache) {
+      wikiTitleCacheService.refreshForNote(note, authorizationService.getCurrentUser());
+    }
     return noteRealmService.build(note, authorizationService.getCurrentUser());
   }
 }
