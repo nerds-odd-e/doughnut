@@ -35,11 +35,15 @@ class AdminDataMigrationController {
     return adminDataMigrationService.getStatus();
   }
 
-  @Operation(operationId = "runDataMigration", summary = "Run wiki index-folder data migration")
-  @PostMapping("/run")
-  public AdminDataMigrationStatusDTO runDataMigration() throws UnexpectedNoAccessRightException {
+  @Operation(
+      operationId = "runDataMigrationBatch",
+      summary =
+          "Run one wiki index-folder data migration batch — call again while moreBatchesRemain is true")
+  @PostMapping("/run-batch")
+  public AdminDataMigrationStatusDTO runDataMigrationBatch()
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
-    return adminDataMigrationService.run();
+    return adminDataMigrationService.runBatch();
   }
 }

@@ -605,6 +605,11 @@ export type AdminDataMigrationStatusDto = {
     updatedRelationNotesClearedFolder?: number;
     deletedObsoleteNotebookNameRootFolders?: number;
     notebookCountSlugScan?: number;
+    migrationInProgress?: boolean;
+    moreBatchesRemain?: boolean;
+    completedBatchOrdinal?: number;
+    batchTotalPlanned?: number;
+    batchPhaseSummary?: string;
 };
 
 export type UserDto = {
@@ -2708,21 +2713,21 @@ export type GenerateImageResponses = {
 
 export type GenerateImageResponse = GenerateImageResponses[keyof GenerateImageResponses];
 
-export type RunDataMigrationData = {
+export type RunDataMigrationBatchData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/admin/data-migration/run';
+    url: '/api/admin/data-migration/run-batch';
 };
 
-export type RunDataMigrationResponses = {
+export type RunDataMigrationBatchResponses = {
     /**
      * OK
      */
     200: AdminDataMigrationStatusDto;
 };
 
-export type RunDataMigrationResponse = RunDataMigrationResponses[keyof RunDataMigrationResponses];
+export type RunDataMigrationBatchResponse = RunDataMigrationBatchResponses[keyof RunDataMigrationBatchResponses];
 
 export type UpdateUserData = {
     body: UserDto;

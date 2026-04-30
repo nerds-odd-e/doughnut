@@ -192,7 +192,7 @@ const methodToController: Record<string, any> = {
   triggerFailure: FailureReportController,
   listUsers: AdminUserController,
   getAdminDataMigrationStatus: AdminDataMigrationController,
-  runDataMigration: AdminDataMigrationController,
+  runDataMigrationBatch: AdminDataMigrationController,
 }
 
 type SdkServiceName = keyof typeof methodToController

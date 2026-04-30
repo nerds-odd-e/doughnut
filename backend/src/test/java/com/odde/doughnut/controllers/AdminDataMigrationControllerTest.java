@@ -20,6 +20,16 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
   @Autowired AdminDataMigrationController controller;
   @Autowired JdbcTemplate jdbcTemplate;
 
+  static AdminDataMigrationStatusDTO migrateAllViaBatchedApi(
+      AdminDataMigrationController adminDataMigrationController)
+      throws UnexpectedNoAccessRightException {
+    AdminDataMigrationStatusDTO r = adminDataMigrationController.runDataMigrationBatch();
+    while (r.isMoreBatchesRemain()) {
+      r = adminDataMigrationController.runDataMigrationBatch();
+    }
+    return r;
+  }
+
   @Test
   void adminGetsStatus() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
@@ -38,21 +48,26 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void adminCanRunDataMigration() throws UnexpectedNoAccessRightException {
+  void adminRunsDataMigrationInBatchedStepsUntilComplete() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
 
-    AdminDataMigrationStatusDTO run = controller.runDataMigration();
+    AdminDataMigrationStatusDTO first = controller.runDataMigrationBatch();
+    assertThat(first.isMoreBatchesRemain(), equalTo(first.getBatchTotalPlanned() > 1));
+
+    AdminDataMigrationStatusDTO run = migrateAllViaBatchedApi(controller);
 
     assertThat(run.isCompletedOnce(), equalTo(true));
+    assertThat(run.isMoreBatchesRemain(), equalTo(false));
     assertThat(run.getMessage(), notNullValue());
     assertThat(run.getNotebookCountSlugScan(), greaterThanOrEqualTo(0L));
+    assertThat(run.getCompletedBatchOrdinal(), equalTo(run.getBatchTotalPlanned()));
   }
 
   @Test
-  void nonAdminCannotRunDataMigration() {
+  void nonAdminCannotRunDataMigrationBatch() {
     currentUser.setUser(makeMe.aUser().please());
 
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.runDataMigration());
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.runDataMigrationBatch());
   }
 
   @Test
@@ -95,7 +110,7 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
 
     makeMe.entityPersister.flush();
 
-    AdminDataMigrationStatusDTO result = controller.runDataMigration();
+    AdminDataMigrationStatusDTO result = migrateAllViaBatchedApi(controller);
 
     assertThat(result.getDetachedChildFoldersFromIndexFolder(), greaterThanOrEqualTo(1));
     assertThat(result.getUpdatedNormalNotesDetachedFromIndex(), greaterThanOrEqualTo(1));

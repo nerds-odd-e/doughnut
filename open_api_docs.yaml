@@ -2016,12 +2016,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AiGeneratedImage"
-  /api/admin/data-migration/run:
+  /api/admin/data-migration/run-batch:
     post:
       tags:
       - admin-data-migration-controller
-      summary: Run wiki index-folder data migration
-      operationId: runDataMigration
+      summary: Run one wiki index-folder data migration batch - call again while moreBatchesRemain
+        is true
+      operationId: runDataMigrationBatch
       responses:
         "200":
           description: OK
@@ -4617,6 +4618,18 @@ components:
         notebookCountSlugScan:
           type: integer
           format: int64
+        migrationInProgress:
+          type: boolean
+        moreBatchesRemain:
+          type: boolean
+        completedBatchOrdinal:
+          type: integer
+          format: int32
+        batchTotalPlanned:
+          type: integer
+          format: int32
+        batchPhaseSummary:
+          type: string
     UserDTO:
       type: object
       properties:

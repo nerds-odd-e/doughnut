@@ -18,14 +18,19 @@ describe("DataMigrationPanel", () => {
     updatedRelationNotesClearedFolder: 0,
     deletedObsoleteNotebookNameRootFolders: 0,
     notebookCountSlugScan: 0,
+    migrationInProgress: false,
+    moreBatchesRemain: false,
+    completedBatchOrdinal: 0,
+    batchTotalPlanned: 0,
+    batchPhaseSummary: "",
   }
 
-  let runSpy: ReturnType<typeof mockSdkService<"runDataMigration">>
+  let runBatchSpy: ReturnType<typeof mockSdkService<"runDataMigrationBatch">>
   let getSpy: ReturnType<typeof mockSdkService<"getAdminDataMigrationStatus">>
 
   beforeEach(() => {
     getSpy = mockSdkService("getAdminDataMigrationStatus", idleDto)
-    runSpy = mockSdkService("runDataMigration", idleDto)
+    runBatchSpy = mockSdkService("runDataMigrationBatch", idleDto)
   })
 
   it("shows intro copy about migrating index-folder topology", async () => {
@@ -33,7 +38,7 @@ describe("DataMigrationPanel", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("index-folder")
-    expect(wrapper.text()).toContain("retained for this running server")
+    expect(wrapper.text()).toContain("small HTTP batches")
   })
 
   it("loads status from the server when mounted", async () => {
@@ -56,19 +61,47 @@ describe("DataMigrationPanel", () => {
     expect(btn.text()).toContain("Run migration")
   })
 
-  it("clicking Run migration calls runDataMigration and updates summary", async () => {
+  it("clicking Run migration chains runDataMigrationBatch until complete", async () => {
+    const midProgress: AdminDataMigrationStatusDto = {
+      migrationInProgress: true,
+      moreBatchesRemain: true,
+      completedBatchOrdinal: 1,
+      batchTotalPlanned: 3,
+      batchPhaseSummary: "Topology batch 1/2",
+      completedOnce: false,
+      message:
+        "Detached child folders 0; moved normal notes 0; cleared relation note folders 0;",
+      detachedChildFoldersFromIndexFolder: 0,
+      updatedNormalNotesDetachedFromIndex: 0,
+      updatedRelationNotesClearedFolder: 0,
+      deletedObsoleteNotebookNameRootFolders: 0,
+      notebookCountSlugScan: 0,
+    }
     const migrated: AdminDataMigrationStatusDto = {
+      migrationInProgress: false,
+      moreBatchesRemain: false,
+      completedBatchOrdinal: 3,
+      batchTotalPlanned: 3,
+      batchPhaseSummary: "Done",
       completedOnce: true,
       lastCompletedAt: "2026-04-01T08:30:12.345Z",
       message:
-        "Detached child folders 1; moved normal notes 2; cleared relation note folders 0;",
+        "Detached child folders 1; moved normal notes 2; cleared relation note folders 0; slug regen scanned 3 notebooks.",
       detachedChildFoldersFromIndexFolder: 1,
       updatedNormalNotesDetachedFromIndex: 2,
       updatedRelationNotesClearedFolder: 0,
       deletedObsoleteNotebookNameRootFolders: 0,
       notebookCountSlugScan: 3,
     }
-    runSpy.mockResolvedValue(wrapSdkResponse(migrated))
+
+    let callIdx = 0
+    runBatchSpy.mockImplementation(async () => {
+      callIdx++
+      if (callIdx === 1) {
+        return wrapSdkResponse(midProgress)
+      }
+      return wrapSdkResponse(migrated)
+    })
 
     const wrapper = helper.component(DataMigrationPanel).mount()
     await flushPromises()
@@ -78,14 +111,17 @@ describe("DataMigrationPanel", () => {
       .trigger("click")
     await flushPromises()
 
-    expect(runSpy).toHaveBeenCalledTimes(1)
-    expect(wrapper.text()).toContain("Detached child folders 1")
+    expect(runBatchSpy).toHaveBeenCalledTimes(2)
+    expect(wrapper.text()).toContain("slug regen scanned 3 notebooks")
+    expect(
+      wrapper.find('[data-testid="data-migration-progress"]').exists()
+    ).toBe(false)
   })
 
-  it("shows error when runDataMigration fails", async () => {
+  it("shows error when runDataMigrationBatch fails", async () => {
     vi.spyOn(
       AdminDataMigrationController,
-      "runDataMigration"
+      "runDataMigrationBatch"
     ).mockResolvedValue(wrapSdkError("Forbidden"))
 
     const wrapper = helper.component(DataMigrationPanel).mount()
