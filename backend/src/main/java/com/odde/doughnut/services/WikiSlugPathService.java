@@ -2,6 +2,8 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.List;
 import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,9 +13,22 @@ import org.springframework.stereotype.Service;
 public class WikiSlugPathService {
 
   private final JdbcTemplate jdbcTemplate;
+  private final NoteRepository noteRepository;
+  private final EntityPersister entityPersister;
 
-  public WikiSlugPathService(JdbcTemplate jdbcTemplate) {
+  public WikiSlugPathService(
+      JdbcTemplate jdbcTemplate, NoteRepository noteRepository, EntityPersister entityPersister) {
     this.jdbcTemplate = jdbcTemplate;
+    this.noteRepository = noteRepository;
+    this.entityPersister = entityPersister;
+  }
+
+  public void regenerateAllNoteSlugPaths() {
+    for (Note note : noteRepository.findAllNonDeletedNotesOrderByNotebookFolderAndId()) {
+      assignSlugForNewNote(note);
+      entityPersister.merge(note);
+    }
+    entityPersister.flush();
   }
 
   public void assignSlugForNewFolder(Folder folder) {

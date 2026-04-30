@@ -1,8 +1,8 @@
 <template>
   <div aria-live="polite">
     <div class="daisy-alert daisy-alert-info daisy-mb-4" role="status">
-      Admin data migrations will appear here once a migration is implemented on the server. The stub
-      below shows whatever the backend returns today.
+      Run migration applies server-side wiki data backfills (relationship titles and details, then
+      note slug regeneration). The summary shows the latest status or batch result from the backend.
     </div>
 
     <div v-if="error" class="daisy-alert daisy-alert-error daisy-mb-4" role="alert">

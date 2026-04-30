@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,22 +17,25 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
   @Autowired AdminDataMigrationController controller;
 
   @Test
-  void adminGetsStatusStub() throws UnexpectedNoAccessRightException {
+  void adminGetsMigrationStatus() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
 
     AdminDataMigrationStatusDTO status = controller.getAdminDataMigrationStatus();
 
-    assertThat(status.getMessage(), equalTo(AdminDataMigrationService.IDLE_MESSAGE));
+    assertThat(status.getMessage(), equalTo(AdminDataMigrationService.READY_MESSAGE));
   }
 
   @Test
-  void adminRunBatchMatchesStatusStub() throws UnexpectedNoAccessRightException {
+  void adminRunBatchReturnsBatchSummary() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
 
     AdminDataMigrationStatusDTO run = controller.runDataMigrationBatch();
 
     assertThat(run.getMessage(), notNullValue());
-    assertThat(run.getMessage(), equalTo(controller.getAdminDataMigrationStatus().getMessage()));
+    assertThat(run.getMessage(), containsString("Migration batch"));
+    assertThat(
+        controller.getAdminDataMigrationStatus().getMessage(),
+        equalTo(AdminDataMigrationService.READY_MESSAGE));
   }
 
   @Test
