@@ -61,6 +61,7 @@ class NoteControllerTests extends ControllerTestBase {
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
       assertThat(noteRealm.getFromBazaar(), is(true));
+      assertThat(noteRealm.getNotebookId(), equalTo(note.getNotebook().getId()));
     }
 
     @Test
@@ -70,6 +71,7 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getSlug(), equalTo(note.getSlug()));
       assertThat(noteRealm.getFromBazaar(), is(false));
+      assertThat(noteRealm.getNotebookId(), equalTo(note.getNotebook().getId()));
     }
 
     @Test
@@ -146,6 +148,7 @@ class NoteControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
       NoteRealm realm = controller.showNoteByAmbiguousBasename("foo");
       assertThat(realm.getId(), equalTo(note.getId()));
+      assertThat(realm.getNotebookId(), equalTo(note.getNotebook().getId()));
     }
 
     @Test
@@ -155,6 +158,7 @@ class NoteControllerTests extends ControllerTestBase {
       noteService.destroy(note);
       NoteRealm realm = controller.showNoteByAmbiguousBasename("tdd");
       assertThat(realm.getId(), equalTo(note.getId()));
+      assertThat(realm.getNotebookId(), equalTo(note.getNotebook().getId()));
       assertThat(realm.getNote().getDeletedAt(), notNullValue());
     }
 

@@ -229,10 +229,10 @@ export type NoteRealm = {
     slug: string;
     note: Note;
     fromBazaar?: boolean;
+    notebookId: number;
     children?: Array<Note>;
     inboundReferences?: Array<Note>;
     wikiTitles?: Array<WikiTitle>;
-    notebook: Notebook;
 };
 
 export type NoteTopology = {
@@ -915,10 +915,10 @@ export type NoteRealmWritable = {
     slug: string;
     note: NoteWritable;
     fromBazaar?: boolean;
+    notebookId: number;
     children?: Array<NoteWritable>;
     inboundReferences?: Array<NoteWritable>;
     wikiTitles?: Array<WikiTitle>;
-    notebook: Notebook;
 };
 
 export type RecallPromptWritable = {

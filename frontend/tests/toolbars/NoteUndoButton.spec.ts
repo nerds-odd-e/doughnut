@@ -301,7 +301,7 @@ describe("NoteUndoButton", () => {
       expect(mockedPush).toHaveBeenCalledWith({
         name: "noteShowByNotebookSlug",
         params: {
-          notebookId: String(noteRealm.notebook.id),
+          notebookId: String(noteRealm.notebookId),
           noteSlugPath: noteRealm.slug,
         },
       })
@@ -330,7 +330,7 @@ describe("NoteUndoButton", () => {
       expect(mockedPush).toHaveBeenCalledWith({
         name: "noteShowByNotebookSlug",
         params: {
-          notebookId: String(noteRealm.notebook.id),
+          notebookId: String(noteRealm.notebookId),
           noteSlugPath: noteRealm.slug,
         },
       })
@@ -358,7 +358,7 @@ describe("NoteUndoButton", () => {
       expect(mockedPush).toHaveBeenCalledWith({
         name: "noteShowByNotebookSlug",
         params: {
-          notebookId: String(noteRealm.notebook.id),
+          notebookId: String(noteRealm.notebookId),
           noteSlugPath: noteRealm.slug,
         },
       })
@@ -383,7 +383,7 @@ describe("NoteUndoButton", () => {
       expect(mockedPush).toHaveBeenCalledWith({
         name: "noteShowByNotebookSlug",
         params: {
-          notebookId: String(parentNoteRealm.notebook.id),
+          notebookId: String(parentNoteRealm.notebookId),
           noteSlugPath: parentNoteRealm.slug,
         },
       })

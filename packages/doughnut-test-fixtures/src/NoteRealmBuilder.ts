@@ -1,8 +1,6 @@
 import type { NoteRealm } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
-import generateId from './generateId'
-import NotebookBuilder from './NotebookBuilder'
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
   data: NoteRealm
@@ -20,7 +18,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       inboundReferences: [],
       children: [],
       wikiTitles: [],
-      notebook: new NotebookBuilder().please(),
+      notebookId: noteData.noteTopology.notebookId,
     }
   }
 
@@ -31,14 +29,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   notebookName(value: string): NoteRealmBuilder {
     this.noteBuilder.notebookName(value)
-    return this
-  }
-
-  inCircle(circleName: string) {
-    this.data.notebook.circle = {
-      id: generateId(),
-      name: circleName,
-    }
     return this
   }
 
@@ -85,6 +75,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
     this.data.slug = this.data.note.noteTopology.slug
+    this.data.notebookId = this.data.note.noteTopology.notebookId
+    this.data.wikiTitles ??= []
     return this.data
   }
 }

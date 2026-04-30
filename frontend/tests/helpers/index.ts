@@ -34,7 +34,11 @@ import {
   AdminDataMigrationController,
   AdminUserController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type {
+  Circle,
+  NoteRealm,
+  Notebook,
+} from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 
 // Mapping of method names to their controller classes
@@ -295,6 +299,18 @@ export function mockSdkService<K extends SdkServiceName>(
       // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
       .mockResolvedValue(wrapSdkResponse(data) as any)
   )
+}
+
+/** Mocks `NotebookController.get` for the notebook that owns `realm` (e.g. note show breadcrumb circle). */
+export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
+  const notebook: Notebook = {
+    id: realm.notebookId,
+    title: realm.note.noteTopology.notebookTitle ?? "Notebook",
+    notebookSettings: { skipMemoryTrackingEntirely: false },
+    updated_at: realm.note.updatedAt,
+    ...(circle ? { circle } : {}),
+  }
+  return mockSdkService("get", notebook)
 }
 
 /**

@@ -36,7 +36,8 @@ describe("NotebookPage.spec", () => {
   it("shows the note-show sidebar toggle and loads the tree via index slug when present", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
-    indexRealm.notebook = { ...indexRealm.notebook, id: notebook.id }
+    indexRealm.notebookId = notebook.id
+    indexRealm.note.noteTopology.notebookId = notebook.id
     mockSdkService("get", notebook)
     const slugSpy = mockSdkService("getNoteBySlug", indexRealm)
     helper

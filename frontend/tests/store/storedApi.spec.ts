@@ -87,7 +87,7 @@ describe("storedApiCollection", () => {
 
       expect(routerPush).toHaveBeenCalledWith({
         name: "notebookPage",
-        params: { notebookId: note.notebook!.id },
+        params: { notebookId: note.notebookId },
       })
     })
   })

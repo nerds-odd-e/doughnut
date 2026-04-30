@@ -72,7 +72,10 @@ const noteRealm = computed(() =>
     : undefined
 )
 const notebookId = computed(
-  () => props.notebookRootNotebookId ?? noteRealm.value?.notebook.id
+  () =>
+    props.notebookRootNotebookId ??
+    noteRealm.value?.notebookId ??
+    props.referenceNote?.noteTopology.notebookId
 )
 
 // Emits

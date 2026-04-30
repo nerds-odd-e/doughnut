@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -16,11 +15,10 @@ import org.springframework.lang.NonNull;
   "slug",
   "note",
   "fromBazaar",
-  "circle",
+  "notebookId",
   "children",
   "inboundReferences",
-  "wikiTitles",
-  "notebook"
+  "wikiTitles"
 })
 public class NoteRealm {
   @Getter @Setter private List<Note> inboundReferences;
@@ -53,7 +51,7 @@ public class NoteRealm {
 
   @NonNull
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  public Notebook getNotebook() {
-    return Objects.requireNonNull(note.getNotebook());
+  public Integer getNotebookId() {
+    return Objects.requireNonNull(note.getNotebook()).getId();
   }
 }

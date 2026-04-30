@@ -3845,6 +3845,9 @@ components:
           $ref: "#/components/schemas/Note"
         fromBazaar:
           type: boolean
+        notebookId:
+          type: integer
+          format: int32
         children:
           type: array
           items:
@@ -3857,12 +3860,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WikiTitle"
-        notebook:
-          $ref: "#/components/schemas/Notebook"
       required:
       - id
       - note
-      - notebook
+      - notebookId
       - slug
     NoteTopology:
       type: object

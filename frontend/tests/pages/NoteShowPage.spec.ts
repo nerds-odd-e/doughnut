@@ -2,6 +2,7 @@ import NoteShowPage from "@/pages/NoteShowPage.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
+  mockNotebookGetForNoteRealm,
   mockShowNoteAccessory,
   mockSdkService,
   wrapSdkError,
@@ -24,10 +25,14 @@ describe("all in note show page", () => {
   })
 
   describe("note show", () => {
-    const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
+    const noteRealm = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
       mockSdkService("showNote", noteRealm)
+      mockNotebookGetForNoteRealm(noteRealm, {
+        id: 101,
+        name: "a circle",
+      })
     })
 
     it(" should fetch API", async () => {
@@ -49,11 +54,15 @@ describe("all in note show page", () => {
   })
 
   describe("note show by basename", () => {
-    const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
+    const noteRealm = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
       mockSdkService("showNoteByAmbiguousBasename", noteRealm)
       mockSdkService("showNote", noteRealm)
+      mockNotebookGetForNoteRealm(noteRealm, {
+        id: 101,
+        name: "a circle",
+      })
     })
 
     it("resolves basename then loads note and passes stable id to NoteShow via storage", async () => {
@@ -102,11 +111,15 @@ describe("all in note show page", () => {
   })
 
   describe("note show by notebook slug path", () => {
-    const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
+    const noteRealm = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
       mockSdkService("getNoteBySlug", noteRealm)
       mockSdkService("showNote", noteRealm)
+      mockNotebookGetForNoteRealm(noteRealm, {
+        id: 101,
+        name: "a circle",
+      })
     })
 
     it("resolves slug path then loads note and passes stable id to NoteShow via storage", async () => {
@@ -142,6 +155,7 @@ describe("all in note show page", () => {
     beforeEach(() => {
       mockSdkService("showNote", note)
       mockSdkService("getConversationsAboutNote", [])
+      mockNotebookGetForNoteRealm(note)
     })
 
     it("should maximize conversation when maximize button is clicked", async () => {
@@ -195,7 +209,7 @@ describe("all in note show page", () => {
 
       expect(router.currentRoute.value.name).toBe("noteShowByNotebookSlug")
       expect(router.currentRoute.value.params.notebookId).toBe(
-        String(note.notebook.id)
+        String(note.notebookId)
       )
       expect(router.currentRoute.value.params.noteSlugPath).toBe(note.slug)
       expect(router.currentRoute.value.query.conversation).toBeUndefined()

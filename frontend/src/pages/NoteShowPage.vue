@@ -38,7 +38,7 @@
         v-if="noteRealm"
         v-bind="{
           fromBazaar: noteRealm?.fromBazaar,
-          circle: noteRealm.notebook.circle,
+          circle: notebookForBreadcrumb?.circle,
           noteTopology: noteRealm?.note.noteTopology,
         }"
       />
@@ -65,7 +65,7 @@
       <NoteSidebar
         v-if="noteRealm"
         :note-realm="noteRealm"
-        :notebook-id="noteRealm.notebook.id"
+        :notebook-id="noteRealm.notebookId"
       />
     </aside>
 
@@ -120,7 +120,8 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalBar from "../components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm, Notebook } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 
 const router = useRouter()
 const route = useRoute()
@@ -242,6 +243,40 @@ const noteRealm = computed(() => {
   if (id == null) return undefined
   return storageAccessor.value.refOfNoteRealm(id).value
 })
+
+const routeNotebookId = computed((): number | undefined => {
+  if (
+    props.notebookId == null ||
+    Number.isNaN(props.notebookId) ||
+    props.noteSlugPath === undefined ||
+    props.noteSlugPath === ""
+  ) {
+    return undefined
+  }
+  return props.notebookId
+})
+
+const notebookForBreadcrumb = ref<Notebook | undefined>(undefined)
+
+watch(
+  () => routeNotebookId.value ?? noteRealm.value?.notebookId,
+  async (notebookId) => {
+    if (notebookId == null || Number.isNaN(Number(notebookId))) {
+      notebookForBreadcrumb.value = undefined
+      return
+    }
+    if (notebookForBreadcrumb.value?.id === notebookId) {
+      return
+    }
+    const { data, error } = await NotebookController.get({
+      path: { notebook: notebookId },
+    })
+    if (!error && data) {
+      notebookForBreadcrumb.value = data
+    }
+  },
+  { immediate: true }
+)
 
 const sidebarOpened = ref(false)
 const isContentMinimized = ref(false)

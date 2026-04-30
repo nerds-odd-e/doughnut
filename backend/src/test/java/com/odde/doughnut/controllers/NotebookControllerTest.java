@@ -863,6 +863,7 @@ class NotebookControllerTest extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
       NoteRealm realm = controller.getNoteBySlug(note.getNotebook(), "some-folder/foo");
       assertThat(realm.getId(), equalTo(note.getId()));
+      assertThat(realm.getNotebookId(), equalTo(note.getNotebook().getId()));
     }
 
     @Test

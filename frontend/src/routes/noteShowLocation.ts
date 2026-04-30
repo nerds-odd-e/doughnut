@@ -17,7 +17,7 @@ export function noteShowByNotebookSlugLocation(
 export function noteShowByNotebookSlugLocationFromNoteRealm(
   noteRealm: NoteRealm
 ): RouteLocationNamedRaw {
-  return noteShowByNotebookSlugLocation(noteRealm.notebook.id, noteRealm.slug)
+  return noteShowByNotebookSlugLocation(noteRealm.notebookId, noteRealm.slug)
 }
 
 export function noteShowByNotebookSlugLocationFromNoteTopology(
