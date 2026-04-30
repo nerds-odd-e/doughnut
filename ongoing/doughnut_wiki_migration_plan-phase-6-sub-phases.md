@@ -26,6 +26,10 @@ By the end of Phase 6:
 
 Each sub-phase below is planned as a five-minute commit. If implementation discovers a sub-phase cannot be finished, tested, and committed inside that timebox, stop and split it before continuing.
 
+## Status
+
+All sub-phases are **planned** and not started. Each sub-phase below is intended to be independently testable and committable; do not batch adjacent sub-phases into one commit unless the plan is first updated to explain why the split no longer makes sense.
+
 ## Sub-Phase 6.1 - Root Listing Uses Notebook Root Folder Scope
 
 **Type:** Behavior.
@@ -132,7 +136,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Post-condition:** Siblings are resolved from the note's folder; for a note without a folder, siblings are resolved from the notebook root. The graph no longer asks the parent note for children to determine siblings.
 
-**Work:** Add focused graph retrieval tests that distinguish legacy parent siblings from folder/notebook-root siblings, then move sibling lookup behind a cohesive folder-scope query/service used by graph sibling handlers.
+**Work:** Add focused graph retrieval tests that distinguish legacy parent siblings from folder siblings and separately prove that a no-folder note gets siblings from the notebook root. Then move sibling lookup behind a cohesive folder-scope query/service used by graph sibling handlers.
 
 **Verify:** Focused graph retrieval tests, likely `GraphRAGServiceTest` or the existing graph relationship tests touched by sibling handlers.
 

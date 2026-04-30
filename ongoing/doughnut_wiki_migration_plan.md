@@ -627,7 +627,7 @@ Phase 1 already persists **`folderId`** parallel to **`Note.parent`** and keeps 
 
 - Prefer **folder-scoped** listing and navigation for “what lives here”; retire parent-note **children** lists as the primary containment UI (creation targets the relevant **folder**, not a structural parent note pointer in product semantics).
 - Remove **`shortDetails`** from **`NoteTopology`** and regenerate the API client.
-- For note graph retrieval, resolve structural siblings from **folder scope**: same **`folderId`** for foldered notes, or same notebook with no **`folderId`** for notebook-root notes.
+- For note graph retrieval, resolve structural siblings from **folder scope**: same **`folderId`** for foldered notes, or same **notebook root** (same notebook and no **`folderId`**) for notes that have no folder.
 
 ## Sub-Phase Plan
 
