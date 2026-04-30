@@ -348,7 +348,7 @@ describe("Sidebar", () => {
       ).toBe(true)
     })
 
-    it("hides Add Next Sibling Note when active note is notebook head", async () => {
+    it("hides Add Next Sibling Note when active note has no parent", async () => {
       wrapper = helper
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())

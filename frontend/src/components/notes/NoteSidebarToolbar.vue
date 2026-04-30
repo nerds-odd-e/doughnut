@@ -9,14 +9,14 @@
         <FolderPlus class="w-5 h-5" />
       </NotebookRootNoteNewButton>
       <NoteNewButton
-        v-if="note != null && topologyHeadResolved"
+        v-if="note != null && activeNoteTopologyResolved"
         button-title="Add Child Note"
         v-bind="{ referenceNote: note!, insertMode: 'as-child' }"
       >
         <FolderPlus class="w-5 h-5" />
       </NoteNewButton>
       <NoteNewButton
-        v-if="note?.parentId && topologyHeadResolved"
+        v-if="note?.parentId && activeNoteTopologyResolved"
         button-title="Add Next Sibling Note"
         v-bind="{ referenceNote: note!, insertMode: 'after' }"
       >
@@ -36,8 +36,10 @@ import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 const props = defineProps<{
   notebookId: number
   note?: Note
-  topologyHeadResolved: boolean
+  activeNoteTopologyResolved: boolean
 }>()
 
-const preferNotebookRootCreation = computed(() => !props.topologyHeadResolved)
+const preferNotebookRootCreation = computed(
+  () => !props.activeNoteTopologyResolved
+)
 </script>

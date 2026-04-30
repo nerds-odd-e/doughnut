@@ -4,7 +4,7 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :note="activeNoteRealm?.note"
-      :topology-head-resolved="noteContextResolved"
+      :active-note-topology-resolved="noteContextResolved"
     />
     <SidebarInner
       v-if="sidebarTreeShown"
@@ -28,7 +28,7 @@ const props = defineProps({
     type: Object as PropType<NoteRealm | undefined>,
     required: false,
   },
-  /** Opens root-note POST /api/notebooks/{id}/create-note whenever topology head is missing */
+  /** Notebook id for sidebar chrome; toolbar shows root create until active note topology exists */
   notebookId: { type: Number, required: true },
 })
 

@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
+import { ancestorTopologyIds } from "./noteTopologyAncestors"
 import { computed, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
@@ -76,26 +77,6 @@ watch(
   { immediate: true }
 )
 
-watch(
-  () => ({
-    activeNoteId: props.activeNoteRealm?.note?.id,
-    parentTopic:
-      props.activeNoteRealm?.note?.noteTopology.parentOrSubjectNoteTopology,
-  }),
-  () => {
-    if (props.noteId !== undefined) return
-    if (!props.activeNoteRealm?.note) return
-    const storedApi = storageAccessor.value.storedApi()
-    let cursor =
-      props.activeNoteRealm.note.noteTopology.parentOrSubjectNoteTopology
-    while (cursor) {
-      storedApi.getNoteRealmRefAndLoadWhenNeeded(cursor.id)
-      cursor = cursor.parentOrSubjectNoteTopology
-    }
-  },
-  { immediate: true }
-)
-
 const displayNotes = computed(() => {
   if (props.noteId !== undefined && subtreeRealmRef) {
     return subtreeRealmRef.value?.children ?? []
@@ -115,17 +96,21 @@ watch(
     if (!props.activeNoteRealm?.note) {
       return
     }
-    const parentNoteTopic =
-      props.activeNoteRealm.note.noteTopology.parentOrSubjectNoteTopology
+    const note = props.activeNoteRealm.note
+    const parentTopic = note.noteTopology.parentOrSubjectNoteTopology
+
+    if (props.noteId === undefined) {
+      const storedApi = storageAccessor.value.storedApi()
+      for (const id of ancestorTopologyIds(parentTopic)) {
+        storedApi.getNoteRealmRefAndLoadWhenNeeded(id)
+      }
+    }
+
     const uniqueIds = new Set([
       ...expandedIds.value,
-      props.activeNoteRealm.note.id,
+      note.id,
+      ...ancestorTopologyIds(parentTopic),
     ])
-    let cursor = parentNoteTopic
-    while (cursor) {
-      uniqueIds.add(cursor.id)
-      cursor = cursor.parentOrSubjectNoteTopology
-    }
     expandedIds.value = Array.from(uniqueIds)
   },
   { immediate: true }
