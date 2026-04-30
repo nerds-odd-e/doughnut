@@ -13,6 +13,25 @@ import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
 const findChildNoteCard = (title: string) =>
   cy.findByText(title, { selector: '.daisy-card-title .title-text' })
 
+const notebookNoteBySlugHref = /^\/d\/notebooks\/\d+\/notes\/[^?#]+$/
+const notebookNoteBySlugInUrl = /\/d\/notebooks\/\d+\/notes\/[^?#]+$/
+
+function wikiLinkInDetailsFluent(linkText: string) {
+  const locator = () =>
+    cy.get('[role=details]').find('a.doughnut-link').contains(linkText)
+  return {
+    expectNotebookNoteBySlugHref() {
+      locator().should('have.attr', 'href').and('match', notebookNoteBySlugHref)
+      return this
+    },
+    followAndAssumeNote(noteTitle: string) {
+      locator().click()
+      cy.url({ timeout: 15000 }).should('match', notebookNoteBySlugInUrl)
+      return assumeNotePage(noteTitle)
+    },
+  }
+}
+
 export const assumeNotePage = (noteTopology?: string) => {
   const findNoteTitle = (title) =>
     cy.findByText(title, { selector: '[role=title]' })
@@ -308,6 +327,9 @@ export const assumeNotePage = (noteTopology?: string) => {
           noteCreationForm.submit()
         },
       }
+    },
+    wikiLinkInDetails(linkText: string) {
+      return wikiLinkInDetailsFluent(linkText)
     },
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)
