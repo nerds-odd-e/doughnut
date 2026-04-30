@@ -143,27 +143,48 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = selectFromNote + " WHERE n.parent.id = :parentId")
   List<Note> findAllByParentId(@Param("parentId") Integer parentId);
 
-  /**
-   * Relationship notes that still need wiki migration work: blank title, legacy details without
-   * relationship frontmatter, or no persisted wiki-title cache rows yet. Ordered by id for resume
-   * cursors.
-   */
+  String RELATIONSHIP_WIKI_MIGRATION_ELIGIBILITY =
+      " n.targetNote IS NOT NULL "
+          + "AND n.deletedAt IS NULL "
+          + "AND n.relationType IS NOT NULL "
+          + "AND n.parent IS NOT NULL "
+          + "AND (n.title IS NULL OR TRIM(n.title) = '' "
+          + "OR n.details IS NULL OR TRIM(n.details) = '' "
+          + "OR n.details NOT LIKE '%type: relationship%' "
+          + "OR NOT EXISTS (SELECT 1 FROM NoteWikiTitleCache c WHERE c.note = n)) ";
+
+  @Query("SELECT COUNT(n) FROM Note n WHERE " + RELATIONSHIP_WIKI_MIGRATION_ELIGIBILITY)
+  long countRelationshipNotesEligibleForWikiReferenceMigration();
+
+  @Query(
+      "SELECT n.id FROM Note n WHERE "
+          + RELATIONSHIP_WIKI_MIGRATION_ELIGIBILITY
+          + "AND (:exclusiveAfter IS NULL OR n.id > :exclusiveAfter) "
+          + "ORDER BY n.id ASC")
+  List<Integer> findRelationshipWikiMigrationCandidateIdsExclusiveAfterAsc(
+      @Param("exclusiveAfter") Integer exclusiveAfter, Pageable pageable);
+
+  @Query(
+      "SELECT DISTINCT n FROM Note n "
+          + "JOIN FETCH n.parent JOIN FETCH n.targetNote JOIN FETCH n.notebook "
+          + "WHERE n.id IN :ids")
+  List<Note> hydrateRelationshipWikiMigrationNotesByIds(@Param("ids") List<Integer> ids);
+
+  @Query("SELECT COUNT(n) FROM Note n WHERE n.deletedAt IS NULL")
+  long countNonDeletedNotes();
+
+  @Query(
+      "SELECT n.id FROM Note n WHERE n.deletedAt IS NULL "
+          + "AND (:exclusiveAfter IS NULL OR n.id > :exclusiveAfter) "
+          + "ORDER BY n.id ASC")
+  List<Integer> findNonDeletedNoteIdsExclusiveAfterAsc(
+      @Param("exclusiveAfter") Integer exclusiveAfter, Pageable pageable);
+
   @Query(
       value =
-          "SELECT DISTINCT n FROM Note n "
-              + "JOIN FETCH n.parent "
-              + "JOIN FETCH n.targetNote "
-              + "JOIN FETCH n.notebook "
-              + "WHERE n.targetNote IS NOT NULL "
-              + "AND n.deletedAt IS NULL "
-              + "AND n.relationType IS NOT NULL "
-              + "AND n.parent IS NOT NULL "
-              + "AND (n.title IS NULL OR TRIM(n.title) = '' "
-              + "OR n.details IS NULL OR TRIM(n.details) = '' "
-              + "OR n.details NOT LIKE '%type: relationship%' "
-              + "OR NOT EXISTS (SELECT 1 FROM NoteWikiTitleCache c WHERE c.note = n)) "
-              + "ORDER BY n.id ASC")
-  List<Note> findRelationshipNotesForWikiReferenceMigrationOrderByIdAsc();
+          "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
+              + "WHERE n.id IN :ids")
+  List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
 
   @Query(
       value =
@@ -171,12 +192,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + "WHERE n.deletedAt IS NULL "
               + "ORDER BY n.notebook.id ASC, n.folder.id ASC NULLS LAST, n.id ASC")
   List<Note> findAllNonDeletedNotesOrderByNotebookFolderAndId();
-
-  @Query(
-      value =
-          "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
-              + "WHERE n.deletedAt IS NULL ORDER BY n.id ASC")
-  List<Note> findAllNonDeletedNotesOrderByIdAsc();
 
   Optional<Note> findFirstByParent_IdAndFolderIsNotNullAndDeletedAtIsNullOrderByIdAsc(
       Integer parentId);

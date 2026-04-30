@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,25 +93,24 @@ public class AdminDataMigrationService {
   private AdminDataMigrationStatusDTO runRelationshipWikiBackfillBatch(User adminUser) {
     String step = STEP_RELATIONSHIP_WIKI_BACKFILL;
     try {
-      List<Note> candidates =
-          noteRepository.findRelationshipNotesForWikiReferenceMigrationOrderByIdAsc();
-      List<Integer> orderedIds = candidates.stream().map(Note::getId).toList();
-      wikiReferenceMigrationProgressService.startOrResume(step, orderedIds.size());
-      List<Integer> pending =
-          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
-      if (pending.isEmpty()) {
+      long totalEligible = noteRepository.countRelationshipNotesEligibleForWikiReferenceMigration();
+      wikiReferenceMigrationProgressService.startOrResume(
+          step, totalCountForProgress(totalEligible));
+      Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
+      List<Integer> batchIds =
+          noteRepository.findRelationshipWikiMigrationCandidateIdsExclusiveAfterAsc(
+              exclusiveAfter, PageRequest.of(0, WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
+      if (batchIds.isEmpty()) {
         wikiReferenceMigrationProgressService.markCompleted(step);
         AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
         dto.setMessage("Relationship wiki backfill: nothing pending.");
         populateMigrationProgress(dto);
         return dto;
       }
-      int take = Math.min(WIKI_REFERENCE_MIGRATION_BATCH_SIZE, pending.size());
-      List<Integer> batch = pending.subList(0, take);
+      List<Note> loaded = noteRepository.hydrateRelationshipWikiMigrationNotesByIds(batchIds);
       Map<Integer, Note> byId =
-          candidates.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
-      for (Integer id : batch) {
-        Note relation = byId.get(id);
+          loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
+      for (Note relation : notesForBatchIdsInOrder(batchIds, byId)) {
         if (relation.getTitle() == null || relation.getTitle().trim().isEmpty()) {
           relation.setTitle(
               RelationshipNoteTitleFormatter.format(
@@ -132,17 +132,17 @@ public class AdminDataMigrationService {
         entityPersister.merge(relation);
       }
       entityPersister.flush();
-      int lastId = batch.get(batch.size() - 1);
-      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batch.size());
-      List<Integer> stillPending =
-          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
-      if (stillPending.isEmpty()) {
+      int lastId = batchIds.get(batchIds.size() - 1);
+      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
+      if (noteRepository
+          .findRelationshipWikiMigrationCandidateIdsExclusiveAfterAsc(lastId, PageRequest.of(0, 1))
+          .isEmpty()) {
         wikiReferenceMigrationProgressService.markCompleted(step);
       }
       AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
       dto.setMessage(
           "Relationship wiki backfill: processed %d note(s) in this batch."
-              .formatted(batch.size()));
+              .formatted(batchIds.size()));
       populateMigrationProgress(dto);
       return dto;
     } catch (RuntimeException e) {
@@ -164,20 +164,19 @@ public class AdminDataMigrationService {
     String step = STEP_LEGACY_PARENT_FRONTMATTER;
     try {
       entityPersister.flush();
-      List<Integer> orderedIds = legacyChildNoteIdsOrderedForMigration();
-      wikiReferenceMigrationProgressService.startOrResume(step, orderedIds.size());
-      List<Integer> pending =
-          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
-      if (pending.isEmpty()) {
+      long total = countLegacyChildNotesEligibleForWikiMigration();
+      wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(total));
+      Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
+      List<Integer> batchIds =
+          nextLegacyChildNoteIdsPage(exclusiveAfter, WIKI_REFERENCE_MIGRATION_BATCH_SIZE);
+      if (batchIds.isEmpty()) {
         wikiReferenceMigrationProgressService.markCompleted(step);
         AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
         dto.setMessage("Legacy parent frontmatter: nothing pending.");
         populateMigrationProgress(dto);
         return dto;
       }
-      int take = Math.min(WIKI_REFERENCE_MIGRATION_BATCH_SIZE, pending.size());
-      List<Integer> batch = pending.subList(0, take);
-      for (Integer id : batch) {
+      for (Integer id : batchIds) {
         Note note = noteRepository.findById(id).orElseThrow();
         Note parent = note.getParent();
         String parentTitle = parent != null ? parent.getTitle() : null;
@@ -189,20 +188,19 @@ public class AdminDataMigrationService {
         entityPersister.merge(note);
       }
       entityPersister.flush();
-      for (Integer id : batch) {
+      for (Integer id : batchIds) {
         Note note = noteRepository.findById(id).orElseThrow();
         wikiTitleCacheService.refreshForNote(note, viewerForWikiTitleCacheRefresh(note, adminUser));
       }
-      int lastId = batch.get(batch.size() - 1);
-      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batch.size());
-      List<Integer> stillPending =
-          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
-      if (stillPending.isEmpty()) {
+      int lastId = batchIds.get(batchIds.size() - 1);
+      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
+      if (nextLegacyChildNoteIdsPage(lastId, 1).isEmpty()) {
         wikiReferenceMigrationProgressService.markCompleted(step);
       }
       AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
       dto.setMessage(
-          "Legacy parent frontmatter: processed %d note(s) in this batch.".formatted(batch.size()));
+          "Legacy parent frontmatter: processed %d note(s) in this batch."
+              .formatted(batchIds.size()));
       populateMigrationProgress(dto);
       return dto;
     } catch (RuntimeException e) {
@@ -225,38 +223,37 @@ public class AdminDataMigrationService {
   private AdminDataMigrationStatusDTO runSlugRegenerationBatch() {
     String step = STEP_NOTE_SLUG_PATH_REGENERATION;
     try {
-      List<Note> allNotes = noteRepository.findAllNonDeletedNotesOrderByIdAsc();
-      List<Integer> orderedIds = allNotes.stream().map(Note::getId).toList();
-      wikiReferenceMigrationProgressService.startOrResume(step, orderedIds.size());
-      List<Integer> pending =
-          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
-      if (pending.isEmpty()) {
+      long total = noteRepository.countNonDeletedNotes();
+      wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(total));
+      Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
+      List<Integer> batchIds =
+          noteRepository.findNonDeletedNoteIdsExclusiveAfterAsc(
+              exclusiveAfter, PageRequest.of(0, WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
+      if (batchIds.isEmpty()) {
         wikiReferenceMigrationProgressService.markCompleted(step);
         AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
         dto.setMessage("Slug regeneration: nothing pending.");
         populateMigrationProgress(dto);
         return dto;
       }
-      int take = Math.min(WIKI_REFERENCE_MIGRATION_BATCH_SIZE, pending.size());
-      List<Integer> batch = pending.subList(0, take);
+      List<Note> loaded = noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(batchIds);
       Map<Integer, Note> byId =
-          allNotes.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
-      for (Integer id : batch) {
-        Note note = byId.get(id);
+          loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
+      for (Note note : notesForBatchIdsInOrder(batchIds, byId)) {
         wikiSlugPathService.assignSlugForNewNote(note);
         entityPersister.merge(note);
       }
       entityPersister.flush();
-      int lastId = batch.get(batch.size() - 1);
-      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batch.size());
-      List<Integer> stillPending =
-          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
-      if (stillPending.isEmpty()) {
+      int lastId = batchIds.get(batchIds.size() - 1);
+      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
+      if (noteRepository
+          .findNonDeletedNoteIdsExclusiveAfterAsc(lastId, PageRequest.of(0, 1))
+          .isEmpty()) {
         wikiReferenceMigrationProgressService.markCompleted(step);
       }
       AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
       dto.setMessage(
-          "Slug regeneration: processed %d note(s) in this batch.".formatted(batch.size()));
+          "Slug regeneration: processed %d note(s) in this batch.".formatted(batchIds.size()));
       populateMigrationProgress(dto);
       return dto;
     } catch (RuntimeException e) {
@@ -316,12 +313,13 @@ public class AdminDataMigrationService {
 
   private int estimatedPendingTotalForStep(String activeStep) {
     if (STEP_RELATIONSHIP_WIKI_BACKFILL.equals(activeStep)) {
-      return noteRepository.findRelationshipNotesForWikiReferenceMigrationOrderByIdAsc().size();
+      return totalCountForProgress(
+          noteRepository.countRelationshipNotesEligibleForWikiReferenceMigration());
     }
     if (STEP_LEGACY_PARENT_FRONTMATTER.equals(activeStep)) {
-      return legacyChildNoteIdsOrderedForMigration().size();
+      return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
     }
-    return noteRepository.findAllNonDeletedNotesOrderByIdAsc().size();
+    return totalCountForProgress(noteRepository.countNonDeletedNotes());
   }
 
   private static void copyProgressFields(
@@ -375,11 +373,50 @@ public class AdminDataMigrationService {
         .orElse(false);
   }
 
-  private List<Integer> legacyChildNoteIdsOrderedForMigration() {
+  private Integer exclusiveLastProcessedNoteId(String stepName) {
+    return wikiReferenceMigrationProgressService
+        .find(stepName)
+        .map(WikiReferenceMigrationProgress::getLastProcessedNote)
+        .filter(Objects::nonNull)
+        .map(Note::getId)
+        .orElse(null);
+  }
+
+  private static int totalCountForProgress(long total) {
+    if (total > Integer.MAX_VALUE) {
+      return Integer.MAX_VALUE;
+    }
+    return (int) total;
+  }
+
+  private static List<Note> notesForBatchIdsInOrder(
+      List<Integer> batchIds, Map<Integer, Note> byId) {
+    return batchIds.stream().map(byId::get).filter(Objects::nonNull).toList();
+  }
+
+  private long countLegacyChildNotesEligibleForWikiMigration() {
+    Long c =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
+                + "AND target_note_id IS NULL",
+            Long.class);
+    return c == null ? 0 : c;
+  }
+
+  private List<Integer> nextLegacyChildNoteIdsPage(Integer exclusiveAfter, int limit) {
+    if (exclusiveAfter == null) {
+      return jdbcTemplate.query(
+          "SELECT id FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
+              + "AND target_note_id IS NULL ORDER BY id ASC LIMIT ?",
+          (rs, rowNum) -> rs.getInt(1),
+          limit);
+    }
     return jdbcTemplate.query(
         "SELECT id FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
-            + "AND target_note_id IS NULL ORDER BY id ASC",
-        (rs, rowNum) -> rs.getInt(1));
+            + "AND target_note_id IS NULL AND id > ? ORDER BY id ASC LIMIT ?",
+        (rs, rowNum) -> rs.getInt(1),
+        exclusiveAfter,
+        limit);
   }
 
   private Optional<String> findFailedStepName() {

@@ -107,6 +107,24 @@ And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
 
 **Commit boundary:** One folder-first navigation commit.
 
+**Temporary presentation note:** During this sub-phase, a folder returned by structural listing may be merged into the note row with the same title/slug at the same level. This keeps migrated former parent-note trees visually stable while the sidebar data source changes from note children to folder listings.
+
+## Sub-Phase 6.4.1 - Sidebar Renders Folders And Notes As Separate Items
+
+**Type:** Behavior.
+
+**Pre-condition:** Sidebar structural branches are loaded from notebook root and folder-scoped listing APIs, and the temporary 6.4 presentation merges matching folder/note rows.
+
+**Trigger:** A user opens a notebook root or folder that contains both folders and notes.
+
+**Post-condition:** Folders and notes are rendered as separate sidebar items. Folder items can only open and collapse to reveal the notes and child folders inside them. Note items are the only items that navigate to notes. Path navigation clicks folder items for every path segment except the last segment, then clicks the final note item.
+
+**Work:** Replace the temporary matching-folder merge with explicit folder rows in the sidebar row model and components. Update the E2E navigation helper so `navigateToNoteFromPath` expands/clicks folder items for intermediate path segments and clicks the final note item.
+
+**Verify:** Targeted frontend sidebar test plus `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/note_tree_view.feature`.
+
+**Commit boundary:** One separate-folder-sidebar commit.
+
 ## Sub-Phase 6.5 - New Notes Appear In The Current Folder Scope
 
 **Type:** Behavior.
