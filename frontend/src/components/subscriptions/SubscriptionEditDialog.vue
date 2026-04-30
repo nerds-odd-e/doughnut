@@ -16,6 +16,7 @@ import { defineComponent, type PropType } from "vue"
 import type {
   Subscription,
   SubscriptionDto,
+  SubscriptionForNotebooksListing,
 } from "@generated/doughnut-backend-api"
 import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -25,7 +26,7 @@ import TextInput from "../form/TextInput.vue"
 export default defineComponent({
   props: {
     subscription: {
-      type: Object as PropType<Subscription>,
+      type: Object as PropType<Subscription | SubscriptionForNotebooksListing>,
       required: true,
     },
   },

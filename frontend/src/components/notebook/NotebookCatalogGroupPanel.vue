@@ -127,7 +127,7 @@ import { RouterLink } from "vue-router"
 import type {
   Notebook,
   NotebookCatalogGroupItem,
-  Subscription,
+  SubscriptionForNotebooksListing,
   User,
 } from "@generated/doughnut-backend-api"
 import NotebookButtons from "./NotebookButtons.vue"
@@ -146,7 +146,7 @@ const props = defineProps({
     required: true,
   },
   subscriptions: {
-    type: Array as PropType<Subscription[]>,
+    type: Array as PropType<SubscriptionForNotebooksListing[]>,
     required: true,
   },
   user: {
@@ -197,8 +197,10 @@ const hint = computed(() =>
   })
 )
 
-function subscriptionForNotebook(notebookId: number): Subscription | undefined {
-  return props.subscriptions.find((s) => s.notebook?.id === notebookId)
+function subscriptionForNotebook(
+  notebookId: number
+): SubscriptionForNotebooksListing | undefined {
+  return props.subscriptions.find((s) => s.notebook.id === notebookId)
 }
 </script>
 

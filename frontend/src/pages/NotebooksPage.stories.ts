@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import type { Subscription, User } from "@generated/doughnut-backend-api"
+import type {
+  SubscriptionForNotebooksListing,
+  User,
+} from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Page Views/NotebooksPageView",
@@ -55,9 +58,19 @@ export const WithNotebooksAndSubscriptions: Story = {
         )
         .please(),
       subscriptions: [
-        { id: 1, notebook: sharedNb, user: mockUser } as Subscription,
-        { id: 2, notebook: communityNb, user: mockUser } as Subscription,
-      ],
+        {
+          id: 1,
+          dailyTargetOfNewNotes: 5,
+          notebook: sharedNb,
+          user: mockUser,
+        },
+        {
+          id: 2,
+          dailyTargetOfNewNotes: 5,
+          notebook: communityNb,
+          user: mockUser,
+        },
+      ] satisfies SubscriptionForNotebooksListing[],
       user: mockUser,
     }
   })(),

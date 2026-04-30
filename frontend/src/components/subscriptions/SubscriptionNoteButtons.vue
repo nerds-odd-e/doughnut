@@ -67,7 +67,10 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { Subscription } from "@generated/doughnut-backend-api"
+import type {
+  Subscription,
+  SubscriptionForNotebooksListing,
+} from "@generated/doughnut-backend-api"
 import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
@@ -78,7 +81,7 @@ import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
 
 const props = defineProps({
   subscription: {
-    type: Object as PropType<Subscription>,
+    type: Object as PropType<Subscription | SubscriptionForNotebooksListing>,
     required: true,
   },
   notebookId: {

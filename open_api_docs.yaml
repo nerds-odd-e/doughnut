@@ -3727,8 +3727,6 @@ components:
           $ref: "#/components/schemas/Circle"
         description:
           type: string
-        hasAttachedBook:
-          type: boolean
         updated_at:
           type: string
           format: date-time
@@ -5032,7 +5030,7 @@ components:
           notebooks:
             type: array
             items:
-              $ref: "#/components/schemas/Notebook"
+              $ref: "#/components/schemas/NotebookClientView"
       required:
       - createdAt
       - id
@@ -5056,7 +5054,7 @@ components:
       - type: object
         properties:
           notebook:
-            $ref: "#/components/schemas/Notebook"
+            $ref: "#/components/schemas/NotebookClientView"
       required:
       - notebook
     NotebookCatalogSubscribedNotebookItem:
@@ -5065,20 +5063,50 @@ components:
       - type: object
         properties:
           notebook:
-            $ref: "#/components/schemas/Notebook"
+            $ref: "#/components/schemas/NotebookClientView"
           subscriptionId:
             type: integer
             format: int32
       required:
       - notebook
       - subscriptionId
+    NotebookClientView:
+      type: object
+      description: "Notebook fields exposed to clients, optionally including attached-book\
+        \ indicator."
+      properties:
+        id:
+          type: integer
+          format: int32
+        certifiable:
+          type: boolean
+        notebookSettings:
+          $ref: "#/components/schemas/NotebookSettings"
+        creatorId:
+          type: string
+        name:
+          type: string
+        circle:
+          $ref: "#/components/schemas/Circle"
+        description:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        hasAttachedBook:
+          type: boolean
+      required:
+      - id
+      - name
+      - notebookSettings
+      - updated_at
     NotebooksViewedByUser:
       type: object
       properties:
         notebooks:
           type: array
           items:
-            $ref: "#/components/schemas/Notebook"
+            $ref: "#/components/schemas/NotebookClientView"
         catalogItems:
           type: array
           items:
@@ -5089,10 +5117,29 @@ components:
         subscriptions:
           type: array
           items:
-            $ref: "#/components/schemas/Subscription"
+            $ref: "#/components/schemas/SubscriptionForNotebooksListing"
       required:
       - catalogItems
       - notebooks
+    SubscriptionForNotebooksListing:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        dailyTargetOfNewNotes:
+          type: integer
+          format: int32
+        user:
+          $ref: "#/components/schemas/User"
+        notebook:
+          $ref: "#/components/schemas/NotebookClientView"
+        name:
+          type: string
+      required:
+      - dailyTargetOfNewNotes
+      - id
+      - notebook
     BookUserLastReadPosition:
       type: object
       properties:

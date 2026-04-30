@@ -185,7 +185,6 @@ export type Notebook = {
     name: string;
     circle?: Circle;
     description?: string;
-    hasAttachedBook?: boolean;
     updated_at: string;
 };
 
@@ -775,7 +774,7 @@ export type NotebookCatalogGroupItem = Omit<NotebookCatalogItem, 'type'> & {
     id: number;
     name: string;
     createdAt: string;
-    notebooks: Array<Notebook>;
+    notebooks: Array<NotebookClientView>;
     type: 'notebookGroup';
 };
 
@@ -784,20 +783,43 @@ export type NotebookCatalogItem = {
 };
 
 export type NotebookCatalogNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
-    notebook: Notebook;
+    notebook: NotebookClientView;
     type: 'notebook';
 };
 
 export type NotebookCatalogSubscribedNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
-    notebook: Notebook;
+    notebook: NotebookClientView;
     subscriptionId: number;
     type: 'subscribedNotebook';
 };
 
+/**
+ * Notebook fields exposed to clients, optionally including attached-book indicator.
+ */
+export type NotebookClientView = {
+    id: number;
+    certifiable?: boolean;
+    notebookSettings: NotebookSettings;
+    creatorId?: string;
+    name: string;
+    circle?: Circle;
+    description?: string;
+    updated_at: string;
+    hasAttachedBook?: boolean;
+};
+
 export type NotebooksViewedByUser = {
-    notebooks: Array<Notebook>;
+    notebooks: Array<NotebookClientView>;
     catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem | NotebookCatalogSubscribedNotebookItem>;
-    subscriptions?: Array<Subscription>;
+    subscriptions?: Array<SubscriptionForNotebooksListing>;
+};
+
+export type SubscriptionForNotebooksListing = {
+    id: number;
+    dailyTargetOfNewNotes: number;
+    user?: User;
+    notebook: NotebookClientView;
+    name?: string;
 };
 
 export type BookUserLastReadPosition = {
@@ -971,20 +993,6 @@ export type ConversationSubjectWritable = {
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
-};
-
-export type NotebooksViewedByUserWritable = {
-    notebooks: Array<Notebook>;
-    catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem | NotebookCatalogSubscribedNotebookItem>;
-    subscriptions?: Array<SubscriptionWritable>;
-};
-
-export type CircleForUserViewWritable = {
-    id: number;
-    name: string;
-    invitationCode: string;
-    notebooks: NotebooksViewedByUserWritable;
-    members: Array<UserForOtherUserView>;
 };
 
 export type PutNotebookBookBlockReadingRecordData = {

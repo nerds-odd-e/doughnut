@@ -4,7 +4,9 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
+import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
@@ -13,10 +15,13 @@ import com.odde.doughnut.entities.repositories.BookRepository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,48 +44,45 @@ public class NotebookCatalogService {
    */
   public NotebooksViewedByUser buildView(
       List<Notebook> allNotebooks, List<NotebookGroup> groups, List<Subscription> subscriptions) {
+    Set<Integer> ids = notebookIdsReferenced(allNotebooks, subscriptions);
+    Set<Integer> withBook =
+        ids.isEmpty()
+            ? Set.of()
+            : new HashSet<>(bookRepository.findNotebookIdsWithAttachedBooksIn(ids));
+
+    Map<Integer, NotebookClientView> byNotebookId = new HashMap<>();
+    Function<Notebook, NotebookClientView> wrap =
+        nb ->
+            byNotebookId.computeIfAbsent(
+                nb.getId(), __ -> NotebookClientView.of(nb, withBook.contains(nb.getId())));
+
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
-    dto.notebooks = allNotebooks;
-    dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions);
-    fillHasAttachedBook(dto, subscriptions);
+    dto.notebooks = allNotebooks.stream().map(wrap).toList();
+    dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions, wrap);
+    dto.subscriptions =
+        subscriptions.stream()
+            .map(s -> SubscriptionForNotebooksListing.from(s, wrap.apply(s.getNotebook())))
+            .toList();
     return dto;
   }
 
-  private void fillHasAttachedBook(NotebooksViewedByUser dto, List<Subscription> subscriptions) {
+  private static Set<Integer> notebookIdsReferenced(
+      List<Notebook> allNotebooks, List<Subscription> subscriptions) {
     Set<Integer> ids = new HashSet<>();
-    dto.notebooks.forEach(n -> ids.add(n.getId()));
+    allNotebooks.forEach(n -> ids.add(n.getId()));
     for (Subscription s : subscriptions) {
       if (s.getNotebook() != null) {
         ids.add(s.getNotebook().getId());
       }
     }
-    Set<Integer> withBook = new HashSet<>();
-    if (!ids.isEmpty()) {
-      withBook.addAll(bookRepository.findNotebookIdsWithAttachedBooksIn(ids));
-    }
-    for (Notebook n : dto.notebooks) {
-      n.setHasAttachedBook(withBook.contains(n.getId()));
-    }
-    for (Subscription s : subscriptions) {
-      Notebook nb = s.getNotebook();
-      if (nb != null) {
-        nb.setHasAttachedBook(withBook.contains(nb.getId()));
-      }
-    }
-    for (NotebookCatalogItem item : dto.catalogItems) {
-      switch (item) {
-        case NotebookCatalogNotebookItem ni ->
-            ni.notebook.setHasAttachedBook(withBook.contains(ni.notebook.getId()));
-        case NotebookCatalogSubscribedNotebookItem si ->
-            si.notebook.setHasAttachedBook(withBook.contains(si.notebook.getId()));
-        case NotebookCatalogGroupItem gi ->
-            gi.notebooks.forEach(n -> n.setHasAttachedBook(withBook.contains(n.getId())));
-      }
-    }
+    return ids;
   }
 
   private static List<NotebookCatalogItem> buildCatalogItems(
-      List<Notebook> allNotebooks, List<NotebookGroup> groups, List<Subscription> subscriptions) {
+      List<Notebook> allNotebooks,
+      List<NotebookGroup> groups,
+      List<Subscription> subscriptions,
+      Function<Notebook, NotebookClientView> wrap) {
     List<SortableRow> rows = new ArrayList<>();
 
     for (Notebook notebook : allNotebooks) {
@@ -89,7 +91,7 @@ public class NotebookCatalogService {
       }
       rows.add(
           new SortableRow(
-              new NotebookCatalogNotebookItem(notebook),
+              new NotebookCatalogNotebookItem(wrap.apply(notebook)),
               catalogSortTimestamp(notebook),
               0,
               notebook.getId()));
@@ -102,7 +104,7 @@ public class NotebookCatalogService {
       Notebook notebook = subscription.getNotebook();
       rows.add(
           new SortableRow(
-              new NotebookCatalogSubscribedNotebookItem(notebook, subscription.getId()),
+              new NotebookCatalogSubscribedNotebookItem(wrap.apply(notebook), subscription.getId()),
               catalogSortTimestamp(notebook),
               0,
               notebook.getId()));
@@ -138,7 +140,10 @@ public class NotebookCatalogService {
       rows.add(
           new SortableRow(
               new NotebookCatalogGroupItem(
-                  group.getId(), group.getName(), group.getCreatedAt(), allMembers),
+                  group.getId(),
+                  group.getName(),
+                  group.getCreatedAt(),
+                  allMembers.stream().map(wrap).toList()),
               group.getCreatedAt(),
               1,
               group.getId()));

@@ -1,11 +1,14 @@
-import type { Notebook } from "@generated/doughnut-backend-api"
+import type { NotebookClientView } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 
 function compareTitles(a: string, b: string): number {
   return a.localeCompare(b, undefined, { sensitivity: "base" })
 }
 
-function compareNotebooks(a: Notebook, b: Notebook): number {
+function compareNotebooks(
+  a: NotebookClientView,
+  b: NotebookClientView
+): number {
   const t = compareTitles(a.name ?? "", b.name ?? "")
   if (t !== 0) {
     return t

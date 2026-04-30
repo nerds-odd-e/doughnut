@@ -142,7 +142,7 @@ import { computed, onMounted, ref, watch } from "vue"
 import { LayoutGrid, List, Search, X } from "lucide-vue-next"
 import type {
   Notebook,
-  Subscription,
+  SubscriptionForNotebooksListing,
   User,
 } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
@@ -159,7 +159,7 @@ const props = defineProps({
     required: true,
   },
   subscriptions: {
-    type: Array as PropType<Subscription[]>,
+    type: Array as PropType<SubscriptionForNotebooksListing[]>,
     required: true,
   },
   user: {

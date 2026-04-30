@@ -1,5 +1,8 @@
 import { ref } from "vue"
-import type { Notebook, Subscription } from "@generated/doughnut-backend-api"
+import type {
+  Notebook,
+  SubscriptionForNotebooksListing,
+} from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import {
   patchNotebookInCatalogItems,
@@ -7,7 +10,9 @@ import {
 } from "@/components/notebook/patchNotebookInCatalogItems"
 
 export function useMyNotebooksCatalog() {
-  const subscriptions = ref<Subscription[] | undefined>(undefined)
+  const subscriptions = ref<SubscriptionForNotebooksListing[] | undefined>(
+    undefined
+  )
   const catalogItems = ref<NotebookCatalogEntry[] | undefined>(undefined)
 
   const fetchData = async () => {

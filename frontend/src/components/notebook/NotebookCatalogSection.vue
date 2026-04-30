@@ -116,7 +116,7 @@ import type { PropType } from "vue"
 import type { NotebookCatalogEntry } from "./patchNotebookInCatalogItems"
 import type {
   Notebook,
-  Subscription,
+  SubscriptionForNotebooksListing,
   User,
 } from "@generated/doughnut-backend-api"
 import NotebookButtons from "./NotebookButtons.vue"
@@ -131,7 +131,7 @@ const props = defineProps({
     required: true,
   },
   subscriptions: {
-    type: Array as PropType<Subscription[]>,
+    type: Array as PropType<SubscriptionForNotebooksListing[]>,
     required: true,
   },
   layout: {
@@ -157,7 +157,9 @@ defineEmits<{
   (e: "refresh"): void
 }>()
 
-function subscriptionById(subscriptionId: number): Subscription | undefined {
+function subscriptionById(
+  subscriptionId: number
+): SubscriptionForNotebooksListing | undefined {
   return props.subscriptions.find((s) => s.id === subscriptionId)
 }
 

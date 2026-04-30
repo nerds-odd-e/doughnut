@@ -67,7 +67,7 @@ import { LayoutGrid, List } from "lucide-vue-next"
 import type {
   Notebook,
   NotebookCatalogGroupItem,
-  Subscription,
+  SubscriptionForNotebooksListing,
   User,
 } from "@generated/doughnut-backend-api"
 import NotebookCatalogGroupPanel from "@/components/notebook/NotebookCatalogGroupPanel.vue"
@@ -81,7 +81,7 @@ defineProps({
     required: true,
   },
   subscriptions: {
-    type: Array as PropType<Subscription[]>,
+    type: Array as PropType<SubscriptionForNotebooksListing[]>,
     required: true,
   },
   user: {

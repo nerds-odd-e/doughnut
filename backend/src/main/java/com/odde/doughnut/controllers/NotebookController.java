@@ -107,10 +107,7 @@ class NotebookController {
     List<Notebook> notebooks =
         notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
     List<Subscription> subscriptions = user.getSubscriptions();
-    NotebooksViewedByUser notebooksViewedByUser =
-        notebookCatalogService.buildView(notebooks, groups, subscriptions);
-    notebooksViewedByUser.subscriptions = subscriptions;
-    return notebooksViewedByUser;
+    return notebookCatalogService.buildView(notebooks, groups, subscriptions);
   }
 
   @PostMapping({"/create"})
