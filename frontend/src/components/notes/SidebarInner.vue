@@ -81,7 +81,7 @@ const displayNotes = computed(() => {
   if (props.noteId !== undefined && subtreeRealmRef) {
     return subtreeRealmRef.value?.children ?? []
   }
-  return rootNotesList.value
+  return rootNotesList.value.filter((n) => n.parentId == null)
 })
 
 const expandedIds = ref<number[]>([])
