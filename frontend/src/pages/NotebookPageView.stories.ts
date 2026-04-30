@@ -33,9 +33,6 @@ export const Default: Story = {
   args: {
     notebook: makeMe.aNotebook.please(),
     user: mockUser,
-    approval: undefined,
-    approvalLoaded: true,
-    additionalInstructions: "",
   },
 }
 
@@ -51,9 +48,6 @@ export const WithCustomSettings: Story = {
       },
     },
     user: mockUser,
-    approval: undefined,
-    approvalLoaded: true,
-    additionalInstructions: "",
   },
 }
 
@@ -62,8 +56,5 @@ export const AdminView: Story = {
   args: {
     notebook: makeMe.aNotebook.please(),
     user: mockAdminUser,
-    approval: undefined,
-    approvalLoaded: true,
-    additionalInstructions: "Custom AI instructions",
   },
 }

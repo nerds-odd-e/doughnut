@@ -16,6 +16,10 @@ import { beforeEach, describe, it, expect, vi } from "vitest"
 describe("NotebookPageView.spec", () => {
   beforeEach(() => {
     mockSdkService("getApprovalForNotebook", { approval: undefined })
+    mockSdkService("getAiAssistant", {
+      id: 1,
+      additionalInstructionsToAi: "",
+    })
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkError("Not found") as Awaited<
         ReturnType<typeof NotebookBooksController.getBook>

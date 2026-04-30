@@ -3,7 +3,7 @@ Feature: Bazaar browsing
   Part of the bazaar should be visible to everyone.
 
   Background:
-    Given there are some notes for existing user "old_learner" in notebook "Shape"
+    Given there are some notes for existing user "old_learner" in notebook "Geometry set"
       | Title            | Details                          | Parent Title|
       | Shape            | The form of something            |             |
       | Rectangle        | four equal straight sides        | Shape       |
@@ -14,12 +14,12 @@ Feature: Bazaar browsing
       | precondition     | square has stronger precondition | In OOP      |
       | Shapes are good  |                                  | Shape       |
     And there is "a specialization of" relationship between note "Square" and "Rectangle"
-    And notebook "Shape" is shared to the Bazaar
+    And notebook "Geometry set" is shared to the Bazaar
 
   Scenario: Browsing as non-user
     When I haven't login
     Then I should see "Geometry set" shared in the Bazaar
-    When I open the notebook "Shape" in the Bazaar
+    When I open the notebook "Geometry set" in the Bazaar
     Then there shouldn't be any note edit button
     And I should see "Bazaar" in breadcrumb
     When I click the child note "Rectangle"

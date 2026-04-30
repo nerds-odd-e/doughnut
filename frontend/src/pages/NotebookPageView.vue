@@ -213,11 +213,19 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref, watch } from "vue"
+import { ref, watch, computed } from "vue"
 import { useRouter } from "vue-router"
-import type { Notebook, User } from "@generated/doughnut-backend-api"
+import type {
+  Notebook,
+  User,
+  NotebookCertificateApproval,
+  NotebookAiAssistant,
+} from "@generated/doughnut-backend-api"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  NotebookController,
+  NotebookCertificateApprovalController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
@@ -235,17 +243,50 @@ import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAss
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
-  approval: {
-    type: Object as PropType<
-      | import("@generated/doughnut-backend-api").NotebookCertificateApproval
-      | undefined
-    >,
-    required: false,
-  },
-  approvalLoaded: { type: Boolean, default: false },
-  additionalInstructions: { type: String, default: "" },
   showAddFirstNote: { type: Boolean, default: false },
 })
+
+const approval = ref<NotebookCertificateApproval | undefined>(undefined)
+const approvalLoaded = ref(false)
+const aiAssistant = ref<NotebookAiAssistant | undefined>(undefined)
+
+const additionalInstructions = computed(
+  () => aiAssistant.value?.additionalInstructionsToAi || ""
+)
+
+const fetchApproval = async () => {
+  const { data: dto, error } = await apiCallWithLoading(() =>
+    NotebookCertificateApprovalController.getApprovalForNotebook({
+      path: { notebook: props.notebook.id },
+    })
+  )
+  if (!error) {
+    approval.value = dto!.approval
+    approvalLoaded.value = true
+  } else {
+    approvalLoaded.value = true
+  }
+}
+
+const fetchAiAssistant = async () => {
+  const { data: assistant, error } = await apiCallWithLoading(() =>
+    NotebookController.getAiAssistant({
+      path: { notebook: props.notebook.id },
+    })
+  )
+  if (!error) {
+    aiAssistant.value = assistant!
+  }
+}
+
+watch(
+  () => props.notebook.id,
+  () => {
+    fetchApproval()
+    fetchAiAssistant()
+  },
+  { immediate: true }
+)
 
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void

@@ -86,9 +86,6 @@
         <NotebookPageView
           :notebook="notebook"
           :user="user"
-          :approval="approval"
-          :approval-loaded="approvalLoaded"
-          :additional-instructions="aiAssistant?.additionalInstructionsToAi || ''"
           :show-add-first-note="sidebarAnchorNoteId == null"
           @notebook-updated="handleNotebookUpdated"
         />
@@ -108,17 +105,8 @@ import {
   type Ref,
 } from "vue"
 import { useRoute } from "vue-router"
-import type {
-  Notebook,
-  User,
-  NotebookCertificateApproval,
-  NotebookAiAssistant,
-} from "@generated/doughnut-backend-api"
-import {
-  NotebookController,
-  NotebookCertificateApprovalController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import type { Notebook, User } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
@@ -129,9 +117,6 @@ const route = useRoute()
 const storageAccessor = useStorageAccessor()
 const user = inject<Ref<User | undefined>>("currentUser")
 const notebook = ref<Notebook | undefined>(undefined)
-const approval = ref<NotebookCertificateApproval | undefined>(undefined)
-const approvalLoaded = ref(false)
-const aiAssistant = ref<NotebookAiAssistant | undefined>(undefined)
 
 const sidebarOpened = ref(false)
 const sidebarAnchorNoteId = ref<number | undefined>()
@@ -174,33 +159,6 @@ const fetchNotebook = async () => {
   }
 }
 
-const fetchApproval = async () => {
-  if (!notebook.value) return
-  const { data: dto, error } = await apiCallWithLoading(() =>
-    NotebookCertificateApprovalController.getApprovalForNotebook({
-      path: { notebook: notebook.value!.id },
-    })
-  )
-  if (!error) {
-    approval.value = dto!.approval
-    approvalLoaded.value = true
-  } else {
-    approvalLoaded.value = true
-  }
-}
-
-const fetchAiAssistant = async () => {
-  if (!notebook.value) return
-  const { data: assistant, error } = await apiCallWithLoading(() =>
-    NotebookController.getAiAssistant({
-      path: { notebook: notebook.value!.id },
-    })
-  )
-  if (!error) {
-    aiAssistant.value = assistant!
-  }
-}
-
 const handleNotebookUpdated = (updatedNotebook: Notebook) => {
   notebook.value = updatedNotebook
 }
@@ -226,10 +184,6 @@ watch(
   () => route.params.notebookId,
   async () => {
     await fetchNotebook()
-    if (notebook.value) {
-      fetchApproval()
-      fetchAiAssistant()
-    }
   }
 )
 
@@ -239,10 +193,6 @@ onMounted(async () => {
     sidebarOpened.value = true
   }
   await fetchNotebook()
-  if (notebook.value) {
-    fetchApproval()
-    fetchAiAssistant()
-  }
 })
 
 onBeforeUnmount(() => {
