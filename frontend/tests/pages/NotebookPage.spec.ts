@@ -81,7 +81,7 @@ describe("NotebookPage.spec", () => {
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookId = notebook.id
     indexRealm.note.noteTopology.notebookId = notebook.id
-    mockSdkService("get", notebook)
+    mockSdkService("get", { notebook, hasAttachedBook: false })
     let release!: () => void
     const gate = new Promise<void>((resolve) => {
       release = resolve
