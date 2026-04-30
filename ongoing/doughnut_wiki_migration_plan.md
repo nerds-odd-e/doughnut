@@ -633,7 +633,7 @@ Phase 1 already persists **`folderId`** parallel to **`Note.parent`** and keeps 
 
 ## Sub-Phase Plan
 
-Phase 6 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests.
+Phase 6 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests. Sub-phase **6.5** (folder-first creation and notebook primary actions) is split further into **6.5.1**–**6.5.4** in that document.
 
 ## Non-goals
 

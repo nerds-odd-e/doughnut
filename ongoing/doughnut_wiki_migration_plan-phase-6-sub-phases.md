@@ -125,21 +125,73 @@ And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
 
 **Commit boundary:** One separate-folder-sidebar commit.
 
-## Sub-Phase 6.5 - New Notes Appear In The Current Folder Scope
+## Sub-Phase 6.5 — Folder-First Creation UX (Split)
+
+Folder-first note creation and primary actions are implemented in ordered steps below. Complete **6.5.1** before **6.5.2**, and so on, because later steps depend on “folder-only” placement semantics and (from **6.5.2**) an explicit **active folder** in the sidebar.
+
+### Sub-Phase 6.5.1 - New Notes Set Folder Only (No Structural Parent On Create)
 
 **Type:** Behavior.
 
-**Pre-condition:** A user is browsing a folder-backed structural location.
+**Pre-condition:** Note creation still sets or aligns legacy `Note.parent` for folder-first placement.
 
-**Trigger:** The user creates a note from that location.
+**Trigger:** The user creates a new note via any flow covered by existing creation tests.
 
-**Post-condition:** The new note appears among notes in the current folder scope. Root creation creates a root note with no folder.
+**Post-condition:** Creation assigns **folder** placement only (`folderId` / notebook-root scope as appropriate). The product path does **not** add or rely on setting a structural **parent note** for containment on create. Existing scenarios that exercised creation behavior keep passing unchanged in intent.
 
-**Work:** Extend note creation tests for the folder-first surface and adjust creation targets to use folder scope where product semantics previously relied on structural parent note context.
+**Work:** Adjust create-note APIs and callers so new notes stop writing structural parent where folder scope is authoritative; align with **`ongoing/doughnut_wiki_architecture_north_star.md`** (containment via folder).
 
-**Verify:** Focused backend creation test plus targeted Cypress for note creation, likely `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_creation.feature`.
+**Verify:** Existing related E2E for note creation still pass; targeted backend test if creation behavior is asserted there; likely `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_creation.feature` (extend only if assertions must track the new invariant).
 
-**Commit boundary:** One creation-in-folder-scope commit.
+**Commit boundary:** One folder-only-on-create commit.
+
+### Sub-Phase 6.5.2 - Active Folder Focus In Sidebar (Highlight; Click vs Blur)
+
+**Type:** Behavior.
+
+**Pre-condition:** Sidebar shows folders as navigable structural items (**6.4.1**).
+
+**Trigger:** The user **clicks** a folder row in the sidebar.
+
+**Post-condition:** That folder becomes the **current active folder**. The UI applies a visible **highlight** (or equivalent focus styling) so the active folder is distinct from inactive rows. When the sidebar folder row loses focus (**blur**) or equivalent deactivation rules apply per product UX, the folder is **no longer** active—no lingering “selected folder” styling.
+
+**Work:** Implement active-folder state in the sidebar (click to activate, blur to clear—match standard focus/target behavior for folder rows).
+
+**Verify:** Manual or frontend unit/visual check as appropriate. **Do not add new E2E** for this sub-phase.
+
+**Commit boundary:** One active-folder-sidebar commit.
+
+### Sub-Phase 6.5.3 - Replace “Add Next Sibling Note” With Always-Visible “New Note”
+
+**Type:** Behavior.
+
+**Pre-condition:** A “next sibling” or insert-between note control exists with ordering/insert semantics. Create-note paths may still accept a structural **parent note** or **auto-create a folder when missing** based on legacy parent-folder alignment.
+
+**Trigger:** The user chooses to add a new note from the primary note action strip (or equivalent).
+
+**Post-condition:** A single control labeled **New note** is **always shown** (not conditional on insertion point). **Remove** insert-between / explicit sibling-insert behavior; new notes are appended as the **last** among structural siblings in the relevant scope. The control uses updated **iconography** (replace the prior sibling-insert icon). Creating a note requires **no parent node**: placement is **optional folder only** (`folderId` or equivalent)—either the **current active folder** (**6.5.2**) supplies it, or the note lands in **notebook root** (`folderId` absent). **Remove** any code that **creates a folder for the parent note** when the aligned folder **does not** exist; folders are explicit (user-created via **New folder** (**6.5.4**) or testability/migrations), not implied from note parentage at create time.
+
+**Work:** Rename the button to **New note**, simplify creation to append-last, wire placement to active folder when set, drop obsolete insert logic. Slim create payloads and services to optional folder + notebook root semantics only; delete parent-based folder provisioning on create.
+
+**Verify:** Update existing E2E in `e2e_test/features/note_creation_and_update/note_creation.feature` so they reflect always-visible **New note**, append-last semantics, and active-folder targeting where applicable—likely `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_creation.feature`.
+
+**Commit boundary:** One new-note-button commit.
+
+### Sub-Phase 6.5.4 - Repurpose “Add Child Note” To “New Folder”; E2E For Folders
+
+**Type:** Behavior.
+
+**Pre-condition:** A separate control exists for adding a structural child note under a context (historically “Add child note”).
+
+**Trigger:** The user chooses to create a folder from that control.
+
+**Post-condition:** The repurposed button creates a **folder** (not a note)—label **New folder**, appropriate icon/step definition. Root-level folder creation and nested folder creation are covered by observable behavior tests.
+
+**Work:** Rename/repurpose UI and handlers from child-note creation to folder creation; move scenarios that previously used this button **to create notes** onto the **New note** (**6.5.3**) control. Add **one or two** new E2E scenarios: adding a folder at **notebook root**, and adding a **nested** folder under an existing folder (or equivalent nesting case).
+
+**Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_creation.feature` (updated suite including new folder scenarios).
+
+**Commit boundary:** One new-folder-button commit.
 
 ## Sub-Phase 6.6 - Remove Short Details From Backend Topology
 
@@ -193,7 +245,7 @@ And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
 
 **Type:** Structure / cleanup.
 
-**Pre-condition:** Testability folder placement, folder-first listing, creation in folder scope, `shortDetails` removal, and graph folder-scope siblings are passing targeted tests.
+**Pre-condition:** Testability folder placement, folder-first listing, folder-first creation UX (sub-phases **6.5.1**–**6.5.4**), `shortDetails` removal, and graph folder-scope siblings are passing targeted tests.
 
 **Trigger:** Final targeted verification for Phase 6.
 

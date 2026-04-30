@@ -93,6 +93,46 @@ export const noteSidebar = () => {
       })
       pageIsNotLoading()
     },
+    /**
+     * One path segment after the notebook card: expand a matching **folder** row if present,
+     * otherwise navigate by clicking the **note** `.title-text` row (Legacy parent-only setups
+     * with no mirrored folder rows).
+     */
+    navigateStructuralIntermediate(segment: string) {
+      pageIsNotLoading()
+      const label = segment.trim()
+      cy.get('aside').then(($aside) => {
+        const root = $aside.get(0)
+        if (!root) {
+          throw new Error('aside not found')
+        }
+        const matchedFolder = [
+          ...root.querySelectorAll('.sidebar-folder-label'),
+        ].find((el) => el.textContent?.trim() === label)
+        if (matchedFolder) {
+          const li = matchedFolder.closest('li')
+          if (!li) {
+            throw new Error('folder label not in li')
+          }
+          cy.wrap(li).then(($li) => {
+            if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
+              cy.wrap($li).within(() => {
+                cy.findByTitle('expand children').click()
+              })
+            }
+          })
+        } else {
+          cy.wrap($aside).within(() => {
+            cy.get('.title-text')
+              .filter((_, el) => el.textContent?.trim() === label)
+              .first()
+              .should('be.visible')
+              .click()
+          })
+        }
+      })
+      pageIsNotLoading()
+    },
     navigateToNote(noteTopology: string) {
       pageIsNotLoading()
       cy.get('aside').within(() => {
