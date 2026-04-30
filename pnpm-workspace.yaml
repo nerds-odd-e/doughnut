@@ -8,16 +8,17 @@ packages:
 
 strictDepBuilds: true
 
-onlyBuiltDependencies:
-  - package-with-necessary-build-scripts
-  - '@badeball/cypress-cucumber-preprocessor'
-  - '@biomejs/biome'
-  - '@parcel/watcher'
-  - core-js
-  - core-js-pure
-  - cypress
-  - esbuild
-  - protobufjs
-
-ignoredBuiltDependencies:
-  - package-with-unnecessary-build-scripts
+allowBuilds:
+  '@badeball/cypress-cucumber-preprocessor': true
+  '@biomejs/biome': true
+  '@parcel/watcher': true
+  canvas: true
+  core-js: true
+  core-js-pure: true
+  cypress: true
+  ejs: true
+  es5-ext: false
+  esbuild: true
+  github_action_sound: true
+  protobufjs: true
+  tesseract.js: true
