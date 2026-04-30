@@ -21,6 +21,7 @@ Feature: Bazaar browsing
     When I open the notebook "Geometry set" in the Bazaar
     Then there shouldn't be any note edit button
     And I should see "Bazaar" in breadcrumb
-    # When I click the child note "Rectangle"
-    # Then there shouldn't be any note edit button
-    # And I should see it has relationship to "Square"
+    When I navigate to "Bazaar/Geometry set/Shape" note
+    And I click the child note "Rectangle"
+    Then there shouldn't be any note edit button
+    And I should see it has relationship to "Square"

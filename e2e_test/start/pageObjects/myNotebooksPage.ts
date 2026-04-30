@@ -2,8 +2,7 @@
 import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
 import type NotePath from '../../support/NotePath'
-import { assumeNotePage } from './notePage'
-import { noteSidebar } from './noteSidebar'
+import { navigateAlongNotebookCatalogPath } from '../navigateNotePath'
 import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
@@ -39,16 +38,7 @@ const myNotebooksPage = () => {
       if (segments.length === 0) {
         return this as any
       }
-      const [notebookName, ...noteTitles] = segments
-      const notebook = notebookList().navigateToNotebook(notebookName!)
-      if (noteTitles.length === 0) {
-        return notebook
-      }
-      noteTitles.forEach((noteTitle) => {
-        noteSidebar().navigateToNote(noteTitle)
-      })
-      const leafTitle = noteTitles[noteTitles.length - 1]!
-      return assumeNotePage(leafTitle)
+      return navigateAlongNotebookCatalogPath(segments) as any
     },
     creatingNotebook(notebookTopic: string, description?: string) {
       addNewNotebookButton().click()

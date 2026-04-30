@@ -3,6 +3,11 @@ import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
 import mock_services from './mock_services/index'
 import { pageIsNotLoading as waitForPageNotLoading } from './pageBase'
 import { questionGenerationService } from './questionGenerationService'
+import type NotePath from '../support/NotePath'
+import {
+  BAZAAR_NOTE_PATH_ROOT,
+  navigateAlongNotebookCatalogPath,
+} from './navigateNotePath'
 import router from './router'
 import testability from './testability'
 import mcpApi from './mcpApi'
@@ -86,6 +91,24 @@ const start = {
   recall,
   navigateToNotebookPage,
   navigateToNotebooksPage,
+
+  navigateToNoteFromPath(notePath: NotePath) {
+    const segments = [...notePath.path]
+    if (segments.length === 0) {
+      return this
+    }
+    if (segments[0] === BAZAAR_NOTE_PATH_ROOT) {
+      navigateToBazaar()
+      segments.shift()
+      if (segments.length === 0) {
+        return this
+      }
+    } else {
+      navigateToNotebooksPage()
+    }
+    navigateAlongNotebookCatalogPath(segments)
+    return this
+  },
 
   // === Services & Utilities ===
   form,

@@ -380,7 +380,7 @@ Then(
 )
 
 When('I navigate to {notepath} note', (notePath: NotePath) => {
-  start.navigateToNotebooksPage().navigateToPath(notePath)
+  start.navigateToNoteFromPath(notePath)
 })
 
 When('I click the child note {string}', (noteTopology: string) => {
