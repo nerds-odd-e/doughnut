@@ -334,9 +334,6 @@ export default class StoredApiCollection implements StoredApi {
       throw apiError
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
-    if (nrwp.parent) {
-      this.storage.refreshNoteRealm(nrwp.parent)
-    }
     refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)

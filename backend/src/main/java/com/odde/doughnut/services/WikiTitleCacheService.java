@@ -11,6 +11,7 @@ import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -46,15 +47,18 @@ public class WikiTitleCacheService {
     return List.copyOf(out);
   }
 
-  @Transactional
+  /** Own transaction and FK proxies so callers do not accumulate pending cache rows in-session. */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void refreshForNote(Note note, User viewer) {
-    noteWikiTitleCacheRepository.deleteByNote_Id(note.getId());
+    Integer noteId = note.getId();
+    noteWikiTitleCacheRepository.deleteByNote_Id(noteId);
     entityManager.flush();
+    Note cacheOwner = entityManager.getReference(Note.class, noteId);
     for (WikiLinkResolver.ResolvedWikiLink link :
         wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
       NoteWikiTitleCache row = new NoteWikiTitleCache();
-      row.setNote(note);
-      row.setTargetNote(link.targetNote());
+      row.setNote(cacheOwner);
+      row.setTargetNote(entityManager.getReference(Note.class, link.targetNote().getId()));
       row.setLinkText(link.linkText());
       noteWikiTitleCacheRepository.save(row);
     }

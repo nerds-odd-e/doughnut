@@ -133,17 +133,17 @@ Folder-first note creation and primary actions are implemented in ordered steps 
 
 **Type:** Behavior.
 
-**Pre-condition:** Note creation still sets or aligns legacy `Note.parent` for folder-first placement.
+**Pre-condition:** Create flows still write legacy `Note.parent` (or equivalent “structural parent note”) when placing a new note, alongside or in place of folder placement.
 
 **Trigger:** The user creates a new note via any flow covered by existing creation tests.
 
-**Post-condition:** Creation assigns **folder** placement only (`folderId` / notebook-root scope as appropriate). The product path does **not** add or rely on setting a structural **parent note** for containment on create. Existing scenarios that exercised creation behavior keep passing unchanged in intent.
+**Post-condition:** Creation sets **folder** placement only (`folderId` and notebook-root scope when no folder). Code paths that **set or infer `parent` / parent-note id for the new note on create** are removed; no new structural parent edge is written for containment. **Scope is only “stop writing parent for new notes.”** Do not pull in later **6.5.x** UX (always-visible New note, active folder, New folder, append-last UX) here.
 
-**Work:** Adjust create-note APIs and callers so new notes stop writing structural parent where folder scope is authoritative; align with **`ongoing/doughnut_wiki_architecture_north_star.md`** (containment via folder).
+**Work:** **Primary deliverable:** remove the code that **sets `parent` / parent-note id on the new note** at create time (no new structural parent value written for the child). Delete or bypass that assignment in construction/services and any callers whose only job is to supply it. Keep folder resolution and notebook root behavior that already drive listing; do not redesign create APIs or UI here unless an existing test forces a tiny alignment change. **`ongoing/doughnut_wiki_architecture_north_star.md`:** containment via folder, not parent-on-create.
 
-**Verify:** Existing related E2E for note creation still pass; targeted backend test if creation behavior is asserted there; likely `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_creation.feature` (extend only if assertions must track the new invariant).
+**Verify:** The main risk is **existing E2E** that implicitly depend on parent-tree shape after create (e.g. tree position, “under” assertions). Prefer **minimal test adjustments** that preserve scenario intent under folder-first semantics over rewriting **6.5.3**–**6.5.4** behaviors early. Run backend creation tests if they assert parent-on-create; run `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_creation.feature` and any other specs that hit the same create paths until green.
 
-**Commit boundary:** One folder-only-on-create commit.
+**Commit boundary:** One commit: remove parent-on-create wiring only, with tests/E2E still passing.
 
 ### Sub-Phase 6.5.2 - Active Folder Focus In Sidebar (Highlight; Click vs Blur)
 
