@@ -10,7 +10,7 @@ import AdmZip from 'adm-zip'
 import type { ExpectedFile } from '../start/downloadChecker'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
-import { runShellCommandSync } from './cliE2eRepo'
+import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
 
 const commonConfig = {
@@ -258,7 +258,13 @@ const commonConfig = {
         async bundleMcpServer() {
           const mcpServerDir = join(repoRoot, 'mcp-server')
           try {
-            runShellCommandSync('pnpm bundle', { cwd: mcpServerDir })
+            runShellCommandSync('pnpm bundle', {
+              cwd: mcpServerDir,
+              env: {
+                ...process.env,
+                ...CLI_E2E_PNPM_SPAWN_ENV,
+              },
+            })
             return true
           } catch (error) {
             console.error('Failed to bundle MCP server:', error)
