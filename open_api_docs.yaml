@@ -4042,7 +4042,7 @@ components:
         newTitle:
           type: string
           maxLength: 150
-          minLength: 1
+          minLength: 0
         wikidataId:
           type: string
           pattern: ^$|Q\d+
@@ -4643,7 +4643,7 @@ components:
         newTitle:
           type: string
           maxLength: 150
-          minLength: 1
+          minLength: 0
       required:
       - newTitle
     NoteUpdateDetailsDTO:

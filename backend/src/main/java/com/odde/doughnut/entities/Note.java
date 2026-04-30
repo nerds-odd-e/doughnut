@@ -12,8 +12,8 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.converters.RelationTypeConverter;
 import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.validators.ValidateNoteTargetTitle;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
@@ -27,7 +27,6 @@ import org.springframework.lang.NonNull;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
 @JsonPropertyOrder({"noteTopology", "details", "parentId", "relationType", "updatedAt"})
-@ValidateNoteTargetTitle
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
@@ -71,7 +70,8 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonPropertyDescription("The details of the note is in markdown format.")
   private String details;
 
-  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
+  @NotBlank
+  @Size(max = MAX_TITLE_LENGTH)
   @Getter
   @Setter
   @Column(name = "title")

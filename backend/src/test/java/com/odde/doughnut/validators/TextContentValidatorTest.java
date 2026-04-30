@@ -71,12 +71,14 @@ public class TextContentValidatorTest {
     Set<ConstraintViolation<Note>> violations = validator.validate(relationNote);
     assertThat(violations, is(not(empty())));
     assertThat(
-        violations.stream()
-            .anyMatch(
-                v ->
-                    v.getMessage().equals("Note with targetNote must have a non-empty title")
-                        && v.getPropertyPath().toString().equals("title")),
+        violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("title")),
         is(true));
+  }
+
+  @Test
+  public void whitespaceOnlyTitleIsInvalid() {
+    newNote.setTitle("   ");
+    assertThat(getViolations(), is(not(empty())));
   }
 
   @Test
