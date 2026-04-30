@@ -1,15 +1,20 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminDataMigrationService {
+
+  private static final byte CHECKPOINT_ID = 1;
 
   private enum BatchPhase {
     TOPOLOGY,
@@ -17,49 +22,29 @@ public class AdminDataMigrationService {
     SLUG_NOTEBOOKS
   }
 
-  private static final class MigrationSession {
-    BatchPhase phase = BatchPhase.TOPOLOGY;
-
-    /** Each row: [notebook_id, index_note_id]. */
-    List<int[]> topologyPairs = List.of();
-
-    List<Integer> slugNotebookIds = List.of();
-
-    int topoIndex;
-    int slugIndex;
-
-    int detachedChildFoldersFromIndexFolder;
-    int updatedNormalNotesDetachedFromIndex;
-    int updatedRelationNotesClearedFolder;
-    int deletedObsoleteNotebookNameRootFolders;
-
-    int batchesExecuted;
-
-    int batchTotalPlanned;
-
-    MigrationSession shallowCopy() {
-      MigrationSession copy = new MigrationSession();
-      copy.phase = phase;
-      copy.topologyPairs = topologyPairs;
-      copy.slugNotebookIds = slugNotebookIds;
-      copy.topoIndex = topoIndex;
-      copy.slugIndex = slugIndex;
-      copy.detachedChildFoldersFromIndexFolder = detachedChildFoldersFromIndexFolder;
-      copy.updatedNormalNotesDetachedFromIndex = updatedNormalNotesDetachedFromIndex;
-      copy.updatedRelationNotesClearedFolder = updatedRelationNotesClearedFolder;
-      copy.deletedObsoleteNotebookNameRootFolders = deletedObsoleteNotebookNameRootFolders;
-      copy.batchesExecuted = batchesExecuted;
-      copy.batchTotalPlanned = batchTotalPlanned;
-      return copy;
-    }
-  }
+  private static final RowMapper<Checkpoint> CHECKPOINT_MAPPER =
+      new RowMapper<>() {
+        @Override
+        public Checkpoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+          Checkpoint c = new Checkpoint();
+          c.phase = BatchPhase.valueOf(rs.getString("phase"));
+          c.topoPairsDone = rs.getInt("topo_pairs_done");
+          c.topologyPairTotal = rs.getInt("topology_pair_total");
+          c.slugPrepDone = rs.getBoolean("slug_prep_done");
+          c.detachedChildFoldersFromIndexFolder = rs.getInt("detached_child_folders");
+          c.updatedNormalNotesDetachedFromIndex = rs.getInt("updated_normal_notes");
+          c.updatedRelationNotesClearedFolder = rs.getInt("updated_relation_notes");
+          c.deletedObsoleteNotebookNameRootFolders = rs.getInt("deleted_obsolete_roots");
+          c.batchesCompleted = rs.getInt("batches_completed");
+          c.batchTotalPlanned = rs.getInt("batch_total_planned");
+          return c;
+        }
+      };
 
   private final JdbcTemplate jdbcTemplate;
   private final AdminDataMigrationBatchExecutor batchExecutor;
 
   private volatile AdminDataMigrationStatusDTO lastSuccessfulStatus = freshIdleStatusDto();
-
-  private MigrationSession activeSession;
 
   public AdminDataMigrationService(
       JdbcTemplate jdbcTemplate, AdminDataMigrationBatchExecutor batchExecutor) {
@@ -68,105 +53,275 @@ public class AdminDataMigrationService {
   }
 
   public synchronized AdminDataMigrationStatusDTO getStatus() {
-    if (activeSession == null) {
+    Optional<Checkpoint> ck = fetchCheckpointSkipLock();
+    if (ck.isEmpty()) {
       return duplicate(lastSuccessfulStatus);
     }
-    return runningDtoFromSession(
-        activeSession.shallowCopy(), lastSuccessfulStatus.isCompletedOnce());
+    return runningDtoFromCheckpoint(ck.get(), lastSuccessfulStatus.isCompletedOnce());
   }
 
   @Transactional
   public synchronized AdminDataMigrationStatusDTO runBatch() {
-    if (activeSession == null) {
-      activeSession = startNewMigrationSession();
+    List<Checkpoint> locked =
+        jdbcTemplate.query(
+            """
+            SELECT id, phase, topo_pairs_done, topology_pair_total, slug_prep_done,
+                   detached_child_folders, updated_normal_notes, updated_relation_notes,
+                   deleted_obsolete_roots, batches_completed, batch_total_planned
+            FROM wiki_data_migration_checkpoint
+            WHERE id = ?
+            FOR UPDATE
+            """,
+            CHECKPOINT_MAPPER,
+            CHECKPOINT_ID);
+
+    Checkpoint checkpoint;
+    if (locked.isEmpty()) {
+      clearSlugNotebookDoneTable();
+      checkpoint = insertFreshCheckpointLocked();
+    } else {
+      checkpoint = locked.getFirst();
     }
 
-    MigrationSession session = activeSession;
-    executeExactlyOneTransactionalBatch(session);
+    executeExactlyOneTransactionalBatch(checkpoint);
 
-    if (!migrationFullyDone(session)) {
-      return runningDtoFromSession(session.shallowCopy(), lastSuccessfulStatus.isCompletedOnce());
+    boolean done = migrationFullyDoneAfterMutation(checkpoint);
+    AdminDataMigrationStatusDTO dto;
+
+    if (done) {
+      clearPersistedProgress();
+      dto = finalDtoFromCheckpoint(checkpoint);
+      lastSuccessfulStatus = duplicate(dto);
+    } else {
+      persistCheckpoint(checkpoint);
+      dto = runningDtoFromCheckpoint(checkpoint, lastSuccessfulStatus.isCompletedOnce());
     }
 
-    AdminDataMigrationStatusDTO done = finalDtoFromFinishedSession(session);
-    lastSuccessfulStatus = duplicate(done);
-    activeSession = null;
-    return duplicate(done);
+    return duplicate(dto);
   }
 
-  private MigrationSession startNewMigrationSession() {
-    List<int[]> topologyPairs =
+  private static final class Checkpoint {
+    BatchPhase phase;
+    int topoPairsDone;
+    int topologyPairTotal;
+    boolean slugPrepDone;
+
+    int detachedChildFoldersFromIndexFolder;
+    int updatedNormalNotesDetachedFromIndex;
+    int updatedRelationNotesClearedFolder;
+    int deletedObsoleteNotebookNameRootFolders;
+
+    int batchesCompleted;
+    int batchTotalPlanned;
+  }
+
+  private Optional<Checkpoint> fetchCheckpointSkipLock() {
+    List<Checkpoint> rows =
+        jdbcTemplate.query(
+            """
+            SELECT id, phase, topo_pairs_done, topology_pair_total, slug_prep_done,
+                   detached_child_folders, updated_normal_notes, updated_relation_notes,
+                   deleted_obsolete_roots, batches_completed, batch_total_planned
+            FROM wiki_data_migration_checkpoint
+            WHERE id = ?
+            """,
+            CHECKPOINT_MAPPER,
+            CHECKPOINT_ID);
+    return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
+  }
+
+  private Checkpoint insertFreshCheckpointLocked() {
+    int topoTotal = countTopologyPairs();
+    int notebookLive = countNotebooksLive();
+
+    Checkpoint c = new Checkpoint();
+    c.phase = BatchPhase.TOPOLOGY;
+    c.topoPairsDone = 0;
+    c.topologyPairTotal = topoTotal;
+    c.slugPrepDone = false;
+    c.detachedChildFoldersFromIndexFolder = 0;
+    c.updatedNormalNotesDetachedFromIndex = 0;
+    c.updatedRelationNotesClearedFolder = 0;
+    c.deletedObsoleteNotebookNameRootFolders = 0;
+    c.batchesCompleted = 0;
+    c.batchTotalPlanned = Math.addExact(topoTotal, Math.addExact(1, notebookLive));
+
+    jdbcTemplate.update(
+        """
+        INSERT INTO wiki_data_migration_checkpoint
+            (id, phase, topo_pairs_done, topology_pair_total, slug_prep_done,
+             detached_child_folders, updated_normal_notes, updated_relation_notes,
+             deleted_obsolete_roots, batches_completed, batch_total_planned)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        CHECKPOINT_ID,
+        c.phase.name(),
+        c.topoPairsDone,
+        c.topologyPairTotal,
+        c.slugPrepDone ? 1 : 0,
+        c.detachedChildFoldersFromIndexFolder,
+        c.updatedNormalNotesDetachedFromIndex,
+        c.updatedRelationNotesClearedFolder,
+        c.deletedObsoleteNotebookNameRootFolders,
+        c.batchesCompleted,
+        c.batchTotalPlanned);
+    return c;
+  }
+
+  private void persistCheckpoint(Checkpoint c) {
+    jdbcTemplate.update(
+        """
+        UPDATE wiki_data_migration_checkpoint
+           SET phase = ?,
+               topo_pairs_done = ?,
+               topology_pair_total = ?,
+               slug_prep_done = ?,
+               detached_child_folders = ?,
+               updated_normal_notes = ?,
+               updated_relation_notes = ?,
+               deleted_obsolete_roots = ?,
+               batches_completed = ?,
+               batch_total_planned = ?
+         WHERE id = ?
+        """,
+        c.phase.name(),
+        c.topoPairsDone,
+        c.topologyPairTotal,
+        c.slugPrepDone ? 1 : 0,
+        c.detachedChildFoldersFromIndexFolder,
+        c.updatedNormalNotesDetachedFromIndex,
+        c.updatedRelationNotesClearedFolder,
+        c.deletedObsoleteNotebookNameRootFolders,
+        c.batchesCompleted,
+        c.batchTotalPlanned,
+        CHECKPOINT_ID);
+  }
+
+  private void clearSlugNotebookDoneTable() {
+    jdbcTemplate.update("DELETE FROM wiki_data_migration_slug_notebook_done");
+  }
+
+  private void clearPersistedProgress() {
+    jdbcTemplate.update("DELETE FROM wiki_data_migration_slug_notebook_done");
+    jdbcTemplate.update("DELETE FROM wiki_data_migration_checkpoint WHERE id = ?", CHECKPOINT_ID);
+  }
+
+  private int countTopologyPairs() {
+    Integer n =
+        jdbcTemplate.queryForObject(
+            """
+            SELECT COUNT(*) FROM notebook_head_note nh
+            INNER JOIN notebook n ON n.id = nh.notebook_id
+            """,
+            Integer.class);
+    return n == null ? 0 : n;
+  }
+
+  private int countNotebooksLive() {
+    Integer n = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM notebook", Integer.class);
+    return n == null ? 0 : n;
+  }
+
+  private int countSlugNotebookDoneRows() {
+    Integer n =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM wiki_data_migration_slug_notebook_done", Integer.class);
+    return n == null ? 0 : n;
+  }
+
+  private int[] topologyPairAtOffset(int zeroBasedOffset) {
+    List<int[]> pairs =
         jdbcTemplate.query(
             """
             SELECT nh.notebook_id, nh.head_note_id
             FROM notebook_head_note nh
             INNER JOIN notebook n ON n.id = nh.notebook_id
             ORDER BY nh.notebook_id ASC
+            LIMIT 1 OFFSET ?
             """,
-            (rs, rowNum) -> new int[] {rs.getInt("notebook_id"), rs.getInt("head_note_id")});
-
-    List<Integer> slugNotebookIds =
-        new ArrayList<>(
-            jdbcTemplate.queryForList("SELECT id FROM notebook ORDER BY id ASC", Integer.class));
-
-    MigrationSession s = new MigrationSession();
-    s.topologyPairs = topologyPairs;
-    s.slugNotebookIds = slugNotebookIds;
-    s.phase = BatchPhase.TOPOLOGY;
-    s.topoIndex = 0;
-    s.slugIndex = 0;
-    s.batchTotalPlanned = topologyPairs.size() + 1 + slugNotebookIds.size();
-    s.batchesExecuted = 0;
-    return s;
+            (rs, rowNum) -> new int[] {rs.getInt("notebook_id"), rs.getInt("head_note_id")},
+            zeroBasedOffset);
+    if (pairs.isEmpty()) {
+      throw new IllegalStateException(
+          "topology pair offset "
+              + zeroBasedOffset
+              + " out of bounds (migrate checkpoint vs live data mismatch)");
+    }
+    return pairs.getFirst();
   }
 
-  private void executeExactlyOneTransactionalBatch(MigrationSession s) {
+  private Optional<Integer> nextSlugNotebookWithoutDoneRow() {
+    List<Integer> ids =
+        jdbcTemplate.queryForList(
+            """
+            SELECT n.id FROM notebook n
+             WHERE NOT EXISTS (
+               SELECT 1 FROM wiki_data_migration_slug_notebook_done d WHERE d.notebook_id = n.id
+             )
+            ORDER BY n.id ASC
+            LIMIT 1
+            """,
+            Integer.class);
+    return ids.isEmpty() ? Optional.empty() : Optional.of(ids.getFirst());
+  }
+
+  private void executeExactlyOneTransactionalBatch(Checkpoint s) {
     foldEmptyTopologyIntoSlugPrepWhenNeeded(s);
 
     if (s.phase == BatchPhase.TOPOLOGY) {
-      int[] pair = s.topologyPairs.get(s.topoIndex);
+      int[] pair = topologyPairAtOffset(s.topoPairsDone);
       AdminDataMigrationBatchExecutor.TopologyBatchTotals totals =
           batchExecutor.detachIndexTopologyForNotebook(pair[0], pair[1]);
       s.detachedChildFoldersFromIndexFolder += totals.detachedChildFolders();
       s.updatedNormalNotesDetachedFromIndex += totals.normalNotes();
       s.updatedRelationNotesClearedFolder += totals.relationNotes();
       s.deletedObsoleteNotebookNameRootFolders += totals.deletedRoots();
-      s.topoIndex++;
-      s.batchesExecuted++;
+      s.topoPairsDone++;
+      s.batchesCompleted++;
       return;
     }
 
     if (s.phase == BatchPhase.SLUG_PREP) {
       batchExecutor.installSlugPrepPlaceholdersGlobally();
       s.phase = BatchPhase.SLUG_NOTEBOOKS;
-      s.slugIndex = 0;
-      s.batchesExecuted++;
+      s.slugPrepDone = true;
+      s.batchesCompleted++;
       return;
     }
 
-    if (s.slugIndex >= s.slugNotebookIds.size()) {
+    Optional<Integer> nextSlugNotebook = nextSlugNotebookWithoutDoneRow();
+    if (nextSlugNotebook.isEmpty()) {
       return;
     }
-
-    batchExecutor.regenerateSlugPathsForNotebook(s.slugNotebookIds.get(s.slugIndex));
-    s.slugIndex++;
-    s.batchesExecuted++;
+    Integer notebookId = nextSlugNotebook.get();
+    batchExecutor.regenerateSlugPathsForNotebook(notebookId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO wiki_data_migration_slug_notebook_done (notebook_id)
+        VALUES (?)
+        """,
+        notebookId);
+    s.batchesCompleted++;
   }
 
-  private static void foldEmptyTopologyIntoSlugPrepWhenNeeded(MigrationSession s) {
-    if (s.phase == BatchPhase.TOPOLOGY && s.topoIndex >= s.topologyPairs.size()) {
+  private static void foldEmptyTopologyIntoSlugPrepWhenNeeded(Checkpoint s) {
+    if (s.phase == BatchPhase.TOPOLOGY && s.topoPairsDone >= s.topologyPairTotal) {
       s.phase = BatchPhase.SLUG_PREP;
     }
   }
 
-  private static boolean migrationFullyDone(MigrationSession s) {
-    return s.phase == BatchPhase.SLUG_NOTEBOOKS && s.slugIndex >= s.slugNotebookIds.size();
+  private boolean migrationFullyDoneAfterMutation(Checkpoint c) {
+    foldEmptyTopologyIntoSlugPrepWhenNeeded(c);
+    if (c.phase != BatchPhase.SLUG_NOTEBOOKS) {
+      return false;
+    }
+    return nextSlugNotebookWithoutDoneRow().isEmpty();
   }
 
-  private AdminDataMigrationStatusDTO runningDtoFromSession(
-      MigrationSession s, boolean hadCompletedPreviously) {
+  private AdminDataMigrationStatusDTO runningDtoFromCheckpoint(
+      Checkpoint c, boolean hadCompletedPreviously) {
     AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    copyAggregatesFromSessionInto(s, dto);
+    copyAggregatesFromCheckpointInto(c, dto);
     dto.setNotebookCountSlugScan(0);
 
     dto.setMigrationInProgress(true);
@@ -175,21 +330,21 @@ public class AdminDataMigrationService {
     dto.setCompletedOnce(hadCompletedPreviously);
     dto.setLastCompletedAt(null);
 
-    dto.setCompletedBatchOrdinal(s.batchesExecuted);
-    dto.setBatchTotalPlanned(s.batchTotalPlanned);
-    dto.setBatchPhaseSummary(phaseSummaryLabel(s));
+    dto.setCompletedBatchOrdinal(c.batchesCompleted);
+    dto.setBatchTotalPlanned(c.batchTotalPlanned);
+    dto.setBatchPhaseSummary(phaseSummaryLabel(c));
 
     dto.setMessage(runningCountersLine(dto));
     return dto;
   }
 
-  private AdminDataMigrationStatusDTO finalDtoFromFinishedSession(MigrationSession s) {
+  private AdminDataMigrationStatusDTO finalDtoFromCheckpoint(Checkpoint c) {
     AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    copyAggregatesFromSessionInto(s, dto);
+    copyAggregatesFromCheckpointInto(c, dto);
 
-    long notebookDistinct =
+    Long notebookDistinct =
         jdbcTemplate.queryForObject("SELECT COUNT(DISTINCT id) FROM notebook", Long.class);
-    dto.setNotebookCountSlugScan(notebookDistinct);
+    dto.setNotebookCountSlugScan(notebookDistinct == null ? 0L : notebookDistinct);
 
     dto.setMigrationInProgress(false);
     dto.setMoreBatchesRemain(false);
@@ -197,34 +352,34 @@ public class AdminDataMigrationService {
     dto.setCompletedOnce(true);
     dto.setLastCompletedAt(Instant.now());
 
-    dto.setCompletedBatchOrdinal(s.batchesExecuted);
-    dto.setBatchTotalPlanned(s.batchTotalPlanned);
+    dto.setCompletedBatchOrdinal(c.batchesCompleted);
+    dto.setBatchTotalPlanned(c.batchTotalPlanned);
     dto.setBatchPhaseSummary("Done");
 
     dto.setMessage(summaryMessage(dto));
     return dto;
   }
 
-  private static void copyAggregatesFromSessionInto(
-      MigrationSession s, AdminDataMigrationStatusDTO dto) {
+  private static void copyAggregatesFromCheckpointInto(
+      Checkpoint s, AdminDataMigrationStatusDTO dto) {
     dto.setDetachedChildFoldersFromIndexFolder(s.detachedChildFoldersFromIndexFolder);
     dto.setUpdatedNormalNotesDetachedFromIndex(s.updatedNormalNotesDetachedFromIndex);
     dto.setUpdatedRelationNotesClearedFolder(s.updatedRelationNotesClearedFolder);
     dto.setDeletedObsoleteNotebookNameRootFolders(s.deletedObsoleteNotebookNameRootFolders);
   }
 
-  private static String phaseSummaryLabel(MigrationSession s) {
-    if (s.phase == BatchPhase.TOPOLOGY) {
-      int n = Math.max(1, s.topologyPairs.size());
-      int at = Math.min(s.topoIndex, s.topologyPairs.size());
+  private String phaseSummaryLabel(Checkpoint c) {
+    if (c.phase == BatchPhase.TOPOLOGY) {
+      int n = Math.max(1, c.topologyPairTotal);
+      int at = Math.min(c.topoPairsDone, c.topologyPairTotal);
       return "Topology batch " + at + "/" + n;
     }
-    if (s.phase == BatchPhase.SLUG_PREP) {
+    if (c.phase == BatchPhase.SLUG_PREP) {
       return "Slug preparation (globally assigns placeholders)";
     }
-    int totalNb = Math.max(1, s.slugNotebookIds.size());
-    int atNb = Math.min(s.slugIndex, s.slugNotebookIds.size());
-    return "Slug notebooks " + atNb + "/" + totalNb;
+    int done = countSlugNotebookDoneRows();
+    int totalNb = Math.max(1, countNotebooksLive());
+    return "Slug notebooks " + done + "/" + totalNb + " marked done";
   }
 
   private static String runningCountersLine(AdminDataMigrationStatusDTO dto) {
