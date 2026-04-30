@@ -253,6 +253,12 @@ public class NoteService {
     Note target = relation.getTargetNote();
     relation.setTitle(
         RelationshipNoteTitleFormatter.format(source.getTitle(), type.label, target.getTitle()));
+    String preserved =
+        RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
+            relation.getDetails());
+    relation.setDetails(
+        RelationshipNoteMarkdownFormatter.format(
+            type, source.getTitle(), target.getTitle(), preserved));
     relation.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
   }
 

@@ -151,10 +151,40 @@ class RelationControllerTests extends ControllerTestBase {
       relationshipCreation.relationType = RelationType.SPECIALIZE;
       var after = controller.updateRelationship(relationNote, relationshipCreation);
 
-      String expected =
+      String expectedTitle =
           RelationshipNoteTitleFormatter.format(
               source.getTitle(), RelationType.SPECIALIZE.label, target.getTitle());
-      assertThat(after.getFirst().getNote().getTitle(), equalTo(expected));
+      assertThat(after.getFirst().getNote().getTitle(), equalTo(expectedTitle));
+      String expectedDetails =
+          RelationshipNoteMarkdownFormatter.format(
+              RelationType.SPECIALIZE, source.getTitle(), target.getTitle(), null);
+      assertThat(after.getFirst().getNote().getDetails(), equalTo(expectedDetails));
+    }
+
+    @Test
+    void updatesRelationshipNoteDetailsAndKeepsUserSuffixWhenRelationTypeChanges()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      Note source = makeMe.aNote("Moon").creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Earth").creatorAndOwner(currentUser.getUser()).please();
+      relationshipCreation.relationType = RelationType.PART;
+      var created =
+          controller.addRelationshipFinalize(
+              source, target, relationshipCreation, makeMe.successfulBindingResult());
+      Note relationNote =
+          noteRepository.findById(created.getFirst().getNote().getId()).orElseThrow();
+      relationNote.setDetails(
+          RelationshipNoteMarkdownFormatter.format(
+                  RelationType.PART, source.getTitle(), target.getTitle(), null)
+              + "\n\nUser line");
+      noteRepository.save(relationNote);
+
+      relationshipCreation.relationType = RelationType.SPECIALIZE;
+      var after = controller.updateRelationship(relationNote, relationshipCreation);
+
+      String expectedDetails =
+          RelationshipNoteMarkdownFormatter.format(
+              RelationType.SPECIALIZE, source.getTitle(), target.getTitle(), "User line");
+      assertThat(after.getFirst().getNote().getDetails(), equalTo(expectedDetails));
     }
   }
 }

@@ -9,6 +9,39 @@ public final class RelationshipNoteMarkdownFormatter {
 
   private RelationshipNoteMarkdownFormatter() {}
 
+  public static String extractUserSuffixFromRelationshipDetails(String details) {
+    if (details == null) {
+      return null;
+    }
+    String n = details.replace("\r\n", "\n");
+    if (!n.startsWith("---\n")) {
+      return null;
+    }
+    int sep = n.indexOf("\n---\n\n", 1);
+    if (sep < 0) {
+      return null;
+    }
+    String frontmatterBlock = n.substring(4, sep);
+    if (!frontmatterBlock.contains("type: relationship")) {
+      return null;
+    }
+    String afterFm = n.substring(sep + 6);
+    int firstNl = afterFm.indexOf('\n');
+    if (firstNl < 0) {
+      return null;
+    }
+    String rest = afterFm.substring(firstNl + 1);
+    if (rest.isEmpty()) {
+      return null;
+    }
+    if (rest.startsWith("\n\n")) {
+      rest = rest.substring(2);
+    } else if (rest.startsWith("\n")) {
+      rest = rest.substring(1);
+    }
+    return trimmedOrNull(rest);
+  }
+
   public static String format(
       RelationType relationType,
       String sourceTitle,

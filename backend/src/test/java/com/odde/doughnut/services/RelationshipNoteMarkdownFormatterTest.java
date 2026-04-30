@@ -55,6 +55,42 @@ class RelationshipNoteMarkdownFormatterTest {
   }
 
   @Test
+  void extractUserSuffix_returns_null_when_no_trailing_user_content() {
+    String markdown =
+        RelationshipNoteMarkdownFormatter.format(RelationType.RELATED_TO, "S", "T", null);
+    assertThat(
+        RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(markdown),
+        equalTo(null));
+  }
+
+  @Test
+  void extractUserSuffix_returns_content_after_generated_block() {
+    String markdown =
+        RelationshipNoteMarkdownFormatter.format(
+            RelationType.PART, "Moon", "Earth", "My crater note.\n\nSecond paragraph.");
+    assertThat(
+        RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(markdown),
+        equalTo("My crater note.\n\nSecond paragraph."));
+  }
+
+  @Test
+  void extractUserSuffix_handles_crlf_in_input() {
+    String lf = RelationshipNoteMarkdownFormatter.format(RelationType.PART, "A", "B", "user line");
+    String crlf = lf.replace("\n", "\r\n");
+    assertThat(
+        RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(crlf),
+        equalTo("user line"));
+  }
+
+  @Test
+  void extractUserSuffix_returns_null_when_not_relationship_frontmatter() {
+    assertThat(
+        RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
+            "---\ntype: article\n---\n\nBody.\n\nExtra"),
+        equalTo(null));
+  }
+
+  @Test
   void escapes_quotes_and_backslashes_in_yaml_quoted_titles() {
     String markdown =
         RelationshipNoteMarkdownFormatter.format(

@@ -601,6 +601,13 @@ When(
   }
 )
 
+When(
+  'I update the current note details using markdown to become:',
+  (newDetails: string) => {
+    start.assumeNotePage().updateDetailsAsMarkdown(newDetails)
+  }
+)
+
 When('I flush pending note details save', () => {
   start.assumeNotePage().flushPendingDetailsSave()
 })
