@@ -43,6 +43,15 @@ When(
 )
 
 When(
+  'I open the relationship from {string} to {string}',
+  (sourceNoteTopology: string, targetTitle: string) => {
+    start
+      .jumpToNotePage(sourceNoteTopology)
+      .navigateToRelationshipChild(targetTitle)
+  }
+)
+
+When(
   'I move note {string} to be under note {string}',
   (fromNoteTopic: string, toNoteTopic: string) => {
     start
@@ -156,6 +165,16 @@ Then(
   (noteTopology: string, targetTitle: string) => {
     start.jumpToNotePage(noteTopology)
     cy.findByText(targetTitle, { selector: 'main *' }).should('not.exist')
+  }
+)
+
+Then(
+  'I should be on the relationship note page with relation {string} to {string}',
+  (relationType: string, targetTitle: string) => {
+    cy.get('[role=details]').should('be.visible')
+    cy.findByRole('title')
+      .should('contain', relationType)
+      .and('contain', targetTitle)
   }
 )
 

@@ -44,5 +44,7 @@ Feature: add relationship
   Scenario: Undo creating relationship
     When I add relationship from top level note "Sedition" as "similar to" to note "Sedation"
     Then I should see "Sedition" has relationship "similar to" "Sedation"
+    When I open the relationship from "Sedition" to "Sedation"
+    Then I should be on the relationship note page with relation "similar to" to "Sedation"
     When I undo "create note"
     Then I should see "Sedition" has no relationship to "Sedation"

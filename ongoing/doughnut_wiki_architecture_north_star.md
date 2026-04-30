@@ -48,6 +48,7 @@ A notebook is the top-level boundary of a knowledge collection.
 A notebook may contain:
 
 - notebook name
+- optional short plain-text **description** (settings message, separate from note body)
 - notebook-level configuration
 - optional `index` note
 - folders
@@ -61,6 +62,7 @@ The notebook keeps its own name. Notebook page content comes from an optional or
 Notebook
   id
   name
+  description (optional short plain text)
   config
   createdAt
   updatedAt
@@ -70,7 +72,7 @@ Notebook
 
 A notebook may have an ordinary root-level note titled `index` with slug `index`.
 
-The `index` note supplies the notebook page body content when it exists. It is optional: a notebook page can render an empty rich editor before the note exists, and saving content can create the `index` note. Apart from this notebook-page presentation role, the `index` note is used as a normal note: it has a stable note ID, a normal title, a normal slug, normal content, links, backlinks, properties, and export/import behavior.
+The `index` note supplies the notebook page body summary when it exists. It is optional: the notebook page resolves **`index`** by slug without assuming absence until that load completes, and editing full body content happens on the normal note show route for that slug. Users create or update the `index` note like any other note. Apart from this notebook-page presentation role, the `index` note is a normal note: stable note ID, title, slug, content, links, backlinks, properties, and export/import behavior.
 
 ### Folder
 

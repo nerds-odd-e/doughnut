@@ -391,18 +391,17 @@ For each notebook:
 2. Rename the current head note to title `index` and slug `index`, or otherwise migrate its content into a normal root note with those values.
 3. Prefer preserving the former head note ID if feasible, because the migrated `index` note is still a normal note with stable identity.
 4. Clear notebook/head-note coupling so notebook lookup no longer requires a head note.
-5. Stop creating head notes for new notebooks. Create the `index` note only when notebook page content is saved.
+5. Stop creating head notes for new notebooks. The optional root `index` note is created only when the user creates or edits that note like any other note (not precreating it for new notebooks).
 
 ## UI Changes
 
-The notebook UI should shift from head-note/settings editing to a notebook page:
+The notebook UI shifts from head-note/settings editing to a notebook page:
 
-- remove “edit notebook settings”
-- remove the `edit` segment from the notebook page path
+- remove “edit notebook settings” as the default entry; notebook settings remain reachable from the notebook page where needed
+- remove the legacy `/d/notebooks/:notebookId/edit` route; the notebook page is the entry surface
 - clicking a notebook goes directly to the notebook page
-- at the top of the notebook page, show the rich editor for the `index` note content instead of the head note summary
-- show the empty rich editor even if the `index` note does not exist yet; saving content creates the normal `index` note
-- notebook page should have the same sidebar behavior as the note show page
+- notebook name and a short plain-text **`description`** (notebook-owned) appear on the notebook page; optional **`index`** content is resolved by slug (`index`) with explicit loading state and an edit affordance to the normal note route (**`/d/notebooks/:notebookId/notes/index`**)
+- notebook page uses the same sidebar behavior as the note show page
 
 ## Export Implication
 
@@ -418,12 +417,21 @@ If the notebook has no `index` note, export omits `index.md`.
 
 After this phase:
 
-- notebook keeps its own name
-- the former head note is represented as a normal root note titled `index`
-- an `index` note is optional for each notebook
-- UI can display and edit notebook page content through the `index` note rich editor
+- notebook keeps its own name and optional **`description`**
+- the former head note is represented as a normal root note titled `index` (when migrated)
+- an `index` note is optional for each notebook; body editing uses the normal note show path
 - first-layer notes no longer need to be children of a head note
 - new notebooks do not require head notes or pre-created `index` notes
+- `NoteRealm` exposes **`notebookId`** only (no embedded notebook on the wire); Obsidian export emits **`index.md`** only when an index note exists; **`notebook_head_note`** is removed after migration
+
+## Status and implementation notes
+
+Phase 3 is **complete** in the codebase.
+
+- **Persistence:** Migrations add **`notebook.description`**, migrate former head notes to root **`index`** notes, then drop **`notebook_head_note`** (e.g. `V300000152` through `V300000156`).
+- **API / clients:** Notebook DTOs carry **`description`**; no **`headNote`** / **`headNoteId`**; **`NoteRealm`** carries **`notebookId`** only (regenerate client after OpenAPI changes).
+- **Frontend:** Catalog and cards link to **`notebookPage`**; notebook page loads optional index via slug API, avoids flashing “no index” while loading, and links edit to slug **`index`** on the note show route; legacy notebook **`/edit`** route removed.
+- **Tests:** Controller tests assert absent head fields on JSON where applicable; Vitest and E2E cover notebook page and catalog navigation.
 
 ---
 
