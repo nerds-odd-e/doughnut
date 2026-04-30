@@ -60,14 +60,14 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
 
     assertThat(
         first.getCurrentStepName(),
-        equalTo(AdminDataMigrationService.STEP_RELATIONSHIP_TITLE_BACKFILL));
+        equalTo(AdminDataMigrationService.STEP_RELATIONSHIP_WIKI_BACKFILL));
     assertThat(first.isWikiReferenceMigrationComplete(), is(false));
     assertThat(
         first.getProcessedCount(),
         equalTo(AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
 
     AdminDataMigrationStatusDTO second = controller.runDataMigrationBatch();
-    assertThat(second.getMessage(), containsString("Title backfill"));
+    assertThat(second.getMessage(), containsString("Relationship wiki backfill"));
     assertThat(second.getMessage(), containsString("1 note"));
   }
 

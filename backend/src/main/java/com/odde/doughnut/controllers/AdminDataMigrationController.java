@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AdminDataMigrationService;
 import com.odde.doughnut.services.AuthorizationService;
@@ -41,6 +42,7 @@ class AdminDataMigrationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
-    return adminDataMigrationService.runBatch();
+    User admin = authorizationService.getCurrentUser();
+    return adminDataMigrationService.runBatch(admin);
   }
 }

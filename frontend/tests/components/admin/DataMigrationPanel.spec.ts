@@ -52,7 +52,7 @@ describe("DataMigrationPanel", () => {
 
   it("continues batches until migration reports complete", async () => {
     const inProgress: AdminDataMigrationStatusDto = {
-      message: "Title backfill: processed 1 note(s) in this batch.",
+      message: "Relationship wiki backfill: processed 1 note(s) in this batch.",
       wikiReferenceMigrationComplete: false,
       currentStepName: "relationship_title_backfill",
       stepStatus: "RUNNING",
