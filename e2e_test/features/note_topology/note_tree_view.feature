@@ -64,9 +64,27 @@ Feature: Note tree view
       | note-title |
       | LeSS in Action |
       | TDD        |
-      | TPP        |
       | ATDD       |
       | Pull       |
+      | CI         |
+
+  Scenario: Sidebar tree stays populated when opening another note from the sidebar
+    Given I navigate to "LeSS training/LeSS in Action/TDD" note
+    When I expand the side bar
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | LeSS in Action |
+      | TDD        |
+      | TPP        |
+      | ATDD       |
+      | CI         |
+    When I open the note "CI" from the sidebar
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | LeSS in Action |
+      | TDD        |
+      | TPP        |
+      | ATDD       |
       | CI         |
 
   Scenario: expand and collapse children in the sidebar

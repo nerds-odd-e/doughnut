@@ -212,6 +212,92 @@ describe("all in note show page", () => {
         expect(el?.textContent?.trim()).toBe("Beta")
       })
     })
+
+    it("keeps root tree visible before delayed showNoteByAmbiguousBasename finishes and does not refetch root notes", async () => {
+      const realmA = makeMe.aNoteRealm.title("Alpha").please()
+      const realmB = makeMe.aNoteRealm.title("Beta").please()
+      const sharedNotebookId = 99
+      for (const r of [realmA, realmB]) {
+        r.notebookId = sharedNotebookId
+        r.note.noteTopology.notebookId = sharedNotebookId
+      }
+      const shallowA = { ...realmA, children: undefined } as NoteRealm
+      const shallowB = { ...realmB, children: undefined } as NoteRealm
+
+      const realmById: Record<number, NoteRealm> = {
+        [realmA.id]: realmA,
+        [realmB.id]: realmB,
+      }
+      mockSdkServiceWithImplementation("showNote", (options) => {
+        const id = (options as Options<ShowNoteData>).path.note
+        const r = realmById[id]
+        if (r === undefined) {
+          throw new Error(`NoteShowPage.spec: unmocked showNote ${id}`)
+        }
+        return r
+      })
+
+      let releaseSecondBasename: (() => void) | undefined
+      mockSdkServiceWithImplementation(
+        "showNoteByAmbiguousBasename",
+        async (options) => {
+          const basename = (options as { path: { basename: string } }).path
+            .basename
+          if (basename === "slug-b") {
+            await new Promise<void>((resolve) => {
+              releaseSecondBasename = resolve
+            })
+            return realmB
+          }
+          return realmA
+        }
+      )
+
+      const rootListSpy = mockSdkService("listNotebookRootNotes", [
+        shallowA,
+        shallowB,
+      ])
+
+      mockNotebookGetForNoteRealm(realmA, {
+        id: 101,
+        name: "a circle",
+      })
+
+      const wrapper = helper
+        .component(NoteShowPageWithNotebookSidebarLayout)
+        .withCurrentUser(makeMe.aUser.please())
+        .withCleanStorage()
+        .withProps({
+          slug: "slug-a",
+        })
+        .withRouter(router)
+        .mount({ attachTo: document.body })
+
+      await flushPromises()
+      await vi.waitUntil(() => {
+        const el = document.querySelector('[data-test="note-title"]')
+        return el?.textContent?.trim() === "Alpha"
+      })
+      const rootCallsAfterAlpha = rootListSpy.mock.calls.length
+      expect(rootCallsAfterAlpha).toBeGreaterThan(0)
+
+      await wrapper.setProps({
+        slug: "slug-b",
+      })
+      await flushPromises()
+
+      expect(screen.getAllByText("Alpha").length).toBeGreaterThan(0)
+      expect(rootListSpy.mock.calls.length).toBe(rootCallsAfterAlpha)
+      expect(releaseSecondBasename).toBeDefined()
+
+      releaseSecondBasename!()
+      await flushPromises()
+      expect(rootListSpy.mock.calls.length).toBe(rootCallsAfterAlpha)
+      await waitFor(() => {
+        const el = document.querySelector('[data-test="note-title"]')
+        expect(el?.textContent?.trim()).toBe("Beta")
+      })
+    })
   })
 
   describe("conversation maximize/minimize", () => {
