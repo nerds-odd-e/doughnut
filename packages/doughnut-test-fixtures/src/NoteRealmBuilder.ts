@@ -19,6 +19,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       note: noteData,
       inboundReferences: [],
       children: [],
+      wikiTitles: [],
       notebook: new NotebookBuilder().please(),
     }
   }

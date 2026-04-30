@@ -3653,7 +3653,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NoteTestData"
-          writeOnly: true
         externalIdentifier:
           type: string
           writeOnly: true
@@ -3854,6 +3853,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
+        wikiTitles:
+          type: array
+          items:
+            $ref: "#/components/schemas/WikiTitle"
         notebook:
           $ref: "#/components/schemas/Notebook"
       required:
@@ -3903,6 +3906,17 @@ components:
       - id
       - notebookId
       - slug
+    WikiTitle:
+      type: object
+      properties:
+        title:
+          type: string
+        noteId:
+          type: integer
+          format: int32
+      required:
+      - noteId
+      - title
     NoteMoveDTO:
       type: object
       properties:

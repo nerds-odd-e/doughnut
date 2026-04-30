@@ -148,6 +148,7 @@ export type NoteTestData = {
 };
 
 export type NotesTestData = {
+    noteTestData?: Array<NoteTestData>;
     notebookName: string;
 };
 
@@ -230,6 +231,7 @@ export type NoteRealm = {
     fromBazaar?: boolean;
     children?: Array<Note>;
     inboundReferences?: Array<Note>;
+    wikiTitles?: Array<WikiTitle>;
     notebook: Notebook;
 };
 
@@ -243,6 +245,11 @@ export type NoteTopology = {
     parentOrSubjectNoteTopology?: NoteTopology;
     notebookId: number;
     notebookName?: string;
+};
+
+export type WikiTitle = {
+    title: string;
+    noteId: number;
 };
 
 export type NoteMoveDto = {
@@ -910,6 +917,7 @@ export type NoteRealmWritable = {
     fromBazaar?: boolean;
     children?: Array<NoteWritable>;
     inboundReferences?: Array<NoteWritable>;
+    wikiTitles?: Array<WikiTitle>;
     notebook: Notebook;
 };
 

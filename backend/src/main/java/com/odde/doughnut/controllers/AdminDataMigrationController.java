@@ -38,7 +38,7 @@ class AdminDataMigrationController {
   @Operation(
       operationId = "runDataMigrationBatch",
       summary =
-          "Run one wiki index-folder data migration batch — call again while moreBatchesRemain is true")
+          "Run one wiki index-folder data migration batch - call again while moreBatchesRemain is true")
   @PostMapping("/run-batch")
   public AdminDataMigrationStatusDTO runDataMigrationBatch()
       throws UnexpectedNoAccessRightException {

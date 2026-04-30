@@ -35,10 +35,8 @@ import { computed, ref, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
-import {
-  replaceWikiLinksInHtml,
-  type WikiTitle,
-} from "./replaceWikiLinksInHtml"
+import type { WikiTitle } from "@generated/doughnut-backend-api"
+import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
   composeNoteDetailsFromPropertyRows,
   parseNoteDetailsMarkdown,

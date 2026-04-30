@@ -37,8 +37,8 @@ import { nextTick, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
+import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
-import type { WikiTitle } from "../../form/replaceWikiLinksInHtml"
 
 const emit = defineEmits<{
   deadLinkClick: [title: string]

@@ -1,7 +1,4 @@
-export interface WikiTitle {
-  title: string
-  noteId: number
-}
+import type { WikiTitle } from "@generated/doughnut-backend-api"
 
 export function replaceWikiLinksInHtml(
   html: string,

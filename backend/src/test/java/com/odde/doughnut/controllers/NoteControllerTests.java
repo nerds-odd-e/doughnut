@@ -71,6 +71,37 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(noteRealm.getSlug(), equalTo(note.getSlug()));
       assertThat(noteRealm.getFromBazaar(), is(false));
     }
+
+    @Test
+    void shouldReturnWikiTitlesForLinksMatchingDescendantsUnderRoot()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note head = makeMe.aNote().creatorAndOwner(user).title("root-head").please();
+      Note matched = makeMe.aNote().title("LinkedPage").under(head).please();
+      Note viewer =
+          makeMe.aNote().under(head).details("Text [[LinkedPage]] and [[NoSuch]].").please();
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("LinkedPage"));
+      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(matched.getId()));
+    }
+
+    @Test
+    void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note head = makeMe.aNote().creatorAndOwner(user).please();
+      Note fromFm = makeMe.aNote().title("FrontmatterTarget").under(head).please();
+      String details =
+          "---\n"
+              + "see: Summary with [[FrontmatterTarget]]\n"
+              + "---\n"
+              + "[[FrontmatterTarget]] body\n";
+      Note viewer = makeMe.aNote().under(head).details(details).please();
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      assertThat(realm.getWikiTitles().get(0).getTitle(), equalTo("FrontmatterTarget"));
+      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(fromFm.getId()));
+    }
   }
 
   @Nested

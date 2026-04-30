@@ -26,7 +26,7 @@
                     note: noteRealm.note,
                     asMarkdown,
                     readonly: readonly(noteRealm),
-                    wikiTitles: getWikiTitles(noteRealm),
+                    wikiTitles: noteRealm.wikiTitles ?? [],
                   }"
                   @dead-link-click="onDeadLinkClick"
                 />
@@ -92,7 +92,6 @@
             :insert-mode="
               isNotebookIndexRootNote(noteRealm) ? 'as-child' : 'after'
             "
-            @closed="onDeadLinkCreateModalClosed"
           />
         </template>
       </template>
@@ -104,14 +103,11 @@
 import { inject, ref, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import { nonReloadingClient } from "@/managedApi/clientSetup"
 import type {
   NoteAccessory,
   NoteRealm,
-  NoteTopology,
   User,
 } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
@@ -120,7 +116,6 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
-import type { WikiTitle } from "../form/replaceWikiLinksInHtml"
 
 defineProps({
   noteId: { type: Number, required: true },
@@ -146,49 +141,9 @@ const onNoteAccessoryUpdated = () => {
 }
 const asMarkdown = ref(false)
 
-const wikiTitles = ref<WikiTitle[]>([])
-const lastFetchedWikiRootNoteId = ref<number | undefined>(undefined)
-
 function isNotebookIndexRootNote(noteRealm: NoteRealm): boolean {
   const t = noteRealm.note.noteTopology
   return t.slug === "index" && !t.parentOrSubjectNoteTopology
-}
-
-function rootNoteTopologyId(noteRealm: NoteRealm): number | undefined {
-  let cursor: NoteTopology | undefined = noteRealm.note.noteTopology
-  while (cursor?.parentOrSubjectNoteTopology) {
-    cursor = cursor.parentOrSubjectNoteTopology
-  }
-  return cursor?.id
-}
-
-const onDeadLinkCreateModalClosed = () => {
-  lastFetchedWikiRootNoteId.value = undefined
-}
-
-const fetchWikiTitles = async (rootNoteId: number) => {
-  if (rootNoteId === lastFetchedWikiRootNoteId.value) return
-  lastFetchedWikiRootNoteId.value = rootNoteId
-  const { data, error } = await NoteController.getDescendants({
-    path: { note: rootNoteId },
-    client: nonReloadingClient,
-  })
-  if (!error && data) {
-    wikiTitles.value = (data.relatedNotes ?? [])
-      .filter((note) => !!note.title && !!note.uri)
-      .map((note) => ({
-        title: note.title!,
-        noteId: parseInt(note.uri!.replace("/n", ""), 10),
-      }))
-  }
-}
-
-const getWikiTitles = (noteRealm: NoteRealm) => {
-  const rootId = rootNoteTopologyId(noteRealm)
-  if (rootId != null) {
-    fetchWikiTitles(rootId)
-  }
-  return wikiTitles.value
 }
 
 const toLocalDateString = (date: string) => new Date(date).toLocaleDateString()

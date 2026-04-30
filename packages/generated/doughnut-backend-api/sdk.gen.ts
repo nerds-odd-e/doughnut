@@ -1231,7 +1231,7 @@ export class AiController {
 
 export class AdminDataMigrationController {
     /**
-     * Run one wiki index-folder data migration batch â call again while moreBatchesRemain is true
+     * Run one wiki index-folder data migration batch - call again while moreBatchesRemain is true
      */
     public static runDataMigrationBatch<ThrowOnError extends boolean = false>(options?: Options<RunDataMigrationBatchData, ThrowOnError>) {
         return (options?.client ?? client).post<RunDataMigrationBatchResponses, unknown, ThrowOnError>({ url: '/api/admin/data-migration/run-batch', ...options });

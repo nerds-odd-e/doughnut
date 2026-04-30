@@ -1,6 +1,4 @@
 import NoteShow from "@/components/notes/NoteShow.vue"
-import { nonReloadingClient } from "@/managedApi/clientSetup"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockShowNoteAccessory, mockSdkService } from "@tests/helpers"
@@ -21,7 +19,6 @@ describe("new/updated pink banner", () => {
 
   beforeEach(() => {
     mockShowNoteAccessory()
-    mockSdkService("getDescendants", { relatedNotes: [] } as never)
   })
 
   it.each([
@@ -54,26 +51,17 @@ describe("new/updated pink banner", () => {
   })
 })
 
-function rootTopologyId(realm: NoteRealm): number {
-  let cursor = realm.note.noteTopology
-  while (cursor.parentOrSubjectNoteTopology) {
-    cursor = cursor.parentOrSubjectNoteTopology
-  }
-  return cursor.id
-}
-
 describe("note wth children", () => {
   const note = makeMe.aNoteRealm.please()
 
   beforeEach(() => {
     mockShowNoteAccessory()
-    mockSdkService("getDescendants", { relatedNotes: [] } as never)
   })
 
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
 
-  const render = (n: NoteRealm) => {
+  const render = (n: typeof note) => {
     mockSdkService("showNote", n)
     wrapper = helper
       .component(NoteShow)
@@ -97,20 +85,6 @@ describe("note wth children", () => {
 
     expect(showNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
-    })
-  })
-
-  it("fetches wiki title candidates without redirecting on unauthorized responses", async () => {
-    const getDescendantsSpy = mockSdkService("getDescendants", {
-      relatedNotes: [],
-    } as never)
-
-    render(note)
-    await flushPromises()
-
-    expect(getDescendantsSpy).toHaveBeenCalledWith({
-      path: { note: rootTopologyId(note) },
-      client: nonReloadingClient,
     })
   })
 
