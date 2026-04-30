@@ -28,7 +28,9 @@ public class WikiLinkResolver {
     this.authorizationService = authorizationService;
   }
 
-  public List<WikiTitle> resolveWikiTitles(Note focusNote, User viewer) {
+  public record ResolvedWikiLink(String linkText, Note targetNote) {}
+
+  public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
     String details = focusNote.getDetails();
     if (details == null || details.isBlank()) {
       return List.of();
@@ -39,14 +41,23 @@ public class WikiLinkResolver {
     }
     Map<String, Note> noteByExactTitle =
         descendantNotesIndexedByExactTitle(withoutRelations(rootNote(focusNote)));
-    List<WikiTitle> out = new ArrayList<>();
+    List<ResolvedWikiLink> out = new ArrayList<>();
     for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
       Note target = resolveToken(token, noteByExactTitle, viewer, focusNote);
       if (target != null) {
-        Notebook notebook =
-            target.getNotebook() != null ? target.getNotebook() : focusNote.getNotebook();
-        out.add(new WikiTitle(token, notebook.getId(), target.getSlug()));
+        out.add(new ResolvedWikiLink(token, target));
       }
+    }
+    return List.copyOf(out);
+  }
+
+  public List<WikiTitle> resolveWikiTitles(Note focusNote, User viewer) {
+    List<WikiTitle> out = new ArrayList<>();
+    for (ResolvedWikiLink link : resolveWikiLinksForCache(focusNote, viewer)) {
+      Note target = link.targetNote();
+      Notebook notebook =
+          target.getNotebook() != null ? target.getNotebook() : focusNote.getNotebook();
+      out.add(new WikiTitle(link.linkText(), notebook.getId(), target.getSlug()));
     }
     return List.copyOf(out);
   }

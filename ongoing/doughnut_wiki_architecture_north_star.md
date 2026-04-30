@@ -165,7 +165,11 @@ The default link text is the note title. The displayed text may be different fro
 
 Doughnut may index these links for graph view, backlinks, search, and relationship discovery.
 
-#### Final state
+#### Phase 5 persisted wiki cache (minimal)
+
+The first persisted shape is table `note_wiki_title_cache`: `id`, source `note_id`, `target_note_id`, and `link_text` (full token inside `[[]]`). Slug and notebook for client surfaces are joined from the target note when building DTOs; they are intentionally not duplicated on the cache row.
+
+#### Final state (longer-term derived index sketch)
 
 ```text
 LinkIndex
@@ -175,6 +179,8 @@ LinkIndex
   targetSlug
   createdAt
 ```
+
+This richer index (extra display/audit fields) is a directional target for later phases—for example path-based resolution and unresolved-link handling—not the Phase 5 physical table.
 
 The link index is derived from note content. The content remains the source of truth.
 

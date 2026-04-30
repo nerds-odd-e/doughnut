@@ -571,6 +571,10 @@ This phase is also the point where the title invariant closes: after Phase 5, a 
 
 Phase 5 introduces a persisted cache of wiki-title references derived from note details and frontmatter. The cache is refreshed when a note's details are updated and backfilled during migration.
 
+### Physical cache row
+
+Table `note_wiki_title_cache` stores: `id`; `note_id` (the note whose Markdown `details` were parsed); `target_note_id` (the resolved link target); `link_text` (the full inner wiki token inside `[[]]`). Only resolved links are persisted. Stable list order is row `id` ascending. Until sub-phase 5.15, `NoteRealm.wikiTitles` and the public `WikiTitle` DTO still use live resolution from details; after 5.15, read paths load from this cache while `notebookId` and `slug` on `WikiTitle` remain derived from `target_note_id` (and authorization) at read time—not extra columns on the cache table.
+
 The cache is used to populate `NoteRealm.wikiTitles`, incoming references, and note graph relationships. For existing non-relationship notes, migration adds a `parent: "[[Parent Title]]"` frontmatter property when a legacy parent exists, then refreshes the cache. New notes do not get this property by default.
 
 When a note title changes, the cache identifies notes that reference the old title so their wiki references can be updated to the new title and refreshed.

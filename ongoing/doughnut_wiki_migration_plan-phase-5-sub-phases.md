@@ -226,7 +226,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 ## Current Production Migration Note
 
-Sub-phases 5.1 through 5.12 are already implemented. The admin data migration code introduced by 5.8 and 5.9 has not yet been run against production data.
+Sub-phases 5.1 through 5.13 are already implemented. The admin data migration code introduced by 5.8 and 5.9 has not yet been run against production data.
 
 Do not run the old relationship title/details migration as one long blocking admin request. The production run should happen after wiki-title cache persistence exists, so the title backfill, details/frontmatter backfill, slug regeneration, and cache backfill can be performed together in resumable batches.
 
@@ -240,7 +240,9 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Post-condition:** The parsed wiki-title references can be persisted as cache rows owned by the note, with ordering preserved for stable API output.
 
-**Work:** Add the cache table/entity/repository and a cohesive parser/refresher service that extracts wiki titles from Markdown body and frontmatter values such as `source`, `target`, and `parent`.
+**Physical cache row** (`note_wiki_title_cache`): `id`, `note_id` (source note whose details were parsed), `target_note_id` (resolved target note), `link_text` (full wiki token inside `[[]]`, including `|` aliases and qualified `notebook:title`). Only **resolved** links produce rows (same omission rules as runtime wiki resolution today). Stable ordering uses surrogate `id` ascending (insert order matches resolver order); no separate ordinal column.
+
+**Work:** Add the cache table/entity/repository and a cohesive parser/refresher service (`WikiTitleCacheService`) that reuses `WikiLinkResolver` resolution and replaces all rows for a note in one transaction.
 
 **Verify:** Focused backend tests for parser/refresher behavior and persistence replacement semantics.
 
