@@ -49,9 +49,18 @@ public class PredefinedQuestionsTestData {
   public List<PredefinedQuestion> buildPredefinedQuestions(NoteRepository noteRepository) {
     return predefinedQuestionTestData.stream()
         .map(
-            question ->
-                question.buildPredefinedQuestion(
-                    noteRepository.findFirstInNotebookByName(notebookName, question.noteTitle)))
+            row -> {
+              Note note = noteRepository.findFirstInNotebookByName(notebookName, row.noteTitle);
+              if (note == null) {
+                throw new IllegalArgumentException(
+                    "No note with title `"
+                        + row.noteTitle
+                        + "` in notebook named `"
+                        + notebookName
+                        + "`");
+              }
+              return row.buildPredefinedQuestion(note);
+            })
         .collect(Collectors.toList());
   }
 }

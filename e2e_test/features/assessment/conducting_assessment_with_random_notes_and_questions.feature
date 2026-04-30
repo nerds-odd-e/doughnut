@@ -8,7 +8,7 @@ Feature: Self assessment with random notes and questions
       | Singapore | Countries    |
       | Vietnam   | Countries    |
     And notebook "World facts" is shared to the Bazaar
-    And there are questions in the notebook "Countries" for the note:
+    And there are questions in the notebook "World facts" for the note:
       | Note Title | Question                         | Answer | One Wrong Choice | Approved |
       | Singapore  | Where in the world is Singapore? | Asia   | euro             | true     |
       | Vietnam    | Most famous food of Vietnam?     | Pho    | bread            | true     |
