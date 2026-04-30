@@ -9,10 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -236,7 +238,7 @@ class NotebookControllerTest extends ControllerTestBase {
   @Nested
   class ListNotebookRootNotes {
     @Test
-    void returnsOnlyNotesWithNullParent()
+    void returnsOnlyNotesInNotebookRootFolderScope()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteCreationDTO createNb = new NoteCreationDTO();
       createNb.setNewTitle("NB With Roots");
@@ -252,9 +254,11 @@ class NotebookControllerTest extends ControllerTestBase {
       Integer rootTwoId = controller.createNoteAtNotebookRoot(nb, r2).getCreated().getId();
 
       Note rootOne = noteRepository.findById(rootOneId).orElseThrow();
-      Note child = makeMe.aNote("Under Root").under(rootOne).please();
+      Folder childFolder = makeMe.aFolder().notebook(nb).name("Nested Holder").please();
+      Note child = makeMe.aNote("Under Root").under(rootOne).folder(childFolder).please();
 
-      List<NoteRealm> roots = controller.listNotebookRootNotes(nb);
+      FolderListing listing = controller.listNotebookRootNotes(nb);
+      List<NoteRealm> roots = listing.notes();
       assertEquals(2, roots.size());
       assertEquals(
           List.of(rootOneId, rootTwoId).stream().sorted().toList(),
@@ -268,6 +272,68 @@ class NotebookControllerTest extends ControllerTestBase {
       NoteRealm rootTwoRealm =
           roots.stream().filter(r -> r.getId().equals(rootTwoId)).findFirst().orElseThrow();
       assertNull(rootTwoRealm.getChildren());
+    }
+
+    @Test
+    void includesNoteWithNonNullParentWhenFolderIsNull()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Folder Scope");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      NoteCreationDTO r1 = new NoteCreationDTO();
+      r1.setNewTitle("Anchor");
+      Integer anchorId = controller.createNoteAtNotebookRoot(nb, r1).getCreated().getId();
+      Note anchor = noteRepository.findById(anchorId).orElseThrow();
+      Note childInRootScope = makeMe.aNote("Child no folder").under(anchor).please();
+
+      assertTrue(
+          noteRepository.findNotebookRootNotesByNotebookId(nb.getId()).stream()
+              .noneMatch(n -> n.getId().equals(childInRootScope.getId())));
+
+      FolderListing listing = controller.listNotebookRootNotes(nb);
+      assertTrue(
+          listing.notes().stream().anyMatch(r -> r.getId().equals(childInRootScope.getId())));
+    }
+
+    @Test
+    void excludesNotesAssignedToAFolder()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Exclusion");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      Folder f = makeMe.aFolder().notebook(nb).name("Away").please();
+      NoteCreationDTO r1 = new NoteCreationDTO();
+      r1.setNewTitle("In Folder");
+      NoteCreationResult created = controller.createNoteAtNotebookRoot(nb, r1);
+      Note inFolder = noteRepository.findById(created.getCreated().getId()).orElseThrow();
+      inFolder.setFolder(f);
+      noteRepository.save(inFolder);
+
+      FolderListing listing = controller.listNotebookRootNotes(nb);
+      assertTrue(listing.notes().stream().noneMatch(r -> r.getId().equals(inFolder.getId())));
+    }
+
+    @Test
+    void returnsTopLevelFoldersForNotebook()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Folders");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      makeMe.aFolder().notebook(nb).name("Inbox").please();
+      Folder parentFolder = makeMe.aFolder().notebook(nb).name("Parent").please();
+      makeMe.aFolder().notebook(nb).parentFolder(parentFolder).name("Nested").please();
+
+      FolderListing listing = controller.listNotebookRootNotes(nb);
+      assertEquals(2, listing.folders().size());
+      assertEquals(
+          List.of("inbox", "parent"),
+          listing.folders().stream().map(f -> f.slug()).sorted().toList());
     }
 
     @Test

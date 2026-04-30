@@ -60,7 +60,7 @@ public class NoteService {
   }
 
   public List<Note> findNotebookRootNotes(Integer notebookId) {
-    return noteRepository.findNotebookRootNotesByNotebookId(notebookId);
+    return noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebookId);
   }
 
   public List<Note> findNotesVisibleToUserBySlugBasename(User user, String basename) {

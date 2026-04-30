@@ -1,14 +1,17 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
+import com.odde.doughnut.controllers.dto.NotebookRootFolder;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NotebookGroupRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -58,6 +61,7 @@ class NotebookController {
   private final NotebookGroupRepository notebookGroupRepository;
   private final NotebookGroupService notebookGroupService;
   private final NotebookRepository notebookRepository;
+  private final FolderRepository folderRepository;
   private final NotebookCatalogService notebookCatalogService;
   private final NoteService noteService;
   private final NoteConstructionService noteConstructionService;
@@ -75,6 +79,7 @@ class NotebookController {
       NotebookGroupRepository notebookGroupRepository,
       NotebookGroupService notebookGroupService,
       NotebookRepository notebookRepository,
+      FolderRepository folderRepository,
       NotebookCatalogService notebookCatalogService,
       NoteService noteService,
       NoteConstructionService noteConstructionService,
@@ -90,6 +95,7 @@ class NotebookController {
     this.notebookGroupRepository = notebookGroupRepository;
     this.notebookGroupService = notebookGroupService;
     this.notebookRepository = notebookRepository;
+    this.folderRepository = folderRepository;
     this.notebookCatalogService = notebookCatalogService;
     this.noteService = noteService;
     this.noteConstructionService = noteConstructionService;
@@ -267,16 +273,26 @@ class NotebookController {
     return noteRealmService.build(note, user);
   }
 
-  @Operation(summary = "List top-level notes in the notebook (no parent)")
+  @Operation(
+      summary = "List notebook root: notes without a folder and top-level folders",
+      description =
+          "Notes are those in the notebook with no folder assignment (notebook root scope), not"
+              + " filtered by legacy parent. Folders are notebook root folders (no parent folder).")
   @GetMapping("/{notebook}/root-notes")
-  public List<NoteRealm> listNotebookRootNotes(
+  public FolderListing listNotebookRootNotes(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     User user = authorizationService.getCurrentUser();
-    return noteService.findNotebookRootNotes(notebook.getId()).stream()
-        .map(n -> noteRealmService.buildForNotebookRootListing(n, user))
-        .toList();
+    List<NoteRealm> notes =
+        noteService.findNotebookRootNotes(notebook.getId()).stream()
+            .map(n -> noteRealmService.buildForNotebookRootListing(n, user))
+            .toList();
+    List<NotebookRootFolder> folders =
+        folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .map(NotebookRootFolder::from)
+            .toList();
+    return new FolderListing(notes, folders);
   }
 
   @GetMapping("/{notebook}/obsidian")

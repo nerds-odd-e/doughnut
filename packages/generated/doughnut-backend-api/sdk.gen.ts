@@ -818,7 +818,9 @@ export class NotebookController {
     }
     
     /**
-     * List top-level notes in the notebook (no parent)
+     * List notebook root: notes without a folder and top-level folders
+     *
+     * Notes are those in the notebook with no folder assignment (notebook root scope), not filtered by legacy parent. Folders are notebook root folders (no parent folder).
      */
     public static listNotebookRootNotes<ThrowOnError extends boolean = false>(options: Options<ListNotebookRootNotesData, ThrowOnError>) {
         return (options.client ?? client).get<ListNotebookRootNotesResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/root-notes', ...options });

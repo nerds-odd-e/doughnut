@@ -64,7 +64,10 @@ describe("Sidebar", () => {
       ...topNoteRealm,
       children: undefined,
     } as NoteRealm
-    mockSdkService("listNotebookRootNotes", [shallowTopRealm])
+    mockSdkService("listNotebookRootNotes", {
+      notes: [shallowTopRealm],
+      folders: [],
+    })
 
     const fullRealmByNoteId: Record<number, NoteRealm> = {
       [topNoteRealm.id]: topNoteRealm,
@@ -141,7 +144,10 @@ describe("Sidebar", () => {
       ...topNoteRealm,
       children: undefined,
     } as NoteRealm
-    const rootSpy = mockSdkService("listNotebookRootNotes", [shallowTopRealm])
+    const rootSpy = mockSdkService("listNotebookRootNotes", {
+      notes: [shallowTopRealm],
+      folders: [],
+    })
     mountSidebar(firstGeneration)
     await flushPromises()
     expect(rootSpy).toHaveBeenCalledTimes(1)
@@ -170,7 +176,10 @@ describe("Sidebar", () => {
         ...topNoteRealm,
         children: undefined,
       } as NoteRealm
-      const rootSpy = mockSdkService("listNotebookRootNotes", [shallowTopRealm])
+      const rootSpy = mockSdkService("listNotebookRootNotes", {
+        notes: [shallowTopRealm],
+        folders: [],
+      })
       const fullRealmByNoteId: Record<number, NoteRealm> = {
         [topNoteRealm.id]: topNoteRealm,
         [firstGeneration.id]: firstGeneration,

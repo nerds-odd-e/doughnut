@@ -2720,7 +2720,10 @@ paths:
     get:
       tags:
       - notebook-controller
-      summary: List top-level notes in the notebook (no parent)
+      summary: "List notebook root: notes without a folder and top-level folders"
+      description: "Notes are those in the notebook with no folder assignment (notebook\
+        \ root scope), not filtered by legacy parent. Folders are notebook root folders\
+        \ (no parent folder)."
       operationId: listNotebookRootNotes
       parameters:
       - name: notebook
@@ -2734,9 +2737,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
+                $ref: "#/components/schemas/FolderListing"
   /api/notebooks/{notebook}/note/by-slug:
     get:
       tags:
@@ -5109,6 +5110,32 @@ components:
       - dailyTargetOfNewNotes
       - id
       - notebook
+    FolderListing:
+      type: object
+      description: Notes and child folders in a structural listing scope (e.g. notebook
+        root or a folder).
+      properties:
+        notes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteRealm"
+        folders:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotebookRootFolder"
+    NotebookRootFolder:
+      type: object
+      description: Notebook root-level folder row for listing.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+      required:
+      - name
+      - slug
     BookUserLastReadPosition:
       type: object
       properties:

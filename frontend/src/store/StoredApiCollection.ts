@@ -259,8 +259,9 @@ export default class StoredApiCollection implements StoredApi {
         toErrorMessage(error, "Failed to load notebook root notes")
       )
     }
-    this.refreshNoteRealms(data)
-    return data
+    const notes = data.notes ?? []
+    this.refreshNoteRealms(notes)
+    return notes
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {

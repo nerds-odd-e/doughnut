@@ -167,10 +167,10 @@ describe("all in note show page", () => {
         return realmA
       })
 
-      const rootListSpy = mockSdkService("listNotebookRootNotes", [
-        shallowA,
-        shallowB,
-      ])
+      const rootListSpy = mockSdkService("listNotebookRootNotes", {
+        notes: [shallowA, shallowB],
+        folders: [],
+      })
 
       mockNotebookGetForNoteRealm(realmA, {
         id: 101,
@@ -253,10 +253,10 @@ describe("all in note show page", () => {
         }
       )
 
-      const rootListSpy = mockSdkService("listNotebookRootNotes", [
-        shallowA,
-        shallowB,
-      ])
+      const rootListSpy = mockSdkService("listNotebookRootNotes", {
+        notes: [shallowA, shallowB],
+        folders: [],
+      })
 
       mockNotebookGetForNoteRealm(realmA, {
         id: 101,

@@ -814,6 +814,23 @@ export type SubscriptionForNotebooksListing = {
     name?: string;
 };
 
+/**
+ * Notes and child folders in a structural listing scope (e.g. notebook root or a folder).
+ */
+export type FolderListing = {
+    notes?: Array<NoteRealm>;
+    folders?: Array<NotebookRootFolder>;
+};
+
+/**
+ * Notebook root-level folder row for listing.
+ */
+export type NotebookRootFolder = {
+    id?: string;
+    name: string;
+    slug: string;
+};
+
 export type BookUserLastReadPosition = {
     id: number;
     locator: ContentLocatorFull;
@@ -984,6 +1001,14 @@ export type ConversationSubjectWritable = {
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
+};
+
+/**
+ * Notes and child folders in a structural listing scope (e.g. notebook root or a folder).
+ */
+export type FolderListingWritable = {
+    notes?: Array<NoteRealmWritable>;
+    folders?: Array<NotebookRootFolder>;
 };
 
 export type PutNotebookBookBlockReadingRecordData = {
@@ -3395,7 +3420,7 @@ export type ListNotebookRootNotesResponses = {
     /**
      * OK
      */
-    200: Array<NoteRealm>;
+    200: FolderListing;
 };
 
 export type ListNotebookRootNotesResponse = ListNotebookRootNotesResponses[keyof ListNotebookRootNotesResponses];
