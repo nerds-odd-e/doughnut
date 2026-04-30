@@ -297,8 +297,8 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       unimport:
-        specifier: ^6.1.1
-        version: 6.1.1
+        specifier: ^6.2.0
+        version: 6.2.0
       unplugin-auto-import:
         specifier: ^21.0.0
         version: 21.0.0
@@ -5566,6 +5566,9 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
+  pkg-types@2.3.1:
+    resolution: {integrity: sha512-y+ichcgc2LrADuhLNAx8DFjVfgz91pRxfZdI3UDhxHvcVEZsenLO+7XaU5vOp0u/7V/wZ+plyuQxtrDlZJ+yeg==}
+
   playwright-core@1.59.1:
     resolution: {integrity: sha512-HBV/RJg81z5BiiZ9yPzIiClYV/QMsDCKUyogwH9p3MCP6IYjUFu/MActgYAvK0oWyV9NlwM3GLBjADyWgydVyg==}
     engines: {node: '>=18'}
@@ -6778,9 +6781,14 @@ packages:
     resolution: {integrity: sha512-8rqAmtJV8o60x46kBAJKtHpJDJWkA2xcBqWKPI14MgUb05o1pnpnCnXSxedUXyeq7p8fR5g3pTo2BaswZ9lD9A==}
     engines: {node: '>=18.12.0'}
 
-  unimport@6.1.1:
-    resolution: {integrity: sha512-ZY3adHF8WFSaiF1O+Eqtltt4wMZPGQ+WWLtnbc31TxglU/dx7q8B66kvXdfyGTWA25X8OO00X9b9iyLzrWOZmw==}
+  unimport@6.2.0:
+    resolution: {integrity: sha512-4NcqaphAHQff4eBWQ3pjVOCYNLlmVGGMoLDmboobh8+OQe9yP7UyeoMP043M1bG0YNc3CqtukD2VuINxOqm4rQ==}
     engines: {node: '>=18.12.0'}
+    peerDependencies:
+      oxc-parser: '*'
+    peerDependenciesMeta:
+      oxc-parser:
+        optional: true
 
   unist-util-is@6.0.1:
     resolution: {integrity: sha512-LsiILbtBETkDz8I9p1dQ0uyRUWuaQzd/cuEeS1hoRSyW5E5XGmTzlwY1OrNzzakGowI9Dr/I8HVaw4hTtnxy8g==}
@@ -11201,7 +11209,7 @@ snapshots:
       require-and-forget: 1.0.1
       shelljs: 0.10.0
       spec-change: 1.11.20
-      tinyglobby: 0.2.15
+      tinyglobby: 0.2.16
       tsx: 4.21.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -13100,6 +13108,12 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
+  pkg-types@2.3.1:
+    dependencies:
+      confbox: 0.2.4
+      exsolve: 1.0.8
+      pathe: 2.0.3
+
   playwright-core@1.59.1: {}
 
   playwright@1.59.1:
@@ -14482,7 +14496,7 @@ snapshots:
       unplugin: 2.3.11
       unplugin-utils: 0.3.1
 
-  unimport@6.1.1:
+  unimport@6.2.0:
     dependencies:
       acorn: 8.16.0
       escape-string-regexp: 5.0.0
@@ -14492,7 +14506,7 @@ snapshots:
       mlly: 1.8.2
       pathe: 2.0.3
       picomatch: 4.0.4
-      pkg-types: 2.3.0
+      pkg-types: 2.3.1
       scule: 1.3.0
       strip-literal: 3.1.0
       tinyglobby: 0.2.16
