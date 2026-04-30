@@ -182,6 +182,7 @@ Then(
 Then(
   'I should see the relationship note title reflects {string} {string} {string}',
   (sourceTitle: string, relationType: string, targetTitle: string) => {
+    start.jumpToNotePage(sourceTitle).navigateToRelationshipChild(targetTitle)
     cy.findByRole('title')
       .should('contain', sourceTitle)
       .and('contain', relationType)

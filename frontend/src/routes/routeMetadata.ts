@@ -60,7 +60,7 @@ export const routeMetadata: RouteMetadata[] = [
   },
   {
     path: "/d/notes/:slug",
-    name: "noteShow",
+    name: "noteShowByAmbiguousSlug",
     props: (route: RouteLocation) => {
       const raw = route.params.slug
       if (raw === undefined || raw === "") {

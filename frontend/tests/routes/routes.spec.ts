@@ -12,15 +12,17 @@ describe("routes", () => {
     })
   })
 
-  describe("noteShow route", () => {
+  describe("noteShowByAmbiguousSlug route", () => {
     it("should match /d/notes/:slug and pass slug prop", async () => {
       await router.push("/d/notes/my-note-slug")
 
       const route = router.currentRoute.value
-      expect(route.name).toBe("noteShow")
+      expect(route.name).toBe("noteShowByAmbiguousSlug")
       expect(route.params.slug).toBe("my-note-slug")
 
-      const noteShowRoute = routes.find((r) => r.name === "noteShow")
+      const noteShowRoute = routes.find(
+        (r) => r.name === "noteShowByAmbiguousSlug"
+      )
       expect(noteShowRoute).toBeDefined()
       if (noteShowRoute && typeof noteShowRoute.props === "function") {
         expect(noteShowRoute.props(route)).toEqual({
@@ -33,10 +35,12 @@ describe("routes", () => {
       await router.push("/d/notes/123")
 
       const route = router.currentRoute.value
-      expect(route.name).toBe("noteShow")
+      expect(route.name).toBe("noteShowByAmbiguousSlug")
       expect(route.params.slug).toBe("123")
 
-      const noteShowRoute = routes.find((r) => r.name === "noteShow")
+      const noteShowRoute = routes.find(
+        (r) => r.name === "noteShowByAmbiguousSlug"
+      )
       expect(noteShowRoute).toBeDefined()
       if (noteShowRoute && typeof noteShowRoute.props === "function") {
         expect(noteShowRoute.props(route)).toEqual({ slug: "123" })
@@ -45,7 +49,9 @@ describe("routes", () => {
 
     it("should not match legacy /n:id URLs", () => {
       const resolved = router.resolve("/n123")
-      expect(resolved.matched.some((r) => r.name === "noteShow")).toBe(false)
+      expect(
+        resolved.matched.some((r) => r.name === "noteShowByAmbiguousSlug")
+      ).toBe(false)
     })
   })
 

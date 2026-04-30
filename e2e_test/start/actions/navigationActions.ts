@@ -8,7 +8,7 @@ export const navigationActions = {
     const basename = wikiBasenameFromTitle(noteTopology)
     const url = `/d/notes/${encodeURIComponent(basename)}`
     if (forceLoadPage) cy.visit(url)
-    else router().push(url, 'noteShow', { slug: basename })
+    else router().push(url, 'noteShowByAmbiguousSlug', { slug: basename })
 
     return assumeNotePage(noteTopology)
   },

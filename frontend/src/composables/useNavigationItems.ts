@@ -33,7 +33,7 @@ export function useNavigationItems() {
         isActive: [
           "notebooks",
           "notebookGroup",
-          "noteShow",
+          "noteShowByAmbiguousSlug",
           "noteShowByNotebookSlug",
           "notebookPage",
         ].includes(route.name as string),
