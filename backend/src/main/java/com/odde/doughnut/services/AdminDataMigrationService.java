@@ -129,6 +129,7 @@ public class AdminDataMigrationService {
         wikiSlugPathService.assignSlugForNewNote(relation);
         refreshWikiTitleCacheForRelationshipMigration(relation, adminUser);
         entityPersister.merge(relation);
+        entityPersister.flush();
       }
       entityPersister.flush();
       int lastId = batchIds.get(batchIds.size() - 1);
@@ -190,6 +191,7 @@ public class AdminDataMigrationService {
       for (Integer id : batchIds) {
         Note note = noteRepository.findById(id).orElseThrow();
         refreshWikiTitleCacheForLegacyMigration(note, adminUser);
+        entityPersister.flush();
       }
       int lastId = batchIds.get(batchIds.size() - 1);
       wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
@@ -219,7 +221,10 @@ public class AdminDataMigrationService {
     return adminUser;
   }
 
-  /** Clears stuck cache rows then retries once; fails the batch if the relationship step still cannot refresh. */
+  /**
+   * Clears stuck cache rows then retries once; fails the batch if the relationship step still
+   * cannot refresh.
+   */
   private void refreshWikiTitleCacheForRelationshipMigration(Note note, User adminUser) {
     User viewer = viewerForWikiTitleCacheRefresh(note, adminUser);
     try {
@@ -230,7 +235,9 @@ public class AdminDataMigrationService {
     }
   }
 
-  /** Best-effort refresh; cursor still advances so migration can finish even if cache stays empty. */
+  /**
+   * Best-effort refresh; cursor still advances so migration can finish even if cache stays empty.
+   */
   private void refreshWikiTitleCacheForLegacyMigration(Note note, User adminUser) {
     User viewer = viewerForWikiTitleCacheRefresh(note, adminUser);
     try {
