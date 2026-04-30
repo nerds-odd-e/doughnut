@@ -61,12 +61,13 @@ class CircleController {
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(circle);
+    User viewer = authorizationService.getCurrentUser();
     var ownership = circle.getOwnership();
     List<NotebookGroup> groups = notebookGroupRepository.findByOwnership_Id(ownership.getId());
     List<Notebook> notebooks =
         notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
     NotebooksViewedByUser notebooksView =
-        notebookCatalogService.buildView(notebooks, groups, List.of());
+        notebookCatalogService.buildView(viewer, notebooks, groups, List.of());
     return circle.jsonCircleForUserView(notebooksView);
   }
 

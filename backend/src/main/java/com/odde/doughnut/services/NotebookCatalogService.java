@@ -10,6 +10,7 @@ import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -32,10 +33,11 @@ public class NotebookCatalogService {
     this.bookRepository = bookRepository;
   }
 
-  public NotebookClientView clientViewFor(Notebook notebook) {
+  public NotebookClientView clientViewFor(Notebook notebook, User viewer) {
     boolean hasAttachedBook =
         !bookRepository.findNotebookIdsWithAttachedBooksIn(List.of(notebook.getId())).isEmpty();
-    return NotebookClientView.of(notebook, hasAttachedBook);
+    boolean readonly = viewer == null || !viewer.owns(notebook);
+    return NotebookClientView.of(notebook, hasAttachedBook, readonly);
   }
 
   /**
@@ -47,7 +49,10 @@ public class NotebookCatalogService {
    * </ul>
    */
   public NotebooksViewedByUser buildView(
-      List<Notebook> allNotebooks, List<NotebookGroup> groups, List<Subscription> subscriptions) {
+      User viewer,
+      List<Notebook> allNotebooks,
+      List<NotebookGroup> groups,
+      List<Subscription> subscriptions) {
     Set<Integer> ids = notebookIdsReferenced(allNotebooks, subscriptions);
     Set<Integer> withBook =
         ids.isEmpty()
@@ -58,7 +63,10 @@ public class NotebookCatalogService {
     Function<Notebook, NotebookClientView> wrap =
         nb ->
             byNotebookId.computeIfAbsent(
-                nb.getId(), __ -> NotebookClientView.of(nb, withBook.contains(nb.getId())));
+                nb.getId(),
+                __ ->
+                    NotebookClientView.of(
+                        nb, withBook.contains(nb.getId()), viewer == null || !viewer.owns(nb)));
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();

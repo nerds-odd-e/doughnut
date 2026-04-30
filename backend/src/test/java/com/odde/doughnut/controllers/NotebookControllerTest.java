@@ -150,6 +150,47 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(notebookPayload.get("id").asInt(), equalTo(nb.getId()));
       assertThat(notebookPayload.get("name").asText(), equalTo("API Shape NB"));
       assertThat(notebookPayload.get("description").asText(), equalTo("Blurb"));
+      assertThat(tree.get("readonly").asBoolean(), is(false));
+    }
+  }
+
+  @Nested
+  class GetNotebook {
+    @Test
+    void ownerGetsWritableNotebookClientView() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      NotebookClientView view = controller.get(nb);
+      assertThat(view.notebook().getId(), equalTo(nb.getId()));
+      assertThat(view.readonly(), is(false));
+    }
+
+    @Test
+    void anonymousGetsReadonlyNotebookClientViewWhenNotebookInBazaar()
+        throws UnexpectedNoAccessRightException {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aBazaarNotebook(nb).please();
+      currentUser.setUser(null);
+      NotebookClientView view = controller.get(nb);
+      assertThat(view.notebook().getId(), equalTo(nb.getId()));
+      assertThat(view.readonly(), is(true));
+    }
+
+    @Test
+    void anonymousDeniedWhenNotebookNotInBazaar() {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      currentUser.setUser(null);
+      assertThrows(ResponseStatusException.class, () -> controller.get(nb));
+    }
+
+    @Test
+    void deniesLoggedInUserWithoutReadAccessToNotebook() {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      currentUser.setUser(makeMe.aUser().please());
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.get(nb));
     }
   }
 

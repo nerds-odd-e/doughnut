@@ -108,7 +108,7 @@ class NotebookController {
     List<Notebook> notebooks =
         notebookRepository.findByOwnership_IdAndDeletedAtIsNull(ownership.getId());
     List<Subscription> subscriptions = user.getSubscriptions();
-    return notebookCatalogService.buildView(notebooks, groups, subscriptions);
+    return notebookCatalogService.buildView(user, notebooks, groups, subscriptions);
   }
 
   @PostMapping({"/create"})
@@ -159,8 +159,9 @@ class NotebookController {
   @GetMapping(value = "/{notebook}")
   public NotebookClientView get(@PathVariable @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn();
-    return notebookCatalogService.clientViewFor(notebook);
+    authorizationService.assertReadAuthorization(notebook);
+    User user = authorizationService.getCurrentUser();
+    return notebookCatalogService.clientViewFor(notebook, user);
   }
 
   @PostMapping(value = "/{notebook}/share")

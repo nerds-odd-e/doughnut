@@ -23,7 +23,7 @@ class CircleNoteBuilder extends Builder<CircleForUserView> {
       (notebook) => ({
         type: 'notebook' as const,
         notebook,
-      }),
+      })
     )
     return {
       id: generateId(),

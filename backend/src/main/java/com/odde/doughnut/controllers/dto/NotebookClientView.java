@@ -10,9 +10,11 @@ import jakarta.validation.constraints.NotNull;
         "Notebook entity plus optional client-only fields (e.g. catalog attachment hints).")
 public record NotebookClientView(
     @NotNull Notebook notebook,
-    @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook) {
+    @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
+    boolean readonly) {
 
-  public static NotebookClientView of(Notebook notebook, boolean hasAttachedBook) {
-    return new NotebookClientView(notebook, hasAttachedBook);
+  public static NotebookClientView of(
+      Notebook notebook, boolean hasAttachedBook, boolean readonly) {
+    return new NotebookClientView(notebook, hasAttachedBook, readonly);
   }
 }

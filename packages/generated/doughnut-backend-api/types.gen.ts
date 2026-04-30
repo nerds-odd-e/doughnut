@@ -801,6 +801,7 @@ export type NotebookCatalogSubscribedNotebookItem = Omit<NotebookCatalogItem, 't
 export type NotebookClientView = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
+    readonly?: boolean;
 };
 
 export type NotebooksViewedByUser = {

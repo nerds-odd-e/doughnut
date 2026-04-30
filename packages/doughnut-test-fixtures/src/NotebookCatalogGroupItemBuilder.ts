@@ -32,7 +32,7 @@ class NotebookCatalogGroupItemBuilder extends Builder<NotebookCatalogGroupItem> 
     for (const n of memberNames) {
       const nb = new NotebookBuilder()
       nb.notebuilder.title(n)
-      this.memberNotebooks.push({ notebook: nb.do() })
+      this.memberNotebooks.push({ notebook: nb.do(), readonly: false })
     }
     return this
   }
@@ -43,7 +43,10 @@ class NotebookCatalogGroupItemBuilder extends Builder<NotebookCatalogGroupItem> 
   }
 
   membersFromNotebooks(notebooks: Notebook[]) {
-    this.memberNotebooks = notebooks.map((n) => ({ notebook: n }))
+    this.memberNotebooks = notebooks.map((n) => ({
+      notebook: n,
+      readonly: false,
+    }))
     return this
   }
 

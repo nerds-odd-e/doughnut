@@ -5080,6 +5080,8 @@ components:
           $ref: "#/components/schemas/Notebook"
         hasAttachedBook:
           type: boolean
+        readonly:
+          type: boolean
       required:
       - notebook
     NotebooksViewedByUser:

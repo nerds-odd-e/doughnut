@@ -1,4 +1,3 @@
-@ignore
 Feature: Bazaar browsing
   Part of the bazaar should be visible to everyone.
 

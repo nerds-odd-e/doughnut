@@ -1,9 +1,6 @@
 <template>
   <ContentLoader v-if="notebook === undefined" />
-  <div
-    v-else-if="user !== undefined"
-    class="daisy-flex daisy-flex-col daisy-h-full"
-  >
+  <div v-else class="daisy-flex daisy-flex-col daisy-h-full">
     <GlobalBar>
       <button
         role="button"
@@ -38,18 +35,23 @@
         class="daisy-text-sm daisy-breadcrumbs daisy-max-w-full daisy-min-w-0"
       >
         <ul class="daisy-m-0 daisy-pl-0">
-          <li>
-            <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
+          <li v-if="isNotebookReadOnly">
+            <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
           </li>
-          <li v-if="notebook.circle">
-            <router-link
-              :to="{
-                name: 'circleShow',
-                params: { circleId: notebook.circle.id },
-              }"
-              >{{ notebook.circle.name }}</router-link
-            >
-          </li>
+          <template v-else>
+            <li>
+              <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
+            </li>
+            <li v-if="notebook.circle">
+              <router-link
+                :to="{
+                  name: 'circleShow',
+                  params: { circleId: notebook.circle.id },
+                }"
+                >{{ notebook.circle.name }}</router-link
+              >
+            </li>
+          </template>
           <li>{{ notebook.name }}</li>
         </ul>
       </div>
@@ -83,7 +85,12 @@
       <main
         class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
       >
+        <NotebookPageReadonlySummary
+          v-if="isNotebookReadOnly"
+          :notebook="notebook"
+        />
         <NotebookPageView
+          v-else
           :notebook="notebook"
           :user="user"
           :show-add-first-note="indexSlugStatus === 'absent'"
@@ -107,8 +114,13 @@ import {
   type Ref,
 } from "vue"
 import { useRoute } from "vue-router"
-import type { Notebook, User } from "@generated/doughnut-backend-api"
+import type {
+  Notebook,
+  User,
+  NotebookClientView,
+} from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
@@ -118,7 +130,13 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 const user = inject<Ref<User | undefined>>("currentUser")
-const notebook = ref<Notebook | undefined>(undefined)
+const notebookClient = ref<NotebookClientView | undefined>(undefined)
+
+const notebook = computed(() => notebookClient.value?.notebook)
+
+const isNotebookReadOnly = computed(
+  () => notebookClient.value?.readonly === true
+)
 
 const sidebarOpened = ref(false)
 const sidebarAnchorNoteId = ref<number | undefined>()
@@ -163,13 +181,18 @@ const fetchNotebook = async () => {
   const { data: result, error } = await NotebookController.get({
     path: { notebook: notebookId },
   })
-  if (!error) {
-    notebook.value = result!.notebook
+  if (!error && result) {
+    notebookClient.value = result
+    return
   }
+  notebookClient.value = undefined
 }
 
 const handleNotebookUpdated = (updatedNotebook: Notebook) => {
-  notebook.value = updatedNotebook
+  const prev = notebookClient.value
+  if (prev != null) {
+    notebookClient.value = { ...prev, notebook: updatedNotebook }
+  }
 }
 
 watch(notebook, async (nb) => {
