@@ -210,8 +210,15 @@ public class AdminDataMigrationService {
     Integer n =
         jdbcTemplate.queryForObject(
             """
-            SELECT COUNT(*) FROM notebook_head_note nh
-            INNER JOIN notebook n ON n.id = nh.notebook_id
+            SELECT COUNT(*) FROM (
+              SELECT n.notebook_id
+              FROM note n
+              WHERE n.deleted_at IS NULL
+                AND n.parent_id IS NULL
+                AND n.folder_id IS NULL
+                AND (n.slug = 'index' OR LOWER(n.title) = 'index')
+              GROUP BY n.notebook_id
+            ) t
             """,
             Integer.class);
     return n == null ? 0 : n;
@@ -233,13 +240,17 @@ public class AdminDataMigrationService {
     List<int[]> pairs =
         jdbcTemplate.query(
             """
-            SELECT nh.notebook_id, nh.head_note_id
-            FROM notebook_head_note nh
-            INNER JOIN notebook n ON n.id = nh.notebook_id
-            ORDER BY nh.notebook_id ASC
+            SELECT n.notebook_id, MIN(n.id) AS index_note_id
+            FROM note n
+            WHERE n.deleted_at IS NULL
+              AND n.parent_id IS NULL
+              AND n.folder_id IS NULL
+              AND (n.slug = 'index' OR LOWER(n.title) = 'index')
+            GROUP BY n.notebook_id
+            ORDER BY n.notebook_id ASC
             LIMIT 1 OFFSET ?
             """,
-            (rs, rowNum) -> new int[] {rs.getInt("notebook_id"), rs.getInt("head_note_id")},
+            (rs, rowNum) -> new int[] {rs.getInt("notebook_id"), rs.getInt("index_note_id")},
             zeroBasedOffset);
     if (pairs.isEmpty()) {
       throw new IllegalStateException(

@@ -40,8 +40,7 @@ class NotebookDescriptionPersistenceTest extends ControllerTestBase {
     jdbcTemplate.update(
         """
         UPDATE notebook n
-        INNER JOIN notebook_head_note nh ON nh.notebook_id = n.id
-        INNER JOIN note hn ON nh.head_note_id = hn.id AND hn.deleted_at IS NULL
+        INNER JOIN note hn ON hn.notebook_id = n.id AND hn.id = ? AND hn.deleted_at IS NULL
         SET n.description = CASE
           WHEN hn.details IS NULL THEN NULL
           WHEN TRIM(REGEXP_REPLACE(hn.details, '<[^>]*>', '')) = '' THEN NULL
@@ -51,6 +50,7 @@ class NotebookDescriptionPersistenceTest extends ControllerTestBase {
         END
         WHERE n.id = ?
         """,
+        head.getId(),
         notebook.getId());
 
     String stored =

@@ -55,14 +55,6 @@ public class Ownership {
     return this.circle.getMembers().contains(user);
   }
 
-  public Note prepareHeadNoteForNewNotebook(
-      User user, Timestamp currentUTCTimestamp, String titleConstructor) {
-    final Note note = new Note();
-    note.initialize(user, null, currentUTCTimestamp, titleConstructor);
-    note.buildNotebookForHeadNote(this, user);
-    return note;
-  }
-
   public Notebook prepareNotebookForNewNotebook(
       User creator, Timestamp currentUTCTimestamp, String titleConstructor, String description) {
     Notebook notebook = new Notebook();

@@ -171,7 +171,7 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap,
         NoteRepository noteRepository,
         EntityPersister entityPersister) {
-      Note firstHeadCreatedInBatch = null;
+      Note firstRootCreatedInBatch = null;
       for (NoteTestData injection : noteTestData) {
         Note note = titleNoteMap.get(injection.title);
         if (!Strings.isBlank(injection.parentTitle)) {
@@ -179,26 +179,20 @@ class TestabilityRestController {
           continue;
         }
         if (notebookFromRepositoryOrNull != null) {
-          Note head = notebookFromRepositoryOrNull.getHeadNote();
-          if (head == null) {
-            note.initializeAsNotebookRoot(
-                notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
-            notebookFromRepositoryOrNull.setHeadNote(note);
-            notebookFromRepositoryOrNull.setUpdated_at(currentUTCTimestamp);
-            entityPersister.save(notebookFromRepositoryOrNull);
-            continue;
-          }
-          note.setParentNote(head);
+          note.initializeAsNotebookRoot(
+              notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
+          notebookFromRepositoryOrNull.setUpdated_at(currentUTCTimestamp);
+          entityPersister.merge(notebookFromRepositoryOrNull);
           continue;
         }
-        if (firstHeadCreatedInBatch == null) {
-          note.buildNotebookForHeadNote(ownership, user);
+        if (firstRootCreatedInBatch == null) {
+          note.attachToNewNotebook(ownership, user);
           note.getNotebook().setName(notebookName);
           note.getNotebook().setUpdated_at(currentUTCTimestamp);
           entityPersister.save(note.getNotebook());
-          firstHeadCreatedInBatch = note;
+          firstRootCreatedInBatch = note;
         } else {
-          note.setParentNote(firstHeadCreatedInBatch);
+          note.setParentNote(firstRootCreatedInBatch);
         }
       }
     }

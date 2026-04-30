@@ -72,12 +72,6 @@ public class NoteService {
   public void destroy(Note note) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
-    if (note.getNotebook() != null) {
-      if (note.getNotebook().getHeadNote() == note) {
-        note.getNotebook().setDeletedAt(currentUTCTimestamp);
-        entityPersister.merge(note.getNotebook());
-      }
-    }
 
     // Delete all descendants recursively
     List<Note> descendants = note.getAllDescendants().toList();
@@ -131,13 +125,6 @@ public class NoteService {
   }
 
   public void restore(Note note) {
-    if (note.getNotebook() != null) {
-      if (note.getNotebook().getHeadNote() == note) {
-        note.getNotebook().setDeletedAt(null);
-        entityPersister.merge(note.getNotebook());
-      }
-    }
-
     Timestamp deletedAt = note.getDeletedAt();
     if (deletedAt != null) {
       List<Integer> noteIdsToRestore = collectNoteIdsToRestore(note, deletedAt);

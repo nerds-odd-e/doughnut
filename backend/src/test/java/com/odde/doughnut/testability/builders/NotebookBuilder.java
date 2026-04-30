@@ -9,22 +9,26 @@ import com.odde.doughnut.testability.MakeMe;
 import java.util.function.Consumer;
 
 public class NotebookBuilder extends EntityBuilder<Notebook> {
-  private final NoteBuilder noteBuilder;
+  private NoteBuilder noteBuilder;
+  private final boolean existingNotebook;
   private BookBuilder bookAttachment;
 
   public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
     super(makeMe, notebook);
-    if (notebook != null) {
-      noteBuilder = makeMe.theNote(notebook.getHeadNote());
+    this.existingNotebook = notebook != null;
+    if (existingNotebook) {
+      this.noteBuilder = null;
     } else {
-      noteBuilder = makeMe.aNote().asHeadNoteOfANotebook(null);
+      this.noteBuilder = makeMe.aNote().attachToNewNotebook(null);
     }
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    Note note = noteBuilder.please(needPersist);
-    this.entity = note.getNotebook();
+    if (noteBuilder != null) {
+      Note note = noteBuilder.please(needPersist);
+      this.entity = note.getNotebook();
+    }
   }
 
   @Override
@@ -46,23 +50,42 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
   }
 
   public NotebookBuilder creatorAndOwner(User user) {
-    noteBuilder.creatorAndOwner(user);
+    if (noteBuilder != null) {
+      noteBuilder.creatorAndOwner(user);
+    } else {
+      entity.setOwnership(user.getOwnership());
+      entity.setCreatorEntity(user);
+    }
     return this;
   }
 
   public NotebookBuilder withNChildrenThat(int count, Consumer<NoteBuilder> childNoteThat) {
+    if (noteBuilder == null) {
+      noteBuilder = makeMe.aNote().inNotebook(entity);
+      if (entity.getCreatorEntity() != null) {
+        noteBuilder.creator(entity.getCreatorEntity());
+      }
+    }
     noteBuilder.withNChildrenThat(count, childNoteThat);
     return this;
   }
 
   public NotebookBuilder owner(User user) {
-    noteBuilder.ownership(user.getOwnership());
+    if (noteBuilder != null) {
+      noteBuilder.ownership(user.getOwnership());
+    } else {
+      entity.setOwnership(user.getOwnership());
+    }
 
     return this;
   }
 
   public NotebookBuilder owner(Circle circle) {
-    noteBuilder.ownership(circle.getOwnership());
+    if (noteBuilder != null) {
+      noteBuilder.ownership(circle.getOwnership());
+    } else {
+      entity.setOwnership(circle.getOwnership());
+    }
     return this;
   }
 }

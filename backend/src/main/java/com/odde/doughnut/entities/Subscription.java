@@ -45,11 +45,6 @@ public class Subscription extends EntityIdentifiedByIdOnly {
     return notebook.getName();
   }
 
-  @JsonIgnore
-  public Note getHeadNote() {
-    return notebook.getHeadNote();
-  }
-
   public void setFromDTO(SubscriptionDTO subscriptionDTO) {
     setDailyTargetOfNewNotes(subscriptionDTO.getDailyTargetOfNewNotes());
   }

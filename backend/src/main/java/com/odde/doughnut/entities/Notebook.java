@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.utils.Randomizer;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
@@ -41,16 +40,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   @JsonIgnore
   private Ownership ownership;
-
-  @JoinTable(
-      name = "notebook_head_note",
-      joinColumns = {@JoinColumn(name = "notebook_id", referencedColumnName = "id")},
-      inverseJoinColumns = {@JoinColumn(name = "head_note_id", referencedColumnName = "id")})
-  @OneToOne(optional = true, fetch = FetchType.LAZY)
-  @Getter
-  @Setter
-  @JsonIgnore
-  private Note headNote;
 
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
   @JsonIgnore
@@ -157,12 +146,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
           "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
     return questions;
-  }
-
-  @Hidden
-  @JsonIgnore
-  public Integer getHeadNoteId() {
-    return headNote != null ? headNote.getId() : null;
   }
 
   public Circle getCircle() {

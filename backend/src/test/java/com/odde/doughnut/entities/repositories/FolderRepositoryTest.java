@@ -56,7 +56,8 @@ class FolderRepositoryTest {
   void persistsNoteWithFolderReference() {
     Notebook notebook = makeMe.aNotebook().please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
-    Note note = makeMe.aNote().under(notebook.getHeadNote()).folder(folder).please();
+    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    Note note = makeMe.aNote().under(root).folder(folder).please();
     makeMe.entityPersister.flush();
 
     Note loaded = noteRepository.findById(note.getId()).orElseThrow();
@@ -103,7 +104,8 @@ class FolderRepositoryTest {
   void persistsAndReloadsNoteSlug() {
     Notebook notebook = makeMe.aNotebook().please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
-    Note note = makeMe.aNote().under(notebook.getHeadNote()).folder(folder).please();
+    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    Note note = makeMe.aNote().under(root).folder(folder).please();
     note.setSlug("inbox/my-note");
     makeMe.entityPersister.flush();
 
@@ -115,9 +117,9 @@ class FolderRepositoryTest {
   @Test
   void nestedFoldersMirrorContainmentHierarchyForNotes() {
     Notebook notebook = makeMe.aNotebook().please();
-    Note head = notebook.getHeadNote();
+    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
     Folder folderForHeadChildren =
-        makeMe.aFolder().notebook(notebook).name(head.getTitle()).please();
+        makeMe.aFolder().notebook(notebook).name(root.getTitle()).please();
     Folder folderForSectionChildren =
         makeMe
             .aFolder()
@@ -127,7 +129,7 @@ class FolderRepositoryTest {
             .please();
 
     Note section =
-        makeMe.aNote().under(head).title("Section").folder(folderForHeadChildren).please();
+        makeMe.aNote().under(root).title("Section").folder(folderForHeadChildren).please();
     Note leaf =
         makeMe.aNote().under(section).title("Leaf").folder(folderForSectionChildren).please();
     Long siblingOrder = leaf.getSiblingOrder();

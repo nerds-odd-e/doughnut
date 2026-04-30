@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
@@ -167,9 +166,7 @@ public class NoteMotionServiceTest {
     makeMe.refresh(firstChild);
     makeMe.refresh(grandChild);
     makeMe.refresh(topNote);
-    Notebook notebook = makeMe.entityPersister.find(Notebook.class, notebookIdBefore);
     assertThat(firstChild.getNotebook().getId(), equalTo(notebookIdBefore));
-    assertThat(notebook.getHeadNote(), equalTo(topNote));
     assertThat(firstChild.getParent(), nullValue());
     assertThat(firstChild.getFolder(), nullValue());
     assertThat(firstChild.getSlug(), equalTo("middle"));
@@ -192,9 +189,7 @@ public class NoteMotionServiceTest {
     makeMe.refresh(firstChild);
     makeMe.refresh(grandChild);
     makeMe.refresh(topNote);
-    Notebook notebook = makeMe.entityPersister.find(Notebook.class, notebookIdBefore);
     assertThat(firstChild.getNotebook().getId(), equalTo(notebookIdBefore));
-    assertThat(notebook.getHeadNote(), equalTo(topNote));
 
     Integer notebookId = firstChild.getNotebook().getId();
     Long total =
@@ -299,19 +294,16 @@ public class NoteMotionServiceTest {
     }
 
     @Test
-    void movingHeadNoteIntoAnotherNotebookClearsSourceHeadAndKeepsSourceNotebook()
+    void movingRootNoteIntoAnotherNotebookKeepsSourceNotebook()
         throws CyclicLinkDetectedException, MovementNotPossibleException {
-      Integer sourceNotebookId = topNote.getNotebook().getId();
       Integer destNotebookId = otherNotebook.getNotebook().getId();
 
       move(topNote, otherNotebook, true);
 
       makeMe.entityPersister.flush();
-      Notebook sourceNotebook = makeMe.entityPersister.find(Notebook.class, sourceNotebookId);
       makeMe.refresh(topNote);
       makeMe.refresh(firstChild);
 
-      assertThat(sourceNotebook.getHeadNote(), nullValue());
       assertThat(topNote.getNotebook().getId(), equalTo(destNotebookId));
       assertThat(firstChild.getNotebook().getId(), equalTo(destNotebookId));
     }

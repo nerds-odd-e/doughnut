@@ -3823,9 +3823,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        notebookInRestoreAsHeadNote:
-          $ref: "#/components/schemas/Notebook"
-          writeOnly: true
       required:
       - createdAt
       - id

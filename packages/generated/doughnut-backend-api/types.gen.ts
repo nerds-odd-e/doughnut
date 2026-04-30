@@ -929,7 +929,6 @@ export type NoteWritable = {
     id: number;
     createdAt: string;
     wikidataId?: string;
-    notebookInRestoreAsHeadNote?: Notebook;
 };
 
 export type NoteRealmWritable = {

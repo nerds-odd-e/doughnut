@@ -7,7 +7,6 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
@@ -37,8 +36,7 @@ public class NotebookCatalogService {
    * Sort keys for the notebooks page catalog (merged list of ungrouped notebooks and groups):
    *
    * <ul>
-   *   <li><b>Notebook</b> row: head note {@link Note#getCreatedAt()} when present, else {@link
-   *       Notebook#getUpdated_at()}.
+   *   <li><b>Notebook</b> row: {@link Notebook#getUpdated_at()}.
    *   <li><b>Group</b> row: {@link NotebookGroup#getCreatedAt()}.
    * </ul>
    */
@@ -160,7 +158,7 @@ public class NotebookCatalogService {
   private record SortableRow(NotebookCatalogItem item, Timestamp sortAt, int kind, int tieId) {}
 
   private static Timestamp catalogSortTimestamp(Notebook notebook) {
-    Note head = notebook.getHeadNote();
-    return head != null ? head.getCreatedAt() : notebook.getUpdated_at();
+    Timestamp at = notebook.getUpdated_at();
+    return at != null ? at : new Timestamp(0L);
   }
 }

@@ -31,10 +31,17 @@ public class NoteBuilder extends EntityBuilder<Note> {
     updatedAt(entity.getCreatedAt());
   }
 
-  public NoteBuilder asHeadNoteOfANotebook(Ownership ownership) {
+  public NoteBuilder attachToNewNotebook(Ownership ownership) {
     if (entity.getNotebook() != null)
       throw new AssertionError("Can add notebook for `" + entity + "`, a notebook already exist.");
-    entity.buildNotebookForHeadNote(ownership, null);
+    entity.attachToNewNotebook(ownership, null);
+    return this;
+  }
+
+  public NoteBuilder inNotebook(Notebook notebook) {
+    if (entity.getNotebook() != null)
+      throw new AssertionError("Notebook already set for `" + entity + "`.");
+    entity.assignNotebook(notebook);
     return this;
   }
 
@@ -74,7 +81,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder inCircle(Circle circle) {
-    return asHeadNoteOfANotebook(circle.getOwnership());
+    return attachToNewNotebook(circle.getOwnership());
   }
 
   @Override
@@ -83,7 +90,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
       creator(makeMe.aUser().please(needPersist));
     }
     if (entity.getNotebook() == null) {
-      asHeadNoteOfANotebook(entity.getCreator().getOwnership());
+      attachToNewNotebook(entity.getCreator().getOwnership());
     }
     if (entity.getNotebook().getCreatorEntity() == null) {
       entity.getNotebook().setCreatorEntity(entity.getCreator());

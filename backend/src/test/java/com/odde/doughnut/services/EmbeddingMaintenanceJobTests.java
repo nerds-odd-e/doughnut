@@ -4,6 +4,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ class EmbeddingMaintenanceJobTests {
 
   @Autowired MakeMe makeMe;
   @Autowired NotebookRepository notebookRepository;
+  @Autowired NoteRepository noteRepository;
 
   @Mock NotebookIndexingService notebookIndexingService;
 
@@ -34,8 +36,14 @@ class EmbeddingMaintenanceJobTests {
     nb1 = makeMe.aNotebook().please();
     nb2 = makeMe.aNotebook().please();
     // Add a couple of notes to each to simulate content
-    makeMe.aNote().under(nb1.getHeadNote()).please();
-    makeMe.aNote().under(nb2.getHeadNote()).please();
+    makeMe
+        .aNote()
+        .under(noteRepository.findNotebookRootNotesByNotebookId(nb1.getId()).getFirst())
+        .please();
+    makeMe
+        .aNote()
+        .under(noteRepository.findNotebookRootNotesByNotebookId(nb2.getId()).getFirst())
+        .please();
 
     job = new EmbeddingMaintenanceJob(notebookRepository, notebookIndexingService);
   }

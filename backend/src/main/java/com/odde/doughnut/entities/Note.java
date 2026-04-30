@@ -222,6 +222,11 @@ public class Note extends EntityIdentifiedByIdOnly {
     getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
   }
 
+  @JsonIgnore
+  public void assignNotebook(Notebook notebook) {
+    setNotebook(notebook);
+  }
+
   private void setNotebook(Notebook notebook) {
     this.notebook = notebook;
   }
@@ -382,11 +387,10 @@ public class Note extends EntityIdentifiedByIdOnly {
     setCreator(user);
   }
 
-  public void buildNotebookForHeadNote(Ownership ownership, User creator) {
+  public void attachToNewNotebook(Ownership ownership, User creator) {
     final Notebook notebook = new Notebook();
     notebook.setCreatorEntity(creator);
     notebook.setOwnership(ownership);
-    notebook.setHeadNote(this);
     setNotebook(notebook);
     String headTitle = getTitle();
     if (headTitle != null && !headTitle.isBlank()) {
@@ -402,18 +406,6 @@ public class Note extends EntityIdentifiedByIdOnly {
       getParent().children.remove(this);
       this.parent = null;
     }
-  }
-
-  @JsonIgnore
-  public void restoreAsHeadNote(Ownership ownership, User creator) {
-    detachFromParentInMemory();
-    buildNotebookForHeadNote(ownership, creator);
-    getAllDescendants()
-        .forEach(descendant -> descendant.setNotebookInRestoreAsHeadNote(getNotebook()));
-  }
-
-  private void setNotebookInRestoreAsHeadNote(Notebook notebook) {
-    setNotebook(notebook);
   }
 
   @JsonIgnore

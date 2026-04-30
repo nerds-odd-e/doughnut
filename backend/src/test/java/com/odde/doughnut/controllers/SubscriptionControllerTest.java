@@ -46,7 +46,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
   void subscribeToNoteSuccessfully() throws UnexpectedNoAccessRightException {
     SubscriptionDTO subscription = new SubscriptionDTO();
     Subscription result = controller.createSubscription(notebook, subscription);
-    assertEquals(topNote, result.getHeadNote());
+    assertEquals(notebook.getId(), result.getNotebook().getId());
     assertEquals(currentUser.getUser(), result.getUser());
   }
 

@@ -103,8 +103,7 @@ class NotebookControllerTest extends ControllerTestBase {
       RedirectToNoteResponse response = controller.createNotebook(noteCreation);
       assertThat(response.notebookId, notNullValue());
       assertThat(response.noteId, nullValue());
-      Notebook nb = notebookRepository.findById(response.notebookId).orElseThrow();
-      assertThat(nb.getHeadNote(), nullValue());
+      notebookRepository.findById(response.notebookId).orElseThrow();
       assertThat(noteRepository.countByNotebook_Id(response.notebookId), equalTo(0L));
     }
 
@@ -162,8 +161,7 @@ class NotebookControllerTest extends ControllerTestBase {
       createNb.setNewTitle("Notebook WithoutIndex");
       RedirectToNoteResponse redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebookId).orElseThrow();
-      assertThat(nb.getHeadNote(), nullValue());
-      assertThat(noteRepository.countByNotebook_Id(nb.getId()), equalTo(0L));
+      assertThat(noteRepository.countByNotebook_Id(redirect.notebookId), equalTo(0L));
 
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Root One");
@@ -315,7 +313,7 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void ungroupedNotebooksOrderedByHeadNoteCreatedAt() {
+    void ungroupedNotebooksOrderedByNotebookUpdatedAt() {
       User user = makeMe.aUser().please();
       currentUser.setUser(user);
       testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-01-01 00:00:00"));
@@ -726,7 +724,7 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void whenNotebookHasNoHeadNote_returnsEmptyZip()
+    void whenNotebookHasNoIndexNote_returnsEmptyZip()
         throws UnexpectedNoAccessRightException, IOException {
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Obsidian Empty Nb");
@@ -743,7 +741,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void download_whenNotebookHasIndexNote_includesIndexMd()
         throws UnexpectedNoAccessRightException, IOException {
-      Note head = notebook.getHeadNote();
+      Note head = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
       makeMe.theNote(head).title("Overview").slug("index").details("Notebook intro").please();
       makeMe.refresh(notebook);
       ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(notebook);
@@ -773,12 +771,7 @@ class NotebookControllerTest extends ControllerTestBase {
     void setup() {
       // Create notebook with Note1
       notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      note1 =
-          makeMe
-              .aNote("note 1")
-              .under(notebook.getHeadNote())
-              .details("Content of Note 1")
-              .please();
+      note1 = makeMe.aNote("note 1").inNotebook(notebook).details("Content of Note 1").please();
 
       // Create mock zip file from actual test resource
       try {
@@ -796,7 +789,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
       // Assert
       Note existingNote =
-          notebook.getHeadNote().getChildren().stream()
+          noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).stream()
               .filter(n -> n.getTitle().equals("note 1"))
               .findFirst()
               .orElseThrow();

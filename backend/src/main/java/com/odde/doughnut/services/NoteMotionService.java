@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
@@ -27,7 +26,6 @@ public class NoteMotionService {
 
   public void execute(Note subject, Note relativeToNote, boolean asFirstChildOfNote)
       throws CyclicLinkDetectedException {
-    Notebook notebook = subject.getNotebook();
     validateNoCyclicLink(subject, relativeToNote);
     if (asFirstChildOfNote) {
       subject.updateSiblingOrderAsFirstChild(relativeToNote);
@@ -47,11 +45,6 @@ public class NoteMotionService {
     subject.getAllDescendants().forEach(entityPersister::merge);
     entityPersister.merge(subject);
     entityPersister.flush();
-
-    if (notebook.getHeadNote() == subject) {
-      notebook.setHeadNote(null);
-      entityPersister.merge(notebook);
-    }
   }
 
   private void validateNoCyclicLink(Note subject, Note relativeToNote)

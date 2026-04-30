@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -175,7 +176,7 @@ public class ObsidianFormatService {
       return;
     }
 
-    Note currentParent = notebook.getHeadNote();
+    Note currentParent = notebookService.findOptionalIndexNote(notebook).orElse(null);
     String[] pathParts = entry.getName().split("/");
 
     boolean isIndexFile = pathParts[pathParts.length - 1].equals("__index.md");
@@ -186,13 +187,13 @@ public class ObsidianFormatService {
       if (shouldSkipPart(part)) {
         continue;
       }
-      currentParent = processNotePart(currentParent, part, entry, zipIn, false);
+      currentParent = processNotePart(notebook, currentParent, part, entry, zipIn, false);
     }
 
     if (!isIndexFile) {
       String lastPart = pathParts[lastPartIndex];
       String noteName = removeMarkdownExtension(lastPart);
-      processNotePart(currentParent, noteName, entry, zipIn, true);
+      processNotePart(notebook, currentParent, noteName, entry, zipIn, true);
     }
   }
 
@@ -205,16 +206,26 @@ public class ObsidianFormatService {
   }
 
   private Note processNotePart(
-      Note currentParent, String noteName, ZipEntry entry, ZipInputStream zipIn, boolean isLastPart)
+      Notebook notebook,
+      Note currentParent,
+      String noteName,
+      ZipEntry entry,
+      ZipInputStream zipIn,
+      boolean isLastPart)
       throws IOException {
-    currentParent = noteRepository.findById(currentParent.getId()).orElse(null);
-    Note existingNote = findExistingNote(currentParent, noteName);
+    if (currentParent != null) {
+      currentParent = noteRepository.findById(currentParent.getId()).orElse(null);
+    }
+    Note existingNote = findExistingNote(notebook, currentParent, noteName);
 
     if (existingNote != null) {
       return existingNote;
     }
 
-    Note newNote = noteConstructionService.createNote(currentParent, noteName);
+    Note newNote =
+        currentParent != null
+            ? noteConstructionService.createNote(currentParent, noteName)
+            : noteConstructionService.createRootNoteInNotebook(notebook, noteName);
     newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted
@@ -222,7 +233,9 @@ public class ObsidianFormatService {
 
     // Refresh both entities to get the latest state
     entityPersister.refresh(newNote);
-    entityPersister.refresh(currentParent);
+    if (currentParent != null) {
+      entityPersister.refresh(currentParent);
+    }
 
     if (!entry.isDirectory() && isLastPart) {
       addContentToNote(newNote, zipIn);
@@ -230,9 +243,15 @@ public class ObsidianFormatService {
     return newNote;
   }
 
-  private Note findExistingNote(Note parent, String noteName) {
-    return parent.getChildren().stream()
-        .filter(note -> note.getTitle().equals(noteName))
+  private Note findExistingNote(Notebook notebook, Note parent, String noteName) {
+    if (parent != null) {
+      return parent.getChildren().stream()
+          .filter(note -> Objects.equals(note.getTitle(), noteName))
+          .findFirst()
+          .orElse(null);
+    }
+    return noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).stream()
+        .filter(note -> Objects.equals(note.getTitle(), noteName))
         .findFirst()
         .orElse(null);
   }

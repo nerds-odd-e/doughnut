@@ -40,8 +40,9 @@ class NotebookReindexingServiceTests {
   void setup() {
     // Service removed; tests below will use noteEmbeddingService directly where applicable
     notebook = makeMe.aNotebook().please();
-    makeMe.aNote().under(notebook.getHeadNote()).please();
-    makeMe.aNote().under(notebook.getHeadNote()).please();
+    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    makeMe.aNote().under(root).please();
+    makeMe.aNote().under(root).please();
     makeMe.refresh(notebook);
     // Default: mock batched streaming embeddings to return a vector for every note
     when(embeddingService.streamEmbeddingsForNoteList(any()))

@@ -81,6 +81,10 @@ public class NoteConstructionService {
     return note;
   }
 
+  public Note createRootNoteInNotebook(Notebook notebook, String title) {
+    return createRootNote(notebook, title);
+  }
+
   public Note createNoteUnderParentId(Integer parentNoteId, String title)
       throws UnexpectedNoAccessRightException {
     Note parentNote =

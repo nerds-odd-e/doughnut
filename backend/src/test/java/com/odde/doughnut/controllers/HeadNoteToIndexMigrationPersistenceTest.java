@@ -23,17 +23,17 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
   private static final String BACKFILL_NOTEBOOK_NAME =
       """
       UPDATE notebook n
-      INNER JOIN notebook_head_note nh ON nh.notebook_id = n.id
-      INNER JOIN note hn ON nh.head_note_id = hn.id AND hn.deleted_at IS NULL
+      INNER JOIN note hn ON hn.notebook_id = n.id AND hn.deleted_at IS NULL
       SET n.name = LEFT(hn.title, 150)
+      WHERE hn.id = ?
       """;
 
   private static final String DISAMBIGUATE_NON_HEAD_INDEX_SLUGS =
       """
       UPDATE note n
-      INNER JOIN notebook_head_note nh ON nh.notebook_id = n.notebook_id
       SET n.slug = CONCAT('legacy-index-', n.id)
-      WHERE n.id <> nh.head_note_id
+      WHERE n.id <> ?
+        AND n.notebook_id = ?
         AND n.slug = 'index'
         AND n.deleted_at IS NULL
       """;
@@ -41,12 +41,12 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
   private static final String HEAD_NOTES_TO_INDEX =
       """
       UPDATE note hn
-      INNER JOIN notebook_head_note nh ON nh.head_note_id = hn.id
       SET hn.title = 'index',
           hn.slug = 'index',
           hn.folder_id = NULL,
           hn.parent_id = NULL
-      WHERE hn.deleted_at IS NULL
+      WHERE hn.id = ?
+        AND hn.deleted_at IS NULL
       """;
 
   @Test
@@ -69,16 +69,21 @@ class HeadNoteToIndexMigrationPersistenceTest extends ControllerTestBase {
       throws UnexpectedNoAccessRightException {
     User user = makeMe.aUser().please();
     currentUser.setUser(user);
-    Note head =
-        makeMe.aHeadNote("LegacyCap").creatorAndOwner(user).details("Notebook body").please();
-    Notebook notebook = head.getNotebook();
-    int headId = head.getId();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note legacyRoot =
+        makeMe
+            .aNote("LegacyCap")
+            .inNotebook(notebook)
+            .creatorAndOwner(user)
+            .details("Notebook body")
+            .please();
+    int headId = legacyRoot.getId();
     int notebookId = notebook.getId();
     makeMe.entityPersister.flush();
 
-    jdbcTemplate.update(BACKFILL_NOTEBOOK_NAME);
-    jdbcTemplate.update(DISAMBIGUATE_NON_HEAD_INDEX_SLUGS);
-    jdbcTemplate.update(HEAD_NOTES_TO_INDEX);
+    jdbcTemplate.update(BACKFILL_NOTEBOOK_NAME, headId);
+    jdbcTemplate.update(DISAMBIGUATE_NON_HEAD_INDEX_SLUGS, headId, notebookId);
+    jdbcTemplate.update(HEAD_NOTES_TO_INDEX, headId);
     entityManager.clear();
 
     String storedName =
