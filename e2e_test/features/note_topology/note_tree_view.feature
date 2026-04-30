@@ -68,7 +68,6 @@ Feature: Note tree view
       | ATDD       |
       | CI         |
 
-  @ignore
   Scenario: moving a note within the parent
     When I move the note "CI" up among its siblings
     Then I should see the note "CI" before the note "ATDD" in the sidebar
