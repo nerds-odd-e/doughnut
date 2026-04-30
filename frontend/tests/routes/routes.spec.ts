@@ -108,4 +108,13 @@ describe("routes", () => {
       }
     })
   })
+
+  describe("notebookPage route", () => {
+    it("does not match legacy /d/notebooks/:id/edit URL", () => {
+      const resolved = router.resolve("/d/notebooks/42/edit")
+      expect(resolved.matched.some((r) => r.name === "notebookPage")).toBe(
+        false
+      )
+    })
+  })
 })

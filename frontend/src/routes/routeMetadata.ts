@@ -27,13 +27,6 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
-    path: "/d/notebooks/:notebookId(\\d+)/edit",
-    redirect: (to) => ({
-      name: "notebookPage",
-      params: { notebookId: to.params.notebookId },
-    }),
-  },
-  {
     path: "/d/notebooks/:notebookId/book",
     name: "bookReading",
     props: (route: RouteLocation) => ({
