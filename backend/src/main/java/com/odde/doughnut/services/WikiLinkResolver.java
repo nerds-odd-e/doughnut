@@ -123,6 +123,7 @@ public class WikiLinkResolver {
 
   private static Map<String, Note> descendantNotesIndexedByExactTitle(Note root) {
     Map<String, Note> byTitle = new LinkedHashMap<>();
+    mergeNoteByExactTitle(byTitle, root);
     root.getAllDescendants().forEach(desc -> mergeNoteByExactTitle(byTitle, desc));
     return byTitle;
   }
