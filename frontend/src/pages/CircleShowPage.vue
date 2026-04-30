@@ -220,7 +220,7 @@ const filteredOnlyCatalogItems = computed(() => {
       return true
     }
     return item.notebooks.some((nb) =>
-      (nb.name ?? "").toLowerCase().includes(q)
+      (nb.notebook.name ?? "").toLowerCase().includes(q)
     )
   })
   return rows.map((item) => {
@@ -259,11 +259,15 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
   if (!circle.value) {
     return
   }
-  const list = circle.value.notebooks.notebooks
-  const index = list.findIndex((n) => n.id === updatedNotebook.id)
-  if (index !== -1) {
-    list[index] = updatedNotebook
-  }
+  circle.value.notebooks.notebooks = circle.value.notebooks.notebooks.map(
+    (entry) =>
+      entry.notebook.id === updatedNotebook.id
+        ? {
+            ...entry,
+            notebook: { ...entry.notebook, ...updatedNotebook },
+          }
+        : entry
+  )
   circle.value.notebooks.catalogItems = patchNotebookInCatalogItems(
     catalogItems.value,
     updatedNotebook

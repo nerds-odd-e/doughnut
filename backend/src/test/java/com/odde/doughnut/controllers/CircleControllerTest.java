@@ -153,7 +153,7 @@ class CircleControllerTest extends ControllerTestBase {
           notebooksView.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .anyMatch(row -> row.notebook.getNotebook().getId().equals(inGroup.getId())));
+              .anyMatch(row -> row.notebook.getId().equals(inGroup.getId())));
       NotebookCatalogGroupItem groupRow =
           notebooksView.catalogItems.stream()
               .filter(NotebookCatalogGroupItem.class::isInstance)
@@ -162,13 +162,13 @@ class CircleControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
       assertThat(
-          groupRow.notebooks.stream().map(n -> n.getNotebook().getId()).toList(),
+          groupRow.notebooks.stream().map(n -> n.notebook().getId()).toList(),
           equalTo(List.of(inGroup.getId())));
       assertThat(
           notebooksView.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .map(row -> row.notebook.getNotebook().getId())
+              .map(row -> row.notebook.getId())
               .toList(),
           equalTo(List.of(ungrouped.getId())));
     }

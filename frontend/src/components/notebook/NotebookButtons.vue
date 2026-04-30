@@ -2,7 +2,7 @@
   <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <button
-      v-if="showReadBookAttached"
+      v-if="hasAttachedBook === true"
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
       title="Read book"
@@ -21,7 +21,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer"
         aria-label="Notebook actions"
       >
-        <MoreHorizontal class="w-5 h-5" />
+        <MoreHorizontal class="h-5 w-5" />
       </summary>
       <ul
         tabindex="0"
@@ -59,11 +59,7 @@
 import { computed, inject, ref, type ComputedRef } from "vue"
 import { useRouter } from "vue-router"
 import { BookOpen, MoreHorizontal } from "lucide-vue-next"
-import type {
-  Notebook,
-  NotebookClientView,
-  User,
-} from "@generated/doughnut-backend-api"
+import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import Modal from "@/components/commons/Modal.vue"
 import {
@@ -88,16 +84,11 @@ const moveToGroupCircleId = computed(
 )
 
 const props = defineProps<{
-  notebook: Notebook | NotebookClientView
+  notebook: Notebook
+  hasAttachedBook?: boolean
   user?: User
   catalogGroupId?: number
 }>()
-
-const showReadBookAttached = computed(
-  () =>
-    "hasAttachedBook" in props.notebook &&
-    props.notebook.hasAttachedBook === true
-)
 
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void

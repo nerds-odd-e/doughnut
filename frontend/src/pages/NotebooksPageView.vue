@@ -197,7 +197,7 @@ const filteredOnlyCatalogItems = computed(() => {
       return true
     }
     return item.notebooks.some((nb) =>
-      (nb.name ?? "").toLowerCase().includes(q)
+      (nb.notebook.name ?? "").toLowerCase().includes(q)
     )
   })
   return rows.map((item) => {

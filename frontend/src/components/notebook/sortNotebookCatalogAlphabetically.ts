@@ -5,15 +5,15 @@ function compareTitles(a: string, b: string): number {
   return a.localeCompare(b, undefined, { sensitivity: "base" })
 }
 
-function compareNotebooks(
+function compareGroupMembers(
   a: NotebookClientView,
   b: NotebookClientView
 ): number {
-  const t = compareTitles(a.name ?? "", b.name ?? "")
+  const t = compareTitles(a.notebook.name ?? "", b.notebook.name ?? "")
   if (t !== 0) {
     return t
   }
-  return a.id - b.id
+  return a.notebook.id - b.notebook.id
 }
 
 function topLevelName(item: NotebookCatalogEntry): string {
@@ -46,7 +46,7 @@ export function sortNotebookCatalogAlphabetically(
     }
     return {
       ...item,
-      notebooks: [...item.notebooks].sort(compareNotebooks),
+      notebooks: [...item.notebooks].sort(compareGroupMembers),
     }
   })
 }

@@ -1,4 +1,5 @@
 import type {
+  Notebook,
   NotebookCatalogGroupItem,
   NotebookClientView,
 } from '@generated/doughnut-backend-api'
@@ -31,13 +32,18 @@ class NotebookCatalogGroupItemBuilder extends Builder<NotebookCatalogGroupItem> 
     for (const n of memberNames) {
       const nb = new NotebookBuilder()
       nb.notebuilder.title(n)
-      this.memberNotebooks.push(nb.do())
+      this.memberNotebooks.push({ notebook: nb.do() })
     }
     return this
   }
 
-  members(notebooks: NotebookClientView[]) {
-    this.memberNotebooks = [...notebooks]
+  members(entries: NotebookClientView[]) {
+    this.memberNotebooks = [...entries]
+    return this
+  }
+
+  membersFromNotebooks(notebooks: Notebook[]) {
+    this.memberNotebooks = notebooks.map((n) => ({ notebook: n }))
     return this
   }
 

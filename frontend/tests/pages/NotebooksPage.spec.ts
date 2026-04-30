@@ -221,7 +221,7 @@ describe("Notebooks Page", () => {
           .id(1)
           .name("G")
           .createdAt("2020-01-01T00:00:00.000Z")
-          .members([member])
+          .membersFromNotebooks([member])
           .please(),
       ]
 
@@ -251,26 +251,18 @@ describe("Notebooks Page", () => {
       const grp = vm.catalogItems?.[0]
       expect(grp?.type).toBe("notebookGroup")
       if (grp?.type === "notebookGroup") {
-        expect(grp.notebooks[0]?.name).toBe("Renamed Member")
+        expect(grp.notebooks[0]?.notebook.name).toBe("Renamed Member")
       }
     })
 
     it("preserves hasAttachedBook when notebook-updated payload omits it", async () => {
-      const originalNotebook = {
-        ...makeMe.aNotebook.please(),
-        name: "T",
-        hasAttachedBook: true,
-      }
-      const { hasAttachedBook, ...updatedNotebook } = {
-        ...originalNotebook,
-        name: "Updated",
-      }
-      expect(hasAttachedBook).toBe(true)
+      const notebookEntity = { ...makeMe.aNotebook.please(), name: "T" }
+      const updatedNotebook = { ...notebookEntity, name: "Updated" }
 
       mockSdkService("myNotebooks", {
-        notebooks: [originalNotebook],
+        notebooks: [{ notebook: notebookEntity, hasAttachedBook: true }],
         catalogItems: makeMe.notebookCatalog
-          .notebooks(originalNotebook)
+          .notebooks({ ...notebookEntity, hasAttachedBook: true })
           .please(),
         subscriptions: [],
       })
@@ -292,7 +284,7 @@ describe("Notebooks Page", () => {
       await flushPromises()
 
       if (vm.catalogItems?.[0]?.type === "notebook") {
-        expect(vm.catalogItems[0].notebook.hasAttachedBook).toBe(true)
+        expect(vm.catalogItems[0].hasAttachedBook).toBe(true)
         expect(vm.catalogItems[0].notebook.name).toBe("Updated")
       }
     })
@@ -300,13 +292,12 @@ describe("Notebooks Page", () => {
 
   describe("read book catalog button", () => {
     it("shows read book control when hasAttachedBook is true", async () => {
-      const nb = {
-        ...makeMe.aNotebook.please(),
-        hasAttachedBook: true as const,
-      }
+      const nb = makeMe.aNotebook.please()
       mockSdkService("myNotebooks", {
-        notebooks: [nb],
-        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        notebooks: [{ notebook: nb, hasAttachedBook: true }],
+        catalogItems: makeMe.notebookCatalog
+          .notebooks({ ...nb, hasAttachedBook: true })
+          .please(),
         subscriptions: [],
       })
       const wrapper = helper
@@ -321,13 +312,12 @@ describe("Notebooks Page", () => {
     })
 
     it("navigates to book reading when read book is clicked", async () => {
-      const nb = {
-        ...makeMe.aNotebook.please(),
-        hasAttachedBook: true as const,
-      }
+      const nb = makeMe.aNotebook.please()
       mockSdkService("myNotebooks", {
-        notebooks: [nb],
-        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        notebooks: [{ notebook: nb, hasAttachedBook: true }],
+        catalogItems: makeMe.notebookCatalog
+          .notebooks({ ...nb, hasAttachedBook: true })
+          .please(),
         subscriptions: [],
       })
       const router = createRouter({ history: createWebHistory(), routes })
@@ -352,10 +342,12 @@ describe("Notebooks Page", () => {
     })
 
     it("hides read book control when hasAttachedBook is false", async () => {
-      const nb = { ...makeMe.aNotebook.please(), hasAttachedBook: false }
+      const nb = makeMe.aNotebook.please()
       mockSdkService("myNotebooks", {
-        notebooks: [nb],
-        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        notebooks: [{ notebook: nb, hasAttachedBook: false }],
+        catalogItems: makeMe.notebookCatalog
+          .notebooks({ ...nb, hasAttachedBook: false })
+          .please(),
         subscriptions: [],
       })
       const wrapper = helper
@@ -831,11 +823,16 @@ describe("Notebooks Page", () => {
           .id(1)
           .name("Mixed Group")
           .createdAt("2020-01-01T00:00:00.000Z")
-          .members([ownedMember, subMember])
+          .membersFromNotebooks([ownedMember, subMember])
           .please(),
       ]
       const subscriptions = [
-        { id: 99, notebook: subMember, user: makeMe.aUser.please() },
+        {
+          id: 99,
+          dailyTargetOfNewNotes: 5,
+          notebook: subMember,
+          user: makeMe.aUser.please(),
+        },
       ]
 
       const wrapper = helper

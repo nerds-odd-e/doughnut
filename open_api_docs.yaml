@@ -5051,7 +5051,9 @@ components:
       - type: object
         properties:
           notebook:
-            $ref: "#/components/schemas/NotebookClientView"
+            $ref: "#/components/schemas/Notebook"
+          hasAttachedBook:
+            type: boolean
       required:
       - notebook
     NotebookCatalogSubscribedNotebookItem:
@@ -5060,43 +5062,26 @@ components:
       - type: object
         properties:
           notebook:
-            $ref: "#/components/schemas/NotebookClientView"
+            $ref: "#/components/schemas/Notebook"
           subscriptionId:
             type: integer
             format: int32
+          hasAttachedBook:
+            type: boolean
       required:
       - notebook
       - subscriptionId
     NotebookClientView:
       type: object
-      description: "Notebook fields exposed to clients, optionally including attached-book\
-        \ indicator."
+      description: Notebook entity plus optional client-only fields (e.g. catalog
+        attachment hints).
       properties:
-        id:
-          type: integer
-          format: int32
-        certifiable:
-          type: boolean
-        notebookSettings:
-          $ref: "#/components/schemas/NotebookSettings"
-        creatorId:
-          type: string
-        name:
-          type: string
-        circle:
-          $ref: "#/components/schemas/Circle"
-        description:
-          type: string
-        updated_at:
-          type: string
-          format: date-time
+        notebook:
+          $ref: "#/components/schemas/Notebook"
         hasAttachedBook:
           type: boolean
       required:
-      - id
-      - name
-      - notebookSettings
-      - updated_at
+      - notebook
     NotebooksViewedByUser:
       type: object
       properties:
@@ -5130,7 +5115,9 @@ components:
         user:
           $ref: "#/components/schemas/User"
         notebook:
-          $ref: "#/components/schemas/NotebookClientView"
+          $ref: "#/components/schemas/Notebook"
+        hasAttachedBook:
+          type: boolean
         name:
           type: string
       required:

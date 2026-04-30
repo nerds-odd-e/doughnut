@@ -783,28 +783,23 @@ export type NotebookCatalogItem = {
 };
 
 export type NotebookCatalogNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
-    notebook: NotebookClientView;
+    notebook: Notebook;
+    hasAttachedBook?: boolean;
     type: 'notebook';
 };
 
 export type NotebookCatalogSubscribedNotebookItem = Omit<NotebookCatalogItem, 'type'> & {
-    notebook: NotebookClientView;
+    notebook: Notebook;
     subscriptionId: number;
+    hasAttachedBook?: boolean;
     type: 'subscribedNotebook';
 };
 
 /**
- * Notebook fields exposed to clients, optionally including attached-book indicator.
+ * Notebook entity plus optional client-only fields (e.g. catalog attachment hints).
  */
 export type NotebookClientView = {
-    id: number;
-    certifiable?: boolean;
-    notebookSettings: NotebookSettings;
-    creatorId?: string;
-    name: string;
-    circle?: Circle;
-    description?: string;
-    updated_at: string;
+    notebook: Notebook;
     hasAttachedBook?: boolean;
 };
 
@@ -818,7 +813,8 @@ export type SubscriptionForNotebooksListing = {
     id: number;
     dailyTargetOfNewNotes: number;
     user?: User;
-    notebook: NotebookClientView;
+    notebook: Notebook;
+    hasAttachedBook?: boolean;
     name?: string;
 };
 

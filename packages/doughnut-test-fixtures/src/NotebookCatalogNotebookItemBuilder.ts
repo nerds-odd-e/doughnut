@@ -8,6 +8,7 @@ import NotebookBuilder from './NotebookBuilder'
 class NotebookCatalogNotebookItemBuilder extends Builder<NotebookCatalogNotebookItem> {
   private notebookBuilder = new NotebookBuilder()
   private notebookOverride: Notebook | undefined
+  private hasAttachedBookFlag: boolean | undefined
 
   forNotebook(notebook: Notebook) {
     this.notebookOverride = notebook
@@ -19,9 +20,18 @@ class NotebookCatalogNotebookItemBuilder extends Builder<NotebookCatalogNotebook
     return this
   }
 
+  hasAttachedBook(value: boolean) {
+    this.hasAttachedBookFlag = value
+    return this
+  }
+
   do(): NotebookCatalogNotebookItem {
     const notebook = this.notebookOverride ?? this.notebookBuilder.do()
-    return { type: 'notebook', notebook }
+    const item: NotebookCatalogNotebookItem = { type: 'notebook', notebook }
+    if (this.hasAttachedBookFlag !== undefined) {
+      item.hasAttachedBook = this.hasAttachedBookFlag
+    }
+    return item
   }
 }
 

@@ -26,11 +26,16 @@ class NotebookCatalogBuilder extends Builder<NotebookCatalogEntry[]> {
     return this
   }
 
-  notebooks(...notebooks: Notebook[]) {
-    for (const nb of notebooks) {
-      this.items.push(
-        new NotebookCatalogNotebookItemBuilder().forNotebook(nb).do()
+  notebooks(...inputs: Array<Notebook & { hasAttachedBook?: boolean }>) {
+    for (const raw of inputs) {
+      const { hasAttachedBook, ...nb } = raw
+      const b = new NotebookCatalogNotebookItemBuilder().forNotebook(
+        nb as Notebook
       )
+      if (hasAttachedBook !== undefined) {
+        b.hasAttachedBook(hasAttachedBook)
+      }
+      this.items.push(b.do())
     }
     return this
   }
@@ -47,7 +52,10 @@ class NotebookCatalogBuilder extends Builder<NotebookCatalogEntry[]> {
 
   groupWithMembers(name: string, members: Notebook[]) {
     this.items.push(
-      new NotebookCatalogGroupItemBuilder().name(name).members(members).do()
+      new NotebookCatalogGroupItemBuilder()
+        .name(name)
+        .membersFromNotebooks(members)
+        .do()
     )
     return this
   }

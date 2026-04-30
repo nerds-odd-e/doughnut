@@ -1,8 +1,8 @@
-import type { Notebook } from "@generated/doughnut-backend-api"
+import type { NotebookClientView } from "@generated/doughnut-backend-api"
 
 export function groupCatalogMemberPreviewHint(args: {
   groupName: string
-  notebooks: Notebook[]
+  notebooks: NotebookClientView[]
   memberPreviewLimit: number | null
   catalogFilterActive: boolean
 }): {
@@ -34,7 +34,7 @@ export function groupCatalogMemberPreviewHint(args: {
     subtitle = total === 1 ? "1 notebook" : `${total} notebooks`
   }
 
-  const names = notebooks.map((nb) => nb.name ?? "Untitled")
+  const names = notebooks.map((nb) => nb.notebook.name ?? "Untitled")
   const namesForAria =
     names.length <= 12
       ? names.join(", ")

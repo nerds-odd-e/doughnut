@@ -10,6 +10,7 @@
       >
         <NotebookButtons
           v-bind="{ notebook: item.notebook, user }"
+          :has-attached-book="item.hasAttachedBook"
           @notebook-updated="$emit('notebook-updated', $event)"
           @refresh="$emit('refresh')"
         />
@@ -27,6 +28,7 @@
         <NotebookButtons
           v-else
           v-bind="{ notebook: item.notebook, user }"
+          :has-attached-book="item.hasAttachedBook"
           @notebook-updated="$emit('notebook-updated', $event)"
           @refresh="$emit('refresh')"
         />
@@ -62,6 +64,7 @@
             <span class="daisy-flex daisy-justify-end daisy-p-0">
               <NotebookButtons
                 v-bind="{ notebook: item.notebook, user }"
+                :has-attached-book="item.hasAttachedBook"
                 @notebook-updated="$emit('notebook-updated', $event)"
                 @refresh="$emit('refresh')"
               />
@@ -87,6 +90,7 @@
               <NotebookButtons
                 v-else
                 v-bind="{ notebook: item.notebook, user }"
+                :has-attached-book="item.hasAttachedBook"
                 @notebook-updated="$emit('notebook-updated', $event)"
                 @refresh="$emit('refresh')"
               />

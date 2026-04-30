@@ -11,6 +11,6 @@ export function narrowGroupNotebooksForCatalogFilter(
     return group.notebooks
   }
   return group.notebooks.filter((nb) =>
-    (nb.name ?? "").toLowerCase().includes(q)
+    (nb.notebook.name ?? "").toLowerCase().includes(q)
   )
 }

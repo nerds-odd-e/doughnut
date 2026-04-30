@@ -56,10 +56,13 @@ public class NotebookCatalogService {
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();
-    dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions, wrap);
+    dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions, wrap, withBook);
     dto.subscriptions =
         subscriptions.stream()
-            .map(s -> SubscriptionForNotebooksListing.from(s, wrap.apply(s.getNotebook())))
+            .map(
+                s ->
+                    SubscriptionForNotebooksListing.from(
+                        s, s.getNotebook(), withBook.contains(s.getNotebook().getId())))
             .toList();
     return dto;
   }
@@ -80,7 +83,8 @@ public class NotebookCatalogService {
       List<Notebook> allNotebooks,
       List<NotebookGroup> groups,
       List<Subscription> subscriptions,
-      Function<Notebook, NotebookClientView> wrap) {
+      Function<Notebook, NotebookClientView> wrap,
+      Set<Integer> withBook) {
     List<SortableRow> rows = new ArrayList<>();
 
     for (Notebook notebook : allNotebooks) {
@@ -89,7 +93,7 @@ public class NotebookCatalogService {
       }
       rows.add(
           new SortableRow(
-              new NotebookCatalogNotebookItem(wrap.apply(notebook)),
+              new NotebookCatalogNotebookItem(notebook, withBook.contains(notebook.getId())),
               catalogSortTimestamp(notebook),
               0,
               notebook.getId()));
@@ -102,7 +106,8 @@ public class NotebookCatalogService {
       Notebook notebook = subscription.getNotebook();
       rows.add(
           new SortableRow(
-              new NotebookCatalogSubscribedNotebookItem(wrap.apply(notebook), subscription.getId()),
+              new NotebookCatalogSubscribedNotebookItem(
+                  notebook, subscription.getId(), withBook.contains(notebook.getId())),
               catalogSortTimestamp(notebook),
               0,
               notebook.getId()));

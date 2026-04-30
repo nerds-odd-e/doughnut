@@ -269,9 +269,7 @@ class NotebookControllerTest extends ControllerTestBase {
       List<Notebook> notebooks = currentUser.getUser().getOwnership().getNotebooks();
       assertEquals(
           notebooks,
-          controller.myNotebooks().notebooks.stream()
-              .map(NotebookClientView::getNotebook)
-              .toList());
+          controller.myNotebooks().notebooks.stream().map(NotebookClientView::notebook).toList());
     }
   }
 
@@ -291,7 +289,7 @@ class NotebookControllerTest extends ControllerTestBase {
           view.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .anyMatch(cell -> cell.notebook.getNotebook().getId().equals(grouped.getId()));
+              .anyMatch(cell -> cell.notebook.getId().equals(grouped.getId()));
       assertFalse(topLevelGrouped);
       NotebookCatalogGroupItem groupRow =
           view.catalogItems.stream()
@@ -301,13 +299,13 @@ class NotebookControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
       assertThat(
-          groupRow.notebooks.stream().map(n -> n.getNotebook().getId()).toList(),
+          groupRow.notebooks.stream().map(n -> n.notebook().getId()).toList(),
           equalTo(List.of(grouped.getId())));
       assertThat(
           view.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .map(n -> n.notebook.getNotebook().getId())
+              .map(n -> n.notebook.getId())
               .toList(),
           equalTo(List.of(ungrouped.getId())));
     }
@@ -325,7 +323,7 @@ class NotebookControllerTest extends ControllerTestBase {
           view.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .map(n -> n.notebook.getNotebook().getId())
+              .map(n -> n.notebook.getId())
               .toList(),
           equalTo(List.of(first.getId(), second.getId())));
     }
@@ -350,7 +348,7 @@ class NotebookControllerTest extends ControllerTestBase {
               .anyMatch(
                   item ->
                       item instanceof NotebookCatalogSubscribedNotebookItem s
-                          && s.notebook.getNotebook().getId().equals(bazaarNotebook.getId()));
+                          && s.notebook.getId().equals(bazaarNotebook.getId()));
       assertFalse(topLevelSubscribed);
       NotebookCatalogGroupItem groupRow =
           view.catalogItems.stream()
@@ -360,7 +358,7 @@ class NotebookControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
       assertThat(
-          groupRow.notebooks.stream().map(n -> n.getNotebook().getId()).toList(),
+          groupRow.notebooks.stream().map(n -> n.notebook().getId()).toList(),
           equalTo(List.of(bazaarNotebook.getId())));
     }
 
@@ -406,26 +404,26 @@ class NotebookControllerTest extends ControllerTestBase {
           view.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .filter(n -> n.notebook.getNotebook().getId().equals(withBook.getId()))
+              .filter(n -> n.notebook.getId().equals(withBook.getId()))
               .findFirst()
               .orElseThrow();
-      assertThat(withRow.notebook.getHasAttachedBook(), equalTo(true));
+      assertThat(withRow.hasAttachedBook, equalTo(true));
       NotebookCatalogNotebookItem withoutRow =
           view.catalogItems.stream()
               .filter(NotebookCatalogNotebookItem.class::isInstance)
               .map(NotebookCatalogNotebookItem.class::cast)
-              .filter(n -> n.notebook.getNotebook().getId().equals(withoutBook.getId()))
+              .filter(n -> n.notebook.getId().equals(withoutBook.getId()))
               .findFirst()
               .orElseThrow();
-      assertThat(withoutRow.notebook.getHasAttachedBook(), equalTo(false));
+      assertThat(withoutRow.hasAttachedBook, equalTo(false));
     }
   }
 
   private static Integer catalogItemNotebookId(
       com.odde.doughnut.controllers.dto.NotebookCatalogItem item) {
     return switch (item) {
-      case NotebookCatalogNotebookItem n -> n.notebook.getNotebook().getId();
-      case NotebookCatalogSubscribedNotebookItem s -> s.notebook.getNotebook().getId();
+      case NotebookCatalogNotebookItem n -> n.notebook.getId();
+      case NotebookCatalogSubscribedNotebookItem s -> s.notebook.getId();
       case NotebookCatalogGroupItem g -> null;
     };
   }

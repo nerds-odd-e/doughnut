@@ -33,20 +33,21 @@
     <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-border-l-2 daisy-border-primary/30 daisy-pl-3">
       <NotebookListRow
         v-for="nb in previewNotebooks"
-        :key="nb.id"
-        :notebook="nb"
+        :key="nb.notebook.id"
+        :notebook="nb.notebook"
         :compact="compactMembers"
       >
         <SubscriptionNoteButtons
-          v-if="subscriptionForNotebook(nb.id)"
-          :subscription="subscriptionForNotebook(nb.id)!"
-          :notebook-id="nb.id"
+          v-if="subscriptionForNotebook(nb.notebook.id)"
+          :subscription="subscriptionForNotebook(nb.notebook.id)!"
+          :notebook-id="nb.notebook.id"
           :catalog-group-id="group.id"
           @updated="$emit('refresh')"
         />
         <NotebookButtons
           v-else
-          v-bind="{ notebook: nb, user }"
+          v-bind="{ notebook: nb.notebook, user }"
+          :has-attached-book="nb.hasAttachedBook"
           :catalog-group-id="group.id"
           @notebook-updated="$emit('notebook-updated', $event)"
           @refresh="$emit('refresh')"
@@ -90,24 +91,25 @@
     >
       <div
         v-for="nb in previewNotebooks"
-        :key="nb.id"
+        :key="nb.notebook.id"
         role="card"
         class="daisy-card"
         data-cy="notebook-card"
       >
-        <NotebookCard :notebook="nb" :compact="compactMembers">
+        <NotebookCard :notebook="nb.notebook" :compact="compactMembers">
           <template #cardHeader>
             <span class="daisy-flex daisy-justify-end daisy-p-0">
               <SubscriptionNoteButtons
-                v-if="subscriptionForNotebook(nb.id)"
-                :subscription="subscriptionForNotebook(nb.id)!"
-                :notebook-id="nb.id"
+                v-if="subscriptionForNotebook(nb.notebook.id)"
+                :subscription="subscriptionForNotebook(nb.notebook.id)!"
+                :notebook-id="nb.notebook.id"
                 :catalog-group-id="group.id"
                 @updated="$emit('refresh')"
               />
               <NotebookButtons
                 v-else
-                v-bind="{ notebook: nb, user }"
+                v-bind="{ notebook: nb.notebook, user }"
+                :has-attached-book="nb.hasAttachedBook"
                 :catalog-group-id="group.id"
                 @notebook-updated="$emit('notebook-updated', $event)"
                 @refresh="$emit('refresh')"
