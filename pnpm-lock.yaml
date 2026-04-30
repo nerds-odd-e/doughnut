@@ -40,8 +40,8 @@ importers:
         specifier: ^1.29.0
         version: 1.29.0(zod@4.3.6)
       '@redocly/cli':
-        specifier: ^2.30.1
-        version: 2.30.1(@opentelemetry/api@1.9.0)(core-js@3.46.0)
+        specifier: ^2.30.2
+        version: 2.30.2(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.14.1)
@@ -1765,9 +1765,6 @@ packages:
   '@protobufjs/float@1.0.2':
     resolution: {integrity: sha512-Ddb+kVXlXst9d+R9PfTIxh1EdNkgoRe5tOX6t01f1lYWOvJnSPDBlG241QLzcyPdoNTsblLUdujGSE4RzrTZGQ==}
 
-  '@protobufjs/inquire@1.1.0':
-    resolution: {integrity: sha512-kdSefcPdruJiFMVSbn801t4vFK7KB/5gd2fYvrxhuJYg8ILrmn9SKSX2tZdV6V+ksulWqS7aXjBcRXl3wHoD9Q==}
-
   '@protobufjs/inquire@1.1.1':
     resolution: {integrity: sha512-mnzgDV26ueAvk7rsbt9L7bE0SuAoqyuys/sMMrmVcN5x9VsxpcG3rqAUSgDyLp0UZlmNfIbQ4fHfCtreVBk8Ew==}
 
@@ -1789,8 +1786,8 @@ packages:
   '@redocly/cli-otel@0.1.2':
     resolution: {integrity: sha512-Bg7BoO5t1x3lVK+KhA5aGPmeXpQmdf6WtTYHhelKJCsQ+tRMiJoFAQoKHoBHAoNxXrhlS3K9lKFLHGmtxsFQfA==}
 
-  '@redocly/cli@2.30.1':
-    resolution: {integrity: sha512-n5lRNAuA5Sz+pFn6VKhngUlj3E6bR0NtUF3eWzsuVWc3ffu5TyLhD12xRcASyi+aW7Z1z33/leGwIvKRKeG3xg==}
+  '@redocly/cli@2.30.2':
+    resolution: {integrity: sha512-DWTydfVgEJkqDMcriRuy+MX+IYaEPU0AvV/nKuT1/1ajTugofkxlClHfZOK8Kwv47qAHvZ9w3oF+WCP/fVyW2g==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1804,12 +1801,12 @@ packages:
     resolution: {integrity: sha512-/oy8sXi5xK4+HvcFR7xS1A74zJ5aS6rtacNEr91SczLqvtxz79opxp7yYpdYtfGQAp6igx9eU9alwSC/R/X3Cg==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.30.1':
-    resolution: {integrity: sha512-ggv0nRy9Y7D1PxsmXE8MWU/x6EOVC/njZw1s7Z5TVt7OzHzLUiB2AroZzsU1dIMl2KRm4n3ygdo2VlNAAovyGQ==}
+  '@redocly/openapi-core@2.30.2':
+    resolution: {integrity: sha512-J1UB/I1s9eRpirIVgzH/B1Jj+hYQHYExruLk+edPOqneFIlFc38wKiTRkj/TVpwcmzRHJNu5SSI6NTrrfPa4BA==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.30.1':
-    resolution: {integrity: sha512-b3IiUa+oFcUppfUNcNubyKJ1/Gnt8brlU2+MrF0E+tpFJANMLXejQ0DcNN7t6lq2ZgCyp9DDK76tlJMmOIIcAQ==}
+  '@redocly/respect-core@2.30.2':
+    resolution: {integrity: sha512-4dVg57ItG19MGsLWDPmbUid81kHEbGqLcSSp1Q/8wHGJVzxmFgX9JOkqEw059/dwCYjP+txPhcMDORh0pK9ivQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.17':
@@ -7809,7 +7806,7 @@ snapshots:
       '@cucumber/gherkin-utils': 11.0.0
       '@cucumber/html-formatter': 23.1.0(@cucumber/messages@32.3.1)
       '@cucumber/junit-xml-formatter': 0.13.3(@cucumber/messages@32.3.1)
-      '@cucumber/message-streams': 4.1.1(@cucumber/messages@32.3.1)
+      '@cucumber/message-streams': 4.1.1(@cucumber/messages@32.0.1)
       '@cucumber/messages': 32.3.1
       '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.8.2)(@cucumber/messages@32.3.1)
       '@cucumber/tag-expressions': 9.1.0
@@ -7845,7 +7842,7 @@ snapshots:
   '@cucumber/gherkin-streams@6.0.0(@cucumber/gherkin@38.0.0)(@cucumber/message-streams@4.1.1(@cucumber/messages@32.3.1))(@cucumber/messages@32.3.1)':
     dependencies:
       '@cucumber/gherkin': 38.0.0
-      '@cucumber/message-streams': 4.1.1(@cucumber/messages@32.3.1)
+      '@cucumber/message-streams': 4.1.1(@cucumber/messages@32.0.1)
       '@cucumber/messages': 32.3.1
       commander: 14.0.0
       source-map-support: 0.5.21
@@ -7882,9 +7879,9 @@ snapshots:
     dependencies:
       '@cucumber/messages': 32.0.1
 
-  '@cucumber/message-streams@4.1.1(@cucumber/messages@32.3.1)':
+  '@cucumber/message-streams@4.1.1(@cucumber/messages@32.0.1)':
     dependencies:
-      '@cucumber/messages': 32.3.1
+      '@cucumber/messages': 32.0.1
       mime: 3.0.0
 
   '@cucumber/messages@32.0.1':
@@ -8750,11 +8747,9 @@ snapshots:
   '@protobufjs/fetch@1.1.0':
     dependencies:
       '@protobufjs/aspromise': 1.1.2
-      '@protobufjs/inquire': 1.1.0
+      '@protobufjs/inquire': 1.1.1
 
   '@protobufjs/float@1.0.2': {}
-
-  '@protobufjs/inquire@1.1.0': {}
 
   '@protobufjs/inquire@1.1.1': {}
 
@@ -8782,15 +8777,15 @@ snapshots:
     dependencies:
       ulid: 2.4.0
 
-  '@redocly/cli@2.30.1(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
+  '@redocly/cli@2.30.2(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.214.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.6.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.6.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.40.0
       '@redocly/cli-otel': 0.1.2
-      '@redocly/openapi-core': 2.30.1
-      '@redocly/respect-core': 2.30.1
+      '@redocly/openapi-core': 2.30.2
+      '@redocly/respect-core': 2.30.2
       ajv: '@redocly/ajv@8.18.0'
       ajv-formats: 3.0.1(@redocly/ajv@8.18.0)
       colorette: 1.4.0
@@ -8841,7 +8836,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.30.1':
+  '@redocly/openapi-core@2.30.2':
     dependencies:
       '@redocly/ajv': 8.18.0
       '@redocly/config': 0.48.1
@@ -8854,12 +8849,12 @@ snapshots:
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
 
-  '@redocly/respect-core@2.30.1':
+  '@redocly/respect-core@2.30.2':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.18.0
-      '@redocly/openapi-core': 2.30.1
+      '@redocly/openapi-core': 2.30.2
       ajv: '@redocly/ajv@8.18.0'
       better-ajv-errors: 1.2.0(@redocly/ajv@8.18.0)
       colorette: 2.0.20
@@ -9254,7 +9249,7 @@ snapshots:
       '@typescript-eslint/types': 8.56.1
       '@typescript-eslint/visitor-keys': 8.56.1
       debug: 4.4.3(supports-color@8.1.1)
-      minimatch: 10.2.3
+      minimatch: 10.2.5
       semver: 7.7.4
       tinyglobby: 0.2.16
       ts-api-utils: 2.4.0(typescript@5.9.3)
