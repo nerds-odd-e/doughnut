@@ -183,7 +183,7 @@ Given(
       )
       .then((showResponse) => {
         const realm = unwrapData<NoteRealm>(showResponse)
-        const notebookId = realm.notebook?.id
+        const notebookId = realm.notebookId
         expect(notebookId, 'head note must belong to a notebook').to.be.a(
           'number'
         )

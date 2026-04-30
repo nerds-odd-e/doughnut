@@ -95,7 +95,7 @@ const testability = () => {
           })
           .then((response) => {
             const realm = unwrapData<NoteRealm>(response)
-            const notebookId = realm.notebook?.id
+            const notebookId = realm.notebookId
             expect(notebookId, 'head note must belong to a notebook').to.be.a(
               'number'
             )
