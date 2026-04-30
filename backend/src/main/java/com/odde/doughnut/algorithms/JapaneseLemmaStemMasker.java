@@ -88,6 +88,22 @@ final class JapaneseLemmaStemMasker {
     addSpec(stem + "くなかった", "なかった", out, seen);
     addSpec(stem + "くなければ", "なければ", out, seen);
     addSpec(stem + "ければ", "ば", out, seen);
+    addSpec(stem + "そう", "そう", out, seen);
+    addSpec(stem + "さ", "さ", out, seen);
+    addSpec(stem + "くありませんでした", "ありませんでした", out, seen);
+    addSpec(stem + "くありません", "ありません", out, seen);
+    addSpec(stem + "すぎる", "る", out, seen);
+    addVerbSuffixesOnStem(stem + "すぎ", out, seen);
+    addSpec(stem + "くなる", "なる", out, seen);
+    addSpec(stem + "くなった", "なった", out, seen);
+    addSpec(stem + "くなって", "なって", out, seen);
+    addSpec(stem + "くならなかった", "ならなかった", out, seen);
+    addSpec(stem + "くならなければ", "なければ", out, seen);
+    addSpec(stem + "くならない", "ならない", out, seen);
+    addSpec(stem + "くなりませんでした", "ませんでした", out, seen);
+    addSpec(stem + "くなりません", "ません", out, seen);
+    addSpec(stem + "くなりました", "ました", out, seen);
+    addSpec(stem + "くなります", "ます", out, seen);
     addVerbSuffixesOnStem(stem + "く", out, seen);
   }
 
@@ -269,7 +285,7 @@ final class JapaneseLemmaStemMasker {
   }
 
   private static boolean isParticleStart(int cp) {
-    return "はがをにでのとへもかやねよさ".indexOf(cp) >= 0;
+    return "はがをにでのとへもかやねよさ".indexOf(cp) >= 0 || cp == 'だ';
   }
 
   private static String lastChar(String s) {
