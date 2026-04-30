@@ -6,6 +6,6 @@ Feature: Notebook catalog navigation
     Given I am logged in as an existing user
 
   Scenario: Opening a notebook from the catalog lands on the notebook page
-    Given I have a notebook "Catalog nav suite" with a note "Notebook Catalog Nav E2E" and details "Head body baseline for catalog open."
+    Given I have a notebook "Catalog nav suite"
     When I open the notebook "Catalog nav suite" from my notebooks catalog
     And the notebook page summary shows name "Catalog nav suite"

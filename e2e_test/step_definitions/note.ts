@@ -33,6 +33,12 @@ Given(
   }
 )
 
+Given('I have a notebook {string}', (notebookName: string) => {
+  cy.get<string>('@currentLoginUser').then((username) =>
+    start.testability().injectNotes([], username, notebookName)
+  )
+})
+
 Given('there are some notes:', (data: DataTable) => {
   const hashes = data.hashes()
   hashes.forEach((note) => {

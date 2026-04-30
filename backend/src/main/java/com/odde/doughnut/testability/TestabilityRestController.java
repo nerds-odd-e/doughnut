@@ -147,7 +147,7 @@ class TestabilityRestController {
 
   @Schema(name = "NotesTestData")
   static class NotesTestData {
-    @Setter private List<NoteTestData> noteTestData;
+    @Getter @Setter private List<NoteTestData> noteTestData;
     @Setter private String externalIdentifier;
     @Setter private String circleName; // optional
 
@@ -181,10 +181,12 @@ class TestabilityRestController {
         if (notebookFromRepositoryOrNull != null) {
           Note head = notebookFromRepositoryOrNull.getHeadNote();
           if (head == null) {
-            throw new RuntimeException(
-                "Notebook `"
-                    + notebookName
-                    + "` has no head note; cannot inject notes without Parent Title.");
+            note.initializeAsNotebookRoot(
+                notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
+            notebookFromRepositoryOrNull.setHeadNote(note);
+            notebookFromRepositoryOrNull.setUpdated_at(currentUTCTimestamp);
+            entityPersister.save(notebookFromRepositoryOrNull);
+            continue;
           }
           note.setParentNote(head);
           continue;
@@ -241,6 +243,28 @@ class TestabilityRestController {
     final User user = getUserModelByExternalIdentifier(notesTestData.externalIdentifier);
     Ownership ownership = getOwnership(notesTestData, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+
+    List<NoteTestData> injections =
+        Optional.ofNullable(notesTestData.getNoteTestData()).orElseGet(Collections::emptyList);
+    notesTestData.setNoteTestData(injections);
+    if (injections.isEmpty()) {
+      Optional<Notebook> existingNotebook =
+          notebookRepository.findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
+              notesTestData.notebookName);
+      if (existingNotebook.isPresent()) {
+        Notebook nb = existingNotebook.get();
+        if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
+          throw new RuntimeException(
+              "Notebook named `"
+                  + notesTestData.notebookName
+                  + "` exists but belongs to different ownership.");
+        }
+        return Collections.emptyMap();
+      }
+      notebookService.createNotebookForOwnership(
+          ownership, user, currentUTCTimestamp, notesTestData.notebookName, null);
+      return Collections.emptyMap();
+    }
 
     Notebook notebookFromRepository =
         notebookRepository
