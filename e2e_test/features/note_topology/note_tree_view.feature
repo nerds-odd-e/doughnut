@@ -4,13 +4,13 @@ Feature: Note tree view
   Background:
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
-      | Title            | Parent Title   |
-      | TDD              | LeSS in Action |
-      | ATDD             | LeSS in Action |
-      | CI               | LeSS in Action |
-      | TPP              | TDD            |
-      | Const            | TPP            |
-      | Pull             | ATDD           |
+      | Title            | Parent Title   | Folder               |
+      | TDD              | LeSS in Action | LeSS in Action       |
+      | ATDD             | LeSS in Action | LeSS in Action       |
+      | CI               | LeSS in Action | LeSS in Action       |
+      | TPP              | TDD            | LeSS in Action/TDD   |
+      | Const            | TPP            | LeSS in Action/TPP   |
+      | Pull             | ATDD           | LeSS in Action/ATDD  |
 
   Scenario: a note can have children
     Given I navigate to "LeSS training/LeSS in Action" note

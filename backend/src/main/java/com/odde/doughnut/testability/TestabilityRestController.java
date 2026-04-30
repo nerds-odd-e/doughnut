@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.CircleRepository;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -57,6 +58,7 @@ class TestabilityRestController {
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
   @Autowired NoteService noteService;
   @Autowired WikiSlugPathService wikiSlugPathService;
+  @Autowired FolderRepository folderRepository;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -121,6 +123,12 @@ class TestabilityRestController {
     @JsonProperty("Wikidata Id")
     @Setter
     private String wikidataId;
+
+    @Schema(name = "Folder", description = "Notebook-local folder path (segments separated by /).")
+    @JsonProperty("Folder")
+    @Getter
+    @Setter
+    private String folder;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = new Note();
@@ -217,6 +225,48 @@ class TestabilityRestController {
     }
   }
 
+  private void applyExplicitFolderPlacements(
+      List<NoteTestData> injections, Map<String, Note> titleNoteMap, Timestamp now) {
+    for (NoteTestData injection : injections) {
+      if (Strings.isBlank(injection.getFolder())) {
+        continue;
+      }
+      Note note = titleNoteMap.get(injection.title);
+      Folder folder = resolveOrCreateFolderPath(note.getNotebook(), injection.getFolder(), now);
+      note.setFolder(folder);
+    }
+  }
+
+  private Folder resolveOrCreateFolderPath(Notebook notebook, String folderPath, Timestamp now) {
+    Folder parent = null;
+    for (String rawSegment : folderPath.split("/")) {
+      String name = rawSegment.trim();
+      if (name.isEmpty()) {
+        continue;
+      }
+      Integer parentFolderId = parent == null ? null : parent.getId();
+      List<Folder> candidates =
+          folderRepository.findCandidateChildContainers(notebook.getId(), parentFolderId, name);
+      if (!candidates.isEmpty()) {
+        parent = candidates.getFirst();
+        continue;
+      }
+      Folder created = new Folder();
+      created.setNotebook(notebook);
+      created.setParentFolder(parent);
+      created.setName(name);
+      created.setCreatedAt(now);
+      created.setUpdatedAt(now);
+      wikiSlugPathService.assignSlugForNewFolder(created);
+      entityPersister.save(created);
+      parent = created;
+    }
+    if (parent == null) {
+      throw new RuntimeException("Folder path resolved to no folder: `" + folderPath + "`");
+    }
+    return parent;
+  }
+
   @Schema(name = "ShareToBazaarRequest")
   @Getter
   @Setter
@@ -284,6 +334,7 @@ class TestabilityRestController {
         titleNoteMap,
         this.noteRepository,
         this.entityPersister);
+    applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister, this.wikiSlugPathService);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));

@@ -3671,6 +3671,9 @@ components:
           type: string
         Wikidata Id:
           type: string
+        Folder:
+          type: string
+          description: Notebook-local folder path (segments separated by /).
     NotesTestData:
       type: object
       properties:

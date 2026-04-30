@@ -145,6 +145,10 @@ export type NoteTestData = {
     'Image Url'?: string;
     'Image Mask'?: string;
     'Wikidata Id'?: string;
+    /**
+     * Notebook-local folder path (segments separated by /).
+     */
+    Folder?: string;
 };
 
 export type NotesTestData = {
