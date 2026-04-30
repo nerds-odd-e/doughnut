@@ -1,9 +1,16 @@
 import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type {
+  NoteRealm,
+  Options,
+  ShowNoteData,
+} from "@generated/doughnut-backend-api"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 
@@ -52,7 +59,27 @@ describe("Sidebar", () => {
       firstGenerationSibling
     storageAccessor.value.refOfNoteRealm(secondGeneration.id).value =
       secondGeneration
-    mockSdkService("listNotebookRootNotes", [topNoteRealm])
+
+    const shallowTopRealm = {
+      ...topNoteRealm,
+      children: undefined,
+    } as NoteRealm
+    mockSdkService("listNotebookRootNotes", [shallowTopRealm])
+
+    const fullRealmByNoteId: Record<number, NoteRealm> = {
+      [topNoteRealm.id]: topNoteRealm,
+      [firstGeneration.id]: firstGeneration,
+      [firstGenerationSibling.id]: firstGenerationSibling,
+      [secondGeneration.id]: secondGeneration,
+    }
+    mockSdkServiceWithImplementation("showNote", (options) => {
+      const id = (options as Options<ShowNoteData>).path.note
+      const realm = fullRealmByNoteId[id]
+      if (realm === undefined) {
+        throw new Error(`Sidebar.spec: unmocked showNote for note id ${id}`)
+      }
+      return realm
+    })
   })
 
   beforeEach(() => {
@@ -287,6 +314,23 @@ describe("Sidebar", () => {
     expect(
       findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
     ).toBe(true)
+  })
+
+  it("shows ellipsis child-count badge for shallow listNotebookRootNotes realms", async () => {
+    wrapper = helper
+      .component(Sidebar)
+      .withCurrentUser(makeMe.aUser.please())
+      .withProps({
+        activeNoteRealm: undefined,
+        notebookId: topNoteRealm.notebookId,
+      })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+    await flushPromises()
+
+    const badge = wrapper.find('[title="expand children"]')
+    expect(badge.exists()).toBe(true)
+    expect(badge.text()).toBe("...")
   })
 
   it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {

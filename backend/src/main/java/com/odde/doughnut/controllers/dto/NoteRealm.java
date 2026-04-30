@@ -1,5 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +25,9 @@ import org.springframework.lang.NonNull;
 public class NoteRealm {
   @Getter @Setter private List<Note> inboundReferences;
 
+  /** When true, {@link #getChildren()} returns null so JSON omits {@code children}. */
+  private boolean omitChildrenFromJson;
+
   @NotNull @Getter private Note note;
 
   @Getter @Setter private Boolean fromBazaar;
@@ -32,6 +37,10 @@ public class NoteRealm {
   public NoteRealm(Note note, List<WikiTitle> wikiTitles) {
     this.note = note;
     this.wikiTitles = List.copyOf(wikiTitles);
+  }
+
+  public void markNotebookRootListingShallow() {
+    this.omitChildrenFromJson = true;
   }
 
   @NotNull
@@ -45,7 +54,12 @@ public class NoteRealm {
     return Objects.requireNonNullElse(note.getSlug(), "");
   }
 
+  @JsonProperty("children")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public List<Note> getChildren() {
+    if (omitChildrenFromJson) {
+      return null;
+    }
     return note.getChildren();
   }
 

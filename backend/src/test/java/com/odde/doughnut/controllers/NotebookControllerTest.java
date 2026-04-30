@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -259,6 +260,14 @@ class NotebookControllerTest extends ControllerTestBase {
           List.of(rootOneId, rootTwoId).stream().sorted().toList(),
           roots.stream().map(NoteRealm::getId).sorted().toList());
       assertFalse(roots.stream().anyMatch(r -> r.getId().equals(child.getId())));
+
+      assertFalse(rootOne.getChildren().isEmpty());
+      NoteRealm rootOneRealm =
+          roots.stream().filter(r -> r.getId().equals(rootOneId)).findFirst().orElseThrow();
+      assertNull(rootOneRealm.getChildren());
+      NoteRealm rootTwoRealm =
+          roots.stream().filter(r -> r.getId().equals(rootTwoId)).findFirst().orElseThrow();
+      assertNull(rootTwoRealm.getChildren());
     }
 
     @Test

@@ -25,6 +25,12 @@ public class NoteRealmService {
     return realm;
   }
 
+  public NoteRealm buildForNotebookRootListing(Note note, User viewer) {
+    NoteRealm realm = build(note, viewer);
+    realm.markNotebookRootListingShallow();
+    return realm;
+  }
+
   private boolean inboundReferenceVisible(Note inboundReference, User viewer) {
     if (inboundReference.getParent().getNotebook()
         == inboundReference.getTargetNote().getNotebook()) {

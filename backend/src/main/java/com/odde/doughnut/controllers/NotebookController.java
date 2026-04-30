@@ -275,7 +275,7 @@ class NotebookController {
     authorizationService.assertReadAuthorization(notebook);
     User user = authorizationService.getCurrentUser();
     return noteService.findNotebookRootNotes(notebook.getId()).stream()
-        .map(n -> noteRealmService.build(n, user))
+        .map(n -> noteRealmService.buildForNotebookRootListing(n, user))
         .toList();
   }
 
