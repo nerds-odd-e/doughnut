@@ -626,6 +626,8 @@ Phase 1 already persists **`folderId`** parallel to **`Note.parent`** and keeps 
 ## Model / API / UI
 
 - Prefer **folder-scoped** listing and navigation for “what lives here”; retire parent-note **children** lists as the primary containment UI (creation targets the relevant **folder**, not a structural parent note pointer in product semantics).
+- Before switching the sidebar, update testability note injection so E2E setup can provide an optional **`Folder`** path separately from **`Parent Title`**. **`Parent Title`** remains only the legacy parent-id setup; **`Folder`** places the note in an explicit folder path, including nested paths such as `LeSS in Action/TDD`.
+- In the sidebar, only notebook root and folders have children. Notes are rendered as knowledge units and should not be queried for child lists for structural navigation.
 - Remove **`shortDetails`** from **`NoteTopology`** and regenerate the API client.
 - For note graph retrieval, resolve structural siblings from **folder scope**: same **`folderId`** for foldered notes, or same **notebook root** (same notebook and no **`folderId`**) for notes that have no folder.
 

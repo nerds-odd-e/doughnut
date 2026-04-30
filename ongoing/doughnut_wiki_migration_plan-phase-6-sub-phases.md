@@ -62,23 +62,52 @@ All sub-phases are **planned** and not started. Each sub-phase below is intended
 
 **Commit boundary:** One folder-listing behavior commit.
 
-## Sub-Phase 6.3 - Sidebar Uses Folder-Scoped Listings For Structural Peers
+## Sub-Phase 6.3 - Testability Note Injection Supports Folder Placement
 
 **Type:** Behavior.
 
-**Pre-condition:** Root and folder-scoped listing APIs exist.
+**Pre-condition:** E2E scenarios inject notebook notes using a table with `Title` and `Parent Title`, while folder data may need to differ from the legacy parent-note tree.
+
+**Trigger:** A scenario uses `And I have a notebook "..." with a note "..." and notes:` and provides a `Folder` column.
+
+**Post-condition:** The testability endpoint treats `Parent Title` only as the legacy parent-id relationship and does not create or infer a folder from it. When `Folder` is provided, the injected note is placed in that folder, creating nested folder paths such as `LeSS in Action/TDD` as needed. Existing scenarios without `Folder` keep working as before.
+
+**Example setup shape:**
+
+```gherkin
+And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
+  | Title | Parent Title   | Folder              |
+  | TDD   | LeSS in Action | LeSS in Action      |
+  | ATDD  | LeSS in Action | LeSS in Action      |
+  | CI    | LeSS in Action | LeSS in Action      |
+  | TPP   | TDD            | LeSS in Action/TDD  |
+  | Const | TPP            | LeSS in Action/TPP  |
+  | Pull  | ATDD           | LeSS in Action/ATDD |
+```
+
+**Work:** Extend the testability inject-note DTO/step mapping to accept optional `Folder`, resolve or create each folder path within the notebook, and assign the injected note's `folderId` from that path. Do not let `Parent Title` create folders implicitly.
+
+**Verify:** Run the existing E2E feature(s) that inject notes through this step, starting with `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/note_tree_view.feature`, and keep the existing no-`Folder` scenarios passing.
+
+**Commit boundary:** One testability-folder-placement commit.
+
+## Sub-Phase 6.4 - Sidebar Uses Folder-Scoped Listings For Structural Peers
+
+**Type:** Behavior.
+
+**Pre-condition:** Root and folder-scoped listing APIs exist, and E2E setup can place notes in explicit folder paths independently from legacy `Parent Title`.
 
 **Trigger:** A user opens a notebook root, a folder, or a note whose peers are in the same folder.
 
-**Post-condition:** The visible structural peers come from notebook root or folder membership rather than parent-note children.
+**Post-condition:** The visible structural peers come from notebook root or folder membership rather than parent-note children. The frontend no longer asks a note for its children for sidebar listing; only notebook root and folders have children in the sidebar.
 
-**Work:** Extend the existing sidebar/tree feature or page-object tests to assert folder-scoped peers, then wire the frontend listing path to the root/folder APIs. Keep lazy loading behavior intact where possible.
+**Work:** Extend the existing sidebar/tree feature or page-object tests to assert folder-scoped peers using the new `Folder` setup column, then wire the frontend listing path to the root/folder APIs. Keep lazy loading behavior intact for root and folder nodes, and remove note-child sidebar loading.
 
 **Verify:** Targeted frontend test and the relevant Cypress spec, likely `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/note_tree_view.feature`.
 
 **Commit boundary:** One folder-first navigation commit.
 
-## Sub-Phase 6.4 - New Notes Appear In The Current Folder Scope
+## Sub-Phase 6.5 - New Notes Appear In The Current Folder Scope
 
 **Type:** Behavior.
 
@@ -94,7 +123,7 @@ All sub-phases are **planned** and not started. Each sub-phase below is intended
 
 **Commit boundary:** One creation-in-folder-scope commit.
 
-## Sub-Phase 6.5 - Remove Short Details From Backend Topology
+## Sub-Phase 6.6 - Remove Short Details From Backend Topology
 
 **Type:** Behavior / API cleanup.
 
@@ -110,7 +139,7 @@ All sub-phases are **planned** and not started. Each sub-phase below is intended
 
 **Commit boundary:** One backend/API topology cleanup commit.
 
-## Sub-Phase 6.6 - Remove Short Details From Frontend Cards And Fixtures
+## Sub-Phase 6.7 - Remove Short Details From Frontend Cards And Fixtures
 
 **Type:** Behavior / UI cleanup.
 
@@ -126,7 +155,7 @@ All sub-phases are **planned** and not started. Each sub-phase below is intended
 
 **Commit boundary:** One frontend/fixture cleanup commit.
 
-## Sub-Phase 6.7 - Note Graph Siblings Come From Folder Scope
+## Sub-Phase 6.8 - Note Graph Siblings Come From Folder Scope
 
 **Type:** Behavior.
 
@@ -142,11 +171,11 @@ All sub-phases are **planned** and not started. Each sub-phase below is intended
 
 **Commit boundary:** One graph-sibling-source commit.
 
-## Sub-Phase 6.8 - Phase 6 Closeout And Plan Update
+## Sub-Phase 6.9 - Phase 6 Closeout And Plan Update
 
 **Type:** Structure / cleanup.
 
-**Pre-condition:** Folder-first listing, creation in folder scope, `shortDetails` removal, and graph folder-scope siblings are passing targeted tests.
+**Pre-condition:** Testability folder placement, folder-first listing, creation in folder scope, `shortDetails` removal, and graph folder-scope siblings are passing targeted tests.
 
 **Trigger:** Final targeted verification for Phase 6.
 
