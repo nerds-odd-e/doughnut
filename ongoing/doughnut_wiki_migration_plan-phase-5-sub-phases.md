@@ -224,6 +224,12 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One delete-compatibility commit.
 
+## Current Production Migration Note
+
+Sub-phases 5.1 through 5.12 are already implemented. The admin data migration code introduced by 5.8 and 5.9 has not yet been run against production data.
+
+Do not run the old relationship title/details migration as one long blocking admin request. The production run should happen after wiki-title cache persistence exists, so the title backfill, details/frontmatter backfill, slug regeneration, and cache backfill can be performed together in resumable batches.
+
 ## Sub-Phase 5.13 - Wiki Title Cache Persistence
 
 **Type:** Structure for the next behavior.
@@ -272,39 +278,71 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One NoteRealm cache-read commit.
 
-## Sub-Phase 5.16 - Backfill Relationship Wiki Title Cache
+## Sub-Phase 5.16 - Resumable Admin Migration Progress
+
+**Type:** Structure for the next behavior.
+
+**Pre-condition:** The wiki-title cache exists, and the relationship title/details migration logic from 5.8 and 5.9 exists but has not been run in production.
+
+**Trigger:** The admin migration endpoint is asked to start or resume the wiki-reference migration.
+
+**Post-condition:** Migration progress is persisted in the database so a backend timeout, crash, deploy, or failed batch does not lose completed work.
+
+**Work:** Add a temporary persisted progress table for this migration, for example a capability-named table such as `wiki_reference_migration_progress`, with one row per migration step. Track step name, status, total count, processed count, last processed note id, last error, timestamps, and a completion marker. Each batch must run in a short transaction and update progress before returning.
+
+**Verify:** Focused backend tests that start a migration, process a batch, simulate a new service instance or repeated call, and resume from persisted progress without reprocessing completed rows.
+
+**Commit boundary:** One migration-progress-persistence commit.
+
+## Sub-Phase 5.17 - Admin Migration Shows Batched Progress
 
 **Type:** Behavior.
 
-**Pre-condition:** Migrated relationship notes contain `source` and `target` frontmatter.
+**Pre-condition:** Migration progress is persisted.
 
 **Trigger:** The admin data migration runs.
 
-**Post-condition:** Existing relationship notes with source and target have cache rows for those wiki titles.
+**Post-condition:** The admin frontend can show migration progress after each batch and does not wait on one long request that risks a timeout.
 
-**Work:** Extend the migration test for old relationship notes, then refresh the cache after relationship frontmatter/details are backfilled.
+**Work:** Change the admin migration flow so each request processes at most one bounded batch and returns progress. The frontend can call again, poll, or continue until the response says the migration is complete. Surface current step, processed count, total count, and failure message when a batch fails.
 
-**Verify:** Focused backend migration test through `AdminDataMigrationService.run()`.
+**Verify:** Focused backend API tests for progress responses plus the smallest frontend test needed for the admin progress display.
 
-**Commit boundary:** One relationship-cache-backfill commit.
+**Commit boundary:** One admin-progress behavior commit.
 
-## Sub-Phase 5.17 - Migrate Legacy Parent to Frontmatter Reference
+## Sub-Phase 5.18 - Batched Relationship Migration and Cache Backfill
 
 **Type:** Behavior.
 
-**Pre-condition:** Existing non-relationship notes may still have a parent note that expresses semantic context.
+**Pre-condition:** The admin migration can resume from persisted progress and report batch progress.
 
 **Trigger:** The admin data migration runs.
 
-**Post-condition:** Existing non-relationship notes with a parent have `parent: "[[Parent Title]]"` in frontmatter, and their wiki-title cache includes that parent title.
+**Post-condition:** Existing relationship notes are migrated in batches: titles from 5.8 are backfilled, details/frontmatter from 5.9 are backfilled, slugs are regenerated where needed, and `source` / `target` wiki-title cache rows are created in the same resumable production run.
 
-**Work:** Add a migration test for an ordinary child note, serialize or merge frontmatter without overwriting existing properties, and refresh the note's cache. Do not add this frontmatter in new-note creation paths.
+**Work:** Fold the 5.8 title migration and 5.9 details migration into the new batched runner instead of requiring the old one-shot admin button. Process relationship notes by stable id ranges. For each note in a batch, derive the title if needed, write relationship frontmatter/body if needed, regenerate the slug after title changes, refresh the wiki-title cache, then mark progress. Keep each operation idempotent so rerunning a batch after a failure is safe.
 
-**Verify:** Focused backend migration test and a note-creation regression showing new notes do not receive default `parent` frontmatter.
+**Verify:** Focused backend migration tests through the public admin migration entry point for first batch, resume, idempotent rerun, and final completion.
 
-**Commit boundary:** One legacy-parent-frontmatter commit.
+**Commit boundary:** One batched relationship production-migration commit.
 
-## Sub-Phase 5.18 - Relationship UI Reads Relation From Frontmatter
+## Sub-Phase 5.19 - Batched Legacy Parent Frontmatter and Cache Backfill
+
+**Type:** Behavior.
+
+**Pre-condition:** Relationship notes have been migrated and cache rows can be refreshed in batches.
+
+**Trigger:** The admin data migration advances to existing non-relationship notes.
+
+**Post-condition:** Existing non-relationship notes with a parent have `parent: "[[Parent Title]]"` in frontmatter, and their wiki-title cache includes that parent title. New notes still do not receive this frontmatter by default.
+
+**Work:** Add the legacy-parent step to the same resumable migration job. Serialize or merge frontmatter without overwriting existing properties, refresh the note's cache in the same batch, and persist progress separately from the relationship migration step so it can resume independently.
+
+**Verify:** Focused backend migration tests for ordinary child notes, existing frontmatter preservation, resume, and a note-creation regression showing new notes do not receive default `parent` frontmatter.
+
+**Commit boundary:** One batched legacy-parent-frontmatter commit.
+
+## Sub-Phase 5.20 - Relationship UI Reads Relation From Frontmatter
 
 **Type:** Behavior.
 
@@ -320,7 +358,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One relation-frontmatter-runtime commit.
 
-## Sub-Phase 5.19 - Remove Relationship Link Type Field
+## Sub-Phase 5.21 - Remove Relationship Link Type Field
 
 **Type:** Persistence cleanup.
 
@@ -336,7 +374,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One link-type-removal commit.
 
-## Sub-Phase 5.20 - References Use Cached Wiki Titles
+## Sub-Phase 5.22 - References Use Cached Wiki Titles
 
 **Type:** Behavior.
 
@@ -352,7 +390,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One cache-backed-references commit.
 
-## Sub-Phase 5.21 - Remove Relationship Target Field
+## Sub-Phase 5.23 - Remove Relationship Target Field
 
 **Type:** Persistence cleanup.
 
@@ -368,7 +406,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One target-field-removal commit.
 
-## Sub-Phase 5.22 - Title Rename Updates Cached Wiki References
+## Sub-Phase 5.24 - Title Rename Updates Cached Wiki References
 
 **Type:** Behavior.
 
@@ -384,7 +422,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One reverse-reference-title-update commit.
 
-## Sub-Phase 5.23 - Note Graph Uses Cached Wiki References
+## Sub-Phase 5.25 - Note Graph Uses Cached Wiki References
 
 **Type:** Behavior.
 
@@ -400,11 +438,11 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 **Commit boundary:** One cache-backed-graph commit.
 
-## Sub-Phase 5.24 - Phase 5 Closeout and Plan Update
+## Sub-Phase 5.26 - Phase 5 Closeout and Plan Update
 
 **Type:** Structure / cleanup.
 
-**Pre-condition:** Relationship creation, migration, edit, delete, cache-backed references, graph retrieval, and title invariants are passing.
+**Pre-condition:** Relationship creation, migration, edit, delete, cache-backed references, graph retrieval, and title invariants are passing. The resumable admin migration has reached complete status in production or the deployment checklist explicitly records why it has not.
 
 **Trigger:** Final targeted verification for Phase 5.
 
@@ -415,6 +453,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 - Remove any `@wip` tags introduced while driving Phase 5 behavior.
 - Update `ongoing/doughnut_wiki_migration_plan.md` with Phase 5 status and any discoveries.
 - Remove obsolete relationship-note-specific code that depended on `relation_type`, `target_note_id`, child relationship notes, or child-derived incoming references.
+- Drop the temporary migration progress table only after the production migration has completed and rollback/resume is no longer needed; otherwise leave it with an explicit follow-up cleanup note.
 - Run the relationship specs touched in this phase with targeted `--spec` commands.
 
 **Commit boundary:** One cleanup/docs commit that leaves Phase 5 closed and ready for Phase 6 (folder-first listing and removal of note **`shortDetails`**).

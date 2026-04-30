@@ -2,13 +2,13 @@
 
 ## Concepts
 
-In Doughnut, notes are atomic knowledge points organized hierarchically within notebooks. Each note (except root notes) has a parent and contains a title, details, and a unique URI. In the Graph RAG system, notes are represented as JSON objects with separate `uri` and `title` fields.
+In Doughnut, notes are atomic knowledge points organized within notebooks and folders. During the wiki migration, parent-note containment is being replaced by folder containment. After Phase 6 of `ongoing/doughnut_wiki_migration_plan.md`, graph sibling retrieval uses folder scope: siblings come from the same folder, or from the notebook root when a note has no folder. In the Graph RAG system, notes are represented as JSON objects with separate `uri` and `title` fields.
 
 A note becomes a relation when it relates to a target note, with its parent becoming the subject and its title serving as the predicate. Relation notes can still contain details, and their target notes may come from different notebooks.
 
 Key relationships in the note graph include:
-- Parent-child relationships (including related children)
-- Sibling relationships (prior and younger siblings)
+- Folder/notebook-root structural relationships during and after the folder-first migration
+- Sibling relationships (prior and younger siblings from the note's folder scope)
 - Target relationships (for relation notes)
 - Reference relationships (inbound references to the current note)
 - Extended relationships (parent siblings, cousins, etc.)

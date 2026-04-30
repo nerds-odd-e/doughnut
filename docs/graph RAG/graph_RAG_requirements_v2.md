@@ -21,7 +21,7 @@ The structural parent in the contextual path.
 The note's relation target.
 (The note represents a relationship between its parent and this target.)
 	3.	sibling
-The nearest structural sibling (in left-to-right or right-to-left order).
+The nearest structural sibling (in left-to-right or right-to-left order). After Phase 6 of `ongoing/doughnut_wiki_migration_plan.md`, this comes from the note's folder; when the note has no folder, it comes from the notebook root.
 	4.	target-sibling
 The nearest co-relator sharing the same relation target.
 	5.	child

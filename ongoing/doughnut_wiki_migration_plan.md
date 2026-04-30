@@ -575,6 +575,8 @@ The cache is used to populate `NoteRealm.wikiTitles`, incoming references, and n
 
 When a note title changes, the cache identifies notes that reference the old title so their wiki references can be updated to the new title and refreshed.
 
+The production admin migration should run as a resumable batched job after the cache exists. It combines the already-implemented old relationship title/details backfill with the relationship cache backfill and legacy-parent frontmatter/cache backfill. Progress is stored in a temporary persisted migration table so the admin frontend can show progress between batches and resume safely after backend errors, deploys, or timeouts.
+
 ## Sub-Phase Plan
 
 Phase 5 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests.
@@ -615,12 +617,17 @@ Phase 1 already persists **`folderId`** parallel to **`Note.parent`** and keeps 
 
 **Trigger:** User browses a notebook, opens a folder, views note cards, or creates a note in what used to be a “parent holds children” place.
 
-**Post-condition:** Structural peers are shown as **folder siblings** (or root notes) through the main flows; **`shortDetails`** is gone from **`NoteTopology`**, OpenAPI, generated clients, and listing/card surfaces that displayed it.
+**Post-condition:** Structural peers are shown as **folder siblings** (or notebook-root notes when there is no folder) through the main flows; **`shortDetails`** is gone from **`NoteTopology`**, OpenAPI, generated clients, and listing/card surfaces that displayed it. Note graph sibling retrieval uses the same rule: siblings come from the note's folder, or from the notebook root when the note has no folder.
 
 ## Model / API / UI
 
 - Prefer **folder-scoped** listing and navigation for “what lives here”; retire parent-note **children** lists as the primary containment UI (creation targets the relevant **folder**, not a structural parent note pointer in product semantics).
 - Remove **`shortDetails`** from **`NoteTopology`** and regenerate the API client.
+- For note graph retrieval, resolve structural siblings from **folder scope**: same **`folderId`** for foldered notes, or same notebook with no **`folderId`** for notebook-root notes.
+
+## Sub-Phase Plan
+
+Phase 6 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests.
 
 ## Non-goals
 
@@ -634,6 +641,7 @@ After this phase:
 
 - folder-first listing matches the wiki containment story while **`Note.parent`** may still exist until **Phase 7**
 - topology and cards no longer expose **`shortDetails`**
+- note graph sibling relationships come from folder membership, or notebook-root membership when the note has no folder
 
 ---
 

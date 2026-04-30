@@ -625,6 +625,8 @@ But order should not be required for ordinary knowledge notes.
 
 The current sibling order concept belongs to the old parent-child note tree. It may remain during migration so existing navigation stays stable, but it should be removed in a relatively late cleanup phase after folder navigation, map notes, and any domain-specific ordering mechanisms have replaced it.
 
+After Phase 6 of the migration plan, note graph sibling retrieval follows folder containment instead of parent-note containment: a note's siblings are notes in the same folder, or notes at the notebook root when the note has no folder.
+
 ## Compatibility Principles
 
 ### Principle 1: Markdown is the portable surface
