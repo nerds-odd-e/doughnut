@@ -157,7 +157,7 @@
       "path-to-regexp": ">=8.4.0",
       "@xmldom/xmldom": ">=0.9.10",
       "defu": ">=6.1.5",
-      "gifencoder>canvas": ">=3.2.3",
+      "canvas": ">=3.2.3",
       "follow-redirects": ">=1.16.0",
       "protobufjs": ">=7.5.5",
       "uuid": ">=14.0.0",
