@@ -79,8 +79,8 @@ importers:
         specifier: ^0.11.10
         version: 0.11.10
       slugify:
-        specifier: 1.6.6
-        version: 1.6.6
+        specifier: 1.6.9
+        version: 1.6.9
       superagent:
         specifier: ^10.3.0
         version: 10.3.0
@@ -6212,8 +6212,8 @@ packages:
     resolution: {integrity: sha512-tf+h5W1IrjNm/9rKKj0JU2MDMruiopx0jjVA5zCdBtcGjfp0+c5rHw/zADLC3IeKlGHtVbHtpfzvYA0OYT+HKg==}
     engines: {node: '>=8.0.0'}
 
-  slugify@1.6.6:
-    resolution: {integrity: sha512-h+z7HKHYXj6wJU+AnS/+IH8Uh9fdcX1Lrhg1/VMdf9PwoBQXFcXiAdsy2tSK0P6gKwJLXp02r90ahUCqHk9rrw==}
+  slugify@1.6.9:
+    resolution: {integrity: sha512-vZ7rfeehZui7wQs438JXBckYLkIIdfHOXsaVEUMyS5fHo1483l1bMdo0EDSWYclY0yZKFOipDy4KHuKs6ssvdg==}
     engines: {node: '>=8.0.0'}
 
   smtp-server@3.18.4:
@@ -13889,7 +13889,7 @@ snapshots:
 
   slugify@1.4.7: {}
 
-  slugify@1.6.6: {}
+  slugify@1.6.9: {}
 
   smtp-server@3.18.4:
     dependencies:
