@@ -36,7 +36,7 @@ public class AdminDataMigrationService {
           STEP_NOTE_SLUG_PATH_REGENERATION);
 
   /** Max notes processed per HTTP request for each wiki reference migration step. */
-  public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 50;
+  public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 10;
 
   private final NoteRepository noteRepository;
   private final WikiSlugPathService wikiSlugPathService;
