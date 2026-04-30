@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminDataMigrationService {
@@ -31,6 +32,7 @@ public class AdminDataMigrationService {
     return dto;
   }
 
+  @Transactional
   public AdminDataMigrationStatusDTO runBatch() {
     int titlesBackfilled = backfillRelationshipTitles();
     int detailsBackfilled = backfillRelationshipDetails();
