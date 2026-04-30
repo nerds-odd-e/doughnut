@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationResult;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
@@ -50,7 +50,7 @@ public class McpNoteCreationController {
 
   @PostMapping(value = "/create")
   @Transactional
-  public NoteCreationResult createNoteViaMcp(@Valid @RequestBody McpNoteAddDTO noteCreation)
+  public NoteRealm createNoteViaMcp(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     authorizationService.assertLoggedIn();
 

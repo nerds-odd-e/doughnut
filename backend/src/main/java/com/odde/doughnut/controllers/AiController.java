@@ -124,7 +124,7 @@ public class AiController {
 
   @PostMapping("/promote-point-to-child/{note}")
   @Transactional
-  public NoteCreationResult promotePointToChild(
+  public NoteRealm promotePointToChild(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
@@ -133,14 +133,14 @@ public class AiController {
 
   @PostMapping("/promote-point-to-sibling/{note}")
   @Transactional
-  public NoteCreationResult promotePointToSibling(
+  public NoteRealm promotePointToSibling(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     return promotePoint(note, request, false);
   }
 
-  private NoteCreationResult promotePoint(Note note, PointsRequestDTO request, boolean toChild)
+  private NoteRealm promotePoint(Note note, PointsRequestDTO request, boolean toChild)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String point = getSinglePoint(request);

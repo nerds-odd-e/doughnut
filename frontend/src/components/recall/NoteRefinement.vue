@@ -183,25 +183,24 @@ const promotePoint = async (index: number, apiCall: () => Promise<unknown>) => {
   try {
     const response = (await apiCallWithLoading(
       apiCall as () => Promise<{
-        data?: { created?: NoteRealm; parent?: NoteRealm }
+        data?: NoteRealm
         error?: unknown
       }>
     )) as {
-      data?: { created?: NoteRealm; parent?: NoteRealm }
+      data?: NoteRealm
       error?: unknown
     }
-    const result = response.data
 
-    if (response.error || !result?.created) {
+    if (response.error || !response.data) {
       await popups.alert("Failed to create note with AI")
       return
     }
 
+    const result = response.data
+
     if (storageAccessor.value) {
-      storageAccessor.value.refreshNoteRealm(result.created)
-      if (result.parent) {
-        storageAccessor.value.refreshNoteRealm(result.parent)
-      }
+      storageAccessor.value.refreshNoteRealm(result)
+      await storageAccessor.value.storedApi().reloadNoteRealm(props.note.id)
     }
 
     understandingPoints.value.splice(index, 1)

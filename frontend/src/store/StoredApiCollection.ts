@@ -93,6 +93,8 @@ export interface StoredApi {
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]>
 
+  reloadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm>
+
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit title" | "edit details",
@@ -333,7 +335,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       throw apiError
     }
-    const focus = this.storage.refreshNoteRealm(nrwp.created)
+    const focus = this.storage.refreshNoteRealm(nrwp)
     refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
@@ -368,7 +370,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       throw apiError
     }
-    const focus = this.storage.refreshNoteRealm(nrwp.created)
+    const focus = this.storage.refreshNoteRealm(nrwp)
     refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
@@ -403,7 +405,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       throw apiError
     }
-    const focus = this.storage.refreshNoteRealm(nrwp.created)
+    const focus = this.storage.refreshNoteRealm(nrwp)
     refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     await this.routerReplaceFocus(router, focus)
@@ -452,6 +454,10 @@ export default class StoredApiCollection implements StoredApi {
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
+  }
+
+  async reloadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm> {
+    return this.loadNote(noteId)
   }
 
   async moveAfter(

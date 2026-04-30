@@ -30,10 +30,8 @@ describe('add_note tool', () => {
 
     // Mock the service response
     const mockCreateNote = vi.mocked(McpNoteCreationController.createNoteViaMcp)
-    const mockResponse: CreateNoteViaMcpResponse = {
-      created: makeMe.aNoteRealm.title('Test Note').please(),
-      parent: makeMe.aNoteRealm.title('Parent Note').please(),
-    }
+    const mockResponse: CreateNoteViaMcpResponse =
+      makeMe.aNoteRealm.title('Test Note').please()
     // OpenAPI client returns { data, error, request, response } structure
     mockCreateNote.mockResolvedValue({
       data: mockResponse,

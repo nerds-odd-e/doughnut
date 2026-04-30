@@ -40,10 +40,7 @@ describe("adding new note", () => {
     mockSdkService("semanticSearch", [])
     mockSdkService("semanticSearchWithin", [])
     mockSdkService("getRecentNotes", [])
-    const createNoteResult = {
-      created: makeMe.aNoteRealm.please(),
-      parent: makeMe.aNoteRealm.please(),
-    }
+    const createNoteResult = makeMe.aNoteRealm.please()
     mockedCreateNote = mockSdkService("createNoteUnderParent", createNoteResult)
   })
 

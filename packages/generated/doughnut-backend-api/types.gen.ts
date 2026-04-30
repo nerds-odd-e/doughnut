@@ -324,11 +324,6 @@ export type NoteCreationDto = {
     description?: string;
 };
 
-export type NoteCreationResult = {
-    created: NoteRealm;
-    parent?: NoteRealm;
-};
-
 export type SpellingVerificationResult = {
     correct?: boolean;
 };
@@ -968,11 +963,6 @@ export type RecallPromptWritable = {
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
     spellingQuestion?: SpellingQuestion;
-};
-
-export type NoteCreationResultWritable = {
-    created: NoteRealmWritable;
-    parent?: NoteRealmWritable;
 };
 
 export type MemoryTrackerWritable = {
@@ -1720,7 +1710,7 @@ export type CreateNoteAfterResponses = {
     /**
      * OK
      */
-    200: NoteCreationResult;
+    200: NoteRealm;
 };
 
 export type CreateNoteAfterResponse = CreateNoteAfterResponses[keyof CreateNoteAfterResponses];
@@ -1738,7 +1728,7 @@ export type CreateNoteUnderParentResponses = {
     /**
      * OK
      */
-    200: NoteCreationResult;
+    200: NoteRealm;
 };
 
 export type CreateNoteUnderParentResponse = CreateNoteUnderParentResponses[keyof CreateNoteUnderParentResponses];
@@ -2044,7 +2034,7 @@ export type CreateNoteAtNotebookRootResponses = {
     /**
      * OK
      */
-    200: NoteCreationResult;
+    200: NoteRealm;
 };
 
 export type CreateNoteAtNotebookRootResponse = CreateNoteAtNotebookRootResponses[keyof CreateNoteAtNotebookRootResponses];
@@ -2258,7 +2248,7 @@ export type CreateNoteViaMcpResponses = {
     /**
      * OK
      */
-    200: NoteCreationResult;
+    200: NoteRealm;
 };
 
 export type CreateNoteViaMcpResponse = CreateNoteViaMcpResponses[keyof CreateNoteViaMcpResponses];
@@ -2692,7 +2682,7 @@ export type PromotePointToSiblingResponses = {
     /**
      * OK
      */
-    200: NoteCreationResult;
+    200: NoteRealm;
 };
 
 export type PromotePointToSiblingResponse = PromotePointToSiblingResponses[keyof PromotePointToSiblingResponses];
@@ -2710,7 +2700,7 @@ export type PromotePointToChildResponses = {
     /**
      * OK
      */
-    200: NoteCreationResult;
+    200: NoteRealm;
 };
 
 export type PromotePointToChildResponse = PromotePointToChildResponses[keyof PromotePointToChildResponses];

@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationResult;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
@@ -151,22 +151,25 @@ public class NoteConstructionService {
                     }));
   }
 
-  public NoteCreationResult createNoteWithWikidataService(
+  private BindException duplicateWikidataBinding(NoteCreationDTO noteCreation) {
+    BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
+    bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
+    return new BindException(bindingResult);
+  }
+
+  public NoteRealm createNoteWithWikidataService(
       Note parentNote, NoteCreationDTO noteCreation, User user, WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, BindException {
     try {
       Note note =
           createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
-      return new NoteCreationResult(
-          noteRealmService.build(note, user), noteRealmService.build(parentNote, user));
+      return noteRealmService.build(note, user);
     } catch (DuplicateWikidataIdException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
-      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
-      throw new BindException(bindingResult);
+      throw duplicateWikidataBinding(noteCreation);
     }
   }
 
-  public NoteCreationResult createRootNoteWithWikidataService(
+  public NoteRealm createRootNoteWithWikidataService(
       Notebook notebook,
       NoteCreationDTO noteCreation,
       User user,
@@ -175,42 +178,39 @@ public class NoteConstructionService {
     try {
       Note note =
           createRootNoteWithWikidataInfo(notebook, wikidataIdWithApi, noteCreation.getNewTitle());
-      return new NoteCreationResult(noteRealmService.build(note, user), null);
+      return noteRealmService.build(note, user);
     } catch (DuplicateWikidataIdException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
-      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
-      throw new BindException(bindingResult);
+      throw duplicateWikidataBinding(noteCreation);
     }
   }
 
   public Note createNoteAfter(
-      Note referenceNote,
-      NoteCreationDTO noteCreation,
-      User user,
-      WikidataIdWithApi wikidataIdWithApi)
+      Note referenceNote, NoteCreationDTO noteCreation, WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, BindException {
-    Note note =
-        createNoteWithWikidataService(
-                referenceNote.getParent(), noteCreation, user, wikidataIdWithApi)
-            .getCreated()
-            .getNote();
-    note.setSiblingOrderToInsertAfter(referenceNote);
-    note.adjustPositionAsAChildOfParentInMemory();
-    entityPersister.save(note);
-    return note;
+    try {
+      Note note =
+          createNoteWithWikidataInfo(
+              referenceNote.getParent(), wikidataIdWithApi, noteCreation.getNewTitle());
+      note.setSiblingOrderToInsertAfter(referenceNote);
+      note.adjustPositionAsAChildOfParentInMemory();
+      entityPersister.save(note);
+      return note;
+    } catch (DuplicateWikidataIdException e) {
+      throw duplicateWikidataBinding(noteCreation);
+    }
   }
 
-  public NoteCreationResult createNoteFromPromotedPointToChild(
+  public NoteRealm createNoteFromPromotedPointToChild(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
     return createNoteFromPromotedPoint(originalNote, originalNote.getId(), aiResult);
   }
 
-  public NoteCreationResult createNoteFromPromotedPointToSibling(
+  public NoteRealm createNoteFromPromotedPointToSibling(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
     return createNoteFromPromotedPoint(originalNote, originalNote.getParent().getId(), aiResult);
   }
 
-  private NoteCreationResult createNoteFromPromotedPoint(
+  private NoteRealm createNoteFromPromotedPoint(
       Note originalNote, Integer parentNoteId, PointExtractionResult aiResult)
       throws UnexpectedNoAccessRightException {
     User user = authorizationService.getCurrentUser();
@@ -225,7 +225,6 @@ public class NoteConstructionService {
     originalNote.setDetails(aiResult.updatedParentDetails);
     entityPersister.save(originalNote);
 
-    return new NoteCreationResult(
-        noteRealmService.build(newNote, user), noteRealmService.build(originalNote, user));
+    return noteRealmService.build(newNote, user);
   }
 }

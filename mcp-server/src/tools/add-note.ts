@@ -2,7 +2,6 @@ import { z } from 'zod'
 import type {
   NoteCreationDTO,
   McpNoteAddDTO,
-  CreateNoteViaMcpResponse,
 } from '@generated/doughnut-backend-api'
 import { McpNoteCreationController } from '@generated/doughnut-backend-api/sdk.gen'
 import { createTool } from './tool-builder.js'
@@ -66,19 +65,17 @@ Response Format:
       throw new Error(`API error: ${JSON.stringify(response.error)}`)
     }
 
-    const result = response.data as CreateNoteViaMcpResponse
+    const result = response.data
 
-    if (!(result && result.created && result.created.note)) {
+    if (!(result && result.note)) {
       throw new Error(
         `Failed to create note: API returned invalid response structure. Response: ${JSON.stringify(result)}`
       )
     }
 
     return jsonResponse({
-      title: result.created.note.noteTopology.title,
-      message: result.parent
-        ? `Added "${result.created.note.noteTopology.title}" to parent "${result.parent.note.noteTopology.title}"`
-        : `Added "${result.created.note.noteTopology.title}" at notebook root`,
+      title: result.note.noteTopology.title,
+      message: `Added "${result.note.noteTopology.title}" under "${parentTitle}"`,
     })
   } catch (error) {
     if (error instanceof Error) {

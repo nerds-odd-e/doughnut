@@ -52,7 +52,7 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
       makeMe.aNote("Lord of the Rings").creatorAndOwner(currentUser.getUser()).please();
 
       var result = controller.createNoteViaMcp(GeneratorMcpNoteAddDTO("Lord of the Rings"));
-      assertEquals("new note", result.getCreated().getNote().getTitle());
+      assertEquals("new note", result.getNote().getTitle());
     }
 
     @Test

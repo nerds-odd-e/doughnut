@@ -39,7 +39,7 @@ class NoteCreationController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  public NoteCreationResult createNoteUnderParent(
+  public NoteRealm createNoteUnderParent(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
@@ -53,7 +53,7 @@ class NoteCreationController {
 
   @PostMapping(value = "/{referenceNote}/create-after")
   @Transactional
-  public NoteCreationResult createNoteAfter(
+  public NoteRealm createNoteAfter(
       @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
@@ -62,15 +62,13 @@ class NoteCreationController {
       throw new UnexpectedNoAccessRightException();
     }
 
+    User user = authorizationService.getCurrentUser();
     Note note =
         noteConstructionService.createNoteAfter(
             referenceNote,
             noteCreation,
-            authorizationService.getCurrentUser(),
             wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
-    return new NoteCreationResult(
-        noteRealmService.build(note, authorizationService.getCurrentUser()),
-        noteRealmService.build(note.getParent(), authorizationService.getCurrentUser()));
+    return noteRealmService.build(note, user);
   }
 }

@@ -76,7 +76,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent =
           makeMe.aNote().title("ExplicitParent").creatorAndOwner(currentUser.getUser()).please();
-      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       Note created = noteRepository.findById(response.getId()).orElseThrow();
       assertThat(created.getFolder(), not(nullValue()));
       assertThat(created.getFolder().getName(), equalTo("ExplicitParent"));
@@ -92,13 +92,12 @@ class NoteCreationControllerTests extends ControllerTestBase {
       sectionDto.setNewTitle("Section");
       Note section =
           noteRepository
-              .findById(controller.createNoteUnderParent(bookRoot, sectionDto).getCreated().getId())
+              .findById(controller.createNoteUnderParent(bookRoot, sectionDto).getId())
               .orElseThrow();
       noteCreation.setNewTitle("Leaf");
       Note leaf =
           noteRepository
-              .findById(
-                  controller.createNoteUnderParent(section, noteCreation).getCreated().getId())
+              .findById(controller.createNoteUnderParent(section, noteCreation).getId())
               .orElseThrow();
       assertThat(leaf.getFolder(), not(nullValue()));
       assertThat(leaf.getFolder().getName(), equalTo("Section"));
@@ -111,7 +110,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent =
           makeMe.aNote().title("ExplicitParent").creatorAndOwner(currentUser.getUser()).please();
-      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       Note created = noteRepository.findById(response.getId()).orElseThrow();
       assertThat(created.getFolder().getSlug(), equalTo("explicitparent"));
       assertThat(created.getSlug(), equalTo("explicitparent/new-title"));
@@ -126,13 +125,12 @@ class NoteCreationControllerTests extends ControllerTestBase {
       sectionDto.setNewTitle("Section");
       Note section =
           noteRepository
-              .findById(controller.createNoteUnderParent(bookRoot, sectionDto).getCreated().getId())
+              .findById(controller.createNoteUnderParent(bookRoot, sectionDto).getId())
               .orElseThrow();
       noteCreation.setNewTitle("Leaf");
       Note leaf =
           noteRepository
-              .findById(
-                  controller.createNoteUnderParent(section, noteCreation).getCreated().getId())
+              .findById(controller.createNoteUnderParent(section, noteCreation).getId())
               .orElseThrow();
       assertThat(section.getFolder().getSlug(), equalTo("bookhead"));
       assertThat(leaf.getFolder().getSlug(), equalTo("bookhead/section"));
@@ -146,13 +144,13 @@ class NoteCreationControllerTests extends ControllerTestBase {
       noteCreation.setNewTitle("dup");
       Note n1 =
           noteRepository
-              .findById(controller.createNoteUnderParent(parent, noteCreation).getCreated().getId())
+              .findById(controller.createNoteUnderParent(parent, noteCreation).getId())
               .orElseThrow();
       assertThat(n1.getSlug(), equalTo("sharedparent/dup"));
       noteCreation.setNewTitle("dup");
       Note n2 =
           noteRepository
-              .findById(controller.createNoteUnderParent(parent, noteCreation).getCreated().getId())
+              .findById(controller.createNoteUnderParent(parent, noteCreation).getId())
               .orElseThrow();
       assertThat(n2.getSlug(), equalTo("sharedparent/dup-2"));
     }
@@ -162,9 +160,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent = makeMe.aNote().title("SharedParent").creatorAndOwner(currentUser.getUser()).please();
       noteCreation.setNewTitle("first child");
-      Integer id1 = controller.createNoteUnderParent(parent, noteCreation).getCreated().getId();
+      Integer id1 = controller.createNoteUnderParent(parent, noteCreation).getId();
       noteCreation.setNewTitle("second child");
-      Integer id2 = controller.createNoteUnderParent(parent, noteCreation).getCreated().getId();
+      Integer id2 = controller.createNoteUnderParent(parent, noteCreation).getId();
       Note n1 = noteRepository.findById(id1).orElseThrow();
       Note n2 = noteRepository.findById(id2).orElseThrow();
       assertThat(n1.getFolder().getId(), equalTo(n2.getFolder().getId()));
@@ -173,10 +171,11 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationResult nr = controller.createNoteUnderParent(parent, noteCreation);
-      assertThat(nr.getParent(), not(nullValue()));
-      NoteRealm response = nr.getCreated();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       assertThat(response.getId(), not(nullValue()));
+      assertThat(
+          noteRepository.findById(response.getId()).orElseThrow().getParent().getId(),
+          equalTo(parent.getId()));
     }
 
     @Test
@@ -194,14 +193,14 @@ class NoteCreationControllerTests extends ControllerTestBase {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
-      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       assertThat(response.getNote().getWikidataId(), equalTo("Q12345"));
     }
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+      NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       assertThat(response.getNote().getWikidataId(), equalTo(null));
     }
 
@@ -242,7 +241,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
               IOException {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
-        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
         assertThat(note.getNote().getDetails(), containsString("Location: " + lnglat));
       }
 
@@ -253,7 +252,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
               UnexpectedNoAccessRightException,
               IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
-        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
         assertThat(
             note.getNote().getDetails(), stringContainsInOrder("Location: center of the earth"));
       }
@@ -306,7 +305,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
         String description = note.getNote().getDetails();
         if (expectedBirthday != null) {
           assertThat(description, containsString(expectedBirthday));
@@ -326,7 +325,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         mockWikidataEntity("Q34660", "Canada");
         noteCreation.setWikidataId("Q8337");
         noteCreation.setNewTitle("Johnny boy");
-        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
 
         assertEquals("Johnny boy", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
@@ -352,7 +351,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
               IOException {
         mockWikidataWBGetEntity(
             "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
-        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
 
         assertEquals("Harry Potter", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
@@ -371,7 +370,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
                 .wikidataClaimsJson("Q8337")
                 .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
                 .please());
-        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
+        NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
 
         assertEquals(
             "The girl sat next to the window", note.getNote().getChildren().get(1).getTitle());
@@ -395,7 +394,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void shouldCreateNoteAfterReferenceNote()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
+      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation);
       assertThat(response.getId(), not(nullValue()));
       assertThat(response.getNote().getTitle(), equalTo("new note"));
     }
@@ -420,7 +419,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void shouldInsertNoteAfterReferenceNoteAndBeforeNextSibling()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
+      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation);
       Note createdNote = noteRepository.findById(response.getId()).get();
 
       // Get all siblings in order

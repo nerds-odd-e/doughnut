@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
@@ -196,7 +195,7 @@ class NotebookControllerTest extends ControllerTestBase {
   @Nested
   class CreateNoteAtNotebookRoot {
     @Test
-    void createsTopLevelNoteWithNullParentFolderAndResultParent()
+    void createsTopLevelNoteWithNullParentFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteCreationDTO createNb = new NoteCreationDTO();
       createNb.setNewTitle("Notebook WithoutIndex");
@@ -206,10 +205,9 @@ class NotebookControllerTest extends ControllerTestBase {
 
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Root One");
-      NoteCreationResult result = controller.createNoteAtNotebookRoot(nb, noteCreation);
+      NoteRealm result = controller.createNoteAtNotebookRoot(nb, noteCreation);
 
-      assertThat(result.getParent(), nullValue());
-      Note created = noteRepository.findById(result.getCreated().getId()).orElseThrow();
+      Note created = noteRepository.findById(result.getId()).orElseThrow();
       assertThat(created.getParent(), nullValue());
       assertThat(created.getFolder(), nullValue());
       assertThat(created.getNotebook().getId(), equalTo(nb.getId()));
@@ -247,11 +245,11 @@ class NotebookControllerTest extends ControllerTestBase {
 
       NoteCreationDTO r1 = new NoteCreationDTO();
       r1.setNewTitle("Root One");
-      Integer rootOneId = controller.createNoteAtNotebookRoot(nb, r1).getCreated().getId();
+      Integer rootOneId = controller.createNoteAtNotebookRoot(nb, r1).getId();
 
       NoteCreationDTO r2 = new NoteCreationDTO();
       r2.setNewTitle("Root Two");
-      Integer rootTwoId = controller.createNoteAtNotebookRoot(nb, r2).getCreated().getId();
+      Integer rootTwoId = controller.createNoteAtNotebookRoot(nb, r2).getId();
 
       Note rootOne = noteRepository.findById(rootOneId).orElseThrow();
       Folder childFolder = makeMe.aFolder().notebook(nb).name("Nested Holder").please();
@@ -284,7 +282,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
       NoteCreationDTO r1 = new NoteCreationDTO();
       r1.setNewTitle("Anchor");
-      Integer anchorId = controller.createNoteAtNotebookRoot(nb, r1).getCreated().getId();
+      Integer anchorId = controller.createNoteAtNotebookRoot(nb, r1).getId();
       Note anchor = noteRepository.findById(anchorId).orElseThrow();
       Note childInRootScope = makeMe.aNote("Child no folder").under(anchor).please();
 
@@ -308,8 +306,8 @@ class NotebookControllerTest extends ControllerTestBase {
       Folder f = makeMe.aFolder().notebook(nb).name("Away").please();
       NoteCreationDTO r1 = new NoteCreationDTO();
       r1.setNewTitle("In Folder");
-      NoteCreationResult created = controller.createNoteAtNotebookRoot(nb, r1);
-      Note inFolder = noteRepository.findById(created.getCreated().getId()).orElseThrow();
+      NoteRealm createdRoot = controller.createNoteAtNotebookRoot(nb, r1);
+      Note inFolder = noteRepository.findById(createdRoot.getId()).orElseThrow();
       inFolder.setFolder(f);
       noteRepository.save(inFolder);
 

@@ -838,7 +838,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -862,7 +862,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/verify-spelling:
     post:
       tags:
@@ -1234,7 +1234,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/notebooks/{notebook}/book/reorganize-layout/suggest:
     post:
       tags:
@@ -1477,7 +1477,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -1955,7 +1955,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/ai/promote-point-to-child/{note}:
     post:
       tags:
@@ -1979,7 +1979,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:
@@ -4082,15 +4082,6 @@ components:
           minLength: 0
       required:
       - newTitle
-    NoteCreationResult:
-      type: object
-      properties:
-        created:
-          $ref: "#/components/schemas/NoteRealm"
-        parent:
-          $ref: "#/components/schemas/NoteRealm"
-      required:
-      - created
     SpellingVerificationResult:
       type: object
       properties:

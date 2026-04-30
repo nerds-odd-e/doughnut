@@ -7,12 +7,13 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.NoteCreationResult;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.PointsRequestDTO;
 import com.odde.doughnut.controllers.dto.RemovePointsResponseDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.PointExtractionResult;
@@ -45,6 +46,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerTest extends ControllerTestBase {
   @Autowired AiController controller;
+  @Autowired NoteRepository noteRepository;
 
   Note note;
 
@@ -386,12 +388,12 @@ class AiControllerTest extends ControllerTestBase {
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
-      NoteCreationResult response = controller.promotePointToChild(testNote, requestDTO);
+      NoteRealm response = controller.promotePointToChild(testNote, requestDTO);
 
-      assertThat(response.getCreated().getNote().getTitle()).isEqualTo("Extracted Child Note");
-      assertThat(response.getCreated().getNote().getDetails())
+      assertThat(response.getNote().getTitle()).isEqualTo("Extracted Child Note");
+      assertThat(response.getNote().getDetails())
           .isEqualTo("Expanded details for the promoted point.");
-      assertThat(response.getParent().getNote().getDetails())
+      assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getDetails())
           .isEqualTo("Updated parent with summary.");
     }
 
@@ -454,12 +456,11 @@ class AiControllerTest extends ControllerTestBase {
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
-      NoteCreationResult response = controller.promotePointToSibling(testNote, requestDTO);
+      NoteRealm response = controller.promotePointToSibling(testNote, requestDTO);
 
-      assertThat(response.getCreated().getNote().getTitle()).isEqualTo("Extracted Sibling Note");
-      assertThat(response.getCreated().getNote().getDetails())
-          .isEqualTo("Expanded details for the sibling.");
-      assertThat(response.getParent().getNote().getDetails())
+      assertThat(response.getNote().getTitle()).isEqualTo("Extracted Sibling Note");
+      assertThat(response.getNote().getDetails()).isEqualTo("Expanded details for the sibling.");
+      assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getDetails())
           .isEqualTo("Updated parent with summary.");
     }
 

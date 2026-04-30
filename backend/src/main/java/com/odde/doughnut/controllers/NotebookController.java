@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookRootFolder;
@@ -133,7 +132,7 @@ class NotebookController {
 
   @PostMapping(value = "/{notebook}/create-note")
   @Transactional
-  public NoteCreationResult createNoteAtNotebookRoot(
+  public NoteRealm createNoteAtNotebookRoot(
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
