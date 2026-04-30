@@ -9,10 +9,9 @@ Feature: Understanding Check
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Sample tree" with a note "Parent" and details ""
-    And there are some notes:
-      | Title | Parent Title | Details     |
-      | Sample | Parent      | A. B. C. D. E. |
+    And I have a notebook "Sample tree" with a note "Parent" and notes:
+      | Title  | Parent Title | Folder | Details        |
+      | Sample | Parent       | Parent | A. B. C. D. E. |
     And OpenAI generates understanding checklist with points:
       | A |
       | B |
