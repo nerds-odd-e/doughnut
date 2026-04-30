@@ -5,7 +5,7 @@ Feature: Notebook creation
 
   Scenario: Create notebook with description
     When I create a notebook with title "Sedation Wiki" and description "Quick reference for sedation protocols"
-    Then I should see these notes belonging to the user at the top level of all my notes
+    Then I should see my notebooks:
       | Title          | Description                                |
       | Sedation Wiki  | Quick reference for sedation protocols     |
 

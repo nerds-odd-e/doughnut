@@ -10,7 +10,7 @@ Feature: Notebook deletion
   Scenario: Delete a notebook and undo
     Given I assimilate the note "LeSS in Action" via more options
     When I delete notebook "LeSS in Action"
-    Then I should not see note "LeSS in Action" at the top level of all my notes
+    Then I should not see "LeSS in Action" in my notebooks
     When I undo delete note to recover note "LeSS in Action"
     Then the deleted notebook with title "LeSS in Action" should be restored
     And there should be no more undo to do

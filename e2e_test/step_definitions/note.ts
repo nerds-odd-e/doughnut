@@ -300,12 +300,9 @@ When('I visit all my notebooks', () => {
   start.navigateToNotebooksPage()
 })
 
-Then(
-  'I should see these notes belonging to the user at the top level of all my notes',
-  (data: DataTable) => {
-    start.navigateToNotebooksPage().expectNotebookCards(data.hashes())
-  }
-)
+Then('I should see my notebooks:', (data: DataTable) => {
+  start.navigateToNotebooksPage().expectNotebookCards(data.hashes())
+})
 
 Then(
   'I should see {notepath} with these children',
@@ -347,19 +344,9 @@ Then(
   }
 )
 
-Then(
-  'I should not see note {string} at the top level of all my notes',
-  (noteTopology: string) => {
-    start.navigateToNotebooksPage().expectNotebookNotToExist(noteTopology)
-  }
-)
-
-Then(
-  'I should see note {string} at the top level of all my notes',
-  (noteTopology: string) => {
-    start.navigateToNotebooksPage().expectNotebookToExist(noteTopology)
-  }
-)
+Then('I should not see {string} in my notebooks', (noteTopology: string) => {
+  start.navigateToNotebooksPage().expectNotebookNotToExist(noteTopology)
+})
 
 When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
