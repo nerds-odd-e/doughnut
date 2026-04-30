@@ -253,15 +253,6 @@ When(
       .addingChildNote()
       .createNoteWithTitle(title)
     start.assumeNotePage(title)
-    cy.url().then((url) => {
-      const match = url.match(/\/n(\d+)/)
-      if (match) {
-        cy.task('setTestState', {
-          key: `createdNoteId_${title}`,
-          value: parseInt(match[1]!),
-        })
-      }
-    })
   }
 )
 
@@ -351,16 +342,7 @@ When('I should see that the note creation is not successful', () => {
 Then(
   'I should see the note {string} is marked as deleted',
   (noteTopology: string) => {
-    cy.task<string | number | undefined>(
-      'getTestState',
-      `createdNoteId_${noteTopology}`
-    ).then((noteId) => {
-      if (noteId) {
-        start.jumpToNotePageById(noteId as number)
-      } else {
-        start.jumpToNotePage(noteTopology)
-      }
-    })
+    start.jumpToNotePage(noteTopology)
     cy.findByText('This note has been deleted')
   }
 )
