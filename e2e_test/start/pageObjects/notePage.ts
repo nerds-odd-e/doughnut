@@ -144,7 +144,8 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.findByText(count, { selector: '[role=collapsed-children-count]' })
     },
     findNoteDetails: (expected: string, timeout?: number) => {
-      const lines = expected.split('\n').filter((line) => line.length > 0)
+      const normalized = expected.replace(/\\n/g, '\n')
+      const lines = normalized.split('\n').filter((line) => line.length > 0)
       cy.get('[role=details]', timeout ? { timeout } : {}).should(($el) => {
         const text = $el.text()
         for (const line of lines) {

@@ -268,7 +268,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public void prependDescription(String addition) {
     String prevDesc = getDetails() != null ? getDetails() : "";
-    String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
+    String desc = prevDesc.isEmpty() ? addition : addition + "\n\n" + prevDesc;
     setDetails(desc);
   }
 

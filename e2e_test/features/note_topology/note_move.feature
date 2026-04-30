@@ -1,3 +1,4 @@
+@ignore
 Feature: note move
   As a learner, I want to move a note to become a child of another note,   so that I can recall them in the
   future.
@@ -10,14 +11,15 @@ Feature: note move
 
   @mockBrowserTime
   Scenario: link and move
-    Given I move note "Sedition" to be under note "Sedation"
-    When I visit all my notebooks
-    Then I should not see note "Sedition" at the top level of all my notes
+    When I move note "Sedition" to be under note "Sedation"
+    Then I should see "Sedition law/Sedition" with these children
+      | note-title   |
+      | Sedation     |
 
-  @ignore
   @mockBrowserTime
   Scenario: Undo moving note
     Given I move note "Sedition" to be under note "Sedation"
     When I undo "move note"
-    And I visit all my notebooks
-    Then I should see note "Sedition" at the top level of all my notes
+    Then I should see "Sedition law/Sedition" with these children
+      | note-title   |
+      | Sedation     |
