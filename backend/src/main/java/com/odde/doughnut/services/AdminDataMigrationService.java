@@ -10,9 +10,11 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +22,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminDataMigrationService {
 
   public static final String READY_MESSAGE =
-      "Wiki data migration: relationship wiki backfill (title, details, cache), then batched note"
-          + " slug regeneration.";
+      "Wiki data migration: relationship wiki backfill (title, details, cache), legacy parent"
+          + " frontmatter and cache on child notes, then batched note slug regeneration.";
 
   public static final String STEP_RELATIONSHIP_WIKI_BACKFILL = "relationship_wiki_backfill";
+  public static final String STEP_LEGACY_PARENT_FRONTMATTER = "legacy_parent_frontmatter";
   public static final String STEP_NOTE_SLUG_PATH_REGENERATION = "note_slug_path_regeneration";
 
-  /** Max notes processed per HTTP request for relationship wiki backfill or slug regeneration. */
+  private static final List<String> WIKI_REFERENCE_MIGRATION_STEPS =
+      List.of(
+          STEP_RELATIONSHIP_WIKI_BACKFILL,
+          STEP_LEGACY_PARENT_FRONTMATTER,
+          STEP_NOTE_SLUG_PATH_REGENERATION);
+
+  /** Max notes processed per HTTP request for each wiki reference migration step. */
   public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 50;
 
   private final NoteRepository noteRepository;
@@ -34,18 +43,21 @@ public class AdminDataMigrationService {
   private final EntityPersister entityPersister;
   private final WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final JdbcTemplate jdbcTemplate;
 
   public AdminDataMigrationService(
       NoteRepository noteRepository,
       WikiSlugPathService wikiSlugPathService,
       EntityPersister entityPersister,
       WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      JdbcTemplate jdbcTemplate) {
     this.noteRepository = noteRepository;
     this.wikiSlugPathService = wikiSlugPathService;
     this.entityPersister = entityPersister;
     this.wikiReferenceMigrationProgressService = wikiReferenceMigrationProgressService;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.jdbcTemplate = jdbcTemplate;
   }
 
   public AdminDataMigrationStatusDTO getStatus() {
@@ -70,6 +82,9 @@ public class AdminDataMigrationService {
     }
     if (!stepCompleted(STEP_RELATIONSHIP_WIKI_BACKFILL)) {
       return runRelationshipWikiBackfillBatch(adminUser);
+    }
+    if (!stepCompleted(STEP_LEGACY_PARENT_FRONTMATTER)) {
+      return runLegacyParentFrontmatterBatch(adminUser);
     }
     return runSlugRegenerationBatch();
   }
@@ -145,6 +160,57 @@ public class AdminDataMigrationService {
    * Wiki link resolution uses notebook read access; use notebook owner or a circle member when
    * present, otherwise the admin running the migration.
    */
+  private AdminDataMigrationStatusDTO runLegacyParentFrontmatterBatch(User adminUser) {
+    String step = STEP_LEGACY_PARENT_FRONTMATTER;
+    try {
+      entityPersister.flush();
+      List<Integer> orderedIds = legacyChildNoteIdsOrderedForMigration();
+      wikiReferenceMigrationProgressService.startOrResume(step, orderedIds.size());
+      List<Integer> pending =
+          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
+      if (pending.isEmpty()) {
+        wikiReferenceMigrationProgressService.markCompleted(step);
+        AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
+        dto.setMessage("Legacy parent frontmatter: nothing pending.");
+        populateMigrationProgress(dto);
+        return dto;
+      }
+      int take = Math.min(WIKI_REFERENCE_MIGRATION_BATCH_SIZE, pending.size());
+      List<Integer> batch = pending.subList(0, take);
+      for (Integer id : batch) {
+        Note note = noteRepository.findById(id).orElseThrow();
+        Note parent = note.getParent();
+        String parentTitle = parent != null ? parent.getTitle() : null;
+        String merged =
+            LegacyParentWikiFrontmatterMerge.mergeParentWikiLink(note.getDetails(), parentTitle);
+        if (!Objects.equals(merged, note.getDetails())) {
+          note.setDetails(merged);
+        }
+        entityPersister.merge(note);
+      }
+      entityPersister.flush();
+      for (Integer id : batch) {
+        Note note = noteRepository.findById(id).orElseThrow();
+        wikiTitleCacheService.refreshForNote(note, viewerForWikiTitleCacheRefresh(note, adminUser));
+      }
+      int lastId = batch.get(batch.size() - 1);
+      wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batch.size());
+      List<Integer> stillPending =
+          wikiReferenceMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
+      if (stillPending.isEmpty()) {
+        wikiReferenceMigrationProgressService.markCompleted(step);
+      }
+      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
+      dto.setMessage(
+          "Legacy parent frontmatter: processed %d note(s) in this batch.".formatted(batch.size()));
+      populateMigrationProgress(dto);
+      return dto;
+    } catch (RuntimeException e) {
+      wikiReferenceMigrationProgressService.markFailed(step, e.getMessage());
+      return dtoAfterFailure(step, e.getMessage());
+    }
+  }
+
   private static User viewerForWikiTitleCacheRefresh(Note relationshipNote, User adminUser) {
     Ownership ownership = relationshipNote.getNotebook().getOwnership();
     if (ownership.getUser() != null) {
@@ -215,7 +281,7 @@ public class AdminDataMigrationService {
 
   private void populateMigrationProgress(AdminDataMigrationStatusDTO dto) {
     Optional<WikiReferenceMigrationProgress> failed =
-        List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_NOTE_SLUG_PATH_REGENERATION).stream()
+        WIKI_REFERENCE_MIGRATION_STEPS.stream()
             .flatMap(s -> wikiReferenceMigrationProgressService.find(s).stream())
             .filter(p -> p.getStatus() == WikiReferenceMigrationStepStatus.FAILED)
             .findFirst();
@@ -252,6 +318,9 @@ public class AdminDataMigrationService {
     if (STEP_RELATIONSHIP_WIKI_BACKFILL.equals(activeStep)) {
       return noteRepository.findRelationshipNotesForWikiReferenceMigrationOrderByIdAsc().size();
     }
+    if (STEP_LEGACY_PARENT_FRONTMATTER.equals(activeStep)) {
+      return legacyChildNoteIdsOrderedForMigration().size();
+    }
     return noteRepository.findAllNonDeletedNotesOrderByIdAsc().size();
   }
 
@@ -265,7 +334,7 @@ public class AdminDataMigrationService {
   }
 
   private int aggregateProcessedWhenComplete() {
-    return List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_NOTE_SLUG_PATH_REGENERATION).stream()
+    return WIKI_REFERENCE_MIGRATION_STEPS.stream()
         .mapToInt(
             s ->
                 wikiReferenceMigrationProgressService
@@ -276,7 +345,7 @@ public class AdminDataMigrationService {
   }
 
   private int aggregateTotalWhenComplete() {
-    return List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_NOTE_SLUG_PATH_REGENERATION).stream()
+    return WIKI_REFERENCE_MIGRATION_STEPS.stream()
         .mapToInt(
             s ->
                 wikiReferenceMigrationProgressService
@@ -287,15 +356,16 @@ public class AdminDataMigrationService {
   }
 
   private String activeIncompleteStepName() {
-    if (!stepCompleted(STEP_RELATIONSHIP_WIKI_BACKFILL)) {
-      return STEP_RELATIONSHIP_WIKI_BACKFILL;
+    for (String step : WIKI_REFERENCE_MIGRATION_STEPS) {
+      if (!stepCompleted(step)) {
+        return step;
+      }
     }
-    return STEP_NOTE_SLUG_PATH_REGENERATION;
+    throw new IllegalStateException("No incomplete wiki reference migration step");
   }
 
   private boolean migrationFullyComplete() {
-    return stepCompleted(STEP_RELATIONSHIP_WIKI_BACKFILL)
-        && stepCompleted(STEP_NOTE_SLUG_PATH_REGENERATION);
+    return WIKI_REFERENCE_MIGRATION_STEPS.stream().allMatch(this::stepCompleted);
   }
 
   private boolean stepCompleted(String stepName) {
@@ -305,8 +375,15 @@ public class AdminDataMigrationService {
         .orElse(false);
   }
 
+  private List<Integer> legacyChildNoteIdsOrderedForMigration() {
+    return jdbcTemplate.query(
+        "SELECT id FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
+            + "AND target_note_id IS NULL ORDER BY id ASC",
+        (rs, rowNum) -> rs.getInt(1));
+  }
+
   private Optional<String> findFailedStepName() {
-    for (String s : List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_NOTE_SLUG_PATH_REGENERATION)) {
+    for (String s : WIKI_REFERENCE_MIGRATION_STEPS) {
       if (wikiReferenceMigrationProgressService
           .find(s)
           .map(p -> p.getStatus() == WikiReferenceMigrationStepStatus.FAILED)

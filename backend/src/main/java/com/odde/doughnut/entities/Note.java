@@ -125,7 +125,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Note targetNote;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
@@ -217,7 +217,13 @@ public class Note extends EntityIdentifiedByIdOnly {
   public void setParentNote(Note parentNote) {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
+    if (this.parent != null) {
+      this.parent.children.removeIf(c -> c == this);
+    }
     this.parent = parentNote;
+    if (parentNote.children.stream().noneMatch(c -> c == this)) {
+      parentNote.children.add(this);
+    }
     // Update notebook for all descendants including relationships
     getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
   }

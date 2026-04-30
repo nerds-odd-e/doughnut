@@ -1,9 +1,11 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -113,6 +115,113 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
+  void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
+    User owner = makeMe.aUser().please();
+    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note child = makeMe.aNote().title("Child").under(parent).please();
+    child.setDetails("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
+    makeMe.entityPersister.merge(child);
+    makeMe.entityPersister.flush();
+
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
+  }
+
+  @Test
+  void wikiLinkResolver_findsPlainWikiLinkInBody() {
+    User owner = makeMe.aUser().please();
+    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note child = makeMe.aNote().title("Child").under(parent).details("See [[Alpha]]").please();
+    makeMe.entityPersister.flush();
+    makeMe.entityPersister.refresh(parent);
+
+    assertThat(parent.getChildren().size(), equalTo(1));
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
+  }
+
+  @Autowired WikiLinkResolver wikiLinkResolver;
+
+  @Test
+  void runBatch_addsParentFrontmatterAndWikiTitleCacheForOrdinaryChild() {
+    Note parent = makeMe.aNote().title("Alpha").please();
+    Note child = makeMe.aNote().title("Child").under(parent).details("Body line.").please();
+
+    runWikiReferenceMigrationToCompletion();
+
+    Note updated = makeMe.entityPersister.find(Note.class, child.getId());
+    assertThat(updated.getDetails(), containsString("parent: \"[[Alpha]]\""));
+    assertThat(updated.getDetails(), containsString("Body line."));
+    var rows = noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(child.getId());
+    assertThat(rows, not(empty()));
+    assertThat(rows.stream().map(r -> r.getLinkText()).toList(), hasItem(equalTo("Alpha")));
+    assertThat(
+        rows.stream()
+            .filter(r -> r.getLinkText().equals("Alpha"))
+            .findFirst()
+            .orElseThrow()
+            .getTargetNote()
+            .getId(),
+        equalTo(parent.getId()));
+  }
+
+  @Test
+  void runBatch_mergesParentIntoExistingFrontmatterWithoutRemovingOtherKeys() {
+    Note parent = makeMe.aNote().title("P").please();
+    Note child = makeMe.aNote().under(parent).details("---\nfoo: bar\n---\n\nBody").please();
+
+    runWikiReferenceMigrationToCompletion();
+
+    Note updated = makeMe.entityPersister.find(Note.class, child.getId());
+    assertThat(updated.getDetails(), containsString("foo: bar"));
+    assertThat(updated.getDetails(), containsString("parent: \"[[P]]\""));
+    assertThat(updated.getDetails(), containsString("Body"));
+  }
+
+  @Test
+  void runBatch_legacyParentFrontmatterRunsInBatchedChunks() {
+    User owner = makeMe.aUser().please();
+    Note root = makeMe.aNote().title("Root").creatorAndOwner(owner).please();
+    int extra = AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE;
+    for (int i = 0; i < extra + 1; i++) {
+      makeMe.aNote().title("Leaf" + i).withNoDescription().under(root).please();
+    }
+    makeMe.entityPersister.flush();
+
+    AdminDataMigrationStatusDTO rel = adminDataMigrationService.runBatch(admin());
+    assertThat(rel.getMessage(), containsString("Relationship wiki backfill"));
+    assertThat(rel.getMessage(), containsString("nothing pending"));
+
+    AdminDataMigrationStatusDTO leg1 = adminDataMigrationService.runBatch(admin());
+    assertThat(leg1.getMessage(), containsString("Legacy parent frontmatter"));
+    assertThat(
+        leg1.getProcessedCount(),
+        equalTo(AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
+
+    AdminDataMigrationStatusDTO leg2 = adminDataMigrationService.runBatch(admin());
+    assertThat(leg2.getMessage(), containsString("Legacy parent frontmatter"));
+    assertThat(leg2.getMessage(), containsString("1 note"));
+
+    AdminDataMigrationStatusDTO slug1 = adminDataMigrationService.runBatch(admin());
+    assertThat(
+        slug1.getCurrentStepName(),
+        equalTo(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION));
+    assertThat(
+        slug1.getProcessedCount(),
+        equalTo(AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
+
+    AdminDataMigrationStatusDTO slug2 = adminDataMigrationService.runBatch(admin());
+    assertThat(slug2.isWikiReferenceMigrationComplete(), is(true));
+    assertThat(slug2.getMessage(), containsString("Slug regeneration"));
+  }
+
+  @Test
+  void newChildNoteDetailsDoNotIncludeParentFrontmatterBeforeMigration() {
+    Note parent = makeMe.aNote().title("Root").please();
+    Note child = makeMe.aNote().title("Fresh").withNoDescription().under(parent).please();
+
+    assertThat(child.getDetails(), not(containsString("parent:")));
+  }
+
+  @Test
   void runBatch_populatesWikiTitleCacheForRelationshipNotes() {
     User owner = makeMe.aUser().please();
     Note root = makeMe.aNote().title("Root").creatorAndOwner(owner).please();
@@ -169,6 +278,14 @@ class AdminDataMigrationServiceTest {
     AdminDataMigrationStatusDTO first = adminDataMigrationService.runBatch(admin());
     assertThat(first.getMessage(), containsString("Relationship wiki backfill"));
     assertThat(first.getMessage(), containsString("nothing pending"));
+
+    AdminDataMigrationStatusDTO legacy = adminDataMigrationService.runBatch(admin());
+    assertThat(legacy.getMessage(), containsString("Legacy parent frontmatter"));
+    assertThat(
+        legacy.getCurrentStepName(),
+        anyOf(
+            equalTo(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER),
+            equalTo(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION)));
 
     AdminDataMigrationStatusDTO slugFirst = adminDataMigrationService.runBatch(admin());
     assertThat(
