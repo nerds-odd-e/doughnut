@@ -33,7 +33,7 @@ const componentMap: Record<string, unknown> = {
   notebooks: NotebooksPage,
   notebookGroup: NotebookGroupPage,
   noteShowByAmbiguousSlug: NoteShowPage,
-  noteShowByNotebookSlug: NoteShowPage,
+  noteShow: NoteShowPage,
   circleShow: CircleShowPage,
   bazaar: BazaarPage,
   assessmentAndCertificateHistory: AssessmentAndCertificateHistoryPage,

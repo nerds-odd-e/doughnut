@@ -52,7 +52,7 @@ describe("NoteToolbar", () => {
     await flushPromises()
 
     expect(pushSpy).toHaveBeenCalledWith({
-      name: "noteShowByNotebookSlug",
+      name: "noteShow",
       params: {
         notebookId: String(noteRealm.note.noteTopology.notebookId),
         noteSlugPath: noteRealm.note.noteTopology.slug,

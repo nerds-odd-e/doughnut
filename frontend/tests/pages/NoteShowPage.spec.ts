@@ -145,7 +145,7 @@ describe("all in note show page", () => {
       await flushPromises()
 
       await router.push({
-        name: "noteShowByNotebookSlug",
+        name: "noteShow",
         params: {
           notebookId: String(note.notebookId),
           noteSlugPath: note.slug,
@@ -176,7 +176,7 @@ describe("all in note show page", () => {
       await flushPromises()
 
       await router.push({
-        name: "noteShowByNotebookSlug",
+        name: "noteShow",
         params: {
           notebookId: String(note.notebookId),
           noteSlugPath: note.slug,
@@ -191,7 +191,7 @@ describe("all in note show page", () => {
       await wrapper.find('[aria-label="Close dialog"]').trigger("click")
       await flushPromises()
 
-      expect(router.currentRoute.value.name).toBe("noteShowByNotebookSlug")
+      expect(router.currentRoute.value.name).toBe("noteShow")
       expect(router.currentRoute.value.params.notebookId).toBe(
         String(note.notebookId)
       )
@@ -203,7 +203,7 @@ describe("all in note show page", () => {
 
     it("should open conversation when URL has conversation=true", async () => {
       router.push({
-        name: "noteShowByNotebookSlug",
+        name: "noteShow",
         params: {
           notebookId: String(note.notebookId),
           noteSlugPath: note.slug,

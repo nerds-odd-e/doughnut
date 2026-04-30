@@ -41,7 +41,7 @@ describe("note title", () => {
       const link = links[0]!
       expect(link.exists()).toBe(true)
       expect(JSON.parse(link.attributes("to")!)).toMatchObject({
-        name: "noteShowByNotebookSlug",
+        name: "noteShow",
         params: {
           notebookId: String(target.noteTopology.notebookId),
           noteSlugPath: target.noteTopology.slug,

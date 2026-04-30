@@ -77,7 +77,7 @@ describe("AssimilateSingleNotePage", () => {
 
       await flushPromises()
 
-      expect(router.currentRoute.value.name).toBe("noteShowByNotebookSlug")
+      expect(router.currentRoute.value.name).toBe("noteShow")
       expect(router.currentRoute.value.params.notebookId).toBe(
         String(noteRealm.note.noteTopology.notebookId)
       )

@@ -42,7 +42,7 @@ export const routeMetadata: RouteMetadata[] = [
   },
   {
     path: "/d/notebooks/:notebookId(\\d+)/notes/:noteSlugPath(.*)",
-    name: "noteShowByNotebookSlug",
+    name: "noteShow",
     props: (route: RouteLocation) => {
       const raw = route.params.noteSlugPath
       const pathStr =

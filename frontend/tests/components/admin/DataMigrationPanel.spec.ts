@@ -28,7 +28,7 @@ describe("DataMigrationPanel", () => {
 
     expect(getSpy).toHaveBeenCalled()
     expect(wrapper.text()).toContain("stub message")
-    expect(wrapper.text()).toContain("Admin data migrations")
+    expect(wrapper.text()).toContain("server-side wiki data backfills")
   })
 
   it("clicking Run migration calls runDataMigrationBatch and updates summary", async () => {

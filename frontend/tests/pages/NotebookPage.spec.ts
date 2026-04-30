@@ -67,7 +67,7 @@ describe("NotebookPage.spec", () => {
     expect(toAttr).toBeTruthy()
     expect(JSON.parse(toAttr!)).toEqual(
       expect.objectContaining({
-        name: "noteShowByNotebookSlug",
+        name: "noteShow",
         params: expect.objectContaining({
           notebookId: String(notebook.id),
           noteSlugPath: "index",

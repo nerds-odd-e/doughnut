@@ -55,16 +55,16 @@ describe("routes", () => {
     })
   })
 
-  describe("noteShowByNotebookSlug route", () => {
+  describe("noteShow route", () => {
     it("should match path with multi-segment note slug and pass props", async () => {
       await router.push("/d/notebooks/42/notes/journal/2025/daily")
 
       const route = router.currentRoute.value
-      expect(route.name).toBe("noteShowByNotebookSlug")
+      expect(route.name).toBe("noteShow")
       expect(route.params.notebookId).toBe("42")
       expect(route.params.noteSlugPath).toBe("journal/2025/daily")
 
-      const meta = routes.find((r) => r.name === "noteShowByNotebookSlug")
+      const meta = routes.find((r) => r.name === "noteShow")
       expect(meta).toBeDefined()
       if (meta && typeof meta.props === "function") {
         expect(meta.props(route)).toEqual({
@@ -75,7 +75,7 @@ describe("routes", () => {
     })
     it("should navigate by name with multi-segment noteSlugPath params", async () => {
       await router.push({
-        name: "noteShowByNotebookSlug",
+        name: "noteShow",
         params: {
           notebookId: "42",
           noteSlugPath: "journal/2025/daily",
@@ -83,10 +83,10 @@ describe("routes", () => {
       })
 
       const route = router.currentRoute.value
-      expect(route.name).toBe("noteShowByNotebookSlug")
+      expect(route.name).toBe("noteShow")
       expect(route.params.notebookId).toBe("42")
       expect(route.params.noteSlugPath).toBe("journal/2025/daily")
-      const meta = routes.find((r) => r.name === "noteShowByNotebookSlug")
+      const meta = routes.find((r) => r.name === "noteShow")
       expect(meta).toBeDefined()
       if (meta && typeof meta.props === "function") {
         expect(meta.props(route)).toEqual({

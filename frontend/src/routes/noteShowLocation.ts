@@ -6,7 +6,7 @@ export function noteShowByNotebookSlugLocation(
   noteSlugPath: string
 ): RouteLocationNamedRaw {
   return {
-    name: "noteShowByNotebookSlug",
+    name: "noteShow",
     params: {
       notebookId: String(notebookId),
       noteSlugPath,
@@ -14,7 +14,7 @@ export function noteShowByNotebookSlugLocation(
   }
 }
 
-/** Plain path for wiki links in HTML (matches `noteShowByNotebookSlug`). */
+/** Plain path for wiki links in HTML (matches `noteShow`). */
 export function noteShowByNotebookSlugHref(
   notebookId: number,
   noteSlugPath: string

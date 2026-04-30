@@ -34,7 +34,7 @@ export function useNavigationItems() {
           "notebooks",
           "notebookGroup",
           "noteShowByAmbiguousSlug",
-          "noteShowByNotebookSlug",
+          "noteShow",
           "notebookPage",
         ].includes(route.name as string),
       },
