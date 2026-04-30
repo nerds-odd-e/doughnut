@@ -5,10 +5,7 @@
   >
     <slot name="cardHeader" />
       <div class="daisy-card-body daisy-p-4">
-    <router-link
-      :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
-      class="daisy-no-underline"
-    >
+    <router-link :to="noteShowLocation" class="daisy-no-underline">
         <h5 class="daisy-card-title">
           <NoteTitleWithLink v-bind="{ noteTopology }" />
         </h5>
@@ -25,13 +22,19 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
+import { computed } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
+import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 
-defineProps({
+const props = defineProps({
   noteTopology: {
     type: Object as PropType<NoteTopology>,
     required: true,
   },
 })
+
+const noteShowLocation = computed(() =>
+  noteShowByNotebookSlugLocationFromNoteTopology(props.noteTopology)
+)
 </script>

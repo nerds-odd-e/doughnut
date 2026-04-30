@@ -139,6 +139,8 @@ Note
   updatedAt
 ```
 
+Listing and card surfaces use **title** and **slug** path; there is no separate derived **short-details** (or similar) field on topology or wire DTOs—the body is **content** only.
+
 Note properties are represented as leading YAML frontmatter in the note's Markdown content. The Markdown content is the portable source of truth; rich editing surfaces may parse the frontmatter and show it as editable property rows, then serialize changes back into the same leading frontmatter block. The backend does not need a separate property bag to preserve properties, though later indexing or import workflows may derive selected fields from frontmatter when there is a product need.
 
 After the relationship-note migration, **`title`** is required for every note: it cannot be null or empty. Legacy title-less notes are migration input only and must be backfilled before the parent-note model is removed.

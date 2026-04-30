@@ -302,7 +302,7 @@ After this phase:
 
 This phase does not need to:
 
-- remove the note parent field from schema or APIs (that is a later phase, after folders own placement)
+- remove the note parent field from schema or APIs (that is **Phase 7**, after folders own placement in product behavior — see **Phase 6**)
 - convert relationship notes
 - parse all wiki links
 - support Obsidian import/export
@@ -449,7 +449,7 @@ Edits in either surface update the same leading frontmatter block and must round
 
 ## Rationale
 
-The north-star architecture treats notes as Markdown-like units that may carry **frontmatter** (`ongoing/doughnut_wiki_architecture_north_star.md`). Keeping metadata in the Markdown details instead of ad hoc columns supports Obsidian-style Markdown, export/import, and later phases that put structured fields in content (for example relationship notes in **Phase 5** and note export in **Phase 10**).
+The north-star architecture treats notes as Markdown-like units that may carry **frontmatter** (`ongoing/doughnut_wiki_architecture_north_star.md`). Keeping metadata in the Markdown details instead of ad hoc columns supports Obsidian-style Markdown, export/import, and later phases that put structured fields in content (for example relationship notes in **Phase 5** and note export in **Phase 11**).
 
 ## Observable behavior
 
@@ -475,9 +475,9 @@ The north-star architecture treats notes as Markdown-like units that may carry *
 This phase does not need to:
 
 - convert relationship notes into normal notes (**Phase 5**)
-- remove the note parent field (**Phase 6**)
-- parse wiki links in body content (**Phase 8**)
-- add folder-level `defaultProperties` or folder templates (**Phase 9**)
+- remove the note parent field (**Phase 7**)
+- parse wiki links in body content (**Phase 9**)
+- add folder-level `defaultProperties` or folder templates (**Phase 10**)
 - deliver full Obsidian export/import semantics for every conceivable frontmatter key (later phases build on persisted frontmatter)
 
 ## Expected Result
@@ -500,7 +500,7 @@ Phase 4 is **complete** in the codebase.
 
 ## Deferred / follow-up
 
-- **Obsidian export and user-authored frontmatter:** Export behavior was not changed as part of Phase 4. [`ObsidianFormatService`](backend/src/main/java/com/odde/doughnut/services/ObsidianFormatService.java) currently emits exporter-owned YAML plus a `# title` line and appends raw `details`; reconciling that with user-authored leading YAML in `details` so exported files are coherent belongs in **Phase 10 — Export to Obsidian Markdown** (see the follow-up note there).
+- **Obsidian export and user-authored frontmatter:** Export behavior was not changed as part of Phase 4. [`ObsidianFormatService`](backend/src/main/java/com/odde/doughnut/services/ObsidianFormatService.java) currently emits exporter-owned YAML plus a `# title` line and appends raw `details`; reconciling that with user-authored leading YAML in `details` so exported files are coherent belongs in **Phase 11 — Export to Obsidian Markdown** (see the follow-up note there).
 
 ---
 
@@ -510,7 +510,7 @@ Phase 4 is **complete** in the codebase.
 
 Convert special structured relationship notes into ordinary Markdown-like notes.
 
-Relationship notes today depend on the **parent** pointer for structure; this phase runs **before** removing the note parent (Phase 6) so migration can read that structure reliably.
+Relationship notes today depend on the **parent** pointer for structure; this phase runs **before** folder-first containment UX (**Phase 6**) and **before** removing the note parent from schema (**Phase 7**) so migration can read that structure reliably.
 
 ## Current Relationship Note
 
@@ -583,11 +583,51 @@ After this phase:
 
 ---
 
-# Phase 6 — Remove Note Parent (Folders Replace Containment)
+# Phase 6 — Folder-First Child Listing; Remove Note Short Details
 
 ## Goal
 
-**Remove the note parent concept** from the model after containment has been migrated into folders and relationship notes no longer depend on it (Phase 5). The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
+Present **structural containment** through **folders** instead of **note-attached children**: primary navigation and listing APIs treat notes as members of a **folder** (or notebook root), not as a **children** collection hanging off a parent note. Remove **`shortDetails`** (the derived truncation of note body/details on **`NoteTopology`**) from wire shapes and UI so notes align with the north-star **title + Markdown content** surface—without a parallel summary field on topology DTOs.
+
+## Rationale
+
+Phase 1 already persists **`folderId`** parallel to **`Note.parent`** and keeps folders aligned on create/move. Users still experience much of the old tree through parent-child navigation and cards until this phase. **`ongoing/doughnut_wiki_architecture_north_star.md`** assigns **folder** as the only structural container; cards and sidebars should not anchor containment on “this note’s children.”
+
+**Short details** are a legacy preview derived from HTML/Markdown **details**. The final model uses **title**, persisted **slug** path, and full **content**; optional excerpts belong in content/frontmatter or a later explicit policy, not **`NoteTopology.shortDetails`**.
+
+## Observable behavior
+
+**Pre-condition:** Relationship notes are ordinary notes (**Phase 5** complete). Folders and slugs behave as in prior phases.
+
+**Trigger:** User browses a notebook, opens a folder, views note cards, or creates a note in what used to be a “parent holds children” place.
+
+**Post-condition:** Structural peers are shown as **folder siblings** (or root notes) through the main flows; **`shortDetails`** is gone from **`NoteTopology`**, OpenAPI, generated clients, and listing/card surfaces that displayed it.
+
+## Model / API / UI
+
+- Prefer **folder-scoped** listing and navigation for “what lives here”; retire parent-note **children** lists as the primary containment UI (creation targets the relevant **folder**, not a structural parent note pointer in product semantics).
+- Remove **`shortDetails`** from **`NoteTopology`** and regenerate the API client.
+
+## Non-goals
+
+- Dropping **`Note.parent`** from persistence (**Phase 7**).
+- Folder subtree move (**Phase 8**).
+- Wiki-link parsing (**Phase 9**).
+
+## Expected Result
+
+After this phase:
+
+- folder-first listing matches the wiki containment story while **`Note.parent`** may still exist until **Phase 7**
+- topology and cards no longer expose **`shortDetails`**
+
+---
+
+# Phase 7 — Remove Note Parent (Folders Replace Containment)
+
+## Goal
+
+**Remove the note parent concept** from the model after containment has been migrated into folders, relationship notes no longer depend on parent-pointer structure (**Phase 5**), and product behavior already treats folders as the containment surface (**Phase 6**). The target is not “optional parent”—it is **no parent-note field** for structure; folders are the sole mechanism for where a note lives.
 
 ## Rationale
 
@@ -605,7 +645,7 @@ If users want “semantic parent” for reading, it belongs in content (links, f
 
 ## Model Change
 
-Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and converted old relationship-note trees into folder + links in Phase 5).
+Remove the note-to-parent association used for containment and navigation from schema, APIs, and UI (exact steps depend on prior phases: migration must have assigned `folderId` and converted old relationship-note trees into folder + links in Phase 5; Phase 6 completes folder-first UX before this schema removal).
 
 A valid note has:
 
@@ -638,7 +678,7 @@ After this phase:
 
 ---
 
-# Phase 7 — Move a Folder
+# Phase 8 — Move a Folder
 
 ## Goal
 
@@ -663,8 +703,8 @@ folder move = one folder, new parent, recompute that folder’s slug and all des
 
 ## Non-Goals
 
-- Parsing wiki links in content (Phase 8)
-- Folder configuration templates (Phase 9)
+- Parsing wiki links in content (Phase 9)
+- Folder configuration templates (Phase 10)
 - Obsidian export/import (later phases)
 
 ## Expected Result
@@ -677,7 +717,7 @@ After this phase:
 
 ---
 
-# Phase 8 — Add Wiki-Link Parser and Link Index
+# Phase 9 — Add Wiki-Link Parser and Link Index
 
 ## Goal
 
@@ -750,7 +790,7 @@ After this phase:
 
 ---
 
-# Phase 9 — Add Folder Configuration Behavior
+# Phase 10 — Add Folder Configuration Behavior
 
 ## Goal
 
@@ -816,7 +856,7 @@ After this phase:
 
 ---
 
-# Phase 10 — Export to Obsidian Markdown
+# Phase 11 — Export to Obsidian Markdown
 
 ## Goal
 
@@ -874,7 +914,7 @@ aliases:
 
 ### Persisted YAML vs export layout (Phase 4 deferral)
 
-Phase 4 stores optional properties as leading YAML inside note `details`. Until Phase 10 export explicitly merges that with exporter metadata, [`ObsidianFormatService`](backend/src/main/java/com/odde/doughnut/services/ObsidianFormatService.java) may emit overlapping structure (`generateFrontMatter` plus `# title` and raw `details`). Delivering single coherent Markdown files per note (including user frontmatter) is part of completing Phase 10 export semantics.
+Phase 4 stores optional properties as leading YAML inside note `details`. Until Phase 11 export explicitly merges that with exporter metadata, [`ObsidianFormatService`](backend/src/main/java/com/odde/doughnut/services/ObsidianFormatService.java) may emit overlapping structure (`generateFrontMatter` plus `# title` and raw `details`). Delivering single coherent Markdown files per note (including user frontmatter) is part of completing Phase 11 export semantics.
 
 ## Link Export
 
@@ -913,7 +953,7 @@ After this phase:
 
 ---
 
-# Phase 11 — Import and Round Trip from Obsidian
+# Phase 12 — Import and Round Trip from Obsidian
 
 ## Goal
 
@@ -982,7 +1022,7 @@ After this phase:
 
 ---
 
-# Phase 12 — Remove Legacy Assumptions
+# Phase 13 — Remove Legacy Assumptions
 
 ## Goal
 
@@ -1062,13 +1102,14 @@ After this phase:
 3. Replace head note with optional index note
 4. Introduce note properties (YAML frontmatter, persisted)
 5. Convert relationship notes
-6. Remove note parent (folders replace containment)
-7. Move a folder
-8. Add wiki-link parser and link index
-9. Add folder config behavior
-10. Export to Obsidian Markdown
-11. Import and round trip from Obsidian
-12. Remove legacy assumptions
+6. Folder-first listing; remove note short details
+7. Remove note parent (folders replace containment)
+8. Move a folder
+9. Add wiki-link parser and link index
+10. Add folder config behavior
+11. Export to Obsidian Markdown
+12. Import and round trip from Obsidian
+13. Remove legacy assumptions
 ```
 
 ## Dependency Summary
@@ -1079,13 +1120,14 @@ folder
     -> optional index note without head note
       -> note properties (YAML frontmatter, rich + markdown surfaces)
         -> relationship notes as normal notes
-          -> remove note parent (folders own placement)
-            -> move a folder (subtree slug updates)
-              -> wiki-link parser and link index
-                -> folder config
-                  -> Obsidian export
-                    -> Obsidian import / round trip
-                      -> legacy cleanup
+          -> folder-first listing; remove note short details from topology
+            -> remove note parent (folders own placement)
+              -> move a folder (subtree slug updates)
+                -> wiki-link parser and link index
+                  -> folder config
+                    -> Obsidian export
+                      -> Obsidian import / round trip
+                        -> legacy cleanup
 ```
 
 ## Final Architectural Intention

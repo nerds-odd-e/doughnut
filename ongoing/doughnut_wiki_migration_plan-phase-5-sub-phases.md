@@ -19,7 +19,7 @@ By the end of Phase 5:
 
 - **Relationship title:** derive the title from the source note title, relation label, and target note title. Keep it human-readable first; the slug is derived separately from the truncated title by the existing slug service.
 - **Title length:** truncate the derived relationship title before persistence so it never exceeds `Note.MAX_TITLE_LENGTH`. Prefer truncating at the title boundary over adding IDs or hashes.
-- **Source of truth during Phase 5:** write relationship frontmatter into note details while keeping legacy columns long enough for existing screens and Phase 6 migration safety. Removing those columns belongs to Phase 6 or later cleanup.
+- **Source of truth during Phase 5:** write relationship frontmatter into note details while keeping legacy columns long enough for existing screens and until note-parent removal (**Phase 7**). Removing those columns belongs to **Phase 7** or later cleanup.
 - **Title invariant:** Phase 5 is the last phase that may tolerate legacy null or empty note titles. After Phase 5, production code and schema should treat note title as required.
 
 ## Sizing Rule
@@ -232,7 +232,7 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 - Remove any `@wip` tags introduced while driving Phase 5 behavior.
 - Update `ongoing/doughnut_wiki_migration_plan.md` with Phase 5 status and any discoveries.
-- Remove obsolete relationship-note-specific code only when no current behavior uses it; otherwise leave explicit cleanup for Phase 6.
+- Remove obsolete relationship-note-specific code only when no current behavior uses it; otherwise leave explicit cleanup for Phase 7 or later.
 - Run the relationship specs touched in this phase with targeted `--spec` commands.
 
-**Commit boundary:** One cleanup/docs commit that leaves Phase 5 closed and ready for Phase 6.
+**Commit boundary:** One cleanup/docs commit that leaves Phase 5 closed and ready for Phase 6 (folder-first listing and removal of note **`shortDetails`**).
