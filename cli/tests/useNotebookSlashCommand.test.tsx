@@ -24,8 +24,13 @@ import {
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
-function notebookWithName(name: string) {
-  return makeMe.aNotebook.withSeedNote(makeMe.aNote.title(name).please()).do()
+/** One element of `NotebooksViewedByUser.notebooks` from `myNotebooks`. */
+function myNotebooksApiRow(name: string) {
+  return {
+    notebook: makeMe.aNotebook
+      .withSeedNote(makeMe.aNote.title(name).please())
+      .do(),
+  }
 }
 
 function UseNotebookStageTestShell(props: { readonly argument?: string }) {
@@ -138,7 +143,7 @@ describe('useNotebookSlashCommand stage', () => {
 
   test('active stage /exit clears notebook shell and records assistant line', async () => {
     myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [notebookWithName('Top Maths')] },
+      data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
     const { stdin, lastStrippedFrame, waitForFramesToInclude } =
@@ -152,7 +157,7 @@ describe('useNotebookSlashCommand stage', () => {
 
   test('unknown notebook name shows error and does not enter stage', async () => {
     myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [notebookWithName('Other')] },
+      data: { notebooks: [myNotebooksApiRow('Other')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
     const result = render(notebookStageTestAppElement('Missing Notebook'))
@@ -223,7 +228,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('duplicate notebook names show ambiguity error', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithName('Same'), notebookWithName('Same')],
+        notebooks: [myNotebooksApiRow('Same'), myNotebooksApiRow('Same')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -240,7 +245,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('bare /use shows picker; Enter selects first notebook', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithName('Alpha'), notebookWithName('Beta')],
+        notebooks: [myNotebooksApiRow('Alpha'), myNotebooksApiRow('Beta')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -254,7 +259,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('bare /use picker: Down + Enter selects second notebook', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithName('Alpha'), notebookWithName('Beta')],
+        notebooks: [myNotebooksApiRow('Alpha'), myNotebooksApiRow('Beta')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -288,7 +293,7 @@ describe('useNotebookSlashCommand stage', () => {
   test('bare /use Esc on picker settles Cancelled', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
-        notebooks: [notebookWithName('Alpha'), notebookWithName('Beta')],
+        notebooks: [myNotebooksApiRow('Alpha'), myNotebooksApiRow('Beta')],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
@@ -308,9 +313,9 @@ describe('useNotebookSlashCommand stage', () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
         notebooks: [
-          notebookWithName('Alpha'),
-          notebookWithName('Beta'),
-          notebookWithName('Alpaca'),
+          myNotebooksApiRow('Alpha'),
+          myNotebooksApiRow('Beta'),
+          myNotebooksApiRow('Alpaca'),
         ],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
@@ -340,9 +345,9 @@ describe('useNotebookSlashCommand stage', () => {
     myNotebooksSpy.mockResolvedValue({
       data: {
         notebooks: [
-          notebookWithName('Alpha'),
-          notebookWithName('Beta'),
-          notebookWithName('Alpaca'),
+          myNotebooksApiRow('Alpha'),
+          myNotebooksApiRow('Beta'),
+          myNotebooksApiRow('Alpaca'),
         ],
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)

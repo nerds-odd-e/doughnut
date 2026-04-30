@@ -31,6 +31,10 @@ const NOTEBOOK_NOT_FOUND = 'No notebook found with that name.'
 
 const NO_NOTEBOOKS_MESSAGE = 'No notebooks found.'
 
+function notebooksFromMyNotebooksView(view: NotebooksViewedByUser): Notebook[] {
+  return view.notebooks.map((row) => row.notebook)
+}
+
 function UseNotebookActiveShell({
   notebook,
   onSettled,
@@ -92,7 +96,8 @@ function UseNotebookStage({
         })
       )
 
-      const matches = view.notebooks.filter((n: Notebook) => n.name === title)
+      const listed = notebooksFromMyNotebooksView(view)
+      const matches = listed.filter((n) => n.name === title)
       if (matches.length === 0) {
         throw new Error(NOTEBOOK_NOT_FOUND)
       }
@@ -101,7 +106,7 @@ function UseNotebookStage({
           `Multiple notebooks match "${title}". Rename one in the web app so the name is unique.`
         )
       }
-      resolvedNotebookRef.current = matches[0]
+      resolvedNotebookRef.current = matches[0]!
       return ''
     },
     [title]
@@ -120,10 +125,11 @@ function UseNotebookStage({
         ...doughnutSdkOptions(signal),
       })
     )
-    if (view.notebooks.length === 0) {
+    const listed = notebooksFromMyNotebooksView(view)
+    if (listed.length === 0) {
       throw new Error(NO_NOTEBOOKS_MESSAGE)
     }
-    pickerListRef.current = view.notebooks
+    pickerListRef.current = listed
     return ''
   }, [])
 
