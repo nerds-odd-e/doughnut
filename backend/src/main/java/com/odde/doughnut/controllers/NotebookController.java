@@ -285,7 +285,7 @@ class NotebookController {
     User user = authorizationService.getCurrentUser();
     List<NoteRealm> notes =
         noteService.findNotebookRootNotes(notebook.getId()).stream()
-            .map(n -> noteRealmService.buildForNotebookRootListing(n, user))
+            .map(n -> noteRealmService.build(n, user))
             .toList();
     List<NotebookRootFolder> folders =
         folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
@@ -311,7 +311,7 @@ class NotebookController {
     User user = authorizationService.getCurrentUser();
     List<NoteRealm> notes =
         noteService.findNotesInFolderScope(folder.getId()).stream()
-            .map(n -> noteRealmService.buildForNotebookRootListing(n, user))
+            .map(n -> noteRealmService.build(n, user))
             .toList();
     List<NotebookRootFolder> childFolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()

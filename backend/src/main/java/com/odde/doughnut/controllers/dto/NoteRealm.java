@@ -26,8 +26,6 @@ public class NoteRealm {
   @Getter @Setter private List<Note> inboundReferences;
 
   /** When true, {@link #getChildren()} returns null so JSON omits {@code children}. */
-  private boolean omitChildrenFromJson;
-
   @NotNull @Getter private Note note;
 
   @Getter @Setter private Boolean fromBazaar;
@@ -37,10 +35,6 @@ public class NoteRealm {
   public NoteRealm(Note note, List<WikiTitle> wikiTitles) {
     this.note = note;
     this.wikiTitles = List.copyOf(wikiTitles);
-  }
-
-  public void markNotebookRootListingShallow() {
-    this.omitChildrenFromJson = true;
   }
 
   @NotNull
@@ -57,9 +51,6 @@ public class NoteRealm {
   @JsonProperty("children")
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public List<Note> getChildren() {
-    if (omitChildrenFromJson) {
-      return null;
-    }
     return note.getRelationships();
   }
 

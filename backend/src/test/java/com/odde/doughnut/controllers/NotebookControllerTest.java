@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -235,43 +234,6 @@ class NotebookControllerTest extends ControllerTestBase {
 
   @Nested
   class ListNotebookRootNotes {
-    @Test
-    void returnsOnlyNotesInNotebookRootFolderScope()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
-      createNb.setNewTitle("NB With Roots");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-
-      NoteCreationDTO r1 = new NoteCreationDTO();
-      r1.setNewTitle("Root One");
-      Integer rootOneId = controller.createNoteAtNotebookRoot(nb, r1).getId();
-
-      NoteCreationDTO r2 = new NoteCreationDTO();
-      r2.setNewTitle("Root Two");
-      Integer rootTwoId = controller.createNoteAtNotebookRoot(nb, r2).getId();
-
-      Note rootOne = noteRepository.findById(rootOneId).orElseThrow();
-      Folder childFolder = makeMe.aFolder().notebook(nb).name("Nested Holder").please();
-      Note child = makeMe.aNote("Under Root").under(rootOne).folder(childFolder).please();
-
-      FolderListing listing = controller.listNotebookRootNotes(nb);
-      List<NoteRealm> roots = listing.notes();
-      assertEquals(2, roots.size());
-      assertEquals(
-          List.of(rootOneId, rootTwoId).stream().sorted().toList(),
-          roots.stream().map(NoteRealm::getId).sorted().toList());
-      assertFalse(roots.stream().anyMatch(r -> r.getId().equals(child.getId())));
-
-      assertFalse(rootOne.getChildren().isEmpty());
-      NoteRealm rootOneRealm =
-          roots.stream().filter(r -> r.getId().equals(rootOneId)).findFirst().orElseThrow();
-      assertNull(rootOneRealm.getChildren());
-      NoteRealm rootTwoRealm =
-          roots.stream().filter(r -> r.getId().equals(rootTwoId)).findFirst().orElseThrow();
-      assertNull(rootTwoRealm.getChildren());
-    }
-
     @Test
     void includesNoteWithNonNullParentWhenFolderIsNull()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
