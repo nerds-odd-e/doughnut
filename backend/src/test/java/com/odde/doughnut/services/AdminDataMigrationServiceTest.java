@@ -17,6 +17,10 @@ import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.WikiSlugGeneration;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -300,5 +304,26 @@ class AdminDataMigrationServiceTest {
     AdminDataMigrationStatusDTO slugSecond = adminDataMigrationService.runBatch(admin());
     assertThat(slugSecond.isWikiReferenceMigrationComplete(), is(true));
     assertThat(slugSecond.getMessage(), containsString("Slug regeneration"));
+  }
+
+  @Test
+  void runBatch_slugRegeneration_assignsDistinctSlugsWhenDuplicateTitlesShareBatch() {
+    User owner = makeMe.aUser().please();
+    Note root = makeMe.aNote().title("Root").creatorAndOwner(owner).please();
+    int n = AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE;
+    List<Integer> childIds = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+      childIds.add(makeMe.aNote().title("Collision").under(root).please().getId());
+    }
+    makeMe.entityPersister.flush();
+
+    runWikiReferenceMigrationToCompletion();
+
+    Set<String> basenames = new HashSet<>();
+    for (Integer id : childIds) {
+      Note note = makeMe.entityPersister.find(Note.class, id);
+      basenames.add(WikiSlugPathAssignment.basenameOf(note.getSlug()));
+    }
+    assertThat(basenames.size(), equalTo(n));
   }
 }
