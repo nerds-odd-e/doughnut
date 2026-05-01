@@ -85,16 +85,6 @@ public class NoteConstructionService {
     return createRootNote(notebook, title);
   }
 
-  public Note createNoteUnderParentId(Integer parentNoteId, String title)
-      throws UnexpectedNoAccessRightException {
-    Note parentNote =
-        noteRepository
-            .findById(parentNoteId)
-            .orElseThrow(() -> new RuntimeException("Parent note not found"));
-    authorizationService.assertAuthorization(parentNote);
-    return createNote(parentNote, title);
-  }
-
   private Note createNoteWithWikidataInfo(
       Note parentNote, WikidataIdWithApi wikidataIdWithApi, String title)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
@@ -212,16 +202,16 @@ public class NoteConstructionService {
 
   public NoteRealm createNoteFromPromotedPointToSibling(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
-    return createNoteFromPromotedPoint(originalNote, originalNote.getParent().getId(), aiResult);
+    return createNoteFromPromotedPoint(originalNote, originalNote.getParent(), aiResult);
   }
 
   private NoteRealm createNoteFromPromotedPoint(
-      Note originalNote, Integer parentNoteId, PointExtractionResult aiResult)
+      Note originalNote, Note parentNote, PointExtractionResult aiResult)
       throws UnexpectedNoAccessRightException {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Note newNote = createNoteUnderParentId(parentNoteId, aiResult.newNoteTitle);
+    Note newNote = createNote(parentNote, aiResult.newNoteTitle);
     newNote.setDetails(aiResult.newNoteDetails);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
