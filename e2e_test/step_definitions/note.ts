@@ -688,7 +688,7 @@ Then(
     start
       .assumeNotePage()
       .wikiLinkInDetails(linkText)
-      .expectNotebookNoteBySlugHref()
+      .expectNoteShowHref()
       .followAndAssumeNote(linkText)
   }
 )
@@ -699,7 +699,7 @@ Then(
     start
       .assumeNotePage()
       .wikiLinkInDetails(linkText)
-      .expectNotebookNoteBySlugHref()
+      .expectNoteShowHref()
       .followAndAssumeNote(noteTitle)
   }
 )

@@ -10,20 +10,20 @@ import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
 
-const notebookNoteBySlugHref = /^\/d\/notebooks\/\d+\/notes\/[^?#]+$/
-const notebookNoteBySlugInUrl = /\/d\/notebooks\/\d+\/notes\/[^?#]+$/
+const noteShowHref = /^\/d\/n\/\d+$/
+const noteShowPathInUrl = /\/d\/n\/\d+/
 
 function wikiLinkInDetailsFluent(linkText: string) {
   const locator = () =>
     cy.get('[role=details]').find('a.doughnut-link').contains(linkText)
   return {
-    expectNotebookNoteBySlugHref() {
-      locator().should('have.attr', 'href').and('match', notebookNoteBySlugHref)
+    expectNoteShowHref() {
+      locator().should('have.attr', 'href').and('match', noteShowHref)
       return this
     },
     followAndAssumeNote(noteTitle: string) {
       locator().click()
-      cy.url({ timeout: 15000 }).should('match', notebookNoteBySlugInUrl)
+      cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
       return assumeNotePage(noteTitle)
     },
   }
