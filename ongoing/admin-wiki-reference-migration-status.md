@@ -4,20 +4,14 @@ This note tracks **production progress** for `POST /api/admin/data-migration/run
 
 ## What the migration does (order)
 
-1. **Relationship wiki backfill** — `relationship_wiki_backfill`: relationship notes get title, YAML `type: relationship`, `source` / `target` wiki tokens, relationship body line, slug assignment (`assignSlugForNewNote` during the batch), `note_wiki_title_cache` refresh (JDBC path in migration).
+1. **Relationship wiki backfill** — `relationship_wiki_backfill`: relationship notes get title, YAML `type: relationship`, `source` / `target` wiki tokens, relationship body line, and `note_wiki_title_cache` refresh (JDBC path in migration).
 2. **Legacy parent frontmatter** — `legacy_parent_frontmatter`: non-relation children with a parent get missing `parent: "[[…]]"` in YAML (`LegacyParentWikiFrontmatterMerge`), then cache refresh.
 
-Wiki reference migration **completes** when both steps above are `COMPLETED`. There is **no** admin migration step that regenerates slugs for all notes anymore (canonical note URLs use note id, not slug paths).
+Wiki reference migration **completes** when both steps above are `COMPLETED`.
 
-## Obsolete progress rows (`note_slug_path_regeneration`)
+## Progress rows outside the active steps
 
-Older deployments may still have a `wiki_reference_migration_progress` row for `note_slug_path_regeneration`. The application **does not** read that step for completion, failure gating, or batch work. A `FAILED` (or any other) status on that row **does not** stop batches or status from reporting wiki reference migration complete once steps 1 and 2 are done.
-
-**Optional housekeeping:** operators may delete the obsolete row or set it to `COMPLETED` and clear `last_error` so dashboards stay tidy—purely cosmetic.
-
-## Historical production blockage (slug regeneration era)
-
-Production previously stopped during batched slug regeneration with duplicate key **`note.uk_note_notebook_slug`**. Root cause was transactional buffering during JDBC sibling slug queries; that logic lived in `AdminDataMigrationBatchWorker` slug regeneration (removed). **`WikiSlugPathService.regenerateAllNoteSlugPaths`** may still exist for manual or other tooling outside this migration.
+The application only **gates** on the two steps above. Any other rows in `wiki_reference_migration_progress` (including leftovers from retired tooling) do not affect whether batches run or whether completion is reported once steps 1 and 2 are `COMPLETED`. Operators may delete or tidy stray rows for a cleaner dashboard.
 
 ## Why step 1 (relationship backfill) should run again after code fixes
 

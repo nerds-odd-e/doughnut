@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminDataMigrationService implements AdminDataMigrationProgressPopulator {
 
-  public static final String DIAGNOSTIC_MARKER = "admin-wiki-migration-diagnostics:slug-path-v2";
+  public static final String DIAGNOSTIC_MARKER = "admin-wiki-migration-diagnostics:v1";
 
   public static final String READY_MESSAGE =
       ("Wiki data migration [%s]: relationship wiki backfill (title, details, cache), legacy parent"
@@ -23,12 +23,6 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
 
   public static final String STEP_RELATIONSHIP_WIKI_BACKFILL = "relationship_wiki_backfill";
   public static final String STEP_LEGACY_PARENT_FRONTMATTER = "legacy_parent_frontmatter";
-
-  /**
-   * Legacy progress row name only. Slug regeneration is no longer part of the wiki reference
-   * migration order; existing DB rows do not gate completion.
-   */
-  public static final String STEP_NOTE_SLUG_PATH_REGENERATION = "note_slug_path_regeneration";
 
   private static final List<String> WIKI_REFERENCE_MIGRATION_STEPS =
       List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_LEGACY_PARENT_FRONTMATTER);
@@ -221,12 +215,11 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   private static String failureMessage(String step, RuntimeException e) {
-    return "marker=%s; step=%s; batchSize=%d; noteSlugMaxLen=%d; cause=%s; rootCause=%s"
+    return "marker=%s; step=%s; batchSize=%d; cause=%s; rootCause=%s"
         .formatted(
             DIAGNOSTIC_MARKER,
             step,
             WIKI_REFERENCE_MIGRATION_BATCH_SIZE,
-            767,
             e.getMessage() == null ? "" : e.getMessage(),
             rootCauseMessage(e));
   }

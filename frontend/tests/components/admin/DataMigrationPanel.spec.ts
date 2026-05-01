@@ -60,7 +60,7 @@ describe("DataMigrationPanel", () => {
       totalCount: 2,
     }
     const complete: AdminDataMigrationStatusDto = {
-      message: "Regenerated slug paths for all non-deleted notes.",
+      message: "Wiki reference migration is already complete.",
       wikiReferenceMigrationComplete: true,
       stepStatus: "COMPLETED",
       processedCount: 3,
@@ -84,7 +84,9 @@ describe("DataMigrationPanel", () => {
     expect(
       wrapper.get('[data-testid="data-migration-counts"]').text()
     ).toContain("3 / 3")
-    expect(wrapper.text()).toContain("Regenerated slug paths")
+    expect(wrapper.text()).toContain(
+      "Wiki reference migration is already complete"
+    )
   })
 
   it("shows error when runDataMigrationBatch fails", async () => {

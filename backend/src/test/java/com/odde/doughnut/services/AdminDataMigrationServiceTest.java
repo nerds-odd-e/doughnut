@@ -55,7 +55,7 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
-  void runBatch_backfillsNullRelationshipTitle_stableSlugUnchanged() {
+  void runBatch_backfillsNullRelationshipTitle() {
     Note parent = makeMe.aNote().title("Alpha").please();
     Note target = makeMe.aNote().title("Beta").under(parent).please();
     Note relation = makeMe.aRelation().between(parent, target, RelationType.PART).please();
@@ -253,15 +253,15 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
-  void obsolete_failed_slug_progress_row_does_not_block_migration_completion() {
+  void obsolete_failed_progress_row_for_retired_step_does_not_block_migration_completion() {
     jdbcTemplate.update(
         "INSERT INTO wiki_reference_migration_progress (step_name, status, total_count,"
             + " processed_count, last_error) VALUES (?, ?, ?, ?, ?)",
-        AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION,
+        "retired_non_gating_step",
         WikiReferenceMigrationStepStatus.FAILED.name(),
         27377,
         2220,
-        "obsolete slug-regeneration failure");
+        "obsolete batch failure");
 
     Note parent = makeMe.aNote().title("P").please();
     Note target = makeMe.aNote().title("Q").under(parent).please();

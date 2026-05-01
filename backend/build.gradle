@@ -65,7 +65,6 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-  implementation 'com.github.slugify:slugify:3.0.7'
   implementation 'org.flywaydb:flyway-mysql'
   compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'

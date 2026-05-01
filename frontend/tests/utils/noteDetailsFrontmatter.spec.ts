@@ -122,7 +122,8 @@ describe("composeNoteDetailsMarkdown", () => {
   })
 
   it("round-trips simple parse and compose", () => {
-    const original = "---\ntitle: Hello\nslug: my-note\n---\n## Body\n\nMore.\n"
+    const original =
+      "---\ntitle: Hello\nalias: my-note\n---\n## Body\n\nMore.\n"
     const parsed = parseNoteDetailsMarkdown(original)
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return

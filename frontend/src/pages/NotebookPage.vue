@@ -9,8 +9,8 @@
       v-else
       :notebook="notebook"
       :user="user"
-      :show-add-first-note="indexSlugStatus === 'absent'"
-      :index-slug-status="indexSlugStatus"
+      :show-add-first-note="indexNoteStatus === 'absent'"
+      :index-note-status="indexNoteStatus"
       :index-note-id="sidebarAnchorNoteId"
       @notebook-updated="handleNotebookUpdated"
     />
@@ -56,7 +56,7 @@ const isNotebookReadOnly = computed(
 )
 
 const sidebarAnchorNoteId = ref<number | undefined>()
-const indexSlugStatus = ref<"pending" | "present" | "absent">("pending")
+const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
 let indexResolveGeneration = 0
 
 const fetchNotebook = async () => {
@@ -106,7 +106,7 @@ watch(
   async (key) => {
     if (key === undefined) {
       sidebarAnchorNoteId.value = undefined
-      indexSlugStatus.value = "pending"
+      indexNoteStatus.value = "pending"
       currentActiveNoteId.value = undefined
       return
     }
@@ -114,10 +114,10 @@ watch(
     const [, indexNoteId] = key
     const gen = ++indexResolveGeneration
     sidebarAnchorNoteId.value = undefined
-    indexSlugStatus.value = "pending"
+    indexNoteStatus.value = "pending"
 
     if (indexNoteId == null) {
-      indexSlugStatus.value = "absent"
+      indexNoteStatus.value = "absent"
       return
     }
 
@@ -125,10 +125,10 @@ watch(
       await storageAccessor.value.storedApi().loadNoteRealm(indexNoteId)
       if (gen !== indexResolveGeneration) return
       sidebarAnchorNoteId.value = indexNoteId
-      indexSlugStatus.value = "present"
+      indexNoteStatus.value = "present"
     } catch {
       if (gen !== indexResolveGeneration) return
-      indexSlugStatus.value = "absent"
+      indexNoteStatus.value = "absent"
     }
   },
   { immediate: true }

@@ -138,7 +138,7 @@ const noteContextResolved = computed(
   () => props.activeNoteRealm?.note?.noteTopology != null
 )
 
-/** Notebook overview pages may load root notes without an anchor note (e.g. no `index` slug). */
+/** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(
   () =>
     props.activeNoteRealm === undefined ||

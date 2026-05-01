@@ -2,7 +2,7 @@
 
 ## Parent Phase
 
-Phase 6 of `ongoing/doughnut_wiki_migration_plan.md`: Folder-First Child Listing; Remove Note Short Details.
+Phase 6 (see `ongoing/doughnut_wiki_migration_plan.md`): Folder-First Child Listing; Remove Note Short Details.
 
 ## Goal
 
@@ -11,7 +11,7 @@ Make structural note listing folder-first while `Note.parent` still exists for c
 By the end of Phase 6:
 
 - main listing/navigation APIs treat notes as members of a folder, or notebook root when `folderId` is absent
-- note cards and topology DTOs expose title and slug, not a derived `shortDetails` preview
+- note cards and topology DTOs expose title (not a derived `shortDetails` preview)
 - note graph sibling relationships come from the note's folder; when a note has no folder, siblings come from the notebook root
 - existing parent fields may still exist until Phase 7, but they are no longer the primary source for folder-first listing or note graph siblings
 
@@ -107,7 +107,7 @@ And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
 
 **Commit boundary:** One folder-first navigation commit.
 
-**Temporary presentation note:** During this sub-phase, a folder returned by structural listing may be merged into the note row with the same title/slug at the same level. This keeps migrated former parent-note trees visually stable while the sidebar data source changes from note children to folder listings.
+**Temporary presentation note:** During this sub-phase, a folder returned by structural listing may be merged into the note row with the same title at the same level. This keeps migrated former parent-note trees visually stable while the sidebar data source changes from note children to folder listings.
 
 ## Sub-Phase 6.4.1 - Sidebar Renders Folders And Notes As Separate Items
 
@@ -217,7 +217,7 @@ Folder-first note creation and primary actions are implemented in ordered steps 
 
 **Trigger:** Users view note cards, title components, notebook index summaries, or tests using generated fixtures.
 
-**Post-condition:** Card and fixture code compiles without `shortDetails`; note cards show title/slug-based topology only. Notebook index summary derives from loaded details when needed.
+**Post-condition:** Card and fixture code compiles without `shortDetails`; note cards show title-based topology only. Notebook index summary derives from loaded details when needed.
 
 **Work:** Remove `shortDetails` references from frontend components, tests, and `doughnut-test-fixtures` builders. Keep any remaining summary behavior explicitly local to the surface that needs it.
 
@@ -253,7 +253,7 @@ Folder-first note creation and primary actions are implemented in ordered steps 
 
 **Work:**
 
-- Update `ongoing/doughnut_wiki_migration_plan.md` with Phase 6 status and any discoveries.
+- Update `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md` (or the plan index) with Phase 6 status and any discoveries.
 - Update related graph docs if implementation changes the exact sibling ordering or query shape.
 - Remove any temporary `@wip` tags introduced while driving Phase 6 behavior.
 - Run the targeted backend/frontend/E2E checks touched in this phase.

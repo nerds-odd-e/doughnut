@@ -49,7 +49,7 @@ class NotebookServiceTest {
   }
 
   @Test
-  void findOptionalIndexNote_whenTitleIsIndexCaseInsensitiveAndSlugIsNot_findsNote() {
+  void findOptionalIndexNote_whenTitleIsIndexCaseInsensitive_findsNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
     Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();

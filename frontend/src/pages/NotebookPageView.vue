@@ -10,7 +10,7 @@
     </div>
 
     <div
-      v-if="indexSlugStatus === 'pending'"
+      v-if="indexNoteStatus === 'pending'"
       class="notebook-page-index-details daisy-mb-6 daisy-flex daisy-items-center daisy-gap-2"
       data-testid="notebook-index-loading"
     >
@@ -19,7 +19,7 @@
     </div>
 
     <div
-      v-else-if="indexSlugStatus === 'present'"
+      v-else-if="indexNoteStatus === 'present'"
       class="notebook-page-index-details daisy-mb-6"
       data-testid="notebook-index-details"
     >
@@ -282,7 +282,7 @@ const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
   showAddFirstNote: { type: Boolean, default: false },
-  indexSlugStatus: {
+  indexNoteStatus: {
     type: String as PropType<"pending" | "present" | "absent">,
     default: "absent",
   },
@@ -292,7 +292,7 @@ const props = defineProps({
 const storageAccessor = useStorageAccessor()
 
 const indexRealm = computed(() => {
-  if (props.indexSlugStatus !== "present" || props.indexNoteId == null) {
+  if (props.indexNoteStatus !== "present" || props.indexNoteId == null) {
     return undefined
   }
   return storageAccessor.value.refOfNoteRealm(props.indexNoteId).value

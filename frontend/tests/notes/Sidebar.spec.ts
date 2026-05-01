@@ -30,7 +30,6 @@ function structuralFolder(folderId: number, noteRealm: NoteRealm) {
   return {
     id: String(folderId),
     name: noteRealm.note.noteTopology.title!,
-    slug: `folder-${folderId}`,
   }
 }
 
