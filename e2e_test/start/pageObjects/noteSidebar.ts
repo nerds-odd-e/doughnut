@@ -184,6 +184,37 @@ export const noteSidebar = () => {
       pageIsNotLoading()
     },
 
+    /**
+     * Under a structural folder row (label = parent note title), assert exactly one note row
+     * shows the relationship note as a single `.title-text` (no relationship-container assembly).
+     */
+    expectRelationshipNoteTitleUnderFolder(
+      folderLabel: string,
+      sourceTitle: string,
+      relationPhrase: string,
+      targetTitle: string
+    ) {
+      pageIsNotLoading()
+      const expectedTitle =
+        `${sourceTitle} ${relationPhrase} ${targetTitle}`.trim()
+      expandFolderRowIfCollapsed(folderLabel)
+      cy.get('aside').within(() => {
+        folderRowByExactLabel(folderLabel)
+          .children('ul.daisy-list-group')
+          .first()
+          .find('li')
+          .filter((_, li) => {
+            const el = li.querySelector('.title-text')
+            return el?.textContent?.trim() === expectedTitle
+          })
+          .should('have.length', 1)
+          .first()
+          .within(() => {
+            cy.get('.relationship-container').should('not.exist')
+          })
+      })
+    },
+
     /** Child note rows (`li` with `.title-text`) under an expanded sidebar folder, in DOM order. */
     expectChildrenUnderFolder(
       folderLabel: string,

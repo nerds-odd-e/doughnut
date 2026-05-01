@@ -14,6 +14,9 @@ Feature: relationship edit and remove
     And I should see "Moon" has relationship "a specialization of" "Earth"
     When I open the relationship from "Moon" to "Earth"
     Then I should see the relationship note title reflects "Moon" "a specialization of" "Earth"
+    When I expand the side bar
+    And I expand the children of note "Moon" in the sidebar
+    Then I should see the relationship note in the sidebar under folder "Moon" with composed title "Moon" "a specialization of" "Earth"
     When I open the note details markdown editor
     Then the note details markdown source should contain "relation: a-specialization-of"
     And the note details markdown source should contain "[[Moon]] a specialization of [[Earth]]"
@@ -25,6 +28,9 @@ Feature: relationship edit and remove
     And I should see "Moon" has relationship "a specialization of" "Earth"
     When I open the relationship from "Moon" to "Earth"
     Then I should see the relationship note title reflects "Moon" "a specialization of" "Earth"
+    When I expand the side bar
+    And I expand the children of note "Moon" in the sidebar
+    Then I should see the relationship note in the sidebar under folder "Moon" with composed title "Moon" "a specialization of" "Earth"
     When I open the note details markdown editor
     Then the note details markdown source should contain "relation: a-specialization-of"
     And the note details markdown source should contain "[[Moon]] a specialization of [[Earth]]"
@@ -49,6 +55,9 @@ Feature: relationship edit and remove
     And I flush pending note details save
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
     Then I should see the relationship note title reflects "Moon" "a specialization of" "Earth"
+    When I expand the side bar
+    And I expand the children of note "Moon" in the sidebar
+    Then I should see the relationship note in the sidebar under folder "Moon" with composed title "Moon" "a specialization of" "Earth"
     When I open the note details markdown editor
     Then the note details markdown source should contain "relation: a-specialization-of"
     And the note details markdown source should contain "Observations from orbit."
