@@ -4,9 +4,12 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
@@ -126,8 +129,10 @@ public class WikiLinkResolver {
 
   private static List<String> dedupePreserveOrder(List<String> titles) {
     List<String> out = new ArrayList<>();
+    Set<String> seenNormalized = new HashSet<>();
     for (String t : titles) {
-      if (!out.contains(t)) {
+      String key = Normalizer.normalize(t, Normalizer.Form.NFKC);
+      if (seenNormalized.add(key)) {
         out.add(t);
       }
     }

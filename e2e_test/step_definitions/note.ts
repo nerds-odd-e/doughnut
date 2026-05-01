@@ -310,8 +310,8 @@ Then(
     start
       .pageIsNotLoading()
       .navigateToNotebooksPage()
-      .navigateToPath(notePath)
-      .expectChildren(data.hashes())
+      .openFolder(notePath)
+      .expectChildrenUnderSidebarFolder(data.hashes())
   }
 )
 

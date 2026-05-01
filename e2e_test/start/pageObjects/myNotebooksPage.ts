@@ -2,7 +2,11 @@
 import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
 import type NotePath from '../../support/NotePath'
-import { navigateAlongNotebookCatalogPath } from '../navigateNotePath'
+import {
+  navigateAlongNotebookCatalogPath,
+  openFolderAlongNotebookCatalogPath,
+} from '../navigateNotePath'
+import { noteSidebar } from './noteSidebar'
 import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
@@ -39,6 +43,26 @@ const myNotebooksPage = () => {
         return this as any
       }
       return navigateAlongNotebookCatalogPath(segments) as any
+    },
+    /**
+     * Walks the catalog sidebar treating every path segment after the notebook as structural
+     * (folders). Unlike {@link navigateToPath}, does not open the last segment as a note.
+     */
+    openFolder(notePath: NotePath) {
+      const segments = notePath.path
+      if (segments.length < 2) {
+        throw new Error(
+          'openFolder requires a notebook plus at least one path segment (folder path)'
+        )
+      }
+      openFolderAlongNotebookCatalogPath(segments)
+      const folderLabel = segments[segments.length - 1]!
+      return {
+        expectChildrenUnderSidebarFolder(children: Record<string, string>[]) {
+          noteSidebar().expectChildrenUnderFolder(folderLabel, children)
+          return this as any
+        },
+      }
     },
     creatingNotebook(notebookTopic: string, description?: string) {
       addNewNotebookButton().click()

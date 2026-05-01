@@ -61,7 +61,8 @@ public class WikiTitleCacheService {
     for (WikiLinkResolver.ResolvedWikiLink link :
         wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
       jdbcTemplate.update(
-          "INSERT INTO note_wiki_title_cache (note_id, target_note_id, link_text) VALUES (?, ?, ?)",
+          "INSERT INTO note_wiki_title_cache (note_id, target_note_id, link_text) VALUES (?, ?, ?) "
+              + "AS new ON DUPLICATE KEY UPDATE target_note_id = new.target_note_id",
           noteId,
           link.targetNote().getId(),
           link.linkText());

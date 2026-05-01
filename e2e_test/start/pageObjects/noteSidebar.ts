@@ -15,33 +15,53 @@ const sidebarAddNoteButton = (buttonName?: string) => {
   }
 }
 
-export const noteSidebar = () => {
+function openSidebarIfCollapsed() {
   cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
     if (!$button.hasClass('sidebar-expanded')) {
       cy.wrap($button).click()
     }
   })
   cy.get('aside').should('be.visible')
+}
+
+/** Exact label on `.sidebar-folder-label`, visible, deepest match (mirrors structural tree). */
+function folderRowByExactLabel(folderLabel: string) {
+  return cy
+    .get('.sidebar-folder-label')
+    .filter((_, el) => el.textContent?.trim() === folderLabel.trim())
+    .filter(':visible')
+    .last()
+    .should('be.visible')
+    .closest('li')
+}
+
+function expandFolderRowIfCollapsed(segment: string) {
+  pageIsNotLoading()
+  const label = segment.trim()
+  cy.get('aside').within(() => {
+    folderRowByExactLabel(label).then(($li) => {
+      if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
+        cy.wrap($li).within(() => {
+          cy.findByTitle('expand children').click()
+        })
+      }
+    })
+  })
+  pageIsNotLoading()
+}
+
+export const noteSidebar = () => {
+  openSidebarIfCollapsed()
 
   return {
-    expand: (noteTopology: string) => {
-      cy.get('aside').within(() => {
-        cy.contains('.sidebar-folder-label', noteTopology)
-          .closest('li')
-          .then(($li) => {
-            if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
-              cy.wrap($li).within(() => {
-                cy.findByTitle('expand children').click()
-              })
-            }
-          })
-      })
-    },
+    expand: (noteTopology: string) => expandFolderRowIfCollapsed(noteTopology),
+
     siblingOrder: (higher: string, lower: string) => {
       cy.get('aside').within(() => {
         cy.contains(higher).parent().parent().nextAll().contains(lower)
       })
     },
+
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       pageIsNotLoading()
       const expectedNoteTopics = expectedNotes.map((note) => note['note-title'])
@@ -60,79 +80,64 @@ export const noteSidebar = () => {
         })
       })
     },
+
     addingNoteButton() {
       pageIsNotLoading()
       return sidebarAddNoteButton('Add note')
     },
+
     addingChildNoteButton() {
       pageIsNotLoading()
       return sidebarAddNoteButton()
     },
+
     addingChildNote() {
       sidebarAddNoteButton().click()
       return noteCreationForm
     },
+
     addingNextSiblingNote() {
       pageIsNotLoading()
       sidebarAddNoteButton('Add Next Sibling Note').click()
       return noteCreationForm
     },
-    /** Expands a sidebar folder row by human **name** (not a note `.title-text` link). */
-    navigateExpandFolder(folderLabel: string) {
-      pageIsNotLoading()
-      cy.get('aside').within(() => {
-        cy.contains('.sidebar-folder-label', folderLabel)
-          .closest('li')
-          .then(($li) => {
-            if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
-              cy.wrap($li).within(() => {
-                cy.findByTitle('expand children').click()
-              })
-            }
-          })
-      })
-      pageIsNotLoading()
-    },
+
     /**
-     * One path segment after the notebook card: expand a matching **folder** row if present,
-     * otherwise navigate by clicking the **note** `.title-text` row (Legacy parent-only setups
-     * with no mirrored folder rows).
+     * One path segment after the notebook card: expand a matching folder row if present,
+     * otherwise navigate by clicking the note `.title-text` row.
      */
     navigateStructuralIntermediate(segment: string) {
       pageIsNotLoading()
       const label = segment.trim()
-      cy.get('aside').then(($aside) => {
-        const root = $aside.get(0)
-        if (!root) {
-          throw new Error('aside not found')
-        }
-        const matchedFolder = [
-          ...root.querySelectorAll('.sidebar-folder-label'),
-        ].find((el) => el.textContent?.trim() === label)
-        if (matchedFolder) {
-          const li = matchedFolder.closest('li')
-          if (!li) {
-            throw new Error('folder label not in li')
+
+      cy.get('aside')
+        .then(($aside) => {
+          const root = $aside.get(0)
+          if (!root) throw new Error('aside not found')
+          return [...root.querySelectorAll('.sidebar-folder-label')].some(
+            (el) => el.textContent?.trim() === label
+          )
+        })
+        .then((hasMatchingFolderRow) => {
+          if (hasMatchingFolderRow) {
+            expandFolderRowIfCollapsed(segment)
+            return
           }
-          cy.wrap(li).then(($li) => {
-            if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
-              cy.wrap($li).within(() => {
-                cy.findByTitle('expand children').click()
-              })
-            }
-          })
-        } else {
-          cy.wrap($aside).within(() => {
+          cy.get('aside').within(() => {
             cy.get('.title-text')
               .filter((_, el) => el.textContent?.trim() === label)
               .first()
               .should('be.visible')
               .click()
           })
-        }
-      })
-      pageIsNotLoading()
+          pageIsNotLoading()
+        })
     },
+
+    expandStructuralIntermediateFolderOnly(segment: string) {
+      expandFolderRowIfCollapsed(segment)
+    },
+
     navigateToNote(noteTopology: string) {
       pageIsNotLoading()
       cy.get('aside').within(() => {
@@ -142,10 +147,58 @@ export const noteSidebar = () => {
       })
       pageIsNotLoading()
     },
+
+    /** Child note rows (`li` with `.title-text`) under an expanded sidebar folder, in DOM order. */
+    expectChildrenUnderFolder(
+      folderLabel: string,
+      children: Record<string, string>[]
+    ) {
+      pageIsNotLoading()
+      const expected = children.map(
+        (row) => row['note-title'] ?? row.Title ?? ''
+      )
+      if (expected.length > 0 && expected.some((t) => !t)) {
+        throw new Error('each row must include note-title or Title')
+      }
+
+      cy.get('aside').within(() => {
+        if (expected.length === 0) {
+          folderRowByExactLabel(folderLabel)
+            .children('ul.daisy-list-group')
+            .should('not.exist')
+          return
+        }
+
+        folderRowByExactLabel(folderLabel)
+          .children('ul.daisy-list-group')
+          .first()
+          .should('be.visible')
+          .children('li')
+          .filter((_, li) => Cypress.$(li).find('.title-text').length > 0)
+          .should('have.length', expected.length)
+          .as('folderNoteRows')
+
+        children.forEach((elem, noteIndex) => {
+          cy.get('@folderNoteRows')
+            .eq(noteIndex)
+            .within(() => {
+              for (const propName in elem) {
+                const value = elem[propName]!
+                if (propName === 'note-title' || propName === 'Title') {
+                  cy.get('.title-text')
+                    .filter((_i, el) => el.textContent?.trim() === value)
+                    .should('have.length.at.least', 1)
+                } else {
+                  cy.findByText(value)
+                }
+              }
+            })
+        })
+      })
+    },
   }
 }
 
-/** Page objects that show the note sidebar (note page, notebook page) share these. */
 export const sidebarChildNotePageMethods = () => ({
   addingNoteButton() {
     return noteSidebar().addingNoteButton()

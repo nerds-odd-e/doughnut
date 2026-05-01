@@ -6,9 +6,9 @@ Feature: Wiki links in notes
     Given I am logged in as an existing user
     And I have a notebook "WikiLinks E2E NB" with a note "WikiLinks E2E Root" and details "An awesome training"
     And there are some notes:
-      | Title             | Parent Title       |
-      | WikiLinks E2E Tech | WikiLinks E2E Root |
-      | WikiLinks E2E CI   | WikiLinks E2E Root |
+      | Title              | Parent Title       | Folder             |
+      | WikiLinks E2E Tech | WikiLinks E2E Root | WikiLinks E2E Root |
+      | WikiLinks E2E CI   | WikiLinks E2E Root | WikiLinks E2E Root |
 
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" details using markdown to become:
@@ -23,8 +23,8 @@ Feature: Wiki links in notes
   Scenario: A qualified wiki link opens a note in another notebook
     Given I have a notebook "WikiCross Src NB" with a note "WikiCross From" and details "origin"
     And I have a notebook "WikiCross Tgt NB" with a note "WikiCross Tgt Root" and notes:
-      | Title           | Parent Title      |
-      | WikiCross Deep  | WikiCross Tgt Root |
+      | Title           | Parent Title       | Folder            |
+      | WikiCross Deep  | WikiCross Tgt Root | WikiCross Tgt Root |
     When I update note "WikiCross From" details using markdown to become:
       """
       Read [[WikiCross Tgt NB:WikiCross Deep]].

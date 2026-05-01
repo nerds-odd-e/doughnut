@@ -31,3 +31,22 @@ export function navigateAlongNotebookCatalogPath(segments: string[]) {
   sidebar.navigateToNote(leafNoteTitle)
   return assumeNotePage(leafNoteTitle)
 }
+
+/**
+ * Opens the notebook and walks the sidebar by structural segments only; the last path
+ * segment is treated as a folder (expanded / structural), not opened as a note view.
+ * Use {@link navigateAlongNotebookCatalogPath} when the last segment is a note to open.
+ */
+export function openFolderAlongNotebookCatalogPath(segments: string[]) {
+  if (segments.length < 2) {
+    throw new Error(
+      'openFolder path needs at least a notebook name and one folder segment'
+    )
+  }
+  const [notebookName, ...pathInNotebook] = segments
+  notebookList().navigateToNotebook(notebookName!)
+  const sidebar = noteSidebar()
+  for (const segment of pathInNotebook) {
+    sidebar.expandStructuralIntermediateFolderOnly(segment)
+  }
+}
