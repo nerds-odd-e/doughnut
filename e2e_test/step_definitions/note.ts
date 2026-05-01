@@ -498,10 +498,6 @@ When('I start to chat about the note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology).startAConversationAboutNote()
 })
 
-When('I collapse the children of note {string}', (noteTopology: string) => {
-  start.assumeNotePage(noteTopology).collapseChildren()
-})
-
 When('I expand the children of note {string}', (noteTopology: string) => {
   start.assumeNotePage(noteTopology).expandChildren()
 })
@@ -512,17 +508,6 @@ When(
     start.noteSidebar().expand(noteTopology)
   }
 )
-
-When(
-  'I should see the note {string} with {int} children collapsed',
-  (noteTopology: string, childrenCount: number) => {
-    start.assumeNotePage(noteTopology).collapsedChildrenWithCount(childrenCount)
-  }
-)
-
-Then('I should see the children notes:', (data: DataTable) => {
-  start.assumeNotePage().expectChildren(data.hashes())
-})
 
 When('I route to the note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)

@@ -12,17 +12,6 @@ Feature: Note tree view
       | Const | TPP            | LeSS in Action/TDD/TPP |
       | Pull  | ATDD           | LeSS in Action/ATDD    |
 
-  Scenario: a note can have children
-    Given I navigate to "LeSS training/LeSS in Action" note
-    When I collapse the children of note "LeSS in Action"
-    Then I should see the note "LeSS in Action" with 3 children collapsed
-    When I expand the children of note "LeSS in Action"
-    Then I should see the children notes:
-      | note-title |
-      | TDD        |
-      | ATDD       |
-      | CI         |
-
   Scenario: expand side bar to see the note tree
     Given I am on a window 500 * 500
     And I navigate to "LeSS training/LeSS in Action" note

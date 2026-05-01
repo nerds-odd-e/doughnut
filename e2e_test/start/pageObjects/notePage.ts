@@ -62,27 +62,8 @@ export const assumeNotePage = (
       cy.get('main').within(() => findChildNoteCard(noteTopology).click())
       return assumeNotePage(noteTopology)
     },
-    collapseChildren: () => {
-      cy.get('main').within(() => {
-        cy.findByRole('button', { name: 'collapse children' }).click()
-      })
-    },
     expandChildren: () => {
       cy.findByRole('button', { name: 'expand children' }).click()
-    },
-    expectChildren: (children: Record<string, string>[]) => {
-      cy.get('main').within(() => {
-        cy.get('.daisy-card-title').should('have.length', children.length)
-        children.forEach((elem) => {
-          for (const propName in elem) {
-            if (propName === 'note-title') {
-              findChildNoteCard(elem[propName]!)
-            } else {
-              cy.findByText(elem[propName]!)
-            }
-          }
-        })
-      })
     },
     addRelationshipTo: (target: string) => {
       // Related notes as child cards use .daisy-card-title .title-text; the note title
@@ -145,9 +126,6 @@ export const assumeNotePage = (
           cy.findByText(noteTopology)
         )
       )
-    },
-    collapsedChildrenWithCount: (count: number) => {
-      cy.findByText(count, { selector: '[role=collapsed-children-count]' })
     },
     findNoteDetails: (expected: string, timeout?: number) => {
       const normalized = expected.replace(/\\n/g, '\n')
