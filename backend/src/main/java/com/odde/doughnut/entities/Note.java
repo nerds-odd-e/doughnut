@@ -64,7 +64,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private NoteAccessory noteAccessory;
 
-  @Column(name = "details")
+  @Column(name = "details", columnDefinition = "mediumtext")
   @Getter
   @Setter
   @JsonPropertyDescription("The details of the note is in markdown format.")
@@ -116,6 +116,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Column(name = "sibling_order")
   @JsonIgnore
   @Getter
+  @Setter
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
   @ManyToOne
