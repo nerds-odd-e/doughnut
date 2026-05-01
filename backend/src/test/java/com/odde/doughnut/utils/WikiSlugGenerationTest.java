@@ -44,4 +44,15 @@ class WikiSlugGenerationTest {
   void uniqueSlugResolvesCollisionsForFallbackBase() {
     assertEquals("untitled-2", WikiSlugGeneration.uniqueSlugWithin("どうやら", Set.of("untitled")));
   }
+
+  @Test
+  void uniqueSlugWithinMaxLen_truncatesBaseWhenNeeded() {
+    assertEquals("abc", WikiSlugGeneration.uniqueSlugWithinMaxLen("Abc Def Ghijk", Set.of(), 3));
+  }
+
+  @Test
+  void uniqueSlugWithinMaxLen_numericSuffixWhenBaseTakenWithinBudget() {
+    assertEquals(
+        "hel-2", WikiSlugGeneration.uniqueSlugWithinMaxLen("Hello World", Set.of("hello"), 5));
+  }
 }

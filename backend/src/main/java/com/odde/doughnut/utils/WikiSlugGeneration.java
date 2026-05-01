@@ -32,4 +32,36 @@ public final class WikiSlugGeneration {
     }
     return candidate;
   }
+
+  /**
+   * Like {@link #uniqueSlugWithin} but each candidate is truncated so {@code candidate.length() <=
+   * maxLen}. Use when the owning path prefix already consumes most of the slug column length.
+   */
+  public static String uniqueSlugWithinMaxLen(
+      String rawSeed, Set<String> siblingSlugs, int maxLen) {
+    Objects.requireNonNull(siblingSlugs, "siblingSlugs");
+    if (maxLen < 1) {
+      throw new IllegalArgumentException("maxLen must be >= 1");
+    }
+    String base = toBaseSlug(rawSeed);
+    String candidate = truncateToLen(base, maxLen);
+    int n = 2;
+    while (siblingSlugs.contains(candidate)) {
+      String suffix = "-" + n;
+      int budget = maxLen - suffix.length();
+      if (budget < 1) {
+        throw new IllegalStateException("Cannot uniquify slug within maxLen=" + maxLen);
+      }
+      candidate = truncateToLen(base, budget) + suffix;
+      n++;
+    }
+    return candidate;
+  }
+
+  private static String truncateToLen(String s, int maxLen) {
+    if (s.length() <= maxLen) {
+      return s;
+    }
+    return s.substring(0, maxLen);
+  }
 }

@@ -29,6 +29,10 @@ import org.springframework.lang.NonNull;
 @JsonPropertyOrder({"noteTopology", "details", "parentId", "relationType", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
+
+  /** Matches DB {@code note.slug} column length (see Flyway {@code V300000151}). */
+  public static final int MAX_SLUG_LENGTH = 767;
+
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
   @OneToOne
@@ -53,7 +57,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @Column(name = "slug", nullable = false)
   @NotNull
-  @Size(min = 1, max = 767)
+  @Size(min = 1, max = MAX_SLUG_LENGTH)
   @Getter
   @Setter
   @JsonIgnore

@@ -4,6 +4,8 @@ import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.utils.WikiSlugGeneration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -57,7 +59,17 @@ public class WikiSlugPathService {
             ? Set.of()
             : WikiSlugPathAssignment.basenamesFromSlugs(
                 findNoteSlugsInFolderScopeJdbc(notebookId, folderId, excludeNoteId));
+
+    String folderSlug = folder == null ? null : folder.getSlug();
+    if (folderSlug != null && folderSlug.length() >= Note.MAX_SLUG_LENGTH - 1) {
+      assignNotebookUniqueFallbackSlug(note, notebookId, excludeNoteId);
+      return;
+    }
+
     WikiSlugPathAssignment.setNoteSlug(note, siblingBasenames);
+    if (note.getSlug().length() > Note.MAX_SLUG_LENGTH) {
+      assignNotebookUniqueFallbackSlug(note, notebookId, excludeNoteId);
+    }
   }
 
   public void assignSlugForNewNoteSkippingSiblingQuery(Note note) {
@@ -109,5 +121,31 @@ public class WikiSlugPathService {
         notebookId,
         folderId,
         excludeNoteId);
+  }
+
+  private List<String> findNoteSlugsInNotebookJdbc(Integer notebookId, Integer excludeNoteId) {
+    if (excludeNoteId == null) {
+      return jdbcTemplate.queryForList(
+          "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL",
+          String.class,
+          notebookId);
+    }
+    return jdbcTemplate.queryForList(
+        "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL AND id <> ?",
+        String.class,
+        notebookId,
+        excludeNoteId);
+  }
+
+  private void assignNotebookUniqueFallbackSlug(
+      Note note, Integer notebookId, Integer excludeNoteId) {
+    List<String> existing = findNoteSlugsInNotebookJdbc(notebookId, excludeNoteId);
+    Set<String> taken = new HashSet<>(existing);
+    Integer id = note.getId();
+    if (id != null) {
+      note.setSlug(WikiSlugGeneration.uniqueSlugWithin("nid" + id, taken));
+      return;
+    }
+    note.setSlug(WikiSlugGeneration.uniqueSlugWithin("nidtmp", taken));
   }
 }
