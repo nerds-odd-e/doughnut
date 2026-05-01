@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationProgress;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
@@ -14,9 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminDataMigrationService implements AdminDataMigrationProgressPopulator {
 
+  public static final String DIAGNOSTIC_MARKER = "admin-wiki-migration-diagnostics:slug-path-v2";
+
   public static final String READY_MESSAGE =
-      "Wiki data migration: relationship wiki backfill (title, details, cache), legacy parent"
-          + " frontmatter and cache on child notes, then batched note slug regeneration.";
+      ("Wiki data migration [%s]: relationship wiki backfill (title, details, cache), legacy parent"
+              + " frontmatter and cache on child notes, then batched note slug regeneration.")
+          .formatted(DIAGNOSTIC_MARKER);
 
   public static final String STEP_RELATIONSHIP_WIKI_BACKFILL = "relationship_wiki_backfill";
   public static final String STEP_LEGACY_PARENT_FRONTMATTER = "legacy_parent_frontmatter";
@@ -70,13 +74,18 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       return batchWorker.executeBatch(adminUser);
     } catch (RuntimeException e) {
       String step = stepNameForRecordedFailureMark();
-      wikiReferenceMigrationProgressService.markFailed(step, errorMessageSafe(e));
-      return dtoAfterFailure(step, e.getMessage());
+      String failureMessage = failureMessage(step, e);
+      wikiReferenceMigrationProgressService.markFailed(step, errorMessageSafe(failureMessage));
+      return dtoAfterFailure(failureMessage);
     }
   }
 
   private static String errorMessageSafe(RuntimeException e) {
     String m = e.getMessage();
+    return errorMessageSafe(m);
+  }
+
+  private static String errorMessageSafe(String m) {
     if (m != null && m.length() > 65535) {
       return m.substring(0, 65535);
     }
@@ -209,11 +218,30 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     return dto;
   }
 
-  private AdminDataMigrationStatusDTO dtoAfterFailure(String step, String message) {
+  private AdminDataMigrationStatusDTO dtoAfterFailure(String message) {
     AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
     dto.setMessage("Migration batch failed: " + message);
     populateMigrationProgress(dto);
     return dto;
+  }
+
+  private static String failureMessage(String step, RuntimeException e) {
+    return "marker=%s; step=%s; batchSize=%d; noteSlugMaxLen=%d; cause=%s; rootCause=%s"
+        .formatted(
+            DIAGNOSTIC_MARKER,
+            step,
+            WIKI_REFERENCE_MIGRATION_BATCH_SIZE,
+            Note.MAX_SLUG_LENGTH,
+            e.getMessage() == null ? "" : e.getMessage(),
+            rootCauseMessage(e));
+  }
+
+  private static String rootCauseMessage(Throwable e) {
+    Throwable root = e;
+    while (root.getCause() != null) {
+      root = root.getCause();
+    }
+    return root.getMessage() == null ? "" : root.getMessage();
   }
 
   private long countLegacyChildNotesEligibleForWikiMigration() {

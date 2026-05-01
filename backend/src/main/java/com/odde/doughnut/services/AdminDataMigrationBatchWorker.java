@@ -237,9 +237,7 @@ public class AdminDataMigrationBatchWorker {
     Map<Integer, Note> byId =
         loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
     for (Note note : notesForBatchIdsInOrder(batchIds, byId)) {
-      wikiSlugPathService.assignSlugForNewNote(note);
-      entityPersister.merge(note);
-      entityPersister.flush();
+      regenerateSlugForNoteInBatch(note, batchIds);
     }
     int lastId = batchIds.get(batchIds.size() - 1);
     wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
@@ -253,6 +251,54 @@ public class AdminDataMigrationBatchWorker {
         "Slug regeneration: processed %d note(s) in this batch.".formatted(batchIds.size()));
     progressPopulator.populateMigrationProgress(dto);
     return dto;
+  }
+
+  private void regenerateSlugForNoteInBatch(Note note, List<Integer> batchIds) {
+    String oldSlug = note.getSlug();
+    try {
+      wikiSlugPathService.assignSlugForNewNote(note);
+      entityPersister.merge(note);
+      entityPersister.flush();
+    } catch (RuntimeException e) {
+      throw new IllegalStateException(slugRegenerationFailureDetails(note, oldSlug, batchIds), e);
+    }
+  }
+
+  private static String slugRegenerationFailureDetails(
+      Note note, String oldSlug, List<Integer> batchIds) {
+    String assignedSlug = note.getSlug();
+    String folderSlug = note.getFolder() == null ? null : note.getFolder().getSlug();
+    Integer folderId = note.getFolder() == null ? null : note.getFolder().getId();
+    return "slug-regeneration-note-failed marker=%s noteId=%s notebookId=%s folderId=%s"
+        + " title=%s oldSlugLen=%d assignedSlugLen=%d folderSlugLen=%d oldSlug=%s assignedSlug=%s"
+        + " folderSlug=%s batchIds=%s"
+            .formatted(
+                AdminDataMigrationService.DIAGNOSTIC_MARKER,
+                note.getId(),
+                note.getNotebook().getId(),
+                folderId,
+                preview(note.getTitle()),
+                lengthOf(oldSlug),
+                lengthOf(assignedSlug),
+                lengthOf(folderSlug),
+                preview(oldSlug),
+                preview(assignedSlug),
+                preview(folderSlug),
+                batchIds);
+  }
+
+  private static int lengthOf(String value) {
+    return value == null ? 0 : value.length();
+  }
+
+  private static String preview(String value) {
+    if (value == null) {
+      return "<null>";
+    }
+    if (value.length() <= 120) {
+      return value;
+    }
+    return value.substring(0, 80) + "..." + value.substring(value.length() - 20);
   }
 
   private Integer exclusiveLastProcessedNoteId(String stepName) {
