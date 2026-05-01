@@ -476,4 +476,26 @@ describe("replaceWikiLinksInHtml", () => {
       'class="dead-link"'
     )
   })
+
+  it("upgrades rich-editor dead-link anchors when wikiTitles resolve", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        '<p><a href="#" class="dead-link">MyNote</a></p>',
+        [{ linkText: "MyNote", notebookId: 9, slug: "my-note" }]
+      )
+    ).toBe(
+      '<p><a href="/d/notebooks/9/notes/my-note" class="doughnut-link">MyNote</a></p>'
+    )
+  })
+
+  it("upgrades dead-link anchors when class precedes href", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        '<p><a class="dead-link" href="#">MyNote</a></p>',
+        [{ linkText: "MyNote", notebookId: 9, slug: "my-note" }]
+      )
+    ).toBe(
+      '<p><a href="/d/notebooks/9/notes/my-note" class="doughnut-link">MyNote</a></p>'
+    )
+  })
 })
