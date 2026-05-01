@@ -28,7 +28,7 @@ Feature: Note creation should have details if wikidata is a person
   @usingMockedWikidataService
   Scenario: Add country of origin as a sibling when the person is created
     When I create a note belonging to "People" with title "Confucius" and wikidata id "Q4604"
-    Then I should see "Notable people/People" with these children
+    Then I should see folder "Notable people/People" containing these notes:
       | note-title |
       | Taiwan     |
       | Confucius  |

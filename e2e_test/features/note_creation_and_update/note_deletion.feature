@@ -17,7 +17,7 @@ Feature: Note deletion
     Given there is "a part of" relationship between note "TDD" and "tech"
     And I should see "TDD" has relationship "a part of" "tech"
     When I delete note "TDD"
-    Then I should see "LeSS training/LeSS in Action/tech" with these children
+    Then I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
     When I undo "delete note"
@@ -28,11 +28,11 @@ Feature: Note deletion
     Given I delete note "TDD" at 13:00
     And I delete note "tech" at 14:00
     When I undo delete note to recover note "tech"
-    And I should see "LeSS training/LeSS in Action/tech" with these children
+    And I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
     When I undo delete note to recover note "TDD" again
-    And I should see "LeSS training/LeSS in Action/tech" with these children
+    And I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
       | TDD        |
@@ -47,7 +47,7 @@ Feature: Note deletion
     When I delete note "child"
     Then I should see the note "child" is marked as deleted
     And I should see the note "Unit Test" is marked as deleted
-    And I should see "Descendants suite/Descendants Test/parent" with these children
+    And I should see folder "Descendants suite/Descendants Test/parent" containing these notes:
       | note-title |
 
   Scenario: Delete a note will delete its references
@@ -59,6 +59,6 @@ Feature: Note deletion
     And I should see "source" has relationship "a part of" "target"
     When I delete note "target"
     And I navigate to References suite/References Test note
-    Then I should see "References suite/References Test" with these children
+    Then I should see folder "References suite/References Test" containing these notes:
       | note-title |
       | source     |

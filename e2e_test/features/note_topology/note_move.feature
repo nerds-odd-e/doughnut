@@ -11,9 +11,9 @@ Feature: note move
   @mockBrowserTime
   Scenario: link and move
     Given I move note "Sedition" to be under note "Sedation"
-    Then I should see "Sedation care/Sedation" with these children
+    Then I should see folder "Sedation care/Sedation" containing these notes:
       | note-title   |
       | Sedition     |
     When I undo "move note"
-    Then I should see "Sedation care/Sedation" with these children
+    Then I should see folder "Sedation care/Sedation" containing these notes:
       | note-title   |

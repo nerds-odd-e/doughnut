@@ -17,7 +17,7 @@ Feature: Nested Note creation
       | team         |
       | tech         |
       | Re-quirement |
-    And I should see "LeSS training/LeSS in Action" with these children
+    And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title   |
       | team         |
       | tech         |
@@ -35,7 +35,7 @@ Feature: Nested Note creation
       | team         |
       | coordination |
       | tech         |
-    And I should see "LeSS training/LeSS in Action" with these children
+    And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title   |
       | team         |
       | coordination |
@@ -45,7 +45,7 @@ Feature: Nested Note creation
     When I create a note belonging to "LeSS in Action" with title "New Note"
     And I undo "create note"
     Then I should see the note "New Note" is marked as deleted
-    And I should see "LeSS training/LeSS in Action" with these children
+    And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title |
       | team       |
       | tech       |

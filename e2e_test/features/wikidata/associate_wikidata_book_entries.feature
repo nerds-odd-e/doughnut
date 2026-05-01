@@ -14,7 +14,7 @@ Feature: Note creation for a book
       | Q45575          |
       | Q92608          |
     When I create a note belonging to "My Favourite Books" with title "The C Programming Language" and wikidata id "Q1137974"
-    Then I should see "Favorite reads/My Favourite Books" with these children
+    Then I should see folder "Favorite reads/My Favourite Books" containing these notes:
       | note-title                 |
       | The C Programming Language |
       | Dennis Ritchie             |

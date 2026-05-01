@@ -305,7 +305,7 @@ Then('I should see my notebooks:', (data: DataTable) => {
 })
 
 Then(
-  'I should see {notepath} with these children',
+  'I should see folder {notepath} containing these notes:',
   (notePath: NotePath, data: DataTable) => {
     start
       .pageIsNotLoading()

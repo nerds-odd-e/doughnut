@@ -41,7 +41,7 @@ Feature: Understanding Check
     When I am assimilating the note "Sample"
     And I should see an understanding checklist with 5 points
     And I promote the point "B" to a sibling note
-    Then I should see "Sample tree/Parent" with these children
+    Then I should see folder "Sample tree/Parent" containing these notes:
       | note-title |
       | Sample     |
       | Point B    |

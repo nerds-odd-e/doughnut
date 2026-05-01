@@ -17,7 +17,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Scenario: Adding note to a known parent note
     When AI agent adds note via MCP tool to add note "Procedural" under "Programming Concepts"
-    Then I should see "CS concepts/Programming Concepts" with these children
+    Then I should see folder "CS concepts/Programming Concepts" containing these notes:
       | note-title      |
       | Object Oriented |
       | Functional      |
