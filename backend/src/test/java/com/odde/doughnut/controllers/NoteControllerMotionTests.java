@@ -10,9 +10,7 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteChildContainerFolderService;
-import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -137,9 +135,9 @@ class NoteControllerMotionTests extends ControllerTestBase {
   }
 
   @Nested
-  class SlugOnMove {
+  class FolderAlignmentOnMove {
     @Test
-    void moveAsFirstChildOfSibling_prefixedSlugUsesTargetFolderSlug()
+    void moveAsFirstChildOfSibling_assignsChildContainerFolder()
         throws UnexpectedNoAccessRightException,
             CyclicLinkDetectedException,
             MovementNotPossibleException {
@@ -152,11 +150,11 @@ class NoteControllerMotionTests extends ControllerTestBase {
       controller.moveAfter(leaf, siblingContainer, "asFirstChild");
       makeMe.refresh(leaf);
       assertThat(leaf.getFolder(), notNullValue());
-      assertThat(leaf.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(leaf.getId())));
+      assertThat(leaf.getFolder().getName(), equalTo(siblingContainer.getTitle()));
     }
 
     @Test
-    void moveIntoFolderWhereTitlesCollide_keepsStableSlugPerNote()
+    void moveIntoFolderWhereTitlesCollide_updatesParentAndNotebookScope()
         throws UnexpectedNoAccessRightException,
             CyclicLinkDetectedException,
             MovementNotPossibleException {
@@ -171,16 +169,11 @@ class NoteControllerMotionTests extends ControllerTestBase {
       alignFoldersForTestSubtree(root);
       alignFoldersForTestSubtree(otherRoot);
       makeMe.entityPersister.flush();
-      Stream.concat(Stream.of(root), root.getAllDescendants())
-          .forEach(makeMe.wikiSlugPathService::assignSlugForNewNote);
-      Stream.concat(Stream.of(otherRoot), otherRoot.getAllDescendants())
-          .forEach(makeMe.wikiSlugPathService::assignSlugForNewNote);
-      makeMe.entityPersister.flush();
-      makeMe.refresh(mover);
 
       controller.moveAfter(mover, secondDup, "");
       makeMe.refresh(mover);
-      assertThat(mover.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(mover.getId())));
+      assertThat(mover.getParent(), equalTo(section));
+      assertThat(mover.getNotebook().getId(), equalTo(root.getNotebook().getId()));
     }
   }
 }

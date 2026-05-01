@@ -70,7 +70,6 @@ class AdminDataMigrationServiceTest {
     String expectedTitle =
         RelationshipNoteTitleFormatter.format("Alpha", RelationType.PART.label, "Beta");
     assertThat(updated.getTitle(), equalTo(expectedTitle));
-    assertThat(updated.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(updated.getId())));
   }
 
   @Test

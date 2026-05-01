@@ -213,20 +213,8 @@ class TestabilityRestController {
     }
 
     private void saveByOriginalOrder(
-        Map<String, Note> titleNoteMap,
-        EntityPersister entityPersister,
-        WikiSlugPathService wikiSlugPathService) {
-      noteTestData.forEach(
-          inject -> {
-            Note note = titleNoteMap.get(inject.title);
-            wikiSlugPathService.assignSlugForNewNote(note);
-            entityPersister.save(note);
-          });
-      entityPersister.flush();
-      noteTestData.forEach(
-          inject ->
-              wikiSlugPathService.finalizeNoteSlugAfterPersist(
-                  Objects.requireNonNull(titleNoteMap.get(inject.title))));
+        Map<String, Note> titleNoteMap, EntityPersister entityPersister) {
+      noteTestData.forEach(inject -> entityPersister.save(titleNoteMap.get(inject.title)));
     }
   }
 
@@ -340,7 +328,7 @@ class TestabilityRestController {
         this.noteRepository,
         this.entityPersister);
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
-    notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister, this.wikiSlugPathService);
+    notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));
   }

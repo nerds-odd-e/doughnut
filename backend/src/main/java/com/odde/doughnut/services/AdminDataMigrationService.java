@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationProgress;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
@@ -227,7 +226,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
             DIAGNOSTIC_MARKER,
             step,
             WIKI_REFERENCE_MIGRATION_BATCH_SIZE,
-            Note.MAX_SLUG_LENGTH,
+            767,
             e.getMessage() == null ? "" : e.getMessage(),
             rootCauseMessage(e));
   }

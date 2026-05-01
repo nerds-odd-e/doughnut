@@ -74,7 +74,7 @@ class FolderRepositoryTest {
     Note loaded = noteRepository.findById(note.getId()).orElseThrow();
 
     assertThat(loaded.getFolder(), nullValue());
-    assertThat(loaded.getSlug(), notNullValue());
+    assertThat(loaded.getId(), notNullValue());
   }
 
   @Test
@@ -100,21 +100,6 @@ class FolderRepositoryTest {
     assertThat(loaded.getSlug(), equalTo("drafts"));
   }
 
-  @Test
-  void persistsAndReloadsNoteSlug() {
-    Notebook notebook = makeMe.aNotebook().please();
-    Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
-    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    Note note = makeMe.aNote().under(root).folder(folder).please();
-    note.setSlug("inbox/my-note");
-    makeMe.entityPersister.flush();
-
-    Note loaded = noteRepository.findById(note.getId()).orElseThrow();
-
-    assertThat(loaded.getSlug(), equalTo("inbox/my-note"));
-  }
-
-  @Test
   void nestedFoldersMirrorContainmentHierarchyForNotes() {
     Notebook notebook = makeMe.aNotebook().please();
     Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();

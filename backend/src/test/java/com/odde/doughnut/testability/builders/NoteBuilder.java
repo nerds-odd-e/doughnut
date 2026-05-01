@@ -105,9 +105,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (needPersist) {
       ensureParentNotesPersisted(entity);
     }
-    if (entity.getSlug() == null || entity.getSlug().isEmpty()) {
-      fillNoteSlug(entity);
-    }
   }
 
   private void ensureParentNotesPersisted(Note note) {
@@ -117,33 +114,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     ensureParentNotesPersisted(parent);
     if (parent.getId() == null) {
-      if (parent.getSlug() == null || parent.getSlug().isEmpty()) {
-        fillNoteSlug(parent);
-      }
       makeMe.entityPersister.save(parent);
       makeMe.entityPersister.flush();
-      if (makeMe.wikiSlugPathService != null) {
-        makeMe.wikiSlugPathService.finalizeNoteSlugAfterPersist(parent);
-      }
-    }
-  }
-
-  private void fillNoteSlug(Note note) {
-    if (makeMe.wikiSlugPathService != null
-        && note.getNotebook() != null
-        && note.getNotebook().getId() != null) {
-      makeMe.wikiSlugPathService.assignSlugForNewNote(note);
-    } else {
-      note.setSlug("nid-stub");
     }
   }
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    if (needPersist && makeMe.wikiSlugPathService != null) {
-      makeMe.entityPersister.flush();
-      makeMe.wikiSlugPathService.finalizeNoteSlugAfterPersist(entity);
-    }
     relationBuilders.forEach(relationBuilder -> relationBuilder.please(needPersist));
     predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
@@ -166,11 +143,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder folder(Folder folder) {
     this.folder = folder;
-    return this;
-  }
-
-  public NoteBuilder slug(String slug) {
-    entity.setSlug(slug);
     return this;
   }
 

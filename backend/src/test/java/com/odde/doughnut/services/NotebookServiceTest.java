@@ -53,7 +53,7 @@ class NotebookServiceTest {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
     Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    makeMe.theNote(root).title("Index").slug("notebook-landing").please();
+    makeMe.theNote(root).title("Index").please();
 
     Optional<Note> result = notebookService.findOptionalIndexNote(notebook);
 

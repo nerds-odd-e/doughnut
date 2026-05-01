@@ -31,21 +31,10 @@ class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
       WHERE hn.id = ?
       """;
 
-  private static final String DISAMBIGUATE_OTHER_INDEX_SLUGS_IN_NOTEBOOK =
-      """
-      UPDATE note n
-      SET n.slug = CONCAT('legacy-index-', n.id)
-      WHERE n.id <> ?
-        AND n.notebook_id = ?
-        AND n.slug = 'index'
-        AND n.deleted_at IS NULL
-      """;
-
-  private static final String RENAME_ROOT_NOTE_TO_INDEX_SLUG_AND_TITLE =
+  private static final String RENAME_ROOT_NOTE_TO_INDEX_TITLE =
       """
       UPDATE note hn
       SET hn.title = 'index',
-          hn.slug = 'index',
           hn.folder_id = NULL,
           hn.parent_id = NULL
       WHERE hn.id = ?
@@ -68,7 +57,7 @@ class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
   }
 
   @Test
-  void legacyRootBecomesIndexNote_preservesNotebookNameAndResolvesIndexSlug()
+  void legacyRootBecomesIndexNote_preservesNotebookNameAndIndexTitle()
       throws UnexpectedNoAccessRightException {
     User user = makeMe.aUser().please();
     currentUser.setUser(user);
@@ -85,8 +74,7 @@ class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
     makeMe.entityPersister.flush();
 
     jdbcTemplate.update(BACKFILL_NOTEBOOK_NAME, rootNoteId);
-    jdbcTemplate.update(DISAMBIGUATE_OTHER_INDEX_SLUGS_IN_NOTEBOOK, rootNoteId, notebookId);
-    jdbcTemplate.update(RENAME_ROOT_NOTE_TO_INDEX_SLUG_AND_TITLE, rootNoteId);
+    jdbcTemplate.update(RENAME_ROOT_NOTE_TO_INDEX_TITLE, rootNoteId);
     entityManager.clear();
 
     String storedName =
@@ -97,10 +85,7 @@ class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
     String storedTitle =
         jdbcTemplate.queryForObject(
             "SELECT title FROM note WHERE id = ?", String.class, rootNoteId);
-    String storedSlug =
-        jdbcTemplate.queryForObject("SELECT slug FROM note WHERE id = ?", String.class, rootNoteId);
     assertThat(storedTitle, equalTo("index"));
-    assertThat(storedSlug, equalTo("index"));
 
     Notebook reloadedNb = notebookRepository.findById(notebookId).orElseThrow();
     assertThat(notebookController.get(reloadedNb).indexNoteId(), equalTo(rootNoteId));

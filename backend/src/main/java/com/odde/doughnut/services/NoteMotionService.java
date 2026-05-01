@@ -6,22 +6,18 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteMotionService {
   private final EntityPersister entityPersister;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
-  private final WikiSlugPathService wikiSlugPathService;
 
   public NoteMotionService(
       EntityPersister entityPersister,
-      NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiSlugPathService wikiSlugPathService) {
+      NoteChildContainerFolderService noteChildContainerFolderService) {
     this.entityPersister = entityPersister;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
-    this.wikiSlugPathService = wikiSlugPathService;
   }
 
   public void execute(Note subject, Note relativeToNote, boolean asFirstChildOfNote)
@@ -38,9 +34,7 @@ public class NoteMotionService {
     entityPersister.flush();
     alignFoldersForNoteAndDescendants(subject);
     entityPersister.flush();
-    recomputeSlugPathsForNoteSubtree(subject);
 
-    // Save all descendants as their notebooks have changed
     subject.getAllDescendants().forEach(entityPersister::merge);
     entityPersister.merge(subject);
     entityPersister.flush();
@@ -88,15 +82,9 @@ public class NoteMotionService {
     entityPersister.flush();
     alignFoldersForNoteAndDescendants(note);
     entityPersister.flush();
-    recomputeSlugPathsForNoteSubtree(note);
     note.getAllDescendants().forEach(entityPersister::merge);
     entityPersister.merge(note);
     entityPersister.flush();
-  }
-
-  private void recomputeSlugPathsForNoteSubtree(Note root) {
-    Stream.concat(Stream.of(root), root.getAllDescendants())
-        .forEach(wikiSlugPathService::assignSlugForNewNote);
   }
 
   private void alignFoldersForNoteAndDescendants(Note root) {

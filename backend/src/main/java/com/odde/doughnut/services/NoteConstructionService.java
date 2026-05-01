@@ -39,7 +39,6 @@ public class NoteConstructionService {
   private final EntityPersister entityPersister;
   private final NoteService noteService;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
-  private final WikiSlugPathService wikiSlugPathService;
   private final NoteRealmService noteRealmService;
 
   @Autowired
@@ -51,7 +50,6 @@ public class NoteConstructionService {
       EntityPersister entityPersister,
       NoteService noteService,
       NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiSlugPathService wikiSlugPathService,
       NoteRealmService noteRealmService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
@@ -60,7 +58,6 @@ public class NoteConstructionService {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
-    this.wikiSlugPathService = wikiSlugPathService;
     this.noteRealmService = noteRealmService;
   }
 
@@ -82,12 +79,9 @@ public class NoteConstructionService {
     User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeAsNotebookRoot(notebook, user, ts, title);
-    wikiSlugPathService.assignSlugForNewNote(note);
     assignSiblingOrderAppendLast(note);
     if (entityPersister != null) {
       entityPersister.save(note);
-      entityPersister.flush();
-      wikiSlugPathService.finalizeNoteSlugAfterPersist(note);
     }
     return note;
   }
@@ -117,12 +111,9 @@ public class NoteConstructionService {
     note.initialize(user, null, ts, title);
     note.assignNotebook(notebook);
     note.setFolder(folder);
-    wikiSlugPathService.assignSlugForNewNote(note);
     assignSiblingOrderAppendLast(note);
     if (entityPersister != null) {
       entityPersister.save(note);
-      entityPersister.flush();
-      wikiSlugPathService.finalizeNoteSlugAfterPersist(note);
     }
     return note;
   }

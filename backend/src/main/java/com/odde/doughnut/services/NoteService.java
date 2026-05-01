@@ -27,21 +27,18 @@ public class NoteService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
-  private final WikiSlugPathService wikiSlugPathService;
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiSlugPathService wikiSlugPathService) {
+      NoteChildContainerFolderService noteChildContainerFolderService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
-    this.wikiSlugPathService = wikiSlugPathService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -230,10 +227,7 @@ public class NoteService {
         RelationshipNoteMarkdownFormatter.format(
             type, sourceNote.getTitle(), targetNote.getTitle(), null));
     relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
-    wikiSlugPathService.assignSlugForNewNote(relation);
     entityPersister.save(relation);
-    entityPersister.flush();
-    wikiSlugPathService.finalizeNoteSlugAfterPersist(relation);
     return relation;
   }
 

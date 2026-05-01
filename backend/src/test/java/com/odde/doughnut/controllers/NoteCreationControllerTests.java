@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteChildContainerFolderService;
-import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
@@ -109,18 +108,17 @@ class NoteCreationControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void assignsStableNoteSlugAndFolderSlugFromTitles()
+    void assignsFolderSlugFromParentTitle()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent =
           makeMe.aNote().title("ExplicitParent").creatorAndOwner(currentUser.getUser()).please();
       NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       Note created = noteRepository.findById(response.getId()).orElseThrow();
       assertThat(created.getFolder().getSlug(), equalTo("explicitparent"));
-      assertThat(created.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(created.getId())));
     }
 
     @Test
-    void assignsNestedFolderSlugsAndStableNoteSlug()
+    void assignsNestedFolderSlugsForSectionAndLeaf()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Note bookRoot =
           makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
@@ -137,11 +135,10 @@ class NoteCreationControllerTests extends ControllerTestBase {
               .orElseThrow();
       assertThat(section.getFolder().getSlug(), equalTo("bookhead"));
       assertThat(leaf.getFolder().getSlug(), equalTo("bookhead/section"));
-      assertThat(leaf.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(leaf.getId())));
     }
 
     @Test
-    void assignsDistinctStableNoteSlugsWhenSameTitleUnderSameFolder()
+    void duplicateTitlesUnderSameFolder_shareChildContainerFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent = makeMe.aNote().title("SharedParent").creatorAndOwner(currentUser.getUser()).please();
       noteCreation.setNewTitle("dup");
@@ -149,13 +146,13 @@ class NoteCreationControllerTests extends ControllerTestBase {
           noteRepository
               .findById(controller.createNoteUnderParent(parent, noteCreation).getId())
               .orElseThrow();
-      assertThat(n1.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(n1.getId())));
       noteCreation.setNewTitle("dup");
       Note n2 =
           noteRepository
               .findById(controller.createNoteUnderParent(parent, noteCreation).getId())
               .orElseThrow();
-      assertThat(n2.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(n2.getId())));
+      assertThat(n1.getFolder().getId(), equalTo(n2.getFolder().getId()));
+      assertThat(n1.getId(), not(equalTo(n2.getId())));
     }
 
     @Test

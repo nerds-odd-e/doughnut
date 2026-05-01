@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminDataMigrationBatchWorker {
 
   private final NoteRepository noteRepository;
-  private final WikiSlugPathService wikiSlugPathService;
   private final EntityPersister entityPersister;
   private final WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService;
   private final WikiTitleCacheService wikiTitleCacheService;
@@ -32,14 +31,12 @@ public class AdminDataMigrationBatchWorker {
 
   public AdminDataMigrationBatchWorker(
       NoteRepository noteRepository,
-      WikiSlugPathService wikiSlugPathService,
       EntityPersister entityPersister,
       WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService,
       WikiTitleCacheService wikiTitleCacheService,
       JdbcTemplate jdbcTemplate,
       @Lazy AdminDataMigrationProgressPopulator progressPopulator) {
     this.noteRepository = noteRepository;
-    this.wikiSlugPathService = wikiSlugPathService;
     this.entityPersister = entityPersister;
     this.wikiReferenceMigrationProgressService = wikiReferenceMigrationProgressService;
     this.wikiTitleCacheService = wikiTitleCacheService;
@@ -103,7 +100,6 @@ public class AdminDataMigrationBatchWorker {
                 relation.getTargetNote().getTitle(),
                 relation.getDetails()));
       }
-      wikiSlugPathService.assignSlugForNewNote(relation);
       User viewer = viewerForWikiTitleCacheRefresh(relation, adminUser);
       refreshWikiTitleCacheForRelationshipMigration(relation, viewer);
       entityPersister.merge(relation);

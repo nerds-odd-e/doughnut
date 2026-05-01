@@ -35,7 +35,6 @@ import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteChildContainerFolderService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
-import com.odde.doughnut.services.WikiSlugPathService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -239,7 +238,6 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(created.getParent(), nullValue());
       assertThat(created.getFolder(), nullValue());
       assertThat(created.getNotebook().getId(), equalTo(nb.getId()));
-      assertThat(created.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(created.getId())));
     }
 
     @Test
