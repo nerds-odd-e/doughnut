@@ -55,7 +55,10 @@ public class AdminDataMigrationBatchWorker {
     if (!wikiStepCompleted(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER)) {
       return runLegacyParentFrontmatterBatch(adminUser);
     }
-    return runSlugRegenerationBatch();
+    AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
+    dto.setMessage("Wiki reference migration is already complete.");
+    progressPopulator.populateMigrationProgress(dto);
+    return dto;
   }
 
   private boolean wikiStepCompleted(String stepName) {
@@ -215,90 +218,6 @@ public class AdminDataMigrationBatchWorker {
         // Cache can be rebuilt when the note is loaded in the app.
       }
     }
-  }
-
-  private AdminDataMigrationStatusDTO runSlugRegenerationBatch() {
-    String step = AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION;
-    long total = noteRepository.countNonDeletedNotes();
-    wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(total));
-    Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
-    List<Integer> batchIds =
-        noteRepository.findNonDeletedNoteIdsExclusiveAfterAsc(
-            exclusiveAfter,
-            PageRequest.of(0, AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
-    if (batchIds.isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-      dto.setMessage("Slug regeneration: nothing pending.");
-      progressPopulator.populateMigrationProgress(dto);
-      return dto;
-    }
-    List<Note> loaded = noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(batchIds);
-    Map<Integer, Note> byId =
-        loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
-    for (Note note : notesForBatchIdsInOrder(batchIds, byId)) {
-      regenerateSlugForNoteInBatch(note, batchIds);
-    }
-    int lastId = batchIds.get(batchIds.size() - 1);
-    wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
-    if (noteRepository
-        .findNonDeletedNoteIdsExclusiveAfterAsc(lastId, PageRequest.of(0, 1))
-        .isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-    }
-    AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    dto.setMessage(
-        "Slug regeneration: processed %d note(s) in this batch.".formatted(batchIds.size()));
-    progressPopulator.populateMigrationProgress(dto);
-    return dto;
-  }
-
-  private void regenerateSlugForNoteInBatch(Note note, List<Integer> batchIds) {
-    String oldSlug = note.getSlug();
-    try {
-      wikiSlugPathService.assignSlugForNewNote(note);
-      entityPersister.merge(note);
-      entityPersister.flush();
-    } catch (RuntimeException e) {
-      throw new IllegalStateException(slugRegenerationFailureDetails(note, oldSlug, batchIds), e);
-    }
-  }
-
-  private static String slugRegenerationFailureDetails(
-      Note note, String oldSlug, List<Integer> batchIds) {
-    String assignedSlug = note.getSlug();
-    String folderSlug = note.getFolder() == null ? null : note.getFolder().getSlug();
-    Integer folderId = note.getFolder() == null ? null : note.getFolder().getId();
-    return "slug-regeneration-note-failed marker=%s noteId=%s notebookId=%s folderId=%s"
-        + " title=%s oldSlugLen=%d assignedSlugLen=%d folderSlugLen=%d oldSlug=%s assignedSlug=%s"
-        + " folderSlug=%s batchIds=%s"
-            .formatted(
-                AdminDataMigrationService.DIAGNOSTIC_MARKER,
-                note.getId(),
-                note.getNotebook().getId(),
-                folderId,
-                preview(note.getTitle()),
-                lengthOf(oldSlug),
-                lengthOf(assignedSlug),
-                lengthOf(folderSlug),
-                preview(oldSlug),
-                preview(assignedSlug),
-                preview(folderSlug),
-                batchIds);
-  }
-
-  private static int lengthOf(String value) {
-    return value == null ? 0 : value.length();
-  }
-
-  private static String preview(String value) {
-    if (value == null) {
-      return "<null>";
-    }
-    if (value.length() <= 120) {
-      return value;
-    }
-    return value.substring(0, 80) + "..." + value.substring(value.length() - 20);
   }
 
   private Integer exclusiveLastProcessedNoteId(String stepName) {

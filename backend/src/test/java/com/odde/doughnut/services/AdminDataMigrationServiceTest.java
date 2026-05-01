@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -17,10 +16,6 @@ import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.WikiSlugGeneration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -204,17 +199,9 @@ class AdminDataMigrationServiceTest {
     assertThat(leg2.getMessage(), containsString("Legacy parent frontmatter"));
     assertThat(leg2.getMessage(), containsString("1 note"));
 
-    AdminDataMigrationStatusDTO slug1 = adminDataMigrationService.runBatch(admin());
-    assertThat(
-        slug1.getCurrentStepName(),
-        equalTo(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION));
-    assertThat(
-        slug1.getProcessedCount(),
-        equalTo(AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
-
-    AdminDataMigrationStatusDTO slug2 = adminDataMigrationService.runBatch(admin());
-    assertThat(slug2.isWikiReferenceMigrationComplete(), is(true));
-    assertThat(slug2.getMessage(), containsString("Slug regeneration"));
+    AdminDataMigrationStatusDTO done = adminDataMigrationService.runBatch(admin());
+    assertThat(done.isWikiReferenceMigrationComplete(), is(true));
+    assertThat(done.getMessage(), containsString("already complete"));
   }
 
   @Test
@@ -270,60 +257,22 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
-  void runBatch_slugRegenerationRunsInMultipleHttpSizedBatches() {
-    User owner = makeMe.aUser().please();
-    Note root = makeMe.aNote().title("Root").creatorAndOwner(owner).please();
-    int extra = AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE;
-    for (int i = 0; i < extra; i++) {
-      makeMe.aNote().title("Leaf" + i).under(root).please();
-    }
-    makeMe.entityPersister.flush();
+  void obsolete_failed_slug_progress_row_does_not_block_migration_completion() {
+    jdbcTemplate.update(
+        "INSERT INTO wiki_reference_migration_progress (step_name, status, total_count,"
+            + " processed_count, last_error) VALUES (?, ?, ?, ?, ?)",
+        AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION,
+        WikiReferenceMigrationStepStatus.FAILED.name(),
+        27377,
+        2220,
+        "obsolete slug-regeneration failure");
 
-    AdminDataMigrationStatusDTO first = adminDataMigrationService.runBatch(admin());
-    assertThat(first.getMessage(), containsString("Relationship wiki backfill"));
-    assertThat(first.getMessage(), containsString("nothing pending"));
-
-    AdminDataMigrationStatusDTO legacy = adminDataMigrationService.runBatch(admin());
-    assertThat(legacy.getMessage(), containsString("Legacy parent frontmatter"));
-    assertThat(
-        legacy.getCurrentStepName(),
-        anyOf(
-            equalTo(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER),
-            equalTo(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION)));
-
-    AdminDataMigrationStatusDTO slugFirst = adminDataMigrationService.runBatch(admin());
-    assertThat(
-        slugFirst.getCurrentStepName(),
-        equalTo(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION));
-    assertThat(slugFirst.getMessage(), containsString("Slug regeneration"));
-    assertThat(slugFirst.isWikiReferenceMigrationComplete(), is(false));
-    assertThat(
-        slugFirst.getProcessedCount(),
-        equalTo(AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
-
-    AdminDataMigrationStatusDTO slugSecond = adminDataMigrationService.runBatch(admin());
-    assertThat(slugSecond.isWikiReferenceMigrationComplete(), is(true));
-    assertThat(slugSecond.getMessage(), containsString("Slug regeneration"));
-  }
-
-  @Test
-  void runBatch_slugRegeneration_assignsDistinctSlugsWhenDuplicateTitlesShareBatch() {
-    User owner = makeMe.aUser().please();
-    Note root = makeMe.aNote().title("Root").creatorAndOwner(owner).please();
-    int n = AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE;
-    List<Integer> childIds = new ArrayList<>();
-    for (int i = 0; i < n; i++) {
-      childIds.add(makeMe.aNote().title("Collision").under(root).please().getId());
-    }
-    makeMe.entityPersister.flush();
+    Note parent = makeMe.aNote().title("P").please();
+    Note target = makeMe.aNote().title("Q").under(parent).please();
+    makeMe.aRelation().between(parent, target, RelationType.PART).please();
 
     runWikiReferenceMigrationToCompletion();
 
-    Set<String> basenames = new HashSet<>();
-    for (Integer id : childIds) {
-      Note note = makeMe.entityPersister.find(Note.class, id);
-      basenames.add(WikiSlugPathAssignment.basenameOf(note.getSlug()));
-    }
-    assertThat(basenames.size(), equalTo(n));
+    assertThat(adminDataMigrationService.getStatus().isWikiReferenceMigrationComplete(), is(true));
   }
 }

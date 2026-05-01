@@ -31,22 +31,19 @@ class AdminDataMigrationServiceFailureMessageTest {
             OptionalProgress.completed(AdminDataMigrationService.STEP_RELATIONSHIP_WIKI_BACKFILL));
     when(progressService.find(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER))
         .thenReturn(
-            OptionalProgress.completed(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER));
-    when(progressService.find(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION))
-        .thenReturn(
-            OptionalProgress.running(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION));
+            OptionalProgress.running(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER));
     when(batchWorker.executeBatch(Mockito.any())).thenThrow(new RuntimeException("duplicate slug"));
 
     AdminDataMigrationStatusDTO dto = service.runBatch(new User());
 
     assertThat(dto.getMessage(), containsString(AdminDataMigrationService.DIAGNOSTIC_MARKER));
-    assertThat(dto.getMessage(), containsString("step=note_slug_path_regeneration"));
+    assertThat(dto.getMessage(), containsString("step=legacy_parent_frontmatter"));
     assertThat(dto.getMessage(), containsString("batchSize=10"));
     assertThat(dto.getMessage(), containsString("noteSlugMaxLen=767"));
     assertThat(dto.getMessage(), containsString("duplicate slug"));
     verify(progressService)
         .markFailed(
-            Mockito.eq(AdminDataMigrationService.STEP_NOTE_SLUG_PATH_REGENERATION),
+            Mockito.eq(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER),
             Mockito.contains(AdminDataMigrationService.DIAGNOSTIC_MARKER));
   }
 

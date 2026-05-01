@@ -19,18 +19,20 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
 
   public static final String READY_MESSAGE =
       ("Wiki data migration [%s]: relationship wiki backfill (title, details, cache), legacy parent"
-              + " frontmatter and cache on child notes, then batched note slug regeneration.")
+              + " frontmatter and cache on child notes.")
           .formatted(DIAGNOSTIC_MARKER);
 
   public static final String STEP_RELATIONSHIP_WIKI_BACKFILL = "relationship_wiki_backfill";
   public static final String STEP_LEGACY_PARENT_FRONTMATTER = "legacy_parent_frontmatter";
+
+  /**
+   * Legacy progress row name only. Slug regeneration is no longer part of the wiki reference
+   * migration order; existing DB rows do not gate completion.
+   */
   public static final String STEP_NOTE_SLUG_PATH_REGENERATION = "note_slug_path_regeneration";
 
   private static final List<String> WIKI_REFERENCE_MIGRATION_STEPS =
-      List.of(
-          STEP_RELATIONSHIP_WIKI_BACKFILL,
-          STEP_LEGACY_PARENT_FRONTMATTER,
-          STEP_NOTE_SLUG_PATH_REGENERATION);
+      List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_LEGACY_PARENT_FRONTMATTER);
 
   /** Max notes processed per HTTP request for each wiki reference migration step. */
   public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 10;
@@ -100,10 +102,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     if (!stepCompleted(STEP_RELATIONSHIP_WIKI_BACKFILL)) {
       return STEP_RELATIONSHIP_WIKI_BACKFILL;
     }
-    if (!stepCompleted(STEP_LEGACY_PARENT_FRONTMATTER)) {
-      return STEP_LEGACY_PARENT_FRONTMATTER;
-    }
-    return STEP_NOTE_SLUG_PATH_REGENERATION;
+    return STEP_LEGACY_PARENT_FRONTMATTER;
   }
 
   @Override
@@ -147,10 +146,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       return totalCountForProgress(
           noteRepository.countRelationshipNotesEligibleForWikiReferenceMigration());
     }
-    if (STEP_LEGACY_PARENT_FRONTMATTER.equals(activeStep)) {
-      return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
-    }
-    return totalCountForProgress(noteRepository.countNonDeletedNotes());
+    return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
   }
 
   private static void copyProgressFields(

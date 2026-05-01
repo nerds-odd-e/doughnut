@@ -1,44 +1,37 @@
 # Admin wiki reference migration redo plan
 
-This plan extends the existing admin wiki reference migration without redoing the currently interrupted work out of order.
+This plan extends the existing admin wiki reference migration without redoing completed work out of order.
 
-## Current production state
+## Current product behavior (wiki reference migration)
 
-- Production is stopped in `note_slug_path_regeneration` with a `FAILED` row in `wiki_reference_migration_progress`.
-- The intended immediate production action is to deploy the slug-regeneration flush fix, clear the failed gate, and continue `note_slug_path_regeneration` from its persisted cursor.
-- The new relationship YAML correction should run after the original three steps complete, as a new fourth step, not by resetting the original `relationship_wiki_backfill` step.
+- **Active steps:** `relationship_wiki_backfill`, then `legacy_parent_frontmatter`. Migration completes when both are `COMPLETED`.
+- **`note_slug_path_regeneration`:** removed from the ordered migration. Existing `wiki_reference_migration_progress` rows for this step are **ignored** for gating and batch execution. Operators may delete the row or mark it `COMPLETED` for housekeeping only.
+- Slugs are still assigned during relationship backfill for each note (`assignSlugForNewNote`); there is no separate full-corpus slug regeneration batch in admin migration.
 
-## Target migration order
+## Prior production state (historical)
 
-1. `relationship_wiki_backfill` keeps its original meaning: fill missing legacy relationship title/details/cache/slug data.
-2. `legacy_parent_frontmatter` keeps its original meaning: add parent wiki frontmatter to legacy child notes and refresh cache.
-3. `note_slug_path_regeneration` keeps its original meaning: regenerate note slugs, including the current interrupted production cursor.
-4. `relationship_wiki_reference_refresh` rewrites relationship note YAML frontmatter/body links for all relationship notes and refreshes `note_wiki_title_cache`.
+Production had been stopped with a `FAILED` row on `note_slug_path_regeneration`. After deploy that removes slug regeneration from the migration service, **that failure no longer blocks** wiki reference completion. No need to clear that row for migration logic to finish steps 1–2; optional cleanup as above.
 
-Use `50` as the batch size for admin wiki reference migration steps after the code change that introduces the fourth step.
+## Target migration order (including future fourth step)
 
-## Phase 1: Resume interrupted slug regeneration
+1. `relationship_wiki_backfill` — fill missing legacy relationship title/details/cache/slug data for relationship notes.
+2. `legacy_parent_frontmatter` — parent wiki frontmatter on legacy child notes and cache refresh.
+3. _(obsolete)_ `note_slug_path_regeneration` — not run by the application anymore.
+4. **`relationship_wiki_reference_refresh`** _(planned)_ — rewrite relationship note YAML/frontmatter/body links for qualified cross-notebook tokens and refresh `note_wiki_title_cache`; should be ordered **after** `legacy_parent_frontmatter` when implemented.
+
+Use `50` as the batch size for admin wiki reference migration steps after the code change that introduces the fourth step (when that lands).
+
+## Phase 1: Production unblocked from obsolete slug gate
 
 Type: Behavior
 
-Goal: finish the already-started production `note_slug_path_regeneration` safely, without changing the scope of migrated relationship details.
-
-Code work:
-
-- Keep the per-note `merge` + `flush` behavior in slug regeneration so slug disambiguation sees earlier notes processed in the same HTTP batch.
-- Keep the existing three-step order for this deployment.
-
-Tests:
-
-- Backend test proves slug regeneration can process multiple notes in one HTTP batch without assigning duplicate slugs.
-- Backend migration tests for existing three-step progress still pass.
+Goal: wiki reference migration completes after relationship backfill and legacy parent frontmatter without requiring slug regeneration batches.
 
 Deployment and ops:
 
-- Deploy after this phase.
-- After this deployment, clear only the `FAILED` gate for `note_slug_path_regeneration` and trigger admin migration batches again.
-- Continue triggering batches until `note_slug_path_regeneration` completes.
-- Do not reset `relationship_wiki_backfill` for this phase.
+- Deploy the version that omits `note_slug_path_regeneration` from `AdminDataMigrationService`.
+- Run migration batches until steps 1 and 2 report complete.
+- Optionally tidy obsolete `note_slug_path_regeneration` progress rows.
 
 ## Phase 2: Define relationship wiki reference refresh behavior
 
@@ -93,21 +86,21 @@ Deployment and ops:
 
 Type: Behavior
 
-Goal: make admin migration run `relationship_wiki_reference_refresh` after `note_slug_path_regeneration`.
+Goal: make admin migration run `relationship_wiki_reference_refresh` after `legacy_parent_frontmatter`.
 
 Code work:
 
-- Add `relationship_wiki_reference_refresh` to the ordered migration step list after `note_slug_path_regeneration`.
+- Add `relationship_wiki_reference_refresh` to the ordered migration step list after `legacy_parent_frontmatter`.
 - Add batch worker logic that selects all non-deleted relationship notes in stable id order.
 - Process 50 notes per HTTP request.
 - For each relationship note, rewrite the generated relationship YAML/frontmatter/body block using current source/target notebook context while preserving user suffix content.
 - Refresh `note_wiki_title_cache` for each processed relationship note using the existing JDBC replacement path.
 - Record progress in `wiki_reference_migration_progress` with the same cursor semantics as the existing steps.
-- Update status/ready text so the admin UI clearly reports the fourth step.
+- Update status/ready text so the admin UI clearly reports the third active step.
 
 Tests:
 
-- Migration test proves the fourth step runs only after the first three steps complete.
+- Migration test proves the fourth step runs only after the first two active steps complete.
 - Migration test proves already-migrated relationship notes are still rewritten by the fourth step.
 - Migration test proves cache rows are replaced/refreshed for rewritten relationship notes.
 - Migration test proves the fourth step is resumable across multiple batches of size 50.
@@ -116,7 +109,7 @@ Deployment and ops:
 
 - Deploy after this phase.
 - After this deployment, trigger admin migration batches again.
-- Because production should already have completed `note_slug_path_regeneration` after Phase 1, the service should start the new `relationship_wiki_reference_refresh` step.
+- Because production should already have completed steps 1–2 before this deploy, the service should start `relationship_wiki_reference_refresh`.
 - Continue triggering batches until the fourth step is `COMPLETED`.
 
 ## Phase 5: Verify production completion
@@ -127,11 +120,11 @@ Goal: confirm production data and progress rows match the intended final state.
 
 Checks:
 
-- `wiki_reference_migration_progress` has completed rows for all four steps.
+- `wiki_reference_migration_progress` has completed rows for all **active** migration steps (including the fourth step when present).
 - Spot-check relationship notes with cross-notebook source/target links: YAML and body contain qualified wiki links where needed.
 - Spot-check same-notebook relationship notes: YAML and body remain unqualified.
 - Spot-check `note_wiki_title_cache` rows for rewritten relationship notes: link text and target note ids match the rewritten details.
-- Admin migration status reports completion and does not show a failed gate.
+- Admin migration status reports completion and does not show a failed gate on active steps.
 
 Deployment and ops:
 
