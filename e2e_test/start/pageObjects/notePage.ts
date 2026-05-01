@@ -58,10 +58,6 @@ export const assumeNotePage = (
     moreOptions: () => {
       return makeSureNoteMoreOptionsDialogIsOpen()
     },
-    navigateToChild: (noteTopology: string) => {
-      cy.get('main').within(() => findChildNoteCard(noteTopology).click())
-      return assumeNotePage(noteTopology)
-    },
     expandChildren: () => {
       cy.findByRole('button', { name: 'expand children' }).click()
     },

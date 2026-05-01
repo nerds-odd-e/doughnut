@@ -352,10 +352,6 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
 })
 
-When('I click the child note {string}', (noteTopology: string) => {
-  start.assumeNotePage().navigateToChild(noteTopology)
-})
-
 When('I move note {string} left', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
   cy.findByText('Move This Note').click()
