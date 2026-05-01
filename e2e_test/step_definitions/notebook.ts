@@ -188,6 +188,7 @@ When(
     cy.get('[data-testid="notebook-page-title-edit"]').click()
     cy.get('[data-testid="notebook-page-name-input"]').clear().type(newName)
     cy.get('[data-testid="notebook-page-name-update"]').click()
+    cy.findByRole('button', { name: 'OK' }).click()
     pageIsNotLoading()
   }
 )

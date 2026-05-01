@@ -10,6 +10,7 @@ import helper, {
   wrapSdkError,
   wrapSdkResponse,
 } from "@tests/helpers"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
 
@@ -157,6 +158,10 @@ describe("NotebookPageView.spec", () => {
       .get('[data-testid="notebook-page-name-update"]')
       .trigger("click")
     await flushPromises()
+    while (usePopups().popups.peek()?.length) {
+      usePopups().popups.done(true)
+      await flushPromises()
+    }
 
     expect(updateSpy).toHaveBeenCalledWith(
       expect.objectContaining({
