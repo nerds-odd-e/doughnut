@@ -59,7 +59,7 @@ Then(
 
 Given('OpenAI has models {string} available', (modelNames: string) => {
   cy.then(async () => {
-    mock_services.openAi().stubGetModels(modelNames)
+    await mock_services.openAi().stubGetModels(modelNames)
   })
 })
 

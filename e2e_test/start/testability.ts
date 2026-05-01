@@ -303,7 +303,7 @@ const testability = () => {
     },
 
     injectSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
-      this.injectSuggestedQuestions([
+      return this.injectSuggestedQuestions([
         {
           positiveFeedback,
           preservedNoteContent: 'note content',

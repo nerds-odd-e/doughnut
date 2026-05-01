@@ -12,7 +12,7 @@ import start, { mock_services } from '../start'
 Given(
   'the admin modifies the question suggested {string} to:',
   (originalQuestionStem: string, newQuestion: DataTable) => {
-    start
+    return start
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
       .updateQuestionSuggestionAndChoice(
@@ -23,7 +23,7 @@ Given(
 )
 
 Given('an admin duplicates the question {string}', (questionStem: string) => {
-  start
+  return start
     .loginAsAdminAndGoToAdminDashboard()
     .goToFineTuningData()
     .duplicateNegativeQuestion(questionStem)
@@ -32,7 +32,7 @@ Given('an admin duplicates the question {string}', (questionStem: string) => {
 Given(
   'an admin can retrieve the training data for question generation containing:',
   (question: DataTable) => {
-    start
+    return start
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
       .expectExampleQuestions(question.hashes())
@@ -42,7 +42,7 @@ Given(
 Given(
   'an admin can retrieve the training data for question generation containing {int} examples',
   (numberOfRecords: number) => {
-    start
+    return start
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
       .expectFineTuningExamplesCount(numberOfRecords)
@@ -52,7 +52,7 @@ Given(
 Given(
   'there should be {int} examples containing {string}',
   (numOfOccurrence: number, expectedString: string) => {
-    start
+    return start
       .assumeAdminDashboardPage()
       .goToFineTuningData()
       .expectString(numOfOccurrence, expectedString)
@@ -62,20 +62,24 @@ Given(
 Given(
   'I navigate to the {string} section in the admin dashboard',
   (tabName: string) => {
-    start.goToAdminDashboard().goToTabInAdminDashboard(tabName)
+    return start.goToAdminDashboard().goToTabInAdminDashboard(tabName)
   }
 )
 
 Given('OpenAI responds with {string} when uploading file', (result) => {
-  mock_services.openAi().stubOpenAiUploadResponse(result === 'success')
+  cy.then(async () => {
+    await mock_services.openAi().stubOpenAiUploadResponse(result === 'success')
+  })
 })
 
 Given('OpenAI responds with {string} when triggering fine-tuning', (result) => {
-  mock_services.openAi().stubFineTuningStatus(result === 'success')
+  cy.then(async () => {
+    await mock_services.openAi().stubFineTuningStatus(result === 'success')
+  })
 })
 
 When('I attempt to trigger fine-tuning', () => {
-  start
+  return start
     .loginAsAdminAndGoToAdminDashboard()
     .goToFineTuningData()
     .triggerFineTuning()
@@ -115,26 +119,37 @@ Given(
       },
     }))
 
-    start.testability().injectSuggestedQuestions(positives.concat(negatives))
+    return start
+      .testability()
+      .injectSuggestedQuestions(positives.concat(negatives))
   }
 )
 
 When('I choose model {string} for {string}', (model: string, task: string) => {
-  start.goToAdminDashboard().goToModelManagement().chooseModel(model, task)
+  return start
+    .goToAdminDashboard()
+    .goToModelManagement()
+    .chooseModel(model, task)
 })
 
 When('I remove the notebook {string} from the bazaar', (notebook: string) => {
-  start.goToAdminDashboard().goToBazaarManagement().removeFromBazaar(notebook)
+  return start
+    .goToAdminDashboard()
+    .goToBazaarManagement()
+    .removeFromBazaar(notebook)
 })
 
 When('I approve notebook {string} to become certified', (notebook: string) => {
-  start.goToAdminDashboard().goToCertificationRequestPage().approve(notebook)
+  return start
+    .goToAdminDashboard()
+    .goToCertificationRequestPage()
+    .approve(notebook)
 })
 
 Then(
   'I should see following notebooks waiting for approval only:',
   (notebooks: DataTable) => {
-    start
+    return start
       .goToAdminDashboard()
       .goToCertificationRequestPage()
       .listContainsExactly(notebooks.raw().map((row) => row[0]!))
