@@ -239,8 +239,8 @@ public class AdminDataMigrationBatchWorker {
     for (Note note : notesForBatchIdsInOrder(batchIds, byId)) {
       wikiSlugPathService.assignSlugForNewNote(note);
       entityPersister.merge(note);
+      entityPersister.flush();
     }
-    entityPersister.flush();
     int lastId = batchIds.get(batchIds.size() - 1);
     wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
     if (noteRepository

@@ -27,8 +27,8 @@ public class WikiSlugPathService {
     for (Note note : noteRepository.findAllNonDeletedNotesOrderByNotebookFolderAndId()) {
       assignSlugForNewNote(note);
       entityPersister.merge(note);
+      entityPersister.flush();
     }
-    entityPersister.flush();
   }
 
   public void assignSlugForNewFolder(Folder folder) {
