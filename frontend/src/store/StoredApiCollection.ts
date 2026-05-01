@@ -474,11 +474,7 @@ export default class StoredApiCollection implements StoredApi {
     this.refreshNoteRealms(updatedNotes)
 
     if (moveInfo) {
-      this.noteEditingHistory.moveNote(
-        noteId,
-        moveInfo.originalParentId,
-        moveInfo.previousSiblingId
-      )
+      this.noteEditingHistory.moveNote(noteId, moveInfo.originalParentId)
     }
 
     return updatedNotes
@@ -490,20 +486,10 @@ export default class StoredApiCollection implements StoredApi {
 
     const parentId = noteRealm.note.parentId
     if (parentId === null || parentId === undefined) {
-      return { originalParentId: null, previousSiblingId: null }
+      return { originalParentId: null }
     }
 
-    const parentRealm = this.storage.refOfNoteRealm(parentId).value
-    if (!parentRealm?.children) return null
-
-    const siblings = parentRealm.children
-    const noteIndex = siblings.findIndex((n) => n.id === noteId)
-    const previousSiblingId = noteIndex > 0 ? siblings[noteIndex - 1]!.id : null
-
-    return {
-      originalParentId: parentId,
-      previousSiblingId,
-    }
+    return { originalParentId: parentId }
   }
 
   async updateTextField(
@@ -557,8 +543,7 @@ export default class StoredApiCollection implements StoredApi {
     if (undone.type === "move note") {
       const noteRealm = await this.undoMoveNote(
         undone.noteId,
-        undone.originalParentId ?? null,
-        undone.previousSiblingId ?? null
+        undone.originalParentId ?? null
       )
       return { noteRealm }
     }
@@ -575,8 +560,7 @@ export default class StoredApiCollection implements StoredApi {
 
   private async undoMoveNote(
     noteId: Doughnut.ID,
-    originalParentId: Doughnut.ID | null,
-    previousSiblingId: Doughnut.ID | null
+    originalParentId: Doughnut.ID | null
   ) {
     if (originalParentId === null || originalParentId === undefined) {
       const { data: noteRealm, error } = await apiCallWithLoading(() =>
@@ -587,14 +571,6 @@ export default class StoredApiCollection implements StoredApi {
       }
       this.refreshNoteRealms([noteRealm])
       return noteRealm
-    }
-    if (previousSiblingId !== null) {
-      const updatedNotes = await this.moveAfterWithoutUndo(
-        noteId,
-        previousSiblingId,
-        "after"
-      )
-      return updatedNotes[0]!
     }
     const updatedNotes = await this.moveAfterWithoutUndo(
       noteId,
@@ -709,11 +685,7 @@ export default class StoredApiCollection implements StoredApi {
     this.refreshNoteRealms(noteRealms)
 
     if (moveInfo) {
-      this.noteEditingHistory.moveNote(
-        sourceId,
-        moveInfo.originalParentId,
-        moveInfo.previousSiblingId
-      )
+      this.noteEditingHistory.moveNote(sourceId, moveInfo.originalParentId)
     }
   }
 }

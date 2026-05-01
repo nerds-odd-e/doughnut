@@ -8,7 +8,6 @@ export interface HistoryRecord {
   noteId: Doughnut.ID
   textContent?: string
   originalParentId?: Doughnut.ID
-  previousSiblingId?: Doughnut.ID | null
 }
 
 export default class NoteEditingHistory {
@@ -56,16 +55,11 @@ export default class NoteEditingHistory {
     this.noteUndoHistories.push({ type: "create note", noteId })
   }
 
-  moveNote(
-    noteId: Doughnut.ID,
-    originalParentId: Doughnut.ID | null,
-    previousSiblingId: Doughnut.ID | null
-  ) {
+  moveNote(noteId: Doughnut.ID, originalParentId: Doughnut.ID | null) {
     this.noteUndoHistories.push({
       type: "move note",
       noteId,
       originalParentId: originalParentId ?? undefined,
-      previousSiblingId,
     })
   }
 }
