@@ -21,7 +21,7 @@
 import type { PropType } from "vue"
 import { computed } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
-import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { noteShowLocationFromNoteTopology } from "@/routes/noteShowLocation"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 
 const props = defineProps({
@@ -32,6 +32,6 @@ const props = defineProps({
 })
 
 const noteShowLocation = computed(() =>
-  noteShowByNotebookSlugLocationFromNoteTopology(props.noteTopology)
+  noteShowLocationFromNoteTopology(props.noteTopology)
 )
 </script>

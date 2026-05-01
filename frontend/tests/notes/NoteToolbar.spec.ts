@@ -17,7 +17,7 @@ describe("NoteToolbar", () => {
     document.body.innerHTML = ""
   })
 
-  it("routes to notebook slug when starting a conversation about the note", async () => {
+  it("routes to note show by id when starting a conversation about the note", async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes,
@@ -54,8 +54,7 @@ describe("NoteToolbar", () => {
     expect(pushSpy).toHaveBeenCalledWith({
       name: "noteShow",
       params: {
-        notebookId: String(noteRealm.note.noteTopology.notebookId),
-        noteSlugPath: noteRealm.note.noteTopology.slug,
+        noteId: String(noteRealm.note.id),
       },
       query: { conversation: "true" },
     })

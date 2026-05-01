@@ -43,8 +43,7 @@ describe("note title", () => {
       expect(JSON.parse(link.attributes("to")!)).toMatchObject({
         name: "noteShow",
         params: {
-          notebookId: String(target.noteTopology.notebookId),
-          noteSlugPath: target.noteTopology.slug,
+          noteId: String(target.noteTopology.id),
         },
       })
       expect(link.text()).toBe(target.noteTopology.title!)

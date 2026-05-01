@@ -18,7 +18,17 @@ const router = () => {
         (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
       return cy.window().then((win: CustomWindow) => {
         if (win.router && isFirstVisited) {
-          const location = { path: fallback, query: { time: Date.now() } }
+          const stringParams = Object.fromEntries(
+            Object.entries(params).map(([k, v]) => [k, String(v)])
+          )
+          const location =
+            name.length > 0
+              ? {
+                  name,
+                  params: stringParams,
+                  query: { time: Date.now() },
+                }
+              : { path: fallback, query: { time: Date.now() } }
           return cy.wrap(
             win.router.push(location).catch((error) => {
               cy.log('router push failed')

@@ -71,8 +71,7 @@ describe("NotebookPage.spec", () => {
       expect.objectContaining({
         name: "noteShow",
         params: expect.objectContaining({
-          notebookId: String(notebook.id),
-          noteSlugPath: "index",
+          noteId: String(indexRealm.id),
         }),
       })
     )

@@ -52,7 +52,7 @@ import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
 import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
-import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { noteShowLocationFromNoteTopology } from "@/routes/noteShowLocation"
 
 const props = defineProps<{
   conversation: Conversation
@@ -92,7 +92,7 @@ const handleConversationChange = (conversationId: number) => {
 const handleCloseDialog = () => {
   const noteTopology = props.conversation.subject?.note?.noteTopology
   if (noteTopology) {
-    router.push(noteShowByNotebookSlugLocationFromNoteTopology(noteTopology))
+    router.push(noteShowLocationFromNoteTopology(noteTopology))
   }
 }
 </script>

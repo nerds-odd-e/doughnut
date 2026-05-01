@@ -1,20 +1,20 @@
 import type { NoteRealm, NoteTopology } from "@generated/doughnut-backend-api"
 import type { RouteLocationNamedRaw } from "vue-router"
 
-export function noteShowByNotebookSlugLocation(
-  notebookId: number,
-  noteSlugPath: string
-): RouteLocationNamedRaw {
+export function noteShowLocation(noteId: number): RouteLocationNamedRaw {
   return {
     name: "noteShow",
     params: {
-      notebookId: String(notebookId),
-      noteSlugPath,
+      noteId: String(noteId),
     },
   }
 }
 
-/** Plain path for wiki links in HTML (matches `noteShow`). */
+export function noteShowHref(noteId: number): string {
+  return `/d/n/${noteId}`
+}
+
+/** Plain path for wiki links in HTML until WikiTitle exposes note id (Phase 2). */
 export function noteShowByNotebookSlugHref(
   notebookId: number,
   noteSlugPath: string
@@ -29,17 +29,27 @@ export function noteShowByNotebookSlugHref(
   return `/d/notebooks/${notebookId}/notes/${tail}`
 }
 
-export function noteShowByNotebookSlugLocationFromNoteRealm(
-  noteRealm: NoteRealm
+export function noteShowLegacyNotebookSlugLocation(
+  notebookId: number,
+  noteSlugPath: string
 ): RouteLocationNamedRaw {
-  return noteShowByNotebookSlugLocation(noteRealm.notebookId, noteRealm.slug)
+  return {
+    name: "noteShowLegacyNotebookSlug",
+    params: {
+      notebookId: String(notebookId),
+      noteSlugPath,
+    },
+  }
 }
 
-export function noteShowByNotebookSlugLocationFromNoteTopology(
+export function noteShowLocationFromNoteRealm(
+  noteRealm: NoteRealm
+): RouteLocationNamedRaw {
+  return noteShowLocation(noteRealm.id)
+}
+
+export function noteShowLocationFromNoteTopology(
   noteTopology: NoteTopology
 ): RouteLocationNamedRaw {
-  return noteShowByNotebookSlugLocation(
-    noteTopology.notebookId,
-    noteTopology.slug
-  )
+  return noteShowLocation(noteTopology.id)
 }

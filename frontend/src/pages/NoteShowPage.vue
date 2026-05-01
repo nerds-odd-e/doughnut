@@ -47,7 +47,7 @@ import {
   notebookSidebarNotebookPageContext,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
-import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
+import { noteShowLocationFromNoteRealm } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 const router = useRouter()
@@ -55,18 +55,12 @@ const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
-  slug: { type: String, required: false },
+  noteId: { type: Number, required: false },
   notebookId: { type: Number, required: false },
   noteSlugPath: { type: String, required: false },
 })
 
-const ambiguousSlugError = ref<string | null>(null)
-const ambiguousSlugResolvedNoteId = ref<number | undefined>(undefined)
-const notebookSlugError = ref<string | null>(null)
-const notebookSlugResolvedNoteId = ref<number | undefined>(undefined)
-let notebookSlugLoadGeneration = 0
-
-const isNotebookSlugEntry = computed(
+const isLegacyNotebookSlugEntry = computed(
   () =>
     props.notebookId != null &&
     !Number.isNaN(props.notebookId) &&
@@ -74,8 +68,12 @@ const isNotebookSlugEntry = computed(
     props.noteSlugPath !== ""
 )
 
-const loadError = computed(
-  () => notebookSlugError.value ?? ambiguousSlugError.value
+const notebookSlugError = ref<string | null>(null)
+const notebookSlugResolvedNoteId = ref<number | undefined>(undefined)
+let notebookSlugLoadGeneration = 0
+
+const loadError = computed(() =>
+  isLegacyNotebookSlugEntry.value ? notebookSlugError.value : null
 )
 
 watch(loadError, (err) => {
@@ -85,32 +83,11 @@ watch(loadError, (err) => {
 })
 
 watch(
-  () => props.slug,
-  async (s) => {
-    if (isNotebookSlugEntry.value) {
-      return
-    }
-    ambiguousSlugError.value = null
-    ambiguousSlugResolvedNoteId.value = undefined
-    if (s === undefined || s === "") {
-      return
-    }
-    try {
-      const realm = await storageAccessor.value
-        .storedApi()
-        .loadNoteByAmbiguousBasename(s)
-      ambiguousSlugResolvedNoteId.value = realm.id
-    } catch (e: unknown) {
-      ambiguousSlugError.value =
-        e instanceof Error ? e.message : "Could not load note"
-    }
-  },
-  { immediate: true }
-)
-
-watch(
   () => [props.notebookId, props.noteSlugPath] as const,
   async ([nb, path]) => {
+    if (!isLegacyNotebookSlugEntry.value) {
+      return
+    }
     notebookSlugError.value = null
     const generation = ++notebookSlugLoadGeneration
     notebookSlugResolvedNoteId.value = undefined
@@ -133,7 +110,7 @@ watch(
 )
 
 const resolvedNoteId = computed((): number | undefined => {
-  if (isNotebookSlugEntry.value) {
+  if (isLegacyNotebookSlugEntry.value) {
     if (notebookSlugResolvedNoteId.value == null) {
       return undefined
     }
@@ -141,14 +118,8 @@ const resolvedNoteId = computed((): number | undefined => {
       notebookSlugResolvedNoteId.value
     ).value?.id
   }
-  if (
-    props.slug !== undefined &&
-    props.slug !== "" &&
-    ambiguousSlugResolvedNoteId.value != null
-  ) {
-    return storageAccessor.value.refOfNoteRealm(
-      ambiguousSlugResolvedNoteId.value
-    ).value?.id
+  if (props.noteId != null && !Number.isNaN(props.noteId)) {
+    return props.noteId
   }
   return undefined
 })
@@ -171,23 +142,26 @@ watch(
 
 watch(
   () => ({
-    slug: props.slug,
+    legacy: isLegacyNotebookSlugEntry.value,
     notebookId: props.notebookId,
-    isSlug: isNotebookSlugEntry.value,
     realm: noteRealm.value,
+    noteId: props.noteId,
   }),
-  ({ slug, notebookId, isSlug, realm }) => {
-    if (isSlug && notebookId != null && !Number.isNaN(notebookId)) {
+  ({ legacy, notebookId, realm, noteId }) => {
+    if (legacy && notebookId != null && !Number.isNaN(notebookId)) {
       currentNotebookId.value = notebookId
       return
     }
-    if (slug !== undefined && slug !== "") {
-      if (realm?.notebookId != null) {
-        currentNotebookId.value = realm.notebookId
+    if (!legacy && noteId != null && !Number.isNaN(noteId)) {
+      const nb = realm?.notebookId ?? realm?.note.noteTopology.notebookId
+      if (nb != null) {
+        currentNotebookId.value = nb
       }
       return
     }
-    currentNotebookId.value = undefined
+    if (!legacy && (noteId == null || Number.isNaN(noteId))) {
+      currentNotebookId.value = undefined
+    }
   },
   { immediate: true }
 )
@@ -201,7 +175,7 @@ const toggleMaximize = () => {
 const handleCloseConversation = (conversationRealm: NoteRealm) => {
   isContentMinimized.value = false
   router.replace({
-    ...noteShowByNotebookSlugLocationFromNoteRealm(conversationRealm),
+    ...noteShowLocationFromNoteRealm(conversationRealm),
     query: {},
   })
 }

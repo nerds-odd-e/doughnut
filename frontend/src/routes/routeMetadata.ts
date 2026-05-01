@@ -41,8 +41,16 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
-    path: "/d/notebooks/:notebookId(\\d+)/notes/:noteSlugPath(.*)",
+    path: "/d/n/:noteId(\\d+)",
     name: "noteShow",
+    props: (route: RouteLocation) => ({
+      noteId: Number(route.params.noteId),
+    }),
+    meta: { useNoteStorageAccessor: true },
+  },
+  {
+    path: "/d/notebooks/:notebookId(\\d+)/notes/:noteSlugPath(.*)",
+    name: "noteShowLegacyNotebookSlug",
     props: (route: RouteLocation) => {
       const raw = route.params.noteSlugPath
       const pathStr =
@@ -54,26 +62,6 @@ export const routeMetadata: RouteMetadata[] = [
       return {
         notebookId: Number(route.params.notebookId),
         noteSlugPath: pathStr,
-      }
-    },
-    meta: { useNoteStorageAccessor: true },
-  },
-  {
-    path: "/d/notes/:slug",
-    name: "noteShowByAmbiguousSlug",
-    props: (route: RouteLocation) => {
-      const raw = route.params.slug
-      if (raw === undefined || raw === "") {
-        return {}
-      }
-      const segment = Array.isArray(raw) ? String(raw[0] ?? "") : String(raw)
-      if (segment === "") {
-        return {}
-      }
-      try {
-        return { slug: decodeURIComponent(segment) }
-      } catch {
-        return { slug: segment }
       }
     },
     meta: { useNoteStorageAccessor: true },

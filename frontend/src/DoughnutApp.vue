@@ -37,7 +37,7 @@ const route = useRoute()
 const notebookSidebarRouteNames = new Set([
   "notebookPage",
   "noteShow",
-  "noteShowByAmbiguousSlug",
+  "noteShowLegacyNotebookSlug",
 ])
 const showsNotebookSidebarLayout = computed(() =>
   notebookSidebarRouteNames.has(String(route.name))

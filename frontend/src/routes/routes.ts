@@ -32,7 +32,7 @@ const componentMap: Record<string, unknown> = {
   root: HomePage,
   notebooks: NotebooksPage,
   notebookGroup: NotebookGroupPage,
-  noteShowByAmbiguousSlug: NoteShowPage,
+  noteShowLegacyNotebookSlug: NoteShowPage,
   noteShow: NoteShowPage,
   circleShow: CircleShowPage,
   bazaar: BazaarPage,

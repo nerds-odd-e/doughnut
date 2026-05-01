@@ -1,7 +1,7 @@
 <template>
   <NotebookSidebarLayout>
     <NoteShowPage
-      :slug="slug"
+      :note-id="noteId"
       :notebook-id="notebookId"
       :note-slug-path="noteSlugPath"
     />
@@ -13,7 +13,7 @@ import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 
 defineProps({
-  slug: { type: String, required: false },
+  noteId: { type: Number, required: false },
   notebookId: { type: Number, required: false },
   noteSlugPath: { type: String, required: false },
 })

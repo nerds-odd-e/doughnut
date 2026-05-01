@@ -13,7 +13,7 @@ import type { Note } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilateSingleNotePageView from "./AssimilateSingleNotePageView.vue"
 import { useRouter } from "vue-router"
-import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 
 const { noteId } = defineProps<{
   noteId: number
@@ -32,9 +32,9 @@ const loadNote = async () => {
 }
 
 const assimilationDone = () => {
-  const top = note.value?.noteTopology
-  if (top) {
-    router.push(noteShowByNotebookSlugLocationFromNoteTopology(top))
+  const id = note.value?.id
+  if (id != null) {
+    router.push(noteShowLocation(id))
   }
 }
 

@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
 import { computed } from "vue"
-import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { noteShowLocationFromNoteTopology } from "@/routes/noteShowLocation"
 import { colors } from "../../colors"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import RelationNob from "./RelationNob.vue"
@@ -31,7 +31,7 @@ const noteTopology = computed(() =>
 )
 
 const noteShowLocation = computed(() =>
-  noteShowByNotebookSlugLocationFromNoteTopology(props.note.noteTopology)
+  noteShowLocationFromNoteTopology(noteTopology.value)
 )
 
 const fontColor = computed(() =>

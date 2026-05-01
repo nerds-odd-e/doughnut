@@ -1,7 +1,7 @@
 import { expect, vi, beforeEach, afterEach, describe, it } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper, { mockSdkService } from "@tests/helpers"
-import { noteShowByNotebookSlugLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { noteShowLocationFromNoteTopology } from "@/routes/noteShowLocation"
 import makeMe from "doughnut-test-fixtures/makeMe"
 
 const mockedPush = vi.fn()
@@ -50,7 +50,7 @@ describe("ConversationComponent", () => {
     await minimizeButton.trigger("click")
 
     expect(mockedPush).toHaveBeenCalledWith(
-      noteShowByNotebookSlugLocationFromNoteTopology(note.noteTopology)
+      noteShowLocationFromNoteTopology(note.noteTopology)
     )
   })
 

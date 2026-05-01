@@ -23,7 +23,7 @@ import {
   setErrorObjectForFieldErrors,
 } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { noteShowByNotebookSlugLocationFromNoteRealm } from "@/routes/noteShowLocation"
+import { noteShowLocationFromNoteRealm } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
@@ -145,9 +145,7 @@ export default class StoredApiCollection implements StoredApi {
     if (!focusOnNote) {
       return await router.replace({ name: "notebooks" })
     }
-    return await router.replace(
-      noteShowByNotebookSlugLocationFromNoteRealm(focusOnNote)
-    )
+    return await router.replace(noteShowLocationFromNoteRealm(focusOnNote))
   }
 
   private async updateTextContentWithoutUndo(
@@ -653,7 +651,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       return
     }
-    await router.push(noteShowByNotebookSlugLocationFromNoteRealm(noteRealm))
+    await router.push(noteShowLocationFromNoteRealm(noteRealm))
     return noteRealm
   }
 
