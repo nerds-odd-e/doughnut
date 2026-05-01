@@ -50,3 +50,8 @@ Feature: Wiki links in notes
       | WikiLinks E2E Tech     |
       | WikiLinks E2E CI      |
       | WikiLinks E2E Missing |
+    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E CI" note
+    Then I should see the rich content elements in the note details:
+      | Tag               | Content               |
+      | a:not(.dead-link) | WikiLinks E2E Missing |
+      | a:not(.dead-link) | WikiLinks E2E Tech    |

@@ -163,4 +163,32 @@ describe("storedApiCollection", () => {
       })
     })
   })
+
+  describe("refreshWikiLinkCacheForNote", () => {
+    let updateNoteDetailsSpy: ReturnType<
+      typeof mockSdkService<"updateNoteDetails">
+    >
+
+    beforeEach(() => {
+      vi.clearAllMocks()
+      updateNoteDetailsSpy = mockSdkService("updateNoteDetails", note)
+    })
+
+    it("calls updateNoteDetails even when details match stored note", async () => {
+      const detailsBody = "same details"
+      const sa = storageAccessor.value.storedApi()
+      storageAccessor.value.refreshNoteRealm({
+        ...note,
+        note: { ...note.note, details: detailsBody },
+      })
+
+      await sa.refreshWikiLinkCacheForNote(note.id)
+
+      expect(updateNoteDetailsSpy).toHaveBeenCalledTimes(1)
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { details: detailsBody },
+      })
+    })
+  })
 })

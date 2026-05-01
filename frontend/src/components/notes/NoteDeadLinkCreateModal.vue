@@ -5,6 +5,7 @@
         :notebook-root-notebook-id="notebookId"
         :target-folder-id="folderId ?? undefined"
         :initial-title="modelValue"
+        :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         @close-dialog="close"
       />
     </template>
@@ -19,6 +20,7 @@ defineProps<{
   notebookId: number
   folderId?: number | null
   modelValue: string | null
+  sourceNoteId: number
 }>()
 
 const emit = defineEmits<{

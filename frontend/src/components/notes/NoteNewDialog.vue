@@ -68,6 +68,8 @@ const props = defineProps<{
   initialTitle?: string
   /** Duplicate title search is scoped from this note when using notebook-root create (sidebar). */
   titleSearchAnchorNote?: Note
+  /** After notebook-root create, refresh wiki title cache for this note before navigating away. */
+  wikiTitleCacheRefreshSourceNoteId?: number
 }>()
 
 const titleSearchScopeNote = computed(
@@ -132,7 +134,13 @@ const processForm = async () => {
         router,
         props.notebookRootNotebookId,
         creationData.value,
-        props.targetFolderId
+        {
+          folderId: props.targetFolderId,
+          refreshWikiTitleCacheForNoteIds:
+            props.wikiTitleCacheRefreshSourceNoteId != null
+              ? [props.wikiTitleCacheRefreshSourceNoteId]
+              : undefined,
+        }
       )
     } else if (props.referenceNote == null || props.insertMode == null) {
       throw new Error("Invalid note creation mode")

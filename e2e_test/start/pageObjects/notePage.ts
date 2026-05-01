@@ -230,9 +230,17 @@ export const assumeNotePage = (
       return this
     },
     expectRichDetails(elements: Record<string, string>[]) {
-      elements.forEach((element) => {
-        cy.get(element.Tag as string).should('contain', element.Content)
-      })
+      for (const element of elements) {
+        const tag = element.Tag as string
+        const content = element.Content
+        cy.get('#main-note-content .note-details .ql-editor').within(() => {
+          if (content === '') {
+            cy.get(tag).should('exist')
+          } else {
+            cy.contains(tag, content).should('exist')
+          }
+        })
+      }
     },
     addRichNoteProperty(key: string, value: string) {
       cy.get('[role=details]').within(() => {

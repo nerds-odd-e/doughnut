@@ -75,7 +75,10 @@ export interface StoredApi {
     router: Router,
     notebookId: number,
     data: NoteCreationDto,
-    folderId?: number | null
+    options?: {
+      folderId?: number | null
+      refreshWikiTitleCacheForNoteIds?: number[]
+    }
   ): Promise<NoteRealm>
 
   createRelationship(
@@ -105,6 +108,9 @@ export interface StoredApi {
     noteId: Doughnut.ID,
     value?: NoteDetailsCompletion
   ): Promise<void>
+
+  /** PATCH note details with current stored body so the backend rebuilds wiki title cache. */
+  refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void>
 
   updateWikidataId(
     noteId: Doughnut.ID,
@@ -362,8 +368,14 @@ export default class StoredApiCollection implements StoredApi {
     router: Router,
     notebookId: number,
     data: NoteCreationDto,
-    folderId?: number | null
+    options?: {
+      folderId?: number | null
+      refreshWikiTitleCacheForNoteIds?: number[]
+    }
   ) {
+    const folderId = options?.folderId
+    const refreshWikiTitleCacheForNoteIds =
+      options?.refreshWikiTitleCacheForNoteIds
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
     const { data: nrwp, error } = await apiCallWithLoading(() =>
@@ -392,6 +404,11 @@ export default class StoredApiCollection implements StoredApi {
     const focus = this.storage.refreshNoteRealm(nrwp)
     refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
+    if (refreshWikiTitleCacheForNoteIds) {
+      for (const id of refreshWikiTitleCacheForNoteIds) {
+        await this.refreshWikiLinkCacheForNote(id)
+      }
+    }
     await this.routerReplaceFocus(router, focus)
     return focus
   }
@@ -508,6 +525,15 @@ export default class StoredApiCollection implements StoredApi {
     }
 
     await this.updateTextField(noteId, "edit details", value.details)
+  }
+
+  async refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void> {
+    let realm = this.storage.refOfNoteRealm(noteId).value
+    if (!realm?.note) {
+      realm = await this.loadNote(noteId)
+    }
+    const details = realm.note.details ?? ""
+    await this.updateTextContentWithoutUndo(noteId, "edit details", details)
   }
 
   private async undoInner(): Promise<{
