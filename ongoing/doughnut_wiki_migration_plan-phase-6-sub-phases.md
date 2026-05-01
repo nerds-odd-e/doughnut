@@ -28,7 +28,24 @@ Each sub-phase below is planned as a five-minute commit. If implementation disco
 
 ## Status
 
-All sub-phases are **planned** and not started. Each sub-phase below is intended to be independently testable and committable; do not batch adjacent sub-phases into one commit unless the plan is first updated to explain why the split no longer makes sense.
+**Phase 6 is complete** (sub-phases **6.1–6.9**). The bullets under **Goal** above describe the delivered product state; `NoteTopology.shortDetails` is removed from API and UI; graph structural siblings use folder scope (or notebook root when `folderId` is absent) via `NoteService.findStructuralPeerNotesInOrder`, matching `docs/graph RAG/graph_RAG_requirements_v2.md`. Legacy `Note.parent` may still exist until Phase 7.
+
+| Sub-phase | Status |
+|-----------|--------|
+| 6.1 Root listing uses notebook root folder scope | Done |
+| 6.2 Folder listing API | Done |
+| 6.3 Testability folder placement | Done |
+| 6.4 Sidebar folder-scoped listings | Done |
+| 6.4.1 Separate folder and note sidebar rows | Done |
+| 6.5.1–6.5.4 Folder-first creation UX | Done |
+| 6.6 Remove `shortDetails` (backend / OpenAPI) | Done |
+| 6.7 Remove `shortDetails` (frontend / fixtures) | Done |
+| 6.8 Note graph siblings from folder scope | Done |
+| 6.9 Phase 6 closeout and plan update | Done |
+
+**Closeout verification (6.9):** `NotebookControllerTest`, `GraphRAGServiceTest`; Cypress `e2e_test/features/note_topology/note_tree_view.feature` and `e2e_test/features/note_creation_and_update/note_creation.feature`; `pnpm generateTypeScript` (no diff when OpenAPI is unchanged). No `@wip` scenarios in `e2e_test/features` at closeout.
+
+Each sub-phase below remains the capability-named record of behavior and tests; **Sizing Rule** and per-sub-phase **Commit boundary** notes are historical workflow guidance, not open work.
 
 ## Sub-Phase 6.1 - Root Listing Uses Notebook Root Folder Scope
 
@@ -259,3 +276,5 @@ Folder-first note creation and primary actions are implemented in ordered steps 
 - Run the targeted backend/frontend/E2E checks touched in this phase.
 
 **Commit boundary:** One cleanup/docs commit that leaves Phase 6 closed and ready for Phase 7.
+
+**Status:** Done.
