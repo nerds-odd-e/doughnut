@@ -125,6 +125,36 @@ describe("adding new note", () => {
     wrapper.unmount()
   })
 
+  it("searches for duplicate when using notebook-root create with a title search anchor note", async () => {
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(
+      wrapSdkResponse([
+        { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
+      ])
+    )
+    const wrapper = helper
+      .component(NoteNewDialog)
+      .withCleanStorage()
+      .withProps({
+        notebookRootNotebookId:
+          note.noteTopology.notebookId != null
+            ? Number(note.noteTopology.notebookId)
+            : 1,
+        titleSearchAnchorNote: note,
+      })
+      .mount({ attachTo: document.body })
+    await wrapper.find("input#note-title").setValue("myth")
+
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("mythical")
+    expect(searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
+      path: { note: note.id },
+      body: expect.objectContaining({ searchKey: "myth" }),
+    })
+    wrapper.unmount()
+  })
+
   describe("submit form", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>
 

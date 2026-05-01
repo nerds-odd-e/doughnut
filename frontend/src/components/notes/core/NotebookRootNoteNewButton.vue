@@ -7,6 +7,7 @@
       <NoteNewDialog
         :notebook-root-notebook-id="notebookId"
         :target-folder-id="targetFolderId ?? undefined"
+        :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         @close-dialog="closer"
       />
     </template>
@@ -15,6 +16,7 @@
 
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
+import type { Note } from "@generated/doughnut-backend-api"
 import NoteNewDialog from "../NoteNewDialog.vue"
 
 defineProps<{
@@ -22,5 +24,6 @@ defineProps<{
   buttonTitle: string
   ariaLabel?: string
   targetFolderId?: number | null
+  titleSearchAnchorNote?: Note | null
 }>()
 </script>

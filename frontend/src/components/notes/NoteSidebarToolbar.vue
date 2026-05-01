@@ -7,6 +7,7 @@
       <NotebookRootNoteNewButton
         :notebook-id="notebookId"
         :target-folder-id="userActiveFolderId"
+        :title-search-anchor-note="note"
         button-title="New note"
         aria-label="New note"
       >

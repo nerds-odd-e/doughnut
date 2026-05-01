@@ -19,9 +19,9 @@
               </template>
             </NoteFormTitleOnly>
             <SearchResults
-              v-if="notebookRootNotebookId == null && referenceNote"
+              v-if="titleSearchScopeNote"
               v-bind="{
-                noteId: referenceNote.id,
+                noteId: titleSearchScopeNote.id,
                 inputSearchKey: effectiveSearchKey,
                 isDropdown: true,
                 notebookId: notebookId
@@ -66,18 +66,28 @@ const props = defineProps<{
   /** Scope for create-note when using notebook root API (active sidebar folder). */
   targetFolderId?: number
   initialTitle?: string
+  /** Duplicate title search is scoped from this note when using notebook-root create (sidebar). */
+  titleSearchAnchorNote?: Note
 }>()
+
+const titleSearchScopeNote = computed(
+  () => props.referenceNote ?? props.titleSearchAnchorNote
+)
 
 const noteRealm = computed(() =>
   props.referenceNote != null
     ? storageAccessor.value.refOfNoteRealm(props.referenceNote.id).value
-    : undefined
+    : props.titleSearchAnchorNote != null
+      ? storageAccessor.value.refOfNoteRealm(props.titleSearchAnchorNote.id)
+          .value
+      : undefined
 )
 const notebookId = computed(
   () =>
     props.notebookRootNotebookId ??
     noteRealm.value?.notebookId ??
-    props.referenceNote?.noteTopology.notebookId
+    props.referenceNote?.noteTopology.notebookId ??
+    props.titleSearchAnchorNote?.noteTopology.notebookId
 )
 
 // Emits
