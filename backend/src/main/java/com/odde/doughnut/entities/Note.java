@@ -383,13 +383,12 @@ public class Note extends EntityIdentifiedByIdOnly {
     setCreator(user);
   }
 
-  /** Top-level note in a notebook: no parent note, no folder (notebook root). */
+  /** Top-level note in a notebook: no parent note. Folder stays unset (null). */
   public void initializeAsNotebookRoot(
       Notebook notebook, User user, Timestamp currentUTCTimestamp, String title) {
     Objects.requireNonNull(notebook, "notebook");
     setNotebook(notebook);
     this.parent = null;
-    setFolder(null);
     setUpdatedAt(currentUTCTimestamp);
     setTitle(title);
     setCreatedAt(currentUTCTimestamp);

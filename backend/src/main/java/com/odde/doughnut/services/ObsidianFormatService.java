@@ -222,10 +222,7 @@ public class ObsidianFormatService {
       return existingNote;
     }
 
-    Note newNote =
-        currentParent != null
-            ? noteConstructionService.createNote(currentParent, noteName)
-            : noteConstructionService.createRootNoteInNotebook(notebook, noteName);
+    Note newNote = noteConstructionService.createNote(notebook, currentParent, noteName);
     newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted

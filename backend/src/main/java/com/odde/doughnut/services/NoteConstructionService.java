@@ -15,6 +15,7 @@ import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,48 +55,28 @@ public class NoteConstructionService {
     this.noteRealmService = noteRealmService;
   }
 
-  public Note createNote(Note parentNote, String title) {
+  public Note createNote(Notebook notebook, Note parentNote, String title) {
+    Objects.requireNonNull(notebook, "notebook");
     final Note note = new Note();
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    note.initialize(user, parentNote, currentUTCTimestamp, title);
     if (parentNote != null) {
+      note.initialize(user, parentNote, currentUTCTimestamp, title);
       note.setFolder(noteChildContainerFolderService.resolveForParent(parentNote));
+    } else {
+      note.initializeAsNotebookRoot(notebook, user, currentUTCTimestamp, title);
     }
     wikiSlugPathService.assignSlugForNewNote(note);
     if (entityPersister != null) {
       entityPersister.save(note);
     }
     return note;
-  }
-
-  private Note createRootNote(Notebook notebook, String title) {
-    Note note = new Note();
-    User user = authorizationService.getCurrentUser();
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    note.initializeAsNotebookRoot(notebook, user, currentUTCTimestamp, title);
-    wikiSlugPathService.assignSlugForNewNote(note);
-    if (entityPersister != null) {
-      entityPersister.save(note);
-    }
-    return note;
-  }
-
-  public Note createRootNoteInNotebook(Notebook notebook, String title) {
-    return createRootNote(notebook, title);
   }
 
   private Note createNoteWithWikidataInfo(
-      Note parentNote, WikidataIdWithApi wikidataIdWithApi, String title)
+      Notebook notebook, Note parentNote, WikidataIdWithApi wikidataIdWithApi, String title)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note = createNote(parentNote, title);
-    return attachWikidataAndRefresh(note, wikidataIdWithApi);
-  }
-
-  private Note createRootNoteWithWikidataInfo(
-      Notebook notebook, WikidataIdWithApi wikidataIdWithApi, String title)
-      throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note = createRootNote(notebook, title);
+    Note note = createNote(notebook, parentNote, title);
     return attachWikidataAndRefresh(note, wikidataIdWithApi);
   }
 
@@ -138,13 +119,11 @@ public class NoteConstructionService {
                     () -> {
                       try {
                         Note siblingParentNote = focalNote.getParent();
-                        if (siblingParentNote != null) {
-                          createNoteWithWikidataInfo(
-                              siblingParentNote, subWikidataIdWithApi, siblingTitle);
-                        } else {
-                          createRootNoteWithWikidataInfo(
-                              focalNote.getNotebook(), subWikidataIdWithApi, siblingTitle);
-                        }
+                        createNoteWithWikidataInfo(
+                            focalNote.getNotebook(),
+                            siblingParentNote,
+                            subWikidataIdWithApi,
+                            siblingTitle);
                       } catch (Exception | DuplicateWikidataIdException e) {
                         throw new RuntimeException(e);
                       }
@@ -162,7 +141,8 @@ public class NoteConstructionService {
       throws InterruptedException, IOException, BindException {
     try {
       Note note =
-          createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
+          createNoteWithWikidataInfo(
+              parentNote.getNotebook(), parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
       return noteRealmService.build(note, user);
     } catch (DuplicateWikidataIdException e) {
       throw duplicateWikidataBinding(noteCreation);
@@ -177,7 +157,7 @@ public class NoteConstructionService {
       throws InterruptedException, IOException, BindException {
     try {
       Note note =
-          createRootNoteWithWikidataInfo(notebook, wikidataIdWithApi, noteCreation.getNewTitle());
+          createNoteWithWikidataInfo(notebook, null, wikidataIdWithApi, noteCreation.getNewTitle());
       return noteRealmService.build(note, user);
     } catch (DuplicateWikidataIdException e) {
       throw duplicateWikidataBinding(noteCreation);
@@ -190,7 +170,10 @@ public class NoteConstructionService {
     try {
       Note note =
           createNoteWithWikidataInfo(
-              referenceNote.getParent(), wikidataIdWithApi, noteCreation.getNewTitle());
+              referenceNote.getNotebook(),
+              referenceNote.getParent(),
+              wikidataIdWithApi,
+              noteCreation.getNewTitle());
       note.setSiblingOrderToInsertAfter(referenceNote);
       note.adjustPositionAsAChildOfParentInMemory();
       entityPersister.save(note);
@@ -211,7 +194,7 @@ public class NoteConstructionService {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Note newNote = createNote(parentNote, aiResult.newNoteTitle);
+    Note newNote = createNote(originalNote.getNotebook(), parentNote, aiResult.newNoteTitle);
     newNote.setDetails(aiResult.newNoteDetails);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
