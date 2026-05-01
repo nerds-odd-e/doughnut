@@ -297,7 +297,13 @@ describe("NoteRefinement component", () => {
     })
 
     it("hides LoadingModal when API fails", async () => {
-      mockSdkService("promotePointToChild", wrapSdkError({}))
+      let resolveApi: () => void
+      mockSdkServiceWithImplementation("promotePointToChild", async () => {
+        await new Promise<void>((r) => {
+          resolveApi = r
+        })
+        return wrapSdkError({})
+      })
       const wrapper = mount(["Test understanding point"])
       await flushPromises()
 
@@ -305,8 +311,11 @@ describe("NoteRefinement component", () => {
         .find('button[title="Promote to child note"]')
         .trigger("click")
       await nextTick()
+      await flushPromises()
 
       expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      resolveApi!()
+      await flushPromises()
       usePopups().popups.done(true)
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
