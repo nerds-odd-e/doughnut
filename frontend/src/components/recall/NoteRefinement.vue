@@ -200,7 +200,6 @@ const promotePoint = async (index: number, apiCall: () => Promise<unknown>) => {
 
     if (storageAccessor.value) {
       storageAccessor.value.refreshNoteRealm(result)
-      await storageAccessor.value.storedApi().reloadNoteRealm(props.note.id)
     }
 
     understandingPoints.value.splice(index, 1)

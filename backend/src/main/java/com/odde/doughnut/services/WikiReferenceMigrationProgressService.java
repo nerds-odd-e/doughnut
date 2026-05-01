@@ -5,22 +5,31 @@ import com.odde.doughnut.entities.WikiReferenceMigrationProgress;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.WikiReferenceMigrationProgressRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WikiReferenceMigrationProgressService {
 
+  @PersistenceContext private EntityManager entityManager;
+
   private final WikiReferenceMigrationProgressRepository progressRepository;
   private final NoteRepository noteRepository;
+  private final JdbcTemplate jdbcTemplate;
 
   public WikiReferenceMigrationProgressService(
-      WikiReferenceMigrationProgressRepository progressRepository, NoteRepository noteRepository) {
+      WikiReferenceMigrationProgressRepository progressRepository,
+      NoteRepository noteRepository,
+      JdbcTemplate jdbcTemplate) {
     this.progressRepository = progressRepository;
     this.noteRepository = noteRepository;
+    this.jdbcTemplate = jdbcTemplate;
   }
 
   /** Joins the caller transaction so nested lookups are not wrapped in {@code readOnly=true}. */
@@ -97,11 +106,25 @@ public class WikiReferenceMigrationProgressService {
     progressRepository.save(p);
   }
 
+  /**
+   * Updates failure row via JDBC to avoid Hibernate auto-flush triggered by repository queries when
+   * the session holds bad cache entities.
+   */
   @Transactional
   public void markFailed(String stepName, String message) {
-    WikiReferenceMigrationProgress p = progressRepository.findByStepName(stepName).orElseThrow();
-    p.setStatus(WikiReferenceMigrationStepStatus.FAILED);
-    p.setLastError(message);
-    progressRepository.save(p);
+    Timestamp now = new Timestamp(System.currentTimeMillis());
+    int updated =
+        jdbcTemplate.update(
+            "UPDATE wiki_reference_migration_progress SET status = ?, last_error = ?, updated_at = ?"
+                + " WHERE step_name = ?",
+            WikiReferenceMigrationStepStatus.FAILED.name(),
+            message,
+            now,
+            stepName);
+    if (updated != 1) {
+      throw new IllegalStateException(
+          "No wiki_reference_migration_progress row for step: " + stepName);
+    }
+    entityManager.clear();
   }
 }
