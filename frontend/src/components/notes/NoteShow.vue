@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, type Ref } from "vue"
+import { inject, ref, watch, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type {
@@ -116,7 +116,7 @@ import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
 
-defineProps({
+const props = defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
@@ -139,6 +139,13 @@ const onNoteAccessoryUpdated = () => {
   reloadKey.value += 1
 }
 const asMarkdown = ref(false)
+
+watch(
+  () => props.noteId,
+  () => {
+    asMarkdown.value = false
+  }
+)
 
 const toLocalDateString = (date: string) => new Date(date).toLocaleDateString()
 </script>

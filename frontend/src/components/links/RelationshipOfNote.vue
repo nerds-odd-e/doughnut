@@ -1,13 +1,17 @@
 <template>
   <span class="relationship-container daisy-inline-flex daisy-items-center daisy-gap-1">
-    <RelationNob v-bind="{ noteTopology }" v-if="!!reverse" :inverse-icon="true" />
+    <RelationNob
+      v-if="!!reverse"
+      :note-topology="relationshipTopology"
+      :inverse-icon="true"
+    />
     <router-link
       :to="noteShowLocation"
       class="relationship-title daisy-no-underline daisy-font-medium hover:daisy-underline daisy-transition-all"
     >
-      <NoteTitleComponent v-if="noteTopology" v-bind="{ noteTopology }" />
+      <NoteTitleComponent v-if="titleTopology" v-bind="{ noteTopology: titleTopology }" />
     </router-link>
-    <RelationNob v-bind="{ noteTopology }" v-if="!reverse" :inverse-icon="false" />
+    <RelationNob v-if="!reverse" :note-topology="relationshipTopology" :inverse-icon="false" />
   </span>
 </template>
 
@@ -24,14 +28,18 @@ const props = defineProps<{
   reverse?: boolean
 }>()
 
-const noteTopology = computed(() =>
+/** Route to the relationship note (not subject/target). */
+const relationshipTopology = computed(() => props.note.noteTopology)
+
+/** Label in the link: referring note (reverse) or target (forward). */
+const titleTopology = computed(() =>
   props.reverse
     ? props.note.noteTopology.parentOrSubjectNoteTopology!
     : props.note.noteTopology.targetNoteTopology!
 )
 
 const noteShowLocation = computed(() =>
-  noteShowLocationFromNoteTopology(noteTopology.value)
+  noteShowLocationFromNoteTopology(relationshipTopology.value)
 )
 
 const fontColor = computed(() =>
