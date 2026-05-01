@@ -84,7 +84,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private String description;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false, length = 150)
   private String name;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

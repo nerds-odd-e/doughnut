@@ -824,6 +824,21 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldRejectEmptyOrWhitespaceNameOnUpdate() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      var request = new NotebookUpdateRequest();
+      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+      request.setName("   ");
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.updateNotebook(note.getNotebook(), request));
+      request.setName("");
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.updateNotebook(note.getNotebook(), request));
+    }
+
+    @Test
     void shouldLeaveNameUnchangedWhenNameOmitted() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setName("Original Name");

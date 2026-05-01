@@ -497,6 +497,13 @@ const cancelEditingNotebookName = () => {
 
 const submitNotebookNameUpdate = async () => {
   const trimmed = draftNotebookName.value.trim()
+  if (trimmed === "") {
+    errors.value = {
+      ...errors.value,
+      name: "Notebook name cannot be empty",
+    }
+    return
+  }
   updatingNotebookName.value = true
   errors.value = { ...errors.value, name: undefined }
   const { data: updatedNotebook, error } = await apiCallWithLoading(() =>

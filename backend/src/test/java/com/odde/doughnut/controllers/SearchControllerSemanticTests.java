@@ -80,8 +80,6 @@ class SearchControllerSemanticTests extends ControllerTestBase {
     void setup() {
       referenceNote =
           makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
-      referenceNote =
-          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -141,8 +139,6 @@ class SearchControllerSemanticTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      referenceNote =
-          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
       referenceNote =
           makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
