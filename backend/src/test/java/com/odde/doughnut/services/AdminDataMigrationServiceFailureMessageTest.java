@@ -39,7 +39,7 @@ class AdminDataMigrationServiceFailureMessageTest {
 
     assertThat(dto.getMessage(), containsString(AdminDataMigrationService.DIAGNOSTIC_MARKER));
     assertThat(dto.getMessage(), containsString("step=legacy_parent_frontmatter"));
-    assertThat(dto.getMessage(), containsString("batchSize=10"));
+    assertThat(dto.getMessage(), containsString("batchSize=50"));
     assertThat(dto.getMessage(), containsString("batch worker failed"));
     verify(progressService)
         .markFailed(

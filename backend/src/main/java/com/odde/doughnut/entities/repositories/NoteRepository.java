@@ -167,6 +167,29 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "WHERE n.id IN :ids")
   List<Note> hydrateRelationshipWikiMigrationNotesByIds(@Param("ids") List<Integer> ids);
 
+  String RELATIONSHIP_WIKI_REFERENCE_REFRESH_ELIGIBILITY =
+      " n.targetNote IS NOT NULL "
+          + "AND n.deletedAt IS NULL "
+          + "AND n.relationType IS NOT NULL "
+          + "AND n.parent IS NOT NULL ";
+
+  @Query("SELECT COUNT(n) FROM Note n WHERE " + RELATIONSHIP_WIKI_REFERENCE_REFRESH_ELIGIBILITY)
+  long countRelationshipNotesForWikiReferenceRefresh();
+
+  @Query(
+      "SELECT n.id FROM Note n WHERE "
+          + RELATIONSHIP_WIKI_REFERENCE_REFRESH_ELIGIBILITY
+          + "AND (:exclusiveAfter IS NULL OR n.id > :exclusiveAfter) "
+          + "ORDER BY n.id ASC")
+  List<Integer> findRelationshipWikiReferenceRefreshCandidateIdsExclusiveAfterAsc(
+      @Param("exclusiveAfter") Integer exclusiveAfter, Pageable pageable);
+
+  @Query(
+      "SELECT DISTINCT n FROM Note n JOIN FETCH n.parent p JOIN FETCH p.notebook "
+          + "JOIN FETCH n.targetNote t JOIN FETCH t.notebook JOIN FETCH n.notebook "
+          + "WHERE n.id IN :ids")
+  List<Note> hydrateRelationshipWikiReferenceRefreshNotesByIds(@Param("ids") List<Integer> ids);
+
   @Query("SELECT COUNT(n) FROM Note n WHERE n.deletedAt IS NULL")
   long countNonDeletedNotes();
 

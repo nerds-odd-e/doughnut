@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
 import org.junit.jupiter.api.Test;
 
@@ -98,5 +100,59 @@ class RelationshipNoteMarkdownFormatterTest {
     assertThat(markdown, containsString("source: \"[[Say \\\"hi\\\"]]\""));
     assertThat(markdown, containsString("target: \"[[C:\\\\path]]\""));
     assertThat(markdown, startsWith("---\n"));
+  }
+
+  @Test
+  void formatForRelationshipNote_uses_unqualified_links_when_notebooks_match() {
+    Notebook nb = newNotebook("OnlyNb");
+    Note source = noteIn(nb, "Alpha");
+    Note target = noteIn(nb, "Beta");
+    Note relation = noteIn(nb, "");
+    String markdown =
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, RelationType.RELATED_TO, source, target, null);
+    assertThat(markdown, containsString("source: \"[[Alpha]]\""));
+    assertThat(markdown, containsString("target: \"[[Beta]]\""));
+    assertThat(markdown, containsString("[[Alpha]] related to [[Beta]]."));
+  }
+
+  @Test
+  void formatForRelationshipNote_qualifies_endpoint_in_other_notebook() {
+    Notebook nbRel = newNotebook("HomeNb");
+    Notebook nbOther = newNotebook("OtherNb");
+    Note source = noteIn(nbRel, "Source");
+    Note target = noteIn(nbOther, "Target");
+    Note relation = noteIn(nbRel, "");
+    String markdown =
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, RelationType.PART, source, target, null);
+    assertThat(markdown, containsString("source: \"[[Source]]\""));
+    assertThat(markdown, containsString("target: \"[[OtherNb: Target]]\""));
+    assertThat(markdown, containsString("[[Source]] a part of [[OtherNb: Target]]."));
+  }
+
+  @Test
+  void formatForRelationshipNote_appends_preserved_suffix() {
+    Notebook nb = newNotebook("N");
+    Note source = noteIn(nb, "A");
+    Note target = noteIn(nb, "B");
+    Note relation = noteIn(nb, "");
+    String markdown =
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, RelationType.RELATED_TO, source, target, "User bit.\n");
+    assertThat(markdown, containsString("[[A]] related to [[B]].\n\nUser bit."));
+  }
+
+  private static Notebook newNotebook(String name) {
+    Notebook nb = new Notebook();
+    nb.setName(name);
+    return nb;
+  }
+
+  private static Note noteIn(Notebook nb, String title) {
+    Note n = new Note();
+    n.assignNotebook(nb);
+    n.setTitle(title);
+    return n;
   }
 }

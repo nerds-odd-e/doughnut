@@ -116,7 +116,7 @@ class RelationControllerTests extends ControllerTestBase {
     void relationshipNoteHasDerivedTitle()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note source = makeMe.aNote("Tool").creatorAndOwner(currentUser.getUser()).please();
-      Note target = makeMe.aNote("Task").creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Task").under(source).please();
       relationshipCreation.relationType = RelationType.APPLICATION;
       var result =
           controller.addRelationshipFinalize(
@@ -141,7 +141,7 @@ class RelationControllerTests extends ControllerTestBase {
     void updatesRelationshipNoteTitleWhenRelationTypeChanges()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note source = makeMe.aNote("Moon").creatorAndOwner(currentUser.getUser()).please();
-      Note target = makeMe.aNote("Earth").creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Earth").under(source).please();
       relationshipCreation.relationType = RelationType.PART;
       var created =
           controller.addRelationshipFinalize(
@@ -165,7 +165,7 @@ class RelationControllerTests extends ControllerTestBase {
     void updatesRelationshipNoteDetailsAndKeepsUserSuffixWhenRelationTypeChanges()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note source = makeMe.aNote("Moon").creatorAndOwner(currentUser.getUser()).please();
-      Note target = makeMe.aNote("Earth").creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Earth").under(source).please();
       relationshipCreation.relationType = RelationType.PART;
       var created =
           controller.addRelationshipFinalize(

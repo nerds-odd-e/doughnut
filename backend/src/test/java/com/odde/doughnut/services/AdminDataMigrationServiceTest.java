@@ -5,11 +5,13 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
@@ -105,8 +107,12 @@ class AdminDataMigrationServiceTest {
     assertThat(
         updated.getDetails(),
         equalTo(
-            RelationshipNoteMarkdownFormatter.format(
-                RelationType.APPLICATION, "Source", "Target", "Legacy line one.\n\nLine two.")));
+            RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+                updated,
+                RelationType.APPLICATION,
+                makeMe.entityPersister.find(Note.class, parent.getId()),
+                makeMe.entityPersister.find(Note.class, target.getId()),
+                "Legacy line one.\n\nLine two.")));
   }
 
   @Test
@@ -195,9 +201,9 @@ class AdminDataMigrationServiceTest {
     assertThat(leg2.getMessage(), containsString("Legacy parent frontmatter"));
     assertThat(leg2.getMessage(), containsString("1 note"));
 
-    AdminDataMigrationStatusDTO done = adminDataMigrationService.runBatch(admin());
-    assertThat(done.isWikiReferenceMigrationComplete(), is(true));
-    assertThat(done.getMessage(), containsString("already complete"));
+    AdminDataMigrationStatusDTO wikiRef = adminDataMigrationService.runBatch(admin());
+    assertThat(wikiRef.isWikiReferenceMigrationComplete(), is(true));
+    assertThat(wikiRef.getMessage(), containsString("Relationship wiki reference refresh"));
   }
 
   @Test
@@ -270,5 +276,98 @@ class AdminDataMigrationServiceTest {
     runWikiReferenceMigrationToCompletion();
 
     assertThat(adminDataMigrationService.getStatus().isWikiReferenceMigrationComplete(), is(true));
+  }
+
+  @Test
+  void runBatch_relationshipWikiReferenceRefresh_qualifiesCrossNotebookTargetsAndRefreshesCache() {
+    User owner = admin();
+    Note nbARoot = makeMe.aNote().title("NotebookA").creatorAndOwner(owner).please();
+    Note nbBRoot = makeMe.aNote().title("NotebookB").creatorAndOwner(owner).please();
+    Note source = makeMe.aNote().title("SourceTitle").under(nbARoot).please();
+    Note target = makeMe.aNote().title("TargetTitle").under(nbBRoot).please();
+    Note relation = makeMe.aRelation().between(source, target, RelationType.RELATED_TO).please();
+
+    runWikiReferenceMigrationToCompletion();
+
+    Note updated = makeMe.entityPersister.find(Note.class, relation.getId());
+    assertThat(updated.getDetails(), containsString("source: \"[[SourceTitle]]\""));
+    assertThat(updated.getDetails(), containsString("target: \"[[NotebookB: TargetTitle]]\""));
+    assertThat(
+        updated.getDetails(),
+        containsString("[[SourceTitle]] related to [[NotebookB: TargetTitle]]."));
+
+    var rows = noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(updated.getId());
+    assertThat(
+        rows.stream().map(NoteWikiTitleCache::getLinkText).toList(),
+        hasItems("SourceTitle", "NotebookB: TargetTitle"));
+    Note loadedSource = makeMe.entityPersister.find(Note.class, source.getId());
+    Note loadedTarget = makeMe.entityPersister.find(Note.class, target.getId());
+    assertThat(
+        rows.stream()
+            .filter(r -> r.getLinkText().equals("SourceTitle"))
+            .findFirst()
+            .orElseThrow()
+            .getTargetNote()
+            .getId(),
+        equalTo(loadedSource.getId()));
+    assertThat(
+        rows.stream()
+            .filter(r -> r.getLinkText().equals("NotebookB: TargetTitle"))
+            .findFirst()
+            .orElseThrow()
+            .getTargetNote()
+            .getId(),
+        equalTo(loadedTarget.getId()));
+  }
+
+  @Test
+  void runBatch_relationshipWikiReferenceRefresh_keepsUnqualifiedLinksForSameNotebook() {
+    User owner = admin();
+    Note root = makeMe.aNote().title("Home").creatorAndOwner(owner).please();
+    Note source = makeMe.aNote().title("Alpha").under(root).please();
+    Note target = makeMe.aNote().title("Beta").under(root).please();
+    Note relation = makeMe.aRelation().between(source, target, RelationType.RELATED_TO).please();
+
+    runWikiReferenceMigrationToCompletion();
+
+    Note updated = makeMe.entityPersister.find(Note.class, relation.getId());
+    assertThat(updated.getDetails(), containsString("source: \"[[Alpha]]\""));
+    assertThat(updated.getDetails(), containsString("target: \"[[Beta]]\""));
+    assertThat(updated.getDetails(), containsString("[[Alpha]] related to [[Beta]]."));
+    assertThat(
+        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(updated.getId()).stream()
+            .map(NoteWikiTitleCache::getLinkText)
+            .toList(),
+        hasItems("Alpha", "Beta"));
+  }
+
+  @Test
+  void runBatch_relationshipWikiReferenceRefresh_preservesUserSuffixAfterRewrite() {
+    User owner = admin();
+    Note root = makeMe.aNote().title("Home").creatorAndOwner(owner).please();
+    Note source = makeMe.aNote().title("Moon").under(root).please();
+    Note target = makeMe.aNote().title("Earth").under(root).please();
+    Note relation = makeMe.aRelation().between(source, target, RelationType.PART).please();
+
+    String seeded =
+        RelationshipNoteMarkdownFormatter.format(RelationType.PART, "Moon", "Earth", null)
+            + "\n\nUser scribble below.";
+    jdbcTemplate.update("UPDATE note SET details = ? WHERE id = ?", seeded, relation.getId());
+    makeMe.entityPersister.flush();
+    makeMe.entityPersister.refresh(relation);
+
+    runWikiReferenceMigrationToCompletion();
+
+    Note updated = makeMe.entityPersister.find(Note.class, relation.getId());
+    assertThat(updated.getDetails(), containsString("User scribble below."));
+    assertThat(
+        updated.getDetails(),
+        equalTo(
+            RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+                updated,
+                RelationType.PART,
+                makeMe.entityPersister.find(Note.class, source.getId()),
+                makeMe.entityPersister.find(Note.class, target.getId()),
+                "User scribble below.")));
   }
 }

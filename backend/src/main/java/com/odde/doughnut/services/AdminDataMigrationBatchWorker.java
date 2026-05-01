@@ -52,10 +52,7 @@ public class AdminDataMigrationBatchWorker {
     if (!wikiStepCompleted(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER)) {
       return runLegacyParentFrontmatterBatch(adminUser);
     }
-    AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    dto.setMessage("Wiki reference migration is already complete.");
-    progressPopulator.populateMigrationProgress(dto);
-    return dto;
+    return runRelationshipWikiReferenceRefreshBatch(adminUser);
   }
 
   private boolean wikiStepCompleted(String stepName) {
@@ -214,6 +211,57 @@ public class AdminDataMigrationBatchWorker {
         // Cache can be rebuilt when the note is loaded in the app.
       }
     }
+  }
+
+  private AdminDataMigrationStatusDTO runRelationshipWikiReferenceRefreshBatch(User adminUser) {
+    String step = AdminDataMigrationService.STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH;
+    long total = noteRepository.countRelationshipNotesForWikiReferenceRefresh();
+    wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(total));
+    Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
+    List<Integer> batchIds =
+        noteRepository.findRelationshipWikiReferenceRefreshCandidateIdsExclusiveAfterAsc(
+            exclusiveAfter,
+            PageRequest.of(0, AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
+    if (batchIds.isEmpty()) {
+      wikiReferenceMigrationProgressService.markCompleted(step);
+      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
+      dto.setMessage("Relationship wiki reference refresh: nothing pending.");
+      progressPopulator.populateMigrationProgress(dto);
+      return dto;
+    }
+    List<Note> loaded = noteRepository.hydrateRelationshipWikiReferenceRefreshNotesByIds(batchIds);
+    Map<Integer, Note> byId =
+        loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
+    for (Note relation : notesForBatchIdsInOrder(batchIds, byId)) {
+      String preserved =
+          RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
+              relation.getDetails());
+      relation.setDetails(
+          RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+              relation,
+              relation.getRelationType(),
+              relation.getParent(),
+              relation.getTargetNote(),
+              preserved));
+      User viewer = viewerForWikiTitleCacheRefresh(relation, adminUser);
+      refreshWikiTitleCacheForRelationshipMigration(relation, viewer);
+      entityPersister.merge(relation);
+      entityPersister.flush();
+    }
+    int lastId = batchIds.get(batchIds.size() - 1);
+    wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
+    if (noteRepository
+        .findRelationshipWikiReferenceRefreshCandidateIdsExclusiveAfterAsc(
+            lastId, PageRequest.of(0, 1))
+        .isEmpty()) {
+      wikiReferenceMigrationProgressService.markCompleted(step);
+    }
+    AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
+    dto.setMessage(
+        "Relationship wiki reference refresh: processed %d note(s) in this batch."
+            .formatted(batchIds.size()));
+    progressPopulator.populateMigrationProgress(dto);
+    return dto;
   }
 
   private Integer exclusiveLastProcessedNoteId(String stepName) {

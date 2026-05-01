@@ -224,8 +224,8 @@ public class NoteService {
         RelationshipNoteTitleFormatter.format(
             sourceNote.getTitle(), type.label, targetNote.getTitle()));
     relation.setDetails(
-        RelationshipNoteMarkdownFormatter.format(
-            type, sourceNote.getTitle(), targetNote.getTitle(), null));
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, type, sourceNote, targetNote, null));
     relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
     entityPersister.save(relation);
     return relation;
@@ -244,8 +244,8 @@ public class NoteService {
         RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
             relation.getDetails());
     relation.setDetails(
-        RelationshipNoteMarkdownFormatter.format(
-            type, source.getTitle(), target.getTitle(), preserved));
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, type, source, target, preserved));
     relation.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
   }
 

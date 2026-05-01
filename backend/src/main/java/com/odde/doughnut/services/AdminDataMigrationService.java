@@ -18,17 +18,23 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
 
   public static final String READY_MESSAGE =
       ("Wiki data migration [%s]: relationship wiki backfill (title, details, cache), legacy parent"
-              + " frontmatter and cache on child notes.")
+              + " frontmatter and cache on child notes, then relationship wiki reference refresh"
+              + " (notebook-qualified links and cache).")
           .formatted(DIAGNOSTIC_MARKER);
 
   public static final String STEP_RELATIONSHIP_WIKI_BACKFILL = "relationship_wiki_backfill";
   public static final String STEP_LEGACY_PARENT_FRONTMATTER = "legacy_parent_frontmatter";
+  public static final String STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH =
+      "relationship_wiki_reference_refresh";
 
   private static final List<String> WIKI_REFERENCE_MIGRATION_STEPS =
-      List.of(STEP_RELATIONSHIP_WIKI_BACKFILL, STEP_LEGACY_PARENT_FRONTMATTER);
+      List.of(
+          STEP_RELATIONSHIP_WIKI_BACKFILL,
+          STEP_LEGACY_PARENT_FRONTMATTER,
+          STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH);
 
   /** Max notes processed per HTTP request for each wiki reference migration step. */
-  public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 10;
+  public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 50;
 
   private final NoteRepository noteRepository;
   private final WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService;
@@ -76,8 +82,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   private static String errorMessageSafe(RuntimeException e) {
-    String m = e.getMessage();
-    return errorMessageSafe(m);
+    return errorMessageSafe(e.getMessage());
   }
 
   private static String errorMessageSafe(String m) {
@@ -95,7 +100,10 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     if (!stepCompleted(STEP_RELATIONSHIP_WIKI_BACKFILL)) {
       return STEP_RELATIONSHIP_WIKI_BACKFILL;
     }
-    return STEP_LEGACY_PARENT_FRONTMATTER;
+    if (!stepCompleted(STEP_LEGACY_PARENT_FRONTMATTER)) {
+      return STEP_LEGACY_PARENT_FRONTMATTER;
+    }
+    return STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH;
   }
 
   @Override
@@ -138,6 +146,12 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     if (STEP_RELATIONSHIP_WIKI_BACKFILL.equals(activeStep)) {
       return totalCountForProgress(
           noteRepository.countRelationshipNotesEligibleForWikiReferenceMigration());
+    }
+    if (STEP_LEGACY_PARENT_FRONTMATTER.equals(activeStep)) {
+      return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
+    }
+    if (STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH.equals(activeStep)) {
+      return totalCountForProgress(noteRepository.countRelationshipNotesForWikiReferenceRefresh());
     }
     return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
   }
