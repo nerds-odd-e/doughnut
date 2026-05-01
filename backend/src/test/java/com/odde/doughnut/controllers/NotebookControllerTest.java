@@ -811,6 +811,27 @@ class NotebookControllerTest extends ControllerTestBase {
       controller.updateNotebook(note.getNotebook(), request);
       assertThat(note.getNotebook().getDescription(), equalTo("unchanged"));
     }
+
+    @Test
+    void shouldPersistNameOnUpdate() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      note.getNotebook().setName("Old Title");
+      var request = new NotebookUpdateRequest();
+      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+      request.setName("  New Title  ");
+      controller.updateNotebook(note.getNotebook(), request);
+      assertThat(note.getNotebook().getName(), equalTo("New Title"));
+    }
+
+    @Test
+    void shouldLeaveNameUnchangedWhenNameOmitted() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      note.getNotebook().setName("Original Name");
+      var request = new NotebookUpdateRequest();
+      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+      controller.updateNotebook(note.getNotebook(), request);
+      assertThat(note.getNotebook().getName(), equalTo("Original Name"));
+    }
   }
 
   @Nested

@@ -130,6 +130,48 @@ describe("NotebookPageView.spec", () => {
     updateSpy.mockRestore()
   })
 
+  it("sends current settings and new name when updating notebook name from summary", async () => {
+    const nb: Notebook = {
+      ...makeMe.aNotebook.please(),
+      name: "Original title",
+    }
+    const updateSpy = vi
+      .spyOn(NotebookController, "updateNotebook")
+      .mockResolvedValue(wrapSdkResponse({ ...nb, name: "Edited title" }))
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook: nb })
+      .mount()
+
+    await wrapper
+      .get('[data-testid="notebook-page-title-edit"]')
+      .trigger("click")
+    const input = wrapper.get('[data-testid="notebook-page-name-input"]')
+      .element as HTMLInputElement
+    input.value = "Edited title"
+    await wrapper
+      .get('[data-testid="notebook-page-name-input"]')
+      .trigger("input")
+    await wrapper
+      .get('[data-testid="notebook-page-name-update"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { notebook: nb.id },
+        body: expect.objectContaining({
+          name: "Edited title",
+          description: nb.description ?? "",
+          skipMemoryTrackingEntirely:
+            nb.notebookSettings.skipMemoryTrackingEntirely,
+        }),
+      })
+    )
+    updateSpy.mockRestore()
+  })
+
   it("shows no-book copy without Read when getBook has no book", async () => {
     const wrapper = helper
       .component(NotebookPageView)

@@ -9,3 +9,9 @@ Feature: Notebook catalog navigation
     Given I have a notebook "Catalog nav suite"
     When I open the notebook "Catalog nav suite" from my notebooks catalog
     And the notebook page summary shows name "Catalog nav suite"
+
+  Scenario: Renaming a notebook from the notebook page summary
+    Given I have a notebook "Rename me suite"
+    When I open the notebook "Rename me suite" from my notebooks catalog
+    And I rename the notebook from the notebook page summary to "Renamed catalog suite"
+    Then the notebook page summary shows name "Renamed catalog suite"

@@ -362,6 +362,7 @@ export type NotebookUpdateRequest = {
     numberOfQuestionsInAssessment?: number;
     certificateExpiry?: string;
     description?: string;
+    name?: string;
 };
 
 /**

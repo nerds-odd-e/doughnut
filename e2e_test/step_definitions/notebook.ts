@@ -11,6 +11,7 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import notebookPage from '../start/pageObjects/notebookPage'
+import { pageIsNotLoading } from '../start/pageBase'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
   start.navigateToNotebookPage(noteTopology).shareNotebookToBazaar()
@@ -180,3 +181,13 @@ Then('the notebook page summary shows name {string}', (name: string) => {
     .find('h1')
     .should('contain.text', name)
 })
+
+When(
+  'I rename the notebook from the notebook page summary to {string}',
+  (newName: string) => {
+    cy.get('[data-testid="notebook-page-title-edit"]').click()
+    cy.get('[data-testid="notebook-page-name-input"]').clear().type(newName)
+    cy.get('[data-testid="notebook-page-name-update"]').click()
+    pageIsNotLoading()
+  }
+)

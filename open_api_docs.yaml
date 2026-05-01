@@ -4088,6 +4088,10 @@ components:
           type: string
           maxLength: 500
           minLength: 0
+        name:
+          type: string
+          maxLength: 150
+          minLength: 0
     FolderCreationRequest:
       type: object
       description: Create a folder under notebook root or nested under the folder

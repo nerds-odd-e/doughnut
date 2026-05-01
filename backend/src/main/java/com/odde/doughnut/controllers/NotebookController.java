@@ -176,6 +176,9 @@ class NotebookController {
     if (request.getDescription() != null) {
       notebook.setDescription(request.getDescription().isBlank() ? null : request.getDescription());
     }
+    if (request.getName() != null) {
+      notebook.setName(request.getName().trim());
+    }
     entityPersister.save(notebook);
     return notebook;
   }
