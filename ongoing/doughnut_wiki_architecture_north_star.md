@@ -141,6 +141,7 @@ Table `note_wiki_title_cache`: `id`, source `note_id`, `target_note_id`, `link_t
 - **Internal id** is stable and used for database references, synchronization, and **`/d/n/:noteId`** routes.
 - **Titles** and optional YAML keys in frontmatter support human editing and import/export filenames; they are not alternate primary keys in the HTTP API.
 - **Folders** are addressed by id in APIs; names are unique among siblings under the same parent folder within a notebook.
+- **No persisted path slugs** — The product model does **not** keep **`note.slug`** or **`folder.slug`** columns, **`unique(notebook_id, slug)`**, or path strings as canonical identity on notes or folders. Earlier migration phases may have used those fields; they are intentionally absent from this target architecture.
 
 ## Import and export
 
