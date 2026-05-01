@@ -1,4 +1,5 @@
 import Sidebar from "@/components/notes/Sidebar.vue"
+import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type {
   NoteRealm,
@@ -176,6 +177,7 @@ describe("Sidebar", () => {
   })
 
   afterEach(() => {
+    notebookSidebarNotebookPageContext.value = undefined
     wrapper?.unmount()
     document.body.innerHTML = ""
     vi.restoreAllMocks()
@@ -554,6 +556,23 @@ describe("Sidebar", () => {
       findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
     ).toBe(true)
     expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
+  })
+
+  it("hides New note when notebook page is readonly and anchor realm is not loaded yet", async () => {
+    notebookSidebarNotebookPageContext.value = {
+      notebook: makeMe.aNotebook.please(),
+      isNotebookReadOnly: true,
+    }
+    wrapper = helper
+      .component(Sidebar)
+      .withCurrentUser(makeMe.aUser.please())
+      .withProps({
+        activeNoteRealm: undefined,
+        notebookId: topNoteRealm.notebookId,
+      })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+    expect(wrapper.find('button[title="New note"]').exists()).toBe(false)
   })
 
   describe("drag and drop functionality", () => {

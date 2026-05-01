@@ -39,6 +39,7 @@ import {
   type SidebarNoteDragState,
   sidebarNoteDragStateKey,
 } from "./sidebarNoteDragContext"
+import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
 
 const props = defineProps({
   /** When set, highlights the active note and expands its ancestors */
@@ -164,6 +165,7 @@ const currentUser = inject<Ref<User | undefined>>("currentUser")
 const sidebarReadonly = computed(
   () =>
     !currentUser?.value ||
+    notebookSidebarNotebookPageContext.value?.isNotebookReadOnly === true ||
     (props.activeNoteRealm != null && props.activeNoteRealm.fromBazaar === true)
 )
 
