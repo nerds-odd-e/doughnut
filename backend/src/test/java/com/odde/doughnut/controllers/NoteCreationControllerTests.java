@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.NoteChildContainerFolderService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
@@ -28,6 +29,7 @@ import org.springframework.validation.BindException;
 
 class NoteCreationControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
+  @Autowired NoteChildContainerFolderService noteChildContainerFolderService;
   @Autowired MakeMe makeMe;
   @Autowired NoteCreationController controller;
   @MockitoBean HttpClientAdapter httpClientAdapter;
@@ -329,11 +331,15 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
         assertEquals("Johnny boy", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        List<String> siblingTitlesUnderParent =
-            noteRepository.findById(parent.getId()).orElseThrow().getChildren().stream()
+        Note persisted = noteRepository.findById(note.getId()).orElseThrow();
+        assertThat(persisted.getFolder(), not(nullValue()));
+        List<String> peerTitles =
+            noteRepository
+                .findNotesInFolderOrderBySiblingOrder(persisted.getFolder().getId())
+                .stream()
                 .map(Note::getTitle)
                 .toList();
-        assertThat(siblingTitlesUnderParent, hasItems("Johnny boy", "Canada"));
+        assertThat(peerTitles, hasItems("Johnny boy", "Canada"));
       }
     }
 
@@ -359,11 +365,15 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
         assertEquals("Harry Potter", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        List<String> siblingTitlesUnderParent =
-            noteRepository.findById(parent.getId()).orElseThrow().getChildren().stream()
+        Note persisted = noteRepository.findById(note.getId()).orElseThrow();
+        assertThat(persisted.getFolder(), not(nullValue()));
+        List<String> peerTitles =
+            noteRepository
+                .findNotesInFolderOrderBySiblingOrder(persisted.getFolder().getId())
+                .stream()
                 .map(Note::getTitle)
                 .toList();
-        assertThat(siblingTitlesUnderParent, hasItems("Harry Potter", "J. K. Rowling"));
+        assertThat(peerTitles, hasItems("Harry Potter", "J. K. Rowling"));
       }
 
       @Test
@@ -382,12 +392,16 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
         assertEquals("Harry Potter", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        List<String> siblingTitlesUnderParent =
-            noteRepository.findById(parent.getId()).orElseThrow().getChildren().stream()
+        Note persisted = noteRepository.findById(note.getId()).orElseThrow();
+        assertThat(persisted.getFolder(), not(nullValue()));
+        List<String> peerTitles =
+            noteRepository
+                .findNotesInFolderOrderBySiblingOrder(persisted.getFolder().getId())
+                .stream()
                 .map(Note::getTitle)
                 .toList();
         assertThat(
-            siblingTitlesUnderParent,
+            peerTitles,
             hasItems("Harry Potter", "J. K. Rowling", "The girl sat next to the window"));
       }
     }
@@ -402,7 +416,12 @@ class NoteCreationControllerTests extends ControllerTestBase {
     void setup() {
       Note parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       referenceNote = makeMe.aNote().under(parent).please();
-      makeMe.aNote("next sibling").under(parent).please();
+      Note nextSibling = makeMe.aNote("next sibling").under(parent).please();
+      Folder sharedFolder = noteChildContainerFolderService.resolveForParent(parent);
+      referenceNote.setFolder(sharedFolder);
+      nextSibling.setFolder(sharedFolder);
+      makeMe.entityPersister.save(referenceNote);
+      makeMe.entityPersister.save(nextSibling);
       noteCreation.setNewTitle("new note");
     }
 
@@ -435,15 +454,16 @@ class NoteCreationControllerTests extends ControllerTestBase {
     void shouldInsertNoteAfterReferenceNoteAndBeforeNextSibling()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation);
-      Note createdNote = noteRepository.findById(response.getId()).get();
+      Note createdNote = noteRepository.findById(response.getId()).orElseThrow();
+      assertThat(createdNote.getFolder(), not(nullValue()));
+      List<String> titlesInFolder =
+          noteRepository
+              .findNotesInFolderOrderBySiblingOrder(createdNote.getFolder().getId())
+              .stream()
+              .map(Note::getTitle)
+              .toList();
 
-      // Get all siblings in order
-      List<Note> siblings = createdNote.getParent().getChildren();
-
-      // Verify order: referenceNote -> createdNote -> "next sibling"
-      assertThat(siblings.get(0).getTitle(), equalTo(referenceNote.getTitle()));
-      assertThat(siblings.get(1).getTitle(), equalTo("new note"));
-      assertThat(siblings.get(2).getTitle(), equalTo("next sibling"));
+      assertThat(titlesInFolder, contains(referenceNote.getTitle(), "new note", "next sibling"));
     }
   }
 }

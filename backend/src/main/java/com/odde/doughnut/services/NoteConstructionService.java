@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
@@ -57,15 +58,30 @@ public class NoteConstructionService {
 
   public Note createNote(Notebook notebook, Note parentNote, String title) {
     Objects.requireNonNull(notebook, "notebook");
-    final Note note = new Note();
-    User user = authorizationService.getCurrentUser();
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     if (parentNote != null) {
-      note.initialize(user, parentNote, currentUTCTimestamp, title);
-      note.setFolder(noteChildContainerFolderService.resolveForParent(parentNote));
-    } else {
-      note.initializeAsNotebookRoot(notebook, user, currentUTCTimestamp, title);
+      Folder folder = noteChildContainerFolderService.resolveForParent(parentNote);
+      return persistNewNoteInNotebookFolder(notebook, folder, title);
     }
+    Note note = new Note();
+    User user = authorizationService.getCurrentUser();
+    Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
+    note.initializeAsNotebookRoot(notebook, user, ts, title);
+    wikiSlugPathService.assignSlugForNewNote(note);
+    if (entityPersister != null) {
+      entityPersister.save(note);
+    }
+    return note;
+  }
+
+  private Note persistNewNoteInNotebookFolder(Notebook notebook, Folder folder, String title) {
+    Objects.requireNonNull(notebook, "notebook");
+    Objects.requireNonNull(folder, "folder");
+    Note note = new Note();
+    User user = authorizationService.getCurrentUser();
+    Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
+    note.initialize(user, null, ts, title);
+    note.assignNotebook(notebook);
+    note.setFolder(folder);
     wikiSlugPathService.assignSlugForNewNote(note);
     if (entityPersister != null) {
       entityPersister.save(note);
@@ -119,11 +135,21 @@ public class NoteConstructionService {
                     () -> {
                       try {
                         Note siblingParentNote = focalNote.getParent();
-                        createNoteWithWikidataInfo(
-                            focalNote.getNotebook(),
-                            siblingParentNote,
-                            subWikidataIdWithApi,
-                            siblingTitle);
+                        if (siblingParentNote != null) {
+                          createNoteWithWikidataInfo(
+                              focalNote.getNotebook(),
+                              siblingParentNote,
+                              subWikidataIdWithApi,
+                              siblingTitle);
+                        } else if (focalNote.getFolder() != null) {
+                          attachWikidataAndRefresh(
+                              persistNewNoteInNotebookFolder(
+                                  focalNote.getNotebook(), focalNote.getFolder(), siblingTitle),
+                              subWikidataIdWithApi);
+                        } else {
+                          createNoteWithWikidataInfo(
+                              focalNote.getNotebook(), null, subWikidataIdWithApi, siblingTitle);
+                        }
                       } catch (Exception | DuplicateWikidataIdException e) {
                         throw new RuntimeException(e);
                       }
@@ -175,7 +201,6 @@ public class NoteConstructionService {
               wikidataIdWithApi,
               noteCreation.getNewTitle());
       note.setSiblingOrderToInsertAfter(referenceNote);
-      note.adjustPositionAsAChildOfParentInMemory();
       entityPersister.save(note);
       return note;
     } catch (DuplicateWikidataIdException e) {
