@@ -34,7 +34,7 @@ describe("DataMigrationPanel", () => {
   it("clicking Run migration calls runDataMigrationBatch and updates summary", async () => {
     const reply: AdminDataMigrationStatusDto = {
       message: "after run",
-      wikiReferenceMigrationComplete: true,
+      dataMigrationComplete: true,
     }
     runBatchSpy.mockResolvedValue(wrapSdkResponse(reply))
 
@@ -52,16 +52,16 @@ describe("DataMigrationPanel", () => {
 
   it("continues batches until migration reports complete", async () => {
     const inProgress: AdminDataMigrationStatusDto = {
-      message: "Relationship wiki backfill: processed 1 note(s) in this batch.",
-      wikiReferenceMigrationComplete: false,
-      currentStepName: "relationship_title_backfill",
+      message: "Step A: processed 1 item(s).",
+      dataMigrationComplete: false,
+      currentStepName: "example_step_one",
       stepStatus: "RUNNING",
       processedCount: 1,
       totalCount: 2,
     }
     const complete: AdminDataMigrationStatusDto = {
-      message: "Wiki reference migration is already complete.",
-      wikiReferenceMigrationComplete: true,
+      message: "Migration is already complete.",
+      dataMigrationComplete: true,
       stepStatus: "COMPLETED",
       processedCount: 3,
       totalCount: 3,
@@ -84,9 +84,7 @@ describe("DataMigrationPanel", () => {
     expect(
       wrapper.get('[data-testid="data-migration-counts"]').text()
     ).toContain("3 / 3")
-    expect(wrapper.text()).toContain(
-      "Wiki reference migration is already complete"
-    )
+    expect(wrapper.text()).toContain("Migration is already complete")
   })
 
   it("shows error when runDataMigrationBatch fails", async () => {

@@ -102,7 +102,7 @@ onMounted(async () => {
 })
 
 function migrationFinished(d: AdminDataMigrationStatusDto): boolean {
-  return Boolean(d.wikiReferenceMigrationComplete) || d.stepStatus === "FAILED"
+  return Boolean(d.dataMigrationComplete) || d.stepStatus === "FAILED"
 }
 
 const runMigrationStub = async () => {

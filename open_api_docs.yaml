@@ -4608,7 +4608,7 @@ components:
       properties:
         message:
           type: string
-        wikiReferenceMigrationComplete:
+        dataMigrationComplete:
           type: boolean
         currentStepName:
           type: string

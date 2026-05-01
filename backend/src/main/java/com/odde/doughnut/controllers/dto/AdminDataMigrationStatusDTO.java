@@ -10,7 +10,7 @@ public class AdminDataMigrationStatusDTO {
   /** Human-readable migration status placeholder for admin UI. */
   private String message;
 
-  private boolean wikiReferenceMigrationComplete;
+  private boolean dataMigrationComplete;
 
   /** Capability-named step, e.g. relationship_title_backfill. */
   private String currentStepName;

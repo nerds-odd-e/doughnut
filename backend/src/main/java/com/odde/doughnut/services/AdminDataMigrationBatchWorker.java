@@ -1,312 +1,36 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.WikiReferenceMigrationProgress;
-import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
-import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Runs one batch for the lowest incomplete step registered in {@link
+ * AdminDataMigrationService#orderedAdminDataMigrationSteps}. When none are configured, each call is
+ * a no-op acknowledgement so the HTTP surface stays stable.
+ *
+ * <p>To add migration work later, populate {@link
+ * AdminDataMigrationService#orderedAdminDataMigrationSteps} and extend this worker to drive {@link
+ * WikiReferenceMigrationProgressService} accordingly.
+ */
 @Service
 public class AdminDataMigrationBatchWorker {
 
-  private final NoteRepository noteRepository;
-  private final EntityPersister entityPersister;
-  private final WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService;
-  private final WikiTitleCacheService wikiTitleCacheService;
-  private final JdbcTemplate jdbcTemplate;
+  static final String NO_STEPS_CONFIGURED_BATCH_MESSAGE =
+      "Batch acknowledged: no admin data migration steps are configured.";
+
   private final AdminDataMigrationProgressPopulator progressPopulator;
 
   public AdminDataMigrationBatchWorker(
-      NoteRepository noteRepository,
-      EntityPersister entityPersister,
-      WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService,
-      WikiTitleCacheService wikiTitleCacheService,
-      JdbcTemplate jdbcTemplate,
       @Lazy AdminDataMigrationProgressPopulator progressPopulator) {
-    this.noteRepository = noteRepository;
-    this.entityPersister = entityPersister;
-    this.wikiReferenceMigrationProgressService = wikiReferenceMigrationProgressService;
-    this.wikiTitleCacheService = wikiTitleCacheService;
-    this.jdbcTemplate = jdbcTemplate;
     this.progressPopulator = progressPopulator;
   }
 
-  @Transactional(rollbackFor = Exception.class)
-  public AdminDataMigrationStatusDTO executeBatch(User adminUser) {
-    if (!wikiStepCompleted(AdminDataMigrationService.STEP_RELATIONSHIP_WIKI_BACKFILL)) {
-      return runRelationshipWikiBackfillBatch(adminUser);
-    }
-    if (!wikiStepCompleted(AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER)) {
-      return runLegacyParentFrontmatterBatch(adminUser);
-    }
-    return runRelationshipWikiReferenceRefreshBatch(adminUser);
-  }
-
-  private boolean wikiStepCompleted(String stepName) {
-    return wikiReferenceMigrationProgressService
-        .find(stepName)
-        .map(p -> p.getStatus() == WikiReferenceMigrationStepStatus.COMPLETED)
-        .orElse(false);
-  }
-
-  private AdminDataMigrationStatusDTO runRelationshipWikiBackfillBatch(User adminUser) {
-    String step = AdminDataMigrationService.STEP_RELATIONSHIP_WIKI_BACKFILL;
-    long totalEligible = noteRepository.countRelationshipNotesEligibleForWikiReferenceMigration();
-    wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(totalEligible));
-    Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
-    List<Integer> batchIds =
-        noteRepository.findRelationshipWikiMigrationCandidateIdsExclusiveAfterAsc(
-            exclusiveAfter,
-            PageRequest.of(0, AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
-    if (batchIds.isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-      dto.setMessage("Relationship wiki backfill: nothing pending.");
-      progressPopulator.populateMigrationProgress(dto);
-      return dto;
-    }
-    List<Note> loaded = noteRepository.hydrateRelationshipWikiMigrationNotesByIds(batchIds);
-    Map<Integer, Note> byId =
-        loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
-    for (Note relation : notesForBatchIdsInOrder(batchIds, byId)) {
-      if (relation.getTitle() == null || relation.getTitle().trim().isEmpty()) {
-        relation.setTitle(
-            RelationshipNoteTitleFormatter.format(
-                relation.getParent().getTitle(),
-                relation.getRelationType().label,
-                relation.getTargetNote().getTitle()));
-      }
-      if (needsRelationshipDetailsMigration(relation)) {
-        relation.setDetails(
-            RelationshipNoteMarkdownFormatter.format(
-                relation.getRelationType(),
-                relation.getParent().getTitle(),
-                relation.getTargetNote().getTitle(),
-                relation.getDetails()));
-      }
-      User viewer = viewerForWikiTitleCacheRefresh(relation, adminUser);
-      refreshWikiTitleCacheForRelationshipMigration(relation, viewer);
-      entityPersister.merge(relation);
-      entityPersister.flush();
-    }
-    entityPersister.flush();
-    int lastId = batchIds.get(batchIds.size() - 1);
-    wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
-    if (noteRepository
-        .findRelationshipWikiMigrationCandidateIdsExclusiveAfterAsc(lastId, PageRequest.of(0, 1))
-        .isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-    }
+  public AdminDataMigrationStatusDTO executeBatch(@SuppressWarnings("unused") User adminUser) {
     AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    dto.setMessage(
-        "Relationship wiki backfill: processed %d note(s) in this batch."
-            .formatted(batchIds.size()));
+    dto.setMessage(NO_STEPS_CONFIGURED_BATCH_MESSAGE);
     progressPopulator.populateMigrationProgress(dto);
     return dto;
-  }
-
-  private static boolean needsRelationshipDetailsMigration(Note relation) {
-    String d = relation.getDetails();
-    return d == null || d.trim().isEmpty() || !d.contains("type: relationship");
-  }
-
-  /**
-   * Wiki link resolution uses notebook read access; use notebook owner or a circle member when
-   * present, otherwise the admin running the migration.
-   */
-  private AdminDataMigrationStatusDTO runLegacyParentFrontmatterBatch(User adminUser) {
-    String step = AdminDataMigrationService.STEP_LEGACY_PARENT_FRONTMATTER;
-    entityPersister.flush();
-    long total = countLegacyChildNotesEligibleForWikiMigration();
-    wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(total));
-    Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
-    List<Integer> batchIds =
-        nextLegacyChildNoteIdsPage(
-            exclusiveAfter, AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE);
-    if (batchIds.isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-      dto.setMessage("Legacy parent frontmatter: nothing pending.");
-      progressPopulator.populateMigrationProgress(dto);
-      return dto;
-    }
-    for (Integer id : batchIds) {
-      Note note = noteRepository.findById(id).orElseThrow();
-      Note parent = note.getParent();
-      String parentTitle = parent != null ? parent.getTitle() : null;
-      String merged =
-          LegacyParentWikiFrontmatterMerge.mergeParentWikiLink(note.getDetails(), parentTitle);
-      if (!Objects.equals(merged, note.getDetails())) {
-        note.setDetails(merged);
-      }
-      entityPersister.merge(note);
-    }
-    entityPersister.flush();
-    for (Integer id : batchIds) {
-      refreshWikiTitleCacheForLegacyMigration(id, adminUser);
-    }
-    int lastId = batchIds.get(batchIds.size() - 1);
-    wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
-    if (nextLegacyChildNoteIdsPage(lastId, 1).isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-    }
-    AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    dto.setMessage(
-        "Legacy parent frontmatter: processed %d note(s) in this batch."
-            .formatted(batchIds.size()));
-    progressPopulator.populateMigrationProgress(dto);
-    return dto;
-  }
-
-  private static User viewerForWikiTitleCacheRefresh(Note relationshipNote, User adminUser) {
-    Ownership ownership = relationshipNote.getNotebook().getOwnership();
-    if (ownership.getUser() != null) {
-      return ownership.getUser();
-    }
-    if (ownership.getCircle() != null && !ownership.getCircle().getMembers().isEmpty()) {
-      return ownership.getCircle().getMembers().getFirst();
-    }
-    return adminUser;
-  }
-
-  /**
-   * Clears stuck rows then retries once; JDBC avoids enqueueing {@link
-   * com.odde.doughnut.entities.NoteWikiTitleCache} on the migration session.
-   */
-  private void refreshWikiTitleCacheForRelationshipMigration(Note note, User viewer) {
-    try {
-      wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
-    } catch (RuntimeException e) {
-      jdbcTemplate.update("DELETE FROM note_wiki_title_cache WHERE note_id = ?", note.getId());
-      wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
-    }
-  }
-
-  /**
-   * Best-effort refresh; cursor still advances so migration can finish even if cache stays empty.
-   */
-  private void refreshWikiTitleCacheForLegacyMigration(int noteId, User adminUser) {
-    Note note = noteRepository.findById(noteId).orElseThrow();
-    User viewer = viewerForWikiTitleCacheRefresh(note, adminUser);
-    try {
-      wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
-    } catch (RuntimeException e) {
-      jdbcTemplate.update("DELETE FROM note_wiki_title_cache WHERE note_id = ?", noteId);
-      try {
-        wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
-      } catch (RuntimeException ignored) {
-        // Cache can be rebuilt when the note is loaded in the app.
-      }
-    }
-  }
-
-  private AdminDataMigrationStatusDTO runRelationshipWikiReferenceRefreshBatch(User adminUser) {
-    String step = AdminDataMigrationService.STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH;
-    long total = noteRepository.countRelationshipNotesForWikiReferenceRefresh();
-    wikiReferenceMigrationProgressService.startOrResume(step, totalCountForProgress(total));
-    Integer exclusiveAfter = exclusiveLastProcessedNoteId(step);
-    List<Integer> batchIds =
-        noteRepository.findRelationshipWikiReferenceRefreshCandidateIdsExclusiveAfterAsc(
-            exclusiveAfter,
-            PageRequest.of(0, AdminDataMigrationService.WIKI_REFERENCE_MIGRATION_BATCH_SIZE));
-    if (batchIds.isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-      dto.setMessage("Relationship wiki reference refresh: nothing pending.");
-      progressPopulator.populateMigrationProgress(dto);
-      return dto;
-    }
-    List<Note> loaded = noteRepository.hydrateRelationshipWikiReferenceRefreshNotesByIds(batchIds);
-    Map<Integer, Note> byId =
-        loaded.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
-    for (Note relation : notesForBatchIdsInOrder(batchIds, byId)) {
-      String preserved =
-          RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
-              relation.getDetails());
-      relation.setDetails(
-          RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-              relation,
-              relation.getRelationType(),
-              relation.getParent(),
-              relation.getTargetNote(),
-              preserved));
-      User viewer = viewerForWikiTitleCacheRefresh(relation, adminUser);
-      refreshWikiTitleCacheForRelationshipMigration(relation, viewer);
-      entityPersister.merge(relation);
-      entityPersister.flush();
-    }
-    int lastId = batchIds.get(batchIds.size() - 1);
-    wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
-    if (noteRepository
-        .findRelationshipWikiReferenceRefreshCandidateIdsExclusiveAfterAsc(
-            lastId, PageRequest.of(0, 1))
-        .isEmpty()) {
-      wikiReferenceMigrationProgressService.markCompleted(step);
-    }
-    AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-    dto.setMessage(
-        "Relationship wiki reference refresh: processed %d note(s) in this batch."
-            .formatted(batchIds.size()));
-    progressPopulator.populateMigrationProgress(dto);
-    return dto;
-  }
-
-  private Integer exclusiveLastProcessedNoteId(String stepName) {
-    return wikiReferenceMigrationProgressService
-        .find(stepName)
-        .map(WikiReferenceMigrationProgress::getLastProcessedNote)
-        .filter(Objects::nonNull)
-        .map(Note::getId)
-        .orElse(null);
-  }
-
-  private static int totalCountForProgress(long total) {
-    if (total > Integer.MAX_VALUE) {
-      return Integer.MAX_VALUE;
-    }
-    return (int) total;
-  }
-
-  private static List<Note> notesForBatchIdsInOrder(
-      List<Integer> batchIds, Map<Integer, Note> byId) {
-    return batchIds.stream().map(byId::get).filter(Objects::nonNull).toList();
-  }
-
-  private long countLegacyChildNotesEligibleForWikiMigration() {
-    Long c =
-        jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
-                + "AND target_note_id IS NULL",
-            Long.class);
-    return c == null ? 0 : c;
-  }
-
-  private List<Integer> nextLegacyChildNoteIdsPage(Integer exclusiveAfter, int limit) {
-    if (exclusiveAfter == null) {
-      return jdbcTemplate.query(
-          "SELECT id FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
-              + "AND target_note_id IS NULL ORDER BY id ASC LIMIT ?",
-          (rs, rowNum) -> rs.getInt(1),
-          limit);
-    }
-    return jdbcTemplate.query(
-        "SELECT id FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
-            + "AND target_note_id IS NULL AND id > ? ORDER BY id ASC LIMIT ?",
-        (rs, rowNum) -> rs.getInt(1),
-        exclusiveAfter,
-        limit);
   }
 }

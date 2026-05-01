@@ -4,51 +4,37 @@ import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationProgress;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AdminDataMigrationService implements AdminDataMigrationProgressPopulator {
 
-  public static final String DIAGNOSTIC_MARKER = "admin-wiki-migration-diagnostics:v1";
+  public static final String DIAGNOSTIC_MARKER = "admin-data-migration-diagnostics:v1";
 
   public static final String READY_MESSAGE =
-      ("Wiki data migration [%s]: relationship wiki backfill (title, details, cache), legacy parent"
-              + " frontmatter and cache on child notes, then relationship wiki reference refresh"
-              + " (notebook-qualified links and cache).")
+      ("[%s]: Admin-triggered migration runs in bounded batches; progress rows live in "
+              + "wiki_reference_migration_progress keyed by step name.")
           .formatted(DIAGNOSTIC_MARKER);
 
-  public static final String STEP_RELATIONSHIP_WIKI_BACKFILL = "relationship_wiki_backfill";
-  public static final String STEP_LEGACY_PARENT_FRONTMATTER = "legacy_parent_frontmatter";
-  public static final String STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH =
-      "relationship_wiki_reference_refresh";
+  /**
+   * Ordered steps that gate completion reporting and batch routing. Populate this list and
+   * implement {@link AdminDataMigrationBatchWorker} when adding migrations.
+   */
+  public static final List<String> orderedAdminDataMigrationSteps = List.of();
 
-  private static final List<String> WIKI_REFERENCE_MIGRATION_STEPS =
-      List.of(
-          STEP_RELATIONSHIP_WIKI_BACKFILL,
-          STEP_LEGACY_PARENT_FRONTMATTER,
-          STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH);
+  /** Default notes per HTTP request once batch processing is wired for steps. */
+  public static final int DATA_MIGRATION_BATCH_SIZE = 50;
 
-  /** Max notes processed per HTTP request for each wiki reference migration step. */
-  public static final int WIKI_REFERENCE_MIGRATION_BATCH_SIZE = 50;
-
-  private final NoteRepository noteRepository;
   private final WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService;
-  private final JdbcTemplate jdbcTemplate;
   private final AdminDataMigrationBatchWorker batchWorker;
 
   public AdminDataMigrationService(
-      NoteRepository noteRepository,
       WikiReferenceMigrationProgressService wikiReferenceMigrationProgressService,
-      JdbcTemplate jdbcTemplate,
       @Lazy AdminDataMigrationBatchWorker batchWorker) {
-    this.noteRepository = noteRepository;
     this.wikiReferenceMigrationProgressService = wikiReferenceMigrationProgressService;
-    this.jdbcTemplate = jdbcTemplate;
     this.batchWorker = batchWorker;
   }
 
@@ -65,19 +51,17 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       return dtoAfterBlockedRun(
           "Migration is stopped after a failure; fix data and clear progress if needed.");
     }
-    if (migrationFullyComplete()) {
-      AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-      dto.setMessage("Wiki reference migration is already complete.");
-      populateMigrationProgress(dto);
-      return dto;
-    }
     try {
       return batchWorker.executeBatch(adminUser);
     } catch (RuntimeException e) {
-      String step = stepNameForRecordedFailureMark();
-      String failureMessage = failureMessage(step, e);
-      wikiReferenceMigrationProgressService.markFailed(step, errorMessageSafe(failureMessage));
-      return dtoAfterFailure(failureMessage);
+      Optional<String> step = firstIncompleteTrackedStepName();
+      if (step.isPresent()) {
+        String failureMessage = failureMessage(step.get(), e);
+        wikiReferenceMigrationProgressService.markFailed(
+            step.get(), errorMessageSafe(failureMessage));
+        return dtoAfterFailure(failureMessage);
+      }
+      throw e;
     }
   }
 
@@ -92,34 +76,29 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     return m != null ? m : "";
   }
 
-  /**
-   * If the transactional batch aborted, completion flags still reflect state before failure; derive
-   * which step failed for {@link WikiReferenceMigrationProgressService#markFailed}.
-   */
-  private String stepNameForRecordedFailureMark() {
-    if (!stepCompleted(STEP_RELATIONSHIP_WIKI_BACKFILL)) {
-      return STEP_RELATIONSHIP_WIKI_BACKFILL;
-    }
-    if (!stepCompleted(STEP_LEGACY_PARENT_FRONTMATTER)) {
-      return STEP_LEGACY_PARENT_FRONTMATTER;
-    }
-    return STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH;
-  }
-
   @Override
   public void populateMigrationProgress(AdminDataMigrationStatusDTO dto) {
+    if (orderedAdminDataMigrationSteps.isEmpty()) {
+      dto.setDataMigrationComplete(true);
+      dto.setCurrentStepName(null);
+      dto.setStepStatus(WikiReferenceMigrationStepStatus.COMPLETED.name());
+      dto.setProcessedCount(0);
+      dto.setTotalCount(0);
+      dto.setLastError(null);
+      return;
+    }
     Optional<WikiReferenceMigrationProgress> failed =
-        WIKI_REFERENCE_MIGRATION_STEPS.stream()
+        orderedAdminDataMigrationSteps.stream()
             .flatMap(s -> wikiReferenceMigrationProgressService.find(s).stream())
             .filter(p -> p.getStatus() == WikiReferenceMigrationStepStatus.FAILED)
             .findFirst();
     if (failed.isPresent()) {
       copyProgressFields(dto, failed.get());
-      dto.setWikiReferenceMigrationComplete(false);
+      dto.setDataMigrationComplete(false);
       return;
     }
     if (migrationFullyComplete()) {
-      dto.setWikiReferenceMigrationComplete(true);
+      dto.setDataMigrationComplete(true);
       dto.setCurrentStepName(null);
       dto.setStepStatus(WikiReferenceMigrationStepStatus.COMPLETED.name());
       dto.setLastError(null);
@@ -127,7 +106,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       dto.setTotalCount(aggregateTotalWhenComplete());
       return;
     }
-    dto.setWikiReferenceMigrationComplete(false);
+    dto.setDataMigrationComplete(false);
     String activeStep = activeIncompleteStepName();
     dto.setCurrentStepName(activeStep);
     wikiReferenceMigrationProgressService
@@ -137,23 +116,9 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
             () -> {
               dto.setStepStatus(WikiReferenceMigrationStepStatus.PENDING.name());
               dto.setProcessedCount(0);
-              dto.setTotalCount(estimatedPendingTotalForStep(activeStep));
+              dto.setTotalCount(0);
               dto.setLastError(null);
             });
-  }
-
-  private int estimatedPendingTotalForStep(String activeStep) {
-    if (STEP_RELATIONSHIP_WIKI_BACKFILL.equals(activeStep)) {
-      return totalCountForProgress(
-          noteRepository.countRelationshipNotesEligibleForWikiReferenceMigration());
-    }
-    if (STEP_LEGACY_PARENT_FRONTMATTER.equals(activeStep)) {
-      return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
-    }
-    if (STEP_RELATIONSHIP_WIKI_REFERENCE_REFRESH.equals(activeStep)) {
-      return totalCountForProgress(noteRepository.countRelationshipNotesForWikiReferenceRefresh());
-    }
-    return totalCountForProgress(countLegacyChildNotesEligibleForWikiMigration());
   }
 
   private static void copyProgressFields(
@@ -166,7 +131,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   private int aggregateProcessedWhenComplete() {
-    return WIKI_REFERENCE_MIGRATION_STEPS.stream()
+    return orderedAdminDataMigrationSteps.stream()
         .mapToInt(
             s ->
                 wikiReferenceMigrationProgressService
@@ -177,7 +142,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   private int aggregateTotalWhenComplete() {
-    return WIKI_REFERENCE_MIGRATION_STEPS.stream()
+    return orderedAdminDataMigrationSteps.stream()
         .mapToInt(
             s ->
                 wikiReferenceMigrationProgressService
@@ -188,16 +153,16 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   private String activeIncompleteStepName() {
-    for (String step : WIKI_REFERENCE_MIGRATION_STEPS) {
+    for (String step : orderedAdminDataMigrationSteps) {
       if (!stepCompleted(step)) {
         return step;
       }
     }
-    throw new IllegalStateException("No incomplete wiki reference migration step");
+    throw new IllegalStateException("No incomplete tracked migration step");
   }
 
   private boolean migrationFullyComplete() {
-    return WIKI_REFERENCE_MIGRATION_STEPS.stream().allMatch(this::stepCompleted);
+    return orderedAdminDataMigrationSteps.stream().allMatch(this::stepCompleted);
   }
 
   private boolean stepCompleted(String stepName) {
@@ -207,11 +172,13 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
         .orElse(false);
   }
 
-  private static int totalCountForProgress(long total) {
-    if (total > Integer.MAX_VALUE) {
-      return Integer.MAX_VALUE;
+  private Optional<String> firstIncompleteTrackedStepName() {
+    for (String step : orderedAdminDataMigrationSteps) {
+      if (!stepCompleted(step)) {
+        return Optional.of(step);
+      }
     }
-    return (int) total;
+    return Optional.empty();
   }
 
   private AdminDataMigrationStatusDTO dtoAfterBlockedRun(String message) {
@@ -233,7 +200,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
         .formatted(
             DIAGNOSTIC_MARKER,
             step,
-            WIKI_REFERENCE_MIGRATION_BATCH_SIZE,
+            DATA_MIGRATION_BATCH_SIZE,
             e.getMessage() == null ? "" : e.getMessage(),
             rootCauseMessage(e));
   }
@@ -246,17 +213,8 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     return root.getMessage() == null ? "" : root.getMessage();
   }
 
-  private long countLegacyChildNotesEligibleForWikiMigration() {
-    Long c =
-        jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM note WHERE deleted_at IS NULL AND parent_id IS NOT NULL "
-                + "AND target_note_id IS NULL",
-            Long.class);
-    return c == null ? 0 : c;
-  }
-
   private Optional<String> findFailedStepName() {
-    for (String s : WIKI_REFERENCE_MIGRATION_STEPS) {
+    for (String s : orderedAdminDataMigrationSteps) {
       if (wikiReferenceMigrationProgressService
           .find(s)
           .map(p -> p.getStatus() == WikiReferenceMigrationStepStatus.FAILED)
