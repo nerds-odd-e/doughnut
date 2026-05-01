@@ -252,6 +252,7 @@ When(
     start.noteSidebar().activateFolderByLabel(noteTopology)
     start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
     start.assumeNotePage(title)
+    start.testability().rememberUiCreatedNote(title)
   }
 )
 
@@ -267,6 +268,7 @@ When(
       .createNoteWithTitleAndWikidataId(title, wikidataId)
     // Wikidata creation enriches siblings (authors, country); backend work can exceed default 6s.
     start.assumeNotePage(title, { timeout: 30000 })
+    start.testability().rememberUiCreatedNote(title)
   }
 )
 
@@ -662,6 +664,7 @@ When(
     start.noteSidebar().activateFolderByLabel(folderLabel)
     start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
     start.assumeNotePage(title)
+    start.testability().rememberUiCreatedNote(title)
   }
 )
 Then(
