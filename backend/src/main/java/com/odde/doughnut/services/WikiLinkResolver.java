@@ -8,7 +8,6 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,11 +38,9 @@ public class WikiLinkResolver {
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }
-    Note subtreeRoot = withoutRelations(rootNote(focusNote));
-    int subtreeRootId = subtreeRoot.getId();
     List<ResolvedWikiLink> out = new ArrayList<>();
     for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
-      Note target = resolveToken(token, viewer, focusNote, subtreeRootId);
+      Note target = resolveToken(token, viewer, focusNote);
       if (target != null) {
         out.add(new ResolvedWikiLink(token, target));
       }
@@ -51,34 +48,21 @@ public class WikiLinkResolver {
     return List.copyOf(out);
   }
 
-  private Note resolveToken(String token, User viewer, Note focusNote, int subtreeRootNoteId) {
+  private Note resolveToken(String token, User viewer, Note focusNote) {
     Qualified qualified = Qualified.tryParse(token);
     if (qualified != null) {
-      return firstReadableCandidate(qualified, viewer);
+      return firstReadableNotebookMatch(qualified.notebookName(), qualified.noteTitle(), viewer);
     }
-    Note target =
-        noteRepository
-            .findSmallestNonRelationSubtreeNoteIdByRootNoteIdAndTitle(subtreeRootNoteId, token)
-            .stream()
-            .findFirst()
-            .flatMap(noteRepository::findById)
-            .orElse(null);
-    if (target != null) {
-      Notebook notebook = target.getNotebook();
-      if (notebook == null) {
-        notebook = focusNote.getNotebook();
-      }
-      if (authorizationService.userMayReadNotebook(viewer, notebook)) {
-        return target;
-      }
+    Notebook focusNotebook = focusNote.getNotebook();
+    if (focusNotebook == null) {
+      return null;
     }
-    return null;
+    return firstReadableNotebookMatch(focusNotebook.getName(), token, viewer);
   }
 
-  private Note firstReadableCandidate(Qualified qualified, User viewer) {
+  private Note firstReadableNotebookMatch(String notebookName, String noteTitle, User viewer) {
     List<Note> candidates =
-        noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(
-            qualified.notebookName(), qualified.noteTitle());
+        noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
     for (Note candidate : candidates) {
       Notebook notebook = candidate.getNotebook();
       if (notebook != null && authorizationService.userMayReadNotebook(viewer, notebook)) {
@@ -101,18 +85,6 @@ public class WikiLinkResolver {
       }
       return new Qualified(nb, nt);
     }
-  }
-
-  private static Note rootNote(Note note) {
-    Note current = note;
-    while (current.getParent() != null) {
-      current = current.getParent();
-    }
-    return current;
-  }
-
-  private static Note withoutRelations(Note root) {
-    return root.isRelation() ? Objects.requireNonNullElse(root.getParent(), root) : root;
   }
 
   private static List<String> extractWikiTitles(String markdown) {

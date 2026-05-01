@@ -254,23 +254,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
 
   /**
-   * Unqualified wiki links resolve in the subtree under {@code rootNoteId} (self plus descendants
-   * via {@code parent_id}), excluding relation rows. When titles collide, smallest id wins.
-   */
-  @Query(
-      value =
-          "WITH RECURSIVE subtree AS ("
-              + "SELECT id FROM note WHERE id = :rootNoteId AND deleted_at IS NULL "
-              + "UNION ALL SELECT n.id FROM note n INNER JOIN subtree s ON n.parent_id = s.id "
-              + "WHERE n.deleted_at IS NULL) "
-              + "SELECT n.id FROM note n INNER JOIN subtree t ON n.id = t.id "
-              + "WHERE n.target_note_id IS NULL AND n.title = :noteTitle "
-              + "ORDER BY n.id ASC LIMIT 1",
-      nativeQuery = true)
-  List<Integer> findSmallestNonRelationSubtreeNoteIdByRootNoteIdAndTitle(
-      @Param("rootNoteId") Integer rootNoteId, @Param("noteTitle") String noteTitle);
-
-  /**
    * Basename is the segment after the last {@code /} in {@code slug}; use MySQL SUBSTRING_INDEX.
    * Includes soft-deleted rows so note URLs by slug still resolve for deleted-note UI.
    */

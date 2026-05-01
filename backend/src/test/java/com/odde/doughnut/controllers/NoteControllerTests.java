@@ -77,7 +77,7 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldReturnWikiTitlesForLinksMatchingDescendantsUnderRoot()
+    void shouldReturnWikiTitlesForUnqualifiedLinksByNotebookNameAndTitle()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().creatorAndOwner(user).title("root-head").please();
