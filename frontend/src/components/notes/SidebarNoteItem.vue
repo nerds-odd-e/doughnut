@@ -8,6 +8,7 @@
       'dragging': draggedNote?.id === noteRealm.id,
     }"
     draggable="true"
+    @click="onNoteRowClick"
     @dragstart="(e) => onDragStart(e, noteRealm.note)"
     @dragover.prevent="(e) => onDragOver(e, noteRealm.note)"
     @dragleave="onDragLeave"
@@ -42,9 +43,12 @@
 import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
+import { sidebarUserActiveFolderSlugKey } from "./sidebarFolderExpansion"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { inject } from "vue"
 
 const storageAccessor = useStorageAccessor()
+const userActiveFolderSlug = inject(sidebarUserActiveFolderSlugKey, undefined)
 
 interface Props {
   note: Note
@@ -63,6 +67,12 @@ interface Props {
 const props = defineProps<Props>()
 
 const noteRealm = storageAccessor.value.refOfNoteRealmWithFallback(props.note)
+
+function onNoteRowClick() {
+  if (userActiveFolderSlug != null) {
+    userActiveFolderSlug.value = null
+  }
+}
 </script>
 
 <style lang="scss" scoped>

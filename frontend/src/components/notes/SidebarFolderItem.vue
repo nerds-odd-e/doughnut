@@ -2,10 +2,13 @@
   <li
     v-if="folderId != null"
     class="daisy-list-group-item daisy-list-group-item-action daisy-py-2 daisy-pb-0 daisy-pe-0 daisy-border-0"
+    tabindex="0"
     :data-sidebar-folder-expanded="isExpanded"
     :class="{
-      'active-item': isActiveFolder,
+      'active-item': isNotePathFolder,
+      'sidebar-folder-user-active': isUserActiveFolder,
     }"
+    @focusout="onFolderRowFocusOut"
   >
     <div
       class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start folder-content"
@@ -45,6 +48,7 @@ import {
   sidebarActiveNoteFolderSlugPrefixesKey,
   sidebarExpandedFolderSlugsKey,
   sidebarToggleFolderSlugKey,
+  sidebarUserActiveFolderSlugKey,
 } from "./sidebarFolderExpansion"
 import { computed, inject, ref } from "vue"
 
@@ -59,6 +63,7 @@ const toggleFolderSlug = inject(sidebarToggleFolderSlugKey)!
 const activeNoteFolderSlugPrefixes = inject(
   sidebarActiveNoteFolderSlugPrefixesKey
 )!
+const userActiveFolderSlug = inject(sidebarUserActiveFolderSlugKey, undefined)
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
@@ -72,16 +77,48 @@ const slug = computed(() => props.folder.slug ?? "")
 
 const isExpanded = computed(() => expandedFolderSlugs.value.has(slug.value))
 
-const isActiveFolder = computed(
+const isNotePathFolder = computed(
   () =>
     slug.value.length > 0 && activeNoteFolderSlugPrefixes.value.has(slug.value)
+)
+
+const isUserActiveFolder = computed(
+  () =>
+    userActiveFolderSlug != null &&
+    slug.value.length > 0 &&
+    userActiveFolderSlug.value === slug.value
 )
 
 function setStructuralChildCount(count: number) {
   structuralChildCount.value = count
 }
 
+function onFolderRowFocusOut(event: FocusEvent) {
+  if (
+    userActiveFolderSlug == null ||
+    userActiveFolderSlug.value !== slug.value
+  ) {
+    return
+  }
+  const li = event.currentTarget as HTMLElement
+  const next = event.relatedTarget as Node | null
+  if (next && li.contains(next)) return
+  const root = li.closest("[data-note-sidebar-root]")
+  if (
+    next instanceof Element &&
+    root != null &&
+    root.contains(next) &&
+    next.closest("[data-note-sidebar-toolbar]")
+  ) {
+    return
+  }
+  userActiveFolderSlug.value = null
+}
+
 function toggleExpand() {
+  if (userActiveFolderSlug != null && slug.value.length > 0) {
+    userActiveFolderSlug.value = slug.value
+  }
   toggleFolderSlug(slug.value)
 }
 </script>
@@ -94,5 +131,10 @@ function toggleExpand() {
 .folder-content {
   position: relative;
   padding-bottom: 4px;
+}
+
+.sidebar-folder-user-active {
+  background-color: color-mix(in srgb, var(--color-base-200, #f0f0f0) 75%, #3b82f6) !important;
+  box-shadow: inset 2px 0 0 #3b82f6;
 }
 </style>

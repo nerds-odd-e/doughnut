@@ -191,6 +191,77 @@ describe("Sidebar", () => {
     return li ? new DOMWrapper(li) : undefined
   }
 
+  describe("user active folder", () => {
+    const findRootFolderRowByTopTitle = () => {
+      const label = wrapper
+        .findAll(".sidebar-folder-label")
+        .find((w) =>
+          w.text().includes(topNoteRealm.note.noteTopology.title ?? "")
+        )
+      if (!label?.exists()) return
+      const li = label.element.closest("li")
+      return li ? new DOMWrapper(li) : undefined
+    }
+
+    it("applies sidebar-folder-user-active when a folder row is clicked", async () => {
+      mountSidebar(firstGeneration)
+      await vi.waitUntil(() =>
+        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      )
+      const folderRow = findRootFolderRowByTopTitle()
+      expect(folderRow?.exists()).toBe(true)
+      await folderRow!.find(".sidebar-folder-label").trigger("click")
+      await flushPromises()
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    })
+
+    it("clears user active folder styling when a note row is clicked", async () => {
+      mountSidebar(firstGeneration)
+      await vi.waitUntil(() =>
+        findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+      )
+      const folderRow = findRootFolderRowByTopTitle()
+      await folderRow!.find(".sidebar-folder-label").trigger("click")
+      await flushPromises()
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+
+      const noteRow = findSidebarItem(topNoteRealm.note.noteTopology.title!)
+      expect(noteRow?.exists()).toBe(true)
+      await noteRow!.trigger("click")
+      await flushPromises()
+      expect(folderRow!.classes()).not.toContain("sidebar-folder-user-active")
+    })
+
+    it("does not clear user active folder when focus moves to the sidebar toolbar", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: firstGeneration,
+          notebookId: firstGeneration.notebookId,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      await vi.waitUntil(() =>
+        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      )
+      const folderRow = findRootFolderRowByTopTitle()
+      await folderRow!.find(".sidebar-folder-label").trigger("click")
+      await flushPromises()
+      const toolbarBtn = wrapper.find('button[title="Add Child Note"]')
+      expect(toolbarBtn.exists()).toBe(true)
+
+      folderRow!.element.focus()
+      const leave = new FocusEvent("focusout", {
+        bubbles: true,
+        relatedTarget: toolbarBtn.element,
+      })
+      folderRow!.element.dispatchEvent(leave)
+      await flushPromises()
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    })
+  })
+
   it("should call the api once if top note", async () => {
     mountSidebar(topNoteRealm)
     await vi.waitUntil(() =>

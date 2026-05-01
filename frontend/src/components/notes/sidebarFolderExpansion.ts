@@ -12,6 +12,10 @@ export const sidebarActiveNoteFolderSlugPrefixesKey: InjectionKey<
   ComputedRef<Set<string>>
 > = Symbol("sidebarActiveNoteFolderSlugPrefixes")
 
+/** User-clicked folder row for default create placement; cleared on blur, note click, or notebook switch. */
+export const sidebarUserActiveFolderSlugKey: InjectionKey<Ref<string | null>> =
+  Symbol("sidebarUserActiveFolderSlug")
+
 /** Structural folder slug path segments toward a note slug (excluding the note basename segment). */
 export function noteSlugFolderPrefixes(noteSlug: string): string[] {
   const parts = noteSlug.split("/").filter(Boolean)

@@ -1,5 +1,8 @@
 <template>
-  <nav class="daisy-navbar daisy-bg-base-200 daisy-min-h-0 daisy-py-1 daisy-px-1 daisy-sticky daisy-top-0 daisy-z-10">
+  <nav
+    class="daisy-navbar daisy-bg-base-200 daisy-min-h-0 daisy-py-1 daisy-px-1 daisy-sticky daisy-top-0 daisy-z-10"
+    data-note-sidebar-toolbar
+  >
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NotebookRootNoteNewButton
         v-if="preferNotebookRootCreation"

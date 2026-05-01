@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-ml-[-1rem]">
+  <div class="daisy-ml-[-1rem]" data-note-sidebar-root>
     <NoteSidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
@@ -31,6 +31,7 @@ import {
   sidebarActiveNoteFolderSlugPrefixesKey,
   sidebarExpandedFolderSlugsKey,
   sidebarToggleFolderSlugKey,
+  sidebarUserActiveFolderSlugKey,
 } from "./sidebarFolderExpansion"
 import {
   type SidebarNoteDragState,
@@ -48,6 +49,7 @@ const props = defineProps({
 })
 
 const expandedFolderSlugs = ref<Set<string>>(new Set())
+const userActiveFolderSlug = ref<string | null>(null)
 
 function ensureFolderExpanded(folderSlug: string) {
   if (folderSlug === "") return
@@ -121,6 +123,7 @@ const sidebarNoteDrag: SidebarNoteDragState = {
 provide(sidebarExpandedFolderSlugsKey, expandedFolderSlugs)
 provide(sidebarToggleFolderSlugKey, toggleFolderSlug)
 provide(sidebarActiveNoteFolderSlugPrefixesKey, activeNoteFolderSlugPrefixes)
+provide(sidebarUserActiveFolderSlugKey, userActiveFolderSlug)
 provide(sidebarNoteDragStateKey, sidebarNoteDrag)
 
 watch(
@@ -143,6 +146,7 @@ watch(
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderSlugs.value = new Set()
+      userActiveFolderSlug.value = null
       sidebarNoteDrag.draggedNote.value = null
       sidebarNoteDrag.isDraggedOver.value = null
       sidebarNoteDrag.dropMode.value = "after"
