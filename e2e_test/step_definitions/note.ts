@@ -264,8 +264,8 @@ When(
       .jumpToNotePage(noteTopology)
       .addingChildNote()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
-    // Wait for the note to be created and verify the title appears
-    start.assumeNotePage(title)
+    // Wikidata creation enriches siblings (authors, country); backend work can exceed default 6s.
+    start.assumeNotePage(title, { timeout: 30000 })
   }
 )
 

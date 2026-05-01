@@ -26,10 +26,12 @@ Feature: Note creation should have details if wikidata is a person
 
 
   @usingMockedWikidataService
-  Scenario: Create a note for the country of origin when the person is created
+  Scenario: Add country of origin as a sibling when the person is created
     When I create a note belonging to "People" with title "Confucius" and wikidata id "Q4604"
-    Then I should see "Notable people/People/Confucius" with these children
+    Then I should see "Notable people/People" with these children
       | note-title |
+      | Taiwan     |
+      | Confucius  |
       | Lu         |
 
   @usingMockedWikidataService

@@ -113,8 +113,10 @@ public class NoteConstructionService {
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, noteService);
-      wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
-      wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
+      wikidataIdWithApi
+          .getCountryOfOrigin()
+          .ifPresent(wwa -> addWikidataLinkedSiblingNote(note, wwa));
+      wikidataIdWithApi.getAuthors().forEach(wwa -> addWikidataLinkedSiblingNote(note, wwa));
     }
     entityPersister.flush();
     entityPersister.refresh(note);
@@ -122,21 +124,22 @@ public class NoteConstructionService {
   }
 
   @SneakyThrows
-  private void createSubNote(Note parentNote, WikidataIdWithApi subWikidataIdWithApi) {
+  private void addWikidataLinkedSiblingNote(
+      Note focalNote, WikidataIdWithApi subWikidataIdWithApi) {
     Optional<String> optionalTitle = subWikidataIdWithApi.fetchEnglishTitleFromApi();
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     optionalTitle.ifPresent(
-        subNoteTitle ->
+        siblingTitle ->
             noteRepository
                 .noteWithWikidataIdWithinNotebook(
-                    parentNote.getNotebook().getId(), subWikidataIdWithApi.wikidataId())
+                    focalNote.getNotebook().getId(), subWikidataIdWithApi.wikidataId())
                 .stream()
                 .findFirst()
                 .ifPresentOrElse(
                     existingNote -> {
                       noteService.createRelationship(
-                          parentNote,
+                          focalNote,
                           existingNote,
                           user,
                           RelationType.RELATED_TO,
@@ -144,7 +147,14 @@ public class NoteConstructionService {
                     },
                     () -> {
                       try {
-                        createNoteWithWikidataInfo(parentNote, subWikidataIdWithApi, subNoteTitle);
+                        Note siblingParentNote = focalNote.getParent();
+                        if (siblingParentNote != null) {
+                          createNoteWithWikidataInfo(
+                              siblingParentNote, subWikidataIdWithApi, siblingTitle);
+                        } else {
+                          createRootNoteWithWikidataInfo(
+                              focalNote.getNotebook(), subWikidataIdWithApi, siblingTitle);
+                        }
                       } catch (Exception | DuplicateWikidataIdException e) {
                         throw new RuntimeException(e);
                       }

@@ -32,9 +32,15 @@ function wikiLinkInDetailsFluent(linkText: string) {
   }
 }
 
-export const assumeNotePage = (noteTopology?: string) => {
-  const findNoteTitle = (title) =>
-    cy.findByText(title, { selector: '[role=title]' })
+export const assumeNotePage = (
+  noteTopology?: string,
+  options?: { timeout?: number }
+) => {
+  const findNoteTitle = (title: string) =>
+    cy.findByText(title, {
+      selector: '[role=title]',
+      ...(options?.timeout !== undefined ? { timeout: options.timeout } : {}),
+    })
 
   if (noteTopology) {
     findNoteTitle(noteTopology)

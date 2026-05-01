@@ -329,7 +329,11 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
         assertEquals("Johnny boy", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("Canada", note.getNote().getChildren().get(0).getTitle());
+        List<String> siblingTitlesUnderParent =
+            noteRepository.findById(parent.getId()).orElseThrow().getChildren().stream()
+                .map(Note::getTitle)
+                .toList();
+        assertThat(siblingTitlesUnderParent, hasItems("Johnny boy", "Canada"));
       }
     }
 
@@ -355,7 +359,11 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
         assertEquals("Harry Potter", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTitle());
+        List<String> siblingTitlesUnderParent =
+            noteRepository.findById(parent.getId()).orElseThrow().getChildren().stream()
+                .map(Note::getTitle)
+                .toList();
+        assertThat(siblingTitlesUnderParent, hasItems("Harry Potter", "J. K. Rowling"));
       }
 
       @Test
@@ -372,8 +380,15 @@ class NoteCreationControllerTests extends ControllerTestBase {
                 .please());
         NoteRealm note = controller.createNoteUnderParent(parent, noteCreation);
 
-        assertEquals(
-            "The girl sat next to the window", note.getNote().getChildren().get(1).getTitle());
+        assertEquals("Harry Potter", note.getNote().getTitle());
+        assertEquals("Q8337", note.getNote().getWikidataId());
+        List<String> siblingTitlesUnderParent =
+            noteRepository.findById(parent.getId()).orElseThrow().getChildren().stream()
+                .map(Note::getTitle)
+                .toList();
+        assertThat(
+            siblingTitlesUnderParent,
+            hasItems("Harry Potter", "J. K. Rowling", "The girl sat next to the window"));
       }
     }
   }
