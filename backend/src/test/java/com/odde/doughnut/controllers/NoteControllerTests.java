@@ -69,7 +69,6 @@ class NoteControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
-      assertThat(noteRealm.getSlug(), equalTo(note.getSlug()));
       assertThat(noteRealm.getFromBazaar(), is(false));
       assertThat(noteRealm.getNotebookId(), equalTo(note.getNotebook().getId()));
     }

@@ -14,7 +14,6 @@ import org.springframework.lang.NonNull;
 
 @JsonPropertyOrder({
   "id",
-  "slug",
   "note",
   "fromBazaar",
   "notebookId",
@@ -39,12 +38,6 @@ public class NoteRealm {
   @NotNull
   public Integer getId() {
     return note.getId();
-  }
-
-  @NonNull
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  public String getSlug() {
-    return Objects.requireNonNullElse(note.getSlug(), "");
   }
 
   @JsonProperty("relationshipsDeprecating")

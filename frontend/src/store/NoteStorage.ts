@@ -33,7 +33,6 @@ export class StorageImplementation implements NoteStorage {
     if (ref.value === undefined) {
       ref.value = {
         id: note.id,
-        slug: "",
         note,
         notebookId: note.noteTopology.notebookId,
         wikiTitles: [],

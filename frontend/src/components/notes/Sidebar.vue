@@ -23,12 +23,11 @@ import type { NoteRealm, Note, User } from "@generated/doughnut-backend-api"
 import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import {
-  noteSlugFolderPrefixes,
-  sidebarActiveNoteFolderSlugPrefixesKey,
-  sidebarExpandedFolderSlugsKey,
-  sidebarToggleFolderSlugKey,
+  sidebarStructuralSidebarTitlesKey,
+  sidebarActiveNoteFolderIdsKey,
+  sidebarExpandedFolderIdsKey,
+  sidebarToggleFolderIdKey,
   sidebarUserActiveFolderIdKey,
-  sidebarUserActiveFolderSlugKey,
 } from "./sidebarFolderExpansion"
 import {
   type SidebarNoteDragState,
@@ -46,47 +45,49 @@ const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 
-const expandedFolderSlugs = ref<Set<string>>(new Set())
-const userActiveFolderSlug = ref<string | null>(null)
+const expandedFolderIds = ref<Set<number>>(new Set())
 const userActiveFolderId = ref<number | null>(null)
 
-function ensureFolderExpanded(folderSlug: string) {
-  if (folderSlug === "") return
-  if (expandedFolderSlugs.value.has(folderSlug)) return
-  expandedFolderSlugs.value = new Set([
-    ...expandedFolderSlugs.value,
-    folderSlug,
-  ])
+function ensureFolderExpanded(folderId: number | undefined) {
+  if (folderId == null) return
+  if (expandedFolderIds.value.has(folderId)) return
+  expandedFolderIds.value = new Set([...expandedFolderIds.value, folderId])
 }
 
-function toggleFolderSlug(folderSlug: string) {
-  const next = new Set(expandedFolderSlugs.value)
-  if (next.has(folderSlug)) {
-    next.delete(folderSlug)
+function toggleFolderId(folderId: number) {
+  const next = new Set(expandedFolderIds.value)
+  if (next.has(folderId)) {
+    next.delete(folderId)
   } else {
-    next.add(folderSlug)
+    next.add(folderId)
   }
-  expandedFolderSlugs.value = next
+  expandedFolderIds.value = next
 }
 
-function expandFolderSlugsForTopologySlug(slug: string | undefined) {
-  if (!slug) return
-  for (const prefix of noteSlugFolderPrefixes(slug)) {
-    ensureFolderExpanded(prefix)
-  }
-  ensureFolderExpanded(slug)
-}
-
-const activeNoteFolderSlugPrefixes = computed(() => {
-  const prefixes = new Set<string>()
-  const slug = props.activeNoteRealm?.slug
-  if (slug) {
-    for (const p of noteSlugFolderPrefixes(slug)) {
-      prefixes.add(p)
+function titlesAlongNoteTopologyChain(noteRealm: NoteRealm | undefined) {
+  const titles = new Set<string>()
+  let t = noteRealm?.note?.noteTopology
+  while (t) {
+    const title = t.title
+    if (title != null && title !== "") {
+      titles.add(title)
     }
-    prefixes.add(slug)
+    t = t.parentOrSubjectNoteTopology
   }
-  return prefixes
+  return titles
+}
+
+const structuralSidebarTitles = computed(() =>
+  titlesAlongNoteTopologyChain(props.activeNoteRealm)
+)
+
+const activeNoteFolderIds = computed(() => {
+  const ids = new Set<number>()
+  const fid = props.activeNoteRealm?.note?.noteTopology?.folderId
+  if (fid != null) {
+    ids.add(fid)
+  }
+  return ids
 })
 
 const sidebarNoteDrag: SidebarNoteDragState = {
@@ -96,18 +97,17 @@ const sidebarNoteDrag: SidebarNoteDragState = {
   dropIndicatorStyle: ref({}),
 }
 
-provide(sidebarExpandedFolderSlugsKey, expandedFolderSlugs)
-provide(sidebarToggleFolderSlugKey, toggleFolderSlug)
-provide(sidebarActiveNoteFolderSlugPrefixesKey, activeNoteFolderSlugPrefixes)
-provide(sidebarUserActiveFolderSlugKey, userActiveFolderSlug)
+provide(sidebarExpandedFolderIdsKey, expandedFolderIds)
+provide(sidebarToggleFolderIdKey, toggleFolderId)
+provide(sidebarStructuralSidebarTitlesKey, structuralSidebarTitles)
+provide(sidebarActiveNoteFolderIdsKey, activeNoteFolderIds)
 provide(sidebarUserActiveFolderIdKey, userActiveFolderId)
 provide(sidebarNoteDragStateKey, sidebarNoteDrag)
 
 watch(
   () => props.activeNoteRealm,
   (realm) => {
-    if (!realm?.note?.noteTopology) return
-    expandFolderSlugsForTopologySlug(realm.slug)
+    ensureFolderExpanded(realm?.note?.noteTopology?.folderId)
   },
   { immediate: true, deep: true }
 )
@@ -116,8 +116,7 @@ watch(
   () => props.notebookId,
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
-      expandedFolderSlugs.value = new Set()
-      userActiveFolderSlug.value = null
+      expandedFolderIds.value = new Set()
       userActiveFolderId.value = null
       sidebarNoteDrag.draggedNote.value = null
       sidebarNoteDrag.isDraggedOver.value = null

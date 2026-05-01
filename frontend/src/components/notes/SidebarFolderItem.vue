@@ -45,13 +45,13 @@ import type {
 } from "@generated/doughnut-backend-api"
 import SidebarInner from "./SidebarInner.vue"
 import {
-  sidebarActiveNoteFolderSlugPrefixesKey,
-  sidebarExpandedFolderSlugsKey,
-  sidebarToggleFolderSlugKey,
+  sidebarStructuralSidebarTitlesKey,
+  sidebarActiveNoteFolderIdsKey,
+  sidebarExpandedFolderIdsKey,
+  sidebarToggleFolderIdKey,
   sidebarUserActiveFolderIdKey,
-  sidebarUserActiveFolderSlugKey,
 } from "./sidebarFolderExpansion"
-import { computed, inject, ref } from "vue"
+import { computed, inject, ref, watch } from "vue"
 
 const props = defineProps<{
   folder: NotebookRootFolder
@@ -59,12 +59,10 @@ const props = defineProps<{
   activeNoteRealm?: NoteRealm
 }>()
 
-const expandedFolderSlugs = inject(sidebarExpandedFolderSlugsKey)!
-const toggleFolderSlug = inject(sidebarToggleFolderSlugKey)!
-const activeNoteFolderSlugPrefixes = inject(
-  sidebarActiveNoteFolderSlugPrefixesKey
-)!
-const userActiveFolderSlug = inject(sidebarUserActiveFolderSlugKey, undefined)
+const expandedFolderIds = inject(sidebarExpandedFolderIdsKey)!
+const toggleFolderId = inject(sidebarToggleFolderIdKey)!
+const structuralTitles = inject(sidebarStructuralSidebarTitlesKey)!
+const activeNoteFolderIds = inject(sidebarActiveNoteFolderIdsKey)!
 const userActiveFolderId = inject(sidebarUserActiveFolderIdKey, undefined)
 
 const structuralChildCount = ref<number | undefined>(undefined)
@@ -75,20 +73,38 @@ const folderId = computed(() => {
   return Number(raw)
 })
 
-const slug = computed(() => props.folder.slug ?? "")
+function ensureFolderExpandedById(id: number | undefined) {
+  if (id == null) return
+  if (expandedFolderIds.value.has(id)) return
+  expandedFolderIds.value = new Set([...expandedFolderIds.value, id])
+}
 
-const isExpanded = computed(() => expandedFolderSlugs.value.has(slug.value))
+watch(
+  () => [structuralTitles.value, props.folder.name, folderId.value] as const,
+  () => {
+    if (folderId.value == null) return
+    if (structuralTitles.value.has(props.folder.name)) {
+      ensureFolderExpandedById(folderId.value)
+    }
+  },
+  { immediate: true }
+)
+
+const isExpanded = computed(
+  () => folderId.value != null && expandedFolderIds.value.has(folderId.value)
+)
 
 const isNotePathFolder = computed(
   () =>
-    slug.value.length > 0 && activeNoteFolderSlugPrefixes.value.has(slug.value)
+    (folderId.value != null && activeNoteFolderIds.value.has(folderId.value)) ||
+    structuralTitles.value.has(props.folder.name)
 )
 
 const isUserActiveFolder = computed(
   () =>
-    userActiveFolderSlug != null &&
-    slug.value.length > 0 &&
-    userActiveFolderSlug.value === slug.value
+    userActiveFolderId != null &&
+    folderId.value != null &&
+    userActiveFolderId.value === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -97,8 +113,9 @@ function setStructuralChildCount(count: number) {
 
 function onFolderRowFocusOut(event: FocusEvent) {
   if (
-    userActiveFolderSlug == null ||
-    userActiveFolderSlug.value !== slug.value
+    userActiveFolderId == null ||
+    folderId.value == null ||
+    userActiveFolderId.value !== folderId.value
   ) {
     return
   }
@@ -114,20 +131,16 @@ function onFolderRowFocusOut(event: FocusEvent) {
   ) {
     return
   }
-  userActiveFolderSlug.value = null
-  if (userActiveFolderId != null) {
-    userActiveFolderId.value = null
-  }
+  userActiveFolderId.value = null
 }
 
 function toggleExpand() {
-  if (userActiveFolderSlug != null && slug.value.length > 0) {
-    userActiveFolderSlug.value = slug.value
-  }
   if (userActiveFolderId != null && folderId.value != null) {
     userActiveFolderId.value = folderId.value
   }
-  toggleFolderSlug(slug.value)
+  if (folderId.value != null) {
+    toggleFolderId(folderId.value)
+  }
 }
 </script>
 

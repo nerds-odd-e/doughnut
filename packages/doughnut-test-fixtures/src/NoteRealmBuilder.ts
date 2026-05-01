@@ -1,21 +1,6 @@
-import type {
-  Note,
-  NoteRealm,
-  NoteTopology,
-} from '@generated/doughnut-backend-api'
+import type { NoteRealm } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
-
-function realmSlugFromNoteTopology(note: Note): string {
-  const ids: number[] = []
-  let t: NoteTopology | undefined = note.noteTopology
-  while (t) {
-    ids.push(t.id)
-    t = t.parentOrSubjectNoteTopology
-  }
-  ids.reverse()
-  return ids.map((id) => `s${id}`).join('/')
-}
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
   data: NoteRealm
@@ -28,7 +13,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     const noteData = this.noteBuilder.data
     this.data = {
       id: noteData.id,
-      slug: realmSlugFromNoteTopology(noteData),
       note: noteData,
       inboundReferences: [],
       relationshipsDeprecating: [],
@@ -89,7 +73,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
-    this.data.slug = realmSlugFromNoteTopology(this.data.note)
     this.data.notebookId = this.data.note.noteTopology.notebookId
     this.data.wikiTitles ??= []
     return this.data

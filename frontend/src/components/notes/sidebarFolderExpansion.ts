@@ -1,31 +1,24 @@
 import type { ComputedRef, InjectionKey, Ref } from "vue"
 
-export type ExpandedFolderSlugSet = Ref<Set<string>>
+export type ExpandedFolderIdSet = Ref<Set<number>>
 
-export const sidebarExpandedFolderSlugsKey: InjectionKey<ExpandedFolderSlugSet> =
-  Symbol("sidebarExpandedFolderSlugs")
+export const sidebarExpandedFolderIdsKey: InjectionKey<ExpandedFolderIdSet> =
+  Symbol("sidebarExpandedFolderIds")
 
-export const sidebarToggleFolderSlugKey: InjectionKey<(slug: string) => void> =
-  Symbol("sidebarToggleFolderSlug")
+export const sidebarToggleFolderIdKey: InjectionKey<
+  (folderId: number) => void
+> = Symbol("sidebarToggleFolderId")
 
-export const sidebarActiveNoteFolderSlugPrefixesKey: InjectionKey<
+/** Note titles along active note → root topology chain (including the active note). */
+export const sidebarStructuralSidebarTitlesKey: InjectionKey<
   ComputedRef<Set<string>>
-> = Symbol("sidebarActiveNoteFolderSlugPrefixes")
+> = Symbol("sidebarStructuralSidebarTitles")
+
+/** Assigned folder (folder-first containment), when present on topology. */
+export const sidebarActiveNoteFolderIdsKey: InjectionKey<
+  ComputedRef<Set<number>>
+> = Symbol("sidebarActiveNoteFolderIds")
 
 /** User-clicked folder row for default create placement; cleared on blur, note click, or notebook switch. */
-export const sidebarUserActiveFolderSlugKey: InjectionKey<Ref<string | null>> =
-  Symbol("sidebarUserActiveFolderSlug")
-
 export const sidebarUserActiveFolderIdKey: InjectionKey<Ref<number | null>> =
   Symbol("sidebarUserActiveFolderId")
-
-/** Structural folder slug path segments toward a note slug (excluding the note basename segment). */
-export function noteSlugFolderPrefixes(noteSlug: string): string[] {
-  const parts = noteSlug.split("/").filter(Boolean)
-  if (parts.length <= 1) return []
-  const prefixes: string[] = []
-  for (let depth = 1; depth < parts.length; depth++) {
-    prefixes.push(parts.slice(0, depth).join("/"))
-  }
-  return prefixes
-}

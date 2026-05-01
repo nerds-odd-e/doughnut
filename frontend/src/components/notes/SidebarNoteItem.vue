@@ -43,15 +43,11 @@
 import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
-import {
-  sidebarUserActiveFolderIdKey,
-  sidebarUserActiveFolderSlugKey,
-} from "./sidebarFolderExpansion"
+import { sidebarUserActiveFolderIdKey } from "./sidebarFolderExpansion"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { inject } from "vue"
 
 const storageAccessor = useStorageAccessor()
-const userActiveFolderSlug = inject(sidebarUserActiveFolderSlugKey, undefined)
 const userActiveFolderId = inject(sidebarUserActiveFolderIdKey, undefined)
 
 interface Props {
@@ -73,9 +69,6 @@ const props = defineProps<Props>()
 const noteRealm = storageAccessor.value.refOfNoteRealmWithFallback(props.note)
 
 function onNoteRowClick() {
-  if (userActiveFolderSlug != null) {
-    userActiveFolderSlug.value = null
-  }
   if (userActiveFolderId != null) {
     userActiveFolderId.value = null
   }

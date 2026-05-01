@@ -229,7 +229,6 @@ export type Note = {
 
 export type NoteRealm = {
     id: number;
-    slug: string;
     note: Note;
     fromBazaar?: boolean;
     notebookId: number;
@@ -958,7 +957,6 @@ export type NoteWritable = {
 
 export type NoteRealmWritable = {
     id: number;
-    slug: string;
     note: NoteWritable;
     fromBazaar?: boolean;
     notebookId: number;

@@ -57,28 +57,15 @@ type SidebarStructuralRow =
   | { kind: "note"; note: Note }
   | { kind: "folder"; folder: NotebookRootFolder }
 
-function basename(path: string): string {
-  const i = path.lastIndexOf("/")
-  return i === -1 ? path : path.slice(i + 1)
-}
-
 function folderNumericId(folder: NotebookRootFolder): number | undefined {
   if (folder.id == null || folder.id === "") return undefined
   return Number(folder.id)
 }
 
-function folderMatchesNote(
-  folder: NotebookRootFolder,
-  note: Note,
-  realmSlug: string
-): boolean {
+function folderMatchesNote(folder: NotebookRootFolder, note: Note): boolean {
   if (folderNumericId(folder) === undefined) return false
   const title = note.noteTopology.title ?? ""
-  return (
-    folder.slug === realmSlug ||
-    folder.name === title ||
-    basename(folder.slug) === basename(realmSlug)
-  )
+  return folder.name === title
 }
 
 function buildStructuralRows(
@@ -91,9 +78,7 @@ function buildStructuralRows(
   for (const realm of realms) {
     const note = realm.note
     rows.push({ kind: "note", note })
-    const index = unused.findIndex((folder) =>
-      folderMatchesNote(folder, note, realm.slug)
-    )
+    const index = unused.findIndex((folder) => folderMatchesNote(folder, note))
     if (index !== -1) {
       const [folder] = unused.splice(index, 1)
       if (folder && folderNumericId(folder) !== undefined) {
