@@ -328,7 +328,7 @@ describe("NoteEditableDetails", () => {
         note: {
           id: noteId,
           details: options.body?.details,
-          noteTopology: { id: noteId, slug: `s${noteId}`, title: "Test Note" },
+          noteTopology: { id: noteId, title: "Test Note", notebookId: 1 },
         },
       })
       // biome-ignore lint/suspicious/noExplicitAny: Vitest mock typing requires any for implementation functions

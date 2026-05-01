@@ -17,7 +17,6 @@ class NoteBuilder extends Builder<Note> {
       id,
       noteTopology: {
         id,
-        slug: `s${id}`,
         title: 'Note1.1.1',
         notebookId,
       },
@@ -86,7 +85,6 @@ class NoteBuilder extends Builder<Note> {
     const targetNotebookId = generateId()
     this.data.noteTopology.targetNoteTopology = {
       id: targetId,
-      slug: `s${targetId}`,
       relationType: value,
       title: 'a target',
       notebookId: targetNotebookId,

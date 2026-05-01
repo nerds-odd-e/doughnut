@@ -11,10 +11,6 @@ import org.springframework.lang.NonNull;
 public class NoteTopology {
   @NonNull private Integer id;
 
-  @NonNull
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String slug;
-
   private String title;
   private RelationType relationType;
   private NoteTopology targetNoteTopology;

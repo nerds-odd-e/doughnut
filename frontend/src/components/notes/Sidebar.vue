@@ -19,12 +19,7 @@
 <script setup lang="ts">
 import type { PropType, Ref } from "vue"
 import { computed, inject, provide, ref, watch } from "vue"
-import type {
-  NoteRealm,
-  NoteTopology,
-  Note,
-  User,
-} from "@generated/doughnut-backend-api"
+import type { NoteRealm, Note, User } from "@generated/doughnut-backend-api"
 import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import {
@@ -82,38 +77,15 @@ function expandFolderSlugsForTopologySlug(slug: string | undefined) {
   ensureFolderExpanded(slug)
 }
 
-function walkAncestorTopologies(
-  start: NoteTopology | undefined,
-  fn: (t: NoteTopology) => void
-) {
-  let cursor = start
-  while (cursor) {
-    fn(cursor)
-    cursor = cursor.parentOrSubjectNoteTopology
-  }
-}
-
 const activeNoteFolderSlugPrefixes = computed(() => {
   const prefixes = new Set<string>()
-  const note = props.activeNoteRealm?.note
-  const slug = note?.noteTopology?.slug
+  const slug = props.activeNoteRealm?.slug
   if (slug) {
     for (const p of noteSlugFolderPrefixes(slug)) {
       prefixes.add(p)
     }
     prefixes.add(slug)
   }
-  walkAncestorTopologies(
-    note?.noteTopology.parentOrSubjectNoteTopology,
-    (topology) => {
-      const s = topology.slug
-      if (!s) return
-      for (const p of noteSlugFolderPrefixes(s)) {
-        prefixes.add(p)
-      }
-      prefixes.add(s)
-    }
-  )
   return prefixes
 })
 
@@ -132,16 +104,10 @@ provide(sidebarUserActiveFolderIdKey, userActiveFolderId)
 provide(sidebarNoteDragStateKey, sidebarNoteDrag)
 
 watch(
-  () => props.activeNoteRealm?.note,
-  (note) => {
-    if (!note?.noteTopology) return
-    expandFolderSlugsForTopologySlug(note.noteTopology.slug)
-    walkAncestorTopologies(
-      note.noteTopology.parentOrSubjectNoteTopology,
-      (topology) => {
-        expandFolderSlugsForTopologySlug(topology.slug)
-      }
-    )
+  () => props.activeNoteRealm,
+  (realm) => {
+    if (!realm?.note?.noteTopology) return
+    expandFolderSlugsForTopologySlug(realm.slug)
   },
   { immediate: true, deep: true }
 )

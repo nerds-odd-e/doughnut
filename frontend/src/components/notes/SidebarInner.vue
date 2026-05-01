@@ -67,27 +67,33 @@ function folderNumericId(folder: NotebookRootFolder): number | undefined {
   return Number(folder.id)
 }
 
-function folderMatchesNote(folder: NotebookRootFolder, note: Note): boolean {
+function folderMatchesNote(
+  folder: NotebookRootFolder,
+  note: Note,
+  realmSlug: string
+): boolean {
   if (folderNumericId(folder) === undefined) return false
-  const slug = note.noteTopology.slug ?? ""
   const title = note.noteTopology.title ?? ""
   return (
-    folder.slug === slug ||
+    folder.slug === realmSlug ||
     folder.name === title ||
-    basename(folder.slug) === basename(slug)
+    basename(folder.slug) === basename(realmSlug)
   )
 }
 
 function buildStructuralRows(
-  notes: Note[],
+  realms: NoteRealm[],
   folders: NotebookRootFolder[] | undefined
 ): SidebarStructuralRow[] {
   const unused = [...(folders ?? [])]
   const rows: SidebarStructuralRow[] = []
 
-  for (const note of notes) {
+  for (const realm of realms) {
+    const note = realm.note
     rows.push({ kind: "note", note })
-    const index = unused.findIndex((folder) => folderMatchesNote(folder, note))
+    const index = unused.findIndex((folder) =>
+      folderMatchesNote(folder, note, realm.slug)
+    )
     if (index !== -1) {
       const [folder] = unused.splice(index, 1)
       if (folder && folderNumericId(folder) !== undefined) {
@@ -134,8 +140,8 @@ async function refreshListing() {
       props.folderId == null
         ? await api.loadNotebookRootNotes(props.notebookId)
         : await api.loadFolderListing(props.notebookId, props.folderId)
-    const notes = (listing.notes ?? []).map((r) => r.note)
-    displayRows.value = buildStructuralRows(notes, listing.folders)
+    const realms = listing.notes ?? []
+    displayRows.value = buildStructuralRows(realms, listing.folders)
     props.onStructuralPeerCount?.(displayRows.value.length)
   } catch {
     displayRows.value = []

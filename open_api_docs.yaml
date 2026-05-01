@@ -3830,8 +3830,6 @@ components:
         id:
           type: integer
           format: int32
-        slug:
-          type: string
         title:
           type: string
         relationType:
@@ -3866,7 +3864,6 @@ components:
       required:
       - id
       - notebookId
-      - slug
     WikiTitle:
       type: object
       properties:
