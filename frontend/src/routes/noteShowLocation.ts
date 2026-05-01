@@ -14,7 +14,7 @@ export function noteShowHref(noteId: number): string {
   return `/d/n/${noteId}`
 }
 
-/** Plain path for wiki links in HTML until WikiTitle exposes note id (Phase 2). */
+/** Slug-path note URL (legacy navigation paths). Prefer {@link noteShowHref} for new links. */
 export function noteShowByNotebookSlugHref(
   notebookId: number,
   noteSlugPath: string

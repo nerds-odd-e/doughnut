@@ -464,11 +464,9 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces known wikilink text with a note href", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
-        { linkText: "MyNote", notebookId: 9, slug: "my-note" },
+        { linkText: "MyNote", noteId: 42 },
       ])
-    ).toBe(
-      '<p><a href="/d/notebooks/9/notes/my-note" class="doughnut-link">MyNote</a></p>'
-    )
+    ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
   })
 
   it("marks unknown wikilinks as dead links", () => {
@@ -481,21 +479,17 @@ describe("replaceWikiLinksInHtml", () => {
     expect(
       replaceWikiLinksInHtml(
         '<p><a href="#" class="dead-link">MyNote</a></p>',
-        [{ linkText: "MyNote", notebookId: 9, slug: "my-note" }]
+        [{ linkText: "MyNote", noteId: 42 }]
       )
-    ).toBe(
-      '<p><a href="/d/notebooks/9/notes/my-note" class="doughnut-link">MyNote</a></p>'
-    )
+    ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
   })
 
   it("upgrades dead-link anchors when class precedes href", () => {
     expect(
       replaceWikiLinksInHtml(
         '<p><a class="dead-link" href="#">MyNote</a></p>',
-        [{ linkText: "MyNote", notebookId: 9, slug: "my-note" }]
+        [{ linkText: "MyNote", noteId: 42 }]
       )
-    ).toBe(
-      '<p><a href="/d/notebooks/9/notes/my-note" class="doughnut-link">MyNote</a></p>'
-    )
+    ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
   })
 })

@@ -15,8 +15,5 @@ public class WikiTitle {
   private String linkText;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private Integer notebookId;
-
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String slug;
+  private Integer noteId;
 }

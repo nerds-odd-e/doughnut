@@ -252,8 +252,7 @@ export type NoteTopology = {
 
 export type WikiTitle = {
     linkText: string;
-    notebookId: number;
-    slug: string;
+    noteId: number;
 };
 
 export type NoteMoveDto = {

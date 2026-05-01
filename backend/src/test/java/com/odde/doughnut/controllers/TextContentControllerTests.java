@@ -124,8 +124,7 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
       assertThat(wt.getLinkText(), equalTo("OnlyA"));
-      assertThat(wt.getNotebookId(), equalTo(onlyA.getNotebook().getId()));
-      assertThat(wt.getSlug(), equalTo(onlyA.getSlug()));
+      assertThat(wt.getNoteId(), equalTo(onlyA.getId()));
 
       List<NoteWikiTitleCache> rows =
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
@@ -151,7 +150,7 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
       assertThat(wt.getLinkText(), equalTo("OnlyB"));
-      assertThat(wt.getSlug(), equalTo(onlyB.getSlug()));
+      assertThat(wt.getNoteId(), equalTo(onlyB.getId()));
 
       List<NoteWikiTitleCache> rows =
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());

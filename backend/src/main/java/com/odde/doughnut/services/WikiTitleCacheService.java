@@ -45,7 +45,7 @@ public class WikiTitleCacheService {
       if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
         continue;
       }
-      out.add(new WikiTitle(row.getLinkText(), notebook.getId(), target.getSlug()));
+      out.add(new WikiTitle(row.getLinkText(), target.getId()));
     }
     return List.copyOf(out);
   }

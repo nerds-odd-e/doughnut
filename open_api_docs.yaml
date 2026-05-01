@@ -3915,15 +3915,12 @@ components:
       properties:
         linkText:
           type: string
-        notebookId:
+        noteId:
           type: integer
           format: int32
-        slug:
-          type: string
       required:
       - linkText
-      - notebookId
-      - slug
+      - noteId
     NoteMoveDTO:
       type: object
       properties:

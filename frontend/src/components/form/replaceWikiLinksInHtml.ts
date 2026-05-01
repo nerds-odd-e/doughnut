@@ -1,5 +1,5 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { noteShowByNotebookSlugHref } from "@/routes/noteShowLocation"
+import { noteShowHref } from "@/routes/noteShowLocation"
 
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -8,9 +8,9 @@ function escapeRegExp(s: string): string {
 /** Rich editor HTML uses dead-link anchors, not [[ ]] literals; upgrade when titles resolve. */
 function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
   let result = html
-  for (const { linkText, notebookId, slug } of wikiTitles) {
+  for (const { linkText, noteId } of wikiTitles) {
     const esc = escapeRegExp(linkText)
-    const href = noteShowByNotebookSlugHref(notebookId, slug)
+    const href = noteShowHref(noteId)
     const live = `<a href="${href}" class="doughnut-link">${linkText}</a>`
     result = result.replace(
       new RegExp(`<a href="#" class="dead-link">\\s*${esc}\\s*</a>`, "gi"),
@@ -29,10 +29,10 @@ export function replaceWikiLinksInHtml(
   wikiTitles: WikiTitle[]
 ): string {
   let result = html
-  wikiTitles.forEach(({ linkText, notebookId, slug }) => {
+  wikiTitles.forEach(({ linkText, noteId }) => {
     result = result.replace(
       `[[${linkText}]]`,
-      `<a href="${noteShowByNotebookSlugHref(notebookId, slug)}" class="doughnut-link">${linkText}</a>`
+      `<a href="${noteShowHref(noteId)}" class="doughnut-link">${linkText}</a>`
     )
   })
   result = upgradeDeadWikiAnchors(result, wikiTitles)
