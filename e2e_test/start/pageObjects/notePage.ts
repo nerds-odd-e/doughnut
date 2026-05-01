@@ -59,23 +59,31 @@ export const assumeNotePage = (
       cy.findByRole('button', { name: 'expand children' }).click()
     },
     addRelationshipTo: (target: string) => {
-      // Related notes as child cards use .daisy-card-title .title-text; the note title
-      // predicate (NoteTitleAsPredicate) uses .title-text inside h2[role=title] when
-      // viewing the target side of a link — both must match for changeRelationType etc.
-      const findRelationshipScope = () =>
-        cy
-          .get('main')
-          .find('.title-text')
-          .contains(target)
-          .closest('[role=card], [role=title]')
       return {
         relationType: (relationType: string) => {
-          findRelationshipScope().findAllByText(relationType, {
-            selector: '.relation-type',
+          cy.get('main').then(($main) => {
+            const cardWithTarget = $main
+              .find('[role=card]')
+              .toArray()
+              .find((el) => el.textContent?.includes(target))
+            if (cardWithTarget) {
+              cy.wrap(cardWithTarget).should('contain', relationType)
+            } else {
+              cy.get('main')
+                .find('[role=title]')
+                .should('contain', target)
+                .and('contain', relationType)
+            }
           })
         },
         goto: () => {
-          findRelationshipScope().find('.relation-type').click({ force: true })
+          cy.get('main')
+            .find('[role=card]')
+            .contains(target)
+            .closest('[role=card]')
+            .find('a')
+            .first()
+            .click({ force: true })
         },
       }
     },

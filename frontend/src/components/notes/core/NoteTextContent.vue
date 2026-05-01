@@ -2,14 +2,7 @@
   <div class="daisy-alert daisy-alert-warning" v-if="note.deletedAt">
     This note has been deleted
   </div>
-  <NoteTitleAsPredicate
-    v-if="note.noteTopology.targetNoteTopology"
-    v-bind="{ noteTopology: note.noteTopology, readonly }"
-  />
-  <NoteEditableTitle
-    v-else
-    v-bind="{ noteTopology: note.noteTopology, readonly }"
-  />
+  <NoteEditableTitle v-bind="{ noteTopology: note.noteTopology, readonly }" />
   <div role="details" class="note-details">
     <NoteEditableDetails
       v-bind="{
@@ -29,7 +22,6 @@
 import { computed, type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
-import NoteTitleAsPredicate from "./NoteTitleAsPredicate.vue"
 import NoteEditableDetails from "./NoteEditableDetails.vue"
 
 const props = defineProps({

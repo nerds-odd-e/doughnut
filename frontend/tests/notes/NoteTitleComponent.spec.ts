@@ -34,19 +34,13 @@ describe("note title", () => {
     const target = makeMe.aNote.underNote(note).please()
     const relationNote = makeMe.aRelationship.to(target).please()
 
-    it("should have relationship to target", async () => {
+    it("renders stored title as plain text without links", async () => {
       mountComponent(relationNote)
       await flushPromises()
-      const links = wrapper.findAll("a.router-link")
-      const link = links[0]!
-      expect(link.exists()).toBe(true)
-      expect(JSON.parse(link.attributes("to")!)).toMatchObject({
-        name: "noteShow",
-        params: {
-          noteId: String(target.noteTopology.id),
-        },
-      })
-      expect(link.text()).toBe(target.noteTopology.title!)
+      expect(wrapper.find(".title-text").text().trim()).toBe(
+        relationNote.noteTopology.title!.trim()
+      )
+      expect(wrapper.findAll("a").length).toBe(0)
     })
   })
 })

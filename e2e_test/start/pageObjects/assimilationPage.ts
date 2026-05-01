@@ -100,13 +100,10 @@ export const assumeAssimilationPage = () => ({
               additionalInfo,
               '; '
             )
-            if (title) cy.findByText(title, { selector: '[role=title] *' })
-            if (targetNote) {
-              cy.get('[role=title]').within(() => {
-                cy.findByText(targetNote).should('be.visible')
-              })
-            }
-            if (relationType) cy.get('.relation-type').contains(relationType)
+            if (title) cy.get('[role=title]').should('contain', title)
+            if (targetNote) cy.get('[role=title]').should('contain', targetNote)
+            if (relationType)
+              cy.get('[role=title]').should('contain', relationType)
           }
           break
         }
