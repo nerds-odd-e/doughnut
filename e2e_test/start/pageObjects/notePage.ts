@@ -78,7 +78,7 @@ export const assumeNotePage = (
           })
         },
         goto: () => {
-          findRelationshipScope().find('.relation-type').click()
+          findRelationshipScope().find('.relation-type').click({ force: true })
         },
       }
     },

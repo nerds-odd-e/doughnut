@@ -60,7 +60,7 @@ public class NoteRealm {
     if (omitChildrenFromJson) {
       return null;
     }
-    return note.getChildren();
+    return note.getRelationships();
   }
 
   @NonNull
