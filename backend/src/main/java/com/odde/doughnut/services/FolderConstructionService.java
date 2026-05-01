@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.NotebookRootFolder;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -17,18 +18,18 @@ import org.springframework.web.server.ResponseStatusException;
 public class FolderConstructionService {
 
   private final NoteRepository noteRepository;
+  private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
-  private final WikiSlugPathService wikiSlugPathService;
   private final TestabilitySettings testabilitySettings;
 
   public FolderConstructionService(
       NoteRepository noteRepository,
+      FolderRepository folderRepository,
       EntityPersister entityPersister,
-      WikiSlugPathService wikiSlugPathService,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
+    this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
-    this.wikiSlugPathService = wikiSlugPathService;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -56,6 +57,14 @@ public class FolderConstructionService {
       parentFolder = contextNote.getFolder();
     }
 
+    Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
+    if (!folderRepository
+        .findCandidateChildContainers(notebook.getId(), parentFolderId, trimmedName)
+        .isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "A folder with this name already exists here.");
+    }
+
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Folder folder = new Folder();
     folder.setNotebook(notebook);
@@ -63,7 +72,6 @@ public class FolderConstructionService {
     folder.setName(trimmedName);
     folder.setCreatedAt(now);
     folder.setUpdatedAt(now);
-    wikiSlugPathService.assignSlugForNewFolder(folder);
     entityPersister.save(folder);
     return NotebookRootFolder.from(folder);
   }

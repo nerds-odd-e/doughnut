@@ -4114,11 +4114,8 @@ components:
           type: string
         name:
           type: string
-        slug:
-          type: string
       required:
       - name
-      - slug
     BlockDepthSuggestion:
       type: object
       description: Suggested depth for a single block

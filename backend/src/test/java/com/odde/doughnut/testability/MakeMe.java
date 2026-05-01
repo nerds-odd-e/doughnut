@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.NoteEmbeddingService;
-import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
@@ -16,9 +15,6 @@ public class MakeMe extends MakeMeWithoutDB {
   @Autowired public NoteEmbeddingService noteEmbeddingService;
   @Autowired public BookStorage bookStorage;
   @Autowired public TestabilitySettings testabilitySettings;
-
-  @Autowired(required = false)
-  public WikiSlugPathService wikiSlugPathService;
 
   private MakeMe() {}
 

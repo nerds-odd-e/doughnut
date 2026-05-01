@@ -366,8 +366,8 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderListing listing = controller.listNotebookRootNotes(nb);
       assertEquals(2, listing.folders().size());
       assertEquals(
-          List.of("inbox", "parent"),
-          listing.folders().stream().map(f -> f.slug()).sorted().toList());
+          List.of("Inbox", "Parent"),
+          listing.folders().stream().map(NotebookRootFolder::name).sorted().toList());
     }
 
     @Test
@@ -439,7 +439,6 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderListing listing = controller.listFolderListing(nb, parent);
       assertEquals(1, listing.folders().size());
       assertEquals("Nested", listing.folders().getFirst().name());
-      assertEquals("parent/nested", listing.folders().getFirst().slug());
     }
 
     @Test
@@ -483,7 +482,6 @@ class NotebookControllerTest extends ControllerTestBase {
       req.setName("  Inbox  ");
       NotebookRootFolder created = controller.createFolder(nb, req);
       assertThat(created.name(), equalTo("Inbox"));
-      assertThat(created.slug(), equalTo("inbox"));
 
       FolderListing listing = controller.listNotebookRootNotes(nb);
       assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
@@ -509,7 +507,24 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderListing listing = controller.listFolderListing(nb, scope);
       assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
       assertThat(created.name(), equalTo("Sub"));
-      assertThat(created.slug(), equalTo("scope/sub"));
+    }
+
+    @Test
+    void rejectsDuplicateSiblingFolderName() throws UnexpectedNoAccessRightException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Dup Folder");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      FolderCreationRequest first = new FolderCreationRequest();
+      first.setName("Same");
+      controller.createFolder(nb, first);
+
+      FolderCreationRequest dup = new FolderCreationRequest();
+      dup.setName("Same");
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.createFolder(nb, dup));
+      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
     }
 
     @Test

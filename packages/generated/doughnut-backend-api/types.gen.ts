@@ -384,7 +384,6 @@ export type FolderCreationRequest = {
 export type NotebookRootFolder = {
     id?: string;
     name: string;
-    slug: string;
 };
 
 /**

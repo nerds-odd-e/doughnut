@@ -18,7 +18,6 @@ import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -57,7 +56,6 @@ class TestabilityRestController {
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
   @Autowired NoteService noteService;
-  @Autowired WikiSlugPathService wikiSlugPathService;
   @Autowired FolderRepository folderRepository;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
@@ -250,7 +248,6 @@ class TestabilityRestController {
       created.setName(name);
       created.setCreatedAt(now);
       created.setUpdatedAt(now);
-      wikiSlugPathService.assignSlugForNewFolder(created);
       entityPersister.save(created);
       parent = created;
     }

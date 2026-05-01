@@ -34,14 +34,6 @@ public class Folder extends EntityIdentifiedByIdOnly {
   @Setter
   private String name;
 
-  @Column(name = "slug", nullable = false)
-  @NotNull
-  @Size(min = 1, max = 767)
-  @Getter
-  @Setter
-  @JsonIgnore
-  private String slug;
-
   @Column(name = "created_at")
   @NotNull
   @Getter

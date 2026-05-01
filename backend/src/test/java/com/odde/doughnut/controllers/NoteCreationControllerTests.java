@@ -108,17 +108,17 @@ class NoteCreationControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void assignsFolderSlugFromParentTitle()
+    void assignsChildContainerFolderNamedFromParentTitle()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       parent =
           makeMe.aNote().title("ExplicitParent").creatorAndOwner(currentUser.getUser()).please();
       NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       Note created = noteRepository.findById(response.getId()).orElseThrow();
-      assertThat(created.getFolder().getSlug(), equalTo("explicitparent"));
+      assertThat(created.getFolder().getName(), equalTo("ExplicitParent"));
     }
 
     @Test
-    void assignsNestedFolderSlugsForSectionAndLeaf()
+    void assignsNestedChildContainerFoldersByAncestorTitles()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Note bookRoot =
           makeMe.aNote().title("BookHead").creatorAndOwner(currentUser.getUser()).please();
@@ -133,8 +133,8 @@ class NoteCreationControllerTests extends ControllerTestBase {
           noteRepository
               .findById(controller.createNoteUnderParent(section, noteCreation).getId())
               .orElseThrow();
-      assertThat(section.getFolder().getSlug(), equalTo("bookhead"));
-      assertThat(leaf.getFolder().getSlug(), equalTo("bookhead/section"));
+      assertThat(section.getFolder().getName(), equalTo("BookHead"));
+      assertThat(leaf.getFolder().getName(), equalTo("Section"));
     }
 
     @Test

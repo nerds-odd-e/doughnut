@@ -101,7 +101,7 @@ function rowKey(row: SidebarStructuralRow): string {
     return `n-${row.note.id}`
   }
   const fid = folderNumericId(row.folder)
-  return fid != null ? `f-${fid}` : `f-slug:${row.folder.slug}`
+  return `f-${fid ?? "unknown"}`
 }
 
 interface Props {
