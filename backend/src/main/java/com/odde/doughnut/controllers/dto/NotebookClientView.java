@@ -15,8 +15,8 @@ public record NotebookClientView(
     @JsonInclude(JsonInclude.Include.NON_NULL)
         @Schema(
             description =
-                "Id of this notebook's index landing note when one exists (matches slug-or-title"
-                    + " heuristic used server-side); omitted when absent.")
+                "Id of this notebook's index landing note when one exists (root folder scope,"
+                    + " title equal to \"index\" case-insensitive); omitted when absent.")
         Integer indexNoteId) {
 
   public static NotebookClientView of(

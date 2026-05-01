@@ -10,7 +10,7 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteChildContainerFolderService;
-import com.odde.doughnut.services.WikiSlugPathAssignment;
+import com.odde.doughnut.services.WikiSlugPathService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -152,11 +152,11 @@ class NoteControllerMotionTests extends ControllerTestBase {
       controller.moveAfter(leaf, siblingContainer, "asFirstChild");
       makeMe.refresh(leaf);
       assertThat(leaf.getFolder(), notNullValue());
-      assertThat(leaf.getSlug(), startsWith(leaf.getFolder().getSlug() + "/"));
+      assertThat(leaf.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(leaf.getId())));
     }
 
     @Test
-    void moveIntoFolderWhereBasenameCollides_disambiguatesNoteSlugForApiPath()
+    void moveIntoFolderWhereTitlesCollide_keepsStableSlugPerNote()
         throws UnexpectedNoAccessRightException,
             CyclicLinkDetectedException,
             MovementNotPossibleException {
@@ -180,7 +180,7 @@ class NoteControllerMotionTests extends ControllerTestBase {
 
       controller.moveAfter(mover, secondDup, "");
       makeMe.refresh(mover);
-      assertThat(WikiSlugPathAssignment.basenameOf(mover.getSlug()), equalTo("dup-3"));
+      assertThat(mover.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(mover.getId())));
     }
   }
 }

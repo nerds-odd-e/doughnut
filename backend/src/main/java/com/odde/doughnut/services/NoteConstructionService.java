@@ -86,6 +86,8 @@ public class NoteConstructionService {
     assignSiblingOrderAppendLast(note);
     if (entityPersister != null) {
       entityPersister.save(note);
+      entityPersister.flush();
+      wikiSlugPathService.finalizeNoteSlugAfterPersist(note);
     }
     return note;
   }
@@ -119,6 +121,8 @@ public class NoteConstructionService {
     assignSiblingOrderAppendLast(note);
     if (entityPersister != null) {
       entityPersister.save(note);
+      entityPersister.flush();
+      wikiSlugPathService.finalizeNoteSlugAfterPersist(note);
     }
     return note;
   }

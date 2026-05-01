@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class WikiSlugPathService {
 
+  static final String NOTE_SLUG_TMP_PREFIX = "nidtmp";
+
   private final JdbcTemplate jdbcTemplate;
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
@@ -27,7 +29,7 @@ public class WikiSlugPathService {
 
   public void regenerateAllNoteSlugPaths() {
     for (Note note : noteRepository.findAllNonDeletedNotesOrderByNotebookFolderAndId()) {
-      assignSlugForNewNote(note);
+      note.setSlug(stableNoteSlug(note.getId()));
       entityPersister.merge(note);
       entityPersister.flush();
     }
@@ -50,30 +52,32 @@ public class WikiSlugPathService {
   }
 
   public void assignSlugForNewNote(Note note) {
-    Integer notebookId = note.getNotebook().getId();
-    Folder folder = note.getFolder();
-    Integer folderId = folder == null ? null : folder.getId();
-    Integer excludeNoteId = note.getId();
-    Set<String> siblingBasenames =
-        notebookId == null
-            ? Set.of()
-            : WikiSlugPathAssignment.basenamesFromSlugs(
-                findNoteSlugsInFolderScopeJdbc(notebookId, folderId, excludeNoteId));
-
-    String folderSlug = folder == null ? null : folder.getSlug();
-    if (folderSlug != null && folderSlug.length() >= Note.MAX_SLUG_LENGTH - 1) {
-      assignNotebookUniqueFallbackSlug(note, notebookId, excludeNoteId);
+    Integer id = note.getId();
+    if (id != null) {
+      note.setSlug(stableNoteSlug(id));
       return;
     }
+    Integer notebookId = note.getNotebook().getId();
+    if (notebookId == null) {
+      throw new IllegalStateException("notebook id required to assign note slug");
+    }
+    List<String> existing = findNoteSlugsInNotebookJdbc(notebookId, null);
+    Set<String> taken = new HashSet<>(existing);
+    note.setSlug(WikiSlugGeneration.uniqueSlugWithin(NOTE_SLUG_TMP_PREFIX, taken));
+  }
 
-    WikiSlugPathAssignment.setNoteSlug(note, siblingBasenames);
-    if (note.getSlug().length() > Note.MAX_SLUG_LENGTH) {
-      assignNotebookUniqueFallbackSlug(note, notebookId, excludeNoteId);
+  /**
+   * After persist + flush so {@link Note#getId()} is assigned ({@code GenerationType.IDENTITY}).
+   */
+  public void finalizeNoteSlugAfterPersist(Note note) {
+    String s = note.getSlug();
+    if (s != null && s.startsWith(NOTE_SLUG_TMP_PREFIX)) {
+      note.setSlug(stableNoteSlug(note.getId()));
     }
   }
 
-  public void assignSlugForNewNoteSkippingSiblingQuery(Note note) {
-    WikiSlugPathAssignment.setNoteSlug(note, Set.of());
+  public static String stableNoteSlug(int noteId) {
+    return "nid" + noteId;
   }
 
   private List<String> findFolderSlugsOfSiblingsJdbc(Integer notebookId, Integer parentFolderId) {
@@ -90,39 +94,6 @@ public class WikiSlugPathService {
         parentFolderId);
   }
 
-  private List<String> findNoteSlugsInFolderScopeJdbc(
-      Integer notebookId, Integer folderId, Integer excludeNoteId) {
-    if (folderId == null) {
-      if (excludeNoteId == null) {
-        return jdbcTemplate.queryForList(
-            "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL AND folder_id"
-                + " IS NULL",
-            String.class,
-            notebookId);
-      }
-      return jdbcTemplate.queryForList(
-          "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL AND folder_id IS"
-              + " NULL AND id <> ?",
-          String.class,
-          notebookId,
-          excludeNoteId);
-    }
-    if (excludeNoteId == null) {
-      return jdbcTemplate.queryForList(
-          "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL AND folder_id = ?",
-          String.class,
-          notebookId,
-          folderId);
-    }
-    return jdbcTemplate.queryForList(
-        "SELECT slug FROM note WHERE notebook_id = ? AND deleted_at IS NULL AND folder_id = ? AND"
-            + " id <> ?",
-        String.class,
-        notebookId,
-        folderId,
-        excludeNoteId);
-  }
-
   private List<String> findNoteSlugsInNotebookJdbc(Integer notebookId, Integer excludeNoteId) {
     if (excludeNoteId == null) {
       return jdbcTemplate.queryForList(
@@ -135,17 +106,5 @@ public class WikiSlugPathService {
         String.class,
         notebookId,
         excludeNoteId);
-  }
-
-  private void assignNotebookUniqueFallbackSlug(
-      Note note, Integer notebookId, Integer excludeNoteId) {
-    List<String> existing = findNoteSlugsInNotebookJdbc(notebookId, excludeNoteId);
-    Set<String> taken = new HashSet<>(existing);
-    Integer id = note.getId();
-    if (id != null) {
-      note.setSlug(WikiSlugGeneration.uniqueSlugWithin("nid" + id, taken));
-      return;
-    }
-    note.setSlug(WikiSlugGeneration.uniqueSlugWithin("nidtmp", taken));
   }
 }

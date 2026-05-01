@@ -232,6 +232,8 @@ public class NoteService {
     relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
     wikiSlugPathService.assignSlugForNewNote(relation);
     entityPersister.save(relation);
+    entityPersister.flush();
+    wikiSlugPathService.finalizeNoteSlugAfterPersist(relation);
     return relation;
   }
 

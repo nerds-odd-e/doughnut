@@ -165,7 +165,7 @@ class ObsidianFormatServiceTest {
 
   @Test
   void export_withRootIndexNote_emitsIndexMdAtRoot() throws IOException {
-    makeMe.theNote(rootNote).title("Landing").slug("index").details("Index body").please();
+    makeMe.theNote(rootNote).title("index").details("Index body").please();
     makeMe.aNote("Parent Note").under(rootNote).details("Parent Content").please();
     Notebook notebook = rootNote.getNotebook();
     makeMe.refresh(notebook);

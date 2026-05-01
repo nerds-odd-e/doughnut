@@ -116,11 +116,12 @@ public class NoteMotionServiceTest {
     makeMe.refresh(firstChild);
     assertThat(firstChild.getFolder(), notNullValue());
     assertThat(firstChild.getFolder().getName(), equalTo(secondChild.getTitle()));
-    assertThat(firstChild.getSlug(), startsWith(firstChild.getFolder().getSlug() + "/"));
+    assertThat(
+        firstChild.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(firstChild.getId())));
   }
 
   @Test
-  void moveIntoParentWhereBasenamesConflictGetsNextDisambiguatedSlug()
+  void moveIntoParentWhereBasenamesConflict_keepsStableSlugPerNote()
       throws CyclicLinkDetectedException, MovementNotPossibleException {
     Note root = makeMe.aRootNote("top").please();
     Note section = makeMe.aNote("Section").under(root).please();
@@ -142,7 +143,7 @@ public class NoteMotionServiceTest {
 
     makeMe.refresh(mover);
     assertThat(mover.getParent(), equalTo(section));
-    assertThat(WikiSlugPathAssignment.basenameOf(mover.getSlug()), equalTo("dup-3"));
+    assertThat(mover.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(mover.getId())));
   }
 
   @Test
@@ -169,10 +170,12 @@ public class NoteMotionServiceTest {
     assertThat(firstChild.getNotebook().getId(), equalTo(notebookIdBefore));
     assertThat(firstChild.getParent(), nullValue());
     assertThat(firstChild.getFolder(), nullValue());
-    assertThat(firstChild.getSlug(), equalTo("middle"));
+    assertThat(
+        firstChild.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(firstChild.getId())));
     assertThat(grandChild.getFolder(), notNullValue());
     assertThat(grandChild.getFolder().getName(), equalTo(firstChild.getTitle()));
-    assertThat(grandChild.getSlug(), startsWith(grandChild.getFolder().getSlug() + "/"));
+    assertThat(
+        grandChild.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(grandChild.getId())));
   }
 
   @Test
@@ -203,7 +206,8 @@ public class NoteMotionServiceTest {
             Long.class,
             notebookId);
     assertThat(total, equalTo(distinctSlugs));
-    assertThat(grandChild.getSlug(), startsWith(firstChild.getSlug() + "/"));
+    assertThat(
+        grandChild.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(grandChild.getId())));
   }
 
   @Nested
@@ -311,7 +315,9 @@ public class NoteMotionServiceTest {
     @Test
     void shouldUpdateNotebookForAllDescendants()
         throws CyclicLinkDetectedException, MovementNotPossibleException {
-      String firstSlugBefore = firstChild.getSlug();
+      Integer firstId = firstChild.getId();
+      Integer secondId = secondChild.getId();
+      Integer thirdId = thirdLevel.getId();
       move(firstChild, otherNotebook, true);
 
       makeMe.refresh(firstChild);
@@ -332,10 +338,9 @@ public class NoteMotionServiceTest {
       assertThat(thirdLevel.getFolder(), notNullValue());
       assertThat(thirdLevel.getFolder().getName(), equalTo(secondChild.getTitle()));
 
-      assertThat(firstChild.getSlug(), not(equalTo(firstSlugBefore)));
-      assertThat(firstChild.getSlug(), startsWith(firstChild.getFolder().getSlug() + "/"));
-      assertThat(secondChild.getSlug(), startsWith(secondChild.getFolder().getSlug() + "/"));
-      assertThat(thirdLevel.getSlug(), startsWith(thirdLevel.getFolder().getSlug() + "/"));
+      assertThat(firstChild.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(firstId)));
+      assertThat(secondChild.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(secondId)));
+      assertThat(thirdLevel.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(thirdId)));
     }
 
     @Test

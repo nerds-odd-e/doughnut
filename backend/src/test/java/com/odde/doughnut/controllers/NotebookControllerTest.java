@@ -35,6 +35,7 @@ import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteChildContainerFolderService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
+import com.odde.doughnut.services.WikiSlugPathService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -192,14 +193,7 @@ class NotebookControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Note index =
-          makeMe
-              .aNote()
-              .creatorAndOwner(owner)
-              .inNotebook(nb)
-              .title("index")
-              .slug("index")
-              .please();
+      Note index = makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("index").please();
 
       NotebookClientView view = controller.get(nb);
 
@@ -245,7 +239,7 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(created.getParent(), nullValue());
       assertThat(created.getFolder(), nullValue());
       assertThat(created.getNotebook().getId(), equalTo(nb.getId()));
-      assertThat(created.getSlug(), equalTo("root-one"));
+      assertThat(created.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(created.getId())));
     }
 
     @Test
@@ -1041,7 +1035,7 @@ class NotebookControllerTest extends ControllerTestBase {
     void download_whenNotebookHasIndexNote_includesIndexMd()
         throws UnexpectedNoAccessRightException, IOException {
       Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-      makeMe.theNote(root).title("Overview").slug("index").details("Notebook intro").please();
+      makeMe.theNote(root).title("index").details("Notebook intro").please();
       makeMe.refresh(notebook);
       ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(notebook);
       assertThat(entity.getStatusCode(), equalTo(HttpStatus.OK));

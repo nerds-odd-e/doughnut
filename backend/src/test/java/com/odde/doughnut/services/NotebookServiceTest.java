@@ -36,11 +36,11 @@ class NotebookServiceTest {
   }
 
   @Test
-  void findOptionalIndexNote_whenRootNoteSlugIsIndex_findsNote() {
+  void findOptionalIndexNote_whenRootNoteTitleIsIndex_findsNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
     Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    makeMe.theNote(root).title("Overview").slug("index").please();
+    makeMe.theNote(root).title("index").please();
 
     Optional<Note> result = notebookService.findOptionalIndexNote(notebook);
 

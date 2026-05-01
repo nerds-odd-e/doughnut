@@ -1,13 +1,11 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.WikiSlugPathAssignment;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.util.Strings;
 
@@ -123,6 +121,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
         fillNoteSlug(parent);
       }
       makeMe.entityPersister.save(parent);
+      makeMe.entityPersister.flush();
+      if (makeMe.wikiSlugPathService != null) {
+        makeMe.wikiSlugPathService.finalizeNoteSlugAfterPersist(parent);
+      }
     }
   }
 
@@ -132,12 +134,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
         && note.getNotebook().getId() != null) {
       makeMe.wikiSlugPathService.assignSlugForNewNote(note);
     } else {
-      WikiSlugPathAssignment.setNoteSlug(note, Set.of());
+      note.setSlug("nid-stub");
     }
   }
 
   @Override
   protected void afterCreate(boolean needPersist) {
+    if (needPersist && makeMe.wikiSlugPathService != null) {
+      makeMe.entityPersister.flush();
+      makeMe.wikiSlugPathService.finalizeNoteSlugAfterPersist(entity);
+    }
     relationBuilders.forEach(relationBuilder -> relationBuilder.please(needPersist));
     predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));

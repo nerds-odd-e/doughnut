@@ -15,7 +15,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.utils.WikiSlugGeneration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,7 +55,7 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
-  void runBatch_backfillsNullRelationshipTitleThenSlugReflectsTitle() {
+  void runBatch_backfillsNullRelationshipTitle_stableSlugUnchanged() {
     Note parent = makeMe.aNote().title("Alpha").please();
     Note target = makeMe.aNote().title("Beta").under(parent).please();
     Note relation = makeMe.aRelation().between(parent, target, RelationType.PART).please();
@@ -71,9 +70,7 @@ class AdminDataMigrationServiceTest {
     String expectedTitle =
         RelationshipNoteTitleFormatter.format("Alpha", RelationType.PART.label, "Beta");
     assertThat(updated.getTitle(), equalTo(expectedTitle));
-    assertThat(
-        WikiSlugPathAssignment.basenameOf(updated.getSlug()),
-        equalTo(WikiSlugGeneration.toBaseSlug(expectedTitle)));
+    assertThat(updated.getSlug(), equalTo(WikiSlugPathService.stableNoteSlug(updated.getId())));
   }
 
   @Test

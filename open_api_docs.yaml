@@ -4317,8 +4317,9 @@ components:
         indexNoteId:
           type: integer
           format: int32
-          description: Id of this notebook's index landing note when one exists (matches
-            slug-or-title heuristic used server-side); omitted when absent.
+          description: "Id of this notebook's index landing note when one exists (root\
+            \ folder scope, title equal to \"index\" case-insensitive); omitted when\
+            \ absent."
       required:
       - notebook
     NotebookCertificateApproval:

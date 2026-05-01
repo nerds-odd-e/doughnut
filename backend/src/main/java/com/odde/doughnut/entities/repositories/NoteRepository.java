@@ -70,7 +70,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           selectFromNote
               + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.folder IS NULL "
-              + " AND (n.slug = 'index' OR LOWER(n.title) = 'index') ORDER BY n.id ASC")
+              + " AND LOWER(n.title) = 'index' ORDER BY n.id ASC")
   List<Note> findRootIndexNoteCandidatesForNotebook(
       @Param("notebookId") Integer notebookId, Pageable pageable);
 

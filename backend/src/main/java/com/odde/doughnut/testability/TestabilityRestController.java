@@ -222,6 +222,11 @@ class TestabilityRestController {
             wikiSlugPathService.assignSlugForNewNote(note);
             entityPersister.save(note);
           });
+      entityPersister.flush();
+      noteTestData.forEach(
+          inject ->
+              wikiSlugPathService.finalizeNoteSlugAfterPersist(
+                  Objects.requireNonNull(titleNoteMap.get(inject.title))));
     }
   }
 

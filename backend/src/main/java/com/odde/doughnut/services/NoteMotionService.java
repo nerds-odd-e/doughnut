@@ -35,7 +35,6 @@ public class NoteMotionService {
       subject.setParentNote(relativeToNote.getParent());
     }
     subject.adjustPositionAsAChildOfParentInMemory();
-    assignUniquePlaceholderSlugsPendingFolderAlign(subject);
     entityPersister.flush();
     alignFoldersForNoteAndDescendants(subject);
     entityPersister.flush();
@@ -86,7 +85,6 @@ public class NoteMotionService {
   public void moveToTopLevel(Note note, User user) {
     note.detachFromParentInMemory();
     note.setFolder(null);
-    assignUniquePlaceholderSlugsPendingFolderAlign(note);
     entityPersister.flush();
     alignFoldersForNoteAndDescendants(note);
     entityPersister.flush();
@@ -99,12 +97,6 @@ public class NoteMotionService {
   private void recomputeSlugPathsForNoteSubtree(Note root) {
     Stream.concat(Stream.of(root), root.getAllDescendants())
         .forEach(wikiSlugPathService::assignSlugForNewNote);
-  }
-
-  private void assignUniquePlaceholderSlugsPendingFolderAlign(Note root) {
-    Stream.concat(Stream.of(root), root.getAllDescendants())
-        .filter(n -> n.getId() != null)
-        .forEach(n -> n.setSlug("z-wip-mv-" + n.getId()));
   }
 
   private void alignFoldersForNoteAndDescendants(Note root) {
