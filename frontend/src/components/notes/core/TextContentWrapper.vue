@@ -15,6 +15,7 @@ import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { normalizeNoteDetails } from "@/utils/normalizeNoteDetails"
+import { hasNewWikiLinkTexts } from "@/utils/noteDetailsWikiLinks"
 
 const storageAccessor = useStorageAccessor()
 
@@ -80,6 +81,7 @@ const onUpdate = (noteId: number, newValue: string) => {
   if (field === "edit details") {
     const normalizedNewValue = normalizeNoteDetails(newValue)
     const normalizedLastSaved = normalizeNoteDetails(lastSavedValue.value ?? "")
+    const prevNormalized = normalizeNoteDetails(localValue.value ?? "")
 
     errors.value = {}
     localValue.value = newValue
@@ -90,6 +92,9 @@ const onUpdate = (noteId: number, newValue: string) => {
 
     changer(noteId, normalizedNewValue, version.value + 1, setError)
     version.value += 1
+    if (hasNewWikiLinkTexts(prevNormalized, normalizedNewValue)) {
+      changer.flush()
+    }
     return
   }
 

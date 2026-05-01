@@ -239,6 +239,77 @@ describe("NoteEditableDetails", () => {
     wrapper.unmount()
   })
 
+  it("should save details immediately when a new wiki link appears (flush debounce)", async () => {
+    vi.useFakeTimers()
+
+    const noteId = 1
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({
+        noteId,
+        noteDetails: "Hello",
+        readonly: false,
+        asMarkdown: true,
+        wikiTitles: [],
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+    detailsEl.value = "Hello [[OtherNote]]"
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      path: { note: noteId },
+      body: { details: "Hello [[OtherNote]]" },
+    })
+
+    vi.useRealTimers()
+    wrapper.unmount()
+  })
+
+  it("should not save details until debounce when edit adds no new wiki link", async () => {
+    vi.useFakeTimers()
+
+    const noteId = 1
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({
+        noteId,
+        noteDetails: "Hello",
+        readonly: false,
+        asMarkdown: true,
+        wikiTitles: [],
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+    detailsEl.value = "Hello world"
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(1000)
+    await flushPromises()
+
+    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      path: { note: noteId },
+      body: { details: "Hello world" },
+    })
+
+    vi.useRealTimers()
+    wrapper.unmount()
+  })
+
   it("should preserve second edit when first save response arrives after second edit", async () => {
     const noteId = 1
     let resolveFirstSave: (() => void) | undefined
