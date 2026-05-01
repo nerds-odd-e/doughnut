@@ -23,6 +23,7 @@
         :model-value="value"
         :readonly="readonly"
         :wiki-titles="wikiTitles"
+        :relation-property-api-note-id="relationPropertyApiNoteId"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
@@ -50,6 +51,7 @@ const props = defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  relationPropertyApiNoteId: Number,
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)

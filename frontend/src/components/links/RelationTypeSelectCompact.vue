@@ -1,5 +1,12 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field: '', errorMessage, title: titlized }">
+  <InputWithType
+    v-bind="{
+      scopeName,
+      field: '',
+      errorMessage,
+      title: hideLabel ? undefined : titlized,
+    }"
+  >
     <PopButton :aria-label="titlized">
       <template #button_face>
         <SvgRelationTypeIcon
@@ -51,10 +58,18 @@ const props = defineProps({
   allowEmpty: { type: Boolean, default: false },
   field: { type: String, default: "relationType" },
   inverseIcon: Boolean,
+  /** When true, omit the visible field label (e.g. property grid already shows the key). */
+  hideLabel: { type: Boolean, default: false },
 })
 
 defineEmits(["update:modelValue"])
 
 const titlized = computed(() => startCase(camelCase(props.field ?? "")))
-const label = computed(() => props.modelValue || "default")
+const label = computed(() =>
+  props.modelValue
+    ? props.modelValue
+    : props.hideLabel
+      ? "Select relation type"
+      : "default"
+)
 </script>

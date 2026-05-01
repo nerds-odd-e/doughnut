@@ -97,8 +97,8 @@ export const assumeNotePage = (
       })
     },
     changeRelationType: function (relationType: string, target: string) {
-      cy.findByRole('title').within(() => {
-        cy.get('.relation-type').click()
+      cy.get('[data-property-key="relation"]').within(() => {
+        cy.findByRole('button', { name: 'Relation Type' }).click()
       })
       form.getField('Relation Type').clickOption(relationType)
       pageIsNotLoading()

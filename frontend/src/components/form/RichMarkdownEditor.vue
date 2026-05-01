@@ -4,6 +4,7 @@
       ref="frontmatterPropertiesRef"
       :details-markdown="modelValue ?? ''"
       :read-only="readonly"
+      :relation-property-api-note-id="relationPropertyApiNoteId"
       @properties-changed="onPropertiesChanged"
     />
     <div
@@ -52,6 +53,7 @@ const props = defineProps({
   errors: Object,
   readonly: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  relationPropertyApiNoteId: Number,
 })
 
 const emits = defineEmits<{

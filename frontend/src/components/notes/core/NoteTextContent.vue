@@ -12,25 +12,36 @@
   />
   <div role="details" class="note-details">
     <NoteEditableDetails
-      v-bind="{ readonly, noteId: note.id, noteDetails: note.details, asMarkdown, wikiTitles }"
+      v-bind="{
+        readonly,
+        noteId: note.id,
+        noteDetails: note.details,
+        asMarkdown,
+        wikiTitles,
+        relationPropertyApiNoteId: relationshipNoteRelationApiId,
+      }"
       @dead-link-click="$emit('deadLinkClick', $event)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { type PropType } from "vue"
+import { computed, type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteTitleAsPredicate from "./NoteTitleAsPredicate.vue"
 import NoteEditableDetails from "./NoteEditableDetails.vue"
 
-defineProps({
+const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
+
+const relationshipNoteRelationApiId = computed(() =>
+  props.note.noteTopology.targetNoteTopology ? props.note.id : undefined
+)
 
 defineEmits<{ deadLinkClick: [title: string] }>()
 </script>

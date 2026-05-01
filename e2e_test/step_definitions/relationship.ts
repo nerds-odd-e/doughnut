@@ -190,7 +190,7 @@ Then(
   }
 )
 
-Then(
+When(
   'I change the relationship from {string} to {string} to {string}',
   (noteTopology: string, targetTitle: string, relationType: string) => {
     start
@@ -200,7 +200,7 @@ Then(
   }
 )
 
-Then(
+When(
   'I change the reference from {string} to {string} to {string}',
   (noteTopology: string, referenceTitle: string, relationType: string) => {
     start

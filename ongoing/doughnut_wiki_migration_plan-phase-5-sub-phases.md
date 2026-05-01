@@ -12,12 +12,14 @@ By the end of Phase 5:
 
 - every relationship note has a non-empty title derived from its relationship and truncated to `Note.MAX_TITLE_LENGTH` (currently 150 characters)
 - relationship note details include relationship frontmatter and readable Markdown content
-- relationship notes remain visible in existing relationship UI flows while becoming portable Markdown notes
+- relation type, subject, and target are only a templated way to create a new note
+- notes created from a relationship template are ordinary notes in title display, sidebar display, note show, references, and graph behavior
 - wiki-title references are persisted in a cache derived from note details/frontmatter
 - `NoteRealm.wikiTitles`, reference lists, and graph retrieval use the cached wiki-title references instead of legacy `target_note_id` / child relationship notes
 - legacy non-relationship notes have a migration-only `parent: "[[...]]"` frontmatter property that preserves the old semantic parent as a wiki reference
 - relationship `relation` and `target` data come from frontmatter/cache instead of `relation_type` / `target_note_id`
 - no note title may be null or empty after the Phase 5 data migration and schema/API tightening
+- there is no relation-note-specific product model; every note is just a normal note
 
 ## Design Decisions
 
@@ -27,6 +29,7 @@ By the end of Phase 5:
 - **Legacy relationship columns:** keep `relation_type` / `target_note_id` only until relationship UI, `NoteRealm`, references, and graph retrieval read from frontmatter/cache. Remove those columns before Phase 5 closes.
 - **Legacy parent semantics:** for existing non-relationship notes only, migrate the old semantic parent into a `parent: "[[Parent Title]]"` frontmatter property and update the wiki-title cache. New notes do not receive this frontmatter by default.
 - **Title invariant:** Phase 5 is the last phase that may tolerate legacy null or empty note titles. After Phase 5, production code and schema should treat note title as required.
+- **Relationship creation template:** relation type, subject, and target are treated as creation-time template inputs that seed title/details/frontmatter. After creation, the result is an ordinary note; frontend and backend code should not branch on a "relation note" display model.
 
 ## Sizing Rule
 
@@ -344,21 +347,111 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One batched legacy-parent-frontmatter commit.
 
-## Sub-Phase 5.20 - Relationship UI Reads Relation From Frontmatter
+## Sub-Phase 5.20 - Relationship Template UI Becomes Normal Note UI
 
 **Type:** Behavior.
 
 **Pre-condition:** Relationship notes store `relation` in frontmatter and existing notes are migrated.
 
-**Trigger:** A user views, edits, or deletes a relationship.
+**Trigger:** A user views, edits, or deletes a note created from a relationship template.
 
-**Post-condition:** Relationship behavior no longer needs `Note.relationType` / `linkType`; it reads and writes the `relation` frontmatter property.
+**Post-condition:** Relationship-specific UI and topology fields are removed from the read path. The only remaining relationship-specific behavior is creation/editing of the `relation` frontmatter property through the note property surface.
 
-**Work:** Update relationship read/edit paths to use the frontmatter representation, keeping existing relation UI behavior stable.
+### Sub-Sub-Phase 5.20.1 - Edit Relation Through Property Value
+
+**Type:** Behavior.
+
+**Pre-condition:** A note has a frontmatter property named `relation`.
+
+**Trigger:** A user clicks the value field for the `relation` property in rich mode.
+
+**Post-condition:** The value is edited as a relation type selector/editor, not as direct rich-text content and not through the title icon.
+
+**Work:** Treat `relation` as a special property in the rich property editor. Remove the relation-type edit affordance from the title/icon path and update the existing relationship edit E2E coverage to drive the property value field instead.
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/relationships/relationship_edit_and_remove.feature`.
 
-**Commit boundary:** One relation-frontmatter-runtime commit.
+**Commit boundary:** One relation-property-edit commit.
+
+### Sub-Sub-Phase 5.20.2 - Relation Notes Use Normal Note Title In Main Frontend
+
+**Type:** Behavior.
+
+**Pre-condition:** Notes created from a relationship template have ordinary titles.
+
+**Trigger:** A user opens one of those notes in the frontend.
+
+**Post-condition:** The frontend displays the note title normally and removes the special relationship title presentation.
+
+**Work:** Remove the special title rendering for relation notes in the main note page/card surfaces and update the existing E2E test expectations for the new normal-title behavior.
+
+**Verify:** Target the existing relationship E2E spec that asserts note title display.
+
+**Commit boundary:** One normal-title-display commit.
+
+### Sub-Sub-Phase 5.20.3 - Sidebar Uses Normal Note Title
+
+**Type:** Behavior.
+
+**Pre-condition:** The frontend main surfaces display ordinary note titles for notes created from relationship templates.
+
+**Trigger:** A user views the sidebar/tree containing one of those notes.
+
+**Post-condition:** The sidebar uses the normal note title and no longer builds a special relationship label.
+
+**Work:** Remove relation-specific title composition from sidebar display and update the existing E2E test that covers relationship visibility/navigation.
+
+**Verify:** Target the existing relationship/sidebar E2E spec that observes the sidebar title.
+
+**Commit boundary:** One sidebar-normal-title commit.
+
+### Sub-Sub-Phase 5.20.4 - Remove Relation Type From NoteTopology
+
+**Type:** Structure cleanup.
+
+**Pre-condition:** Frontend relation display/editing no longer reads `NoteTopology.relationType`.
+
+**Trigger:** API types are regenerated or compiled.
+
+**Post-condition:** `NoteTopology` no longer exposes `relationType`, and frontend/backend references to that field are gone.
+
+**Work:** Remove the field from the backend topology DTO, regenerate the TypeScript API client if OpenAPI changes, and delete obsolete frontend reads.
+
+**Verify:** Focused backend compile/tests plus affected frontend typecheck/test target.
+
+**Commit boundary:** One topology-relation-type-removal commit.
+
+### Sub-Sub-Phase 5.20.5 - Remove Target Note Topology From NoteTopology
+
+**Type:** Structure cleanup.
+
+**Pre-condition:** Frontend relation display/navigation no longer reads `NoteTopology.targetNoteTopology`.
+
+**Trigger:** API types are regenerated or compiled.
+
+**Post-condition:** `NoteTopology` no longer exposes `targetNoteTopology`, and frontend/backend references to that field are gone.
+
+**Work:** Remove the field from the backend topology DTO, regenerate the TypeScript API client if OpenAPI changes, and delete obsolete frontend reads.
+
+**Verify:** Focused backend compile/tests plus affected frontend typecheck/test target.
+
+**Commit boundary:** One topology-target-removal commit.
+
+### Sub-Sub-Phase 5.20.6 - Backend Reads Relation Type From Frontmatter
+
+**Type:** Behavior.
+
+**Pre-condition:** Relation type is stored in the `relation` frontmatter property.
+
+**Trigger:** A backend path still needs the relation type while relationship-template behavior is being removed.
+
+**Post-condition:** The backend derives relation type from frontmatter instead of `Note.relationType` / topology fields.
+
+**Work:** Update remaining backend read/edit/delete paths that need a relation label to parse the `relation` frontmatter property. Keep this scoped to runtime compatibility until the relation-specific paths are removed.
+
+**Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/relationships/relationship_edit_and_remove.feature`.
+
+**Commit boundary:** One backend-frontmatter-relation commit.
 
 ## Sub-Phase 5.21 - References Use Cached Wiki Titles
 
@@ -392,39 +485,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One link-type-removal commit.
 
-## Sub-Phase 5.23 - Remove Relationship Target Field
-
-**Type:** Persistence cleanup.
-
-**Pre-condition:** Runtime reference behavior and relationship displays no longer read `Note.targetNote`.
-
-**Trigger:** Database migrations and generated API are applied.
-
-**Post-condition:** The `target_note_id` field is removed from the note model, schema, OpenAPI, generated client, and frontend/backend references.
-
-**Work:** Drop the column, remove `targetNote` mappings and repository methods used only by the legacy column, and route remaining target behavior through frontmatter/cache.
-
-**Verify:** Focused backend tests and targeted relationship E2E specs.
-
-**Commit boundary:** One target-field-removal commit.
-
-## Sub-Phase 5.24 - Title Rename Updates Cached Wiki References
-
-**Type:** Behavior.
-
-**Pre-condition:** Incoming references are discoverable from the wiki-title cache.
-
-**Trigger:** A note's title changes.
-
-**Post-condition:** Notes that reference the old title are reverse-updated to reference the new title, and their cache rows are refreshed.
-
-**Work:** Add a title-update test that creates at least one referencing note, changes the target title, and verifies both the source details/frontmatter and cache use the new wiki title.
-
-**Verify:** Focused controller/service tests for note title update.
-
-**Commit boundary:** One reverse-reference-title-update commit.
-
-## Sub-Phase 5.25 - Note Graph Uses Cached Wiki References
+## Sub-Phase 5.23 - Note Graph Uses Cached Wiki References
 
 **Type:** Behavior.
 
@@ -440,7 +501,55 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One cache-backed-graph commit.
 
-## Sub-Phase 5.26 - Phase 5 Closeout and Plan Update
+## Sub-Phase 5.24 - Remove Relationship Target Field
+
+**Type:** Persistence cleanup.
+
+**Pre-condition:** Runtime reference behavior and relationship displays no longer read `Note.targetNote`.
+
+**Trigger:** Database migrations and generated API are applied.
+
+**Post-condition:** The `target_note_id` field is removed from the note model, schema, OpenAPI, generated client, and frontend/backend references.
+
+**Work:** Drop the column, remove `targetNote` mappings and repository methods used only by the legacy column, and route remaining target behavior through frontmatter/cache.
+
+**Verify:** Focused backend tests and targeted relationship E2E specs.
+
+**Commit boundary:** One target-field-removal commit.
+
+## Sub-Phase 5.25 - Title Rename Updates Cached Wiki References
+
+**Type:** Behavior.
+
+**Pre-condition:** Incoming references are discoverable from the wiki-title cache.
+
+**Trigger:** A note's title changes.
+
+**Post-condition:** Notes that reference the old title are reverse-updated to reference the new title, and their cache rows are refreshed.
+
+**Work:** Add a title-update test that creates at least one referencing note, changes the target title, and verifies both the source details/frontmatter and cache use the new wiki title.
+
+**Verify:** Focused controller/service tests for note title update.
+
+**Commit boundary:** One reverse-reference-title-update commit.
+
+## Sub-Phase 5.26 - Note Show Stops Surfacing Relationships As Child Notes
+
+**Type:** Behavior.
+
+**Pre-condition:** References and graph retrieval use cached wiki-title references instead of child relationship notes.
+
+**Trigger:** A user opens a note show page for a note that used to have relationship child notes.
+
+**Post-condition:** `NoteRealm.relationshipsDeprecating` is removed, child relationship notes are no longer shown as relationship rows on note show, and users find relationships through the replacement reference/wiki-link surface.
+
+**Work:** Remove `relationshipsDeprecating` from `NoteRealm` and from frontend note show rendering. Update the existing E2E relationship/reference test to find the relationship through the new reference surface instead of the child-notes relationship list.
+
+**Verify:** Target the existing E2E feature that currently observes note-show relationships, plus focused backend/frontend tests affected by the `NoteRealm` shape change.
+
+**Commit boundary:** One note-show-reference-surface commit.
+
+## Sub-Phase 5.27 - Phase 5 Closeout and Plan Update
 
 **Type:** Structure / cleanup.
 

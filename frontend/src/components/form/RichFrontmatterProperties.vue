@@ -18,7 +18,9 @@
     >
       <template v-for="row in propertyRows" :key="row.key">
         <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
-        <dd class="daisy-m-0">{{ row.value }}</dd>
+        <dd class="daisy-m-0">
+          {{ isRelationPropertyRow(row) ? relationLabelFromKebab(row.value) : row.value }}
+        </dd>
       </template>
     </dl>
     <div
@@ -41,7 +43,20 @@
           @focus="onRowFocus(idx)"
           @blur="commitRow(idx)"
         >
+        <RelationTypeSelectCompact
+          v-if="
+            isRelationPropertyRow(propertyRows[idx]!) && relationPropertyApiNoteId != null
+          "
+          field="relationType"
+          scope-name="rich-note-relation-property"
+          hide-label
+          :model-value="relationTypeFromKebab(propertyRows[idx]!.value)"
+          :error-message="relationPropertyFormErrors.relationType"
+          :inverse-icon="true"
+          @update:model-value="onRelationTypeSelected(idx, $event)"
+        />
         <input
+          v-else
           v-model="propertyRows[idx]!.value"
           type="text"
           class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
@@ -110,6 +125,13 @@
 
 <script setup lang="ts">
 import { computed, ref, useId, watch } from "vue"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
+import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import {
+  relationLabelFromKebab,
+  relationTypeFromKebab,
+} from "@/models/relationTypeOptions"
 import {
   parseNoteDetailsMarkdown,
   removePropertyRowAt,
@@ -122,7 +144,16 @@ const props = defineProps<{
   detailsMarkdown: string
   /** When true, properties list is display-only and insert chrome is hidden. */
   readOnly?: boolean
+  /**
+   * When set (relationship note show page), the `relation` property value is edited via
+   * `updateRelationship` instead of local frontmatter rows.
+   */
+  relationPropertyApiNoteId?: number
 }>()
+
+const storageAccessor = useStorageAccessor()
+
+const relationPropertyFormErrors = ref<{ relationType?: string }>({})
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
@@ -158,9 +189,33 @@ watch(
     draftValue.value = ""
     validationMessage.value = ""
     rowSnapshots.value = {}
+    relationPropertyFormErrors.value = {}
   },
   { immediate: true }
 )
+
+function isRelationPropertyRow(row: PropertyRow): boolean {
+  return row.key.trim().toLowerCase() === "relation"
+}
+
+function onRelationTypeSelected(
+  idx: number,
+  newType: NoteTopology["relationType"] | undefined
+) {
+  const noteId = props.relationPropertyApiNoteId
+  if (noteId == null || newType === undefined) return
+  const row = propertyRows.value[idx]
+  if (!row || !isRelationPropertyRow(row)) return
+  const current = relationTypeFromKebab(row.value)
+  if (current === newType) return
+  relationPropertyFormErrors.value = {}
+  storageAccessor.value
+    .storedApi()
+    .updateRelationship(noteId, { relationType: newType })
+    .catch((error) => {
+      relationPropertyFormErrors.value = error as { relationType?: string }
+    })
+}
 
 const headingVisible = computed(
   () => propertyRows.value.length > 0 || isReadOnly.value
