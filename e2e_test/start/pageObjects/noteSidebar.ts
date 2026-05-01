@@ -3,9 +3,9 @@ import noteCreationForm from './noteForms/noteCreationForm'
 
 const sidebarAddNoteButton = (buttonName?: string) => {
   const getButton = () =>
-    cy
-      .get('aside')
-      .findByRole('button', { name: buttonName ?? 'Add Child Note' })
+    cy.get('aside').findByRole('button', {
+      name: buttonName ?? 'New note',
+    })
   return {
     click: () => {
       getButton().click({ force: true })
@@ -88,11 +88,11 @@ export const noteSidebar = () => {
 
     addingChildNoteButton() {
       pageIsNotLoading()
-      return sidebarAddNoteButton()
+      return sidebarAddNoteButton('New note')
     },
 
     addingChildNote() {
-      sidebarAddNoteButton().click()
+      sidebarAddNoteButton('New note').click()
       return noteCreationForm
     },
 
@@ -111,6 +111,31 @@ export const noteSidebar = () => {
       pageIsNotLoading()
       sidebarAddNoteButton('New note').click()
       return noteCreationForm
+    },
+
+    addingNewFolderFromToolbar() {
+      pageIsNotLoading()
+      sidebarAddNoteButton('New folder').click()
+      return noteCreationForm
+    },
+
+    expectSidebarFolderVisible(folderLabel: string) {
+      pageIsNotLoading()
+      folderRowByExactLabel(folderLabel)
+    },
+
+    expectSidebarFolderUnderParent(
+      parentFolderLabel: string,
+      childFolderLabel: string
+    ) {
+      pageIsNotLoading()
+      expandFolderRowIfCollapsed(parentFolderLabel)
+      cy.get('aside').within(() => {
+        folderRowByExactLabel(parentFolderLabel)
+          .find('ul.daisy-list-group .sidebar-folder-label')
+          .filter((_, el) => el.textContent?.trim() === childFolderLabel.trim())
+          .should('have.length.at.least', 1)
+      })
     },
 
     /**
@@ -222,5 +247,8 @@ export const sidebarChildNotePageMethods = () => ({
   },
   addingNewNoteFromToolbar() {
     return noteSidebar().addingNewNoteFromToolbar()
+  },
+  addingNewFolderFromToolbar() {
+    return noteSidebar().addingNewFolderFromToolbar()
   },
 })

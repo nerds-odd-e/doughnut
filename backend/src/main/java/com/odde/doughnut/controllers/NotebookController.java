@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -17,6 +18,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
+import com.odde.doughnut.services.FolderConstructionService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
@@ -66,6 +68,7 @@ class NotebookController {
   private final NoteConstructionService noteConstructionService;
   private final WikidataService wikidataService;
   private final NoteRealmService noteRealmService;
+  private final FolderConstructionService folderConstructionService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -83,7 +86,8 @@ class NotebookController {
       NoteService noteService,
       NoteConstructionService noteConstructionService,
       WikidataService wikidataService,
-      NoteRealmService noteRealmService) {
+      NoteRealmService noteRealmService,
+      FolderConstructionService folderConstructionService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -100,6 +104,7 @@ class NotebookController {
     this.noteConstructionService = noteConstructionService;
     this.wikidataService = wikidataService;
     this.noteRealmService = noteRealmService;
+    this.folderConstructionService = folderConstructionService;
   }
 
   @GetMapping("")
@@ -143,6 +148,21 @@ class NotebookController {
         noteCreation,
         user,
         wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
+  }
+
+  @Operation(
+      summary = "Create a folder",
+      description =
+          "Creates a folder at notebook root when underNoteId is omitted, or nested under the"
+              + " context note's folder when underNoteId is set.")
+  @PostMapping("/{notebook}/folders")
+  @Transactional
+  public NotebookRootFolder createFolder(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @Valid @RequestBody FolderCreationRequest request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    return folderConstructionService.createFolder(notebook, request);
   }
 
   @PostMapping(value = "/{notebook}")

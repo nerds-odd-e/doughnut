@@ -369,6 +369,29 @@ export type NotebookUpdateRequest = {
 };
 
 /**
+ * Create a folder under notebook root or nested under the folder of a context note.
+ */
+export type FolderCreationRequest = {
+    /**
+     * Display name for the new folder
+     */
+    name: string;
+    /**
+     * When set, the new folder is a child of this note's folder (or notebook root when the note has no folder). Must belong to the target notebook.
+     */
+    underNoteId?: number;
+};
+
+/**
+ * Notebook root-level folder row for listing.
+ */
+export type NotebookRootFolder = {
+    id?: string;
+    name: string;
+    slug: string;
+};
+
+/**
  * Suggested depth for a single block
  */
 export type BlockDepthSuggestion = {
@@ -821,15 +844,6 @@ export type SubscriptionForNotebooksListing = {
 export type FolderListing = {
     notes?: Array<NoteRealm>;
     folders?: Array<NotebookRootFolder>;
-};
-
-/**
- * Notebook root-level folder row for listing.
- */
-export type NotebookRootFolder = {
-    id?: string;
-    name: string;
-    slug: string;
 };
 
 export type BookUserLastReadPosition = {
@@ -2004,6 +2018,24 @@ export type ImportObsidianResponses = {
      */
     200: unknown;
 };
+
+export type CreateFolderData = {
+    body: FolderCreationRequest;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders';
+};
+
+export type CreateFolderResponses = {
+    /**
+     * OK
+     */
+    200: NotebookRootFolder;
+};
+
+export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];
 
 export type CreateNoteAtNotebookRootData = {
     body: NoteCreationDto;

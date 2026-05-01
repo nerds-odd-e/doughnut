@@ -1187,6 +1187,33 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/folders:
+    post:
+      tags:
+      - notebook-controller
+      summary: Create a folder
+      description: "Creates a folder at notebook root when underNoteId is omitted,\
+        \ or nested under the context note's folder when underNoteId is set."
+      operationId: createFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderCreationRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookRootFolder"
   /api/notebooks/{notebook}/create-note:
     post:
       tags:
@@ -4115,6 +4142,37 @@ components:
           type: string
           maxLength: 500
           minLength: 0
+    FolderCreationRequest:
+      type: object
+      description: Create a folder under notebook root or nested under the folder
+        of a context note.
+      properties:
+        name:
+          type: string
+          description: Display name for the new folder
+          maxLength: 512
+          minLength: 0
+        underNoteId:
+          type: integer
+          format: int32
+          description: "When set, the new folder is a child of this note's folder\
+            \ (or notebook root when the note has no folder). Must belong to the target\
+            \ notebook."
+      required:
+      - name
+    NotebookRootFolder:
+      type: object
+      description: Notebook root-level folder row for listing.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+      required:
+      - name
+      - slug
     BlockDepthSuggestion:
       type: object
       description: Suggested depth for a single block
@@ -5101,19 +5159,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NotebookRootFolder"
-    NotebookRootFolder:
-      type: object
-      description: Notebook root-level folder row for listing.
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        slug:
-          type: string
-      required:
-      - name
-      - slug
     BookUserLastReadPosition:
       type: object
       properties:

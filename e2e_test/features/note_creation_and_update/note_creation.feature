@@ -49,3 +49,11 @@ Feature: Nested Note creation
       | note-title |
       | team       |
       | tech       |
+
+  Scenario: Create a folder at notebook root
+    When I create a folder named "Top Shelf" while viewing note "LeSS in Action"
+    Then I should see sidebar folder "Top Shelf"
+
+  Scenario: Create a nested folder under an existing folder
+    When I create a folder named "Deep" while viewing note "team"
+    Then I should see sidebar folder "Deep" under folder "LeSS in Action"

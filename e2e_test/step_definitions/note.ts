@@ -248,10 +248,9 @@ When(
 When(
   'I create a note belonging to {string} with title {string}',
   (noteTopology: string, title: string) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .addingChildNote()
-      .createNoteWithTitle(title)
+    start.jumpToNotePage(noteTopology)
+    start.noteSidebar().activateFolderByLabel(noteTopology)
+    start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
     start.assumeNotePage(title)
   }
 )
@@ -260,9 +259,11 @@ When(
   'I create a note belonging to {string} with title {string} and wikidata id {string}',
   (noteTopology: string, title: string, wikidataId: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
+    start.jumpToNotePage(noteTopology)
+    start.noteSidebar().activateFolderByLabel(noteTopology)
     start
-      .jumpToNotePage(noteTopology)
-      .addingChildNote()
+      .noteSidebar()
+      .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
     // Wikidata creation enriches siblings (authors, country); backend work can exceed default 6s.
     start.assumeNotePage(title, { timeout: 30000 })
@@ -273,15 +274,20 @@ When(
   'I attempt to create a note belonging to {string} with title {string} and wikidata id {string}',
   (noteTopology: string, title: string, wikidataId: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
+    start.jumpToNotePage(noteTopology)
+    start.noteSidebar().activateFolderByLabel(noteTopology)
     start
-      .jumpToNotePage(noteTopology)
-      .addingChildNote()
+      .noteSidebar()
+      .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
   }
 )
 
 When('I am creating a note under {notepath}', (notePath: NotePath) => {
-  start.navigateToNotebooksPage().navigateToPath(notePath).addingChildNote()
+  start
+    .navigateToNotebooksPage()
+    .navigateToPath(notePath)
+    .addingNewNoteFromToolbar()
 })
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
@@ -312,6 +318,30 @@ Then(
       .navigateToNotebooksPage()
       .openFolder(notePath)
       .expectChildrenUnderSidebarFolder(data.hashes())
+  }
+)
+
+When(
+  'I create a folder named {string} while viewing note {string}',
+  (folderName: string, noteTitle: string) => {
+    start.jumpToNotePage(noteTitle)
+    start
+      .noteSidebar()
+      .addingNewFolderFromToolbar()
+      .createFolderWithName(folderName)
+  }
+)
+
+Then('I should see sidebar folder {string}', (folderLabel: string) => {
+  start.noteSidebar().expectSidebarFolderVisible(folderLabel)
+})
+
+Then(
+  'I should see sidebar folder {string} under folder {string}',
+  (childFolderLabel: string, parentFolderLabel: string) => {
+    start
+      .noteSidebar()
+      .expectSidebarFolderUnderParent(parentFolderLabel, childFolderLabel)
   }
 )
 

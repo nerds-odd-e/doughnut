@@ -248,7 +248,7 @@ describe("Sidebar", () => {
       const folderRow = findRootFolderRowByTopTitle()
       await folderRow!.find(".sidebar-folder-label").trigger("click")
       await flushPromises()
-      const toolbarBtn = wrapper.find('button[title="Add Child Note"]')
+      const toolbarBtn = wrapper.find('button[title="New folder"]')
       expect(toolbarBtn.exists()).toBe(true)
 
       folderRow!.element.focus()
@@ -448,7 +448,7 @@ describe("Sidebar", () => {
   })
 
   describe("sidebar toolbar", () => {
-    it("shows New note and Add Child Note when a user is present and notebook is not from bazaar", async () => {
+    it("shows New note and New folder when a user is present and notebook is not from bazaar", async () => {
       wrapper = helper
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
@@ -459,7 +459,7 @@ describe("Sidebar", () => {
         .mount({ attachTo: document.body })
       await flushPromises()
       expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
-      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
+      expect(wrapper.find('button[title="New folder"]').exists()).toBe(true)
     })
 
     it("shows New note when active note has no parent", async () => {
@@ -473,10 +473,10 @@ describe("Sidebar", () => {
         .mount({ attachTo: document.body })
       await flushPromises()
       expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
-      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
+      expect(wrapper.find('button[title="New folder"]').exists()).toBe(true)
     })
 
-    it("hides Add Child Note when no current user", async () => {
+    it("hides New folder when no current user", async () => {
       wrapper = helper
         .component(Sidebar)
         .withProps({
@@ -485,12 +485,10 @@ describe("Sidebar", () => {
         })
         .mount({ attachTo: document.body })
       await flushPromises()
-      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(
-        false
-      )
+      expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)
     })
 
-    it("hides Add Child Note when note realm is from bazaar", async () => {
+    it("hides New folder when note realm is from bazaar", async () => {
       const bazaarRealm = {
         ...firstGeneration,
         fromBazaar: true,
@@ -504,9 +502,7 @@ describe("Sidebar", () => {
         })
         .mount({ attachTo: document.body })
       await flushPromises()
-      expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(
-        false
-      )
+      expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)
     })
   })
 

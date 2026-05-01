@@ -5,6 +5,12 @@ const noteCreationForm = {
   submit() {
     submittableForm.submit()
   },
+  createFolderWithName(name: string) {
+    return submittableForm.submitWith({
+      'Folder name': name,
+    })
+  },
+
   createNoteWithTitle(title: string) {
     return submittableForm.submitWith({
       Title: title,

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -21,6 +22,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
+import com.odde.doughnut.controllers.dto.NotebookRootFolder;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
@@ -442,6 +444,64 @@ class NotebookControllerTest extends ControllerTestBase {
       ResponseStatusException ex =
           assertThrows(
               ResponseStatusException.class, () -> controller.listFolderListing(nbA, folderInB));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+  }
+
+  @Nested
+  class CreateFolder {
+    @Test
+    void createsRootFolder() throws UnexpectedNoAccessRightException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Create Folder Root");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      FolderCreationRequest req = new FolderCreationRequest();
+      req.setName("  Inbox  ");
+      NotebookRootFolder created = controller.createFolder(nb, req);
+      assertThat(created.name(), equalTo("Inbox"));
+      assertThat(created.slug(), equalTo("inbox"));
+
+      FolderListing listing = controller.listNotebookRootNotes(nb);
+      assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
+    }
+
+    @Test
+    void createsNestedFolderUnderContextNotesFolder() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Create Nested");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
+      Note noteInScope =
+          makeMe.aNote("Inside").inNotebook(nb).creatorAndOwner(owner).folder(scope).please();
+
+      FolderCreationRequest req = new FolderCreationRequest();
+      req.setName("Sub");
+      req.setUnderNoteId(noteInScope.getId());
+      NotebookRootFolder created = controller.createFolder(nb, req);
+
+      FolderListing listing = controller.listFolderListing(nb, scope);
+      assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
+      assertThat(created.name(), equalTo("Sub"));
+      assertThat(created.slug(), equalTo("scope/sub"));
+    }
+
+    @Test
+    void rejectsUnderNoteFromOtherNotebook() {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Note noteInB = makeMe.aNote("Only B").inNotebook(nbB).creatorAndOwner(owner).please();
+
+      FolderCreationRequest req = new FolderCreationRequest();
+      req.setName("Bad");
+      req.setUnderNoteId(noteInB.getId());
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.createFolder(nbA, req));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
   }

@@ -1,8 +1,10 @@
 import type {
+  FolderCreationRequest,
   FolderListing,
   NoteDetailsCompletion,
   NoteMoveDto,
   NoteRealm,
+  NotebookRootFolder,
   WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
 import type {
@@ -57,6 +59,11 @@ export interface StoredApi {
     notebookId: number,
     folderId: number
   ): Promise<FolderListing>
+
+  createFolder(
+    notebookId: number,
+    body: FolderCreationRequest
+  ): Promise<NotebookRootFolder>
 
   createNote(
     router: Router,
@@ -280,6 +287,24 @@ export default class StoredApiCollection implements StoredApi {
     }
     const notes = data.notes ?? []
     this.refreshNoteRealms(notes)
+    return data
+  }
+
+  async createFolder(notebookId: number, body: FolderCreationRequest) {
+    const payload: FolderCreationRequest =
+      body.underNoteId != null
+        ? { name: body.name, underNoteId: body.underNoteId }
+        : { name: body.name }
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.createFolder({
+        path: { notebook: notebookId },
+        body: payload,
+      })
+    )
+    if (error || !data) {
+      throw new Error(toErrorMessage(error, "Failed to create folder"))
+    }
+    refreshSidebarStructuralListings()
     return data
   }
 

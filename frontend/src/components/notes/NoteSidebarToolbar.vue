@@ -12,28 +12,35 @@
       >
         <FilePlus class="w-5 h-5" />
       </NotebookRootNoteNewButton>
-      <NoteNewButton
-        v-if="note != null && activeNoteTopologyResolved"
-        button-title="Add Child Note"
-        v-bind="{ referenceNote: note!, insertMode: 'as-child' }"
-        aria-label="Add Child Note"
+      <FolderNewButton
+        :notebook-id="notebookId"
+        :under-note-id="folderContextNoteId"
+        button-title="New folder"
+        aria-label="New folder"
       >
-        <FolderPlus class="w-5 h-5" />
-      </NoteNewButton>
+        <FolderTree class="w-5 h-5" />
+      </FolderNewButton>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import { FilePlus, FolderPlus } from "lucide-vue-next"
-import NoteNewButton from "./core/NoteNewButton.vue"
+import { FilePlus, FolderTree } from "lucide-vue-next"
+import { computed } from "vue"
+import FolderNewButton from "./core/FolderNewButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 
-defineProps<{
+const props = defineProps<{
   notebookId: number
   note?: Note
   activeNoteTopologyResolved: boolean
   userActiveFolderId: number | null
 }>()
+
+const folderContextNoteId = computed(() =>
+  props.note != null && props.activeNoteTopologyResolved
+    ? props.note.id
+    : undefined
+)
 </script>
