@@ -49,15 +49,5 @@ describe("note title", () => {
       })
       expect(link.text()).toBe(target.noteTopology.title!)
     })
-
-    it("if relationship note has details the relationship is an icon", async () => {
-      relationNote.noteTopology.shortDetails = "exist"
-      mountComponent(relationNote)
-      await flushPromises()
-      const link = wrapper.find("a.router-link")
-      expect(link.exists()).toBe(true)
-      expect(link.text()).toBe("🔗")
-      expect(wrapper.text()).toContain(target.noteTopology.title!)
-    })
   })
 })

@@ -16,7 +16,6 @@ public class NoteTopology {
   private String slug;
 
   private String title;
-  private String shortDetails;
   private RelationType relationType;
   private NoteTopology targetNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;

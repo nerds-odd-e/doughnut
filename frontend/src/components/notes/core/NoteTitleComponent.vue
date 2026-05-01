@@ -3,10 +3,7 @@
     <template v-if="full">
       <NoteTitleWithLink
         v-if="noteTopology.parentOrSubjectNoteTopology"
-        v-bind="{
-          noteTopology: noteTopology.parentOrSubjectNoteTopology,
-          iconized: iconizedTarget,
-        }"
+        v-bind="{ noteTopology: noteTopology.parentOrSubjectNoteTopology }"
       />
       &nbsp;
     </template>
@@ -16,16 +13,9 @@
     <SvgRelationTypeIcon v-if="relationType" :relation-type="relationType" :inverse-icon="true" />
     &nbsp;
     <span>
-      <NoteTitleComponent
-        v-if="iconizedTarget"
-        v-bind="{ noteTopology: noteTopology.targetNoteTopology }"
-      />
       <NoteTitleWithLink
         class="hover-underline"
-        v-bind="{
-          noteTopology: noteTopology.targetNoteTopology,
-          iconized: iconizedTarget,
-        }"
+        v-bind="{ noteTopology: noteTopology.targetNoteTopology }"
       />
     </span>
   </template>
@@ -36,7 +26,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import SvgRelationTypeIcon from "@/components/svgs/SvgRelationTypeIcon.vue"
 import NoteTitleWithLink from "../NoteTitleWithLink.vue"
@@ -46,15 +36,8 @@ const props = defineProps({
   full: { type: Boolean, default: false },
 })
 
-const reactiveProps = ref(props)
-
-const relationType = computed(
-  () => reactiveProps.value.noteTopology.relationType
-)
-const title = computed(() => reactiveProps.value.noteTopology.title ?? "")
-const iconizedTarget = computed(
-  () => !!reactiveProps.value.noteTopology.shortDetails
-)
+const relationType = computed(() => props.noteTopology.relationType)
+const title = computed(() => props.noteTopology.title ?? "")
 </script>
 
 <style scoped>

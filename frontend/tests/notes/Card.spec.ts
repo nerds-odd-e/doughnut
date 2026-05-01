@@ -5,7 +5,7 @@ import helper from "@tests/helpers"
 import { describe, it } from "vitest"
 
 describe("Card", () => {
-  it("renders the card with title and details", async () => {
+  it("renders the card with title", async () => {
     const note = makeMe.aNote
       .title("this is a note")
       .details("the details")
@@ -15,6 +15,5 @@ describe("Card", () => {
       .withProps({ noteTopology: note.noteTopology })
       .render()
     await screen.findByText("this is a note")
-    await screen.findByText("the details, just shorter")
   })
 })

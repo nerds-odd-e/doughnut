@@ -3,8 +3,7 @@
     :to="noteShowByNotebookSlugLocationFromNoteTopology(noteTopology)"
     class="daisy-text-decoration-none"
   >
-    <NoteTitleComponent v-if="!iconized" v-bind="{ noteTopology }" />
-    <span v-else>🔗</span>
+    <NoteTitleComponent v-bind="{ noteTopology }" />
   </router-link>
 </template>
 
@@ -16,6 +15,5 @@ import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
-  iconized: { type: Boolean, required: false },
 })
 </script>

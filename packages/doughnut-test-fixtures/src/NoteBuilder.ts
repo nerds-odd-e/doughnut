@@ -53,7 +53,6 @@ class NoteBuilder extends Builder<Note> {
 
   details(value: string | undefined): NoteBuilder {
     this.data.details = value
-    this.data.noteTopology.shortDetails = `${value}, just shorter`
     return this
   }
 

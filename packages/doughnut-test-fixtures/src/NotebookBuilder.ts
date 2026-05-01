@@ -38,7 +38,9 @@ class NotebookBuilder extends Builder<Notebook> {
   do(): Notebook {
     const built = this.notebuilder.do()
     this.data.name = built.noteTopology.title ?? ''
-    this.data.description = built.noteTopology.shortDetails
+    this.data.description = built.details
+      ? `${built.details}, just shorter`
+      : undefined
     return this.data
   }
 }

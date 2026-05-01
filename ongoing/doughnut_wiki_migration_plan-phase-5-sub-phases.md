@@ -360,23 +360,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One relation-frontmatter-runtime commit.
 
-## Sub-Phase 5.21 - Remove Relationship Link Type Field
-
-**Type:** Persistence cleanup.
-
-**Pre-condition:** Runtime relationship behavior reads relation from frontmatter.
-
-**Trigger:** Database migrations and generated API are applied.
-
-**Post-condition:** The `relation_type` / link-type field is removed from the note model, schema, OpenAPI, generated client, and frontend/backend references.
-
-**Work:** Drop the column, remove entity/DTO/API references, regenerate TypeScript if OpenAPI changes, and delete obsolete converter code.
-
-**Verify:** Focused backend tests plus affected frontend compile/test target; run relationship E2E if wire behavior changed.
-
-**Commit boundary:** One link-type-removal commit.
-
-## Sub-Phase 5.22 - References Use Cached Wiki Titles
+## Sub-Phase 5.21 - References Use Cached Wiki Titles
 
 **Type:** Behavior.
 
@@ -391,6 +375,22 @@ Do not run the old relationship title/details migration as one long blocking adm
 **Verify:** Focused controller/service tests for same-notebook and cross-notebook visible references.
 
 **Commit boundary:** One cache-backed-references commit.
+
+## Sub-Phase 5.22 - Remove Relationship Link Type Field
+
+**Type:** Persistence cleanup.
+
+**Pre-condition:** Runtime relationship behavior reads relation from frontmatter.
+
+**Trigger:** Database migrations and generated API are applied.
+
+**Post-condition:** The `relation_type` / link-type field is removed from the note model, schema, OpenAPI, generated client, and frontend/backend references.
+
+**Work:** Drop the column, remove entity/DTO/API references, regenerate TypeScript if OpenAPI changes, and delete obsolete converter code.
+
+**Verify:** Focused backend tests plus affected frontend compile/test target; run relationship E2E if wire behavior changed.
+
+**Commit boundary:** One link-type-removal commit.
 
 ## Sub-Phase 5.23 - Remove Relationship Target Field
 

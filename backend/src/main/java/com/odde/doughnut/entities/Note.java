@@ -315,7 +315,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteTopology.setId(getId());
     noteTopology.setSlug(Objects.requireNonNullElse(getSlug(), ""));
     noteTopology.setTitle(getTitle() != null ? getTitle() : "");
-    noteTopology.setShortDetails(getShortDetails());
     noteTopology.setRelationType(getRelationType());
     Notebook notebook = Objects.requireNonNull(getNotebook());
     noteTopology.setNotebookId(notebook.getId());
@@ -330,14 +329,6 @@ public class Note extends EntityIdentifiedByIdOnly {
       noteTopology.setFolderId(getFolder().getId());
     }
     return noteTopology;
-  }
-
-  @JsonIgnore
-  public String getShortDetails() {
-    if (isRelation()) {
-      return null;
-    }
-    return new HtmlOrMarkdown(getDetails()).beginning(50);
   }
 
   @JsonIgnore

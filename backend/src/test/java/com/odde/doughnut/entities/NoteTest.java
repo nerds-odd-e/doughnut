@@ -28,26 +28,6 @@ public class NoteTest {
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
 
-  @Test
-  void shortDetails() {
-    Note note =
-        makeMe
-            .aNote()
-            .details(
-                "<strong>this is a very long sentence</strong> that contains very little meaning. The purpose is to test the truncate.")
-            .please();
-    assertThat(
-        note.getNoteTopology().getShortDetails(),
-        equalTo("this is a very long sentence that contains very li..."));
-    assertThat(note.getNoteTopology().getSlug(), equalTo(note.getSlug()));
-  }
-
-  @Test
-  void shortDetailsShouldBeNullIfEmpty() {
-    Note note = makeMe.aNote().details("").please();
-    assertThat(note.getNoteTopology().getShortDetails(), nullValue());
-  }
-
   @Nested
   class TargetNote {
     Note parent;
@@ -66,13 +46,6 @@ public class NoteTest {
       assertThat(
           relationNote.getNoteTopology().getTargetNoteTopology().getTitle(),
           equalTo(target.getTitle()));
-    }
-
-    @Test
-    void relationshipNoteDoesNotUseDetailsForShortDetailsPreview() {
-      relationNote.setDetails(
-          "---\ntype: relationship\nrelation: similar-to\n---\n\n[[A]] similar to [[B]].");
-      assertThat(relationNote.getShortDetails(), nullValue());
     }
 
     @Test

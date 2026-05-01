@@ -9,9 +9,6 @@
         <h5 class="daisy-card-title">
           <NoteTitleWithLink v-bind="{ noteTopology }" />
         </h5>
-        <p v-if="noteTopology.shortDetails" class="daisy-text-base">
-          {{ noteTopology.shortDetails }}
-        </p>
     </router-link>
     <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
       <slot name="button" :note-title="noteTopology" />

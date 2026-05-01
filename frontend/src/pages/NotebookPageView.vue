@@ -306,8 +306,6 @@ const indexDisplayTitle = computed(() => {
 const indexSummaryLine = computed(() => {
   const r = indexRealm.value
   if (!r) return ""
-  const short = r.note.noteTopology.shortDetails?.trim()
-  if (short) return short
   const d = r.note.details?.trim()
   if (!d) return ""
   return d.length > 160 ? `${d.slice(0, 157)}…` : d
