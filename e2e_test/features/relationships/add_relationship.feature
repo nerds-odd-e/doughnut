@@ -48,6 +48,6 @@ Feature: add relationship
     When I open the note details markdown editor
     Then the note details markdown source should contain "type: relationship"
     And the note details markdown source should contain "relation: similar-to"
-    And the note details markdown source should contain "[[Sedition]] similar to [[Sedation]]"
+    And the note details markdown source should contain "[[Sedition]] similar to [[Sedation care: Sedation]]"
     When I undo "create note"
     Then I should see "Sedition" has no relationship to "Sedation"
