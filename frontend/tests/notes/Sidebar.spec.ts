@@ -43,8 +43,14 @@ function stubFolderListingForTree(
     if (folderId === FOLDER_TOP_NOTE_CHILDREN_ID) {
       return {
         notes: [
-          { ...firstGeneration, children: undefined } as NoteRealm,
-          { ...firstGenerationSibling, children: undefined } as NoteRealm,
+          {
+            ...firstGeneration,
+            relationshipsDeprecating: undefined,
+          } as NoteRealm,
+          {
+            ...firstGenerationSibling,
+            relationshipsDeprecating: undefined,
+          } as NoteRealm,
         ],
         folders: [
           structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
@@ -53,7 +59,12 @@ function stubFolderListingForTree(
     }
     if (folderId === FOLDER_FIRST_GEN_CHILDREN_ID) {
       return {
-        notes: [{ ...secondGeneration, children: undefined } as NoteRealm],
+        notes: [
+          {
+            ...secondGeneration,
+            relationshipsDeprecating: undefined,
+          } as NoteRealm,
+        ],
         folders: [],
       }
     }
@@ -102,7 +113,7 @@ describe("Sidebar", () => {
 
     const shallowTopRealm = {
       ...topNoteRealm,
-      children: undefined,
+      relationshipsDeprecating: undefined,
     } as NoteRealm
     mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
@@ -190,7 +201,7 @@ describe("Sidebar", () => {
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
     const shallowTopRealm = {
       ...topNoteRealm,
-      children: undefined,
+      relationshipsDeprecating: undefined,
     } as NoteRealm
     const rootSpy = mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
@@ -222,7 +233,7 @@ describe("Sidebar", () => {
     it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
       const shallowTopRealm = {
         ...topNoteRealm,
-        children: undefined,
+        relationshipsDeprecating: undefined,
       } as NoteRealm
       const rootSpy = mockSdkService("listNotebookRootNotes", {
         notes: [shallowTopRealm],

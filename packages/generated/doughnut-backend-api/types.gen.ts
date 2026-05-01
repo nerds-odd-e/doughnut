@@ -233,7 +233,7 @@ export type NoteRealm = {
     note: Note;
     fromBazaar?: boolean;
     notebookId: number;
-    children?: Array<Note>;
+    relationshipsDeprecating?: Array<Note>;
     inboundReferences?: Array<Note>;
     wikiTitles?: Array<WikiTitle>;
 };
@@ -945,7 +945,7 @@ export type NoteRealmWritable = {
     note: NoteWritable;
     fromBazaar?: boolean;
     notebookId: number;
-    children?: Array<NoteWritable>;
+    relationshipsDeprecating?: Array<NoteWritable>;
     inboundReferences?: Array<NoteWritable>;
     wikiTitles?: Array<WikiTitle>;
 };

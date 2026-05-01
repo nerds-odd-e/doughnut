@@ -3847,7 +3847,7 @@ components:
         notebookId:
           type: integer
           format: int32
-        children:
+        relationshipsDeprecating:
           type: array
           items:
             $ref: "#/components/schemas/Note"

@@ -18,14 +18,13 @@ import org.springframework.lang.NonNull;
   "note",
   "fromBazaar",
   "notebookId",
-  "children",
+  "relationshipsDeprecating",
   "inboundReferences",
   "wikiTitles"
 })
 public class NoteRealm {
   @Getter @Setter private List<Note> inboundReferences;
 
-  /** When true, {@link #getChildren()} returns null so JSON omits {@code children}. */
   @NotNull @Getter private Note note;
 
   @Getter @Setter private Boolean fromBazaar;
@@ -48,9 +47,9 @@ public class NoteRealm {
     return Objects.requireNonNullElse(note.getSlug(), "");
   }
 
-  @JsonProperty("children")
+  @JsonProperty("relationshipsDeprecating")
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public List<Note> getChildren() {
+  public List<Note> getRelationshipsDeprecating() {
     return note.getRelationships();
   }
 

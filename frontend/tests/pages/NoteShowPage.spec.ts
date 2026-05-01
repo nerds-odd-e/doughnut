@@ -137,8 +137,14 @@ describe("all in note show page", () => {
         r.notebookId = sharedNotebookId
         r.note.noteTopology.notebookId = sharedNotebookId
       }
-      const shallowA = { ...realmA, children: undefined } as NoteRealm
-      const shallowB = { ...realmB, children: undefined } as NoteRealm
+      const shallowA = {
+        ...realmA,
+        relationshipsDeprecating: undefined,
+      } as NoteRealm
+      const shallowB = {
+        ...realmB,
+        relationshipsDeprecating: undefined,
+      } as NoteRealm
 
       const realmById: Record<number, NoteRealm> = {
         [realmA.id]: realmA,
@@ -221,8 +227,14 @@ describe("all in note show page", () => {
         r.notebookId = sharedNotebookId
         r.note.noteTopology.notebookId = sharedNotebookId
       }
-      const shallowA = { ...realmA, children: undefined } as NoteRealm
-      const shallowB = { ...realmB, children: undefined } as NoteRealm
+      const shallowA = {
+        ...realmA,
+        relationshipsDeprecating: undefined,
+      } as NoteRealm
+      const shallowB = {
+        ...realmB,
+        relationshipsDeprecating: undefined,
+      } as NoteRealm
 
       const realmById: Record<number, NoteRealm> = {
         [realmA.id]: realmA,

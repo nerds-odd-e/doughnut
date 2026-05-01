@@ -16,7 +16,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       slug: noteData.noteTopology.slug,
       note: noteData,
       inboundReferences: [],
-      children: [],
+      relationshipsDeprecating: [],
       wikiTitles: [],
       notebookId: noteData.noteTopology.notebookId,
     }
@@ -63,7 +63,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   }
 
   under(value: NoteRealm): NoteRealmBuilder {
-    value?.children?.push(this.data.note)
+    value?.relationshipsDeprecating?.push(this.data.note)
     this.data.note.parentId = value.id
     this.data.note.noteTopology.parentOrSubjectNoteTopology =
       value.note.noteTopology

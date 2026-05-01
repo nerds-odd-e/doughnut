@@ -58,8 +58,8 @@ class NoteBuilder extends Builder<Note> {
   }
 
   under(value: NoteRealm): NoteBuilder {
-    value.children ||= []
-    value.children.push(this.data)
+    value.relationshipsDeprecating ||= []
+    value.relationshipsDeprecating.push(this.data)
     this.underNote(value.note)
     return this
   }

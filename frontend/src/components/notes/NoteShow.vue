@@ -51,7 +51,7 @@
                 </NoteRecentUpdateIndicator>
                 <ChildrenNotes
                   v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
-                  :notes="noteRealm.children ?? []"
+                  :notes="noteRealm.relationshipsDeprecating ?? []"
                 />
               </div>
               <div
