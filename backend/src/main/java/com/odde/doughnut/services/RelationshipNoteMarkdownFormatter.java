@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
@@ -12,27 +13,23 @@ public final class RelationshipNoteMarkdownFormatter {
   private RelationshipNoteMarkdownFormatter() {}
 
   public static String extractUserSuffixFromRelationshipDetails(String details) {
-    if (details == null) {
+    NoteDetailsMarkdown.LeadingFrontmatter frontmatter =
+        NoteDetailsMarkdown.splitLeadingFrontmatter(details).orElse(null);
+    if (frontmatter == null) {
       return null;
     }
-    String n = details.replace("\r\n", "\n");
-    if (!n.startsWith("---\n")) {
+    if (!frontmatter.yamlRaw().contains("type: relationship")) {
       return null;
     }
-    int sep = n.indexOf("\n---\n\n", 1);
-    if (sep < 0) {
-      return null;
+    String body = frontmatter.body();
+    if (body.startsWith("\n")) {
+      body = body.substring(1);
     }
-    String frontmatterBlock = n.substring(4, sep);
-    if (!frontmatterBlock.contains("type: relationship")) {
-      return null;
-    }
-    String afterFm = n.substring(sep + 6);
-    int firstNl = afterFm.indexOf('\n');
+    int firstNl = body.indexOf('\n');
     if (firstNl < 0) {
       return null;
     }
-    String rest = afterFm.substring(firstNl + 1);
+    String rest = body.substring(firstNl + 1);
     if (rest.isEmpty()) {
       return null;
     }

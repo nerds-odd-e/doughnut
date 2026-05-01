@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
+import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
@@ -173,7 +174,9 @@ public class Note extends EntityIdentifiedByIdOnly {
   public ClozedString createMaskedDetailsForRecall() {
     if (isDetailsBlank()) return new ClozedString(null, "");
 
-    return ClozedString.forMarkdownWithMarkMasks(getDetails()).hide(getNoteTitle());
+    return ClozedString.forMarkdownWithMarkMasks(
+            NoteDetailsMarkdown.bodyWithoutLeadingFrontmatter(getDetails()))
+        .hide(getNoteTitle());
   }
 
   @JsonIgnore

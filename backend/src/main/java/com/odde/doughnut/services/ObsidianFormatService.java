@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -256,11 +257,10 @@ public class ObsidianFormatService {
   private void addContentToNote(Note note, ZipInputStream zipIn) throws IOException {
     String content = new String(zipIn.readAllBytes());
 
-    String[] parts = content.split("---", 3);
-    if (parts.length == 3) {
-      // Parse frontmatter
-      String frontmatter = parts[1].trim();
-      Map<String, String> metadata = parseFrontmatter(frontmatter);
+    NoteDetailsMarkdown.LeadingFrontmatter frontmatter =
+        NoteDetailsMarkdown.splitLeadingFrontmatter(content).orElse(null);
+    if (frontmatter != null) {
+      Map<String, String> metadata = parseFrontmatter(frontmatter.yamlRaw().trim());
 
       // Check if note with this ID exists
       if (metadata.containsKey("note_id")) {
@@ -269,7 +269,7 @@ public class ObsidianFormatService {
 
         if (existingNote != null) {
           // Update existing note instead of creating new one
-          updateExistingNote(existingNote, parts[2].trim(), note.getTitle());
+          updateExistingNote(existingNote, frontmatter.body().trim(), note.getTitle());
           // Copy the children to the existing note
           note.getChildren().forEach(child -> child.setParentNote(existingNote));
           // Remove the temporary note
@@ -279,7 +279,7 @@ public class ObsidianFormatService {
       }
 
       // Process content for new note
-      String markdownContent = parts[2].trim();
+      String markdownContent = frontmatter.body().trim();
       if (markdownContent.startsWith("# ")) {
         int nextLineIndex = markdownContent.indexOf('\n');
         if (nextLineIndex != -1) {

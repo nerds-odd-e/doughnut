@@ -58,6 +58,34 @@ class RecallPromptTest {
     }
 
     @Test
+    void spellingStemOmitsLeadingYamlFrontmatterFence() {
+      Note noteWithFm =
+          makeMe
+              .aNote("sedition")
+              .details(
+                  "---\n" + "see: \"[[Other]]\"\n" + "---\n" + "Sedition means incite violence")
+              .please();
+      MemoryTracker tracker =
+          makeMe.aMemoryTrackerFor(noteWithFm).by(makeMe.aUser().please()).please();
+      RecallPrompt recallPrompt = new RecallPrompt();
+      recallPrompt.setQuestionType(QuestionType.SPELLING);
+      recallPrompt.setMemoryTracker(tracker);
+
+      SpellingQuestion spellingQuestion = recallPrompt.getSpellingQuestion();
+
+      assertThat(spellingQuestion, org.hamcrest.Matchers.notNullValue());
+      assertThat(
+          spellingQuestion.getStem(),
+          org.hamcrest.Matchers.containsString("means incite violence"));
+      assertThat(
+          spellingQuestion.getStem(),
+          org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("see:")));
+      assertThat(
+          spellingQuestion.getStem(),
+          org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("---")));
+    }
+
+    @Test
     void shouldReturnNullWhenQuestionTypeIsNotSpelling() {
       RecallPrompt recallPrompt = new RecallPrompt();
       recallPrompt.setQuestionType(QuestionType.MCQ);
