@@ -8,7 +8,7 @@ const sidebarAddNoteButton = (buttonName?: string) => {
       .findByRole('button', { name: buttonName ?? 'Add Child Note' })
   return {
     click: () => {
-      getButton().click()
+      getButton().click({ force: true })
       return noteCreationForm
     },
     shouldNotExist: () => getButton().should('not.exist'),
@@ -83,7 +83,7 @@ export const noteSidebar = () => {
 
     addingNoteButton() {
       pageIsNotLoading()
-      return sidebarAddNoteButton('Add note')
+      return sidebarAddNoteButton('New note')
     },
 
     addingChildNoteButton() {
@@ -96,9 +96,20 @@ export const noteSidebar = () => {
       return noteCreationForm
     },
 
-    addingNextSiblingNote() {
+    activateFolderByLabel(folderLabel: string) {
       pageIsNotLoading()
-      sidebarAddNoteButton('Add Next Sibling Note').click()
+      cy.get('aside').within(() => {
+        folderRowByExactLabel(folderLabel)
+          .find('.sidebar-folder-label')
+          .should('be.visible')
+          .click()
+      })
+      pageIsNotLoading()
+    },
+
+    addingNewNoteFromToolbar() {
+      pageIsNotLoading()
+      sidebarAddNoteButton('New note').click()
       return noteCreationForm
     },
 
@@ -209,7 +220,7 @@ export const sidebarChildNotePageMethods = () => ({
   addingChildNote() {
     return noteSidebar().addingChildNote()
   },
-  addingNextSiblingNote() {
-    return noteSidebar().addingNextSiblingNote()
+  addingNewNoteFromToolbar() {
+    return noteSidebar().addingNewNoteFromToolbar()
   },
 })

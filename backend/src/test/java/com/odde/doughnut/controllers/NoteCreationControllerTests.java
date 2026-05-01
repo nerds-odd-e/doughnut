@@ -175,9 +175,10 @@ class NoteCreationControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNoteUnderParent(parent, noteCreation);
       assertThat(response.getId(), not(nullValue()));
-      assertThat(
-          noteRepository.findById(response.getId()).orElseThrow().getParent().getId(),
-          equalTo(parent.getId()));
+      Note created = noteRepository.findById(response.getId()).orElseThrow();
+      assertThat(created.getParent(), nullValue());
+      assertThat(created.getFolder(), not(nullValue()));
+      assertThat(created.getFolder().getNotebook().getId(), equalTo(parent.getNotebook().getId()));
     }
 
     @Test
@@ -404,66 +405,6 @@ class NoteCreationControllerTests extends ControllerTestBase {
             peerTitles,
             hasItems("Harry Potter", "J. K. Rowling", "The girl sat next to the window"));
       }
-    }
-  }
-
-  @Nested
-  class createNoteAfterTest {
-    Note referenceNote;
-    NoteCreationDTO noteCreation = new NoteCreationDTO();
-
-    @BeforeEach
-    void setup() {
-      Note parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      referenceNote = makeMe.aNote().under(parent).please();
-      Note nextSibling = makeMe.aNote("next sibling").under(parent).please();
-      Folder sharedFolder = noteChildContainerFolderService.resolveForParent(parent);
-      referenceNote.setFolder(sharedFolder);
-      nextSibling.setFolder(sharedFolder);
-      makeMe.entityPersister.save(referenceNote);
-      makeMe.entityPersister.save(nextSibling);
-      noteCreation.setNewTitle("new note");
-    }
-
-    @Test
-    void shouldCreateNoteAfterReferenceNote()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation);
-      assertThat(response.getId(), not(nullValue()));
-      assertThat(response.getNote().getTitle(), equalTo("new note"));
-    }
-
-    @Test
-    void shouldNotAllowCreatingSiblingForRootNote() {
-      Note rootNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.createNoteAfter(rootNote, noteCreation));
-    }
-
-    @Test
-    void shouldNotAllowCreatingSiblingForNoteWithoutAccess() {
-      User otherUser = makeMe.aUser().please();
-      Note otherNote = makeMe.aNote().creatorAndOwner(otherUser).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.createNoteAfter(otherNote, noteCreation));
-    }
-
-    @Test
-    void shouldInsertNoteAfterReferenceNoteAndBeforeNextSibling()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation);
-      Note createdNote = noteRepository.findById(response.getId()).orElseThrow();
-      assertThat(createdNote.getFolder(), not(nullValue()));
-      List<String> titlesInFolder =
-          noteRepository
-              .findNotesInFolderOrderBySiblingOrder(createdNote.getFolder().getId())
-              .stream()
-              .map(Note::getTitle)
-              .toList();
-
-      assertThat(titlesInFolder, contains(referenceNote.getTitle(), "new note", "next sibling"));
     }
   }
 }

@@ -5,6 +5,7 @@
       :notebook-id="notebookId"
       :note="activeNoteRealm?.note"
       :active-note-topology-resolved="noteContextResolved"
+      :user-active-folder-id="userActiveFolderId"
     />
     <SidebarInner
       v-if="sidebarTreeShown"
@@ -31,6 +32,7 @@ import {
   sidebarActiveNoteFolderSlugPrefixesKey,
   sidebarExpandedFolderSlugsKey,
   sidebarToggleFolderSlugKey,
+  sidebarUserActiveFolderIdKey,
   sidebarUserActiveFolderSlugKey,
 } from "./sidebarFolderExpansion"
 import {
@@ -50,6 +52,7 @@ const props = defineProps({
 
 const expandedFolderSlugs = ref<Set<string>>(new Set())
 const userActiveFolderSlug = ref<string | null>(null)
+const userActiveFolderId = ref<number | null>(null)
 
 function ensureFolderExpanded(folderSlug: string) {
   if (folderSlug === "") return
@@ -124,6 +127,7 @@ provide(sidebarExpandedFolderSlugsKey, expandedFolderSlugs)
 provide(sidebarToggleFolderSlugKey, toggleFolderSlug)
 provide(sidebarActiveNoteFolderSlugPrefixesKey, activeNoteFolderSlugPrefixes)
 provide(sidebarUserActiveFolderSlugKey, userActiveFolderSlug)
+provide(sidebarUserActiveFolderIdKey, userActiveFolderId)
 provide(sidebarNoteDragStateKey, sidebarNoteDrag)
 
 watch(
@@ -147,6 +151,7 @@ watch(
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderSlugs.value = new Set()
       userActiveFolderSlug.value = null
+      userActiveFolderId.value = null
       sidebarNoteDrag.draggedNote.value = null
       sidebarNoteDrag.isDraggedOver.value = null
       sidebarNoteDrag.dropMode.value = "after"

@@ -27,19 +27,19 @@ Feature: Nested Note creation
     When I create a note belonging to "LeSS in Action" with title ""
     Then I should see that the note creation is not successful
 
-  Scenario: Create a new note as next sibling
-    When I create a note after "team" with title "coordination"
+  Scenario: Create a new note appended last in folder
+    When I activate folder "LeSS in Action" in the sidebar and create a new note with title "coordination"
     Then I should see the note tree in the sidebar
       | note-title   |
       | LeSS in Action |
       | team         |
-      | coordination |
       | tech         |
+      | coordination |
     And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title   |
       | team         |
-      | coordination |
       | tech         |
+      | coordination |
 
   Scenario: Undo creating a new note
     When I create a note belonging to "LeSS in Action" with title "New Note"

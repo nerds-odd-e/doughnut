@@ -448,7 +448,7 @@ describe("Sidebar", () => {
   })
 
   describe("sidebar toolbar", () => {
-    it("shows Add Child Note when a user is present and notebook is not from bazaar", async () => {
+    it("shows New note and Add Child Note when a user is present and notebook is not from bazaar", async () => {
       wrapper = helper
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
@@ -458,25 +458,11 @@ describe("Sidebar", () => {
         })
         .mount({ attachTo: document.body })
       await flushPromises()
+      expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
       expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
     })
 
-    it("shows Add Next Sibling Note when active note has a parent", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: firstGeneration,
-          notebookId: firstGeneration.notebookId,
-        })
-        .mount({ attachTo: document.body })
-      await flushPromises()
-      expect(
-        wrapper.find('button[title="Add Next Sibling Note"]').exists()
-      ).toBe(true)
-    })
-
-    it("hides Add Next Sibling Note when active note has no parent", async () => {
+    it("shows New note when active note has no parent", async () => {
       wrapper = helper
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
@@ -486,10 +472,8 @@ describe("Sidebar", () => {
         })
         .mount({ attachTo: document.body })
       await flushPromises()
+      expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
       expect(wrapper.find('button[title="Add Child Note"]').exists()).toBe(true)
-      expect(
-        wrapper.find('button[title="Add Next Sibling Note"]').exists()
-      ).toBe(false)
     })
 
     it("hides Add Child Note when no current user", async () => {
@@ -573,7 +557,7 @@ describe("Sidebar", () => {
     expect(
       findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
     ).toBe(true)
-    expect(wrapper.find(`button[title="Add note"]`).exists()).toBe(true)
+    expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
   })
 
   describe("drag and drop functionality", () => {

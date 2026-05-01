@@ -40,7 +40,10 @@ public class NoteChildContainerFolderService {
   }
 
   private Folder findOrCreateChildContainer(Note parentNote) {
-    Folder parentFolderContext = findExistingChildContainerForAncestor(parentNote.getParent());
+    Folder parentFolderContext =
+        parentNote.getParent() != null
+            ? findExistingChildContainerForAncestor(parentNote.getParent())
+            : parentNote.getFolder();
     Integer parentFolderId = parentFolderContext == null ? null : parentFolderContext.getId();
     List<Folder> candidates =
         folderRepository.findCandidateChildContainers(

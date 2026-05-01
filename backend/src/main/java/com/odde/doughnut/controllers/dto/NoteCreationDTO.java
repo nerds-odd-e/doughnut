@@ -15,4 +15,6 @@ public class NoteCreationDTO extends NoteUpdateTitleDTO {
   @Setter
   @Size(max = 500)
   private String description;
+
+  @Getter @Setter private Integer folderId;
 }

@@ -1,11 +1,12 @@
 <template>
-  <PopButton :title="buttonTitle">
+  <PopButton :title="buttonTitle" :aria-label="ariaLabel ?? buttonTitle">
     <template #button_face>
       <slot />
     </template>
     <template #default="{ closer }">
       <NoteNewDialog
         :notebook-root-notebook-id="notebookId"
+        :target-folder-id="targetFolderId ?? undefined"
         @close-dialog="closer"
       />
     </template>
@@ -19,5 +20,7 @@ import NoteNewDialog from "../NoteNewDialog.vue"
 defineProps<{
   notebookId: number
   buttonTitle: string
+  ariaLabel?: string
+  targetFolderId?: number | null
 }>()
 </script>

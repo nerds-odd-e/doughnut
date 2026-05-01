@@ -63,6 +63,8 @@ const props = defineProps<{
   referenceNote?: Note
   insertMode?: InsertMode
   notebookRootNotebookId?: number
+  /** Scope for create-note when using notebook root API (active sidebar folder). */
+  targetFolderId?: number
   initialTitle?: string
 }>()
 
@@ -119,18 +121,15 @@ const processForm = async () => {
       await api.createRootNoteAtNotebook(
         router,
         props.notebookRootNotebookId,
-        creationData.value
+        creationData.value,
+        props.targetFolderId
       )
     } else if (props.referenceNote == null || props.insertMode == null) {
       throw new Error("Invalid note creation mode")
     } else if (props.insertMode === "as-child") {
       await api.createNote(router, props.referenceNote.id, creationData.value)
     } else {
-      await api.createNoteAfter(
-        router,
-        props.referenceNote.id,
-        creationData.value
-      )
+      throw new Error("Invalid note creation mode")
     }
     emit("closeDialog")
   } catch (res: unknown) {

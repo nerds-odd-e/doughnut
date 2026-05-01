@@ -16,6 +16,9 @@ export const sidebarActiveNoteFolderSlugPrefixesKey: InjectionKey<
 export const sidebarUserActiveFolderSlugKey: InjectionKey<Ref<string | null>> =
   Symbol("sidebarUserActiveFolderSlug")
 
+export const sidebarUserActiveFolderIdKey: InjectionKey<Ref<number | null>> =
+  Symbol("sidebarUserActiveFolderId")
+
 /** Structural folder slug path segments toward a note slug (excluding the note basename segment). */
 export function noteSlugFolderPrefixes(noteSlug: string): string[] {
   const parts = noteSlug.split("/").filter(Boolean)

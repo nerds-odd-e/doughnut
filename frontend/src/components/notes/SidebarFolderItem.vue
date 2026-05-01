@@ -48,6 +48,7 @@ import {
   sidebarActiveNoteFolderSlugPrefixesKey,
   sidebarExpandedFolderSlugsKey,
   sidebarToggleFolderSlugKey,
+  sidebarUserActiveFolderIdKey,
   sidebarUserActiveFolderSlugKey,
 } from "./sidebarFolderExpansion"
 import { computed, inject, ref } from "vue"
@@ -64,6 +65,7 @@ const activeNoteFolderSlugPrefixes = inject(
   sidebarActiveNoteFolderSlugPrefixesKey
 )!
 const userActiveFolderSlug = inject(sidebarUserActiveFolderSlugKey, undefined)
+const userActiveFolderId = inject(sidebarUserActiveFolderIdKey, undefined)
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
@@ -113,11 +115,17 @@ function onFolderRowFocusOut(event: FocusEvent) {
     return
   }
   userActiveFolderSlug.value = null
+  if (userActiveFolderId != null) {
+    userActiveFolderId.value = null
+  }
 }
 
 function toggleExpand() {
   if (userActiveFolderSlug != null && slug.value.length > 0) {
     userActiveFolderSlug.value = slug.value
+  }
+  if (userActiveFolderId != null && folderId.value != null) {
+    userActiveFolderId.value = folderId.value
   }
   toggleFolderSlug(slug.value)
 }

@@ -815,30 +815,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/notes/{referenceNote}/create-after:
-    post:
-      tags:
-      - note-creation-controller
-      operationId: createNoteAfter
-      parameters:
-      - name: referenceNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteCreationDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -4056,6 +4032,9 @@ components:
           type: string
           maxLength: 500
           minLength: 0
+        folderId:
+          type: integer
+          format: int32
       required:
       - newTitle
     SpellingVerificationResult:

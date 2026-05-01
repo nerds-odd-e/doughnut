@@ -322,6 +322,7 @@ export type NoteCreationDto = {
     newTitle: string;
     wikidataId?: string;
     description?: string;
+    folderId?: number;
 };
 
 export type SpellingVerificationResult = {
@@ -1696,24 +1697,6 @@ export type GenerateQuestionWithoutSaveResponses = {
 };
 
 export type GenerateQuestionWithoutSaveResponse = GenerateQuestionWithoutSaveResponses[keyof GenerateQuestionWithoutSaveResponses];
-
-export type CreateNoteAfterData = {
-    body: NoteCreationDto;
-    path: {
-        referenceNote: number;
-    };
-    query?: never;
-    url: '/api/notes/{referenceNote}/create-after';
-};
-
-export type CreateNoteAfterResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type CreateNoteAfterResponse = CreateNoteAfterResponses[keyof CreateNoteAfterResponses];
 
 export type CreateNoteUnderParentData = {
     body: NoteCreationDto;

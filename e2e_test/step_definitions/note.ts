@@ -626,17 +626,14 @@ Then(
 )
 
 When(
-  'I create a note after {string} with title {string}',
-  (noteTopology: string, title: string) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .addingNextSiblingNote()
-      .createNoteWithTitle(title)
-    // Wait for the note to be created and verify the title appears
+  'I activate folder {string} in the sidebar and create a new note with title {string}',
+  (folderLabel: string, title: string) => {
+    start.jumpToNotePage('team')
+    start.noteSidebar().activateFolderByLabel(folderLabel)
+    start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
     start.assumeNotePage(title)
   }
 )
-
 Then(
   'I should see note {notepath} has details {string}',
   (notePath: NotePath, expectedDetails: string) => {

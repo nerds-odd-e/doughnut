@@ -1,5 +1,5 @@
 <template>
-  <PopButton :title="buttonTitle">
+  <PopButton :title="buttonTitle" :aria-label="ariaLabel ?? buttonTitle">
     <template #button_face>
       <slot />
     </template>
@@ -22,5 +22,6 @@ defineProps<{
   referenceNote: Note
   insertMode: InsertMode
   buttonTitle: string
+  ariaLabel?: string
 }>()
 </script>

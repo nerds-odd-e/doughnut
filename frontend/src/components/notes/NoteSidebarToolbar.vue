@@ -5,25 +5,20 @@
   >
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NotebookRootNoteNewButton
-        v-if="preferNotebookRootCreation"
         :notebook-id="notebookId"
-        button-title="Add note"
+        :target-folder-id="userActiveFolderId"
+        button-title="New note"
+        aria-label="New note"
       >
-        <FolderPlus class="w-5 h-5" />
+        <FilePlus class="w-5 h-5" />
       </NotebookRootNoteNewButton>
       <NoteNewButton
         v-if="note != null && activeNoteTopologyResolved"
         button-title="Add Child Note"
         v-bind="{ referenceNote: note!, insertMode: 'as-child' }"
+        aria-label="Add Child Note"
       >
         <FolderPlus class="w-5 h-5" />
-      </NoteNewButton>
-      <NoteNewButton
-        v-if="note?.parentId && activeNoteTopologyResolved"
-        button-title="Add Next Sibling Note"
-        v-bind="{ referenceNote: note!, insertMode: 'after' }"
-      >
-        <Folders class="w-5 h-5" />
       </NoteNewButton>
     </div>
   </nav>
@@ -31,18 +26,14 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import { computed } from "vue"
-import { FolderPlus, Folders } from "lucide-vue-next"
+import { FilePlus, FolderPlus } from "lucide-vue-next"
 import NoteNewButton from "./core/NoteNewButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 
-const props = defineProps<{
+defineProps<{
   notebookId: number
   note?: Note
   activeNoteTopologyResolved: boolean
+  userActiveFolderId: number | null
 }>()
-
-const preferNotebookRootCreation = computed(
-  () => !props.activeNoteTopologyResolved
-)
 </script>

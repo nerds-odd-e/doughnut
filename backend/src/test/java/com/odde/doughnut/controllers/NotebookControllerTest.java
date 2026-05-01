@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -29,6 +30,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
+import com.odde.doughnut.services.NoteChildContainerFolderService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
 import java.io.ByteArrayInputStream;
@@ -61,6 +63,7 @@ class NotebookControllerTest extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
   @Autowired NoteService noteService;
+  @Autowired NoteChildContainerFolderService noteChildContainerFolderService;
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired ObjectMapper objectMapper;
   private Note topNote;
@@ -229,6 +232,53 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.createNoteAtNotebookRoot(nb, noteCreation));
+    }
+
+    @Test
+    void createsNotesInFolderInAppendLastOrder()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Folder Create");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Folder f = makeMe.aFolder().notebook(nb).name("Box").please();
+
+      NoteCreationDTO a = new NoteCreationDTO();
+      a.setNewTitle("A");
+      a.setFolderId(f.getId());
+      controller.createNoteAtNotebookRoot(nb, a);
+
+      NoteCreationDTO b = new NoteCreationDTO();
+      b.setNewTitle("B");
+      b.setFolderId(f.getId());
+      controller.createNoteAtNotebookRoot(nb, b);
+
+      NoteCreationDTO c = new NoteCreationDTO();
+      c.setNewTitle("C");
+      c.setFolderId(f.getId());
+      controller.createNoteAtNotebookRoot(nb, c);
+
+      List<String> titles =
+          noteRepository.findNotesInFolderOrderBySiblingOrder(f.getId()).stream()
+              .map(Note::getTitle)
+              .toList();
+      assertThat(titles, contains("A", "B", "C"));
+    }
+
+    @Test
+    void rejectsFolderIdFromAnotherNotebook()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      User owner = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nb2 = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder f2 = makeMe.aFolder().notebook(nb2).name("Other").please();
+      NoteCreationDTO dto = new NoteCreationDTO();
+      dto.setNewTitle("Intruding");
+      dto.setFolderId(f2.getId());
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.createNoteAtNotebookRoot(nb1, dto));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
     }
   }
 
@@ -965,7 +1015,10 @@ class NotebookControllerTest extends ControllerTestBase {
       makeMe.refresh(note1);
 
       // Assert
-      Note importedNote = note1.getChildren().stream().findFirst().orElseThrow();
+      Note importedNote =
+          noteRepository.searchExactInNotebook(notebook.getId(), "note 2").stream()
+              .findFirst()
+              .orElseThrow();
 
       assertThat(importedNote.getTitle(), equalTo("note 2"));
       assertThat(importedNote.getDetails(), equalTo("note 2"));
@@ -977,11 +1030,15 @@ class NotebookControllerTest extends ControllerTestBase {
       controller.importObsidian(zipFile, notebook);
       makeMe.refresh(note1);
 
-      // Assert
-      Note note2 = note1.getChildren().stream().findFirst().orElseThrow();
+      // Assert: containment is folder-first; imported child shares note1's child-container folder
+      Note note2 =
+          noteRepository.searchExactInNotebook(notebook.getId(), "note 2").stream()
+              .findFirst()
+              .orElseThrow();
+      Folder container = noteChildContainerFolderService.resolveForParent(note1);
 
-      assertThat(note2.getParent(), equalTo(note1));
-      assertThat(note1.getChildren().size(), equalTo(1));
+      assertThat(note2.getFolder(), notNullValue());
+      assertThat(note2.getFolder().getId(), equalTo(container.getId()));
     }
 
     @Test

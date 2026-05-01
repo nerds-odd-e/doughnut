@@ -87,7 +87,6 @@ const methodToController: Record<string, any> = {
   addQuestionManually: PredefinedQuestionController,
   generateQuestionWithoutSave: PredefinedQuestionController,
   exportQuestionGeneration: PredefinedQuestionController,
-  createNoteAfter: NoteCreationController,
   createNoteUnderParent: NoteCreationController,
   updateWikidataId: NoteController,
   updateNoteRecallSetting: NoteController,

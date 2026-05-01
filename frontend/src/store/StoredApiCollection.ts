@@ -64,16 +64,11 @@ export interface StoredApi {
     data: NoteCreationDto
   ): Promise<NoteRealm>
 
-  createNoteAfter(
-    router: Router,
-    referenceId: Doughnut.ID,
-    data: NoteCreationDto
-  ): Promise<NoteRealm>
-
   createRootNoteAtNotebook(
     router: Router,
     notebookId: number,
-    data: NoteCreationDto
+    data: NoteCreationDto,
+    folderId?: number | null
   ): Promise<NoteRealm>
 
   createRelationship(
@@ -338,50 +333,18 @@ export default class StoredApiCollection implements StoredApi {
     return focus
   }
 
-  async createNoteAfter(
-    router: Router,
-    referenceId: Doughnut.ID,
-    data: NoteCreationDto
-  ) {
-    const { data: nrwp, error } = await apiCallWithLoading(() =>
-      NoteCreationController.createNoteAfter({
-        path: { referenceNote: referenceId },
-        body: data,
-      })
-    )
-    if (error || !nrwp) {
-      const apiError = new Error("Failed to create note after") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to create note after"
-        if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
-    }
-    const focus = this.storage.refreshNoteRealm(nrwp)
-    refreshSidebarStructuralListings()
-    this.noteEditingHistory.createNote(focus.id)
-    await this.routerReplaceFocus(router, focus)
-    return focus
-  }
-
   async createRootNoteAtNotebook(
     router: Router,
     notebookId: number,
-    data: NoteCreationDto
+    data: NoteCreationDto,
+    folderId?: number | null
   ) {
+    const body: NoteCreationDto =
+      folderId != null ? { ...data, folderId } : { ...data }
     const { data: nrwp, error } = await apiCallWithLoading(() =>
       NotebookController.createNoteAtNotebookRoot({
         path: { notebook: notebookId },
-        body: data,
+        body,
       })
     )
     if (error || !nrwp) {
