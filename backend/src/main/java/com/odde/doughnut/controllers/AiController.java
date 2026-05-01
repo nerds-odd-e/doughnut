@@ -122,38 +122,21 @@ public class AiController {
     return new RemovePointsResponseDTO(newDetails);
   }
 
-  @PostMapping("/promote-point-to-child/{note}")
-  @Transactional
-  public NoteRealm promotePointToChild(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody PointsRequestDTO request)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
-    return promotePoint(note, request, true);
-  }
-
   @PostMapping("/promote-point-to-sibling/{note}")
   @Transactional
   public NoteRealm promotePointToSibling(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody PointsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
-    return promotePoint(note, request, false);
-  }
-
-  private NoteRealm promotePoint(Note note, PointsRequestDTO request, boolean toChild)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String point = getSinglePoint(request);
     var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
-    PointExtractionResult aiResult =
-        toChild ? automation.promotePointToChild(point) : automation.promotePointToSibling(point);
+    PointExtractionResult aiResult = automation.promotePointToSibling(point);
     if (aiResult == null) {
       throw new ResponseStatusException(
           HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate extraction result");
     }
-    return toChild
-        ? noteConstructionService.createNoteFromPromotedPointToChild(note, aiResult)
-        : noteConstructionService.createNoteFromPromotedPointToSibling(note, aiResult);
+    return noteConstructionService.createNoteFromPromotedPointToSibling(note, aiResult);
   }
 
   private static String getSinglePoint(PointsRequestDTO request) {

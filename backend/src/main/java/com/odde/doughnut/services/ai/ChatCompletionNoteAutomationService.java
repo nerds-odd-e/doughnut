@@ -39,22 +39,10 @@ public class ChatCompletionNoteAutomationService {
         List.of());
   }
 
-  public PointExtractionResult promotePointToChild(String point) throws JsonProcessingException {
-    return runPromotePointExtraction(point, true);
-  }
-
   public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
-    return runPromotePointExtraction(point, false);
-  }
-
-  private PointExtractionResult runPromotePointExtraction(String point, boolean toChild)
-      throws JsonProcessingException {
     String t = note.getTitle() != null ? note.getTitle() : "";
     String d = note.getDetails() != null ? note.getDetails() : "";
-    InstructionAndSchema tool =
-        toChild
-            ? AiToolFactory.promotePointToChildAiTool(point, t, d)
-            : AiToolFactory.promotePointToSiblingAiTool(point, t, d);
+    InstructionAndSchema tool = AiToolFactory.promotePointToSiblingAiTool(point, t, d);
     return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
   }
 

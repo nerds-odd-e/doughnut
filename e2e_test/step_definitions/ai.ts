@@ -222,23 +222,6 @@ Given(
 )
 
 Given(
-  'OpenAI will extract point {string} to child note with title {string} and details {string} and updated parent details {string}',
-  (
-    _point: string,
-    newNoteTitle: string,
-    newNoteDetails: string,
-    updatedParentDetails: string
-  ) => {
-    stubExtractPointResponse(
-      '.*extract.*point.*child.*',
-      newNoteTitle,
-      newNoteDetails,
-      updatedParentDetails
-    )
-  }
-)
-
-Given(
   'OpenAI will extract point {string} to sibling note with title {string} and details {string} and updated parent details {string}',
   (
     _point: string,

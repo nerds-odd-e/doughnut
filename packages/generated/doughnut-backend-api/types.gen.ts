@@ -2687,24 +2687,6 @@ export type PromotePointToSiblingResponses = {
 
 export type PromotePointToSiblingResponse = PromotePointToSiblingResponses[keyof PromotePointToSiblingResponses];
 
-export type PromotePointToChildData = {
-    body: PointsRequestDto;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/promote-point-to-child/{note}';
-};
-
-export type PromotePointToChildResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type PromotePointToChildResponse = PromotePointToChildResponses[keyof PromotePointToChildResponses];
-
 export type GenerateUnderstandingChecklistData = {
     body?: never;
     path: {

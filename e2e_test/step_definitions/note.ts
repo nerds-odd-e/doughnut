@@ -670,10 +670,6 @@ Then('the note details should contain a line break', () => {
   start.assumeNotePage().expectNoteDetailsContainLineBreak()
 })
 
-When('I promote the point {string} to a child note', (pointText: string) => {
-  start.assumeAssimilationPage().promotePointToChildNote(pointText)
-})
-
 When('I promote the point {string} to a sibling note', (pointText: string) => {
   start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
 })

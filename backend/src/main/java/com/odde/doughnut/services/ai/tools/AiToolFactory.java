@@ -221,36 +221,6 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema promotePointToChildAiTool(
-      String point, String noteTitle, String noteDetails) {
-    String instruction =
-        """
-        You are helping extract a point from a note to create a new child note.
-
-        Current note title: "%s"
-        Current note details:
-        ---
-        %s
-        ---
-
-        Point to extract: "%s"
-
-        Tasks:
-        1. Generate a concise, meaningful title for the new child note based on this point
-        2. Expand the point into detailed content (in markdown) for the new note
-        3. Identify the related content in the current note's details
-        4. Replace that content with a brief summary (1-2 sentences) that references the key concept
-
-        Guidelines:
-        - The new note should be self-contained and comprehensive
-        - The summary in current note should maintain reading flow
-        - Keep all unrelated parts of current note details unchanged
-        """
-            .formatted(noteTitle, noteDetails, point);
-
-    return new InstructionAndSchema(instruction, promotePoint());
-  }
-
   public static InstructionAndSchema promotePointToSiblingAiTool(
       String point, String noteTitle, String noteDetails) {
     String instruction =

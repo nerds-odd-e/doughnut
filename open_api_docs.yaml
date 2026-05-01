@@ -1956,30 +1956,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/ai/promote-point-to-child/{note}:
-    post:
-      tags:
-      - ai-controller
-      operationId: promotePointToChild
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PointsRequestDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:

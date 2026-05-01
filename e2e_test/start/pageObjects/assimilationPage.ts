@@ -180,14 +180,6 @@ export const assumeAssimilationPage = () => ({
     cy.findByRole('button', { name: 'Ignore questions' }).click()
     return this
   },
-  promotePointToChildNote(pointText: string) {
-    understandingChecklist().within(() => {
-      cy.contains('li', pointText)
-        .findByRole('button', { name: 'Child' })
-        .click()
-    })
-    return this
-  },
   promotePointToSiblingNote(pointText: string) {
     understandingChecklist().within(() => {
       cy.contains('li', pointText)

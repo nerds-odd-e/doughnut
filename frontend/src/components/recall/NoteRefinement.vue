@@ -25,17 +25,11 @@
             />
             <span class="daisy-break-words">{{ point }}</span>
           </label>
-          <div class="daisy-flex daisy-gap-1 daisy-shrink-0">
+          <div
+            v-if="note.parentId"
+            class="daisy-flex daisy-gap-1 daisy-shrink-0"
+          >
             <button
-              class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-              @click="promotePointToChildNote(point, index)"
-              title="Promote to child note"
-            >
-              <FolderPlus class="w-4 h-4" />
-              Child
-            </button>
-            <button
-              v-if="note.parentId"
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
               @click="promotePointToSiblingNote(point, index)"
               title="Promote to sibling note"
@@ -77,7 +71,7 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
-import { FolderPlus, Folders } from "lucide-vue-next"
+import { Folders } from "lucide-vue-next"
 import LoadingModal from "../commons/LoadingModal.vue"
 import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -209,15 +203,6 @@ const promotePoint = async (index: number, apiCall: () => Promise<unknown>) => {
   } finally {
     isPromotingPoint.value = false
   }
-}
-
-const promotePointToChildNote = (point: string, index: number) => {
-  promotePoint(index, () =>
-    AiController.promotePointToChild({
-      path: { note: props.note.id },
-      body: { points: [point] },
-    })
-  )
 }
 
 const promotePointToSiblingNote = (point: string, index: number) => {

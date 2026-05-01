@@ -210,11 +210,6 @@ public class NoteConstructionService {
     }
   }
 
-  public NoteRealm createNoteFromPromotedPointToChild(
-      Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
-    return createNoteFromPromotedPoint(originalNote, originalNote.getId(), aiResult);
-  }
-
   public NoteRealm createNoteFromPromotedPointToSibling(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
     return createNoteFromPromotedPoint(originalNote, originalNote.getParent().getId(), aiResult);
