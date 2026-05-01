@@ -1,10 +1,6 @@
 <template>
   <NotebookSidebarLayout>
-    <NoteShowPage
-      :note-id="noteId"
-      :notebook-id="notebookId"
-      :note-slug-path="noteSlugPath"
-    />
+    <NoteShowPage :note-id="noteId" />
   </NotebookSidebarLayout>
 </template>
 
@@ -14,7 +10,5 @@ import NoteShowPage from "@/pages/NoteShowPage.vue"
 
 defineProps({
   noteId: { type: Number, required: false },
-  notebookId: { type: Number, required: false },
-  noteSlugPath: { type: String, required: false },
 })
 </script>

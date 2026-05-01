@@ -56,15 +56,11 @@ async function waitForDebounce() {
   await flushPromises()
 }
 
-/** Note id from stubbed router-link `to` (see RenderingHelper); routes use slug `s{id}` from makeMe. */
+/** Note id from stubbed router-link `to` (see RenderingHelper). */
 function noteIdFromStubbedLinkTo(toAttr: string): number | undefined {
   try {
     const to = JSON.parse(toAttr) as {
-      params?: { noteSlugPath?: string; noteId?: string | number }
-    }
-    const slug = to.params?.noteSlugPath
-    if (typeof slug === "string" && /^s\d+$/.test(slug)) {
-      return Number(slug.slice(1))
+      params?: { noteId?: string | number }
     }
     const nid = to.params?.noteId
     if (nid != null) return Number(nid)

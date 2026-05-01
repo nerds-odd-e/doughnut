@@ -1,13 +1,6 @@
 <template>
   <div class="daisy-flex daisy-flex-col daisy-h-full">
-    <div
-      v-if="loadError !== null"
-      class="daisy-alert daisy-alert-error daisy-my-4"
-      role="alert"
-    >
-      {{ loadError }}
-    </div>
-    <ContentLoader v-else-if="resolvedNoteId === undefined" />
+    <ContentLoader v-if="resolvedNoteId === undefined" />
     <NoteShow
       v-else
       v-bind="{
@@ -45,7 +38,6 @@ import {
   currentActiveNoteId,
   currentNotebookId,
   notebookSidebarNotebookPageContext,
-  resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocationFromNoteRealm } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
@@ -56,68 +48,9 @@ const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
   noteId: { type: Number, required: false },
-  notebookId: { type: Number, required: false },
-  noteSlugPath: { type: String, required: false },
 })
-
-const isLegacyNotebookSlugEntry = computed(
-  () =>
-    props.notebookId != null &&
-    !Number.isNaN(props.notebookId) &&
-    props.noteSlugPath !== undefined &&
-    props.noteSlugPath !== ""
-)
-
-const notebookSlugError = ref<string | null>(null)
-const notebookSlugResolvedNoteId = ref<number | undefined>(undefined)
-let notebookSlugLoadGeneration = 0
-
-const loadError = computed(() =>
-  isLegacyNotebookSlugEntry.value ? notebookSlugError.value : null
-)
-
-watch(loadError, (err) => {
-  if (err != null) {
-    resetNotebookSidebarState()
-  }
-})
-
-watch(
-  () => [props.notebookId, props.noteSlugPath] as const,
-  async ([nb, path]) => {
-    if (!isLegacyNotebookSlugEntry.value) {
-      return
-    }
-    notebookSlugError.value = null
-    const generation = ++notebookSlugLoadGeneration
-    notebookSlugResolvedNoteId.value = undefined
-    if (nb == null || Number.isNaN(nb) || path === undefined || path === "") {
-      return
-    }
-    try {
-      const realm = await storageAccessor.value
-        .storedApi()
-        .loadNoteByNotebookSlug(nb, path)
-      if (generation !== notebookSlugLoadGeneration) return
-      notebookSlugResolvedNoteId.value = realm.id
-    } catch (e: unknown) {
-      if (generation !== notebookSlugLoadGeneration) return
-      notebookSlugError.value =
-        e instanceof Error ? e.message : "Could not load note"
-    }
-  },
-  { immediate: true }
-)
 
 const resolvedNoteId = computed((): number | undefined => {
-  if (isLegacyNotebookSlugEntry.value) {
-    if (notebookSlugResolvedNoteId.value == null) {
-      return undefined
-    }
-    return storageAccessor.value.refOfNoteRealm(
-      notebookSlugResolvedNoteId.value
-    ).value?.id
-  }
   if (props.noteId != null && !Number.isNaN(props.noteId)) {
     return props.noteId
   }
@@ -142,24 +75,18 @@ watch(
 
 watch(
   () => ({
-    legacy: isLegacyNotebookSlugEntry.value,
-    notebookId: props.notebookId,
     realm: noteRealm.value,
     noteId: props.noteId,
   }),
-  ({ legacy, notebookId, realm, noteId }) => {
-    if (legacy && notebookId != null && !Number.isNaN(notebookId)) {
-      currentNotebookId.value = notebookId
-      return
-    }
-    if (!legacy && noteId != null && !Number.isNaN(noteId)) {
+  ({ realm, noteId }) => {
+    if (noteId != null && !Number.isNaN(noteId)) {
       const nb = realm?.notebookId ?? realm?.note.noteTopology.notebookId
       if (nb != null) {
         currentNotebookId.value = nb
       }
       return
     }
-    if (!legacy && (noteId == null || Number.isNaN(noteId))) {
+    if (noteId == null || Number.isNaN(noteId)) {
       currentNotebookId.value = undefined
     }
   },

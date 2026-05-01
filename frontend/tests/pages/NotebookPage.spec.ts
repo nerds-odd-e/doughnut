@@ -3,13 +3,11 @@ import NotebookPageWithNotebookSidebarLayout from "@tests/fixtures/NotebookPageW
 import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
-  wrapSdkError,
 } from "@tests/helpers"
 import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, it, expect, vi } from "vitest"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { beforeEach, describe, it, expect } from "vitest"
 
 describe("NotebookPage.spec", () => {
   beforeEach(() => {
@@ -20,10 +18,7 @@ describe("NotebookPage.spec", () => {
 
   it("shows the current number of questions in assessment if set", async () => {
     const notebook = makeMe.aNotebook.numberOfQuestionsInAssessment(4).please()
-    mockSdkService("get", { notebook, hasAttachedBook: false })
-    vi.spyOn(NotebookController, "getNoteBySlug").mockResolvedValue(
-      wrapSdkError("no index") as never
-    )
+    mockSdkService("get", { notebook, hasAttachedBook: false, readonly: false })
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
@@ -39,13 +34,18 @@ describe("NotebookPage.spec", () => {
     expect((input as HTMLInputElement).value).toBe("4")
   })
 
-  it("shows the note-show sidebar toggle and loads the tree via index slug when present", async () => {
+  it("shows the note-show sidebar toggle and loads index state when notebook exposes landing id", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookId = notebook.id
     indexRealm.note.noteTopology.notebookId = notebook.id
-    mockSdkService("get", { notebook, hasAttachedBook: false })
-    const slugSpy = mockSdkService("getNoteBySlug", indexRealm)
+    mockSdkService("get", {
+      notebook,
+      hasAttachedBook: false,
+      readonly: false,
+      indexNoteId: indexRealm.id,
+    })
+    const showSpy = mockSdkService("showNote", indexRealm)
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
@@ -58,12 +58,9 @@ describe("NotebookPage.spec", () => {
       .render()
     await flushPromises()
     expect(screen.getByTitle("toggle sidebar")).toBeInTheDocument()
-    expect(slugSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: { notebook: notebook.id },
-        query: { slugPath: "index" },
-      })
-    )
+    expect(showSpy).toHaveBeenCalledWith({
+      path: { note: indexRealm.id },
+    })
     const edit = screen.getByTestId("notebook-index-edit")
     const toAttr = edit.getAttribute("to")
     expect(toAttr).toBeTruthy()
@@ -77,17 +74,22 @@ describe("NotebookPage.spec", () => {
     )
   })
 
-  it("does not show empty-index prompt while index slug is still loading", async () => {
+  it("does not show empty-index prompt while landing note load is delayed", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookId = notebook.id
     indexRealm.note.noteTopology.notebookId = notebook.id
-    mockSdkService("get", { notebook, hasAttachedBook: false })
+    mockSdkService("get", {
+      notebook,
+      hasAttachedBook: false,
+      readonly: false,
+      indexNoteId: indexRealm.id,
+    })
     let release!: () => void
     const gate = new Promise<void>((resolve) => {
       release = resolve
     })
-    mockSdkServiceWithImplementation("getNoteBySlug", async () => {
+    mockSdkServiceWithImplementation("showNote", async () => {
       await gate
       return indexRealm
     })
@@ -111,13 +113,13 @@ describe("NotebookPage.spec", () => {
     expect(screen.getByTestId("notebook-index-edit")).toBeInTheDocument()
   })
 
-  it("does not load sidebar via showNote when index slug is missing", async () => {
+  it("shows add-first-note prompt when notebook omits landing index id", async () => {
     const notebook = makeMe.aNotebook.please()
-    mockSdkService("get", { notebook, hasAttachedBook: false })
-    vi.spyOn(NotebookController, "getNoteBySlug").mockResolvedValue(
-      wrapSdkError("not found") as never
-    )
-    const showSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+    mockSdkService("get", {
+      notebook,
+      hasAttachedBook: false,
+      readonly: false,
+    })
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
@@ -130,7 +132,6 @@ describe("NotebookPage.spec", () => {
       .render()
     await flushPromises()
     expect(screen.getByTitle("toggle sidebar")).toBeInTheDocument()
-    expect(showSpy).not.toHaveBeenCalled()
     expect(screen.getByTestId("notebook-add-first-note")).toBeInTheDocument()
   })
 })

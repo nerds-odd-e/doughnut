@@ -14,34 +14,6 @@ export function noteShowHref(noteId: number): string {
   return `/d/n/${noteId}`
 }
 
-/** Slug-path note URL (legacy navigation paths). Prefer {@link noteShowHref} for new links. */
-export function noteShowByNotebookSlugHref(
-  notebookId: number,
-  noteSlugPath: string
-): string {
-  const tail =
-    noteSlugPath === ""
-      ? ""
-      : noteSlugPath
-          .split("/")
-          .map((seg) => encodeURIComponent(seg))
-          .join("/")
-  return `/d/notebooks/${notebookId}/notes/${tail}`
-}
-
-export function noteShowLegacyNotebookSlugLocation(
-  notebookId: number,
-  noteSlugPath: string
-): RouteLocationNamedRaw {
-  return {
-    name: "noteShowLegacyNotebookSlug",
-    params: {
-      notebookId: String(notebookId),
-      noteSlugPath,
-    },
-  }
-}
-
 export function noteShowLocationFromNoteRealm(
   noteRealm: NoteRealm
 ): RouteLocationNamedRaw {

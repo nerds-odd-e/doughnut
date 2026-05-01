@@ -25,10 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
-import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
@@ -142,60 +140,6 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(realm.getWikiTitles(), hasSize(1));
       assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("FrontmatterTarget"));
       assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(fromFm.getId()));
-    }
-  }
-
-  @Nested
-  class showNoteByAmbiguousBasename {
-    @Test
-    void shouldReturnNoteWhenSlugBasenameMatchesExactlyOneVisibleNote() {
-      User user = currentUser.getUser();
-      Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
-      NoteRealm realm = controller.showNoteByAmbiguousBasename("foo");
-      assertThat(realm.getId(), equalTo(note.getId()));
-      assertThat(realm.getNotebookId(), equalTo(note.getNotebook().getId()));
-    }
-
-    @Test
-    void shouldStillResolveBasenameAfterSoftDeleteSoClientCanShowDeletedState() {
-      User user = currentUser.getUser();
-      Note note = makeMe.aNote().creatorAndOwner(user).slug("a/tdd").please();
-      noteService.destroy(note);
-      NoteRealm realm = controller.showNoteByAmbiguousBasename("tdd");
-      assertThat(realm.getId(), equalTo(note.getId()));
-      assertThat(realm.getNotebookId(), equalTo(note.getNotebook().getId()));
-      assertThat(realm.getNote().getDeletedAt(), notNullValue());
-    }
-
-    @Test
-    void shouldYieldConflictWhenMoreThanOneAccessibleNoteSharesBasename() {
-      User user = currentUser.getUser();
-      makeMe.aNote().creatorAndOwner(user).slug("a/foo").please();
-      makeMe.aNote().creatorAndOwner(user).slug("b/foo").please();
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.showNoteByAmbiguousBasename("foo"));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-    }
-
-    @Test
-    void shouldYieldNotFoundWhenNoMatchingSlugBasenameForUser() {
-      makeMe.aNote().creatorAndOwner(currentUser.getUser()).slug("only/other").please();
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class,
-              () -> controller.showNoteByAmbiguousBasename("missing"));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
-    }
-
-    @Test
-    void shouldTreatOtherUsersPrivateNoteMatchingBasenameAsNotAccessible() {
-      User otherUser = makeMe.aUser().please();
-      makeMe.aNote().creatorAndOwner(otherUser).slug("x/foo").please();
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.showNoteByAmbiguousBasename("foo"));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
   }
 

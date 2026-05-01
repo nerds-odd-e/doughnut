@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
 
   @Autowired JdbcTemplate jdbcTemplate;
   @Autowired NotebookController notebookController;
+  @Autowired NoteController noteController;
+  @Autowired NotebookRepository notebookRepository;
   @Autowired EntityManager entityManager;
 
   private static final String BACKFILL_NOTEBOOK_NAME =
@@ -99,8 +102,11 @@ class LegacyRootToIndexNoteMigrationPersistenceTest extends ControllerTestBase {
     assertThat(storedTitle, equalTo("index"));
     assertThat(storedSlug, equalTo("index"));
 
-    NoteRealm realm = notebookController.getNoteBySlug(notebook, "index");
-    assertThat(realm.getId(), equalTo(rootNoteId));
-    assertThat(realm.getNote().getDetails(), equalTo("Notebook body"));
+    Notebook reloadedNb = notebookRepository.findById(notebookId).orElseThrow();
+    assertThat(notebookController.get(reloadedNb).indexNoteId(), equalTo(rootNoteId));
+
+    Note headNote = entityManager.find(Note.class, rootNoteId);
+    NoteRealm refreshedHead = noteController.showNote(headNote);
+    assertThat(refreshedHead.getNote().getDetails(), equalTo("Notebook body"));
   }
 }

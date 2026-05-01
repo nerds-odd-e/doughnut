@@ -56,26 +56,8 @@ const isNotebookReadOnly = computed(
 )
 
 const sidebarAnchorNoteId = ref<number | undefined>()
-/** Resolves optional root `index` slug; separate from `sidebarAnchorNoteId` during async load. */
 const indexSlugStatus = ref<"pending" | "present" | "absent">("pending")
-let indexSlugResolveGeneration = 0
-
-const resolveSidebarRealm = async (nb: Notebook) => {
-  const gen = ++indexSlugResolveGeneration
-  sidebarAnchorNoteId.value = undefined
-  indexSlugStatus.value = "pending"
-  try {
-    const realm = await storageAccessor.value
-      .storedApi()
-      .loadNoteByNotebookSlug(nb.id, "index")
-    if (gen !== indexSlugResolveGeneration) return
-    sidebarAnchorNoteId.value = realm.id
-    indexSlugStatus.value = "present"
-  } catch {
-    if (gen !== indexSlugResolveGeneration) return
-    indexSlugStatus.value = "absent"
-  }
-}
+let indexResolveGeneration = 0
 
 const fetchNotebook = async () => {
   const notebookId = Number(route.params.notebookId)
@@ -97,14 +79,56 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
 }
 
 watch(
-  [notebook, isNotebookReadOnly],
-  ([nb, ro]) => {
-    if (nb) {
-      currentNotebookId.value = nb.id
-      notebookSidebarNotebookPageContext.value = {
-        notebook: nb,
-        isNotebookReadOnly: ro,
-      }
+  notebookClient,
+  (c) => {
+    if (!c) {
+      notebookSidebarNotebookPageContext.value = undefined
+      currentNotebookId.value = undefined
+      return
+    }
+    currentNotebookId.value = c.notebook.id
+    notebookSidebarNotebookPageContext.value = {
+      notebook: c.notebook,
+      isNotebookReadOnly: c.readonly === true,
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+watch(
+  () =>
+    notebookClient.value
+      ? ([
+          notebookClient.value.notebook.id,
+          notebookClient.value.indexNoteId ?? null,
+        ] as const)
+      : undefined,
+  async (key) => {
+    if (key === undefined) {
+      sidebarAnchorNoteId.value = undefined
+      indexSlugStatus.value = "pending"
+      currentActiveNoteId.value = undefined
+      return
+    }
+
+    const [, indexNoteId] = key
+    const gen = ++indexResolveGeneration
+    sidebarAnchorNoteId.value = undefined
+    indexSlugStatus.value = "pending"
+
+    if (indexNoteId == null) {
+      indexSlugStatus.value = "absent"
+      return
+    }
+
+    try {
+      await storageAccessor.value.storedApi().loadNoteRealm(indexNoteId)
+      if (gen !== indexResolveGeneration) return
+      sidebarAnchorNoteId.value = indexNoteId
+      indexSlugStatus.value = "present"
+    } catch {
+      if (gen !== indexResolveGeneration) return
+      indexSlugStatus.value = "absent"
     }
   },
   { immediate: true }
@@ -117,18 +141,6 @@ watch(
   },
   { immediate: true }
 )
-
-watch(notebook, async (nb) => {
-  if (nb) {
-    await resolveSidebarRealm(nb)
-  } else {
-    sidebarAnchorNoteId.value = undefined
-    indexSlugStatus.value = "pending"
-    currentActiveNoteId.value = undefined
-    currentNotebookId.value = undefined
-    notebookSidebarNotebookPageContext.value = undefined
-  }
-})
 
 watch(
   () => route.params.notebookId,

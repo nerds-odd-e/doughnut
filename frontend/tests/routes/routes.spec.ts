@@ -12,60 +12,6 @@ describe("routes", () => {
     })
   })
 
-  describe("noteShowLegacyNotebookSlug route", () => {
-    it("should match /d/notebooks/:notebookId/notes/:path and pass props", async () => {
-      await router.push("/d/notebooks/42/notes/journal/2025/daily")
-
-      const route = router.currentRoute.value
-      expect(route.name).toBe("noteShowLegacyNotebookSlug")
-      expect(route.params.notebookId).toBe("42")
-      expect(route.params.noteSlugPath).toBe("journal/2025/daily")
-
-      const legacyRoute = routes.find(
-        (r) => r.name === "noteShowLegacyNotebookSlug"
-      )
-      expect(legacyRoute).toBeDefined()
-      if (legacyRoute && typeof legacyRoute.props === "function") {
-        expect(legacyRoute.props(route)).toEqual({
-          notebookId: 42,
-          noteSlugPath: "journal/2025/daily",
-        })
-      }
-    })
-
-    it("should navigate by name with multi-segment noteSlugPath params", async () => {
-      await router.push({
-        name: "noteShowLegacyNotebookSlug",
-        params: {
-          notebookId: "42",
-          noteSlugPath: "journal/2025/daily",
-        },
-      })
-
-      const route = router.currentRoute.value
-      expect(route.name).toBe("noteShowLegacyNotebookSlug")
-      expect(route.params.notebookId).toBe("42")
-      expect(route.params.noteSlugPath).toBe("journal/2025/daily")
-      const legacyRoute = routes.find(
-        (r) => r.name === "noteShowLegacyNotebookSlug"
-      )
-      expect(legacyRoute).toBeDefined()
-      if (legacyRoute && typeof legacyRoute.props === "function") {
-        expect(legacyRoute.props(route)).toEqual({
-          notebookId: 42,
-          noteSlugPath: "journal/2025/daily",
-        })
-      }
-    })
-
-    it("should not match canonical note-id URLs", () => {
-      const resolved = router.resolve("/d/n/123")
-      expect(
-        resolved.matched.some((r) => r.name === "noteShowLegacyNotebookSlug")
-      ).toBe(false)
-    })
-  })
-
   describe("noteShow route", () => {
     it("should match /d/n/:noteId and pass noteId prop", async () => {
       await router.push("/d/n/123")
@@ -101,6 +47,15 @@ describe("routes", () => {
           noteId: 456,
         })
       }
+    })
+
+    it("does not absorb legacy slash paths under notebooks", async () => {
+      await router.push("/d/notebooks/42/notes/a/b")
+
+      expect(router.currentRoute.value.name).not.toBe("noteShow")
+      expect(
+        router.currentRoute.value.matched.some((r) => r.name === "noteShow")
+      ).toBe(false)
     })
   })
 

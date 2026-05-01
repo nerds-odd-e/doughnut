@@ -252,10 +252,7 @@
 import type { PropType } from "vue"
 import { ref, watch, computed } from "vue"
 import { useRouter } from "vue-router"
-import {
-  noteShowLocation,
-  noteShowLegacyNotebookSlugLocation,
-} from "@/routes/noteShowLocation"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import type {
   Notebook,
   User,
@@ -315,9 +312,7 @@ const indexSummaryLine = computed(() => {
 })
 
 const indexNoteEditLocation = computed(() =>
-  props.indexNoteId != null
-    ? noteShowLocation(props.indexNoteId)
-    : noteShowLegacyNotebookSlugLocation(props.notebook.id, "index")
+  noteShowLocation(props.indexNoteId!)
 )
 
 const approval = ref<NotebookCertificateApproval | undefined>(undefined)

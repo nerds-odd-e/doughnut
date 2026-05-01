@@ -49,24 +49,6 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/notebooks/:notebookId(\\d+)/notes/:noteSlugPath(.*)",
-    name: "noteShowLegacyNotebookSlug",
-    props: (route: RouteLocation) => {
-      const raw = route.params.noteSlugPath
-      const pathStr =
-        raw === undefined || raw === ""
-          ? ""
-          : Array.isArray(raw)
-            ? raw.join("/")
-            : String(raw)
-      return {
-        notebookId: Number(route.params.notebookId),
-        noteSlugPath: pathStr,
-      }
-    },
-    meta: { useNoteStorageAccessor: true },
-  },
-  {
     path: "/d/circles/:circleId",
     name: "circleShow",
     props: true,

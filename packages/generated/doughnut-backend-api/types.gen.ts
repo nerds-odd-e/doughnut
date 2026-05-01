@@ -492,6 +492,10 @@ export type NotebookClientView = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
+    /**
+     * Id of this notebook's index landing note when one exists (matches slug-or-title heuristic used server-side); omitted when absent.
+     */
+    indexNoteId?: number;
 };
 
 export type NotebookCertificateApproval = {
@@ -3363,24 +3367,6 @@ export type GetRecentNotesResponses = {
 
 export type GetRecentNotesResponse = GetRecentNotesResponses[keyof GetRecentNotesResponses];
 
-export type ShowNoteByAmbiguousBasenameData = {
-    body?: never;
-    path: {
-        basename: string;
-    };
-    query?: never;
-    url: '/api/notes/by-basename/{basename}';
-};
-
-export type ShowNoteByAmbiguousBasenameResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type ShowNoteByAmbiguousBasenameResponse = ShowNoteByAmbiguousBasenameResponses[keyof ShowNoteByAmbiguousBasenameResponses];
-
 export type MyNotebooksData = {
     body?: never;
     path?: never;
@@ -3414,29 +3400,6 @@ export type ListNotebookRootNotesResponses = {
 };
 
 export type ListNotebookRootNotesResponse = ListNotebookRootNotesResponses[keyof ListNotebookRootNotesResponses];
-
-export type GetNoteBySlugData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query: {
-        /**
-         * Notebook-local note slug path (may contain '/')
-         */
-        slugPath: string;
-    };
-    url: '/api/notebooks/{notebook}/note/by-slug';
-};
-
-export type GetNoteBySlugResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type GetNoteBySlugResponse = GetNoteBySlugResponses[keyof GetNoteBySlugResponses];
 
 export type ListFolderListingData = {
     body?: never;

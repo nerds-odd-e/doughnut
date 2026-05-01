@@ -11,10 +11,16 @@ import jakarta.validation.constraints.NotNull;
 public record NotebookClientView(
     @NotNull Notebook notebook,
     @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
-    boolean readonly) {
+    boolean readonly,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+        @Schema(
+            description =
+                "Id of this notebook's index landing note when one exists (matches slug-or-title"
+                    + " heuristic used server-side); omitted when absent.")
+        Integer indexNoteId) {
 
   public static NotebookClientView of(
-      Notebook notebook, boolean hasAttachedBook, boolean readonly) {
-    return new NotebookClientView(notebook, hasAttachedBook, readonly);
+      Notebook notebook, Boolean hasAttachedBook, boolean readonly, Integer indexNoteId) {
+    return new NotebookClientView(notebook, hasAttachedBook, readonly, indexNoteId);
   }
 }

@@ -188,11 +188,41 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void includesLandingNoteIndexIdWhenEligibleRootNoteExists()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Note index =
+          makeMe
+              .aNote()
+              .creatorAndOwner(owner)
+              .inNotebook(nb)
+              .title("index")
+              .slug("index")
+              .please();
+
+      NotebookClientView view = controller.get(nb);
+
+      assertThat(view.indexNoteId(), equalTo(index.getId()));
+    }
+
+    @Test
     void deniesLoggedInUserWithoutReadAccessToNotebook() {
       User owner = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.get(nb));
+    }
+
+    @Test
+    void omitsLandingNoteIndexIdWhenNoEligibleIndexNoteYet()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+
+      NotebookClientView view = controller.get(nb);
+
+      assertThat(view.indexNoteId(), nullValue());
     }
   }
 
@@ -1126,88 +1156,6 @@ class NotebookControllerTest extends ControllerTestBase {
       // Verify the correct status and message
       assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
       assertEquals("User Not Found", exception.getReason());
-    }
-  }
-
-  @Nested
-  class GetNoteBySlug {
-    @Test
-    void returnsRealmWhenSlugMatchesInNotebook() throws UnexpectedNoAccessRightException {
-      User user = currentUser.getUser();
-      Note note = makeMe.aNote().creatorAndOwner(user).slug("some-folder/foo").please();
-      NoteRealm realm = controller.getNoteBySlug(note.getNotebook(), "some-folder/foo");
-      assertThat(realm.getId(), equalTo(note.getId()));
-      assertThat(realm.getNotebookId(), equalTo(note.getNotebook().getId()));
-    }
-
-    @Test
-    void yieldsNotFoundWhenSlugMissing() throws UnexpectedNoAccessRightException {
-      User user = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      ResponseStatusException ex =
-          assertThrows(ResponseStatusException.class, () -> controller.getNoteBySlug(nb, "nope"));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
-    }
-
-    @Test
-    void yieldsNotFoundWhenSlugExistsOnlyInOtherNotebook() throws UnexpectedNoAccessRightException {
-      User user = currentUser.getUser();
-      makeMe.aNote().creatorAndOwner(user).slug("path/bar").please();
-      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.getNoteBySlug(otherNb, "path/bar"));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
-    }
-
-    @Test
-    void deniesWhenUserCannotReadNotebook() {
-      User owner = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(owner).slug("a/b").please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.getNoteBySlug(note.getNotebook(), "a/b"));
-    }
-
-    @Test
-    void allowsAnonymousReadWhenNotebookInBazaar() throws UnexpectedNoAccessRightException {
-      User owner = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(owner).slug("public/path").please();
-      makeMe.aBazaarNotebook(note.getNotebook()).please();
-      currentUser.setUser(null);
-      NoteRealm realm = controller.getNoteBySlug(note.getNotebook(), "public/path");
-      assertThat(realm.getId(), equalTo(note.getId()));
-    }
-
-    @Test
-    void deniesAnonymousWhenNotebookNotInBazaar() {
-      User owner = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(owner).slug("private/path").please();
-      currentUser.setUser(null);
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class,
-              () -> controller.getNoteBySlug(note.getNotebook(), "private/path"));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
-    }
-
-    @Test
-    void stillResolvesAfterSoftDelete() throws UnexpectedNoAccessRightException {
-      User user = currentUser.getUser();
-      Note note = makeMe.aNote().creatorAndOwner(user).slug("a/tdd").please();
-      noteService.destroy(note);
-      NoteRealm realm = controller.getNoteBySlug(note.getNotebook(), "a/tdd");
-      assertThat(realm.getId(), equalTo(note.getId()));
-      assertThat(realm.getNote().getDeletedAt(), notNullValue());
-    }
-
-    @Test
-    void blankSlugYieldsNotFound() throws UnexpectedNoAccessRightException {
-      User user = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      ResponseStatusException ex =
-          assertThrows(ResponseStatusException.class, () -> controller.getNoteBySlug(nb, "   "));
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
   }
 }

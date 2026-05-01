@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
@@ -28,16 +29,20 @@ import org.springframework.stereotype.Service;
 public class NotebookCatalogService {
 
   private final BookRepository bookRepository;
+  private final NotebookService notebookService;
 
-  public NotebookCatalogService(BookRepository bookRepository) {
+  public NotebookCatalogService(BookRepository bookRepository, NotebookService notebookService) {
     this.bookRepository = bookRepository;
+    this.notebookService = notebookService;
   }
 
   public NotebookClientView clientViewFor(Notebook notebook, User viewer) {
     boolean hasAttachedBook =
         !bookRepository.findNotebookIdsWithAttachedBooksIn(List.of(notebook.getId())).isEmpty();
     boolean readonly = viewer == null || !viewer.owns(notebook);
-    return NotebookClientView.of(notebook, hasAttachedBook, readonly);
+    Integer indexNoteId =
+        notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
+    return NotebookClientView.of(notebook, hasAttachedBook, readonly, indexNoteId);
   }
 
   /**
@@ -66,7 +71,10 @@ public class NotebookCatalogService {
                 nb.getId(),
                 __ ->
                     NotebookClientView.of(
-                        nb, withBook.contains(nb.getId()), viewer == null || !viewer.owns(nb)));
+                        nb,
+                        withBook.contains(nb.getId()),
+                        viewer == null || !viewer.owns(nb),
+                        null));
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();

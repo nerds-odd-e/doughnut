@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -13,8 +12,6 @@ import org.springframework.data.repository.query.Param;
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   long countByNotebook_Id(Integer notebookId);
-
-  Optional<Note> findByNotebook_IdAndSlug(Integer notebookId, String slug);
 
   String selectFromNote = "SELECT n FROM Note n";
   String searchForTitleLike = " WHERE n.title LIKE :pattern AND n.deletedAt IS NULL ";
@@ -252,23 +249,4 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           "SELECT MAX(n.createdAt) FROM Note n WHERE n.creator.id = :userId AND n.deletedAt IS NULL")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
-
-  /**
-   * Basename is the segment after the last {@code /} in {@code slug}; use MySQL SUBSTRING_INDEX.
-   * Includes soft-deleted rows so note URLs by slug still resolve for deleted-note UI.
-   */
-  @Query(
-      value = "SELECT id FROM note WHERE SUBSTRING_INDEX(slug, '/', -1) = :basename",
-      nativeQuery = true)
-  List<Integer> findIdsBySlugBasenameIncludingDeleted(@Param("basename") String basename);
-
-  default List<Note> findAllBySlugBasenameIncludingDeleted(String basename) {
-    List<Integer> ids = findIdsBySlugBasenameIncludingDeleted(basename);
-    if (ids.isEmpty()) {
-      return List.of();
-    }
-    List<Note> out = new ArrayList<>();
-    findAllById(ids).forEach(out::add);
-    return out;
-  }
 }

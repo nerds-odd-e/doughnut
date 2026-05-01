@@ -263,35 +263,6 @@ class NotebookController {
     return notebookService.findByNotebookId(notebook.getId());
   }
 
-  @Operation(summary = "Get note by full slug path within notebook")
-  @GetMapping("/{notebook}/note/by-slug")
-  public NoteRealm getNoteBySlug(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @Parameter(description = "Notebook-local note slug path (may contain '/')")
-          @RequestParam("slugPath")
-          String slug)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    if (slug == null || slug.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this slug.");
-    }
-    String trimmed = slug.trim();
-    String normalized = trimmed.startsWith("/") ? trimmed.substring(1) : trimmed;
-    if (normalized.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No note found for this slug.");
-    }
-    Note note =
-        noteService
-            .findNoteInNotebookBySlug(notebook.getId(), normalized)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No note found for this slug."));
-    authorizationService.assertReadAuthorization(note);
-    User user = authorizationService.getCurrentUser();
-    return noteRealmService.build(note, user);
-  }
-
   @Operation(
       summary = "List notebook root: notes without a folder and top-level folders",
       description =

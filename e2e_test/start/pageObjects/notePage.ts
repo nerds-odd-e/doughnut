@@ -10,9 +10,6 @@ import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
 
-const findChildNoteCard = (title: string) =>
-  cy.findByText(title, { selector: '.daisy-card-title .title-text' })
-
 const notebookNoteBySlugHref = /^\/d\/notebooks\/\d+\/notes\/[^?#]+$/
 const notebookNoteBySlugInUrl = /\/d\/notebooks\/\d+\/notes\/[^?#]+$/
 

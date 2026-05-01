@@ -46,12 +46,8 @@ export interface StoredApi {
 
   getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
 
-  loadNoteByAmbiguousBasename(basename: string): Promise<NoteRealm>
-
-  loadNoteByNotebookSlug(
-    notebookId: number,
-    slugPath: string
-  ): Promise<NoteRealm>
+  /** Loads a note realm into storage (same as navigating to the note-id route). */
+  loadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm>
 
   loadNotebookRootNotes(notebookId: number): Promise<FolderListing>
 
@@ -233,32 +229,8 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
-  async loadNoteByAmbiguousBasename(basename: string): Promise<NoteRealm> {
-    const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NoteController.showNoteByAmbiguousBasename({
-        path: { basename },
-      })
-    )
-    if (error || !noteRealm) {
-      throw new Error(toErrorMessage(error, "Failed to load note"))
-    }
-    return this.storage.refreshNoteRealm(noteRealm)
-  }
-
-  async loadNoteByNotebookSlug(
-    notebookId: number,
-    slugPath: string
-  ): Promise<NoteRealm> {
-    const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NotebookController.getNoteBySlug({
-        path: { notebook: notebookId },
-        query: { slugPath },
-      })
-    )
-    if (error || !noteRealm) {
-      throw new Error(toErrorMessage(error, "Failed to load note"))
-    }
-    return this.storage.refreshNoteRealm(noteRealm)
+  async loadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm> {
+    return this.loadNote(noteId)
   }
 
   async loadNotebookRootNotes(notebookId: number): Promise<FolderListing> {
