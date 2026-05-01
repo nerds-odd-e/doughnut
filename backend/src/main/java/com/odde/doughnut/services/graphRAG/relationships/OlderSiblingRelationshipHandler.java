@@ -9,9 +9,9 @@ public class OlderSiblingRelationshipHandler extends RelationshipHandler {
   private final List<Note> siblings;
   private int currentIndex;
 
-  public OlderSiblingRelationshipHandler(Note relatingNote) {
+  public OlderSiblingRelationshipHandler(Note relatingNote, List<Note> structuralPeers) {
     super(RelationshipToFocusNote.OlderSibling, relatingNote);
-    siblings = relatingNote.getSiblings();
+    siblings = structuralPeers;
     int focusIndex = siblings.indexOf(relatingNote);
     currentIndex = focusIndex - 1; // Start from newest prior sibling
   }

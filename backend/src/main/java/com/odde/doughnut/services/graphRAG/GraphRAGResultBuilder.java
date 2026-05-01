@@ -7,20 +7,26 @@ import java.util.Map;
 
 public class GraphRAGResultBuilder {
   private int remainingBudget;
-  private final Map<Note, BareNote> addedNotes = new HashMap<>();
+  private final Map<Integer, BareNote> addedNotesByNoteId = new HashMap<>();
   private final GraphRAGResult result;
   private final TokenCountingStrategy tokenCountingStrategy;
+  private final int focusNoteId;
 
   public GraphRAGResultBuilder(
       Note focusNote, int tokenBudget, TokenCountingStrategy tokenCountingStrategy) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     FocusNote focus = FocusNote.fromNote(focusNote);
     this.result = new GraphRAGResult(focus);
+    this.focusNoteId = focusNote.getId();
     this.remainingBudget = tokenBudget - tokenCountingStrategy.estimateTokens(focus);
   }
 
   public BareNote addNoteToRelatedNotes(Note note, RelationshipToFocusNote relationship) {
-    BareNote existingNote = addedNotes.get(note);
+    if (note.getId() == focusNoteId) {
+      return null;
+    }
+
+    BareNote existingNote = addedNotesByNoteId.get(note.getId());
     if (existingNote != null) {
       return existingNote;
     }
@@ -30,7 +36,7 @@ public class GraphRAGResultBuilder {
     if (tokens <= remainingBudget) {
       result.getRelatedNotes().add(bareNote);
       remainingBudget -= tokens;
-      addedNotes.put(note, bareNote);
+      addedNotesByNoteId.put(note.getId(), bareNote);
       return bareNote;
     }
     return null;

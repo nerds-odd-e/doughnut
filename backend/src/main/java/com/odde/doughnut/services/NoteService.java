@@ -57,6 +57,17 @@ public class NoteService {
     return noteRepository.findNotesInFolderOrderBySiblingOrder(folderId);
   }
 
+  /**
+   * Notes in the same structural scope as {@code note}: its folder, or notebook root when no
+   * folder.
+   */
+  public List<Note> findStructuralPeerNotesInOrder(Note note) {
+    if (note.getFolder() != null) {
+      return findNotesInFolderScope(note.getFolder().getId());
+    }
+    return findNotebookRootNotes(note.getNotebook().getId());
+  }
+
   public void destroy(Note note) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);

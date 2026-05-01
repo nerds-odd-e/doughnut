@@ -10,11 +10,14 @@ public abstract class SpiralSiblingRelationshipHandler extends RelationshipHandl
   private boolean isLeft = true; // Start with left side
 
   protected SpiralSiblingRelationshipHandler(
-      RelationshipToFocusNote relationship, Note relatingNote, Note parent) {
+      RelationshipToFocusNote relationship,
+      Note relatingNote,
+      Note anchorNote,
+      List<Note> structuralPeers) {
     super(relationship, relatingNote);
-    if (parent != null) {
-      this.siblings = parent.getSiblings();
-      this.parentIndex = siblings.indexOf(parent);
+    if (anchorNote != null && structuralPeers != null && !structuralPeers.isEmpty()) {
+      this.siblings = structuralPeers;
+      this.parentIndex = structuralPeers.indexOf(anchorNote);
     } else {
       this.siblings = List.of();
       this.parentIndex = -1;

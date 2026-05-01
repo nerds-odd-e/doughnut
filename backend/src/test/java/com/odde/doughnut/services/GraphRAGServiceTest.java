@@ -7,7 +7,9 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GraphRAGServiceTest {
   @Autowired private MakeMe makeMe;
   @Autowired private GraphRAGService graphRAGService;
+  @Autowired private NoteService noteService;
 
   // Helper methods for common test operations
   private List<BareNote> getNotesWithRelationship(
@@ -75,7 +78,10 @@ public class GraphRAGServiceTest {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
-      note = makeMe.aNote().under(parent).please();
+      Notebook notebook = parent.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("parent-child-peers").please();
+      parent = makeMe.theNote(parent).folder(peerFolder).please();
+      note = makeMe.aNote().under(parent).folder(peerFolder).please();
     }
 
     @Test
@@ -124,9 +130,21 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().title("Parent Note").please();
-      target = makeMe.aNote().title("Target Note").details("Target Details").please();
-      note = makeMe.aRelation().between(parent, target).please();
+      Note parentNote = makeMe.aNote().title("Parent Note").please();
+      Notebook notebook = parentNote.getNotebook();
+      Folder peerFolder =
+          makeMe.aFolder().notebook(notebook).name("target-relation-peers").please();
+      parentNote = makeMe.theNote(parentNote).folder(peerFolder).please();
+      target =
+          makeMe
+              .aNote()
+              .title("Target Note")
+              .details("Target Details")
+              .inNotebook(notebook)
+              .creator(parentNote.getCreator())
+              .folder(peerFolder)
+              .please();
+      note = makeMe.aRelation().between(parentNote, target).folder(peerFolder).please();
     }
 
     @Test
@@ -175,8 +193,8 @@ public class GraphRAGServiceTest {
       assertThat(result.getFocusNote().getTarget(), equalTo(target));
       assertThat(result.getFocusNote().getChildren(), contains(target.getUri()));
 
-      // But should appear only once in related notes
-      assertThat(result.getRelatedNotes(), hasSize(3)); // parent and child/target
+      // Parent plus target once (may be classified as RelationshipTarget and/or reached as child)
+      assertThat(result.getRelatedNotes(), hasSize(2));
     }
 
     @Nested
@@ -365,11 +383,26 @@ public class GraphRAGServiceTest {
     @BeforeEach
     void setup() {
       Note parent = makeMe.aNote().title("Parent Note").please();
-      focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
+      Notebook notebook = parent.getNotebook();
+      Folder peerFolder =
+          makeMe.aFolder().notebook(notebook).name("younger-sibling-peers").please();
+      focusNote = makeMe.aNote().under(parent).folder(peerFolder).title("Focus Note").please();
       youngerSibling1 =
-          makeMe.aNote().under(parent).title("Younger One").details("Sibling 1 Details").please();
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .title("Younger One")
+              .details("Sibling 1 Details")
+              .please();
       youngerSibling2 =
-          makeMe.aNote().under(parent).title("Younger Two").details("Sibling 2 Details").please();
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .title("Younger Two")
+              .details("Sibling 2 Details")
+              .please();
     }
 
     @Test
@@ -472,11 +505,25 @@ public class GraphRAGServiceTest {
     @BeforeEach
     void setup() {
       Note parent = makeMe.aNote().title("Parent Note").please();
+      Notebook notebook = parent.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("older-sibling-peers").please();
       olderSibling1 =
-          makeMe.aNote().under(parent).title("Prior One").details("Sibling 1 Details").please();
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .title("Prior One")
+              .details("Sibling 1 Details")
+              .please();
       olderSibling2 =
-          makeMe.aNote().under(parent).title("Prior Two").details("Sibling 2 Details").please();
-      focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .title("Prior Two")
+              .details("Sibling 2 Details")
+              .please();
+      focusNote = makeMe.aNote().under(parent).folder(peerFolder).title("Focus Note").please();
     }
 
     @Test
@@ -717,13 +764,19 @@ public class GraphRAGServiceTest {
     private Note parentSibling1;
     private Note parentSibling2;
     private Note focusNote;
+    private Folder peerFolder;
 
     @BeforeEach
     void setup() {
       Note grandParent = makeMe.aNote().title("Grand Parent").please();
-      Note parent = makeMe.aNote().under(grandParent).title("Parent").please();
-      parentSibling1 = makeMe.aNote().under(grandParent).title("Parent Sibling 1").please();
-      parentSibling2 = makeMe.aNote().under(grandParent).title("Parent Sibling 2").please();
+      Notebook notebook = grandParent.getNotebook();
+      peerFolder = makeMe.aFolder().notebook(notebook).name("parent-sibling-peers").please();
+      grandParent = makeMe.theNote(grandParent).folder(peerFolder).please();
+      Note parent = makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent").please();
+      parentSibling1 =
+          makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent Sibling 1").please();
+      parentSibling2 =
+          makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent Sibling 2").please();
       focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
     }
 
@@ -759,9 +812,12 @@ public class GraphRAGServiceTest {
 
       @BeforeEach
       void setup() {
-        parentSibling1Child1 = makeMe.aNote().under(parentSibling1).title("PS1 Child 1").please();
-        parentSibling1Child2 = makeMe.aNote().under(parentSibling1).title("PS1 Child 2").please();
-        parentSibling2Child1 = makeMe.aNote().under(parentSibling2).title("PS2 Child 1").please();
+        parentSibling1Child1 =
+            makeMe.aNote().under(parentSibling1).folder(peerFolder).title("PS1 Child 1").please();
+        parentSibling1Child2 =
+            makeMe.aNote().under(parentSibling1).folder(peerFolder).title("PS1 Child 2").please();
+        parentSibling2Child1 =
+            makeMe.aNote().under(parentSibling2).folder(peerFolder).title("PS2 Child 1").please();
       }
 
       @Test
@@ -801,11 +857,69 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
+  class WhenStructuralPeersUseFolderNotLegacyParentChildren {
+    @Test
+    void youngerAndOlderSiblingsIgnoreNoteThatSharesParentButNotFolder() {
+      Note parent = makeMe.aNote().title("Legacy parent").please();
+      Notebook notebook = parent.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("graph-folder-peers").please();
+      Note folderOlder =
+          makeMe.aNote().under(parent).folder(peerFolder).title("Folder older").please();
+      Note focus = makeMe.aNote().under(parent).folder(peerFolder).title("Focus").please();
+      Note folderYounger =
+          makeMe.aNote().under(parent).folder(peerFolder).title("Folder younger").please();
+      makeMe.aNote().under(parent).title("Tree only not in folder").please();
+
+      GraphRAGResult result = graphRAGService.retrieve(focus, 1000);
+
+      assertThat(result.getFocusNote().getOlderSiblings(), contains(folderOlder.getUri()));
+      assertThat(result.getFocusNote().getYoungerSiblings(), contains(folderYounger.getUri()));
+      assertRelatedNotesContain(result, RelationshipToFocusNote.YoungerSibling, folderYounger);
+      assertRelatedNotesContain(result, RelationshipToFocusNote.OlderSibling, folderOlder);
+
+      List<BareNote> youngerFromGraph =
+          getNotesWithRelationship(result, RelationshipToFocusNote.YoungerSibling);
+      assertThat(youngerFromGraph, hasSize(1));
+      assertThat(
+          youngerFromGraph.stream().map(BareNote::getUri).collect(Collectors.toList()),
+          contains(folderYounger.getUri()));
+    }
+  }
+
+  @Nested
+  class WhenStructuralPeersAreNotebookRootScope {
+    @Test
+    void youngerAndOlderSiblingsMatchNotebookRootFolderScopedOrdering() {
+      Note a = makeMe.aNote().title("Root A").please();
+      Notebook notebook = a.getNotebook();
+      var creator = a.getCreator();
+      Note b = makeMe.aNote().title("Root B").inNotebook(notebook).creator(creator).please();
+      Note c = makeMe.aNote().title("Root C").inNotebook(notebook).creator(creator).please();
+
+      List<Note> peersB = noteService.findStructuralPeerNotesInOrder(b);
+      int idx = peersB.indexOf(b);
+      List<String> expectedYounger =
+          peersB.subList(idx + 1, peersB.size()).stream().map(Note::getUri).toList();
+      GraphRAGResult resultMiddle = graphRAGService.retrieve(b, 1000);
+      assertThat(resultMiddle.getFocusNote().getYoungerSiblings(), equalTo(expectedYounger));
+
+      List<Note> peersC = noteService.findStructuralPeerNotesInOrder(c);
+      int cIdx = peersC.indexOf(c);
+      List<String> expectedOlder = peersC.subList(0, cIdx).stream().map(Note::getUri).toList();
+      GraphRAGResult resultLast = graphRAGService.retrieve(c, 1000);
+      assertThat(resultLast.getFocusNote().getOlderSiblings(), equalTo(expectedOlder));
+    }
+  }
+
+  @Nested
   class JsonSerialization {
     @Test
     void shouldIncludeRelatedNotesFieldInJson() throws Exception {
       Note note = makeMe.aNote().title("Test Note").please();
-      Note child = makeMe.aNote().under(note).title("Child Note").please();
+      Notebook notebook = note.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("json-serial-peers").please();
+      note = makeMe.theNote(note).folder(peerFolder).please();
+      Note child = makeMe.aNote().under(note).folder(peerFolder).title("Child Note").please();
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
@@ -880,7 +994,10 @@ public class GraphRAGServiceTest {
     void shouldTruncateASCIICharactersCorrectly() {
       String longDetails = "a".repeat(2000);
       Note note = makeMe.aNote().title("Test Note").details(longDetails).please();
-      Note child = makeMe.aNote().under(note).please();
+      Notebook notebook = note.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-peers").please();
+      note = makeMe.theNote(note).folder(peerFolder).please();
+      Note child = makeMe.aNote().under(note).folder(peerFolder).please();
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000);
 
@@ -895,7 +1012,10 @@ public class GraphRAGServiceTest {
       // Each CJK character takes 3 bytes in UTF-8
       String cjkText = "你好世界".repeat(500); // 2000 bytes (500 * 4 chars * 3 bytes)
       Note note = makeMe.aNote().title("Test Note").details(cjkText).please();
-      Note child = makeMe.aNote().under(note).please();
+      Notebook notebook = note.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-cjk-peers").please();
+      note = makeMe.theNote(note).folder(peerFolder).please();
+      Note child = makeMe.aNote().under(note).folder(peerFolder).please();
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000);
 
@@ -924,7 +1044,10 @@ public class GraphRAGServiceTest {
       // Mix of ASCII (1 byte) and CJK (3 bytes)
       String mixedText = "Hello你好World世界".repeat(200);
       Note note = makeMe.aNote().title("Test Note").details(mixedText).please();
-      Note child = makeMe.aNote().under(note).please();
+      Notebook notebook = note.getNotebook();
+      Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-mixed-peers").please();
+      note = makeMe.theNote(note).folder(peerFolder).please();
+      Note child = makeMe.aNote().under(note).folder(peerFolder).please();
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000);
 
