@@ -101,7 +101,8 @@ public class AdminDataMigrationBatchWorker {
                 relation.getDetails()));
       }
       wikiSlugPathService.assignSlugForNewNote(relation);
-      refreshWikiTitleCacheForRelationshipMigration(relation, adminUser);
+      User viewer = viewerForWikiTitleCacheRefresh(relation, adminUser);
+      refreshWikiTitleCacheForRelationshipMigration(relation, viewer);
       entityPersister.merge(relation);
       entityPersister.flush();
     }
@@ -159,9 +160,7 @@ public class AdminDataMigrationBatchWorker {
     }
     entityPersister.flush();
     for (Integer id : batchIds) {
-      Note note = noteRepository.findById(id).orElseThrow();
-      refreshWikiTitleCacheForLegacyMigration(note, adminUser);
-      entityPersister.flush();
+      refreshWikiTitleCacheForLegacyMigration(id, adminUser);
     }
     int lastId = batchIds.get(batchIds.size() - 1);
     wikiReferenceMigrationProgressService.recordBatchSuccess(step, lastId, batchIds.size());
@@ -188,30 +187,30 @@ public class AdminDataMigrationBatchWorker {
   }
 
   /**
-   * Clears stuck cache rows then retries once; fails the batch if the relationship step still
-   * cannot refresh.
+   * Clears stuck rows then retries once; JDBC avoids enqueueing {@link
+   * com.odde.doughnut.entities.NoteWikiTitleCache} on the migration session.
    */
-  private void refreshWikiTitleCacheForRelationshipMigration(Note note, User adminUser) {
-    User viewer = viewerForWikiTitleCacheRefresh(note, adminUser);
+  private void refreshWikiTitleCacheForRelationshipMigration(Note note, User viewer) {
     try {
-      wikiTitleCacheService.refreshForNote(note, viewer);
+      wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
     } catch (RuntimeException e) {
       jdbcTemplate.update("DELETE FROM note_wiki_title_cache WHERE note_id = ?", note.getId());
-      wikiTitleCacheService.refreshForNote(note, viewer);
+      wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
     }
   }
 
   /**
    * Best-effort refresh; cursor still advances so migration can finish even if cache stays empty.
    */
-  private void refreshWikiTitleCacheForLegacyMigration(Note note, User adminUser) {
+  private void refreshWikiTitleCacheForLegacyMigration(int noteId, User adminUser) {
+    Note note = noteRepository.findById(noteId).orElseThrow();
     User viewer = viewerForWikiTitleCacheRefresh(note, adminUser);
     try {
-      wikiTitleCacheService.refreshForNote(note, viewer);
+      wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
     } catch (RuntimeException e) {
-      jdbcTemplate.update("DELETE FROM note_wiki_title_cache WHERE note_id = ?", note.getId());
+      jdbcTemplate.update("DELETE FROM note_wiki_title_cache WHERE note_id = ?", noteId);
       try {
-        wikiTitleCacheService.refreshForNote(note, viewer);
+        wikiTitleCacheService.replaceWikiTitleCacheRowsJdbc(note, viewer);
       } catch (RuntimeException ignored) {
         // Cache can be rebuilt when the note is loaded in the app.
       }
