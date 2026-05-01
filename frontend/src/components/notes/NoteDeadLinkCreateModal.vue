@@ -2,8 +2,8 @@
   <Modal v-if="modelValue !== null" @close_request="close">
     <template #body>
       <NoteNewDialog
-        :reference-note="referenceNote"
-        :insert-mode="insertMode"
+        :notebook-root-notebook-id="notebookId"
+        :target-folder-id="folderId ?? undefined"
         :initial-title="modelValue"
         @close-dialog="close"
       />
@@ -12,14 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
-import type { InsertMode } from "@/models/InsertMode"
 import Modal from "@/components/commons/Modal.vue"
 import NoteNewDialog from "./NoteNewDialog.vue"
 
 defineProps<{
-  referenceNote: Note
-  insertMode: InsertMode
+  notebookId: number
+  folderId?: number | null
   modelValue: string | null
 }>()
 

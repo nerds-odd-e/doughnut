@@ -3878,6 +3878,9 @@ components:
           format: int32
         notebookName:
           type: string
+        folderId:
+          type: integer
+          format: int32
       required:
       - id
       - notebookId

@@ -27,6 +27,9 @@ public class NoteTopology {
 
   private String notebookName;
 
+  /** Present when the note is assigned to a folder (folder-first containment). */
+  private Integer folderId;
+
   public int getId() {
     return this.id;
   }

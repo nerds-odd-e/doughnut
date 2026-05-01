@@ -34,7 +34,6 @@ Feature: Wiki links in notes
       | a   | WikiCross Tgt NB:WikiCross Deep    |
     And the link "WikiCross Tgt NB:WikiCross Deep" should open the note titled "WikiCross Deep"
 
-  @ignore
   Scenario: A dead wiki link is shown and can create the missing note
     When I update note "WikiLinks E2E CI" details using markdown to become:
       """

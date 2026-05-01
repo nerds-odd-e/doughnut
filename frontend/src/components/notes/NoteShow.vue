@@ -88,10 +88,8 @@
 
           <NoteDeadLinkCreateModal
             v-model="pendingDeadLinkTitle"
-            :reference-note="noteRealm.note"
-            :insert-mode="
-              isNotebookIndexRootNote(noteRealm) ? 'as-child' : 'after'
-            "
+            :notebook-id="noteRealm.notebookId"
+            :folder-id="noteRealm.note.noteTopology.folderId ?? undefined"
           />
         </template>
       </template>
@@ -140,11 +138,6 @@ const onNoteAccessoryUpdated = () => {
   reloadKey.value += 1
 }
 const asMarkdown = ref(false)
-
-function isNotebookIndexRootNote(noteRealm: NoteRealm): boolean {
-  const t = noteRealm.note.noteTopology
-  return t.slug === "index" && !t.parentOrSubjectNoteTopology
-}
 
 const toLocalDateString = (date: string) => new Date(date).toLocaleDateString()
 </script>

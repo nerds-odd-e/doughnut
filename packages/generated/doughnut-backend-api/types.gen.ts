@@ -248,6 +248,7 @@ export type NoteTopology = {
     parentOrSubjectNoteTopology?: NoteTopology;
     notebookId: number;
     notebookName?: string;
+    folderId?: number;
 };
 
 export type WikiTitle = {
