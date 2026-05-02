@@ -28,8 +28,7 @@ public final class RelationshipNoteMarkdownFormatter {
 
   /**
    * Reads {@code relation:} from relationship-note frontmatter. Empty when not a relationship note,
-   * no {@code relation} line, or unknown kebab (callers should fall back to {@link
-   * com.odde.doughnut.entities.Note#getRelationType()}).
+   * no {@code relation} line, or unknown kebab.
    */
   public static Optional<RelationType> parseRelationTypeFromRelationshipNoteDetails(
       String details) {
@@ -41,12 +40,9 @@ public final class RelationshipNoteMarkdownFormatter {
                     .flatMap(RelationshipNoteMarkdownFormatter::relationTypeFromKebab));
   }
 
-  /**
-   * Frontmatter-first relation type read; falls back to the persisted {@code relation_type} column.
-   */
+  /** Resolves relation type from relationship-note details frontmatter only. */
   public static RelationType relationTypeForRelationNoteRead(Note note) {
-    return parseRelationTypeFromRelationshipNoteDetails(note.getDetails())
-        .orElse(note.getRelationType());
+    return parseRelationTypeFromRelationshipNoteDetails(note.getDetails()).orElse(null);
   }
 
   public static String extractUserSuffixFromRelationshipDetails(String details) {

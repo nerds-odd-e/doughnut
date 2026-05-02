@@ -11,7 +11,6 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.entities.converters.RelationTypeConverter;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +26,7 @@ import org.springframework.lang.NonNull;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"noteTopology", "details", "parentId", "relationType", "updatedAt"})
+@JsonPropertyOrder({"noteTopology", "details", "parentId", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -126,11 +125,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private Note parent;
 
-  @Convert(converter = RelationTypeConverter.class)
-  @Column(name = "relation_type")
-  @JsonIgnore
-  private RelationType relationType;
-
   @OneToMany(mappedBy = "note")
   @Getter
   @JsonIgnore
@@ -182,16 +176,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isDetailsBlank() {
     return new HtmlOrMarkdown(getDetails()).isBlank();
-  }
-
-  @JsonIgnore
-  public RelationType getRelationType() {
-    return relationType;
-  }
-
-  @JsonIgnore
-  public void setRelationType(RelationType relationType) {
-    this.relationType = relationType;
   }
 
   @JsonIgnore

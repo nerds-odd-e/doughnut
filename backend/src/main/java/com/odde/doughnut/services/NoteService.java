@@ -247,32 +247,24 @@ public class NoteService {
   }
 
   /**
-   * Rebuilds title and relationship markdown from the current relation type. Prefers the persisted
-   * {@code relation_type} when set so an API relation update wins over stale frontmatter until
-   * details are rewritten; otherwise falls back to parsing {@code relation:} from details.
+   * Rebuilds title and relationship markdown from {@code relationType} (from the API on update, or
+   * the type chosen at creation).
    */
-  public void refreshRelationshipNoteTitle(Note relation) {
-    RelationType type =
-        Optional.ofNullable(relation.getRelationType())
-            .or(
-                () ->
-                    RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(
-                        relation.getDetails()))
-            .orElse(null);
-    if (type == null) {
+  public void refreshRelationshipNoteTitle(Note relation, RelationType relationType) {
+    if (relationType == null) {
       return;
     }
     Note source = relation.getParent();
     Note target = relation.getTargetNote();
     relation.setTitle(
-        RelationshipNoteTitleFormatter.format(source.getTitle(), type.label, target.getTitle()));
+        RelationshipNoteTitleFormatter.format(
+            source.getTitle(), relationType.label, target.getTitle()));
     String preserved =
         RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
             relation.getDetails());
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, type, source, target, preserved));
-    relation.setRelationType(type);
+            relation, relationType, source, target, preserved));
     relation.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
   }
 
@@ -285,7 +277,6 @@ public class NoteService {
     final Note note = new Note();
     note.initialize(creator, sourceNote, currentUTCTimestamp, null);
     note.setTargetNote(targetNote);
-    note.setRelationType(type);
     note.getRecallSetting()
         .setLevel(
             Math.max(

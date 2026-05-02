@@ -58,7 +58,7 @@ public class BareNote {
   public com.odde.doughnut.entities.RelationType getRelationType() {
     return note.isRelation()
         ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
-        : note.getRelationType();
+        : null;
   }
 
   @JsonProperty("target")

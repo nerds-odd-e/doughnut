@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import java.sql.Timestamp;
@@ -101,7 +102,7 @@ class NoteRealmServiceTest {
     Note relation = makeMe.aRelation().between(subject, focal).please();
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, relation.getRelationType(), subject, focal, null));
+            relation, RelationType.SPECIALIZE, subject, focal, null));
     makeMe.entityPersister.merge(relation);
     makeMe.entityPersister.flush();
     wikiTitleCacheService.refreshForNote(relation, user);
@@ -173,7 +174,7 @@ class NoteRealmServiceTest {
     Note relation = makeMe.aRelation().between(subject, focal).please();
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, relation.getRelationType(), subject, focal, null));
+            relation, RelationType.SPECIALIZE, subject, focal, null));
     makeMe.entityPersister.merge(relation);
     makeMe.entityPersister.flush();
     wikiTitleCacheService.refreshForNote(relation, user);

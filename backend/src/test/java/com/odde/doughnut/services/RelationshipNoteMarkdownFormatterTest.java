@@ -101,10 +101,9 @@ class RelationshipNoteMarkdownFormatterTest {
   }
 
   @Test
-  void relationTypeForRelationNoteRead_prefers_frontmatter_over_persisted_column() {
+  void relationTypeForRelationNoteRead_reads_relation_from_details() {
     Note relation = new Note();
     relation.setTargetNote(new Note());
-    relation.setRelationType(RelationType.RELATED_TO);
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.format(RelationType.PART, "A", "B", null));
     assertThat(

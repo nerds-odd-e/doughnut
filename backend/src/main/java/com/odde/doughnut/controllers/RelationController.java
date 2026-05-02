@@ -64,8 +64,7 @@ class RelationController {
       @RequestBody RelationshipCreation relationshipCreation)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(relation);
-    relation.setRelationType(relationshipCreation.relationType);
-    noteService.refreshRelationshipNoteTitle(relation);
+    noteService.refreshRelationshipNoteTitle(relation, relationshipCreation.relationType);
     entityPersister.save(relation);
     User user = authorizationService.getCurrentUser();
     wikiTitleCacheService.refreshForNote(relation, user);
