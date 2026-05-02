@@ -9,11 +9,11 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid Doughnut Access Token with label "For MCP services"
     And I connect to an MCP client that connects to Doughnut MCP service
     And I have a notebook "CS concepts" with a note "Programming Concepts" and notes:
-      | Title           | Parent Title         | Folder                              |
-      | Object Oriented | Programming Concepts | Programming Concepts                |
-      | Functional      | Programming Concepts | Programming Concepts                |
-      | Classes         | Object Oriented      | Programming Concepts/Object Oriented |
-      | Inheritance     | Object Oriented      | Programming Concepts/Object Oriented |
+      | Title           | Folder                               |
+      | Object Oriented | Programming Concepts                  |
+      | Functional      | Programming Concepts                  |
+      | Classes         | Programming Concepts/Object Oriented  |
+      | Inheritance     | Programming Concepts/Object Oriented |
 
   Scenario: Adding note to a known parent note
     When AI agent adds note via MCP tool to add note "Procedural" under "Programming Concepts"

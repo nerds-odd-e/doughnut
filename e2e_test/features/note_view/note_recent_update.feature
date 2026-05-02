@@ -6,12 +6,12 @@ Feature: see recent note update
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And I have a notebook "World atlas" with a note "World" and notes:
-      | Title   | Parent Title | Details           |
-      | Germany | World        |                   |
-      | Japan   | World        |                   |
-      | Berlin  | Germany      | Berlin has a wall |
-      | Munich  | Germany      | Munich has beer   |
-      | Italy   | World        |                   |
+      | Title   | Folder        | Details           |
+      | Germany | World         |                   |
+      | Japan   | World         |                   |
+      | Berlin  | World/Germany | Berlin has a wall |
+      | Munich  | World/Germany | Munich has beer   |
+      | Italy   | World         |                   |
     And I let the server to time travel to 24 hours ago
 
   Scenario Outline: I should see the color of a newer note is fresher

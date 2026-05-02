@@ -11,8 +11,8 @@ Feature: Note creation should have details if wikidata is a person
     And Wikidata.org entity "Q706446" is a person from "Q22502" and birthday is "+1980-03-31T00:00:00Z"
     And Wikidata.org entity "Q4604" is a person from "Q736936" and birthday is "-0552-10-09T00:00:00Z"
     And I have a notebook "Notable people" with a note "People" and notes:
-      | Title  | Parent Title | Wikidata Id | Folder |
-      | Taiwan | People       | Q22502      | People |
+      | Title  | Wikidata Id | Folder |
+      | Taiwan | Q22502      | People |
 
   @usingMockedWikidataService
   Scenario Outline: Create a note for a person with wikidata should auto fill the details

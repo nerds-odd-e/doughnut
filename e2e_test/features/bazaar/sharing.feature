@@ -7,9 +7,9 @@ Feature: Bazaar sharing
 
   Scenario: Contributing To Bazaar
     Given I have a notebook "Geometry set" with a note "Shape" and notes:
-      | Title    | Details                   | Parent Title |
-      | Square   | four equal straight sides | Shape        |
-      | Triangle | three sides shape         | Shape        |
+      | Title    | Details                   |
+      | Square   | four equal straight sides |
+      | Triangle | three sides shape         |
     When I choose to share my notebook "Geometry set"
     Then I should see "Geometry set" shared in the Bazaar
 

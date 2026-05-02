@@ -184,6 +184,13 @@ class TestabilityRestController {
           note.setParentNote(getParentNote(titleNoteMap, noteRepository, injection.parentTitle));
           continue;
         }
+        Optional<String> inferredParentTitle =
+            implicitStructuralParentTitleFromNotebookLocalFolderPath(injection.getFolder());
+        if (inferredParentTitle.isPresent()) {
+          note.setParentNote(
+              getParentNote(titleNoteMap, noteRepository, inferredParentTitle.get()));
+          continue;
+        }
         if (notebookFromRepositoryOrNull != null) {
           note.initializeAsNotebookRoot(
               notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
@@ -214,6 +221,21 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap, EntityPersister entityPersister) {
       noteTestData.forEach(inject -> entityPersister.save(titleNoteMap.get(inject.title)));
     }
+  }
+
+  private static Optional<String> implicitStructuralParentTitleFromNotebookLocalFolderPath(
+      String folderPath) {
+    if (Strings.isBlank(folderPath)) {
+      return Optional.empty();
+    }
+    String lastNonEmptySegment = null;
+    for (String raw : folderPath.split("/")) {
+      String trimmed = raw.trim();
+      if (!trimmed.isEmpty()) {
+        lastNonEmptySegment = trimmed;
+      }
+    }
+    return Optional.ofNullable(lastNonEmptySegment);
   }
 
   private void applyExplicitFolderPlacements(

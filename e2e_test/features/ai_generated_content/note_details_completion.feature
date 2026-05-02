@@ -5,9 +5,9 @@ Feature: Note details completion
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Taiwan primer" with a note "Taiwan" and notes:
-      | Title   | Details    | Parent Title |
-      | Taipei  | It is a    | Taiwan       |
-      | Weather | It rains a | Taipei       |
+      | Title   | Folder       | Details    |
+      | Taipei  | Taiwan       | It is a    |
+      | Weather | Taiwan/Taipei | It rains a |
 
   Scenario: OpenAI Service Unavailability
     Given the OpenAI service is unavailable due to invalid system token

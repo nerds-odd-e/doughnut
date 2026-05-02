@@ -4,13 +4,13 @@ Feature: Note tree view
   Background:
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
-      | Title | Parent Title | Folder                 |
-      | TDD   |              | LeSS in Action         |
-      | ATDD  |              | LeSS in Action         |
-      | CI    |              | LeSS in Action         |
-      | TPP   | TDD            | LeSS in Action/TDD     |
-      | Const | TPP            | LeSS in Action/TDD/TPP |
-      | Pull  | ATDD           | LeSS in Action/ATDD    |
+      | Title | Folder                 |
+      | TDD   | LeSS in Action         |
+      | ATDD  | LeSS in Action         |
+      | CI    | LeSS in Action         |
+      | TPP   | LeSS in Action/TDD     |
+      | Const | LeSS in Action/TDD/TPP |
+      | Pull  | LeSS in Action/ATDD    |
 
   Scenario: expand side bar to see the note tree
     Given I am on a window 500 * 500

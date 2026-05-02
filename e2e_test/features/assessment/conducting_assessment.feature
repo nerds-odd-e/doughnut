@@ -5,10 +5,10 @@ Feature: Conducting assessment
   Background:
     Given I am logged in as an existing user
     And I have a notebook "World facts" with a note "Countries" and notes:
-      | Title     | Parent Title |
-      | Singapore | Countries    |
-      | Vietnam   | Countries    |
-      | Japan     | Countries    |
+      | Title     |
+      | Singapore |
+      | Vietnam   |
+      | Japan     |
     And notebook "World facts" is shared to the Bazaar
     And there are questions in the notebook "World facts" for the note:
       | Note Title | Question                           | Answer | One Wrong Choice | Approved |

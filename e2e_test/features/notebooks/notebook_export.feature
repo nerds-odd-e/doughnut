@@ -3,10 +3,10 @@ Feature: Notebook export for Obsidian
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Export home" with a note "Index" and notes:
-      | Title        | Details         | Parent Title |
-      | Parent Note  | Parent Content  | Index        |
-      | Child Note   | Child Content   | Parent Note  |
-      | Leaf Note    | Leaf Content    | Parent Note  |
+      | Title       | Details        | Folder          |
+      | Parent Note | Parent Content | Index           |
+      | Child Note  | Child Content  | Index/Parent Note |
+      | Leaf Note   | Leaf Content   | Index/Parent Note |
 
   Scenario: Export notebook as a hierarchical zip file for Obsidian
     When I export notebook "Export home" to Obsidian markdown zip file

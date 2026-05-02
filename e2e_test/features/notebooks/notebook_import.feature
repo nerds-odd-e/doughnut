@@ -11,8 +11,8 @@ Feature: Notebook Import
 
   Scenario: Import zip from Obsidian with one new child
     Given  I have a notebook "Import fixture" with a note "title 1" and notes:
-      | Title   | Details | Parent Title |
-      | note 1  |         | title 1      |
+      | Title   | Details | Folder |
+      | note 1  |         | title 1 |
     When I Import Obsidian data "import-one-child.zip" to note "title 1"
     Then I should see folder "Import fixture/title 1/note 1" containing these notes:
       | note-title |
@@ -21,9 +21,9 @@ Feature: Notebook Import
 
   Scenario: Import zip from Obsidian with two nested new child
     Given I have a notebook "Import fixture" with a note "title 1" and notes:
-      | Title   | Details | Parent Title |
-      | note 1  |         | title 1      |
-      | note 2  |         | note 1       |
+      | Title   | Details | Folder           |
+      | note 1  |         | title 1           |
+      | note 2  |         | title 1/note 1    |
     When I Import Obsidian data "import-two-layer.zip" to note "title 1"
     Then I should see folder "Import fixture/title 1/note 1/note 2" containing these notes:
       | note-title |
@@ -33,9 +33,9 @@ Feature: Notebook Import
 
   Scenario: Import zip from Obsidian with two nested new child
     Given I have a notebook "Import fixture" with a note "title 1" and notes:
-      | Title   | Details | Parent Title |
-      | note 1  |         | title 1      |
-      | note 2  |         | note 1       |
+      | Title   | Details | Folder           |
+      | note 1  |         | title 1           |
+      | note 2  |         | title 1/note 1    |
     When I Import Obsidian data "import-multiple-layer.zip" to note "title 1"
     Then I should see folder "Import fixture/title 1/note 1/note 2" containing these notes:
       | note-title |

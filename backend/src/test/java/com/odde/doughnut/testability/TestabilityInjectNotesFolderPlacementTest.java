@@ -34,9 +34,9 @@ class TestabilityInjectNotesFolderPlacementTest {
 
     List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
     rows.add(row("LeSS in Action", null, null));
-    rows.add(row("TDD", "LeSS in Action", null));
-    rows.add(row("TPP", "TDD", null));
-    rows.add(row("Const", "TPP", "LeSS in Action/TPP"));
+    rows.add(row("TDD", null, "LeSS in Action"));
+    rows.add(row("TPP", null, "LeSS in Action/TDD"));
+    rows.add(row("Const", null, "LeSS in Action/TPP"));
     rows.add(row("NoFolderChild", "TDD", null));
 
     data.setNoteTestData(rows);

@@ -3,11 +3,11 @@ Feature: Note deletion
   Background:
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
-      | Title     | Parent Title   | Folder               |
-      | team      | LeSS in Action | LeSS in Action       |
-      | tech      | LeSS in Action | LeSS in Action       |
-      | TDD       | tech           | LeSS in Action/tech  |
-      | CI System | tech           | LeSS in Action/tech  |
+      | Title     | Folder               |
+      | team      | LeSS in Action       |
+      | tech      | LeSS in Action       |
+      | TDD       | LeSS in Action/tech  |
+      | CI System | LeSS in Action/tech  |
 
   Scenario: Delete a note
     When I delete note "TDD"
@@ -40,10 +40,10 @@ Feature: Note deletion
   @ignore
   Scenario: Delete a note will delete its descendants
     Given I have a notebook "Descendants suite" with a note "Descendants Test" and notes:
-      | Title     | Parent Title     | Folder                            |
-      | parent    | Descendants Test | Descendants Test                  |
-      | child     | parent           | Descendants Test/parent           |
-      | Unit Test | child            | Descendants Test/parent/child     |
+      | Title     | Folder                        |
+      | parent    | Descendants Test               |
+      | child     | Descendants Test/parent        |
+      | Unit Test | Descendants Test/parent/child  |
     When I delete note "child"
     Then I should see the note "child" is marked as deleted
     And I should see the note "Unit Test" is marked as deleted
@@ -52,9 +52,9 @@ Feature: Note deletion
 
   Scenario: Delete a note will delete its references
     Given I have a notebook "References suite" with a note "References Test" and notes:
-      | Title  | Parent Title     | Folder          |
-      | source | References Test  | References Test |
-      | target | References Test  | References Test |
+      | Title  | Folder          |
+      | source | References Test |
+      | target | References Test |
     And there is "a part of" relationship between note "source" and "target"
     And I should see "source" has relationship "a part of" "target"
     When I delete note "target"

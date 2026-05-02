@@ -5,8 +5,8 @@ Feature: Nested Note Create with wikidata
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Wildlife notes" with a note "Animals" and notes:
-      | Title | Parent Title | Folder  |
-      | keep  | Animals      | Animals |
+      | Title | Folder  |
+      | keep  | Animals |
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
@@ -31,7 +31,7 @@ Feature: Nested Note Create with wikidata
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with duplicate wikidata id within the same notebook
     Given I have a notebook "Stargazing" with a note "Star" and notes:
-      | Title | Wikidata Id | Parent Title | Folder |
-      | Sun   | Q123        | Star         | Star   |
+      | Title | Wikidata Id | Folder |
+      | Sun   | Q123        | Star   |
     When I attempt to create a note belonging to "Star" with title "Solar" and wikidata id "Q123"
     Then I should see an error "Duplicate Wikidata ID Detected." on Wikidata Id in note creation
