@@ -12,14 +12,8 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
@@ -80,57 +74,9 @@ public class NoteService {
   public void destroy(Note note) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
-
-    List<Note> cluster = collectSoftDeleteCluster(note);
-    for (Note member : cluster) {
-      member.setUpdatedAt(currentUTCTimestamp);
-      member.setDeletedAt(currentUTCTimestamp);
-      entityPersister.merge(member);
-    }
-
-    List<Note> inboundReferences = new ArrayList<>();
-    for (Note member : cluster) {
-      inboundReferences.addAll(noteRepository.findAllByTargetNote(member.getId()));
-    }
-    for (Note reference : inboundReferences) {
-      reference.setDeletedAt(currentUTCTimestamp);
-      entityPersister.merge(reference);
-    }
-
-    softDeleteMemoryTrackersForNotes(collectNoteIdsForDeletion(cluster));
-  }
-
-  /**
-   * Notes soft-deleted with {@code root}: {@code root} plus relationship carriers reachable from
-   * {@code root} through successive {@link Note#isRelation()} children only (not structural
-   * note-tree containment).
-   */
-  private List<Note> collectSoftDeleteCluster(Note root) {
-    List<Note> out = new ArrayList<>();
-    Set<Integer> seen = new HashSet<>();
-    Deque<Note> q = new ArrayDeque<>();
-    q.add(root);
-    seen.add(root.getId());
-    while (!q.isEmpty()) {
-      Note n = q.removeFirst();
-      out.add(n);
-      for (Note child : noteRepository.findAllByParentId(n.getId())) {
-        if (!child.isRelation() || !seen.add(child.getId())) {
-          continue;
-        }
-        q.add(child);
-      }
-    }
-    return out;
-  }
-
-  private List<Integer> collectNoteIdsForDeletion(List<Note> cluster) {
-    Set<Integer> noteIds = new LinkedHashSet<>();
-    for (Note member : cluster) {
-      noteIds.add(member.getId());
-      noteRepository.findAllByTargetNote(member.getId()).forEach(r -> noteIds.add(r.getId()));
-    }
-    return new ArrayList<>(noteIds);
+    note.setDeletedAt(currentUTCTimestamp);
+    entityPersister.merge(note);
+    softDeleteMemoryTrackersForNotes(List.of(note.getId()));
   }
 
   private void softDeleteMemoryTrackersForNotes(List<Integer> noteIds) {
@@ -145,58 +91,10 @@ public class NoteService {
   public void restore(Note note) {
     Timestamp deletedAt = note.getDeletedAt();
     if (deletedAt != null) {
-      List<Integer> noteIdsToRestore = collectNoteIdsToRestore(note, deletedAt);
-      restoreMemoryTrackersForNotes(noteIdsToRestore, deletedAt);
-
-      // Restore all descendants that were deleted at the same time (cascaded deletion)
-      restoreDescendantsRecursively(note, deletedAt);
-
-      // Restore all inbound references that were deleted at the same time
-      List<Note> inboundReferences = noteRepository.findAllByTargetNote(note.getId());
-      for (Note reference : inboundReferences) {
-        if (deletedAt.equals(reference.getDeletedAt())) {
-          reference.setDeletedAt(null);
-          entityPersister.merge(reference);
-        }
-      }
-
-      // Restore all inbound references to descendants that were deleted at the same time
-      restoreDescendantReferencesRecursively(note, deletedAt);
+      restoreMemoryTrackersForNotes(List.of(note.getId()), deletedAt);
     }
-
     note.setDeletedAt(null);
     entityPersister.merge(note);
-  }
-
-  private List<Integer> collectNoteIdsToRestore(Note note, Timestamp deletedAt) {
-    Set<Integer> noteIds = new LinkedHashSet<>();
-    collectNoteIdsToRestoreInto(noteIds, note, deletedAt);
-    return new ArrayList<>(noteIds);
-  }
-
-  private void collectNoteIdsToRestoreInto(Set<Integer> noteIds, Note note, Timestamp deletedAt) {
-    if (!deletedAt.equals(note.getDeletedAt())) {
-      return;
-    }
-    Set<Integer> visited = new HashSet<>();
-    Deque<Note> q = new ArrayDeque<>();
-    q.add(note);
-    visited.add(note.getId());
-    while (!q.isEmpty()) {
-      Note n = q.removeFirst();
-      noteIds.add(n.getId());
-      noteRepository.findAllByTargetNote(n.getId()).stream()
-          .filter(r -> deletedAt.equals(r.getDeletedAt()))
-          .forEach(r -> noteIds.add(r.getId()));
-      for (Note child : noteRepository.findAllByParentId(n.getId())) {
-        if (!deletedAt.equals(child.getDeletedAt()) || !child.isRelation()) {
-          continue;
-        }
-        if (visited.add(child.getId())) {
-          q.add(child);
-        }
-      }
-    }
   }
 
   private void restoreMemoryTrackersForNotes(List<Integer> noteIds, Timestamp deletedAt) {
@@ -212,48 +110,6 @@ public class NoteService {
   private boolean sameTimestamp(Timestamp a, Timestamp b) {
     if (a == null || b == null) return a == b;
     return Math.abs(a.getTime() - b.getTime()) < 1000;
-  }
-
-  private void restoreDescendantsRecursively(Note note, Timestamp deletedAt) {
-    Deque<Note> q = new ArrayDeque<>();
-    for (Note child : noteRepository.findAllByParentId(note.getId())) {
-      if (deletedAt.equals(child.getDeletedAt()) && child.isRelation()) {
-        q.add(child);
-      }
-    }
-    while (!q.isEmpty()) {
-      Note n = q.removeFirst();
-      n.setDeletedAt(null);
-      entityPersister.merge(n);
-      for (Note child : noteRepository.findAllByParentId(n.getId())) {
-        if (deletedAt.equals(child.getDeletedAt()) && child.isRelation()) {
-          q.add(child);
-        }
-      }
-    }
-  }
-
-  private void restoreDescendantReferencesRecursively(Note note, Timestamp deletedAt) {
-    Deque<Note> q = new ArrayDeque<>();
-    for (Note child : noteRepository.findAllByParentId(note.getId())) {
-      if (deletedAt.equals(child.getDeletedAt()) && child.isRelation()) {
-        q.add(child);
-      }
-    }
-    while (!q.isEmpty()) {
-      Note n = q.removeFirst();
-      for (Note reference : noteRepository.findAllByTargetNote(n.getId())) {
-        if (deletedAt.equals(reference.getDeletedAt())) {
-          reference.setDeletedAt(null);
-          entityPersister.merge(reference);
-        }
-      }
-      for (Note child : noteRepository.findAllByParentId(n.getId())) {
-        if (deletedAt.equals(child.getDeletedAt()) && child.isRelation()) {
-          q.add(child);
-        }
-      }
-    }
   }
 
   public boolean hasDuplicateWikidataId(Note note) {

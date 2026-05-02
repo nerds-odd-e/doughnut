@@ -14,7 +14,7 @@ Feature: Note deletion
     When I delete note "TDD"
     Then I should see the note "TDD" is marked as deleted
 
-  Scenario: Delete a note will delete its relationships
+  Scenario: Deleting a note leaves folder peers; undo restores relationships
     Given there is "a part of" relationship between note "TDD" and "tech"
     And I should see "TDD" has relationship "a part of" "tech"
     When I delete note "TDD"
@@ -51,7 +51,7 @@ Feature: Note deletion
       | note-title |
       | Unit Test  |
 
-  Scenario: Delete a note will delete its references
+  Scenario: Deleting a note leaves inbound relationship notes and folder peers
     Given I have a notebook "References suite" with notes:
       | Title  | Folder          |
       | References Test | |
@@ -64,3 +64,4 @@ Feature: Note deletion
     Then I should see folder "References suite/References Test" containing these notes:
       | note-title |
       | source     |
+    And I should see note "References suite/References Test/source" has relationship "a part of" "target"

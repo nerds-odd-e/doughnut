@@ -62,7 +62,7 @@ public class NoteServiceTest {
     }
 
     @Test
-    void shouldCascadeSoftDeleteToOutgoingRelationshipNotes() {
+    void shouldNotCascadeSoftDeleteToOutgoingRelationshipNotes() {
       Note subject = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
       Note target = makeMe.aNote().creatorAndOwner(subject.getCreator()).please();
       Note relation = makeMe.aRelation().between(subject, target).please();
@@ -70,7 +70,7 @@ public class NoteServiceTest {
       noteService.destroy(subject);
 
       assertThat(subject.getDeletedAt(), notNullValue());
-      assertThat(relation.getDeletedAt(), notNullValue());
+      assertThat(relation.getDeletedAt(), nullValue());
     }
   }
 

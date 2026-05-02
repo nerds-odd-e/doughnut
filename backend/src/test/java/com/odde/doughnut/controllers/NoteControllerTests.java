@@ -320,7 +320,8 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldDeleteRelationshipsWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
+    void shouldNotSoftDeleteOutgoingRelationshipNotesWhenSubjectIsDeleted()
+        throws UnexpectedNoAccessRightException {
       Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
       Note relation = makeMe.aRelation().between(subject, targetNote).please();
       makeMe.refresh(subject);
@@ -328,11 +329,12 @@ class NoteControllerTests extends ControllerTestBase {
       controller.deleteNote(subject);
 
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(relation.getDeletedAt(), is(not(nullValue())));
+      assertThat(relation.getDeletedAt(), is(nullValue()));
     }
 
     @Test
-    void shouldDeleteReferencesWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
+    void shouldNotSoftDeleteInboundRelationshipNotesWhenFocalNoteIsDeleted()
+        throws UnexpectedNoAccessRightException {
       Note sourceNote = makeMe.aNote("source").creatorAndOwner(currentUser.getUser()).please();
       Note reference = makeMe.aRelation().between(sourceNote, subject).please();
       makeMe.refresh(subject);
@@ -340,7 +342,7 @@ class NoteControllerTests extends ControllerTestBase {
       controller.deleteNote(subject);
 
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(reference.getDeletedAt(), is(not(nullValue())));
+      assertThat(reference.getDeletedAt(), is(nullValue()));
     }
 
     @Test
