@@ -32,17 +32,6 @@ When(
 )
 
 When(
-  'I add relationship from top level note {string} as {string} to note {string}',
-  (fromNoteTopic: string, relationType: string, toNoteTopic: string) => {
-    start
-      .jumpToNotePage(fromNoteTopic)
-      .startSearchingAndAddRelationship()
-      .findTarget(toNoteTopic)
-      .createRelationshipToTopLevelNoteAs(toNoteTopic, relationType)
-  }
-)
-
-When(
   'I open the relationship from {string} to {string}',
   (sourceNoteTopology: string, targetTitle: string) => {
     start

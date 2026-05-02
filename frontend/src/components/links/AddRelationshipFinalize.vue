@@ -31,10 +31,8 @@ import type { NoteTopology } from "@generated/doughnut-backend-api"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "lucide-vue-next"
-import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
@@ -58,16 +56,6 @@ const relationshipFormErrors = ref({
 const relationTypeSelected = async (
   relationType: RelationshipCreation["relationType"]
 ) => {
-  if (props.note.noteTopology.parentOrSubjectNoteTopology == null) {
-    if (
-      !(await popups.confirm(
-        `"${props.note.noteTopology.title}" is a top level notebook. Do you want to move it under other notebook?`
-      ))
-    ) {
-      return
-    }
-  }
-
   try {
     if (relationType !== undefined) {
       await storageAccessor.value

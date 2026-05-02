@@ -26,8 +26,8 @@ Feature: add relationship
 
   @mockBrowserTime
   Scenario: creating relationship
-    When I add relationship from top level note "Sedition" as "similar to" to note "Sedation"
-    And I add relationship from top level note "Sedition" as "similar to" to note "Sedative"
+    When I add relationship from note "Sedition" as "similar to" to note "Sedation"
+    And I add relationship from note "Sedition" as "similar to" to note "Sedative"
     Then I should see "Sedition" has relationship "similar to" "Sedation, Sedative"
 
   @mockBrowserTime
@@ -41,7 +41,7 @@ Feature: add relationship
 
   @mockBrowserTime
   Scenario: Undo creating relationship
-    When I add relationship from top level note "Sedition" as "similar to" to note "Sedation"
+    When I add relationship from note "Sedition" as "similar to" to note "Sedation"
     Then I should see "Sedition" has relationship "similar to" "Sedation"
     When I open the relationship from "Sedition" to "Sedation"
     Then I should be on the relationship note page from "Sedition" with relation "similar to" to "Sedation"
