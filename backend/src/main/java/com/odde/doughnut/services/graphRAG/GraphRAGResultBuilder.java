@@ -22,12 +22,12 @@ public class GraphRAGResultBuilder {
       User viewer) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     FocusNote focus = FocusNote.fromNote(focusNote);
-    focus
-        .getLinks()
-        .addAll(wikiTitleCacheService.outgoingWikiLinkTargetUrisForViewer(focusNote, viewer));
-    focus
-        .getInboundReferences()
-        .addAll(wikiTitleCacheService.inboundReferenceUrisForViewer(focusNote, viewer));
+    wikiTitleCacheService
+        .outgoingWikiLinkTargetNotesForViewer(focusNote, viewer)
+        .forEach(n -> focus.getLinks().add(GraphNoteWikiUri.of(n, false)));
+    wikiTitleCacheService
+        .referencesNotesForViewer(focusNote, viewer)
+        .forEach(n -> focus.getInboundReferences().add(GraphNoteWikiUri.of(n, false)));
     this.result = new GraphRAGResult(focus);
     this.focusNoteId = focusNote.getId();
     this.remainingBudget = tokenBudget - tokenCountingStrategy.estimateTokens(focus);

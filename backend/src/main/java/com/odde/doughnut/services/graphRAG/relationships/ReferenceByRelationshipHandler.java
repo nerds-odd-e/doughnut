@@ -29,9 +29,10 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
+    String wikiUri = addedNote.getUri();
     List<String> refs = focus.getInboundReferences();
-    if (!refs.contains(addedNote.getUri())) {
-      refs.add(addedNote.getUri());
+    if (!refs.contains(wikiUri)) {
+      refs.add(wikiUri);
     }
   }
 }

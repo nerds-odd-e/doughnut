@@ -615,7 +615,7 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnGraphWithDefaultTokenLimit() throws UnexpectedNoAccessRightException {
       GraphRAGResult result = controller.getGraph(rootNote, 5000);
 
-      assertThat(result.getFocusNote().getUri(), equalTo(rootNote.getUri()));
+      assertThat(result.getFocusNote().getUri(), equalTo("[[Root]]"));
     }
 
     @Test
@@ -639,7 +639,7 @@ class NoteControllerTests extends ControllerTestBase {
       Note grandchild = makeMe.aNote("Grandchild").under(child1).please();
       makeMe.refresh(rootNote);
       GraphRAGResult result = controller.getDescendants(rootNote);
-      assertThat(result.getFocusNote().getUri(), equalTo(rootNote.getUri()));
+      assertThat(result.getFocusNote().getUri(), equalTo("[[Root]]"));
       assertThat(result.getRelatedNotes(), hasSize(2));
       assertThat(
           result.getRelatedNotes().stream().map(n -> n.getTitle()).toList(),

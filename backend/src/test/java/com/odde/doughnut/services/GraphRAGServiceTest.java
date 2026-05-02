@@ -50,16 +50,20 @@ public class GraphRAGServiceTest {
   }
 
   private void assertRelatedNotesIncludeNotes(GraphRAGResult result, Note... expectedNotes) {
-    List<String> relatedUris = result.getRelatedNotes().stream().map(BareNote::getUri).toList();
     for (Note note : expectedNotes) {
-      assertThat(describeRelatedNotes(result), relatedUris, hasItem(note.getUri()));
+      assertThat(
+          describeRelatedNotes(result),
+          result.getRelatedNotes().stream().anyMatch(b -> b.equals(note)),
+          is(true));
     }
   }
 
   private void assertRelatedNotesExcludeNotes(GraphRAGResult result, Note... excludedNotes) {
-    List<String> relatedUris = result.getRelatedNotes().stream().map(BareNote::getUri).toList();
     for (Note note : excludedNotes) {
-      assertThat(describeRelatedNotes(result), relatedUris, not(hasItem(note.getUri())));
+      assertThat(
+          describeRelatedNotes(result),
+          result.getRelatedNotes().stream().anyMatch(b -> b.equals(note)),
+          is(false));
     }
   }
 
@@ -141,7 +145,7 @@ public class GraphRAGServiceTest {
 
       BareNote bn =
           result.getRelatedNotes().stream()
-              .filter(b -> b.getUri().equals(wikiTarget.getUri()))
+              .filter(b -> b.equals(wikiTarget))
               .findFirst()
               .orElseThrow();
       assertThat(
@@ -253,8 +257,7 @@ public class GraphRAGServiceTest {
               .filter(n -> n.equals(targetSibling1) || n.equals(targetSibling2))
               .toList();
       assertThat(siblingBare, hasSize(2));
-      assertThat(
-          siblingBare.stream().map(BareNote::getUri).toList(), not(hasItem(focusNote.getUri())));
+      assertThat(siblingBare.stream().anyMatch(b -> b.equals(focusNote)), is(false));
     }
 
     @Test
@@ -307,7 +310,9 @@ public class GraphRAGServiceTest {
 
       assertThat(
           result.getFocusNote().getYoungerSiblings(),
-          contains(youngerSibling1.getUri(), youngerSibling2.getUri()));
+          contains(
+              GraphNoteWikiUri.of(youngerSibling1, false),
+              GraphNoteWikiUri.of(youngerSibling2, false)));
       assertRelatedNotesContain(
           result, RelationshipToFocusNote.YoungerSibling, youngerSibling1, youngerSibling2);
     }
@@ -373,7 +378,9 @@ public class GraphRAGServiceTest {
 
       assertThat(
           result.getFocusNote().getOlderSiblings(),
-          contains(olderSibling1.getUri(), olderSibling2.getUri()));
+          contains(
+              GraphNoteWikiUri.of(olderSibling1, false),
+              GraphNoteWikiUri.of(olderSibling2, false)));
 
       List<BareNote> siblingNotes =
           result.getRelatedNotes().stream()
@@ -465,7 +472,9 @@ public class GraphRAGServiceTest {
 
       assertThat(
           full.getFocusNote().getInboundReferences(),
-          containsInAnyOrder(inboundReferenceNote1.getUri(), inboundReferenceNote2.getUri()));
+          containsInAnyOrder(
+              GraphNoteWikiUri.of(inboundReferenceNote1, false),
+              GraphNoteWikiUri.of(inboundReferenceNote2, false)));
       assertRelatedNotesIncludeNotes(full, inboundReferenceNote1, inboundReferenceNote2);
 
       GraphRAGResult limited = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
@@ -492,7 +501,9 @@ public class GraphRAGServiceTest {
 
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, root.getCreator());
 
-      assertThat(result.getFocusNote().getInboundReferences(), contains(referrer.getUri()));
+      assertThat(
+          result.getFocusNote().getInboundReferences(),
+          contains(GraphNoteWikiUri.of(referrer, false)));
       assertRelatedNotesIncludeNotes(result, referrer);
     }
   }
@@ -513,8 +524,12 @@ public class GraphRAGServiceTest {
 
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
-      assertThat(result.getFocusNote().getOlderSiblings(), contains(folderOlder.getUri()));
-      assertThat(result.getFocusNote().getYoungerSiblings(), contains(folderYounger.getUri()));
+      assertThat(
+          result.getFocusNote().getOlderSiblings(),
+          contains(GraphNoteWikiUri.of(folderOlder, false)));
+      assertThat(
+          result.getFocusNote().getYoungerSiblings(),
+          contains(GraphNoteWikiUri.of(folderYounger, false)));
       assertRelatedNotesContain(result, RelationshipToFocusNote.YoungerSibling, folderYounger);
       assertRelatedNotesContain(result, RelationshipToFocusNote.OlderSibling, folderOlder);
     }
@@ -533,13 +548,16 @@ public class GraphRAGServiceTest {
       List<Note> peersB = noteService.findStructuralPeerNotesInOrder(b);
       int idx = peersB.indexOf(b);
       List<String> expectedYounger =
-          peersB.subList(idx + 1, peersB.size()).stream().map(Note::getUri).toList();
+          peersB.subList(idx + 1, peersB.size()).stream()
+              .map(n -> GraphNoteWikiUri.of(n, false))
+              .toList();
       GraphRAGResult resultMiddle = graphRAGService.retrieve(b, 1000, b.getCreator());
       assertThat(resultMiddle.getFocusNote().getYoungerSiblings(), equalTo(expectedYounger));
 
       List<Note> peersC = noteService.findStructuralPeerNotesInOrder(c);
       int cIdx = peersC.indexOf(c);
-      List<String> expectedOlder = peersC.subList(0, cIdx).stream().map(Note::getUri).toList();
+      List<String> expectedOlder =
+          peersC.subList(0, cIdx).stream().map(n -> GraphNoteWikiUri.of(n, false)).toList();
       GraphRAGResult resultLast = graphRAGService.retrieve(c, 1000, c.getCreator());
       assertThat(resultLast.getFocusNote().getOlderSiblings(), equalTo(expectedOlder));
     }
@@ -612,11 +630,13 @@ public class GraphRAGServiceTest {
       assertThat(focusJson.get("links").isMissingNode(), is(false));
       assertThat(focusJson.get("links").isArray(), is(true));
       assertThat(focusJson.get("links").size(), greaterThanOrEqualTo(1));
-      assertThat(focusJson.get("links").toString(), containsString(outgoing.getUri()));
+      assertThat(
+          focusJson.get("links").toString(), containsString(GraphNoteWikiUri.of(outgoing, false)));
 
       assertThat(focusJson.get("inboundReferences").isArray(), is(true));
       assertThat(
-          jsonTextArrayElements(focusJson.get("inboundReferences")), hasItem(referrer.getUri()));
+          jsonTextArrayElements(focusJson.get("inboundReferences")),
+          hasItem(GraphNoteWikiUri.of(referrer, false)));
     }
 
     @Test
@@ -726,7 +746,6 @@ public class GraphRAGServiceTest {
       Notebook notebook = parentSeed.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-peers").please();
       Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
-      final String parentUri = parent.getUri();
       Note child =
           makeMe
               .aNote()
@@ -739,10 +758,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
       BareNote bn =
-          result.getRelatedNotes().stream()
-              .filter(b -> b.getUri().equals(parentUri))
-              .findFirst()
-              .orElseThrow();
+          result.getRelatedNotes().stream().filter(b -> b.equals(parent)).findFirst().orElseThrow();
       assertThat(
           bn.getDetails(), equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
     }
@@ -754,7 +770,6 @@ public class GraphRAGServiceTest {
       Notebook notebook = parentSeed.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-cjk-peers").please();
       Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
-      final String parentUri = parent.getUri();
       Note child =
           makeMe
               .aNote()
@@ -767,10 +782,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
       BareNote bn =
-          result.getRelatedNotes().stream()
-              .filter(b -> b.getUri().equals(parentUri))
-              .findFirst()
-              .orElseThrow();
+          result.getRelatedNotes().stream().filter(b -> b.equals(parent)).findFirst().orElseThrow();
       String truncated = bn.getDetails();
 
       assertThat(truncated, endsWith("..."));

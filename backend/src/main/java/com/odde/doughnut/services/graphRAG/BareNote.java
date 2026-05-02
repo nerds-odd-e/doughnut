@@ -53,7 +53,7 @@ public class BareNote {
 
   @JsonProperty("uri")
   public String getUri() {
-    return note.getUri();
+    return GraphNoteWikiUri.of(note, relationToFocusNote == RelationshipToFocusNote.Self);
   }
 
   @JsonProperty("title")

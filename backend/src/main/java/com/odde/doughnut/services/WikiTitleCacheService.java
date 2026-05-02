@@ -62,21 +62,19 @@ public class WikiTitleCacheService {
     return List.copyOf(out);
   }
 
-  /** URIs for {@link #wikiTitlesForViewer} targets (same authorization and order). */
-  public List<String> outgoingWikiLinkTargetUrisForViewer(Note focusNote, User viewer) {
-    List<String> uris = new ArrayList<>();
+  /**
+   * Authorized outgoing wiki-link target notes for viewer (same authorization and order as {@link
+   * #wikiTitlesForViewer}).
+   */
+  public List<Note> outgoingWikiLinkTargetNotesForViewer(Note focusNote, User viewer) {
+    List<Note> notes = new ArrayList<>();
     for (WikiTitle wt : wikiTitlesForViewer(focusNote, viewer)) {
       Note n = entityManager.find(Note.class, wt.getNoteId());
       if (n != null) {
-        uris.add(n.getUri());
+        notes.add(n);
       }
     }
-    return List.copyOf(uris);
-  }
-
-  /** URIs for {@link #referencesNotesForViewer} (same list and order). */
-  public List<String> inboundReferenceUrisForViewer(Note focalNote, User viewer) {
-    return referencesNotesForViewer(focalNote, viewer).stream().map(Note::getUri).toList();
+    return List.copyOf(notes);
   }
 
   /**
