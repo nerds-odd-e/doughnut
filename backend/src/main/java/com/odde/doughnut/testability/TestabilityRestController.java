@@ -187,9 +187,13 @@ class TestabilityRestController {
         Optional<String> inferredParentTitle =
             implicitStructuralParentTitleFromNotebookLocalFolderPath(injection.getFolder());
         if (inferredParentTitle.isPresent()) {
-          note.setParentNote(
-              getParentNote(titleNoteMap, noteRepository, inferredParentTitle.get()));
-          continue;
+          Note parentFromFolderName =
+              getParentNote(titleNoteMap, noteRepository, inferredParentTitle.get());
+          if (parentFromFolderName != null) {
+            note.setParentNote(parentFromFolderName);
+            continue;
+          }
+          // No note titled like the inferred folder segment — use batch/notebook rules below.
         }
         if (notebookFromRepositoryOrNull != null) {
           note.initializeAsNotebookRoot(

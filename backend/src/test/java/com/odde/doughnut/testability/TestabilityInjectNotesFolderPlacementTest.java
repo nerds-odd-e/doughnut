@@ -53,6 +53,28 @@ class TestabilityInjectNotesFolderPlacementTest {
     assertThat(noFolder.getFolder(), nullValue());
   }
 
+  @Test
+  void injectNotes_folderSegmentNeedNotMatchAParentNoteSameTitle() {
+    var user = makeMe.aUser().please();
+    var data = new TestabilityRestController.NotesTestData();
+    data.setNotebookName("Atlas nb");
+    data.setExternalIdentifier(user.getExternalIdentifier());
+
+    List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
+    rows.add(row("Germany", null, "World"));
+    rows.add(row("Japan", null, "World"));
+    data.setNoteTestData(rows);
+
+    Map<String, Integer> ids = testabilityRestController.injectNotes(data);
+
+    Note germany = noteRepository.findById(ids.get("Germany")).orElseThrow();
+    Note japan = noteRepository.findById(ids.get("Japan")).orElseThrow();
+    assertThat(germany.getParent(), nullValue());
+    assertThat(japan.getParent().getTitle(), equalTo("Germany"));
+    assertThat(germany.getFolder(), notNullValue());
+    assertThat(japan.getFolder(), notNullValue());
+  }
+
   private static TestabilityRestController.NoteTestData row(
       String title, String parentTitle, String folder) {
     TestabilityRestController.NoteTestData n = new TestabilityRestController.NoteTestData();
