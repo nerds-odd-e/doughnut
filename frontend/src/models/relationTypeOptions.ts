@@ -1,6 +1,7 @@
 import type { NoteTopology } from "@generated/doughnut-backend-api"
+import { parseNoteDetailsMarkdown } from "@/utils/noteDetailsFrontmatter"
 
-type RelationTypeLabel = NonNullable<NoteTopology["relationType"]>
+export type RelationTypeLabel = NonNullable<NoteTopology["relationType"]>
 
 interface RelationTypeOption {
   label: RelationTypeLabel
@@ -93,6 +94,31 @@ export function relationTypeFromKebab(kebab: string): RelationTypeLabel {
   const label = relationLabelFromKebab(kebab)
   const found = relationTypeOptions.find(({ label: l }) => l === label)
   return found?.label ?? relationTypeOptions[0]!.label
+}
+
+function relationKebabFromProperties(
+  properties: Record<string, string>
+): string | undefined {
+  for (const key of Object.keys(properties)) {
+    if (key.trim().toLowerCase() === "relation") {
+      const v = properties[key]?.trim()
+      if (!v) return
+      return v
+    }
+  }
+  return
+}
+
+/** Relation type label for display from note Markdown `relation` frontmatter (same mapping as rich property editor). */
+export function relationTypeLabelFromNoteDetails(
+  details: string | undefined | null
+): RelationTypeLabel | undefined {
+  if (details == null) return
+  const parsed = parseNoteDetailsMarkdown(details)
+  if (!parsed.ok) return
+  const kebab = relationKebabFromProperties(parsed.properties)
+  if (kebab === undefined) return
+  return relationTypeFromKebab(kebab)
 }
 
 export { relationTypeOptions, reverseLabel }

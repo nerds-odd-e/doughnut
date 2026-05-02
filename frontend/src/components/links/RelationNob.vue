@@ -1,8 +1,8 @@
 <template>
-  <span class="relation-nob" :title="noteTopology.relationType">
+  <span class="relation-nob" :title="relationTypeLabel">
     <SvgRelationTypeIcon
-      v-if="noteTopology.relationType"
-      :relation-type="noteTopology.relationType"
+      v-if="relationTypeLabel"
+      :relation-type="relationTypeLabel"
       :inverse-icon="inverseIcon"
     />
   </span>
@@ -10,13 +10,13 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 
 defineProps({
-  noteTopology: {
-    type: Object as PropType<NoteTopology>,
-    required: true,
+  relationTypeLabel: {
+    type: String as PropType<RelationTypeLabel | undefined>,
+    default: undefined,
   },
   inverseIcon: Boolean,
 })

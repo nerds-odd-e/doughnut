@@ -2,7 +2,7 @@
   <span class="relationship-container daisy-inline-flex daisy-items-center daisy-gap-1">
     <RelationNob
       v-if="!!reverse"
-      :note-topology="relationshipTopology"
+      :relation-type-label="relationTypeLabel"
       :inverse-icon="true"
     />
     <router-link
@@ -11,7 +11,11 @@
     >
       <NoteTitleComponent v-if="titleTopology" v-bind="{ noteTopology: titleTopology }" />
     </router-link>
-    <RelationNob v-if="!reverse" :note-topology="relationshipTopology" :inverse-icon="false" />
+    <RelationNob
+      v-if="!reverse"
+      :relation-type-label="relationTypeLabel"
+      :inverse-icon="false"
+    />
   </span>
 </template>
 
@@ -19,6 +23,7 @@
 import type { Note } from "@generated/doughnut-backend-api"
 import { computed } from "vue"
 import { noteShowLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { relationTypeLabelFromNoteDetails } from "@/models/relationTypeOptions"
 import { colors } from "../../colors"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import RelationNob from "./RelationNob.vue"
@@ -27,6 +32,10 @@ const props = defineProps<{
   note: Note
   reverse?: boolean
 }>()
+
+const relationTypeLabel = computed(() =>
+  relationTypeLabelFromNoteDetails(props.note.details)
+)
 
 /** Route to the relationship note (not subject/target). */
 const relationshipTopology = computed(() => props.note.noteTopology)

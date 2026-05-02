@@ -66,7 +66,7 @@
                   >
                     <div class="daisy-flex daisy-items-center daisy-gap-2">
                       <span class="daisy-text-sm daisy-text-base-content/70">
-                        {{ reverseLabel(relation.noteTopology.relationType) }}
+                        {{ reverseLabel(relationTypeLabelFromNoteDetails(relation.details)) }}
                       </span>
                       <RelationshipOfNote
                         class="relationship-multi"
@@ -114,7 +114,10 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
 import RelationshipOfNote from "../links/RelationshipOfNote.vue"
-import { reverseLabel } from "../../models/relationTypeOptions"
+import {
+  relationTypeLabelFromNoteDetails,
+  reverseLabel,
+} from "../../models/relationTypeOptions"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
