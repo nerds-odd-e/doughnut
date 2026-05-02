@@ -61,18 +61,18 @@ export const assumeNotePage = (
     addRelationshipTo: (target: string) => {
       return {
         relationType: (relationType: string) => {
-          cy.get('main').then(($main) => {
-            const cardWithTarget = $main
+          cy.get('#main-note-content').then(($scope) => {
+            const cardWithTarget = $scope
               .find('[role=card]')
               .toArray()
               .find((el) => el.textContent?.includes(target))
             if (cardWithTarget) {
               cy.wrap(cardWithTarget).should('contain', relationType)
             } else {
-              cy.get('main')
-                .find('[role=title]')
-                .should('contain', target)
-                .and('contain', relationType)
+              cy.contains('#main-note-content [role=card]', target).should(
+                'contain',
+                relationType
+              )
             }
           })
         },

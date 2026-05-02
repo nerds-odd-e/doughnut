@@ -78,6 +78,7 @@ export const assumeNoteTargetSearchDialog = () => {
         .findByRole('button', { name: 'Add Relationship' })
         .click()
       form.getField('Relation Type').clickOption(relationType)
+      pageIsNotLoading()
     },
     createRelationshipToTopLevelNoteAs(
       toNoteTopic: string,

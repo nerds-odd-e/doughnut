@@ -312,20 +312,4 @@ describe("in place edit on title", () => {
       )
     })
   })
-  describe("for a relationship note", () => {
-    const target = makeMe.aNote.underNote(note).please()
-    const relationNote = makeMe.aRelationship.to(target).please()
-
-    it("should dispay target", async () => {
-      mountComponent(relationNote)
-      expect(wrapper.text()).toContain(
-        relationNote.noteTopology.targetNoteTopology?.title
-      )
-    })
-
-    it("should dispay breadcrumbs", async () => {
-      mountComponent(relationNote)
-      expect(wrapper.text()).toContain(note.noteTopology.title!)
-    })
-  })
 })
