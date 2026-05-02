@@ -15,7 +15,7 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
       List<Note> inboundReferenceNotes,
       PriorityLayer priorityThreeLayer,
       PriorityLayer priorityFourLayer) {
-    super(RelationshipToFocusNote.ReferenceBy, null);
+    super(null, null);
     this.inboundReferenceNotes = new ArrayList<>(inboundReferenceNotes);
     this.priorityThreeLayer = priorityThreeLayer;
     this.priorityFourLayer = priorityFourLayer;
@@ -40,11 +40,6 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
 
       return referringNote;
     }
-    return null;
-  }
-
-  @Override
-  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
     return null;
   }
 

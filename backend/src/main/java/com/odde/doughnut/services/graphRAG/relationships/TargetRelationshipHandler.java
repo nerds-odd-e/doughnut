@@ -7,7 +7,7 @@ public class TargetRelationshipHandler extends RelationshipHandler {
   private final Note target;
 
   public TargetRelationshipHandler(Note target) {
-    super(RelationshipToFocusNote.RelationshipTarget, target);
+    super(null, target);
     this.target = target;
   }
 
@@ -18,11 +18,6 @@ public class TargetRelationshipHandler extends RelationshipHandler {
     }
     exhausted = true;
     return target;
-  }
-
-  @Override
-  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
-    return null;
   }
 
   @Override

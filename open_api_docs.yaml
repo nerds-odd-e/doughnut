@@ -4907,23 +4907,16 @@ components:
           - Child
           - OlderSibling
           - YoungerSibling
-          - RelationshipTarget
-          - Relationship
-          - SiblingOfTarget
-          - ReferenceBy
           - ReferencingNote
           - ContextAncestor
           - TargetContextAncestor
           - ReferenceContextAncestor
-          - TargetOfRelationship
           - RelationshipOfTargetSibling
-          - ReferencedTargetOfRelationship
           - ParentSibling
           - TargetParentSibling
           - ParentSiblingChild
           - TargetParentSiblingChild
           - SiblingOfReferencingNote
-          - RemotelyRelated
         linkFromFocus:
           type: boolean
         linkHop2:
@@ -4973,23 +4966,16 @@ components:
           - Child
           - OlderSibling
           - YoungerSibling
-          - RelationshipTarget
-          - Relationship
-          - SiblingOfTarget
-          - ReferenceBy
           - ReferencingNote
           - ContextAncestor
           - TargetContextAncestor
           - ReferenceContextAncestor
-          - TargetOfRelationship
           - RelationshipOfTargetSibling
-          - ReferencedTargetOfRelationship
           - ParentSibling
           - TargetParentSibling
           - ParentSiblingChild
           - TargetParentSiblingChild
           - SiblingOfReferencingNote
-          - RemotelyRelated
         linkFromFocus:
           type: boolean
         linkHop2:

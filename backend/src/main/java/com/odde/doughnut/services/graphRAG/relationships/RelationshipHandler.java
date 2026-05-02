@@ -4,13 +4,14 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.FocusNote;
 import lombok.Getter;
+import org.springframework.lang.Nullable;
 
 public abstract class RelationshipHandler {
   @Getter protected final RelationshipToFocusNote relationshipToFocusNote;
   protected final Note relatingNote;
 
   protected RelationshipHandler(
-      RelationshipToFocusNote relationshipToFocusNote, Note relatingNote) {
+      @Nullable RelationshipToFocusNote relationshipToFocusNote, Note relatingNote) {
     this.relationshipToFocusNote = relationshipToFocusNote;
     this.relatingNote = relatingNote;
   }

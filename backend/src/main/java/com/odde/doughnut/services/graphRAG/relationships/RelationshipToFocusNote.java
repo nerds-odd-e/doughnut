@@ -3,21 +3,12 @@ package com.odde.doughnut.services.graphRAG.relationships;
 public enum RelationshipToFocusNote {
   Self,
 
-  // Core structure
+  // Core structure (tree expansion)
   Parent,
   Child,
   OlderSibling,
   YoungerSibling,
 
-  // Core relationships
-  RelationshipTarget,
-  Relationship,
-
-  // Target neighborhood
-  SiblingOfTarget,
-
-  // References
-  ReferenceBy,
   ReferencingNote,
 
   // Contextual inclusion
@@ -25,12 +16,7 @@ public enum RelationshipToFocusNote {
   TargetContextAncestor,
   ReferenceContextAncestor,
 
-  // Relationship-derived
-  TargetOfRelationship,
   RelationshipOfTargetSibling,
-
-  // Reference + relationship
-  ReferencedTargetOfRelationship,
 
   // Parent neighborhood
   ParentSibling,
@@ -39,5 +25,4 @@ public enum RelationshipToFocusNote {
   TargetParentSiblingChild,
 
   SiblingOfReferencingNote,
-  RemotelyRelated
 }

@@ -799,7 +799,7 @@ export type BareNote = {
     title?: string;
     target?: UriAndTitle;
     parent?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelationship' | 'RelationshipOfTargetSibling' | 'ReferencedTargetOfRelationship' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
     details?: string;
@@ -814,7 +814,7 @@ export type FocusNote = {
     title?: string;
     target?: UriAndTitle;
     parent?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelationship' | 'RelationshipOfTargetSibling' | 'ReferencedTargetOfRelationship' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
     details?: string;

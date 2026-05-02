@@ -12,7 +12,7 @@ public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
 
   public SiblingOfTargetRelationshipHandler(
       List<Note> targetSiblings, PriorityLayer priorityThreeLayer) {
-    super(RelationshipToFocusNote.SiblingOfTarget, null);
+    super(null, null);
     this.priorityThreeLayer = priorityThreeLayer;
     this.targetSiblings = new ArrayList<>(targetSiblings);
   }
@@ -30,11 +30,6 @@ public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
 
       return targetSibling;
     }
-    return null;
-  }
-
-  @Override
-  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
     return null;
   }
 

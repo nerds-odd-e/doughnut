@@ -254,7 +254,7 @@ public class GraphRAGServiceTest {
       assertThat(result.getFocusNote().getTarget(), equalTo(target));
       assertThat(result.getFocusNote().getChildren(), contains(target.getUri()));
 
-      // Parent plus target once (may be classified as RelationshipTarget and/or reached as child)
+      // Parent plus target once (relationship carrier excluded from structural child edges)
       assertThat(result.getRelatedNotes(), hasSize(2));
     }
 
@@ -677,16 +677,11 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertRelatedNotesHaveLinkFromFocus(result, targetNote);
-      assertThat(
-          getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship), empty());
       assertThat(result.getFocusNote().getChildren(), not(contains(relatedChild.getUri())));
       assertThat(
           result.getRelatedNotes().stream()
               .filter(n -> n.getUri().equals(relatedChild.getUri()))
-              .filter(
-                  n ->
-                      n.getRelationToFocusNote() == RelationshipToFocusNote.Child
-                          || n.getRelationToFocusNote() == RelationshipToFocusNote.Relationship)
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
               .collect(Collectors.toList()),
           empty());
     }
@@ -714,9 +709,6 @@ public class GraphRAGServiceTest {
         assertThat(result.getFocusNote().getChildren(), not(contains(relatedChild.getUri())));
         assertRelatedNotesHaveLinkFromFocus(result, targetNote);
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
-            empty());
-        assertThat(
             result.getRelatedNotes().stream()
                 .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
                 .count(),
@@ -731,9 +723,6 @@ public class GraphRAGServiceTest {
             result.getFocusNote().getChildren(),
             containsInAnyOrder(
                 regularChild1.getUri(), regularChild2.getUri(), regularChild3.getUri()));
-        assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
-            empty());
       }
 
       @Test
@@ -750,14 +739,8 @@ public class GraphRAGServiceTest {
         assertThat(
             result.getRelatedNotes().stream()
                 .filter(n -> n.getUri().equals(relatedChild.getUri()))
-                .filter(
-                    n ->
-                        n.getRelationToFocusNote() == RelationshipToFocusNote.Child
-                            || n.getRelationToFocusNote() == RelationshipToFocusNote.Relationship)
+                .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
                 .collect(Collectors.toList()),
-            empty());
-        assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
             empty());
       }
     }
@@ -1071,10 +1054,17 @@ public class GraphRAGServiceTest {
           graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
 
       for (GraphRAGResult result : List.of(resultHighBudget, resultLowBudget)) {
-        assertThat(
-            getNotesWithRelationship(
-                result, RelationshipToFocusNote.ReferencedTargetOfRelationship),
-            empty());
+        for (Note refParent : List.of(referenceParent1, referenceParent2)) {
+          result.getRelatedNotes().stream()
+              .filter(b -> b.equals(refParent))
+              .findFirst()
+              .ifPresent(
+                  b ->
+                      assertThat(
+                          describeRelatedNotes(result),
+                          b.getRelationToFocusNote(),
+                          equalTo(RelationshipToFocusNote.RelationshipOfTargetSibling)));
+        }
       }
     }
   }
