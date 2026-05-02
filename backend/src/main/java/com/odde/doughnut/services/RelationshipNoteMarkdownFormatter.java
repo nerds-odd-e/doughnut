@@ -15,6 +15,17 @@ public final class RelationshipNoteMarkdownFormatter {
   private RelationshipNoteMarkdownFormatter() {}
 
   /**
+   * True when {@code details} have leading YAML frontmatter whose raw block includes {@code type:
+   * relationship} — the same shape {@link #parseRelationTypeFromRelationshipNoteDetails} and {@link
+   * #format} use for relationship notes.
+   */
+  public static boolean isRelationshipShapedDetails(String details) {
+    return NoteDetailsMarkdown.splitLeadingFrontmatter(details)
+        .map(fm -> fm.yamlRaw().contains("type: relationship"))
+        .orElse(false);
+  }
+
+  /**
    * Same kebab rule as the frontend {@code relationKebabFromLabel} — must stay aligned with {@link
    * #format} / {@link #formatForRelationshipNote}.
    */

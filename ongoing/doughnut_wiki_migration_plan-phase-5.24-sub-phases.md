@@ -1,0 +1,87 @@
+# Phase 5.24 — Remove `note.target_note_id` (split delivery)
+
+Parent context: wiki migration Phase 5, sub-phase **5.24** in `doughnut_wiki_migration_plan-phase-5-sub-phases.md`.
+
+This document **re-sequences** 5.24 into smaller slices aligned with `.cursor/rules/planning.mdc`: each slice is either **behavior** (externally observable) or **structure** (no observable change; tests stay green). **Dropping the `note` column and FK is the final slice**, after nothing in application code relies on them.
+
+---
+
+## Anchor design (unchanged from parent doc)
+
+- Relationship notes are identified by **leading YAML** (`type: relationship`) and **`source:` / `target:`** wikilinks — not by a FK on `note`.
+- **Semantic target** resolves via **`WikiLinkResolver`** (and cache rows in `note_wiki_title_cache`, which keeps its own `target_note_id` — explicitly in scope only as cache storage, not dropped here).
+- Inbound references to a focal note for destroy / restore / recall extend **semantic** “points at focal” queries, scoped to relationship-shaped notes joined through the cache — not “every note that wikilinks focal.”
+
+---
+
+## What “SQL / targetNote cleanup” means (before dropping the column)
+
+| Kind | Action |
+|------|--------|
+| **Committed Flyway history** (`V10000063__baseline.sql`, `V300000114__…`, `V300000158__…`, `V300000118__…`, etc.) | **Do not edit.** They recorded past schema/state. New work uses **new** migrations only after the runtime no longer reads the column (see **last slice**). |
+| **Runtime JPQL / JDBC on `note` via `target_note_id` or `Note.targetNote`** | Eliminate in **early slices**: repository methods (`findAllByTargetNote`-style paths), Hibernate cascade predicates wired through FK. Prefer **`note_wiki_title_cache`** join + relationship-marker filter aligned with YAML predicate (**`RelationshipNoteMarkdownFormatter`** family). |
+| **`note_wiki_title_cache`** (`target_note_id`, `NoteWikiTitleCache.targetNote`, JDBC `INSERT … note_wiki_title_cache … target_note_id`) | **Remain** until a later parent phase explicitly changes cache shape; optional **rename-only** refactor (`resolvedLinkedNoteId`, `:linkedNoteId`) is fine — semantics refer to **cache**, not **`note.target_note_id`**. |
+
+---
+
+## Recommended sub-phases (stop-safe order)
+
+### 5.24a — Predicate: relationship-note classification (**structure**)
+
+- **`Note.isRelation()`**: Stop branching on **`getTargetNote() != null`**; delegate to one **`RelationshipNoteMarkdownFormatter`**-adjacent predicate (frontmatter **`type: relationship`**).
+- **Deliverable:** No removal of **`Note.targetNote`** mapping yet; observable behavior unchanged for notes that already have compliant frontmatter (operational data gate stays with batched migrations from parent phases).
+
+### 5.24b — Semantic target resolver (**behavior**, narrow surface)
+
+- **`RelationshipNoteEndpointResolver`**: `relation` + viewer → **`Optional<Note>`** via **`target:` YAML** + **`WikiLinkResolver.resolveWikiInnerTitle`**.
+- Wire first at **`NoteService.refreshRelationshipNoteTitle`**, **`RelationController`** (realm), any single-call-site slice that today reads **`relation.getTargetNote()`**.
+
+### 5.24c — Cascade soft-delete / restore (**behavior**)
+
+- **`NoteService.destroy` / `restore`**: Replace **`NoteRepository.findAllByTargetNote`** with **`NoteWikiTitleCacheRepository`** queries joining referrer **`note`** and restricting to relationship-shaped notes (**marker / predicate from 5.24a**), keyed by **`note_wiki_title_cache.target_note_id`** pointing at deleted/restored focal id.
+- **Tests:** **`NoteControllerTests`** delete / restore reference scenarios.
+
+### 5.24d — Recall propagation (**behavior**)
+
+- **`NoteController.updateNoteRecallSetting`**: Extend **`relatedNotesForRecallPropagation(note)`** (new or evolved helper) — **`Stream.concat(children relationships, inbound semantic relationship notes)`** — without **`inboundReferences`** once queries exist.
+- **Flyway:** still **before** dropping **`note.target_note_id`**.
+
+### 5.24e — GraphRAG / BareNote / focus JSON (**behavior**)
+
+- **`BareNote`**, **`FocusNote.fromNote`**: inject **`UriAndTitle`** resolved target where **`User`** is known; **`WikiTitleCacheService`** graph paths drop **`getTargetNote()`** shortcuts — use **5.24a** + resolver / cache consistency.
+- **Tests:** **`GraphRAGServiceTest`**, **`GraphRAGResultTest`**; disambiguate **`fromNote(..., null)`** with **`(UriAndTitle) null`** if overloads clash.
+
+### 5.24f — AI stacks (**behavior**)
+
+- **`OpenAIChatRequestBuilder`**, **`AiQuestionGenerator`**, automation / fine-tuning factories: pass resolver or pre-resolved **`UriAndTitle`**; remove entity-level **`preserveNoteContent` / `getTargetNote()`** branches if they existed only for FK legacy.
+- **Tests:** generator / builder tests (Spring or unit as today).
+
+### 5.24g — Test builders (**structure**)
+
+- **`NoteBuilder.afterCreate`**: after persisting a relationship note, call **`WikiTitleCacheService.refreshForNote`** (parity with **`NoteService.createRelationship`**), guarded when **`MakeMe.wikiTitleCacheService`** is null (plain **`makeMeWithoutFactoryService`**).
+- **`NoteRealmServiceTest`**: “stale inbound” cases simulate by **`deleteByNote_Id`** on cache for the relation after create; rename tests that mention **legacy FK**.
+
+### 5.24h — Thin JPA (**structure**, column still exists)
+
+- Drop **`inboundReferences`** and dead **`getRelationshipsAndRefers`** once **5.24d** is live; grep for **`Note.getTargetNote`** in `src/main/java` should be empty (cache entity **`NoteWikiTitleCache.getTargetNote`** allowed).
+
+### 5.24i — Flyway: drop **`note.target_note_id`** (**behavior** / deploy gate — **last**)
+
+- Single new migration: drop **`note_ibfk_1`**, index, column (`note` table only).
+- Remove **`Note.targetNote`** field and **`NoteRepository.findAllByTargetNote`** if still present.
+- **`pnpm backend:verify`** where CI runs migrations; **`pnpm backend:test_only`**; Cypress **`--spec`** `e2e_test/features/relationships/add_relationship.feature`, `relationship_edit_and_remove.feature`.
+
+---
+
+## Verification summary
+
+| Milestone | Typical gate |
+|-----------|----------------|
+| Through 5.24h | **`pnpm backend:test_only`** (targeted Gradle slices while iterating) |
+| 5.24i | **`backend:verify`**, full backend tests, relationship Cypress specs |
+
+---
+
+## Operational note
+
+Production / shared DBs must complete frontmatter + cache backfill (parent **5.16–5.19** gate) **before** deploying **5.24i** (`DROP COLUMN`). No merge of **5.24i** ahead of that gate on environments that may still store relations without cache rows.

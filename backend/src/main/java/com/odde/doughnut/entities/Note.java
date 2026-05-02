@@ -11,6 +11,7 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -319,7 +320,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isRelation() {
-    return getTargetNote() != null;
+    return RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(getDetails());
   }
 
   @JsonIgnore
