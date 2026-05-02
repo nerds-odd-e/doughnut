@@ -110,11 +110,56 @@ describe("Sidebar", () => {
     .under(firstGeneration)
     .please()
 
+  /** Aligns active realm with folder-first API: ancestorFolders + folderId for this stub tree. */
+  function realmAsActiveInSidebarStub(realm: NoteRealm): NoteRealm {
+    const topTitle = topNoteRealm.note.noteTopology.title!
+    const firstTitle = firstGeneration.note.noteTopology.title!
+
+    if (realm.id === topNoteRealm.id) {
+      return { ...realm, ancestorFolders: [] }
+    }
+    if (
+      realm.id === firstGeneration.id ||
+      realm.id === firstGenerationSibling.id
+    ) {
+      return {
+        ...realm,
+        ancestorFolders: [
+          { id: String(FOLDER_TOP_NOTE_CHILDREN_ID), name: topTitle },
+        ],
+        note: {
+          ...realm.note,
+          noteTopology: {
+            ...realm.note.noteTopology,
+            folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
+          },
+        },
+      } as NoteRealm
+    }
+    if (realm.id === secondGeneration.id) {
+      return {
+        ...realm,
+        ancestorFolders: [
+          { id: String(FOLDER_TOP_NOTE_CHILDREN_ID), name: topTitle },
+          { id: String(FOLDER_FIRST_GEN_CHILDREN_ID), name: firstTitle },
+        ],
+        note: {
+          ...realm.note,
+          noteTopology: {
+            ...realm.note.noteTopology,
+            folderId: FOLDER_FIRST_GEN_CHILDREN_ID,
+          },
+        },
+      } as NoteRealm
+    }
+    return { ...realm, ancestorFolders: realm.ancestorFolders ?? [] }
+  }
+
   const mountSidebar = (n: NoteRealm) => {
     wrapper = helper
       .component(Sidebar)
       .withProps({
-        activeNoteRealm: n,
+        activeNoteRealm: realmAsActiveInSidebarStub(n),
         notebookId: n.notebookId,
       })
       .mount({ attachTo: document.body })
@@ -258,7 +303,7 @@ describe("Sidebar", () => {
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
-          activeNoteRealm: firstGeneration,
+          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
           notebookId: firstGeneration.notebookId,
         })
         .mount({ attachTo: document.body })
@@ -307,7 +352,7 @@ describe("Sidebar", () => {
     ).toBe(true)
 
     await wrapper.setProps({
-      activeNoteRealm: secondGeneration,
+      activeNoteRealm: realmAsActiveInSidebarStub(secondGeneration),
       notebookId: firstGeneration.notebookId,
     })
     await flushPromises()
@@ -474,7 +519,7 @@ describe("Sidebar", () => {
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
-          activeNoteRealm: firstGeneration,
+          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
           notebookId: firstGeneration.notebookId,
         })
         .mount({ attachTo: document.body })
@@ -488,7 +533,7 @@ describe("Sidebar", () => {
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
-          activeNoteRealm: topNoteRealm,
+          activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
           notebookId: topNoteRealm.notebookId,
         })
         .mount({ attachTo: document.body })
@@ -501,7 +546,7 @@ describe("Sidebar", () => {
       wrapper = helper
         .component(Sidebar)
         .withProps({
-          activeNoteRealm: firstGeneration,
+          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
           notebookId: firstGeneration.notebookId,
         })
         .mount({ attachTo: document.body })
@@ -511,7 +556,7 @@ describe("Sidebar", () => {
 
     it("hides New folder when note realm is from bazaar", async () => {
       const bazaarRealm = {
-        ...firstGeneration,
+        ...realmAsActiveInSidebarStub(firstGeneration),
         fromBazaar: true,
       } as NoteRealm
       wrapper = helper
@@ -559,7 +604,7 @@ describe("Sidebar", () => {
       .component(Sidebar)
       .withCurrentUser(makeMe.aUser.please())
       .withProps({
-        activeNoteRealm: topNoteRealm,
+        activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
         notebookId: topNoteRealm.notebookId,
       })
       .mount({ attachTo: document.body })

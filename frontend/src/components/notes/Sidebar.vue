@@ -34,6 +34,7 @@ import {
   sidebarNoteDragStateKey,
 } from "./sidebarNoteDragContext"
 import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
+import { structuralSidebarTitlesFromRealm } from "./sidebarStructuralTitles"
 
 const props = defineProps({
   /** When set, highlights the active note and expands its ancestors */
@@ -64,21 +65,8 @@ function toggleFolderId(folderId: number) {
   expandedFolderIds.value = next
 }
 
-function titlesAlongNoteTopologyChain(noteRealm: NoteRealm | undefined) {
-  const titles = new Set<string>()
-  let t = noteRealm?.note?.noteTopology
-  while (t) {
-    const title = t.title
-    if (title != null && title !== "") {
-      titles.add(title)
-    }
-    t = t.parentOrSubjectNoteTopology
-  }
-  return titles
-}
-
 const structuralSidebarTitles = computed(() =>
-  titlesAlongNoteTopologyChain(props.activeNoteRealm)
+  structuralSidebarTitlesFromRealm(props.activeNoteRealm)
 )
 
 const activeNoteFolderIds = computed(() => {

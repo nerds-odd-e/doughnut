@@ -39,7 +39,7 @@ By the end of Phase 7:
 
 Folder placement is expressed by path segments that become folder **names** in the same **notebook** as the fixture notes. If a segment equals another note’s **title** in that setup, the scenario is hard to read and can mask mistakes (or interact badly with any name-based resolution during migration).
 
-**When:** While touching E2E data in sub-phases **7.2**, **7.4**, and **7.13** (and any other fixture edit in Phase 7), actively look for this overlap in the same notebook block: compare each `Folder` path segment to every other row’s note title and to titles introduced in the same scenario (including anchor notes from the surrounding `Given`).
+**When:** While touching E2E data in sub-phases **7.2**, **7.4**, and **7.14** (and any other fixture edit in Phase 7), actively look for this overlap in the same notebook block: compare each `Folder` path segment to every other row’s note title and to titles introduced in the same scenario (including anchor notes from the surrounding `Given`).
 
 **How to find:** There is no single grep for semantic equality; use feature-wide review. A practical pass is: open each `.feature` you modify, list note titles and folder path segments for one notebook at a time, flag duplicates across the two lists.
 
@@ -149,11 +149,25 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused frontend tests for note creation plus the smallest relevant E2E note creation spec.
 
-## Sub-Phase 7.8 - Remove `parentId` from Public Note Wire Shapes
+## Sub-Phase 7.8 - Remove `parentOrSubjectNoteTopology` from `NoteTopology`
 
 **Type:** Structure.
 
-**Pre-condition:** Frontend no longer reads `note.parentId` for structural placement or breadcrumbs.
+**Pre-condition:** Sub-phase 7.5 holds (breadcrumbs and structural placement consume `NoteRealm` ancestor folders where needed). Any UX that still depended on the nested topology chain—breadcrumb fallback that walks `parentOrSubjectNoteTopology`, relationship-note subject affordances, recall/CLI context, or store keys derived from the nested id—has an explicit replacement (same `NoteRealm` fields, folder placement, links, or a small dedicated DTO surface agreed in earlier phases).
+
+**Trigger:** `NoteTopology` still declares `parentOrSubjectNoteTopology`, OpenAPI still nests it, generated TypeScript or test fixtures still build or read the tree.
+
+**Post-condition:** The field is removed from the Java `NoteTopology` DTO, serializers, and OpenAPI; generated types and `makeMe` / fixture builders no longer set it; no production code walks nested topology for the behaviors above.
+
+**Work:** Remove the field from `NoteTopology` and delete call-site fallbacks that only existed for the parent/subject chain (for example legacy breadcrumb ancestry when folder trail is empty). Update `StoredApiCollection`, recall UI, CLI recall context, and any `noteTopologyAncestors`-style helpers to use the replacement shape. Run `pnpm generateTypeScript` after OpenAPI changes.
+
+**Verify:** Focused tests for breadcrumb, recall/refinement, and any touched store paths; `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`; smallest E2E spec if only integration surfaces change.
+
+## Sub-Phase 7.9 - Remove `parentId` from Public Note Wire Shapes
+
+**Type:** Structure.
+
+**Pre-condition:** Frontend no longer reads `note.parentId` for structural placement or breadcrumbs. `NoteTopology` no longer exposes `parentOrSubjectNoteTopology` (sub-phase 7.8).
 
 **Trigger:** Backend OpenAPI still exposes `parentId` on note DTO/entity responses.
 
@@ -163,7 +177,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused backend API/controller test, `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`, and focused frontend type/test command for touched frontend files.
 
-## Sub-Phase 7.9 - Replace Parent-Based Note Creation Endpoint
+## Sub-Phase 7.10 - Replace Parent-Based Note Creation Endpoint
 
 **Type:** Structure.
 
@@ -177,7 +191,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** `NoteCreationControllerTests` focused cases and the targeted note creation E2E spec.
 
-## Sub-Phase 7.10 - Convert Note Motion Away from Parent Edges
+## Sub-Phase 7.11 - Convert Note Motion Away from Parent Edges
 
 **Type:** Structure.
 
@@ -191,7 +205,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused `NoteMotionServiceTest` / `NoteControllerMotionTests` plus the targeted sidebar/motion E2E spec if the behavior is exposed there.
 
-## Sub-Phase 7.11 - Replace Parent-Based Restore/Delete Traversal
+## Sub-Phase 7.12 - Replace Parent-Based Restore/Delete Traversal
 
 **Type:** Structure.
 
@@ -205,7 +219,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused backend controller/service tests for delete/restore.
 
-## Sub-Phase 7.12 - Remove Parent-Based Graph Relationships
+## Sub-Phase 7.13 - Remove Parent-Based Graph Relationships
 
 **Type:** Structure.
 
@@ -219,7 +233,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused `GraphRAGServiceTest`.
 
-## Sub-Phase 7.13 - Remove Parent From Test Builders and Testability Fixtures
+## Sub-Phase 7.14 - Remove Parent From Test Builders and Testability Fixtures
 
 **Type:** Structure.
 
@@ -233,7 +247,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused backend/frontend tests and targeted E2E specs for the touched area.
 
-## Sub-Phase 7.14 - Remove Parent From Import/Export Transitional Paths
+## Sub-Phase 7.15 - Remove Parent From Import/Export Transitional Paths
 
 **Type:** Structure.
 
@@ -247,7 +261,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Targeted import/export E2E spec and focused backend tests.
 
-## Sub-Phase 7.15 - Drop `Note.parent` and `Note.children` From Domain Code
+## Sub-Phase 7.16 - Drop `Note.parent` and `Note.children` From Domain Code
 
 **Type:** Structure.
 
@@ -261,7 +275,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused backend test package that compiles the touched services/controllers.
 
-## Sub-Phase 7.16 - Drop `note.parent_id` and Parent Indexes
+## Sub-Phase 7.17 - Drop `note.parent_id` and Parent Indexes
 
 **Type:** Structure.
 
@@ -275,7 +289,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused backend migration/controller test or `CURSOR_DEV=true nix develop -c pnpm backend:test_only` if no narrower migration check exists.
 
-## Sub-Phase 7.17 - Final Phase 7 Sweep
+## Sub-Phase 7.18 - Final Phase 7 Sweep
 
 **Type:** Structure.
 
