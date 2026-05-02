@@ -12,13 +12,11 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.services.RelationshipNoteEndpointResolver;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -40,7 +38,6 @@ class RelationController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
-  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
 
   public RelationController(
       EntityPersister entityPersister,
@@ -49,8 +46,7 @@ class RelationController {
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService,
-      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver) {
+      WikiTitleCacheService wikiTitleCacheService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
@@ -58,7 +54,6 @@ class RelationController {
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
-    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
   }
 
   @PostMapping(value = "/{relation}")
@@ -72,7 +67,7 @@ class RelationController {
     noteService.refreshRelationshipNoteTitle(relation, relationshipCreation.relationType, user);
     entityPersister.save(relation);
     wikiTitleCacheService.refreshForNote(relation, user);
-    return getNoteRealm(relation, user);
+    return List.of(noteRealmService.build(relation, user));
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")
@@ -108,19 +103,6 @@ class RelationController {
             relationshipCreation.relationType,
             testabilitySettings.getCurrentUTCTimestamp());
 
-    return getNoteRealm(relation, user);
-  }
-
-  private List<NoteRealm> getNoteRealm(Note relation, User user) {
-    Optional<Note> resolved =
-        relationshipNoteEndpointResolver
-            .resolveSemanticTarget(relation, user)
-            .or(() -> wikiTitleCacheService.primaryWikiLinkedTargetForGraph(relation, user));
-    Note nt = resolved.map(n -> entityPersister.find(Note.class, n.getId())).orElse(null);
-    Note np = entityPersister.find(Note.class, relation.getParent().getId());
-    return List.of(
-        noteRealmService.build(relation, user),
-        noteRealmService.build(nt, user),
-        noteRealmService.build(np, user));
+    return List.of(noteRealmService.build(relation, user));
   }
 }

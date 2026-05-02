@@ -111,7 +111,7 @@ class RelationControllerTests extends ControllerTestBase {
       var result =
           controller.addRelationshipFinalize(
               source, target, relationshipCreation, makeMe.successfulBindingResult());
-      assertThat(result, hasSize(3));
+      assertThat(result, hasSize(1));
       String expected =
           RelationshipNoteTitleFormatter.format(
               source.getTitle(), RelationType.APPLICATION.label, target.getTitle());
