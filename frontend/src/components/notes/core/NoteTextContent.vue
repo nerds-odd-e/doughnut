@@ -11,7 +11,6 @@
         noteDetails: note.details,
         asMarkdown,
         wikiTitles,
-        relationPropertyApiNoteId: relationshipNoteRelationApiId,
       }"
       @dead-link-click="$emit('deadLinkClick', $event)"
     />
@@ -19,9 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue"
+import { type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
-import { detailsHasRelationProperty } from "@/utils/noteDetailsFrontmatter"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableDetails from "./NoteEditableDetails.vue"
 
@@ -31,12 +29,6 @@ const props = defineProps({
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
-
-const relationshipNoteRelationApiId = computed(() =>
-  detailsHasRelationProperty(props.note.details ?? "")
-    ? props.note.id
-    : undefined
-)
 
 defineEmits<{ deadLinkClick: [title: string] }>()
 </script>

@@ -603,7 +603,7 @@ describe("NoteEditableDetails", () => {
   })
 
   describe("relation property API context in rich mode", () => {
-    it("shows RelationTypeSelectCompact when relationPropertyApiNoteId is set and details include relation", async () => {
+    it("shows RelationTypeSelectCompact when noteDetails include relation frontmatter", async () => {
       const details = `---
 relation: parent-of
 ---
@@ -619,11 +619,13 @@ relation: parent-of
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
-          relationPropertyApiNoteId: 99,
         })
         .mount({ attachTo: document.body })
 
       await flushPromises()
+
+      const rich = wrapper.findComponent({ name: "RichMarkdownEditor" })
+      expect(rich.props("relationPropertyUsesRelationshipApi")).toBe(true)
 
       const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
       expect(rfp.exists()).toBe(true)
@@ -634,9 +636,9 @@ relation: parent-of
       wrapper.unmount()
     })
 
-    it("uses plain value input for relation row when relationPropertyApiNoteId is absent", async () => {
+    it("sets relationPropertyUsesRelationshipApi false when noteDetails omit relation", async () => {
       const details = `---
-relation: parent-of
+topic: training
 ---
 
 # Body`
@@ -655,13 +657,8 @@ relation: parent-of
 
       await flushPromises()
 
-      const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
-      expect(
-        rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
-      ).toBe(false)
-      expect(
-        rfp.find('[data-testid="rich-note-property-row-value-input"]').exists()
-      ).toBe(true)
+      const rich = wrapper.findComponent({ name: "RichMarkdownEditor" })
+      expect(rich.props("relationPropertyUsesRelationshipApi")).toBe(false)
       wrapper.unmount()
     })
   })

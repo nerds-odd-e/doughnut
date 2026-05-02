@@ -50,6 +50,7 @@ import type { WikiTitle } from "@generated/doughnut-backend-api"
 import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { detailsHasRelationProperty } from "@/utils/noteDetailsFrontmatter"
 
 const emit = defineEmits<{
   deadLinkClick: [title: string]
@@ -61,11 +62,10 @@ const props = defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
-  relationPropertyApiNoteId: Number,
 })
 
-const relationPropertyUsesRelationshipApi = computed(
-  () => props.relationPropertyApiNoteId != null
+const relationPropertyUsesRelationshipApi = computed(() =>
+  detailsHasRelationProperty(props.noteDetails ?? "")
 )
 
 const relationPropertyRelationTypeError = ref<string | undefined>()
@@ -85,12 +85,11 @@ watch(
 function onRelationPropertyRelationTypeSelected(
   relationType: RelationTypeLabel
 ) {
-  const noteIdForApi = props.relationPropertyApiNoteId
-  if (noteIdForApi == null) return
+  if (!relationPropertyUsesRelationshipApi.value) return
   relationPropertyRelationTypeError.value = undefined
   storageAccessor.value
     .storedApi()
-    .updateRelationship(noteIdForApi, { relationType: relationType })
+    .updateRelationship(props.noteId, { relationType: relationType })
     .catch((error) => {
       const e = error as { relationType?: string }
       if (e?.relationType) {
