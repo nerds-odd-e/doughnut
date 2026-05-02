@@ -67,7 +67,8 @@ class RelationController {
     noteService.refreshRelationshipNoteTitle(relation, relationshipCreation.relationType, user);
     entityPersister.save(relation);
     wikiTitleCacheService.refreshForNote(relation, user);
-    return getNoteRealm(relation, user);
+    return List.of(
+        noteRealmService.build(relation, user), noteRealmService.build(relation.getParent(), user));
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")
@@ -103,11 +104,7 @@ class RelationController {
             relationshipCreation.relationType,
             testabilitySettings.getCurrentUTCTimestamp());
 
-    return getNoteRealm(relation, user);
-  }
-
-  private List<NoteRealm> getNoteRealm(Note relation, User user) {
-    Note np = entityPersister.find(Note.class, relation.getParent().getId());
-    return List.of(noteRealmService.build(relation, user), noteRealmService.build(np, user));
+    return List.of(
+        noteRealmService.build(relation, user), noteRealmService.build(sourceNote, user));
   }
 }
