@@ -3,10 +3,12 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
@@ -83,6 +85,51 @@ class RelationControllerTests extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveNote(note2, note1, noteMoveDTO, makeMe.successfulBindingResult()));
+    }
+  }
+
+  @Nested
+  class MoveNoteToFolderTest {
+    User anotherUser;
+    Note ownNote;
+    Folder targetFolder;
+
+    @BeforeEach
+    void setup() {
+      anotherUser = makeMe.aUser().please();
+      ownNote = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
+      Note anchor = makeMe.aRootNote("nbroot").creatorAndOwner(currentUser.getUser()).please();
+      targetFolder = makeMe.aFolder().notebook(anchor.getNotebook()).name("TargetF").please();
+    }
+
+    @Test
+    void moveNoteToFolderSuccessfully() throws UnexpectedNoAccessRightException {
+      Note mover =
+          makeMe.aNote("mover").creatorAndOwner(currentUser.getUser()).under(ownNote).please();
+      var result = controller.moveNoteToFolder(mover, targetFolder);
+      assertThat(result, hasSize(1));
+      mover = noteRepository.findById(mover.getId()).orElseThrow();
+      assertThat(mover.getFolder().getId(), equalTo(targetFolder.getId()));
+      assertThat(mover.getParent(), nullValue());
+    }
+
+    @Test
+    void shouldNotAllowMoveOtherPeoplesNoteToFolder() {
+      Note mover = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.moveNoteToFolder(mover, targetFolder));
+    }
+
+    @Test
+    void shouldNotAllowMoveToUnauthorizedFolderNotebook() {
+      Note mover = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note otherAnchor = makeMe.aRootNote("other").creatorAndOwner(anotherUser).please();
+      Folder otherFolder =
+          makeMe.aFolder().notebook(otherAnchor.getNotebook()).name("ForeignF").please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.moveNoteToFolder(mover, otherFolder));
     }
   }
 

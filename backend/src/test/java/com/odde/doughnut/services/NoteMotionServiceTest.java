@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
@@ -110,6 +111,22 @@ public class NoteMotionServiceTest {
     makeMe.refresh(firstChild);
     assertThat(firstChild.getFolder(), notNullValue());
     assertThat(firstChild.getFolder().getName(), equalTo(secondChild.getTitle()));
+  }
+
+  @Test
+  void moveIntoFolder_detachesParentAndSetsFolder() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
+    Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("Dest").please();
+    Note mover = makeMe.aNote("mover").creatorAndOwner(user).under(root).please();
+    makeMe.entityPersister.flush();
+
+    noteMotionService.executeMoveIntoFolder(mover, folder);
+
+    makeMe.refresh(mover);
+    assertThat(mover.getParent(), nullValue());
+    assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
+    assertThat(mover.getNotebook().getId(), equalTo(root.getNotebook().getId()));
   }
 
   @Test

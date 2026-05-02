@@ -567,6 +567,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
+  /api/relations/move-to-folder/{sourceNote}/{targetFolder}:
+    post:
+      tags:
+      - relation-controller
+      operationId: moveNoteToFolder
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: targetFolder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/relations/create/{sourceNote}/{targetNote}:
     post:
       tags:

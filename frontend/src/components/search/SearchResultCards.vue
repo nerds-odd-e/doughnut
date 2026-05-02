@@ -12,6 +12,21 @@
         >
           <slot name="button" :search-result="searchHit.noteSearchResult" />
         </template>
+        <template
+          #folderButton
+          v-if="
+            $slots.folderButton &&
+            searchHit.hitKind === 'FOLDER' &&
+            searchHit.folderId != null
+          "
+        >
+          <slot
+            name="folderButton"
+            :folder-id="searchHit.folderId"
+            :folder-name="searchHit.folderName"
+            :notebook-id="searchHit.notebookId"
+          />
+        </template>
       </SearchResultCard>
     </div>
   </div>

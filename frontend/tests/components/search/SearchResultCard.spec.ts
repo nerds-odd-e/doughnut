@@ -126,4 +126,45 @@ describe("SearchResultCard", () => {
     expect(wrapper.text()).toContain("Archive")
     expect(wrapper.find(".router-link").exists()).toBe(false)
   })
+
+  it("renders folderButton slot for folder hit", () => {
+    const hit: RelationshipLiteralSearchHit = {
+      hitKind: "FOLDER",
+      folderId: 9,
+      folderName: "Archive",
+      notebookId: 1,
+      notebookName: "NB",
+      distance: 0.9,
+    }
+    const wrapper = helper
+      .component(SearchResultCard)
+      .withProps({ searchHit: hit })
+      .mount({
+        slots: {
+          folderButton: '<button type="button">Move Under</button>',
+        },
+      })
+
+    expect(wrapper.text()).toContain("Move Under")
+  })
+
+  it("note hit button slot can show Add Relationship without Move Under", () => {
+    const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .id(1)
+      .title("Test Note")
+      .notebookId(10)
+      .please()
+
+    const wrapper = helper
+      .component(SearchResultCard)
+      .withProps({ searchHit: noteHit(searchResult) })
+      .mount({
+        slots: {
+          button: '<button type="button">Add Relationship</button>',
+        },
+      })
+
+    expect(wrapper.text()).toContain("Add Relationship")
+    expect(wrapper.text()).not.toContain("Move Under")
+  })
 })

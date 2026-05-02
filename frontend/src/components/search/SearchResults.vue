@@ -37,6 +37,20 @@
         <template #button="{ searchResult: result }">
           <slot name="button" :note-topology="result.noteTopology" />
         </template>
+        <template
+          #folderButton="{
+            folderId,
+            folderName,
+            notebookId: folderNotebookId,
+          }"
+        >
+          <slot
+            name="folderButton"
+            :folder-id="folderId"
+            :folder-name="folderName"
+            :notebook-id="folderNotebookId"
+          />
+        </template>
       </SearchResultCards>
     </div>
 
@@ -78,6 +92,20 @@
         <template #button="{ searchResult: result }">
           <slot name="button" :note-topology="result.noteTopology" />
         </template>
+        <template
+          #folderButton="{
+            folderId,
+            folderName,
+            notebookId: folderNotebookId,
+          }"
+        >
+          <slot
+            name="folderButton"
+            :folder-id="folderId"
+            :folder-name="folderName"
+            :notebook-id="folderNotebookId"
+          />
+        </template>
       </SearchResultCards>
     </div>
   </div>
@@ -118,6 +146,11 @@ const props = defineProps({
 
 defineSlots<{
   button: (props: { noteTopology: NoteTopology }) => void
+  folderButton: (props: {
+    folderId: number
+    folderName?: string
+    notebookId?: number
+  }) => void
 }>()
 
 const searchTerm = ref<SearchTerm>({

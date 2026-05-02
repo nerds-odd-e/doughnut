@@ -9,20 +9,23 @@
     />
     <SearchResults v-bind="{ noteId, inputSearchKey, notebookId }">
       <template v-if="noteId" #button="{ noteTopology }">
-        <div class="daisy-join daisy-join-horizontal">
-          <button
-            class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-join-item"
-            @click.prevent="emit('selected', noteTopology)"
-          >
-            Add Relationship
-          </button>
-          <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-sm daisy-join-item"
-            @click.prevent="emit('moveUnder', noteTopology)"
-          >
-            Move Under
-          </button>
-        </div>
+        <button
+          class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          @click.prevent="emit('selected', noteTopology)"
+        >
+          Add Relationship
+        </button>
+      </template>
+      <template
+        v-if="noteId"
+        #folderButton="{ folderId: targetFolderId }"
+      >
+        <button
+          class="daisy-btn daisy-btn-secondary daisy-btn-sm"
+          @click.prevent="emit('moveUnderFolder', targetFolderId)"
+        >
+          Move Under
+        </button>
       </template>
     </SearchResults>
   </div>
@@ -41,7 +44,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: "selected", noteTopology: NoteTopology): void
-  (e: "moveUnder", noteTopology: NoteTopology): void
+  (e: "moveUnderFolder", folderId: number): void
 }>()
 
 const inputSearchKey = ref("")

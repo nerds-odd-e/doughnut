@@ -47,7 +47,7 @@ When(
       .jumpToNotePage(fromNoteTopic)
       .startSearchingAndAddRelationship()
       .findTarget(toNoteTopic)
-      .moveUnder()
+      .moveUnder(toNoteTopic)
   }
 )
 

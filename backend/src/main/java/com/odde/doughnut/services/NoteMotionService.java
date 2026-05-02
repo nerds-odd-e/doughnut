@@ -1,7 +1,11 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -12,12 +16,15 @@ import org.springframework.stereotype.Service;
 public class NoteMotionService {
   private final EntityPersister entityPersister;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
+  private final NoteRepository noteRepository;
 
   public NoteMotionService(
       EntityPersister entityPersister,
-      NoteChildContainerFolderService noteChildContainerFolderService) {
+      NoteChildContainerFolderService noteChildContainerFolderService,
+      NoteRepository noteRepository) {
     this.entityPersister = entityPersister;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
+    this.noteRepository = noteRepository;
   }
 
   public void execute(Note subject, Note relativeToNote, boolean asFirstChildOfNote)
@@ -84,6 +91,31 @@ public class NoteMotionService {
     entityPersister.flush();
     note.getAllDescendants().forEach(entityPersister::merge);
     entityPersister.merge(note);
+    entityPersister.flush();
+  }
+
+  /**
+   * Places {@code source} in {@code targetFolder} (folder placement; no structural parent note).
+   * Descendant notes keep their parent-note subtree; folder ids are realigned from that subtree.
+   */
+  public void executeMoveIntoFolder(Note source, Folder targetFolder) {
+    source.detachFromParentInMemory();
+    Notebook targetNotebook = targetFolder.getNotebook();
+    source.assignNotebook(targetNotebook);
+    source.getAllDescendants().forEach(d -> d.assignNotebook(targetNotebook));
+    source.setFolder(targetFolder);
+    List<Note> peers = noteRepository.findNotesInFolderOrderBySiblingOrder(targetFolder.getId());
+    List<Note> others = peers.stream().filter(p -> !p.getId().equals(source.getId())).toList();
+    long next =
+        others.isEmpty()
+            ? SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT
+            : others.getLast().getSiblingOrder() + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
+    source.setSiblingOrder(next);
+    entityPersister.flush();
+    source.getAllDescendants().forEach(this::alignFolderForSingleNote);
+    entityPersister.flush();
+    source.getAllDescendants().forEach(entityPersister::merge);
+    entityPersister.merge(source);
     entityPersister.flush();
   }
 

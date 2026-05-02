@@ -27,6 +27,12 @@
       <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
         <slot name="button" />
       </div>
+      <div
+        class="daisy-card-actions daisy-justify-end"
+        v-if="$slots.folderButton"
+      >
+        <slot name="folderButton" />
+      </div>
     </div>
   </div>
 </template>

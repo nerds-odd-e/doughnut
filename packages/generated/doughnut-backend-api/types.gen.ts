@@ -1552,6 +1552,25 @@ export type MoveNoteResponses = {
 
 export type MoveNoteResponse = MoveNoteResponses[keyof MoveNoteResponses];
 
+export type MoveNoteToFolderData = {
+    body?: never;
+    path: {
+        sourceNote: number;
+        targetFolder: number;
+    };
+    query?: never;
+    url: '/api/relations/move-to-folder/{sourceNote}/{targetFolder}';
+};
+
+export type MoveNoteToFolderResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type MoveNoteToFolderResponse = MoveNoteToFolderResponses[keyof MoveNoteToFolderResponses];
+
 export type AddRelationshipFinalizeData = {
     body: RelationshipCreation;
     path: {

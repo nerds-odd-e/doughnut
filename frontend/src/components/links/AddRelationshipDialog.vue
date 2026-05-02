@@ -5,7 +5,7 @@
     v-if="!targetNoteTopology"
     v-bind="{ noteId: note?.id, notebookId: notebookId }"
     @selected="targetNoteTopology = $event"
-    @moveUnder="moveUnder($event)"
+    @moveUnderFolder="moveUnderFolder($event)"
   />
   <AddRelationshipFinalize
     v-if="targetNoteTopology && note"
@@ -44,15 +44,13 @@ const notebookId = computed(
   () => noteRealm.value?.notebookId ?? note?.noteTopology.notebookId
 )
 
-async function moveUnder(targetNoteTopology: NoteTopology) {
-  if (!(await popups.confirm("Move note under target note?"))) {
+async function moveUnderFolder(targetFolderId: number) {
+  if (!(await popups.confirm("Move note into this folder?"))) {
     return
   }
   storageAccessor.value
     .storedApi()
-    .moveNote(note!.id, targetNoteTopology.id, {
-      asFirstChild: false,
-    })
+    .moveNoteToFolder(note!.id, targetFolderId)
     .then(() => {
       emit("closeDialog")
     })

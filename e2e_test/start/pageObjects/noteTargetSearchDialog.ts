@@ -67,8 +67,20 @@ export const assumeNoteTargetSearchDialog = () => {
         .then((elms) => Cypress._.map(elms, 'innerText'))
         .should('deep.equal', targets)
     },
-    moveUnder() {
-      cy.findByRole('button', { name: 'Move Under' }).click()
+    moveUnder(folderTitle: string, notebookName?: string) {
+      let cards = cy.get('[role=card]').filter((_, el) => {
+        const t = el.querySelector('.folder-hit-card-title')
+        if (!t?.textContent?.includes(folderTitle)) return false
+        if (notebookName && !el.textContent?.includes(notebookName))
+          return false
+        return true
+      })
+      if (notebookName) {
+        cards = cards.should('have.length', 1)
+      } else {
+        cards = cards.should('have.length.at.least', 1).first()
+      }
+      cards.findByRole('button', { name: 'Move Under' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
     },
