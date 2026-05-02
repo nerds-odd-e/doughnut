@@ -3,10 +3,10 @@ Feature: relationship edit and remove
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Space topics" with a note "Space" and notes:
-      | Title | Folder |
-      | Moon | Space |
-      | Earth | Space |
-      | Mars | Space |
+      | Title |
+      | Moon |
+      | Earth |
+      | Mars |
     And there is "a part of" relationship between note "Moon" and "Earth"
 
   Scenario: change relation type
