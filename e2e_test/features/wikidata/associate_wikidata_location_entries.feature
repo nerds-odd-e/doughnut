@@ -19,9 +19,9 @@ Feature: Note creation/edit for a location
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
-    When there are some notes:
-      | Title            | Details     | Parent Title|
-      | Singapore        | The red dot | places      |
+    Given I have a notebook "Places map" with notes:
+      | Title     | Details     | Folder |
+      | Singapore | The red dot | places |
     And Wikidata search result always has "Singapore" with ID "Q334"
     And I associate the note "Singapore" with wikidata id "Q334"
     Then the note details on the current page should be "Location: 1.3'N, 103.8'E\nThe red dot"

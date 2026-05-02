@@ -5,10 +5,10 @@ Feature: Re-assimilate note after too many wrong answers
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "English practice" with a note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details                        | Parent Title |
-      | sedition | Sedition means incite violence | English      |
+    And I have a notebook "English practice" with notes:
+      | Title    | Details                        | Skip Memory Tracking |
+      | English  |                                | true                 |
+      | sedition | Sedition means incite violence |                      |
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |

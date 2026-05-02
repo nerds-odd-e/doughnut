@@ -5,12 +5,14 @@ Feature: Assimilate With Remembering Spelling
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "English practice" with a note "English" which skips memory tracking
+    And I have a notebook "English practice" with notes:
+      | Title   | Skip Memory Tracking |
+      | English | true                 |
 
   Scenario Outline: Remembering spelling availability depends on note details
-    Given there are some notes:
-      | Title | Details        | Parent Title |
-      | Word  | <details>      | English      |
+    Given I have a notebook "English practice" with notes:
+      | Title | Details   | Parent Title |
+      | Word  | <details> | English      |
     When I am assimilating the note "Word"
     Then remembering spelling should be <availability>
 
@@ -20,7 +22,7 @@ Feature: Assimilate With Remembering Spelling
       | note has definition      | Definition content      | available    |
 
   Scenario Outline: Verify spelling proceeds with keep for recall
-    Given there are some notes:
+    Given I have a notebook "English practice" with notes:
       | Title        | Details           | Parent Title |
       | <note_title> | Non-empty details | English      |
     And I am assimilating the note "<note_title>"
@@ -35,16 +37,16 @@ Feature: Assimilate With Remembering Spelling
       | sedition       | wrong answer   | "error: wrong spelling" |
 
   Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
-    Given there are some notes:
+    Given I have a notebook "English practice" with notes:
       | Title   | Details           | Parent Title |
       | Relearn | Non-empty details | English      |
     And I assimilated one note "Relearn" on day 1
     And I add remember spelling to the note "Relearn"
     When I navigate to the assimilation page
     Then I should see 1 due for assimilation
-    
+
   Scenario: Add only spelling memory tracker when note already has trackers
-    Given there are some notes:
+    Given I have a notebook "English practice" with notes:
       | Title | Details           | Parent Title |
       | Word  | Non-empty details | English      |
     And I assimilated one note "Word" on day 1
@@ -54,7 +56,7 @@ Feature: Assimilate With Remembering Spelling
     Then the spelling verification result for note "Word" should be "success"
 
   Scenario: Keep for recall disabled when note already has memory trackers
-    Given there are some notes:
+    Given I have a notebook "English practice" with notes:
       | Title | Details           | Parent Title |
       | Word  | Non-empty details | English      |
     And I assimilated one note "Word" on day 1

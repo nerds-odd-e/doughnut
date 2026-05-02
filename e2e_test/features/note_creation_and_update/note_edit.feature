@@ -66,7 +66,7 @@ Feature: Note Edit
       | td     | 88      |
 
   Scenario: Edit a note title should update the sidebar
-    Given there are some notes:
+    Given I have a notebook "LeSS training" with notes:
       | Title | Parent Title   |
       | TDD   | LeSS in Action |
     When I update note title "TDD" to become "Critical thinking"

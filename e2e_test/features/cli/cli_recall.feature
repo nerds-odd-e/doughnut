@@ -5,15 +5,15 @@ Feature: CLI recall status and recall session
   Background:
     Given I am logged in as an existing user
     And I set the access token for "old_learner" in the interactive CLI
-    And I have a notebook "English practice" with a note "English" which skips memory tracking
 
   Rule: English notebook with two notes (sedition vs sedation; markdown in details)
 
     Background:
-      Given there are some notes:
-        | Title    | Details                        | Parent Title |
-        | sedition | Sedition means incite violence | English      |
-        | sedation | **Put** to sleep is _sedation_ | English      |
+      And I have a notebook "English practice" with notes:
+        | Title    | Details                        | Skip Memory Tracking |
+        | English  |                                | true                 |
+        | sedition | Sedition means incite violence |                      |
+        | sedation | **Put** to sleep is _sedation_ |                      |
 
     @disableOpenAiService
     Scenario: Recall status shows count when notes are due
@@ -32,10 +32,10 @@ Feature: CLI recall status and recall session
       And I should see "Put" styled in the Current guidance
       And I should see "Yes, I remember?" in the Current guidance
       When I enter "y" in the interactive CLI
-      Then I should see "English › sedation" in answered questions
+      Then I should see "sedation" in answered questions
       And I should see "Put to sleep" in answered questions
       And I should see "Reviewed: sedation" in answered questions
-      And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
+      When I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 1 note" in past CLI assistant messages
 
     @disableOpenAiService
@@ -67,7 +67,7 @@ Feature: CLI recall status and recall session
       And I should see "to incite violence" in the Current guidance
       When I enter "1" in the interactive CLI
       Then I should see "Correct!" in answered questions
-      And I should see "English › sedition" in answered questions
+      And I should see "sedition" in answered questions
       And I should see "What is the meaning of sedition?" in answered questions
       And I should see "to incite violence" in answered questions
 
@@ -80,7 +80,7 @@ Feature: CLI recall status and recall session
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
       Then I should see "Incorrect" in answered questions
-      And I should see "English › sedition" in answered questions
+      And I should see "sedition" in answered questions
       And I should see "What is the meaning of sedition?" in answered questions
       And I should see "to sleep" in answered questions
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
@@ -107,9 +107,10 @@ Feature: CLI recall status and recall session
   Rule: Spelling recall when the note has remember spelling enabled
 
     Background:
-      Given there are some notes:
-        | Title    | Details                        | Parent Title | Remember Spelling |
-        | sedition | Sedition means incite violence | English      | true              |
+      And I have a notebook "English practice" with notes:
+        | Title    | Details                        | Skip Memory Tracking | Remember Spelling |
+        | English  |                                | true                 |                   |
+        | sedition | Sedition means incite violence |                      | true              |
 
     @disableOpenAiService
     Scenario: Recall spelling — correct answer then just review
@@ -120,10 +121,10 @@ Feature: CLI recall status and recall session
       When I enter "sedition" in the interactive CLI
       Then I should see "Correct!" in answered questions
       And I should see "Your answer: sedition" in answered questions
-      And I should see "English › sedition" in answered questions
+      And I should see "sedition" in answered questions
       And I should see "Sedition means incite violence" in answered questions
       When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      Then I should see "English › sedition" in answered questions
+      Then I should see "sedition" in answered questions
       And I should see "Sedition means incite violence" in answered questions
       And I should see "Reviewed: sedition" in answered questions
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"

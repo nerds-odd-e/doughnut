@@ -5,12 +5,18 @@ Feature: search note
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Sedation care" with a note "Sedation" and details "Put to sleep"
-    And I have a notebook "Sedative drugs" with a note "Sedative" and details "Sleep medicine"
-    And there are some notes:
-      | Title    | Parent Title |
-      | Physical | Sedation     |
-      | Magical  | Sedation     |
+    And I have a notebook "Sedation care" with notes:
+      | Title    | Details      |
+      | Sedation | Put to sleep |
+      | Physical |              |
+      | Magical  |              |
+    And I have a notebook "Sedative drugs" with notes:
+      | Title      | Details        |
+      | Sedative   | Sleep medicine |
+      | Diazepam   |                |
+      | Lorazepam  |                |
+      | Clonazepam |                |
+      | Pam        |                |
 
   @mockBrowserTime
   Scenario Outline: Search at the top level
@@ -23,12 +29,6 @@ Feature: search note
 
   @mockBrowserTime
   Scenario: Show exact match first when searching
-      Given there are some notes:
-      | Title      | Parent Title |
-      | Diazepam   | Sedative     |
-      | Lorazepam  | Sedative     |
-      | Clonazepam | Sedative     |
-      | Pam        | Sedative     |
     When I start searching from all my notebooks page
     Then I should see "Pam, Diazepam, Lorazepam, Clonazepam" as targets only when searching "pam"
 

@@ -141,11 +141,13 @@ CLI steps use `cli.xxx` page objects (in `e2e_test/start/pageObjects/cli/`), not
 
 Example:
 ```gherkin
-Given there are some notes:
-  | Title    | Parent Title | Skip Memory Tracking |
-  | Shape    |              | true        |
-  | Square   | Shape        |             |
+Given I have a notebook "Geometry set" with notes:
+  | Title  |
+  | Shape  |
+  | Square |
 ```
+
+Square is placed under Shape when the notebook is created in one inject batch (no `Folder` column; see testability inject ordering).
 
 ### 6. Service Mocking
 
@@ -217,17 +219,19 @@ expectEndOfAssessment(expectedScore?: string) {
 
 Example of assertive Given step (assertion inside page object, not step definition):
 ```typescript
-// Step definition - clean and simple
-Given('there are some notes:', (data: DataTable) => {
-  start.testability().injectNotes(data.hashes())
+// Step definition - clean and simple (see e2e_test/step_definitions/note.ts for real wiring)
+Given('I have a notebook {string} with notes:', (notebookName: string, data: DataTable) => {
+  cy.get('@currentLoginUser').then((username) =>
+    start.testability().injectNotes(data.hashes(), username, notebookName)
+  )
 })
 
 // Page object implementation - contains the assertion
-injectNotes(noteTestData: NoteTestData[]) {
+injectNotes(noteTestData: NoteTestData[], ...) {
   return cy.request({...}).then((response) => {
     const expectedCount = noteTestData.length
     const actualCount = Object.keys(response.body).length
-    expect(actualCount, 
+    expect(actualCount,
       `Expected ${expectedCount} notes to be created, but backend only created ${actualCount}`
     ).to.equal(expectedCount)
     // ... rest of implementation

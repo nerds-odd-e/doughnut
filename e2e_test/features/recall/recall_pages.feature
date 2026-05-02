@@ -3,12 +3,12 @@ Feature: Assimilation and Recall Pages
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "English practice" with a note "English" which skips memory tracking
-    And there are some notes:
-      | Title    | Details         | Image Url   | Parent Title |
-      | Sedition | Incite violence |             | English      |
-      | Sedation | Put to sleep    |             | English      |
-      | Sedative | Sleep medicine  | a_slide.jpg | English      |
+    And I have a notebook "English practice" with notes:
+      | Title    | Details         | Image Url   | Skip Memory Tracking |
+      | English  |                 |             | true                   |
+      | Sedition | Incite violence |             |                        |
+      | Sedation | Put to sleep    |             |                        |
+      | Sedative | Sleep medicine  | a_slide.jpg |                        |
     And there is "similar to" relationship between note "Sedition" and "Sedation"
 
   Scenario: Different assimilation pages for different notes

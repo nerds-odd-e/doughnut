@@ -53,31 +53,6 @@ Given('I have a notebook {string}', (notebookName: string) => {
   )
 })
 
-Given('there are some notes:', (data: DataTable) => {
-  const hashes = data.hashes()
-  hashes.forEach((note) => {
-    if (!note['Parent Title']) {
-      throw new Error('Parent Title is required for all notes')
-    }
-  })
-  const titleRow = hashes.find((n) => !(n['Parent Title'] ?? '').trim())
-  let notebookName: string
-  if (titleRow?.Title) {
-    notebookName = titleRow.Title
-  } else {
-    const parent = hashes[0]?.['Parent Title']?.trim()
-    if (!parent) {
-      throw new Error(
-        'Cannot infer notebookName for injectNotes: need a first row with a Title (no Parent Title) or Parent Title on the first row'
-      )
-    }
-    notebookName = parent
-  }
-  cy.get<string>('@currentLoginUser').then((username) =>
-    start.testability().injectNotes(hashes, username, notebookName)
-  )
-})
-
 Given(
   'I have a notebook {string} with a note {string}',
   (notebookName: string, noteTitle: string) => {
