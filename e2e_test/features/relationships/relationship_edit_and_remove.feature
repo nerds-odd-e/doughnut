@@ -25,7 +25,7 @@ Feature: relationship edit and remove
     And the note details markdown source should not contain "[[Moon]] a part of [[Earth]]"
 
   Scenario: change relation type of a reverse relationship
-    When I change the reference from "Earth" to "Moon" to "a specialization of"
+    When I change the reference from "Earth" to "Moon a part of Earth" to "a specialization of"
     And I should see "Moon" has relationship "a specialization of" "Earth"
     When I open the relationship from "Moon" to "Earth"
     Then I should see the relationship note title reflects "Moon" "a specialization of" "Earth"

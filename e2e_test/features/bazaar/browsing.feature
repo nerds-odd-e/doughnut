@@ -23,4 +23,4 @@ Feature: Bazaar browsing
     And I should see "Bazaar" in breadcrumb
     When I navigate to "Bazaar/Geometry set/Shape/Rectangle" note
     Then there shouldn't be any note edit button
-    And I should see it has relationship to "Square"
+    And I should see it has relationship to "Square a specialization of Rectangle"

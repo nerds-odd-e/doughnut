@@ -114,9 +114,11 @@ export const assumeNotePage = (
 
     navigateToReference: (referenceTopic: string) => {
       cy.get('main').within(() => {
-        cy.findByText(referenceTopic, {
-          selector: '.relationship-container .title-text',
-        }).click()
+        cy.contains('h3', 'Referenced by')
+          .parent()
+          .within(() => {
+            cy.findByText(referenceTopic, { selector: '.title-text' }).click()
+          })
       })
       return assumeNotePage()
     },

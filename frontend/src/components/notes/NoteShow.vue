@@ -68,11 +68,15 @@
                       <span class="daisy-text-sm daisy-text-base-content/70">
                         {{ reverseLabel(relationTypeLabelFromNoteDetails(relation.details)) }}
                       </span>
-                      <RelationshipOfNote
-                        class="relationship-multi"
+                      <RelationNob
+                        :relation-type-label="
+                          relationTypeLabelFromNoteDetails(relation.details)
+                        "
+                        :inverse-icon="true"
+                      />
+                      <NoteTitleWithLink
                         :key="relation.id"
-                        v-bind="{ note: relation }"
-                        :reverse="true"
+                        :note-topology="relation.noteTopology"
                       />
                     </div>
                   </li>
@@ -113,7 +117,8 @@ import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
-import RelationshipOfNote from "../links/RelationshipOfNote.vue"
+import RelationNob from "../links/RelationNob.vue"
+import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 import {
   relationTypeLabelFromNoteDetails,
   reverseLabel,
