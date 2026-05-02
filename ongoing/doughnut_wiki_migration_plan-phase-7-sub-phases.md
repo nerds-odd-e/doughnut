@@ -19,7 +19,7 @@ Remove the structural note parent concept from tests, frontend code, backend API
 By the end of Phase 7:
 
 - E2E fixtures use folders, not `Parent Title`, when the behavior under test is structural placement.
-- note setup and folder setup are distinct; creating a note never implicitly creates folders after the migration.
+- **Production** note creation and movement never create folders as a side effect; folders exist as explicit entities first. **Testability** may still expose one cohesive setup (folder tree + notes) in a single call or step, as long as it resolves to explicit folders then places notes—no structural reliance on `Parent Title`.
 - public note wire shapes do not expose `parentId`
 - frontend behavior does not branch on `note.parentId`
 - note creation and movement use notebook/folder placement, not parent-note containment
@@ -31,9 +31,25 @@ By the end of Phase 7:
 
 - **No optional parent shim:** Phase 7 removes the parent field instead of making it nullable-but-unused.
 - **Folder placement is the source:** When a note needs placement, use `folderId`; notebook root is represented by no folder.
-- **Folders and notes are separate concepts:** From sub-phase 7.3 onward, testability and production flows should create folders explicitly before placing notes in them. A note creation request may reference an existing folder, but must not create folders as a side effect.
+- **Folders and notes are separate concepts in the product model:** A note references `folderId` (or notebook root); it is not contained by another note. **Production** flows create folders through folder APIs, not as a side effect of creating a note. **Testability** may bundle “ensure this folder path, then place these notes” in one surface for ergonomics, as long as the implementation still materializes folders as real rows and does not reintroduce parent-note containment for structure.
 - **Keep behavior green:** Most sub-phases are structure phases guarded by existing E2E or focused controller/frontend tests. If a cleanup makes the relevant test fail, revert that cleanup and leave it to a later sub-phase with a smaller production change.
 - **Small-batch rule:** Each sub-phase is scoped so it can be completed and verified in about five minutes. If implementation exceeds that, stop and split the sub-phase.
+
+## E2E fixtures: folder path vs note title collisions
+
+Folder placement is expressed by path segments that become folder **names** in the same **notebook** as the fixture notes. If a segment equals another note’s **title** in that setup, the scenario is hard to read and can mask mistakes (or interact badly with any name-based resolution during migration).
+
+**When:** While touching E2E data in sub-phases **7.2**, **7.4**, and **7.12** (and any other fixture edit in Phase 7), actively look for this overlap in the same notebook block: compare each `Folder` path segment to every other row’s note title and to titles introduced in the same scenario (including anchor notes from the surrounding `Given`).
+
+**How to find:** There is no single grep for semantic equality; use feature-wide review. A practical pass is: open each `.feature` you modify, list note titles and folder path segments for one notebook at a time, flag duplicates across the two lists.
+
+**Resolve each collision** (pick the smallest change that keeps the scenario’s intent):
+
+1. **Remove the note** if nothing in the feature depends on that note (no step clicks it, searches for it, or asserts on it).
+2. **Rename the note** if the behavior under test needs that note but not that exact title string.
+3. **Rename the folder** (change the `Folder` path segment) if the test is about the folder shape or navigation label and the note title must stay as written.
+
+Apply the same rule to **new** fixtures: avoid introducing the same string as both a folder segment and an unrelated note title unless the test explicitly means to assert that edge case.
 
 ## Sub-Phase 7.1 - Easy Folder-Only E2E Fixture Cleanup
 
@@ -45,7 +61,7 @@ By the end of Phase 7:
 
 **Post-condition:** The easy rows in `e2e_test/features/note_topology/note_tree_view.feature` no longer set unnecessary `Parent Title`; the sidebar tree behavior is unchanged.
 
-**Work:** First run the targeted spec as a baseline. If it fails, do not edit this fixture. If it passes, remove the unnecessary `Parent Title` values/column only where folder placement already describes the desired setup. Leave any row that proves hard to delete for a future sub-phase.
+**Work:** First run the targeted spec as a baseline. If it fails, do not edit this fixture. If it passes, remove the unnecessary `Parent Title` values/column only where folder placement already describes the desired setup. Leave any row that proves hard to delete for a future sub-phase. If you add or change `Folder` paths, apply [folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions).
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/note_tree_view.feature`.
 
@@ -59,35 +75,35 @@ By the end of Phase 7:
 
 **Post-condition:** The next small batch of folder-backed E2E fixtures no longer duplicates structural placement through `Parent Title`.
 
-**Work:** Remove `Parent Title` from one capability file at a time where `Folder` is already present, starting with the smallest specs such as note creation or Wikidata setup. If a spec fails after removing parent data, restore that fixture and record it as needing a later production change.
+**Work:** Remove `Parent Title` from one capability file at a time where `Folder` is already present, starting with the smallest specs such as note creation or Wikidata setup. If a spec fails after removing parent data, restore that fixture and record it as needing a later production change. Apply [folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions) in the same edit when you touch a file.
 
 **Verify:** Run the targeted `pnpm cypress run --spec ...` for only the touched feature file.
 
-## Sub-Phase 7.3 - Testability Separates Folder and Note Setup
+## Sub-Phase 7.3 - Testability: Cohesive Folder + Note Setup Without Production Side Effects
 
 **Type:** Structure for the next behavior.
 
-**Pre-condition:** Some E2E setup can create notes with `Folder` and no `Parent Title`, but this still risks treating folder paths as something note injection may create implicitly.
+**Pre-condition:** Some E2E setup can create notes with `Folder` and no `Parent Title`, but it is unclear whether folder path handling is only a testability convenience or leaks into production note creation as implicit folder creation.
 
-**Trigger:** Testability setup needs a note inside a folder.
+**Trigger:** Testability setup needs a note inside a folder (often expressed as a folder path in one fixture).
 
-**Post-condition:** Testability has separate setup for folders and notes. Folder setup creates the folder structure; note setup only creates notes in an existing folder or notebook root. Notes and folders are not created together.
+**Post-condition:** Testability may keep **one** setup path that establishes the folder tree and places notes together (same request, same step, or thin wrapper—team preference). What must **not** happen: production note-create or note-move APIs grow or keep “create missing folders from a path string” behavior. Folder path resolution for tests, if any, runs in testability only and ends with explicit folder ids before notes are persisted. `Parent Title` remains only for fixtures that still need legacy structural parent until later sub-phases remove it.
 
-**Work:** Add the smallest explicit folder setup path to testability, then adjust note injection so folder placement means "place this note in an existing folder" rather than "create folders while creating notes." Keep `Parent Title` support temporarily only for fixtures that still need legacy setup.
+**Work:** Clarify or adjust testability so cohesive setup is implemented as “ensure folders (explicit entities), then inject notes with `folderId` / path resolved to ids,” not as parent-note simulation. Add a focused backend test only if needed to lock the boundary (testability may create folders while setting up a scenario; production note endpoints do not). Do **not** require callers to split into two unrelated HTTP steps unless that already matches the codebase.
 
-**Verify:** Focused backend test proving folder setup and note setup are separate, plus the smallest E2E spec from 7.1 if the controller test is not enough to prove UI reachability.
+**Verify:** Focused backend test for the production vs testability boundary if the code change is non-obvious; otherwise the smallest E2E spec from 7.1 plus any existing testability tests you touch.
 
 ## Sub-Phase 7.4 - Convert Remaining Simple E2E Setup to Folder Paths
 
 **Type:** Structure.
 
-**Pre-condition:** Separate folder setup and note setup are covered.
+**Pre-condition:** Sub-phase 7.3 clarified cohesive test setup vs production (no implicit folder creation on note create/move).
 
 **Trigger:** E2E fixtures use `Parent Title` only to place notes under a root note or folder-shaped note.
 
 **Post-condition:** More fixtures create folders explicitly, then place notes in those existing folders; only genuinely legacy semantic-parent scenarios still mention `Parent Title`.
 
-**Work:** Convert one small capability area at a time, such as assessment, recall, search, or notebook deletion. Do not bundle unrelated feature files. Do not introduce new note setup that creates folders implicitly.
+**Work:** Convert one small capability area at a time, such as assessment, recall, search, or notebook deletion. Do not bundle unrelated feature files. Do not introduce new note setup that creates folders implicitly. Apply [folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions) so folder segments do not duplicate unrelated note titles in the same notebook.
 
 **Verify:** Run the targeted `pnpm cypress run --spec ...` for each touched feature file.
 
@@ -197,9 +213,9 @@ By the end of Phase 7:
 
 **Trigger:** Backend builders, E2E testability DTOs, and remaining tests still use `Parent Title` for structural placement.
 
-**Post-condition:** Test setup creates folders separately from notes, then uses notebook/existing-folder placement for structure. Any old semantic-parent fixture is rewritten as frontmatter/link content or deleted if it no longer represents product behavior.
+**Post-condition:** Test setup uses folder-first structural placement; cohesive testability setup is allowed where it still resolves to explicit folders before notes. Any old semantic-parent fixture is rewritten as frontmatter/link content or deleted if it no longer represents product behavior.
 
-**Work:** Remove remaining easy `Parent Title` paths in one test area at a time. Replace implicit folder creation during note injection with explicit folder setup. Leave import/export or book-layout cases to a dedicated sub-phase if they encode a different capability.
+**Work:** Remove remaining easy `Parent Title` paths in one test area at a time. Where note injection used to create folders implicitly in production, that path must already be gone; testability may keep a single bundled setup. Leave import/export or book-layout cases to a dedicated sub-phase if they encode a different capability. Re-check [folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions) for any fixture you change.
 
 **Verify:** Focused backend/frontend tests and targeted E2E specs for the touched area.
 
@@ -261,6 +277,7 @@ By the end of Phase 7:
 
 ## Notes for Future Splitting
 
+- Folder segment vs note title overlap in a fixture is a common footgun; treat collision cleanup as part of the same PR when you already have that feature file open (see [E2E fixtures: folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions)).
 - If any sub-phase touches more than one observable capability, split it before coding.
 - If a fixture cleanup fails because production still requires parent data, restore the fixture and add a narrower production sub-phase immediately before retrying that cleanup.
 - Do not remove ignored or hard-to-delete parent setup in the first cleanup. Keep the first change intentionally small and reversible.

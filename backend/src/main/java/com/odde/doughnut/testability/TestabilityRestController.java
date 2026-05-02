@@ -122,7 +122,12 @@ class TestabilityRestController {
     @Setter
     private String wikidataId;
 
-    @Schema(name = "Folder", description = "Notebook-local folder path (segments separated by /).")
+    @Schema(
+        name = "Folder",
+        description =
+            "Notebook-local folder path (segments separated by /). E2E/testability only: missing"
+                + " folder rows are created here, then the note is assigned that folder. Production"
+                + " note APIs do not accept or infer folder paths.")
     @JsonProperty("Folder")
     @Getter
     @Setter
@@ -184,16 +189,23 @@ class TestabilityRestController {
           note.setParentNote(getParentNote(titleNoteMap, noteRepository, injection.parentTitle));
           continue;
         }
-        Optional<String> inferredParentTitle =
-            implicitStructuralParentTitleFromNotebookLocalFolderPath(injection.getFolder());
-        if (inferredParentTitle.isPresent()) {
-          Note parentFromFolderName =
-              getParentNote(titleNoteMap, noteRepository, inferredParentTitle.get());
-          if (parentFromFolderName != null) {
-            note.setParentNote(parentFromFolderName);
-            continue;
+        if (!Strings.isBlank(injection.getFolder())) {
+          if (notebookFromRepositoryOrNull != null) {
+            note.initializeAsNotebookRoot(
+                notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
+            notebookFromRepositoryOrNull.setUpdated_at(currentUTCTimestamp);
+            entityPersister.merge(notebookFromRepositoryOrNull);
+          } else if (firstRootCreatedInBatch == null) {
+            note.attachToNewNotebook(ownership, user);
+            note.getNotebook().setName(notebookName);
+            note.getNotebook().setUpdated_at(currentUTCTimestamp);
+            entityPersister.save(note.getNotebook());
+            firstRootCreatedInBatch = note;
+          } else {
+            note.initializeAsNotebookRoot(
+                firstRootCreatedInBatch.getNotebook(), user, currentUTCTimestamp, injection.title);
           }
-          // No note titled like the inferred folder segment — use batch/notebook rules below.
+          continue;
         }
         if (notebookFromRepositoryOrNull != null) {
           note.initializeAsNotebookRoot(
@@ -225,21 +237,6 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap, EntityPersister entityPersister) {
       noteTestData.forEach(inject -> entityPersister.save(titleNoteMap.get(inject.title)));
     }
-  }
-
-  private static Optional<String> implicitStructuralParentTitleFromNotebookLocalFolderPath(
-      String folderPath) {
-    if (Strings.isBlank(folderPath)) {
-      return Optional.empty();
-    }
-    String lastNonEmptySegment = null;
-    for (String raw : folderPath.split("/")) {
-      String trimmed = raw.trim();
-      if (!trimmed.isEmpty()) {
-        lastNonEmptySegment = trimmed;
-      }
-    }
-    return Optional.ofNullable(lastNonEmptySegment);
   }
 
   private void applyExplicitFolderPlacements(

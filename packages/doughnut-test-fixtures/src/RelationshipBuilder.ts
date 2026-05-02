@@ -1,4 +1,7 @@
-import type { Note, RelationshipCreation } from '@generated/doughnut-backend-api'
+import type {
+  Note,
+  RelationshipCreation,
+} from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
 

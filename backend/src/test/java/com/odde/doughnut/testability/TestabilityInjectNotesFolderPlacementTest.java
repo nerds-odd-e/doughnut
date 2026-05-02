@@ -44,12 +44,13 @@ class TestabilityInjectNotesFolderPlacementTest {
     Map<String, Integer> ids = testabilityRestController.injectNotes(data);
 
     Note constNote = noteRepository.findById(ids.get("Const")).orElseThrow();
-    assertThat(constNote.getParent().getTitle(), equalTo("TPP"));
+    assertThat(constNote.getParent(), nullValue());
     assertThat(constNote.getFolder(), notNullValue());
     assertThat(constNote.getFolder().getName(), equalTo("TPP"));
     assertThat(constNote.getFolder().getParentFolder().getName(), equalTo("LeSS in Action"));
 
     Note noFolder = noteRepository.findById(ids.get("NoFolderChild")).orElseThrow();
+    assertThat(noFolder.getParent().getTitle(), equalTo("TDD"));
     assertThat(noFolder.getFolder(), nullValue());
   }
 
@@ -70,9 +71,11 @@ class TestabilityInjectNotesFolderPlacementTest {
     Note germany = noteRepository.findById(ids.get("Germany")).orElseThrow();
     Note japan = noteRepository.findById(ids.get("Japan")).orElseThrow();
     assertThat(germany.getParent(), nullValue());
-    assertThat(japan.getParent().getTitle(), equalTo("Germany"));
+    assertThat(japan.getParent(), nullValue());
     assertThat(germany.getFolder(), notNullValue());
     assertThat(japan.getFolder(), notNullValue());
+    assertThat(japan.getFolder().getId(), equalTo(germany.getFolder().getId()));
+    assertThat(germany.getFolder().getName(), equalTo("World"));
   }
 
   private static TestabilityRestController.NoteTestData row(

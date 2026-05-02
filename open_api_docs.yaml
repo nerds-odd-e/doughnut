@@ -3609,7 +3609,9 @@ components:
           type: string
         Folder:
           type: string
-          description: Notebook-local folder path (segments separated by /).
+          description: "Notebook-local folder path (segments separated by /). E2E/testability\
+            \ only: missing folder rows are created here, then the note is assigned\
+            \ that folder. Production note APIs do not accept or infer folder paths."
     NotesTestData:
       type: object
       properties:

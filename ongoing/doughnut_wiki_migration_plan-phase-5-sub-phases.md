@@ -355,7 +355,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Trigger:** A user views, edits, or deletes a note created from a relationship template.
 
-**Post-condition:** Relationship-specific UI is removed from title, icon, and sidebar paths. **Display** of relation type (icons, inverted labels) reads the `relation` value from **note details** frontmatter (see 5.20.4), not `NoteTopology`. Topology DTO fields such as `relationType` are removed after that read path migrates (5.20.5+). **Editing** the relation continues through the note property surface and existing creation flows until the wiki model fully absorbs those flows.
+**Post-condition:** Relationship-specific UI is removed from title, icon, and sidebar paths. **Display** of relation type (icons, inverted labels) reads the `relation` value from **note details** frontmatter (see 5.20.4), not `NoteTopology`. Topology DTO fields such as `relationType` are removed after that read path migrates (5.20.5), then inbound note-show rows lose `RelationshipOfNote` (5.20.6), relation-row API identity moves out of `RichMarkdownEditor` (5.20.7), and `targetNoteTopology` is removed from topology (5.20.8). **Editing** the relation continues through the note property surface and existing creation flows until the wiki model fully absorbs those flows.
 
 ### Sub-Sub-Phase 5.20.1 - Edit Relation Through Property Value
 
@@ -411,11 +411,11 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Pre-condition:** Relationship notes store `relation` in frontmatter. API responses that drive relation-type **display** include `Note.details` (or an equivalent parsed-properties shape) for those notes.
 
-**Trigger:** A user views a surface that shows the relation type icon or inverted label for a relationship note (for example inbound references on note show, or `RelationshipOfNote`).
+**Trigger:** A user views a surface that shows the relation type icon or inverted label for a relationship note (for example inbound references on note show, or the relationship row before `RelationshipOfNote` is removed in 5.20.6).
 
 **Post-condition:** Display uses the `relation` value parsed from the note’s markdown frontmatter (same normalization as the property editor / `relationTypeFromKebab`), not `NoteTopology.relationType`.
 
-**Work:** Add or reuse a small helper to read the relation label from `details`. Update `NoteShow`, `RelationNob` / `RelationshipOfNote`, and any other **read-only** UI that still reads `noteTopology.relationType`. Keep a single mapping from stored values (kebab / slug) to display labels shared with `RichFrontmatterProperties`.
+**Work:** Add or reuse a small helper to read the relation label from `details`. Update `NoteShow` (label span beside the inbound link), `RelationNob` / `RelationshipOfNote` until 5.20.6 removes the latter, and any other **read-only** UI that still reads `noteTopology.relationType`. Keep a single mapping from stored values (kebab / slug) to display labels shared with `RichFrontmatterProperties`.
 
 **Verify:** Targeted relationship display E2E (`--spec` for relationship / note-show coverage touched) plus any focused frontend tests for the parser if the helper is non-trivial.
 
@@ -425,13 +425,13 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 | Area | Covered by frontmatter parse? | Notes |
 |------|--------------------------------|-------|
-| **Display** (`NoteShow` inbound refs, `RelationshipOfNote` / `RelationNob`) | **Yes**, once `details` is reliably present on those `Note` payloads | Both paths already have a full `Note`; switch the read source. |
+| **Display** (`NoteShow` inbound refs, `RelationshipOfNote` until 5.20.6 / `RelationNob`) | **Yes**, once `details` is reliably present on those `Note` payloads | Inbound row: label from frontmatter; linked title becomes a normal note link in 5.20.6 (no `RelationshipOfNote`). |
 | **Cards / search hits / any surface with only `NoteTopology`** | **Not automatically** | No body to parse unless the wire shape adds `details`, a short relation snippet, or the UI stops showing relation type there. Today **`Card` does not use `RelationNob`**; search results use topology without relation icon—confirm when implementing. |
 | **Editing** (`RichFrontmatterProperties`, relation property row) | **Already** | Driven by frontmatter rows and API update; not a `noteTopology.relationType` read. |
 | **Creation** (`AddRelationshipFinalize`, DTO `RelationshipCreation`) | **N/A** | User-chosen type on create; not derived from topology display. |
 | **Types** (`NoteTopology["relationType"]` on selects) | **Mechanical follow-up** | After display migration, retype selectors from a shared label union or string; then **5.20.5** can remove the field from `NoteTopology`. |
 
-**Conclusion:** Frontmatter parsing can replace **all current** frontend **reads** of `noteTopology.relationType` for surfaces that already carry `Note.details`. It does **not** replace hypothetical future list-only payloads; if those must show relation type, extend the API or accept no icon until the note is opened. Ordering stays: **this phase (5.20.4) → then 5.20.5 removes `relationType` from topology.**
+**Conclusion:** Frontmatter parsing can replace **all current** frontend **reads** of `noteTopology.relationType` for surfaces that already carry `Note.details`. It does **not** replace hypothetical future list-only payloads; if those must show relation type, extend the API or accept no icon until the note is opened. Ordering stays: **this phase (5.20.4) → then 5.20.5 removes `relationType` from topology → 5.20.6 removes `RelationshipOfNote` → 5.20.7 stops threading note id through `RichMarkdownEditor` → 5.20.8 removes `targetNoteTopology` → 5.20.9 backend frontmatter reads.**
 
 ### Sub-Sub-Phase 5.20.5 - Remove Relation Type From NoteTopology
 
@@ -449,11 +449,43 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One topology-relation-type-removal commit.
 
-### Sub-Sub-Phase 5.20.6 - Remove Target Note Topology From NoteTopology
+### Sub-Sub-Phase 5.20.6 - Note Show Inbound References: Normal Linked Title Only (Remove RelationshipOfNote)
+
+**Type:** Behavior / structure cleanup.
+
+**Pre-condition:** Inbound reference notes have ordinary persisted titles (Phase 5 relationship title work). The “referenced by” relation label reads from frontmatter (5.20.4).
+
+**Trigger:** A user opens a note that has inbound references.
+
+**Post-condition:** Each “referenced by” row shows the inverted relation label and a **normal** navigable note title (same title treatment as other note links), pointing at the referring relationship note. `RelationshipOfNote.vue` is removed.
+
+**Work:** In `NoteShow.vue`, replace `RelationshipOfNote` with a `router-link` (or shared small link component) to the referring note’s show route using `noteTopology.id` / `note.id`, plus `NoteTitleComponent` or the same title source used elsewhere—**not** a subject/target split from `targetNoteTopology` / `parentOrSubjectNoteTopology`. Delete `frontend/src/components/links/RelationshipOfNote.vue`, remove stale `components.d.ts` entries, and delete any helpers/styles/tests used only by that component.
+
+**Verify:** Targeted relationship / note-show E2E (`--spec` for referenced-by behavior); frontend tests that referenced the removed component.
+
+**Commit boundary:** One inbound-ref presentation commit.
+
+### Sub-Sub-Phase 5.20.7 - Relation Property API Note Id Only at Note-Editing Layer (Not RichMarkdownEditor)
+
+**Type:** Structure (layering / cohesion).
+
+**Pre-condition:** Rich mode composes `NoteEditableDetails` → `RichMarkdownEditor` → `RichFrontmatterProperties`.
+
+**Trigger:** A developer extends the generic rich markdown editor.
+
+**Post-condition:** `RichMarkdownEditor` does **not** declare or forward `relationPropertyApiNoteId` (it is the persisted id of the note whose `details` are being edited—nothing markdown-generic about it). `RichFrontmatterProperties` still receives that id for relation-type API updates, supplied from `NoteEditableDetails` or `NoteTextContent` via `provide`/`inject`, a thin note-local wrapper, or template composition that keeps the prop on the frontmatter block only.
+
+**Work:** Remove the prop from `RichMarkdownEditor`; wire the id into `RichFrontmatterProperties` from the note-editing parent only. Replace any `targetNoteTopology`-based predicate in `NoteTextContent` (or siblings) that only existed to decide “pass note id for relation row” with a frontmatter-based check or the straightforward **editing note id** when the `relation` property is present—so the markdown stack does not depend on topology for identity. Update `RichMarkdownEditor.spec.ts`, `NoteEditableDetails.spec.ts`, and any builders that set the prop on the editor.
+
+**Verify:** Focused frontend tests for relation property edit in rich mode (paths that hit the relation row API).
+
+**Commit boundary:** One editor-layering commit.
+
+### Sub-Sub-Phase 5.20.8 - Remove Target Note Topology From NoteTopology
 
 **Type:** Structure cleanup.
 
-**Pre-condition:** Frontend relation display/navigation no longer reads `NoteTopology.targetNoteTopology`.
+**Pre-condition:** Frontend relation display/navigation no longer reads `NoteTopology.targetNoteTopology` (including removal of `RelationshipOfNote` in 5.20.6 and any remaining reads in cards/search).
 
 **Trigger:** API types are regenerated or compiled.
 
@@ -465,7 +497,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One topology-target-removal commit.
 
-### Sub-Sub-Phase 5.20.7 - Backend Reads Relation Type From Frontmatter
+### Sub-Sub-Phase 5.20.9 - Backend Reads Relation Type From Frontmatter
 
 **Type:** Behavior.
 
