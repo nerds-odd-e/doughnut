@@ -89,6 +89,97 @@ class NoteRealmServiceTest {
   }
 
   @Test
+  void relationships_deprecating_uses_cache_source_row_on_subject_realm() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note subject = makeMe.aNote().under(root).please();
+    Note relation = makeMe.aRelation().between(subject, focal).please();
+    relation.setDetails(
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, relation.getRelationType(), subject, focal, null));
+    makeMe.entityPersister.merge(relation);
+    makeMe.entityPersister.flush();
+    wikiTitleCacheService.refreshForNote(relation, user);
+
+    NoteRealm subjectRealm = noteRealmService.build(subject, user);
+
+    assertThat(subjectRealm.getRelationshipsDeprecating(), hasSize(1));
+    assertThat(
+        subjectRealm.getRelationshipsDeprecating().get(0).getId(), equalTo(relation.getId()));
+
+    NoteRealm focalRealm = noteRealmService.build(focal, user);
+    assertThat(focalRealm.getRelationshipsDeprecating(), empty());
+  }
+
+  @Test
+  void relationships_deprecating_empty_when_cache_not_refreshed_even_if_structural_child_exists() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note subject = makeMe.aNote().under(root).please();
+    makeMe.aRelation().between(subject, focal).please();
+
+    NoteRealm realm = noteRealmService.build(subject, user);
+
+    assertThat(realm.getRelationshipsDeprecating(), empty());
+  }
+
+  @Test
+  void relationships_deprecating_excludes_non_relation_body_wikilink_only_inbound_includes() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note carrier = makeMe.aNote().under(root).details("[[Focal]]").please();
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getInboundReferences(), hasSize(1));
+    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
+    assertThat(realm.getRelationshipsDeprecating(), empty());
+  }
+
+  @Test
+  void relationships_deprecating_includes_non_relation_parent_yaml_row() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note carrier = makeMe.aNote().title("Child").under(root).please();
+    carrier.setDetails("---\nparent: \"[[Focal]]\"\n---\n\nBody.");
+    makeMe.entityPersister.merge(carrier);
+    makeMe.entityPersister.flush();
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getRelationshipsDeprecating(), hasSize(1));
+    assertThat(realm.getRelationshipsDeprecating().get(0).getId(), equalTo(carrier.getId()));
+  }
+
+  @Test
+  void relationships_deprecating_omits_soft_deleted_relation_even_if_cache_row_remains() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note subject = makeMe.aNote().under(root).please();
+    Note relation = makeMe.aRelation().between(subject, focal).please();
+    relation.setDetails(
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            relation, relation.getRelationType(), subject, focal, null));
+    makeMe.entityPersister.merge(relation);
+    makeMe.entityPersister.flush();
+    wikiTitleCacheService.refreshForNote(relation, user);
+
+    relation.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+    makeMe.entityPersister.merge(relation);
+
+    NoteRealm realm = noteRealmService.build(subject, user);
+
+    assertThat(realm.getRelationshipsDeprecating(), empty());
+  }
+
+  @Test
   void inbound_includes_cross_notebook_carrier_when_viewer_can_refer() {
     User user = makeMe.aUser().please();
     Note headMain = makeMe.aNote().creatorAndOwner(user).title("MainNb").please();

@@ -21,15 +21,5 @@
     "Then": 3
   },
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.configuration.runtimes": [
-    {
-      "name": "JavaSE-25",
-      "path": "${workspaceFolder}/.nix/jdk",
-      "default": true
-    }
-  ],
-  "java.configuration.updateBuildConfiguration": "interactive",
-  "java.import.gradle.java.home": "${workspaceFolder}/.nix/jdk",
-  "java.jdt.ls.java.home": "${workspaceFolder}/.nix/jdk",
-  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1536m -Xms100m -Xlog:disable"
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

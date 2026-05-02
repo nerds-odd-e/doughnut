@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteFrontmatterWikiLinkTokens;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -8,9 +9,11 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +70,45 @@ public class WikiTitleCacheService {
       }
       Note referrer = entityManager.find(Note.class, referrerId);
       if (referrer == null) {
+        continue;
+      }
+      if (inboundReferrerVisible(referrer, focalNote, viewer)) {
+        distinctOrder.put(referrerId, referrer);
+      }
+    }
+    return List.copyOf(distinctOrder.values());
+  }
+
+  /**
+   * Notes whose relationship {@code source:} or non-relationship {@code parent:} wikilink resolves
+   * to {@code focalNote}, for {@link
+   * com.odde.doughnut.controllers.dto.NoteRealm#getRelationshipsDeprecating()}. Same visibility
+   * rules as {@link #inboundReferrerNotesForViewer}.
+   */
+  public List<Note> subjectAndParentLinkedReferrerNotesForViewer(Note focalNote, User viewer) {
+    List<NoteWikiTitleCache> rows =
+        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
+    LinkedHashMap<Integer, Note> distinctOrder = new LinkedHashMap<>();
+    for (NoteWikiTitleCache row : rows) {
+      Integer referrerId = row.getNote().getId();
+      if (distinctOrder.containsKey(referrerId)) {
+        continue;
+      }
+      Note referrer = entityManager.find(Note.class, referrerId);
+      if (referrer == null) {
+        continue;
+      }
+      Set<String> allowedNormalized =
+          referrer.isRelation()
+              ? NoteFrontmatterWikiLinkTokens.normalizedWikiLinkTokensFromYamlField(
+                  referrer.getDetails(), "source")
+              : NoteFrontmatterWikiLinkTokens.normalizedWikiLinkTokensFromYamlField(
+                  referrer.getDetails(), "parent");
+      if (allowedNormalized.isEmpty()) {
+        continue;
+      }
+      String rowKey = Normalizer.normalize(row.getLinkText(), Normalizer.Form.NFKC);
+      if (!allowedNormalized.contains(rowKey)) {
         continue;
       }
       if (inboundReferrerVisible(referrer, focalNote, viewer)) {

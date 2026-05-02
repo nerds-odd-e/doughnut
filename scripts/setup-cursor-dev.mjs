@@ -5,7 +5,7 @@
  */
 
 import { existsSync, mkdirSync, rmSync, symlinkSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve as resolvePath } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
@@ -85,6 +85,9 @@ function refreshNixJavaLink(cwd = repoRoot()) {
 try {
   const { linkPath, javaHome } = refreshNixJavaLink()
   console.error(`${linkPath} -> ${javaHome}`)
+  console.error(
+    `Optional Cursor Java (User settings JSON): "java.jdt.ls.java.home": "${resolvePath(linkPath)}"`
+  )
   process.exit(0)
 } catch (error) {
   console.error(`${error}`)

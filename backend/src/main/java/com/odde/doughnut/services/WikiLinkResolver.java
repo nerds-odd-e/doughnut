@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -9,14 +10,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WikiLinkResolver {
-
-  private static final Pattern WIKI_LINK = Pattern.compile("\\[\\[([^\\]]+)]]");
 
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
@@ -34,7 +31,7 @@ public class WikiLinkResolver {
     if (details == null || details.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = extractWikiTitles(details);
+    List<String> linkTitlesOrdered = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(details);
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }
@@ -85,18 +82,6 @@ public class WikiLinkResolver {
       }
       return new Qualified(nb, nt);
     }
-  }
-
-  private static List<String> extractWikiTitles(String markdown) {
-    Matcher matcher = WIKI_LINK.matcher(markdown);
-    List<String> titles = new ArrayList<>();
-    while (matcher.find()) {
-      String t = matcher.group(1).trim();
-      if (!t.isEmpty()) {
-        titles.add(t);
-      }
-    }
-    return titles;
   }
 
   private static List<String> dedupePreserveOrder(List<String> titles) {

@@ -23,6 +23,12 @@ import org.springframework.lang.NonNull;
   "wikiTitles"
 })
 public class NoteRealm {
+  @JsonProperty("relationshipsDeprecating")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Getter
+  @Setter
+  private List<Note> relationshipsDeprecating;
+
   @Getter @Setter private List<Note> inboundReferences;
 
   @NotNull @Getter private Note note;
@@ -41,12 +47,6 @@ public class NoteRealm {
   @NotNull
   public Integer getId() {
     return note.getId();
-  }
-
-  @JsonProperty("relationshipsDeprecating")
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public List<Note> getRelationshipsDeprecating() {
-    return note.getRelationships();
   }
 
   @NonNull
