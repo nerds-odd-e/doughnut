@@ -9,6 +9,9 @@ const keepForRecallButton = (options?: { timeout?: number }) =>
 const understandingChecklist = () =>
   cy.contains('Understanding Checklist:').closest('.daisy-bg-accent')
 
+const mainNoteTitle = () =>
+  cy.get('#main-note-content [data-test="note-title"]', { timeout: 15000 })
+
 export const assumeAssimilationPage = () => ({
   expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
     const [assimilatedTodayCount, toAssimilateCountForToday, totalCount] =
@@ -72,7 +75,7 @@ export const assumeAssimilationPage = () => ({
     } else {
       switch (assimilationType) {
         case 'single note': {
-          if (title) cy.findByText(title, { selector: '[role=title]' })
+          if (title) mainNoteTitle().should('contain', title)
           if (additionalInfo) {
             cy.get('.note-details').should('contain', additionalInfo)
           }
@@ -100,10 +103,9 @@ export const assumeAssimilationPage = () => ({
               additionalInfo,
               '; '
             )
-            if (title) cy.get('[role=title]').should('contain', title)
-            if (targetNote) cy.get('[role=title]').should('contain', targetNote)
-            if (relationType)
-              cy.get('[role=title]').should('contain', relationType)
+            if (title) mainNoteTitle().should('contain', title)
+            if (targetNote) mainNoteTitle().should('contain', targetNote)
+            if (relationType) mainNoteTitle().should('contain', relationType)
           }
           break
         }
