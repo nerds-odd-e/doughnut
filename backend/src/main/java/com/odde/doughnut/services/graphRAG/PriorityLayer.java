@@ -59,7 +59,7 @@ public class PriorityLayer {
         BareNote result =
             builder.addNoteToRelatedNotes(
                 relatedNote,
-                handler.getRelationshipToFocusNoteFor(relatedNote),
+                handler.getRelationshipToFocusNote(),
                 handler.isLinkFromFocusFor(relatedNote),
                 handler.isLinkHop2For(relatedNote));
 

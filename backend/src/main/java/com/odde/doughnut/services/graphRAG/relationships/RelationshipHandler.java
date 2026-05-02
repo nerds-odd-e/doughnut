@@ -18,10 +18,6 @@ public abstract class RelationshipHandler {
 
   public abstract Note handle();
 
-  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
-    return relationshipToFocusNote;
-  }
-
   public boolean isLinkFromFocusFor(Note note) {
     return false;
   }

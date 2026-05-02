@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -158,23 +159,7 @@ public class WikiTitleCacheService {
    * User#canReferTo}).
    */
   public List<Note> inboundReferrerNotesForViewer(Note focalNote, User viewer) {
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
-    LinkedHashMap<Integer, Note> distinctOrder = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row : rows) {
-      Integer referrerId = row.getNote().getId();
-      if (distinctOrder.containsKey(referrerId)) {
-        continue;
-      }
-      Note referrer = entityManager.find(Note.class, referrerId);
-      if (referrer == null) {
-        continue;
-      }
-      if (inboundReferrerVisible(referrer, focalNote, viewer)) {
-        distinctOrder.put(referrerId, referrer);
-      }
-    }
-    return List.copyOf(distinctOrder.values());
+    return distinctReferrersFromTargetRows(focalNote, viewer, (row, referrer) -> true);
   }
 
   /**
@@ -184,6 +169,30 @@ public class WikiTitleCacheService {
    * #inboundReferrerNotesForViewer}.
    */
   public List<Note> subjectAndParentLinkedReferrerNotesForViewer(Note focalNote, User viewer) {
+    return distinctReferrersFromTargetRows(
+        focalNote,
+        viewer,
+        (row, referrer) -> {
+          Set<String> allowedNormalized =
+              referrer.isRelation()
+                  ? NoteFrontmatterWikiLinkTokens.normalizedWikiLinkTokensFromYamlField(
+                      referrer.getDetails(), "source")
+                  : NoteFrontmatterWikiLinkTokens.normalizedWikiLinkTokensFromYamlField(
+                      referrer.getDetails(), "parent");
+          if (allowedNormalized.isEmpty()) {
+            return false;
+          }
+          String rowKey = Normalizer.normalize(row.getLinkText(), Normalizer.Form.NFKC);
+          return allowedNormalized.contains(rowKey);
+        });
+  }
+
+  /**
+   * Walks wiki cache rows targeting {@code focalNote}, dedupes by referring note id, applies {@code
+   * rowMatches} before visibility.
+   */
+  private List<Note> distinctReferrersFromTargetRows(
+      Note focalNote, User viewer, BiPredicate<NoteWikiTitleCache, Note> rowMatches) {
     List<NoteWikiTitleCache> rows =
         noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
     LinkedHashMap<Integer, Note> distinctOrder = new LinkedHashMap<>();
@@ -193,20 +202,7 @@ public class WikiTitleCacheService {
         continue;
       }
       Note referrer = entityManager.find(Note.class, referrerId);
-      if (referrer == null) {
-        continue;
-      }
-      Set<String> allowedNormalized =
-          referrer.isRelation()
-              ? NoteFrontmatterWikiLinkTokens.normalizedWikiLinkTokensFromYamlField(
-                  referrer.getDetails(), "source")
-              : NoteFrontmatterWikiLinkTokens.normalizedWikiLinkTokensFromYamlField(
-                  referrer.getDetails(), "parent");
-      if (allowedNormalized.isEmpty()) {
-        continue;
-      }
-      String rowKey = Normalizer.normalize(row.getLinkText(), Normalizer.Form.NFKC);
-      if (!allowedNormalized.contains(rowKey)) {
+      if (referrer == null || !rowMatches.test(row, referrer)) {
         continue;
       }
       if (inboundReferrerVisible(referrer, focalNote, viewer)) {
