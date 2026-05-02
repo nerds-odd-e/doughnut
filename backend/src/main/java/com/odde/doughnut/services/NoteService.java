@@ -140,10 +140,14 @@ public class NoteService {
       return;
     }
     Note source = relation.getParent();
-    Note target =
+    Optional<Note> targetOpt =
         relationshipNoteEndpointResolver
             .resolveSemanticTarget(relation, viewer)
-            .orElseGet(relation::getTargetNote);
+            .or(() -> wikiTitleCacheService.primaryWikiLinkedTargetForGraph(relation, viewer));
+    if (targetOpt.isEmpty()) {
+      return;
+    }
+    Note target = targetOpt.get();
     relation.setTitle(
         RelationshipNoteTitleFormatter.format(
             source.getTitle(), relationType.label, target.getTitle()));

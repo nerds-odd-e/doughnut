@@ -32,6 +32,7 @@ public class WikiTitleCacheService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
+  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
   private final JdbcTemplate jdbcTemplate;
 
   public WikiTitleCacheService(
@@ -39,11 +40,13 @@ public class WikiTitleCacheService {
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       NoteRepository noteRepository,
       AuthorizationService authorizationService,
+      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver,
       JdbcTemplate jdbcTemplate) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
+    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
     this.jdbcTemplate = jdbcTemplate;
   }
 
@@ -76,34 +79,35 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * Semantic primary target for graph: prefers legacy {@link Note#getTargetNote()} when it matches
-   * an outgoing wiki target or is still readable; for a non-relation focus, relation children’s
-   * targets are considered in sibling order. Otherwise the first authorized outgoing target.
+   * Graph “primary” target: relationship {@code target:} semantics (YAML + wiki resolution) when
+   * they align with an authorized outgoing cache target or are readable; otherwise first outgoing
+   * from {@link #outgoingWikiLinkedTargetsForGraph}. Does not use {@code note.target_note_id}.
    */
   public Optional<Note> primaryWikiLinkedTargetForGraph(Note focus, User viewer) {
     List<Note> outgoing = outgoingWikiLinkedTargetsForGraph(focus, viewer);
-    List<Note> legacyCandidates = new ArrayList<>();
-    if (focus.getTargetNote() != null) {
-      legacyCandidates.add(focus.getTargetNote());
-    }
-    if (!focus.isRelation()) {
+    List<Note> semanticCandidates = new ArrayList<>();
+    if (focus.isRelation()) {
+      relationshipNoteEndpointResolver
+          .resolveSemanticTarget(focus, viewer)
+          .ifPresent(semanticCandidates::add);
+    } else {
       for (Note carrier : relationCarrierChildrenOrdered(focus)) {
-        if (carrier.getTargetNote() != null) {
-          legacyCandidates.add(carrier.getTargetNote());
-        }
+        relationshipNoteEndpointResolver
+            .resolveSemanticTarget(carrier, viewer)
+            .ifPresent(semanticCandidates::add);
       }
     }
-    for (Note legacy : legacyCandidates) {
+    for (Note sem : semanticCandidates) {
       for (Note o : outgoing) {
-        if (o.getId().equals(legacy.getId())) {
+        if (o.getId().equals(sem.getId())) {
           return Optional.of(o);
         }
       }
     }
-    for (Note legacy : legacyCandidates) {
-      Notebook nb = legacy.getNotebook();
+    for (Note sem : semanticCandidates) {
+      Notebook nb = sem.getNotebook();
       if (nb != null && authorizationService.userMayReadNotebook(viewer, nb)) {
-        return Optional.of(legacy);
+        return Optional.of(sem);
       }
     }
     if (!outgoing.isEmpty()) {

@@ -18,6 +18,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -111,15 +112,11 @@ class RelationController {
   }
 
   private List<NoteRealm> getNoteRealm(Note relation, User user) {
-    Note nt =
+    Optional<Note> resolved =
         relationshipNoteEndpointResolver
             .resolveSemanticTarget(relation, user)
-            .map(n -> entityPersister.find(Note.class, n.getId()))
-            .orElseGet(
-                () -> {
-                  Note legacy = relation.getTargetNote();
-                  return legacy == null ? null : entityPersister.find(Note.class, legacy.getId());
-                });
+            .or(() -> wikiTitleCacheService.primaryWikiLinkedTargetForGraph(relation, user));
+    Note nt = resolved.map(n -> entityPersister.find(Note.class, n.getId())).orElse(null);
     Note np = entityPersister.find(Note.class, relation.getParent().getId());
     return List.of(
         noteRealmService.build(relation, user),

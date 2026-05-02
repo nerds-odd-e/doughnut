@@ -84,9 +84,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
 
-  @OneToMany(mappedBy = "targetNote")
-  private List<Note> inboundReferences = new ArrayList<>();
-
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
   @OrderBy("siblingOrder")
@@ -141,11 +138,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public List<Note> getRelationships() {
     return getChildren().stream().filter(Note::isRelation).toList();
-  }
-
-  @JsonIgnore
-  public List<Note> getInboundReferences() {
-    return filterDeletedUnmodifiableNoteList(inboundReferences);
   }
 
   public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
@@ -274,11 +266,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public Stream<Note> getAllNoneRelationDescendants() {
     return getAllDescendants().filter(n -> !n.isRelation());
-  }
-
-  @JsonIgnore
-  public Stream<Note> getRelationshipsAndRefers() {
-    return Stream.concat(getRelationships().stream(), getInboundReferences().stream());
   }
 
   @JsonIgnore

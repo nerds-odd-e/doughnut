@@ -8,7 +8,7 @@ Sub-phase 7.13 of `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`: 
 
 GraphRAG context should describe the focus note through wiki links and folder placement only. Note parent/child edges no longer provide graph relationship meaning or expansion.
 
-By the end of 7.13:
+**Target end state by the end of 7.13:**
 
 - `FocusNote` has no children list.
 - `FocusNote.contextualPath` is a single folder-name crumb string for the focus note's folder path; it does not create related notes.
@@ -18,6 +18,8 @@ By the end of 7.13:
 - `RelationshipToFocusNote` contains only currently meaningful graph roles.
 - `BareNote.uri` is a wiki-link URI: `[[note title]]` for the focus note itself, and `[[notebook name: note title]]` when the URI appears on a note other than the focus note.
 - `BareNote` no longer exposes `linkFromFocus` or `linkHop2` (serialized `target`, `parent`, `relation_type`, and `subject` are already gone in **5.24e**); relationship meaning lives in `details` / `detailsTruncated` and in the focus note's link lists.
+
+**`BareNote` as implemented today** (`backend/.../graphRAG/BareNote.java`): JSON property order is `uri`, `title`, `relationToFocusNote`, `linkFromFocus`, `linkHop2`, `details`, `detailsTruncated`, `createdAt`. Serialized `uri` is still `note.getUri()` (legacy note URI), not wiki-link text yet. `linkFromFocus` and `linkHop2` are still present as booleans on the wire and in `mergeIntoExisting(...)`. `equals` / `hashCode` delegate to `UriAndTitle.fromNote(note)` via `@JsonIgnore` `getUriAndTitle()`. Factories: `fromNote(note, relation)`, `fromNote(note, relation, linkFromFocus, linkHop2)`, `fromNoteWithoutTruncate(note)`. Sub-phases **7.13.8**–**7.13.9** carry the simplification and wiki-uri behavior above from target into code.
 
 ## Design Decisions
 
@@ -167,7 +169,7 @@ Wiki targets and wiki inbound references may still add related notes, but withou
 - `detailsTruncated`;
 - `createdAt`.
 
-It no longer exposes `linkFromFocus` or `linkHop2` (see **5.24e** for `target`, `parent`, `relation_type`, and `subject`).
+It no longer exposes `linkFromFocus` or `linkHop2` (see **5.24e** for `target`, `parent`, `relation_type`, and `subject`). **Today** those two booleans are still on the class, in `@JsonPropertyOrder`, the protected constructor, `mergeIntoExisting`, `fromNote(..., boolean, boolean)`, and `@JsonProperty` accessors — all of that goes away in this slice.
 
 **Work:** Remove the getters, constructor parameters, merge flags, JSON property order entries, and tests for removed fields. Relationship structure remains available only through note details/frontmatter and truncation.
 
@@ -181,7 +183,7 @@ It no longer exposes `linkFromFocus` or `linkHop2` (see **5.24e** for `target`, 
 
 **Trigger:** GraphRAG serializes the focus note or a related note URI.
 
-**Post-condition:** `BareNote.uri` uses wiki-link text instead of the legacy note URI:
+**Post-condition:** `BareNote.getUri()` (JSON `uri`) uses wiki-link text instead of `note.getUri()`. **Today** `getUri()` returns `note.getUri()` unchanged.
 
 - focus note: `[[note title]]`;
 - note rendered from another note's graph context: `[[notebook name: note title]]`.

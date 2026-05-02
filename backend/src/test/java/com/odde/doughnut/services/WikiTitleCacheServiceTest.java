@@ -192,7 +192,7 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
-    void primary_falls_back_to_authorized_legacy_when_not_in_cache() {
+    void primary_resolves_from_yaml_when_cache_rows_are_missing() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Note target = makeMe.aNote().under(root).title("Beta").please();
@@ -217,7 +217,7 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
-    void unreadable_legacy_primary_matches_first_outgoing_instead_of_secret_fk() {
+    void primary_ignores_poisoned_target_note_fk_and_follows_yaml_target() {
       User user = makeMe.aUser().please();
       User otherUser = makeMe.aUser().please();
       Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).please();
@@ -244,7 +244,7 @@ class WikiTitleCacheServiceTest {
               .primaryWikiLinkedTargetForGraph(carrier, user)
               .orElseThrow()
               .getId(),
-          equalTo(outgoing.get(0).getId()));
+          equalTo(target.getId()));
       assertThat(
           wikiTitleCacheService
               .primaryWikiLinkedTargetForGraph(carrier, user)
