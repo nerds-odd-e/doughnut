@@ -93,7 +93,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void relationships_deprecating_uses_cache_source_row_on_subject_realm() {
+  void subject_realm_references_include_relation_note_when_cache_refreshed() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -108,18 +108,15 @@ class NoteRealmServiceTest {
 
     NoteRealm subjectRealm = noteRealmService.build(subject, user);
 
-    assertThat(subjectRealm.getRelationshipsDeprecating(), hasSize(1));
-    assertThat(
-        subjectRealm.getRelationshipsDeprecating().get(0).getId(), equalTo(relation.getId()));
     assertThat(subjectRealm.getReferences(), hasSize(1));
     assertThat(subjectRealm.getReferences().get(0).getId(), equalTo(relation.getId()));
 
-    NoteRealm focalRealm = noteRealmService.build(focal, user);
-    assertThat(focalRealm.getRelationshipsDeprecating(), empty());
+    assertThat(
+        wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(focal, user), empty());
   }
 
   @Test
-  void relationships_deprecating_empty_when_cache_not_refreshed_even_if_structural_child_exists() {
+  void references_empty_when_cache_not_refreshed_even_if_structural_child_exists() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -128,11 +125,11 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(subject, user);
 
-    assertThat(realm.getRelationshipsDeprecating(), empty());
+    assertThat(realm.getReferences(), empty());
   }
 
   @Test
-  void relationships_deprecating_excludes_non_relation_body_wikilink_only_inbound_includes() {
+  void body_wikilink_carrier_is_inbound_only_not_subject_parent_slice() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -143,13 +140,14 @@ class NoteRealmServiceTest {
 
     assertThat(realm.getInboundReferences(), hasSize(1));
     assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
-    assertThat(realm.getRelationshipsDeprecating(), empty());
+    assertThat(
+        wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(focal, user), empty());
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }
 
   @Test
-  void relationships_deprecating_includes_non_relation_parent_yaml_row() {
+  void parent_yaml_carrier_appears_in_inbound_and_references() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -162,13 +160,12 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(focal, user);
 
     assertThat(realm.getInboundReferences(), hasSize(1));
-    assertThat(realm.getRelationshipsDeprecating(), hasSize(1));
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }
 
   @Test
-  void relationships_deprecating_omits_soft_deleted_relation_even_if_cache_row_remains() {
+  void references_omit_soft_deleted_relation_even_if_cache_row_remains() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -186,7 +183,7 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(subject, user);
 
-    assertThat(realm.getRelationshipsDeprecating(), empty());
+    assertThat(realm.getReferences(), empty());
   }
 
   @Test

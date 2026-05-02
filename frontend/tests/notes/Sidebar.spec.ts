@@ -57,17 +57,11 @@ function stubFolderListingForTree(
     if (folderId === FOLDER_TOP_NOTE_CHILDREN_ID) {
       return {
         notes: [
-          {
-            ...noteRealmInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
-            relationshipsDeprecating: undefined,
-          } as NoteRealm,
-          {
-            ...noteRealmInFolder(
-              firstGenerationSibling,
-              FOLDER_TOP_NOTE_CHILDREN_ID
-            ),
-            relationshipsDeprecating: undefined,
-          } as NoteRealm,
+          noteRealmInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
+          noteRealmInFolder(
+            firstGenerationSibling,
+            FOLDER_TOP_NOTE_CHILDREN_ID
+          ),
         ],
         folders: [
           structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
@@ -77,13 +71,7 @@ function stubFolderListingForTree(
     if (folderId === FOLDER_FIRST_GEN_CHILDREN_ID) {
       return {
         notes: [
-          {
-            ...noteRealmInFolder(
-              secondGeneration,
-              FOLDER_FIRST_GEN_CHILDREN_ID
-            ),
-            relationshipsDeprecating: undefined,
-          } as NoteRealm,
+          noteRealmInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
         ],
         folders: [],
       }
@@ -176,10 +164,7 @@ describe("Sidebar", () => {
     storageAccessor.value.refOfNoteRealm(secondGeneration.id).value =
       secondGeneration
 
-    const shallowTopRealm = {
-      ...topNoteRealm,
-      relationshipsDeprecating: undefined,
-    } as NoteRealm
+    const shallowTopRealm = { ...topNoteRealm } as NoteRealm
     mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
@@ -336,10 +321,7 @@ describe("Sidebar", () => {
   })
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
-    const shallowTopRealm = {
-      ...topNoteRealm,
-      relationshipsDeprecating: undefined,
-    } as NoteRealm
+    const shallowTopRealm = { ...topNoteRealm } as NoteRealm
     const rootSpy = mockSdkService("listNotebookRootNotes", {
       notes: [shallowTopRealm],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
@@ -368,10 +350,7 @@ describe("Sidebar", () => {
     })
 
     it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
-      const shallowTopRealm = {
-        ...topNoteRealm,
-        relationshipsDeprecating: undefined,
-      } as NoteRealm
+      const shallowTopRealm = { ...topNoteRealm } as NoteRealm
       const rootSpy = mockSdkService("listNotebookRootNotes", {
         notes: [shallowTopRealm],
         folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],

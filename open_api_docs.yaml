@@ -3822,10 +3822,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FolderTrailSegment"
-        relationshipsDeprecating:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
         inboundReferences:
           type: array
           items:

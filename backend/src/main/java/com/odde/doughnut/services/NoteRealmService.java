@@ -24,11 +24,11 @@ public class NoteRealmService {
   public NoteRealm build(Note note, User viewer) {
     var wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(note, viewer);
     NoteRealm realm = new NoteRealm(note, wikiTitles);
-    realm.setInboundReferences(wikiTitleCacheService.inboundReferrerNotesForViewer(note, viewer));
-    realm.setRelationshipsDeprecating(
-        wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(note, viewer));
-    realm.setReferences(
-        mergeReferenceNotes(realm.getInboundReferences(), realm.getRelationshipsDeprecating()));
+    var inbound = wikiTitleCacheService.inboundReferrerNotesForViewer(note, viewer);
+    var subjectOrParentLinked =
+        wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(note, viewer);
+    realm.setInboundReferences(inbound);
+    realm.setReferences(mergeReferenceNotes(inbound, subjectOrParentLinked));
     realm.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
     realm.setAncestorFolders(folderTrailFromRootToContainingFolder(note));
     return realm;

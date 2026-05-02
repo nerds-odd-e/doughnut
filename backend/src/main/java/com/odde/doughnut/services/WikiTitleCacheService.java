@@ -81,9 +81,9 @@ public class WikiTitleCacheService {
 
   /**
    * Notes whose relationship {@code source:} or non-relationship {@code parent:} wikilink resolves
-   * to {@code focalNote}, for {@link
-   * com.odde.doughnut.controllers.dto.NoteRealm#getRelationshipsDeprecating()}. Same visibility
-   * rules as {@link #inboundReferrerNotesForViewer}.
+   * to {@code focalNote}, merged into {@link
+   * com.odde.doughnut.controllers.dto.NoteRealm#getReferences()}. Same visibility rules as {@link
+   * #inboundReferrerNotesForViewer}.
    */
   public List<Note> subjectAndParentLinkedReferrerNotesForViewer(Note focalNote, User viewer) {
     List<NoteWikiTitleCache> rows =
