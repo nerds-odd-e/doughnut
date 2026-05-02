@@ -23,24 +23,26 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
 
   @Override
   public Note handle() {
-    if (currentIndex < inboundReferenceNotes.size()) {
-      Note referringNote = inboundReferenceNotes.get(currentIndex++);
+    return consumeNextInboundReferrer();
+  }
 
-      // Add referring subject to priority 3
-      if (priorityThreeLayer != null) {
-        priorityThreeLayer.addHandler(
-            new ReferencingNoteRelationshipHandler(referringNote, priorityFourLayer));
-      }
-
-      // Add referring contextual path to priority 4
-      if (priorityFourLayer != null) {
-        priorityFourLayer.addHandler(
-            new ReferenceContextAncestorRelationshipHandler(referringNote));
-      }
-
-      return referringNote;
+  /** Next inbound referrer and side-effect expanded handlers; null when exhausted. */
+  public Note consumeNextInboundReferrer() {
+    if (currentIndex >= inboundReferenceNotes.size()) {
+      return null;
     }
-    return null;
+    Note referringNote = inboundReferenceNotes.get(currentIndex++);
+
+    if (priorityThreeLayer != null) {
+      priorityThreeLayer.addHandler(
+          new ReferencingNoteRelationshipHandler(referringNote, priorityFourLayer));
+    }
+
+    if (priorityFourLayer != null) {
+      priorityFourLayer.addHandler(new ReferenceContextAncestorRelationshipHandler(referringNote));
+    }
+
+    return referringNote;
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.relationships.ReferenceByRelationshipHandler;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,26 +52,42 @@ public class PriorityLayer {
 
   private boolean processCurrentLayer(GraphRAGResultBuilder builder) {
     boolean anyHandlerProcessed = false;
-
+    layerSweep:
     for (RelationshipHandler handler : handlers) {
-      Note relatedNote = handler.handle();
-
-      if (relatedNote != null) {
-        BareNote result =
-            builder.addNoteToRelatedNotes(
-                relatedNote,
-                handler.getRelationshipToFocusNote(),
-                handler.isLinkFromFocusFor(relatedNote),
-                handler.isLinkHop2For(relatedNote));
-
-        if (result != null) {
-          handler.afterHandledSuccessfully(builder.getFocusNote(), result);
-          notesProcessedSinceLastLayerSwitch++;
-          anyHandlerProcessed = true;
-
-          // If we've hit the limit, give next layer a chance
-          if (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer) {
-            break;
+      if (handler instanceof ReferenceByRelationshipHandler refHandler) {
+        Note relatedNote;
+        while ((relatedNote = refHandler.consumeNextInboundReferrer()) != null) {
+          BareNote result =
+              builder.addNoteToRelatedNotes(
+                  relatedNote,
+                  handler.getRelationshipToFocusNote(),
+                  handler.isLinkFromFocusFor(relatedNote),
+                  handler.isLinkHop2For(relatedNote));
+          if (result != null) {
+            handler.afterHandledSuccessfully(builder.getFocusNote(), result);
+            notesProcessedSinceLastLayerSwitch++;
+            anyHandlerProcessed = true;
+            if (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer) {
+              break layerSweep;
+            }
+          }
+        }
+      } else {
+        Note relatedNote = handler.handle();
+        if (relatedNote != null) {
+          BareNote result =
+              builder.addNoteToRelatedNotes(
+                  relatedNote,
+                  handler.getRelationshipToFocusNote(),
+                  handler.isLinkFromFocusFor(relatedNote),
+                  handler.isLinkHop2For(relatedNote));
+          if (result != null) {
+            handler.afterHandledSuccessfully(builder.getFocusNote(), result);
+            notesProcessedSinceLastLayerSwitch++;
+            anyHandlerProcessed = true;
+            if (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer) {
+              break layerSweep;
+            }
           }
         }
       }

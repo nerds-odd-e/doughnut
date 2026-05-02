@@ -62,10 +62,12 @@ public class GraphRAGService {
             });
     List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
     priorityTwoHandlers.add(new ChildRelationshipHandler(focusNote));
-    for (Note reference : wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer)) {
+    List<Note> referencesForViewer =
+        wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer);
+    if (!referencesForViewer.isEmpty()) {
       priorityTwoHandlers.add(
           new ReferenceByRelationshipHandler(
-              List.of(reference), priorityThreeLayer, priorityFourLayer));
+              referencesForViewer, priorityThreeLayer, priorityFourLayer));
     }
     priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
