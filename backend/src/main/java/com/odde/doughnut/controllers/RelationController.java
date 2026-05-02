@@ -13,6 +13,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ class RelationController {
   private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
   public RelationController(
       EntityPersister entityPersister,
@@ -44,13 +46,15 @@ class RelationController {
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
-      NoteRealmService noteRealmService) {
+      NoteRealmService noteRealmService,
+      WikiTitleCacheService wikiTitleCacheService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
+    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   @PostMapping(value = "/{relation}")
@@ -63,7 +67,9 @@ class RelationController {
     relation.setRelationType(relationshipCreation.relationType);
     noteService.refreshRelationshipNoteTitle(relation);
     entityPersister.save(relation);
-    return getNoteRealm(relation, authorizationService.getCurrentUser());
+    User user = authorizationService.getCurrentUser();
+    wikiTitleCacheService.refreshForNote(relation, user);
+    return getNoteRealm(relation, user);
   }
 
   @PostMapping(value = "/move/{sourceNote}/{targetNote}")

@@ -27,18 +27,21 @@ public class NoteService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NoteChildContainerFolderService noteChildContainerFolderService) {
+      NoteChildContainerFolderService noteChildContainerFolderService,
+      WikiTitleCacheService wikiTitleCacheService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
+    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -239,6 +242,7 @@ public class NoteService {
             relation, type, sourceNote, targetNote, null));
     relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
     entityPersister.save(relation);
+    wikiTitleCacheService.refreshForNote(relation, creator);
     return relation;
   }
 

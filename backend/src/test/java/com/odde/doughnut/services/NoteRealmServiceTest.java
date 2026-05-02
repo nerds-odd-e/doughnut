@@ -2,12 +2,15 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
+import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +25,7 @@ class NoteRealmServiceTest {
   @Autowired com.odde.doughnut.testability.MakeMe makeMe;
   @Autowired NoteRealmService noteRealmService;
   @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired WikiTitleCacheService wikiTitleCacheService;
 
   @Test
   void wiki_titles_empty_when_details_have_links_but_cache_not_refreshed() {
@@ -54,5 +58,112 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(carrier, viewer);
 
     assertThat(realm.getWikiTitles(), empty());
+  }
+
+  @Test
+  void inbound_references_use_cache_rows_pointing_at_focal_same_notebook() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note carrier = makeMe.aNote().under(root).details("[[Focal]]").please();
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getInboundReferences(), hasSize(1));
+    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
+  }
+
+  @Test
+  void inbound_empty_when_cache_not_refreshed_even_if_legacy_target_fk_exists() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note subject = makeMe.aNote().under(root).please();
+    makeMe.aRelation().between(subject, focal).please();
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getInboundReferences(), empty());
+  }
+
+  @Test
+  void inbound_includes_cross_notebook_carrier_when_viewer_can_refer() {
+    User user = makeMe.aUser().please();
+    Note headMain = makeMe.aNote().creatorAndOwner(user).title("MainNb").please();
+    Note focal = makeMe.aNote().title("Focal").under(headMain).please();
+    Note headOther = makeMe.aNote().creatorAndOwner(user).title("OtherNb").please();
+    Note carrier = makeMe.aNote().under(headOther).please();
+
+    NoteWikiTitleCache row = new NoteWikiTitleCache();
+    row.setNote(carrier);
+    row.setTargetNote(focal);
+    row.setLinkText("MainNb:Focal");
+    noteWikiTitleCacheRepository.save(row);
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getInboundReferences(), hasSize(1));
+    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
+  }
+
+  @Test
+  void inbound_omits_cross_notebook_carrier_when_viewer_cannot_refer() {
+    User ownerFocal = makeMe.aUser().please();
+    User ownerCarrier = makeMe.aUser().please();
+    Note headMain = makeMe.aNote().creatorAndOwner(ownerFocal).title("MainNb").please();
+    Note focal = makeMe.aNote().title("Focal").under(headMain).please();
+    Note headOther = makeMe.aNote().creatorAndOwner(ownerCarrier).title("OtherNb").please();
+    Note carrier = makeMe.aNote().under(headOther).please();
+
+    NoteWikiTitleCache row = new NoteWikiTitleCache();
+    row.setNote(carrier);
+    row.setTargetNote(focal);
+    row.setLinkText("MainNb:Focal");
+    noteWikiTitleCacheRepository.save(row);
+
+    NoteRealm realm = noteRealmService.build(focal, ownerFocal);
+
+    assertThat(realm.getInboundReferences(), empty());
+  }
+
+  @Test
+  void inbound_omits_soft_deleted_carrier_even_if_cache_row_remains() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note carrier = makeMe.aNote().under(root).details("[[Focal]]").please();
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    carrier.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+    makeMe.entityPersister.merge(carrier);
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getInboundReferences(), empty());
+  }
+
+  @Test
+  void inbound_dedupes_multiple_cache_rows_for_same_carrier_note() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note carrier = makeMe.aNote().under(root).please();
+
+    NoteWikiTitleCache rowA = new NoteWikiTitleCache();
+    rowA.setNote(carrier);
+    rowA.setTargetNote(focal);
+    rowA.setLinkText("one");
+    NoteWikiTitleCache rowB = new NoteWikiTitleCache();
+    rowB.setNote(carrier);
+    rowB.setTargetNote(focal);
+    rowB.setLinkText("two");
+    noteWikiTitleCacheRepository.save(rowA);
+    noteWikiTitleCacheRepository.save(rowB);
+
+    NoteRealm realm = noteRealmService.build(focal, user);
+
+    assertThat(realm.getInboundReferences(), hasSize(1));
+    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
   }
 }

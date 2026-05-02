@@ -17,20 +17,8 @@ public class NoteRealmService {
   public NoteRealm build(Note note, User viewer) {
     var wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(note, viewer);
     NoteRealm realm = new NoteRealm(note, wikiTitles);
-    realm.setInboundReferences(
-        note.getInboundReferences().stream()
-            .filter(link -> inboundReferenceVisible(link, viewer))
-            .toList());
+    realm.setInboundReferences(wikiTitleCacheService.inboundReferrerNotesForViewer(note, viewer));
     realm.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
     return realm;
-  }
-
-  private boolean inboundReferenceVisible(Note inboundReference, User viewer) {
-    if (inboundReference.getParent().getNotebook()
-        == inboundReference.getTargetNote().getNotebook()) {
-      return true;
-    }
-    if (viewer == null) return false;
-    return viewer.canReferTo(inboundReference.getParent().getNotebook());
   }
 }

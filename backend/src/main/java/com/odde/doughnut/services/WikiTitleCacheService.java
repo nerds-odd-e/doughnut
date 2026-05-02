@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,41 @@ public class WikiTitleCacheService {
       out.add(new WikiTitle(row.getLinkText(), target.getId()));
     }
     return List.copyOf(out);
+  }
+
+  /**
+   * Notes whose resolved wiki links point at {@code focalNote}, for {@link NoteRealm} inbound
+   * references. Same visibility rules as legacy inbound (parent notebook vs focal notebook, {@link
+   * User#canReferTo}).
+   */
+  public List<Note> inboundReferrerNotesForViewer(Note focalNote, User viewer) {
+    List<NoteWikiTitleCache> rows =
+        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
+    LinkedHashMap<Integer, Note> distinctOrder = new LinkedHashMap<>();
+    for (NoteWikiTitleCache row : rows) {
+      Integer referrerId = row.getNote().getId();
+      if (distinctOrder.containsKey(referrerId)) {
+        continue;
+      }
+      Note referrer = entityManager.find(Note.class, referrerId);
+      if (referrer == null) {
+        continue;
+      }
+      if (inboundReferrerVisible(referrer, focalNote, viewer)) {
+        distinctOrder.put(referrerId, referrer);
+      }
+    }
+    return List.copyOf(distinctOrder.values());
+  }
+
+  private static boolean inboundReferrerVisible(Note referrer, Note focalNote, User viewer) {
+    if (referrer.getParent().getNotebook() == focalNote.getNotebook()) {
+      return true;
+    }
+    if (viewer == null) {
+      return false;
+    }
+    return viewer.canReferTo(referrer.getParent().getNotebook());
   }
 
   /**
