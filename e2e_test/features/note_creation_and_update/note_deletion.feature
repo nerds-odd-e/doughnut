@@ -38,8 +38,7 @@ Feature: Note deletion
       | CI System  |
       | TDD        |
 
-  @ignore
-  Scenario: Delete a note will delete its descendants
+  Scenario: Deleting a note does not remove other notes by structural descent
     Given I have a notebook "Descendants suite" with notes:
       | Title     | Folder                        |
       | Descendants Test | |
@@ -48,9 +47,9 @@ Feature: Note deletion
       | Unit Test | Descendants Test/parent/child  |
     When I delete note "child"
     Then I should see the note "child" is marked as deleted
-    And I should see the note "Unit Test" is marked as deleted
-    And I should see folder "Descendants suite/Descendants Test/parent" containing these notes:
+    And I should see folder "Descendants suite/Descendants Test/parent/child" containing these notes:
       | note-title |
+      | Unit Test  |
 
   Scenario: Delete a note will delete its references
     Given I have a notebook "References suite" with notes:

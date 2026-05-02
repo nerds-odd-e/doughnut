@@ -297,23 +297,26 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldDeleteTheChildNoteButNotSibling() throws UnexpectedNoAccessRightException {
+    void shouldSoftDeleteSubjectWithoutRemovingSiblingUnderParent()
+        throws UnexpectedNoAccessRightException {
       makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(1));
       assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(1));
+      assertThat(child.getDeletedAt(), is(nullValue()));
     }
 
     @Test
-    void shouldDeleteDescendantsWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
+    void shouldNotSoftDeleteStructuralDescendantsWhenNoteIsDeleted()
+        throws UnexpectedNoAccessRightException {
       Note grandchild = makeMe.aNote("grandchild").under(child).please();
       makeMe.refresh(parent);
 
       controller.deleteNote(subject);
 
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(child.getDeletedAt(), is(not(nullValue())));
-      assertThat(grandchild.getDeletedAt(), is(not(nullValue())));
+      assertThat(child.getDeletedAt(), is(nullValue()));
+      assertThat(grandchild.getDeletedAt(), is(nullValue()));
     }
 
     @Test
@@ -341,7 +344,7 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldDeleteDescendantsReferencesWhenNoteIsDeleted()
+    void shouldNotSoftDeleteInboundReferencesToStructuralChildrenWhenParentNoteIsDeleted()
         throws UnexpectedNoAccessRightException {
       Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
       Note referenceToChild = makeMe.aRelation().between(targetNote, child).please();
@@ -350,8 +353,8 @@ class NoteControllerTests extends ControllerTestBase {
       controller.deleteNote(subject);
 
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(child.getDeletedAt(), is(not(nullValue())));
-      assertThat(referenceToChild.getDeletedAt(), is(not(nullValue())));
+      assertThat(child.getDeletedAt(), is(nullValue()));
+      assertThat(referenceToChild.getDeletedAt(), is(nullValue()));
     }
 
     @Nested

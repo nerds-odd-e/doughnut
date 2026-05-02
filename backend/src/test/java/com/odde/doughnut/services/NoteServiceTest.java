@@ -48,6 +48,30 @@ public class NoteServiceTest {
 
       assertThat(userService.getMemoryTrackersFor(note.getCreator(), note), hasSize(0));
     }
+
+    @Test
+    void shouldNotCascadeSoftDeleteToStructuralChildNotes() {
+      Note parent = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
+      Note subject = makeMe.aNote().under(parent).please();
+      Note child = makeMe.aNote("child").under(subject).please();
+
+      noteService.destroy(subject);
+
+      assertThat(subject.getDeletedAt(), notNullValue());
+      assertThat(child.getDeletedAt(), nullValue());
+    }
+
+    @Test
+    void shouldCascadeSoftDeleteToOutgoingRelationshipNotes() {
+      Note subject = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
+      Note target = makeMe.aNote().creatorAndOwner(subject.getCreator()).please();
+      Note relation = makeMe.aRelation().between(subject, target).please();
+
+      noteService.destroy(subject);
+
+      assertThat(subject.getDeletedAt(), notNullValue());
+      assertThat(relation.getDeletedAt(), notNullValue());
+    }
   }
 
   @Nested

@@ -36,10 +36,14 @@ This document **re-sequences** 5.24 into smaller slices aligned with `.cursor/ru
 - **`RelationshipNoteEndpointResolver`**: `relation` + viewer → **`Optional<Note>`** via **`target:` YAML** + **`WikiLinkResolver.resolveWikiInnerTitle`**.
 - Wire first at **`NoteService.refreshRelationshipNoteTitle`**, **`RelationController`** (realm), any single-call-site slice that today reads **`relation.getTargetNote()`**.
 
-### 5.24c — Cascade soft-delete / restore (**behavior**)
+### 5.24c — Soft-delete / restore without relationship or reference cascade (**behavior**)
 
-- **`NoteService.destroy` / `restore`**: Replace **`NoteRepository.findAllByTargetNote`** with **`NoteWikiTitleCacheRepository`** queries joining referrer **`note`** and restricting to relationship-shaped notes (**marker / predicate from 5.24a**), keyed by **`note_wiki_title_cache.target_note_id`** pointing at deleted/restored focal id.
-- **Tests:** **`NoteControllerTests`** delete / restore reference scenarios.
+- **`NoteService.destroy`**: Soft-delete the focal note **without** cascade soft-delete of its **relationship notes** or **referencing notes** (remove **`findAllByTargetNote`**-driven destroy batches; adjust any **descendant** walk so relationship / reference rows are not delete fallout). **Non-relation structural children** policy stays explicit in code and tests in the same slice so behavior matches E2E.
+- **`NoteService.restore`**: Drop restore logic that assumed those relationship/reference notes were deleted in the same timestamp batch; after undo, previously live edges resolve again.
+- **`WikiTitleCacheService` / destroy path:** **Do not** remove or invalidate **`note_wiki_title_cache`** rows as part of note soft-delete. Cache rows remain; a soft-deleted target simply does not participate in resolution the way a live note does.
+- **Observable UX:** Referencing relationship notes **stay in the tree**; wikilinks whose **semantic target** is soft-deleted **read as dead links** until the target is restored.
+- **Undo delete:** Restoring the focal note returns prior resolution behavior; **every link works again** without repopulating cache from scratch (cache was never torn down for this path).
+- **Tests:** Align **`NoteControllerTests`** delete / restore scenarios with the new non-cascade contract; update Cypress **`e2e_test/features/note_creation_and_update/note_deletion.feature`** (relationship + reference scenarios) so they expect relationship/reference notes to **remain listed**, with dead-link assertions where the UI exposes link state (or the narrowest observable the suite already supports).
 
 ### 5.24d — Recall propagation (**behavior**)
 
