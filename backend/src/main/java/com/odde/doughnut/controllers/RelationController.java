@@ -1,13 +1,11 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -70,26 +68,6 @@ class RelationController {
     User user = authorizationService.getCurrentUser();
     wikiTitleCacheService.refreshForNote(relation, user);
     return getNoteRealm(relation, user);
-  }
-
-  @PostMapping(value = "/move/{sourceNote}/{targetNote}")
-  @Transactional
-  public List<NoteRealm> moveNote(
-      @PathVariable @Schema(type = "integer") Note sourceNote,
-      @PathVariable @Schema(type = "integer") Note targetNote,
-      @RequestBody @Valid NoteMoveDTO noteMoveDTO,
-      BindingResult bindingResult)
-      throws UnexpectedNoAccessRightException,
-          BindException,
-          CyclicLinkDetectedException,
-          MovementNotPossibleException {
-    if (bindingResult.hasErrors()) throw new BindException(bindingResult);
-    authorizationService.assertAuthorization(sourceNote);
-    authorizationService.assertAuthorization(targetNote);
-    noteMotionService.executeMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild);
-    User user = authorizationService.getCurrentUser();
-    return List.of(
-        noteRealmService.build(sourceNote, user), noteRealmService.build(targetNote, user));
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")

@@ -258,10 +258,6 @@ export type WikiTitle = {
     noteId: number;
 };
 
-export type NoteMoveDto = {
-    asFirstChild?: boolean;
-};
-
 export type QuestionContestResult = {
     advice?: string;
     rejected?: boolean;
@@ -1539,25 +1535,6 @@ export type UpdateRelationshipResponses = {
 };
 
 export type UpdateRelationshipResponse = UpdateRelationshipResponses[keyof UpdateRelationshipResponses];
-
-export type MoveNoteData = {
-    body: NoteMoveDto;
-    path: {
-        sourceNote: number;
-        targetNote: number;
-    };
-    query?: never;
-    url: '/api/relations/move/{sourceNote}/{targetNote}';
-};
-
-export type MoveNoteResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type MoveNoteResponse = MoveNoteResponses[keyof MoveNoteResponses];
 
 export type MoveNoteToFolderData = {
     body?: never;

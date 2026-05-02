@@ -536,37 +536,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
-  /api/relations/move/{sourceNote}/{targetNote}:
-    post:
-      tags:
-      - relation-controller
-      operationId: moveNote
-      parameters:
-      - name: sourceNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteMoveDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/relations/move-to-folder/{sourceNote}/{targetFolder}:
     post:
       tags:
@@ -3861,11 +3830,6 @@ components:
       required:
       - linkText
       - noteId
-    NoteMoveDTO:
-      type: object
-      properties:
-        asFirstChild:
-          type: boolean
     QuestionContestResult:
       type: object
       properties:

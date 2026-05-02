@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
@@ -14,7 +13,6 @@ import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.RelationshipNoteTitleFormatter;
@@ -31,61 +29,6 @@ class RelationControllerTests extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-  }
-
-  @Nested
-  class MoveNoteTest {
-    User anotherUser;
-    Note note1;
-    Note note2;
-    NoteMoveDTO noteMoveDTO = new NoteMoveDTO();
-
-    @BeforeEach
-    void setup() {
-      anotherUser = makeMe.aUser().please();
-      note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      note2 = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
-      noteMoveDTO.asFirstChild = false;
-    }
-
-    @Test
-    void moveNoteSuccessfully()
-        throws BindException,
-            UnexpectedNoAccessRightException,
-            CyclicLinkDetectedException,
-            MovementNotPossibleException {
-      Note note3 = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      noteMoveDTO.asFirstChild = false;
-      var result = controller.moveNote(note3, note2, noteMoveDTO, makeMe.successfulBindingResult());
-      assertThat(result, hasSize(2));
-    }
-
-    @Test
-    void shouldRejectMovingAsFirstChildWhenSubjectIsAlreadyFirstChildOfTarget() {
-      Note parentNote = makeMe.aNote("parent").creatorAndOwner(currentUser.getUser()).please();
-      Note onlyChild =
-          makeMe.aNote("only").creatorAndOwner(currentUser.getUser()).under(parentNote).please();
-      noteMoveDTO.asFirstChild = true;
-      assertThrows(
-          MovementNotPossibleException.class,
-          () ->
-              controller.moveNote(
-                  onlyChild, parentNote, noteMoveDTO, makeMe.successfulBindingResult()));
-    }
-
-    @Test
-    void shouldNotAllowMoveOtherPeoplesNote() {
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.moveNote(note1, note2, noteMoveDTO, makeMe.successfulBindingResult()));
-    }
-
-    @Test
-    void shouldNotAllowMoveToOtherPeoplesNote() {
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.moveNote(note2, note1, noteMoveDTO, makeMe.successfulBindingResult()));
-    }
   }
 
   @Nested
