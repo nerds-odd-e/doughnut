@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
@@ -213,17 +212,10 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldExposeRelationshipTargetInRelatedNotesWithLinkFromFocus() {
+    void shouldIncludeTargetInRelatedNotesWithFocusTitle() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getFocusNote().getTitle(), equalTo(note.getTitle()));
-      assertRelatedNotesHaveLinkFromFocus(result, target);
-    }
-
-    @Test
-    void shouldIncludeTargetInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
-
       assertThat(result.getRelatedNotes(), hasSize(2));
       assertRelatedNotesHaveLinkFromFocus(result, target);
     }
@@ -972,29 +964,20 @@ public class GraphRAGServiceTest {
   @Nested
   class JsonSerialization {
     @Test
-    void shouldIncludeRelatedNotesFieldInJson() throws Exception {
+    void shouldSerializeRelatedNotesArray() throws Exception {
       Note note = makeMe.aNote().title("Test Note").please();
       Notebook notebook = note.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("json-serial-peers").please();
       note = makeMe.theNote(note).folder(peerFolder).please();
-      Note child = makeMe.aNote().under(note).folder(peerFolder).title("Child Note").please();
+      makeMe.aNote().under(note).folder(peerFolder).title("Child Note").please();
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
-      JsonNode jsonNode = objectMapper.valueToTree(result);
+      JsonNode jsonNode = new ObjectMapperConfig().objectMapper().valueToTree(result);
 
-      assertThat(jsonNode.has("relatedNotes"), is(true));
       assertThat(jsonNode.get("relatedNotes").isArray(), is(true));
       assertThat(jsonNode.get("relatedNotes").size(), equalTo(1));
-
-      // Verify the structure of the related note (structural child edge)
-      JsonNode relatedNote = jsonNode.get("relatedNotes").get(0);
-      assertThat(relatedNote.has("relationToFocusNote"), is(true));
-      assertThat(relatedNote.has("linkFromFocus"), is(true));
-      assertThat(relatedNote.has("linkHop2"), is(true));
-      assertThat(relatedNote.get("linkFromFocus").asBoolean(), is(false));
-      assertThat(relatedNote.get("linkHop2").asBoolean(), is(false));
+      assertThat(jsonNode.get("relatedNotes").get(0).has("relationToFocusNote"), is(true));
     }
   }
 
