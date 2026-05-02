@@ -51,11 +51,6 @@ public final class RelationshipNoteMarkdownFormatter {
                     .flatMap(RelationshipNoteMarkdownFormatter::relationTypeFromKebab));
   }
 
-  /** Resolves relation type from relationship-note details frontmatter only. */
-  public static RelationType relationTypeForRelationNoteRead(Note note) {
-    return parseRelationTypeFromRelationshipNoteDetails(note.getDetails()).orElse(null);
-  }
-
   public static String extractUserSuffixFromRelationshipDetails(String details) {
     NoteDetailsMarkdown.LeadingFrontmatter frontmatter =
         NoteDetailsMarkdown.splitLeadingFrontmatter(details).orElse(null);

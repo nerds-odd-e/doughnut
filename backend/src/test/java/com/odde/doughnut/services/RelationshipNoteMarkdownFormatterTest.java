@@ -121,16 +121,6 @@ class RelationshipNoteMarkdownFormatterTest {
   }
 
   @Test
-  void relationTypeForRelationNoteRead_reads_relation_from_details() {
-    Note relation = new Note();
-    relation.setDetails(
-        RelationshipNoteMarkdownFormatter.format(RelationType.PART, "A", "B", null));
-    assertThat(
-        RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(relation),
-        equalTo(RelationType.PART));
-  }
-
-  @Test
   void appends_preserved_details_below_body() {
     String markdown =
         RelationshipNoteMarkdownFormatter.format(

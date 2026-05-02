@@ -4,7 +4,6 @@ import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.io.ByteArrayOutputStream;
@@ -108,7 +107,7 @@ public class ObsidianFormatService {
   private List<String> ancestorFolderLikeSegmentsFromParentPointers(Note note) {
     ArrayDeque<String> segments = new ArrayDeque<>();
     for (Note parent = note.getParent(); parent != null; parent = parent.getParent()) {
-      segments.addFirst(getNoteTitleForFile(parent));
+      segments.addFirst(parent.getTitle());
     }
     return new ArrayList<>(segments);
   }
@@ -118,7 +117,7 @@ public class ObsidianFormatService {
     if (segmentsBeforeTitleSanitize.isEmpty() || indexNote.isEmpty()) {
       return segmentsBeforeTitleSanitize;
     }
-    String indexTitleForMatch = getNoteTitleForFile(indexNote.get());
+    String indexTitleForMatch = indexNote.get().getTitle();
     if (!segmentsBeforeTitleSanitize.getFirst().equalsIgnoreCase(indexTitleForMatch)) {
       return segmentsBeforeTitleSanitize;
     }
@@ -145,7 +144,7 @@ public class ObsidianFormatService {
     }
     List<String> prefixBelowTitle = obsidianDirSegmentsBeforeTitle(note, indexNote);
     ArrayList<String> childScope = new ArrayList<>(prefixBelowTitle);
-    childScope.add(getNoteTitleForFile(note));
+    childScope.add(note.getTitle());
 
     return notesInNotebook.stream()
         .filter(m -> !isOptionalIndexNote(m, indexNote))
@@ -158,7 +157,7 @@ public class ObsidianFormatService {
         obsidianDirSegmentsBeforeTitle(note, indexNote).stream()
             .map(this::sanitizeFileName)
             .toList();
-    String sanitizedTitle = sanitizeFileName(getNoteTitleForFile(note));
+    String sanitizedTitle = sanitizeFileName(note.getTitle());
     boolean hasSubtree = noteExportsAsObsidianSubtree(note, notesInNotebook, indexNote);
 
     String tail = hasSubtree ? sanitizedTitle + "/__index.md" : sanitizedTitle + ".md";
@@ -166,20 +165,6 @@ public class ObsidianFormatService {
     return dirSegmentsSanitized.isEmpty()
         ? tail
         : String.join("/", dirSegmentsSanitized) + "/" + tail;
-  }
-
-  private String getNoteTitleForFile(Note note) {
-    if (note.getTitle() != null) {
-      return note.getTitle();
-    }
-    RelationType relationType =
-        note.isRelation()
-            ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
-            : null;
-    if (relationType != null) {
-      return "_" + relationType.label;
-    }
-    return "untitled";
   }
 
   private String generateMarkdownContent(Note note) {
