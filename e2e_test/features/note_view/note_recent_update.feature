@@ -5,8 +5,9 @@ Feature: see recent note update
   Background:
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
-    And I have a notebook "World atlas" with a note "World" and notes:
+    And I have a notebook "World atlas" with notes:
       | Title   | Folder        | Details           |
+      | World | | |
       | Germany | World         |                   |
       | Japan   | World         |                   |
       | Berlin  | World/Germany | Berlin has a wall |

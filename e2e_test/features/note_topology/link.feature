@@ -22,8 +22,9 @@ Feature: Wiki links in notes
 
   Scenario: A qualified wiki link opens a note in another notebook
     Given I have a notebook "WikiCross Src NB" with a note "WikiCross From" and details "origin"
-    And I have a notebook "WikiCross Tgt NB" with a note "WikiCross Tgt Root" and notes:
+    And I have a notebook "WikiCross Tgt NB" with notes:
       | Title           | Folder            |
+      | WikiCross Tgt Root | |
       | WikiCross Deep  | WikiCross Tgt Root |
     When I update note "WikiCross From" details using markdown to become:
       """

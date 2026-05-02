@@ -4,7 +4,7 @@ Feature: Conducting assessment
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "World facts" with a note "Countries" and notes:
+    And I have a notebook "World facts" with notes:
       | Title     |
       | Singapore |
       | Vietnam   |

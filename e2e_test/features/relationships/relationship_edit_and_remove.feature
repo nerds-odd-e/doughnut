@@ -2,8 +2,9 @@ Feature: relationship edit and remove
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Space topics" with a note "Space" and notes:
+    And I have a notebook "Space topics" with notes:
       | Title |
+      | Space |
       | Moon |
       | Earth |
       | Mars |

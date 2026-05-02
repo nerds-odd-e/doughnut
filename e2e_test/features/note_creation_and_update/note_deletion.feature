@@ -2,8 +2,9 @@ Feature: Note deletion
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
+    And I have a notebook "LeSS training" with notes:
       | Title     | Folder               |
+      | LeSS in Action | |
       | team      | LeSS in Action       |
       | tech      | LeSS in Action       |
       | TDD       | LeSS in Action/tech  |
@@ -39,8 +40,9 @@ Feature: Note deletion
 
   @ignore
   Scenario: Delete a note will delete its descendants
-    Given I have a notebook "Descendants suite" with a note "Descendants Test" and notes:
+    Given I have a notebook "Descendants suite" with notes:
       | Title     | Folder                        |
+      | Descendants Test | |
       | parent    | Descendants Test               |
       | child     | Descendants Test/parent        |
       | Unit Test | Descendants Test/parent/child  |
@@ -51,8 +53,9 @@ Feature: Note deletion
       | note-title |
 
   Scenario: Delete a note will delete its references
-    Given I have a notebook "References suite" with a note "References Test" and notes:
+    Given I have a notebook "References suite" with notes:
       | Title  | Folder          |
+      | References Test | |
       | source | References Test |
       | target | References Test |
     And there is "a part of" relationship between note "source" and "target"

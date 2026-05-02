@@ -6,8 +6,9 @@ Feature: Bazaar sharing
     Given I am logged in as an existing user
 
   Scenario: Contributing To Bazaar
-    Given I have a notebook "Geometry set" with a note "Shape" and notes:
+    Given I have a notebook "Geometry set" with notes:
       | Title    | Details                   |
+      | Shape    | |
       | Square   | four equal straight sides |
       | Triangle | three sides shape         |
     When I choose to share my notebook "Geometry set"

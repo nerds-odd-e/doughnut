@@ -8,8 +8,9 @@ Feature: MCP (Model Context Protocol) Services
     Given I am logged in as "old_learner"
     And I have a valid Doughnut Access Token with label "For MCP services"
     And I connect to an MCP client that connects to Doughnut MCP service
-    And I have a notebook "CS concepts" with a note "Programming Concepts" and notes:
+    And I have a notebook "CS concepts" with notes:
       | Title           | Folder                               |
+      | Programming Concepts | |
       | Object Oriented | Programming Concepts                  |
       | Functional      | Programming Concepts                  |
       | Classes         | Programming Concepts/Object Oriented  |

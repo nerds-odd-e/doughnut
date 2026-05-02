@@ -2,8 +2,9 @@
 Feature: Notebook export for Obsidian
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Export home" with a note "Index" and notes:
+    And I have a notebook "Export home" with notes:
       | Title       | Details        | Folder          |
+      | Index       | | |
       | Parent Note | Parent Content | Index           |
       | Child Note  | Child Content  | Index/Parent Note |
       | Leaf Note   | Leaf Content   | Index/Parent Note |

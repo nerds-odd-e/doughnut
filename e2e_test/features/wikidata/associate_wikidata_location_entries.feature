@@ -5,8 +5,9 @@ Feature: Note creation/edit for a location
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Places map" with a note "places" and notes:
+    And I have a notebook "Places map" with notes:
       | Title | Folder |
+      | places | |
       | keep  | places |
     And Wikidata.org has an entity "Q334" with label "Singapore"
     And Wikidata.org entity "Q334" is a location at 1.3, 103.8

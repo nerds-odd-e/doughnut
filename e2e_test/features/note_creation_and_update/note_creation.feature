@@ -4,8 +4,9 @@ Feature: Nested Note creation
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
+    And I have a notebook "LeSS training" with notes:
       | Title | Folder         |
+      | LeSS in Action | |
       | team  | LeSS in Action |
       | tech  | LeSS in Action |
 

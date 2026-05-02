@@ -2,8 +2,9 @@ Feature: Note creation for a book
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Favorite reads" with a note "My Favourite Books" and notes:
+    And I have a notebook "Favorite reads" with notes:
       | Title | Folder             |
+      | My Favourite Books | |
       | keep  | My Favourite Books |
 
   @usingMockedWikidataService

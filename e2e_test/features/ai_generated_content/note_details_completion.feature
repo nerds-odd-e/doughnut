@@ -4,8 +4,9 @@ Feature: Note details completion
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Taiwan primer" with a note "Taiwan" and notes:
+    And I have a notebook "Taiwan primer" with notes:
       | Title   | Folder       | Details    |
+      | Taiwan | | |
       | Taipei  | Taiwan       | It is a    |
       | Weather | Taiwan/Taipei | It rains a |
 

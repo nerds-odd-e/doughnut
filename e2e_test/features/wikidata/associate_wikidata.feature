@@ -37,8 +37,9 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
-    Given I have a notebook "Wildlife deck" with a note "Animals" and notes:
+    Given I have a notebook "Wildlife deck" with notes:
       | Title            | Wikidata Id|
+      | Animals | |
       | Dog              | Q123       |
       | Canine           | Q456       |
     And Wikidata search result always has "Canine" with ID "Q11399"

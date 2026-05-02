@@ -2,8 +2,9 @@ Feature: Notebook deletion
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
+    And I have a notebook "LeSS training" with notes:
       | Title |
+      | LeSS in Action |
       | team  |
       | tech  |
 

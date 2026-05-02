@@ -22,11 +22,25 @@ defineParameterType({
   },
 })
 
+function omitBlankOptionalInjectionFields(rows: Record<string, string>[]) {
+  return rows.map((row) => {
+    const next = { ...row }
+    for (const [key, value] of Object.entries(next)) {
+      if (key === 'Title') {
+        continue
+      }
+      if (typeof value === 'string' && value.trim() === '') {
+        delete next[key]
+      }
+    }
+    return next
+  })
+}
+
 Given(
-  'I have a notebook {string} with a note {string} and notes:',
-  (notebookName: string, firstNoteTitle: string, data: DataTable) => {
-    const notes = data.hashes()
-    notes.unshift({ Title: firstNoteTitle })
+  'I have a notebook {string} with notes:',
+  (notebookName: string, data: DataTable) => {
+    const notes = omitBlankOptionalInjectionFields(data.hashes())
     cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes(notes, username, notebookName)
     )
