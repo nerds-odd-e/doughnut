@@ -59,11 +59,9 @@ describe("repeat page", () => {
 
   describe("normal view", () => {
     const noteRealm = makeMe.aNoteRealm.please()
-    const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
-    const { note } = memoryTracker
 
     beforeEach(() => {
-      mockSdkService("assimilating", [note, note])
+      mockSdkService("assimilating", [noteRealm, noteRealm])
       showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
     })
 

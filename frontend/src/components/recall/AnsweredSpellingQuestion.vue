@@ -4,7 +4,13 @@
       {{ answeredQuestion?.answer?.correct ? 'Correct!' : `Your answer \`${answeredQuestion?.answer?.spellingAnswer}\` is incorrect.` }}
     </strong>
   </div>
-  <NoteUnderQuestion v-if="answeredQuestion?.note" v-bind="{ noteTopology: answeredQuestion.note.noteTopology }" />
+  <NoteUnderQuestion
+    v-if="answeredQuestion?.note"
+    v-bind="{
+      noteTopology: answeredQuestion.note.noteTopology,
+      ancestorFolders: answeredQuestion.ancestorFolders ?? [],
+    }"
+  />
   <ViewMemoryTrackerLink
     v-if="answeredQuestion?.memoryTrackerId"
     :memory-tracker-id="answeredQuestion.memoryTrackerId"

@@ -70,7 +70,7 @@ function recallJustReviewPayloadFromMemoryTracker(
     noteTitle,
     detailsMarkdown,
     notebookName,
-    breadcrumbTitles: noteBreadcrumbTrailTitles(note),
+    breadcrumbTitles: noteBreadcrumbTrailTitles(note, mt.ancestorFolders),
   }
 }
 

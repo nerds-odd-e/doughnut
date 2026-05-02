@@ -71,7 +71,6 @@ class NoteBuilder extends Builder<Note> {
 
   underNote(value: Note): NoteBuilder {
     this.data.parentId = value.id
-    this.data.noteTopology.parentOrSubjectNoteTopology = value.noteTopology
     return this
   }
 

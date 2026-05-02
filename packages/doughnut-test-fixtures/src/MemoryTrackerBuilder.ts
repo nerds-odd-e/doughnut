@@ -51,6 +51,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
 
   ofNote(note: NoteRealm): MemoryTrackerBuilder {
     this.data.note = note.note
+    this.data.ancestorFolders = note.ancestorFolders ?? []
     return this
   }
 

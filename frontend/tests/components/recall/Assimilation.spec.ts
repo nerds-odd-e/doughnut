@@ -88,7 +88,10 @@ describe("Assimilation component", () => {
   const mount = (overrides?: { note?: typeof note }) =>
     renderer
       .withCleanStorage()
-      .withProps({ note: overrides?.note ?? note })
+      .withProps({
+        note: overrides?.note ?? note,
+        ancestorFolders: noteRealm.ancestorFolders ?? [],
+      })
       .withRouter()
       .mount()
 

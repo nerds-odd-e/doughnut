@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
-import type { Note } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -23,7 +23,7 @@ defineEmits(["update-assimilating"])
 const { setDueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =
   useAssimilationCount()
 
-const notes = ref<Note[] | undefined>(undefined)
+const notes = ref<NoteRealm[] | undefined>(undefined)
 const reloadKey = ref(0)
 
 const assimilationDone = () => {

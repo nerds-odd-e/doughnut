@@ -2,20 +2,33 @@
   <div class="note-under-question daisy-bg-base-200 daisy-border-base-300">
     <div class="note-label daisy-bg-base-200 daisy-text-base-content">Note under question</div>
     <div class="breadcrumb-wrapper">
-      <Breadcrumb v-bind="{ noteTopology, includingSelf: true }" />
+      <Breadcrumb
+        v-bind="{
+          noteTopology,
+          includingSelf: true,
+          ancestorFolders: ancestorFolders ?? [],
+        }"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type {
+  FolderTrailSegment,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 
 defineProps({
   noteTopology: {
     type: Object as PropType<NoteTopology>,
     required: true,
+  },
+  ancestorFolders: {
+    type: Array as PropType<FolderTrailSegment[] | undefined>,
+    default: undefined,
   },
 })
 </script>

@@ -143,7 +143,7 @@ describe('recall just-review (interactive)', () => {
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
-    return makeMe.aNoteRealm
+    const child = makeMe.aNoteRealm
       .title('Sedition')
       .notebookName('NB')
       .details('Sedition means incite violence')
@@ -151,6 +151,8 @@ describe('recall just-review (interactive)', () => {
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
+    child.ancestorFolders = [{ id: '1', name: 'English' }]
+    return child
   }
 
   function mockShowMemoryTrackerCardForRealm(
@@ -401,7 +403,7 @@ describe('recall just-review (interactive)', () => {
     expect(out).toContain('Alpha')
   })
 
-  test('just-review answered block: breadcrumb parent › child, details, Reviewed line', async () => {
+  test('just-review answered block: breadcrumb notebook › folder › note, details, Reviewed line', async () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(childNoteUnderEnglish())
 
@@ -414,7 +416,7 @@ describe('recall just-review (interactive)', () => {
     await untilPlain(frames, (p) => {
       const plain = stripAnsi(p)
       return (
-        plain.includes('English › Sedition') &&
+        plain.includes('NB › English › Sedition') &&
         plain.includes('Sedition means incite violence') &&
         plain.includes('Reviewed: Sedition')
       )

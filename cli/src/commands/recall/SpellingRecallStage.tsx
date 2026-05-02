@@ -89,7 +89,10 @@ function recallAnsweredSpellingInk(args: {
 }): ReactElement {
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(
-    noteBreadcrumbTrailTitles(args.answeredPrompt.note)
+    noteBreadcrumbTrailTitles(
+      args.answeredPrompt.note,
+      args.answeredPrompt.ancestorFolders
+    )
   )
   const detailsMarkdown = noteDetailsMarkdownOrFallback(
     args.answeredPrompt.note,

@@ -17,14 +17,24 @@ describe("breadcrumb with circles", () => {
     await screen.findByText("Bazaar")
   })
 
-  it("show ancestors in correct order", async () => {
+  it("shows folder trail in outer-to-inner order via ancestorFolders", async () => {
     helper
       .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: false, noteTopology: grandChild.noteTopology })
+      .withProps({
+        fromBazaar: false,
+        noteTopology: grandChild.noteTopology,
+        ancestorFolders: [
+          { id: "1", name: "parent" },
+          { id: "2", name: "child" },
+        ],
+      })
       .render()
-    const items = screen.getAllByText(/parent|child/)
-    expect(items[0]).toHaveTextContent("parent")
-    expect(items[1]).toHaveTextContent("child")
+    const parentEl = screen.getByText("parent")
+    const childEl = screen.getByText("child")
+    expect(
+      parentEl.compareDocumentPosition(childEl) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
   })
 
   it("shows folder trail from ancestorFolders instead of parent topology", async () => {

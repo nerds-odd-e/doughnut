@@ -1,6 +1,11 @@
 <template>
   <div v-if="note">
-    <NoteUnderQuestion v-bind="{ noteTopology: note.noteTopology }" />
+    <NoteUnderQuestion
+      v-bind="{
+        noteTopology: note.noteTopology,
+        ancestorFolders: answeredQuestion.ancestorFolders ?? [],
+      }"
+    />
     <ViewMemoryTrackerLink
       v-if="answeredQuestion?.memoryTrackerId"
       :memory-tracker-id="answeredQuestion.memoryTrackerId"

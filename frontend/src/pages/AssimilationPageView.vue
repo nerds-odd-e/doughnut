@@ -44,17 +44,20 @@
   <div class="daisy-mx-auto daisy-min-w-0 daisy-container daisy-mt-3">
     <ContentLoader v-if="notes === undefined" />
     <template v-else>
-      <div v-if="notes?.length === 0" class="daisy-text-center daisy-py-8">
+      <div v-if="(notes?.length ?? 0) === 0" class="daisy-text-center daisy-py-8">
         <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
           🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
         </h1>
       </div>
       <Assimilation
-        v-if="note"
-        v-bind="{ note }"
+        v-if="noteRealm"
+        v-bind="{
+          note: noteRealm.note,
+          ancestorFolders: noteRealm.ancestorFolders ?? [],
+        }"
         @assimilation-done="assimilationDone"
         @reload-needed="onReloadNeeded"
-        :key="`${note.id}-${note.updatedAt}`"
+        :key="`${noteRealm.note.id}-${noteRealm.note.updatedAt}`"
       />
     </template>
   </div>
@@ -62,7 +65,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { Note } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import Assimilation from "@/components/recall/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
@@ -70,7 +73,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 const props = defineProps({
   notes: {
-    type: Array as PropType<Note[] | undefined>,
+    type: Array as PropType<NoteRealm[] | undefined>,
     required: false,
   },
   assimilatedCountOfTheDay: {
@@ -88,7 +91,7 @@ const emit = defineEmits<{
   (e: "reload-needed"): void
 }>()
 
-const note = computed(() => props.notes?.[0])
+const noteRealm = computed(() => props.notes?.[0])
 const remainingAssimilationCountForToday = computed(
   () => props.notes?.length || 0
 )

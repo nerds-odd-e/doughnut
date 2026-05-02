@@ -71,7 +71,10 @@ function recallAnsweredMcqInk(args: {
 }): ReactElement {
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(
-    noteBreadcrumbTrailTitles(args.answeredPrompt.note)
+    noteBreadcrumbTrailTitles(
+      args.answeredPrompt.note,
+      args.answeredPrompt.ancestorFolders
+    )
   )
   const correct = args.answeredPrompt.answer?.correct === true
   const fromPredefined =

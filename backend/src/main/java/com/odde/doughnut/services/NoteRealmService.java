@@ -1,12 +1,9 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.FolderTrailSegment;
+import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,21 +27,8 @@ public class NoteRealmService {
     realm.setInboundReferences(inbound);
     realm.setReferences(mergeReferenceNotes(inbound, subjectOrParentLinked));
     realm.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
-    realm.setAncestorFolders(folderTrailFromRootToContainingFolder(note));
+    realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(note));
     return realm;
-  }
-
-  private static List<FolderTrailSegment> folderTrailFromRootToContainingFolder(Note note) {
-    Folder folder = note.getFolder();
-    if (folder == null) {
-      return List.of();
-    }
-    List<Folder> leafToRoot = new ArrayList<>();
-    for (Folder f = folder; f != null; f = f.getParentFolder()) {
-      leafToRoot.add(f);
-    }
-    Collections.reverse(leafToRoot);
-    return leafToRoot.stream().map(FolderTrailSegment::from).toList();
   }
 
   /**

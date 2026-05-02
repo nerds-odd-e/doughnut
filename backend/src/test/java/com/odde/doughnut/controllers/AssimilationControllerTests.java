@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -31,8 +32,9 @@ class AssimilationControllerTests extends ControllerTestBase {
     void assimilating() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
-      List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
+      List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
+      assertThat(memoryTrackerWithRecallSettings.get(0).getNote().getId(), equalTo(n.getId()));
     }
 
     @Test
@@ -45,8 +47,9 @@ class AssimilationControllerTests extends ControllerTestBase {
     void shouldHandleInvalidTimezoneByUsingUTC() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
-      List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
+      List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
+      assertThat(memoryTrackerWithRecallSettings.get(0).getNote().getId(), equalTo(n.getId()));
     }
   }
 

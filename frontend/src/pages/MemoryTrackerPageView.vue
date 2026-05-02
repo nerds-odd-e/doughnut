@@ -78,7 +78,12 @@
       </button>
     </div>
     <div v-if="memoryTracker.note" class="daisy-mb-6">
-      <NoteUnderQuestion v-bind="{ noteTopology: memoryTracker.note.noteTopology }" />
+      <NoteUnderQuestion
+        v-bind="{
+          noteTopology: memoryTracker.note.noteTopology,
+          ancestorFolders: memoryTracker.ancestorFolders ?? [],
+        }"
+      />
     </div>
     <div v-if="recallPrompts.length === 0" class="daisy-alert daisy-alert-info">
       No recall prompts found for this memory tracker.

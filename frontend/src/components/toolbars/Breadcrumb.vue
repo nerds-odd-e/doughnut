@@ -39,18 +39,6 @@ const ancestors = computed(() => {
     }
     return []
   }
-
-  const result: NoteTopology[] = []
-  let currentTopology = props.noteTopology
-
-  if (props.includingSelf) {
-    result.push(currentTopology)
-  }
-
-  while (currentTopology.parentOrSubjectNoteTopology) {
-    result.unshift(currentTopology.parentOrSubjectNoteTopology)
-    currentTopology = currentTopology.parentOrSubjectNoteTopology
-  }
-  return result
+  return props.includingSelf ? [props.noteTopology] : []
 })
 </script>

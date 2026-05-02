@@ -23,43 +23,25 @@ export const Simple: Story = {
   },
 }
 
-// Note with a few ancestors
+// Note with a few folder segments (breadcrumb path)
 export const WithAncestors: Story = {
   args: {
-    noteTopology: (() => {
-      let currentNote = makeMe.aNote.title("Programming").please()
-      currentNote = makeMe.aNote
-        .title("Languages")
-        .underNote(currentNote)
-        .please()
-      currentNote = makeMe.aNote
-        .title("TypeScript")
-        .underNote(currentNote)
-        .please()
-      return currentNote.noteTopology
-    })(),
+    noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
+    ancestorFolders: [
+      { id: "1", name: "Programming" },
+      { id: "2", name: "Languages" },
+    ],
   },
 }
 
-// Note with many ancestors (testing horizontal scroll)
+// Long folder trail (testing horizontal scroll)
 export const WithManyAncestors: Story = {
   args: {
-    noteTopology: (() => {
-      // Create a chain of 10 ancestor notes
-      let currentNote = makeMe.aNote.title("Ancestor 1").please()
-      for (let i = 2; i <= 10; i++) {
-        currentNote = makeMe.aNote
-          .title(`Ancestor ${i}`)
-          .underNote(currentNote)
-          .please()
-      }
-      // Create the final note with all ancestors
-      currentNote = makeMe.aNote
-        .title("TypeScript")
-        .underNote(currentNote)
-        .please()
-      return currentNote.noteTopology
-    })(),
+    noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
+    ancestorFolders: Array.from({ length: 10 }, (_, i) => ({
+      id: String(i + 1),
+      name: `Ancestor ${i + 1}`,
+    })),
   },
   decorators: [
     () => ({

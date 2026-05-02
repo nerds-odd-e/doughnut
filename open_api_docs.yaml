@@ -3150,7 +3150,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Note"
+                  $ref: "#/components/schemas/NoteRealm"
   /api/assessment:
     get:
       tags:
@@ -3846,8 +3846,6 @@ components:
           format: int32
         title:
           type: string
-        parentOrSubjectNoteTopology:
-          $ref: "#/components/schemas/NoteTopology"
         notebookId:
           type: integer
           format: int32
@@ -3921,6 +3919,10 @@ components:
           $ref: "#/components/schemas/Notebook"
         note:
           $ref: "#/components/schemas/Note"
+        ancestorFolders:
+          type: array
+          items:
+            $ref: "#/components/schemas/FolderTrailSegment"
         questionGeneratedTime:
           type: string
           format: date-time
@@ -4387,6 +4389,10 @@ components:
           type: boolean
         spelling:
           type: boolean
+        ancestorFolders:
+          type: array
+          items:
+            $ref: "#/components/schemas/FolderTrailSegment"
       required:
       - id
       - nextRecallAt

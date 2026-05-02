@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.FolderTrailSegment;
+import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,6 +32,7 @@ import lombok.Setter;
   "multipleChoicesQuestion",
   "notebook",
   "note",
+  "ancestorFolders",
   "questionGeneratedTime",
   "isContested",
   "answerTime",
@@ -111,6 +115,15 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
       return getMemoryTracker().getNote();
     }
     return null;
+  }
+
+  @JsonProperty
+  public List<FolderTrailSegment> getAncestorFolders() {
+    Note n = getNote();
+    if (n == null) {
+      return List.of();
+    }
+    return FolderTrailSegments.fromRootToContainingFolder(n);
   }
 
   @JsonProperty("predefinedQuestion")

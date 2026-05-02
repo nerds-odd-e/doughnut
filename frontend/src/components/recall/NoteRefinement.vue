@@ -26,7 +26,9 @@
             <span class="daisy-break-words">{{ point }}</span>
           </label>
           <div
-            v-if="note.noteTopology.parentOrSubjectNoteTopology"
+            v-if="
+              note.noteTopology.folderId != null || note.parentId != null
+            "
             class="daisy-flex daisy-gap-1 daisy-shrink-0"
           >
             <button

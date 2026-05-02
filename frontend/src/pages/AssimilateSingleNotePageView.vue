@@ -8,7 +8,7 @@
     <ContentLoader v-if="!note" />
     <Assimilation
       v-if="note"
-      v-bind="{ note }"
+      v-bind="{ note, ancestorFolders }"
       @assimilation-done="assimilationDone"
       @reload-needed="onReloadNeeded"
       :key="note.id"
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type { FolderTrailSegment, Note } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import Assimilation from "@/components/recall/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
@@ -27,6 +27,10 @@ defineProps({
   note: {
     type: Object as PropType<Note | undefined>,
     required: false,
+  },
+  ancestorFolders: {
+    type: Array as PropType<FolderTrailSegment[]>,
+    default: () => [],
   },
 })
 

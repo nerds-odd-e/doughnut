@@ -417,8 +417,7 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refOfNoteRealm(noteId).value
     if (!noteRealm?.note) return null
 
-    const parentNoteId =
-      noteRealm.note.noteTopology.parentOrSubjectNoteTopology?.id
+    const parentNoteId = noteRealm.note.parentId
     if (parentNoteId === null || parentNoteId === undefined) {
       return { originalParentId: null }
     }

@@ -249,7 +249,6 @@ export type NoteRealm = {
 export type NoteTopology = {
     id: number;
     title?: string;
-    parentOrSubjectNoteTopology?: NoteTopology;
     notebookId: number;
     notebookName?: string;
     folderId?: number;
@@ -284,6 +283,7 @@ export type RecallPrompt = {
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook: Notebook;
     note?: Note;
+    ancestorFolders?: Array<FolderTrailSegment>;
     questionGeneratedTime?: string;
     isContested?: boolean;
     answerTime?: string;
@@ -530,6 +530,7 @@ export type MemoryTracker = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
+    ancestorFolders?: Array<FolderTrailSegment>;
 };
 
 export type McpNoteAddDto = {
@@ -980,6 +981,7 @@ export type RecallPromptWritable = {
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook: Notebook;
     note?: NoteWritable;
+    ancestorFolders?: Array<FolderTrailSegment>;
     questionGeneratedTime?: string;
     isContested?: boolean;
     answerTime?: string;
@@ -998,6 +1000,7 @@ export type MemoryTrackerWritable = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
+    ancestorFolders?: Array<FolderTrailSegment>;
 };
 
 export type ConversationWritable = {
@@ -3856,7 +3859,7 @@ export type AssimilatingResponses = {
     /**
      * OK
      */
-    200: Array<Note>;
+    200: Array<NoteRealm>;
 };
 
 export type AssimilatingResponse = AssimilatingResponses[keyof AssimilatingResponses];

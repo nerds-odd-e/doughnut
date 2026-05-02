@@ -2,7 +2,11 @@
   <main>
     <div class="breadcrumb-wrapper daisy-mb-2">
       <Breadcrumb
-        v-bind="{ noteTopology: note.noteTopology, includingSelf: false }"
+        v-bind="{
+          noteTopology: note.noteTopology,
+          includingSelf: false,
+          ancestorFolders,
+        }"
       />
     </div>
     <NoteShow
@@ -45,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type { FolderTrailSegment, Note } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -59,8 +63,9 @@ import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
-const { note } = defineProps<{
+const { note, ancestorFolders = [] } = defineProps<{
   note: Note
+  ancestorFolders?: FolderTrailSegment[]
 }>()
 
 const emit = defineEmits<{

@@ -31,11 +31,11 @@ type Story = StoryObj<typeof meta>
 export const WithNotes: Story = {
   args: {
     notes: [
-      makeMe.aNote
+      makeMe.aNoteRealm
         .title("TypeScript")
         .details("TypeScript is a typed superset of JavaScript.")
         .please(),
-      makeMe.aNote
+      makeMe.aNoteRealm
         .title("Vue.js")
         .details("Vue.js is a progressive JavaScript framework.")
         .please(),
@@ -49,7 +49,7 @@ export const WithNotes: Story = {
 export const WithSingleNote: Story = {
   args: {
     notes: [
-      makeMe.aNote
+      makeMe.aNoteRealm
         .title("React")
         .details("React is a JavaScript library for building user interfaces.")
         .please(),
@@ -81,7 +81,7 @@ export const Loading: Story = {
 export const HighProgress: Story = {
   args: {
     notes: [
-      makeMe.aNote
+      makeMe.aNoteRealm
         .title("Python")
         .details("Python is a high-level programming language.")
         .please(),
@@ -95,7 +95,7 @@ export const HighProgress: Story = {
 export const DailyProgressOnly: Story = {
   args: {
     notes: [
-      makeMe.aNote
+      makeMe.aNoteRealm
         .title("JavaScript")
         .details("JavaScript is a programming language.")
         .please(),

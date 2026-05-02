@@ -1,10 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -28,6 +30,7 @@ class AssimilationController {
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
+  private final NoteRealmService noteRealmService;
 
   @Autowired
   public AssimilationController(
@@ -35,17 +38,19 @@ class AssimilationController {
       SubscriptionService subscriptionService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      UserService userService) {
+      UserService userService,
+      NoteRealmService noteRealmService) {
     this.memoryTrackerService = memoryTrackerService;
     this.subscriptionService = subscriptionService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
+    this.noteRealmService = noteRealmService;
   }
 
   @GetMapping("/assimilating")
   @Transactional(readOnly = true)
-  public List<Note> assimilating(@RequestParam(value = "timezone") String timezone) {
+  public List<NoteRealm> assimilating(@RequestParam(value = "timezone") String timezone) {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
@@ -54,6 +59,7 @@ class AssimilationController {
     return new AssimilationService(
             user, userService, subscriptionService, currentUTCTimestamp, timeZone)
         .getNotesToAssimilate()
+        .map(note -> noteRealmService.build(note, user))
         .toList();
   }
 
