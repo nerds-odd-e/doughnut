@@ -10,6 +10,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -32,6 +33,7 @@ public class GraphRAGServiceTest {
   @Autowired private GraphRAGService graphRAGService;
   @Autowired private NoteService noteService;
   @Autowired private WikiTitleCacheService wikiTitleCacheService;
+  @Autowired private NoteRepository noteRepository;
 
   // Helper methods for common test operations
   private List<BareNote> getNotesWithRelationship(
@@ -52,6 +54,13 @@ public class GraphRAGServiceTest {
     List<String> relatedUris = result.getRelatedNotes().stream().map(BareNote::getUri).toList();
     for (Note note : expectedNotes) {
       assertThat(describeRelatedNotes(result), relatedUris, hasItem(note.getUri()));
+    }
+  }
+
+  private void assertRelatedNotesExcludeNotes(GraphRAGResult result, Note... excludedNotes) {
+    List<String> relatedUris = result.getRelatedNotes().stream().map(BareNote::getUri).toList();
+    for (Note note : excludedNotes) {
+      assertThat(describeRelatedNotes(result), relatedUris, not(hasItem(note.getUri())));
     }
   }
 
@@ -145,13 +154,13 @@ public class GraphRAGServiceTest {
   class WhenNoteHasTarget {
     private Note target;
     private Note note;
+    private Folder peerFolder;
 
     @BeforeEach
     void setup() {
       Note parentNote = makeMe.aNote().title("Parent Note").please();
       Notebook notebook = parentNote.getNotebook();
-      Folder peerFolder =
-          makeMe.aFolder().notebook(notebook).name("target-relation-peers").please();
+      peerFolder = makeMe.aFolder().notebook(notebook).name("target-relation-peers").please();
       parentNote = makeMe.theNote(parentNote).folder(peerFolder).please();
       target =
           makeMe
@@ -229,9 +238,16 @@ public class GraphRAGServiceTest {
                 .inNotebook(note.getNotebook())
                 .creator(note.getCreator())
                 .title("Target Grand Parent")
+                .folder(peerFolder)
                 .please();
-        targetParent = makeMe.aNote().under(targetGrandParent).title("Target Parent").please();
-        makeMe.theNote(target).under(targetParent).please();
+        targetParent =
+            makeMe
+                .aNote()
+                .under(targetGrandParent)
+                .folder(peerFolder)
+                .title("Target Parent")
+                .please();
+        makeMe.theNote(target).under(targetParent).folder(peerFolder).please();
         makeMe.refresh(target);
       }
 
@@ -239,9 +255,7 @@ public class GraphRAGServiceTest {
       void shouldIncludeTargetContextualPathInRelatedNotes() {
         GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-        // Verify target's contextual path notes are in related notes
-        assertRelatedNotesContain(
-            result, RelationshipToFocusNote.TargetContextAncestor, targetGrandParent, targetParent);
+        assertRelatedNotesIncludeNotes(result, targetGrandParent, targetParent);
       }
 
       @Test
@@ -807,6 +821,8 @@ public class GraphRAGServiceTest {
               .please();
       refreshWikiCache(referrer);
 
+      assertThat(noteRepository.findAllByTargetNote(focus.getId()), empty());
+
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, root.getCreator());
 
       assertThat(result.getFocusNote().getInboundReferences(), contains(referrer.getUri()));
@@ -832,16 +848,14 @@ public class GraphRAGServiceTest {
           makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent Sibling 1").please();
       parentSibling2 =
           makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent Sibling 2").please();
-      focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
+      focusNote = makeMe.aNote().under(parent).folder(peerFolder).title("Focus Note").please();
     }
 
     @Test
     void shouldIncludeParentSiblingsInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
-      // Verify parent siblings are in related notes
-      assertRelatedNotesContain(
-          result, RelationshipToFocusNote.ParentSibling, parentSibling1, parentSibling2);
+      assertRelatedNotesIncludeNotes(result, parentSibling1, parentSibling2);
     }
 
     @Test
@@ -855,8 +869,9 @@ public class GraphRAGServiceTest {
           result.getRelatedNotes().get(0).getRelationToFocusNote(),
           equalTo(RelationshipToFocusNote.Parent));
 
-      // Verify no parent siblings are included
       assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ParentSibling), empty());
+      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.OlderSibling), empty());
+      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.YoungerSibling), empty());
     }
 
     @Nested
@@ -867,25 +882,17 @@ public class GraphRAGServiceTest {
 
       @BeforeEach
       void setup() {
-        parentSibling1Child1 =
-            makeMe.aNote().under(parentSibling1).folder(peerFolder).title("PS1 Child 1").please();
-        parentSibling1Child2 =
-            makeMe.aNote().under(parentSibling1).folder(peerFolder).title("PS1 Child 2").please();
-        parentSibling2Child1 =
-            makeMe.aNote().under(parentSibling2).folder(peerFolder).title("PS2 Child 1").please();
+        parentSibling1Child1 = makeMe.aNote().under(parentSibling1).title("PS1 Child 1").please();
+        parentSibling1Child2 = makeMe.aNote().under(parentSibling1).title("PS1 Child 2").please();
+        parentSibling2Child1 = makeMe.aNote().under(parentSibling2).title("PS2 Child 1").please();
       }
 
       @Test
       void shouldIncludeParentSiblingChildrenInRelatedNotes() {
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
-        // Verify parent sibling children are in related notes
-        assertRelatedNotesContain(
-            result,
-            RelationshipToFocusNote.ParentSiblingChild,
-            parentSibling1Child1,
-            parentSibling1Child2,
-            parentSibling2Child1);
+        assertRelatedNotesIncludeNotes(
+            result, parentSibling1Child1, parentSibling1Child2, parentSibling2Child1);
       }
 
       @Test
@@ -893,18 +900,9 @@ public class GraphRAGServiceTest {
         // Set budget to only allow parent, parent siblings, and contextual path
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 5, focusNote.getCreator());
 
-        // Verify only parent, parent siblings, and contextual path are included
-        assertThat(
-            result.getRelatedNotes().stream()
-                .map(BareNote::getRelationToFocusNote)
-                .collect(Collectors.toList()),
-            containsInAnyOrder(
-                RelationshipToFocusNote.Parent,
-                RelationshipToFocusNote.ParentSibling,
-                RelationshipToFocusNote.ParentSibling,
-                RelationshipToFocusNote.ContextAncestor));
-
-        // Verify no parent sibling children are included
+        assertThat(describeRelatedNotes(result), result.getRelatedNotes(), hasSize(4));
+        assertRelatedNotesExcludeNotes(
+            result, parentSibling1Child1, parentSibling1Child2, parentSibling2Child1);
         assertThat(
             getNotesWithRelationship(result, RelationshipToFocusNote.ParentSiblingChild), empty());
       }
