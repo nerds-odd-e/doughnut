@@ -11,6 +11,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -81,8 +82,8 @@ public class WikiTitleCacheService {
 
   /**
    * Notes whose relationship {@code source:} or non-relationship {@code parent:} wikilink resolves
-   * to {@code focalNote}, merged into {@link
-   * com.odde.doughnut.controllers.dto.NoteRealm#getReferences()}. Same visibility rules as {@link
+   * to {@code focalNote}. Same visibility rules as {@link #inboundReferrerNotesForViewer}. For note
+   * show, use {@link #referencesNotesForViewer} which merges this slice with {@link
    * #inboundReferrerNotesForViewer}.
    */
   public List<Note> subjectAndParentLinkedReferrerNotesForViewer(Note focalNote, User viewer) {
@@ -116,6 +117,36 @@ public class WikiTitleCacheService {
       }
     }
     return List.copyOf(distinctOrder.values());
+  }
+
+  /**
+   * Merged, deduped referrer notes for {@code focalNote} and {@code viewer}: inbound wiki links
+   * plus subject/parent-linked rows from the wiki-title cache, in one ordered list for {@link
+   * com.odde.doughnut.controllers.dto.NoteRealm#getReferences()}.
+   */
+  public List<Note> referencesNotesForViewer(Note focalNote, User viewer) {
+    return mergeReferenceNotes(
+        inboundReferrerNotesForViewer(focalNote, viewer),
+        subjectAndParentLinkedReferrerNotesForViewer(focalNote, viewer));
+  }
+
+  /**
+   * Dedupes by referring note id (inbound list first, then relation-style), stable order by id
+   * ascending.
+   */
+  static List<Note> mergeReferenceNotes(List<Note> inbound, List<Note> relationStyle) {
+    LinkedHashMap<Integer, Note> byId = new LinkedHashMap<>();
+    if (inbound != null) {
+      for (Note n : inbound) {
+        byId.putIfAbsent(n.getId(), n);
+      }
+    }
+    if (relationStyle != null) {
+      for (Note n : relationStyle) {
+        byId.putIfAbsent(n.getId(), n);
+      }
+    }
+    return byId.values().stream().sorted(Comparator.comparing(Note::getId)).toList();
   }
 
   private static boolean inboundReferrerVisible(Note referrer, Note focalNote, User viewer) {

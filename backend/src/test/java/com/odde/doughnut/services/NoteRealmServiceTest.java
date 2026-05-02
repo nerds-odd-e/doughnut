@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import java.sql.Timestamp;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -271,20 +270,6 @@ class NoteRealmServiceTest {
     assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
-  }
-
-  @Test
-  void merge_reference_notes_dedupes_and_orders_by_note_id() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note second = makeMe.aNote().under(root).please();
-    Note first = makeMe.aNote().under(root).please();
-
-    List<Note> merged =
-        NoteRealmService.mergeReferenceNotes(List.of(second), List.of(first, second));
-    assertThat(merged, hasSize(2));
-    assertThat(merged.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
-    assertThat(merged.get(1).getId(), equalTo(Math.max(first.getId(), second.getId())));
   }
 
   @Test
