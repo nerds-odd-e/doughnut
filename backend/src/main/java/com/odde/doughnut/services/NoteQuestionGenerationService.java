@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -18,18 +17,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NoteQuestionGenerationService {
-  protected final GlobalSettingsService globalSettingsService;
   private final OpenAiApiHandler openAiApiHandler;
   private final ObjectMapper objectMapper;
   private final QuestionGenerationRequestBuilder requestBuilder;
 
   @Autowired
   public NoteQuestionGenerationService(
-      GlobalSettingsService globalSettingsService,
       OpenAiApiHandler openAiApiHandler,
       ObjectMapper objectMapper,
       QuestionGenerationRequestBuilder requestBuilder) {
-    this.globalSettingsService = globalSettingsService;
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
     this.requestBuilder = requestBuilder;
@@ -58,12 +54,8 @@ public class NoteQuestionGenerationService {
 
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String customPrompt, String additionalMessage) {
-    RelationType relationType =
-        note.isRelation()
-            ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
-            : null;
     String prompt = (customPrompt != null) ? customPrompt : AiToolFactory.getDefaultMcqPrompt();
-    InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt, relationType);
+    InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt);
     OpenAIChatRequestBuilder chatRequestBuilder =
         requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage);
 

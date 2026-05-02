@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
 
@@ -15,25 +14,14 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return questionAiTool(getDefaultMcqPrompt(), null);
+    return questionAiTool(getDefaultMcqPrompt());
   }
 
-  public static InstructionAndSchema mcqWithAnswerAiTool(RelationType relationType) {
-    return questionAiTool(getDefaultMcqPrompt(), relationType);
-  }
-
-  public static InstructionAndSchema questionAiTool(
-      String customPrompt, RelationType relationType) {
-    String baseInstruction = getBaseInstruction();
-    String relationTypeInstruction = getRelationTypeInstruction(relationType);
-
-    StringBuilder fullInstruction = new StringBuilder(baseInstruction);
+  public static InstructionAndSchema questionAiTool(String customPrompt) {
+    StringBuilder fullInstruction = new StringBuilder(getBaseInstruction());
 
     if (customPrompt != null && !customPrompt.isBlank()) {
       fullInstruction.append("\n").append(customPrompt);
-    }
-    if (relationTypeInstruction != null) {
-      fullInstruction.append("\n").append(relationTypeInstruction);
     }
     return new InstructionAndSchema(
         fullInstruction.toString(), askSingleAnswerMultipleChoiceQuestion());
@@ -67,13 +55,6 @@ public class AiToolFactory {
         - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
         - Choice order semantics (strictChoiceOrder): In typical MCQs without meta-choices ('All of the above', 'None of the above', 'Only A and B'), strictChoiceOrder must ALWAYS be false.
         """;
-  }
-
-  private static String getRelationTypeInstruction(RelationType relationType) {
-    if (relationType == null) {
-      return null;
-    }
-    return relationType.getQuestionGenerationInstruction();
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {

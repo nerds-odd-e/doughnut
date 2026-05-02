@@ -19,8 +19,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -174,37 +172,24 @@ class NoteQuestionGenerationServiceTests {
           request.messages().stream().filter(message -> message.system().isPresent()).count();
       assertThat(systemMessageCount, is(1L));
     }
-  }
 
-  @Nested
-  class RelationTypeInstructions {
-
-    private Note createRelationNote(RelationType relationType) {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, relationType).please();
-      Note relationNote =
-          sourceNote.getChildren().stream().filter(Note::isRelation).toList().get(0);
-      makeMe.aNote().under(relationNote).please();
-      return relationNote;
-    }
-
-    @ParameterizedTest
-    @EnumSource(RelationType.class)
-    void shouldIncludeRelationTypeInstruction(RelationType relationType) {
-      Note relationNote = createRelationNote(relationType);
-
-      ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
+    @Test
+    void shouldNotIncludeRelationTypeSpecialInstructionForRegularNote() {
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(
-          "Request should contain instruction for " + relationType,
-          systemMessageContains(request, relationType.getQuestionGenerationInstruction().trim()),
-          is(true));
+          systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
     }
 
     @Test
-    void shouldNotIncludeRelationTypeInstructionForNonRelationshipNote() {
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+    void shouldNotIncludeRelationTypeSpecialInstructionForRelationshipNote() {
+      Note targetNote = makeMe.aNote().please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.PART).please();
+      Note relationNote =
+          sourceNote.getChildren().stream().filter(Note::isRelation).findFirst().orElseThrow();
+
+      ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       assertThat(
           systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
