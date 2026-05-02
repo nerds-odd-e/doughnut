@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.*;
@@ -16,20 +17,27 @@ public class GraphRAGService {
   private final NoteRepository noteRepository;
   private final NoteService noteService;
   private final ObjectMapper objectMapper;
+  private final AuthorizationService authorizationService;
 
   @Autowired
   public GraphRAGService(
       TokenCountingStrategy tokenCountingStrategy,
       NoteRepository noteRepository,
       NoteService noteService,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      AuthorizationService authorizationService) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     this.noteRepository = noteRepository;
     this.noteService = noteService;
     this.objectMapper = objectMapper;
+    this.authorizationService = authorizationService;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
+    return retrieve(focusNote, tokenBudgetForRelatedNotes, authorizationService.getCurrentUser());
+  }
+
+  public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes, User viewer) {
     // Create priority four layer first so we can pass it to ParentSiblingHandler
     PriorityLayer priorityFourLayer = new PriorityLayer(2);
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);

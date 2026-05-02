@@ -53,7 +53,7 @@ public class GraphRAGServiceTest {
     void shouldRetrieveJustTheFocusNoteWithZeroBudget() {
       Note note = makeMe.aNote().title("Test Note").details("Test Details").please();
 
-      GraphRAGResult result = graphRAGService.retrieve(note, 0);
+      GraphRAGResult result = graphRAGService.retrieve(note, 0, note.getCreator());
 
       assertThat(result.getFocusNote().getDetails(), equalTo("Test Details"));
       assertThat(result.getRelatedNotes(), empty());
@@ -64,7 +64,7 @@ public class GraphRAGServiceTest {
       String longDetails = "a".repeat(2000);
       Note note = makeMe.aNote().title("Test Note").details(longDetails).please();
 
-      GraphRAGResult result = graphRAGService.retrieve(note, 0);
+      GraphRAGResult result = graphRAGService.retrieve(note, 0, note.getCreator());
 
       assertThat(result.getFocusNote().getDetails().length(), equalTo(2000));
     }
@@ -86,14 +86,14 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeParentInFocusNoteAndContextualPath() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getFocusNote().getParent(), equalTo(parent));
     }
 
     @Test
     void shouldIncludeParentInRelatedNotesWhenBudgetAllows() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(
@@ -103,7 +103,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 0);
+      GraphRAGResult result = graphRAGService.retrieve(note, 0, note.getCreator());
 
       assertThat(result.getFocusNote().getParent(), equalTo(parent));
       assertThat(result.getRelatedNotes(), empty());
@@ -114,7 +114,7 @@ public class GraphRAGServiceTest {
       String longDetails = "a".repeat(2000);
       parent.setDetails(longDetails);
 
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(
@@ -149,14 +149,14 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeTargetInFocusNote() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getFocusNote().getTarget(), equalTo(target));
     }
 
     @Test
     void shouldIncludeTargetInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getRelatedNotes(), hasSize(2));
       assertThat(
@@ -169,7 +169,8 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldKeepTargetInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 2); // Only enough for parent
+      GraphRAGResult result =
+          graphRAGService.retrieve(note, 2, note.getCreator()); // Only enough for parent
 
       // Target URI should still be in focus note
       assertThat(result.getFocusNote().getTarget(), equalTo(target));
@@ -187,7 +188,7 @@ public class GraphRAGServiceTest {
       makeMe.theNote(target).under(note).please();
       makeMe.refresh(note);
 
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       // Should be in both target and children lists of focus note
       assertThat(result.getFocusNote().getTarget(), equalTo(target));
@@ -212,7 +213,7 @@ public class GraphRAGServiceTest {
 
       @Test
       void shouldIncludeTargetContextualPathInRelatedNotes() {
-        GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+        GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
         // Verify target's contextual path notes are in related notes
         assertRelatedNotesContain(
@@ -222,7 +223,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldNotIncludeTargetContextualPathWhenBudgetIsLimited() {
         // Set budget to only allow target
-        GraphRAGResult result = graphRAGService.retrieve(note, 3);
+        GraphRAGResult result = graphRAGService.retrieve(note, 3, note.getCreator());
 
         // Verify target is included but not its contextual path
         assertThat(
@@ -262,7 +263,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeSiblingsOfTargetInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertRelatedNotesContain(
           result, RelationshipToFocusNote.SiblingOfTarget, targetSibling1, targetSibling2);
@@ -270,7 +271,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldNotIncludeFocusNoteAsSiblingOfTarget() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       List<BareNote> targetSiblings =
           getNotesWithRelationship(result, RelationshipToFocusNote.SiblingOfTarget);
@@ -283,7 +284,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotIncludeSiblingsOfTargetWhenBudgetIsLimited() {
       // Set budget to only allow parent and target
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
 
       // Verify no target siblings are included
       assertThat(
@@ -294,7 +295,7 @@ public class GraphRAGServiceTest {
     class WhenSiblingsOfTargetHaveSubjects {
       @Test
       void shouldIncludeSubjectsOfSiblingsOfTargetInRelatedNotes() {
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
         // Get the parent notes of target siblings
         Note siblingParent1 = targetSibling1.getParent();
@@ -310,7 +311,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldNotIncludeSubjectsOfSiblingsOfTargetWhenBudgetIsLimited() {
         // Set budget to only allow parent, target, and target siblings
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5, focusNote.getCreator());
 
         // Verify no subjects of target siblings are included
         assertThat(
@@ -335,7 +336,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeChildrenInFocusNoteList() {
-      GraphRAGResult result = graphRAGService.retrieve(parent, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(parent, 1000, parent.getCreator());
 
       assertThat(
           result.getFocusNote().getChildren(),
@@ -344,7 +345,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeChildrenInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(parent, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(parent, 1000, parent.getCreator());
 
       List<BareNote> childNotes =
           result.getRelatedNotes().stream()
@@ -358,7 +359,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldOnlyIncludeChildrenThatFitInBudget() {
       // Set budget to only allow one child
-      GraphRAGResult result = graphRAGService.retrieve(parent, 2);
+      GraphRAGResult result = graphRAGService.retrieve(parent, 2, parent.getCreator());
 
       // Only child1 should be in focus note's children list
       assertThat(result.getFocusNote().getChildren(), contains(child1.getUri()));
@@ -407,7 +408,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeYoungerSiblingsInFocusNoteList() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertThat(
           result.getFocusNote().getYoungerSiblings(),
@@ -416,7 +417,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeYoungerSiblingsInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertRelatedNotesContain(
           result, RelationshipToFocusNote.YoungerSibling, youngerSibling1, youngerSibling2);
@@ -436,7 +437,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldAlternateBetweenChildrenAndYoungerSiblingsWhenBudgetIsLimited() {
         // Set budget to only allow two notes
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 4);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 4, focusNote.getCreator());
 
         // Verify in related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();
@@ -473,7 +474,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeAncestorsInContextualPathInOrder() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 0);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 0, focusNote.getCreator());
 
       // Should be in contextual path in order from root to parent
       assertThat(
@@ -483,7 +484,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeNonParentAncestorsInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       List<BareNote> contextualNotes =
           result.getRelatedNotes().stream()
@@ -528,7 +529,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeOlderSiblingsInFocusNoteListInOrder() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertThat(
           result.getFocusNote().getOlderSiblings(),
@@ -537,7 +538,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeOlderSiblingsInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       List<BareNote> siblingNotes =
           result.getRelatedNotes().stream()
@@ -571,7 +572,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeChildTargetInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
 
@@ -581,7 +582,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldMarkChildWithTargetAsRelationship() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       // The child with a target should be marked as Relationship, not Child
       List<BareNote> relationshipNotes =
@@ -612,7 +613,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldAlternateBetweenPriorityLevelsWhenBudgetIsLimited() {
         // Set budget to allow only 5 notes (3 regular children + 1 relationship child + 1 target)
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 6);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 6, focusNote.getCreator());
 
         // Verify related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();
@@ -646,7 +647,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldIncludeAllChildrenWhenBudgetIsEnough() {
         // Set budget to allow all notes
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
         // Verify related notes include all children and the related child target
         assertThat(
@@ -668,7 +669,7 @@ public class GraphRAGServiceTest {
         makeMe.refresh(focusNote);
 
         // Set budget to allow only 4 notes
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5, focusNote.getCreator());
 
         // Verify related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();
@@ -718,7 +719,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeReferenceByNotesAndTheirSubjectsWhenBudgetIsEnough() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       // Verify inbound reference notes are in focus note's list
       assertThat(
@@ -743,7 +744,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotIncludeReferencingNoteSubjectsWhenBudgetIsLimited() {
       // Set budget to only allow inbound reference notes
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
 
       // Verify only inbound reference notes are included
       assertThat(result.getRelatedNotes(), hasSize(2));
@@ -782,7 +783,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeParentSiblingsInRelatedNotes() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       // Verify parent siblings are in related notes
       assertRelatedNotesContain(
@@ -792,7 +793,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotIncludeParentSiblingsWhenBudgetIsLimited() {
       // Set budget to only allow parent
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 2);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 2, focusNote.getCreator());
 
       // Verify only parent is included
       assertThat(result.getRelatedNotes(), hasSize(1));
@@ -822,7 +823,7 @@ public class GraphRAGServiceTest {
 
       @Test
       void shouldIncludeParentSiblingChildrenInRelatedNotes() {
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
         // Verify parent sibling children are in related notes
         assertRelatedNotesContain(
@@ -836,7 +837,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldNotIncludeParentSiblingChildrenWhenBudgetIsLimited() {
         // Set budget to only allow parent, parent siblings, and contextual path
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5, focusNote.getCreator());
 
         // Verify only parent, parent siblings, and contextual path are included
         assertThat(
@@ -870,7 +871,7 @@ public class GraphRAGServiceTest {
           makeMe.aNote().under(parent).folder(peerFolder).title("Folder younger").please();
       makeMe.aNote().under(parent).title("Tree only not in folder").please();
 
-      GraphRAGResult result = graphRAGService.retrieve(focus, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
       assertThat(result.getFocusNote().getOlderSiblings(), contains(folderOlder.getUri()));
       assertThat(result.getFocusNote().getYoungerSiblings(), contains(folderYounger.getUri()));
@@ -900,13 +901,13 @@ public class GraphRAGServiceTest {
       int idx = peersB.indexOf(b);
       List<String> expectedYounger =
           peersB.subList(idx + 1, peersB.size()).stream().map(Note::getUri).toList();
-      GraphRAGResult resultMiddle = graphRAGService.retrieve(b, 1000);
+      GraphRAGResult resultMiddle = graphRAGService.retrieve(b, 1000, b.getCreator());
       assertThat(resultMiddle.getFocusNote().getYoungerSiblings(), equalTo(expectedYounger));
 
       List<Note> peersC = noteService.findStructuralPeerNotesInOrder(c);
       int cIdx = peersC.indexOf(c);
       List<String> expectedOlder = peersC.subList(0, cIdx).stream().map(Note::getUri).toList();
-      GraphRAGResult resultLast = graphRAGService.retrieve(c, 1000);
+      GraphRAGResult resultLast = graphRAGService.retrieve(c, 1000, c.getCreator());
       assertThat(resultLast.getFocusNote().getOlderSiblings(), equalTo(expectedOlder));
     }
   }
@@ -921,7 +922,7 @@ public class GraphRAGServiceTest {
       note = makeMe.theNote(note).folder(peerFolder).please();
       Note child = makeMe.aNote().under(note).folder(peerFolder).title("Child Note").please();
 
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
       JsonNode jsonNode = objectMapper.valueToTree(result);
@@ -966,7 +967,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeReferenceByToTargetOfRelationship() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       // Verify inbound references to target are included
       assertRelatedNotesContain(
@@ -979,7 +980,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotIncludeReferenceByToTargetWhenBudgetIsLimited() {
       // Set budget to only allow up to target of related child
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
 
       // Verify no inbound references to target are included
       assertThat(
@@ -999,7 +1000,7 @@ public class GraphRAGServiceTest {
       note = makeMe.theNote(note).folder(peerFolder).please();
       Note child = makeMe.aNote().under(note).folder(peerFolder).please();
 
-      GraphRAGResult result = graphRAGService.retrieve(child, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(
@@ -1017,7 +1018,7 @@ public class GraphRAGServiceTest {
       note = makeMe.theNote(note).folder(peerFolder).please();
       Note child = makeMe.aNote().under(note).folder(peerFolder).please();
 
-      GraphRAGResult result = graphRAGService.retrieve(child, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
 
@@ -1049,7 +1050,7 @@ public class GraphRAGServiceTest {
       note = makeMe.theNote(note).folder(peerFolder).please();
       Note child = makeMe.aNote().under(note).folder(peerFolder).please();
 
-      GraphRAGResult result = graphRAGService.retrieve(child, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       String truncated = result.getRelatedNotes().get(0).getDetails();

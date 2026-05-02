@@ -232,8 +232,9 @@ class NoteController {
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
+    User user = authorizationService.getCurrentUser();
 
-    return graphRAGService.retrieve(note, tokenLimit);
+    return graphRAGService.retrieve(note, tokenLimit, user);
   }
 
   @GetMapping("/{note}/descendants")
