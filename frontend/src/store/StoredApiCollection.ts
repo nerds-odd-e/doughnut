@@ -459,12 +459,13 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refOfNoteRealm(noteId).value
     if (!noteRealm?.note) return null
 
-    const parentId = noteRealm.note.parentId
-    if (parentId === null || parentId === undefined) {
+    const parentNoteId =
+      noteRealm.note.noteTopology.parentOrSubjectNoteTopology?.id
+    if (parentNoteId === null || parentNoteId === undefined) {
       return { originalParentId: null }
     }
 
-    return { originalParentId: parentId }
+    return { originalParentId: parentNoteId }
   }
 
   async updateTextField(

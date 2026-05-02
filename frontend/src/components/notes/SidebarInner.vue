@@ -149,6 +149,11 @@ watch(sidebarStructuralRefreshKey, () => {
 const dragState = inject(sidebarNoteDragStateKey) ?? createFallbackDragState()
 const { draggedNote, isDraggedOver, dropMode, dropIndicatorStyle } = dragState
 
+function structuralFolderId(note: Note): number | null {
+  const id = note.noteTopology.folderId
+  return id === undefined || id === null ? null : id
+}
+
 const handleDragStart = (event: DragEvent, note: Note) => {
   draggedNote.value = note
   if (event.dataTransfer) {
@@ -175,7 +180,7 @@ const handleDragOver = (event: DragEvent, targetNote: Note) => {
 
   if (
     dropMode.value === "after" &&
-    draggedNote.value.parentId !== targetNote.parentId
+    structuralFolderId(draggedNote.value) !== structuralFolderId(targetNote)
   ) {
     isDraggedOver.value = null
     return
@@ -214,7 +219,7 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
 
   if (
     dropMode.value === "after" &&
-    draggedNote.value.parentId !== targetNote.parentId
+    structuralFolderId(draggedNote.value) !== structuralFolderId(targetNote)
   )
     return
 

@@ -58,7 +58,7 @@ const relationshipFormErrors = ref({
 const relationTypeSelected = async (
   relationType: RelationshipCreation["relationType"]
 ) => {
-  if (props.note.parentId === null) {
+  if (props.note.noteTopology.parentOrSubjectNoteTopology == null) {
     if (
       !(await popups.confirm(
         `"${props.note.noteTopology.title}" is a top level notebook. Do you want to move it under other notebook?`

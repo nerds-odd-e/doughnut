@@ -33,6 +33,20 @@ function structuralFolder(folderId: number, noteRealm: NoteRealm) {
   }
 }
 
+/** Aligns listing payloads with folder-first sidebar drag rules (same folderId = same drop column). */
+function noteRealmInFolder(realm: NoteRealm, folderId: number): NoteRealm {
+  return {
+    ...realm,
+    note: {
+      ...realm.note,
+      noteTopology: {
+        ...realm.note.noteTopology,
+        folderId,
+      },
+    },
+  } as NoteRealm
+}
+
 function stubFolderListingForTree(
   firstGeneration: NoteRealm,
   firstGenerationSibling: NoteRealm,
@@ -44,11 +58,14 @@ function stubFolderListingForTree(
       return {
         notes: [
           {
-            ...firstGeneration,
+            ...noteRealmInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
             relationshipsDeprecating: undefined,
           } as NoteRealm,
           {
-            ...firstGenerationSibling,
+            ...noteRealmInFolder(
+              firstGenerationSibling,
+              FOLDER_TOP_NOTE_CHILDREN_ID
+            ),
             relationshipsDeprecating: undefined,
           } as NoteRealm,
         ],
@@ -61,7 +78,10 @@ function stubFolderListingForTree(
       return {
         notes: [
           {
-            ...secondGeneration,
+            ...noteRealmInFolder(
+              secondGeneration,
+              FOLDER_FIRST_GEN_CHILDREN_ID
+            ),
             relationshipsDeprecating: undefined,
           } as NoteRealm,
         ],
