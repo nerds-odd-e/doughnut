@@ -1,3 +1,4 @@
+import NoteEditableDetails from "@/components/notes/core/NoteEditableDetails.vue"
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -310,6 +311,27 @@ describe("in place edit on title", () => {
       expect(wrapper.find(".error-message").text()).toBe(
         "You are not authorized to edit this note. Perhaps you are not logged in?"
       )
+    })
+  })
+
+  describe("relationPropertyApiNoteId from frontmatter", () => {
+    it("passes note id to NoteEditableDetails when details include relation", async () => {
+      const note = makeMe.aNote
+        .title("Rel")
+        .details("---\nrelation: parent-of\n---\n\nbody\n")
+        .please()
+      mountComponent(note)
+      await flushPromises()
+      const detailsComp = wrapper.findComponent(NoteEditableDetails)
+      expect(detailsComp.props("relationPropertyApiNoteId")).toBe(note.id)
+    })
+
+    it("does not pass relationPropertyApiNoteId when details lack relation", async () => {
+      const note = makeMe.aNote.title("Plain").please()
+      mountComponent(note)
+      await flushPromises()
+      const detailsComp = wrapper.findComponent(NoteEditableDetails)
+      expect(detailsComp.props("relationPropertyApiNoteId")).toBeUndefined()
     })
   })
 })

@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest"
 import {
   composeNoteDetailsFromPropertyRows,
   composeNoteDetailsMarkdown,
+  detailsHasRelationProperty,
   insertPropertyRowAt,
   parseNoteDetailsMarkdown,
+  propertyRecordHasRelationKey,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   sortedPropertyRowsFromRecord,
@@ -228,6 +230,34 @@ describe("property rows compose / mutate", () => {
     const again = parseNoteDetailsMarkdown(md)
     expect(again.ok && again.properties).toEqual({})
     if (again.ok) expect(again.body).toBe("Paragraph.\n")
+  })
+})
+
+describe("detailsHasRelationProperty", () => {
+  it("returns true when relation key exists (case-insensitive)", () => {
+    expect(
+      detailsHasRelationProperty("---\nrelation: parent-of\n---\n\nbody\n")
+    ).toBe(true)
+    expect(detailsHasRelationProperty("---\nRelation: child-of\n---\n\n")).toBe(
+      true
+    )
+  })
+
+  it("returns false without relation key", () => {
+    expect(detailsHasRelationProperty("---\ntopic: x\n---\n")).toBe(false)
+    expect(detailsHasRelationProperty("no frontmatter")).toBe(false)
+  })
+
+  it("returns false on parse failure", () => {
+    expect(detailsHasRelationProperty("---\nbad:\n  nested: x\n---\n")).toBe(
+      false
+    )
+  })
+})
+
+describe("propertyRecordHasRelationKey", () => {
+  it("detects relation with surrounding whitespace on key", () => {
+    expect(propertyRecordHasRelationKey({ " relation ": "x" })).toBe(true)
   })
 })
 

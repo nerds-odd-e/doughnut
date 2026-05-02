@@ -140,6 +140,23 @@ export function parseNoteDetailsMarkdown(
   return { ok: true, properties: mapped.properties, body }
 }
 
+/** True when any key is the `relation` property (trimmed, case-insensitive), matching rich editor rows. */
+export function propertyRecordHasRelationKey(
+  properties: Record<string, string>
+): boolean {
+  for (const key of Object.keys(properties)) {
+    if (key.trim().toLowerCase() === "relation") return true
+  }
+  return false
+}
+
+/** True when parsed details include a `relation` frontmatter key. */
+export function detailsHasRelationProperty(details: string): boolean {
+  const p = parseNoteDetailsMarkdown(details)
+  if (!p.ok) return false
+  return propertyRecordHasRelationKey(p.properties)
+}
+
 /** Composes note Markdown details with optional leading YAML frontmatter. */
 export function composeNoteDetailsMarkdown(input: {
   properties: Record<string, string>

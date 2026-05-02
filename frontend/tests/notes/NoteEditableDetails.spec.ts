@@ -602,6 +602,70 @@ describe("NoteEditableDetails", () => {
     })
   })
 
+  describe("relation property API context in rich mode", () => {
+    it("shows RelationTypeSelectCompact when relationPropertyApiNoteId is set and details include relation", async () => {
+      const details = `---
+relation: parent-of
+---
+
+# Body`
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withRouter()
+        .withProps({
+          noteId: 99,
+          noteDetails: details,
+          readonly: false,
+          asMarkdown: false,
+          wikiTitles: [],
+          relationPropertyApiNoteId: 99,
+        })
+        .mount({ attachTo: document.body })
+
+      await flushPromises()
+
+      const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
+      expect(rfp.exists()).toBe(true)
+      const relationSelect = rfp.findComponent({
+        name: "RelationTypeSelectCompact",
+      })
+      expect(relationSelect.exists()).toBe(true)
+      wrapper.unmount()
+    })
+
+    it("uses plain value input for relation row when relationPropertyApiNoteId is absent", async () => {
+      const details = `---
+relation: parent-of
+---
+
+# Body`
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withRouter()
+        .withProps({
+          noteId: 99,
+          noteDetails: details,
+          readonly: false,
+          asMarkdown: false,
+          wikiTitles: [],
+        })
+        .mount({ attachTo: document.body })
+
+      await flushPromises()
+
+      const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
+      expect(
+        rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
+      ).toBe(false)
+      expect(
+        rfp.find('[data-testid="rich-note-property-row-value-input"]').exists()
+      ).toBe(true)
+      wrapper.unmount()
+    })
+  })
+
   describe("HTML content normalization", () => {
     it("should not save when value contains only <p><br></p> and last saved was also empty", async () => {
       vi.useFakeTimers()

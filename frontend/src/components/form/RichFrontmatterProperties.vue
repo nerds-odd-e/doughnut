@@ -45,13 +45,14 @@
         >
         <RelationTypeSelectCompact
           v-if="
-            isRelationPropertyRow(propertyRows[idx]!) && relationPropertyApiNoteId != null
+            isRelationPropertyRow(propertyRows[idx]!) &&
+            relationPropertyUsesRelationshipApi
           "
           field="relationType"
           scope-name="rich-note-relation-property"
           hide-label
           :model-value="relationTypeFromKebab(propertyRows[idx]!.value)"
-          :error-message="relationPropertyFormErrors.relationType"
+          :error-message="relationPropertyRelationTypeError"
           :inverse-icon="true"
           @update:model-value="onRelationTypeSelected(idx, $event)"
         />
@@ -126,7 +127,6 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from "vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   relationLabelFromKebab,
   relationTypeFromKebab,
@@ -145,18 +145,17 @@ const props = defineProps<{
   /** When true, properties list is display-only and insert chrome is hidden. */
   readOnly?: boolean
   /**
-   * When set (relationship note show page), the `relation` property value is edited via
-   * `updateRelationship` instead of local frontmatter rows.
+   * When true, the `relation` row uses `RelationTypeSelectCompact` and emits
+   * `relationPropertyRelationTypeSelected` instead of calling the API here.
    */
-  relationPropertyApiNoteId?: number
+  relationPropertyUsesRelationshipApi?: boolean
+  /** Binding error for relation type when the parent handles `updateRelationship`. */
+  relationPropertyRelationTypeError?: string
 }>()
-
-const storageAccessor = useStorageAccessor()
-
-const relationPropertyFormErrors = ref<{ relationType?: string }>({})
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
+  relationPropertyRelationTypeSelected: [relationType: RelationTypeLabel]
 }>()
 
 const headingId = useId()
@@ -189,7 +188,6 @@ watch(
     draftValue.value = ""
     validationMessage.value = ""
     rowSnapshots.value = {}
-    relationPropertyFormErrors.value = {}
   },
   { immediate: true }
 )
@@ -202,19 +200,14 @@ function onRelationTypeSelected(
   idx: number,
   newType: RelationTypeLabel | undefined
 ) {
-  const noteId = props.relationPropertyApiNoteId
-  if (noteId == null || newType === undefined) return
+  if (newType === undefined) return
   const row = propertyRows.value[idx]
   if (!row || !isRelationPropertyRow(row)) return
   const current = relationTypeFromKebab(row.value)
   if (current === newType) return
-  relationPropertyFormErrors.value = {}
-  storageAccessor.value
-    .storedApi()
-    .updateRelationship(noteId, { relationType: newType })
-    .catch((error) => {
-      relationPropertyFormErrors.value = error as { relationType?: string }
-    })
+  if (props.relationPropertyUsesRelationshipApi) {
+    emits("relationPropertyRelationTypeSelected", newType)
+  }
 }
 
 const headingVisible = computed(

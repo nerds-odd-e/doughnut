@@ -21,6 +21,7 @@
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
+import { detailsHasRelationProperty } from "@/utils/noteDetailsFrontmatter"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableDetails from "./NoteEditableDetails.vue"
 
@@ -32,7 +33,9 @@ const props = defineProps({
 })
 
 const relationshipNoteRelationApiId = computed(() =>
-  props.note.noteTopology.targetNoteTopology ? props.note.id : undefined
+  detailsHasRelationProperty(props.note.details ?? "")
+    ? props.note.id
+    : undefined
 )
 
 defineEmits<{ deadLinkClick: [title: string] }>()
