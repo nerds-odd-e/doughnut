@@ -571,27 +571,21 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeChildTargetInRelatedNotes() {
+    void shouldExcludeRelationChildAndTargetFromStructuralChildren() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
-      assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
-
-      // Child should still be in children list
-      assertThat(result.getFocusNote().getChildren(), contains(relatedChild.getUri()));
-    }
-
-    @Test
-    void shouldMarkChildWithTargetAsRelationship() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
-
-      // The child with a target should be marked as Relationship, not Child
-      List<BareNote> relationshipNotes =
+      assertThat(
+          getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship), empty());
+      assertThat(result.getFocusNote().getChildren(), not(contains(relatedChild.getUri())));
+      assertThat(
           result.getRelatedNotes().stream()
-              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Relationship)
-              .collect(Collectors.toList());
-
-      assertThat(relationshipNotes, hasSize(1));
-      assertThat(relationshipNotes.get(0).getUri(), is(relatedChild.getUri()));
+              .filter(n -> n.getUri().equals(relatedChild.getUri()))
+              .filter(
+                  n ->
+                      n.getRelationToFocusNote() == RelationshipToFocusNote.Child
+                          || n.getRelationToFocusNote() == RelationshipToFocusNote.Relationship)
+              .collect(Collectors.toList()),
+          empty());
     }
 
     @Nested
@@ -612,81 +606,55 @@ public class GraphRAGServiceTest {
 
       @Test
       void shouldAlternateBetweenPriorityLevelsWhenBudgetIsLimited() {
-        // Set budget to allow only 5 notes (3 regular children + 1 relationship child + 1 target)
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 6, focusNote.getCreator());
 
-        // Verify related notes
-        List<BareNote> relatedNotes = result.getRelatedNotes();
-        assertThat(relatedNotes, hasSize(5));
-
-        // Should have four children (3 regular + 1 relationship)
         assertThat(
             result.getFocusNote().getChildren(),
             containsInAnyOrder(
-                regularChild1.getUri(),
-                regularChild2.getUri(),
-                regularChild3.getUri(),
-                relatedChild.getUri()));
-
-        // Verify relationships (order may vary, but should contain all expected types)
+                regularChild1.getUri(), regularChild2.getUri(), regularChild3.getUri()));
         assertThat(
-            relatedNotes.stream()
-                .map(BareNote::getRelationToFocusNote)
-                .collect(Collectors.toList()),
-            containsInAnyOrder(
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Relationship,
-                RelationshipToFocusNote.TargetOfRelationship));
-
-        // Verify the related child target is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
+            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
+            empty());
+        assertThat(
+            result.getRelatedNotes().stream()
+                .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
+                .count(),
+            is(3L));
       }
 
       @Test
       void shouldIncludeAllChildrenWhenBudgetIsEnough() {
-        // Set budget to allow all notes
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
-        // Verify related notes include all children and the related child target
         assertThat(
             result.getFocusNote().getChildren(),
             containsInAnyOrder(
-                regularChild1.getUri(),
-                regularChild2.getUri(),
-                regularChild3.getUri(),
-                relatedChild.getUri()));
-
-        // Verify the related child target is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
+                regularChild1.getUri(), regularChild2.getUri(), regularChild3.getUri()));
+        assertThat(
+            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
+            empty());
       }
 
       @Test
       void shouldNotIncludeRelatedChildObjectWhenItComesAfterRegularChildrenAndBudgetIsLimited() {
-        // Delete existing related child
         makeMe.theNote(relatedChild).after(regularChild3);
         makeMe.refresh(focusNote);
 
-        // Set budget to allow only 4 notes
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 5, focusNote.getCreator());
 
-        // Verify related notes
-        List<BareNote> relatedNotes = result.getRelatedNotes();
-        assertThat(relatedNotes, hasSize(4));
-
-        // Verify relationships (3 regular children + 1 relationship child)
         assertThat(
-            relatedNotes.stream()
-                .map(BareNote::getRelationToFocusNote)
+            result.getFocusNote().getChildren(),
+            containsInAnyOrder(
+                regularChild1.getUri(), regularChild2.getUri(), regularChild3.getUri()));
+        assertThat(
+            result.getRelatedNotes().stream()
+                .filter(n -> n.getUri().equals(relatedChild.getUri()))
+                .filter(
+                    n ->
+                        n.getRelationToFocusNote() == RelationshipToFocusNote.Child
+                            || n.getRelationToFocusNote() == RelationshipToFocusNote.Relationship)
                 .collect(Collectors.toList()),
-            contains(
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Relationship));
-
-        // Verify no related child target is included
+            empty());
         assertThat(
             getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
             empty());
@@ -942,50 +910,37 @@ public class GraphRAGServiceTest {
     private Note focusNote;
     private Note relatedChild;
     private Note targetNote;
-    private Note inboundReference1;
-    private Note inboundReference2;
 
     @BeforeEach
     void setup() {
       focusNote = makeMe.aNote().title("Focus Note").please();
 
-      // Create the target note first
       targetNote = makeMe.aNote().title("Target Note").details("Target Details").please();
 
-      // Create a relationship between parent and target
       relatedChild = makeMe.aRelation().between(focusNote, targetNote).please();
-
-      // Create inbound references to the target note
-      Note referenceParent1 = makeMe.aNote().title("Reference Parent 1").please();
-      inboundReference1 = makeMe.aRelation().between(referenceParent1, targetNote).please();
-
-      Note referenceParent2 = makeMe.aNote().title("Reference Parent 2").please();
-      inboundReference2 = makeMe.aRelation().between(referenceParent2, targetNote).please();
 
       makeMe.refresh(targetNote);
     }
 
     @Test
-    void shouldIncludeReferenceByToTargetOfRelationship() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
+    void shouldNotIncludeReferencedTargetWhenTargetNotReachedViaStructuralChildWalk() {
+      Note referenceParent1 = makeMe.aNote().title("Reference Parent 1").please();
+      makeMe.aRelation().between(referenceParent1, targetNote).please();
+      Note referenceParent2 = makeMe.aNote().title("Reference Parent 2").please();
+      makeMe.aRelation().between(referenceParent2, targetNote).please();
+      makeMe.refresh(targetNote);
 
-      // Verify inbound references to target are included
-      assertRelatedNotesContain(
-          result,
-          RelationshipToFocusNote.ReferencedTargetOfRelationship,
-          inboundReference1,
-          inboundReference2);
-    }
+      GraphRAGResult resultHighBudget =
+          graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
+      GraphRAGResult resultLowBudget =
+          graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
 
-    @Test
-    void shouldNotIncludeReferenceByToTargetWhenBudgetIsLimited() {
-      // Set budget to only allow up to target of related child
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
-
-      // Verify no inbound references to target are included
-      assertThat(
-          getNotesWithRelationship(result, RelationshipToFocusNote.ReferencedTargetOfRelationship),
-          empty());
+      for (GraphRAGResult result : List.of(resultHighBudget, resultLowBudget)) {
+        assertThat(
+            getNotesWithRelationship(
+                result, RelationshipToFocusNote.ReferencedTargetOfRelationship),
+            empty());
+      }
     }
   }
 
