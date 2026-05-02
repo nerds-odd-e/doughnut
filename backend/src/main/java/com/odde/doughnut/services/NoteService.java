@@ -76,13 +76,7 @@ public class NoteService {
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
-    softDeleteMemoryTrackersForNotes(List.of(note.getId()));
-  }
-
-  private void softDeleteMemoryTrackersForNotes(List<Integer> noteIds) {
-    if (noteIds.isEmpty()) return;
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(noteIds)) {
+    for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
     }
@@ -91,20 +85,15 @@ public class NoteService {
   public void restore(Note note) {
     Timestamp deletedAt = note.getDeletedAt();
     if (deletedAt != null) {
-      restoreMemoryTrackersForNotes(List.of(note.getId()), deletedAt);
+      for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
+        if (sameTimestamp(deletedAt, mt.getDeletedAt())) {
+          mt.setDeletedAt(null);
+          entityPersister.merge(mt);
+        }
+      }
     }
     note.setDeletedAt(null);
     entityPersister.merge(note);
-  }
-
-  private void restoreMemoryTrackersForNotes(List<Integer> noteIds, Timestamp deletedAt) {
-    if (noteIds.isEmpty()) return;
-    for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(noteIds)) {
-      if (sameTimestamp(deletedAt, mt.getDeletedAt())) {
-        mt.setDeletedAt(null);
-        entityPersister.merge(mt);
-      }
-    }
   }
 
   private boolean sameTimestamp(Timestamp a, Timestamp b) {

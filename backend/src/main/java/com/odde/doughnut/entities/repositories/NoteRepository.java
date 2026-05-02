@@ -134,9 +134,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + " LIMIT 20")
   List<Note> findRecentNotesByUser(@Param("userId") Integer userId);
 
-  @Query(value = selectFromNote + " WHERE n.targetNote.id = :targetNoteId")
-  List<Note> findAllByTargetNote(@Param("targetNoteId") Integer targetNoteId);
-
   @Query(
       value =
           selectFromNote

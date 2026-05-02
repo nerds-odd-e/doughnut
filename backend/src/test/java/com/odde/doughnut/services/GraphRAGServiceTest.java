@@ -830,8 +830,6 @@ public class GraphRAGServiceTest {
               .please();
       refreshWikiCache(referrer);
 
-      assertThat(noteRepository.findAllByTargetNote(focus.getId()), empty());
-
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, root.getCreator());
 
       assertThat(result.getFocusNote().getInboundReferences(), contains(referrer.getUri()));
