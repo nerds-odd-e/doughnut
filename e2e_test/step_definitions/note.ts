@@ -361,10 +361,6 @@ Then(
   }
 )
 
-When('I delete notebook {string}', (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology).deleteNote()
-})
-
 When(
   'I delete note {string} at {int}:00',
   (noteTopology: string, hour: number) => {
@@ -389,10 +385,6 @@ Then(
     cy.findByText('This note has been deleted')
   }
 )
-
-Then('I should not see {string} in my notebooks', (noteTopology: string) => {
-  start.navigateToNotebooksPage().expectNotebookNotToExist(noteTopology)
-})
 
 When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
@@ -479,13 +471,6 @@ When(
   (noteTitle: string) => {
     start.assumeNotePage().undo('delete note')
     start.assumeNotePage(noteTitle)
-  }
-)
-
-Then(
-  'the deleted notebook with title {string} should be restored',
-  (title: string) => {
-    start.assumeNotePage(title)
   }
 )
 

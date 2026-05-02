@@ -80,13 +80,6 @@ const myNotebooksPage = () => {
     subscribedNotebooks() {
       return subscribedNotebooks()
     },
-    expectNotebookNotToExist(notebookName: string) {
-      cy.get('main').within(() =>
-        cy
-          .findByText(notebookName, { selector: '.notebook-card h5' })
-          .should('not.exist')
-      )
-    },
     creatingNotebookGroupFromCatalogMove(
       notebookName: string,
       groupName: string,
