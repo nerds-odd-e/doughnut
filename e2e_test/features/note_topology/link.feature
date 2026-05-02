@@ -4,11 +4,10 @@ Feature: Wiki links in notes
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "WikiLinks E2E NB" with a note "WikiLinks E2E Root" and details "An awesome training"
-    And there are some notes:
-      | Title              | Parent Title       | Folder             |
-      | WikiLinks E2E Tech | WikiLinks E2E Root | WikiLinks E2E Root |
-      | WikiLinks E2E CI   | WikiLinks E2E Root | WikiLinks E2E Root |
+    And I have a notebook "WikiLinks E2E NB" with notes:
+      | Title              | Details             | Folder             |
+      | WikiLinks E2E Tech |                     | WikiLinks E2E Root |
+      | WikiLinks E2E CI   |                     | WikiLinks E2E Root |
 
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" details using markdown to become:
@@ -24,7 +23,6 @@ Feature: Wiki links in notes
     Given I have a notebook "WikiCross Src NB" with a note "WikiCross From" and details "origin"
     And I have a notebook "WikiCross Tgt NB" with notes:
       | Title           | Folder            |
-      | WikiCross Tgt Root | |
       | WikiCross Deep  | WikiCross Tgt Root |
     When I update note "WikiCross From" details using markdown to become:
       """
