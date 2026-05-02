@@ -20,8 +20,8 @@ function resolveJavaHomeViaNix(cwd, env) {
       'develop',
       '--accept-flake-config',
       '-c',
-      'bash',
-      '-lc',
+      'sh',
+      '-c',
       'printf "%s" "${JAVA_HOME}"',
     ],
     {
@@ -34,6 +34,11 @@ function resolveJavaHomeViaNix(cwd, env) {
       shell: false,
     }
   )
+  if (resolved.error) {
+    throw new Error(
+      `Could not run nix (${resolved.error.message}). Install Nix or run this script inside nix develop.`
+    )
+  }
   if (resolved.status !== 0) {
     const err = `${resolved.stderr || ''}${resolved.stdout || ''}`.trim()
     throw new Error(
@@ -86,7 +91,7 @@ try {
   console.error('')
   console.error('Fix: ensure Nix is installed, then run again from repo root.')
   console.error(
-    'Equivalent: CURSOR_DEV=true nix develop -c \'printf "%s" "${JAVA_HOME}"\''
+    'Equivalent: CURSOR_DEV=true nix develop -c sh -c \'printf "%s" "${JAVA_HOME}"\''
   )
   process.exit(1)
 }

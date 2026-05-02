@@ -1,5 +1,5 @@
 <template>
-  <BasicBreadcrumb v-bind="{ ancestors }">
+  <BasicBreadcrumb v-bind="{ ancestors, folderSegments }">
     <template #topLink>
       <slot name="topLink" />
     </template>
@@ -7,7 +7,10 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type {
+  FolderTrailSegment,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"
@@ -21,9 +24,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  ancestorFolders: {
+    type: Array as PropType<FolderTrailSegment[]>,
+    default: () => [],
+  },
 })
 
+const folderSegments = computed(() => props.ancestorFolders ?? [])
+
 const ancestors = computed(() => {
+  if (folderSegments.value.length > 0) {
+    if (props.includingSelf) {
+      return [props.noteTopology]
+    }
+    return []
+  }
+
   const result: NoteTopology[] = []
   let currentTopology = props.noteTopology
 

@@ -3764,6 +3764,17 @@ components:
           - confused with
       required:
       - relationType
+    FolderTrailSegment:
+      type: object
+      description: One folder on the path from notebook root to the note's containing
+        folder (outermost first).
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - name
     Note:
       type: object
       properties:
@@ -3807,6 +3818,10 @@ components:
         notebookId:
           type: integer
           format: int32
+        ancestorFolders:
+          type: array
+          items:
+            $ref: "#/components/schemas/FolderTrailSegment"
         relationshipsDeprecating:
           type: array
           items:

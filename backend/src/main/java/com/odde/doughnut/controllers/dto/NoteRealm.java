@@ -17,6 +17,7 @@ import org.springframework.lang.NonNull;
   "note",
   "fromBazaar",
   "notebookId",
+  "ancestorFolders",
   "relationshipsDeprecating",
   "inboundReferences",
   "wikiTitles"
@@ -27,6 +28,8 @@ public class NoteRealm {
   @NotNull @Getter private Note note;
 
   @Getter @Setter private Boolean fromBazaar;
+
+  @Getter @Setter private List<FolderTrailSegment> ancestorFolders = List.of();
 
   @Getter private final List<WikiTitle> wikiTitles;
 

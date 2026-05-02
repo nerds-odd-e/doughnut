@@ -36,6 +36,7 @@
           fromBazaar: noteRealmForBreadcrumb.fromBazaar,
           circle: notebookForBreadcrumb?.circle,
           noteTopology: noteRealmForBreadcrumb.note.noteTopology,
+          ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],
         }"
       />
       <div

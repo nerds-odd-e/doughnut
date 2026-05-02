@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
@@ -165,5 +166,33 @@ class NoteRealmServiceTest {
 
     assertThat(realm.getInboundReferences(), hasSize(1));
     assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
+  }
+
+  @Test
+  void ancestor_folders_ordered_outermost_to_innermost() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Folder outer = makeMe.aFolder().notebook(root.getNotebook()).name("Outer").please();
+    Folder inner =
+        makeMe.aFolder().notebook(root.getNotebook()).parentFolder(outer).name("Inner").please();
+    Note inFolder = makeMe.aNote().creatorAndOwner(user).under(root).folder(inner).please();
+
+    NoteRealm realm = noteRealmService.build(inFolder, user);
+
+    assertThat(realm.getAncestorFolders(), hasSize(2));
+    assertThat(realm.getAncestorFolders().get(0).name(), equalTo("Outer"));
+    assertThat(realm.getAncestorFolders().get(1).name(), equalTo("Inner"));
+    assertThat(realm.getAncestorFolders().get(0).id(), equalTo(outer.getId()));
+    assertThat(realm.getAncestorFolders().get(1).id(), equalTo(inner.getId()));
+  }
+
+  @Test
+  void ancestor_folders_empty_when_note_not_in_folder() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+
+    NoteRealm realm = noteRealmService.build(root, user);
+
+    assertThat(realm.getAncestorFolders(), empty());
   }
 }

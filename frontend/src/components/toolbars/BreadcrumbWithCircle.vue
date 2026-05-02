@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="{ noteTopology }">
+  <Breadcrumb v-bind="{ noteTopology, ancestorFolders }">
     <template #topLink>
       <li v-if="fromBazaar">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
@@ -22,13 +22,21 @@
 </template>
 
 <script setup lang="ts">
-import type { Circle, NoteTopology } from "@generated/doughnut-backend-api"
+import type {
+  Circle,
+  FolderTrailSegment,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 
 defineProps({
   noteTopology: {
     type: Object as PropType<NoteTopology>,
     required: true,
+  },
+  ancestorFolders: {
+    type: Array as PropType<FolderTrailSegment[]>,
+    default: () => [],
   },
   circle: {
     type: Object as PropType<Circle>,

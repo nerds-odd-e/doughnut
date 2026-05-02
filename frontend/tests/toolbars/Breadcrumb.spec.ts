@@ -26,4 +26,28 @@ describe("breadcrumb with circles", () => {
     expect(items[0]).toHaveTextContent("parent")
     expect(items[1]).toHaveTextContent("child")
   })
+
+  it("shows folder trail from ancestorFolders instead of parent topology", async () => {
+    helper
+      .component(BreadcrumbWithCircle)
+      .withProps({
+        fromBazaar: false,
+        noteTopology: grandChild.noteTopology,
+        ancestorFolders: [
+          { id: 10, name: "Outer" },
+          { id: 20, name: "Inner" },
+        ],
+      })
+      .render()
+    expect(screen.queryByText("parent")).toBeNull()
+    expect(screen.queryByText("child")).toBeNull()
+    expect(screen.getByText("Outer")).toBeTruthy()
+    expect(screen.getByText("Inner")).toBeTruthy()
+    expect(
+      screen
+        .getByText("Outer")
+        .compareDocumentPosition(screen.getByText("Inner")) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
 })

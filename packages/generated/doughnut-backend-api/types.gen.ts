@@ -216,6 +216,14 @@ export type RelationshipCreation = {
     relationType: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
 };
 
+/**
+ * One folder on the path from notebook root to the note's containing folder (outermost first).
+ */
+export type FolderTrailSegment = {
+    id?: string;
+    name: string;
+};
+
 export type Note = {
     noteTopology: NoteTopology;
     details?: string;
@@ -232,6 +240,7 @@ export type NoteRealm = {
     note: Note;
     fromBazaar?: boolean;
     notebookId: number;
+    ancestorFolders?: Array<FolderTrailSegment>;
     relationshipsDeprecating?: Array<Note>;
     inboundReferences?: Array<Note>;
     wikiTitles?: Array<WikiTitle>;
@@ -958,6 +967,7 @@ export type NoteRealmWritable = {
     note: NoteWritable;
     fromBazaar?: boolean;
     notebookId: number;
+    ancestorFolders?: Array<FolderTrailSegment>;
     relationshipsDeprecating?: Array<NoteWritable>;
     inboundReferences?: Array<NoteWritable>;
     wikiTitles?: Array<WikiTitle>;

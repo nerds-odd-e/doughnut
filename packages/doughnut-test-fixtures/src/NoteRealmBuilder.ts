@@ -18,6 +18,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       relationshipsDeprecating: [],
       wikiTitles: [],
       notebookId: noteData.noteTopology.notebookId,
+      ancestorFolders: [],
     }
   }
 
