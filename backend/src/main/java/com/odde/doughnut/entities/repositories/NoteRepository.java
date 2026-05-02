@@ -137,6 +137,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = selectFromNote + " WHERE n.targetNote.id = :targetNoteId")
   List<Note> findAllByTargetNote(@Param("targetNoteId") Integer targetNoteId);
 
+  @Query(
+      value =
+          selectFromNote
+              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL ORDER BY n.id ASC")
+  List<Note> findAllNonDeletedNotesByNotebookIdOrderByIdAsc(
+      @Param("notebookId") Integer notebookId);
+
   @Query(value = selectFromNote + " WHERE n.parent.id = :parentId")
   List<Note> findAllByParentId(@Param("parentId") Integer parentId);
 

@@ -1,12 +1,15 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,22 +50,19 @@ public class ObsidianFormatService {
       usedPaths.clear();
 
       Optional<Note> indexNote = notebookService.findOptionalIndexNote(notebook);
-      List<Note> roots = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId());
+      List<Note> notesInNotebook =
+          noteRepository.findAllNonDeletedNotesByNotebookIdOrderByIdAsc(notebook.getId());
 
       if (indexNote.isPresent()) {
-        Note index = indexNote.get();
-        writeIndexMarkdownAtZipRoot(index, zos);
-        for (Note child : index.getChildren()) {
-          writeNoteToZip(child, zos, "");
-        }
+        writeIndexMarkdownAtZipRoot(indexNote.get(), zos);
       }
 
       Integer indexId = indexNote.map(Note::getId).orElse(null);
-      for (Note root : roots) {
-        if (indexId != null && root.getId().equals(indexId)) {
+      for (Note note : notesInNotebook) {
+        if (Objects.equals(note.getId(), indexId)) {
           continue;
         }
-        writeNoteToZip(root, zos, "");
+        emitObsidianNoteZipEntry(note, notesInNotebook, indexNote, zos);
       }
 
       zos.close();
@@ -81,34 +81,90 @@ public class ObsidianFormatService {
     zos.write(fileContent.getBytes());
   }
 
-  private void writeNoteToZip(Note note, ZipOutputStream zos, String path) throws IOException {
-    String filePath = generateFilePath(path, note);
+  private void emitObsidianNoteZipEntry(
+      Note note, List<Note> notesInNotebook, Optional<Note> indexNote, ZipOutputStream zos)
+      throws IOException {
+    String filePath = zipRelativePath(note, notesInNotebook, indexNote);
 
-    // Skip if this path was already used
     if (usedPaths.contains(filePath)) {
       return;
     }
-
-    // Add the path to the set of used paths
     usedPaths.add(filePath);
 
     String fileContent = generateMarkdownContent(note);
     zos.putNextEntry(new ZipEntry(filePath));
     zos.write(fileContent.getBytes());
-
-    String noteTitle = getNoteTitleForFile(note);
-    for (Note child : note.getChildren()) {
-      String newPath = path.isEmpty() ? noteTitle : path + "/" + noteTitle;
-      writeNoteToZip(child, zos, newPath);
-    }
   }
 
-  private String generateFilePath(String path, Note note) {
-    String title = getNoteTitleForFile(note);
-    String sanitizedTitle = sanitizeFileName(title);
-    String fileName =
-        note.getChildren().isEmpty() ? sanitizedTitle + ".md" : sanitizedTitle + "/__index.md";
-    return path.isEmpty() ? fileName : path + "/" + fileName;
+  private List<String> folderSegmentsFromNotebookRoot(Folder deepest) {
+    ArrayDeque<String> segments = new ArrayDeque<>();
+    for (Folder folder = deepest; folder != null; folder = folder.getParentFolder()) {
+      segments.addFirst(folder.getName());
+    }
+    return new ArrayList<>(segments);
+  }
+
+  private List<String> ancestorFolderLikeSegmentsFromParentPointers(Note note) {
+    ArrayDeque<String> segments = new ArrayDeque<>();
+    for (Note parent = note.getParent(); parent != null; parent = parent.getParent()) {
+      segments.addFirst(getNoteTitleForFile(parent));
+    }
+    return new ArrayList<>(segments);
+  }
+
+  private List<String> stripLeadingIndexSegment(
+      List<String> segmentsBeforeTitleSanitize, Optional<Note> indexNote) {
+    if (segmentsBeforeTitleSanitize.isEmpty() || indexNote.isEmpty()) {
+      return segmentsBeforeTitleSanitize;
+    }
+    String indexTitleForMatch = getNoteTitleForFile(indexNote.get());
+    if (!segmentsBeforeTitleSanitize.getFirst().equalsIgnoreCase(indexTitleForMatch)) {
+      return segmentsBeforeTitleSanitize;
+    }
+    return new ArrayList<>(
+        segmentsBeforeTitleSanitize.subList(1, segmentsBeforeTitleSanitize.size()));
+  }
+
+  private List<String> obsidianDirSegmentsBeforeTitle(Note note, Optional<Note> indexNote) {
+    List<String> segments =
+        note.getFolder() != null
+            ? folderSegmentsFromNotebookRoot(note.getFolder())
+            : ancestorFolderLikeSegmentsFromParentPointers(note);
+    return stripLeadingIndexSegment(segments, indexNote);
+  }
+
+  private boolean isOptionalIndexNote(Note note, Optional<Note> indexNote) {
+    return indexNote.filter(i -> Objects.equals(note.getId(), i.getId())).isPresent();
+  }
+
+  private boolean noteExportsAsObsidianSubtree(
+      Note note, List<Note> notesInNotebook, Optional<Note> indexNote) {
+    if (!note.getChildren().isEmpty()) {
+      return true;
+    }
+    List<String> prefixBelowTitle = obsidianDirSegmentsBeforeTitle(note, indexNote);
+    ArrayList<String> childScope = new ArrayList<>(prefixBelowTitle);
+    childScope.add(getNoteTitleForFile(note));
+
+    return notesInNotebook.stream()
+        .filter(m -> !isOptionalIndexNote(m, indexNote))
+        .filter(m -> !Objects.equals(m.getId(), note.getId()))
+        .anyMatch(m -> obsidianDirSegmentsBeforeTitle(m, indexNote).equals(childScope));
+  }
+
+  private String zipRelativePath(Note note, List<Note> notesInNotebook, Optional<Note> indexNote) {
+    List<String> dirSegmentsSanitized =
+        obsidianDirSegmentsBeforeTitle(note, indexNote).stream()
+            .map(this::sanitizeFileName)
+            .toList();
+    String sanitizedTitle = sanitizeFileName(getNoteTitleForFile(note));
+    boolean hasSubtree = noteExportsAsObsidianSubtree(note, notesInNotebook, indexNote);
+
+    String tail = hasSubtree ? sanitizedTitle + "/__index.md" : sanitizedTitle + ".md";
+
+    return dirSegmentsSanitized.isEmpty()
+        ? tail
+        : String.join("/", dirSegmentsSanitized) + "/" + tail;
   }
 
   private String getNoteTitleForFile(Note note) {
