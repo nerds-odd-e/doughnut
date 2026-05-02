@@ -4,10 +4,10 @@ Feature: Note tree view
   Background:
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with a note "LeSS in Action" and notes:
-      | Title | Parent Title   | Folder                 |
-      | TDD   | LeSS in Action | LeSS in Action         |
-      | ATDD  | LeSS in Action | LeSS in Action         |
-      | CI    | LeSS in Action | LeSS in Action         |
+      | Title | Parent Title | Folder                 |
+      | TDD   |              | LeSS in Action         |
+      | ATDD  |              | LeSS in Action         |
+      | CI    |              | LeSS in Action         |
       | TPP   | TDD            | LeSS in Action/TDD     |
       | Const | TPP            | LeSS in Action/TDD/TPP |
       | Pull  | ATDD           | LeSS in Action/ATDD    |
