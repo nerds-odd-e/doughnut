@@ -43,21 +43,14 @@ public class NoteTest {
 
     @Test
     void replaceParentPlaceholder() {
-      assertThat(
-          relationNote.getNoteTopology().getTargetNoteTopology().getTitle(),
-          equalTo(target.getTitle()));
+      assertThat(relationNote.getTargetNote().getTitle(), equalTo(target.getTitle()));
     }
 
     @Test
     void relationOfRelation() {
       Note relationOfRelation = makeMe.aRelation().between(parent, relationNote).please();
       assertThat(
-          relationOfRelation
-              .getNoteTopology()
-              .getTargetNoteTopology()
-              .getTargetNoteTopology()
-              .getId(),
-          equalTo(target.getId()));
+          relationOfRelation.getTargetNote().getTargetNote().getId(), equalTo(target.getId()));
     }
   }
 

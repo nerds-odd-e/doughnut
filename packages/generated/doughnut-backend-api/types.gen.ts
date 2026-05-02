@@ -240,7 +240,6 @@ export type NoteRealm = {
 export type NoteTopology = {
     id: number;
     title?: string;
-    targetNoteTopology?: NoteTopology;
     parentOrSubjectNoteTopology?: NoteTopology;
     notebookId: number;
     notebookName?: string;

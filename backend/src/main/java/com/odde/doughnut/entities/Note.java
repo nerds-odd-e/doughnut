@@ -316,9 +316,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (getParent() != null) {
       noteTopology.setParentOrSubjectNoteTopology(getParent().getNoteTopology());
     }
-    if (getTargetNote() != null) {
-      noteTopology.setTargetNoteTopology(getTargetNote().getNoteTopology());
-    }
     if (getFolder() != null) {
       noteTopology.setFolderId(getFolder().getId());
     }

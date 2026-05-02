@@ -11,7 +11,6 @@ public class NoteTopology {
   @NonNull private Integer id;
 
   private String title;
-  private NoteTopology targetNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;
 
   @NonNull

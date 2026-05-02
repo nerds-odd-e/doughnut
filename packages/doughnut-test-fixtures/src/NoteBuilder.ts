@@ -87,20 +87,8 @@ class NoteBuilder extends Builder<Note> {
 
   relationType(value: RelationshipCreation['relationType']): NoteBuilder {
     this.title(`:${value}`)
-    const targetId = generateId()
-    const targetNotebookId = generateId()
     const kebab = relationLabelToKebab(value)
     this.data.details = `---\nrelation: ${kebab}\n---\n`
-    this.data.noteTopology.targetNoteTopology = {
-      id: targetId,
-      title: 'a target',
-      notebookId: targetNotebookId,
-    }
-    return this
-  }
-
-  target(note: Note): NoteBuilder {
-    this.data.noteTopology.targetNoteTopology = note.noteTopology
     return this
   }
 

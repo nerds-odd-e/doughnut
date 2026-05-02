@@ -6,12 +6,13 @@ import { describe, it, expect } from "vitest"
 describe("AddRelationshipFinalize", () => {
   it("going back", async () => {
     const note = makeMe.aNoteRealm.please()
+    const targetTopology = makeMe.aNote.please().noteTopology
     const wrapper = helper
       .component(AddRelationshipFinalize)
       .withCleanStorage()
       .withProps({
         note,
-        targetNoteTopology: note.note.noteTopology,
+        targetNoteTopology: targetTopology,
       })
       .mount()
     await wrapper.find(".go-back-button").trigger("click")

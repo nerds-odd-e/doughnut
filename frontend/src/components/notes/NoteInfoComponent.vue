@@ -2,7 +2,7 @@
   <NoteRecallSettingForm
     v-bind="{
       noteId: note.id,
-      isLinkNote: !!note.noteTopology?.targetNoteTopology,
+      isLinkNote,
       noteRecallSetting: recallSetting,
       noteDetails: note.details,
     }"
@@ -43,6 +43,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
+import { relationTypeLabelFromNoteDetails } from "@/models/relationTypeOptions"
 import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
@@ -60,6 +61,10 @@ const router = useRouter()
 
 const memoryTrackers = ref(props.noteRecallInfo.memoryTrackers ?? [])
 const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
+
+const isLinkNote = computed(
+  () => relationTypeLabelFromNoteDetails(props.note.details) !== undefined
+)
 
 watch(
   () => props.noteRecallInfo.memoryTrackers,
