@@ -815,30 +815,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/notes/{parentNote}/create:
-    post:
-      tags:
-      - note-creation-controller
-      operationId: createNoteUnderParent
-      parameters:
-      - name: parentNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteCreationDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/verify-spelling:
     post:
       tags:
@@ -3994,25 +3970,6 @@ components:
       required:
       - id
       - preservedQuestion
-    NoteCreationDTO:
-      type: object
-      properties:
-        newTitle:
-          type: string
-          maxLength: 150
-          minLength: 0
-        wikidataId:
-          type: string
-          pattern: ^$|Q\d+
-        description:
-          type: string
-          maxLength: 500
-          minLength: 0
-        folderId:
-          type: integer
-          format: int32
-      required:
-      - newTitle
     SpellingVerificationResult:
       type: object
       properties:
@@ -4120,6 +4077,25 @@ components:
           type: string
       required:
       - name
+    NoteCreationDTO:
+      type: object
+      properties:
+        newTitle:
+          type: string
+          maxLength: 150
+          minLength: 0
+        wikidataId:
+          type: string
+          pattern: ^$|Q\d+
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+        folderId:
+          type: integer
+          format: int32
+      required:
+      - newTitle
     BlockDepthSuggestion:
       type: object
       description: Suggested depth for a single block

@@ -34,6 +34,7 @@ By the end of Phase 7:
 - **Folders and notes are separate concepts in the product model:** A note references `folderId` (or notebook root); it is not contained by another note. **Production** flows create folders through folder APIs, not as a side effect of creating a note. **Testability** may bundle “ensure this folder path, then place these notes” in one surface for ergonomics, as long as the implementation still materializes folders as real rows and does not reintroduce parent-note containment for structure.
 - **Keep behavior green:** Most sub-phases are structure phases guarded by existing E2E or focused controller/frontend tests. If a cleanup makes the relevant test fail, revert that cleanup and leave it to a later sub-phase with a smaller production change.
 - **Small-batch rule:** Each sub-phase is scoped so it can be completed and verified in about five minutes. If implementation exceeds that, stop and split the sub-phase. **Git commits** are not tied one-to-one to sub-phases; developers batch commits as they prefer (same idea as the **Sizing Rule** in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`).
+- **Human-owned git and deploy:** Automated assistants (including IDE agents) must **not** commit, push, open pull requests, or trigger production deploy when a sub-phase or the whole of Phase 7 is finished, unless the maintainer **explicitly** asks for that step. After the sub-phase verification commands pass, stop and hand off; the developer owns version control and CD.
 
 ## E2E fixtures: folder path vs note title collisions
 

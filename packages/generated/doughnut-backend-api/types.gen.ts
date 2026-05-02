@@ -322,13 +322,6 @@ export type SuggestedQuestionForFineTuning = {
     positiveFeedback?: boolean;
 };
 
-export type NoteCreationDto = {
-    newTitle: string;
-    wikidataId?: string;
-    description?: string;
-    folderId?: number;
-};
-
 export type SpellingVerificationResult = {
     correct?: boolean;
 };
@@ -392,6 +385,13 @@ export type FolderCreationRequest = {
 export type NotebookRootFolder = {
     id?: string;
     name: string;
+};
+
+export type NoteCreationDto = {
+    newTitle: string;
+    wikidataId?: string;
+    description?: string;
+    folderId?: number;
 };
 
 /**
@@ -1722,24 +1722,6 @@ export type GenerateQuestionWithoutSaveResponses = {
 };
 
 export type GenerateQuestionWithoutSaveResponse = GenerateQuestionWithoutSaveResponses[keyof GenerateQuestionWithoutSaveResponses];
-
-export type CreateNoteUnderParentData = {
-    body: NoteCreationDto;
-    path: {
-        parentNote: number;
-    };
-    query?: never;
-    url: '/api/notes/{parentNote}/create';
-};
-
-export type CreateNoteUnderParentResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type CreateNoteUnderParentResponse = CreateNoteUnderParentResponses[keyof CreateNoteUnderParentResponses];
 
 export type VerifySpellingData = {
     body: AnswerSpellingDto;
