@@ -78,6 +78,11 @@ export const assumeNoteTargetSearchDialog = () => {
         .findByRole('button', { name: 'Add Relationship' })
         .click()
       form.getField('Relation Type').clickOption(relationType)
+      cy.tick(50)
+      cy.contains('.popups', 'top level notebook')
+        .should('be.visible')
+        .findByRole('button', { name: 'OK' })
+        .click()
       pageIsNotLoading()
     },
     createRelationshipToTopLevelNoteAs(

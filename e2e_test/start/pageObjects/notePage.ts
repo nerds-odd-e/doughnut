@@ -100,6 +100,12 @@ export const assumeNotePage = (
       relationType: string,
       targetNoteTopics: string
     ) {
+      cy.get('#main-note-content').then(($main) => {
+        const expandBtn = $main.find('button[title="expand children"]')
+        if (expandBtn.length) {
+          cy.wrap(expandBtn.first()).click()
+        }
+      })
       commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
         this.expectRelationshipTopic(relationType, target)
       })
