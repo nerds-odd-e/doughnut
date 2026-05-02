@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.hibernate.metamodel.model.domain.JpaMetamodel;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +43,7 @@ public class DBCleanerWorker {
   }
 
   private void truncateTable(String tableName, EntityManager entityManager) {
-    entityManager.createNativeQuery("DELETE FROM `" + tableName + "`").executeUpdate();
-    entityManager
-        .createNativeQuery("ALTER TABLE `" + tableName + "` AUTO_INCREMENT=1")
-        .executeUpdate();
+    entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
   }
 
   private List<String> getAnnotatedTableNames(EntityManager manager) {
@@ -58,6 +54,8 @@ public class DBCleanerWorker {
         .map(e -> e.getJavaType().getAnnotation(Table.class))
         .filter(Objects::nonNull)
         .map(Table::name)
-        .collect(Collectors.toList());
+        .distinct()
+        .sorted()
+        .toList();
   }
 }
