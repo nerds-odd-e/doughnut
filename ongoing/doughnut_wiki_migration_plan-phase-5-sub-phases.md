@@ -355,7 +355,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Trigger:** A user views, edits, or deletes a note created from a relationship template.
 
-**Post-condition:** Relationship-specific UI and topology fields are removed from the read path. The only remaining relationship-specific behavior is creation/editing of the `relation` frontmatter property through the note property surface.
+**Post-condition:** Relationship-specific UI is removed from title, icon, and sidebar paths. **Display** of relation type (icons, inverted labels) reads the `relation` value from **note details** frontmatter (see 5.20.4), not `NoteTopology`. Topology DTO fields such as `relationType` are removed after that read path migrates (5.20.5+). **Editing** the relation continues through the note property surface and existing creation flows until the wiki model fully absorbs those flows.
 
 ### Sub-Sub-Phase 5.20.1 - Edit Relation Through Property Value
 
@@ -405,11 +405,39 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One sidebar-normal-title commit.
 
-### Sub-Sub-Phase 5.20.4 - Remove Relation Type From NoteTopology
+### Sub-Sub-Phase 5.20.4 - Frontend Reads Relation Type From Note Details Frontmatter
+
+**Type:** Behavior.
+
+**Pre-condition:** Relationship notes store `relation` in frontmatter. API responses that drive relation-type **display** include `Note.details` (or an equivalent parsed-properties shape) for those notes.
+
+**Trigger:** A user views a surface that shows the relation type icon or inverted label for a relationship note (for example inbound references on note show, or `RelationshipOfNote`).
+
+**Post-condition:** Display uses the `relation` value parsed from the note’s markdown frontmatter (same normalization as the property editor / `relationTypeFromKebab`), not `NoteTopology.relationType`.
+
+**Work:** Add or reuse a small helper to read the relation label from `details`. Update `NoteShow`, `RelationNob` / `RelationshipOfNote`, and any other **read-only** UI that still reads `noteTopology.relationType`. Keep a single mapping from stored values (kebab / slug) to display labels shared with `RichFrontmatterProperties`.
+
+**Verify:** Targeted relationship display E2E (`--spec` for relationship / note-show coverage touched) plus any focused frontend tests for the parser if the helper is non-trivial.
+
+**Commit boundary:** One frontmatter-relation-display commit.
+
+**Replaceability (can this drop all `relationType` on `NoteTopology` for the frontend?):**
+
+| Area | Covered by frontmatter parse? | Notes |
+|------|--------------------------------|-------|
+| **Display** (`NoteShow` inbound refs, `RelationshipOfNote` / `RelationNob`) | **Yes**, once `details` is reliably present on those `Note` payloads | Both paths already have a full `Note`; switch the read source. |
+| **Cards / search hits / any surface with only `NoteTopology`** | **Not automatically** | No body to parse unless the wire shape adds `details`, a short relation snippet, or the UI stops showing relation type there. Today **`Card` does not use `RelationNob`**; search results use topology without relation icon—confirm when implementing. |
+| **Editing** (`RichFrontmatterProperties`, relation property row) | **Already** | Driven by frontmatter rows and API update; not a `noteTopology.relationType` read. |
+| **Creation** (`AddRelationshipFinalize`, DTO `RelationshipCreation`) | **N/A** | User-chosen type on create; not derived from topology display. |
+| **Types** (`NoteTopology["relationType"]` on selects) | **Mechanical follow-up** | After display migration, retype selectors from a shared label union or string; then **5.20.5** can remove the field from `NoteTopology`. |
+
+**Conclusion:** Frontmatter parsing can replace **all current** frontend **reads** of `noteTopology.relationType` for surfaces that already carry `Note.details`. It does **not** replace hypothetical future list-only payloads; if those must show relation type, extend the API or accept no icon until the note is opened. Ordering stays: **this phase (5.20.4) → then 5.20.5 removes `relationType` from topology.**
+
+### Sub-Sub-Phase 5.20.5 - Remove Relation Type From NoteTopology
 
 **Type:** Structure cleanup.
 
-**Pre-condition:** Frontend relation display/editing no longer reads `NoteTopology.relationType`.
+**Pre-condition:** Frontend relation **display** no longer reads `NoteTopology.relationType` (reads go through note-details frontmatter per 5.20.4). Editing continues through the property surface / API, not topology.
 
 **Trigger:** API types are regenerated or compiled.
 
@@ -421,7 +449,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One topology-relation-type-removal commit.
 
-### Sub-Sub-Phase 5.20.5 - Remove Target Note Topology From NoteTopology
+### Sub-Sub-Phase 5.20.6 - Remove Target Note Topology From NoteTopology
 
 **Type:** Structure cleanup.
 
@@ -437,7 +465,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Commit boundary:** One topology-target-removal commit.
 
-### Sub-Sub-Phase 5.20.6 - Backend Reads Relation Type From Frontmatter
+### Sub-Sub-Phase 5.20.7 - Backend Reads Relation Type From Frontmatter
 
 **Type:** Behavior.
 
