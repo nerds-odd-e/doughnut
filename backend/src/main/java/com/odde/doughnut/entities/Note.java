@@ -111,13 +111,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
   @ManyToOne
-  @JoinColumn(name = "target_note_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private Note targetNote;
-
-  @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter

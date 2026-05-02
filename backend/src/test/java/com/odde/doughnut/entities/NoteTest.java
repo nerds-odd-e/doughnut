@@ -4,7 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.services.RelationshipNoteEndpointResolver;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteTest {
 
   @Autowired MakeMe makeMe;
+  @Autowired RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
 
   @Test
   void timeOrder() {
@@ -37,20 +40,32 @@ public class NoteTest {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().title("parent").please();
-      target = makeMe.aNote().please();
+      target = makeMe.aNote().under(parent).please();
       relationNote = makeMe.aRelation().between(parent, target).please();
     }
 
     @Test
-    void replaceParentPlaceholder() {
-      assertThat(relationNote.getTargetNote().getTitle(), equalTo(target.getTitle()));
+    void semanticTargetResolvesToLinkedNote() {
+      assertThat(
+          relationshipNoteEndpointResolver
+              .resolveSemanticTarget(relationNote, relationNote.getCreator())
+              .map(Note::getTitle),
+          equalTo(Optional.of(target.getTitle())));
     }
 
     @Test
     void relationOfRelation() {
       Note relationOfRelation = makeMe.aRelation().between(parent, relationNote).please();
+      User viewer = relationOfRelation.getCreator();
       assertThat(
-          relationOfRelation.getTargetNote().getTargetNote().getId(), equalTo(target.getId()));
+          relationshipNoteEndpointResolver
+              .resolveSemanticTarget(relationOfRelation, viewer)
+              .flatMap(
+                  inner ->
+                      relationshipNoteEndpointResolver
+                          .resolveSemanticTarget(inner, viewer)
+                          .map(Note::getId)),
+          equalTo(Optional.of(target.getId())));
     }
   }
 

@@ -131,7 +131,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
         && predefinedQuestionBuilders.isEmpty()
         && childrenBuilders.isEmpty()
         && !needPersist) return;
-    if (entity.getTargetNote() != null) makeMe.refresh(entity.getParent());
+    if (entity.isRelation()) makeMe.refresh(entity.getParent());
     else makeMe.refresh(entity);
   }
 

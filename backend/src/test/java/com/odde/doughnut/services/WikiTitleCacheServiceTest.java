@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -214,43 +213,6 @@ class WikiTitleCacheServiceTest {
               .orElseThrow()
               .getId(),
           equalTo(target.getId()));
-    }
-
-    @Test
-    void primary_ignores_poisoned_target_note_fk_and_follows_yaml_target() {
-      User user = makeMe.aUser().please();
-      User otherUser = makeMe.aUser().please();
-      Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).please();
-      Note secretTarget = makeMe.aNote().under(headSecret).please();
-
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note target = makeMe.aNote().under(root).title("Beta").please();
-      Note source =
-          makeMe
-              .aNote()
-              .under(root)
-              .title("Alpha")
-              .relateTo(target, RelationType.RELATED_TO)
-              .please();
-      Note carrier = source.getRelationships().get(0);
-      wikiTitleCacheService.refreshForNote(carrier, user);
-      carrier.setTargetNote(secretTarget);
-      makeMe.entityPersister.merge(carrier);
-
-      List<Note> outgoing = wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(carrier, user);
-      assertThat(outgoing, hasSize(2));
-      assertThat(
-          wikiTitleCacheService
-              .primaryWikiLinkedTargetForGraph(carrier, user)
-              .orElseThrow()
-              .getId(),
-          equalTo(target.getId()));
-      assertThat(
-          wikiTitleCacheService
-              .primaryWikiLinkedTargetForGraph(carrier, user)
-              .orElseThrow()
-              .getId(),
-          not(equalTo(secretTarget.getId())));
     }
   }
 

@@ -123,7 +123,6 @@ class RelationshipNoteMarkdownFormatterTest {
   @Test
   void relationTypeForRelationNoteRead_reads_relation_from_details() {
     Note relation = new Note();
-    relation.setTargetNote(new Note());
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.format(RelationType.PART, "A", "B", null));
     assertThat(

@@ -81,7 +81,8 @@ public class WikiTitleCacheService {
   /**
    * Graph “primary” target: relationship {@code target:} semantics (YAML + wiki resolution) when
    * they align with an authorized outgoing cache target or are readable; otherwise first outgoing
-   * from {@link #outgoingWikiLinkedTargetsForGraph}. Does not use {@code note.target_note_id}.
+   * from {@link #outgoingWikiLinkedTargetsForGraph}. Relationship targets are not stored on the
+   * {@code note} row.
    */
   public Optional<Note> primaryWikiLinkedTargetForGraph(Note focus, User viewer) {
     List<Note> outgoing = outgoingWikiLinkedTargetsForGraph(focus, viewer);

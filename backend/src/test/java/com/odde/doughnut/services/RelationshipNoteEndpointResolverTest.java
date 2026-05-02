@@ -29,9 +29,6 @@ class RelationshipNoteEndpointResolverTest {
     Note target = makeMe.aNote("Tgt").under(source).please();
     Note relation =
         makeMe.aRelation().between(source, target, RelationType.PART).under(source).please();
-    relation.setTargetNote(null);
-    makeMe.entityPersister.merge(relation);
-    makeMe.entityPersister.flush();
 
     assertThat(
         resolver.resolveSemanticTarget(relation, owner).map(Note::getId),

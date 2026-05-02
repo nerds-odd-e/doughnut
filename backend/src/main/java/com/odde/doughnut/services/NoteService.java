@@ -168,7 +168,6 @@ public class NoteService {
       Timestamp currentUTCTimestamp) {
     final Note note = new Note();
     note.initialize(creator, sourceNote, currentUTCTimestamp, null);
-    note.setTargetNote(targetNote);
     note.getRecallSetting()
         .setLevel(
             Math.max(
