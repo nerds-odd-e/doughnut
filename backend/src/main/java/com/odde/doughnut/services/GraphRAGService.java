@@ -53,9 +53,6 @@ public class GraphRAGService {
                         .findFirst())
             .orElse(focusNote);
 
-    PriorityLayer priorityFourLayer = new PriorityLayer(2);
-    PriorityLayer priorityThreeLayer = new PriorityLayer(2);
-
     List<Note> focusStructuralPeers =
         peersSharingTreeParent(focusNote, noteService.findStructuralPeerNotesInOrder(focusNote));
     Note primaryTarget =
@@ -71,23 +68,18 @@ public class GraphRAGService {
     List<Note> referencesForViewer =
         wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer);
     if (!referencesForViewer.isEmpty()) {
-      priorityTwoHandlers.add(
-          new ReferenceByRelationshipHandler(
-              referencesForViewer, priorityThreeLayer, priorityFourLayer));
+      priorityTwoHandlers.add(new ReferenceByRelationshipHandler(referencesForViewer));
     }
     priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     priorityTwoHandlers.add(
         new SiblingOfTargetRelationshipHandler(
             wikiTitleCacheService.siblingWikiLinkReferrersToPrimaryTargetForGraph(
-                focusNote, viewer),
-            priorityThreeLayer));
+                focusNote, viewer)));
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(3, priorityTwoHandlers.toArray(new RelationshipHandler[0]));
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
-    priorityTwoLayer.setNextLayer(priorityThreeLayer);
-    priorityThreeLayer.setNextLayer(priorityFourLayer);
 
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(

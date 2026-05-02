@@ -12,7 +12,7 @@ class CharacterBasedTokenCountingStrategyTest {
     CharacterBasedTokenCountingStrategy strategy = new CharacterBasedTokenCountingStrategy();
     Note note = new Note();
     note.setDetails("1234567890"); // 10 characters
-    BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Parent);
+    BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling);
 
     int tokens = strategy.estimateTokens(bareNote);
     assertTrue(tokens > 20, "Should estimate at least 20 tokens for JSON overhead");
@@ -23,11 +23,11 @@ class CharacterBasedTokenCountingStrategyTest {
     CharacterBasedTokenCountingStrategy strategy = new CharacterBasedTokenCountingStrategy();
     Note note1 = new Note();
     note1.setDetails("short");
-    BareNote bareNote1 = BareNote.fromNote(note1, RelationshipToFocusNote.Parent);
+    BareNote bareNote1 = BareNote.fromNote(note1, RelationshipToFocusNote.OlderSibling);
 
     Note note2 = new Note();
     note2.setDetails("this is a much longer piece of text that should result in more tokens");
-    BareNote bareNote2 = BareNote.fromNote(note2, RelationshipToFocusNote.Parent);
+    BareNote bareNote2 = BareNote.fromNote(note2, RelationshipToFocusNote.OlderSibling);
 
     int tokens1 = strategy.estimateTokens(bareNote1);
     int tokens2 = strategy.estimateTokens(bareNote2);
@@ -40,11 +40,11 @@ class CharacterBasedTokenCountingStrategyTest {
     CharacterBasedTokenCountingStrategy strategy = new CharacterBasedTokenCountingStrategy();
     Note note1 = new Note();
     note1.setDetails("hello world ".repeat(10));
-    BareNote bareNote1 = BareNote.fromNote(note1, RelationshipToFocusNote.Parent);
+    BareNote bareNote1 = BareNote.fromNote(note1, RelationshipToFocusNote.OlderSibling);
 
     Note note2 = new Note();
     note2.setDetails("你好世界 ".repeat(10));
-    BareNote bareNote2 = BareNote.fromNote(note2, RelationshipToFocusNote.Parent);
+    BareNote bareNote2 = BareNote.fromNote(note2, RelationshipToFocusNote.OlderSibling);
 
     int tokens1 = strategy.estimateTokens(bareNote1);
     int tokens2 = strategy.estimateTokens(bareNote2);

@@ -4849,15 +4849,8 @@ components:
           type: string
           enum:
           - Self
-          - Parent
           - OlderSibling
           - YoungerSibling
-          - ReferencingNote
-          - ContextAncestor
-          - TargetContextAncestor
-          - ReferenceContextAncestor
-          - RelationshipOfTargetSibling
-          - SiblingOfReferencingNote
         linkFromFocus:
           type: boolean
         linkHop2:
@@ -4880,15 +4873,8 @@ components:
           type: string
           enum:
           - Self
-          - Parent
           - OlderSibling
           - YoungerSibling
-          - ReferencingNote
-          - ContextAncestor
-          - TargetContextAncestor
-          - ReferenceContextAncestor
-          - RelationshipOfTargetSibling
-          - SiblingOfReferencingNote
         linkFromFocus:
           type: boolean
         linkHop2:

@@ -8,17 +8,10 @@ import java.util.List;
 public class ReferenceByRelationshipHandler extends RelationshipHandler {
   private final List<Note> inboundReferenceNotes;
   private int currentIndex = 0;
-  private final PriorityLayer priorityThreeLayer;
-  private final PriorityLayer priorityFourLayer;
 
-  public ReferenceByRelationshipHandler(
-      List<Note> inboundReferenceNotes,
-      PriorityLayer priorityThreeLayer,
-      PriorityLayer priorityFourLayer) {
+  public ReferenceByRelationshipHandler(List<Note> inboundReferenceNotes) {
     super(null, null);
     this.inboundReferenceNotes = new ArrayList<>(inboundReferenceNotes);
-    this.priorityThreeLayer = priorityThreeLayer;
-    this.priorityFourLayer = priorityFourLayer;
   }
 
   @Override
@@ -26,23 +19,12 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
     return consumeNextInboundReferrer();
   }
 
-  /** Next inbound referrer and side-effect expanded handlers; null when exhausted. */
+  /** Next inbound referrer; null when exhausted. */
   public Note consumeNextInboundReferrer() {
     if (currentIndex >= inboundReferenceNotes.size()) {
       return null;
     }
-    Note referringNote = inboundReferenceNotes.get(currentIndex++);
-
-    if (priorityThreeLayer != null) {
-      priorityThreeLayer.addHandler(
-          new ReferencingNoteRelationshipHandler(referringNote, priorityFourLayer));
-    }
-
-    if (priorityFourLayer != null) {
-      priorityFourLayer.addHandler(new ReferenceContextAncestorRelationshipHandler(referringNote));
-    }
-
-    return referringNote;
+    return inboundReferenceNotes.get(currentIndex++);
   }
 
   @Override

@@ -796,7 +796,7 @@ export type NoteRecallInfo = {
 export type BareNote = {
     uri?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'Parent' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'SiblingOfReferencingNote';
+    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
     details?: string;
@@ -807,7 +807,7 @@ export type BareNote = {
 export type FocusNote = {
     uri?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'Parent' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'SiblingOfReferencingNote';
+    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
     details?: string;
