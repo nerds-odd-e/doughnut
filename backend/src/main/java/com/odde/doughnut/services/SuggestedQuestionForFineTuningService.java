@@ -12,9 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SuggestedQuestionForFineTuningService {
   private final EntityPersister entityPersister;
+  private final GraphRAGService graphRAGService;
 
-  public SuggestedQuestionForFineTuningService(EntityPersister entityPersister) {
+  public SuggestedQuestionForFineTuningService(
+      EntityPersister entityPersister, GraphRAGService graphRAGService) {
     this.entityPersister = entityPersister;
+    this.graphRAGService = graphRAGService;
   }
 
   public SuggestedQuestionForFineTuning update(
@@ -35,7 +38,8 @@ public class SuggestedQuestionForFineTuningService {
       Timestamp currentUTCTimestamp) {
     entity.setUser(user);
     entity.setCreatedAt(currentUTCTimestamp);
-    entity.preserveNoteContent(predefinedQuestion.getNote());
+    entity.setPreservedNoteContent(
+        graphRAGService.getGraphRAGDescription(predefinedQuestion.getNote()));
     entity.preserveQuestion(predefinedQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);

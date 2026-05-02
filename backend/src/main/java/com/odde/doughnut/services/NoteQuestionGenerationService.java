@@ -50,6 +50,12 @@ public class NoteQuestionGenerationService {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
   }
 
+  /** Same message layout as MCQ generation / evaluation (GraphRAG context, notebook hints). */
+  public OpenAIChatRequestBuilder openAiChatRequestForSharedNoteContext(
+      Note note, String additionalMessage) {
+    return requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage);
+  }
+
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String customPrompt, String additionalMessage) {
     RelationType relationType =

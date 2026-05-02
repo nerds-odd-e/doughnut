@@ -11,20 +11,24 @@ public final class NotebookAssistantForNoteServiceFactory {
   private final GlobalSettingsService globalSettingsService;
   private final OpenAiApiHandler openAiApiHandler;
   private final NoteQuestionGenerationService noteQuestionGenerationService;
+  private final GraphRAGService graphRAGService;
 
   @Autowired
   public NotebookAssistantForNoteServiceFactory(
       GlobalSettingsService globalSettingsService,
       OpenAiApiHandler openAiApiHandler,
-      NoteQuestionGenerationService noteQuestionGenerationService) {
+      NoteQuestionGenerationService noteQuestionGenerationService,
+      GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;
     this.openAiApiHandler = openAiApiHandler;
     this.noteQuestionGenerationService = noteQuestionGenerationService;
+    this.graphRAGService = graphRAGService;
   }
 
   public NoteAutomationService createNoteAutomationService(Note note) {
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
-        new ChatCompletionNoteAutomationService(openAiApiHandler, globalSettingsService, note);
+        new ChatCompletionNoteAutomationService(
+            openAiApiHandler, globalSettingsService, graphRAGService, note);
     return new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 

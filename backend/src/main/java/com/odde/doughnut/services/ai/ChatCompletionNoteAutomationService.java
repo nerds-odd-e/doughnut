@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -14,12 +15,17 @@ import java.util.function.Function;
 public class ChatCompletionNoteAutomationService {
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
+  private final GraphRAGService graphRAGService;
   private final Note note;
 
   public ChatCompletionNoteAutomationService(
-      OpenAiApiHandler openAiApiHandler, GlobalSettingsService globalSettingsService, Note note) {
+      OpenAiApiHandler openAiApiHandler,
+      GlobalSettingsService globalSettingsService,
+      GraphRAGService graphRAGService,
+      Note note) {
     this.openAiApiHandler = openAiApiHandler;
     this.globalSettingsService = globalSettingsService;
+    this.graphRAGService = graphRAGService;
     this.note = note;
   }
 
@@ -70,7 +76,8 @@ public class ChatCompletionNoteAutomationService {
   private OpenAIChatRequestBuilder createChatRequestBuilder() {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     OpenAIChatRequestBuilder chatRequestBuilder =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(
+            modelName, graphRAGService.getGraphRAGDescription(note));
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {

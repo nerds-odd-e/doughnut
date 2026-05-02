@@ -97,11 +97,11 @@ public class AiQuestionGenerator {
     }
   }
 
-  // Temporary method until we migrate all functionality
   private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
-    OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName1, note);
-    return new AiQuestionGeneratorForNote(openAiApiHandler, chatAboutNoteRequestBuilder);
+    OpenAIChatRequestBuilder chatRequestBuilder =
+        noteQuestionGenerationService.openAiChatRequestForSharedNoteContext(note, null);
+    chatRequestBuilder.model(modelName1);
+    return new AiQuestionGeneratorForNote(openAiApiHandler, chatRequestBuilder);
   }
 
   public MCQWithAnswer regenerateQuestion(

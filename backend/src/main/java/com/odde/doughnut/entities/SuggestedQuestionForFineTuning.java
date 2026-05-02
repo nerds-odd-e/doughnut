@@ -74,10 +74,6 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
         new ObjectMapperConfig().objectMapper().valueToTree(mcqWithAnswer).toString();
   }
 
-  public void preserveNoteContent(Note note) {
-    this.preservedNoteContent = note.getNoteDescription();
-  }
-
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool();

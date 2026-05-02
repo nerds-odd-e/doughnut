@@ -30,12 +30,36 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   }
 
   @Test
-  void messageShouldContainTarget() {
+  void relationshipNoteDescriptionContainsYamlTargetKey() {
     Note to = makeMe.aNote().inMemoryPlease();
     Note from = makeMe.aNote().inMemoryPlease();
     Note note = makeMe.aRelation().between(from, to).inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
     assertThat(content, containsString("target"));
+  }
+
+  @Test
+  void noteOverloadDelegatesToSameSystemContentAsStringOverload() {
+    Note note = makeMe.aNote().details("body").title("T").inMemoryPlease();
+    String fromNote =
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note)
+            .build()
+            .messages()
+            .getFirst()
+            .system()
+            .get()
+            .content()
+            .toString();
+    String fromString =
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note.getNoteDescription())
+            .build()
+            .messages()
+            .getFirst()
+            .system()
+            .get()
+            .content()
+            .toString();
+    assertThat(fromNote, equalTo(fromString));
   }
 
   private static String getNoteOfFocusDescription(Note note) {

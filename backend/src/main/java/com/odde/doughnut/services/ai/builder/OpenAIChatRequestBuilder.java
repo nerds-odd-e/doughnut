@@ -19,10 +19,20 @@ public class OpenAIChatRequestBuilder {
   ChatCompletionCreateParams.Builder builder = ChatCompletionCreateParams.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
+    return chatAboutNoteRequestBuilder(modelName, note.getNoteDescription());
+  }
+
+  /**
+   * @param focusNoteContextBlock same shape as {@link Note#getNoteDescription()} or {@link
+   *     com.odde.doughnut.services.GraphRAGService#getGraphRAGDescription(Note)} — plain text
+   *     placed in the overall system message.
+   */
+  public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(
+      String modelName, String focusNoteContextBlock) {
     return new OpenAIChatRequestBuilder()
         .model(modelName)
         .addToOverallSystemMessage(systemInstruction)
-        .addToOverallSystemMessage(note.getNoteDescription());
+        .addToOverallSystemMessage(focusNoteContextBlock);
   }
 
   public OpenAIChatRequestBuilder model(String modelName) {

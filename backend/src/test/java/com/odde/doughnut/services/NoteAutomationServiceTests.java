@@ -34,6 +34,7 @@ class NoteAutomationServiceTests {
   OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
+  @Autowired GraphRAGService graphRAGService;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -50,7 +51,8 @@ class NoteAutomationServiceTests {
 
     // Initialize common services
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
-        new ChatCompletionNoteAutomationService(openAiApiHandler, globalSettingsService, testNote);
+        new ChatCompletionNoteAutomationService(
+            openAiApiHandler, globalSettingsService, graphRAGService, testNote);
     service = new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 

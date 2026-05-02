@@ -19,7 +19,7 @@ public class SuggestedQuestionForFineTuningBuilder
   @Override
   protected void beforeCreate(boolean needPersist) {
     Note note = this.note == null ? makeMe.aNote().please() : this.note;
-    entity.preserveNoteContent(note);
+    entity.setPreservedNoteContent(note.getNoteDescription());
     if (this.preservedQuestion != null) {
       entity.preserveQuestion(this.preservedQuestion);
     } else {
