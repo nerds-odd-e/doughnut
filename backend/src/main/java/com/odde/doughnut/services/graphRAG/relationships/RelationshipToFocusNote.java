@@ -5,7 +5,6 @@ public enum RelationshipToFocusNote {
 
   // Core structure (tree expansion)
   Parent,
-  Child,
   OlderSibling,
   YoungerSibling,
 

@@ -30,7 +30,7 @@ class GraphRAGResultTest {
     Note parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
     Note note = makeMe.aNote().under(parent).title("Child Note").please();
     JsonNode json =
-        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.Child));
+        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling));
 
     assertThat(json.has("parent"), is(false));
     assertThat(json.has("subject"), is(false));
@@ -46,7 +46,7 @@ class GraphRAGResultTest {
     Note targetNote = makeMe.aNote().title("Target Note").details("Target Details").please();
     Note note = makeMe.aRelation().between(parent, targetNote).please();
     JsonNode json =
-        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.Child));
+        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling));
 
     assertThat(json.has("parent"), is(false));
     assertThat(json.has("subject"), is(false));
@@ -60,7 +60,7 @@ class GraphRAGResultTest {
   void rootBareNoteHasExpectedJsonShape() throws Exception {
     Note note = makeMe.aNote().title("Root Note").details("Some details").please();
     JsonNode json =
-        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.Child));
+        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling));
 
     assertThat(
         json::fieldNames,
@@ -91,7 +91,7 @@ class GraphRAGResultTest {
     makeMe.refresh(note);
 
     JsonNode json =
-        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.Child));
+        objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling));
 
     assertThat(json.has("createdAt"), is(true));
     assertThat(json.has("updatedAt"), is(false));
@@ -122,7 +122,7 @@ class GraphRAGResultTest {
       String longDetails = "x".repeat(600);
       Note note = makeMe.aNote().title("Long Note").details(longDetails).please();
       JsonNode json =
-          objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.Child));
+          objectMapper.valueToTree(BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling));
 
       assertThat(json.has("detailsTruncated"), is(true));
       assertThat(json.get("detailsTruncated").asBoolean(), is(true));

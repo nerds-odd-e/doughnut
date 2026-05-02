@@ -616,7 +616,6 @@ class NoteControllerTests extends ControllerTestBase {
       GraphRAGResult result = controller.getGraph(rootNote, 5000);
 
       assertThat(result.getFocusNote().getUri(), equalTo(rootNote.getUri()));
-      assertThat(result.getRelatedNotes(), is(not(empty())));
     }
 
     @Test

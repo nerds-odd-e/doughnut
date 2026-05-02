@@ -81,7 +81,6 @@ public class GraphRAGService {
               new TargetRelationshipHandler(primaryTarget),
             });
     List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
-    priorityTwoHandlers.add(new ChildRelationshipHandler(focusNote));
     List<Note> referencesForViewer =
         wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer);
     if (!referencesForViewer.isEmpty()) {

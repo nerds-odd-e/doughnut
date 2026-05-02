@@ -796,7 +796,7 @@ export type NoteRecallInfo = {
 export type BareNote = {
     uri?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
+    relationToFocusNote?: 'Self' | 'Parent' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
     details?: string;
@@ -807,14 +807,13 @@ export type BareNote = {
 export type FocusNote = {
     uri?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
+    relationToFocusNote?: 'Self' | 'Parent' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
     contextualPath?: string;
-    children?: Array<string>;
     olderSiblings?: Array<string>;
     youngerSiblings?: Array<string>;
     links?: Array<string>;
