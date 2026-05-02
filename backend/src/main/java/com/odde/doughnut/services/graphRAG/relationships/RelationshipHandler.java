@@ -18,13 +18,5 @@ public abstract class RelationshipHandler {
 
   public abstract Note handle();
 
-  public boolean isLinkFromFocusFor(Note note) {
-    return false;
-  }
-
-  public boolean isLinkHop2For(Note note) {
-    return false;
-  }
-
   public void afterHandledSuccessfully(FocusNote focusNote, BareNote addedNote) {}
 }

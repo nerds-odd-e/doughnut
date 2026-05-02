@@ -42,34 +42,6 @@ public class GraphRAGServiceTest {
         .collect(Collectors.toList());
   }
 
-  private void assertRelatedNotesHaveLinkFromFocus(GraphRAGResult result, Note... expectedNotes) {
-    for (Note expected : expectedNotes) {
-      BareNote bn =
-          result.getRelatedNotes().stream()
-              .filter(n -> n.equals(expected))
-              .findFirst()
-              .orElseThrow(
-                  () ->
-                      new AssertionError(
-                          describeRelatedNotes(result) + " — missing note " + expected.getUri()));
-      assertThat(describeRelatedNotes(result), bn.isLinkFromFocus(), is(true));
-    }
-  }
-
-  private void assertRelatedNotesHaveLinkHop2(GraphRAGResult result, Note... expectedNotes) {
-    for (Note expected : expectedNotes) {
-      BareNote bn =
-          result.getRelatedNotes().stream()
-              .filter(n -> n.equals(expected))
-              .findFirst()
-              .orElseThrow(
-                  () ->
-                      new AssertionError(
-                          describeRelatedNotes(result) + " — missing note " + expected.getUri()));
-      assertThat(describeRelatedNotes(result), bn.isLinkHop2(), is(true));
-    }
-  }
-
   private void assertRelatedNotesContain(
       GraphRAGResult result, RelationshipToFocusNote relationship, Note... expectedNotes) {
     List<BareNote> notes = getNotesWithRelationship(result, relationship);
@@ -97,11 +69,7 @@ public class GraphRAGServiceTest {
             n ->
                 (n.getRelationToFocusNote() != null
                         ? String.valueOf(n.getRelationToFocusNote())
-                        : "Wiki")
-                    + "|ff="
-                    + n.isLinkFromFocus()
-                    + "|h2="
-                    + n.isLinkHop2()
+                        : "null")
                     + ":"
                     + n.getTitle())
         .collect(Collectors.joining(", "));
@@ -211,7 +179,6 @@ public class GraphRAGServiceTest {
       assertThat(full.getFocusNote().getTitle(), equalTo(note.getTitle()));
       assertThat(
           full.getRelatedNotes().stream().filter(b -> b.equals(target)).count(), equalTo(1L));
-      assertRelatedNotesHaveLinkFromFocus(full, target);
 
       GraphRAGResult zero = graphRAGService.retrieve(note, 0, note.getCreator());
       assertThat(zero.getFocusNote().getTitle(), equalTo(note.getTitle()));
@@ -280,7 +247,6 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
       assertRelatedNotesIncludeNotes(result, targetSibling1, targetSibling2);
-      assertRelatedNotesHaveLinkHop2(result, targetSibling1, targetSibling2);
 
       List<BareNote> siblingBare =
           result.getRelatedNotes().stream()
@@ -451,7 +417,7 @@ public class GraphRAGServiceTest {
     void targetAppearsAsWikiLinkNotAsStructuralChild() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
-      assertRelatedNotesHaveLinkFromFocus(result, targetNote);
+      assertRelatedNotesIncludeNotes(result, targetNote);
     }
   }
 
@@ -500,11 +466,11 @@ public class GraphRAGServiceTest {
       assertThat(
           full.getFocusNote().getInboundReferences(),
           containsInAnyOrder(inboundReferenceNote1.getUri(), inboundReferenceNote2.getUri()));
-      assertRelatedNotesHaveLinkFromFocus(full, inboundReferenceNote1, inboundReferenceNote2);
+      assertRelatedNotesIncludeNotes(full, inboundReferenceNote1, inboundReferenceNote2);
 
       GraphRAGResult limited = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
 
-      assertRelatedNotesHaveLinkFromFocus(limited, inboundReferenceNote1, inboundReferenceNote2);
+      assertRelatedNotesIncludeNotes(limited, inboundReferenceNote1, inboundReferenceNote2);
     }
   }
 
@@ -527,7 +493,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, root.getCreator());
 
       assertThat(result.getFocusNote().getInboundReferences(), contains(referrer.getUri()));
-      assertRelatedNotesHaveLinkFromFocus(result, referrer);
+      assertRelatedNotesIncludeNotes(result, referrer);
     }
   }
 

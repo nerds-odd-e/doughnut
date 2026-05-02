@@ -20,9 +20,4 @@ public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
     }
     return null;
   }
-
-  @Override
-  public boolean isLinkHop2For(Note note) {
-    return true;
-  }
 }

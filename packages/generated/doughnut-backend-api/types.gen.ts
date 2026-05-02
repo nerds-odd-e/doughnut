@@ -797,8 +797,6 @@ export type BareNote = {
     uri?: string;
     title?: string;
     relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling';
-    linkFromFocus?: boolean;
-    linkHop2?: boolean;
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -808,8 +806,6 @@ export type FocusNote = {
     uri?: string;
     title?: string;
     relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling';
-    linkFromFocus?: boolean;
-    linkHop2?: boolean;
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;

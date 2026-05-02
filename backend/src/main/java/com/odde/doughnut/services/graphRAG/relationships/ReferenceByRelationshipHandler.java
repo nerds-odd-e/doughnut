@@ -28,11 +28,6 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public boolean isLinkFromFocusFor(Note note) {
-    return true;
-  }
-
-  @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
     List<String> refs = focus.getInboundReferences();
     if (!refs.contains(addedNote.getUri())) {

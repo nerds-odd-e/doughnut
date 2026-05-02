@@ -17,7 +17,7 @@ public class FocusNote extends BareNote {
   private final List<String> inboundReferences = new ArrayList<>();
 
   private FocusNote(Note note) {
-    super(note, note.getDetails(), RelationshipToFocusNote.Self, null, false, false);
+    super(note, note.getDetails(), RelationshipToFocusNote.Self, null);
     contextualPath = FolderTrailSegments.crumbPathJoinedBySlashSpace(note);
   }
 

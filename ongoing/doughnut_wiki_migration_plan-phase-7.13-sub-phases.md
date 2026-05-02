@@ -158,7 +158,7 @@ Wiki targets and wiki inbound references may still add related notes, but withou
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.services.GraphRAGServiceTest`.
 
-## Sub-Sub-Phase 7.13.8 - Simplify `BareNote` graph wire shape
+## Sub-Sub-Phase 7.13.8 - Simplify `BareNote` graph wire shape ✅ DONE
 
 **Type:** Behavior / API cleanup.
 

@@ -4851,10 +4851,6 @@ components:
           - Self
           - OlderSibling
           - YoungerSibling
-        linkFromFocus:
-          type: boolean
-        linkHop2:
-          type: boolean
         details:
           type: string
         detailsTruncated:
@@ -4875,10 +4871,6 @@ components:
           - Self
           - OlderSibling
           - YoungerSibling
-        linkFromFocus:
-          type: boolean
-        linkHop2:
-          type: boolean
         details:
           type: string
         detailsTruncated:

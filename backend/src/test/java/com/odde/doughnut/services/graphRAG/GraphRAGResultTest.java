@@ -64,14 +64,7 @@ class GraphRAGResultTest {
 
     assertThat(
         json::fieldNames,
-        containsInAnyOrder(
-            "uri",
-            "title",
-            "details",
-            "relationToFocusNote",
-            "linkFromFocus",
-            "linkHop2",
-            "createdAt"));
+        containsInAnyOrder("uri", "title", "details", "relationToFocusNote", "createdAt"));
     assertThat(json.has("detailsTruncated"), is(false));
     assertThat(json.get("details").asText(), is("Some details"));
   }

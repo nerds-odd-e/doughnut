@@ -16,8 +16,6 @@ import lombok.Getter;
   "uri",
   "title",
   "relationToFocusNote",
-  "linkFromFocus",
-  "linkHop2",
   "details",
   "detailsTruncated",
   "createdAt"
@@ -26,23 +24,14 @@ public class BareNote {
   private final Note note;
   @Getter private final String details;
   private RelationshipToFocusNote relationToFocusNote;
-  private boolean linkFromFocus;
-  private boolean linkHop2;
   private final Boolean detailsTruncated;
 
   protected BareNote(
-      Note note,
-      String details,
-      RelationshipToFocusNote relation,
-      Boolean detailsTruncated,
-      boolean linkFromFocus,
-      boolean linkHop2) {
+      Note note, String details, RelationshipToFocusNote relation, Boolean detailsTruncated) {
     this.note = note;
     this.details = details;
     this.relationToFocusNote = relation;
     this.detailsTruncated = detailsTruncated;
-    this.linkFromFocus = linkFromFocus;
-    this.linkHop2 = linkHop2;
   }
 
   @JsonProperty("relationToFocusNote")
@@ -50,24 +39,11 @@ public class BareNote {
     return relationToFocusNote;
   }
 
-  @JsonProperty("linkFromFocus")
-  public boolean isLinkFromFocus() {
-    return linkFromFocus;
-  }
-
-  @JsonProperty("linkHop2")
-  public boolean isLinkHop2() {
-    return linkHop2;
-  }
-
   /** Re-label when the same note is reached again with richer wiki or structural cues. */
-  void mergeIntoExisting(
-      RelationshipToFocusNote incomingRelation, boolean fromFocus, boolean hop2) {
+  void mergeIntoExisting(RelationshipToFocusNote incomingRelation) {
     if (relationToFocusNote == null && incomingRelation != null) {
       relationToFocusNote = incomingRelation;
     }
-    linkFromFocus |= fromFocus;
-    linkHop2 |= hop2;
   }
 
   @JsonIgnore
@@ -96,18 +72,12 @@ public class BareNote {
   }
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
-    return fromNote(note, relation, false, false);
-  }
-
-  public static BareNote fromNote(
-      Note note, RelationshipToFocusNote relation, boolean linkFromFocus, boolean linkHop2) {
     TruncationResult result = truncateDetails(note.getDetails());
-    return new BareNote(
-        note, result.truncatedDetails, relation, result.wasTruncated, linkFromFocus, linkHop2);
+    return new BareNote(note, result.truncatedDetails, relation, result.wasTruncated);
   }
 
   public static BareNote fromNoteWithoutTruncate(Note note) {
-    return new BareNote(note, note.getDetails(), null, null, false, false);
+    return new BareNote(note, note.getDetails(), null, null);
   }
 
   private static TruncationResult truncateDetails(String details) {

@@ -58,11 +58,7 @@ public class PriorityLayer {
         Note relatedNote;
         while ((relatedNote = refHandler.consumeNextInboundReferrer()) != null) {
           BareNote result =
-              builder.addNoteToRelatedNotes(
-                  relatedNote,
-                  handler.getRelationshipToFocusNote(),
-                  handler.isLinkFromFocusFor(relatedNote),
-                  handler.isLinkHop2For(relatedNote));
+              builder.addNoteToRelatedNotes(relatedNote, handler.getRelationshipToFocusNote());
           if (result != null) {
             handler.afterHandledSuccessfully(builder.getFocusNote(), result);
             notesProcessedSinceLastLayerSwitch++;
@@ -76,11 +72,7 @@ public class PriorityLayer {
         Note relatedNote = handler.handle();
         if (relatedNote != null) {
           BareNote result =
-              builder.addNoteToRelatedNotes(
-                  relatedNote,
-                  handler.getRelationshipToFocusNote(),
-                  handler.isLinkFromFocusFor(relatedNote),
-                  handler.isLinkHop2For(relatedNote));
+              builder.addNoteToRelatedNotes(relatedNote, handler.getRelationshipToFocusNote());
           if (result != null) {
             handler.afterHandledSuccessfully(builder.getFocusNote(), result);
             notesProcessedSinceLastLayerSwitch++;
