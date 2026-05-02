@@ -2,7 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.entities.repositories.FolderRepository;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -23,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +45,8 @@ class NoteController {
   private final GraphRAGService graphRAGService;
   private final TestabilitySettings testabilitySettings;
   private final NoteRealmService noteRealmService;
+  private final FolderRepository folderRepository;
+  private final NoteRepository noteRepository;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -55,7 +57,9 @@ class NoteController {
       UserService userService,
       GraphRAGService graphRAGService,
       TestabilitySettings testabilitySettings,
-      NoteRealmService noteRealmService) {
+      NoteRealmService noteRealmService,
+      FolderRepository folderRepository,
+      NoteRepository noteRepository) {
     this.entityPersister = entityPersister;
     this.wikidataService = wikidataService;
     this.noteMotionService = noteMotionService;
@@ -65,6 +69,8 @@ class NoteController {
     this.graphRAGService = graphRAGService;
     this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
+    this.folderRepository = folderRepository;
+    this.noteRepository = noteRepository;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -186,27 +192,30 @@ class NoteController {
     return RedirectToNoteResponse.forNote(note.getId());
   }
 
-  @PostMapping(value = "/move_after/{note}/{targetNote}/{asFirstChild}")
+  @PostMapping(value = "/{note}/reorder")
   @Transactional
-  public List<NoteRealm> moveAfter(
-      @PathVariable @Schema(type = "integer") Note note,
-      @PathVariable @Schema(type = "integer") Note targetNote,
-      @PathVariable @Schema(type = "string") String asFirstChild)
-      throws UnexpectedNoAccessRightException,
-          CyclicLinkDetectedException,
-          MovementNotPossibleException {
+  public List<NoteRealm> reorder(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @RequestBody @Valid NoteReorderDTO body,
+      BindingResult bindingResult)
+      throws UnexpectedNoAccessRightException, BindException, MovementNotPossibleException {
+    if (bindingResult.hasErrors()) {
+      throw new BindException(bindingResult);
+    }
     authorizationService.assertAuthorization(note);
-    authorizationService.assertAuthorization(targetNote);
-
-    boolean asFirstChildBoolean = asFirstChild.compareToIgnoreCase("asFirstChild") == 0;
-    noteMotionService.validate(note, targetNote, asFirstChildBoolean);
-    Note parentBefore = note.getParent();
-    noteMotionService.execute(note, targetNote, asFirstChildBoolean);
-
-    return Stream.of(parentBefore, note.getParent())
-        .distinct()
-        .map(parent -> noteRealmService.build(parent, authorizationService.getCurrentUser()))
-        .toList();
+    Folder targetFolder =
+        body.folderId == null ? null : folderRepository.findById(body.folderId).orElseThrow();
+    if (targetFolder != null) {
+      authorizationService.assertAuthorization(targetFolder.getNotebook());
+    }
+    Note afterNote =
+        body.afterNoteId == null ? null : noteRepository.findById(body.afterNoteId).orElseThrow();
+    if (afterNote != null) {
+      authorizationService.assertReadAuthorization(afterNote);
+    }
+    noteMotionService.executeReorderInPlacement(note, targetFolder, afterNote);
+    User user = authorizationService.getCurrentUser();
+    return List.of(noteRealmService.build(note, user));
   }
 
   @PatchMapping(value = "/{note}/move-to-top-level")

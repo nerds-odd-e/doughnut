@@ -91,7 +91,7 @@ const methodToController: Record<string, any> = {
   updateNoteRecallSetting: NoteController,
   verifySpelling: NoteController,
   deleteNote: NoteController,
-  moveAfter: NoteController,
+  reorder: NoteController,
   showNote: NoteController,
   updateNoteAccessories: NoteController,
   undoDeleteNote: NoteController,

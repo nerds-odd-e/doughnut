@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ public class NoteMotionServiceTest {
   @Autowired NoteMotionService noteMotionService;
   @Autowired NoteChildContainerFolderService noteChildContainerFolderService;
   @Autowired JdbcTemplate jdbcTemplate;
+  @Autowired NoteRepository noteRepository;
 
   @Autowired MakeMe makeMe;
   Note topNote;
@@ -345,6 +348,50 @@ public class NoteMotionServiceTest {
 
       assertThat(relationNote.getFolder(), notNullValue());
       assertThat(relationNote.getFolder().getName(), equalTo(secondChild.getTitle()));
+    }
+  }
+
+  @Nested
+  class ReorderInPlacement {
+    @Test
+    void ordersAfterPeerInFolder() throws MovementNotPossibleException {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
+      Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("box").please();
+      Note n1 = makeMe.aNote("n1").creatorAndOwner(user).under(root).please();
+      Note n2 = makeMe.aNote("n2").creatorAndOwner(user).under(root).please();
+      Note mover = makeMe.aNote("mv").creatorAndOwner(user).under(root).please();
+      makeMe.entityPersister.flush();
+      noteMotionService.executeMoveIntoFolder(n1, folder);
+      noteMotionService.executeMoveIntoFolder(n2, folder);
+      noteMotionService.executeMoveIntoFolder(mover, folder);
+      makeMe.entityPersister.flush();
+
+      noteMotionService.executeReorderInPlacement(mover, folder, n1);
+      List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+      assertThat(
+          ordered.stream().map(Note::getId).toList(),
+          contains(n1.getId(), mover.getId(), n2.getId()));
+    }
+
+    @Test
+    void firstAmongNotebookRootPeers() throws MovementNotPossibleException {
+      User user = makeMe.aUser().please();
+      topNote = makeMe.aRootNote("top").creatorAndOwner(user).please();
+      firstChild = makeMe.aNote("r1").creatorAndOwner(user).under(topNote).please();
+      secondChild = makeMe.aNote("r2").creatorAndOwner(user).under(topNote).please();
+      makeMe.entityPersister.flush();
+      noteMotionService.moveToTopLevel(firstChild, user);
+      noteMotionService.moveToTopLevel(secondChild, user);
+      makeMe.entityPersister.flush();
+      makeMe.refresh(firstChild);
+      makeMe.refresh(secondChild);
+
+      noteMotionService.executeReorderInPlacement(secondChild, null, null);
+      List<Note> ordered =
+          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
+              topNote.getNotebook().getId());
+      assertThat(ordered.getFirst().getId(), equalTo(secondChild.getId()));
     }
   }
 }

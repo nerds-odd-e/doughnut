@@ -96,6 +96,12 @@ function buildStructuralRows(
   return rows
 }
 
+function notesInOrderFromRows(rows: SidebarStructuralRow[]): Note[] {
+  return rows
+    .filter((r): r is { kind: "note"; note: Note } => r.kind === "note")
+    .map((r) => r.note)
+}
+
 function rowKey(row: SidebarStructuralRow): string {
   if (row.kind === "note") {
     return `n-${row.note.id}`
@@ -215,18 +221,35 @@ const handleDragLeave = (event: DragEvent) => {
 const handleDrop = async (event: DragEvent, targetNote: Note) => {
   event.preventDefault()
 
-  if (!draggedNote.value || draggedNote.value.id === targetNote.id) return
+  const dragged = draggedNote.value
+  if (!dragged || dragged.id === targetNote.id) return
 
   if (
     dropMode.value === "after" &&
-    structuralFolderId(draggedNote.value) !== structuralFolderId(targetNote)
+    structuralFolderId(dragged) !== structuralFolderId(targetNote)
   )
     return
+
+  const notes = notesInOrderFromRows(displayRows.value)
+  const targetIdx = notes.findIndex((n) => n.id === targetNote.id)
+  const dragIdx = notes.findIndex((n) => n.id === dragged.id)
+  const folderId = structuralFolderId(targetNote)
+  const placement =
+    dropMode.value === "after"
+      ? { folderId, afterNoteId: targetNote.id }
+      : {
+          folderId,
+          afterNoteId: targetIdx > 0 ? notes[targetIdx - 1]!.id : null,
+        }
+  const undoPlacement = {
+    folderId: structuralFolderId(dragged),
+    afterNoteId: dragIdx > 0 ? notes[dragIdx - 1]!.id : null,
+  }
 
   try {
     await storageAccessor.value
       .storedApi()
-      .moveAfter(draggedNote.value.id, targetNote.id, dropMode.value)
+      .moveAfter(dragged.id, placement, undoPlacement)
 
     await refreshListing()
   } catch (error) {

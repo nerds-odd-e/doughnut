@@ -623,8 +623,8 @@ describe("Sidebar", () => {
       vi.clearAllMocks()
     })
 
-    it("should call moveAfter when dragging and dropping notes", async () => {
-      const moveAfterSpy = mockSdkService("moveAfter", [])
+    it("should call NoteController.reorder when dragging and dropping notes", async () => {
+      const reorderSpy = mockSdkService("reorder", [])
       mountSidebar(firstGeneration)
 
       await flushPromises()
@@ -643,12 +643,12 @@ describe("Sidebar", () => {
       await draggedNote!.trigger("dragstart")
       await dropTarget!.trigger("drop")
 
-      expect(moveAfterSpy).toHaveBeenCalledWith({
-        path: {
-          note: firstGeneration.id,
-          targetNote: firstGenerationSibling.id,
-          asFirstChild: "false",
-        },
+      expect(reorderSpy).toHaveBeenCalledWith({
+        path: { note: firstGeneration.id },
+        body: expect.objectContaining({
+          folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
+          afterNoteId: firstGenerationSibling.id,
+        }),
       })
     })
 
@@ -711,22 +711,22 @@ describe("Sidebar", () => {
       ).toBe(false)
     })
 
-    it("should not call moveAfter when dragging to the same note", async () => {
-      const moveAfterMock = mockSdkService("moveAfter", [])
+    it("should not call reorder when dragging to the same note", async () => {
+      const reorderMock = mockSdkService("reorder", [])
       mountSidebar(firstGeneration)
       await flushPromises()
 
       const note = findSidebarItem(firstGeneration.note.noteTopology.title!)
-      moveAfterMock.mockClear()
+      reorderMock.mockClear()
 
       await note!.trigger("dragstart")
       await note!.trigger("drop")
 
-      expect(moveAfterMock).not.toHaveBeenCalled()
+      expect(reorderMock).not.toHaveBeenCalled()
     })
 
-    it("should not call moveAfter when dragging between different parents", async () => {
-      const moveAfterMock = mockSdkService("moveAfter", [])
+    it("should not call reorder when dragging between different folders", async () => {
+      const reorderMock = mockSdkService("reorder", [])
       mountSidebar(firstGeneration)
       await flushPromises()
 
@@ -737,12 +737,12 @@ describe("Sidebar", () => {
         secondGeneration.note.noteTopology.title!
       )
 
-      moveAfterMock.mockClear()
+      reorderMock.mockClear()
 
       await secondGenNote!.trigger("dragstart")
       await firstGenNote!.trigger("drop")
 
-      expect(moveAfterMock).not.toHaveBeenCalled()
+      expect(reorderMock).not.toHaveBeenCalled()
     })
 
     it("should show drop indicator when dragging over a note", async () => {
@@ -890,8 +890,8 @@ describe("Sidebar", () => {
       expect(dropIndicator.classes()).toContain("drop-as-child")
     })
 
-    it("should call moveAfter with asFirstChild when dropping on right half", async () => {
-      const moveAfterSpy = mockSdkService("moveAfter", [])
+    it("should call reorder with before-target placement when dropping on right half", async () => {
+      const reorderSpy = mockSdkService("reorder", [])
       mountSidebar(firstGeneration)
       await flushPromises()
 
@@ -912,17 +912,17 @@ describe("Sidebar", () => {
       dropTarget!.element.dispatchEvent(dragOverEvent)
       await dropTarget!.trigger("drop")
 
-      expect(moveAfterSpy).toHaveBeenCalledWith({
-        path: {
-          note: firstGeneration.id,
-          targetNote: firstGenerationSibling.id,
-          asFirstChild: "true",
-        },
+      expect(reorderSpy).toHaveBeenCalledWith({
+        path: { note: firstGeneration.id },
+        body: expect.objectContaining({
+          folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
+          afterNoteId: firstGeneration.id,
+        }),
       })
     })
 
-    it("should allow dropping as child even with different parent", async () => {
-      const moveAfterSpy = mockSdkService("moveAfter", [])
+    it("should allow reorder into another folder when dropping on right half", async () => {
+      const reorderSpy = mockSdkService("reorder", [])
       mountSidebar(firstGeneration)
       await flushPromises()
 
@@ -943,12 +943,12 @@ describe("Sidebar", () => {
       firstGenNote!.element.dispatchEvent(dragOverEvent)
       await firstGenNote!.trigger("drop")
 
-      expect(moveAfterSpy).toHaveBeenCalledWith({
-        path: {
-          note: secondGeneration.id,
-          targetNote: firstGenerationSibling.id,
-          asFirstChild: "true",
-        },
+      expect(reorderSpy).toHaveBeenCalledWith({
+        path: { note: secondGeneration.id },
+        body: expect.objectContaining({
+          folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
+          afterNoteId: firstGeneration.id,
+        }),
       })
     })
   })

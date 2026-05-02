@@ -940,6 +940,32 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
+  /api/notes/{note}/reorder:
+    post:
+      tags:
+      - note-controller
+      operationId: reorder
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteReorderDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/recall-setting:
     post:
       tags:
@@ -1024,36 +1050,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
-  /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
-    post:
-      tags:
-      - note-controller
-      operationId: moveAfter
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: asFirstChild
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/notebooks/{notebook}:
     get:
       tags:
@@ -4062,6 +4058,15 @@ components:
           description: "Match score for a folder hit (0 exact, 0.9 partial)"
       required:
       - hitKind
+    NoteReorderDTO:
+      type: object
+      properties:
+        folderId:
+          type: integer
+          format: int32
+        afterNoteId:
+          type: integer
+          format: int32
     NoteRecallSetting:
       type: object
       properties:

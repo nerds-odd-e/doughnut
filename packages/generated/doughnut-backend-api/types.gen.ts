@@ -373,6 +373,11 @@ export type RelationshipLiteralSearchHit = {
     distance?: number;
 };
 
+export type NoteReorderDto = {
+    folderId?: number;
+    afterNoteId?: number;
+};
+
 export type NoteRecallSetting = {
     rememberSpelling?: boolean;
     skipMemoryTracking?: boolean;
@@ -1844,6 +1849,24 @@ export type SearchForRelationshipTargetWithinResponses = {
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
 
+export type ReorderData = {
+    body: NoteReorderDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/reorder';
+};
+
+export type ReorderResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type ReorderResponse = ReorderResponses[keyof ReorderResponses];
+
 export type UpdateNoteRecallSettingData = {
     body: NoteRecallSetting;
     path: {
@@ -1911,26 +1934,6 @@ export type SearchForRelationshipTargetResponses = {
 };
 
 export type SearchForRelationshipTargetResponse = SearchForRelationshipTargetResponses[keyof SearchForRelationshipTargetResponses];
-
-export type MoveAfterData = {
-    body?: never;
-    path: {
-        note: number;
-        targetNote: number;
-        asFirstChild: string;
-    };
-    query?: never;
-    url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}';
-};
-
-export type MoveAfterResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type MoveAfterResponse = MoveAfterResponses[keyof MoveAfterResponses];
 
 export type GetData = {
     body?: never;

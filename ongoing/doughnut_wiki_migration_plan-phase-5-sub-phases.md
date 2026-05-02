@@ -8,7 +8,7 @@ Phase 5 of `ongoing/doughnut_wiki_migration_plan.md`: Convert Relationship Notes
 
 Relationship notes become **ordinary notes**: title, details, frontmatter, and **`note_wiki_title_cache`** carry relationship meaning; no separate product model for “relation notes.” **Note show** uses **`NoteRealm.references`** (5.21.3). **Graph** and **API cleanup** finish in **5.23** (especially **5.23.6** and **5.23.8**). **5.24+** drop legacy **`target_note_id`** / persistence once nothing reads them.
 
-**Graph wire simplification:** **`relationToFocusNote`** is unused in the **frontend** today; **5.23.8** may change or trim it for **wiki-derived** related notes and introduce **`linkFromFocus`** / **`linkHop2`** on the graph DTO so integrators and tests see one common “wiki link graph” story (direct backlink vs next hop), without reference-vs-relationship vocabulary.
+**Graph wire simplification:** **`relationToFocusNote`** is unused in the **frontend** today; **5.23.8** (done) trims wiki rows to **`linkFromFocus`** / **`linkHop2`** on the graph DTO and nullable structural `relationToFocusNote` so integrators and tests see one “wiki link graph” story (direct backlink vs next hop), without reference-vs-relationship vocabulary on the wire.
 
 ## Design decisions (constraints for 5.23–5.27)
 
@@ -49,9 +49,26 @@ Each sub-phase below is sized as a **small cohesive slice** of work (roughly a f
 
 **Overall trigger:** A user or AI flow requests a note graph, or code builds `NoteRealm` / OpenAPI clients after API cleanup.
 
-**Overall post-condition:** Graph RAG discovers **wiki-linked** semantic neighbors only through **`WikiTitleCacheService`** (plus repository queries that service owns)—**not** by distinguishing legacy “relationship row” vs “reference row” shapes. **Structural** expansion (parent / children / ordered siblings / focus ancestor path, and any retained parent-peer neighborhood) stays explicit and tree-based. Deprecated **`NoteRealm.inboundReferences`** / **`NoteRealm.relationshipsDeprecating`** are removed from the wire (**5.23.6**). Related notes that exist **because of the wiki link cache** are labeled on the graph API with **`linkFromFocus`** (cached link **to the focus**) and **`linkHop2`** (cached link **to a note already included as `linkFromFocus`**), replacing the old fine-grained **`relationToFocusNote`** values that only encoded reference-vs-relationship-vs-target roles (**5.23.8**). OpenAPI and generated clients are updated; **frontend** needs no change for these graph-only fields if it truly does not consume them—still run typecheck after regeneration.
+**Overall post-condition:** Graph RAG discovers **wiki-linked** semantic neighbors only through **`WikiTitleCacheService`** (plus repository queries that service owns)—**not** by distinguishing legacy “relationship row” vs “reference row” shapes. **Structural** expansion (parent / children / ordered siblings / focus ancestor path, and any retained parent-peer neighborhood) stays explicit and tree-based. Deprecated **`NoteRealm.inboundReferences`** / **`NoteRealm.relationshipsDeprecating`** are removed from the wire (**5.23.6**). Related notes included from the wiki link cache expose **`linkFromFocus`** (direct cached link toward the focus) and **`linkHop2`** (second hop vs a note already included with `linkFromFocus`); fine-grained wiki-only **`relationToFocusNote`** spellings are retired in favor of those flags (**5.23.8**). OpenAPI and generated clients match; frontend did not require changes beyond typecheck/regeneration unless imports broke.
 
 **Commit boundary:** One green merge per **5.23.x** slice (batch only when the tree stays green between slices).
+
+### 5.23 implementation progress (repo state)
+
+Snapshot of what is already merged in the codebase so handoff docs stay aligned with the tree.
+
+| Sub-phase | Status | Notes |
+|-----------|--------|-------|
+| **5.23.1** | Done | Single cache-backed merge/dedupe for graph and note show; `WikiTitleCacheService` / `NoteRealm.references` path. |
+| **5.23.2** | Done | `GraphRAGService.retrieve(Note, int, User viewer)`; entry points pass the read viewer. |
+| **5.23.3** | Done | Primary wiki target + repository-backed relation-child scan; ordering/fallback per learnings below. |
+| **5.23.4** | Done | Structural `Child` edges skip relation notes; semantic target from cache, not relation children as normal children. |
+| **5.23.5** | Done | Wiki-linked discovery uses `referencesNotesForViewer(focus, viewer)` (no parallel FK vs cache merge in `GraphRAGService`); layer quotas exercised in `GraphRAGServiceTest`. |
+| **5.23.6** | Done | `NoteRealm` wire: `references` (+ `note`, `wikiTitles`, folders, bazaar, etc.); deprecated `inboundReferences` / `relationshipsDeprecating` removed; OpenAPI + generated clients updated. |
+| **5.23.7** | Done (keep extending) | Tests use shared notebook / `canReferTo` / folder-scoped trees where visibility requires it; graph asserts `linkFromFocus` / `linkHop2` where appropriate; add new regressions when edge cases appear. |
+| **5.23.8** | Done | Graph `BareNote` / OpenAPI: `linkFromFocus`, `linkHop2`; wiki-sourced inclusion uses those flags; `relationToFocusNote` JSON omitted when null (`NON_NULL`); structural `RelationshipToFocusNote` values remain for tree expansion; obsolete wiki-only enum constants already removed where unused. |
+
+**Structural follow-up (not a numbered slice):** `GraphRAGService` builds **one** `ReferenceByRelationshipHandler` with the full inbound list for the viewer; `PriorityLayer` drains it in a **single layer sweep** (via `consumeNextInboundReferrer`) so note order and budget behavior stay equivalent to the old list of one-note handlers. This refactor does **not** by itself shrink `RelationshipToFocusNote` further; any extra enum cleanup is a separate grep-driven pass.
 
 ### Learnings from exploratory implementation (avoid rework)
 
