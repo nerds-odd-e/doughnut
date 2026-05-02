@@ -7,12 +7,10 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/relations")
 class RelationController {
-  private final EntityPersister entityPersister;
   private final NoteService noteService;
 
   private final TestabilitySettings testabilitySettings;
@@ -37,38 +34,18 @@ class RelationController {
   private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
-  private final WikiTitleCacheService wikiTitleCacheService;
 
   public RelationController(
-      EntityPersister entityPersister,
       NoteService noteService,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
-      NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService) {
-    this.entityPersister = entityPersister;
+      NoteRealmService noteRealmService) {
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
-    this.wikiTitleCacheService = wikiTitleCacheService;
-  }
-
-  @PostMapping(value = "/{relation}")
-  @Transactional
-  public List<NoteRealm> updateRelationship(
-      @PathVariable @Schema(type = "integer") Note relation,
-      @RequestBody RelationshipCreation relationshipCreation)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(relation);
-    User user = authorizationService.getCurrentUser();
-    noteService.refreshRelationshipNoteTitle(relation, relationshipCreation.relationType, user);
-    entityPersister.save(relation);
-    wikiTitleCacheService.refreshForNote(relation, user);
-    return List.of(
-        noteRealmService.build(relation, user), noteRealmService.build(relation.getParent(), user));
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")

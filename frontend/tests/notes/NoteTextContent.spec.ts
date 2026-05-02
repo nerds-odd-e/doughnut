@@ -313,24 +313,28 @@ describe("in place edit on title", () => {
     })
   })
 
-  describe("rich editor relation API mode from note details", () => {
-    it("enables relationPropertyUsesRelationshipApi when note has relation in frontmatter", async () => {
+  describe("rich editor relation property row", () => {
+    it("shows relation type picker when note has relation in frontmatter", async () => {
       const note = makeMe.aNote
         .title("Rel")
         .details("---\nrelation: parent-of\n---\n\nbody\n")
         .please()
       mountComponent(note)
       await flushPromises()
-      const rich = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      expect(rich.props("relationPropertyUsesRelationshipApi")).toBe(true)
+      const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
+      expect(
+        rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
+      ).toBe(true)
     })
 
-    it("disables relationPropertyUsesRelationshipApi when note lacks relation", async () => {
+    it("omits relation type picker when note lacks relation property", async () => {
       const note = makeMe.aNote.title("Plain").please()
       mountComponent(note)
       await flushPromises()
-      const rich = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      expect(rich.props("relationPropertyUsesRelationshipApi")).toBe(false)
+      const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
+      expect(
+        rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
+      ).toBe(false)
     })
   })
 })

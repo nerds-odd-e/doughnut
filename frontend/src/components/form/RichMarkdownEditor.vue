@@ -4,12 +4,7 @@
       ref="frontmatterPropertiesRef"
       :details-markdown="modelValue ?? ''"
       :read-only="readonly"
-      :relation-property-uses-relationship-api="relationPropertyUsesRelationshipApi"
-      :relation-property-relation-type-error="relationPropertyRelationTypeError"
       @properties-changed="onPropertiesChanged"
-      @relation-property-relation-type-selected="
-        emits('relationPropertyRelationTypeSelected', $event)
-      "
     />
     <div
       v-if="frontmatterParseErrorMessage !== null"
@@ -47,7 +42,6 @@ import {
   parseNoteDetailsMarkdown,
   type PropertyRow,
 } from "@/utils/noteDetailsFrontmatter"
-import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 
 const props = defineProps({
   multipleLine: Boolean,
@@ -58,8 +52,6 @@ const props = defineProps({
   errors: Object,
   readonly: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
-  relationPropertyUsesRelationshipApi: Boolean,
-  relationPropertyRelationTypeError: String,
 })
 
 const emits = defineEmits<{
@@ -67,7 +59,6 @@ const emits = defineEmits<{
   (e: "blur"): void
   (e: "pasteComplete", value: string): void
   (e: "deadLinkClick", title: string): void
-  (e: "relationPropertyRelationTypeSelected", value: RelationTypeLabel): void
 }>()
 
 /** Body markdown (or full details when frontmatter could not be parsed). */

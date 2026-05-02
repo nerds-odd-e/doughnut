@@ -23,34 +23,22 @@
         :model-value="value"
         :readonly="readonly"
         :wiki-titles="wikiTitles"
-        :relation-property-uses-relationship-api="
-          relationPropertyUsesRelationshipApi
-        "
-        :relation-property-relation-type-error="
-          relationPropertyRelationTypeError
-        "
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
         @dead-link-click="emit('deadLinkClick', $event)"
-        @relation-property-relation-type-selected="
-          onRelationPropertyRelationTypeSelected
-        "
       />
     </template>
   </TextContentWrapper>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, type PropType } from "vue"
+import { nextTick, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { detailsHasRelationProperty } from "@/utils/noteDetailsFrontmatter"
 
 const emit = defineEmits<{
   deadLinkClick: [title: string]
@@ -64,39 +52,9 @@ const props = defineProps({
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
 })
 
-const relationPropertyUsesRelationshipApi = computed(() =>
-  detailsHasRelationProperty(props.noteDetails ?? "")
-)
-
-const relationPropertyRelationTypeError = ref<string | undefined>()
-
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =
   usePasteWithLinkImageOptions()
-const storageAccessor = useStorageAccessor()
-
-watch(
-  () => props.noteDetails,
-  () => {
-    relationPropertyRelationTypeError.value = undefined
-  }
-)
-
-function onRelationPropertyRelationTypeSelected(
-  relationType: RelationTypeLabel
-) {
-  if (!relationPropertyUsesRelationshipApi.value) return
-  relationPropertyRelationTypeError.value = undefined
-  storageAccessor.value
-    .storedApi()
-    .updateRelationship(props.noteId, { relationType: relationType })
-    .catch((error) => {
-      const e = error as { relationType?: string }
-      if (e?.relationType) {
-        relationPropertyRelationTypeError.value = e.relationType
-      }
-    })
-}
 
 const offerToRemoveLinksAndImages = async (
   content: string,

@@ -208,10 +208,9 @@ export const assumeNotePage = (
         const $textarea = $details.find('textarea').filter(':visible')
         if ($textarea.length) {
           cy.wrap($textarea.first()).blur()
-        } else {
-          cy.wrap($details).find('.ql-editor').first().blur()
         }
       })
+      cy.get('body').click(0, 0, { force: true })
       cy.get('.dirty').should('not.exist')
       pageIsNotLoading()
       return this

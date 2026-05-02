@@ -168,36 +168,6 @@ Then(
   }
 )
 
-Then(
-  'I should see the relationship note title reflects {string} {string} {string}',
-  (sourceTitle: string, relationType: string, targetTitle: string) => {
-    start.jumpToNotePage(sourceTitle).navigateToRelationshipChild(targetTitle)
-    cy.findByRole('title')
-      .should('contain', sourceTitle)
-      .and('contain', relationType)
-      .and('contain', targetTitle)
-  }
-)
-
-Then(
-  'I should see the relationship note in the sidebar under folder {string} with composed title {string} {string} {string}',
-  (
-    folderLabel: string,
-    sourceTitle: string,
-    relationType: string,
-    targetTitle: string
-  ) => {
-    start
-      .noteSidebar()
-      .expectRelationshipNoteTitleUnderFolder(
-        folderLabel,
-        sourceTitle,
-        relationType,
-        targetTitle
-      )
-  }
-)
-
 When(
   'I change the relationship from {string} to {string} to {string}',
   (noteTopology: string, targetTitle: string, relationType: string) => {

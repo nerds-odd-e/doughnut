@@ -25,7 +25,6 @@ public class NoteService {
   private final TestabilitySettings testabilitySettings;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
   private final WikiTitleCacheService wikiTitleCacheService;
-  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -33,15 +32,13 @@ public class NoteService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiTitleCacheService wikiTitleCacheService,
-      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver) {
+      WikiTitleCacheService wikiTitleCacheService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
     this.wikiTitleCacheService = wikiTitleCacheService;
-    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -129,35 +126,6 @@ public class NoteService {
     entityPersister.save(relation);
     wikiTitleCacheService.refreshForNote(relation, creator);
     return relation;
-  }
-
-  /**
-   * Rebuilds title and relationship markdown from {@code relationType} (from the API on update, or
-   * the type chosen at creation).
-   */
-  public void refreshRelationshipNoteTitle(Note relation, RelationType relationType, User viewer) {
-    if (relationType == null) {
-      return;
-    }
-    Note source = relation.getParent();
-    Optional<Note> targetOpt =
-        relationshipNoteEndpointResolver
-            .resolveSemanticTarget(relation, viewer)
-            .or(() -> wikiTitleCacheService.primaryWikiLinkedTargetForGraph(relation, viewer));
-    if (targetOpt.isEmpty()) {
-      return;
-    }
-    Note target = targetOpt.get();
-    relation.setTitle(
-        RelationshipNoteTitleFormatter.format(
-            source.getTitle(), relationType.label, target.getTitle()));
-    String preserved =
-        RelationshipNoteMarkdownFormatter.extractUserSuffixFromRelationshipDetails(
-            relation.getDetails());
-    relation.setDetails(
-        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, relationType, source, target, preserved));
-    relation.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
   }
 
   public static Note buildARelation(

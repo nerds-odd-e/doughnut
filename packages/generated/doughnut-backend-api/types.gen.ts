@@ -212,10 +212,6 @@ export type GlobalAiModelSettings = {
     othersModel?: string;
 };
 
-export type RelationshipCreation = {
-    relationType: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
-};
-
 /**
  * One folder on the path from notebook root to the note's containing folder (outermost first).
  */
@@ -256,6 +252,10 @@ export type NoteTopology = {
 export type WikiTitle = {
     linkText: string;
     noteId: number;
+};
+
+export type RelationshipCreation = {
+    relationType: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
 };
 
 export type QuestionContestResult = {
@@ -1500,24 +1500,6 @@ export type SetCurrentModelVersionsResponses = {
 };
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
-
-export type UpdateRelationshipData = {
-    body: RelationshipCreation;
-    path: {
-        relation: number;
-    };
-    query?: never;
-    url: '/api/relations/{relation}';
-};
-
-export type UpdateRelationshipResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type UpdateRelationshipResponse = UpdateRelationshipResponses[keyof UpdateRelationshipResponses];
 
 export type MoveNoteToFolderData = {
     body?: never;

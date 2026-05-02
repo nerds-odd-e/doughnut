@@ -132,7 +132,6 @@ const methodToController: Record<string, any> = {
   getRecallPrompts: MemoryTrackerController,
   deleteUnansweredRecallPrompts: MemoryTrackerController,
   createNoteViaMcp: McpNoteCreationController,
-  updateRelationship: RelationController,
   moveNoteToFolder: RelationController,
   addRelationshipFinalize: RelationController,
   duplicate: FineTuningDataController,

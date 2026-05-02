@@ -44,15 +44,11 @@
           @blur="commitRow(idx)"
         >
         <RelationTypeSelectCompact
-          v-if="
-            isRelationPropertyRow(propertyRows[idx]!) &&
-            relationPropertyUsesRelationshipApi
-          "
+          v-if="isRelationPropertyRow(propertyRows[idx]!)"
           field="relationType"
           scope-name="rich-note-relation-property"
           hide-label
           :model-value="relationTypeFromKebab(propertyRows[idx]!.value)"
-          :error-message="relationPropertyRelationTypeError"
           :inverse-icon="true"
           @update:model-value="onRelationTypeSelected(idx, $event)"
         />
@@ -128,6 +124,7 @@
 import { computed, ref, useId, watch } from "vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import {
+  relationKebabFromLabel,
   relationLabelFromKebab,
   relationTypeFromKebab,
   type RelationTypeLabel,
@@ -144,18 +141,10 @@ const props = defineProps<{
   detailsMarkdown: string
   /** When true, properties list is display-only and insert chrome is hidden. */
   readOnly?: boolean
-  /**
-   * When true, the `relation` row uses `RelationTypeSelectCompact` and emits
-   * `relationPropertyRelationTypeSelected` instead of calling the API here.
-   */
-  relationPropertyUsesRelationshipApi?: boolean
-  /** Binding error for relation type when the parent handles `updateRelationship`. */
-  relationPropertyRelationTypeError?: string
 }>()
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
-  relationPropertyRelationTypeSelected: [relationType: RelationTypeLabel]
 }>()
 
 const headingId = useId()
@@ -205,9 +194,20 @@ function onRelationTypeSelected(
   if (!row || !isRelationPropertyRow(row)) return
   const current = relationTypeFromKebab(row.value)
   if (current === newType) return
-  if (props.relationPropertyUsesRelationshipApi) {
-    emits("relationPropertyRelationTypeSelected", newType)
+  const kebab = relationKebabFromLabel(newType)
+  const rows = propertyRows.value.map((r, i) =>
+    i === idx
+      ? { key: r.key.trim(), value: kebab }
+      : { key: r.key.trim(), value: r.value.trim() }
+  )
+  propertyRows.value = rows
+  const result = validatePropertyRowsForRichEdit(propertyRows.value)
+  if (!result.ok) {
+    validationMessage.value = result.message
+    return
   }
+  validationMessage.value = ""
+  emits("properties-changed", [...propertyRows.value])
 }
 
 const headingVisible = computed(

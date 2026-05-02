@@ -510,32 +510,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
-  /api/relations/{relation}:
-    post:
-      tags:
-      - relation-controller
-      operationId: updateRelationship
-      parameters:
-      - name: relation
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RelationshipCreation"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/relations/move-to-folder/{sourceNote}/{targetFolder}:
     post:
       tags:
@@ -3708,28 +3682,6 @@ components:
           type: string
         othersModel:
           type: string
-    RelationshipCreation:
-      type: object
-      properties:
-        relationType:
-          type: string
-          enum:
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
-      required:
-      - relationType
     FolderTrailSegment:
       type: object
       description: One folder on the path from notebook root to the note's containing
@@ -3830,6 +3782,28 @@ components:
       required:
       - linkText
       - noteId
+    RelationshipCreation:
+      type: object
+      properties:
+        relationType:
+          type: string
+          enum:
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+      required:
+      - relationType
     QuestionContestResult:
       type: object
       properties:

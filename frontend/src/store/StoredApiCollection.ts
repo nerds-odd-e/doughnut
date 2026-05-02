@@ -76,11 +76,6 @@ export interface StoredApi {
     data: RelationshipCreation
   ): Promise<void>
 
-  updateRelationship(
-    relationId: Doughnut.ID,
-    data: RelationshipCreation
-  ): Promise<void>
-
   moveAfter(
     noteId: number,
     placement: { folderId: number | null; afterNoteId: number | null },
@@ -362,22 +357,6 @@ export default class StoredApiCollection implements StoredApi {
     if (relationNote) {
       this.noteEditingHistory.createNote(relationNote.id)
     }
-  }
-
-  async updateRelationship(
-    relationId: Doughnut.ID,
-    data: RelationshipCreation
-  ) {
-    const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      RelationController.updateRelationship({
-        path: { relation: relationId },
-        body: data,
-      })
-    )
-    if (error || !noteRealms) {
-      throw new Error(toErrorMessage(error, "Failed to update relationship"))
-    }
-    this.refreshNoteRealms(noteRealms)
   }
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {

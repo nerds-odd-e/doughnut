@@ -602,7 +602,7 @@ describe("NoteEditableDetails", () => {
     })
   })
 
-  describe("relation property API context in rich mode", () => {
+  describe("relation property row in rich mode", () => {
     it("shows RelationTypeSelectCompact when noteDetails include relation frontmatter", async () => {
       const details = `---
 relation: parent-of
@@ -624,9 +624,6 @@ relation: parent-of
 
       await flushPromises()
 
-      const rich = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      expect(rich.props("relationPropertyUsesRelationshipApi")).toBe(true)
-
       const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
       expect(rfp.exists()).toBe(true)
       const relationSelect = rfp.findComponent({
@@ -636,7 +633,7 @@ relation: parent-of
       wrapper.unmount()
     })
 
-    it("sets relationPropertyUsesRelationshipApi false when noteDetails omit relation", async () => {
+    it("omits RelationTypeSelectCompact when noteDetails omit relation property", async () => {
       const details = `---
 topic: training
 ---
@@ -657,8 +654,10 @@ topic: training
 
       await flushPromises()
 
-      const rich = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      expect(rich.props("relationPropertyUsesRelationshipApi")).toBe(false)
+      const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
+      expect(
+        rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
+      ).toBe(false)
       wrapper.unmount()
     })
   })
