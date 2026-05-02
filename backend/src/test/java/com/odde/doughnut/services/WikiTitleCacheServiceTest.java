@@ -157,7 +157,7 @@ class WikiTitleCacheServiceTest {
               .title("Alpha")
               .relateTo(target, RelationType.RELATED_TO)
               .please();
-      Note carrier = source.getRelationships().get(0);
+      Note carrier = source.getChildren().stream().filter(Note::isRelation).toList().get(0);
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -181,7 +181,7 @@ class WikiTitleCacheServiceTest {
               .title("Alpha")
               .relateTo(target, RelationType.RELATED_TO)
               .please();
-      Note carrier = source.getRelationships().get(0);
+      Note carrier = source.getChildren().stream().filter(Note::isRelation).toList().get(0);
       wikiTitleCacheService.refreshForNote(carrier, user);
 
       assertThat(wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(source, user), hasSize(2));
@@ -202,7 +202,7 @@ class WikiTitleCacheServiceTest {
               .title("Alpha")
               .relateTo(target, RelationType.RELATED_TO)
               .please();
-      Note carrier = source.getRelationships().get(0);
+      Note carrier = source.getChildren().stream().filter(Note::isRelation).toList().get(0);
       wikiTitleCacheService.refreshForNote(carrier, user);
       noteWikiTitleCacheRepository.deleteByNote_Id(carrier.getId());
 

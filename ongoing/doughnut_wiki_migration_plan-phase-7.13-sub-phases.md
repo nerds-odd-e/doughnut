@@ -18,12 +18,14 @@ GraphRAG context should describe the focus note through wiki links and folder pl
 - `RelationshipToFocusNote` contains only currently meaningful graph roles.
 - `BareNote.uri` is a wiki-link URI: `[[note title]]` for the focus note itself, and `[[notebook name: note title]]` when the URI appears on a note other than the focus note.
 - `BareNote` no longer exposes `linkFromFocus` or `linkHop2` (serialized `target`, `parent`, `relation_type`, and `subject` are already gone in **5.24e**); relationship meaning lives in `details` / `detailsTruncated` and in the focus note's link lists.
+- **`Note.isRelation()` is gone.** There is no replacement field or method on `Note` that duplicates the old split between “relationship-shaped” notes and everything else. Every previous caller either drops the branching (one behavior for all notes) or deletes the branch entirely. Tests and builders stop filtering with `Note::isRelation`; production code stops gating caches, formatting, GraphRAG, or question generation on it.
 
 **`BareNote` as implemented today** (`backend/.../graphRAG/BareNote.java`): JSON property order is `uri`, `title`, `relationToFocusNote`, `linkFromFocus`, `linkHop2`, `details`, `detailsTruncated`, `createdAt`. Serialized `uri` is still `note.getUri()` (legacy note URI), not wiki-link text yet. `linkFromFocus` and `linkHop2` are still present as booleans on the wire and in `mergeIntoExisting(...)`. `equals` / `hashCode` delegate to `UriAndTitle.fromNote(note)` via `@JsonIgnore` `getUriAndTitle()`. Factories: `fromNote(note, relation)`, `fromNote(note, relation, linkFromFocus, linkHop2)`, `fromNoteWithoutTruncate(note)`. Sub-phases **7.13.8**–**7.13.9** carry the simplification and wiki-uri behavior above from target into code.
 
 ## Design Decisions
 
 - **Children are gone, not replaced:** Child expansion was structural parent-note behavior. Removing it is the product behavior; do not rebuild it from folders or wiki links.
+- **`Note.isRelation()` is gone, not replaced:** Relationship-shaped markdown was a legacy axis for branching. Removing it means no substitute boolean (e.g. “wiki relation note”) on `Note`; narrow the behavior or delete the specialized path rather than renaming the predicate.
 - **Folder path is focus-note context only:** Folder crumbs help the AI situate the focus note, but folder ancestors are not related notes.
 - **Siblings stay folder-based:** Same-folder sibling notes remain useful structural context and are already aligned with Phase 6 folder-first behavior.
 - **Links own semantic relationships:** Outgoing links and inbound references should come from the Phase 5 wiki-title cache, not legacy relation rows or parent/target fields.
@@ -202,9 +204,9 @@ It no longer exposes `linkFromFocus` or `linkHop2` (see **5.24e** for `target`, 
 
 **Trigger:** Search still finds removed graph concepts or stale API/client output.
 
-**Post-condition:** GraphRAG has no parent/child graph relationship handlers, no removed `BareNote` fields, no obsolete wiki-hop flags, and no stale enum assertions. The Phase 7.13 plan and parent Phase 7 plan reflect implementation status.
+**Post-condition:** GraphRAG has no parent/child graph relationship handlers, no removed `BareNote` fields, no obsolete wiki-hop flags, and no stale enum assertions. **`Note.isRelation()` does not exist** and no code references `Note::isRelation`; the Phase 7.13 plan and parent Phase 7 plan reflect implementation status.
 
-**Work:** Search for `ChildRelationshipHandler`, `ParentRelationshipHandler`, `ContextAncestorRelationshipHandler`, `ParentSibling`, `TargetParent`, `SiblingOfReferencingNote`, `RelationshipOfTargetSibling`, `linkFromFocus`, `linkHop2`, `subject`, `relation_type`, `target`, and graph-local `parent` uses. Delete dead code and update this plan with discoveries that affect later Phase 7 work.
+**Work:** Search for `ChildRelationshipHandler`, `ParentRelationshipHandler`, `ContextAncestorRelationshipHandler`, `ParentSibling`, `TargetParent`, `SiblingOfReferencingNote`, `RelationshipOfTargetSibling`, `linkFromFocus`, `linkHop2`, `subject`, `relation_type`, `target`, graph-local `parent` uses, and **`isRelation` / `Note::isRelation`**. Remove the method from `Note` once call sites are gone; delete dead code and update this plan with discoveries that affect later Phase 7 work.
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.services.GraphRAGServiceTest`; run generated-client/type checks only if API files changed.
 

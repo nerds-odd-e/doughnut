@@ -182,7 +182,8 @@ class NoteQuestionGenerationServiceTests {
     private Note createRelationNote(RelationType relationType) {
       Note targetNote = makeMe.aNote().please();
       Note sourceNote = makeMe.aNote().relateTo(targetNote, relationType).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
+      Note relationNote =
+          sourceNote.getChildren().stream().filter(Note::isRelation).toList().get(0);
       makeMe.aNote().under(relationNote).please();
       return relationNote;
     }
