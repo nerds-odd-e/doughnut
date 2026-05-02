@@ -119,12 +119,8 @@ export const assumeNotePage = (
     },
 
     navigateToReference: (referenceTopic: string) => {
-      cy.get('main').within(() => {
-        cy.contains('h3', 'Referenced by')
-          .parent()
-          .within(() => {
-            cy.findByText(referenceTopic, { selector: '.title-text' }).click()
-          })
+      cy.get('#main-note-content').within(() => {
+        cy.findByText(referenceTopic, { selector: '.title-text' }).click()
       })
       return assumeNotePage()
     },

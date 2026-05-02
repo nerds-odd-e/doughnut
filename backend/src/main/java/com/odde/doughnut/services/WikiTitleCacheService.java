@@ -119,13 +119,21 @@ public class WikiTitleCacheService {
   }
 
   private static boolean inboundReferrerVisible(Note referrer, Note focalNote, User viewer) {
-    if (referrer.getParent().getNotebook() == focalNote.getNotebook()) {
-      return true;
-    }
-    if (viewer == null) {
+    Note parent = referrer.getParent();
+    if (parent == null) {
       return false;
     }
-    return viewer.canReferTo(referrer.getParent().getNotebook());
+    Notebook referrerNotebook = parent.getNotebook();
+    Notebook focalNotebook = focalNote.getNotebook();
+    if (referrerNotebook != null
+        && focalNotebook != null
+        && referrerNotebook.getId().equals(focalNotebook.getId())) {
+      return true;
+    }
+    if (viewer == null || referrerNotebook == null) {
+      return false;
+    }
+    return viewer.canReferTo(referrerNotebook);
   }
 
   /**

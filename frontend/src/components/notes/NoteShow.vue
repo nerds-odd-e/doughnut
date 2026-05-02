@@ -17,10 +17,10 @@
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
-              class="note-content-wrapper daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col lg:daisy-flex-row daisy-gap-4"
+              class="note-content-wrapper daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col daisy-gap-4"
               :class="{ minimized: isMinimized }"
             >
-              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-full lg:daisy-w-9/12">
+              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-full">
                 <NoteTextContent
                   v-bind="{
                     note: noteRealm.note,
@@ -49,38 +49,13 @@
                     </span>
                   </p>
                 </NoteRecentUpdateIndicator>
-                <ChildrenNotes
-                  v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
-                  :notes="noteRealm.relationshipsDeprecating ?? []"
-                />
-              </div>
-              <div
-	        v-if="noteRealm.inboundReferences && noteRealm.inboundReferences?.length > 0"
-                class="daisy-w-full lg:daisy-w-3/12 daisy-border-l daisy-border-base-300 daisy-pl-4 daisy-bg-amber-50/50"
-	      >
-                <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">Referenced by</h3>
-                <ul class="daisy-menu daisy-rounded-lg daisy-shadow-sm">
-                  <li v-for="relation in noteRealm.inboundReferences"
-                      :key="relation.id"
-                      class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy-transition-colors daisy-py-2"
-                  >
-                    <div class="daisy-flex daisy-items-center daisy-gap-2">
-                      <span class="daisy-text-sm daisy-text-base-content/70">
-                        {{ reverseLabel(relationTypeLabelFromNoteDetails(relation.details)) }}
-                      </span>
-                      <RelationNob
-                        :relation-type-label="
-                          relationTypeLabelFromNoteDetails(relation.details)
-                        "
-                        :inverse-icon="true"
-                      />
-                      <NoteTitleWithLink
-                        :key="relation.id"
-                        :note-topology="relation.noteTopology"
-                      />
-                    </div>
-                  </li>
-                </ul>
+                <template v-if="(noteRealm.references?.length ?? 0) > 0">
+                  <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">References</h3>
+                  <NoteReferences
+                    v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
+                    :notes="noteRealm.references ?? []"
+                  />
+                </template>
               </div>
             </div>
           </template>
@@ -112,18 +87,11 @@ import type {
   User,
 } from "@generated/doughnut-backend-api"
 import NoteTextContent from "./core/NoteTextContent.vue"
-import ChildrenNotes from "./ChildrenNotes.vue"
+import NoteReferences from "./NoteReferences.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
-import RelationNob from "../links/RelationNob.vue"
-import NoteTitleWithLink from "./NoteTitleWithLink.vue"
-import {
-  relationTypeLabelFromNoteDetails,
-  reverseLabel,
-} from "../../models/relationTypeOptions"
-
 const props = defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },

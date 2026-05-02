@@ -3830,6 +3830,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
         wikiTitles:
           type: array
           items:

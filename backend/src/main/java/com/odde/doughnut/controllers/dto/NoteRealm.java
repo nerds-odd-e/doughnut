@@ -20,6 +20,7 @@ import org.springframework.lang.NonNull;
   "ancestorFolders",
   "relationshipsDeprecating",
   "inboundReferences",
+  "references",
   "wikiTitles"
 })
 public class NoteRealm {
@@ -30,6 +31,13 @@ public class NoteRealm {
   private List<Note> relationshipsDeprecating;
 
   @Getter @Setter private List<Note> inboundReferences;
+
+  /**
+   * Referring notes merged from {@link #getInboundReferences()} and {@link
+   * #getRelationshipsDeprecating()}: same authorization as those slices, deduplicated by referring
+   * note id, sorted by note id ascending.
+   */
+  @Getter @Setter private List<Note> references;
 
   @NotNull @Getter private Note note;
 

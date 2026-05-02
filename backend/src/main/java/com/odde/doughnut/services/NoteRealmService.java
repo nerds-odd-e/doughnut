@@ -7,6 +7,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,8 @@ public class NoteRealmService {
     realm.setInboundReferences(wikiTitleCacheService.inboundReferrerNotesForViewer(note, viewer));
     realm.setRelationshipsDeprecating(
         wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(note, viewer));
+    realm.setReferences(
+        mergeReferenceNotes(realm.getInboundReferences(), realm.getRelationshipsDeprecating()));
     realm.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
     realm.setAncestorFolders(folderTrailFromRootToContainingFolder(note));
     return realm;
@@ -41,5 +45,24 @@ public class NoteRealmService {
     }
     Collections.reverse(leafToRoot);
     return leafToRoot.stream().map(FolderTrailSegment::from).toList();
+  }
+
+  /**
+   * Dedupes by referring note id (inbound list first, then relation-style), stable order by id
+   * ascending.
+   */
+  static List<Note> mergeReferenceNotes(List<Note> inbound, List<Note> relationStyle) {
+    LinkedHashMap<Integer, Note> byId = new LinkedHashMap<>();
+    if (inbound != null) {
+      for (Note n : inbound) {
+        byId.putIfAbsent(n.getId(), n);
+      }
+    }
+    if (relationStyle != null) {
+      for (Note n : relationStyle) {
+        byId.putIfAbsent(n.getId(), n);
+      }
+    }
+    return byId.values().stream().sorted(Comparator.comparing(Note::getId)).toList();
   }
 }

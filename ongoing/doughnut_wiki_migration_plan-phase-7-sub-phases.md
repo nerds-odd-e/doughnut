@@ -159,7 +159,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Post-condition:** The field is removed from the Java `NoteTopology` DTO, serializers, and OpenAPI; generated types and `makeMe` / fixture builders no longer set it; no production code walks nested topology for the behaviors above.
 
-**Work:** Remove the field from `NoteTopology` and delete call-site fallbacks that only existed for the parent/subject chain (for example legacy breadcrumb ancestry when folder trail is empty). Update `StoredApiCollection`, recall UI, CLI recall context, and any `noteTopologyAncestors`-style helpers to use the replacement shape. Run `pnpm generateTypeScript` after OpenAPI changes.
+**Work:** Remove the field from `NoteTopology` and delete call-site fallbacks that only existed for the parent/subject chain (for example legacy breadcrumb ancestry in `Breadcrumb.vue` when the folder trail is empty). Update `StoredApiCollection`, recall UI (`NoteRefinement.vue` and related), CLI recall context, and any other topology walks to use the replacement shape. Run `pnpm generateTypeScript` after OpenAPI changes.
 
 **Verify:** Focused tests for breadcrumb, recall/refinement, and any touched store paths; `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`; smallest E2E spec if only integration surfaces change.
 
@@ -299,7 +299,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Post-condition:** No remaining production reference to structural note parents; plan and north-star docs reflect what was learned.
 
-**Work:** Search for `parentId`, `parent_id`, `Parent Title`, `getParent`, `children`, and parent relationship handlers. Remove dead code or explicitly document any non-structural use that belongs outside Phase 7.
+**Work:** Search for `parentId`, `parent_id`, `parentOrSubjectNoteTopology`, `Parent Title`, `getParent`, `children`, and parent relationship handlers. Remove dead code or explicitly document any non-structural use that belongs outside Phase 7.
 
 **Verify:** Targeted tests touched in this sweep, plus generated API typecheck/tests if API files changed.
 

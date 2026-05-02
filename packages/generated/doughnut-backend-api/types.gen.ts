@@ -243,6 +243,7 @@ export type NoteRealm = {
     ancestorFolders?: Array<FolderTrailSegment>;
     relationshipsDeprecating?: Array<Note>;
     inboundReferences?: Array<Note>;
+    references?: Array<Note>;
     wikiTitles?: Array<WikiTitle>;
 };
 
@@ -970,6 +971,7 @@ export type NoteRealmWritable = {
     ancestorFolders?: Array<FolderTrailSegment>;
     relationshipsDeprecating?: Array<NoteWritable>;
     inboundReferences?: Array<NoteWritable>;
+    references?: Array<NoteWritable>;
     wikiTitles?: Array<WikiTitle>;
 };
 
