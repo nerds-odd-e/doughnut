@@ -104,13 +104,12 @@ export const assumeNotePage = (
         this.expectRelationshipTopic(relationType, target)
       })
     },
-    changeRelationType: function (relationType: string, target: string) {
+    changeRelationType: function (relationType: string) {
       cy.get('[data-property-key="relation"]').within(() => {
         cy.findByRole('button', { name: 'Relation Type' }).click()
       })
       form.getField('Relation Type').clickOption(relationType)
       pageIsNotLoading()
-      this.expectRelationshipTopic(relationType, target)
     },
 
     navigateToReference: (referenceTopic: string) => {

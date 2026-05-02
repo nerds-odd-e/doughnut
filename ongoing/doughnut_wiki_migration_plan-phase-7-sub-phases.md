@@ -33,7 +33,7 @@ By the end of Phase 7:
 - **Folder placement is the source:** When a note needs placement, use `folderId`; notebook root is represented by no folder.
 - **Folders and notes are separate concepts:** From sub-phase 7.3 onward, testability and production flows should create folders explicitly before placing notes in them. A note creation request may reference an existing folder, but must not create folders as a side effect.
 - **Keep behavior green:** Most sub-phases are structure phases guarded by existing E2E or focused controller/frontend tests. If a cleanup makes the relevant test fail, revert that cleanup and leave it to a later sub-phase with a smaller production change.
-- **Commit-sized rule:** Each sub-phase is planned as one closed commit that can be completed, verified, and committed in about five minutes. If implementation exceeds that, stop and split the sub-phase.
+- **Small-batch rule:** Each sub-phase is scoped so it can be completed and verified in about five minutes. If implementation exceeds that, stop and split the sub-phase.
 
 ## Sub-Phase 7.1 - Easy Folder-Only E2E Fixture Cleanup
 
@@ -49,8 +49,6 @@ By the end of Phase 7:
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/note_tree_view.feature`.
 
-**Commit boundary:** One passing E2E fixture cleanup commit, or no code commit if the baseline was red.
-
 ## Sub-Phase 7.2 - Remove Obvious Parent Titles from Folder-Backed Fixtures
 
 **Type:** Structure.
@@ -64,8 +62,6 @@ By the end of Phase 7:
 **Work:** Remove `Parent Title` from one capability file at a time where `Folder` is already present, starting with the smallest specs such as note creation or Wikidata setup. If a spec fails after removing parent data, restore that fixture and record it as needing a later production change.
 
 **Verify:** Run the targeted `pnpm cypress run --spec ...` for only the touched feature file.
-
-**Commit boundary:** One feature-file cleanup commit per passing targeted spec.
 
 ## Sub-Phase 7.3 - Testability Separates Folder and Note Setup
 
@@ -81,8 +77,6 @@ By the end of Phase 7:
 
 **Verify:** Focused backend test proving folder setup and note setup are separate, plus the smallest E2E spec from 7.1 if the controller test is not enough to prove UI reachability.
 
-**Commit boundary:** One testability separation commit.
-
 ## Sub-Phase 7.4 - Convert Remaining Simple E2E Setup to Folder Paths
 
 **Type:** Structure.
@@ -97,8 +91,6 @@ By the end of Phase 7:
 
 **Verify:** Run the targeted `pnpm cypress run --spec ...` for each touched feature file.
 
-**Commit boundary:** One capability-area fixture cleanup commit.
-
 ## Sub-Phase 7.5 - Remove Frontend Reads of `note.parentId`
 
 **Type:** Structure.
@@ -109,11 +101,9 @@ By the end of Phase 7:
 
 **Post-condition:** Frontend code uses `note.noteTopology.folderId`, notebook root state, or existing route/context instead of `note.parentId`; user behavior is unchanged.
 
-**Work:** Replace the smallest frontend parent-id branch first, such as refinement/relationship/root checks or sidebar drag guards. Keep each commit to one component or one cohesive flow.
+**Work:** Replace the smallest frontend parent-id branch first, such as refinement/relationship/root checks or sidebar drag guards. Keep each change to one component or one cohesive flow.
 
 **Verify:** Focused frontend test for the touched component, or the targeted E2E spec that covers the flow when no focused test exists.
-
-**Commit boundary:** One frontend parent-id removal commit.
 
 ## Sub-Phase 7.6 - Remove Unused Parent-Based Frontend API Calls
 
@@ -129,8 +119,6 @@ By the end of Phase 7:
 
 **Verify:** Focused frontend tests for note creation plus the smallest relevant E2E note creation spec.
 
-**Commit boundary:** One frontend API cleanup commit.
-
 ## Sub-Phase 7.7 - Remove `parentId` from Public Note Wire Shapes
 
 **Type:** Structure.
@@ -144,8 +132,6 @@ By the end of Phase 7:
 **Work:** Remove the backend JSON/OpenAPI exposure of `parentId`, regenerate the TypeScript API client, and fix compile errors caused only by the removed field.
 
 **Verify:** Focused backend API/controller test, `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`, and focused frontend type/test command for touched frontend files.
-
-**Commit boundary:** One API shape commit including generated client changes.
 
 ## Sub-Phase 7.8 - Replace Parent-Based Note Creation Endpoint
 
@@ -161,8 +147,6 @@ By the end of Phase 7:
 
 **Verify:** `NoteCreationControllerTests` focused cases and the targeted note creation E2E spec.
 
-**Commit boundary:** One production creation cleanup commit.
-
 ## Sub-Phase 7.9 - Convert Note Motion Away from Parent Edges
 
 **Type:** Structure.
@@ -176,8 +160,6 @@ By the end of Phase 7:
 **Work:** Convert one motion behavior at a time: top-level move, same-folder ordering, then cross-folder placement if currently exposed. Remove `NoteChildContainerFolderService` only after no production path needs parent-to-folder alignment.
 
 **Verify:** Focused `NoteMotionServiceTest` / `NoteControllerMotionTests` plus the targeted sidebar/motion E2E spec if the behavior is exposed there.
-
-**Commit boundary:** One motion behavior commit.
 
 ## Sub-Phase 7.10 - Replace Parent-Based Restore/Delete Traversal
 
@@ -193,8 +175,6 @@ By the end of Phase 7:
 
 **Verify:** Focused backend controller/service tests for delete/restore.
 
-**Commit boundary:** One restore/delete cleanup commit.
-
 ## Sub-Phase 7.11 - Remove Parent-Based Graph Relationships
 
 **Type:** Structure.
@@ -208,8 +188,6 @@ By the end of Phase 7:
 **Work:** Remove or replace one graph relationship handler at a time, keeping prompt/context assertions at the public GraphRAG service boundary.
 
 **Verify:** Focused `GraphRAGServiceTest`.
-
-**Commit boundary:** One graph relationship cleanup commit.
 
 ## Sub-Phase 7.12 - Remove Parent From Test Builders and Testability Fixtures
 
@@ -225,8 +203,6 @@ By the end of Phase 7:
 
 **Verify:** Focused backend/frontend tests and targeted E2E specs for the touched area.
 
-**Commit boundary:** One test-support cleanup commit.
-
 ## Sub-Phase 7.13 - Remove Parent From Import/Export Transitional Paths
 
 **Type:** Structure.
@@ -240,8 +216,6 @@ By the end of Phase 7:
 **Work:** Convert one import/export capability at a time, starting with the smallest notebook import or export feature.
 
 **Verify:** Targeted import/export E2E spec and focused backend tests.
-
-**Commit boundary:** One import/export cleanup commit.
 
 ## Sub-Phase 7.14 - Drop `Note.parent` and `Note.children` From Domain Code
 
@@ -257,8 +231,6 @@ By the end of Phase 7:
 
 **Verify:** Focused backend test package that compiles the touched services/controllers.
 
-**Commit boundary:** One domain model cleanup commit.
-
 ## Sub-Phase 7.15 - Drop `note.parent_id` and Parent Indexes
 
 **Type:** Structure.
@@ -272,8 +244,6 @@ By the end of Phase 7:
 **Work:** Add a Flyway migration dropping `note.parent_id` and obsolete parent indexes/constraints. Do not modify committed migrations.
 
 **Verify:** Focused backend migration/controller test or `CURSOR_DEV=true nix develop -c pnpm backend:test_only` if no narrower migration check exists.
-
-**Commit boundary:** One schema removal commit.
 
 ## Sub-Phase 7.16 - Final Phase 7 Sweep
 
@@ -289,10 +259,8 @@ By the end of Phase 7:
 
 **Verify:** Targeted tests touched in this sweep, plus generated API typecheck/tests if API files changed.
 
-**Commit boundary:** One final cleanup/documentation commit.
-
 ## Notes for Future Splitting
 
 - If any sub-phase touches more than one observable capability, split it before coding.
 - If a fixture cleanup fails because production still requires parent data, restore the fixture and add a narrower production sub-phase immediately before retrying that cleanup.
-- Do not remove ignored or hard-to-delete parent setup in the first cleanup. Keep the first commit intentionally small and reversible.
+- Do not remove ignored or hard-to-delete parent setup in the first cleanup. Keep the first change intentionally small and reversible.

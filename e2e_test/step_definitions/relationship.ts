@@ -215,7 +215,7 @@ When(
     start
       .jumpToNotePage(noteTopology)
       .navigateToRelationshipChild(targetTitle)
-      .changeRelationType(relationType, targetTitle)
+      .changeRelationType(relationType)
   }
 )
 
@@ -225,7 +225,7 @@ When(
     start
       .jumpToNotePage(noteTopology)
       .navigateToReference(referenceTitle)
-      .changeRelationType(relationType, noteTopology)
+      .changeRelationType(relationType)
   }
 )
 
