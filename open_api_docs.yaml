@@ -4911,9 +4911,7 @@ components:
           type: string
           format: date-time
         contextualPath:
-          type: array
-          items:
-            type: string
+          type: string
         children:
           type: array
           items:
@@ -4923,6 +4921,10 @@ components:
           items:
             type: string
         youngerSiblings:
+          type: array
+          items:
+            type: string
+        links:
           type: array
           items:
             type: string

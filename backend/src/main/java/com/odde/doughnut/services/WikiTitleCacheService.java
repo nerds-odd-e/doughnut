@@ -62,6 +62,23 @@ public class WikiTitleCacheService {
     return List.copyOf(out);
   }
 
+  /** URIs for {@link #wikiTitlesForViewer} targets (same authorization and order). */
+  public List<String> outgoingWikiLinkTargetUrisForViewer(Note focusNote, User viewer) {
+    List<String> uris = new ArrayList<>();
+    for (WikiTitle wt : wikiTitlesForViewer(focusNote, viewer)) {
+      Note n = entityManager.find(Note.class, wt.getNoteId());
+      if (n != null) {
+        uris.add(n.getUri());
+      }
+    }
+    return List.copyOf(uris);
+  }
+
+  /** URIs for {@link #referencesNotesForViewer} (same list and order). */
+  public List<String> inboundReferenceUrisForViewer(Note focalNote, User viewer) {
+    return referencesNotesForViewer(focalNote, viewer).stream().map(Note::getUri).toList();
+  }
+
   /**
    * Authorized wiki-link targets from the focus note’s cache rows, then from each relation child
    * under the focus (repository-backed), deduped by target id in first-seen order. Used for graph

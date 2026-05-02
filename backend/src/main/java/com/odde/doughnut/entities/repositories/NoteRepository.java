@@ -157,7 +157,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
-              + "WHERE n.id IN :ids")
+              + "LEFT JOIN FETCH n.parent WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
 
   @Query(

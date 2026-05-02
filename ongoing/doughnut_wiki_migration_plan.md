@@ -2,7 +2,7 @@
 
 - **North star:** `ongoing/doughnut_wiki_architecture_north_star.md`
 - **Admin wiki reference batches:** `ongoing/admin-wiki-reference-migration-redo-plan.md`, `ongoing/admin-wiki-reference-migration-status.md`
-- **Phase 5 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`
+- **Phase 5.24 (drop `note.target_note_id` — optional detail):** `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`
 - **Phase 6 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md` (complete)
 - **Phase 7 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`
 
@@ -18,10 +18,11 @@ Phased migration toward the wiki-style, Obsidian-compatible architecture in the 
 | 2 — Slug paths (`folder.slug`, `note.slug`, routing) | Done (retired at boundary before 7) |
 | 3 — Index note (no head note) | Done |
 | 4 — Properties / YAML frontmatter in `details` | Done |
-| 5 — Relationship notes → normal notes + wiki title cache | Mostly done — open items in phase-5 sub-phase doc |
+| 5 — Relationship notes → normal notes + wiki title cache | Done (title-rename propagation deferred to **Phase 14**; granular **5.24** notes in `doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`) |
 | 6 — Folder-first listing; remove `NoteTopology.shortDetails` | Done |
 | Boundary — slug retirement | Next (before Phase 7) |
 | 7+ | Not started |
+| 14 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
 ---
 
@@ -37,18 +38,19 @@ Phased migration toward the wiki-style, Obsidian-compatible architecture in the 
 
 **Properties** — Leading YAML in Markdown `details`; rich editor mirrors via frontmatter UI. Exporter coherence with user YAML → **Phase 11** (`ObsidianFormatService`).
 
-**Phase 5 (in flight / verify in sub-phase doc)** — Relationship notes are normal notes with frontmatter (`type: relationship`, `relation`, `source`/`target` as `[[…]]`). **`note_wiki_title_cache`** backs references/graph reads; titles are required (non-null/non-empty). Legacy parent may appear as migration-only `parent: "[[…]]"` in frontmatter for non-relationship notes.
+**Phase 5 (shipped)** — Relationship notes are normal notes with frontmatter (`type: relationship`, `relation`, `source`/`target` as `[[…]]`). **`note_wiki_title_cache`** backs references and graph reads; **`NoteRealm.references`** is the unified note-show surface; titles are required (non-null/non-empty). Legacy parent may appear as migration-only `parent: "[[…]]"` in frontmatter for non-relationship notes. **`note.target_note_id`** is removed (**5.24**). **Reverse-updating referrers when a title changes** is **Phase 14** (formerly **5.25** before closeout).
 
 ---
 
 ## Completed work (summary only)
 
-Phases **1–4** and **6** are shipped; **5** is largely shipped — use the **phase-5** / **phase-6** markdown files for checklists and tests.
+Phases **1–6** are shipped. **Phase 5 closeout:** relationship notes normalized; graph and note show use cached wiki links; legacy **`Note.target_note_id`** dropped per **5.24** migrations and `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md` where slice-level detail matters.
 
 - **1:** `Folder`, `note.folder_id`, backfill from parent-note tree; `Note.parent` still drives legacy navigation/ordering until Phase 7.
 - **2:** Full-path slugs, resolution by notebook + slug path and ambiguous basename; moves recompute `note.slug`.
 - **3:** Migrations dropped `notebook_head_note`; catalog → notebook page; optional index at slug `index`.
 - **4:** Frontmatter round-trip (markdown + rich); unsupported YAML shapes block rich body until fixed in markdown.
+- **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph (`linkFromFocus` / `linkHop2`); `relation_type` and `note.target_note_id` removed. Title-rename propagation → **Phase 14**.
 - **6:** Primary containment UX is folder-scoped; topology has no `shortDetails`; graph siblings from folder (or notebook root without folder).
 
 ---
@@ -278,6 +280,38 @@ LinkIndex — derived from content
 
 ---
 
+# Phase 14 — Title rename propagates wiki references
+
+## Goal
+
+When a note’s **title** changes, notes that wiki-linked the **old** title are **reverse-updated** to the **new** title in their Markdown (`details` / frontmatter `[[…]]` tokens where applicable), and **`note_wiki_title_cache`** rows are refreshed so **`NoteRealm.references`**, graph, and search stay consistent.
+
+## Rationale
+
+This slice was **Phase 5.25** before Phase **5** closeout and is scheduled **late** so Phase 5 could ship relationship persistence, unified note-show references, and cleanup first. Implementation may align with **Phase 9** (link index) when that work clarifies a single derived-index story; until then, behavior can build on the existing wiki-title cache from Phase **5**.
+
+## Pre-condition
+
+Referring notes are discoverable via the wiki-title cache; title updates are an established API path.
+
+## Trigger
+
+A user or automation changes a note title.
+
+## Post-condition
+
+Sources that pointed at the old title show updated `[[…]]` text and cache rows for the new title; tests cover title update (controller/service) with at least one referrer.
+
+## Verify
+
+Focused backend tests; optional targeted E2E if end-to-end note show must assert reference text after rename.
+
+## Expected result
+
+Renaming a note does not strand stale wiki tokens or cache rows in common cases; referrers and note show stay coherent.
+
+---
+
 # Phase order summary
 
 ```text
@@ -295,6 +329,7 @@ LinkIndex — derived from content
 11. Obsidian export
 12. Obsidian import / round trip
 13. Legacy cleanup
+14. Title rename propagates wiki references (deferred from Phase 5.25)
 ```
 
 ## Dependency chain
@@ -310,6 +345,7 @@ folders + (historical slugs until boundary)
               → wiki links + indexes
                 → folder config
                   → export → import → legacy cleanup
+                    → title rename propagates wiki references
 ```
 
 ## Principle

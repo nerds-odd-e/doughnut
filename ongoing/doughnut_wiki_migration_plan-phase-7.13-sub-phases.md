@@ -32,6 +32,10 @@ GraphRAG context should describe the focus note through wiki links and folder pl
 - **DTO shape is intentionally smaller:** Removed graph fields should not get compatibility shims unless a currently supported external consumer fails and the maintainer explicitly asks for a transitional contract.
 - **Human-owned git and deploy:** Automated assistants must not commit, push, open pull requests, or trigger deploy unless explicitly asked.
 
+## Verification gate
+
+Every sub-phase closes with **`GraphRAGServiceTest` passing** (and any other suites touched by that slice). Do not merge intentionally failing tests or leave red CI for “later” phases; bundle adjacent implementation when needed so the contract tests stay green.
+
 ## Sub-Sub-Phase 7.13.1 - Lock the wiki-link GraphRAG contract
 
 **Type:** Behavior.
@@ -40,15 +44,15 @@ GraphRAG context should describe the focus note through wiki links and folder pl
 
 **Trigger:** A GraphRAG request is made for a note with outgoing wiki links, inbound wiki references, same-folder siblings, and legacy parent/child data still present in test setup.
 
-**Post-condition:** `GraphRAGServiceTest` describes the intended Phase 7.13 graph contract before production cleanup:
+**Post-condition:** `GraphRAGServiceTest` cases lock the wiki-link GraphRAG JSON contract (and pass):
 
 - focus note exposes `links` for outgoing wiki links;
 - focus note exposes `inboundReferences` for wiki backlinks;
 - focus note exposes a folder crumb path string;
-- related notes include same-folder siblings;
-- related notes do not rely on children, parent, or folder-ancestor related-note expansion.
+- related notes include same-folder siblings (same tree parent within the folder scope);
+- related notes do not treat legacy note-parent expansion as graph structure.
 
-**Work:** Add or rewrite focused `GraphRAGServiceTest` cases around the public `GraphRAGResult` shape. Keep the intentionally failing surface small; do not delete production handlers in this slice unless a test is only asserting the removed behavior.
+**Work:** Add or rewrite focused `GraphRAGServiceTest` cases around the public `GraphRAGResult` shape.
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.services.GraphRAGServiceTest`.
 
@@ -56,7 +60,7 @@ GraphRAG context should describe the focus note through wiki links and folder pl
 
 **Type:** Behavior.
 
-**Pre-condition:** 7.13.1 has a focused failing case for focus-note wiki links and inbound references.
+**Pre-condition:** 7.13.1 defines contract coverage for focus-note wiki links and inbound references.
 
 **Trigger:** `GraphRAGResultBuilder` builds a `FocusNote`.
 

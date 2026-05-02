@@ -9,11 +9,13 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -149,41 +151,56 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeParentInFocusNoteAndContextualPath() {
+    void focusNoteContextualPathUsesFolderCrumbNotLegacyAncestors() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      assertThat(result.getFocusNote().getContextualPath(), hasItem(parent.getUri()));
+      assertThat(result.getFocusNote().getContextualPath(), containsString("parent-child-peers"));
     }
 
     @Test
-    void shouldIncludeParentInRelatedNotesWhenBudgetAllows() {
+    void legacyParentNoteIsNotAddedAsRelatedNoteWhenBudgetAllows() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(
-          result.getRelatedNotes().get(0).getRelationToFocusNote(),
-          equalTo(RelationshipToFocusNote.Parent));
+          result.getRelatedNotes().stream()
+              .noneMatch(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Parent),
+          is(true));
     }
 
     @Test
-    void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
+    void budgetZeroStillSerializesFolderCrumbAndSkipsRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(note, 0, note.getCreator());
 
-      assertThat(result.getFocusNote().getContextualPath(), hasItem(parent.getUri()));
+      assertThat(result.getFocusNote().getContextualPath(), containsString("parent-child-peers"));
       assertThat(result.getRelatedNotes(), empty());
     }
 
     @Test
-    void shouldTruncateParentDetailsInRelatedNotes() {
+    void truncatesLongDetailWikiTargetInRelatedNotes() {
       String longDetails = "a".repeat(2000);
-      parent.setDetails(longDetails);
+      Notebook notebook = parent.getNotebook();
+      Folder wikiFolder = makeMe.aFolder().notebook(notebook).name("truncate-wiki-peers").please();
+      Note wikiTarget =
+          makeMe
+              .aNote()
+              .inNotebook(notebook)
+              .creator(note.getCreator())
+              .folder(wikiFolder)
+              .title("Long Wiki Target")
+              .details(longDetails)
+              .please();
+      makeMe.theNote(note).folder(wikiFolder).details("See [[Long Wiki Target]].").please();
+      refreshWikiCache(note);
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      assertThat(result.getRelatedNotes(), hasSize(1));
+      BareNote bn =
+          result.getRelatedNotes().stream()
+              .filter(b -> b.getUri().equals(wikiTarget.getUri()))
+              .findFirst()
+              .orElseThrow();
       assertThat(
-          result.getRelatedNotes().get(0).getDetails(),
-          equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
+          bn.getDetails(), equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
     }
   }
 
@@ -216,22 +233,18 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
       assertThat(result.getFocusNote().getTitle(), equalTo(note.getTitle()));
-      assertThat(result.getRelatedNotes(), hasSize(2));
+      List<BareNote> linksToTarget =
+          result.getRelatedNotes().stream().filter(b -> b.equals(target)).toList();
+      assertThat(linksToTarget, hasSize(1));
       assertRelatedNotesHaveLinkFromFocus(result, target);
     }
 
     @Test
-    void shouldOmitRelationshipTargetFromRelatedNotesWhenBudgetOnlyAllowsParent() {
-      GraphRAGResult result =
-          graphRAGService.retrieve(note, 2, note.getCreator()); // Only enough for parent
+    void omitsWikiTargetWhenBudgetDoesNotFitAnyRelatedBareNote() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 0, note.getCreator());
 
       assertThat(result.getFocusNote().getTitle(), equalTo(note.getTitle()));
-
-      // Only parent should be in related notes
-      assertThat(result.getRelatedNotes(), hasSize(1));
-      assertThat(
-          result.getRelatedNotes().get(0).getRelationToFocusNote(),
-          equalTo(RelationshipToFocusNote.Parent));
+      assertThat(result.getRelatedNotes(), empty());
     }
 
     @Test
@@ -244,8 +257,8 @@ public class GraphRAGServiceTest {
 
       assertThat(result.getFocusNote().getChildren(), contains(target.getUri()));
 
-      // Parent plus target once (relationship carrier excluded from structural child edges)
-      assertThat(result.getRelatedNotes(), hasSize(2));
+      assertThat(
+          result.getRelatedNotes().stream().filter(b -> b.equals(target)).count(), equalTo(1L));
     }
 
     @Nested
@@ -275,32 +288,24 @@ public class GraphRAGServiceTest {
       }
 
       @Test
-      void shouldIncludeTargetContextualPathInRelatedNotes() {
+      void wikiTargetDoesNotExpandLegacyAncestorChainIntoRelatedNotes() {
         GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-        assertRelatedNotesIncludeNotes(result, targetGrandParent, targetParent);
+        assertRelatedNotesHaveLinkFromFocus(result, target);
+        assertThat(
+            getNotesWithRelationship(result, RelationshipToFocusNote.TargetContextAncestor),
+            empty());
       }
 
       @Test
       void shouldNotIncludeTargetContextualPathWhenBudgetIsLimited() {
-        // Set budget to only allow target
         GraphRAGResult result = graphRAGService.retrieve(note, 3, note.getCreator());
 
-        // Verify target is included but not its contextual path
-        assertThat(result.getRelatedNotes(), hasSize(2));
-        assertThat(
-            result.getRelatedNotes().stream()
-                .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Parent)
-                .count(),
-            equalTo(1L));
         assertThat(
             result.getRelatedNotes().stream()
                 .filter(n -> n.equals(target) && n.isLinkFromFocus())
                 .count(),
             equalTo(1L));
-        assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.TargetContextAncestor),
-            empty());
       }
     }
   }
@@ -373,10 +378,8 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldNotIncludeSiblingsOfTargetWhenBudgetIsLimited() {
-      // Set budget to only allow parent and target
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3, focusNote.getCreator());
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 0, focusNote.getCreator());
 
-      // Verify no target siblings are included
       assertRelatedNotesExcludeNotes(result, targetSibling1, targetSibling2);
     }
 
@@ -524,20 +527,18 @@ public class GraphRAGServiceTest {
 
         // Verify in related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();
-        assertThat(relatedNotes, hasSize(3));
-
-        // Should have one child and one younger sibling
-        assertThat(result.getFocusNote().getChildren(), containsInAnyOrder(child1.getUri()));
-        assertThat(result.getFocusNote().getYoungerSiblings(), contains(youngerSibling1.getUri()));
-
         assertThat(
             relatedNotes.stream()
                 .map(BareNote::getRelationToFocusNote)
                 .collect(Collectors.toList()),
-            containsInAnyOrder(
-                RelationshipToFocusNote.Parent,
-                RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.YoungerSibling));
+            hasItems(RelationshipToFocusNote.Child, RelationshipToFocusNote.YoungerSibling));
+        assertThat(
+            relatedNotes.stream()
+                .noneMatch(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Parent),
+            is(true));
+
+        assertThat(result.getFocusNote().getChildren(), hasSize(2));
+        assertThat(result.getFocusNote().getYoungerSiblings(), contains(youngerSibling1.getUri()));
       }
     }
   }
@@ -551,32 +552,27 @@ public class GraphRAGServiceTest {
     @BeforeEach
     void setup() {
       grandParent = makeMe.aNote().title("Grand Parent").details("GP Details").please();
-      parent = makeMe.aNote().under(grandParent).title("Parent").details("Parent Details").please();
-      focusNote = makeMe.aNote().under(parent).title("Focus").please();
+      Notebook nb = grandParent.getNotebook();
+      Folder outer = makeMe.aFolder().notebook(nb).name("CtxOuter").please();
+      Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("CtxInner").please();
+      grandParent = makeMe.theNote(grandParent).folder(inner).please();
+      parent = makeMe.aNote().under(grandParent).folder(inner).title("Parent").please();
+      focusNote = makeMe.aNote().under(parent).folder(inner).title("Focus").please();
     }
 
     @Test
-    void shouldIncludeAncestorsInContextualPathInOrder() {
+    void shouldIncludeFolderNamesInContextualPathFromRootToContainingFolder() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 0, focusNote.getCreator());
 
-      // Should be in contextual path in order from root to parent
-      assertThat(
-          result.getFocusNote().getContextualPath(),
-          contains(grandParent.getUri(), parent.getUri()));
+      assertThat(result.getFocusNote().getContextualPath(), equalTo("CtxOuter / CtxInner"));
     }
 
     @Test
-    void shouldIncludeNonParentAncestorsInRelatedNotes() {
+    void doesNotEmitLegacyNoteAncestorsAsContextAncestorRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
 
-      List<BareNote> contextualNotes =
-          result.getRelatedNotes().stream()
-              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.ContextAncestor)
-              .collect(Collectors.toList());
-
       assertThat(
-          contextualNotes, hasSize(1)); // Only grandparent, parent is already added as Parent
-      assertThat(contextualNotes.get(0), equalTo(grandParent));
+          getNotesWithRelationship(result, RelationshipToFocusNote.ContextAncestor), empty());
     }
   }
 
@@ -857,18 +853,12 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldNotIncludeParentSiblingsWhenBudgetIsLimited() {
-      // Set budget to only allow parent
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 2, focusNote.getCreator());
 
-      // Verify only parent is included
-      assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(
-          result.getRelatedNotes().get(0).getRelationToFocusNote(),
-          equalTo(RelationshipToFocusNote.Parent));
-
-      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ParentSibling), empty());
-      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.OlderSibling), empty());
-      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.YoungerSibling), empty());
+          result.getRelatedNotes().stream()
+              .noneMatch(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Parent),
+          is(true));
     }
 
     @Nested
@@ -894,14 +884,10 @@ public class GraphRAGServiceTest {
 
       @Test
       void shouldNotIncludeParentSiblingChildrenWhenBudgetIsLimited() {
-        // Set budget to only allow parent, parent siblings, and contextual path
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5, focusNote.getCreator());
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 2, focusNote.getCreator());
 
-        assertThat(describeRelatedNotes(result), result.getRelatedNotes(), hasSize(4));
         assertRelatedNotesExcludeNotes(
             result, parentSibling1Child1, parentSibling1Child2, parentSibling2Child1);
-        assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.ParentSiblingChild), empty());
       }
     }
   }
@@ -958,6 +944,104 @@ public class GraphRAGServiceTest {
       List<String> expectedOlder = peersC.subList(0, cIdx).stream().map(Note::getUri).toList();
       GraphRAGResult resultLast = graphRAGService.retrieve(c, 1000, c.getCreator());
       assertThat(resultLast.getFocusNote().getOlderSiblings(), equalTo(expectedOlder));
+    }
+  }
+
+  /**
+   * Wiki-link graph contract on serialized GraphRAG: folder crumb string on the focus note, {@code
+   * links} plus {@code inboundReferences}, folder peers in related notes, without treating the
+   * legacy note parent as graph expansion.
+   */
+  @Nested
+  class WikiLinkGraphContract {
+
+    private List<String> jsonTextArrayElements(JsonNode arrayNode) {
+      List<String> out = new ArrayList<>();
+      if (arrayNode != null && arrayNode.isArray()) {
+        arrayNode.forEach(n -> out.add(n.asText()));
+      }
+      return out;
+    }
+
+    @Test
+    void serializedFocusNote_exposesLinksInboundRefsAndFolderCrumbString() {
+      Note treeParent = makeMe.aNote().title("713 Tree Parent").please();
+      Notebook notebook = treeParent.getNotebook();
+      User viewer = treeParent.getCreator();
+      Folder outer = makeMe.aFolder().notebook(notebook).name("OuterCrumb").please();
+      Folder inner =
+          makeMe.aFolder().notebook(notebook).parentFolder(outer).name("InnerCrumb").please();
+      treeParent = makeMe.theNote(treeParent).folder(inner).please();
+
+      Note outgoing = makeMe.aNote().under(treeParent).folder(inner).title("713 Outgoing").please();
+
+      Note focus =
+          makeMe
+              .aNote()
+              .under(treeParent)
+              .folder(inner)
+              .title("713 Focus")
+              .details("See [[713 Outgoing]].")
+              .please();
+
+      Note referrer =
+          makeMe
+              .aNote()
+              .under(treeParent)
+              .folder(inner)
+              .title("713 Referrer")
+              .details("Ref [[713 Focus]].")
+              .please();
+
+      refreshWikiCache(focus);
+      refreshWikiCache(referrer);
+
+      GraphRAGResult result = graphRAGService.retrieve(focus, 2500, viewer);
+      JsonNode focusJson =
+          new ObjectMapperConfig().objectMapper().valueToTree(result).get("focusNote");
+
+      // Folder-name crumbs from folder ancestry (not legacy note URIs).
+      assertThat(focusJson.get("contextualPath").isTextual(), is(true));
+
+      String crumbs = focusJson.get("contextualPath").asText();
+      assertThat(crumbs, allOf(containsString("OuterCrumb"), containsString("InnerCrumb")));
+
+      assertThat(focusJson.get("links").isMissingNode(), is(false));
+      assertThat(focusJson.get("links").isArray(), is(true));
+      assertThat(focusJson.get("links").size(), greaterThanOrEqualTo(1));
+      assertThat(focusJson.get("links").toString(), containsString(outgoing.getUri()));
+
+      assertThat(focusJson.get("inboundReferences").isArray(), is(true));
+      assertThat(
+          jsonTextArrayElements(focusJson.get("inboundReferences")), hasItem(referrer.getUri()));
+    }
+
+    @Test
+    void relatedNotes_includeFolderPeersAndExcludeLegacyParentExpansion() {
+      Note treeParent = makeMe.aNote().title("713 Peer Tree Parent").please();
+      Folder inner =
+          makeMe.aFolder().notebook(treeParent.getNotebook()).name("713-peer-folder").please();
+      treeParent = makeMe.theNote(treeParent).folder(inner).please();
+
+      makeMe.aNote().under(treeParent).folder(inner).title("713 Peer Out Wiki").please();
+
+      Note focus =
+          makeMe
+              .aNote()
+              .under(treeParent)
+              .folder(inner)
+              .title("713 Peer Focus")
+              .details("[[713 Peer Out Wiki]].")
+              .please();
+      Note younger =
+          makeMe.aNote().under(treeParent).folder(inner).title("713 Peer Younger").please();
+
+      refreshWikiCache(focus);
+
+      GraphRAGResult result = graphRAGService.retrieve(focus, 3500, focus.getCreator());
+
+      assertRelatedNotesIncludeNotes(result, younger);
+      assertRelatedNotesExcludeNotes(result, treeParent);
     }
   }
 
@@ -1042,7 +1126,10 @@ public class GraphRAGServiceTest {
                       assertThat(
                           describeRelatedNotes(result),
                           b.getRelationToFocusNote(),
-                          equalTo(RelationshipToFocusNote.RelationshipOfTargetSibling)));
+                          anyOf(
+                              equalTo(RelationshipToFocusNote.RelationshipOfTargetSibling),
+                              equalTo(RelationshipToFocusNote.YoungerSibling),
+                              equalTo(RelationshipToFocusNote.OlderSibling))));
         }
       }
     }
@@ -1053,45 +1140,63 @@ public class GraphRAGServiceTest {
     @Test
     void shouldTruncateASCIICharactersCorrectly() {
       String longDetails = "a".repeat(2000);
-      Note note = makeMe.aNote().title("Test Note").details(longDetails).please();
-      Notebook notebook = note.getNotebook();
+      Note parentSeed = makeMe.aNote().title("Truncate ASCII Parent").details(longDetails).please();
+      Notebook notebook = parentSeed.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-peers").please();
-      note = makeMe.theNote(note).folder(peerFolder).please();
-      Note child = makeMe.aNote().under(note).folder(peerFolder).please();
+      Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
+      final String parentUri = parent.getUri();
+      Note child =
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .details("See [[Truncate ASCII Parent]].")
+              .please();
+      refreshWikiCache(child);
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
-      assertThat(result.getRelatedNotes(), hasSize(1));
+      BareNote bn =
+          result.getRelatedNotes().stream()
+              .filter(b -> b.getUri().equals(parentUri))
+              .findFirst()
+              .orElseThrow();
       assertThat(
-          result.getRelatedNotes().get(0).getDetails(),
-          equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
+          bn.getDetails(), equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
     }
 
     @Test
     void shouldTruncateCJKCharactersCorrectly() {
-      // Each CJK character takes 3 bytes in UTF-8
-      String cjkText = "你好世界".repeat(500); // 2000 bytes (500 * 4 chars * 3 bytes)
-      Note note = makeMe.aNote().title("Test Note").details(cjkText).please();
-      Notebook notebook = note.getNotebook();
+      String cjkText = "你好世界".repeat(500);
+      Note parentSeed = makeMe.aNote().title("Truncate CJK Parent").details(cjkText).please();
+      Notebook notebook = parentSeed.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-cjk-peers").please();
-      note = makeMe.theNote(note).folder(peerFolder).please();
-      Note child = makeMe.aNote().under(note).folder(peerFolder).please();
+      Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
+      final String parentUri = parent.getUri();
+      Note child =
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .details("See [[Truncate CJK Parent]].")
+              .please();
+      refreshWikiCache(child);
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
-      assertThat(result.getRelatedNotes(), hasSize(1));
+      BareNote bn =
+          result.getRelatedNotes().stream()
+              .filter(b -> b.getUri().equals(parentUri))
+              .findFirst()
+              .orElseThrow();
+      String truncated = bn.getDetails();
 
-      String truncated = result.getRelatedNotes().get(0).getDetails();
-
-      // Verify it ends with "..."
       assertThat(truncated, endsWith("..."));
 
-      // Verify byte length is within limit
       byte[] truncatedBytes =
           truncated.substring(0, truncated.length() - 3).getBytes(StandardCharsets.UTF_8);
       assertThat(truncatedBytes.length, lessThanOrEqualTo(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH));
 
-      // Verify we didn't cut in the middle of a CJK character
       String withoutEllipsis = truncated.substring(0, truncated.length() - 3);
       assertThat(
           withoutEllipsis.chars().filter(ch -> ch >= 0x4E00 && ch <= 0x9FFF).count() * 3
@@ -1101,28 +1206,36 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldTruncateMixedASCIIAndCJKCorrectly() {
-      // Mix of ASCII (1 byte) and CJK (3 bytes)
       String mixedText = "Hello你好World世界".repeat(200);
-      Note note = makeMe.aNote().title("Test Note").details(mixedText).please();
-      Notebook notebook = note.getNotebook();
+      Note parentSeed = makeMe.aNote().title("Truncate Mixed Parent").details(mixedText).please();
+      Notebook notebook = parentSeed.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-mixed-peers").please();
-      note = makeMe.theNote(note).folder(peerFolder).please();
-      Note child = makeMe.aNote().under(note).folder(peerFolder).please();
+      Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
+      final String parentUri = parent.getUri();
+      Note child =
+          makeMe
+              .aNote()
+              .under(parent)
+              .folder(peerFolder)
+              .details("See [[Truncate Mixed Parent]].")
+              .please();
+      refreshWikiCache(child);
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
 
-      assertThat(result.getRelatedNotes(), hasSize(1));
-      String truncated = result.getRelatedNotes().get(0).getDetails();
+      BareNote bn =
+          result.getRelatedNotes().stream()
+              .filter(b -> b.getUri().equals(parentUri))
+              .findFirst()
+              .orElseThrow();
+      String truncated = bn.getDetails();
       byte[] truncatedBytes = truncated.getBytes(StandardCharsets.UTF_8);
 
-      // Verify the byte length is correct (excluding "...")
       assertThat(
           truncatedBytes.length, lessThanOrEqualTo(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH + 3));
 
-      // Verify the string ends with "..."
       assertThat(truncated, endsWith("..."));
 
-      // Verify we didn't cut in the middle of a CJK character
       String withoutEllipsis = truncated.substring(0, truncated.length() - 3);
       assertThat(
           withoutEllipsis.chars().filter(ch -> ch >= 0x4E00 && ch <= 0x9FFF).count() * 3

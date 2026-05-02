@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.graphRAG;
 
+import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.util.ArrayList;
@@ -8,19 +9,17 @@ import lombok.Getter;
 
 @Getter
 public class FocusNote extends BareNote {
-  private final List<String> contextualPath = new ArrayList<>();
+  private final String contextualPath;
   private final List<String> children = new ArrayList<>();
   private final List<String> olderSiblings = new ArrayList<>();
   private final List<String> youngerSiblings = new ArrayList<>();
+  private final List<String> links = new ArrayList<>();
+
   private final List<String> inboundReferences = new ArrayList<>();
 
   private FocusNote(Note note) {
     super(note, note.getDetails(), RelationshipToFocusNote.Self, null, false, false);
-
-    // Add contextual path (unique to FocusNote)
-    if (note.getParent() != null) {
-      note.getAncestors().forEach(ancestor -> contextualPath.add(ancestor.getUri()));
-    }
+    contextualPath = FolderTrailSegments.crumbPathJoinedBySlashSpace(note);
   }
 
   public static FocusNote fromNote(Note note) {

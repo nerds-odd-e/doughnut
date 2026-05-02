@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -100,14 +101,17 @@ class GraphRAGResultTest {
   @Nested
   class FocusNoteTest {
     @Test
-    void usesContextualPathInsteadOfParentField() throws Exception {
+    void usesFolderCrumbContextualPathInsteadOfParentField() throws Exception {
       Note parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
-      Note note = makeMe.aNote().under(parent).title("Child Note").please();
+      Folder peerFolder =
+          makeMe.aFolder().notebook(parent.getNotebook()).name("focus-peer-folder").please();
+      parent = makeMe.theNote(parent).folder(peerFolder).please();
+      Note note = makeMe.aNote().under(parent).folder(peerFolder).title("Child Note").please();
       JsonNode json = objectMapper.valueToTree(FocusNote.fromNote(note));
 
       assertThat(json.has("parent"), is(false));
       assertThat(json.has("contextualPath"), is(true));
-      assertThat(json.get("contextualPath").toString(), containsString(parent.getUri()));
+      assertThat(json.get("contextualPath").asText(), containsString("focus-peer-folder"));
     }
   }
 

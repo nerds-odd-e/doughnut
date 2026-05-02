@@ -813,10 +813,11 @@ export type FocusNote = {
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
-    contextualPath?: Array<string>;
+    contextualPath?: string;
     children?: Array<string>;
     olderSiblings?: Array<string>;
     youngerSiblings?: Array<string>;
+    links?: Array<string>;
     inboundReferences?: Array<string>;
 };
 

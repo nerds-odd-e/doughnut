@@ -3,10 +3,13 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ public class GraphRAGService {
   private final ObjectMapper objectMapper;
   private final AuthorizationService authorizationService;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final NoteRepository noteRepository;
 
   @Autowired
   public GraphRAGService(
@@ -24,12 +28,14 @@ public class GraphRAGService {
       NoteService noteService,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      NoteRepository noteRepository) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     this.noteService = noteService;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.noteRepository = noteRepository;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
@@ -37,28 +43,42 @@ public class GraphRAGService {
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes, User viewer) {
+    focusNote =
+        Optional.ofNullable(focusNote.getId())
+            .flatMap(
+                id ->
+                    noteRepository
+                        .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(id))
+                        .stream()
+                        .findFirst())
+            .orElse(focusNote);
+
     // Create priority four layer first so we can pass it to ParentSiblingHandler
     PriorityLayer priorityFourLayer = new PriorityLayer(2);
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
 
-    List<Note> focusStructuralPeers = noteService.findStructuralPeerNotesInOrder(focusNote);
+    List<Note> focusStructuralPeers =
+        peersSharingTreeParent(focusNote, noteService.findStructuralPeerNotesInOrder(focusNote));
     Note parent = focusNote.getParent();
     List<Note> parentStructuralPeers =
-        parent != null ? noteService.findStructuralPeerNotesInOrder(parent) : List.of();
+        parent != null
+            ? peersSharingTreeParent(parent, noteService.findStructuralPeerNotesInOrder(parent))
+            : List.of();
     Note primaryTarget =
         wikiTitleCacheService.primaryWikiLinkedTargetForGraph(focusNote, viewer).orElse(null);
     Note targetParent = primaryTarget != null ? primaryTarget.getParent() : null;
     List<Note> targetParentStructuralPeers =
-        targetParent != null ? noteService.findStructuralPeerNotesInOrder(targetParent) : List.of();
+        targetParent != null
+            ? peersSharingTreeParent(
+                targetParent, noteService.findStructuralPeerNotesInOrder(targetParent))
+            : List.of();
 
     // Set up priority layers with number of notes to process before switching
     PriorityLayer priorityOneLayer =
         new PriorityLayer(
             3,
             new RelationshipHandler[] {
-              new ParentRelationshipHandler(focusNote),
               new TargetRelationshipHandler(primaryTarget),
-              new ContextAncestorRelationshipHandler(focusNote)
             });
     List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
     priorityTwoHandlers.add(new ChildRelationshipHandler(focusNote));
@@ -71,7 +91,6 @@ public class GraphRAGService {
     }
     priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
-    priorityTwoHandlers.add(new TargetContextAncestorRelationshipHandler(primaryTarget));
     priorityTwoHandlers.add(
         new ParentSiblingRelationshipHandler(
             focusNote, priorityFourLayer, parent, parentStructuralPeers));
@@ -91,7 +110,12 @@ public class GraphRAGService {
     priorityThreeLayer.setNextLayer(priorityFourLayer);
 
     GraphRAGResultBuilder builder =
-        new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes, tokenCountingStrategy);
+        new GraphRAGResultBuilder(
+            focusNote,
+            tokenBudgetForRelatedNotes,
+            tokenCountingStrategy,
+            wikiTitleCacheService,
+            viewer);
     priorityOneLayer.handle(builder);
     return builder.build();
   }
@@ -109,5 +133,15 @@ public class GraphRAGService {
           %s
           """
         .formatted(jsonString);
+  }
+
+  /**
+   * Folder scope lists every note in the folder; graph siblings are same tree-parent peers only.
+   */
+  private static List<Note> peersSharingTreeParent(Note note, List<Note> folderScopePeers) {
+    Note treeParent = note.getParent();
+    return folderScopePeers.stream()
+        .filter(p -> Objects.equals(p.getParent(), treeParent))
+        .toList();
   }
 }
