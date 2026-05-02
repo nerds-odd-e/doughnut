@@ -2,7 +2,6 @@ import type {
   FolderCreationRequest,
   FolderListing,
   NoteDetailsCompletion,
-  NoteMoveDto,
   NoteRealm,
   NotebookRootFolder,
   WikidataAssociationCreation,
@@ -112,12 +111,6 @@ export interface StoredApi {
     router: Router,
     noteId: Doughnut.ID
   ): Promise<NoteRealm | undefined>
-
-  moveNote(
-    sourceId: Doughnut.ID,
-    targetId: Doughnut.ID,
-    data: NoteMoveDto
-  ): Promise<void>
 
   moveNoteToFolder(
     sourceId: Doughnut.ID,
@@ -608,32 +601,6 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(res[0]!)
     await this.routerReplaceFocus(router, noteRealm)
     return noteRealm
-  }
-
-  async moveNote(
-    sourceId: Doughnut.ID,
-    targetId: Doughnut.ID,
-    data: NoteMoveDto
-  ) {
-    const moveInfo = this.getMoveUndoInfo(sourceId)
-
-    const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      RelationController.moveNote({
-        path: {
-          sourceNote: sourceId,
-          targetNote: targetId,
-        },
-        body: data,
-      })
-    )
-    if (error || !noteRealms) {
-      throw new Error(toErrorMessage(error, "Failed to move note"))
-    }
-    this.refreshNoteRealms(noteRealms)
-
-    if (moveInfo) {
-      this.noteEditingHistory.moveNote(sourceId, moveInfo.originalParentId)
-    }
   }
 
   async moveNoteToFolder(sourceId: Doughnut.ID, targetFolderId: Doughnut.ID) {

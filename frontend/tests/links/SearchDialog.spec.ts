@@ -1,9 +1,10 @@
 import AddRelationshipDialog from "@/components/links/AddRelationshipDialog.vue"
-import { screen } from "@testing-library/vue"
+import usePopups from "@/components/commons/Popups/usePopups"
+import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { beforeEach, vi, describe, it, expect } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("AddRelationshipDialog", () => {
   beforeEach(() => {
@@ -43,5 +44,58 @@ describe("AddRelationshipDialog", () => {
       await screen.findByLabelText("All My Notebooks And Subscriptions")
     ).click()
     expect(await screen.findByLabelText("All My Circles")).not.toBeChecked()
+  })
+
+  describe("Move Under folder hit", () => {
+    it("calls moveNoteToFolder with folder id after confirm", async () => {
+      mockSdkService("getRecentNotes", [])
+      mockSdkService("searchForRelationshipTarget", [])
+      mockSdkService("semanticSearch", [])
+      mockSdkService("semanticSearchWithin", [])
+      const note = MakeMe.aNote.please()
+      const targetFolderId = 42
+      mockSdkService("searchForRelationshipTargetWithin", [
+        {
+          hitKind: "FOLDER",
+          folderId: targetFolderId,
+          folderName: "Archive",
+          notebookId: note.noteTopology.notebookId ?? 1,
+          notebookName: "Nb",
+          distance: 0.9,
+        },
+      ])
+      const moveNoteToFolderSpy = mockSdkService("moveNoteToFolder", [])
+
+      helper
+        .component(AddRelationshipDialog)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+
+      await flushPromises()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "Arc")
+
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      expect(moveNoteToFolderSpy).not.toHaveBeenCalled()
+
+      await screen.findByRole("button", { name: "Move Under" })
+      fireEvent.click(screen.getByRole("button", { name: "Move Under" }))
+      await flushPromises()
+
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(moveNoteToFolderSpy).toHaveBeenCalledTimes(1)
+      expect(moveNoteToFolderSpy).toHaveBeenCalledWith({
+        path: {
+          sourceNote: note.id,
+          targetFolder: targetFolderId,
+        },
+      })
+    })
   })
 })
