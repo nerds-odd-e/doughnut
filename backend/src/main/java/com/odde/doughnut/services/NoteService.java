@@ -28,6 +28,7 @@ public class NoteService {
   private final TestabilitySettings testabilitySettings;
   private final NoteChildContainerFolderService noteChildContainerFolderService;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -35,13 +36,15 @@ public class NoteService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteChildContainerFolderService = noteChildContainerFolderService;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -250,12 +253,15 @@ public class NoteService {
    * Rebuilds title and relationship markdown from {@code relationType} (from the API on update, or
    * the type chosen at creation).
    */
-  public void refreshRelationshipNoteTitle(Note relation, RelationType relationType) {
+  public void refreshRelationshipNoteTitle(Note relation, RelationType relationType, User viewer) {
     if (relationType == null) {
       return;
     }
     Note source = relation.getParent();
-    Note target = relation.getTargetNote();
+    Note target =
+        relationshipNoteEndpointResolver
+            .resolveSemanticTarget(relation, viewer)
+            .orElseGet(relation::getTargetNote);
     relation.setTitle(
         RelationshipNoteTitleFormatter.format(
             source.getTitle(), relationType.label, target.getTitle()));

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,5 +43,15 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     assertThat(parent.getChildren().size(), equalTo(1));
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
+  }
+
+  @Test
+  void resolveWikiInnerTitle_matchesNotebookScopedTitle() {
+    User owner = makeMe.aUser().please();
+    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note child = makeMe.aNote().title("Child").under(parent).please();
+    assertThat(
+        wikiLinkResolver.resolveWikiInnerTitle("Alpha", owner, child).map(Note::getId),
+        equalTo(Optional.of(parent.getId())));
   }
 }

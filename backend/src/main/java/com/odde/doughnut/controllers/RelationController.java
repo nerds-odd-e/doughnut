@@ -12,6 +12,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
+import com.odde.doughnut.services.RelationshipNoteEndpointResolver;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,6 +39,7 @@ class RelationController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
 
   public RelationController(
       EntityPersister entityPersister,
@@ -46,7 +48,8 @@ class RelationController {
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
@@ -54,6 +57,7 @@ class RelationController {
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
   }
 
   @PostMapping(value = "/{relation}")
@@ -63,9 +67,9 @@ class RelationController {
       @RequestBody RelationshipCreation relationshipCreation)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(relation);
-    noteService.refreshRelationshipNoteTitle(relation, relationshipCreation.relationType);
-    entityPersister.save(relation);
     User user = authorizationService.getCurrentUser();
+    noteService.refreshRelationshipNoteTitle(relation, relationshipCreation.relationType, user);
+    entityPersister.save(relation);
     wikiTitleCacheService.refreshForNote(relation, user);
     return getNoteRealm(relation, user);
   }
@@ -107,7 +111,15 @@ class RelationController {
   }
 
   private List<NoteRealm> getNoteRealm(Note relation, User user) {
-    Note nt = entityPersister.find(Note.class, relation.getTargetNote().getId());
+    Note nt =
+        relationshipNoteEndpointResolver
+            .resolveSemanticTarget(relation, user)
+            .map(n -> entityPersister.find(Note.class, n.getId()))
+            .orElseGet(
+                () -> {
+                  Note legacy = relation.getTargetNote();
+                  return legacy == null ? null : entityPersister.find(Note.class, legacy.getId());
+                });
     Note np = entityPersister.find(Note.class, relation.getParent().getId());
     return List.of(
         noteRealmService.build(relation, user),
