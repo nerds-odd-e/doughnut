@@ -77,12 +77,13 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_empty_when_cache_not_refreshed_even_if_legacy_target_fk_exists() {
+  void references_empty_when_cache_rows_deleted_for_relation_carrier() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
     Note subject = makeMe.aNote().under(root).please();
-    makeMe.aRelation().between(subject, focal).please();
+    Note relation = makeMe.aRelation().between(subject, focal).please();
+    noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -113,12 +114,13 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_empty_when_cache_not_refreshed_even_if_structural_child_exists() {
+  void references_empty_when_cache_rows_deleted_for_relation_carrier_structural_child() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
     Note subject = makeMe.aNote().under(root).please();
-    makeMe.aRelation().between(subject, focal).please();
+    Note relation = makeMe.aRelation().between(subject, focal).please();
+    noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
     NoteRealm realm = noteRealmService.build(subject, user);
 
