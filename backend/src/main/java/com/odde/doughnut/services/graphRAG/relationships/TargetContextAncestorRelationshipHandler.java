@@ -7,9 +7,8 @@ public class TargetContextAncestorRelationshipHandler extends RelationshipHandle
   private final List<Note> targetContextualPath;
   private int currentIndex;
 
-  public TargetContextAncestorRelationshipHandler(Note relatingNote) {
-    super(RelationshipToFocusNote.TargetContextAncestor, relatingNote);
-    Note targetNote = relatingNote.getTargetNote();
+  public TargetContextAncestorRelationshipHandler(Note targetNote) {
+    super(RelationshipToFocusNote.TargetContextAncestor, targetNote);
     this.targetContextualPath = targetNote != null ? targetNote.getAncestors() : List.of();
     // Start from the end (closest ancestor/parent) and work backwards to root
     this.currentIndex = targetContextualPath.size() - 1;

@@ -21,7 +21,7 @@ public class RelationBuilder extends EntityBuilder<Note> {
   public NoteBuilder between(Note from, Note to, RelationType relationType) {
     this.entity =
         NoteService.buildARelation(
-            from, to, null, relationType, new Timestamp(System.currentTimeMillis()));
+            from, to, from.getCreator(), relationType, new Timestamp(System.currentTimeMillis()));
     entity.setTitle(
         RelationshipNoteTitleFormatter.format(from.getTitle(), relationType.label, to.getTitle()));
     entity.setDetails(

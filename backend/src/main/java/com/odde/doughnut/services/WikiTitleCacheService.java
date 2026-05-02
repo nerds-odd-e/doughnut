@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,6 +109,19 @@ public class WikiTitleCacheService {
       return Optional.of(outgoing.get(0));
     }
     return Optional.empty();
+  }
+
+  public List<Note> siblingWikiLinkReferrersToPrimaryTargetForGraph(Note focus, User viewer) {
+    Optional<Note> primaryTarget = primaryWikiLinkedTargetForGraph(focus, viewer);
+    if (primaryTarget.isEmpty()) {
+      return List.of();
+    }
+    Set<Integer> excludedCarrierIds =
+        relationCarrierChildrenOrdered(focus).stream().map(Note::getId).collect(Collectors.toSet());
+    excludedCarrierIds.add(focus.getId());
+    return referencesNotesForViewer(primaryTarget.get(), viewer).stream()
+        .filter(n -> !excludedCarrierIds.contains(n.getId()))
+        .toList();
   }
 
   private void appendAuthorizedOutgoingTargets(

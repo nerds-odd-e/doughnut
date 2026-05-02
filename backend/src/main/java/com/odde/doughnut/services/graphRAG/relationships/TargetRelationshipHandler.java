@@ -4,9 +4,11 @@ import com.odde.doughnut.entities.Note;
 
 public class TargetRelationshipHandler extends RelationshipHandler {
   private boolean exhausted = false;
+  private final Note target;
 
-  public TargetRelationshipHandler(Note relatingNote) {
-    super(RelationshipToFocusNote.RelationshipTarget, relatingNote);
+  public TargetRelationshipHandler(Note target) {
+    super(RelationshipToFocusNote.RelationshipTarget, target);
+    this.target = target;
   }
 
   @Override
@@ -15,6 +17,6 @@ public class TargetRelationshipHandler extends RelationshipHandler {
       return null;
     }
     exhausted = true;
-    return relatingNote.getTargetNote();
+    return target;
   }
 }

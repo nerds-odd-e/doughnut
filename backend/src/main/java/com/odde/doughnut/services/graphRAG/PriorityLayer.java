@@ -28,8 +28,8 @@ public class PriorityLayer {
 
       // If we've processed enough notes or can't process more in current layer,
       // give next layer a chance if it exists
-      if (nextLayer != null
-          && (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer || !continueProcessing)) {
+      boolean reachedLayerSwitchLimit = notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer;
+      if (nextLayer != null && (reachedLayerSwitchLimit || !continueProcessing)) {
         // Use handle instead of processCurrentLayer for proper recursion
         nextLayer.handle(builder);
 
@@ -37,7 +37,7 @@ public class PriorityLayer {
         notesProcessedSinceLastLayerSwitch = 0;
 
         // Try current layer again only if we stopped due to notesBeforeNextLayer limit
-        if (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer) {
+        if (reachedLayerSwitchLimit) {
           continueProcessing = true;
         }
       }

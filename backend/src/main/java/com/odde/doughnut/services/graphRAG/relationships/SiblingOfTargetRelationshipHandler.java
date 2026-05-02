@@ -1,10 +1,8 @@
 package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.PriorityLayer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
@@ -13,21 +11,10 @@ public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
   private final PriorityLayer priorityThreeLayer;
 
   public SiblingOfTargetRelationshipHandler(
-      Note relatingNote, NoteRepository noteRepository, PriorityLayer priorityThreeLayer) {
-    super(RelationshipToFocusNote.SiblingOfTarget, relatingNote);
+      List<Note> targetSiblings, PriorityLayer priorityThreeLayer) {
+    super(RelationshipToFocusNote.SiblingOfTarget, null);
     this.priorityThreeLayer = priorityThreeLayer;
-    if (relatingNote.getTargetNote() != null) {
-      List<Note> allNotesWithSameTarget =
-          noteRepository.findAllByTargetNote(relatingNote.getTargetNote().getId());
-      // Filter out the focus note itself and deleted notes
-      this.targetSiblings =
-          allNotesWithSameTarget.stream()
-              .filter(n -> !n.getId().equals(relatingNote.getId()) && n.getDeletedAt() == null)
-              .collect(java.util.stream.Collectors.toList());
-      Collections.shuffle(this.targetSiblings);
-    } else {
-      this.targetSiblings = new ArrayList<>();
-    }
+    this.targetSiblings = new ArrayList<>(targetSiblings);
   }
 
   @Override

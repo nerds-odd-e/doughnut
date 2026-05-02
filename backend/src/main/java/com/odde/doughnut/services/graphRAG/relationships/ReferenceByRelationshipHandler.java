@@ -3,7 +3,6 @@ package com.odde.doughnut.services.graphRAG.relationships;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ReferenceByRelationshipHandler extends RelationshipHandler {
@@ -13,10 +12,11 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
   private final PriorityLayer priorityFourLayer;
 
   public ReferenceByRelationshipHandler(
-      Note relatingNote, PriorityLayer priorityThreeLayer, PriorityLayer priorityFourLayer) {
-    super(RelationshipToFocusNote.ReferenceBy, relatingNote);
-    this.inboundReferenceNotes = new ArrayList<>(relatingNote.getInboundReferences());
-    Collections.shuffle(this.inboundReferenceNotes);
+      List<Note> inboundReferenceNotes,
+      PriorityLayer priorityThreeLayer,
+      PriorityLayer priorityFourLayer) {
+    super(RelationshipToFocusNote.ReferenceBy, null);
+    this.inboundReferenceNotes = new ArrayList<>(inboundReferenceNotes);
     this.priorityThreeLayer = priorityThreeLayer;
     this.priorityFourLayer = priorityFourLayer;
   }

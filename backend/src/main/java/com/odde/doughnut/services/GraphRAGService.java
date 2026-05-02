@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.*;
 import java.util.ArrayList;
@@ -14,23 +13,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class GraphRAGService {
   private final TokenCountingStrategy tokenCountingStrategy;
-  private final NoteRepository noteRepository;
   private final NoteService noteService;
   private final ObjectMapper objectMapper;
   private final AuthorizationService authorizationService;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
   @Autowired
   public GraphRAGService(
       TokenCountingStrategy tokenCountingStrategy,
-      NoteRepository noteRepository,
       NoteService noteService,
       ObjectMapper objectMapper,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      WikiTitleCacheService wikiTitleCacheService) {
     this.tokenCountingStrategy = tokenCountingStrategy;
-    this.noteRepository = noteRepository;
     this.noteService = noteService;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
+    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
@@ -46,8 +45,9 @@ public class GraphRAGService {
     Note parent = focusNote.getParent();
     List<Note> parentStructuralPeers =
         parent != null ? noteService.findStructuralPeerNotesInOrder(parent) : List.of();
-    Note targetParent =
-        focusNote.getTargetNote() != null ? focusNote.getTargetNote().getParent() : null;
+    Note primaryTarget =
+        wikiTitleCacheService.primaryWikiLinkedTargetForGraph(focusNote, viewer).orElse(null);
+    Note targetParent = primaryTarget != null ? primaryTarget.getParent() : null;
     List<Note> targetParentStructuralPeers =
         targetParent != null ? noteService.findStructuralPeerNotesInOrder(targetParent) : List.of();
 
@@ -57,16 +57,19 @@ public class GraphRAGService {
             3,
             new RelationshipHandler[] {
               new ParentRelationshipHandler(focusNote),
-              new TargetRelationshipHandler(focusNote),
+              new TargetRelationshipHandler(primaryTarget),
               new ContextAncestorRelationshipHandler(focusNote)
             });
     List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
     priorityTwoHandlers.add(new ChildRelationshipHandler(focusNote));
+    for (Note reference : wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer)) {
+      priorityTwoHandlers.add(
+          new ReferenceByRelationshipHandler(
+              List.of(reference), priorityThreeLayer, priorityFourLayer));
+    }
     priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
-    priorityTwoHandlers.add(
-        new ReferenceByRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer));
-    priorityTwoHandlers.add(new TargetContextAncestorRelationshipHandler(focusNote));
+    priorityTwoHandlers.add(new TargetContextAncestorRelationshipHandler(primaryTarget));
     priorityTwoHandlers.add(
         new ParentSiblingRelationshipHandler(
             focusNote, priorityFourLayer, parent, parentStructuralPeers));
@@ -74,7 +77,10 @@ public class GraphRAGService {
         new TargetParentSiblingRelationshipHandler(
             focusNote, priorityFourLayer, targetParent, targetParentStructuralPeers));
     priorityTwoHandlers.add(
-        new SiblingOfTargetRelationshipHandler(focusNote, noteRepository, priorityThreeLayer));
+        new SiblingOfTargetRelationshipHandler(
+            wikiTitleCacheService.siblingWikiLinkReferrersToPrimaryTargetForGraph(
+                focusNote, viewer),
+            priorityThreeLayer));
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(3, priorityTwoHandlers.toArray(new RelationshipHandler[0]));
 
