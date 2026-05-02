@@ -12,7 +12,6 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.services.RelationshipNoteEndpointResolver;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +38,6 @@ class RelationController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
-  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
 
   public RelationController(
       EntityPersister entityPersister,
@@ -48,8 +46,7 @@ class RelationController {
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService,
-      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver) {
+      WikiTitleCacheService wikiTitleCacheService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
@@ -57,7 +54,6 @@ class RelationController {
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
-    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
   }
 
   @PostMapping(value = "/{relation}")
