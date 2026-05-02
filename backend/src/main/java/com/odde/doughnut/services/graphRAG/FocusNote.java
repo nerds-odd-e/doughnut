@@ -15,7 +15,7 @@ public class FocusNote extends BareNote {
   private final List<String> inboundReferences = new ArrayList<>();
 
   private FocusNote(Note note) {
-    super(note, note.getDetails(), RelationshipToFocusNote.Self, null);
+    super(note, note.getDetails(), RelationshipToFocusNote.Self, null, false, false);
 
     // Add contextual path (unique to FocusNote)
     if (note.getParent() != null) {

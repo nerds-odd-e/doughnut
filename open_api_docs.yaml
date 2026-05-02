@@ -4924,6 +4924,10 @@ components:
           - TargetParentSiblingChild
           - SiblingOfReferencingNote
           - RemotelyRelated
+        linkFromFocus:
+          type: boolean
+        linkHop2:
+          type: boolean
         details:
           type: string
         detailsTruncated:
@@ -4986,6 +4990,10 @@ components:
           - TargetParentSiblingChild
           - SiblingOfReferencingNote
           - RemotelyRelated
+        linkFromFocus:
+          type: boolean
+        linkHop2:
+          type: boolean
         details:
           type: string
         detailsTruncated:

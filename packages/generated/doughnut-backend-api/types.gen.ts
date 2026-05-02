@@ -800,6 +800,8 @@ export type BareNote = {
     target?: UriAndTitle;
     parent?: UriAndTitle;
     relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelationship' | 'RelationshipOfTargetSibling' | 'ReferencedTargetOfRelationship' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote' | 'RemotelyRelated';
+    linkFromFocus?: boolean;
+    linkHop2?: boolean;
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -813,6 +815,8 @@ export type FocusNote = {
     target?: UriAndTitle;
     parent?: UriAndTitle;
     relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelationship' | 'RelationshipOfTargetSibling' | 'ReferencedTargetOfRelationship' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote' | 'RemotelyRelated';
+    linkFromFocus?: boolean;
+    linkHop2?: boolean;
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;

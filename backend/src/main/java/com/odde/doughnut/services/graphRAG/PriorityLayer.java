@@ -58,7 +58,10 @@ public class PriorityLayer {
       if (relatedNote != null) {
         BareNote result =
             builder.addNoteToRelatedNotes(
-                relatedNote, handler.getRelationshipToFocusNoteFor(relatedNote));
+                relatedNote,
+                handler.getRelationshipToFocusNoteFor(relatedNote),
+                handler.isLinkFromFocusFor(relatedNote),
+                handler.isLinkHop2For(relatedNote));
 
         if (result != null) {
           handler.afterHandledSuccessfully(builder.getFocusNote(), result);

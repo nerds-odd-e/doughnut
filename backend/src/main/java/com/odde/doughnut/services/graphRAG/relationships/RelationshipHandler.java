@@ -21,5 +21,13 @@ public abstract class RelationshipHandler {
     return relationshipToFocusNote;
   }
 
+  public boolean isLinkFromFocusFor(Note note) {
+    return false;
+  }
+
+  public boolean isLinkHop2For(Note note) {
+    return false;
+  }
+
   public void afterHandledSuccessfully(FocusNote focusNote, BareNote addedNote) {}
 }

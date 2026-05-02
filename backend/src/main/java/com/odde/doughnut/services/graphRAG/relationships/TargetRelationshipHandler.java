@@ -19,4 +19,14 @@ public class TargetRelationshipHandler extends RelationshipHandler {
     exhausted = true;
     return target;
   }
+
+  @Override
+  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
+    return null;
+  }
+
+  @Override
+  public boolean isLinkFromFocusFor(Note note) {
+    return target != null && note != null && note.getId().equals(target.getId());
+  }
 }

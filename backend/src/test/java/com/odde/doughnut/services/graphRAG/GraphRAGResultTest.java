@@ -109,7 +109,14 @@ class GraphRAGResultTest {
     // Assert
     assertThat(
         jsonNode::fieldNames,
-        containsInAnyOrder("uri", "title", "details", "relationToFocusNote", "createdAt"));
+        containsInAnyOrder(
+            "uri",
+            "title",
+            "details",
+            "relationToFocusNote",
+            "linkFromFocus",
+            "linkHop2",
+            "createdAt"));
     // detailsTruncated should not be present when details are not truncated
     assertThat(jsonNode.has("detailsTruncated"), is(false));
   }

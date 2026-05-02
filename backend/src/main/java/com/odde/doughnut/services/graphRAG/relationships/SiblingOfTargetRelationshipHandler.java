@@ -32,4 +32,14 @@ public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
     }
     return null;
   }
+
+  @Override
+  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
+    return null;
+  }
+
+  @Override
+  public boolean isLinkHop2For(Note note) {
+    return true;
+  }
 }

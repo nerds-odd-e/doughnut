@@ -21,17 +21,19 @@ public class GraphRAGResultBuilder {
     this.remainingBudget = tokenBudget - tokenCountingStrategy.estimateTokens(focus);
   }
 
-  public BareNote addNoteToRelatedNotes(Note note, RelationshipToFocusNote relationship) {
+  public BareNote addNoteToRelatedNotes(
+      Note note, RelationshipToFocusNote relationship, boolean linkFromFocus, boolean linkHop2) {
     if (note.getId() == focusNoteId) {
       return null;
     }
 
     BareNote existingNote = addedNotesByNoteId.get(note.getId());
     if (existingNote != null) {
+      existingNote.mergeIntoExisting(relationship, linkFromFocus, linkHop2);
       return existingNote;
     }
 
-    BareNote bareNote = BareNote.fromNote(note, relationship);
+    BareNote bareNote = BareNote.fromNote(note, relationship, linkFromFocus, linkHop2);
     int tokens = tokenCountingStrategy.estimateTokens(bareNote);
     if (tokens <= remainingBudget) {
       result.getRelatedNotes().add(bareNote);
