@@ -546,65 +546,6 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasParentSiblings {
-    private Note parentSibling1;
-    private Note parentSibling2;
-    private Note focusNote;
-    private Folder peerFolder;
-
-    @BeforeEach
-    void setup() {
-      Note grandParent = makeMe.aNote().title("Grand Parent").please();
-      Notebook notebook = grandParent.getNotebook();
-      peerFolder = makeMe.aFolder().notebook(notebook).name("parent-sibling-peers").please();
-      grandParent = makeMe.theNote(grandParent).folder(peerFolder).please();
-      Note parent = makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent").please();
-      parentSibling1 =
-          makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent Sibling 1").please();
-      parentSibling2 =
-          makeMe.aNote().under(grandParent).folder(peerFolder).title("Parent Sibling 2").please();
-      focusNote = makeMe.aNote().under(parent).folder(peerFolder).title("Focus Note").please();
-    }
-
-    @Test
-    void parentSiblingsReachRelatedNotesWhenBudgetAllowsNotAsLegacyParentWhenTight() {
-      GraphRAGResult full = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
-      assertRelatedNotesIncludeNotes(full, parentSibling1, parentSibling2);
-
-      GraphRAGResult limited = graphRAGService.retrieve(focusNote, 2, focusNote.getCreator());
-      assertThat(
-          limited.getRelatedNotes().stream()
-              .noneMatch(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Parent),
-          is(true));
-    }
-
-    @Nested
-    class WhenParentSiblingsHaveChildren {
-      private Note parentSibling1Child1;
-      private Note parentSibling1Child2;
-      private Note parentSibling2Child1;
-
-      @BeforeEach
-      void setup() {
-        parentSibling1Child1 = makeMe.aNote().under(parentSibling1).title("PS1 Child 1").please();
-        parentSibling1Child2 = makeMe.aNote().under(parentSibling1).title("PS1 Child 2").please();
-        parentSibling2Child1 = makeMe.aNote().under(parentSibling2).title("PS2 Child 1").please();
-      }
-
-      @Test
-      void parentSiblingChildrenAppearWhenBudgetAllowsDroppedWhenLimited() {
-        GraphRAGResult full = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
-        assertRelatedNotesIncludeNotes(
-            full, parentSibling1Child1, parentSibling1Child2, parentSibling2Child1);
-
-        GraphRAGResult limited = graphRAGService.retrieve(focusNote, 2, focusNote.getCreator());
-        assertRelatedNotesExcludeNotes(
-            limited, parentSibling1Child1, parentSibling1Child2, parentSibling2Child1);
-      }
-    }
-  }
-
-  @Nested
   class WhenStructuralPeersUseFolderNotLegacyParentChildren {
     @Test
     void youngerAndOlderSiblingsIgnoreNoteThatSharesParentButNotFolder() {

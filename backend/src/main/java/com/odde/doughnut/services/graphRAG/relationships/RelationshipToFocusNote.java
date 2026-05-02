@@ -17,11 +17,5 @@ public enum RelationshipToFocusNote {
 
   RelationshipOfTargetSibling,
 
-  // Parent neighborhood
-  ParentSibling,
-  TargetParentSibling,
-  ParentSiblingChild,
-  TargetParentSiblingChild,
-
   SiblingOfReferencingNote,
 }

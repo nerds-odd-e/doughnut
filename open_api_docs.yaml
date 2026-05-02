@@ -4857,10 +4857,6 @@ components:
           - TargetContextAncestor
           - ReferenceContextAncestor
           - RelationshipOfTargetSibling
-          - ParentSibling
-          - TargetParentSibling
-          - ParentSiblingChild
-          - TargetParentSiblingChild
           - SiblingOfReferencingNote
         linkFromFocus:
           type: boolean
@@ -4892,10 +4888,6 @@ components:
           - TargetContextAncestor
           - ReferenceContextAncestor
           - RelationshipOfTargetSibling
-          - ParentSibling
-          - TargetParentSibling
-          - ParentSiblingChild
-          - TargetParentSiblingChild
           - SiblingOfReferencingNote
         linkFromFocus:
           type: boolean

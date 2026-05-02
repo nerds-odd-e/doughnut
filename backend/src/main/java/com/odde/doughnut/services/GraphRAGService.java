@@ -53,27 +53,14 @@ public class GraphRAGService {
                         .findFirst())
             .orElse(focusNote);
 
-    // Create priority four layer first so we can pass it to ParentSiblingHandler
     PriorityLayer priorityFourLayer = new PriorityLayer(2);
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
 
     List<Note> focusStructuralPeers =
         peersSharingTreeParent(focusNote, noteService.findStructuralPeerNotesInOrder(focusNote));
-    Note parent = focusNote.getParent();
-    List<Note> parentStructuralPeers =
-        parent != null
-            ? peersSharingTreeParent(parent, noteService.findStructuralPeerNotesInOrder(parent))
-            : List.of();
     Note primaryTarget =
         wikiTitleCacheService.primaryWikiLinkedTargetForGraph(focusNote, viewer).orElse(null);
-    Note targetParent = primaryTarget != null ? primaryTarget.getParent() : null;
-    List<Note> targetParentStructuralPeers =
-        targetParent != null
-            ? peersSharingTreeParent(
-                targetParent, noteService.findStructuralPeerNotesInOrder(targetParent))
-            : List.of();
 
-    // Set up priority layers with number of notes to process before switching
     PriorityLayer priorityOneLayer =
         new PriorityLayer(
             3,
@@ -90,12 +77,6 @@ public class GraphRAGService {
     }
     priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
-    priorityTwoHandlers.add(
-        new ParentSiblingRelationshipHandler(
-            focusNote, priorityFourLayer, parent, parentStructuralPeers));
-    priorityTwoHandlers.add(
-        new TargetParentSiblingRelationshipHandler(
-            focusNote, priorityFourLayer, targetParent, targetParentStructuralPeers));
     priorityTwoHandlers.add(
         new SiblingOfTargetRelationshipHandler(
             wikiTitleCacheService.siblingWikiLinkReferrersToPrimaryTargetForGraph(
