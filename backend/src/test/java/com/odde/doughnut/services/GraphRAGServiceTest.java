@@ -153,7 +153,7 @@ public class GraphRAGServiceTest {
     void shouldIncludeParentInFocusNoteAndContextualPath() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      assertThat(result.getFocusNote().getParent(), equalTo(parent));
+      assertThat(result.getFocusNote().getContextualPath(), hasItem(parent.getUri()));
     }
 
     @Test
@@ -170,7 +170,7 @@ public class GraphRAGServiceTest {
     void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
       GraphRAGResult result = graphRAGService.retrieve(note, 0, note.getCreator());
 
-      assertThat(result.getFocusNote().getParent(), equalTo(parent));
+      assertThat(result.getFocusNote().getContextualPath(), hasItem(parent.getUri()));
       assertThat(result.getRelatedNotes(), empty());
     }
 
@@ -213,10 +213,11 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeTargetInFocusNote() {
+    void shouldExposeRelationshipTargetInRelatedNotesWithLinkFromFocus() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      assertThat(result.getFocusNote().getTarget(), equalTo(target));
+      assertThat(result.getFocusNote().getTitle(), equalTo(note.getTitle()));
+      assertRelatedNotesHaveLinkFromFocus(result, target);
     }
 
     @Test
@@ -228,12 +229,11 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldKeepTargetInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
+    void shouldOmitRelationshipTargetFromRelatedNotesWhenBudgetOnlyAllowsParent() {
       GraphRAGResult result =
           graphRAGService.retrieve(note, 2, note.getCreator()); // Only enough for parent
 
-      // Target URI should still be in focus note
-      assertThat(result.getFocusNote().getTarget(), equalTo(target));
+      assertThat(result.getFocusNote().getTitle(), equalTo(note.getTitle()));
 
       // Only parent should be in related notes
       assertThat(result.getRelatedNotes(), hasSize(1));
@@ -250,8 +250,6 @@ public class GraphRAGServiceTest {
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
 
-      // Should be in both target and children lists of focus note
-      assertThat(result.getFocusNote().getTarget(), equalTo(target));
       assertThat(result.getFocusNote().getChildren(), contains(target.getUri()));
 
       // Parent plus target once (relationship carrier excluded from structural child edges)

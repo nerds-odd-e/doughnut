@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
@@ -15,11 +14,7 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
   "uri",
-  "subject",
-  "relation_type",
   "title",
-  "target",
-  "parent",
   "relationToFocusNote",
   "linkFromFocus",
   "linkHop2",
@@ -87,33 +82,7 @@ public class BareNote {
 
   @JsonProperty("title")
   public String getTitle() {
-    return getTarget() != null ? null : note.getTitle();
-  }
-
-  @JsonProperty("relation_type")
-  public com.odde.doughnut.entities.RelationType getRelationType() {
-    return note.isRelation()
-        ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
-        : null;
-  }
-
-  @JsonProperty("target")
-  public UriAndTitle getTarget() {
-    return note.getTargetNote() != null ? UriAndTitle.fromNote(note.getTargetNote()) : null;
-  }
-
-  @JsonProperty("parent")
-  public UriAndTitle getParent() {
-    return getTarget() == null && note.getParent() != null
-        ? UriAndTitle.fromNote(note.getParent())
-        : null;
-  }
-
-  @JsonProperty("subject")
-  public UriAndTitle getSubject() {
-    return getTarget() != null && note.getParent() != null
-        ? UriAndTitle.fromNote(note.getParent())
-        : null;
+    return note.getTitle();
   }
 
   @JsonProperty("detailsTruncated")

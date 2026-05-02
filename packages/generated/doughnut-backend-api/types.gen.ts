@@ -795,11 +795,7 @@ export type NoteRecallInfo = {
 
 export type BareNote = {
     uri?: string;
-    subject?: UriAndTitle;
-    relation_type?: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
     title?: string;
-    target?: UriAndTitle;
-    parent?: UriAndTitle;
     relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
@@ -810,11 +806,7 @@ export type BareNote = {
 
 export type FocusNote = {
     uri?: string;
-    subject?: UriAndTitle;
-    relation_type?: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
     title?: string;
-    target?: UriAndTitle;
-    parent?: UriAndTitle;
     relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'RelationshipOfTargetSibling' | 'ParentSibling' | 'TargetParentSibling' | 'ParentSiblingChild' | 'TargetParentSiblingChild' | 'SiblingOfReferencingNote';
     linkFromFocus?: boolean;
     linkHop2?: boolean;
@@ -831,11 +823,6 @@ export type FocusNote = {
 export type GraphRagResult = {
     focusNote?: FocusNote;
     relatedNotes?: Array<BareNote>;
-};
-
-export type UriAndTitle = {
-    uri?: string;
-    title?: string;
 };
 
 export type NotebookCatalogGroupItem = Omit<NotebookCatalogItem, 'type'> & {

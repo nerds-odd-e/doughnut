@@ -52,11 +52,12 @@ This document **re-sequences** 5.24 into smaller slices aligned with `.cursor/ru
 - **Tests:** **`NoteControllerTests.UpdateNoteRecallSetting`**: drop or rewrite **`shouldUpdateRelationshipLevel`** / **`shouldUpdateReferenceLevel`** so they assert **no** level change on the relation when source or target is updated; keep **`shouldPutNoteBackToAssimilationListWhenRememberSpellingIsAddedLater`** (focal-only behavior).
 - **Flyway:** still **before** dropping **`note.target_note_id`**.
 
-### 5.24e — GraphRAG: no FK target on graph paths (**behavior**)
+### 5.24e — GraphRAG: cache-first targets; slim **`BareNote`** JSON (**behavior**) — **done**
 
-- **Scope (this slice only):** **`GraphRAGService`** / **`GraphRAGResultBuilder`** (and any graph helper they call) must not resolve relationship targets via **`Note.getTargetNote()`** or JDBC that assumes **`note.target_note_id`**. Use **5.24a** relationship classification plus **`WikiTitleCacheService`** / **`WikiLinkResolver`** (same viewer rules as elsewhere) so semantic targets come from the wiki-title cache, not the legacy FK.
-- **Out of scope here (Phase 7.13):** **`FocusNote`** shape (`links`, **`inboundReferences`**, folder crumbs, removal of **`children`**), **`BareNote`** field deletion (**`subject`**, **`relation_type`**, **`target`**, **`parent`**, **`linkFromFocus`**, **`linkHop2`**), wiki-link **`BareNote.uri`** formatting, **`RelationshipToFocusNote`** enum shrink, and **`UriAndTitle`** removal or graph-local URI rules — see **`ongoing/doughnut_wiki_migration_plan-phase-7.13-sub-phases.md`** (7.13.1–7.13.10). Do not expand **5.24e** into that JSON/DTO cleanup; keep **`BareNote` / `FocusNote`** wiring minimal for “no **`getTargetNote()`** on graph paths” only.
-- **Tests:** **`GraphRAGServiceTest`** (and **`GraphRAGResultTest`** only if it still asserts graph assembly touched by this slice). Prefer observable graph output or builder boundaries; avoid introducing new **`BareNote`** constructors or overload disambiguation solely for fields **7.13.8** will remove.
+- **`GraphRAGService`** uses **`WikiTitleCacheService.primaryWikiLinkedTargetForGraph`** (cache-ordered outgoing wiki targets for the viewer; transitional legacy FK alignment only inside that service when cache rows are missing — see **`WikiTitleCacheServiceTest.wikiGraphTargets`**). **`GraphRAGResultBuilder`** does not read **`Note.getTargetNote()`**.
+- **`BareNote` / `FocusNote` JSON:** Removed **`target`**, **`parent`**, **`relation_type`**, and **`subject`**. **`title`** is always **`note.getTitle()`**. Relationship semantics stay in **`details`** / frontmatter; structural targets appear in **`relatedNotes`**. Focus tree placement uses **`FocusNote.contextualPath`** until Phase 7.13 folder crumbs.
+- **Out of scope here (Phase 7.13):** **`FocusNote`** shape (`links`, **`inboundReferences`**, folder crumbs, removal of **`children`**), further **`BareNote`** cleanup (**`linkFromFocus`**, **`linkHop2`**), wiki-link **`BareNote.uri`**, **`RelationshipToFocusNote`** enum shrink, **`UriAndTitle`** graph-local rules — see **`ongoing/doughnut_wiki_migration_plan-phase-7.13-sub-phases.md`** (7.13.1–7.13.10).
+- **Verify:** **`pnpm backend:test_only`** — **`GraphRAGServiceTest`**, **`GraphRAGResultTest`**; **`pnpm generateTypeScript`** when OpenAPI changes.
 
 ### 5.24f — AI stacks (**behavior**)
 

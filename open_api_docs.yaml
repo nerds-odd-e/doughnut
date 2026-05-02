@@ -4843,31 +4843,8 @@ components:
       properties:
         uri:
           type: string
-        subject:
-          $ref: "#/components/schemas/UriAndTitle"
-        relation_type:
-          type: string
-          enum:
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
         title:
           type: string
-        target:
-          $ref: "#/components/schemas/UriAndTitle"
-        parent:
-          $ref: "#/components/schemas/UriAndTitle"
         relationToFocusNote:
           type: string
           enum:
@@ -4902,31 +4879,8 @@ components:
       properties:
         uri:
           type: string
-        subject:
-          $ref: "#/components/schemas/UriAndTitle"
-        relation_type:
-          type: string
-          enum:
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
         title:
           type: string
-        target:
-          $ref: "#/components/schemas/UriAndTitle"
-        parent:
-          $ref: "#/components/schemas/UriAndTitle"
         relationToFocusNote:
           type: string
           enum:
@@ -4985,13 +4939,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BareNote"
-    UriAndTitle:
-      type: object
-      properties:
-        uri:
-          type: string
-        title:
-          type: string
     NotebookCatalogGroupItem:
       allOf:
       - $ref: "#/components/schemas/NotebookCatalogItem"

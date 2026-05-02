@@ -17,7 +17,7 @@ By the end of 7.13:
 - Related notes still include sibling notes from the same folder.
 - `RelationshipToFocusNote` contains only currently meaningful graph roles.
 - `BareNote.uri` is a wiki-link URI: `[[note title]]` for the focus note itself, and `[[notebook name: note title]]` when the URI appears on a note other than the focus note.
-- `BareNote` no longer exposes `subject`, `relation_type`, `target`, `parent`, `linkFromFocus`, or `linkHop2`; relationship meaning lives in `details` / `detailsTruncated` and in the focus note's link lists.
+- `BareNote` no longer exposes `linkFromFocus` or `linkHop2` (serialized `target`, `parent`, `relation_type`, and `subject` are already gone in **5.24e**); relationship meaning lives in `details` / `detailsTruncated` and in the focus note's link lists.
 
 ## Design Decisions
 
@@ -167,9 +167,9 @@ Wiki targets and wiki inbound references may still add related notes, but withou
 - `detailsTruncated`;
 - `createdAt`.
 
-It no longer exposes `subject`, `relation_type`, `target`, `parent`, `linkFromFocus`, or `linkHop2`.
+It no longer exposes `linkFromFocus` or `linkHop2` (see **5.24e** for `target`, `parent`, `relation_type`, and `subject`).
 
-**Work:** Remove the getters, constructor parameters, merge flags, JSON property order entries, and tests for removed fields. Relationship-note subject/target information remains available only through note details/frontmatter and truncation.
+**Work:** Remove the getters, constructor parameters, merge flags, JSON property order entries, and tests for removed fields. Relationship structure remains available only through note details/frontmatter and truncation.
 
 **Verify:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.services.GraphRAGServiceTest`; run `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` if OpenAPI output changes.
 

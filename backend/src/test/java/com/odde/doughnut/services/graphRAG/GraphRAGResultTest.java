@@ -24,10 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 class GraphRAGResultTest {
   @Autowired private MakeMe makeMe;
   private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
-  private static final String PARENT = "parent";
 
   @Test
-  void shouldIncludeParentUriAndTitleWhenSerializedToJson() throws Exception {
+  void shouldNotSerializeParentOnBareNoteChildUsesTitleOnly() throws Exception {
     // Arrange
     Note parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
     Note note = makeMe.aNote().under(parent).title("Child Note").please();
@@ -38,11 +37,9 @@ class GraphRAGResultTest {
     JsonNode jsonNode = objectMapper.valueToTree(bareNote);
 
     // Assert
-    assertThat(jsonNode.has(PARENT), is(true));
-    JsonNode parentJson = jsonNode.get(PARENT);
-    assertThat(parentJson.isObject(), is(true));
-    assertThat(parentJson.get("title").asText(), containsString("Parent Note"));
-    assertThat(parentJson.has("uri"), is(true));
+    assertThat(jsonNode.has("parent"), is(false));
+    assertThat(jsonNode.get("title").asText(), containsString("Child Note"));
+    assertThat(jsonNode.has("uri"), is(true));
   }
 
   @Nested
@@ -63,20 +60,17 @@ class GraphRAGResultTest {
     }
 
     @Test
-    void shouldIncludeSubjectButNotParentWhenNoteIsRelated() {
-      // Assert
-      assertThat(jsonNode.has(PARENT), is(false));
-      assertThat(jsonNode.has("subject"), is(true));
-      JsonNode subject = jsonNode.get("subject");
-      assertThat(subject.isObject(), is(true));
-      assertThat(subject.get("title").asText(), containsString("Parent Note"));
+    void shouldOmitSubjectAndParentWhenNoteIsRelated() {
+      assertThat(jsonNode.has("parent"), is(false));
+      assertThat(jsonNode.has("subject"), is(false));
+      assertThat(jsonNode.get("details").asText(), containsString("Parent Note"));
     }
 
     @Test
-    void shouldHaveRelationTypeFieldInsteadOfTitleWhenNoteIsRelated() {
-      assertThat(jsonNode.has("title"), is(false));
-      assertThat(jsonNode.has("relation_type"), is(true));
-      assertThat(jsonNode.get("relation_type").asText(), is("a specialization of"));
+    void shouldIncludeTitleAndOmitRelationTypeWhenNoteIsRelated() {
+      assertThat(jsonNode.has("relation_type"), is(false));
+      assertThat(jsonNode.has("title"), is(true));
+      assertThat(jsonNode.get("title").asText(), equalTo(note.getTitle()));
     }
 
     @Test
@@ -86,14 +80,13 @@ class GraphRAGResultTest {
 
       // Assert property order
       assertThat(jsonString, startsWith("{\"uri\":"));
+      assertThat(jsonString.indexOf("\"title\":"), is(greaterThan(jsonString.indexOf("\"uri\":"))));
+      assertThat(jsonString, not(containsString("\"subject\"")));
+      assertThat(jsonString, not(containsString("\"target\"")));
+      assertThat(jsonString, not(containsString("\"relation_type\"")));
       assertThat(
-          jsonString.indexOf("\"subject\":"), is(greaterThan(jsonString.indexOf("\"uri\":"))));
-      assertThat(
-          jsonString.indexOf("\"relation_type\":"),
-          is(greaterThan(jsonString.indexOf("\"subject\":"))));
-      assertThat(
-          jsonString.indexOf("\"target\":"),
-          is(greaterThan(jsonString.indexOf("\"relation_type\":"))));
+          jsonString.indexOf("\"relationToFocusNote\":"),
+          is(greaterThan(jsonString.indexOf("\"title\":"))));
     }
   }
 
@@ -151,7 +144,7 @@ class GraphRAGResultTest {
   @Nested
   class FocusNoteTest {
     @Test
-    void shouldIncludeParentUriAndTitleWhenSerializedToJson() throws Exception {
+    void shouldExposeParentPlacementViaContextualPathNotParentField() throws Exception {
       // Arrange
       Note parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
       Note note = makeMe.aNote().under(parent).title("Child Note").please();
@@ -163,10 +156,9 @@ class GraphRAGResultTest {
       String jsonString = objectMapper.writeValueAsString(focusNote);
 
       // Assert
-      assertThat(jsonNode.has(PARENT), is(true));
-      JsonNode parentJson = jsonNode.get(PARENT);
-      assertThat(parentJson.isObject(), is(true));
-      assertThat(parentJson.get("title").asText(), containsString("Parent Note"));
+      assertThat(jsonNode.has("parent"), is(false));
+      assertThat(jsonNode.has("contextualPath"), is(true));
+      assertThat(jsonNode.get("contextualPath").toString(), containsString(parent.getUri()));
 
       // Assert property order
       assertThat(jsonString, startsWith("{\"uri\":"));
