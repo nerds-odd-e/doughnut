@@ -1,7 +1,7 @@
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { RelationshipCreation } from "@generated/doughnut-backend-api"
 import { parseNoteDetailsMarkdown } from "@/utils/noteDetailsFrontmatter"
 
-export type RelationTypeLabel = NonNullable<NoteTopology["relationType"]>
+export type RelationTypeLabel = RelationshipCreation["relationType"]
 
 interface RelationTypeOption {
   label: RelationTypeLabel

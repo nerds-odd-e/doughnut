@@ -38,11 +38,10 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/doughnut-backend-api"
-// Using string literals for relationType values
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
+import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 import PopButton from "../commons/Popups/PopButton.vue"
 import InputWithType from "../form/InputWithType.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
@@ -51,7 +50,7 @@ import RelationTypeSelect from "./RelationTypeSelect.vue"
 const props = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopology["relationType"]>,
+    type: String as PropType<RelationTypeLabel>,
     default: undefined,
   },
   errorMessage: String,

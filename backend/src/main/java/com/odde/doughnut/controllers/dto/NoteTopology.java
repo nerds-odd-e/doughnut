@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers.dto;
 
-import com.odde.doughnut.entities.RelationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,6 @@ public class NoteTopology {
   @NonNull private Integer id;
 
   private String title;
-  private RelationType relationType;
   private NoteTopology targetNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;
 

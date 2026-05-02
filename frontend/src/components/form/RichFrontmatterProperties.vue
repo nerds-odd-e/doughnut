@@ -125,12 +125,12 @@
 
 <script setup lang="ts">
 import { computed, ref, useId, watch } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   relationLabelFromKebab,
   relationTypeFromKebab,
+  type RelationTypeLabel,
 } from "@/models/relationTypeOptions"
 import {
   parseNoteDetailsMarkdown,
@@ -200,7 +200,7 @@ function isRelationPropertyRow(row: PropertyRow): boolean {
 
 function onRelationTypeSelected(
   idx: number,
-  newType: NoteTopology["relationType"] | undefined
+  newType: RelationTypeLabel | undefined
 ) {
   const noteId = props.relationPropertyApiNoteId
   if (noteId == null || newType === undefined) return

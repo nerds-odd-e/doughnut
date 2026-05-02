@@ -16,18 +16,19 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/doughnut-backend-api"
-// Using string literals for relationType values
 import type { PropType } from "vue"
 import { computed } from "vue"
-import { relationTypeOptions } from "../../models/relationTypeOptions"
+import {
+  relationTypeOptions,
+  type RelationTypeLabel,
+} from "../../models/relationTypeOptions"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 
 defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopology["relationType"]>,
+    type: String as PropType<RelationTypeLabel>,
     required: false,
     default: undefined,
   },

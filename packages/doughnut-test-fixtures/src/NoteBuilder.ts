@@ -1,10 +1,17 @@
 import type {
   Note,
   NoteRealm,
-  NoteTopology as NoteTopologyType,
+  RelationshipCreation,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
+
+/** Same rule as backend RelationshipNoteMarkdownFormatter.labelToKebab */
+function relationLabelToKebab(label: string): string {
+  const t = label.trim()
+  if (!t) return 'related-to'
+  return t.toLowerCase().replace(/\s+/g, '-')
+}
 
 class NoteBuilder extends Builder<Note> {
   data: Note
@@ -78,14 +85,14 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  relationType(value: NoteTopologyType['relationType']): NoteBuilder {
+  relationType(value: RelationshipCreation['relationType']): NoteBuilder {
     this.title(`:${value}`)
-    // default target
     const targetId = generateId()
     const targetNotebookId = generateId()
+    const kebab = relationLabelToKebab(value)
+    this.data.details = `---\nrelation: ${kebab}\n---\n`
     this.data.noteTopology.targetNoteTopology = {
       id: targetId,
-      relationType: value,
       title: 'a target',
       notebookId: targetNotebookId,
     }
