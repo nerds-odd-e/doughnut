@@ -179,16 +179,6 @@ class NoteController {
     }
     BeanUtils.copyProperties(noteRecallSetting, note.getRecallSetting());
     entityPersister.save(note);
-    note.getRelationshipsAndRefers()
-        .forEach(
-            relation -> {
-              relation
-                  .getRecallSetting()
-                  .setLevel(
-                      Math.max(
-                          relation.getRecallSetting().getLevel(), noteRecallSetting.getLevel()));
-              entityPersister.save(relation);
-            });
     return RedirectToNoteResponse.forNote(note.getId());
   }
 

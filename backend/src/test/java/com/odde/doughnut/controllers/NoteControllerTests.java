@@ -548,19 +548,33 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldUpdateRelationshipLevel() throws UnexpectedNoAccessRightException {
+    void shouldNotChangeRelationshipNoteRecallLevelWhenUpdatingSource()
+        throws UnexpectedNoAccessRightException {
+      int relationLevelBefore = getLevel(relation);
       @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
       noteRecallSetting.setLevel(4);
       controller.updateNoteRecallSetting(source, noteRecallSetting);
-      assertThat(getLevel(relation), is(4));
+      assertThat(
+          getLevel(noteRepository.findById(relation.getId()).orElseThrow()),
+          is(relationLevelBefore));
+      assertThat(
+          noteRepository.findById(source.getId()).orElseThrow().getRecallSetting().getLevel(),
+          is(4));
     }
 
     @Test
-    void shouldUpdateReferenceLevel() throws UnexpectedNoAccessRightException {
+    void shouldNotChangeRelationshipNoteRecallLevelWhenUpdatingTarget()
+        throws UnexpectedNoAccessRightException {
+      int relationLevelBefore = getLevel(relation);
       @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
       noteRecallSetting.setLevel(4);
       controller.updateNoteRecallSetting(target, noteRecallSetting);
-      assertThat(getLevel(relation), is(4));
+      assertThat(
+          getLevel(noteRepository.findById(relation.getId()).orElseThrow()),
+          is(relationLevelBefore));
+      assertThat(
+          noteRepository.findById(target.getId()).orElseThrow().getRecallSetting().getLevel(),
+          is(4));
     }
 
     @Test
