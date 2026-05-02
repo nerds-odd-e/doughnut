@@ -84,13 +84,7 @@ public class WikiTitleCacheService {
    */
   public List<Note> outgoingWikiLinkedTargetsForGraph(Note focus, User viewer) {
     LinkedHashMap<Integer, Note> byTargetId = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row :
-        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focus.getId())) {
-      Note resolved = authorizedOutgoingTargetNote(focus, row, viewer);
-      if (resolved != null) {
-        byTargetId.putIfAbsent(resolved.getId(), resolved);
-      }
-    }
+    appendAuthorizedOutgoingTargets(focus, viewer, byTargetId);
     return List.copyOf(byTargetId.values());
   }
 
@@ -144,6 +138,17 @@ public class WikiTitleCacheService {
     return referencesNotesForViewer(primaryTarget.get(), viewer).stream()
         .filter(n -> !excludedCarrierIds.contains(n.getId()))
         .toList();
+  }
+
+  private void appendAuthorizedOutgoingTargets(
+      Note cacheOwner, User viewer, LinkedHashMap<Integer, Note> byTargetId) {
+    for (NoteWikiTitleCache row :
+        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(cacheOwner.getId())) {
+      Note resolved = authorizedOutgoingTargetNote(cacheOwner, row, viewer);
+      if (resolved != null) {
+        byTargetId.putIfAbsent(resolved.getId(), resolved);
+      }
+    }
   }
 
   private List<Note> relationCarrierChildrenOrdered(Note focus) {
