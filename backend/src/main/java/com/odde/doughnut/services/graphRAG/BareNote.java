@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
@@ -55,7 +56,9 @@ public class BareNote {
 
   @JsonProperty("relation_type")
   public com.odde.doughnut.entities.RelationType getRelationType() {
-    return note.getRelationType();
+    return note.isRelation()
+        ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
+        : note.getRelationType();
   }
 
   @JsonProperty("target")

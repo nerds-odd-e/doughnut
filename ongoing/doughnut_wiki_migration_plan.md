@@ -579,7 +579,7 @@ Phase 5 introduces a persisted cache of wiki-title references derived from note 
 
 Table `note_wiki_title_cache` stores: `id`; `note_id` (the note whose Markdown `details` were parsed); `target_note_id` (the resolved link target); `link_text` (the full inner wiki token inside `[[]]`). Only resolved links are persisted. Stable list order is row `id` ascending. Until sub-phase 5.15, `NoteRealm.wikiTitles` and the public `WikiTitle` DTO still use live resolution from details; after 5.15, read paths load from this cache while `notebookId` and `slug` on `WikiTitle` remain derived from `target_note_id` (and authorization) at read time—not extra columns on the cache table.
 
-The cache is used to populate `NoteRealm.wikiTitles`, incoming references, and note graph relationships. For existing non-relationship notes, migration adds a `parent: "[[Parent Title]]"` frontmatter property when a legacy parent exists, then refreshes the cache. New notes do not get this property by default.
+The cache is used to populate `NoteRealm.wikiTitles`, note-show **references** (unified as `NoteRealm.references` after sub-phase **5.21.3** in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`; see **5.21.1**–**5.21.3** and **5.23** for inbound vs relation slices and API cleanup), and note graph relationships. For existing non-relationship notes, migration adds a `parent: "[[Parent Title]]"` frontmatter property when a legacy parent exists, then refreshes the cache. New notes do not get this property by default.
 
 When a note title changes, the cache identifies notes that reference the old title so their wiki references can be updated to the new title and refreshed.
 
@@ -587,7 +587,7 @@ The production admin migration should run as a resumable batched job after the c
 
 ## Sub-Phase Plan
 
-Phase 5 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests.
+Phase 5 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-5-sub-phases.md`. Each sub-phase is a small, testable slice of work; **git commit cadence is not prescribed**—see the **Sizing Rule** there (`Commit boundary` = cohesion for when you commit, not one commit per sub-phase).
 
 ## Expected Result
 
@@ -597,7 +597,7 @@ After this phase:
 - relationship fields are represented in content and/or frontmatter
 - relationship notes have folder locations and note slugs (`note.slug` as full path)
 - migrated relationship notes have derived, truncated, non-empty titles
-- `NoteRealm.wikiTitles`, incoming references, and note graph relationship lookup use the persisted wiki-title cache
+- `NoteRealm.wikiTitles`, unified **`NoteRealm.references`** on note show (replacing separate inbound vs relationship-child lists), and note graph relationship lookup use the persisted wiki-title cache; legacy **`NoteRealm.inboundReferences`** / **`relationshipsDeprecating`** are removed from the API once graph retrieval is cache-backed (**5.23** in the Phase 5 sub-phase plan)
 - existing non-relationship notes preserve legacy parent semantics as migration-only `parent` frontmatter wiki links
 - relationship `relation` and `target` behavior no longer depends on note-level `relation_type` / link-type or `target_note_id` fields
 - graph retrieval no longer treats children or child relationship notes as the source of incoming references for existing notes, and its reference quota is increased for cache-backed wiki references
@@ -637,7 +637,7 @@ Phase 1 already persists **`folderId`** parallel to **`Note.parent`** and keeps 
 
 ## Sub-Phase Plan
 
-Phase 6 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md`. Each sub-phase is intended to be a small, closed commit with its own targeted tests. Sub-phase **6.5** (folder-first creation and notebook primary actions) is split further into **6.5.1**–**6.5.4** in that document.
+Phase 6 is decomposed in `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md`. Each sub-phase is a small, testable slice; developers choose how to group git commits. Sub-phase **6.5** (folder-first creation and notebook primary actions) is split further into **6.5.1**–**6.5.4** in that document.
 
 ## Non-goals
 

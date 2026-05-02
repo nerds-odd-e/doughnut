@@ -23,7 +23,10 @@ public class QuestionGenerationRequestBuilder {
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
-    RelationType relationType = note.isRelation() ? note.getRelationType() : null;
+    RelationType relationType =
+        note.isRelation()
+            ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
+            : null;
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType);
     return openAiChatRequestForQuestionGeneration(note, additionalMessage)
         .responseJsonSchema(tool)

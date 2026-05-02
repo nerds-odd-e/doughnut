@@ -15,7 +15,7 @@ By the end of Phase 5:
 - relation type, subject, and target are only a templated way to create a new note
 - notes created from a relationship template are ordinary notes in title display, sidebar display, note show, references, and graph behavior
 - wiki-title references are persisted in a cache derived from note details/frontmatter
-- `NoteRealm.wikiTitles`, reference lists, and graph retrieval use the cached wiki-title references instead of legacy `target_note_id` / child relationship notes
+- `NoteRealm.wikiTitles`, unified note-show **references** (`NoteRealm.references` after sub-phase 5.21.3), and graph retrieval use the cached wiki-title references instead of legacy `target_note_id` / child relationship notes
 - legacy non-relationship notes have a migration-only `parent: "[[...]]"` frontmatter property that preserves the old semantic parent as a wiki reference
 - relationship `relation` and `target` data come from frontmatter/cache instead of `relation_type` / `target_note_id`
 - no note title may be null or empty after the Phase 5 data migration and schema/API tightening
@@ -33,7 +33,9 @@ By the end of Phase 5:
 
 ## Sizing Rule
 
-Each sub-phase below is planned as a five-minute commit. If implementation discovers a sub-phase cannot be finished, tested, and committed inside that timebox, stop and split it before continuing.
+Each sub-phase below is sized as a **small cohesive slice** of work (roughly a five-minute *planning* granularity: one concern, one verify step). If a slice cannot be finished and tested inside that scope, split it further before continuing.
+
+**Git commits:** There is **no** requirement to run `git commit` once per sub-phase or immediately after each one. Developers may batch several sub-phases, combine with unrelated fixes, or split one sub-phase across multiple commits as long as the tree stays green. The **`Commit boundary:`** lines under each sub-phase name the **natural cohesion / review unit** (what belongs together in one change when you *do* commit), not a literal commit cadence.
 
 ## Sub-Phase 5.1 - Relationship Note Reachability Test
 
@@ -411,7 +413,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Pre-condition:** Relationship notes store `relation` in frontmatter. API responses that drive relation-type **display** include `Note.details` (or an equivalent parsed-properties shape) for those notes.
 
-**Trigger:** A user views a surface that shows the relation type icon or inverted label for a relationship note (for example inbound references on note show, or the relationship row before `RelationshipOfNote` is removed in 5.20.6).
+**Trigger:** A user views a surface that shows the relation type icon or inverted label for a relationship note (for example inbound rows on note show before **5.21.3** unifies them into **`NoteReferences`**, or the relationship row before `RelationshipOfNote` is removed in 5.20.6).
 
 **Post-condition:** Display uses the `relation` value parsed from the note’s markdown frontmatter (same normalization as the property editor / `relationTypeFromKebab`), not `NoteTopology.relationType`.
 
@@ -515,19 +517,61 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 ## Sub-Phase 5.21 - References Use Cached Wiki Titles
 
+**Type:** Behavior (split into three cohesive slices; commit cadence is up to the developer).
+
+**Pre-condition:** Relationship and parent semantics are represented in note details/frontmatter and rows exist in `note_wiki_title_cache` when links resolve.
+
+**Overall post-condition (after 5.21.3):** Note show uses a single `NoteRealm.references` list built from the cache (plus the same authorization rules as today). The separate “referenced by” sidebar and the old split between inbound vs relationship-child lists are gone from the UI. Legacy `NoteRealm.inboundReferences` and `NoteRealm.relationshipsDeprecating` remain on the wire **only until** graph retrieval is migrated in **5.23**, which then removes those properties from `NoteRealm` and generated clients (see 5.23).
+
+**E2E (all slices):** After each slice, run the smallest relevant `--spec` set (relationship + note-show features touched, for example `e2e_test/features/relationships/*.feature` and any note-show / reference scenarios that assert the reference surface). Keep scenarios green; add or adjust assertions when the observable surface moves (unified list, layout).
+
+### Sub-Sub-Phase 5.21.1 - Inbound References From Wiki Link Cache
+
 **Type:** Behavior.
 
-**Pre-condition:** Relationship and parent references are present in the wiki-title cache.
+**Pre-condition:** Wiki-title cache rows exist for referring notes (`note_id` = referrer, `target_note_id` = resolved target).
 
-**Trigger:** A note realm is built for a note that is referenced by other notes.
+**Trigger:** `NoteRealm` is built for a note **N** that other notes link to.
 
-**Post-condition:** Incoming references are resolved by cached wiki-title entries that point at the note's current title, not by `target_note_id` or relationship child notes.
+**Post-condition:** The list that represents “notes that link to **N** as target” is populated by querying the cache for rows whose `target_note_id` equals **N**’s id (not by `Note.findAllByTargetNote` / legacy `target_note_id` column semantics). Visibility and same-notebook / cross-notebook authorization match current inbound behavior.
 
-**Work:** Replace `NoteRealm.inboundReferences` population and related reference lookup paths with cache-backed queries, preserving existing authorization behavior.
+**Work:** Add or reuse a repository/service query over `note_wiki_title_cache` joined to source notes; wire `NoteRealmService` (or equivalent) to populate the inbound slice from that query. Keep the existing DTO field name (`inboundReferences`) until **5.23** removes it—this slice proves cache parity with focused tests.
 
-**Verify:** Focused controller/service tests for same-notebook and cross-notebook visible references.
+**Verify:** Focused controller/service tests for same-notebook and cross-notebook visible inbound rows; targeted E2E if any user-visible inbound list behavior changes.
 
-**Commit boundary:** One cache-backed-references commit.
+**Commit boundary:** One inbound-from-cache commit.
+
+### Sub-Sub-Phase 5.21.2 - Relationship / Parent–Subject Links From Wiki Link Cache
+
+**Type:** Behavior.
+
+**Pre-condition:** Inbound population can use the cache (5.21.1). Relationship and legacy parent links appear as resolved cache rows where **N** is the **subject** side: e.g. relationship note details whose `source` wiki link resolves to **N**, and non-relationship notes whose `parent` frontmatter link resolves to **N** (exact filter rules follow the same semantics the product used when those edges came from `parent_id` / relationship structure).
+
+**Trigger:** `NoteRealm` is built for a note **N** that is the parent or subject of other notes in the wiki sense.
+
+**Post-condition:** The list that represents “notes that stand in the old relation-child / subject relationship to **N**” is derived from the wiki-title cache (and the same authorization), not from traversing child relationship notes or structural parent edges for that purpose.
+
+**Work:** Implement the cache-backed query for the “**N** as parent/subject” slice; feed the slice that today maps to relationship rows / `relationshipsDeprecating` (name may still be `relationshipsDeprecating` on the DTO until 5.23). Add focused tests that distinguish target-linked vs subject/parent-linked rows.
+
+**Verify:** Focused backend tests; targeted relationship / note-show E2E if the observable list order or membership changes.
+
+**Commit boundary:** One relations-from-cache commit.
+
+### Sub-Sub-Phase 5.21.3 - Unified `NoteRealm.references` and `NoteReferences` UI
+
+**Type:** Behavior.
+
+**Pre-condition:** Inbound and relation-style slices are both cache-backed (5.21.1 and 5.21.2).
+
+**Trigger:** A user opens note show for a note with any mix of inbound and relation-style referring notes.
+
+**Post-condition:** `NoteRealm` exposes a single ordered list property **`references`** (array of `Note` or the same shape consumers need—align with OpenAPI). It merges the two slices with a documented ordering (for example dedupe by referring note id, stable sort). The frontend **removes** the separate “Referenced by” / `inboundReferences` sidebar in `NoteShow.vue`. All items render in one place: rename `frontend/src/components/notes/ChildrenNotes.vue` to **`NoteReferences.vue`**, update imports (including `components.d.ts` if used), and render the **combined** `noteRealm.references` list (expand/collapse / cards behavior stays coherent with one list). Until **5.23**, you may still populate `inboundReferences` / `relationshipsDeprecating` in parallel for graph or other readers; the note-show path must use only `references` and `NoteReferences`.
+
+**Work:** Backend merge + OpenAPI field `references`; frontend rename and single-column layout; remove duplicate inbound-only UI. Update `NoteRealmBuilder` / fixtures and any Vitest builders that assert realm shape.
+
+**Verify:** Focused backend tests for merge ordering and dedupe; frontend tests; targeted Cypress `--spec` for relationship + note-show reference assertions.
+
+**Commit boundary:** One unified-references + UI commit.
 
 ## Sub-Phase 5.22 - Remove Relationship Link Type Field
 
@@ -549,17 +593,19 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Type:** Behavior.
 
-**Pre-condition:** Cached wiki-title references replace legacy inbound relationship lookup.
+**Pre-condition:** Cached wiki-title references drive **note show** (5.21). `NoteRealm` may still expose `inboundReferences` and `relationshipsDeprecating` for older graph code paths until this sub-phase completes.
 
 **Trigger:** A user or AI flow requests a note graph.
 
-**Post-condition:** The graph gets related notes through cache-backed wiki references and no longer traverses children, child relationship notes, or target-child relationship handlers as incoming references for existing notes. The reference quota is increased to account for the broader wiki-reference source.
+**Post-condition:** The graph gets related notes through cache-backed outgoing/incoming reference handlers and no longer traverses children, child relationship notes, or target-child relationship handlers as incoming references for existing notes. The reference quota is increased to account for the broader wiki-reference source.
 
-**Work:** Replace graph relationship handlers that depend on `children`, relationship children, or `targetNote` with cache-backed outgoing/incoming reference handlers; adjust the quota in the graph retrieval policy.
+**API cleanup (same sub-phase or an immediately following commit):** Remove **`NoteRealm.inboundReferences`** and **`NoteRealm.relationshipsDeprecating`** from the backend DTO, OpenAPI, and generated TypeScript. Callers use **`NoteRealm.references`** and/or query the wiki-title cache directly—no parallel inbound vs “relations deprecating” lists on the wire. Regenerate the API client if OpenAPI changes; update **`NoteRealmBuilder`**, MCP, and any tests that assert the old shape.
 
-**Verify:** Focused graph retrieval tests showing cached references are included and legacy child-only relationships are not required.
+**Work:** Replace graph relationship handlers that depend on `children`, relationship children, or `targetNote` with cache-backed handlers; adjust the quota in the graph retrieval policy; delete obsolete realm fields and fix compile errors.
 
-**Commit boundary:** One cache-backed-graph commit.
+**Verify:** Focused graph retrieval tests showing cached references are included and legacy child-only relationships are not required; typecheck and targeted E2E where graph or realm responses are asserted.
+
+**Commit boundary:** One cache-backed-graph slice (optionally two cohesive slices—e.g. graph behavior vs DTO removal—if that improves review; do not leave failing E2E between them). Same git-commit flexibility as [Sizing Rule](#sizing-rule).
 
 ## Sub-Phase 5.24 - Remove Relationship Target Field
 
@@ -581,7 +627,7 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Type:** Behavior.
 
-**Pre-condition:** Incoming references are discoverable from the wiki-title cache.
+**Pre-condition:** Referring notes are discoverable from the wiki-title cache (and, after 5.21.3, surfaced on `NoteRealm.references` for note show).
 
 **Trigger:** A note's title changes.
 
@@ -597,15 +643,15 @@ Do not run the old relationship title/details migration as one long blocking adm
 
 **Type:** Behavior.
 
-**Pre-condition:** References and graph retrieval use cached wiki-title references instead of child relationship notes.
+**Pre-condition:** References and graph retrieval use cached wiki-title references; **`NoteRealm.relationshipsDeprecating`** and **`NoteRealm.inboundReferences`** are removed from the API in **5.23** (note show already uses **`NoteRealm.references`** and **`NoteReferences`** from **5.21.3**).
 
 **Trigger:** A user opens a note show page for a note that used to have relationship child notes.
 
-**Post-condition:** `NoteRealm.relationshipsDeprecating` is removed, child relationship notes are no longer shown as relationship rows on note show, and users find relationships through the replacement reference/wiki-link surface.
+**Post-condition:** Child relationship notes are not presented as a separate “relationship children” concept on note show; users find those edges only through the unified reference surface (`references` / wiki links). Any residual UI, copy, or E2E steps that still assumed a distinct relationship-child list or sidebar inbound panel are removed or rewritten.
 
-**Work:** Remove `relationshipsDeprecating` from `NoteRealm` and from frontend note show rendering. Update the existing E2E relationship/reference test to find the relationship through the new reference surface instead of the child-notes relationship list.
+**Work:** Align remaining note-show copy and E2E with **`NoteReferences`** + **`references`** only. If 5.23 already dropped `relationshipsDeprecating` from the wire, this sub-phase is mostly behavioral confirmation and test cleanup; otherwise complete that removal here in lockstep with the plan above.
 
-**Verify:** Target the existing E2E feature that currently observes note-show relationships, plus focused backend/frontend tests affected by the `NoteRealm` shape change.
+**Verify:** Target the existing E2E feature that observes note-show relationships/references, plus focused frontend tests for `NoteReferences`.
 
 **Commit boundary:** One note-show-reference-surface commit.
 

@@ -4,6 +4,7 @@ import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
+import java.util.Optional;
 
 public final class RelationshipNoteMarkdownFormatter {
 
@@ -11,6 +12,41 @@ public final class RelationshipNoteMarkdownFormatter {
   private static final String UNTITLED = "Untitled";
 
   private RelationshipNoteMarkdownFormatter() {}
+
+  /**
+   * Same kebab rule as the frontend {@code relationKebabFromLabel} — must stay aligned with {@link
+   * #format} / {@link #formatForRelationshipNote}.
+   */
+  public static String relationKebabFromLabel(String label) {
+    String t = trimmedOrEmpty(label);
+    if (t.isEmpty()) {
+      return relationKebabFromLabel(RelationType.RELATED_TO.label);
+    }
+    return t.toLowerCase().replaceAll("\\s+", "-");
+  }
+
+  /**
+   * Reads {@code relation:} from relationship-note frontmatter. Empty when not a relationship note,
+   * no {@code relation} line, or unknown kebab (callers should fall back to {@link
+   * com.odde.doughnut.entities.Note#getRelationType()}).
+   */
+  public static Optional<RelationType> parseRelationTypeFromRelationshipNoteDetails(
+      String details) {
+    return NoteDetailsMarkdown.splitLeadingFrontmatter(details)
+        .filter(fm -> fm.yamlRaw().contains("type: relationship"))
+        .flatMap(
+            fm ->
+                relationKebabFromYamlRaw(fm.yamlRaw())
+                    .flatMap(RelationshipNoteMarkdownFormatter::relationTypeFromKebab));
+  }
+
+  /**
+   * Frontmatter-first relation type read; falls back to the persisted {@code relation_type} column.
+   */
+  public static RelationType relationTypeForRelationNoteRead(Note note) {
+    return parseRelationTypeFromRelationshipNoteDetails(note.getDetails())
+        .orElse(note.getRelationType());
+  }
 
   public static String extractUserSuffixFromRelationshipDetails(String details) {
     NoteDetailsMarkdown.LeadingFrontmatter frontmatter =
@@ -48,7 +84,7 @@ public final class RelationshipNoteMarkdownFormatter {
       String preservedDetailsOrNull) {
     RelationType type = relationType != null ? relationType : RelationType.RELATED_TO;
     String relationLabel = type.label;
-    String relationKebab = labelToKebab(relationLabel);
+    String relationKebab = relationKebabFromLabel(relationLabel);
 
     String sourceDisplay = displayTitle(sourceTitle);
     String targetDisplay = displayTitle(targetTitle);
@@ -85,7 +121,7 @@ public final class RelationshipNoteMarkdownFormatter {
       String preservedDetailsOrNull) {
     RelationType type = relationType != null ? relationType : RelationType.RELATED_TO;
     String relationLabel = type.label;
-    String relationKebab = labelToKebab(relationLabel);
+    String relationKebab = relationKebabFromLabel(relationLabel);
 
     String sourceLink = wikiTokenForEndpoint(relationshipNote, sourceEndpoint);
     String targetLink = wikiTokenForEndpoint(relationshipNote, targetEndpoint);
@@ -169,12 +205,48 @@ public final class RelationshipNoteMarkdownFormatter {
     return t.isEmpty() ? null : t;
   }
 
-  private static String labelToKebab(String label) {
-    String t = trimmedOrEmpty(label);
-    if (t.isEmpty()) {
-      return labelToKebab(RelationType.RELATED_TO.label);
+  private static Optional<String> relationKebabFromYamlRaw(String yamlRaw) {
+    if (yamlRaw == null || yamlRaw.isEmpty()) {
+      return Optional.empty();
     }
-    return t.toLowerCase().replaceAll("\\s+", "-");
+    String normalized = yamlRaw.replace("\r\n", "\n").replace('\r', '\n');
+    for (String line : normalized.split("\n", -1)) {
+      String t = line.trim();
+      if (t.isEmpty() || t.startsWith("#")) {
+        continue;
+      }
+      int colon = t.indexOf(':');
+      if (colon < 0) {
+        continue;
+      }
+      String key = t.substring(0, colon).trim();
+      if (!key.equalsIgnoreCase("relation")) {
+        continue;
+      }
+      String value = t.substring(colon + 1).trim();
+      if (value.isEmpty()) {
+        return Optional.empty();
+      }
+      if (value.length() >= 2) {
+        char first = value.charAt(0);
+        char last = value.charAt(value.length() - 1);
+        if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
+          value = value.substring(1, value.length() - 1).trim();
+        }
+      }
+      return Optional.of(value.toLowerCase());
+    }
+    return Optional.empty();
+  }
+
+  private static Optional<RelationType> relationTypeFromKebab(String kebab) {
+    String k = kebab.trim().toLowerCase();
+    for (RelationType rt : RelationType.values()) {
+      if (relationKebabFromLabel(rt.label).equals(k)) {
+        return Optional.of(rt);
+      }
+    }
+    return Optional.empty();
   }
 
   private static String yamlDoubleQuotedInner(String s) {

@@ -4,6 +4,7 @@ import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.io.ByteArrayOutputStream;
@@ -171,8 +172,12 @@ public class ObsidianFormatService {
     if (note.getTitle() != null) {
       return note.getTitle();
     }
-    if (note.getRelationType() != null) {
-      return "_" + note.getRelationType().label;
+    RelationType relationType =
+        note.isRelation()
+            ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
+            : null;
+    if (relationType != null) {
+      return "_" + relationType.label;
     }
     return "untitled";
   }

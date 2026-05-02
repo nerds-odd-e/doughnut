@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.startsWith;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class RelationshipNoteMarkdownFormatterTest {
@@ -36,6 +37,79 @@ class RelationshipNoteMarkdownFormatterTest {
     String markdown = RelationshipNoteMarkdownFormatter.format(null, "X", "Y", null);
     assertThat(markdown, containsString("relation: related-to"));
     assertThat(markdown, containsString("[[X]] related to [[Y]]."));
+  }
+
+  @Test
+  void parseRelationType_reads_kebab_from_relationship_frontmatter() {
+    String details =
+        RelationshipNoteMarkdownFormatter.format(RelationType.SPECIALIZE, "A", "B", null);
+    assertThat(
+        RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(details),
+        equalTo(Optional.of(RelationType.SPECIALIZE)));
+  }
+
+  @Test
+  void parseRelationType_reads_quoted_relation_value() {
+    String details =
+        "---\n"
+            + "type: relationship\n"
+            + "relation: \"a-part-of\"\n"
+            + "source: \"[[S]]\"\n"
+            + "target: \"[[T]]\"\n"
+            + "---\n\n"
+            + "[[S]] a part of [[T]].";
+    assertThat(
+        RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(details),
+        equalTo(Optional.of(RelationType.PART)));
+  }
+
+  @Test
+  void parseRelationType_empty_for_unknown_kebab() {
+    String details =
+        "---\n"
+            + "type: relationship\n"
+            + "relation: not-a-real-relation\n"
+            + "source: \"[[S]]\"\n"
+            + "---\n\n"
+            + "body";
+    assertThat(
+        RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(details),
+        equalTo(Optional.empty()));
+  }
+
+  @Test
+  void parseRelationType_empty_when_not_relationship_type() {
+    assertThat(
+        RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(
+            "---\ntype: article\nrelation: related-to\n---\n\nx"),
+        equalTo(Optional.empty()));
+  }
+
+  @Test
+  void parseRelationType_empty_when_no_frontmatter() {
+    assertThat(
+        RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(
+            "plain body"),
+        equalTo(Optional.empty()));
+  }
+
+  @Test
+  void relationKebabFromLabel_matches_format_output() {
+    assertThat(
+        RelationshipNoteMarkdownFormatter.relationKebabFromLabel(RelationType.CONFUSE_WITH.label),
+        equalTo("confused-with"));
+  }
+
+  @Test
+  void relationTypeForRelationNoteRead_prefers_frontmatter_over_persisted_column() {
+    Note relation = new Note();
+    relation.setTargetNote(new Note());
+    relation.setRelationType(RelationType.RELATED_TO);
+    relation.setDetails(
+        RelationshipNoteMarkdownFormatter.format(RelationType.PART, "A", "B", null));
+    assertThat(
+        RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(relation),
+        equalTo(RelationType.PART));
   }
 
   @Test

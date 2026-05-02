@@ -52,7 +52,10 @@ public class NoteQuestionGenerationService {
 
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String customPrompt, String additionalMessage) {
-    RelationType relationType = note.isRelation() ? note.getRelationType() : null;
+    RelationType relationType =
+        note.isRelation()
+            ? RelationshipNoteMarkdownFormatter.relationTypeForRelationNoteRead(note)
+            : null;
     String prompt = (customPrompt != null) ? customPrompt : AiToolFactory.getDefaultMcqPrompt();
     InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt, relationType);
     OpenAIChatRequestBuilder chatRequestBuilder =

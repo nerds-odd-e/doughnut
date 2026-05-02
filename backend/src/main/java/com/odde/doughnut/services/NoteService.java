@@ -242,8 +242,19 @@ public class NoteService {
     return relation;
   }
 
+  /**
+   * Rebuilds title and relationship markdown from the current relation type. Prefers the persisted
+   * {@code relation_type} when set so an API relation update wins over stale frontmatter until
+   * details are rewritten; otherwise falls back to parsing {@code relation:} from details.
+   */
   public void refreshRelationshipNoteTitle(Note relation) {
-    RelationType type = relation.getRelationType();
+    RelationType type =
+        Optional.ofNullable(relation.getRelationType())
+            .or(
+                () ->
+                    RelationshipNoteMarkdownFormatter.parseRelationTypeFromRelationshipNoteDetails(
+                        relation.getDetails()))
+            .orElse(null);
     if (type == null) {
       return;
     }
@@ -257,6 +268,7 @@ public class NoteService {
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, type, source, target, preserved));
+    relation.setRelationType(type);
     relation.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
   }
 
