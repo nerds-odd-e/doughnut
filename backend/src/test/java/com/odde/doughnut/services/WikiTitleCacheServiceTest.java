@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -139,6 +140,117 @@ class WikiTitleCacheServiceTest {
       wikiTitleCacheService.refreshForNote(carrier, user);
 
       assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+    }
+  }
+
+  @Nested
+  class wikiGraphTargets {
+
+    @Test
+    void carrier_primary_is_semantic_target_not_first_row_in_cache_order() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note target = makeMe.aNote().under(root).title("Beta").please();
+      Note source =
+          makeMe
+              .aNote()
+              .under(root)
+              .title("Alpha")
+              .relateTo(target, RelationType.RELATED_TO)
+              .please();
+      Note carrier = source.getRelationships().get(0);
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      assertThat(
+          wikiTitleCacheService
+              .primaryWikiLinkedTargetForGraph(carrier, user)
+              .orElseThrow()
+              .getId(),
+          equalTo(target.getId()));
+    }
+
+    @Test
+    void parent_focus_sees_carrier_cache_and_primary_matches_carrier_target() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note target = makeMe.aNote().under(root).title("Beta").please();
+      Note source =
+          makeMe
+              .aNote()
+              .under(root)
+              .title("Alpha")
+              .relateTo(target, RelationType.RELATED_TO)
+              .please();
+      Note carrier = source.getRelationships().get(0);
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      assertThat(wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(source, user), hasSize(2));
+      assertThat(
+          wikiTitleCacheService.primaryWikiLinkedTargetForGraph(source, user).orElseThrow().getId(),
+          equalTo(target.getId()));
+    }
+
+    @Test
+    void primary_falls_back_to_authorized_legacy_when_not_in_cache() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note target = makeMe.aNote().under(root).title("Beta").please();
+      Note source =
+          makeMe
+              .aNote()
+              .under(root)
+              .title("Alpha")
+              .relateTo(target, RelationType.RELATED_TO)
+              .please();
+      Note carrier = source.getRelationships().get(0);
+      wikiTitleCacheService.refreshForNote(carrier, user);
+      noteWikiTitleCacheRepository.deleteByNote_Id(carrier.getId());
+
+      assertThat(wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(carrier, user), empty());
+      assertThat(
+          wikiTitleCacheService
+              .primaryWikiLinkedTargetForGraph(carrier, user)
+              .orElseThrow()
+              .getId(),
+          equalTo(target.getId()));
+    }
+
+    @Test
+    void unreadable_legacy_primary_matches_first_outgoing_instead_of_secret_fk() {
+      User user = makeMe.aUser().please();
+      User otherUser = makeMe.aUser().please();
+      Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).please();
+      Note secretTarget = makeMe.aNote().under(headSecret).please();
+
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note target = makeMe.aNote().under(root).title("Beta").please();
+      Note source =
+          makeMe
+              .aNote()
+              .under(root)
+              .title("Alpha")
+              .relateTo(target, RelationType.RELATED_TO)
+              .please();
+      Note carrier = source.getRelationships().get(0);
+      wikiTitleCacheService.refreshForNote(carrier, user);
+      carrier.setTargetNote(secretTarget);
+      makeMe.entityPersister.merge(carrier);
+
+      List<Note> outgoing = wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(carrier, user);
+      assertThat(outgoing, hasSize(2));
+      assertThat(
+          wikiTitleCacheService
+              .primaryWikiLinkedTargetForGraph(carrier, user)
+              .orElseThrow()
+              .getId(),
+          equalTo(outgoing.get(0).getId()));
+      assertThat(
+          wikiTitleCacheService
+              .primaryWikiLinkedTargetForGraph(carrier, user)
+              .orElseThrow()
+              .getId(),
+          not(equalTo(secretTarget.getId())));
     }
   }
 

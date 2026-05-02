@@ -194,17 +194,87 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 ## Sub-Phase 7.11 - Convert Note Motion Away from Parent Edges
 
-**Type:** Structure.
+**Type:** Structure (rolled out through the sub-sub-phases below).
 
 **Pre-condition:** Folder-first UI is the supported structural navigation surface.
 
-**Trigger:** Backend motion code updates `Note.parent`, child lists, or parent-derived folders.
+**Trigger:** Backend motion code updates `Note.parent`, child lists, or parent-derived folders; or link-target search and placement flows still assume a parent note as the drop target.
 
-**Post-condition:** Note movement updates folder placement/order without parent-note edges.
+**Post-condition (end of 7.11.5):** Note movement updates folder placement and ordering without parent-note edges. Partial-match search used for link targets can surface folders as non-navigating placement context; only folder rows offer structural “move under” from that list; move APIs take folder (and, where ordering matters, folder plus after-note), not a parent note.
 
-**Work:** Convert one motion behavior at a time: top-level move, same-folder ordering, then cross-folder placement if currently exposed. Remove `NoteChildContainerFolderService` only after no production path needs parent-to-folder alignment.
+**Work:** Execute **7.11.1** through **7.11.5** in order unless a later sub-sub-phase’s pre-condition is already satisfied earlier. If **7.11.2** and **7.11.3** would leave the UI calling a parent-based endpoint, implement them in the same change set or complete **7.11.3** first.
 
-**Verify:** Focused `NoteMotionServiceTest` / `NoteControllerMotionTests` plus the targeted sidebar/motion E2E spec if the behavior is exposed there.
+**Verify:** After each sub-sub-phase, that sub-sub-phase’s **Verify** line; after **7.11.5**, the combined checks for original 7.11 intent (`NoteMotionServiceTest` / `NoteControllerMotionTests` plus targeted sidebar/motion E2E when the flow is user-visible).
+
+### Sub-Sub-Phase 7.11.1 - Link-target partial search: notes and folders in results
+
+**Type:** Behavior.
+
+**Pre-condition:** Link-target (or equivalent) search exists and returns note matches by partial title or similar.
+
+**Trigger:** Structural placement is moving to folders; users still need to discover a **folder** as a move target from search, not only notes.
+
+**Post-condition:** For **link-target search only** (not general global search), partial-match results include **both** notes and folders where applicable. **Folder** rows appear in the list for context and selection semantics but are **not** clickable as navigation/open. **Note** rows keep existing navigational behavior unless a later sub-sub-phase narrows it.
+
+**Work:** Extend the link-target search API and UI list so folder matches are returned and rendered distinctly; ensure folder rows do not route to note open/detail. General simple search elsewhere stays note-only unless product explicitly expands it later.
+
+**Verify:** Focused frontend test and/or smallest E2E path that covers link-target search with a folder name fragment; assert folder row present and not a note-navigation control.
+
+### Sub-Sub-Phase 7.11.2 - “Move under” only on folder rows in that result list
+
+**Type:** Behavior.
+
+**Pre-condition:** Sub-sub-phase **7.11.1** (folder rows visible in link-target partial results).
+
+**Trigger:** The result list might still offer the same placement affordances on every row.
+
+**Post-condition:** In that same result list, **only folder** rows show **“move under”** (or the product’s equivalent structural placement control). Note rows do **not** show that control. Completes meaningfully with **7.11.3** so the control invokes folder-based motion.
+
+**Work:** Conditional rendering (and any keyboard/menu parity) so note hits never expose parent-style “move under”; folder hits do.
+
+**Verify:** Focused component or E2E assertion on link-target search results: folder row has control, note row does not.
+
+### Sub-Sub-Phase 7.11.3 - Move endpoint: target folder parameter (not parent note)
+
+**Type:** Structure.
+
+**Pre-condition:** Sub-sub-phase **7.11.2** defines where the user picks a folder target, or the change ships together with **7.11.2**.
+
+**Trigger:** Production move still accepts or resolves placement through a parent note id.
+
+**Post-condition:** The structural move endpoint (or the primary production path used from the link-target flow) accepts a **folder** identity for “move under this folder” (notebook root represented as agreed elsewhere, e.g. absent id or explicit root). Callers used by that flow no longer send a parent note id for containment.
+
+**Work:** Adjust controller/service contract and OpenAPI; regenerate TypeScript; update the link-target “move under” client to pass folder id. Keep any narrow testability shim separate from production semantics.
+
+**Verify:** `NoteMotionServiceTest` / `NoteControllerMotionTests` for folder-target move; `pnpm generateTypeScript` if OpenAPI changed.
+
+### Sub-Sub-Phase 7.11.4 - Move-after / ordering: folder scope plus after-note
+
+**Type:** Structure.
+
+**Pre-condition:** Sub-sub-phase **7.11.3** (moves land in the correct folder without parent edges).
+
+**Trigger:** Ordering within a folder still uses parent-sibling or note-parent chain.
+
+**Post-condition:** “Move after” (or same-folder reorder) is expressed with **folder** scope and an **after** reference to a **note** (or the product’s explicit ordering key), not `parentId` + order derived from note children. API and client agree on the minimal shape (e.g. target folder + optional after-note id).
+
+**Work:** Extend or replace the ordering endpoint body; migrate call sites that still infer order from parent note topology.
+
+**Verify:** Focused motion/order tests at controller or service boundary; targeted E2E if reorder is user-visible.
+
+### Sub-Sub-Phase 7.11.5 - Remaining motion cleanup to full Phase 7.11 bar
+
+**Type:** Structure.
+
+**Pre-condition:** Sub-sub-phases **7.11.1–7.11.4** (search + folder-only affordance + folder-parameter move + folder-scoped after-note ordering).
+
+**Trigger:** Any motion path still touches `Note.parent`, child lists, `NoteChildContainerFolderService`, or parent-derived folder alignment.
+
+**Post-condition:** Same as parent **Sub-Phase 7.11** cumulative bar: all motion behaviors that belonged under 7.11 use folder placement/order only; remove `NoteChildContainerFolderService` when no production path needs parent-to-folder alignment.
+
+**Work:** Convert remaining motion paths (sidebar drag, top-level move, cross-folder placement not covered above) one slice at a time; delete dead parent-based motion code.
+
+**Verify:** `NoteMotionServiceTest` / `NoteControllerMotionTests`; targeted sidebar/motion E2E spec when the behavior is exposed in the UI.
 
 ## Sub-Phase 7.12 - Replace Parent-Based Restore/Delete Traversal
 

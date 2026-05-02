@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -26,16 +28,19 @@ public class WikiTitleCacheService {
 
   private final WikiLinkResolver wikiLinkResolver;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
   private final JdbcTemplate jdbcTemplate;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
+      NoteRepository noteRepository,
       AuthorizationService authorizationService,
       JdbcTemplate jdbcTemplate) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
+    this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.jdbcTemplate = jdbcTemplate;
   }
@@ -44,15 +49,93 @@ public class WikiTitleCacheService {
     List<WikiTitle> out = new ArrayList<>();
     for (NoteWikiTitleCache row :
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focusNote.getId())) {
-      Note target = row.getTargetNote();
-      Notebook notebook =
-          target.getNotebook() != null ? target.getNotebook() : focusNote.getNotebook();
-      if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
-        continue;
+      Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
+      if (resolved != null) {
+        out.add(new WikiTitle(row.getLinkText(), resolved.getId()));
       }
-      out.add(new WikiTitle(row.getLinkText(), target.getId()));
     }
     return List.copyOf(out);
+  }
+
+  /**
+   * Authorized wiki-link targets from the focus note’s cache rows, then from each relation child
+   * under the focus (repository-backed), deduped by target id in first-seen order. Used for graph
+   * expansion.
+   */
+  public List<Note> outgoingWikiLinkedTargetsForGraph(Note focus, User viewer) {
+    LinkedHashMap<Integer, Note> byTargetId = new LinkedHashMap<>();
+    appendAuthorizedOutgoingTargets(focus, viewer, byTargetId);
+    if (!focus.isRelation()) {
+      for (Note carrier : relationCarrierChildrenOrdered(focus)) {
+        appendAuthorizedOutgoingTargets(carrier, viewer, byTargetId);
+      }
+    }
+    return List.copyOf(byTargetId.values());
+  }
+
+  /**
+   * Semantic primary target for graph: prefers legacy {@link Note#getTargetNote()} when it matches
+   * an outgoing wiki target or is still readable; for a non-relation focus, relation children’s
+   * targets are considered in sibling order. Otherwise the first authorized outgoing target.
+   */
+  public Optional<Note> primaryWikiLinkedTargetForGraph(Note focus, User viewer) {
+    List<Note> outgoing = outgoingWikiLinkedTargetsForGraph(focus, viewer);
+    List<Note> legacyCandidates = new ArrayList<>();
+    if (focus.getTargetNote() != null) {
+      legacyCandidates.add(focus.getTargetNote());
+    }
+    if (!focus.isRelation()) {
+      for (Note carrier : relationCarrierChildrenOrdered(focus)) {
+        if (carrier.getTargetNote() != null) {
+          legacyCandidates.add(carrier.getTargetNote());
+        }
+      }
+    }
+    for (Note legacy : legacyCandidates) {
+      for (Note o : outgoing) {
+        if (o.getId().equals(legacy.getId())) {
+          return Optional.of(o);
+        }
+      }
+    }
+    for (Note legacy : legacyCandidates) {
+      Notebook nb = legacy.getNotebook();
+      if (nb != null && authorizationService.userMayReadNotebook(viewer, nb)) {
+        return Optional.of(legacy);
+      }
+    }
+    if (!outgoing.isEmpty()) {
+      return Optional.of(outgoing.get(0));
+    }
+    return Optional.empty();
+  }
+
+  private void appendAuthorizedOutgoingTargets(
+      Note cacheOwner, User viewer, LinkedHashMap<Integer, Note> byTargetId) {
+    for (NoteWikiTitleCache row :
+        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(cacheOwner.getId())) {
+      Note resolved = authorizedOutgoingTargetNote(cacheOwner, row, viewer);
+      if (resolved != null) {
+        byTargetId.putIfAbsent(resolved.getId(), resolved);
+      }
+    }
+  }
+
+  private List<Note> relationCarrierChildrenOrdered(Note focus) {
+    return noteRepository.findAllByParentId(focus.getId()).stream()
+        .filter(n -> n.getDeletedAt() == null && n.isRelation())
+        .sorted(Comparator.comparing(Note::getSiblingOrder).thenComparing(Note::getId))
+        .toList();
+  }
+
+  private Note authorizedOutgoingTargetNote(Note cacheOwner, NoteWikiTitleCache row, User viewer) {
+    Note target = row.getTargetNote();
+    Notebook notebook =
+        target.getNotebook() != null ? target.getNotebook() : cacheOwner.getNotebook();
+    if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
+      return null;
+    }
+    return entityManager.find(Note.class, target.getId());
   }
 
   /**
