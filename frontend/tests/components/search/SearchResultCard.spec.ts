@@ -2,8 +2,15 @@ import SearchResultCard from "@/components/search/SearchResultCard.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import type {
+  NoteSearchResult,
+  RelationshipLiteralSearchHit,
+} from "@generated/doughnut-backend-api"
 import { describe, it, expect } from "vitest"
+
+function noteHit(r: NoteSearchResult): RelationshipLiteralSearchHit {
+  return { hitKind: "NOTE", noteSearchResult: r }
+}
 
 describe("SearchResultCard", () => {
   it("renders the card with title", async () => {
@@ -13,7 +20,10 @@ describe("SearchResultCard", () => {
       .notebookId(10)
       .please()
 
-    helper.component(SearchResultCard).withProps({ searchResult }).render()
+    helper
+      .component(SearchResultCard)
+      .withProps({ searchHit: noteHit(searchResult) })
+      .render()
 
     await screen.findByText("Test Note")
   })
@@ -27,7 +37,7 @@ describe("SearchResultCard", () => {
 
     const wrapper = helper
       .component(SearchResultCard)
-      .withProps({ searchResult })
+      .withProps({ searchHit: noteHit(searchResult) })
       .mount()
 
     const card = wrapper.find('[role="card"]')
@@ -43,7 +53,7 @@ describe("SearchResultCard", () => {
 
     const wrapper = helper
       .component(SearchResultCard)
-      .withProps({ searchResult, notebookId: 10 })
+      .withProps({ searchHit: noteHit(searchResult), notebookId: 10 })
       .mount()
 
     const card = wrapper.find('[role="card"]')
@@ -59,7 +69,7 @@ describe("SearchResultCard", () => {
 
     const wrapper = helper
       .component(SearchResultCard)
-      .withProps({ searchResult, notebookId: 20 })
+      .withProps({ searchHit: noteHit(searchResult), notebookId: 20 })
       .mount()
 
     const card = wrapper.find('[role="card"]')
@@ -74,7 +84,10 @@ describe("SearchResultCard", () => {
       .notebookName("My Notebook")
       .please()
 
-    helper.component(SearchResultCard).withProps({ searchResult }).render()
+    helper
+      .component(SearchResultCard)
+      .withProps({ searchHit: noteHit(searchResult) })
+      .render()
 
     await screen.findByText("My Notebook", {
       selector: ".notebook-name-label",
@@ -90,9 +103,27 @@ describe("SearchResultCard", () => {
 
     const wrapper = helper
       .component(SearchResultCard)
-      .withProps({ searchResult })
+      .withProps({ searchHit: noteHit(searchResult) })
       .mount()
 
     expect(wrapper.find(".notebook-name-label").exists()).toBe(false)
+  })
+
+  it("renders folder title without note link", async () => {
+    const hit: RelationshipLiteralSearchHit = {
+      hitKind: "FOLDER",
+      folderId: 9,
+      folderName: "Archive",
+      notebookId: 1,
+      notebookName: "NB",
+      distance: 0.9,
+    }
+    const wrapper = helper
+      .component(SearchResultCard)
+      .withProps({ searchHit: hit })
+      .mount()
+
+    expect(wrapper.text()).toContain("Archive")
+    expect(wrapper.find(".router-link").exists()).toBe(false)
   })
 })

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -50,14 +51,15 @@ class SearchControllerTests extends ControllerTestBase {
 
       var result = controller.searchForRelationshipTarget(searchTerm);
 
-      assertThat(result, hasSize(2));
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(2));
       assertThat(
-          result.stream().map(r -> r.getNoteTopology().getTitle()).toList(),
+          notes.stream().map(r -> r.getNoteTopology().getTitle()).toList(),
           containsInAnyOrder("Java Programming", "JavaScript Basics"));
       // partial matches should have distance 0.9 for now
-      assertThat(result.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
+      assertThat(notes.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
       assertThat(
-          result.stream()
+          notes.stream()
               .allMatch(r -> r.getNotebookName() != null && !r.getNotebookName().isEmpty()),
           is(true));
     }
@@ -74,14 +76,15 @@ class SearchControllerTests extends ControllerTestBase {
 
       var result = controller.searchForRelationshipTarget(searchTerm);
 
-      assertThat(result, hasSize(greaterThanOrEqualTo(2)));
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(greaterThanOrEqualTo(2)));
       assertThat(
-          result.stream()
+          notes.stream()
               .filter(r -> r.getNoteTopology().getTitle().equals("Java"))
               .allMatch(r -> r.getDistance().equals(0.0f)),
           is(true));
       assertThat(
-          result.stream()
+          notes.stream()
               .filter(r -> !r.getNoteTopology().getTitle().equals("Java"))
               .allMatch(r -> r.getDistance().equals(0.9f)),
           is(true));
@@ -99,7 +102,33 @@ class SearchControllerTests extends ControllerTestBase {
 
       var result = controller.searchForRelationshipTarget(searchTerm);
 
-      assertThat(result, hasSize(2));
+      assertThat(RelationshipLiteralSearchHits.noteMatches(result), hasSize(2));
+    }
+
+    @Test
+    void shouldReturnFolderHitsAlongsideNoteHits() throws UnexpectedNoAccessRightException {
+      var notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aFolder().notebook(notebook).name("Trip Planning").please();
+      makeMe.aNote("My Trip Planning Ideas").creatorAndOwner(currentUser.getUser()).please();
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("Plann");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      assertThat(
+          result.stream()
+              .anyMatch(
+                  h ->
+                      h.isFolder()
+                          && "Trip Planning".equals(h.getFolderName())
+                          && h.getFolderId() != null),
+          is(true));
+      assertThat(
+          RelationshipLiteralSearchHits.noteMatches(result).stream()
+              .anyMatch(r -> r.getNoteTopology().getTitle().contains("Planning")),
+          is(true));
     }
 
     @Test
@@ -161,9 +190,10 @@ class SearchControllerTests extends ControllerTestBase {
       // The search service searches in all user's notebooks, not just the reference note's children
       // So it will find "Child Java Note", "Unrelated Java Note", and potentially the reference
       // note itself
-      assertThat(result, hasSize(greaterThanOrEqualTo(2)));
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(greaterThanOrEqualTo(2)));
       assertThat(
-          result.stream().map(r -> r.getNoteTopology().getTitle()).toList(),
+          notes.stream().map(r -> r.getNoteTopology().getTitle()).toList(),
           hasItems("Child Java Note", "Unrelated Java Note"));
     }
 
@@ -179,7 +209,7 @@ class SearchControllerTests extends ControllerTestBase {
 
       var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
-      assertThat(result, hasSize(2));
+      assertThat(RelationshipLiteralSearchHits.noteMatches(result), hasSize(2));
     }
 
     @Test

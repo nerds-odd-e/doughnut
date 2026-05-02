@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
 import { textResponse, jsonResponse } from '../helpers.js'
-import type { NoteSearchResult } from '@generated/doughnut-backend-api'
+import type { RelationshipLiteralSearchHit } from '@generated/doughnut-backend-api'
 import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
 
 // Schema definitions co-located with the tool
@@ -36,7 +36,7 @@ Response Format:
 
 For broader search results, consider breaking down complex queries into specific concepts.`,
   SearchNoteParamsSchema
-).handle(async (ctx, { query }) => {
+).handle(async (_ctx, { query }) => {
   const searchTerm = {
     searchKey: query,
     allMyNotebooksAndSubscriptions: true,
@@ -52,11 +52,16 @@ For broader search results, consider breaking down complex queries into specific
       return textResponse(`Search error: ${JSON.stringify(response.error)}`)
     }
 
-    const results = response.data as NoteSearchResult[]
+    const results = response.data as RelationshipLiteralSearchHit[]
 
-    if (Array.isArray(results) && results.length > 0) {
-      const firstResult = results[0] as NoteSearchResult
-      return jsonResponse(firstResult)
+    if (!Array.isArray(results) || results.length === 0) {
+      return textResponse('No relevant note found.')
+    }
+    const firstNoteHit = results.find(
+      (h) => h.hitKind === 'NOTE' && h.noteSearchResult
+    )
+    if (firstNoteHit?.noteSearchResult) {
+      return jsonResponse(firstNoteHit.noteSearchResult)
     }
     return textResponse('No relevant note found.')
   } catch (err) {

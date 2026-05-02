@@ -6,7 +6,10 @@ import helper, {
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import type {
+  NoteSearchResult,
+  RelationshipLiteralSearchHit,
+} from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, it, expect, vi } from "vitest"
 
@@ -23,14 +26,21 @@ const searchResult = (
 ): NoteSearchResult =>
   makeMe.aNoteSearchResult.id(id).title(title).distance(distance).please()
 
+function asLiteralHits(
+  notes: NoteSearchResult[]
+): RelationshipLiteralSearchHit[] {
+  return notes.map((r) => ({ hitKind: "NOTE", noteSearchResult: r }))
+}
+
 // Test helpers
 function setupSearchMocks(
   literalResults: NoteSearchResult[] = [],
   semanticResults: NoteSearchResult[] = []
 ) {
-  mockSdkService("searchForRelationshipTarget", literalResults)
+  const literal = asLiteralHits(literalResults)
+  mockSdkService("searchForRelationshipTarget", literal)
   mockSdkService("semanticSearch", semanticResults)
-  mockSdkService("searchForRelationshipTargetWithin", literalResults)
+  mockSdkService("searchForRelationshipTargetWithin", literal)
   mockSdkService("semanticSearchWithin", semanticResults)
 }
 
@@ -131,7 +141,7 @@ describe("SearchResults.vue", () => {
     it("triggers second API call when context changes (noteId added)", async () => {
       vi.useFakeTimers()
 
-      const result = [searchResult(1, "Alpha")]
+      const result = asLiteralHits([searchResult(1, "Alpha")])
       const firstSpy = vi.fn().mockResolvedValue(result)
       const withinSpy = vi.fn().mockResolvedValue(result)
       const semanticSpy = vi.fn().mockResolvedValue([])
@@ -178,8 +188,10 @@ describe("SearchResults.vue", () => {
         searchResult(3, "N3", 0.8),
       ]
 
-      const mockTop = vi.fn().mockResolvedValueOnce(firstBatch)
-      const mockWithin = vi.fn().mockResolvedValueOnce(secondBatch)
+      const mockTop = vi.fn().mockResolvedValueOnce(asLiteralHits(firstBatch))
+      const mockWithin = vi
+        .fn()
+        .mockResolvedValueOnce(asLiteralHits(secondBatch))
       const mockSemanticTop = vi.fn().mockResolvedValueOnce([])
       const mockSemanticWithin = vi.fn().mockResolvedValueOnce([])
 
@@ -232,7 +244,11 @@ describe("SearchResults.vue", () => {
 
       mockSdkServiceWithImplementation(
         "searchForRelationshipTargetWithin",
-        vi.fn().mockResolvedValue([otherNotebookResult, sameNotebookResult])
+        vi
+          .fn()
+          .mockResolvedValue(
+            asLiteralHits([otherNotebookResult, sameNotebookResult])
+          )
       )
       mockSdkServiceWithImplementation(
         "semanticSearchWithin",
@@ -257,6 +273,43 @@ describe("SearchResults.vue", () => {
 
       expect(ids[0]).toBe(2)
       expect(ids[1]).toBe(1)
+      vi.useRealTimers()
+    })
+
+    it("dropdown shows folder hit without router link", async () => {
+      vi.useFakeTimers()
+      const folderHit: RelationshipLiteralSearchHit = {
+        hitKind: "FOLDER",
+        folderId: 42,
+        folderName: "Specs Archive",
+        notebookId: 1,
+        notebookName: "My NB",
+        distance: 0.9,
+      }
+      mockSdkServiceWithImplementation(
+        "searchForRelationshipTargetWithin",
+        vi.fn().mockResolvedValue([folderHit])
+      )
+      mockSdkServiceWithImplementation(
+        "semanticSearchWithin",
+        vi.fn().mockResolvedValue([])
+      )
+      mockSdkService("searchForRelationshipTarget", [])
+      mockSdkService("semanticSearch", [])
+      mockSdkService("getRecentNotes", [])
+
+      const wrapper = mountSearchResults({
+        inputSearchKey: "spec",
+        noteId: 1,
+        isDropdown: true,
+      })
+      await waitForDebounce()
+
+      expect(wrapper.text()).toContain("Specs Archive")
+      expect(wrapper.text()).toContain("My NB")
+      const folderRow = wrapper.find(".folder-search-hit")
+      expect(folderRow.exists()).toBe(true)
+      expect(folderRow.find(".router-link").exists()).toBe(false)
       vi.useRealTimers()
     })
   })
@@ -447,7 +500,9 @@ describe("SearchResults.vue", () => {
       )
 
       const searchSpy = mockSdkService("searchForRelationshipTarget", [])
-      searchSpy.mockResolvedValueOnce(wrapSdkResponse(firstSearchResults))
+      searchSpy.mockResolvedValueOnce(
+        wrapSdkResponse(asLiteralHits(firstSearchResults))
+      )
       searchSpy.mockReturnValue(
         secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
       )

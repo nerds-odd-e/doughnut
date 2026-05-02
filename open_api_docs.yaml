@@ -914,7 +914,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteSearchResult"
+                  $ref: "#/components/schemas/RelationshipLiteralSearchHit"
   /api/notes/{note}/recall-setting:
     post:
       tags:
@@ -998,7 +998,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteSearchResult"
+                  $ref: "#/components/schemas/RelationshipLiteralSearchHit"
   /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
     post:
       tags:
@@ -4010,6 +4010,37 @@ components:
       required:
       - noteTopology
       - notebookId
+    RelationshipLiteralSearchHit:
+      type: object
+      properties:
+        hitKind:
+          type: string
+          enum:
+          - NOTE
+          - FOLDER
+        noteSearchResult:
+          $ref: "#/components/schemas/NoteSearchResult"
+          description: Present when hitKind is NOTE
+        folderId:
+          type: integer
+          format: int32
+          description: Present when hitKind is FOLDER
+        folderName:
+          type: string
+          description: Present when hitKind is FOLDER
+        notebookId:
+          type: integer
+          format: int32
+          description: Notebook for a folder hit
+        notebookName:
+          type: string
+          description: Notebook display name for a folder hit
+        distance:
+          type: number
+          format: float
+          description: "Match score for a folder hit (0 exact, 0.9 partial)"
+      required:
+      - hitKind
     NoteRecallSetting:
       type: object
       properties:

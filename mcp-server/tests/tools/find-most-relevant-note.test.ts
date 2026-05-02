@@ -33,7 +33,15 @@ describe('find_most_relevant_note tool', () => {
     const findMostRelevantNoteTool = findTool('find_most_relevant_note')
 
     const searchResult: SearchForRelationshipTargetResponse = shouldFindNote
-      ? [makeMe.aNoteSearchResult.id(123).title('Test Note').please()]
+      ? [
+          {
+            hitKind: 'NOTE',
+            noteSearchResult: makeMe.aNoteSearchResult
+              .id(123)
+              .title('Test Note')
+              .please(),
+          },
+        ]
       : []
 
     // Mock the service response

@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
+import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -76,13 +77,19 @@ public class McpNoteCreationController {
     mySearchTerm.setAllMyNotebooksAndSubscriptions(true);
     mySearchTerm.setAllMyCircles(true);
 
-    List<NoteSearchResult> results = noteSearchService.searchForNotes(currentUser, mySearchTerm);
+    List<RelationshipLiteralSearchHit> results =
+        noteSearchService.searchForNotes(currentUser, mySearchTerm);
 
-    results.sort(Comparator.comparing(NoteSearchResult::getDistance));
-    if (results.isEmpty()) {
+    List<NoteSearchResult> noteOnly =
+        results.stream()
+            .filter(RelationshipLiteralSearchHit::isNote)
+            .map(RelationshipLiteralSearchHit::getNoteSearchResult)
+            .sorted(Comparator.comparing(NoteSearchResult::getDistance))
+            .toList();
+    if (noteOnly.isEmpty()) {
       throw new UnexpectedNoAccessRightException();
     }
-    int parentId = results.get(0).getNoteTopology().getId();
+    int parentId = noteOnly.get(0).getNoteTopology().getId();
     Optional<Note> parentNoteObj = noteService.findById(parentId);
 
     return parentNoteObj.orElseGet(Note::new);

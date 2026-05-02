@@ -4,10 +4,13 @@
     'md:daisy-grid-cols-3': columns === 3,
     'lg:daisy-grid-cols-3': columns === 3,
   }">
-    <div v-for="searchResult in searchResults" :key="searchResult.noteTopology.id">
-      <SearchResultCard v-bind="{ searchResult: searchResult, notebookId: notebookId }">
-        <template #button v-if="$slots.button">
-          <slot name="button" :search-result="searchResult" />
+    <div v-for="searchHit in searchHits" :key="searchHitRowKey(searchHit)">
+      <SearchResultCard v-bind="{ searchHit, notebookId }">
+        <template
+          #button
+          v-if="$slots.button && searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
+        >
+          <slot name="button" :search-result="searchHit.noteSearchResult" />
         </template>
       </SearchResultCard>
     </div>
@@ -16,16 +19,16 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
 import SearchResultCard from "./SearchResultCard.vue"
+import { searchHitRowKey } from "./searchHitRowKey"
 
 defineProps({
-  searchResults: {
-    type: Array as PropType<NoteSearchResult[]>,
+  searchHits: {
+    type: Array as PropType<RelationshipLiteralSearchHit[]>,
     required: true,
   },
   columns: { type: Number, default: 3 },
   notebookId: { type: Number, default: undefined },
 })
 </script>
-

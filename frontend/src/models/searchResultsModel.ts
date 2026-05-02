@@ -1,5 +1,8 @@
 import { reactive } from "vue"
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import type {
+  NoteSearchResult,
+  RelationshipLiteralSearchHit,
+} from "@generated/doughnut-backend-api"
 
 export interface DisplayState {
   showRecentNotes: boolean
@@ -10,15 +13,63 @@ export interface DisplayState {
   containerClass: string
 }
 
+function noteHitFromSemantic(
+  n: NoteSearchResult
+): RelationshipLiteralSearchHit {
+  return { hitKind: "NOTE", noteSearchResult: n }
+}
+
+function hitMergeKey(h: RelationshipLiteralSearchHit): string {
+  if (h.hitKind === "NOTE" && h.noteSearchResult?.noteTopology?.id != null) {
+    return `n:${h.noteSearchResult.noteTopology.id}`
+  }
+  if (h.hitKind === "FOLDER" && h.folderId != null) {
+    return `f:${h.folderId}`
+  }
+  return `x:${JSON.stringify(h)}`
+}
+
+function hitDistance(h: RelationshipLiteralSearchHit): number {
+  if (h.hitKind === "NOTE" && h.noteSearchResult) {
+    return h.noteSearchResult.distance ?? Number.POSITIVE_INFINITY
+  }
+  if (h.hitKind === "FOLDER") {
+    return h.distance ?? Number.POSITIVE_INFINITY
+  }
+  return Number.POSITIVE_INFINITY
+}
+
+function titleForSort(h: RelationshipLiteralSearchHit): string {
+  if (h.hitKind === "NOTE" && h.noteSearchResult?.noteTopology?.title) {
+    return h.noteSearchResult.noteTopology.title.trim().toLowerCase()
+  }
+  if (h.hitKind === "FOLDER" && h.folderName) {
+    return h.folderName.trim().toLowerCase()
+  }
+  return ""
+}
+
+function notebookIdOf(h: RelationshipLiteralSearchHit): number | undefined {
+  if (h.hitKind === "NOTE" && h.noteSearchResult) {
+    return h.noteSearchResult.notebookId
+  }
+  if (h.hitKind === "FOLDER") {
+    return h.notebookId
+  }
+  return
+}
+
 export class SearchResultsModel {
   private state = reactive({
     isSearchInProgress: false,
     cache: {
-      global: {} as Record<string, NoteSearchResult[]>,
-      local: {} as Record<string, NoteSearchResult[]>,
+      global: {} as Record<string, RelationshipLiteralSearchHit[]>,
+      local: {} as Record<string, RelationshipLiteralSearchHit[]>,
     },
-    recentResult: undefined as NoteSearchResult[] | undefined,
-    previousSearchResult: undefined as NoteSearchResult[] | undefined,
+    recentResult: undefined as RelationshipLiteralSearchHit[] | undefined,
+    previousSearchResult: undefined as
+      | RelationshipLiteralSearchHit[]
+      | undefined,
     recentNotes: [] as NoteSearchResult[],
   })
 
@@ -42,22 +93,24 @@ export class SearchResultsModel {
     this.state.isSearchInProgress = false
   }
 
-  getCachedSearches(isGlobal: boolean): Record<string, NoteSearchResult[]> {
+  getCachedSearches(
+    isGlobal: boolean
+  ): Record<string, RelationshipLiteralSearchHit[]> {
     return isGlobal ? this.state.cache.global : this.state.cache.local
   }
 
   getCachedResult(
     searchKey: string,
     isGlobal: boolean
-  ): NoteSearchResult[] | undefined {
+  ): RelationshipLiteralSearchHit[] | undefined {
     return this.getCachedSearches(isGlobal)[searchKey]
   }
 
   setCachedResult(
     searchKey: string,
     isGlobal: boolean,
-    results: NoteSearchResult[]
-  ): void {
+    results: RelationshipLiteralSearchHit[]
+  ) {
     this.getCachedSearches(isGlobal)[searchKey] = results
     this.state.recentResult = results
   }
@@ -65,7 +118,7 @@ export class SearchResultsModel {
   getSearchResult(
     trimmedSearchKey: string,
     isGlobal: boolean
-  ): NoteSearchResult[] | undefined {
+  ): RelationshipLiteralSearchHit[] | undefined {
     const cachedResult = this.getCachedResult(trimmedSearchKey, isGlobal)
     const resultToUse =
       cachedResult ??
@@ -86,9 +139,12 @@ export class SearchResultsModel {
       this.state.recentResult ??
       this.state.previousSearchResult ??
       []
-    list.forEach((r) => {
-      const id = String(r.noteTopology.id as number)
-      const d = r.distance
+    list.forEach((h) => {
+      if (h.hitKind !== "NOTE" || !h.noteSearchResult?.noteTopology?.id) {
+        return
+      }
+      const id = String(h.noteSearchResult.noteTopology.id as number)
+      const d = h.noteSearchResult.distance
       if (d != null) map[id] = d
     })
     return map
@@ -219,18 +275,18 @@ export class SearchResultsModel {
   mergeAndCacheResults(opts: {
     trimmedSearchKey: string
     isGlobal: boolean
-    literalResults?: NoteSearchResult[]
+    literalResults?: RelationshipLiteralSearchHit[]
     semanticResults?: NoteSearchResult[]
     currentNotebookId?: number
   }): void {
     const existing =
       this.getCachedResult(opts.trimmedSearchKey, opts.isGlobal) ?? []
-    const incoming: NoteSearchResult[] = []
+    const incoming: RelationshipLiteralSearchHit[] = []
     if (opts.literalResults !== undefined) {
       incoming.push(...opts.literalResults)
     }
     if (opts.semanticResults !== undefined) {
-      incoming.push(...opts.semanticResults)
+      incoming.push(...opts.semanticResults.map((n) => noteHitFromSemantic(n)))
     }
     const merged = this.mergeUniqueAndSortByDistance(
       existing,
@@ -243,63 +299,99 @@ export class SearchResultsModel {
   }
 
   private mergeUniqueAndSortByDistance(
-    existing: NoteSearchResult[],
-    incoming: NoteSearchResult[],
+    existing: RelationshipLiteralSearchHit[],
+    incoming: RelationshipLiteralSearchHit[],
     currentNotebookId?: number,
     searchKeyLower = ""
-  ): NoteSearchResult[] {
-    const byId = new Map<number, NoteSearchResult>()
-    const getId = (r: NoteSearchResult) => r.noteTopology.id as number
+  ): RelationshipLiteralSearchHit[] {
+    const byKey = new Map<string, RelationshipLiteralSearchHit>()
 
-    /** Backend literal matches use distance 0 for exact title equality; prefer over semantic rows. */
     const isExactLiteralDistance = (d: number) => d === 0
 
-    const chooseBetter = (a: NoteSearchResult, b: NoteSearchResult) => {
-      const da = a.distance ?? Infinity
-      const db = b.distance ?? Infinity
+    const chooseBetterNote = (a: NoteSearchResult, b: NoteSearchResult) => {
+      const da = a.distance ?? Number.POSITIVE_INFINITY
+      const db = b.distance ?? Number.POSITIVE_INFINITY
       if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return a
       if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return b
       return db < da ? b : a
     }
 
-    existing.forEach((r) => byId.set(getId(r), r))
-    incoming.forEach((r) => {
-      const id = getId(r)
-      const prev = byId.get(id)
-      byId.set(id, prev ? chooseBetter(prev, r) : r)
+    const mergeHit = (
+      prev: RelationshipLiteralSearchHit | undefined,
+      next: RelationshipLiteralSearchHit
+    ): RelationshipLiteralSearchHit => {
+      if (!prev) return next
+      if (
+        prev.hitKind === "NOTE" &&
+        next.hitKind === "NOTE" &&
+        prev.noteSearchResult &&
+        next.noteSearchResult
+      ) {
+        const better = chooseBetterNote(
+          prev.noteSearchResult,
+          next.noteSearchResult
+        )
+        return better === prev.noteSearchResult ? prev : next
+      }
+      if (prev.hitKind === "FOLDER" && next.hitKind === "FOLDER") {
+        const da = prev.distance ?? Number.POSITIVE_INFINITY
+        const db = next.distance ?? Number.POSITIVE_INFINITY
+        if (isExactLiteralDistance(da) && !isExactLiteralDistance(db))
+          return prev
+        if (!isExactLiteralDistance(da) && isExactLiteralDistance(db))
+          return next
+        return db < da ? next : prev
+      }
+      return next
+    }
+
+    existing.forEach((h) => byKey.set(hitMergeKey(h), h))
+    incoming.forEach((h) => {
+      const key = hitMergeKey(h)
+      const prev = byKey.get(key)
+      byKey.set(key, mergeHit(prev, h))
     })
 
-    const titleOf = (r: NoteSearchResult) => r.noteTopology.title ?? ""
-
-    return Array.from(byId.values()).sort((a, b) => {
-      const ta = titleOf(a).trim().toLowerCase()
-      const tb = titleOf(b).trim().toLowerCase()
+    return Array.from(byKey.values()).sort((a, b) => {
+      const ta = titleForSort(a)
+      const tb = titleForSort(b)
       const exactA = searchKeyLower !== "" && ta === searchKeyLower
       const exactB = searchKeyLower !== "" && tb === searchKeyLower
       if (exactA !== exactB) return exactA ? -1 : 1
 
-      const da = a.distance ?? Infinity
-      const db = b.distance ?? Infinity
+      const da = hitDistance(a)
+      const db = hitDistance(b)
       const distDiff = da - db
       if (!Number.isNaN(distDiff) && Math.abs(distDiff) > 1e-6) {
         return distDiff
       }
 
       if (currentNotebookId !== undefined) {
-        const aSame = a.notebookId === currentNotebookId
-        const bSame = b.notebookId === currentNotebookId
+        const aNb = notebookIdOf(a)
+        const bNb = notebookIdOf(b)
+        const aSame = aNb === currentNotebookId
+        const bSame = bNb === currentNotebookId
         const nb = Number(bSame) - Number(aSame)
         if (nb !== 0) return nb
       }
 
-      const lenDiff = titleOf(a).length - titleOf(b).length
+      const lenDiff = ta.length - tb.length
       if (lenDiff !== 0) return lenDiff
-      const cmp = titleOf(a).localeCompare(titleOf(b), undefined, {
+      const cmp = ta.localeCompare(tb, undefined, {
         sensitivity: "base",
       })
       if (cmp !== 0) return cmp
 
-      return (a.noteTopology.id as number) - (b.noteTopology.id as number)
+      if (a.hitKind === "NOTE" && b.hitKind === "NOTE") {
+        return (
+          (a.noteSearchResult!.noteTopology!.id as number) -
+          (b.noteSearchResult!.noteTopology!.id as number)
+        )
+      }
+      if (a.hitKind === "FOLDER" && b.hitKind === "FOLDER") {
+        return (a.folderId ?? 0) - (b.folderId ?? 0)
+      }
+      return a.hitKind === b.hitKind ? 0 : a.hitKind === "NOTE" ? -1 : 1
     })
   }
 }

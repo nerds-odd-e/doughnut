@@ -7,14 +7,25 @@
     <div class="daisy-card-body daisy-p-4">
       <h5 class="daisy-card-title">
         <NoteTitleWithLink
-          :note-topology="searchResult.noteTopology"
+          v-if="searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
+          :note-topology="searchHit.noteSearchResult.noteTopology"
         />
+        <span
+          v-else-if="searchHit.hitKind === 'FOLDER'"
+          class="folder-hit-card-title"
+        >{{ searchHit.folderName }}</span>
       </h5>
-      <div v-if="searchResult.notebookName" class="notebook-name-label">
-        {{ searchResult.notebookName }}
+      <div v-if="displayNotebookName" class="notebook-name-label">
+        {{ displayNotebookName }}
       </div>
+      <small
+        v-if="displayDistance != null"
+        class="similarity-distance daisy-mt-1 daisy-block daisy-text-right"
+      >
+        {{ Number(displayDistance).toFixed(3) }}
+      </small>
       <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
-        <slot name="button" :search-result="searchResult" />
+        <slot name="button" />
       </div>
     </div>
   </div>
@@ -22,20 +33,47 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
 import { computed } from "vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 const props = defineProps({
-  searchResult: { type: Object as PropType<NoteSearchResult>, required: true },
+  searchHit: {
+    type: Object as PropType<RelationshipLiteralSearchHit>,
+    required: true,
+  },
   notebookId: { type: Number, default: undefined },
+})
+
+const displayNotebookName = computed(() => {
+  if (props.searchHit.hitKind === "NOTE" && props.searchHit.noteSearchResult) {
+    return props.searchHit.noteSearchResult.notebookName
+  }
+  if (props.searchHit.hitKind === "FOLDER") {
+    return props.searchHit.notebookName
+  }
+  return undefined
 })
 
 const isDifferentNotebook = computed(() => {
   if (props.notebookId === undefined) {
     return false
   }
-  return props.searchResult.notebookId !== props.notebookId
+  const nb =
+    props.searchHit.hitKind === "NOTE" && props.searchHit.noteSearchResult
+      ? props.searchHit.noteSearchResult.notebookId
+      : props.searchHit.notebookId
+  return nb !== props.notebookId
+})
+
+const displayDistance = computed(() => {
+  if (props.searchHit.hitKind === "NOTE" && props.searchHit.noteSearchResult) {
+    return props.searchHit.noteSearchResult.distance
+  }
+  if (props.searchHit.hitKind === "FOLDER") {
+    return props.searchHit.distance
+  }
+  return undefined
 })
 </script>
 
@@ -50,5 +88,13 @@ const isDifferentNotebook = computed(() => {
   opacity: 0.7;
   margin-top: 0.125rem;
 }
-</style>
 
+.folder-hit-card-title {
+  font-weight: 600;
+}
+
+.similarity-distance {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+</style>

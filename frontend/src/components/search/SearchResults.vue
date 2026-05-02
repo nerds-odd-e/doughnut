@@ -30,7 +30,7 @@
       <SearchResultCards
         v-else
         class="search-result"
-        :search-results="filteredRecentNotes"
+        :search-hits="recentNotesAsHits"
         :columns="3"
         :notebook-id="notebookId"
       >
@@ -48,27 +48,35 @@
     <div v-if="displayState.showSearchResults && searchResult" :class="displayState.containerClass">
       <div class="result-title">{{ displayState.title }}</div>
       <div v-if="isDropdown" class="dropdown-list">
-        <NoteTitleWithLink
-          v-for="result in searchResult"
-          :key="result.noteTopology.id"
-          :noteTopology="result.noteTopology"
-        />
+        <template
+          v-for="hit in searchResult"
+          :key="searchHitRowKey(hit)"
+        >
+          <NoteTitleWithLink
+            v-if="hit.hitKind === 'NOTE' && hit.noteSearchResult"
+            :note-topology="hit.noteSearchResult.noteTopology"
+          />
+          <div
+            v-else-if="hit.hitKind === 'FOLDER'"
+            class="folder-search-hit daisy-py-1 daisy-px-2"
+          >
+            <span class="daisy-font-medium">{{ hit.folderName }}</span>
+            <span
+              v-if="hit.notebookName"
+              class="daisy-block daisy-text-xs daisy-opacity-70"
+            >{{ hit.notebookName }}</span>
+          </div>
+        </template>
       </div>
       <SearchResultCards
         v-else
         class="search-result"
-        :search-results="searchResult"
+        :search-hits="searchResult"
         :columns="3"
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
           <slot name="button" :note-topology="result.noteTopology" />
-          <small
-            v-if="result.distance != null"
-            class="similarity-distance"
-          >
-            {{ Number(result.distance).toFixed(3) }}
-          </small>
         </template>
       </SearchResultCards>
     </div>
@@ -76,7 +84,11 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchTerm, NoteTopology } from "@generated/doughnut-backend-api"
+import type {
+  SearchTerm,
+  NoteTopology,
+  RelationshipLiteralSearchHit,
+} from "@generated/doughnut-backend-api"
 import {
   NoteController,
   SearchController,
@@ -95,6 +107,7 @@ import CheckInput from "../form/CheckInput.vue"
 import SearchResultCards from "./SearchResultCards.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
+import { searchHitRowKey } from "./searchHitRowKey"
 
 const props = defineProps({
   noteId: Number,
@@ -137,6 +150,13 @@ const filteredRecentNotes = computed(() =>
   props.noteId
     ? model.recentNotes.filter((note) => note.noteTopology.id !== props.noteId)
     : model.recentNotes
+)
+
+const recentNotesAsHits = computed((): RelationshipLiteralSearchHit[] =>
+  filteredRecentNotes.value.map((r) => ({
+    hitKind: "NOTE" as const,
+    noteSearchResult: r,
+  }))
 )
 
 const displayState = computed(() =>

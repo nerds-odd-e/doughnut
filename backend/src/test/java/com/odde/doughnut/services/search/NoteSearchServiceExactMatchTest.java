@@ -3,11 +3,12 @@ package com.odde.doughnut.services.search;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.controllers.dto.NoteSearchResult;
+import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -44,12 +45,13 @@ class NoteSearchServiceExactMatchTest {
       Note exactMatch = makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
-      assertThat(results, hasSize(4));
-      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
-      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
+      var notes = RelationshipLiteralSearchHits.noteMatches(results);
+      assertThat(notes, hasSize(4));
+      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
     @Test
@@ -61,14 +63,15 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Clonazepam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
-      assertThat(results, hasSize(5));
-      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
-      assertThat(results.get(1).getNoteTopology().getTitle(), equalTo("pam"));
-      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch1.getId()));
-      assertThat(results.get(1).getNoteTopology().getId(), equalTo(exactMatch2.getId()));
+      var notes = RelationshipLiteralSearchHits.noteMatches(results);
+      assertThat(notes, hasSize(5));
+      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
+      assertThat(notes.get(1).getNoteTopology().getTitle(), equalTo("pam"));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch1.getId()));
+      assertThat(notes.get(1).getNoteTopology().getId(), equalTo(exactMatch2.getId()));
     }
 
     @Test
@@ -79,12 +82,13 @@ class NoteSearchServiceExactMatchTest {
       Note exactMatch = makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
-      assertThat(results, hasSize(greaterThan(20)));
-      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
-      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
+      var notes = RelationshipLiteralSearchHits.noteMatches(results);
+      assertThat(notes, hasSize(greaterThan(20)));
+      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
     @Test
@@ -94,12 +98,13 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Lorazepam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
-      assertThat(results, hasSize(3));
-      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("PAM"));
-      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
+      var notes = RelationshipLiteralSearchHits.noteMatches(results);
+      assertThat(notes, hasSize(3));
+      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("PAM"));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
     @Test
@@ -108,7 +113,7 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("");
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, empty());
@@ -120,7 +125,7 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("   ");
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, empty());
@@ -135,17 +140,18 @@ class NoteSearchServiceExactMatchTest {
       searchTerm.setSearchKey("Match");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      List<NoteSearchResult> results =
+      List<RelationshipLiteralSearchHit> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
-      assertThat(results, hasSize(greaterThanOrEqualTo(2)));
+      var notes = RelationshipLiteralSearchHits.noteMatches(results);
+      assertThat(notes, hasSize(greaterThanOrEqualTo(2)));
       int sameNotebookIndex =
-          results.stream()
+          notes.stream()
               .map(r -> r.getNoteTopology().getId())
               .toList()
               .indexOf(sameNotebookNote.getId());
       int otherNotebookIndex =
-          results.stream()
+          notes.stream()
               .map(r -> r.getNoteTopology().getId())
               .toList()
               .indexOf(otherNotebookNote.getId());

@@ -1,12 +1,17 @@
 package com.odde.doughnut.services.search;
 
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
+import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.EmbeddingService;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,30 +24,37 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class NoteSearchService {
+  private static final int FOLDER_LITERAL_MATCH_CAP = 12;
+
   private final NoteRepository noteRepository;
+  private final FolderRepository folderRepository;
   private final NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
   private final EmbeddingService embeddingService;
 
   public NoteSearchService(
       NoteRepository noteRepository,
+      FolderRepository folderRepository,
       NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository,
       EmbeddingService embeddingService) {
     this.noteRepository = noteRepository;
+    this.folderRepository = folderRepository;
     this.noteEmbeddingJdbcRepository = noteEmbeddingJdbcRepository;
     this.embeddingService = embeddingService;
   }
 
-  public List<NoteSearchResult> searchForNotes(User user, SearchTerm searchTerm) {
+  public List<RelationshipLiteralSearchHit> searchForNotes(User user, SearchTerm searchTerm) {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
     }
 
     List<Note> exactMatches = searchExactMatches(user, searchTerm, null);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, null);
-    return combineExactAndPartialMatches(exactMatches, partialMatches, null, null);
+    List<NoteSearchResult> noteResults =
+        combineExactAndPartialMatches(exactMatches, partialMatches, null, null);
+    return mergeNoteAndFolderLiteralHits(user, searchTerm, null, noteResults);
   }
 
-  public List<NoteSearchResult> searchForNotesInRelationTo(
+  public List<RelationshipLiteralSearchHit> searchForNotesInRelationTo(
       User user, SearchTerm searchTerm, Note note) {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
@@ -52,7 +64,151 @@ public class NoteSearchService {
 
     List<Note> exactMatches = searchExactMatches(user, searchTerm, notebookId);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, notebookId);
-    return combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId, notebookId);
+    List<NoteSearchResult> noteResults =
+        combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId, notebookId);
+    return mergeNoteAndFolderLiteralHits(user, searchTerm, notebookId, noteResults);
+  }
+
+  private List<RelationshipLiteralSearchHit> mergeNoteAndFolderLiteralHits(
+      User user, SearchTerm searchTerm, Integer notebookId, List<NoteSearchResult> noteResults) {
+    List<RelationshipLiteralSearchHit> hits = new ArrayList<>();
+    for (NoteSearchResult r : noteResults) {
+      hits.add(RelationshipLiteralSearchHit.note(r));
+    }
+    List<Folder> exactFolders = searchExactFolderMatches(user, searchTerm, notebookId);
+    List<Folder> partialFolders = searchPartialFolderMatches(user, searchTerm, notebookId);
+    hits.addAll(combineFolderExactAndPartialAsHits(exactFolders, partialFolders));
+    return sortRelationshipLiteralHits(hits, notebookId);
+  }
+
+  private List<RelationshipLiteralSearchHit> combineFolderExactAndPartialAsHits(
+      List<Folder> exactFolders, List<Folder> partialFolders) {
+    List<RelationshipLiteralSearchHit> folderHits = new ArrayList<>();
+    for (Folder f : exactFolders) {
+      folderHits.add(folderToHit(f, 0.0f));
+    }
+    java.util.Set<Integer> exactFolderIds =
+        exactFolders.stream().map(Folder::getId).collect(Collectors.toSet());
+    int remaining = Math.max(0, FOLDER_LITERAL_MATCH_CAP - exactFolders.size());
+    partialFolders.stream()
+        .filter(f -> !exactFolderIds.contains(f.getId()))
+        .limit(remaining)
+        .forEach(f -> folderHits.add(folderToHit(f, 0.9f)));
+    return folderHits;
+  }
+
+  private RelationshipLiteralSearchHit folderToHit(Folder folder, float distance) {
+    return RelationshipLiteralSearchHit.folder(
+        folder.getId(),
+        folder.getName(),
+        folder.getNotebook().getId(),
+        folder.getNotebook().getName(),
+        distance);
+  }
+
+  private List<Folder> searchExactFolderMatches(
+      User user, SearchTerm searchTerm, Integer notebookId) {
+    String key = searchTerm.getTrimmedSearchKey();
+    if (Strings.isBlank(key)) {
+      return List.of();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
+      return Stream.concat(
+              searchExactFoldersInMyNotebooksAndSubscriptions(user, key).stream(),
+              folderRepository.searchExactForUserInAllMyCircle(user.getId(), key).stream())
+          .toList();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
+      return searchExactFoldersInMyNotebooksAndSubscriptions(user, key);
+    }
+    return folderRepository.searchExactInNotebook(notebookId, key);
+  }
+
+  private List<Folder> searchExactFoldersInMyNotebooksAndSubscriptions(User user, String key) {
+    return Stream.concat(
+            folderRepository.searchExactForUserInAllMyNotebooks(user.getId(), key).stream(),
+            folderRepository.searchExactForUserInAllMySubscriptions(user.getId(), key).stream())
+        .toList();
+  }
+
+  private List<Folder> searchPartialFolderMatches(
+      User user, SearchTerm searchTerm, Integer notebookId) {
+    String searchKey = searchTerm.getTrimmedSearchKey();
+    if (Strings.isBlank(searchKey)) {
+      return List.of();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
+      return Stream.concat(
+              searchPartialFoldersInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
+              folderRepository
+                  .searchForUserInAllMyCircle(
+                      user.getId(), getPattern(searchTerm), getFolderPageable())
+                  .stream())
+          .toList();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
+      return searchPartialFoldersInMyNotebooksAndSubscriptions(user, searchTerm);
+    }
+    return folderRepository.searchInNotebook(
+        notebookId, getPattern(searchTerm), getFolderPageable());
+  }
+
+  private List<Folder> searchPartialFoldersInMyNotebooksAndSubscriptions(
+      User user, SearchTerm searchTerm) {
+    return Stream.concat(
+            folderRepository
+                .searchForUserInAllMyNotebooks(
+                    user.getId(), getPattern(searchTerm), getFolderPageable())
+                .stream(),
+            folderRepository
+                .searchForUserInAllMySubscriptions(
+                    user.getId(), getPattern(searchTerm), getFolderPageable())
+                .stream())
+        .toList();
+  }
+
+  private Pageable getFolderPageable() {
+    return PageRequest.of(0, FOLDER_LITERAL_MATCH_CAP);
+  }
+
+  private List<RelationshipLiteralSearchHit> sortRelationshipLiteralHits(
+      List<RelationshipLiteralSearchHit> hits, Integer notebookId) {
+    Comparator<RelationshipLiteralSearchHit> byDistance =
+        Comparator.comparing(
+            h ->
+                h.isNote()
+                    ? (h.getNoteSearchResult().getDistance() != null
+                        ? h.getNoteSearchResult().getDistance()
+                        : Float.MAX_VALUE)
+                    : (h.getDistance() != null ? h.getDistance() : Float.MAX_VALUE));
+    Comparator<RelationshipLiteralSearchHit> byNotebook =
+        (a, b) -> {
+          if (notebookId == null) {
+            return 0;
+          }
+          boolean aSame =
+              notebookId.equals(
+                  a.isNote() ? a.getNoteSearchResult().getNotebookId() : a.getNotebookId());
+          boolean bSame =
+              notebookId.equals(
+                  b.isNote() ? b.getNoteSearchResult().getNotebookId() : b.getNotebookId());
+          return Boolean.compare(bSame, aSame);
+        };
+    Comparator<RelationshipLiteralSearchHit> byLabel =
+        Comparator.comparing(
+            h ->
+                h.isNote()
+                    ? (h.getNoteSearchResult().getNoteTopology().getTitle() != null
+                        ? h.getNoteSearchResult().getNoteTopology().getTitle()
+                        : "")
+                    : (h.getFolderName() != null ? h.getFolderName() : ""),
+            String.CASE_INSENSITIVE_ORDER);
+    Comparator<RelationshipLiteralSearchHit> byId =
+        Comparator.comparing(
+            h -> h.isNote() ? h.getNoteSearchResult().getNoteTopology().getId() : h.getFolderId());
+    return hits.stream()
+        .sorted(byDistance.thenComparing(byNotebook).thenComparing(byLabel).thenComparing(byId))
+        .toList();
   }
 
   public List<NoteSearchResult> semanticSearchForNotes(User user, SearchTerm searchTerm) {

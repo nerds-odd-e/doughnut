@@ -4,13 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ public class UserModelSearchTest {
     anotherUser = makeMe.aUser().please();
   }
 
-  private List<NoteSearchResult> search() {
+  private List<RelationshipLiteralSearchHit> search() {
     return noteSearchService.searchForNotesInRelationTo(user, searchTerm, note);
   }
 
@@ -53,7 +54,7 @@ public class UserModelSearchTest {
   @Test
   void theNoteItselfIsNotIncludedInTheResult() {
     searchTerm.setSearchKey(note.getTitle());
-    assertTrue(search().isEmpty());
+    assertTrue(RelationshipLiteralSearchHits.noteMatches(search()).isEmpty());
   }
 
   @Test
@@ -62,7 +63,10 @@ public class UserModelSearchTest {
     searchTerm.setSearchKey("not");
     NoteTopology expected = anotherNote.getNoteTopology();
     assertThat(
-        search().stream().map(NoteSearchResult::getNoteTopology).toList(), contains(expected));
+        RelationshipLiteralSearchHits.noteMatches(search()).stream()
+            .map(r -> r.getNoteTopology())
+            .toList(),
+        contains(expected));
   }
 
   @Test
@@ -79,8 +83,7 @@ public class UserModelSearchTest {
       makeMe.aNote(commonTitle + i).under(note).please();
     }
     searchTerm.setSearchKey("CommonTitle");
-    List<NoteSearchResult> results = search();
-    assertThat(results.size(), lessThanOrEqualTo(20));
+    assertThat(RelationshipLiteralSearchHits.noteMatches(search()).size(), lessThanOrEqualTo(20));
   }
 
   @Nested
@@ -127,7 +130,10 @@ public class UserModelSearchTest {
       searchTerm.setSearchKey(commonPhrase);
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
-      List<NoteTopology> actual = search().stream().map(NoteSearchResult::getNoteTopology).toList();
+      List<NoteTopology> actual =
+          RelationshipLiteralSearchHits.noteMatches(search()).stream()
+              .map(r -> r.getNoteTopology())
+              .toList();
       assertThat(actual, hasSize(expectedCount));
       assertThat(
           actual,

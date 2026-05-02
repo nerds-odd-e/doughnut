@@ -84,7 +84,14 @@ describe("adding new note", () => {
   it("searches when user edits title back to 'Untitled'", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([
-        { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
+        {
+          hitKind: "NOTE",
+          noteSearchResult: {
+            noteTopology: note.noteTopology,
+            notebookId: 1,
+            distance: 0.9,
+          },
+        },
       ])
     )
     const wrapper = helper
@@ -117,7 +124,14 @@ describe("adding new note", () => {
   it("search for duplicate", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([
-        { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
+        {
+          hitKind: "NOTE",
+          noteSearchResult: {
+            noteTopology: note.noteTopology,
+            notebookId: 1,
+            distance: 0.9,
+          },
+        },
       ])
     )
     const wrapper = helper

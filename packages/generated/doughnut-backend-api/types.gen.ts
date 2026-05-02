@@ -346,6 +346,34 @@ export type NoteSearchResult = {
     distance?: number;
 };
 
+export type RelationshipLiteralSearchHit = {
+    hitKind: 'NOTE' | 'FOLDER';
+    /**
+     * Present when hitKind is NOTE
+     */
+    noteSearchResult?: NoteSearchResult;
+    /**
+     * Present when hitKind is FOLDER
+     */
+    folderId?: number;
+    /**
+     * Present when hitKind is FOLDER
+     */
+    folderName?: string;
+    /**
+     * Notebook for a folder hit
+     */
+    notebookId?: number;
+    /**
+     * Notebook display name for a folder hit
+     */
+    notebookName?: string;
+    /**
+     * Match score for a folder hit (0 exact, 0.9 partial)
+     */
+    distance?: number;
+};
+
 export type NoteRecallSetting = {
     rememberSpelling?: boolean;
     skipMemoryTracking?: boolean;
@@ -1790,7 +1818,7 @@ export type SearchForRelationshipTargetWithinResponses = {
     /**
      * OK
      */
-    200: Array<NoteSearchResult>;
+    200: Array<RelationshipLiteralSearchHit>;
 };
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
@@ -1858,7 +1886,7 @@ export type SearchForRelationshipTargetResponses = {
     /**
      * OK
      */
-    200: Array<NoteSearchResult>;
+    200: Array<RelationshipLiteralSearchHit>;
 };
 
 export type SearchForRelationshipTargetResponse = SearchForRelationshipTargetResponses[keyof SearchForRelationshipTargetResponses];
