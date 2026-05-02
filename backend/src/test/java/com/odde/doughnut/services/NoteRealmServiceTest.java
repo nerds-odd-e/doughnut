@@ -63,7 +63,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void inbound_references_use_cache_rows_pointing_at_focal_same_notebook() {
+  void references_use_cache_rows_pointing_at_focal_same_notebook() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -72,14 +72,12 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), hasSize(1));
-    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }
 
   @Test
-  void inbound_empty_when_cache_not_refreshed_even_if_legacy_target_fk_exists() {
+  void references_empty_when_cache_not_refreshed_even_if_legacy_target_fk_exists() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -88,7 +86,6 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), empty());
     assertThat(realm.getReferences(), empty());
   }
 
@@ -129,7 +126,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void body_wikilink_carrier_is_inbound_only_not_subject_parent_slice() {
+  void body_wikilink_carrier_in_references_subject_parent_slice_empty() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -138,8 +135,6 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), hasSize(1));
-    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
     assertThat(
         wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(focal, user), empty());
     assertThat(realm.getReferences(), hasSize(1));
@@ -147,7 +142,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void parent_yaml_carrier_appears_in_inbound_and_references() {
+  void parent_yaml_carrier_appears_in_references() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -159,7 +154,6 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), hasSize(1));
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }
@@ -187,7 +181,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void inbound_includes_cross_notebook_carrier_when_viewer_can_refer() {
+  void references_include_cross_notebook_carrier_when_viewer_can_refer() {
     User user = makeMe.aUser().please();
     Note headMain = makeMe.aNote().creatorAndOwner(user).title("MainNb").please();
     Note focal = makeMe.aNote().title("Focal").under(headMain).please();
@@ -202,14 +196,12 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), hasSize(1));
-    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }
 
   @Test
-  void inbound_omits_cross_notebook_carrier_when_viewer_cannot_refer() {
+  void references_omit_cross_notebook_carrier_when_viewer_cannot_refer() {
     User ownerFocal = makeMe.aUser().please();
     User ownerCarrier = makeMe.aUser().please();
     Note headMain = makeMe.aNote().creatorAndOwner(ownerFocal).title("MainNb").please();
@@ -225,12 +217,11 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, ownerFocal);
 
-    assertThat(realm.getInboundReferences(), empty());
     assertThat(realm.getReferences(), empty());
   }
 
   @Test
-  void inbound_omits_soft_deleted_carrier_even_if_cache_row_remains() {
+  void references_omit_soft_deleted_carrier_even_if_cache_row_remains() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -242,12 +233,11 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), empty());
     assertThat(realm.getReferences(), empty());
   }
 
   @Test
-  void inbound_dedupes_multiple_cache_rows_for_same_carrier_note() {
+  void references_dedupe_multiple_cache_rows_for_same_carrier_note() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -266,8 +256,6 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getInboundReferences(), hasSize(1));
-    assertThat(realm.getInboundReferences().get(0).getId(), equalTo(carrier.getId()));
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }

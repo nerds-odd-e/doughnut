@@ -16,16 +16,15 @@ import org.springframework.lang.NonNull;
   "fromBazaar",
   "notebookId",
   "ancestorFolders",
-  "inboundReferences",
   "references",
   "wikiTitles"
 })
 public class NoteRealm {
-  @Getter @Setter private List<Note> inboundReferences;
-
   /**
-   * Referring notes merged from inbound wiki-link rows and subject/parent-linked rows: same
-   * authorization as those slices, deduplicated by referring note id, sorted by note id ascending.
+   * Notes that refer to the focus note via the wiki-title cache (body wikilinks plus
+   * subject/parent-linked rows), merged and deduplicated by referring note id, with the same
+   * visibility rules as {@link
+   * com.odde.doughnut.services.WikiTitleCacheService#referencesNotesForViewer}.
    */
   @Getter @Setter private List<Note> references;
 

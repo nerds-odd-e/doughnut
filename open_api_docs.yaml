@@ -3823,10 +3823,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FolderTrailSegment"
-        inboundReferences:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
         references:
           type: array
           items:
