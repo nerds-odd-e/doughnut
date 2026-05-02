@@ -78,18 +78,13 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * Authorized wiki-link targets from the focus note’s cache rows, then from each relation child
-   * under the focus (repository-backed), deduped by target id in first-seen order. Used for graph
-   * expansion.
+   * Authorized wiki-link targets from the focus note’s cache rows only, deduped by target id in
+   * first-seen order. Used with {@link #primaryWikiLinkedTargetForGraph}; relationship semantic
+   * targets are resolved separately from relation children.
    */
   public List<Note> outgoingWikiLinkedTargetsForGraph(Note focus, User viewer) {
     LinkedHashMap<Integer, Note> byTargetId = new LinkedHashMap<>();
     appendAuthorizedOutgoingTargets(focus, viewer, byTargetId);
-    if (!focus.isRelation()) {
-      for (Note carrier : relationCarrierChildrenOrdered(focus)) {
-        appendAuthorizedOutgoingTargets(carrier, viewer, byTargetId);
-      }
-    }
     return List.copyOf(byTargetId.values());
   }
 

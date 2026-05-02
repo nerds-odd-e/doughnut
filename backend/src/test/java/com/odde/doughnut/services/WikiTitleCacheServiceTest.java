@@ -170,27 +170,6 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
-    void parent_focus_sees_carrier_cache_and_primary_matches_carrier_target() {
-      User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note target = makeMe.aNote().under(root).title("Beta").please();
-      Note source =
-          makeMe
-              .aNote()
-              .under(root)
-              .title("Alpha")
-              .relateTo(target, RelationType.RELATED_TO)
-              .please();
-      Note carrier = source.getChildren().stream().filter(Note::isRelation).toList().get(0);
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      assertThat(wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(source, user), hasSize(2));
-      assertThat(
-          wikiTitleCacheService.primaryWikiLinkedTargetForGraph(source, user).orElseThrow().getId(),
-          equalTo(target.getId()));
-    }
-
-    @Test
     void primary_resolves_from_yaml_when_cache_rows_are_missing() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
