@@ -45,15 +45,18 @@ This document **re-sequences** 5.24 into smaller slices aligned with `.cursor/ru
 - **Undo delete:** Restoring the focal note returns prior resolution behavior; **every link works again** without repopulating cache from scratch (cache was never torn down for this path).
 - **Tests:** Align **`NoteControllerTests`** delete / restore scenarios with the new non-cascade contract; update Cypress **`e2e_test/features/note_creation_and_update/note_deletion.feature`** (relationship + reference scenarios) so they expect relationship/reference notes to **remain listed**, with dead-link assertions where the UI exposes link state (or the narrowest observable the suite already supports).
 
-### 5.24d — Recall propagation (**behavior**)
+### 5.24d — No recall setting propagation (**behavior**)
 
-- **`NoteController.updateNoteRecallSetting`**: Extend **`relatedNotesForRecallPropagation(note)`** (new or evolved helper) — **`Stream.concat(children relationships, inbound semantic relationship notes)`** — without **`inboundReferences`** once queries exist.
+- **`NoteController.updateNoteRecallSetting`**: Apply **`BeanUtils.copyProperties`** (and the existing **`rememberSpelling` → reassimilation** branch) **only to the authorized note**. **Remove** the **`getRelationshipsAndRefers().forEach(…)`** loop that raised **related** notes’ recall **`level`** toward the submitted setting — no propagation helper, no semantic-relationship extension, and **no** replacement path that bulk-updates other notes from this endpoint.
+- **Observable:** Recall level, skip-memory-tracking, and remember-spelling changes affect **that note only**; relationship and reference notes keep their prior recall settings until changed on each note individually.
+- **Tests:** **`NoteControllerTests.UpdateNoteRecallSetting`**: drop or rewrite **`shouldUpdateRelationshipLevel`** / **`shouldUpdateReferenceLevel`** so they assert **no** level change on the relation when source or target is updated; keep **`shouldPutNoteBackToAssimilationListWhenRememberSpellingIsAddedLater`** (focal-only behavior).
 - **Flyway:** still **before** dropping **`note.target_note_id`**.
 
-### 5.24e — GraphRAG / BareNote / focus JSON (**behavior**)
+### 5.24e — GraphRAG: no FK target on graph paths (**behavior**)
 
-- **`BareNote`**, **`FocusNote.fromNote`**: inject **`UriAndTitle`** resolved target where **`User`** is known; **`WikiTitleCacheService`** graph paths drop **`getTargetNote()`** shortcuts — use **5.24a** + resolver / cache consistency.
-- **Tests:** **`GraphRAGServiceTest`**, **`GraphRAGResultTest`**; disambiguate **`fromNote(..., null)`** with **`(UriAndTitle) null`** if overloads clash.
+- **Scope (this slice only):** **`GraphRAGService`** / **`GraphRAGResultBuilder`** (and any graph helper they call) must not resolve relationship targets via **`Note.getTargetNote()`** or JDBC that assumes **`note.target_note_id`**. Use **5.24a** relationship classification plus **`WikiTitleCacheService`** / **`WikiLinkResolver`** (same viewer rules as elsewhere) so semantic targets come from the wiki-title cache, not the legacy FK.
+- **Out of scope here (Phase 7.13):** **`FocusNote`** shape (`links`, **`inboundReferences`**, folder crumbs, removal of **`children`**), **`BareNote`** field deletion (**`subject`**, **`relation_type`**, **`target`**, **`parent`**, **`linkFromFocus`**, **`linkHop2`**), wiki-link **`BareNote.uri`** formatting, **`RelationshipToFocusNote`** enum shrink, and **`UriAndTitle`** removal or graph-local URI rules — see **`ongoing/doughnut_wiki_migration_plan-phase-7.13-sub-phases.md`** (7.13.1–7.13.10). Do not expand **5.24e** into that JSON/DTO cleanup; keep **`BareNote` / `FocusNote`** wiring minimal for “no **`getTargetNote()`** on graph paths” only.
+- **Tests:** **`GraphRAGServiceTest`** (and **`GraphRAGResultTest`** only if it still asserts graph assembly touched by this slice). Prefer observable graph output or builder boundaries; avoid introducing new **`BareNote`** constructors or overload disambiguation solely for fields **7.13.8** will remove.
 
 ### 5.24f — AI stacks (**behavior**)
 

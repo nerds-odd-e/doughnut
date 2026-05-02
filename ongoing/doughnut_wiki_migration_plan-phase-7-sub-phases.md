@@ -292,15 +292,15 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 ## Sub-Phase 7.13 - Remove Parent-Based Graph Relationships
 
-**Type:** Structure.
+**Type:** Structure (rolled out through `ongoing/doughnut_wiki_migration_plan-phase-7.13-sub-phases.md`).
 
 **Pre-condition:** Relationship and graph behavior already reads semantic links/cache from Phase 5 (including **5.23**: graph uses wiki-title cache; **`NoteRealm.inboundReferences`** / **`relationshipsDeprecating`** are gone in favor of **`NoteRealm.references`** where applicable) and structural peers from folders from Phase 6.
 
 **Trigger:** GraphRAG relationship handlers still add parent/child/sibling context from note parent edges.
 
-**Post-condition:** Graph context uses folder peers and wiki references only; no parent/child relationship handler relies on `Note.parent`.
+**Post-condition:** Graph context uses folder peers and wiki references only; no parent/child relationship handler relies on `Note.parent`. `FocusNote` exposes folder crumbs plus wiki `links` / `inboundReferences`; `BareNote` has the simplified wiki-link URI shape described in the detailed 7.13 plan.
 
-**Work:** Remove or replace one graph relationship handler at a time, keeping prompt/context assertions at the public GraphRAG service boundary.
+**Work:** Execute the 7.13 sub-sub-phases in the dedicated plan. Remove parent/child graph handlers outright rather than replacing children with another structural expansion; keep same-folder sibling context.
 
 **Verify:** Focused `GraphRAGServiceTest`.
 
