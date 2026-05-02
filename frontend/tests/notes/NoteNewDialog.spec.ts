@@ -26,7 +26,9 @@ vi.mock("vue-router", async (importOriginal) => {
 let searchForRelationshipTargetWithinSpy: ReturnType<
   typeof mockSdkService<"searchForRelationshipTargetWithin">
 >
-let mockedCreateNote: ReturnType<typeof mockSdkService<"createNoteUnderParent">>
+let mockedCreateNoteAtRoot: ReturnType<
+  typeof mockSdkService<"createNoteAtNotebookRoot">
+>
 
 describe("adding new note", () => {
   beforeEach(() => {
@@ -41,7 +43,10 @@ describe("adding new note", () => {
     mockSdkService("semanticSearchWithin", [])
     mockSdkService("getRecentNotes", [])
     const createNoteResult = makeMe.aNoteRealm.please()
-    mockedCreateNote = mockSdkService("createNoteUnderParent", createNoteResult)
+    mockedCreateNoteAtRoot = mockSdkService(
+      "createNoteAtNotebookRoot",
+      createNoteResult
+    )
   })
 
   afterEach(() => {
@@ -51,12 +56,20 @@ describe("adding new note", () => {
 
   const note = makeMe.aNote.title("mythical").please()
 
+  const notebookRootProps = {
+    notebookRootNotebookId:
+      note.noteTopology.notebookId != null
+        ? Number(note.noteTopology.notebookId)
+        : 1,
+    titleSearchAnchorNote: note,
+  }
+
   it("does not search for initial default 'Untitled' title", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
     const wrapper = helper
       .component(NoteNewDialog)
       .withCleanStorage()
-      .withProps({ referenceNote: note, insertMode: "as-child" })
+      .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
 
     // Wait a bit to ensure any potential search would have been triggered
@@ -77,7 +90,7 @@ describe("adding new note", () => {
     const wrapper = helper
       .component(NoteNewDialog)
       .withCleanStorage()
-      .withProps({ referenceNote: note, insertMode: "as-child" })
+      .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
 
     // First, change the title to something else (this marks it as edited)
@@ -110,37 +123,7 @@ describe("adding new note", () => {
     const wrapper = helper
       .component(NoteNewDialog)
       .withCleanStorage()
-      .withProps({ referenceNote: note, insertMode: "as-child" })
-      .mount({ attachTo: document.body })
-    await wrapper.find("input#note-title").setValue("myth")
-
-    vi.runOnlyPendingTimers()
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("mythical")
-    expect(searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
-      path: { note: note.id },
-      body: expect.objectContaining({ searchKey: "myth" }),
-    })
-    wrapper.unmount()
-  })
-
-  it("searches for duplicate when using notebook-root create with a title search anchor note", async () => {
-    searchForRelationshipTargetWithinSpy.mockResolvedValue(
-      wrapSdkResponse([
-        { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
-      ])
-    )
-    const wrapper = helper
-      .component(NoteNewDialog)
-      .withCleanStorage()
-      .withProps({
-        notebookRootNotebookId:
-          note.noteTopology.notebookId != null
-            ? Number(note.noteTopology.notebookId)
-            : 1,
-        titleSearchAnchorNote: note,
-      })
+      .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
     await wrapper.find("input#note-title").setValue("myth")
 
@@ -162,7 +145,7 @@ describe("adding new note", () => {
       wrapper = helper
         .component(NoteNewDialog)
         .withCleanStorage()
-        .withProps({ referenceNote: note, insertMode: "as-child" })
+        .withProps(notebookRootProps)
         .mount({ attachTo: document.body })
       await wrapper.find("input#note-title").setValue("note title")
       vi.clearAllTimers()
@@ -174,9 +157,14 @@ describe("adding new note", () => {
 
     it("call the api", async () => {
       await wrapper.find("form").trigger("submit")
-      expect(mockedCreateNote).toHaveBeenCalledWith({
-        path: { parentNote: note.id },
-        body: expect.anything(),
+      expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+        path: {
+          notebook:
+            note.noteTopology.notebookId != null
+              ? note.noteTopology.notebookId
+              : 1,
+        },
+        body: expect.objectContaining({ newTitle: "note title" }),
       })
     })
 
@@ -184,7 +172,7 @@ describe("adding new note", () => {
       wrapper.find("form").trigger("submit")
       wrapper.find("form").trigger("submit")
       await flushPromises()
-      expect(mockedCreateNote).toHaveBeenCalledTimes(1)
+      expect(mockedCreateNoteAtRoot).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -201,7 +189,7 @@ describe("adding new note", () => {
       wrapper = helper
         .component(NoteNewDialog)
         .withCleanStorage()
-        .withProps({ referenceNote: note, insertMode: "as-child" })
+        .withProps(notebookRootProps)
         .mount({ attachTo: document.body })
     })
 

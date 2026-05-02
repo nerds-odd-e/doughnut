@@ -46,7 +46,6 @@ import type {
   Note,
   NoteCreationDto,
 } from "@generated/doughnut-backend-api"
-import type { InsertMode } from "@/models/InsertMode"
 import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
@@ -58,37 +57,28 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
-// Props — referenceNote required unless creating first note via notebook-root API
 const props = defineProps<{
-  referenceNote?: Note
-  insertMode?: InsertMode
   notebookRootNotebookId?: number
   /** Scope for create-note when using notebook root API (active sidebar folder). */
   targetFolderId?: number
   initialTitle?: string
-  /** Duplicate title search is scoped from this note when using notebook-root create (sidebar). */
+  /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
   titleSearchAnchorNote?: Note
   /** After notebook-root create, refresh wiki title cache for this note before navigating away. */
   wikiTitleCacheRefreshSourceNoteId?: number
 }>()
 
-const titleSearchScopeNote = computed(
-  () => props.referenceNote ?? props.titleSearchAnchorNote
-)
+const titleSearchScopeNote = computed(() => props.titleSearchAnchorNote)
 
 const noteRealm = computed(() =>
-  props.referenceNote != null
-    ? storageAccessor.value.refOfNoteRealm(props.referenceNote.id).value
-    : props.titleSearchAnchorNote != null
-      ? storageAccessor.value.refOfNoteRealm(props.titleSearchAnchorNote.id)
-          .value
-      : undefined
+  props.titleSearchAnchorNote != null
+    ? storageAccessor.value.refOfNoteRealm(props.titleSearchAnchorNote.id).value
+    : undefined
 )
 const notebookId = computed(
   () =>
     props.notebookRootNotebookId ??
     noteRealm.value?.notebookId ??
-    props.referenceNote?.noteTopology.notebookId ??
     props.titleSearchAnchorNote?.noteTopology.notebookId
 )
 
@@ -129,26 +119,21 @@ const processForm = async () => {
 
   const api = storageAccessor.value.storedApi()
   try {
-    if (props.notebookRootNotebookId != null) {
-      await api.createRootNoteAtNotebook(
-        router,
-        props.notebookRootNotebookId,
-        creationData.value,
-        {
-          folderId: props.targetFolderId,
-          refreshWikiTitleCacheForNoteIds:
-            props.wikiTitleCacheRefreshSourceNoteId != null
-              ? [props.wikiTitleCacheRefreshSourceNoteId]
-              : undefined,
-        }
-      )
-    } else if (props.referenceNote == null || props.insertMode == null) {
-      throw new Error("Invalid note creation mode")
-    } else if (props.insertMode === "as-child") {
-      await api.createNote(router, props.referenceNote.id, creationData.value)
-    } else {
+    if (props.notebookRootNotebookId == null) {
       throw new Error("Invalid note creation mode")
     }
+    await api.createRootNoteAtNotebook(
+      router,
+      props.notebookRootNotebookId,
+      creationData.value,
+      {
+        folderId: props.targetFolderId,
+        refreshWikiTitleCacheForNoteIds:
+          props.wikiTitleCacheRefreshSourceNoteId != null
+            ? [props.wikiTitleCacheRefreshSourceNoteId]
+            : undefined,
+      }
+    )
     emit("closeDialog")
   } catch (res: unknown) {
     noteFormErrors.value = {

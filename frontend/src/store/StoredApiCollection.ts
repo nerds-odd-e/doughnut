@@ -14,7 +14,6 @@ import type {
 import {
   RelationController,
   NoteController,
-  NoteCreationController,
   TextContentController,
   NotebookController,
 } from "@generated/doughnut-backend-api/sdk.gen"
@@ -60,12 +59,6 @@ export interface StoredApi {
     notebookId: number,
     body: FolderCreationRequest
   ): Promise<NotebookRootFolder>
-
-  createNote(
-    router: Router,
-    parentId: Doughnut.ID,
-    data: NoteCreationDto
-  ): Promise<NoteRealm>
 
   createRootNoteAtNotebook(
     router: Router,
@@ -297,41 +290,6 @@ export default class StoredApiCollection implements StoredApi {
 
   getNoteRealmRef(noteId: Doughnut.ID) {
     return this.storage.refOfNoteRealm(noteId)
-  }
-
-  async createNote(
-    router: Router,
-    parentId: Doughnut.ID,
-    data: NoteCreationDto
-  ) {
-    const { data: nrwp, error } = await apiCallWithLoading(() =>
-      NoteCreationController.createNoteUnderParent({
-        path: { parentNote: parentId },
-        body: data,
-      })
-    )
-    if (error || !nrwp) {
-      const apiError = new Error("Failed to create note") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to create note"
-        if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
-    }
-    const focus = this.storage.refreshNoteRealm(nrwp)
-    refreshSidebarStructuralListings()
-    this.noteEditingHistory.createNote(focus.id)
-    await this.routerReplaceFocus(router, focus)
-    return focus
   }
 
   async createRootNoteAtNotebook(
