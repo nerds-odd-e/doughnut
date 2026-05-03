@@ -35,12 +35,12 @@ class WikiTitleCacheServiceTest {
     void stores_resolved_links_from_relationship_frontmatter_and_body() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note source = makeMe.aNote().title("Alpha").under(root).please();
-      Note target = makeMe.aNote().title("Beta").under(root).please();
+      Note source = makeMe.aNote().title("Alpha").underSameNotebookAs(root).please();
+      Note target = makeMe.aNote().title("Beta").underSameNotebookAs(root).please();
       String details =
           RelationshipNoteMarkdownFormatter.format(
               RelationType.RELATED_TO, source.getTitle(), target.getTitle(), null);
-      Note carrier = makeMe.aNote().under(root).details(details).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).details(details).please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -57,9 +57,9 @@ class WikiTitleCacheServiceTest {
     void replaces_previous_rows_on_second_refresh() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note a = makeMe.aNote().title("OnlyA").under(root).please();
-      Note b = makeMe.aNote().title("OnlyB").under(root).please();
-      Note carrier = makeMe.aNote().under(root).details("[[OnlyA]]").please();
+      Note a = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
+      Note b = makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[OnlyA]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
       assertThat(
@@ -80,8 +80,9 @@ class WikiTitleCacheServiceTest {
     void dedupes_duplicate_link_text_in_order_of_first_occurrence() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note shared = makeMe.aNote().title("Same").under(root).please();
-      Note carrier = makeMe.aNote().under(root).details("[[Same]] and again [[Same]]").please();
+      Note shared = makeMe.aNote().title("Same").underSameNotebookAs(root).please();
+      Note carrier =
+          makeMe.aNote().underSameNotebookAs(root).details("[[Same]] and again [[Same]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -95,9 +96,9 @@ class WikiTitleCacheServiceTest {
     void unqualified_link_picks_lowest_note_id_when_duplicate_titles_exist_in_subtree() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note firstCreated = makeMe.aNote().title("Dup").under(root).please();
-      makeMe.aNote().title("Dup").under(root).please();
-      Note carrier = makeMe.aNote().under(root).details("[[Dup]]").please();
+      Note firstCreated = makeMe.aNote().title("Dup").underSameNotebookAs(root).please();
+      makeMe.aNote().title("Dup").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[Dup]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -111,12 +112,16 @@ class WikiTitleCacheServiceTest {
     void omits_qualified_link_when_target_notebook_is_not_readable() {
       User otherUser = makeMe.aUser().please();
       Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).title("Secret Notebook").please();
-      makeMe.aNote().title("Hidden Note").under(headSecret).please();
+      makeMe.aNote().title("Hidden Note").underSameNotebookAs(headSecret).please();
 
       User viewer = makeMe.aUser().please();
       Note headSource = makeMe.aNote().creatorAndOwner(viewer).title("My Notebook").please();
       Note carrier =
-          makeMe.aNote().under(headSource).details("Try [[Secret Notebook:Hidden Note]].").please();
+          makeMe
+              .aNote()
+              .underSameNotebookAs(headSource)
+              .details("Try [[Secret Notebook:Hidden Note]].")
+              .please();
 
       wikiTitleCacheService.refreshForNote(carrier, viewer);
 
@@ -127,8 +132,8 @@ class WikiTitleCacheServiceTest {
     void clears_rows_when_details_become_blank() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note a = makeMe.aNote().title("A").under(root).please();
-      Note carrier = makeMe.aNote().under(root).details("[[A]]").please();
+      Note a = makeMe.aNote().title("A").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[A]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
       assertThat(

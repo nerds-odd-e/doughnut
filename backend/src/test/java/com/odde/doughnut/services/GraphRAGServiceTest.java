@@ -137,11 +137,17 @@ public class GraphRAGServiceTest {
       Notebook notebook = parent.getNotebook();
       Folder peerFolder =
           makeMe.aFolder().notebook(notebook).name("younger-sibling-peers").please();
-      focusNote = makeMe.aNote().under(parent).folder(peerFolder).title("Focus Note").please();
+      focusNote =
+          makeMe
+              .aNote()
+              .underSameNotebookAs(parent)
+              .folder(peerFolder)
+              .title("Focus Note")
+              .please();
       youngerSibling1 =
           makeMe
               .aNote()
-              .under(parent)
+              .underSameNotebookAs(parent)
               .folder(peerFolder)
               .title("Younger One")
               .details("Sibling 1 Details")
@@ -149,7 +155,7 @@ public class GraphRAGServiceTest {
       youngerSibling2 =
           makeMe
               .aNote()
-              .under(parent)
+              .underSameNotebookAs(parent)
               .folder(peerFolder)
               .title("Younger Two")
               .details("Sibling 2 Details")
@@ -183,8 +189,9 @@ public class GraphRAGServiceTest {
       Folder outer = makeMe.aFolder().notebook(nb).name("CtxOuter").please();
       Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("CtxInner").please();
       grandParent = makeMe.theNote(grandParent).folder(inner).please();
-      parent = makeMe.aNote().under(grandParent).folder(inner).title("Parent").please();
-      focusNote = makeMe.aNote().under(parent).folder(inner).title("Focus").please();
+      parent =
+          makeMe.aNote().underSameNotebookAs(grandParent).folder(inner).title("Parent").please();
+      focusNote = makeMe.aNote().underSameNotebookAs(parent).folder(inner).title("Focus").please();
     }
 
     @Test
@@ -208,7 +215,7 @@ public class GraphRAGServiceTest {
       olderSibling1 =
           makeMe
               .aNote()
-              .under(parent)
+              .underSameNotebookAs(parent)
               .folder(peerFolder)
               .title("Prior One")
               .details("Sibling 1 Details")
@@ -216,12 +223,18 @@ public class GraphRAGServiceTest {
       olderSibling2 =
           makeMe
               .aNote()
-              .under(parent)
+              .underSameNotebookAs(parent)
               .folder(peerFolder)
               .title("Prior Two")
               .details("Sibling 2 Details")
               .please();
-      focusNote = makeMe.aNote().under(parent).folder(peerFolder).title("Focus Note").please();
+      focusNote =
+          makeMe
+              .aNote()
+              .underSameNotebookAs(parent)
+              .folder(peerFolder)
+              .title("Focus Note")
+              .please();
     }
 
     @Test
@@ -333,11 +346,22 @@ public class GraphRAGServiceTest {
       Notebook notebook = parent.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("graph-folder-peers").please();
       Note folderOlder =
-          makeMe.aNote().under(parent).folder(peerFolder).title("Folder older").please();
-      Note focus = makeMe.aNote().under(parent).folder(peerFolder).title("Focus").please();
+          makeMe
+              .aNote()
+              .underSameNotebookAs(parent)
+              .folder(peerFolder)
+              .title("Folder older")
+              .please();
+      Note focus =
+          makeMe.aNote().underSameNotebookAs(parent).folder(peerFolder).title("Focus").please();
       Note folderYounger =
-          makeMe.aNote().under(parent).folder(peerFolder).title("Folder younger").please();
-      makeMe.aNote().under(parent).title("Tree only not in folder").please();
+          makeMe
+              .aNote()
+              .underSameNotebookAs(parent)
+              .folder(peerFolder)
+              .title("Folder younger")
+              .please();
+      makeMe.aNote().underSameNotebookAs(parent).title("Tree only not in folder").please();
 
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
@@ -566,12 +590,18 @@ public class GraphRAGServiceTest {
       Note olderLong =
           makeMe
               .aNote()
-              .under(treeParent)
+              .underSameNotebookAs(treeParent)
               .folder(peerFolder)
               .title("Older Long")
               .details(longDetails)
               .please();
-      Note focus = makeMe.aNote().under(treeParent).folder(peerFolder).title("Focus Note").please();
+      Note focus =
+          makeMe
+              .aNote()
+              .underSameNotebookAs(treeParent)
+              .folder(peerFolder)
+              .title("Focus Note")
+              .please();
 
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
@@ -595,13 +625,18 @@ public class GraphRAGServiceTest {
       Note olderLong =
           makeMe
               .aNote()
-              .under(treeParent)
+              .underSameNotebookAs(treeParent)
               .folder(peerFolder)
               .title("Older Long CJK")
               .details(cjkText)
               .please();
       Note focus =
-          makeMe.aNote().under(treeParent).folder(peerFolder).title("Focus Note CJK").please();
+          makeMe
+              .aNote()
+              .underSameNotebookAs(treeParent)
+              .folder(peerFolder)
+              .title("Focus Note CJK")
+              .please();
 
       GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
@@ -632,7 +667,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotContainNewlinesInJson() {
       Note note = makeMe.aNote().title("Test Note").details("Test Details").please();
-      Note child = makeMe.aNote().under(note).title("Child Note").please();
+      Note child = makeMe.aNote().underSameNotebookAs(note).title("Child Note").please();
 
       String description = graphRAGService.getGraphRAGDescription(child);
 

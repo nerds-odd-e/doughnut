@@ -76,7 +76,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder underSameNotebookAs(Note note) {
-    return inNotebook(note.getNotebook());
+    inNotebook(note.getNotebook());
+    note.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
+    return this;
   }
 
   public NoteBuilder under(Note parentNote) {
@@ -187,7 +189,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder withNChildrenThat(int numNotes, Consumer<NoteBuilder> childNoteThat) {
     for (int i = 0; i < numNotes; i++) {
-      NoteBuilder childBuilder = makeMe.aNote().under(entity);
+      NoteBuilder childBuilder = makeMe.aNote().underSameNotebookAs(entity);
       childNoteThat.accept(childBuilder);
       this.childrenBuilders.add(childBuilder);
     }

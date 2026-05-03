@@ -33,8 +33,8 @@ class NoteRealmServiceTest {
   void wiki_titles_empty_when_details_have_links_but_cache_not_refreshed() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    makeMe.aNote().title("LinkedPage").under(root).please();
-    Note carrier = makeMe.aNote().under(root).details("[[LinkedPage]]").please();
+    makeMe.aNote().title("LinkedPage").underSameNotebookAs(root).please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[LinkedPage]]").please();
 
     NoteRealm realm = noteRealmService.build(carrier, user);
 
@@ -45,11 +45,11 @@ class NoteRealmServiceTest {
   void omits_cached_target_when_viewer_cannot_read_target_notebook() {
     User otherUser = makeMe.aUser().please();
     Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).title("SecretNb").please();
-    Note hidden = makeMe.aNote().title("Hidden").under(headSecret).please();
+    Note hidden = makeMe.aNote().title("Hidden").underSameNotebookAs(headSecret).please();
 
     User viewer = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(viewer).please();
-    Note carrier = makeMe.aNote().under(root).details("plain").please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).details("plain").please();
 
     NoteWikiTitleCache row = new NoteWikiTitleCache();
     row.setNote(carrier);
@@ -80,8 +80,8 @@ class NoteRealmServiceTest {
   void references_empty_when_cache_rows_deleted_for_relation_carrier() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note subject = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
+    Note subject = makeMe.aNote().underSameNotebookAs(root).please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
@@ -94,8 +94,8 @@ class NoteRealmServiceTest {
   void subject_realm_references_include_relation_note_when_cache_refreshed() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note subject = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
+    Note subject = makeMe.aNote().underSameNotebookAs(root).please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
@@ -114,8 +114,8 @@ class NoteRealmServiceTest {
   void references_empty_when_cache_rows_deleted_for_relation_carrier_structural_child() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note subject = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
+    Note subject = makeMe.aNote().underSameNotebookAs(root).please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
@@ -159,8 +159,8 @@ class NoteRealmServiceTest {
   void references_omit_soft_deleted_relation_even_if_cache_row_remains() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note subject = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
+    Note subject = makeMe.aNote().underSameNotebookAs(root).please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
@@ -202,9 +202,9 @@ class NoteRealmServiceTest {
     User ownerFocal = makeMe.aUser().please();
     User ownerCarrier = makeMe.aUser().please();
     Note headMain = makeMe.aNote().creatorAndOwner(ownerFocal).title("MainNb").please();
-    Note focal = makeMe.aNote().title("Focal").under(headMain).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(headMain).please();
     Note headOther = makeMe.aNote().creatorAndOwner(ownerCarrier).title("OtherNb").please();
-    Note carrier = makeMe.aNote().under(headOther).please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(headOther).please();
 
     NoteWikiTitleCache row = new NoteWikiTitleCache();
     row.setNote(carrier);
@@ -221,8 +221,8 @@ class NoteRealmServiceTest {
   void references_omit_soft_deleted_carrier_even_if_cache_row_remains() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note carrier = makeMe.aNote().under(root).details("[[Focal]]").please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     carrier.setDeletedAt(new Timestamp(System.currentTimeMillis()));

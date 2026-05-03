@@ -34,7 +34,7 @@ public class NoteMotionServiceTest {
     User user = makeMe.aUser().please();
     Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("Dest").please();
-    Note mover = makeMe.aNote("mover").creatorAndOwner(user).under(root).please();
+    Note mover = makeMe.aNote("mover").creatorAndOwner(user).underSameNotebookAs(root).please();
     makeMe.entityPersister.flush();
 
     noteMotionService.executeMoveIntoFolder(mover, folder);
@@ -49,7 +49,7 @@ public class NoteMotionServiceTest {
   void moveToTopLevel_clearsFolderAndDetachesParent() {
     User user = makeMe.aUser().please();
     Note topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
-    Note firstChild = makeMe.aNote("middle").under(topNote).please();
+    Note firstChild = makeMe.aNote("middle").underSameNotebookAs(topNote).please();
     makeMe.entityPersister.flush();
 
     noteMotionService.moveToTopLevel(firstChild, user);
@@ -63,7 +63,7 @@ public class NoteMotionServiceTest {
   void moveToTopLevel_preservesNotebook() {
     User user = makeMe.aUser().please();
     Note topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
-    Note firstChild = makeMe.aNote("middle").under(topNote).please();
+    Note firstChild = makeMe.aNote("middle").underSameNotebookAs(topNote).please();
     Integer notebookIdBefore = topNote.getNotebook().getId();
     makeMe.entityPersister.flush();
 
@@ -88,9 +88,9 @@ public class NoteMotionServiceTest {
       User user = makeMe.aUser().please();
       Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
       Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("box").please();
-      Note n1 = makeMe.aNote("n1").creatorAndOwner(user).under(root).please();
-      Note n2 = makeMe.aNote("n2").creatorAndOwner(user).under(root).please();
-      Note mover = makeMe.aNote("mv").creatorAndOwner(user).under(root).please();
+      Note n1 = makeMe.aNote("n1").creatorAndOwner(user).underSameNotebookAs(root).please();
+      Note n2 = makeMe.aNote("n2").creatorAndOwner(user).underSameNotebookAs(root).please();
+      Note mover = makeMe.aNote("mv").creatorAndOwner(user).underSameNotebookAs(root).please();
       makeMe.entityPersister.flush();
       noteMotionService.executeMoveIntoFolder(n1, folder);
       noteMotionService.executeMoveIntoFolder(n2, folder);
@@ -108,8 +108,10 @@ public class NoteMotionServiceTest {
     void firstAmongNotebookRootPeers() throws MovementNotPossibleException {
       User user = makeMe.aUser().please();
       Note topNote = makeMe.aRootNote("top").creatorAndOwner(user).please();
-      Note firstChild = makeMe.aNote("r1").creatorAndOwner(user).under(topNote).please();
-      Note secondChild = makeMe.aNote("r2").creatorAndOwner(user).under(topNote).please();
+      Note firstChild =
+          makeMe.aNote("r1").creatorAndOwner(user).underSameNotebookAs(topNote).please();
+      Note secondChild =
+          makeMe.aNote("r2").creatorAndOwner(user).underSameNotebookAs(topNote).please();
       makeMe.entityPersister.flush();
       noteMotionService.moveToTopLevel(firstChild, user);
       noteMotionService.moveToTopLevel(secondChild, user);
