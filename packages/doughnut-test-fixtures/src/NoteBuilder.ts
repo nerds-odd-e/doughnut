@@ -46,11 +46,6 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  notebookName(value: string): NoteBuilder {
-    this.data.noteTopology.notebookName = value
-    return this
-  }
-
   wikidataId(value: string): NoteBuilder {
     this.data.wikidataId = value
     return this

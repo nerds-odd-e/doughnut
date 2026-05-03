@@ -128,7 +128,6 @@ describe('recall just-review (interactive)', () => {
   function alphaNoteRealm() {
     return makeMe.aNoteRealm
       .title('Alpha')
-      .notebookName('NB')
       .details('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
@@ -138,14 +137,12 @@ describe('recall just-review (interactive)', () => {
   function childNoteUnderEnglish() {
     const english = makeMe.aNoteRealm
       .title('English')
-      .notebookName('NB')
       .details('')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
     const child = makeMe.aNoteRealm
       .title('Sedition')
-      .notebookName('NB')
       .details('Sedition means incite violence')
       .under(english)
       .createdAt(baseNoteTimes.createdAt)
@@ -156,13 +153,17 @@ describe('recall just-review (interactive)', () => {
   }
 
   function mockShowMemoryTrackerCardForRealm(
-    noteRealm: ReturnType<typeof alphaNoteRealm>
+    noteRealm: ReturnType<typeof alphaNoteRealm>,
+    opts?: { includeNotebookName?: boolean }
   ) {
+    let mt = makeMe.aMemoryTracker
+      .nextRecallAt('2026-06-01T00:00:00Z')
+      .ofNote(noteRealm)
+    if (opts?.includeNotebookName !== false) {
+      mt = mt.notebookName('NB')
+    }
     showMemoryTrackerSpy.mockResolvedValue({
-      data: makeMe.aMemoryTracker
-        .nextRecallAt('2026-06-01T00:00:00Z')
-        .ofNote(noteRealm)
-        .please(),
+      data: mt.please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
   }
 
@@ -196,7 +197,6 @@ describe('recall just-review (interactive)', () => {
         const title = id === 1 ? 'Alpha' : 'Beta'
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .notebookName('NB')
           .details('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
@@ -206,6 +206,7 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealm)
+            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -316,7 +317,6 @@ describe('recall just-review (interactive)', () => {
     const noteRealmAlpha = alphaNoteRealm()
     const noteRealmBeta = makeMe.aNoteRealm
       .title('Beta')
-      .notebookName('NB')
       .details('body-beta')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
@@ -340,6 +340,7 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealmAlpha)
+            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -369,6 +370,7 @@ describe('recall just-review (interactive)', () => {
       data: makeMe.aMemoryTracker
         .nextRecallAt('2026-06-01T00:00:00Z')
         .ofNote(noteRealmBeta)
+        .notebookName('NB')
         .please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
 
@@ -654,7 +656,6 @@ describe('recall just-review (interactive)', () => {
         const title = id === 1 ? 'Alpha' : 'Beta'
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .notebookName('NB')
           .details('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
@@ -663,6 +664,7 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealm)
+            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -727,7 +729,8 @@ describe('recall just-review (interactive)', () => {
         .details('')
         .createdAt(baseNoteTimes.createdAt)
         .updatedAt(baseNoteTimes.updatedAt)
-        .please()
+        .please(),
+      { includeNotebookName: false }
     )
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -820,7 +823,6 @@ describe('recall just-review (interactive)', () => {
               : `unexpected-${String(id)}`
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .notebookName('NB')
           .details('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
@@ -829,6 +831,7 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealm)
+            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>

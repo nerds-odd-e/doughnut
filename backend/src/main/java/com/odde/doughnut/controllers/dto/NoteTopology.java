@@ -16,8 +16,6 @@ public class NoteTopology {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer notebookId;
 
-  private String notebookName;
-
   /** Present when the note is assigned to a folder (folder-first containment). */
   private Integer folderId;
 

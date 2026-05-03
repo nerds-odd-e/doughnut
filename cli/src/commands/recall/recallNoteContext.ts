@@ -9,24 +9,26 @@ type FolderTrailLike = { name?: string }
  */
 export function noteBreadcrumbTrailTitles(
   note: Note | undefined,
-  ancestorFolders?: readonly FolderTrailLike[] | undefined
+  ancestorFolders?: readonly FolderTrailLike[] | undefined,
+  notebookName?: string | undefined
 ): readonly string[] {
   if (note === undefined) {
     return ['Note']
   }
   const topo = note.noteTopology
-  return titlesFromTopologyAndFolders(topo, ancestorFolders)
+  return titlesFromTopologyAndFolders(topo, notebookName, ancestorFolders)
 }
 
 function titlesFromTopologyAndFolders(
   topo: NoteTopology | undefined,
+  notebookName: string | undefined,
   ancestorFolders: readonly FolderTrailLike[] | undefined
 ): readonly string[] {
   if (topo === undefined) {
     return ['Note']
   }
   const parts: string[] = []
-  const notebook = topo.notebookName?.trim()
+  const notebook = notebookName?.trim()
   if (notebook !== undefined && notebook.length > 0) {
     parts.push(notebook)
   }

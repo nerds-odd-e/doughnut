@@ -73,7 +73,8 @@ function recallAnsweredMcqInk(args: {
   const crumb = recallAnsweredBreadcrumbText(
     noteBreadcrumbTrailTitles(
       args.answeredPrompt.note,
-      args.answeredPrompt.ancestorFolders
+      args.answeredPrompt.ancestorFolders,
+      args.answeredPrompt.notebook?.name
     )
   )
   const correct = args.answeredPrompt.answer?.correct === true

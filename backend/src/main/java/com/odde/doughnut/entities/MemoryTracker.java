@@ -136,4 +136,14 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     }
     return FolderTrailSegments.fromRootToContainingFolder(n);
   }
+
+  @JsonProperty("notebookName")
+  public String getNotebookName() {
+    Note n = getNote();
+    if (n == null) {
+      return null;
+    }
+    Notebook nb = n.getNotebook();
+    return nb != null ? nb.getName() : null;
+  }
 }

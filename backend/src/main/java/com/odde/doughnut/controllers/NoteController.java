@@ -2,13 +2,11 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GraphRAGService;
-import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
@@ -34,36 +32,30 @@ class NoteController {
 
   private final EntityPersister entityPersister;
   private final WikidataService wikidataService;
-  private final NoteMotionService noteMotionService;
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
   private final UserService userService;
   private final GraphRAGService graphRAGService;
   private final TestabilitySettings testabilitySettings;
   private final NoteRealmService noteRealmService;
-  private final FolderRepository folderRepository;
 
   public NoteController(
       EntityPersister entityPersister,
       WikidataService wikidataService,
-      NoteMotionService noteMotionService,
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService,
       GraphRAGService graphRAGService,
       TestabilitySettings testabilitySettings,
-      NoteRealmService noteRealmService,
-      FolderRepository folderRepository) {
+      NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
     this.wikidataService = wikidataService;
-    this.noteMotionService = noteMotionService;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
     this.userService = userService;
     this.graphRAGService = graphRAGService;
     this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
-    this.folderRepository = folderRepository;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -171,32 +163,11 @@ class NoteController {
     return RedirectToNoteResponse.forNote(note.getId());
   }
 
-  @PostMapping(value = "/{note}/reorder")
-  @Transactional
-  public List<NoteRealm> reorder(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestBody @Valid NoteReorderDTO body,
-      BindingResult bindingResult)
-      throws UnexpectedNoAccessRightException, BindException {
-    if (bindingResult.hasErrors()) {
-      throw new BindException(bindingResult);
-    }
-    authorizationService.assertAuthorization(note);
-    Folder targetFolder =
-        body.folderId == null ? null : folderRepository.findById(body.folderId).orElseThrow();
-    if (targetFolder != null) {
-      authorizationService.assertAuthorization(targetFolder.getNotebook());
-    }
-    noteMotionService.executeReorderInPlacement(note, targetFolder);
-    User user = authorizationService.getCurrentUser();
-    return List.of(noteRealmService.build(note, user));
-  }
-
   @GetMapping("/recent")
   public List<NoteSearchResult> getRecentNotes() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     return noteService.findRecentNotesByUser(authorizationService.getCurrentUser().getId()).stream()
-        .map(note -> new NoteSearchResult(note.getNoteTopology(), null))
+        .map(note -> new NoteSearchResult(note, null))
         .toList();
   }
 

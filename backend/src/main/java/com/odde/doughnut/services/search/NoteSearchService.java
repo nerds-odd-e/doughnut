@@ -368,7 +368,7 @@ public class NoteSearchService {
   }
 
   private NoteSearchResult noteToSearchResult(Note note, Float distance) {
-    return new NoteSearchResult(note.getNoteTopology(), distance);
+    return new NoteSearchResult(note, distance);
   }
 
   private List<NoteSearchResult> sortByDistanceThenNotebook(

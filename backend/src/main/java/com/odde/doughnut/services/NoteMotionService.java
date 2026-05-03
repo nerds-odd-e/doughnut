@@ -33,26 +33,16 @@ public class NoteMotionService {
   }
 
   /**
-   * Places {@code subject} in {@code targetFolderOrNull} (notebook root when {@code null}) at the
-   * end of its peer list in that scope.
+   * Clears {@code subject}'s folder so it sits in notebook root, then appends it after other
+   * root-scoped notes in that notebook.
    */
-  public void executeReorderInPlacement(Note subject, Folder targetFolderOrNull) {
-    if (targetFolderOrNull != null) {
-      Notebook targetNotebook = targetFolderOrNull.getNotebook();
-      subject.assignNotebook(targetNotebook);
-      subject.setFolder(targetFolderOrNull);
-    } else {
-      subject.setFolder(null);
-    }
-
+  public void executeMoveToNotebookRoot(Note subject) {
+    subject.setFolder(null);
     entityPersister.flush();
 
     Integer notebookId = subject.getNotebook().getId();
     List<Note> peersInPlacement =
-        targetFolderOrNull != null
-            ? noteRepository.findNotesInFolderOrderBySiblingOrder(targetFolderOrNull.getId())
-            : noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebookId);
-
+        noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebookId);
     List<Note> peersExcludingSubject =
         peersInPlacement.stream().filter(n -> !n.getId().equals(subject.getId())).toList();
 

@@ -510,6 +510,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
+  /api/relations/move-to-notebook-root/{sourceNote}:
+    post:
+      tags:
+      - relation-controller
+      operationId: moveNoteToNotebookRoot
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/relations/move-to-folder/{sourceNote}/{targetFolder}:
     post:
       tags:
@@ -883,32 +903,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
-  /api/notes/{note}/reorder:
-    post:
-      tags:
-      - note-controller
-      operationId: reorder
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteReorderDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/recall-setting:
     post:
       tags:
@@ -3657,8 +3651,6 @@ components:
         notebookId:
           type: integer
           format: int32
-        notebookName:
-          type: string
         folderId:
           type: integer
           format: int32
@@ -3890,12 +3882,6 @@ components:
           description: "Match score for a folder hit (0 exact, 0.9 partial)"
       required:
       - hitKind
-    NoteReorderDTO:
-      type: object
-      properties:
-        folderId:
-          type: integer
-          format: int32
     NoteRecallSetting:
       type: object
       properties:
@@ -4255,6 +4241,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FolderTrailSegment"
+        notebookName:
+          type: string
       required:
       - id
       - nextRecallAt

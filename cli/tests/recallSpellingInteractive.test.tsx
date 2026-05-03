@@ -84,7 +84,6 @@ describe('recall spelling (interactive)', () => {
 
     spellingFixtureNoteRealm = makeMe.aNoteRealm
       .title('sedition')
-      .notebookName('NB')
       .details('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)

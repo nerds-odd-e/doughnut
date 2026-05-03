@@ -26,11 +26,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
-  notebookName(value: string): NoteRealmBuilder {
-    this.noteBuilder.notebookName(value)
-    return this
-  }
-
   createdAt(value: string): NoteRealmBuilder {
     this.noteBuilder.createdAt(value)
     return this

@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.entities.Note;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,10 +24,12 @@ public class NoteSearchResult {
 
   private Float distance;
 
-  public NoteSearchResult(NoteTopology noteTopology, Float distance) {
-    this.noteTopology = noteTopology;
-    this.notebookId = noteTopology != null ? noteTopology.getNotebookId() : null;
-    this.notebookName = noteTopology != null ? noteTopology.getNotebookName() : null;
+  public NoteSearchResult(Note note, Float distance) {
+    NoteTopology topology = note != null ? note.getNoteTopology() : null;
+    this.noteTopology = topology;
+    this.notebookId = topology != null ? topology.getNotebookId() : null;
+    this.notebookName =
+        note != null && note.getNotebook() != null ? note.getNotebook().getName() : null;
     this.distance = distance;
   }
 

@@ -61,6 +61,18 @@ class RelationController {
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
+  @PostMapping(value = "/move-to-notebook-root/{sourceNote}")
+  @Transactional
+  public List<NoteRealm> moveNoteToNotebookRoot(
+      @PathVariable @Schema(type = "integer") Note sourceNote)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(sourceNote);
+    authorizationService.assertAuthorization(sourceNote.getNotebook());
+    noteMotionService.executeMoveToNotebookRoot(sourceNote);
+    User user = authorizationService.getCurrentUser();
+    return List.of(noteRealmService.build(sourceNote, user));
+  }
+
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
   public List<NoteRealm> addRelationshipFinalize(

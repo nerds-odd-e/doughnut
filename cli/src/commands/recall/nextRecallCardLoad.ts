@@ -64,13 +64,17 @@ function recallJustReviewPayloadFromMemoryTracker(
   const topo = note?.noteTopology
   const noteTitle = topo?.title?.trim() || 'Note'
   const detailsMarkdown = (note?.details ?? '').trim()
-  const notebookName = topo?.notebookName?.trim()
+  const notebookName = mt.notebookName?.trim()
   return {
     memoryTrackerId: mt.id,
     noteTitle,
     detailsMarkdown,
     notebookName,
-    breadcrumbTitles: noteBreadcrumbTrailTitles(note, mt.ancestorFolders),
+    breadcrumbTitles: noteBreadcrumbTrailTitles(
+      note,
+      mt.ancestorFolders,
+      mt.notebookName
+    ),
   }
 }
 

@@ -243,7 +243,6 @@ export type NoteTopology = {
     id: number;
     title?: string;
     notebookId: number;
-    notebookName?: string;
     folderId?: number;
 };
 
@@ -365,10 +364,6 @@ export type RelationshipLiteralSearchHit = {
      * Match score for a folder hit (0 exact, 0.9 partial)
      */
     distance?: number;
-};
-
-export type NoteReorderDto = {
-    folderId?: number;
 };
 
 export type NoteRecallSetting = {
@@ -556,6 +551,7 @@ export type MemoryTracker = {
     removedFromTracking?: boolean;
     spelling?: boolean;
     ancestorFolders?: Array<FolderTrailSegment>;
+    notebookName?: string;
 };
 
 export type ConversationMessage = {
@@ -1004,6 +1000,7 @@ export type MemoryTrackerWritable = {
     removedFromTracking?: boolean;
     spelling?: boolean;
     ancestorFolders?: Array<FolderTrailSegment>;
+    notebookName?: string;
 };
 
 export type ConversationWritable = {
@@ -1490,6 +1487,24 @@ export type SetCurrentModelVersionsResponses = {
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
 
+export type MoveNoteToNotebookRootData = {
+    body?: never;
+    path: {
+        sourceNote: number;
+    };
+    query?: never;
+    url: '/api/relations/move-to-notebook-root/{sourceNote}';
+};
+
+export type MoveNoteToNotebookRootResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type MoveNoteToNotebookRootResponse = MoveNoteToNotebookRootResponses[keyof MoveNoteToNotebookRootResponses];
+
 export type MoveNoteToFolderData = {
     body?: never;
     path: {
@@ -1779,24 +1794,6 @@ export type SearchForRelationshipTargetWithinResponses = {
 };
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
-
-export type ReorderData = {
-    body: NoteReorderDto;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/reorder';
-};
-
-export type ReorderResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type ReorderResponse = ReorderResponses[keyof ReorderResponses];
 
 export type UpdateNoteRecallSettingData = {
     body: NoteRecallSetting;

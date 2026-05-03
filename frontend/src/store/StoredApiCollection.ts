@@ -3,7 +3,6 @@ import type {
   FolderListing,
   NoteDetailsCompletion,
   NoteRealm,
-  NoteReorderDto,
   NotebookRootFolder,
   WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
@@ -357,29 +356,6 @@ export default class StoredApiCollection implements StoredApi {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
   }
 
-  private reorderBody(placement: { folderId: number | null }): NoteReorderDto {
-    return {
-      folderId: placement.folderId ?? undefined,
-    } as NoteReorderDto
-  }
-
-  private async reorderWithoutUndo(
-    noteId: number,
-    placement: { folderId: number | null }
-  ): Promise<NoteRealm[]> {
-    const { data: updatedNotes, error } = await apiCallWithLoading(() =>
-      NoteController.reorder({
-        path: { note: noteId },
-        body: this.reorderBody(placement),
-      })
-    )
-    if (error || !updatedNotes) {
-      throw new Error(toErrorMessage(error, "Failed to reorder note"))
-    }
-    this.refreshNoteRealms(updatedNotes)
-    return updatedNotes
-  }
-
   private placementUndoForNote(sourceId: Doughnut.ID): {
     folderId: number | null
   } | null {
@@ -468,11 +444,29 @@ export default class StoredApiCollection implements StoredApi {
   private async undoMoveNote(
     noteId: Doughnut.ID,
     originalFolderId: Doughnut.ID | null
-  ) {
-    const updatedNotes = await this.reorderWithoutUndo(noteId, {
-      folderId: originalFolderId,
-    })
-    return updatedNotes[0]!
+  ): Promise<NoteRealm> {
+    if (originalFolderId != null) {
+      const { data: noteRealms, error } = await apiCallWithLoading(() =>
+        RelationController.moveNoteToFolder({
+          path: { sourceNote: noteId, targetFolder: originalFolderId },
+        })
+      )
+      if (error || !noteRealms) {
+        throw new Error(toErrorMessage(error, "Failed to move note"))
+      }
+      this.refreshNoteRealms(noteRealms)
+      return noteRealms[0]!
+    }
+    const { data: noteRealms, error } = await apiCallWithLoading(() =>
+      RelationController.moveNoteToNotebookRoot({
+        path: { sourceNote: noteId },
+      })
+    )
+    if (error || !noteRealms) {
+      throw new Error(toErrorMessage(error, "Failed to move note"))
+    }
+    this.refreshNoteRealms(noteRealms)
+    return noteRealms[0]!
   }
 
   private async undoCreateNote(noteId: Doughnut.ID): Promise<{

@@ -1,8 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
@@ -15,6 +17,7 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.RelationshipNoteTitleFormatter;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,6 +78,74 @@ class RelationControllerTests extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveNoteToFolder(mover, otherFolder));
+    }
+
+    @Test
+    void moveNoteIntoFolderAtEndAmongPeers() throws Throwable {
+      User u = currentUser.getUser();
+      Note anchor = makeMe.aRootNote("top").creatorAndOwner(u).please();
+      Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F").please();
+      Note peerA = makeMe.aNote("A").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      Note peerB = makeMe.aNote("B").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      Note mover = makeMe.aNote("M").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      makeMe.entityPersister.flush();
+      controller.moveNoteToFolder(peerA, folder);
+      controller.moveNoteToFolder(peerB, folder);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToFolder(mover, folder);
+      makeMe.refresh(mover);
+      assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
+      List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+      assertThat(
+          ordered.stream().map(Note::getId).toList(),
+          contains(peerA.getId(), peerB.getId(), mover.getId()));
+    }
+
+    @Test
+    void moveNoteToSameFolderKeepsNoteAtEndAmongPeers() throws Throwable {
+      User u = currentUser.getUser();
+      Note anchor = makeMe.aRootNote("top2").creatorAndOwner(u).please();
+      Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F2").please();
+      Note peerA = makeMe.aNote("A2").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      Note peerB = makeMe.aNote("B2").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      Note mover = makeMe.aNote("M2").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      makeMe.entityPersister.flush();
+      controller.moveNoteToFolder(peerA, folder);
+      controller.moveNoteToFolder(peerB, folder);
+      controller.moveNoteToFolder(mover, folder);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToFolder(mover, folder);
+      List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+      assertThat(
+          ordered.stream().map(Note::getId).toList(),
+          contains(peerA.getId(), peerB.getId(), mover.getId()));
+    }
+  }
+
+  @Nested
+  class MoveNoteToNotebookRootTest {
+    @Test
+    void moveNoteToNotebookRoot_checksAccessOnNote() {
+      Note foreign = makeMe.aNote().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.moveNoteToNotebookRoot(foreign));
+    }
+
+    @Test
+    void moveNoteToNotebookRoot_clearsFolder() throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
+      Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
+      Note mover = makeMe.aNote("M").creatorAndOwner(u).underSameNotebookAs(root).please();
+      makeMe.entityPersister.flush();
+      controller.moveNoteToFolder(mover, folder);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToNotebookRoot(mover);
+      makeMe.refresh(mover);
+      assertThat(mover.getFolder(), nullValue());
     }
   }
 

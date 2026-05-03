@@ -90,7 +90,7 @@ const methodToController: Record<string, any> = {
   updateNoteRecallSetting: NoteController,
   verifySpelling: NoteController,
   deleteNote: NoteController,
-  reorder: NoteController,
+  moveNoteToNotebookRoot: RelationController,
   showNote: NoteController,
   updateNoteAccessories: NoteController,
   undoDeleteNote: NoteController,
@@ -295,7 +295,7 @@ export function mockSdkService<K extends SdkServiceName>(
 export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
   const notebook: Notebook = {
     id: realm.notebookId,
-    name: realm.note.noteTopology.notebookName ?? "Notebook",
+    name: "Notebook",
     notebookSettings: { skipMemoryTrackingEntirely: false },
     updated_at: realm.note.updatedAt,
     ...(circle ? { circle } : {}),
