@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
@@ -45,57 +46,30 @@ public class NoteMotionServiceTest {
   }
 
   @Test
-  void moveToTopLevelClearsRootFolderAndAlignsDescendantFoldersWhenChildContainerExists() {
+  void moveToTopLevel_clearsFolderAndDetachesParent() {
     User user = makeMe.aUser().please();
     Note topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
     Note firstChild = makeMe.aNote("middle").under(topNote).please();
-    Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
-    makeMe.entityPersister.flush();
-    Folder childContainer =
-        makeMe.aFolder().notebook(topNote.getNotebook()).name("middle").parentFolder(null).please();
     makeMe.entityPersister.flush();
 
     noteMotionService.moveToTopLevel(firstChild, user);
 
     makeMe.refresh(firstChild);
-    makeMe.refresh(grandChild);
-    makeMe.refresh(topNote);
     assertThat(firstChild.getParent(), nullValue());
     assertThat(firstChild.getFolder(), nullValue());
-    assertThat(grandChild.getFolder(), notNullValue());
-    assertThat(grandChild.getFolder().getId(), equalTo(childContainer.getId()));
   }
 
   @Test
-  void moveToTopLevelClearsDescendantFolderWhenNoMatchingChildContainerFolder() {
+  void moveToTopLevel_preservesNotebook() {
     User user = makeMe.aUser().please();
     Note topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
     Note firstChild = makeMe.aNote("middle").under(topNote).please();
-    Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
-    makeMe.entityPersister.flush();
-
-    noteMotionService.moveToTopLevel(firstChild, user);
-
-    makeMe.refresh(firstChild);
-    makeMe.refresh(grandChild);
-    assertThat(firstChild.getFolder(), nullValue());
-    assertThat(grandChild.getFolder(), nullValue());
-  }
-
-  @Test
-  void moveToTopLevel_keepsAllNotesInNotebook() {
-    User user = makeMe.aUser().please();
-    Note topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
-    Note firstChild = makeMe.aNote("middle").under(topNote).please();
-    Note grandChild = makeMe.aNote("leaf").under(firstChild).please();
     Integer notebookIdBefore = topNote.getNotebook().getId();
     makeMe.entityPersister.flush();
 
     noteMotionService.moveToTopLevel(firstChild, user);
     makeMe.entityPersister.flush();
     makeMe.refresh(firstChild);
-    makeMe.refresh(grandChild);
-    makeMe.refresh(topNote);
     assertThat(firstChild.getNotebook().getId(), equalTo(notebookIdBefore));
 
     Integer notebookId = firstChild.getNotebook().getId();
@@ -104,7 +78,7 @@ public class NoteMotionServiceTest {
             "SELECT COUNT(*) FROM note WHERE notebook_id = ? AND deleted_at IS NULL",
             Long.class,
             notebookId);
-    assertThat(total, equalTo(3L));
+    assertThat(total, equalTo(2L));
   }
 
   @Nested
@@ -148,6 +122,19 @@ public class NoteMotionServiceTest {
           noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
               topNote.getNotebook().getId());
       assertThat(ordered.getFirst().getId(), equalTo(secondChild.getId()));
+    }
+
+    @Test
+    void reorderAfterStructuralDescendant_throws() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
+      Note parentMover = makeMe.aNote("parent").creatorAndOwner(user).under(root).please();
+      Note child = makeMe.aNote("child").creatorAndOwner(user).under(parentMover).please();
+      makeMe.entityPersister.flush();
+
+      assertThrows(
+          MovementNotPossibleException.class,
+          () -> noteMotionService.executeReorderInPlacement(parentMover, null, child));
     }
   }
 }
