@@ -9,7 +9,6 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +25,6 @@ public class WikiLinkResolver {
   }
 
   public record ResolvedWikiLink(String linkText, Note targetNote) {}
-
-  public Optional<Note> resolveWikiInnerTitle(
-      String wikiLinkInnerTitle, User viewer, Note focusNote) {
-    if (wikiLinkInnerTitle == null || wikiLinkInnerTitle.isBlank()) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(resolveToken(wikiLinkInnerTitle.trim(), viewer, focusNote));
-  }
 
   public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
     String details = focusNote.getDetails();
