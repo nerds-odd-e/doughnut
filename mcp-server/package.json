@@ -20,12 +20,12 @@
     "doughnut-api": "workspace:*"
   },
   "devDependencies": {
-    "doughnut-test-fixtures": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/node": "25.6.0",
+    "doughnut-test-fixtures": "workspace:*",
     "esbuild": "0.28.0",
     "typescript": "6.0.3",
     "vitest": "4.1.5",
-    "zod": "^4.3.6"
+    "zod": "^4.4.2"
   }
 }
