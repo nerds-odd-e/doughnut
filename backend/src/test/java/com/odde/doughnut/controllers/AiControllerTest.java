@@ -432,6 +432,47 @@ class AiControllerTest extends ControllerTestBase {
     }
   }
 
+  @Nested
+  class PromotePointToSiblingInFolderScope {
+    OpenAIChatCompletionMock openAIChatCompletionMock;
+
+    @BeforeEach
+    void setup() {
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    }
+
+    @Test
+    void shouldPlaceSiblingInSameFolderWhenOriginalNoteHasNoParent()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("Context").please();
+      Note noteInFolder =
+          makeMe
+              .aNote()
+              .title("Sample")
+              .creatorAndOwner(currentUser.getUser())
+              .inNotebook(notebook)
+              .folder(folder)
+              .details("Original content with a key point to promote.")
+              .please();
+
+      PointExtractionResult aiResult = new PointExtractionResult();
+      aiResult.setNewNoteTitle("Point B");
+      aiResult.setNewNoteDetails("Extracted");
+      aiResult.setUpdatedParentDetails("A. C. D. E.");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
+
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("key point to promote"));
+      NoteRealm response = controller.promotePointToSibling(noteInFolder, requestDTO);
+
+      assertThat(response.getNote().getTitle()).isEqualTo("Point B");
+      Note persistedSibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      assertThat(persistedSibling.getFolder().getId()).isEqualTo(folder.getId());
+      assertThat(persistedSibling.getParent()).isNull();
+    }
+  }
+
   private static void assertResponseStatus(Executable action, HttpStatus expected) {
     assertThat(assertThrows(ResponseStatusException.class, action).getStatusCode())
         .isEqualTo(expected);

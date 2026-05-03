@@ -20,19 +20,6 @@ Given('I have a notebook named {string}', (notebookName: string) => {
   })
 })
 
-Given('the notebook contains the following notes', (notesTable: DataTable) => {
-  const hashes = notesTable.hashes()
-  cy.get<string>('@currentLoginUser').then((username) => {
-    const notebookName = (hashes[0]?.['Parent Title'] ?? '').trim()
-    if (!notebookName) {
-      throw new Error(
-        'the notebook contains: first row must have Parent Title (root note title)'
-      )
-    }
-    start.testability().injectNotes(hashes, username, notebookName)
-  })
-})
-
 // Additional steps needed for the feature
 When('I select the {string} notebook', (notebookName: string) => {
   start.jumpToNotePage(notebookName)
