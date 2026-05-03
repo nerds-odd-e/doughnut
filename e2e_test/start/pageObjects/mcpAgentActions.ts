@@ -44,16 +44,6 @@ export const mcpAgentActions = () => {
       return this
     },
 
-    addNote(parentTitle: string, newTitle: string) {
-      cy.task('callMcpToolWithParams', {
-        apiName: 'add_note',
-        params: { parentTitle, newTitle },
-      }).then((response) => {
-        cy.wrap(response).as('MCPAddNoteResponse')
-      })
-      return this
-    },
-
     getNoteGraphFromLastSearch(tokenLimit: number) {
       cy.get('@MCPApiResponse').then((searchResponse) => {
         const responseData = searchResponse as unknown as ApiResponse

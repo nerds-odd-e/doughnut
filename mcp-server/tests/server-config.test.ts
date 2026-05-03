@@ -3,7 +3,7 @@ import { tools } from '../src/tools/index.js'
 
 // Helper function to get all expected tool names
 function getExpectedToolNames(): string[] {
-  return ['get_note_graph', 'add_note', 'find_most_relevant_note']
+  return ['get_note_graph', 'find_most_relevant_note']
 }
 
 describe('MCP Server Configuration', () => {
@@ -22,7 +22,7 @@ describe('MCP Server Configuration', () => {
     expectedTools.forEach((toolName) => {
       expect(expectedTools).toContain(toolName)
     })
-    expect(expectedTools).toHaveLength(3)
+    expect(expectedTools).toHaveLength(2)
   })
 })
 

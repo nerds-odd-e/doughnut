@@ -1356,24 +1356,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
-  /api/mcp/notes/create:
-    post:
-      tags:
-      - mcp-note-creation-controller
-      operationId: createNoteViaMcp
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/McpNoteAddDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -4298,13 +4280,6 @@ components:
       - id
       - nextRecallAt
       - note
-    McpNoteAddDTO:
-      type: object
-      properties:
-        parentNote:
-          type: string
-        noteCreationDTO:
-          $ref: "#/components/schemas/NoteCreationDTO"
     ConversationMessage:
       type: object
       properties:

@@ -11,7 +11,7 @@ Is in the `mcp-server` folder.
 
 This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
 
-- Tools for getting instructions and updating note text content via the Doughnut backend API.
+- Tools that read note context from the Doughnut backend API (search and graph).
 
 ## Structure (minimal)
 
@@ -164,8 +164,5 @@ For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP
 
 ## Available Tools
 
-- `update_note_text_content` - Update the title and/or details of a note by note ID
-- `get_notebook_list` - Get list of user's notebooks
-- `get_graph_with_note_id` - Get graph data for a specific note
-- `add_note` - Add a note to a notebook
-- `get_relevant_note` - Search for relevant notes based on a query
+- `find_most_relevant_note` - Search for the single most relevant note for a query
+- `get_note_graph` - Fetch graph context for a note by ID and token limit

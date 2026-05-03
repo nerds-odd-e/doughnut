@@ -30,22 +30,6 @@ Then(
   }
 )
 
-When(
-  'AI agent adds note via MCP tool to add note {string} under {string}',
-  (noteTitle: string, parentTitle: string) => {
-    start.mcpAgentActions().addNote(parentTitle, noteTitle)
-    // Verify the note was created successfully
-    cy.get('@MCPAddNoteResponse').then((response) => {
-      const apiResponse = response as unknown as {
-        content: Array<{ text: string }>
-      }
-      const responseText = apiResponse.content[0]?.text || ''
-      expect(responseText).to.contain(noteTitle)
-    })
-    cy.wait(1000) // Wait for backend to process and commit the note creation
-  }
-)
-
 Then(
   'the graph response should contain the focus note {string}',
   (noteTitle: string) => {

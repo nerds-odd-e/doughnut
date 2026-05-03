@@ -10,8 +10,7 @@ Feature: User Doughnut Access Token
 
   Scenario: Delete a Doughnut Access Token
     Given I am logged in as "old_learner"
-    And I have a notebook "Parent demo" with a note "Parent Note"
     And I have a valid Doughnut Access Token with label "To be deleted"
-    And I can create a note as a child of "Parent Note" using the Doughnut Access Token
+    And calling token-info with the Doughnut Access Token succeeds
     When I delete the Doughnut Access Token with label "To be deleted"
-    Then I cannot create a note as a child of "Parent Note" using the Doughnut Access Token
+    Then calling token-info with the Doughnut Access Token is denied

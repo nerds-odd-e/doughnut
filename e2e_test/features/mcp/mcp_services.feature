@@ -16,14 +16,6 @@ Feature: MCP (Model Context Protocol) Services
       | Classes         | Programming Concepts/Object Oriented  |
       | Inheritance     | Programming Concepts/Object Oriented |
 
-  Scenario: Adding note to a known parent note
-    When AI agent adds note via MCP tool to add note "Procedural" under "Programming Concepts"
-    Then I should see folder "CS concepts/Programming Concepts" containing these notes:
-      | note-title      |
-      | Object Oriented |
-      | Functional      |
-      | Procedural      |
-
   Scenario Outline: AI agent learns from Doughnut via MCP client
     When AI agent searches for relevant notes using MCP tool with the term "<search_term>"
     Then the response should contain "<note_title>"

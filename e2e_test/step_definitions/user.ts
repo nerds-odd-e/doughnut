@@ -163,25 +163,13 @@ When(
   }
 )
 
-Then(
-  'I cannot create a note as a child of {string} using the Doughnut Access Token',
-  (parentNote: string) => {
-    start
-      .mcpApi()
-      .createNote(parentNote, { newTitle: 'Child Note' })
-      .shouldBeDenied()
-  }
-)
+Then('calling token-info with the Doughnut Access Token is denied', () => {
+  start.mcpApi().getTokenInfo().shouldBeDenied()
+})
 
-When(
-  'I can create a note as a child of {string} using the Doughnut Access Token',
-  (parentNote: string) => {
-    start
-      .mcpApi()
-      .createNote(parentNote, { newTitle: 'Child Note' })
-      .shouldBeAccepted()
-  }
-)
+Given('calling token-info with the Doughnut Access Token succeeds', () => {
+  start.mcpApi().getTokenInfo().shouldBeAccepted()
+})
 
 Then(
   'I can see the token with label {string} in the list of tokens',

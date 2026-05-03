@@ -559,11 +559,6 @@ export type MemoryTracker = {
     ancestorFolders?: Array<FolderTrailSegment>;
 };
 
-export type McpNoteAddDto = {
-    parentNote?: string;
-    noteCreationDTO?: NoteCreationDto;
-};
-
 export type ConversationMessage = {
     id: number;
     message: string;
@@ -2191,22 +2186,6 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
-
-export type CreateNoteViaMcpData = {
-    body: McpNoteAddDto;
-    path?: never;
-    query?: never;
-    url: '/api/mcp/notes/create';
-};
-
-export type CreateNoteViaMcpResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type CreateNoteViaMcpResponse = CreateNoteViaMcpResponses[keyof CreateNoteViaMcpResponses];
 
 export type DuplicateData = {
     body?: never;
