@@ -26,7 +26,7 @@ export default defineComponent({
     next(async () => {
       const { data: userInfo, error } =
         await CurrentUserInfoController.currentUserInfo({})
-      if (error || !userInfo?.user) {
+      if (error || !userInfo?.externalIdentifier) {
         loginOrRegisterAndHaltThisThread()
         next(false)
       } else {
