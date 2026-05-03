@@ -24,7 +24,7 @@
                 noteId: titleSearchScopeNote.id,
                 inputSearchKey: effectiveSearchKey,
                 isDropdown: true,
-                notebookId: notebookId
+                notebookId: notebookRootNotebookId,
               }"
               class="title-search-results"
             />
@@ -58,7 +58,7 @@ const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
 const props = defineProps<{
-  notebookRootNotebookId?: number
+  notebookRootNotebookId: number
   /** Scope for create-note when using notebook root API (active sidebar folder). */
   targetFolderId?: number
   initialTitle?: string
@@ -69,18 +69,6 @@ const props = defineProps<{
 }>()
 
 const titleSearchScopeNote = computed(() => props.titleSearchAnchorNote)
-
-const noteRealm = computed(() =>
-  props.titleSearchAnchorNote != null
-    ? storageAccessor.value.refOfNoteRealm(props.titleSearchAnchorNote.id).value
-    : undefined
-)
-const notebookId = computed(
-  () =>
-    props.notebookRootNotebookId ??
-    noteRealm.value?.notebookId ??
-    props.titleSearchAnchorNote?.noteTopology.notebookId
-)
 
 // Emits
 const emit = defineEmits<{
@@ -119,9 +107,6 @@ const processForm = async () => {
 
   const api = storageAccessor.value.storedApi()
   try {
-    if (props.notebookRootNotebookId == null) {
-      throw new Error("Invalid note creation mode")
-    }
     await api.createRootNoteAtNotebook(
       router,
       props.notebookRootNotebookId,
