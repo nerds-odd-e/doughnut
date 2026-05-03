@@ -234,6 +234,7 @@ export type NoteRealm = {
     note: Note;
     fromBazaar?: boolean;
     notebookId: number;
+    folderId?: number;
     ancestorFolders?: Array<FolderTrailSegment>;
     references?: Array<Note>;
     wikiTitles?: Array<WikiTitle>;
@@ -966,6 +967,7 @@ export type NoteRealmWritable = {
     note: NoteWritable;
     fromBazaar?: boolean;
     notebookId: number;
+    folderId?: number;
     ancestorFolders?: Array<FolderTrailSegment>;
     references?: Array<NoteWritable>;
     wikiTitles?: Array<WikiTitle>;
