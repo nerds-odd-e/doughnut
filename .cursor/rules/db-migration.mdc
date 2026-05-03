@@ -22,39 +22,26 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 
 * Migrations are stored in `backend/src/main/resources/db/migration/`
 * Files follow the naming convention: `V{version}__{description}.sql`
-    * Example: `V300000176__rename_onboarded_at_in_memory_tracker_to_assimilated_at.sql`
+    * Example: `V300000172__rename_a_column.sql` (version must exceed **`300000171`**)
 
 ## Version Numbering
 
 * Versions use a numerical format
 
-The project uses two main version patterns:
-- `V10000xxx` for baseline migrations
-- `V300000xxx` for subsequent migrations
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000171__db_migration_placeholder.sql`** is a placeholder for the next migration.
 
-New migrations need to use a greater number than the current latest version number.
+New migrations need to use a **greater** version number than **`300000171`**.
 
 ### Migration Process
 
 * Migrations run automatically when the application starts (non-test environments)
 * For unit tests, DB migration is included in the test command (see `backend-development` rule for test execution)
 
-## Migration File Structure:
+## Migration file structure
 
-SQL files contain the actual migration commands
-Each file should contain a single, atomic change
-Changes can include:
-Creating new tables
-Altering existing tables
-Renaming columns
-Adding/removing constraints
-Dropping tables
-Baseline:
-
-There's a baseline migration file (V10000063__baseline.sql) that contains the initial schema
-
-As noted in V300000101__db_migration_placeholder.sql, previous migrations were collapsed into this baseline file for brevity
-
+* **`V100000000__baseline.sql`** holds the collapsed full DDL (fresh installs).
+* **`V300000171__db_migration_placeholder.sql`** is the tail placeholder; add new migrations with a higher version.
+* Each **new** file after that should contain one atomic change (create/alter/rename/drop as needed).
 ## Best Practices:
 
 * Each migration should be reversible when possible
