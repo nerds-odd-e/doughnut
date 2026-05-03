@@ -357,19 +357,15 @@ export default class StoredApiCollection implements StoredApi {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
   }
 
-  private reorderBody(placement: {
-    folderId: number | null
-    afterNoteId: number | null
-  }): NoteReorderDto {
+  private reorderBody(placement: { folderId: number | null }): NoteReorderDto {
     return {
-      folderId: placement.folderId,
-      afterNoteId: placement.afterNoteId,
+      folderId: placement.folderId ?? undefined,
     } as NoteReorderDto
   }
 
   private async reorderWithoutUndo(
     noteId: number,
-    placement: { folderId: number | null; afterNoteId: number | null }
+    placement: { folderId: number | null }
   ): Promise<NoteRealm[]> {
     const { data: updatedNotes, error } = await apiCallWithLoading(() =>
       NoteController.reorder({
@@ -384,24 +380,14 @@ export default class StoredApiCollection implements StoredApi {
     return updatedNotes
   }
 
-  private async placementUndoForNote(sourceId: Doughnut.ID): Promise<{
+  private placementUndoForNote(sourceId: Doughnut.ID): {
     folderId: number | null
-    afterNoteId: number | null
-  } | null> {
+  } | null {
     const realm = this.storage.refOfNoteRealm(sourceId).value
     if (!realm?.note) return null
-    const nbId = realm.note.noteTopology.notebookId
-    if (nbId == null) return null
+    if (realm.note.noteTopology.notebookId == null) return null
     const folderId = realm.note.noteTopology.folderId ?? null
-    const listing =
-      folderId == null
-        ? await this.loadNotebookRootNotes(nbId)
-        : await this.loadFolderListing(nbId, folderId)
-    const notes = (listing.notes ?? []).map((r) => r.note)
-    const idx = notes.findIndex((n) => n.id === sourceId)
-    if (idx < 0) return { folderId, afterNoteId: null }
-    const afterNoteId = idx > 0 ? notes[idx - 1]!.id : null
-    return { folderId, afterNoteId }
+    return { folderId }
   }
 
   async updateTextField(
@@ -464,8 +450,7 @@ export default class StoredApiCollection implements StoredApi {
     if (undone.type === "move note") {
       const noteRealm = await this.undoMoveNote(
         undone.noteId,
-        undone.originalFolderId ?? null,
-        undone.originalAfterNoteId ?? null
+        undone.originalFolderId ?? null
       )
       return { noteRealm }
     }
@@ -482,12 +467,10 @@ export default class StoredApiCollection implements StoredApi {
 
   private async undoMoveNote(
     noteId: Doughnut.ID,
-    originalFolderId: Doughnut.ID | null,
-    originalAfterNoteId: Doughnut.ID | null
+    originalFolderId: Doughnut.ID | null
   ) {
     const updatedNotes = await this.reorderWithoutUndo(noteId, {
       folderId: originalFolderId,
-      afterNoteId: originalAfterNoteId,
     })
     return updatedNotes[0]!
   }
@@ -555,7 +538,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async moveNoteToFolder(sourceId: Doughnut.ID, targetFolderId: Doughnut.ID) {
-    const undoPlacement = await this.placementUndoForNote(sourceId)
+    const undoPlacement = this.placementUndoForNote(sourceId)
 
     const { data: noteRealms, error } = await apiCallWithLoading(() =>
       RelationController.moveNoteToFolder({

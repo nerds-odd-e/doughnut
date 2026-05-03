@@ -371,31 +371,6 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
 })
 
-When('I move note {string} left', (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology)
-  cy.findByText('Move This Note').click()
-  cy.findByRole('button', { name: 'Move Left' }).click()
-})
-
-When('I move note {string} right', (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology)
-  cy.findByText('Move This Note').click()
-  cy.findByRole('button', { name: 'Move Right' }).click()
-})
-
-When(
-  'I should see {string} is before {string} in {string}',
-  (noteTitle1: string, noteTitle2: string, parentNoteTitle: string) => {
-    start.jumpToNotePage(parentNoteTitle)
-    const matcher = new RegExp(`${noteTitle1}.*${noteTitle2}`, 'g')
-
-    cy.get('.daisy-card-title').then(($els) => {
-      const texts = Array.from($els, (el) => el.innerText)
-      expect(texts).to.match(matcher)
-    })
-  }
-)
-
 // This step definition is for demo purpose
 Then(
   '*for demo* I should see there are {int} descendants',

@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.NoteReorderDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -25,10 +24,9 @@ class NoteControllerMotionTests extends ControllerTestBase {
   @Autowired NoteMotionService noteMotionService;
   @Autowired NoteRepository noteRepository;
 
-  private static NoteReorderDTO reorderDto(Integer folderId, Integer afterNoteId) {
+  private static NoteReorderDTO reorderDto(Integer folderId) {
     NoteReorderDTO dto = new NoteReorderDTO();
     dto.folderId = folderId;
-    dto.afterNoteId = afterNoteId;
     return dto;
   }
 
@@ -42,12 +40,33 @@ class NoteControllerMotionTests extends ControllerTestBase {
     Note foreign = makeMe.aNote().please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () ->
-            controller.reorder(foreign, reorderDto(null, null), makeMe.successfulBindingResult()));
+        () -> controller.reorder(foreign, reorderDto(null), makeMe.successfulBindingResult()));
   }
 
   @Test
-  void reorder_afterPeerInFolder_updatesOrder() throws Throwable {
+  void reorder_movesNoteIntoFolderAtEnd() throws Throwable {
+    User u = currentUser.getUser();
+    Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
+    Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
+    Note peerA = makeMe.aNote("A").creatorAndOwner(u).please();
+    Note peerB = makeMe.aNote("B").creatorAndOwner(u).please();
+    Note mover = makeMe.aNote("M").creatorAndOwner(u).please();
+    makeMe.entityPersister.flush();
+    noteMotionService.executeMoveIntoFolder(peerA, folder);
+    noteMotionService.executeMoveIntoFolder(peerB, folder);
+    makeMe.entityPersister.flush();
+
+    controller.reorder(mover, reorderDto(folder.getId()), makeMe.successfulBindingResult());
+    makeMe.refresh(mover);
+    assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
+    List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+    assertThat(
+        ordered.stream().map(Note::getId).toList(),
+        contains(peerA.getId(), peerB.getId(), mover.getId()));
+  }
+
+  @Test
+  void reorder_sameFolder_keepsNoteAtEndAmongPeers() throws Throwable {
     User u = currentUser.getUser();
     Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
@@ -60,50 +79,10 @@ class NoteControllerMotionTests extends ControllerTestBase {
     noteMotionService.executeMoveIntoFolder(mover, folder);
     makeMe.entityPersister.flush();
 
-    controller.reorder(
-        mover, reorderDto(folder.getId(), peerA.getId()), makeMe.successfulBindingResult());
-    makeMe.refresh(mover);
-    assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
+    controller.reorder(mover, reorderDto(folder.getId()), makeMe.successfulBindingResult());
     List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
     assertThat(
         ordered.stream().map(Note::getId).toList(),
-        contains(peerA.getId(), mover.getId(), peerB.getId()));
-  }
-
-  @Test
-  void reorder_firstInFolder_insertsBeforeExisting() throws Throwable {
-    User u = currentUser.getUser();
-    Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
-    Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
-    Note peerA = makeMe.aNote("A").creatorAndOwner(u).please();
-    Note mover = makeMe.aNote("M").creatorAndOwner(u).please();
-    makeMe.entityPersister.flush();
-    noteMotionService.executeMoveIntoFolder(peerA, folder);
-    noteMotionService.executeMoveIntoFolder(mover, folder);
-    makeMe.entityPersister.flush();
-
-    controller.reorder(mover, reorderDto(folder.getId(), null), makeMe.successfulBindingResult());
-    List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
-    assertThat(ordered.getFirst().getId(), equalTo(mover.getId()));
-  }
-
-  @Test
-  void reorder_afterNoteFromWrongFolder_throws() {
-    User u = currentUser.getUser();
-    Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
-    Folder f1 = makeMe.aFolder().notebook(root.getNotebook()).name("F1").please();
-    Folder f2 = makeMe.aFolder().notebook(root.getNotebook()).name("F2").please();
-    Note in1 = makeMe.aNote("in1").creatorAndOwner(u).please();
-    Note in2 = makeMe.aNote("in2").creatorAndOwner(u).please();
-    makeMe.entityPersister.flush();
-    noteMotionService.executeMoveIntoFolder(in1, f1);
-    noteMotionService.executeMoveIntoFolder(in2, f2);
-    makeMe.entityPersister.flush();
-
-    assertThrows(
-        MovementNotPossibleException.class,
-        () ->
-            controller.reorder(
-                in2, reorderDto(f2.getId(), in1.getId()), makeMe.successfulBindingResult()));
+        contains(peerA.getId(), peerB.getId(), mover.getId()));
   }
 }

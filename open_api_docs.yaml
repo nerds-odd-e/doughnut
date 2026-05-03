@@ -3914,9 +3914,6 @@ components:
         folderId:
           type: integer
           format: int32
-        afterNoteId:
-          type: integer
-          format: int32
     NoteRecallSetting:
       type: object
       properties:

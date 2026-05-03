@@ -369,7 +369,6 @@ export type RelationshipLiteralSearchHit = {
 
 export type NoteReorderDto = {
     folderId?: number;
-    afterNoteId?: number;
 };
 
 export type NoteRecallSetting = {

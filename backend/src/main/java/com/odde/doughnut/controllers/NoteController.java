@@ -3,9 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.FolderRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
-import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -44,7 +42,6 @@ class NoteController {
   private final TestabilitySettings testabilitySettings;
   private final NoteRealmService noteRealmService;
   private final FolderRepository folderRepository;
-  private final NoteRepository noteRepository;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -56,8 +53,7 @@ class NoteController {
       GraphRAGService graphRAGService,
       TestabilitySettings testabilitySettings,
       NoteRealmService noteRealmService,
-      FolderRepository folderRepository,
-      NoteRepository noteRepository) {
+      FolderRepository folderRepository) {
     this.entityPersister = entityPersister;
     this.wikidataService = wikidataService;
     this.noteMotionService = noteMotionService;
@@ -68,7 +64,6 @@ class NoteController {
     this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
     this.folderRepository = folderRepository;
-    this.noteRepository = noteRepository;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -182,7 +177,7 @@ class NoteController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @RequestBody @Valid NoteReorderDTO body,
       BindingResult bindingResult)
-      throws UnexpectedNoAccessRightException, BindException, MovementNotPossibleException {
+      throws UnexpectedNoAccessRightException, BindException {
     if (bindingResult.hasErrors()) {
       throw new BindException(bindingResult);
     }
@@ -192,12 +187,7 @@ class NoteController {
     if (targetFolder != null) {
       authorizationService.assertAuthorization(targetFolder.getNotebook());
     }
-    Note afterNote =
-        body.afterNoteId == null ? null : noteRepository.findById(body.afterNoteId).orElseThrow();
-    if (afterNote != null) {
-      authorizationService.assertReadAuthorization(afterNote);
-    }
-    noteMotionService.executeReorderInPlacement(note, targetFolder, afterNote);
+    noteMotionService.executeReorderInPlacement(note, targetFolder);
     User user = authorizationService.getCurrentUser();
     return List.of(noteRealmService.build(note, user));
   }

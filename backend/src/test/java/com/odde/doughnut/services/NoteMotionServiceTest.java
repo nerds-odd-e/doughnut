@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -56,7 +55,7 @@ public class NoteMotionServiceTest {
   }
 
   @Test
-  void executeReorderInPlacement_ordersAfterPeerInFolder() throws MovementNotPossibleException {
+  void executeReorderInPlacement_appendsAtEndInFolder() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("box").please();
@@ -66,13 +65,12 @@ public class NoteMotionServiceTest {
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(n1, folder);
     noteMotionService.executeMoveIntoFolder(n2, folder);
-    noteMotionService.executeMoveIntoFolder(mover, folder);
     makeMe.entityPersister.flush();
 
-    noteMotionService.executeReorderInPlacement(mover, folder, n1);
+    noteMotionService.executeReorderInPlacement(mover, folder);
     List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
     assertThat(
         ordered.stream().map(Note::getId).toList(),
-        contains(n1.getId(), mover.getId(), n2.getId()));
+        contains(n1.getId(), n2.getId(), mover.getId()));
   }
 }
