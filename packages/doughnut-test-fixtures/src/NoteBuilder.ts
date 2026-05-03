@@ -62,6 +62,11 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
+  folder(folderId: number): NoteBuilder {
+    this.data.noteTopology.folderId = folderId
+    return this
+  }
+
   under(value: NoteRealm): NoteBuilder {
     value.references ||= []
     value.references.push(this.data)

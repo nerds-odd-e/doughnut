@@ -25,12 +25,7 @@
             />
             <span class="daisy-break-words">{{ point }}</span>
           </label>
-          <div
-            v-if="
-              note.noteTopology.folderId != null
-            "
-            class="daisy-flex daisy-gap-1 daisy-shrink-0"
-          >
+          <div class="daisy-flex daisy-gap-1 daisy-shrink-0">
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
               @click="promotePointToSiblingNote(point, index)"

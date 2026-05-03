@@ -44,6 +44,13 @@ class NoteControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
+  private void makeStructuralChildOf(Note child, Note parent) {
+    User user = child.getCreator() != null ? child.getCreator() : parent.getCreator();
+    child.initialize(user, parent, child.getCreatedAt(), child.getTitle());
+    makeMe.entityPersister.merge(child);
+    makeMe.entityPersister.flush();
+  }
+
   @Nested
   class showNoteTest {
     @Test
@@ -309,8 +316,16 @@ class NoteControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      subject = makeMe.aNote().asFirstChildOf(parent).please();
-      child = makeMe.aNote("child").asFirstChildOf(subject).please();
+      subject =
+          makeMe.aNote().creator(currentUser.getUser()).inNotebook(parent.getNotebook()).please();
+      makeStructuralChildOf(subject, parent);
+      child =
+          makeMe
+              .aNote("child")
+              .creator(currentUser.getUser())
+              .inNotebook(parent.getNotebook())
+              .please();
+      makeStructuralChildOf(child, subject);
     }
 
     @Test
@@ -329,7 +344,13 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldSoftDeleteSubjectWithoutRemovingSiblingUnderParent()
         throws UnexpectedNoAccessRightException {
-      makeMe.aNote("silbling").asFirstChildOf(parent).please();
+      Note silbling =
+          makeMe
+              .aNote("silbling")
+              .creator(currentUser.getUser())
+              .inNotebook(parent.getNotebook())
+              .please();
+      makeStructuralChildOf(silbling, parent);
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(1));
       assertThat(parent.getAllDescendants().toList(), hasSize(1));
@@ -339,7 +360,13 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotSoftDeleteStructuralDescendantsWhenNoteIsDeleted()
         throws UnexpectedNoAccessRightException {
-      Note grandchild = makeMe.aNote("grandchild").asFirstChildOf(child).please();
+      Note grandchild =
+          makeMe
+              .aNote("grandchild")
+              .creator(currentUser.getUser())
+              .inNotebook(parent.getNotebook())
+              .please();
+      makeStructuralChildOf(grandchild, child);
       makeMe.refresh(parent);
 
       controller.deleteNote(subject);
@@ -649,7 +676,13 @@ class NoteControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       rootNote = makeMe.aNote("Root").creatorAndOwner(currentUser.getUser()).please();
-      child1 = makeMe.aNote("Child 1").asFirstChildOf(rootNote).please();
+      child1 =
+          makeMe
+              .aNote("Child 1")
+              .creator(currentUser.getUser())
+              .inNotebook(rootNote.getNotebook())
+              .please();
+      makeStructuralChildOf(child1, rootNote);
       makeMe.refresh(rootNote);
     }
 
@@ -678,7 +711,13 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnAllDescendants() throws UnexpectedNoAccessRightException {
-      Note grandchild = makeMe.aNote("Grandchild").asFirstChildOf(child1).please();
+      Note grandchild =
+          makeMe
+              .aNote("Grandchild")
+              .creator(currentUser.getUser())
+              .inNotebook(rootNote.getNotebook())
+              .please();
+      makeStructuralChildOf(grandchild, child1);
       makeMe.refresh(rootNote);
       GraphRAGResult result = controller.getDescendants(rootNote);
       assertThat(result.getFocusNote().getUri(), equalTo("[[Root]]"));

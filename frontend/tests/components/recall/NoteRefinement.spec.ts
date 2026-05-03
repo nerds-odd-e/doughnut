@@ -58,18 +58,9 @@ describe("NoteRefinement component", () => {
     await flushPromises()
   }
 
-  const noteUnderParent = () => {
-    const childNoteRealm = makeMe.aNoteRealm
-      .under(makeMe.aNoteRealm.please())
-      .please()
-    return makeMe.aMemoryTracker.ofNote(childNoteRealm).please().note
-  }
-
   describe("promote point to sibling note", () => {
-    it("displays sibling promote button for each point when note has parent", async () => {
-      const wrapper = mount(["Point 1", "Point 2", "Point 3"], {
-        note: noteUnderParent(),
-      })
+    it("displays sibling promote button for each point", async () => {
+      const wrapper = mount(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
       const listItems = wrapper.findAll("li")
@@ -87,24 +78,21 @@ describe("NoteRefinement component", () => {
         "promotePointToSibling",
         makeMe.aNoteRealm.please()
       )
-      const childNote = noteUnderParent()
-      const wrapper = mount(["Test Point"], { note: childNote })
+      const wrapper = mount(["Test Point"])
       await flushPromises()
 
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
       expect(promotePointToSiblingSpy).toHaveBeenCalledWith({
-        path: { note: childNote.id },
+        path: { note: note.id },
         body: { points: ["Test Point"] },
       })
     })
 
     it("removes point from checklist after successful promotion", async () => {
       mockSdkService("promotePointToSibling", makeMe.aNoteRealm.please())
-      const wrapper = mount(["Point 1", "Point 2", "Point 3"], {
-        note: noteUnderParent(),
-      })
+      const wrapper = mount(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
       await wrapper.findAll("li")[1]!.find("button").trigger("click")
@@ -120,7 +108,7 @@ describe("NoteRefinement component", () => {
       mockSdkService("promotePointToSibling", undefined).mockResolvedValue(
         wrapSdkError("API Error")
       )
-      const wrapper = mount(["Test Point"], { note: noteUnderParent() })
+      const wrapper = mount(["Test Point"])
       await flushPromises()
 
       await wrapper.find("li button").trigger("click")
@@ -128,15 +116,6 @@ describe("NoteRefinement component", () => {
 
       expect(wrapper.findAll("li")).toHaveLength(1)
       expect(wrapper.text()).toContain("Test Point")
-    })
-
-    it("shows no promote buttons when note has no parent", async () => {
-      const wrapper = mount(["Test Point"])
-      await flushPromises()
-
-      expect(
-        wrapper.find('button[title="Promote to sibling note"]').exists()
-      ).toBe(false)
     })
   })
 
@@ -150,9 +129,7 @@ describe("NoteRefinement component", () => {
         await apiPromise
         return makeMe.aNoteRealm.please()
       })
-      const wrapper = mount(["Test understanding point"], {
-        note: noteUnderParent(),
-      })
+      const wrapper = mount(["Test understanding point"])
       await flushPromises()
 
       await wrapper
@@ -175,9 +152,7 @@ describe("NoteRefinement component", () => {
         })
         return wrapSdkError({})
       })
-      const wrapper = mount(["Test understanding point"], {
-        note: noteUnderParent(),
-      })
+      const wrapper = mount(["Test understanding point"])
       await flushPromises()
 
       await wrapper

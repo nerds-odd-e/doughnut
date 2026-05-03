@@ -56,6 +56,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
+  folder(folderId: number): NoteRealmBuilder {
+    this.noteBuilder.folder(folderId)
+    return this
+  }
+
   image(value: string): NoteRealmBuilder {
     this.noteBuilder.image(value)
     return this
