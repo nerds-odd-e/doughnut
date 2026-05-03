@@ -367,20 +367,23 @@ class AiControllerTest extends ControllerTestBase {
 
   @Nested
   class PromotePointToSibling {
-    Note testNote;
     OpenAIChatCompletionMock openAIChatCompletionMock;
 
     @BeforeEach
     void setup() {
-      Note parentNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      testNote = makeMe.aNote().under(parentNote).please();
-      testNote.setDetails("Original content with a key point to promote.");
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     }
 
+    private Note newRootNoteWithPromotableDetails() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      note.setDetails("Original content with a key point to promote.");
+      return note;
+    }
+
     @Test
-    void shouldReturnCreatedSiblingNoteAndUpdatedParent()
+    void shouldReturnCreatedSiblingNoteAtNotebookRootWhenSourceNoteHasNoFolder()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithPromotableDetails();
       PointExtractionResult aiResult = new PointExtractionResult();
       aiResult.setNewNoteTitle("Extracted Sibling Note");
       aiResult.setNewNoteDetails("Expanded details for the sibling.");
@@ -395,54 +398,13 @@ class AiControllerTest extends ControllerTestBase {
       assertThat(response.getNote().getDetails()).isEqualTo("Expanded details for the sibling.");
       assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getDetails())
           .isEqualTo("Updated parent with summary.");
+      Note sibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      assertThat(sibling.getFolder()).isNull();
+      assertThat(sibling.getParent()).isNull();
     }
 
     @Test
-    void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
-      PointsRequestDTO requestDTO = new PointsRequestDTO();
-      requestDTO.setPoints(List.of("a point"));
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.promotePointToSibling(testNote, requestDTO));
-    }
-
-    static Stream<List<String>> invalidPromotePointLists() {
-      return Stream.of(null, List.of(), List.of("a", "b"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidPromotePointLists")
-    void shouldRejectInvalidPointCount(List<String> points) {
-      PointsRequestDTO requestDTO = new PointsRequestDTO();
-      requestDTO.setPoints(points);
-      assertResponseStatus(
-          () -> controller.promotePointToSibling(testNote, requestDTO), HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void shouldThrowWhenAiReturnsNull()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAIChatCompletionMock.mockNullChatCompletion();
-      PointsRequestDTO requestDTO = new PointsRequestDTO();
-      requestDTO.setPoints(List.of("a point"));
-      assertResponseStatus(
-          () -> controller.promotePointToSibling(testNote, requestDTO),
-          HttpStatus.SERVICE_UNAVAILABLE);
-    }
-  }
-
-  @Nested
-  class PromotePointToSiblingInFolderScope {
-    OpenAIChatCompletionMock openAIChatCompletionMock;
-
-    @BeforeEach
-    void setup() {
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-    }
-
-    @Test
-    void shouldPlaceSiblingInSameFolderWhenOriginalNoteHasNoParent()
+    void shouldPlaceSiblingInSameFolderWhenSourceNoteIsInFolder()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Folder folder = makeMe.aFolder().notebook(notebook).name("Context").please();
@@ -470,6 +432,43 @@ class AiControllerTest extends ControllerTestBase {
       Note persistedSibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(persistedSibling.getFolder().getId()).isEqualTo(folder.getId());
       assertThat(persistedSibling.getParent()).isNull();
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      Note testNote = newRootNoteWithPromotableDetails();
+      currentUser.setUser(null);
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("a point"));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.promotePointToSibling(testNote, requestDTO));
+    }
+
+    static Stream<List<String>> invalidPromotePointLists() {
+      return Stream.of(null, List.of(), List.of("a", "b"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPromotePointLists")
+    void shouldRejectInvalidPointCount(List<String> points) {
+      Note testNote = newRootNoteWithPromotableDetails();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(points);
+      assertResponseStatus(
+          () -> controller.promotePointToSibling(testNote, requestDTO), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldThrowWhenAiReturnsNull()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithPromotableDetails();
+      openAIChatCompletionMock.mockNullChatCompletion();
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("a point"));
+      assertResponseStatus(
+          () -> controller.promotePointToSibling(testNote, requestDTO),
+          HttpStatus.SERVICE_UNAVAILABLE);
     }
   }
 

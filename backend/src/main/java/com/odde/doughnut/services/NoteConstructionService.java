@@ -233,25 +233,12 @@ public class NoteConstructionService {
 
   public NoteRealm createNoteFromPromotedPointToSibling(
       Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
-    return createNoteFromPromotedPoint(originalNote, aiResult);
-  }
-
-  private NoteRealm createNoteFromPromotedPoint(Note originalNote, PointExtractionResult aiResult)
-      throws UnexpectedNoAccessRightException {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Note parentNote = originalNote.getParent();
-    Note newNote;
-    if (parentNote != null) {
-      newNote = createNote(originalNote.getNotebook(), parentNote, aiResult.newNoteTitle);
-    } else if (originalNote.getFolder() != null) {
-      newNote =
-          createNoteInNotebookScopeWithoutWikidata(
-              originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    } else {
-      newNote = createNote(originalNote.getNotebook(), null, aiResult.newNoteTitle);
-    }
+    Note newNote =
+        createNoteInNotebookScopeWithoutWikidata(
+            originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     newNote.setDetails(aiResult.newNoteDetails);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
