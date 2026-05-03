@@ -34,9 +34,7 @@ When(
 When(
   'I open the relationship from {string} to {string}',
   (sourceNoteTopology: string, targetTitle: string) => {
-    start
-      .jumpToNotePage(sourceNoteTopology)
-      .navigateToRelationshipChild(targetTitle)
+    start.jumpToNotePage(sourceNoteTopology).navigateToReference(targetTitle)
   }
 )
 
@@ -173,7 +171,7 @@ When(
   (noteTopology: string, targetTitle: string, relationType: string) => {
     start
       .jumpToNotePage(noteTopology)
-      .navigateToRelationshipChild(targetTitle)
+      .navigateToReference(targetTitle)
       .changeRelationType(relationType)
   }
 )
@@ -197,7 +195,7 @@ When(
   (noteTopology: string, targetTitle: string) => {
     start
       .jumpToNotePage(noteTopology)
-      .navigateToRelationshipChild(targetTitle)
+      .navigateToReference(targetTitle)
       .deleteNote()
     start.assumeNotePage(noteTopology) // remain on the same note page
   }

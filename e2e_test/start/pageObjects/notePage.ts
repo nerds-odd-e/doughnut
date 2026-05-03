@@ -76,25 +76,11 @@ export const assumeNotePage = (
             }
           })
         },
-        goto: () => {
-          cy.get('main')
-            .find('[role=card]')
-            .contains(target)
-            .closest('[role=card]')
-            .find('a')
-            .first()
-            .click({ force: true })
-        },
       }
     },
 
     expectRelationshipTopic: function (relationType: string, target: string) {
       this.addRelationshipTo(target).relationType(relationType)
-    },
-
-    navigateToRelationshipChild: function (targetNoteTopic: string) {
-      this.addRelationshipTo(targetNoteTopic).goto()
-      return assumeNotePage()
     },
     expectRelationshipChildren: function (
       relationType: string,
@@ -119,9 +105,13 @@ export const assumeNotePage = (
     },
 
     navigateToReference: (referenceTopic: string) => {
-      cy.get('#main-note-content').within(() => {
-        cy.findByText(referenceTopic, { selector: '.title-text' }).click()
-      })
+      cy.get('#main-note-content')
+        .find('[role=card]')
+        .contains(referenceTopic)
+        .closest('[role=card]')
+        .find('a')
+        .first()
+        .click({ force: true })
       return assumeNotePage()
     },
     expectBreadcrumb: (items: string) => {
