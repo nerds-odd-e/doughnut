@@ -4,8 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.NoteRealmService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +28,8 @@ class TestabilityInjectNotesFolderPlacementTest {
   @Autowired TestabilityRestController testabilityRestController;
   @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
+  @Autowired NoteRealmService noteRealmService;
 
   @Test
   void injectNotes_assignsExplicitFolderPathsForNestedNotes() {
@@ -73,6 +80,25 @@ class TestabilityInjectNotesFolderPlacementTest {
     assertThat(japan.getFolder(), notNullValue());
     assertThat(japan.getFolder().getId(), equalTo(germany.getFolder().getId()));
     assertThat(germany.getFolder().getName(), equalTo("World"));
+  }
+
+  @Test
+  void injectNotes_singleNotebookRootNoteIsReadableByOwner()
+      throws UnexpectedNoAccessRightException {
+    User user = makeMe.aUser().please();
+    var data = new TestabilityRestController.NotesTestData();
+    data.setNotebookName("90s hits");
+    data.setExternalIdentifier(user.getExternalIdentifier());
+    List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
+    rows.add(row("Who Let the Dogs Out", null));
+    data.setNoteTestData(rows);
+
+    Map<String, Integer> ids = testabilityRestController.injectNotes(data);
+    Note note = noteRepository.findById(ids.get("Who Let the Dogs Out")).orElseThrow();
+
+    authorizationService.assertReadAuthorization(user, note);
+    NoteRealm realm = noteRealmService.build(note, user);
+    assertThat(realm.getId(), equalTo(note.getId()));
   }
 
   private static TestabilityRestController.NoteTestData row(String title, String folder) {

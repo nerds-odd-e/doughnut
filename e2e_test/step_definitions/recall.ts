@@ -196,10 +196,10 @@ Then('I should be asked {string}', (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
 
-Then(
+When(
   'I suggest the question {string} of the note {string} as a good example',
   (questionStem: string, noteTopology: string) => {
-    start
+    return start
       .jumpToNotePage(noteTopology)
       .openQuestionList()
       .suggestingQuestionForFineTuning(questionStem)
@@ -207,10 +207,10 @@ Then(
   }
 )
 
-Then(
+When(
   'I suggest the question {string} of the note {string} as a bad example',
   (questionStem: string, noteTopology: string) => {
-    start
+    return start
       .jumpToNotePage(noteTopology)
       .openQuestionList()
       .suggestingQuestionForFineTuning(questionStem)

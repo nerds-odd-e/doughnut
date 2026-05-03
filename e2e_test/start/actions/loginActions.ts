@@ -23,13 +23,17 @@ export const loginActions = {
 
     // Call the service directly - it will use cy.request via our custom request function
     cy.wrap(username).as('currentLoginUser')
-    return cy.wrap(
-      HealthCheckController.ping({
-        headers: {
-          Authorization: `Basic ${btoa(`${username}:password`)}`,
-        },
+    return cy
+      .wrap(
+        HealthCheckController.ping({
+          headers: {
+            Authorization: `Basic ${btoa(`${username}:password`)}`,
+          },
+        })
+      )
+      .then(() => {
+        cy.visit('/d/notebooks')
       })
-    )
   },
 
   reloginAs(username: string) {
