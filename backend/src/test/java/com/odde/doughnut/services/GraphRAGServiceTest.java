@@ -308,19 +308,32 @@ public class GraphRAGServiceTest {
   class WhenNoteHasCacheOnlyReference {
     @Test
     void shouldIncludeReferenceFromWikiTitleCacheWhenNoLegacyRelationshipFieldExists() {
-      Note root = makeMe.aNote().title("Root").please();
-      Note focus = makeMe.aNote().under(root).title("Cache Focus").please();
-      Note referrerParent = makeMe.aNote().under(root).title("Referrer Parent").please();
+      Note anchor = makeMe.aNote().title("Root").please();
+      User viewer = anchor.getCreator();
+      Notebook notebook = anchor.getNotebook();
+      Folder cacheFolder =
+          makeMe.aFolder().notebook(notebook).name("cache-only-ref-folder").please();
+      anchor = makeMe.theNote(anchor).folder(cacheFolder).please();
+      Note focus =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(anchor)
+              .folder(cacheFolder)
+              .title("Cache Focus")
+              .please();
       Note referrer =
           makeMe
               .aNote()
-              .under(referrerParent)
+              .creator(viewer)
+              .underSameNotebookAs(anchor)
+              .folder(cacheFolder)
               .title("Plain Referrer")
               .details("Mentions [[Cache Focus]].")
               .please();
       refreshWikiCache(referrer);
 
-      GraphRAGResult result = graphRAGService.retrieve(focus, 1000, root.getCreator());
+      GraphRAGResult result = graphRAGService.retrieve(focus, 1000, viewer);
 
       assertThat(
           result.getFocusNote().getInboundReferences(),
@@ -420,12 +433,20 @@ public class GraphRAGServiceTest {
           makeMe.aFolder().notebook(notebook).parentFolder(outer).name("InnerCrumb").please();
       anchor = makeMe.theNote(anchor).folder(inner).please();
 
-      Note outgoing = makeMe.aNote().under(anchor).folder(inner).title("713 Outgoing").please();
+      Note outgoing =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(anchor)
+              .folder(inner)
+              .title("713 Outgoing")
+              .please();
 
       Note focus =
           makeMe
               .aNote()
-              .under(anchor)
+              .creator(viewer)
+              .underSameNotebookAs(anchor)
               .folder(inner)
               .title("713 Focus")
               .details("See [[713 Outgoing]].")
@@ -434,7 +455,8 @@ public class GraphRAGServiceTest {
       Note referrer =
           makeMe
               .aNote()
-              .under(anchor)
+              .creator(viewer)
+              .underSameNotebookAs(anchor)
               .folder(inner)
               .title("713 Referrer")
               .details("Ref [[713 Focus]].")
@@ -628,10 +650,22 @@ public class GraphRAGServiceTest {
   class GetGraphRAGDescriptionTests {
     @Test
     void shouldNotContainNewlinesInJson() {
-      Note note = makeMe.aNote().title("Test Note").details("Test Details").please();
-      Note child = makeMe.aNote().underSameNotebookAs(note).title("Child Note").please();
+      Note anchor = makeMe.aNote().title("Test Note").details("Test Details").please();
+      Notebook notebook = anchor.getNotebook();
+      Folder peerFolder =
+          makeMe.aFolder().notebook(notebook).name("graph-rag-json-newlines").please();
+      anchor = makeMe.theNote(anchor).folder(peerFolder).please();
+      User viewer = anchor.getCreator();
+      Note focusPeer =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(anchor)
+              .folder(peerFolder)
+              .title("Focus for JSON")
+              .please();
 
-      String description = graphRAGService.getGraphRAGDescription(child);
+      String description = graphRAGService.getGraphRAGDescription(focusPeer);
 
       // Extract the JSON part (from first { to last })
       int jsonStart = description.indexOf("{");
