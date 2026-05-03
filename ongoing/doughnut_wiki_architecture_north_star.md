@@ -16,9 +16,9 @@ The goal is to align with common personal-knowledge patterns:
 
 Doughnut moves away from a strict parent-child note tree toward a wiki-like model.
 
-The **final state removes the note parent concept from the product model.** Containment and navigation that today use parent-child edges migrate into **folders**. Notes are placed via `folderId` only; there is no parallel “parent note” field for structure.
+The **final state removes the note parent concept from the product model.** Containment and navigation use **folders**. Notes are placed via `folderId` (or notebook root when absent); there is **no** persisted structural parent-note column or FK on `note`.
 
-Interim migrations may still read legacy parent columns while backfilling folders. **As implemented:** folders are stored and updated when child notes are created or notes are moved while `Note.parent` still drives observable tree behavior until parent-note containment is removed from the product model. Once existing tree and relationship-note layouts are represented as folders (and links where appropriate), parent-note containment is **replaced by folders**, not weakened into optionality.
+Historical Flyway scripts may still mention `note.parent_id` for one-time backfills. **As implemented after Phase 7:** structural containment is folder-only. A few flows (for example MCP note creation) still accept a **title search** that resolves to an existing note only to derive **which folder** should hold the new note—via folder services—not to attach a parent-child edge in persistence.
 
 The previous model overloaded `parent` with multiple meanings:
 

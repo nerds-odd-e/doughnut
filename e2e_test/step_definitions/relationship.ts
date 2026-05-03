@@ -187,6 +187,5 @@ When(
       .jumpToNotePage(noteTopology)
       .navigateToReference(targetTitle)
       .deleteNote()
-    start.assumeNotePage(noteTopology) // remain on the same note page
   }
 )

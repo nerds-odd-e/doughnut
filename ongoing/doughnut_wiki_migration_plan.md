@@ -20,8 +20,9 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 4 — Properties / YAML frontmatter in `details` | Done |
 | 5 — Relationship notes → normal notes + wiki title cache | Done (title-rename propagation deferred to **Phase 12**; granular **5.24** notes in `doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`) |
 | 6 — Folder-first listing; remove `NoteTopology.shortDetails` | Done |
-| Boundary — slug retirement | Next (before Phase 7) |
-| 7+ | Not started |
+| Boundary — slug retirement | Done (before Phase 7) |
+| 7 — Remove note parent | Done |
+| 8+ | Not started |
 | 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
 ---
@@ -32,7 +33,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 **Until the boundary below**, the codebase still has persisted **`folder.slug`** / **`note.slug`**, **`unique(notebook_id, slug)`**, and slug-path routes from Phase 2. Basename within a folder = substring after last `/` in `note.slug` (or whole string at root). Slugify: `com.github.slugify:slugify` (`WikiSlugGeneration` / `WikiSlugPathService`).
 
-**Folder** = structural containment; **`Note.parent`** still exists in schema until Phase 7 and was the legacy tree; folder alignment uses `NoteChildContainerFolderService` / `NoteMotionService` (see codebase).
+**Folder** = structural containment. **`note.parent_id`** is removed (Phase 7); folder alignment and motion use folder placement and `NoteChildContainerFolderService` / `NoteMotionService` where applicable (see codebase).
 
 **Index note** — Optional root note titled `index` / slug `index`; notebook has **`name`** and **`description`**; no `headNote` on APIs.
 
@@ -44,28 +45,29 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 ## Completed work (summary only)
 
-Phases **1–6** are shipped. **Phase 5 closeout:** relationship notes normalized; graph and note show use cached wiki links; legacy **`Note.target_note_id`** dropped per **5.24** migrations and `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md` where slice-level detail matters.
+Phases **1–7** are shipped (Phase **7**: structural `note.parent_id` / `Note.parent` removed; folder placement only). **Phase 5 closeout:** relationship notes normalized; graph and note show use cached wiki links; legacy **`Note.target_note_id`** dropped per **5.24** migrations and `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md` where slice-level detail matters.
 
-- **1:** `Folder`, `note.folder_id`, backfill from parent-note tree; `Note.parent` still drives legacy navigation/ordering until Phase 7.
+- **1:** `Folder`, `note.folder_id`, backfill from the former parent-note tree (historical migrations).
 - **2:** Full-path slugs, resolution by notebook + slug path and ambiguous basename; moves recompute `note.slug`.
 - **3:** Migrations dropped `notebook_head_note`; catalog → notebook page; optional index at slug `index`.
 - **4:** Frontmatter round-trip (markdown + rich); unsupported YAML shapes block rich body until fixed in markdown.
 - **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph; `relation_type` and `note.target_note_id` removed. Transitional graph hop flags on related-note DTOs were removed in **Phase 7.13**. Title-rename propagation → **Phase 12**.
 - **6:** Primary containment UX is folder-scoped; topology has no `shortDetails`; graph siblings from folder (or notebook root without folder).
+- **7:** Structural note parent removed from schema and APIs; notes use `folderId` / notebook root; see `doughnut_wiki_migration_plan-phase-7-sub-phases.md`.
 
 ---
 
-## Boundary after Phase 6 — retire persisted slugs
+## Boundary after Phase 6 — retire persisted slugs (historical)
 
-Phases **1–6** shipped **persisted** `folder.slug` / `note.slug` and slug-path routing (**Phase 2**).
+Phases **1–6** once shipped **persisted** `folder.slug` / `note.slug` and slug-path routing (**Phase 2**). The **slug retirement** boundary (before Phase **7**) dropped slug columns and path-primary identity in favor of **`/d/n/:noteId`** and folder ids, per **`ongoing/doughnut_wiki_architecture_north_star.md`**.
 
-**Immediately before** removing **`Note.parent`** (**Phase 7**), finish **eliminating persisted slug/path identity**: drop **`note.slug`** and **`folder.slug`** (schema and backups), slug-keyed uniqueness, slug-path lookups and resolving routes built for Phase 2, and UX that treated path strings as the canonical note address — per **`ongoing/doughnut_wiki_architecture_north_star.md`**. Canonical note URLs become **`/d/n/:noteId`**; folders addressed by **`id`**; sibling folders unique by **`name`** under the same parent.
-
-**Phase 7 onward** in this document assumes slug retirement **complete**.
+**Phase 7 onward** in this document assumes slug retirement **complete** and **no** structural note parent column.
 
 ---
 
 # Phase 7 — Remove note parent (folders replace containment)
+
+**Status:** Shipped — execution detail in `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`.
 
 ## Goal
 
@@ -284,7 +286,7 @@ folders + (historical slugs until boundary)
     → relationship migration + cache
       → folder-first UX
         → slug retirement + id-canonical URLs
-          → drop Note.parent
+          → drop structural note parent (done)
             → folder move
               → wiki links + indexes
                 → folder config

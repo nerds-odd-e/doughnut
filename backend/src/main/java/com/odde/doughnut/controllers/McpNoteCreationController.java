@@ -89,9 +89,9 @@ public class McpNoteCreationController {
     if (noteOnly.isEmpty()) {
       throw new UnexpectedNoAccessRightException();
     }
-    int parentId = noteOnly.get(0).getNoteTopology().getId();
-    Optional<Note> parentNoteObj = noteService.findById(parentId);
+    int anchorNoteId = noteOnly.get(0).getNoteTopology().getId();
+    Optional<Note> anchorNote = noteService.findById(anchorNoteId);
 
-    return parentNoteObj.orElseGet(Note::new);
+    return anchorNote.orElseGet(Note::new);
   }
 }
