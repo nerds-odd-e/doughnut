@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Obsidian-style {@code [[wikilink]]} inner titles in markdown text (occurrence order, no dedupe).
+ * Double-bracket {@code [[wikilink]]} inner titles in markdown text (occurrence order, no dedupe).
  */
 public final class WikiLinkMarkdown {
 

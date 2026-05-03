@@ -109,8 +109,6 @@ const methodToController: Record<string, any> = {
   updateNotebookIndex: NotebookController,
   shareNotebook: NotebookController,
   resetNotebookIndex: NotebookController,
-  downloadNotebookForObsidian: NotebookController,
-  importObsidian: NotebookController,
   createNotebook: NotebookController,
   moveToCircle: NotebookController,
   getAiAssistant: NotebookController,

@@ -183,31 +183,6 @@
       />
     </section>
 
-    <!-- Obsidian Integration Section -->
-    <section class="settings-section daisy-mb-6">
-      <div class="section-header">
-        <h4 class="section-title">Obsidian Integration</h4>
-        <p class="section-description">
-          Import notes from Obsidian vaults or export this notebook for use in Obsidian.
-        </p>
-      </div>
-      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
-        <label class="daisy-btn daisy-btn-outline daisy-btn-sm">
-          Import from Obsidian
-          <input
-            type="file"
-            accept=".zip"
-            class="!hidden"
-            style="display: none !important"
-            @change="handleObsidianImport"
-          />
-        </label>
-        <button class="daisy-btn daisy-btn-outline daisy-btn-sm" @click="exportForObsidian">
-          Export for Obsidian
-        </button>
-      </div>
-    </section>
-
     <section class="settings-section daisy-mb-6">
       <div class="section-header">
         <h4 class="section-title">Assistant Management</h4>
@@ -450,38 +425,6 @@ const processForm = async () => {
     // Extract field-level errors if available (for 400 validation errors)
     const errorObj = toOpenApiError(error)
     errors.value = { ...errors.value, ...(errorObj.errors || {}) }
-  }
-}
-
-const exportForObsidian = () => {
-  const link = document.createElement("a")
-  link.style.display = "none"
-  link.href = `/api/notebooks/${props.notebook.id}/obsidian`
-  link.download = `${props.notebook.name}-obsidian.zip`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  showSuccessToast("Export started")
-}
-
-const handleObsidianImport = async (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-
-  const { error } = await apiCallWithLoading(() =>
-    NotebookController.importObsidian({
-      path: { notebook: props.notebook.id },
-      body: { file },
-    })
-  )
-  if (!error) {
-    // Clear file input for reuse
-    ;(event.target as HTMLInputElement).value = ""
-    showSuccessToast("Obsidian import completed successfully")
-    // Reload the page to show updated content
-    window.location.reload()
-  } else {
-    // Error is handled by global interceptor (toast notification)
   }
 }
 

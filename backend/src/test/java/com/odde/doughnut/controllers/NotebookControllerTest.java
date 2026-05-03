@@ -35,23 +35,17 @@ import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteChildContainerFolderService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
@@ -1043,162 +1037,6 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getAiAssistant(note.getNotebook()));
-    }
-  }
-
-  @Nested
-  class DownloadForObsidian {
-    private Notebook notebook;
-
-    @BeforeEach
-    void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.refresh(notebook);
-    }
-
-    @Test
-    void whenNotAuthorized() {
-      User anotherUser = makeMe.aUser().please();
-      currentUser.setUser(anotherUser);
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.downloadNotebookForObsidian(notebook));
-    }
-
-    @Test
-    void whenNotebookHasNoIndexNote_returnsEmptyZip()
-        throws UnexpectedNoAccessRightException, IOException {
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
-      noteCreation.setNewTitle("Obsidian Empty Nb");
-      NotebookClientView response = controller.createNotebook(noteCreation);
-      Notebook blank = notebookRepository.findById(response.notebook().getId()).orElseThrow();
-      ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(blank);
-      assertThat(entity.getStatusCode(), equalTo(HttpStatus.OK));
-      assertThat(entity.getBody(), notNullValue());
-      assertThat(entity.getBody().length > 0, is(true));
-      List<String> names = zipEntryNames(entity.getBody());
-      assertThat(names.isEmpty(), is(true));
-    }
-
-    @Test
-    void download_whenNotebookHasIndexNote_includesIndexMd()
-        throws UnexpectedNoAccessRightException, IOException {
-      Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-      makeMe.theNote(root).title("index").details("Notebook intro").please();
-      makeMe.refresh(notebook);
-      ResponseEntity<byte[]> entity = controller.downloadNotebookForObsidian(notebook);
-      assertThat(entity.getStatusCode(), equalTo(HttpStatus.OK));
-      assertThat(zipEntryNames(entity.getBody()), org.hamcrest.Matchers.hasItem("index.md"));
-    }
-
-    private static List<String> zipEntryNames(byte[] zipBytes) throws IOException {
-      List<String> names = new ArrayList<>();
-      try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null) {
-          names.add(entry.getName());
-        }
-      }
-      return names;
-    }
-  }
-
-  @Nested
-  class ImportObsidianTest {
-    private Note note1;
-    private Notebook notebook;
-    private MockMultipartFile zipFile;
-
-    @BeforeEach
-    void setup() {
-      // Create notebook with Note1
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      note1 = makeMe.aNote("note 1").inNotebook(notebook).details("Content of Note 1").please();
-
-      // Create mock zip file from actual test resource
-      try {
-        byte[] zipContent = getClass().getResourceAsStream("/import-one-child.zip").readAllBytes();
-        zipFile = new MockMultipartFile("file", "obsidian.zip", "application/zip", zipContent);
-      } catch (IOException e) {
-        throw new RuntimeException("Failed to read test zip file", e);
-      }
-    }
-
-    @Test
-    void shouldPreserveExistingNoteContent() throws UnexpectedNoAccessRightException, IOException {
-      // Act
-      controller.importObsidian(zipFile, notebook);
-
-      // Assert
-      Note existingNote =
-          noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).stream()
-              .filter(n -> n.getTitle().equals("note 1"))
-              .findFirst()
-              .orElseThrow();
-
-      assertThat(existingNote.getTitle(), equalTo("note 1"));
-      assertThat(existingNote.getDetails(), equalTo("Content of Note 1"));
-    }
-
-    @Test
-    void shouldImportNewNoteWithCorrectContent()
-        throws UnexpectedNoAccessRightException, IOException {
-      // Act
-      controller.importObsidian(zipFile, notebook);
-      makeMe.refresh(note1);
-
-      // Assert
-      Note importedNote =
-          noteRepository.searchExactInNotebook(notebook.getId(), "note 2").stream()
-              .findFirst()
-              .orElseThrow();
-
-      assertThat(importedNote.getTitle(), equalTo("note 2"));
-      assertThat(importedNote.getDetails(), equalTo("note 2"));
-    }
-
-    @Test
-    void shouldEstablishCorrectHierarchy() throws UnexpectedNoAccessRightException, IOException {
-      // Act
-      controller.importObsidian(zipFile, notebook);
-      makeMe.refresh(note1);
-
-      // Assert: containment is folder-first; imported child shares note1's child-container folder
-      Note note2 =
-          noteRepository.searchExactInNotebook(notebook.getId(), "note 2").stream()
-              .findFirst()
-              .orElseThrow();
-      Folder container = noteChildContainerFolderService.resolveForParent(note1);
-
-      assertThat(note2.getFolder(), notNullValue());
-      assertThat(note2.getFolder().getId(), equalTo(container.getId()));
-    }
-
-    @Test
-    void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
-      // Arrange
-      User otherUser = makeMe.aUser().please();
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
-
-      // Act & Assert
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.importObsidian(zipFile, otherNotebook));
-    }
-
-    @Test
-    void shouldRequireUserToBeLoggedIn() {
-      // Arrange
-      currentUser.setUser(null);
-
-      // Act & Assert
-      ResponseStatusException exception =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.importObsidian(zipFile, notebook));
-
-      // Verify the correct status and message
-      assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
-      assertEquals("User Not Found", exception.getReason());
     }
   }
 }

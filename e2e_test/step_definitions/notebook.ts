@@ -152,13 +152,6 @@ Then('I should get immediate feedback by showing the wrong answer', () => {
 })
 
 When(
-  'I Import Obsidian data {string} to note {string}',
-  (filename: string, noteTitle: string) => {
-    start.navigateToNotebookPage(noteTitle).importObsidianData(filename)
-  }
-)
-
-When(
   'I open the notebook {string} from my notebooks catalog',
   (notebookName: string) => {
     start.navigateToNotebookPage(notebookName)

@@ -1962,48 +1962,6 @@ export type ResetNotebookIndexResponses = {
     200: unknown;
 };
 
-export type DownloadNotebookForObsidianData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/obsidian';
-};
-
-export type DownloadNotebookForObsidianResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type DownloadNotebookForObsidianResponse = DownloadNotebookForObsidianResponses[keyof DownloadNotebookForObsidianResponses];
-
-export type ImportObsidianData = {
-    body?: {
-        /**
-         * Obsidian zip file to import
-         */
-        file: Blob | File;
-    };
-    path: {
-        /**
-         * Notebook ID
-         */
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/obsidian';
-};
-
-export type ImportObsidianResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type CreateFolderData = {
     body: FolderCreationRequest;
     path: {

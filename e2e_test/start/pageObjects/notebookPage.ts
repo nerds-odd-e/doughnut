@@ -54,35 +54,6 @@ const notebookPage = () => {
       clickButton('Update Notebook AI Assistant Settings')
       pageIsNotLoading()
     },
-    exportForObsidian() {
-      cy.location('pathname').then((pathname) => {
-        const m = pathname.match(/\/d\/notebooks\/(\d+)(?:\/|$)/)
-        expect(m, 'on notebook page with id in URL').to.not.be.null
-        const notebookId = m![1]!
-        cy.findByRole('button', { name: 'Export for Obsidian' }).click()
-        const downloadsFolder = Cypress.config('downloadsFolder') as string
-        cy.request({
-          url: `/api/notebooks/${notebookId}/obsidian`,
-          encoding: 'binary',
-        }).then((response) => {
-          expect(response.status).to.eq(200)
-          cy.writeFile(
-            `${downloadsFolder}/e2e-obsidian-export.zip`,
-            response.body,
-            'binary'
-          )
-          pageIsNotLoading()
-        })
-      })
-      return this
-    },
-    importObsidianData(filename: string) {
-      cy.contains('label', 'Import from Obsidian')
-        .find('input[type="file"]')
-        .selectFile(`e2e_test/fixtures/${filename}`, { force: true })
-      pageIsNotLoading()
-      return this
-    },
     attachEpubFixture(relativePath: string) {
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')

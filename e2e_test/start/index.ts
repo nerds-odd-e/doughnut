@@ -15,7 +15,6 @@ import mcpApi from './mcpApi'
 // === Actions ===
 import { loginActions } from './actions/loginActions'
 import { navigationActions } from './actions/navigationActions'
-import { downloadActions, type ExpectedFile } from './actions/downloadActions'
 
 // === Page Objects - Alphabetically Organized ===
 import { assumeAdminDashboardPage } from './pageObjects/adminPages/adminDashboardPage'
@@ -120,9 +119,7 @@ const start = {
   // === Actions ===
   ...loginActions,
   ...navigationActions,
-  ...downloadActions,
 }
 
 export default start
 export { mock_services }
-export type { ExpectedFile }

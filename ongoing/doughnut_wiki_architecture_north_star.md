@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This roadmap describes the intended architecture of Doughnut as an Obsidian-compatible, wiki-style note model.
+This roadmap describes the intended architecture of Doughnut as a wiki-style, markdown-first note model.
 
-The goal is not to make Doughnut identical to Obsidian, but to align with Obsidian’s mental model:
+The goal is to align with common personal-knowledge patterns:
 
 - Notes are Markdown-like knowledge units.
 - Folders provide storage and navigation structure.
@@ -74,7 +74,7 @@ The index note supplies the notebook page body summary when it exists. The noteb
 
 ### Folder
 
-A folder is a storage and navigation container (similar to Obsidian folders). It organizes notes operationally but is not the main semantic relationship between notes.
+A folder is a storage and navigation container (like a file tree in a notebook). It organizes notes operationally but is not the main semantic relationship between notes.
 
 #### Shape
 
@@ -145,7 +145,7 @@ Table `note_wiki_title_cache`: `id`, source `note_id`, `target_note_id`, `link_t
 
 ## Import and export
 
-- Export (e.g. Obsidian zip) may derive filenames from note **title** or from frontmatter fields the importer understands.
+- Portable Markdown export (when offered) may derive filenames from note **title** or from frontmatter fields a future importer understands.
 - Frontmatter is user-owned: keys like `title`, `alias`, or import-specific metadata are preserved as scalar fields where the parser allows.
 
 ## Principles

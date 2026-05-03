@@ -8,7 +8,7 @@
 
 ## Purpose
 
-Phased migration toward the wiki-style, Obsidian-compatible architecture in the north star. This file tracks **what remains** and **execution order**; deep design for shipped work lives in the north star and phase-specific docs above.
+Phased migration toward the wiki-style, markdown-first architecture in the north star. This file tracks **what remains** and **execution order**; deep design for shipped work lives in the north star and phase-specific docs above.
 
 ## Status
 
@@ -18,11 +18,11 @@ Phased migration toward the wiki-style, Obsidian-compatible architecture in the 
 | 2 — Slug paths (`folder.slug`, `note.slug`, routing) | Done (retired at boundary before 7) |
 | 3 — Index note (no head note) | Done |
 | 4 — Properties / YAML frontmatter in `details` | Done |
-| 5 — Relationship notes → normal notes + wiki title cache | Done (title-rename propagation deferred to **Phase 14**; granular **5.24** notes in `doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`) |
+| 5 — Relationship notes → normal notes + wiki title cache | Done (title-rename propagation deferred to **Phase 12**; granular **5.24** notes in `doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`) |
 | 6 — Folder-first listing; remove `NoteTopology.shortDetails` | Done |
 | Boundary — slug retirement | Next (before Phase 7) |
 | 7+ | Not started |
-| 14 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
+| 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
 ---
 
@@ -36,9 +36,9 @@ Phased migration toward the wiki-style, Obsidian-compatible architecture in the 
 
 **Index note** — Optional root note titled `index` / slug `index`; notebook has **`name`** and **`description`**; no `headNote` on APIs.
 
-**Properties** — Leading YAML in Markdown `details`; rich editor mirrors via frontmatter UI. Exporter coherence with user YAML → **Phase 11** (`ObsidianFormatService`).
+**Properties** — Leading YAML in Markdown `details`; rich editor mirrors via frontmatter UI.
 
-**Phase 5 (shipped)** — Relationship notes are normal notes with frontmatter (`type: relationship`, `relation`, `source`/`target` as `[[…]]`). **`note_wiki_title_cache`** backs references and graph reads; **`NoteRealm.references`** is the unified note-show surface; titles are required (non-null/non-empty). Legacy parent may appear as migration-only `parent: "[[…]]"` in frontmatter for non-relationship notes. **`note.target_note_id`** is removed (**5.24**). **Reverse-updating referrers when a title changes** is **Phase 14** (formerly **5.25** before closeout).
+**Phase 5 (shipped)** — Relationship notes are normal notes with frontmatter (`type: relationship`, `relation`, `source`/`target` as `[[…]]`). **`note_wiki_title_cache`** backs references and graph reads; **`NoteRealm.references`** is the unified note-show surface; titles are required (non-null/non-empty). Legacy parent may appear as migration-only `parent: "[[…]]"` in frontmatter for non-relationship notes. **`note.target_note_id`** is removed (**5.24**). **Reverse-updating referrers when a title changes** is **Phase 12** (formerly **5.25** before closeout).
 
 ---
 
@@ -50,7 +50,7 @@ Phases **1–6** are shipped. **Phase 5 closeout:** relationship notes normalize
 - **2:** Full-path slugs, resolution by notebook + slug path and ambiguous basename; moves recompute `note.slug`.
 - **3:** Migrations dropped `notebook_head_note`; catalog → notebook page; optional index at slug `index`.
 - **4:** Frontmatter round-trip (markdown + rich); unsupported YAML shapes block rich body until fixed in markdown.
-- **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph; `relation_type` and `note.target_note_id` removed. Transitional graph hop flags on related-note DTOs were removed in **Phase 7.13**. Title-rename propagation → **Phase 14**.
+- **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph; `relation_type` and `note.target_note_id` removed. Transitional graph hop flags on related-note DTOs were removed in **Phase 7.13**. Title-rename propagation → **Phase 12**.
 - **6:** Primary containment UX is folder-scoped; topology has no `shortDetails`; graph siblings from folder (or notebook root without folder).
 
 ---
@@ -111,7 +111,7 @@ Reparent a folder (`parentFolderId` or notebook root) while **notes** keep **`fo
 
 ## Non-goals
 
-Wiki-link parsing (**Phase 9**), folder templates (**Phase 10**), Obsidian export (**Phase 11**).
+Wiki-link parsing (**Phase 9**), folder templates (**Phase 10**).
 
 ## Expected result
 
@@ -199,61 +199,7 @@ Folder-level creation defaults and templates; migration-only rules isolated.
 
 ---
 
-# Phase 11 — Export to Obsidian Markdown
-
-## Goal
-
-Export notebooks as Obsidian-compatible folder trees; basenames from **title** (or export rules) + collision handling — **not** from removed `note.slug`.
-
-## Shape (illustrative)
-
-```text
-Notebook/
-  index.md
-  Journal/2026/2026-04-28.md
-  Notes/douyara.md
-  Relationships/….
-```
-
-## Note file
-
-Typical frontmatter includes stable **`id`**, timestamps, **`type`**, etc.; body after `# title`. Merge **user-authored leading YAML inside `details`** with exporter metadata so files are single coherent Markdown (**Phase 4** deferral).
-
-## Links export
-
-Default `[[title]]`; disambiguate with **folder-named** paths using **names**, not old slug columns.
-
-## Expected result
-
-Portable Markdown trees, correct links, coherent frontmatter.
-
----
-
-# Phase 12 — Import and round trip from Obsidian
-
-## Goal
-
-Import Obsidian-style folders; support re-import of exports.
-
-## Priority
-
-```text
-frontmatter id > generated id
-frontmatter title > first H1 > filename-derived title
-folder path → folder records (name uniqueness among siblings)
-```
-
-## Importer responsibilities
-
-Parse frontmatter; create/update folders and notes; preserve **id** when present; derive titles without resurrecting **`note.slug`**; parse wiki links; rebuild link indexes; surface conflicts (id vs path, title collisions, missing targets, etc.).
-
-## Round trip
-
-`Doughnut export → Obsidian edit → Doughnut import` with stable **`id`** in frontmatter where possible.
-
----
-
-# Phase 13 — Remove legacy assumptions
+# Phase 11 — Remove legacy assumptions
 
 ## Goal
 
@@ -280,7 +226,7 @@ LinkIndex — derived from content
 
 ---
 
-# Phase 14 — Title rename propagates wiki references
+# Phase 12 — Title rename propagates wiki references
 
 ## Goal
 
@@ -326,10 +272,8 @@ Renaming a note does not strand stale wiki tokens or cache rows in common cases;
 8. Move folder
 9. Wiki-link parser + indexes
 10. Folder config
-11. Obsidian export
-12. Obsidian import / round trip
-13. Legacy cleanup
-14. Title rename propagates wiki references (deferred from Phase 5.25)
+11. Legacy cleanup
+12. Title rename propagates wiki references (deferred from Phase 5.25)
 ```
 
 ## Dependency chain
@@ -344,7 +288,7 @@ folders + (historical slugs until boundary)
             → folder move
               → wiki links + indexes
                 → folder config
-                  → export → import → legacy cleanup
+                  → legacy cleanup
                     → title rename propagates wiki references
 ```
 

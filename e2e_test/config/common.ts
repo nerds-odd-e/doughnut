@@ -1,13 +1,11 @@
-import { existsSync, readdirSync, rm } from 'node:fs'
-import { extname, join, resolve } from 'node:path'
+import { existsSync, rm } from 'node:fs'
+import { join, resolve } from 'node:path'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor')
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
-import AdmZip from 'adm-zip'
-import type { ExpectedFile } from '../start/downloadChecker'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
@@ -125,96 +123,6 @@ const commonConfig = {
             })
           }
           return checker(retryCount)
-        },
-        checkDownloadedZipContent(expectedFiles: ExpectedFile[]) {
-          const downloadsFolder = config.downloadsFolder
-          const files = readdirSync(downloadsFolder)
-          const zipFile = files.find((file) => file.endsWith('.zip'))
-
-          if (!zipFile) {
-            throw new Error('No zip file found in downloads folder')
-          }
-
-          const zip = new AdmZip(join(downloadsFolder, zipFile))
-          const zipEntries = zip.getEntries()
-
-          const actualFiles = zipEntries.map((entry) => ({
-            Filename: entry.entryName,
-            Format: extname(entry.entryName).slice(1),
-            Content: entry.getData().toString('utf8'),
-          }))
-
-          const expectedFilesArray = expectedFiles.map((file) => ({
-            Filename: file.Filename,
-            Format: file.Format,
-            Content: file.Content,
-            validateMetadata: file.validateMetadata,
-          }))
-
-          const mismatches: string[] = []
-
-          // Check for missing files
-          expectedFilesArray.forEach((expected) => {
-            const actual = actualFiles.find(
-              (file) => file.Filename === expected.Filename
-            )
-            if (!actual) {
-              mismatches.push(`Missing file: ${expected.Filename}`)
-              return
-            }
-
-            if (actual.Format !== expected.Format) {
-              mismatches.push(
-                `Format mismatch in ${expected.Filename}:\n` +
-                  `  Expected: ${expected.Format}\n` +
-                  `  Actual  : ${actual.Format}`
-              )
-            }
-
-            const contentMatch = expected.Content
-              ? actual.Content.includes(expected.Content)
-              : true
-
-            const hasFrontmatter = expected.validateMetadata
-              ? actual.Content.match(
-                  /^---\n(?:note_id: \d+\ncreated_at: .+\nupdated_at: .+\n)---\n/
-                )
-              : true
-
-            if (!(contentMatch && hasFrontmatter)) {
-              mismatches.push(
-                `Content mismatch in ${expected.Filename}:\n` +
-                  `  Expected: ${expected.Content}\n` +
-                  `  Actual  : ${actual.Content}`
-              )
-            }
-          })
-
-          // Check for unexpected files
-          actualFiles.forEach((actual) => {
-            const isExpected = expectedFilesArray.some(
-              (expected) => expected.Filename === actual.Filename
-            )
-            if (!isExpected) {
-              mismatches.push(`Unexpected file found: ${actual.Filename}`)
-            }
-          })
-
-          if (mismatches.length > 0) {
-            const errorMessage = [
-              'ZIP Archive Content Validation Failed:',
-              '----------------------------------------',
-              ...mismatches,
-              '----------------------------------------',
-              'Summary:',
-              `Expected files: ${expectedFilesArray.map((f) => f.Filename).join(', ')}`,
-              `Actual files  : ${actualFiles.map((f) => f.Filename).join(', ')}`,
-            ].join('\n')
-
-            throw new Error(errorMessage)
-          }
-
-          return true
         },
         async spawnAndConnectMcpServer({
           baseUrl,

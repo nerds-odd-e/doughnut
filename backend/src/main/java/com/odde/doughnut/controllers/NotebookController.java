@@ -26,24 +26,18 @@ import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookGroupService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
-import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -55,7 +49,6 @@ class NotebookController {
 
   private final TestabilitySettings testabilitySettings;
 
-  private final ObsidianFormatService obsidianFormatService;
   private final NotebookIndexingService notebookIndexingService;
   private final BazaarService bazaarService;
   private final AuthorizationService authorizationService;
@@ -77,7 +70,6 @@ class NotebookController {
       BazaarService bazaarService,
       AuthorizationService authorizationService,
       NotebookService notebookService,
-      ObsidianFormatService obsidianFormatService,
       NotebookGroupRepository notebookGroupRepository,
       NotebookGroupService notebookGroupService,
       NotebookRepository notebookRepository,
@@ -94,7 +86,6 @@ class NotebookController {
     this.bazaarService = bazaarService;
     this.authorizationService = authorizationService;
     this.notebookService = notebookService;
-    this.obsidianFormatService = obsidianFormatService;
     this.notebookGroupRepository = notebookGroupRepository;
     this.notebookGroupService = notebookGroupService;
     this.notebookRepository = notebookRepository;
@@ -316,40 +307,6 @@ class NotebookController {
             .map(NotebookRootFolder::from)
             .toList();
     return new FolderListing(notes, childFolders);
-  }
-
-  @GetMapping("/{notebook}/obsidian")
-  public ResponseEntity<byte[]> downloadNotebookForObsidian(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException, IOException {
-    authorizationService.assertAuthorization(notebook);
-    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook);
-
-    return ResponseEntity.ok()
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"" + sanitizeFileName(notebook.getName()) + "-obsidian.zip\"")
-        .header(HttpHeaders.CONTENT_TYPE, "application/zip")
-        .body(zipBytes);
-  }
-
-  private String sanitizeFileName(String fileName) {
-    return fileName.replaceAll("[\\/:*?\"<>|]", "_");
-  }
-
-  @Operation(summary = "Import Obsidian file")
-  @PostMapping(value = "/{notebook}/obsidian", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @ResponseStatus(HttpStatus.OK)
-  @Transactional
-  public void importObsidian(
-      @Parameter(description = "Obsidian zip file to import") @RequestParam("file")
-          MultipartFile file,
-      @Parameter(description = "Notebook ID") @PathVariable("notebook") @Schema(type = "integer")
-          Notebook notebook)
-      throws UnexpectedNoAccessRightException, IOException {
-    authorizationService.assertLoggedIn();
-    authorizationService.assertReadAuthorization(notebook);
-    obsidianFormatService.importFromObsidian(file, notebook);
   }
 
   @PostMapping("/{notebook}/update-index")

@@ -97,7 +97,7 @@ Research should **not** be limited to the bullets below; they are **seeds**. Eac
 
 **DRM / encryption:** Treat **`META-INF/encryption.xml`** as a **strong signal** that resources may be unreadable without a DRM stack; **fail fast** with a user-visible error unless we explicitly integrate a licensed DRM SDK. **Password-protected ZIP** (unusual for consumer EPUB) is a separate check. Plain EPUB 3 **font obfuscation** also uses `encryption.xml` but leaves XHTML readable — distinguish by **algorithm** / `EncryptedData` if we need fewer false positives.
 
-**Spike:** `scripts/epub-extraction-spike.mjs` — run `node scripts/epub-extraction-spike.mjs <book.epub>` (repo already has `adm-zip`). Outputs spine, coarse heading-derived outline, `rendition:layout` hint, `encryption.xml` flag, and notes on limitations (nav not merged in the spike).
+**Spike:** `scripts/epub-extraction-spike.mjs` — run `node scripts/epub-extraction-spike.mjs <book.epub>` (add a zip dependency locally for the spike if the script requires it). Outputs spine, coarse heading-derived outline, `rendition:layout` hint, `encryption.xml` flag, and notes on limitations (nav not merged in the spike).
 
 ### 2.2 Frontend viewing technology (your topic)
 
