@@ -26,8 +26,9 @@ public class NoteRealmService {
     Note focus = hydrateNote(note);
     var wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
     NoteRealm realm = new NoteRealm(focus, wikiTitles);
-    realm.setReferences(
-        hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer)));
+    List<Note> refNotes =
+        hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer));
+    realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     realm.setFromBazaar(viewer == null || !viewer.owns(focus.getNotebook()));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
     return realm;

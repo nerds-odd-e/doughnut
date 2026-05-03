@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import type {
   NoteTopology,
-  NotebookRootFolder,
+  FolderTrailSegment,
 } from "@generated/doughnut-backend-api"
 import SidebarInner from "./SidebarInner.vue"
 import {
@@ -54,7 +54,7 @@ import {
 import { computed, inject, ref, watch } from "vue"
 
 const props = defineProps<{
-  folder: NotebookRootFolder
+  folder: FolderTrailSegment
   notebookId: number
   activeNoteTopology?: NoteTopology
 }>()

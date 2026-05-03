@@ -7,4 +7,4 @@ import java.util.List;
     description =
         "Note topologies and child folders in a structural listing scope (e.g. notebook root or"
             + " a folder).")
-public record FolderListing(List<NoteTopology> noteTopologies, List<NotebookRootFolder> folders) {}
+public record FolderListing(List<NoteTopology> noteTopologies, List<FolderTrailSegment> folders) {}

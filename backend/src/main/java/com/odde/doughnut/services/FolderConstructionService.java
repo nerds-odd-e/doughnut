@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
-import com.odde.doughnut.controllers.dto.NotebookRootFolder;
+import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -33,7 +33,7 @@ public class FolderConstructionService {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public NotebookRootFolder createFolder(Notebook notebook, FolderCreationRequest request) {
+  public FolderTrailSegment createFolder(Notebook notebook, FolderCreationRequest request) {
     String trimmedName = request.getName().trim();
     if (trimmedName.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder name must not be blank.");
@@ -73,6 +73,6 @@ public class FolderConstructionService {
     folder.setCreatedAt(now);
     folder.setUpdatedAt(now);
     entityPersister.save(folder);
-    return NotebookRootFolder.from(folder);
+    return FolderTrailSegment.from(folder);
   }
 }

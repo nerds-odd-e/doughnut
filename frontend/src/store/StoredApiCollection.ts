@@ -1,9 +1,9 @@
 import type {
   FolderCreationRequest,
   FolderListing,
+  FolderTrailSegment,
   NoteDetailsCompletion,
   NoteRealm,
-  NotebookRootFolder,
   WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
 import type {
@@ -57,7 +57,7 @@ export interface StoredApi {
   createFolder(
     notebookId: number,
     body: FolderCreationRequest
-  ): Promise<NotebookRootFolder>
+  ): Promise<FolderTrailSegment>
 
   createRootNoteAtNotebook(
     router: Router,

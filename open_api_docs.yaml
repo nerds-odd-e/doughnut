@@ -1100,7 +1100,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebookRootFolder"
+                $ref: "#/components/schemas/FolderTrailSegment"
   /api/notebooks/{notebook}/create-note:
     post:
       tags:
@@ -3575,8 +3575,9 @@ components:
           type: string
     FolderTrailSegment:
       type: object
-      description: One folder on the path from notebook root to the note's containing
-        folder (outermost first).
+      description: "Folder id and display name: ancestor breadcrumb segments (outermost\
+        \ first), notebook root listing rows, or direct child folders in a folder\
+        \ listing."
       properties:
         id:
           type: string
@@ -3631,7 +3632,7 @@ components:
         references:
           type: array
           items:
-            $ref: "#/components/schemas/Note"
+            $ref: "#/components/schemas/NoteTopology"
         wikiTitles:
           type: array
           items:
@@ -3933,16 +3934,6 @@ components:
           description: "When set, the new folder is a child of this note's folder\
             \ (or notebook root when the note has no folder). Must belong to the target\
             \ notebook."
-      required:
-      - name
-    NotebookRootFolder:
-      type: object
-      description: Notebook root-level folder row for listing.
-      properties:
-        id:
-          type: string
-        name:
-          type: string
       required:
       - name
     NoteCreationDTO:
@@ -4855,7 +4846,7 @@ components:
         folders:
           type: array
           items:
-            $ref: "#/components/schemas/NotebookRootFolder"
+            $ref: "#/components/schemas/FolderTrailSegment"
     BookUserLastReadPosition:
       type: object
       properties:

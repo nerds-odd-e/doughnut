@@ -212,7 +212,7 @@ export type GlobalAiModelSettings = {
 };
 
 /**
- * One folder on the path from notebook root to the note's containing folder (outermost first).
+ * Folder id and display name: ancestor breadcrumb segments (outermost first), notebook root listing rows, or direct child folders in a folder listing.
  */
 export type FolderTrailSegment = {
     id?: string;
@@ -235,7 +235,7 @@ export type NoteRealm = {
     fromBazaar?: boolean;
     notebookId: number;
     ancestorFolders?: Array<FolderTrailSegment>;
-    references?: Array<Note>;
+    references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
 };
 
@@ -396,14 +396,6 @@ export type FolderCreationRequest = {
      * When set, the new folder is a child of this note's folder (or notebook root when the note has no folder). Must belong to the target notebook.
      */
     underNoteId?: number;
-};
-
-/**
- * Notebook root-level folder row for listing.
- */
-export type NotebookRootFolder = {
-    id?: string;
-    name: string;
 };
 
 export type NoteCreationDto = {
@@ -850,7 +842,7 @@ export type SubscriptionForNotebooksListing = {
  */
 export type FolderListing = {
     noteTopologies?: Array<NoteTopology>;
-    folders?: Array<NotebookRootFolder>;
+    folders?: Array<FolderTrailSegment>;
 };
 
 export type BookUserLastReadPosition = {
@@ -967,7 +959,7 @@ export type NoteRealmWritable = {
     fromBazaar?: boolean;
     notebookId: number;
     ancestorFolders?: Array<FolderTrailSegment>;
-    references?: Array<NoteWritable>;
+    references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
 };
 
@@ -1951,7 +1943,7 @@ export type CreateFolderResponses = {
     /**
      * OK
      */
-    200: NotebookRootFolder;
+    200: FolderTrailSegment;
 };
 
 export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];

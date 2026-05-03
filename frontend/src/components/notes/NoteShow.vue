@@ -53,7 +53,7 @@
                   <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">References</h3>
                   <NoteReferences
                     v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
-                    :notes="noteRealm.references ?? []"
+                    :note-topologies="noteRealm.references ?? []"
                   />
                 </template>
               </div>

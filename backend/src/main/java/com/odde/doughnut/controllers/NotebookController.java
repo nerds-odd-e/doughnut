@@ -2,11 +2,11 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
+import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
-import com.odde.doughnut.controllers.dto.NotebookRootFolder;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
@@ -145,7 +145,7 @@ class NotebookController {
               + " context note's folder when underNoteId is set.")
   @PostMapping("/{notebook}/folders")
   @Transactional
-  public NotebookRootFolder createFolder(
+  public FolderTrailSegment createFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody FolderCreationRequest request)
       throws UnexpectedNoAccessRightException {
@@ -272,9 +272,9 @@ class NotebookController {
         noteService.findNotebookRootNotes(notebook.getId()).stream()
             .map(Note::getNoteTopology)
             .toList();
-    List<NotebookRootFolder> folders =
+    List<FolderTrailSegment> folders =
         folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-            .map(NotebookRootFolder::from)
+            .map(FolderTrailSegment::from)
             .toList();
     return new FolderListing(noteTopologies, folders);
   }
@@ -297,9 +297,9 @@ class NotebookController {
         noteService.findNotesInFolderScope(folder.getId()).stream()
             .map(Note::getNoteTopology)
             .toList();
-    List<NotebookRootFolder> childFolders =
+    List<FolderTrailSegment> childFolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
-            .map(NotebookRootFolder::from)
+            .map(FolderTrailSegment::from)
             .toList();
     return new FolderListing(noteTopologies, childFolders);
   }

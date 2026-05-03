@@ -112,7 +112,7 @@ public class WikiTitleCacheService {
   /**
    * Referrer notes for {@code focalNote} and {@code viewer}: all wiki-title cache inbound links
    * ({@link #inboundReferrerNotesForViewer}), ordered by note id for {@link
-   * com.odde.doughnut.controllers.dto.NoteRealm#getReferences()} and graph RAG.
+   * com.odde.doughnut.controllers.dto.NoteRealm#getReferences()} (as topologies) and graph RAG.
    */
   public List<Note> referencesNotesForViewer(Note focalNote, User viewer) {
     return inboundReferrerNotesForViewer(focalNote, viewer).stream()

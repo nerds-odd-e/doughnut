@@ -21,11 +21,11 @@ import org.springframework.lang.NonNull;
 })
 public class NoteRealm {
   /**
-   * Notes that refer to the focus note via the wiki-title cache (all inbound resolved links),
-   * deduplicated by referring note id and ordered by id, with the same visibility rules as {@link
+   * Referring notes (wiki-title cache inbound links), as {@link NoteTopology}, deduplicated by
+   * referring note id and ordered by id, with the same visibility rules as {@link
    * com.odde.doughnut.services.WikiTitleCacheService#referencesNotesForViewer}.
    */
-  @Getter @Setter private List<Note> references;
+  @Getter @Setter private List<NoteTopology> references;
 
   @NotNull @Getter private Note note;
 

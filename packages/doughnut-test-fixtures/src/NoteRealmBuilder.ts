@@ -62,7 +62,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   }
 
   under(value: NoteRealm): NoteRealmBuilder {
-    value?.references?.push(this.data.note)
+    value?.references?.push(this.data.note.noteTopology)
     return this
   }
 

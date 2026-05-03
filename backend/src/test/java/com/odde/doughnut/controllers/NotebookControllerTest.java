@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
+import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -24,7 +25,6 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
-import com.odde.doughnut.controllers.dto.NotebookRootFolder;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
@@ -346,7 +346,7 @@ class NotebookControllerTest extends ControllerTestBase {
       assertEquals(2, listing.folders().size());
       assertEquals(
           List.of("Inbox", "Parent"),
-          listing.folders().stream().map(NotebookRootFolder::name).sorted().toList());
+          listing.folders().stream().map(FolderTrailSegment::name).sorted().toList());
     }
 
     @Test
@@ -485,7 +485,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("  Inbox  ");
-      NotebookRootFolder created = controller.createFolder(nb, req);
+      FolderTrailSegment created = controller.createFolder(nb, req);
       assertThat(created.name(), equalTo("Inbox"));
 
       FolderListing listing = controller.listNotebookRootNotes(nb);
@@ -507,7 +507,7 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("Sub");
       req.setUnderNoteId(noteInScope.getId());
-      NotebookRootFolder created = controller.createFolder(nb, req);
+      FolderTrailSegment created = controller.createFolder(nb, req);
 
       FolderListing listing = controller.listFolderListing(nb, scope);
       assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
