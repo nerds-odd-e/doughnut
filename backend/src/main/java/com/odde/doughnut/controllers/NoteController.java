@@ -15,8 +15,6 @@ import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
-import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.services.graphRAG.FocusNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -234,18 +232,6 @@ class NoteController {
     User user = authorizationService.getCurrentUser();
 
     return graphRAGService.retrieve(note, tokenLimit, user);
-  }
-
-  @GetMapping("/{note}/descendants")
-  public GraphRAGResult getDescendants(@PathVariable("note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(note);
-    FocusNote focus = FocusNote.fromNote(note);
-    List<BareNote> descendants =
-        note.getAllDescendants().map(BareNote::fromNoteWithoutTruncate).toList();
-    GraphRAGResult result = new GraphRAGResult(focus);
-    result.getRelatedNotes().addAll(descendants);
-    return result;
   }
 
   @PostMapping(value = "/{note}/verify-spelling")

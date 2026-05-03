@@ -2,30 +2,10 @@
   <div class="daisy-card">
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
-      <!-- Descendants Export -->
-      <details :open="expandedDescendants" class="daisy-collapse daisy-bg-base-200 daisy-rounded-box daisy-mt-4">
-        <summary
-          class="daisy-flex daisy-items-center daisy-gap-2 daisy-underline daisy-cursor-pointer daisy-py-2 daisy-px-1"
-          @click="toggleExpanded('descendants', $event)"
-        >
-          <svg :class="['daisy-transition-transform', 'daisy-duration-200', expandedDescendants ? 'daisy-rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          Export Descendants (JSON)
-        </summary>
-        <div v-if="expandedDescendants" class="daisy-mt-4">
-          <JsonExportSection
-            :json-data="jsonDescendants"
-            :filename="`note-${note.id}-descendants`"
-            textarea-test-id="descendants-json-textarea"
-            copy-button-test-id="copy-json-btn-descendants"
-            download-button-test-id="download-json-btn-descendants"
-          />
-        </div>
-      </details>
-      <!-- Graph Export -->
       <details :open="expandedGraph" class="daisy-collapse daisy-bg-base-200 daisy-rounded-box daisy-mt-4">
         <summary
           class="daisy-flex daisy-items-center daisy-gap-2 daisy-underline daisy-cursor-pointer daisy-py-2 daisy-px-1"
-          @click="toggleExpanded('graph', $event)"
+          @click="toggleGraphExpanded($event)"
         >
           <svg :class="['daisy-transition-transform', 'daisy-duration-200', expandedGraph ? 'daisy-rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           Export Note Graph (JSON)
@@ -77,26 +57,10 @@ import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
 
-const expandedDescendants = ref(false)
 const expandedGraph = ref(false)
-const jsonDescendants = ref("")
 const jsonGraph = ref("")
 const tokenLimit = ref(2000)
 const loadingGraph = ref(false)
-
-watch(
-  () => expandedDescendants.value,
-  async (val) => {
-    if (val && !jsonDescendants.value) {
-      const { data: descendants, error } = await NoteController.getDescendants({
-        path: { note: props.note.id },
-      })
-      if (!error && descendants) {
-        jsonDescendants.value = JSON.stringify(descendants, null, 2)
-      }
-    }
-  }
-)
 
 watch(
   () => expandedGraph.value,
@@ -123,10 +87,8 @@ function refreshGraph() {
   fetchGraph()
 }
 
-function toggleExpanded(which: "descendants" | "graph", event: Event) {
+function toggleGraphExpanded(event: Event) {
   event.preventDefault()
-  if (which === "descendants")
-    expandedDescendants.value = !expandedDescendants.value
-  if (which === "graph") expandedGraph.value = !expandedGraph.value
+  expandedGraph.value = !expandedGraph.value
 }
 </script>

@@ -626,13 +626,5 @@ class NoteControllerTests extends ControllerTestBase {
           UnexpectedNoAccessRightException.class,
           () -> controller.getGraph(unauthorizedNote, 5000));
     }
-
-    @Test
-    void shouldThrowWhenUserDoesNotOwnTheNote() {
-      User otherUser = makeMe.aUser().please();
-      Note otherUsersNote = makeMe.aNote().creatorAndOwner(otherUser).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.getDescendants(otherUsersNote));
-    }
   }
 }

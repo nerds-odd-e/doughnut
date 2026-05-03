@@ -3252,24 +3252,6 @@ export type GetGraphResponses = {
 
 export type GetGraphResponse = GetGraphResponses[keyof GetGraphResponses];
 
-export type GetDescendantsData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/descendants';
-};
-
-export type GetDescendantsResponses = {
-    /**
-     * OK
-     */
-    200: GraphRagResult;
-};
-
-export type GetDescendantsResponse = GetDescendantsResponses[keyof GetDescendantsResponses];
-
 export type ShowNoteAccessoryData = {
     body?: never;
     path: {

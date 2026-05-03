@@ -240,7 +240,6 @@ public class Note extends EntityIdentifiedByIdOnly {
       if (parentNote.children.stream().noneMatch(c -> c == this)) {
         parentNote.children.add(this);
       }
-      getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
     }
     setUpdatedAt(currentUTCTimestamp);
     setTitle(title);
