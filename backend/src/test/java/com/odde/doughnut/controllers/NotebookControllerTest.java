@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -102,7 +103,10 @@ class NotebookControllerTest extends ControllerTestBase {
       NotebookClientView response = controller.createNotebook(noteCreation);
       assertThat(response.notebook().getId(), notNullValue());
       notebookRepository.findById(response.notebook().getId()).orElseThrow();
-      assertThat(noteRepository.countByNotebook_Id(response.notebook().getId()), equalTo(0L));
+      assertThat(
+          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
+              response.notebook().getId()),
+          empty());
     }
 
     @Test
@@ -222,7 +226,10 @@ class NotebookControllerTest extends ControllerTestBase {
       createNb.setNewTitle("Notebook WithoutIndex");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-      assertThat(noteRepository.countByNotebook_Id(redirect.notebook().getId()), equalTo(0L));
+      assertThat(
+          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
+              redirect.notebook().getId()),
+          empty());
 
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Root One");
@@ -316,9 +323,7 @@ class NotebookControllerTest extends ControllerTestBase {
       Note anchor = noteRepository.findById(anchorId).orElseThrow();
       Note childInRootScope = makeMe.aNote("Child no folder").under(anchor).please();
 
-      assertTrue(
-          noteRepository.findNotebookRootNotesByNotebookId(nb.getId()).stream()
-              .noneMatch(n -> n.getId().equals(childInRootScope.getId())));
+      assertThat(childInRootScope.getParent().getId(), equalTo(anchorId));
 
       FolderListing listing = controller.listNotebookRootNotes(nb);
       assertTrue(

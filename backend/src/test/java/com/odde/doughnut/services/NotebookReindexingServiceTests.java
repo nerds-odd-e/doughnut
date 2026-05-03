@@ -40,7 +40,8 @@ class NotebookReindexingServiceTests {
   void setup() {
     // Service removed; tests below will use noteEmbeddingService directly where applicable
     notebook = makeMe.aNotebook().please();
-    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    Note root =
+        noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebook.getId()).getFirst();
     makeMe.aNote().underSameNotebookAs(root).please();
     makeMe.aNote().underSameNotebookAs(root).please();
     makeMe.refresh(notebook);

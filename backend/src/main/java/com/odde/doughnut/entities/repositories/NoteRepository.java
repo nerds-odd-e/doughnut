@@ -11,14 +11,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
-  long countByNotebook_Id(Integer notebookId);
-
   String selectFromNote = "SELECT n FROM Note n";
   String searchForTitleLike = " WHERE n.title LIKE :pattern AND n.deletedAt IS NULL ";
   String searchForTitleExact = " WHERE LOWER(n.title) = LOWER(:key) AND n.deletedAt IS NULL ";
-
-  @Query(value = selectFromNote + " where n.title = :key")
-  Note findFirstByTitle(@Param("key") String key);
 
   @Query(
       value =
@@ -77,13 +72,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
-              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.parent IS NULL"
-              + " ORDER BY n.id ASC")
-  List<Note> findNotebookRootNotesByNotebookId(@Param("notebookId") Integer notebookId);
-
-  @Query(
-      value =
-          selectFromNote
               + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.folder IS NULL"
               + " ORDER BY n.siblingOrder ASC, n.id ASC")
   List<Note> findNotesInNotebookRootFolderScopeByNotebookId(
@@ -136,36 +124,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(
       value =
-          selectFromNote
-              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL ORDER BY n.id ASC")
-  List<Note> findAllNonDeletedNotesByNotebookIdOrderByIdAsc(
-      @Param("notebookId") Integer notebookId);
-
-  @Query(value = selectFromNote + " WHERE n.parent.id = :parentId")
-  List<Note> findAllByParentId(@Param("parentId") Integer parentId);
-
-  @Query("SELECT COUNT(n) FROM Note n WHERE n.deletedAt IS NULL")
-  long countNonDeletedNotes();
-
-  @Query(
-      "SELECT n.id FROM Note n WHERE n.deletedAt IS NULL "
-          + "AND (:exclusiveAfter IS NULL OR n.id > :exclusiveAfter) "
-          + "ORDER BY n.id ASC")
-  List<Integer> findNonDeletedNoteIdsExclusiveAfterAsc(
-      @Param("exclusiveAfter") Integer exclusiveAfter, Pageable pageable);
-
-  @Query(
-      value =
           "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
               + "LEFT JOIN FETCH n.parent WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
-
-  @Query(
-      value =
-          "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
-              + "WHERE n.deletedAt IS NULL "
-              + "ORDER BY n.notebook.id ASC, n.folder.id ASC NULLS LAST, n.id ASC")
-  List<Note> findAllNonDeletedNotesOrderByNotebookFolderAndId();
 
   Optional<Note> findFirstByParent_IdAndFolderIsNotNullAndDeletedAtIsNullOrderByIdAsc(
       Integer parentId);

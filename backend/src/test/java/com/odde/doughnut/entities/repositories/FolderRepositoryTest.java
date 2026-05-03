@@ -56,7 +56,8 @@ class FolderRepositoryTest {
   void persistsNoteWithFolderReference() {
     Notebook notebook = makeMe.aNotebook().please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
-    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    Note root =
+        noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebook.getId()).getFirst();
     Note note = makeMe.aNote().folder(folder).please();
     makeMe.entityPersister.flush();
 
@@ -79,7 +80,8 @@ class FolderRepositoryTest {
 
   void nestedFoldersMirrorContainmentHierarchyForNotes() {
     Notebook notebook = makeMe.aNotebook().please();
-    Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
+    Note root =
+        noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebook.getId()).getFirst();
     Folder folderForRootChildren =
         makeMe.aFolder().notebook(notebook).name(root.getTitle()).please();
     Folder folderForSectionChildren =

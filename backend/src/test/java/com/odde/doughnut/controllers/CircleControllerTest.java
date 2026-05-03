@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,7 +83,10 @@ class CircleControllerTest extends ControllerTestBase {
       assertThat(response.notebook().getId(), notNullValue());
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), equalTo("Circle catalog blurb"));
-      assertThat(noteRepository.countByNotebook_Id(response.notebook().getId()), equalTo(0L));
+      assertThat(
+          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
+              response.notebook().getId()),
+          empty());
     }
   }
 
