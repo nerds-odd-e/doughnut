@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
@@ -22,35 +21,6 @@ public final class RelationshipNoteMarkdownFormatter {
       return relationKebabFromLabel(RelationType.RELATED_TO.label);
     }
     return t.toLowerCase().replaceAll("\\s+", "-");
-  }
-
-  public static String extractUserSuffixFromRelationshipDetails(String details) {
-    NoteDetailsMarkdown.LeadingFrontmatter frontmatter =
-        NoteDetailsMarkdown.splitLeadingFrontmatter(details).orElse(null);
-    if (frontmatter == null) {
-      return null;
-    }
-    if (!frontmatter.yamlRaw().contains("type: relationship")) {
-      return null;
-    }
-    String body = frontmatter.body();
-    if (body.startsWith("\n")) {
-      body = body.substring(1);
-    }
-    int firstNl = body.indexOf('\n');
-    if (firstNl < 0) {
-      return null;
-    }
-    String rest = body.substring(firstNl + 1);
-    if (rest.isEmpty()) {
-      return null;
-    }
-    if (rest.startsWith("\n\n")) {
-      rest = rest.substring(2);
-    } else if (rest.startsWith("\n")) {
-      rest = rest.substring(1);
-    }
-    return trimmedOrNull(rest);
   }
 
   public static String format(

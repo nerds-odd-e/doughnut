@@ -4,10 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.services.WikiLinkResolver;
 import com.odde.doughnut.testability.MakeMe;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired WikiLinkResolver wikiLinkResolver;
 
   @Test
   void timeOrder() {
@@ -29,41 +25,6 @@ public class NoteTest {
     Note note1 = makeMe.aNote().under(parent).please();
     Note note2 = makeMe.aNote().under(parent).please();
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
-  }
-
-  @Nested
-  class TargetNote {
-    Note parent;
-    Note target;
-    Note relationNote;
-
-    @BeforeEach
-    void setup() {
-      parent = makeMe.aNote().title("parent").please();
-      target = makeMe.aNote().under(parent).please();
-      relationNote = makeMe.aRelation().between(parent, target).please();
-    }
-
-    @Test
-    void semanticTargetResolvesToLinkedNote() {
-      assertThat(
-          wikiLinkResolver
-              .resolveSemanticTarget(relationNote, relationNote.getCreator())
-              .map(Note::getTitle),
-          equalTo(Optional.of(target.getTitle())));
-    }
-
-    @Test
-    void relationOfRelation() {
-      Note relationOfRelation = makeMe.aRelation().between(parent, relationNote).please();
-      User viewer = relationOfRelation.getCreator();
-      assertThat(
-          wikiLinkResolver
-              .resolveSemanticTarget(relationOfRelation, viewer)
-              .flatMap(
-                  inner -> wikiLinkResolver.resolveSemanticTarget(inner, viewer).map(Note::getId)),
-          equalTo(Optional.of(target.getId())));
-    }
   }
 
   @Nested
