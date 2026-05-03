@@ -78,9 +78,15 @@ class NoteControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().creatorAndOwner(user).title("root-head").please();
-      Note matched = makeMe.aNote().title("LinkedPage").under(root).please();
+      Note matched =
+          makeMe.aNote().title("LinkedPage").creator(user).inNotebook(root.getNotebook()).please();
       Note viewer =
-          makeMe.aNote().under(root).details("Text [[LinkedPage]] and [[NoSuch]].").please();
+          makeMe
+              .aNote()
+              .creator(user)
+              .inNotebook(root.getNotebook())
+              .details("Text [[LinkedPage]] and [[NoSuch]].")
+              .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
@@ -93,12 +99,19 @@ class NoteControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note headTarget = makeMe.aNote().creatorAndOwner(user).title("Other Notebook").please();
-      Note targetInOther = makeMe.aNote().title("LinkedPage").under(headTarget).please();
+      Note targetInOther =
+          makeMe
+              .aNote()
+              .title("LinkedPage")
+              .creator(user)
+              .inNotebook(headTarget.getNotebook())
+              .please();
       Note headSource = makeMe.aNote().creatorAndOwner(user).title("Main").please();
       Note viewer =
           makeMe
               .aNote()
-              .under(headSource)
+              .creator(user)
+              .inNotebook(headSource.getNotebook())
               .details("See [[Other Notebook:LinkedPage]] for more.")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
@@ -113,12 +126,22 @@ class NoteControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
       Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).title("Secret Notebook").please();
-      makeMe.aNote().title("Hidden Note").under(headSecret).please();
+      makeMe
+          .aNote()
+          .title("Hidden Note")
+          .creator(otherUser)
+          .inNotebook(headSecret.getNotebook())
+          .please();
 
       User viewerUser = currentUser.getUser();
       Note headSource = makeMe.aNote().creatorAndOwner(viewerUser).title("My Notebook").please();
       Note viewer =
-          makeMe.aNote().under(headSource).details("Try [[Secret Notebook:Hidden Note]].").please();
+          makeMe
+              .aNote()
+              .creator(viewerUser)
+              .inNotebook(headSource.getNotebook())
+              .details("Try [[Secret Notebook:Hidden Note]].")
+              .please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), empty());
     }
@@ -127,13 +150,20 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note fromFm = makeMe.aNote().title("FrontmatterTarget").under(root).please();
+      Note fromFm =
+          makeMe
+              .aNote()
+              .title("FrontmatterTarget")
+              .creator(user)
+              .inNotebook(root.getNotebook())
+              .please();
       String details =
           "---\n"
               + "see: Summary with [[FrontmatterTarget]]\n"
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
-      Note viewer = makeMe.aNote().under(root).details(details).please();
+      Note viewer =
+          makeMe.aNote().creator(user).inNotebook(root.getNotebook()).details(details).please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
@@ -279,8 +309,8 @@ class NoteControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      subject = makeMe.aNote().under(parent).please();
-      child = makeMe.aNote("child").under(subject).please();
+      subject = makeMe.aNote().asFirstChildOf(parent).please();
+      child = makeMe.aNote("child").asFirstChildOf(subject).please();
     }
 
     @Test
@@ -299,7 +329,7 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldSoftDeleteSubjectWithoutRemovingSiblingUnderParent()
         throws UnexpectedNoAccessRightException {
-      makeMe.aNote("silbling").under(parent).please();
+      makeMe.aNote("silbling").asFirstChildOf(parent).please();
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(1));
       assertThat(parent.getAllDescendants().toList(), hasSize(1));
@@ -309,7 +339,7 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotSoftDeleteStructuralDescendantsWhenNoteIsDeleted()
         throws UnexpectedNoAccessRightException {
-      Note grandchild = makeMe.aNote("grandchild").under(child).please();
+      Note grandchild = makeMe.aNote("grandchild").asFirstChildOf(child).please();
       makeMe.refresh(parent);
 
       controller.deleteNote(subject);
@@ -494,7 +524,8 @@ class NoteControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      note = makeMe.aNote().under(parent).please();
+      note =
+          makeMe.aNote().creator(currentUser.getUser()).inNotebook(parent.getNotebook()).please();
     }
 
     @Test
@@ -509,7 +540,12 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void shouldNotUpdateWikidataIdIfParentNoteSameWikidataId() {
-      makeMe.aNote().under(parent).wikidataId(noteWikidataId).please();
+      makeMe
+          .aNote()
+          .creator(currentUser.getUser())
+          .inNotebook(parent.getNotebook())
+          .wikidataId(noteWikidataId)
+          .please();
 
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = noteWikidataId;
@@ -524,7 +560,13 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldClearWikidataIdWhenEmptyStringProvided()
         throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
-      note = makeMe.aNote().under(parent).wikidataId("Q123").please();
+      note =
+          makeMe
+              .aNote()
+              .creator(currentUser.getUser())
+              .inNotebook(parent.getNotebook())
+              .wikidataId("Q123")
+              .please();
 
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "";
@@ -607,7 +649,7 @@ class NoteControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       rootNote = makeMe.aNote("Root").creatorAndOwner(currentUser.getUser()).please();
-      child1 = makeMe.aNote("Child 1").under(rootNote).please();
+      child1 = makeMe.aNote("Child 1").asFirstChildOf(rootNote).please();
       makeMe.refresh(rootNote);
     }
 
@@ -636,7 +678,7 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnAllDescendants() throws UnexpectedNoAccessRightException {
-      Note grandchild = makeMe.aNote("Grandchild").under(child1).please();
+      Note grandchild = makeMe.aNote("Grandchild").asFirstChildOf(child1).please();
       makeMe.refresh(rootNote);
       GraphRAGResult result = controller.getDescendants(rootNote);
       assertThat(result.getFocusNote().getUri(), equalTo("[[Root]]"));
