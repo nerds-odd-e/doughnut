@@ -48,6 +48,14 @@ function expandFolderRowIfCollapsed(segment: string) {
     })
   })
   pageIsNotLoading()
+  cy.get('aside').within(() => {
+    folderRowByExactLabel(label).within(() => {
+      cy.get('.title-text', { timeout: 20000 }).should(
+        'have.length.at.least',
+        1
+      )
+    })
+  })
 }
 
 export const noteSidebar = () => {
@@ -177,7 +185,7 @@ export const noteSidebar = () => {
     navigateToNote(noteTopology: string) {
       pageIsNotLoading()
       cy.get('aside').within(() => {
-        cy.findByText(noteTopology, { selector: '.title-text' })
+        cy.findByText(noteTopology, { selector: '.title-text', exact: false })
           .should('be.visible')
           .click()
       })

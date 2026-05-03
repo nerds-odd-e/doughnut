@@ -10,9 +10,9 @@ Feature: Understanding Check
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Sample tree" with notes:
-      | Title  | Parent Title | Folder | Details        |
-      | Parent |              |        | |
-      | Sample | Parent       | Parent | A. B. C. D. E. |
+      | Title  | Folder  | Details        |
+      | Parent |         | |
+      | Sample | Context | A. B. C. D. E. |
     And OpenAI generates understanding checklist with points:
       | A |
       | B |
@@ -42,7 +42,7 @@ Feature: Understanding Check
     When I am assimilating the note "Sample"
     And I should see an understanding checklist with 5 points
     And I promote the point "B" to a sibling note
-    Then I should see folder "Sample tree/Parent" containing these notes:
+    Then I should see folder "Sample tree/Context" containing these notes:
       | note-title |
       | Sample     |
       | Point B    |

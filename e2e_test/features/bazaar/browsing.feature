@@ -3,15 +3,15 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner" in notebook "Geometry set"
-      | Title            | Details                          | Parent Title|
-      | Shape            | The form of something            |             |
-      | Rectangle        | four equal straight sides        | Shape       |
-      | Triangle         | three sides shape                | Shape       |
-      | Square           | a square but big                 | Rectangle   |
-      | In OOP           | a square is not a Rectangle      | Rectangle   |
-      | interface        | their interfaces are different   | In OOP      |
-      | precondition     | square has stronger precondition | In OOP      |
-      | Shapes are good  |                                  | Shape       |
+      | Title            | Details                          | Folder              |
+      | Shape            | The form of something            |                     |
+      | Rectangle        | four equal straight sides        | Topics              |
+      | Triangle         | three sides shape                | Topics              |
+      | Square           | a square but big                 | Topics/Nested       |
+      | In OOP           | a square is not a Rectangle      | Topics/Nested       |
+      | interface        | their interfaces are different   | Topics/Nested/Oop   |
+      | precondition     | square has stronger precondition | Topics/Nested/Oop   |
+      | Shapes are good  |                                  | Topics              |
     And there is "a specialization of" relationship between note "Square" and "Rectangle"
     And notebook "Geometry set" is shared to the Bazaar
 
@@ -21,6 +21,6 @@ Feature: Bazaar browsing
     When I open the notebook "Geometry set" in the Bazaar
     Then there shouldn't be any note edit button
     And I should see "Bazaar" in breadcrumb
-    When I navigate to "Bazaar/Geometry set/Shape/Rectangle" note
+    When I navigate to "Bazaar/Geometry set/Topics/Rectangle" note
     Then there shouldn't be any note edit button
     And I should see it has relationship to "Square a specialization of Rectangle"

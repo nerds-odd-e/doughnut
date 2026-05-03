@@ -103,7 +103,13 @@ Given(
 Given(
   'there are some notes for existing user {string} in notebook {string}',
   (externalIdentifier: string, notebookName: string, data: DataTable) => {
-    const hashes = data.hashes()
+    const hashes = data
+      .hashes()
+      .map((row) =>
+        Object.fromEntries(
+          Object.entries(row).map(([key, value]) => [key.trim(), value])
+        )
+      )
     start.testability().injectNotes(hashes, externalIdentifier, notebookName)
   }
 )
