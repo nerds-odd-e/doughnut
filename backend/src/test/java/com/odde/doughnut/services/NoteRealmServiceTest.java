@@ -264,7 +264,7 @@ class NoteRealmServiceTest {
     Folder outer = makeMe.aFolder().notebook(root.getNotebook()).name("Outer").please();
     Folder inner =
         makeMe.aFolder().notebook(root.getNotebook()).parentFolder(outer).name("Inner").please();
-    Note inFolder = makeMe.aNote().creatorAndOwner(user).under(root).folder(inner).please();
+    Note inFolder = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
 
     NoteRealm realm = noteRealmService.build(inFolder, user);
 

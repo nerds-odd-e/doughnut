@@ -37,10 +37,23 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder inNotebook(Notebook notebook) {
-    if (entity.getNotebook() != null)
-      throw new AssertionError("Notebook already set for `" + entity + "`.");
-    entity.assignNotebook(notebook);
-    return this;
+    if (entity.getNotebook() == null) {
+      entity.assignNotebook(notebook);
+      return this;
+    }
+    if (sameNotebook(entity.getNotebook(), notebook)) {
+      return this;
+    }
+    throw new AssertionError("Notebook already set for `" + entity + "`.");
+  }
+
+  private static boolean sameNotebook(Notebook existing, Notebook requested) {
+    if (existing == requested) {
+      return true;
+    }
+    Integer existingId = existing.getId();
+    Integer requestedId = requested.getId();
+    return existingId != null && existingId.equals(requestedId);
   }
 
   public NoteBuilder creatorAndOwner(User user) {
@@ -154,6 +167,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder folder(Folder folder) {
     this.folder = folder;
+    inNotebook(folder.getNotebook());
     return this;
   }
 

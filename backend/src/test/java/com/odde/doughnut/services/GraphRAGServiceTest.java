@@ -111,7 +111,7 @@ public class GraphRAGServiceTest {
       Notebook notebook = parent.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("parent-child-peers").please();
       parent = makeMe.theNote(parent).folder(peerFolder).please();
-      note = makeMe.aNote().under(parent).folder(peerFolder).please();
+      note = makeMe.aNote().folder(peerFolder).please();
     }
 
     @Test
