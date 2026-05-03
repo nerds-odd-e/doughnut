@@ -208,8 +208,8 @@ public class AssimilationServiceTest {
     void setup() {
       User anotherUser = makeMe.aUser().please();
       Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().under(top).please();
-      note2 = makeMe.aNote().under(top).please();
+      note1 = makeMe.aNote().underSameNotebookAs(top).please();
+      note2 = makeMe.aNote().underSameNotebookAs(top).please();
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
       makeMe.refresh(user);
     }
@@ -267,10 +267,10 @@ public class AssimilationServiceTest {
       // Set up subscription notes
       User anotherUser = makeMe.aUser().please();
       Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().under(top).please();
-      note2 = makeMe.aNote().under(top).please();
-      note3 = makeMe.aNote().under(top).please();
-      note4 = makeMe.aNote().under(top).please();
+      note1 = makeMe.aNote().underSameNotebookAs(top).please();
+      note2 = makeMe.aNote().underSameNotebookAs(top).please();
+      note3 = makeMe.aNote().underSameNotebookAs(top).please();
+      note4 = makeMe.aNote().underSameNotebookAs(top).please();
 
       // Set up subscription with daily limit of 1
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();

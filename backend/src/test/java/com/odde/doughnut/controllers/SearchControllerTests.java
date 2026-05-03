@@ -176,8 +176,9 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnMatchingNotesInRelationToReference() throws UnexpectedNoAccessRightException {
-      Note child1 = makeMe.aNote("Child Java Note").under(referenceNote).please();
-      Note child2 = makeMe.aNote("Child JavaScript Note").under(referenceNote).please();
+      Note child1 = makeMe.aNote("Child Java Note").underSameNotebookAs(referenceNote).please();
+      Note child2 =
+          makeMe.aNote("Child JavaScript Note").underSameNotebookAs(referenceNote).please();
       Note unrelated =
           makeMe.aNote("Unrelated Java Note").creatorAndOwner(currentUser.getUser()).please();
 
@@ -199,8 +200,8 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldRespectSearchScopeSettingsWithinRelation() throws UnexpectedNoAccessRightException {
-      Note child1 = makeMe.aNote("Local Child Note").under(referenceNote).please();
-      Note child2 = makeMe.aNote("Shared Child Note").under(referenceNote).please();
+      Note child1 = makeMe.aNote("Local Child Note").underSameNotebookAs(referenceNote).please();
+      Note child2 = makeMe.aNote("Shared Child Note").underSameNotebookAs(referenceNote).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Child");

@@ -128,7 +128,10 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
           makeMe.aRootNote("My reading list").creatorAndOwner(currentUser.getUser()).please();
       makeMe.theNote(rootNote).withNChildren(10).please();
       noteWithoutQuestions =
-          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(rootNote).please();
+          makeMe
+              .aNote("Zen and the Art of Motorcycle Maintenance")
+              .underSameNotebookAs(rootNote)
+              .please();
       Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser.getUser()).please();
       noteWithQuestions = makeMe.theNote(lila).hasAnApprovedQuestion().please();
     }

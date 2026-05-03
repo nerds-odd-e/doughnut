@@ -114,9 +114,9 @@ class TextContentControllerTests extends ControllerTestBase {
     void refreshesWikiTitleCacheWhenDetailsContainResolvedWikiLink()
         throws UnexpectedNoAccessRightException {
       Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      Note onlyA = makeMe.aNote().title("OnlyA").under(root).please();
-      makeMe.aNote().title("OnlyB").under(root).please();
-      Note carrier = makeMe.aNote().under(root).please();
+      Note onlyA = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
+      makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
       noteUpdateDetailsDTO.setDetails("[[OnlyA]]");
       NoteRealm response = controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
@@ -137,9 +137,9 @@ class TextContentControllerTests extends ControllerTestBase {
     void replacingWikiLinkUpdatesNoteRealmWikiTitlesAndPersistedCache()
         throws UnexpectedNoAccessRightException {
       Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aNote().title("OnlyA").under(root).please();
-      Note onlyB = makeMe.aNote().title("OnlyB").under(root).please();
-      Note carrier = makeMe.aNote().under(root).please();
+      makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
+      Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
       noteUpdateDetailsDTO.setDetails("[[OnlyA]]");
       controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
@@ -162,8 +162,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void clearsWikiTitleCacheWhenDetailsBecomeBlank() throws UnexpectedNoAccessRightException {
       Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aNote().title("OnlyA").under(root).please();
-      Note carrier = makeMe.aNote().under(root).please();
+      makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
       noteUpdateDetailsDTO.setDetails("[[OnlyA]]");
       controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);

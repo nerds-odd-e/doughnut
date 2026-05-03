@@ -62,6 +62,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
+  public NoteBuilder underSameNotebookAs(Note note) {
+    return inNotebook(note.getNotebook());
+  }
+
   public NoteBuilder under(Note parentNote) {
     User user = entity.getCreator() != null ? entity.getCreator() : parentNote.getCreator();
     Timestamp createdAt = entity.getCreatedAt();

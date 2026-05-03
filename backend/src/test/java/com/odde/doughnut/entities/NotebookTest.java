@@ -29,14 +29,14 @@ class NotebookTest {
   class NotesManagementTests {
     @Test
     void shouldIncludeAllNonDeletedNotesInNotebook() {
-      makeMe.aNote().under(rootNote).please();
+      makeMe.aNote().underSameNotebookAs(rootNote).please();
       makeMe.refresh(notebook);
       assertThat(notebook.getNotes().size()).isEqualTo(2);
     }
 
     @Test
     void shouldExcludeSoftDeletedNotesFromNotebook() {
-      makeMe.aNote().under(rootNote).softDeleted().please();
+      makeMe.aNote().underSameNotebookAs(rootNote).softDeleted().please();
       makeMe.refresh(notebook);
       assertThat(notebook.getNotes().size()).isEqualTo(1);
     }

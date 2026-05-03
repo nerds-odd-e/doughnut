@@ -1,23 +1,48 @@
 import { pageIsNotLoading } from '../pageBase'
 import noteCreationForm from './noteForms/noteCreationForm'
 
-const sidebarNoteTitleClickTimeoutMs = 20000
+const sidebarActionTimeoutMs = 20000
 
-/** Retries until a note row with this exact title exists (avoids `.filter` timing out when other `.title-text` nodes exist first). */
-function clickSidebarNoteTitleExact(label: string) {
-  const trimmed = label.trim()
-  cy.get('aside').within(() => {
-    cy.get('.title-text', { timeout: sidebarNoteTitleClickTimeoutMs }).should(
-      ($els) => {
-        const titles = [...$els].map((el) => el.textContent?.trim())
-        expect(
-          titles.some((t) => t === trimmed),
-          `sidebar should list note "${trimmed}" (have: ${titles.join(', ')})`
-        ).to.be.true
-      }
+const trimmedText = (el: Element) => el.textContent?.trim() ?? ''
+
+/** Cypress/jQuery filter: element text equals `label` after trim. */
+const matchesExactLabel = (label: string) => (_: number, el: HTMLElement) =>
+  trimmedText(el) === label.trim()
+
+type AsideSegmentKind = 'folder' | 'note'
+
+function asideSegmentKind(
+  aside: HTMLElement,
+  label: string
+): AsideSegmentKind | null {
+  const t = label.trim()
+  if (
+    [...aside.querySelectorAll('.sidebar-folder-label')].some(
+      (el) => trimmedText(el) === t
     )
-    cy.get('.title-text', { timeout: sidebarNoteTitleClickTimeoutMs })
-      .filter((_, el) => el.textContent?.trim() === trimmed)
+  ) {
+    return 'folder'
+  }
+  if (
+    [...aside.querySelectorAll('.title-text')].some(
+      (el) => trimmedText(el) === t
+    )
+  ) {
+    return 'note'
+  }
+  return null
+}
+
+function withinAside(fn: () => void) {
+  cy.get('aside').within(fn)
+}
+
+function clickSidebarNoteTitleExact(label: string) {
+  const t = label.trim()
+  withinAside(() => {
+    cy.get('.title-text', { timeout: sidebarActionTimeoutMs })
+      .filter(matchesExactLabel(t))
+      .should('have.length.at.least', 1)
       .first()
       .should('be.visible')
       .click()
@@ -47,11 +72,11 @@ function openSidebarIfCollapsed() {
   cy.get('aside').should('be.visible')
 }
 
-/** Exact label on `.sidebar-folder-label`, visible, deepest match (mirrors structural tree). */
+/** Deepest visible `.sidebar-folder-label` row matching `folderLabel`. */
 function folderRowByExactLabel(folderLabel: string) {
   return cy
     .get('.sidebar-folder-label')
-    .filter((_, el) => el.textContent?.trim() === folderLabel.trim())
+    .filter(matchesExactLabel(folderLabel))
     .filter(':visible')
     .last()
     .should('be.visible')
@@ -61,7 +86,7 @@ function folderRowByExactLabel(folderLabel: string) {
 function expandFolderRowIfCollapsed(segment: string) {
   pageIsNotLoading()
   const label = segment.trim()
-  cy.get('aside').within(() => {
+  withinAside(() => {
     folderRowByExactLabel(label).then(($li) => {
       if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
         cy.wrap($li).within(() => {
@@ -71,16 +96,18 @@ function expandFolderRowIfCollapsed(segment: string) {
     })
   })
   pageIsNotLoading()
-  cy.get('aside').within(() => {
+  withinAside(() => {
     folderRowByExactLabel(label).within(() => {
-      // After expand, scope may list only nested folder rows (no `.title-text`) when the
-      // folder-named note was deleted but child folders/notes remain.
-      cy.get('ul.daisy-list-group li, .title-text', { timeout: 20000 }).should(
-        'have.length.at.least',
-        1
-      )
+      cy.get('ul.daisy-list-group li, .title-text', {
+        timeout: sidebarActionTimeoutMs,
+      }).should('have.length.at.least', 1)
     })
   })
+}
+
+function newNoteSidebarButton() {
+  pageIsNotLoading()
+  return sidebarAddNoteButton('New note')
 }
 
 export const noteSidebar = () => {
@@ -90,7 +117,7 @@ export const noteSidebar = () => {
     expand: (noteTopology: string) => expandFolderRowIfCollapsed(noteTopology),
 
     siblingOrder: (higher: string, lower: string) => {
-      cy.get('aside').within(() => {
+      withinAside(() => {
         cy.contains(higher).parent().parent().nextAll().contains(lower)
       })
     },
@@ -114,15 +141,9 @@ export const noteSidebar = () => {
       })
     },
 
-    addingNoteButton() {
-      pageIsNotLoading()
-      return sidebarAddNoteButton('New note')
-    },
+    addingNoteButton: newNoteSidebarButton,
 
-    addingChildNoteButton() {
-      pageIsNotLoading()
-      return sidebarAddNoteButton('New note')
-    },
+    addingChildNoteButton: newNoteSidebarButton,
 
     addingChildNote() {
       sidebarAddNoteButton('New note').click()
@@ -131,7 +152,7 @@ export const noteSidebar = () => {
 
     activateFolderByLabel(folderLabel: string) {
       pageIsNotLoading()
-      cy.get('aside').within(() => {
+      withinAside(() => {
         folderRowByExactLabel(folderLabel)
           .find('.sidebar-folder-label')
           .should('be.visible')
@@ -141,8 +162,7 @@ export const noteSidebar = () => {
     },
 
     addingNewNoteFromToolbar() {
-      pageIsNotLoading()
-      sidebarAddNoteButton('New note').click()
+      newNoteSidebarButton().click()
       return noteCreationForm
     },
 
@@ -163,38 +183,40 @@ export const noteSidebar = () => {
     ) {
       pageIsNotLoading()
       expandFolderRowIfCollapsed(parentFolderLabel)
-      cy.get('aside').within(() => {
+      withinAside(() => {
         folderRowByExactLabel(parentFolderLabel)
           .find('ul.daisy-list-group .sidebar-folder-label')
-          .filter((_, el) => el.textContent?.trim() === childFolderLabel.trim())
+          .filter(matchesExactLabel(childFolderLabel))
           .should('have.length.at.least', 1)
       })
     },
 
     /**
-     * One path segment after the notebook card: expand a matching folder row if present,
-     * otherwise navigate by clicking the note `.title-text` row.
+     * After the notebook card: expand a folder row for this segment, or open the note row.
+     * Waits for sidebar hydration so a folder label is not mistaken for a missing note title.
      */
     navigateStructuralIntermediate(segment: string) {
       pageIsNotLoading()
       const label = segment.trim()
 
-      cy.get('aside')
-        .then(($aside) => {
-          const root = $aside.get(0)
-          if (!root) throw new Error('aside not found')
-          return [...root.querySelectorAll('.sidebar-folder-label')].some(
-            (el) => el.textContent?.trim() === label
-          )
-        })
-        .then((hasMatchingFolderRow) => {
-          if (hasMatchingFolderRow) {
-            expandFolderRowIfCollapsed(segment)
-            return
-          }
+      cy.get('aside', { timeout: sidebarActionTimeoutMs }).should(($aside) => {
+        const root = $aside.get(0)
+        expect(root, 'aside').to.exist
+        expect(
+          asideSegmentKind(root!, label),
+          `sidebar should load "${label}" as folder or note row`
+        ).to.not.be.null
+      })
+
+      cy.get('aside').then(($aside) => {
+        const root = $aside.get(0)!
+        if (asideSegmentKind(root, label) === 'folder') {
+          expandFolderRowIfCollapsed(segment)
+        } else {
           clickSidebarNoteTitleExact(label)
           pageIsNotLoading()
-        })
+        }
+      })
     },
 
     expandStructuralIntermediateFolderOnly(segment: string) {
@@ -207,7 +229,6 @@ export const noteSidebar = () => {
       pageIsNotLoading()
     },
 
-    /** Child note rows (`li` with `.title-text`) under an expanded sidebar folder, in DOM order. */
     expectChildrenUnderFolder(
       folderLabel: string,
       children: Record<string, string>[]
@@ -220,7 +241,7 @@ export const noteSidebar = () => {
         throw new Error('each row must include note-title or Title')
       }
 
-      cy.get('aside').within(() => {
+      withinAside(() => {
         if (expected.length === 0) {
           folderRowByExactLabel(folderLabel)
             .children('ul.daisy-list-group')
@@ -245,7 +266,7 @@ export const noteSidebar = () => {
                 const value = elem[propName]!
                 if (propName === 'note-title' || propName === 'Title') {
                   cy.get('.title-text')
-                    .filter((_i, el) => el.textContent?.trim() === value)
+                    .filter(matchesExactLabel(value))
                     .should('have.length.at.least', 1)
                 } else {
                   cy.findByText(value)

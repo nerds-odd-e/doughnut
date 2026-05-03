@@ -59,7 +59,7 @@ public class UserModelSearchTest {
 
   @Test
   void theSearchIsCaseInsensitive() {
-    Note anotherNote = makeMe.aNote("Some Note").under(note).please();
+    Note anotherNote = makeMe.aNote("Some Note").underSameNotebookAs(note).please();
     searchTerm.setSearchKey("not");
     NoteTopology expected = anotherNote.getNoteTopology();
     assertThat(
@@ -71,7 +71,7 @@ public class UserModelSearchTest {
 
   @Test
   void theSearchResultShouldNotIncludeSoftDeletedNote() {
-    makeMe.aNote("Some Note").under(note).softDeleted().please();
+    makeMe.aNote("Some Note").underSameNotebookAs(note).softDeleted().please();
     searchTerm.setSearchKey("not");
     assertTrue(search().isEmpty());
   }
@@ -80,7 +80,7 @@ public class UserModelSearchTest {
   void searchResultShouldNotExceedTwenty() {
     String commonTitle = "CommonTitle";
     for (int i = 0; i < 25; i++) {
-      makeMe.aNote(commonTitle + i).under(note).please();
+      makeMe.aNote(commonTitle + i).underSameNotebookAs(note).please();
     }
     searchTerm.setSearchKey("CommonTitle");
     assertThat(RelationshipLiteralSearchHits.noteMatches(search()).size(), lessThanOrEqualTo(20));
@@ -107,7 +107,8 @@ public class UserModelSearchTest {
 
     @BeforeEach
     void setup() {
-      noteInTheSameNotebook = makeMe.aNote(commonPhrase + " same notebook").under(note).please();
+      noteInTheSameNotebook =
+          makeMe.aNote(commonPhrase + " same notebook").underSameNotebookAs(note).please();
       noteFromMyOtherNotebook =
           makeMe.aNote(commonPhrase + " other notebook").creatorAndOwner(user).please();
       Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();

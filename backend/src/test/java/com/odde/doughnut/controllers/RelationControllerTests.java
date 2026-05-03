@@ -48,7 +48,11 @@ class RelationControllerTests extends ControllerTestBase {
     @Test
     void moveNoteToFolderSuccessfully() throws UnexpectedNoAccessRightException {
       Note mover =
-          makeMe.aNote("mover").creatorAndOwner(currentUser.getUser()).under(ownNote).please();
+          makeMe
+              .aNote("mover")
+              .creatorAndOwner(currentUser.getUser())
+              .underSameNotebookAs(ownNote)
+              .please();
       var result = controller.moveNoteToFolder(mover, targetFolder);
       assertThat(result, hasSize(1));
       mover = noteRepository.findById(mover.getId()).orElseThrow();
@@ -106,7 +110,7 @@ class RelationControllerTests extends ControllerTestBase {
     void relationshipNoteHasDerivedTitle()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note source = makeMe.aNote("Tool").creatorAndOwner(currentUser.getUser()).please();
-      Note target = makeMe.aNote("Task").under(source).please();
+      Note target = makeMe.aNote("Task").underSameNotebookAs(source).please();
       relationshipCreation.relationType = RelationType.APPLICATION;
       var result =
           controller.addRelationshipFinalize(
