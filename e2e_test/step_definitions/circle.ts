@@ -23,6 +23,7 @@ When('I visit the invitation link', () => {
 
 When('I join the circle', () => {
   cy.get('input[value="Join"]').click()
+  cy.url().should('match', /\/d\/circles\/\d+/)
 })
 
 When(
