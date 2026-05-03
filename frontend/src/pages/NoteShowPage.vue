@@ -80,7 +80,7 @@ watch(
   }),
   ({ realm, noteId }) => {
     if (noteId != null && !Number.isNaN(noteId)) {
-      const nb = realm?.notebookId ?? realm?.note.noteTopology.notebookId
+      const nb = realm?.notebookId
       if (nb != null) {
         currentNotebookId.value = nb
       }
