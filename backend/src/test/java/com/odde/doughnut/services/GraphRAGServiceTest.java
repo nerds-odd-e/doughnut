@@ -58,15 +58,6 @@ public class GraphRAGServiceTest {
     }
   }
 
-  private void assertRelatedNotesExcludeNotes(GraphRAGResult result, Note... excludedNotes) {
-    for (Note note : excludedNotes) {
-      assertThat(
-          describeRelatedNotes(result),
-          result.getRelatedNotes().stream().anyMatch(b -> b.equals(note)),
-          is(false));
-    }
-  }
-
   private String describeRelatedNotes(GraphRAGResult result) {
     return result.getRelatedNotes().stream()
         .map(
@@ -339,10 +330,10 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenStructuralPeersUseFolderNotLegacyParentChildren {
+  class WhenStructuralPeersAreFolderScoped {
     @Test
-    void youngerAndOlderSiblingsIgnoreNoteThatSharesParentButNotFolder() {
-      Note parent = makeMe.aNote().title("Legacy parent").please();
+    void youngerAndOlderSiblingsExcludeNotesOutsideFolder() {
+      Note parent = makeMe.aNote().title("Notebook anchor").please();
       Notebook notebook = parent.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("graph-folder-peers").please();
       Note folderOlder =
@@ -406,8 +397,7 @@ public class GraphRAGServiceTest {
 
   /**
    * Wiki-link graph contract on serialized GraphRAG: folder crumb string on the focus note, {@code
-   * links} plus {@code inboundReferences}, folder peers in related notes, without treating the
-   * legacy note parent as graph expansion.
+   * links} plus {@code inboundReferences}, and folder-scoped peers in related notes.
    */
   @Nested
   class WikiLinkGraphContract {
@@ -422,20 +412,20 @@ public class GraphRAGServiceTest {
 
     @Test
     void serializedFocusNote_exposesLinksInboundRefsAndFolderCrumbString() {
-      Note treeParent = makeMe.aNote().title("713 Tree Parent").please();
-      Notebook notebook = treeParent.getNotebook();
-      User viewer = treeParent.getCreator();
+      Note anchor = makeMe.aNote().title("713 Folder Anchor").please();
+      Notebook notebook = anchor.getNotebook();
+      User viewer = anchor.getCreator();
       Folder outer = makeMe.aFolder().notebook(notebook).name("OuterCrumb").please();
       Folder inner =
           makeMe.aFolder().notebook(notebook).parentFolder(outer).name("InnerCrumb").please();
-      treeParent = makeMe.theNote(treeParent).folder(inner).please();
+      anchor = makeMe.theNote(anchor).folder(inner).please();
 
-      Note outgoing = makeMe.aNote().under(treeParent).folder(inner).title("713 Outgoing").please();
+      Note outgoing = makeMe.aNote().under(anchor).folder(inner).title("713 Outgoing").please();
 
       Note focus =
           makeMe
               .aNote()
-              .under(treeParent)
+              .under(anchor)
               .folder(inner)
               .title("713 Focus")
               .details("See [[713 Outgoing]].")
@@ -444,7 +434,7 @@ public class GraphRAGServiceTest {
       Note referrer =
           makeMe
               .aNote()
-              .under(treeParent)
+              .under(anchor)
               .folder(inner)
               .title("713 Referrer")
               .details("Ref [[713 Focus]].")
@@ -478,34 +468,6 @@ public class GraphRAGServiceTest {
       assertThat(
           jsonTextArrayElements(focusJson.get("inboundReferences")),
           hasItem(GraphNoteWikiUri.of(referrer, false)));
-    }
-
-    @Test
-    void relatedNotes_includeFolderPeersAndExcludeLegacyParentExpansion() {
-      Note treeParent = makeMe.aNote().title("713 Peer Tree Parent").please();
-      Folder inner =
-          makeMe.aFolder().notebook(treeParent.getNotebook()).name("713-peer-folder").please();
-      treeParent = makeMe.theNote(treeParent).folder(inner).please();
-
-      makeMe.aNote().under(treeParent).folder(inner).title("713 Peer Out Wiki").please();
-
-      Note focus =
-          makeMe
-              .aNote()
-              .under(treeParent)
-              .folder(inner)
-              .title("713 Peer Focus")
-              .details("[[713 Peer Out Wiki]].")
-              .please();
-      Note younger =
-          makeMe.aNote().under(treeParent).folder(inner).title("713 Peer Younger").please();
-
-      refreshWikiCache(focus);
-
-      GraphRAGResult result = graphRAGService.retrieve(focus, 3500, focus.getCreator());
-
-      assertRelatedNotesIncludeNotes(result, younger);
-      assertRelatedNotesExcludeNotes(result, treeParent);
     }
   }
 

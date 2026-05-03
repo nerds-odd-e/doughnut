@@ -8,7 +8,6 @@ import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,8 +52,7 @@ public class GraphRAGService {
                         .findFirst())
             .orElse(focusNote);
 
-    List<Note> focusStructuralPeers =
-        peersSharingTreeParent(focusNote, noteService.findStructuralPeerNotesInOrder(focusNote));
+    List<Note> focusStructuralPeers = noteService.findStructuralPeerNotesInOrder(focusNote);
     List<RelationshipHandler> handlers = new ArrayList<>();
     List<Note> referencesForViewer =
         wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer);
@@ -90,15 +88,5 @@ public class GraphRAGService {
           %s
           """
         .formatted(jsonString);
-  }
-
-  /**
-   * Folder scope lists every note in the folder; graph siblings are same tree-parent peers only.
-   */
-  private static List<Note> peersSharingTreeParent(Note note, List<Note> folderScopePeers) {
-    Note treeParent = note.getParent();
-    return folderScopePeers.stream()
-        .filter(p -> Objects.equals(p.getParent(), treeParent))
-        .toList();
   }
 }

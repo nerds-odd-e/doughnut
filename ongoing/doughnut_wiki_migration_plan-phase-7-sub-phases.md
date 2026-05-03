@@ -298,7 +298,7 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Status:** Sub-sub-phases **7.13.1**–**7.13.10** in the dedicated plan are complete. GraphRAG related-note expansion uses wiki inbound referrers, older/younger structural peers, and folder crumbs on the focus note only—no parent/child/ancestor graph handlers.
 
-**Post-condition (met):** Graph context uses folder peers and wiki references for expansion; no parent/child relationship handler remains. `FocusNote` exposes folder crumbs plus wiki `links` / `inboundReferences`; `BareNote` uses the simplified wiki-link URI shape. **`GraphRAGService`** still calls `Note.getParent()` only inside `peersSharingTreeParent` to subset same-folder peers by tree parent until `Note.parent` is removed in broader Phase 7 persistence work (see 7.13.10 notes in the 7.13 plan).
+**Post-condition (met):** Graph context uses folder peers and wiki references for expansion; no parent/child relationship handler remains. `FocusNote` exposes folder crumbs plus wiki `links` / `inboundReferences`; `BareNote` uses the simplified wiki-link URI shape. **`GraphRAGService`** uses folder-scoped peer lists from `NoteService.findStructuralPeerNotesInOrder` only (no `Note.getParent()` subsetting for structural siblings).
 
 **Work:** (Historical) Execute the 7.13 sub-sub-phases in the dedicated plan.
 

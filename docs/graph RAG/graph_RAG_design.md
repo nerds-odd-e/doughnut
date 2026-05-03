@@ -4,7 +4,7 @@
 
 In Doughnut, notes live in notebooks and optional folders. **GraphRAG** builds a bounded JSON snapshot for AI context: the **focus** note plus **related** notes that fit a token budget.
 
-Semantic links come from the **wiki title cache** (Phase 5): outgoing wiki targets and inbound referrers authorized for the viewer. Structural neighborhood is **folder-scoped**: older and younger “siblings” are peers that share the same note-tree parent within the folder peer list from `NoteService.findStructuralPeerNotesInOrder` (see `GraphRAGService.peersSharingTreeParent`). That parent pointer is used only to partition peers until Phase 7 removes `Note.parent` from persistence; it is **not** parent-neighborhood graph expansion.
+Semantic links come from the **wiki title cache** (Phase 5): outgoing wiki targets and inbound referrers authorized for the viewer. Structural neighborhood is **folder-scoped**: older and younger “siblings” are the ordered peer list from `NoteService.findStructuralPeerNotesInOrder` (same folder, or notebook root when the note has no folder), without further partitioning by `Note.parent`.
 
 There are no relationship notes as a separate graph entity: meaning lives in markdown/details, frontmatter, and wiki links.
 
