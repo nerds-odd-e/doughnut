@@ -51,7 +51,7 @@
     "@vue/server-renderer": "^3.5.33",
     "@vue/test-utils": "2.4.10",
     "autoprefixer": "^10.5.0",
-    "daisyui": "4.12.24",
+    "daisyui": "5.5.19",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.46.0",
     "esbuild": "0.28.0",
