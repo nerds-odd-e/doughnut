@@ -66,8 +66,9 @@ class NoteRealmServiceTest {
   void references_use_cache_rows_pointing_at_focal_same_notebook() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note carrier = makeMe.aNote().under(root).details("[[Focal]]").please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
+    Note carrier =
+        makeMe.aNote().creator(user).underSameNotebookAs(root).details("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -128,8 +129,9 @@ class NoteRealmServiceTest {
   void body_wikilink_carrier_in_references() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note carrier = makeMe.aNote().under(root).details("[[Focal]]").please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
+    Note carrier =
+        makeMe.aNote().creator(user).underSameNotebookAs(root).details("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -142,8 +144,8 @@ class NoteRealmServiceTest {
   void parent_yaml_carrier_appears_in_references() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note carrier = makeMe.aNote().title("Child").under(root).please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
+    Note carrier = makeMe.aNote().title("Child").creator(user).underSameNotebookAs(root).please();
     carrier.setDetails("---\nparent: \"[[Focal]]\"\n---\n\nBody.");
     makeMe.entityPersister.merge(carrier);
     makeMe.entityPersister.flush();
@@ -181,9 +183,9 @@ class NoteRealmServiceTest {
   void references_include_cross_notebook_carrier_when_viewer_can_refer() {
     User user = makeMe.aUser().please();
     Note headMain = makeMe.aNote().creatorAndOwner(user).title("MainNb").please();
-    Note focal = makeMe.aNote().title("Focal").under(headMain).please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(headMain).please();
     Note headOther = makeMe.aNote().creatorAndOwner(user).title("OtherNb").please();
-    Note carrier = makeMe.aNote().under(headOther).please();
+    Note carrier = makeMe.aNote().creator(user).underSameNotebookAs(headOther).please();
 
     NoteWikiTitleCache row = new NoteWikiTitleCache();
     row.setNote(carrier);
@@ -202,9 +204,10 @@ class NoteRealmServiceTest {
     User ownerFocal = makeMe.aUser().please();
     User ownerCarrier = makeMe.aUser().please();
     Note headMain = makeMe.aNote().creatorAndOwner(ownerFocal).title("MainNb").please();
-    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(headMain).please();
+    Note focal =
+        makeMe.aNote().title("Focal").creator(ownerFocal).underSameNotebookAs(headMain).please();
     Note headOther = makeMe.aNote().creatorAndOwner(ownerCarrier).title("OtherNb").please();
-    Note carrier = makeMe.aNote().underSameNotebookAs(headOther).please();
+    Note carrier = makeMe.aNote().creator(ownerCarrier).underSameNotebookAs(headOther).please();
 
     NoteWikiTitleCache row = new NoteWikiTitleCache();
     row.setNote(carrier);
@@ -237,8 +240,8 @@ class NoteRealmServiceTest {
   void references_dedupe_multiple_cache_rows_for_same_carrier_note() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note carrier = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
+    Note carrier = makeMe.aNote().creator(user).underSameNotebookAs(root).please();
 
     NoteWikiTitleCache rowA = new NoteWikiTitleCache();
     rowA.setNote(carrier);
