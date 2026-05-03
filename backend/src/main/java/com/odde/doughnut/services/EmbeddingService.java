@@ -118,17 +118,7 @@ public class EmbeddingService {
     String title = note.getTitle() != null ? note.getTitle() : "";
     String details = note.getDetails() != null ? note.getDetails() : "";
 
-    // Build ancestor path like: A/B/C
-    String ancestorPath =
-        note.getAncestors().stream()
-            .map(n -> n.getTitle() == null ? "" : n.getTitle())
-            .filter(s -> !s.isBlank())
-            .collect(java.util.stream.Collectors.joining(" \u203A "));
-
     StringBuilder sb = new StringBuilder(256);
-    if (!ancestorPath.isBlank()) {
-      sb.append("Context: ").append(ancestorPath).append('\n');
-    }
     sb.append("Title: ").append(title).append('\n');
     sb.append("Details:\n");
     if (!details.isBlank()) {

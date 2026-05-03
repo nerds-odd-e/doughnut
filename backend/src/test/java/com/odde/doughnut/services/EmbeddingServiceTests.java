@@ -34,10 +34,7 @@ class EmbeddingServiceTests {
 
   @Test
   void shouldStreamEmbeddingsForNotes() {
-    // Build a small ancestor chain to verify separator rendering
-    Note root = makeMe.aNote().title("Root").please();
-    Note parent = makeMe.aNote().under(root).title("Parent").please();
-    Note note1 = makeMe.aNote().under(parent).title("T1").details("D1").please();
+    Note note1 = makeMe.aNote().title("T1").details("D1").please();
     Note note2 = makeMe.aNote().title("T2").details("D2").please();
 
     Embedding embedding1 = Embedding.builder().index(0L).embedding(List.of(1.0f, 2.0f)).build();
@@ -59,13 +56,11 @@ class EmbeddingServiceTests {
         .thenAnswer(
             invocation -> {
               EmbeddingCreateParams params = invocation.getArgument(0);
-              // Ensure the input contains our structured fields and the "›" separator
               List<String> inputs = params.input().arrayOfStrings().orElse(List.of());
               String first = inputs.get(0);
-              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Context:"));
-              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Root \u203A Parent"));
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Title: T1"));
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Details:"));
+              org.junit.jupiter.api.Assertions.assertTrue(first.contains("D1"));
               return response;
             });
 

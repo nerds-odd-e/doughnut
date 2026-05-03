@@ -1,14 +1,11 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.testability.MakeMe;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,23 +24,17 @@ public class NoteAsTreeNodeTest {
     topLevel = makeMe.aNote("topLevel").please();
   }
 
-  @Nested
-  class GetAncestors {
+  @Test
+  void topLevelNoteHasNoParent() {
+    assertThat(topLevel.getParent(), nullValue());
+  }
 
-    @Test
-    void topLevelNoteHaveEmptyAncestors() {
-      List<Note> ancestors = topLevel.getAncestors();
-      assertThat(ancestors, empty());
-    }
+  @Test
+  void childNoteLinksToImmediateParent() {
+    Note subject = makeMe.aNote("subject").under(topLevel).please();
+    Note sibling = makeMe.aNote("sibling").under(topLevel).please();
 
-    @Test
-    void childHasParentInAncestors() {
-      Note subject = makeMe.aNote("subject").under(topLevel).please();
-      Note sibling = makeMe.aNote("sibling").under(topLevel).please();
-
-      List<Note> ancestry = subject.getAncestors();
-      assertThat(ancestry, contains(topLevel));
-      assertThat(ancestry, not(contains(sibling)));
-    }
+    assertThat(subject.getParent(), is(topLevel));
+    assertThat(sibling.getParent(), is(topLevel));
   }
 }

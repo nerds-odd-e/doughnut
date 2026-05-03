@@ -158,17 +158,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     return new HtmlOrMarkdown(getDetails()).isBlank();
   }
 
-  @JsonIgnore
-  public List<Note> getAncestors() {
-    List<Note> result = new ArrayList<>();
-    Note p = getParent();
-    while (p != null) {
-      result.add(0, p);
-      p = p.getParent();
-    }
-    return result;
-  }
-
   @Override
   public String toString() {
     return "Note{" + "id=" + id + ", title='" + getTitle() + '\'' + '}';
