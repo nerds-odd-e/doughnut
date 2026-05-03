@@ -19,6 +19,7 @@ import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Period;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -323,7 +325,9 @@ class NotebookControllerTest extends ControllerTestBase {
       noteRepository.save(inFolder);
 
       FolderListing listing = controller.listNotebookRootNotes(nb);
-      assertTrue(listing.notes().stream().noneMatch(r -> r.getId().equals(inFolder.getId())));
+      assertTrue(
+          listing.noteTopologies().stream()
+              .noneMatch(t -> Objects.equals(t.getId(), inFolder.getId())));
     }
 
     @Test
@@ -396,9 +400,13 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderListing listing = controller.listFolderListing(nb, scope);
       assertEquals(
           List.of(a.getId(), b.getId()).stream().sorted().toList(),
-          listing.notes().stream().map(NoteRealm::getId).sorted().toList());
-      assertTrue(listing.notes().stream().noneMatch(r -> r.getId().equals(elsewhere.getId())));
-      assertTrue(listing.notes().stream().noneMatch(r -> r.getId().equals(atRoot.getId())));
+          listing.noteTopologies().stream().map(NoteTopology::getId).sorted().toList());
+      assertTrue(
+          listing.noteTopologies().stream()
+              .noneMatch(t -> Objects.equals(t.getId(), elsewhere.getId())));
+      assertTrue(
+          listing.noteTopologies().stream()
+              .noneMatch(t -> Objects.equals(t.getId(), atRoot.getId())));
     }
 
     @Test
@@ -434,8 +442,8 @@ class NotebookControllerTest extends ControllerTestBase {
       makeMe.entityPersister.flush();
 
       FolderListing listing = controller.listFolderListing(nb, fChild);
-      assertEquals(1, listing.notes().size());
-      assertEquals("Unit Test", listing.notes().getFirst().getNote().getTitle());
+      assertEquals(1, listing.noteTopologies().size());
+      assertEquals("Unit Test", listing.noteTopologies().getFirst().getTitle());
     }
 
     @Test

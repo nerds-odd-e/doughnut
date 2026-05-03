@@ -4845,13 +4845,13 @@ components:
       - notebook
     FolderListing:
       type: object
-      description: Notes and child folders in a structural listing scope (e.g. notebook
-        root or a folder).
+      description: Note topologies and child folders in a structural listing scope
+        (e.g. notebook root or a folder).
       properties:
-        notes:
+        noteTopologies:
           type: array
           items:
-            $ref: "#/components/schemas/NoteRealm"
+            $ref: "#/components/schemas/NoteTopology"
         folders:
           type: array
           items:

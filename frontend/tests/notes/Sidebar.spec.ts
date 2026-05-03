@@ -34,17 +34,11 @@ function structuralFolder(folderId: number, noteRealm: NoteRealm) {
 }
 
 /** Aligns listing payloads with folder-first sidebar drag rules (same folderId = same drop column). */
-function noteRealmInFolder(realm: NoteRealm, folderId: number): NoteRealm {
+function noteTopologyInFolder(realm: NoteRealm, folderId: number) {
   return {
-    ...realm,
-    note: {
-      ...realm.note,
-      noteTopology: {
-        ...realm.note.noteTopology,
-        folderId,
-      },
-    },
-  } as NoteRealm
+    ...realm.note.noteTopology,
+    folderId,
+  }
 }
 
 function stubFolderListingForTree(
@@ -56,9 +50,9 @@ function stubFolderListingForTree(
     const folderId = (options as { path: { folder: number } }).path.folder
     if (folderId === FOLDER_TOP_NOTE_CHILDREN_ID) {
       return {
-        notes: [
-          noteRealmInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
-          noteRealmInFolder(
+        noteTopologies: [
+          noteTopologyInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
+          noteTopologyInFolder(
             firstGenerationSibling,
             FOLDER_TOP_NOTE_CHILDREN_ID
           ),
@@ -70,13 +64,13 @@ function stubFolderListingForTree(
     }
     if (folderId === FOLDER_FIRST_GEN_CHILDREN_ID) {
       return {
-        notes: [
-          noteRealmInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
+        noteTopologies: [
+          noteTopologyInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
         ],
         folders: [],
       }
     }
-    return { notes: [], folders: [] }
+    return { noteTopologies: [], folders: [] }
   })
 }
 
@@ -166,7 +160,7 @@ describe("Sidebar", () => {
 
     const shallowTopRealm = { ...topNoteRealm } as NoteRealm
     mockSdkService("listNotebookRootNotes", {
-      notes: [shallowTopRealm],
+      noteTopologies: [shallowTopRealm.note.noteTopology],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     })
     stubFolderListingForTree(
@@ -323,13 +317,13 @@ describe("Sidebar", () => {
     storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
 
     mockSdkService("listNotebookRootNotes", {
-      notes: [{ ...realmZ } as NoteRealm, { ...realmA } as NoteRealm],
+      noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
       folders: [
         { id: "9002", name: "mango" },
         { id: "9001", name: "banana" },
       ],
     })
-    mockSdkService("listFolderListing", { notes: [], folders: [] })
+    mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
     const fullRealmByNoteId: Record<number, NoteRealm> = {
       [topNoteRealm.id]: topNoteRealm,
       [realmZ.id]: realmZ,
@@ -382,7 +376,7 @@ describe("Sidebar", () => {
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
     const shallowTopRealm = { ...topNoteRealm } as NoteRealm
     const rootSpy = mockSdkService("listNotebookRootNotes", {
-      notes: [shallowTopRealm],
+      noteTopologies: [shallowTopRealm.note.noteTopology],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     })
     mountSidebar(firstGeneration)
@@ -411,7 +405,7 @@ describe("Sidebar", () => {
     it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
       const shallowTopRealm = { ...topNoteRealm } as NoteRealm
       const rootSpy = mockSdkService("listNotebookRootNotes", {
-        notes: [shallowTopRealm],
+        noteTopologies: [shallowTopRealm.note.noteTopology],
         folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
       })
       const folderListingSpy = stubFolderListingForTree(

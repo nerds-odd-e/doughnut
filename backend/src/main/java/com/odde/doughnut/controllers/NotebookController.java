@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookRootFolder;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
@@ -20,7 +21,6 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.FolderConstructionService;
 import com.odde.doughnut.services.NoteConstructionService;
-import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCatalogService;
 import com.odde.doughnut.services.NotebookGroupService;
@@ -60,7 +60,6 @@ class NotebookController {
   private final NoteService noteService;
   private final NoteConstructionService noteConstructionService;
   private final WikidataService wikidataService;
-  private final NoteRealmService noteRealmService;
   private final FolderConstructionService folderConstructionService;
 
   public NotebookController(
@@ -78,7 +77,6 @@ class NotebookController {
       NoteService noteService,
       NoteConstructionService noteConstructionService,
       WikidataService wikidataService,
-      NoteRealmService noteRealmService,
       FolderConstructionService folderConstructionService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -94,7 +92,6 @@ class NotebookController {
     this.noteService = noteService;
     this.noteConstructionService = noteConstructionService;
     this.wikidataService = wikidataService;
-    this.noteRealmService = noteRealmService;
     this.folderConstructionService = folderConstructionService;
   }
 
@@ -271,16 +268,15 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    User user = authorizationService.getCurrentUser();
-    List<NoteRealm> notes =
+    List<NoteTopology> noteTopologies =
         noteService.findNotebookRootNotes(notebook.getId()).stream()
-            .map(n -> noteRealmService.build(n, user))
+            .map(Note::getNoteTopology)
             .toList();
     List<NotebookRootFolder> folders =
         folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .map(NotebookRootFolder::from)
             .toList();
-    return new FolderListing(notes, folders);
+    return new FolderListing(noteTopologies, folders);
   }
 
   @Operation(
@@ -297,16 +293,15 @@ class NotebookController {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
-    User user = authorizationService.getCurrentUser();
-    List<NoteRealm> notes =
+    List<NoteTopology> noteTopologies =
         noteService.findNotesInFolderScope(folder.getId()).stream()
-            .map(n -> noteRealmService.build(n, user))
+            .map(Note::getNoteTopology)
             .toList();
     List<NotebookRootFolder> childFolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
             .map(NotebookRootFolder::from)
             .toList();
-    return new FolderListing(notes, childFolders);
+    return new FolderListing(noteTopologies, childFolders);
   }
 
   @PostMapping("/{notebook}/update-index")

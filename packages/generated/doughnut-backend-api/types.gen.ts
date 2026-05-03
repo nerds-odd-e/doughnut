@@ -846,10 +846,10 @@ export type SubscriptionForNotebooksListing = {
 };
 
 /**
- * Notes and child folders in a structural listing scope (e.g. notebook root or a folder).
+ * Note topologies and child folders in a structural listing scope (e.g. notebook root or a folder).
  */
 export type FolderListing = {
-    notes?: Array<NoteRealm>;
+    noteTopologies?: Array<NoteTopology>;
     folders?: Array<NotebookRootFolder>;
 };
 
@@ -1018,14 +1018,6 @@ export type ConversationSubjectWritable = {
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
-};
-
-/**
- * Notes and child folders in a structural listing scope (e.g. notebook root or a folder).
- */
-export type FolderListingWritable = {
-    notes?: Array<NoteRealmWritable>;
-    folders?: Array<NotebookRootFolder>;
 };
 
 export type PutNotebookBookBlockReadingRecordData = {

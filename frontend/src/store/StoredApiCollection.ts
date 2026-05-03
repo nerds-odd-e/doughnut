@@ -228,8 +228,6 @@ export default class StoredApiCollection implements StoredApi {
         toErrorMessage(error, "Failed to load notebook root notes")
       )
     }
-    const notes = data.notes ?? []
-    this.refreshNoteRealms(notes)
     return data
   }
 
@@ -245,8 +243,6 @@ export default class StoredApiCollection implements StoredApi {
     if (error || !data) {
       throw new Error(toErrorMessage(error, "Failed to load folder listing"))
     }
-    const notes = data.notes ?? []
-    this.refreshNoteRealms(notes)
     return data
   }
 

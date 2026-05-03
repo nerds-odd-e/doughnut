@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
 import type {
-  NoteRealm,
   NoteTopology,
   NotebookRootFolder,
 } from "@generated/doughnut-backend-api"
@@ -49,7 +48,7 @@ function noteSortKey(noteTopology: NoteTopology): string {
 }
 
 function buildStructuralRows(
-  realms: NoteRealm[],
+  noteTopologies: NoteTopology[],
   folders: NotebookRootFolder[] | undefined
 ): SidebarStructuralRow[] {
   type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
@@ -65,9 +64,9 @@ function buildStructuralRows(
     folderSortKey(a.folder).localeCompare(folderSortKey(b.folder))
   )
 
-  const noteRows: NoteRow[] = realms.map((realm) => ({
+  const noteRows: NoteRow[] = noteTopologies.map((noteTopology) => ({
     kind: "note" as const,
-    noteTopology: realm.note.noteTopology,
+    noteTopology,
   }))
   noteRows.sort((a, b) =>
     noteSortKey(a.noteTopology).localeCompare(noteSortKey(b.noteTopology))
@@ -105,8 +104,8 @@ async function refreshListing() {
       props.folderId == null
         ? await api.loadNotebookRootNotes(props.notebookId)
         : await api.loadFolderListing(props.notebookId, props.folderId)
-    const realms = listing.notes ?? []
-    displayRows.value = buildStructuralRows(realms, listing.folders)
+    const noteTopologies = listing.noteTopologies ?? []
+    displayRows.value = buildStructuralRows(noteTopologies, listing.folders)
     props.onStructuralPeerCount?.(displayRows.value.length)
   } catch {
     displayRows.value = []
