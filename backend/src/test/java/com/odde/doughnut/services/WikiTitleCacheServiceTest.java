@@ -143,16 +143,19 @@ class WikiTitleCacheServiceTest {
   }
 
   @Test
-  void merge_reference_notes_dedupes_and_orders_by_note_id() {
+  void references_notes_for_viewer_orders_referrers_by_note_id() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note second = makeMe.aNote().under(root).please();
-    Note first = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note second = makeMe.aNote().under(root).details("[[Focal]]").please();
+    Note first = makeMe.aNote().under(root).details("[[Focal]]").please();
+    wikiTitleCacheService.refreshForNote(first, user);
+    wikiTitleCacheService.refreshForNote(second, user);
 
-    List<Note> merged =
-        WikiTitleCacheService.mergeReferenceNotes(List.of(second), List.of(first, second));
-    assertThat(merged, hasSize(2));
-    assertThat(merged.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
-    assertThat(merged.get(1).getId(), equalTo(Math.max(first.getId(), second.getId())));
+    List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);
+
+    assertThat(refs, hasSize(2));
+    assertThat(refs.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
+    assertThat(refs.get(1).getId(), equalTo(Math.max(first.getId(), second.getId())));
   }
 }

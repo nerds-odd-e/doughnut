@@ -108,9 +108,6 @@ class NoteRealmServiceTest {
 
     assertThat(subjectRealm.getReferences(), hasSize(1));
     assertThat(subjectRealm.getReferences().get(0).getId(), equalTo(relation.getId()));
-
-    assertThat(
-        wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(focal, user), empty());
   }
 
   @Test
@@ -128,7 +125,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void body_wikilink_carrier_in_references_subject_parent_slice_empty() {
+  void body_wikilink_carrier_in_references() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").under(root).please();
@@ -137,8 +134,6 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(
-        wikiTitleCacheService.subjectAndParentLinkedReferrerNotesForViewer(focal, user), empty());
     assertThat(realm.getReferences(), hasSize(1));
     assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
   }
