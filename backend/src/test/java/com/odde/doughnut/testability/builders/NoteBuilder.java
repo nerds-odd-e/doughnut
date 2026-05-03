@@ -237,7 +237,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder asFirstChildOf(Note note) {
     attachAsChildOf(note);
-    entity.updateSiblingOrderAsFirstChild(note);
     return this;
   }
 

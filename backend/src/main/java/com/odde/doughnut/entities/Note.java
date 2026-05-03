@@ -172,15 +172,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
-  public void updateSiblingOrderAsFirstChild(Note parentNote) {
-    parentNote.getChildren().stream()
-        .findFirst()
-        .ifPresent(
-            firstChild ->
-                this.siblingOrder =
-                    firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
-  }
-
   @JsonIgnore
   public ImageWithMask getImageWithMask() {
     if (this.noteAccessory == null) return null;

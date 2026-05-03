@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 import { pageIsNotLoading } from '../pageBase'
-import router from '../router'
 import type NotePath from '../../support/NotePath'
 import {
   navigateAlongNotebookCatalogPath,
@@ -125,7 +124,8 @@ const myNotebooksPage = () => {
 }
 
 export const navigateToNotebooksPage = () => {
-  router().push('/d/notebooks', 'notebooks', {})
+  cy.visit('/d/notebooks')
+  cy.wrap('yes').as('firstVisited')
   cy.get('.loading-bar').should('not.exist', { timeout: 30000 })
   return myNotebooksPage()
 }
