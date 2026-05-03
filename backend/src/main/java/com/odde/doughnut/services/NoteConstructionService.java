@@ -108,7 +108,7 @@ public class NoteConstructionService {
     Note note = new Note();
     User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-    note.initialize(user, null, ts, title);
+    note.initializeNewNote(user, notebook, ts, title);
     note.assignNotebook(notebook);
     note.setFolder(folder);
     assignSiblingOrderAppendLast(note);
@@ -163,14 +163,7 @@ public class NoteConstructionService {
                     },
                     () -> {
                       try {
-                        Note siblingParentNote = focalNote.getParent();
-                        if (siblingParentNote != null) {
-                          createNoteWithWikidataInfo(
-                              focalNote.getNotebook(),
-                              siblingParentNote,
-                              subWikidataIdWithApi,
-                              siblingTitle);
-                        } else if (focalNote.getFolder() != null) {
+                        if (focalNote.getFolder() != null) {
                           attachWikidataAndRefresh(
                               persistNewNoteInNotebookFolder(
                                   focalNote.getNotebook(), focalNote.getFolder(), siblingTitle),

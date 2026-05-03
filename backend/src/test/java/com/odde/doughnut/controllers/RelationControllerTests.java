@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
@@ -57,7 +56,6 @@ class RelationControllerTests extends ControllerTestBase {
       assertThat(result, hasSize(1));
       mover = noteRepository.findById(mover.getId()).orElseThrow();
       assertThat(mover.getFolder().getId(), equalTo(targetFolder.getId()));
-      assertThat(mover.getParent(), nullValue());
     }
 
     @Test

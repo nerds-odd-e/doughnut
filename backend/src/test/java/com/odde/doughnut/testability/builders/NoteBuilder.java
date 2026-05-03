@@ -23,7 +23,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder(MakeMe makeMe) {
     super(makeMe, new Note());
-    entity.initialize(null, null, new Timestamp(System.currentTimeMillis()), "");
+    entity.initializeNewNote(null, null, new Timestamp(System.currentTimeMillis()), "");
     if (Strings.isEmpty(entity.getTitle())) title(titleCounter.generate());
     details("descrption");
     updatedAt(entity.getCreatedAt());
@@ -113,21 +113,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     if (folder != null) {
       entity.setFolder(folder);
-    }
-    if (needPersist) {
-      ensureParentNotesPersisted(entity);
-    }
-  }
-
-  private void ensureParentNotesPersisted(Note note) {
-    Note parent = note.getParent();
-    if (parent == null) {
-      return;
-    }
-    ensureParentNotesPersisted(parent);
-    if (parent.getId() == null) {
-      makeMe.entityPersister.save(parent);
-      makeMe.entityPersister.flush();
     }
   }
 

@@ -33,7 +33,6 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
-import com.odde.doughnut.services.NoteChildContainerFolderService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
 import java.io.IOException;
@@ -60,7 +59,6 @@ class NotebookControllerTest extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
   @Autowired NoteService noteService;
-  @Autowired NoteChildContainerFolderService noteChildContainerFolderService;
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired ObjectMapper objectMapper;
   private Note topNote;
@@ -236,7 +234,6 @@ class NotebookControllerTest extends ControllerTestBase {
       NoteRealm result = controller.createNoteAtNotebookRoot(nb, noteCreation);
 
       Note created = noteRepository.findById(result.getId()).orElseThrow();
-      assertThat(created.getParent(), nullValue());
       assertThat(created.getFolder(), nullValue());
       assertThat(created.getNotebook().getId(), equalTo(nb.getId()));
     }

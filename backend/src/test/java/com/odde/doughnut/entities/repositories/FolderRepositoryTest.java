@@ -104,7 +104,6 @@ class FolderRepositoryTest {
     assertThat(loadedLeaf.getFolder().getId(), equalTo(folderForSectionChildren.getId()));
     assertThat(
         loadedLeaf.getFolder().getParentFolder().getId(), equalTo(folderForRootChildren.getId()));
-    assertThat(loadedLeaf.getParent().getId(), equalTo(section.getId()));
     assertThat(loadedLeaf.getSiblingOrder(), equalTo(siblingOrder));
   }
 }

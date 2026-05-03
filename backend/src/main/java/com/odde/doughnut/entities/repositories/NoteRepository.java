@@ -2,7 +2,6 @@ package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -125,11 +124,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
-              + "LEFT JOIN FETCH n.parent WHERE n.id IN :ids")
+              + "WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
-
-  Optional<Note> findFirstByParent_IdAndFolderIsNotNullAndDeletedAtIsNullOrderByIdAsc(
-      Integer parentId);
 
   String recallWhereClause =
       " WHERE "

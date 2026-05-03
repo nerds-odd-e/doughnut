@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.FolderRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -14,33 +13,24 @@ import org.springframework.stereotype.Service;
 public class NoteChildContainerFolderService {
 
   private final FolderRepository folderRepository;
-  private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
   public NoteChildContainerFolderService(
       FolderRepository folderRepository,
-      NoteRepository noteRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.folderRepository = folderRepository;
-    this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
 
   public Folder resolveForParent(Note parentNote) {
-    return noteRepository
-        .findFirstByParent_IdAndFolderIsNotNullAndDeletedAtIsNullOrderByIdAsc(parentNote.getId())
-        .map(Note::getFolder)
-        .orElseGet(() -> findOrCreateChildContainer(parentNote));
+    return findOrCreateChildContainer(parentNote);
   }
 
   private Folder findOrCreateChildContainer(Note parentNote) {
-    Folder parentFolderContext =
-        parentNote.getParent() != null
-            ? findExistingChildContainerForAncestor(parentNote.getParent())
-            : parentNote.getFolder();
+    Folder parentFolderContext = parentNote.getFolder();
     Integer parentFolderId = parentFolderContext == null ? null : parentFolderContext.getId();
     List<Folder> candidates =
         folderRepository.findCandidateChildContainers(
@@ -49,21 +39,6 @@ public class NoteChildContainerFolderService {
       return candidates.getFirst();
     }
     return createFolder(parentNote, parentFolderContext);
-  }
-
-  private Folder findExistingChildContainerForAncestor(Note note) {
-    if (note == null) {
-      return null;
-    }
-    Folder ancestorParentFolder = findExistingChildContainerForAncestor(note.getParent());
-    Integer parentFolderId = ancestorParentFolder == null ? null : ancestorParentFolder.getId();
-    List<Folder> found =
-        folderRepository.findCandidateChildContainers(
-            note.getNotebook().getId(), parentFolderId, folderNameForNote(note));
-    if (found.isEmpty()) {
-      return null;
-    }
-    return found.getFirst();
   }
 
   private Folder createFolder(Note parentNote, Folder parentFolderContext) {

@@ -23,7 +23,7 @@ By the end of Phase 7:
 - public note wire shapes do not expose `parentId`
 - frontend behavior does not branch on `note.parentId`
 - note creation and movement use notebook/folder placement, not parent-note containment
-- graph, restore/delete, export/import, and testability paths do not query note children through `parent_id`
+- graph, restore/delete, and testability paths do not query note children through `parent_id` (notebook import/export was removed from the product; see [Sub-Phase 7.15](#sub-phase-715-importexport-paths-removed))
 - the `note.parent_id` column and `Note.parent` / `Note.children` mappings are gone
 - any remaining semantic parent meaning is represented through links/frontmatter content, not a structural DB edge
 
@@ -314,23 +314,19 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Post-condition:** Test setup uses folder-first structural placement; cohesive testability setup is allowed where it still resolves to explicit folders before notes. Any old semantic-parent fixture is rewritten as frontmatter/link content or deleted if it no longer represents product behavior.
 
-**Work:** Remove remaining easy `Parent Title` paths in one test area at a time. Where note injection used to create folders implicitly in production, that path must already be gone; testability may keep a single bundled setup. Leave import/export or book-layout cases to a dedicated sub-phase if they encode a different capability. Re-check [folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions) for any fixture you change.
+**Work:** Remove remaining easy `Parent Title` paths in one test area at a time. Where note injection used to create folders implicitly in production, that path must already be gone; testability may keep a single bundled setup. Leave book-layout cases to a dedicated sub-phase if they encode a different capability. Re-check [folder path vs note title collisions](#e2e-fixtures-folder-path-vs-note-title-collisions) for any fixture you change.
 
 **Verify:** Focused backend/frontend tests and targeted E2E specs for the touched area.
 
-## Sub-Phase 7.15 - Remove Parent From Import/Export Transitional Paths
+## Sub-Phase 7.15 - Import/export paths removed
 
-**Type:** Structure.
+**Type:** Structure (originally scoped to transitional import/export paths).
 
-**Pre-condition:** General testability and production note placement no longer use parent edges.
+**Status:** The notebook **import/export** capability that nested notes via `parent_id` is **no longer in the product**. There is nothing to migrate on that surface; treat this sub-phase as **complete by removal**.
 
-**Trigger:** Import/export code still translates nested notes into `parent_id` rather than folders.
+**Historical intent (for readers of old branches or notes):** When that feature existed, the bar was: import creates folders explicitly then places notes; export reads folder placement; tests covered observable behavior.
 
-**Post-condition:** Import creates folders explicitly, then creates notes in those existing folders; export reads folder placement. Existing observable import/export behavior remains covered.
-
-**Work:** Convert one import/export capability at a time, starting with the smallest notebook import or export feature.
-
-**Verify:** Targeted import/export E2E spec and focused backend tests.
+**Verify:** N/A — no dedicated import/export E2E or backend tests remain for this scope.
 
 ## Sub-Phase 7.16 - Drop `Note.parent` and `Note.children` From Domain Code
 

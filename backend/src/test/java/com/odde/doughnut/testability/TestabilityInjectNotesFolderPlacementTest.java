@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -44,13 +43,11 @@ class TestabilityInjectNotesFolderPlacementTest {
     Map<String, Integer> ids = testabilityRestController.injectNotes(data);
 
     Note constNote = noteRepository.findById(ids.get("Const")).orElseThrow();
-    assertThat(constNote.getParent(), nullValue());
     assertThat(constNote.getFolder(), notNullValue());
     assertThat(constNote.getFolder().getName(), equalTo("TPP"));
     assertThat(constNote.getFolder().getParentFolder().getName(), equalTo("LeSS in Action"));
 
     Note underTdd = noteRepository.findById(ids.get("UnderTdd")).orElseThrow();
-    assertThat(underTdd.getParent(), nullValue());
     assertThat(underTdd.getFolder(), notNullValue());
     assertThat(underTdd.getFolder().getName(), equalTo("TDD"));
     assertThat(underTdd.getFolder().getParentFolder().getName(), equalTo("LeSS in Action"));
@@ -72,8 +69,6 @@ class TestabilityInjectNotesFolderPlacementTest {
 
     Note germany = noteRepository.findById(ids.get("Germany")).orElseThrow();
     Note japan = noteRepository.findById(ids.get("Japan")).orElseThrow();
-    assertThat(germany.getParent(), nullValue());
-    assertThat(japan.getParent(), nullValue());
     assertThat(germany.getFolder(), notNullValue());
     assertThat(japan.getFolder(), notNullValue());
     assertThat(japan.getFolder().getId(), equalTo(germany.getFolder().getId()));

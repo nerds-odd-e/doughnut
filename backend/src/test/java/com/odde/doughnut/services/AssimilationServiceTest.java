@@ -222,9 +222,13 @@ public class AssimilationServiceTest {
     @Test
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
-      makeMe.theNote(note1).skipMemoryTracking().relateTo(note2).please();
-      Note noteToRecall = getFirstNoteToAssimilate(assimilationService);
-      assertThat(noteToRecall.getParent(), equalTo(note1));
+      makeMe.theNote(note1).skipMemoryTracking().please();
+      Note link = makeMe.aRelation().between(note1, note2).please();
+      makeMe.refresh(user);
+      Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();
+      List<Integer> dueInSubscribedNotebook =
+          subscriptionService.getUnassimilatedNotes(sub).map(Note::getId).toList();
+      assertThat(dueInSubscribedNotebook, hasItem(link.getId()));
     }
 
     @Test

@@ -169,7 +169,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
       assertThat(response.getId(), not(nullValue()));
       Note created = noteRepository.findById(response.getId()).orElseThrow();
-      assertThat(created.getParent(), nullValue());
       assertThat(created.getFolder(), not(nullValue()));
       assertThat(created.getFolder().getNotebook().getId(), equalTo(notebook.getId()));
     }

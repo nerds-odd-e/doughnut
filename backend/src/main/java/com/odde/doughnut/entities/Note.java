@@ -82,11 +82,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
 
-  @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
-  @JsonIgnore
-  @OrderBy("siblingOrder")
-  private final List<Note> children = new ArrayList<>();
-
   @OneToMany(mappedBy = "note")
   @JsonIgnore
   private Set<MemoryTracker> memoryTrackers;
@@ -107,12 +102,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
-
-  @ManyToOne
-  @JoinColumn(name = "parent_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  private Note parent;
 
   @OneToMany(mappedBy = "note")
   @Getter
@@ -218,34 +207,22 @@ public class Note extends EntityIdentifiedByIdOnly {
     return "/n" + getId();
   }
 
-  public void initialize(User user, Note parentNote, Timestamp currentUTCTimestamp, String title) {
-    if (parentNote != null) {
-      setNotebook(parentNote.getNotebook());
-      if (this.parent != null) {
-        this.parent.children.removeIf(c -> c == this);
-      }
-      this.parent = parentNote;
-      if (parentNote.children.stream().noneMatch(c -> c == this)) {
-        parentNote.children.add(this);
-      }
+  public void initializeNewNote(
+      User user, Notebook notebookOrNull, Timestamp currentUTCTimestamp, String title) {
+    if (notebookOrNull != null) {
+      setNotebook(notebookOrNull);
     }
     setUpdatedAt(currentUTCTimestamp);
-    setTitle(title);
+    setTitle(title != null ? title : "");
     setCreatedAt(currentUTCTimestamp);
-    setUpdatedAt(currentUTCTimestamp);
     setCreator(user);
   }
 
-  /** Top-level note in a notebook: no parent note. Folder stays unset (null). */
+  /** Notebook root scope: folder stays unset (null) until set explicitly. */
   public void initializeAsNotebookRoot(
       Notebook notebook, User user, Timestamp currentUTCTimestamp, String title) {
     Objects.requireNonNull(notebook, "notebook");
-    setNotebook(notebook);
-    this.parent = null;
-    setUpdatedAt(currentUTCTimestamp);
-    setTitle(title);
-    setCreatedAt(currentUTCTimestamp);
-    setCreator(user);
+    initializeNewNote(user, notebook, currentUTCTimestamp, title);
   }
 
   public void attachToNewNotebook(Ownership ownership, User creator) {

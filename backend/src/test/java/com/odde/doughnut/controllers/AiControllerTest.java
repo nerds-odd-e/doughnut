@@ -400,7 +400,6 @@ class AiControllerTest extends ControllerTestBase {
           .isEqualTo("Updated parent with summary.");
       Note sibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(sibling.getFolder()).isNull();
-      assertThat(sibling.getParent()).isNull();
     }
 
     @Test
@@ -431,7 +430,6 @@ class AiControllerTest extends ControllerTestBase {
       assertThat(response.getNote().getTitle()).isEqualTo("Point B");
       Note persistedSibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(persistedSibling.getFolder().getId()).isEqualTo(folder.getId());
-      assertThat(persistedSibling.getParent()).isNull();
     }
 
     @Test

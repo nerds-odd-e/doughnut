@@ -143,10 +143,6 @@ class NoteController {
     authorizationService.assertAuthorization(note);
     noteService.destroy(note);
     entityPersister.flush();
-    Note parentNote = note.getParent();
-    if (parentNote != null) {
-      return List.of(noteRealmService.build(parentNote, authorizationService.getCurrentUser()));
-    }
     return List.of();
   }
 

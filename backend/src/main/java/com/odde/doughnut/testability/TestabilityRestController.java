@@ -131,7 +131,7 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = new Note();
-      note.initialize(user, null, currentUTCTimestamp, title);
+      note.initializeNewNote(user, null, currentUTCTimestamp, title);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
       note.setTitle(title);
@@ -212,7 +212,8 @@ class TestabilityRestController {
           entityPersister.save(note.getNotebook());
           firstRootCreatedInBatch = note;
         } else {
-          note.initialize(user, firstRootCreatedInBatch, currentUTCTimestamp, injection.title);
+          note.initializeAsNotebookRoot(
+              firstRootCreatedInBatch.getNotebook(), user, currentUTCTimestamp, injection.title);
         }
       }
     }
