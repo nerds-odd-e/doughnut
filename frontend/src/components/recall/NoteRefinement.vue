@@ -27,7 +27,7 @@
           </label>
           <div
             v-if="
-              note.noteTopology.folderId != null || note.parentId != null
+              note.noteTopology.folderId != null
             "
             class="daisy-flex daisy-gap-1 daisy-shrink-0"
           >
