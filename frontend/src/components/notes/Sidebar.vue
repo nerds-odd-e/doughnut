@@ -22,15 +22,8 @@ import { computed, inject, provide, ref, watch } from "vue"
 import type { NoteRealm, User } from "@generated/doughnut-backend-api"
 import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
-import {
-  sidebarStructuralSidebarTitlesKey,
-  sidebarActiveNoteFolderIdsKey,
-  sidebarExpandedFolderIdsKey,
-  sidebarToggleFolderIdKey,
-  sidebarUserActiveFolderIdKey,
-} from "./sidebarFolderExpansion"
+import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
-import { structuralSidebarTitlesFromRealm } from "./sidebarStructuralTitles"
 
 const props = defineProps({
   /** When set, highlights the active note and expands its ancestors */
@@ -61,10 +54,6 @@ function toggleFolderId(folderId: number) {
   expandedFolderIds.value = next
 }
 
-const structuralSidebarTitles = computed(() =>
-  structuralSidebarTitlesFromRealm(props.activeNoteRealm)
-)
-
 const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
@@ -78,11 +67,28 @@ const activeNoteFolderIds = computed(() => {
   return ids
 })
 
-provide(sidebarExpandedFolderIdsKey, expandedFolderIds)
-provide(sidebarToggleFolderIdKey, toggleFolderId)
-provide(sidebarStructuralSidebarTitlesKey, structuralSidebarTitles)
-provide(sidebarActiveNoteFolderIdsKey, activeNoteFolderIds)
-provide(sidebarUserActiveFolderIdKey, userActiveFolderId)
+const ancestorFolderIds = computed(() => {
+  const ids = new Set<number>()
+  for (const seg of props.activeNoteRealm?.ancestorFolders ?? []) {
+    if (seg.id != null && seg.id !== "") {
+      ids.add(Number(seg.id))
+    }
+  }
+  const fid = activeNoteTopology.value?.folderId
+  if (fid != null) ids.add(fid)
+  return ids
+})
+
+const activeNoteTitle = computed(() => activeNoteTopology.value?.title ?? null)
+
+provide(sidebarTreeKey, {
+  expandedFolderIds,
+  toggleFolder: toggleFolderId,
+  ancestorFolderIds,
+  activeNoteFolderIds,
+  activeNoteTitle,
+  userActiveFolderId,
+})
 
 watch(
   activeNoteTopology,

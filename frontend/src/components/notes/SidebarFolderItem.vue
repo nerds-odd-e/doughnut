@@ -4,7 +4,7 @@
     class="sidebar-folder-li"
     role="treeitem"
     tabindex="0"
-    :aria-level="ariaLevel"
+    :aria-level="currentLevel"
     :aria-expanded="isExpanded"
     :aria-label="folder.name"
     :class="{
@@ -39,7 +39,7 @@
           folderId,
           activeNoteTopology,
           onStructuralPeerCount: setStructuralChildCount,
-          ariaLevel: ariaLevel + 1,
+          level: currentLevel + 1,
         }"
         :key="`folder-${folderId}`"
       />
@@ -54,29 +54,27 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { ChevronDown, ChevronRight, Folder, FolderOpen } from "lucide-vue-next"
 import SidebarInner from "./SidebarInner.vue"
-import {
-  sidebarStructuralSidebarTitlesKey,
-  sidebarActiveNoteFolderIdsKey,
-  sidebarExpandedFolderIdsKey,
-  sidebarToggleFolderIdKey,
-  sidebarUserActiveFolderIdKey,
-} from "./sidebarFolderExpansion"
+import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { computed, inject, ref, watch } from "vue"
 
 const props = defineProps<{
   folder: FolderTrailSegment
   notebookId: number
   activeNoteTopology?: NoteTopology
-  ariaLevel?: number
+  level?: number
 }>()
 
-const ariaLevel = computed(() => props.ariaLevel ?? 1)
+const currentLevel = computed(() => props.level ?? 1)
 
-const expandedFolderIds = inject(sidebarExpandedFolderIdsKey)!
-const toggleFolderId = inject(sidebarToggleFolderIdKey)!
-const structuralTitles = inject(sidebarStructuralSidebarTitlesKey)!
-const activeNoteFolderIds = inject(sidebarActiveNoteFolderIdsKey)!
-const userActiveFolderId = inject(sidebarUserActiveFolderIdKey, undefined)
+const tree = inject(sidebarTreeKey)!
+const {
+  expandedFolderIds,
+  toggleFolder: toggleFolderId,
+  ancestorFolderIds,
+  activeNoteFolderIds,
+  activeNoteTitle,
+  userActiveFolderId,
+} = tree
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
@@ -93,10 +91,20 @@ function ensureFolderExpandedById(id: number | undefined) {
 }
 
 watch(
-  () => [structuralTitles.value, props.folder.name, folderId.value] as const,
+  () =>
+    [
+      ancestorFolderIds.value,
+      activeNoteTitle.value,
+      props.folder.name,
+      folderId.value,
+    ] as const,
   () => {
     if (folderId.value == null) return
-    if (structuralTitles.value.has(props.folder.name)) {
+    if (
+      ancestorFolderIds.value.has(folderId.value) ||
+      (activeNoteTitle.value != null &&
+        props.folder.name === activeNoteTitle.value)
+    ) {
       ensureFolderExpandedById(folderId.value)
     }
   },
@@ -109,8 +117,9 @@ const isExpanded = computed(
 
 const isNotePathFolder = computed(
   () =>
-    (folderId.value != null && activeNoteFolderIds.value.has(folderId.value)) ||
-    structuralTitles.value.has(props.folder.name)
+    folderId.value != null &&
+    (activeNoteFolderIds.value.has(folderId.value) ||
+      ancestorFolderIds.value.has(folderId.value))
 )
 
 const isUserActiveFolder = computed(

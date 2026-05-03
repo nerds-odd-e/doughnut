@@ -2,19 +2,19 @@
   <ul
     v-if="displayRows.length > 0"
     class="sidebar-tree-list"
-    :role="ariaLevel === 1 ? 'tree' : 'group'"
-    :aria-label="ariaLevel === 1 ? 'Note tree' : undefined"
+    :role="currentLevel === 1 ? 'tree' : 'group'"
+    :aria-label="currentLevel === 1 ? 'Note tree' : undefined"
   >
     <template v-for="row in displayRows" :key="rowKey(row)">
       <SidebarNoteItem
         v-if="row.kind === 'note'"
         :note-topology="row.noteTopology"
         :active-note-topology="activeNoteTopology"
-        :aria-level="ariaLevel"
+        :aria-level="currentLevel"
       />
       <SidebarFolderItem
         v-else
-        v-bind="{ notebookId, folder: row.folder, activeNoteTopology, ariaLevel }"
+        v-bind="{ notebookId, folder: row.folder, activeNoteTopology, level: currentLevel }"
       />
     </template>
   </ul>
@@ -95,12 +95,12 @@ interface Props {
   /** Notifies enclosing folder row (when nested) how many peers this listing renders. */
   onStructuralPeerCount?: (count: number) => void
   /** ARIA level for treeitem descendants. Defaults to 1 (root tree). */
-  ariaLevel?: number
+  level?: number
 }
 
 const props = defineProps<Props>()
 
-const ariaLevel = computed(() => props.ariaLevel ?? 1)
+const currentLevel = computed(() => props.level ?? 1)
 
 const displayRows = ref<SidebarStructuralRow[]>([])
 
