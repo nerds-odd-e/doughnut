@@ -14,26 +14,6 @@ import org.junit.jupiter.api.Test;
 class RelationshipNoteMarkdownFormatterTest {
 
   @Test
-  void isRelationshipShapedDetails_true_for_formatted_relationship_markdown() {
-    assertThat(
-        RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(
-            RelationshipNoteMarkdownFormatter.format(RelationType.PART, "A", "B", null)),
-        equalTo(true));
-  }
-
-  @Test
-  void isRelationshipShapedDetails_false_without_leading_relationship_frontmatter() {
-    assertThat(RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(null), equalTo(false));
-    assertThat(
-        RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails("plain body"),
-        equalTo(false));
-    assertThat(
-        RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(
-            "---\ntype: article\n---\n\nBody."),
-        equalTo(false));
-  }
-
-  @Test
   void formats_frontmatter_and_body_for_confused_with() {
     String markdown =
         RelationshipNoteMarkdownFormatter.format(RelationType.CONFUSE_WITH, "A", "B", null);

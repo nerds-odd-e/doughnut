@@ -11,7 +11,6 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -249,13 +248,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   public Stream<Note> getAllDescendants() {
     return Stream.concat(
         getChildren().stream(), getChildren().stream().flatMap(Note::getAllDescendants));
-  }
-
-  @JsonIgnore
-  public Stream<Note> getAllNoneRelationDescendants() {
-    return getAllDescendants()
-        .filter(
-            n -> !RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(n.getDetails()));
   }
 
   @JsonIgnore

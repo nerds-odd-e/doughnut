@@ -302,7 +302,7 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(1));
-      assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(1));
+      assertThat(parent.getAllDescendants().toList(), hasSize(1));
       assertThat(child.getDeletedAt(), is(nullValue()));
     }
 
@@ -466,7 +466,7 @@ class NoteControllerTests extends ControllerTestBase {
         controller.deleteNote(subject);
         controller.undoDeleteNote(subject);
         assertThat(parent.getChildren(), hasSize(1));
-        assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(2));
+        assertThat(parent.getAllDescendants().toList(), hasSize(2));
       }
 
       @Test
@@ -480,7 +480,7 @@ class NoteControllerTests extends ControllerTestBase {
         controller.deleteNote(subject);
 
         controller.undoDeleteNote(subject);
-        assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(1));
+        assertThat(parent.getAllDescendants().toList(), hasSize(1));
       }
     }
   }
