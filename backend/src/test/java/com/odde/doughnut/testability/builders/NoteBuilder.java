@@ -81,20 +81,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  private void attachAsChildOf(Note parentNote) {
-    User user = entity.getCreator() != null ? entity.getCreator() : parentNote.getCreator();
-    Timestamp createdAt = entity.getCreatedAt();
-    Timestamp updatedAt = entity.getUpdatedAt();
-    entity.initialize(user, parentNote, createdAt, entity.getTitle());
-    if (updatedAt != null) {
-      entity.setUpdatedAt(updatedAt);
-    }
-    if (entity.getCreator() == null) {
-      creator(parentNote.getCreator());
-    }
-    parentNote.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
-  }
-
   public NoteBuilder relateTo(Note referTo) {
     return relateTo(referTo, RelationType.SPECIALIZE);
   }
@@ -232,16 +218,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder level(int i) {
     entity.getRecallSetting().setLevel(i);
-    return this;
-  }
-
-  public NoteBuilder asFirstChildOf(Note note) {
-    attachAsChildOf(note);
-    return this;
-  }
-
-  public NoteBuilder after(Note note) {
-    attachAsChildOf(note.getParent());
     return this;
   }
 

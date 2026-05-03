@@ -18,7 +18,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
@@ -122,11 +121,6 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @Embedded @JsonIgnore @Getter private NoteRecallSetting recallSetting = new NoteRecallSetting();
 
-  @JsonIgnore
-  public List<Note> getChildren() {
-    return filterDeletedUnmodifiableNoteList(children);
-  }
-
   public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
     return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
   }
@@ -180,12 +174,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
     return getNoteTitle().matches(spellingAnswer);
-  }
-
-  @JsonIgnore
-  public Stream<Note> getAllDescendants() {
-    return Stream.concat(
-        getChildren().stream(), getChildren().stream().flatMap(Note::getAllDescendants));
   }
 
   @JsonIgnore
