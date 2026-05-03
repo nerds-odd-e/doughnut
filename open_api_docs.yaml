@@ -3651,9 +3651,6 @@ components:
           $ref: "#/components/schemas/NoteTopology"
         details:
           type: string
-        parentId:
-          type: integer
-          format: int32
         updatedAt:
           type: string
           format: date-time

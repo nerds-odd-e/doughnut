@@ -222,7 +222,6 @@ export type FolderTrailSegment = {
 export type Note = {
     noteTopology: NoteTopology;
     details?: string;
-    parentId?: number;
     updatedAt: string;
     id: number;
     createdAt: string;
@@ -970,7 +969,6 @@ export type SubscriptionWritable = {
 export type NoteWritable = {
     noteTopology: NoteTopology;
     details?: string;
-    parentId?: number;
     updatedAt: string;
     id: number;
     createdAt: string;

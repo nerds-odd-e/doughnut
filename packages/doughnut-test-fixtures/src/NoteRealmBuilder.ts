@@ -63,8 +63,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   under(value: NoteRealm): NoteRealmBuilder {
     value?.references?.push(this.data.note)
-    this.data.note.parentId = value.id
-
     return this
   }
 

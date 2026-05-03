@@ -26,7 +26,7 @@ import org.springframework.lang.NonNull;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"noteTopology", "details", "parentId", "updatedAt"})
+@JsonPropertyOrder({"noteTopology", "details", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -192,12 +192,6 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   private Optional<Note> nextSibling() {
     return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
-  }
-
-  public Integer getParentId() {
-    Note parent = getParent();
-    if (parent == null) return null;
-    return parent.id;
   }
 
   @JsonIgnore

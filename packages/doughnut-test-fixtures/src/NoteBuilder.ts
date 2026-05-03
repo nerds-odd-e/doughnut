@@ -69,8 +69,7 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  underNote(value: Note): NoteBuilder {
-    this.data.parentId = value.id
+  underNote(_value: Note): NoteBuilder {
     return this
   }
 
