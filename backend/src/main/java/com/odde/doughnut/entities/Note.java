@@ -253,7 +253,9 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Stream<Note> getAllNoneRelationDescendants() {
-    return getAllDescendants().filter(n -> !n.isRelation());
+    return getAllDescendants()
+        .filter(
+            n -> !RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(n.getDetails()));
   }
 
   @JsonIgnore
@@ -291,11 +293,6 @@ public class Note extends EntityIdentifiedByIdOnly {
       insertIndex++;
     }
     siblings.add(insertIndex, this);
-  }
-
-  @JsonIgnore
-  public boolean isRelation() {
-    return RelationshipNoteMarkdownFormatter.isRelationshipShapedDetails(getDetails());
   }
 
   @JsonIgnore

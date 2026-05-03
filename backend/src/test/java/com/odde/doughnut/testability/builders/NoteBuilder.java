@@ -124,15 +124,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
     relationBuilders.forEach(relationBuilder -> relationBuilder.please(needPersist));
     predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
-    if (needPersist && makeMe.wikiTitleCacheService != null && entity.isRelation()) {
-      makeMe.wikiTitleCacheService.refreshForNote(entity, entity.getCreator());
-    }
     if (relationBuilders.isEmpty()
         && predefinedQuestionBuilders.isEmpty()
         && childrenBuilders.isEmpty()
         && !needPersist) return;
-    if (entity.isRelation()) makeMe.refresh(entity.getParent());
-    else makeMe.refresh(entity);
+    makeMe.refresh(entity);
   }
 
   public NoteBuilder skipMemoryTracking() {

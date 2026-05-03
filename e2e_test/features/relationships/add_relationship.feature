@@ -24,7 +24,6 @@ Feature: add relationship
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
-  @focus
   @mockBrowserTime
   Scenario: creating relationship
     When I add relationship from note "Sedition" as "similar to" to note "Sedation"

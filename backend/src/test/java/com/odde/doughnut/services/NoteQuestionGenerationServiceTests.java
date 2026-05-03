@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
-import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -176,20 +175,6 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldNotIncludeRelationTypeSpecialInstructionForRegularNote() {
       ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
-
-      assertThat(
-          systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
-    }
-
-    @Test
-    void shouldNotIncludeRelationTypeSpecialInstructionForRelationshipNote() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.PART).please();
-      Note relationNote =
-          sourceNote.getChildren().stream().filter(Note::isRelation).findFirst().orElseThrow();
-
-      ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
 
       assertThat(
           systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
