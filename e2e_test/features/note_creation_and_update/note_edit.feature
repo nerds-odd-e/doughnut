@@ -67,8 +67,8 @@ Feature: Note Edit
 
   Scenario: Edit a note title should update the sidebar
     Given I have a notebook "LeSS training" with notes:
-      | Title | Parent Title   |
-      | TDD   | LeSS in Action |
+      | Title |
+      | TDD   |
     When I update note title "TDD" to become "Critical thinking"
     Then I should see the note tree in the sidebar
       | note-title        |

@@ -5,11 +5,11 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner" in notebook "Shape"
-      | Title            | Parent Title| Skip Memory Tracking|
-      | Shape            |             | true       |
-      | Square           | Shape       |            |
-      | Triangle         | Shape       |            |
-      | Big Square       | Square      |            |
+      | Title      | Parent Title | Skip Memory Tracking |
+      | Shape      |              | true                 |
+      | Square     | Shape        |                      |
+      | Triangle   | Shape        |                      |
+      | Big Square | Square       |                      |
     And notebook "Shape" is shared to the Bazaar
 
   Scenario: subscribe to a note and browse

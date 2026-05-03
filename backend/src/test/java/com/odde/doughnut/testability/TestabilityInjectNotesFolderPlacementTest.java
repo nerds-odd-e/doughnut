@@ -26,18 +26,18 @@ class TestabilityInjectNotesFolderPlacementTest {
   @Autowired MakeMe makeMe;
 
   @Test
-  void injectNotes_assignsExplicitFolderIndependentOfParentAndSkipsImplicitFolders() {
+  void injectNotes_assignsExplicitFolderPathsForNestedNotes() {
     var user = makeMe.aUser().please();
     var data = new TestabilityRestController.NotesTestData();
     data.setNotebookName("Folder inject nb");
     data.setExternalIdentifier(user.getExternalIdentifier());
 
     List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
-    rows.add(row("LeSS in Action", null, null));
-    rows.add(row("TDD", null, "LeSS in Action"));
-    rows.add(row("TPP", null, "LeSS in Action/TDD"));
-    rows.add(row("Const", null, "LeSS in Action/TPP"));
-    rows.add(row("NoFolderChild", "TDD", null));
+    rows.add(row("LeSS in Action", null));
+    rows.add(row("TDD", "LeSS in Action"));
+    rows.add(row("TPP", "LeSS in Action/TDD"));
+    rows.add(row("Const", "LeSS in Action/TPP"));
+    rows.add(row("UnderTdd", "LeSS in Action/TDD"));
 
     data.setNoteTestData(rows);
 
@@ -49,9 +49,11 @@ class TestabilityInjectNotesFolderPlacementTest {
     assertThat(constNote.getFolder().getName(), equalTo("TPP"));
     assertThat(constNote.getFolder().getParentFolder().getName(), equalTo("LeSS in Action"));
 
-    Note noFolder = noteRepository.findById(ids.get("NoFolderChild")).orElseThrow();
-    assertThat(noFolder.getParent().getTitle(), equalTo("TDD"));
-    assertThat(noFolder.getFolder(), nullValue());
+    Note underTdd = noteRepository.findById(ids.get("UnderTdd")).orElseThrow();
+    assertThat(underTdd.getParent(), nullValue());
+    assertThat(underTdd.getFolder(), notNullValue());
+    assertThat(underTdd.getFolder().getName(), equalTo("TDD"));
+    assertThat(underTdd.getFolder().getParentFolder().getName(), equalTo("LeSS in Action"));
   }
 
   @Test
@@ -62,8 +64,8 @@ class TestabilityInjectNotesFolderPlacementTest {
     data.setExternalIdentifier(user.getExternalIdentifier());
 
     List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
-    rows.add(row("Germany", null, "World"));
-    rows.add(row("Japan", null, "World"));
+    rows.add(row("Germany", "World"));
+    rows.add(row("Japan", "World"));
     data.setNoteTestData(rows);
 
     Map<String, Integer> ids = testabilityRestController.injectNotes(data);
@@ -78,11 +80,9 @@ class TestabilityInjectNotesFolderPlacementTest {
     assertThat(germany.getFolder().getName(), equalTo("World"));
   }
 
-  private static TestabilityRestController.NoteTestData row(
-      String title, String parentTitle, String folder) {
+  private static TestabilityRestController.NoteTestData row(String title, String folder) {
     TestabilityRestController.NoteTestData n = new TestabilityRestController.NoteTestData();
     n.title = title;
-    n.setParentTitle(parentTitle);
     n.setFolder(folder);
     return n;
   }

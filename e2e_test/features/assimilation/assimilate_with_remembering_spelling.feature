@@ -11,8 +11,8 @@ Feature: Assimilate With Remembering Spelling
 
   Scenario Outline: Remembering spelling availability depends on note details
     Given I have a notebook "English practice" with notes:
-      | Title | Details   | Parent Title |
-      | Word  | <details> | English      |
+      | Title | Details   |
+      | Word  | <details> |
     When I am assimilating the note "Word"
     Then remembering spelling should be <availability>
 
@@ -23,8 +23,8 @@ Feature: Assimilate With Remembering Spelling
 
   Scenario Outline: Verify spelling proceeds with keep for recall
     Given I have a notebook "English practice" with notes:
-      | Title        | Details           | Parent Title |
-      | <note_title> | Non-empty details | English      |
+      | Title        | Details           |
+      | <note_title> | Non-empty details |
     And I am assimilating the note "<note_title>"
     And I keep for recall with remembering spelling
     When I verify spelling with "<spelling_input>"
@@ -38,8 +38,8 @@ Feature: Assimilate With Remembering Spelling
 
   Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
     Given I have a notebook "English practice" with notes:
-      | Title   | Details           | Parent Title |
-      | Relearn | Non-empty details | English      |
+      | Title   | Details           |
+      | Relearn | Non-empty details |
     And I assimilated one note "Relearn" on day 1
     And I add remember spelling to the note "Relearn"
     When I navigate to the assimilation page
@@ -47,8 +47,8 @@ Feature: Assimilate With Remembering Spelling
 
   Scenario: Add only spelling memory tracker when note already has trackers
     Given I have a notebook "English practice" with notes:
-      | Title | Details           | Parent Title |
-      | Word  | Non-empty details | English      |
+      | Title | Details           |
+      | Word  | Non-empty details |
     And I assimilated one note "Word" on day 1
     When I am assimilating the note "Word"
     And I keep for recall with remembering spelling
@@ -57,8 +57,8 @@ Feature: Assimilate With Remembering Spelling
 
   Scenario: Keep for recall disabled when note already has memory trackers
     Given I have a notebook "English practice" with notes:
-      | Title | Details           | Parent Title |
-      | Word  | Non-empty details | English      |
+      | Title | Details           |
+      | Word  | Non-empty details |
     And I assimilated one note "Word" on day 1
     When I am assimilating the note "Word"
     Then the keep for recall button should be disabled

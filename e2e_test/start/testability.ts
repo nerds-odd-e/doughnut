@@ -206,7 +206,7 @@ const testability = () => {
         { Title: notebook },
         ...new Array(numberOfNotes).fill(0).map((_, index) => ({
           Title: `Note about ${index}`,
-          'Parent Title': notebook,
+          Folder: notebook,
         })),
       ]
       return this.injectNotes(notes, creatorId, notebook)
