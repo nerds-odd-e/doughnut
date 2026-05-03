@@ -6,12 +6,12 @@
     <template v-for="row in displayRows" :key="rowKey(row)">
       <SidebarNoteItem
         v-if="row.kind === 'note'"
-        :note="row.note"
-        :active-note-realm="activeNoteRealm"
+        :note-topology="row.noteTopology"
+        :active-note-topology="activeNoteTopology"
       />
       <SidebarFolderItem
         v-else
-        v-bind="{ notebookId, folder: row.folder, activeNoteRealm }"
+        v-bind="{ notebookId, folder: row.folder, activeNoteTopology }"
       />
     </template>
   </ul>
@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
 import type {
-  Note,
   NoteRealm,
+  NoteTopology,
   NotebookRootFolder,
 } from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
@@ -32,7 +32,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 const storageAccessor = useStorageAccessor()
 
 type SidebarStructuralRow =
-  | { kind: "note"; note: Note }
+  | { kind: "note"; noteTopology: NoteTopology }
   | { kind: "folder"; folder: NotebookRootFolder }
 
 function folderNumericId(folder: NotebookRootFolder): number | undefined {
@@ -44,8 +44,8 @@ function folderSortKey(folder: NotebookRootFolder): string {
   return (folder.name ?? "").toLocaleLowerCase()
 }
 
-function noteSortKey(note: Note): string {
-  return (note.noteTopology?.title ?? "").toLocaleLowerCase()
+function noteSortKey(noteTopology: NoteTopology): string {
+  return (noteTopology.title ?? "").toLocaleLowerCase()
 }
 
 function buildStructuralRows(
@@ -67,10 +67,10 @@ function buildStructuralRows(
 
   const noteRows: NoteRow[] = realms.map((realm) => ({
     kind: "note" as const,
-    note: realm.note,
+    noteTopology: realm.note.noteTopology,
   }))
   noteRows.sort((a, b) =>
-    noteSortKey(a.note).localeCompare(noteSortKey(b.note))
+    noteSortKey(a.noteTopology).localeCompare(noteSortKey(b.noteTopology))
   )
 
   return [...folderRows, ...noteRows]
@@ -78,7 +78,7 @@ function buildStructuralRows(
 
 function rowKey(row: SidebarStructuralRow): string {
   if (row.kind === "note") {
-    return `n-${row.note.id}`
+    return `n-${row.noteTopology.id}`
   }
   const fid = folderNumericId(row.folder)
   return `f-${fid ?? "unknown"}`
@@ -87,7 +87,7 @@ function rowKey(row: SidebarStructuralRow): string {
 interface Props {
   notebookId: number
   /** When omitted (e.g. notebook overview with no `index` note), root notes still render without selection */
-  activeNoteRealm?: NoteRealm
+  activeNoteTopology?: NoteTopology
   /** When set, list notes inside this folder. When omitted, list notebook root notes. */
   folderId?: number
   /** Notifies enclosing folder row (when nested) how many peers this listing renders. */

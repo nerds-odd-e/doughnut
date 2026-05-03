@@ -3,8 +3,8 @@
     class="daisy-list-group-item daisy-list-group-item-action daisy-py-2 daisy-pb-0 daisy-pe-0 daisy-border-0"
     :class="{
       'active-item':
-        activeNoteRealm != null &&
-        note.id === activeNoteRealm.note.id,
+        activeNoteTopology != null &&
+        noteTopology.id === activeNoteTopology.id,
     }"
     @click="onNoteRowClick"
   >
@@ -14,18 +14,23 @@
       <NoteTitleWithLink
         :class="{
           'active-title':
-            activeNoteRealm != null &&
-            note.id === activeNoteRealm.note.id,
+            activeNoteTopology != null &&
+            noteTopology.id === activeNoteTopology.id,
         }"
-        v-bind="{ noteTopology: note.noteTopology }"
+        v-bind="{ noteTopology }"
       />
-      <ScrollTo v-if="activeNoteRealm != null && note.id === activeNoteRealm.note.id" />
+      <ScrollTo
+        v-if="
+          activeNoteTopology != null &&
+          noteTopology.id === activeNoteTopology.id
+        "
+      />
     </div>
   </li>
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 import { sidebarUserActiveFolderIdKey } from "./sidebarFolderExpansion"
@@ -34,8 +39,8 @@ import { inject } from "vue"
 const userActiveFolderId = inject(sidebarUserActiveFolderIdKey, undefined)
 
 interface Props {
-  note: Note
-  activeNoteRealm?: NoteRealm
+  noteTopology: NoteTopology
+  activeNoteTopology?: NoteTopology
 }
 
 defineProps<Props>()

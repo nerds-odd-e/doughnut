@@ -30,7 +30,7 @@
       v-bind="{
         notebookId,
         folderId,
-        activeNoteRealm,
+        activeNoteTopology,
         onStructuralPeerCount: setStructuralChildCount,
       }"
       :key="`folder-${folderId}`"
@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import type {
-  NoteRealm,
+  NoteTopology,
   NotebookRootFolder,
 } from "@generated/doughnut-backend-api"
 import SidebarInner from "./SidebarInner.vue"
@@ -56,7 +56,7 @@ import { computed, inject, ref, watch } from "vue"
 const props = defineProps<{
   folder: NotebookRootFolder
   notebookId: number
-  activeNoteRealm?: NoteRealm
+  activeNoteTopology?: NoteTopology
 }>()
 
 const expandedFolderIds = inject(sidebarExpandedFolderIdsKey)!

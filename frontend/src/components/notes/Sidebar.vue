@@ -11,7 +11,7 @@
       v-if="sidebarTreeShown"
       :key="notebookId"
       :notebook-id="notebookId"
-      :active-note-realm="activeNoteRealm"
+      :active-note-topology="activeNoteTopology"
     />
   </div>
 </template>
@@ -65,9 +65,13 @@ const structuralSidebarTitles = computed(() =>
   structuralSidebarTitlesFromRealm(props.activeNoteRealm)
 )
 
+const activeNoteTopology = computed(
+  () => props.activeNoteRealm?.note?.noteTopology
+)
+
 const activeNoteFolderIds = computed(() => {
   const ids = new Set<number>()
-  const fid = props.activeNoteRealm?.note?.noteTopology?.folderId
+  const fid = activeNoteTopology.value?.folderId
   if (fid != null) {
     ids.add(fid)
   }
@@ -81,9 +85,9 @@ provide(sidebarActiveNoteFolderIdsKey, activeNoteFolderIds)
 provide(sidebarUserActiveFolderIdKey, userActiveFolderId)
 
 watch(
-  () => props.activeNoteRealm,
-  (realm) => {
-    ensureFolderExpanded(realm?.note?.noteTopology?.folderId)
+  activeNoteTopology,
+  (topology) => {
+    ensureFolderExpanded(topology?.folderId)
   },
   { immediate: true, deep: true }
 )
@@ -106,14 +110,10 @@ const sidebarReadonly = computed(
     (props.activeNoteRealm != null && props.activeNoteRealm.fromBazaar === true)
 )
 
-const noteContextResolved = computed(
-  () => props.activeNoteRealm?.note?.noteTopology != null
-)
+const noteContextResolved = computed(() => activeNoteTopology.value != null)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(
-  () =>
-    props.activeNoteRealm === undefined ||
-    props.activeNoteRealm.note.noteTopology != null
+  () => props.activeNoteRealm === undefined || activeNoteTopology.value != null
 )
 </script>
