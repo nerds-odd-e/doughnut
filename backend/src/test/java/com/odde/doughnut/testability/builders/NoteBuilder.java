@@ -63,8 +63,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder under(Note parentNote) {
-    entity.setParentNote(parentNote);
-    if (entity.getCreator() == null) creator(parentNote.getCreator());
+    User user = entity.getCreator() != null ? entity.getCreator() : parentNote.getCreator();
+    Timestamp createdAt = entity.getCreatedAt();
+    Timestamp updatedAt = entity.getUpdatedAt();
+    entity.initialize(user, parentNote, createdAt, entity.getTitle());
+    if (updatedAt != null) {
+      entity.setUpdatedAt(updatedAt);
+    }
+    if (entity.getCreator() == null) {
+      creator(parentNote.getCreator());
+    }
     parentNote.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
     return this;
   }

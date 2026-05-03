@@ -212,7 +212,7 @@ class TestabilityRestController {
           entityPersister.save(note.getNotebook());
           firstRootCreatedInBatch = note;
         } else {
-          note.setParentNote(firstRootCreatedInBatch);
+          note.initialize(user, firstRootCreatedInBatch, currentUTCTimestamp, injection.title);
         }
       }
     }

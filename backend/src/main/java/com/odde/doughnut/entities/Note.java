@@ -164,21 +164,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void setParentNote(Note parentNote) {
-    if (parentNote == null) return;
-    setNotebook(parentNote.getNotebook());
-    if (this.parent != null) {
-      this.parent.children.removeIf(c -> c == this);
-    }
-    this.parent = parentNote;
-    if (parentNote.children.stream().noneMatch(c -> c == this)) {
-      parentNote.children.add(this);
-    }
-    // Update notebook for all descendants including relationships
-    getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
-  }
-
-  @JsonIgnore
   public void assignNotebook(Notebook notebook) {
     setNotebook(notebook);
   }
@@ -296,7 +281,17 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   public void initialize(User user, Note parentNote, Timestamp currentUTCTimestamp, String title) {
-    setParentNote(parentNote);
+    if (parentNote != null) {
+      setNotebook(parentNote.getNotebook());
+      if (this.parent != null) {
+        this.parent.children.removeIf(c -> c == this);
+      }
+      this.parent = parentNote;
+      if (parentNote.children.stream().noneMatch(c -> c == this)) {
+        parentNote.children.add(this);
+      }
+      getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
+    }
     setUpdatedAt(currentUTCTimestamp);
     setTitle(title);
     setCreatedAt(currentUTCTimestamp);
