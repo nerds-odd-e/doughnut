@@ -98,10 +98,6 @@ class TestabilityRestController {
     @Setter
     private String details;
 
-    @JsonProperty("Parent Title")
-    @Setter
-    private String parentTitle;
-
     @JsonProperty("Skip Memory Tracking")
     @Setter
     private Boolean skipMemoryTracking;
@@ -180,15 +176,10 @@ class TestabilityRestController {
         Notebook notebookFromRepositoryOrNull,
         Timestamp currentUTCTimestamp,
         Map<String, Note> titleNoteMap,
-        NoteRepository noteRepository,
         EntityPersister entityPersister) {
       Note firstRootCreatedInBatch = null;
       for (NoteTestData injection : noteTestData) {
         Note note = titleNoteMap.get(injection.title);
-        if (!Strings.isBlank(injection.parentTitle)) {
-          note.setParentNote(getParentNote(titleNoteMap, noteRepository, injection.parentTitle));
-          continue;
-        }
         if (!Strings.isBlank(injection.getFolder())) {
           if (notebookFromRepositoryOrNull != null) {
             note.initializeAsNotebookRoot(
@@ -224,13 +215,6 @@ class TestabilityRestController {
           note.setParentNote(firstRootCreatedInBatch);
         }
       }
-    }
-
-    private Note getParentNote(
-        Map<String, Note> titleNoteMap, NoteRepository noteRepository, String parentTitle) {
-      Note parentNote = titleNoteMap.get(parentTitle);
-      if (parentNote != null) return parentNote;
-      return noteRepository.findFirstByTitle(parentTitle);
     }
 
     private void saveByOriginalOrder(
@@ -345,7 +329,6 @@ class TestabilityRestController {
         notebookFromRepository,
         currentUTCTimestamp,
         titleNoteMap,
-        this.noteRepository,
         this.entityPersister);
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);

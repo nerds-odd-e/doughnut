@@ -139,7 +139,6 @@ export type SuggestedQuestionsData = {
 export type NoteTestData = {
     Title?: string;
     Details?: string;
-    'Parent Title'?: string;
     'Skip Memory Tracking'?: boolean;
     'Remember Spelling'?: boolean;
     'Image Url'?: string;

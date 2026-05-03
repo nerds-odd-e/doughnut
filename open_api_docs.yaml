@@ -3535,8 +3535,6 @@ components:
           type: string
         Details:
           type: string
-        Parent Title:
-          type: string
         Skip Memory Tracking:
           type: boolean
         Remember Spelling:
