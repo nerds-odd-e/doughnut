@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.Optional;
@@ -43,6 +44,19 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     assertThat(parent.getChildren().size(), equalTo(1));
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
+  }
+
+  @Test
+  void resolvesRelationshipTargetFromYaml() {
+    User owner = makeMe.aUser().please();
+    Note source = makeMe.aNote("Src").creatorAndOwner(owner).please();
+    Note target = makeMe.aNote("Tgt").under(source).please();
+    Note relation =
+        makeMe.aRelation().between(source, target, RelationType.PART).under(source).please();
+
+    assertThat(
+        wikiLinkResolver.resolveSemanticTarget(relation, owner).map(Note::getId),
+        equalTo(Optional.of(target.getId())));
   }
 
   @Test

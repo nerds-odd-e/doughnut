@@ -1,11 +1,9 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
-import com.odde.doughnut.algorithms.NoteYamlFrontmatterScalars;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
-import java.util.Optional;
 
 public final class RelationshipNoteMarkdownFormatter {
 
@@ -24,20 +22,6 @@ public final class RelationshipNoteMarkdownFormatter {
       return relationKebabFromLabel(RelationType.RELATED_TO.label);
     }
     return t.toLowerCase().replaceAll("\\s+", "-");
-  }
-
-  /**
-   * Reads {@code relation:} from relationship-note frontmatter. Empty when not a relationship note,
-   * no {@code relation} line, or unknown kebab.
-   */
-  public static Optional<RelationType> parseRelationTypeFromRelationshipNoteDetails(
-      String details) {
-    return NoteDetailsMarkdown.splitLeadingFrontmatter(details)
-        .filter(fm -> fm.yamlRaw().contains("type: relationship"))
-        .flatMap(
-            fm ->
-                relationKebabFromYamlRaw(fm.yamlRaw())
-                    .flatMap(RelationshipNoteMarkdownFormatter::relationTypeFromKebab));
   }
 
   public static String extractUserSuffixFromRelationshipDetails(String details) {
@@ -195,21 +179,6 @@ public final class RelationshipNoteMarkdownFormatter {
     }
     String t = s.trim();
     return t.isEmpty() ? null : t;
-  }
-
-  private static Optional<String> relationKebabFromYamlRaw(String yamlRaw) {
-    return NoteYamlFrontmatterScalars.firstScalarValue(yamlRaw, "relation")
-        .map(String::toLowerCase);
-  }
-
-  private static Optional<RelationType> relationTypeFromKebab(String kebab) {
-    String k = kebab.trim().toLowerCase();
-    for (RelationType rt : RelationType.values()) {
-      if (relationKebabFromLabel(rt.label).equals(k)) {
-        return Optional.of(rt);
-      }
-    }
-    return Optional.empty();
   }
 
   private static String yamlDoubleQuotedInner(String s) {

@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
+import com.odde.doughnut.algorithms.NoteYamlFrontmatterScalars;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -33,6 +35,25 @@ public class WikiLinkResolver {
       return Optional.empty();
     }
     return Optional.ofNullable(resolveToken(wikiLinkInnerTitle.trim(), viewer, focusNote));
+  }
+
+  /** Resolves the {@code target:} wiki link from a relationship note's YAML frontmatter. */
+  public Optional<Note> resolveSemanticTarget(Note relation, User viewer) {
+    String details = relation.getDetails();
+    if (details == null || details.isBlank()) {
+      return Optional.empty();
+    }
+    Optional<String> targetScalar =
+        NoteDetailsMarkdown.splitLeadingFrontmatter(details)
+            .flatMap(fm -> NoteYamlFrontmatterScalars.firstScalarValue(fm.yamlRaw(), "target"));
+    if (targetScalar.isEmpty()) {
+      return Optional.empty();
+    }
+    List<String> inners = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(targetScalar.get());
+    if (inners.isEmpty()) {
+      return Optional.empty();
+    }
+    return resolveWikiInnerTitle(inners.getFirst(), viewer, relation);
   }
 
   public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
