@@ -1,6 +1,29 @@
 import { pageIsNotLoading } from '../pageBase'
 import noteCreationForm from './noteForms/noteCreationForm'
 
+const sidebarNoteTitleClickTimeoutMs = 20000
+
+/** Retries until a note row with this exact title exists (avoids `.filter` timing out when other `.title-text` nodes exist first). */
+function clickSidebarNoteTitleExact(label: string) {
+  const trimmed = label.trim()
+  cy.get('aside').within(() => {
+    cy.get('.title-text', { timeout: sidebarNoteTitleClickTimeoutMs }).should(
+      ($els) => {
+        const titles = [...$els].map((el) => el.textContent?.trim())
+        expect(
+          titles.some((t) => t === trimmed),
+          `sidebar should list note "${trimmed}" (have: ${titles.join(', ')})`
+        ).to.be.true
+      }
+    )
+    cy.get('.title-text', { timeout: sidebarNoteTitleClickTimeoutMs })
+      .filter((_, el) => el.textContent?.trim() === trimmed)
+      .first()
+      .should('be.visible')
+      .click()
+  })
+}
+
 const sidebarAddNoteButton = (buttonName?: string) => {
   const getButton = () =>
     cy.get('aside').findByRole('button', {
@@ -169,13 +192,7 @@ export const noteSidebar = () => {
             expandFolderRowIfCollapsed(segment)
             return
           }
-          cy.get('aside').within(() => {
-            cy.get('.title-text')
-              .filter((_, el) => el.textContent?.trim() === label)
-              .first()
-              .should('be.visible')
-              .click()
-          })
+          clickSidebarNoteTitleExact(label)
           pageIsNotLoading()
         })
     },
@@ -186,14 +203,7 @@ export const noteSidebar = () => {
 
     navigateToNote(noteTopology: string) {
       pageIsNotLoading()
-      const label = noteTopology.trim()
-      cy.get('aside').within(() => {
-        cy.get('.title-text')
-          .filter((_, el) => el.textContent?.trim() === label)
-          .first()
-          .should('be.visible')
-          .click()
-      })
+      clickSidebarNoteTitleExact(noteTopology)
       pageIsNotLoading()
     },
 
