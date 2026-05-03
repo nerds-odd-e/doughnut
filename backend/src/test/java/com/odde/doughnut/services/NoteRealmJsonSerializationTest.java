@@ -41,8 +41,8 @@ class NoteRealmJsonSerializationTest {
   void serializes_realm_with_wiki_cache_references() throws Exception {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").under(root).please();
-    Note subject = makeMe.aNote().under(root).please();
+    Note focal = makeMe.aNote().title("Focal").please();
+    Note subject = makeMe.aNote().please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(

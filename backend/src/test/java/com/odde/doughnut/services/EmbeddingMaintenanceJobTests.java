@@ -36,14 +36,9 @@ class EmbeddingMaintenanceJobTests {
     nb1 = makeMe.aNotebook().please();
     nb2 = makeMe.aNotebook().please();
     // Add a couple of notes to each to simulate content
-    makeMe
-        .aNote()
-        .under(noteRepository.findNotebookRootNotesByNotebookId(nb1.getId()).getFirst())
-        .please();
-    makeMe
-        .aNote()
-        .under(noteRepository.findNotebookRootNotesByNotebookId(nb2.getId()).getFirst())
-        .please();
+    makeMe.aNote().please();
+
+    makeMe.aNote().please();
 
     job = new EmbeddingMaintenanceJob(notebookRepository, notebookIndexingService);
   }

@@ -47,7 +47,7 @@ class NoteAutomationServiceTests {
 
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();
-    makeMe.aNote().under(testNote).please();
+    makeMe.aNote().please();
 
     // Initialize common services
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =

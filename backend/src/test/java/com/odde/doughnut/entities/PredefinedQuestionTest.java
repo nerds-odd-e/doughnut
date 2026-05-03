@@ -48,9 +48,8 @@ class PredefinedQuestionTest {
 
     @BeforeEach
     void setup() {
-      Note top = makeMe.aNote().please();
-      note = makeMe.aNote().under(top).rememberSpelling().please();
-      makeMe.aNote("a necessary sibling as filling option").under(top).please();
+      note = makeMe.aNote().rememberSpelling().please();
+      makeMe.aNote("a necessary sibling as filling option").please();
     }
 
     @Test

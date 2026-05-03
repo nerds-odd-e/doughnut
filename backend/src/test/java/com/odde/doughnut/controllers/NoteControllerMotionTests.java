@@ -51,9 +51,9 @@ class NoteControllerMotionTests extends ControllerTestBase {
     User u = currentUser.getUser();
     Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
-    Note peerA = makeMe.aNote("A").creatorAndOwner(u).under(root).please();
-    Note peerB = makeMe.aNote("B").creatorAndOwner(u).under(root).please();
-    Note mover = makeMe.aNote("M").creatorAndOwner(u).under(root).please();
+    Note peerA = makeMe.aNote("A").creatorAndOwner(u).please();
+    Note peerB = makeMe.aNote("B").creatorAndOwner(u).please();
+    Note mover = makeMe.aNote("M").creatorAndOwner(u).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(peerA, folder);
     noteMotionService.executeMoveIntoFolder(peerB, folder);
@@ -75,8 +75,8 @@ class NoteControllerMotionTests extends ControllerTestBase {
     User u = currentUser.getUser();
     Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
-    Note peerA = makeMe.aNote("A").creatorAndOwner(u).under(root).please();
-    Note mover = makeMe.aNote("M").creatorAndOwner(u).under(root).please();
+    Note peerA = makeMe.aNote("A").creatorAndOwner(u).please();
+    Note mover = makeMe.aNote("M").creatorAndOwner(u).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(peerA, folder);
     noteMotionService.executeMoveIntoFolder(mover, folder);
@@ -93,8 +93,8 @@ class NoteControllerMotionTests extends ControllerTestBase {
     Note root = makeMe.aRootNote("top").creatorAndOwner(u).please();
     Folder f1 = makeMe.aFolder().notebook(root.getNotebook()).name("F1").please();
     Folder f2 = makeMe.aFolder().notebook(root.getNotebook()).name("F2").please();
-    Note in1 = makeMe.aNote("in1").creatorAndOwner(u).under(root).please();
-    Note in2 = makeMe.aNote("in2").creatorAndOwner(u).under(root).please();
+    Note in1 = makeMe.aNote("in1").creatorAndOwner(u).please();
+    Note in2 = makeMe.aNote("in2").creatorAndOwner(u).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(in1, f1);
     noteMotionService.executeMoveIntoFolder(in2, f2);

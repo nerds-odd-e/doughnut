@@ -52,7 +52,6 @@ class NullToNotFoundResponseBodyAdviceTest {
   @Test
   void shouldReturn404WhenAskAQuestionReturnsNull() throws Exception {
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-    makeMe.aNote().under(note).please(); // Add another note to the notebook
     User user = currentUser.getUser();
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
 

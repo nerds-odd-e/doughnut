@@ -57,7 +57,7 @@ class FolderRepositoryTest {
     Notebook notebook = makeMe.aNotebook().please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("Inbox").please();
     Note root = noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst();
-    Note note = makeMe.aNote().under(root).folder(folder).please();
+    Note note = makeMe.aNote().folder(folder).please();
     makeMe.entityPersister.flush();
 
     Note loaded = noteRepository.findById(note.getId()).orElseThrow();
@@ -90,10 +90,8 @@ class FolderRepositoryTest {
             .name("Section")
             .please();
 
-    Note section =
-        makeMe.aNote().under(root).title("Section").folder(folderForRootChildren).please();
-    Note leaf =
-        makeMe.aNote().under(section).title("Leaf").folder(folderForSectionChildren).please();
+    Note section = makeMe.aNote().title("Section").folder(folderForRootChildren).please();
+    Note leaf = makeMe.aNote().title("Leaf").folder(folderForSectionChildren).please();
     Long siblingOrder = leaf.getSiblingOrder();
     makeMe.entityPersister.flush();
 

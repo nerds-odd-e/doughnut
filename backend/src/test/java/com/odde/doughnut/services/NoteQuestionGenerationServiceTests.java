@@ -42,7 +42,7 @@ class NoteQuestionGenerationServiceTests {
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     testNote = makeMe.aNote().please();
-    makeMe.aNote().under(testNote).please();
+    makeMe.aNote().please();
   }
 
   private boolean systemMessageContains(ChatCompletionCreateParams request, String text) {

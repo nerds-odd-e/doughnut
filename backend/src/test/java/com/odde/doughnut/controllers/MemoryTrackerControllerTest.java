@@ -181,7 +181,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .creatorAndOwner(currentUser.getUser())
               .rememberSpelling()
               .please();
-      makeMe.aNote().under(note).please();
+      makeMe.aNote().please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
       // Mock OpenAI API call
@@ -217,7 +217,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .creatorAndOwner(currentUser.getUser())
               .rememberSpelling()
               .please();
-      makeMe.aNote().under(note).please();
+      makeMe.aNote().please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(OpenAiNotAvailableException.class, () -> controller.askAQuestion(memoryTracker));

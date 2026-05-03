@@ -30,7 +30,6 @@ class RecallQuestionServiceTest {
   @BeforeEach
   void setup() {
     note = makeMe.aNote().details("description long enough.").please();
-    makeMe.aNote().under(note).please(); // Add another note to the notebook
     memoryTracker = makeMe.aMemoryTrackerFor(note).by(makeMe.aUser().please()).please();
   }
 

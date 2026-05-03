@@ -34,11 +34,7 @@ class NoteEmbeddingServiceTests {
   @BeforeEach
   void setup() {
     notebook = makeMe.aNotebook().please();
-    note =
-        makeMe
-            .aNote()
-            .under(noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst())
-            .please();
+    note = makeMe.aNote().please();
   }
 
   @Test
@@ -52,10 +48,8 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldDeleteNotebookEmbeddings() {
-    makeMe
-        .aNote()
-        .under(noteRepository.findNotebookRootNotesByNotebookId(notebook.getId()).getFirst())
-        .please();
+    makeMe.aNote().please();
+
     makeMe.refresh(notebook);
     notebook.getNotes().forEach(n -> makeMe.aNoteEmbedding(n).please());
 

@@ -67,7 +67,7 @@ class AiQuestionGeneratorTests {
 
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
     // another note is needed, otherwise the note will be the only note in the notebook
-    makeMe.aNote().under(note).please();
+    makeMe.aNote().please();
 
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
@@ -80,7 +80,7 @@ class AiQuestionGeneratorTests {
   void shouldShuffleChoicesWhenStrictChoiceOrderIsFalse() {
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-    makeMe.aNote().under(note).please();
+    makeMe.aNote().please();
 
     // Prepare the AI response with strictChoiceOrder = false
     MCQWithAnswer originalQuestion =
@@ -134,7 +134,7 @@ class AiQuestionGeneratorTests {
 
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-    makeMe.aNote().under(note).please();
+    makeMe.aNote().please();
 
     // Prepare the AI response with strictChoiceOrder = false
     MCQWithAnswer originalQuestion =
@@ -166,7 +166,7 @@ class AiQuestionGeneratorTests {
   void shouldRejectQuestionWithInvalidChoiceIndex() {
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-    makeMe.aNote().under(note).please();
+    makeMe.aNote().please();
 
     // Prepare an AI response with an invalid choice index (3 for a list of 3 choices)
     MCQWithAnswer invalidQuestion =
@@ -190,7 +190,7 @@ class AiQuestionGeneratorTests {
   @Test
   void shouldThrowWhenOpenAiIsNotAvailable() {
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-    makeMe.aNote().under(note).please();
+    makeMe.aNote().please();
 
     testabilitySettings.setOpenAiTokenOverride("");
 
