@@ -172,15 +172,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
-  @JsonIgnore
-  public void setSiblingOrderToInsertAfter(Note relativeToNote) {
-    this.siblingOrder =
-        relativeToNote
-            .nextSibling()
-            .map(x -> (relativeToNote.siblingOrder + x.getSiblingOrder()) / 2)
-            .orElse(relativeToNote.siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
-  }
-
   public void updateSiblingOrderAsFirstChild(Note parentNote) {
     parentNote.getChildren().stream()
         .findFirst()
@@ -188,10 +179,6 @@ public class Note extends EntityIdentifiedByIdOnly {
             firstChild ->
                 this.siblingOrder =
                     firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
-  }
-
-  private Optional<Note> nextSibling() {
-    return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
   }
 
   @JsonIgnore
@@ -239,20 +226,6 @@ public class Note extends EntityIdentifiedByIdOnly {
       noteTopology.setFolderId(getFolder().getId());
     }
     return noteTopology;
-  }
-
-  @JsonIgnore
-  public void adjustPositionAsAChildOfParentInMemory() {
-    List<Note> siblings = getParent().children;
-    siblings.remove(this);
-    int insertIndex = 0;
-    for (Note sibling : siblings) {
-      if (sibling.getSiblingOrder() > getSiblingOrder()) {
-        break;
-      }
-      insertIndex++;
-    }
-    siblings.add(insertIndex, this);
   }
 
   @JsonIgnore

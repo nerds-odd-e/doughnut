@@ -243,7 +243,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder after(Note note) {
     attachAsChildOf(note.getParent());
-    entity.setSiblingOrderToInsertAfter(note);
     return this;
   }
 
