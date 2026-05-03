@@ -184,8 +184,11 @@ export const noteSidebar = () => {
 
     navigateToNote(noteTopology: string) {
       pageIsNotLoading()
+      const label = noteTopology.trim()
       cy.get('aside').within(() => {
-        cy.findByText(noteTopology, { selector: '.title-text', exact: false })
+        cy.get('.title-text')
+          .filter((_, el) => el.textContent?.trim() === label)
+          .first()
           .should('be.visible')
           .click()
       })
