@@ -77,8 +77,8 @@ public class WikiTitleCacheService {
 
   /**
    * Notes whose resolved wiki links point at {@code focalNote}, for {@link
-   * com.odde.doughnut.controllers.dto.NoteRealm} inbound references. Same visibility rules as
-   * legacy inbound (parent notebook vs focal notebook, {@link User#canReferTo}).
+   * com.odde.doughnut.controllers.dto.NoteRealm} inbound references. Visibility uses the referrer's
+   * notebook vs the focal notebook and {@link User#canReferTo}.
    */
   public List<Note> inboundReferrerNotesForViewer(Note focalNote, User viewer) {
     return distinctReferrersFromTargetRows(focalNote, viewer, (row, referrer) -> true);
@@ -121,11 +121,7 @@ public class WikiTitleCacheService {
   }
 
   private static boolean inboundReferrerVisible(Note referrer, Note focalNote, User viewer) {
-    Note parent = referrer.getParent();
-    if (parent == null) {
-      return false;
-    }
-    Notebook referrerNotebook = parent.getNotebook();
+    Notebook referrerNotebook = referrer.getNotebook();
     Notebook focalNotebook = focalNote.getNotebook();
     if (referrerNotebook != null
         && focalNotebook != null

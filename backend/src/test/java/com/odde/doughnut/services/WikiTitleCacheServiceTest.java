@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.doughnut.entities.Note;
@@ -162,5 +163,19 @@ class WikiTitleCacheServiceTest {
     assertThat(refs, hasSize(2));
     assertThat(refs.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
     assertThat(refs.get(1).getId(), equalTo(Math.max(first.getId(), second.getId())));
+  }
+
+  @Test
+  void references_notes_for_viewer_includes_notebook_root_referrer_linking_to_descendant() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").under(root).please();
+    Note referrerAtNotebookRoot =
+        makeMe.aNote().underSameNotebookAs(root).details("[[Focal]]").please();
+    wikiTitleCacheService.refreshForNote(referrerAtNotebookRoot, user);
+
+    List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);
+
+    assertThat(refs, hasItem(referrerAtNotebookRoot));
   }
 }
