@@ -72,8 +72,8 @@ Feature: Note Edit
     When I update note title "TDD" to become "Critical thinking"
     Then I should see the note tree in the sidebar
       | note-title        |
-      | LeSS in Action    |
       | Critical thinking |
+      | LeSS in Action    |
 
   Scenario: Edit a note details with Shift-Enter adds line break
     When I update note "LeSS in Action" to become:

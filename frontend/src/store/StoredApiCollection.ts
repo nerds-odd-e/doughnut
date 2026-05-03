@@ -129,9 +129,13 @@ export default class StoredApiCollection implements StoredApi {
     field: "edit title" | "edit details",
     content: string
   ) {
-    return this.storage.refreshNoteRealm(
+    const realm = this.storage.refreshNoteRealm(
       await this.callUpdateApi(noteId, field, content)
     )
+    if (field === "edit title") {
+      refreshSidebarStructuralListings()
+    }
+    return realm
   }
 
   private async callUpdateApi(

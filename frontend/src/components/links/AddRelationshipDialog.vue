@@ -40,9 +40,7 @@ const targetNoteTopology = ref<NoteTopology | undefined>(undefined)
 const noteRealm = computed(() =>
   note ? storageAccessor.value.refOfNoteRealm(note.id).value : undefined
 )
-const notebookId = computed(
-  () => noteRealm.value?.notebookId ?? note?.noteTopology.notebookId
-)
+const notebookId = computed(() => noteRealm.value?.notebookId)
 
 async function moveUnderFolder(targetFolderId: number) {
   if (!(await popups.confirm("Move note into this folder?"))) {
