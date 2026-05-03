@@ -272,7 +272,7 @@ jobs:
           echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
           echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
           echo "subject=$(git log -1 --format=%s "$GITHUB_SHA" | tr -d '"')" >> "$GITHUB_OUTPUT"
-      - uses: slackapi/slack-github-action@v3.0.2
+      - uses: slackapi/slack-github-action@v3.0.3
         with:
           webhook: ${{ env.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
