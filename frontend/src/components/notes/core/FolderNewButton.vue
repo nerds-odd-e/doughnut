@@ -7,6 +7,7 @@
       <FolderNewDialog
         :notebook-id="notebookId"
         :under-note-id="underNoteId"
+        :under-folder-id="underFolderId"
         @close-dialog="closer"
       />
     </template>
@@ -20,6 +21,7 @@ import FolderNewDialog from "../FolderNewDialog.vue"
 defineProps<{
   notebookId: number
   underNoteId?: number
+  underFolderId?: number
   buttonTitle: string
   ariaLabel?: string
 }>()

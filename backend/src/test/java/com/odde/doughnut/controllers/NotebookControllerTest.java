@@ -515,6 +515,26 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void createsNestedFolderUnderUnderFolderId() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      NoteCreationDTO createNb = new NoteCreationDTO();
+      createNb.setNewTitle("NB Create Under Folder Id");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
+
+      FolderCreationRequest req = new FolderCreationRequest();
+      req.setName("NestedByFolder");
+      req.setUnderFolderId(scope.getId());
+      FolderTrailSegment created = controller.createFolder(nb, req);
+
+      FolderListing listing = controller.listFolderListing(nb, scope);
+      assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
+      assertThat(created.name(), equalTo("NestedByFolder"));
+    }
+
+    @Test
     void rejectsDuplicateSiblingFolderName() throws UnexpectedNoAccessRightException {
       NoteCreationDTO createNb = new NoteCreationDTO();
       createNb.setNewTitle("NB Dup Folder");
@@ -542,6 +562,21 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("Bad");
       req.setUnderNoteId(noteInB.getId());
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.createFolder(nbA, req));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+
+    @Test
+    void rejectsUnderFolderFromOtherNotebook() {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderInB = makeMe.aFolder().notebook(nbB).name("Only B").please();
+
+      FolderCreationRequest req = new FolderCreationRequest();
+      req.setName("Bad");
+      req.setUnderFolderId(folderInB.getId());
       ResponseStatusException ex =
           assertThrows(ResponseStatusException.class, () -> controller.createFolder(nbA, req));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());

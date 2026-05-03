@@ -37,6 +37,7 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 const props = defineProps<{
   notebookId: number
   underNoteId?: number
+  underFolderId?: number
 }>()
 
 const emit = defineEmits<{
@@ -55,7 +56,11 @@ const processForm = async () => {
   try {
     await storageAccessor.value.storedApi().createFolder(props.notebookId, {
       name: name.value,
-      underNoteId: props.underNoteId,
+      ...(props.underFolderId != null
+        ? { underFolderId: props.underFolderId }
+        : props.underNoteId != null
+          ? { underNoteId: props.underNoteId }
+          : {}),
     })
     emit("closeDialog")
   } catch (res: unknown) {

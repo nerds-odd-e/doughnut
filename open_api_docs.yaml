@@ -1079,8 +1079,10 @@ paths:
       tags:
       - notebook-controller
       summary: Create a folder
-      description: "Creates a folder at notebook root when underNoteId is omitted,\
-        \ or nested under the context note's folder when underNoteId is set."
+      description: Creates a folder at notebook root when no parent is specified;
+        as a child of underFolderId when set; otherwise nested under the context note's
+        folder when underNoteId is set (underFolderId takes precedence when both are
+        set).
       operationId: createFolder
       parameters:
       - name: notebook
@@ -3920,20 +3922,26 @@ components:
           minLength: 0
     FolderCreationRequest:
       type: object
-      description: Create a folder under notebook root or nested under the folder
-        of a context note.
+      description: "Create a folder under notebook root, nested under an explicit\
+        \ parent folder, or nested under the folder of a context note."
       properties:
         name:
           type: string
           description: Display name for the new folder
           maxLength: 512
           minLength: 0
+        underFolderId:
+          type: integer
+          format: int32
+          description: "When set, the new folder is created as a direct child of this\
+            \ folder. Must belong to the target notebook. Takes precedence over underNoteId\
+            \ when both are set."
         underNoteId:
           type: integer
           format: int32
-          description: "When set, the new folder is a child of this note's folder\
-            \ (or notebook root when the note has no folder). Must belong to the target\
-            \ notebook."
+          description: "When set (and underFolderId is not), the new folder is a child\
+            \ of this note's folder (or notebook root when the note has no folder).\
+            \ Must belong to the target notebook."
       required:
       - name
     NoteCreationDTO:

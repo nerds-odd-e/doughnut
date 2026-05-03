@@ -70,7 +70,7 @@ function onNoteRowClick() {
   border-radius: 0.25rem;
 
   &:hover {
-    background-color: var(--color-base-300, rgba(0, 0, 0, 0.08));
+    background-color: var(--fallback-b3, oklch(var(--b3) / 1));
   }
 }
 
@@ -80,7 +80,7 @@ function onNoteRowClick() {
 }
 
 .active-item > .note-row {
-  background-color: var(--color-base-300, rgba(0, 0, 0, 0.08));
+  background-color: var(--fallback-b3, oklch(var(--b3) / 1));
 }
 
 .active-title {

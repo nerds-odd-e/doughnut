@@ -15,6 +15,7 @@
       </NotebookRootNoteNewButton>
       <FolderNewButton
         :notebook-id="notebookId"
+        :under-folder-id="folderUnderFolderId"
         :under-note-id="folderContextNoteId"
         button-title="New folder"
         aria-label="New folder"
@@ -39,9 +40,15 @@ const props = defineProps<{
   userActiveFolderId: number | null
 }>()
 
+const folderUnderFolderId = computed(() =>
+  props.userActiveFolderId != null ? props.userActiveFolderId : undefined
+)
+
 const folderContextNoteId = computed(() =>
-  props.note != null && props.activeNoteTopologyResolved
-    ? props.note.id
-    : undefined
+  props.userActiveFolderId != null
+    ? undefined
+    : props.note != null && props.activeNoteTopologyResolved
+      ? props.note.id
+      : undefined
 )
 </script>

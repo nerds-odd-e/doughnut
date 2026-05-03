@@ -350,7 +350,7 @@ describe("Sidebar", () => {
       () => wrapper.findAll(".sidebar-folder-label").length >= 2
     )
 
-    const rootUl = wrapper.get("ul.daisy-list-group")
+    const rootUl = wrapper.get("ul.sidebar-tree-list")
     const rowLabels = Array.from(rootUl.element.children).map((li) => {
       const folder = li.querySelector(".sidebar-folder-label")
       if (folder) return `folder:${folder.textContent?.trim()}`
@@ -614,7 +614,7 @@ describe("Sidebar", () => {
     ).toBe(true)
   })
 
-  it("shows ellipsis child-count badge for shallow listNotebookRootNotes realms", async () => {
+  it("shows folder expand control at notebook root with shallow listNotebookRootNotes", async () => {
     wrapper = helper
       .component(Sidebar)
       .withCurrentUser(makeMe.aUser.please())
@@ -626,9 +626,8 @@ describe("Sidebar", () => {
     await flushPromises()
     await flushPromises()
 
-    const badge = wrapper.find('[title="expand children"]')
-    expect(badge.exists()).toBe(true)
-    expect(badge.text()).toBe("...")
+    const expandBtn = wrapper.find('button[aria-label="expand children"]')
+    expect(expandBtn.exists()).toBe(true)
   })
 
   it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {

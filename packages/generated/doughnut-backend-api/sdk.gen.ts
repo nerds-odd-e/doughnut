@@ -691,7 +691,7 @@ export class NotebookController {
     /**
      * Create a folder
      *
-     * Creates a folder at notebook root when underNoteId is omitted, or nested under the context note's folder when underNoteId is set.
+     * Creates a folder at notebook root when no parent is specified; as a child of underFolderId when set; otherwise nested under the context note's folder when underNoteId is set (underFolderId takes precedence when both are set).
      */
     public static createFolder<ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>) {
         return (options.client ?? client).post<CreateFolderResponses, unknown, ThrowOnError>({

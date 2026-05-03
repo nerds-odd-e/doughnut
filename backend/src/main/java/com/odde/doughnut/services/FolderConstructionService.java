@@ -40,21 +40,37 @@ public class FolderConstructionService {
     }
 
     Folder parentFolder = null;
-    Integer underNoteId = request.getUnderNoteId();
-    if (underNoteId != null) {
-      Note contextNote =
-          noteRepository
-              .findById(underNoteId)
+    Integer underFolderId = request.getUnderFolderId();
+    if (underFolderId != null) {
+      Folder parent =
+          folderRepository
+              .findById(underFolderId)
               .orElseThrow(
                   () ->
-                      new ResponseStatusException(HttpStatus.NOT_FOUND, "Context note not found."));
-      if (!contextNote.getNotebook().getId().equals(notebook.getId())) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not in notebook.");
+                      new ResponseStatusException(
+                          HttpStatus.NOT_FOUND, "Parent folder not found."));
+      if (!parent.getNotebook().getId().equals(notebook.getId())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
       }
-      if (contextNote.getDeletedAt() != null) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Context note not found.");
+      parentFolder = parent;
+    } else {
+      Integer underNoteId = request.getUnderNoteId();
+      if (underNoteId != null) {
+        Note contextNote =
+            noteRepository
+                .findById(underNoteId)
+                .orElseThrow(
+                    () ->
+                        new ResponseStatusException(
+                            HttpStatus.NOT_FOUND, "Context note not found."));
+        if (!contextNote.getNotebook().getId().equals(notebook.getId())) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not in notebook.");
+        }
+        if (contextNote.getDeletedAt() != null) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Context note not found.");
+        }
+        parentFolder = contextNote.getFolder();
       }
-      parentFolder = contextNote.getFolder();
     }
 
     Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();

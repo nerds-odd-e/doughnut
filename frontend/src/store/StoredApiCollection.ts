@@ -248,9 +248,11 @@ export default class StoredApiCollection implements StoredApi {
 
   async createFolder(notebookId: number, body: FolderCreationRequest) {
     const payload: FolderCreationRequest =
-      body.underNoteId != null
-        ? { name: body.name, underNoteId: body.underNoteId }
-        : { name: body.name }
+      body.underFolderId != null
+        ? { name: body.name, underFolderId: body.underFolderId }
+        : body.underNoteId != null
+          ? { name: body.name, underNoteId: body.underNoteId }
+          : { name: body.name }
     const { data, error } = await apiCallWithLoading(() =>
       NotebookController.createFolder({
         path: { notebook: notebookId },
