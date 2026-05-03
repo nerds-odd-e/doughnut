@@ -49,11 +49,6 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  notebookName(value: string): MemoryTrackerBuilder {
-    this.data.notebookName = value
-    return this
-  }
-
   ofNote(note: NoteRealm): MemoryTrackerBuilder {
     this.data.note = note.note
     this.data.ancestorFolders = note.ancestorFolders ?? []

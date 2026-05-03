@@ -156,6 +156,17 @@ export function SpellingRecallStage({
   const width = resolvedTerminalWidth()
 
   useEffect(() => {
+    if (
+      payload.recallPromptId !== undefined &&
+      payload.stemMarkdown !== undefined
+    ) {
+      setLoadState({
+        status: 'ready',
+        recallPromptId: payload.recallPromptId,
+        stemMarkdown: payload.stemMarkdown,
+      })
+      return
+    }
     let cancelled = false
     const ac = new AbortController()
     ;(async () => {
@@ -179,7 +190,12 @@ export function SpellingRecallStage({
       cancelled = true
       ac.abort()
     }
-  }, [onRecallFatalError, payload.memoryTrackerId])
+  }, [
+    onRecallFatalError,
+    payload.memoryTrackerId,
+    payload.recallPromptId,
+    payload.stemMarkdown,
+  ])
 
   const stemRendered = useMemo(() => {
     if (loadState.status !== 'ready') return ''

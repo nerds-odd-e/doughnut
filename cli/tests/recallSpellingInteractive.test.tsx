@@ -7,6 +7,7 @@ import {
 import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
@@ -291,7 +292,8 @@ describe('recall spelling (interactive)', () => {
     await waitForLastFrame(
       lastFrame,
       (p) =>
-        p.includes('Loading spelling question') &&
+        (p.includes('Loading spelling question') ||
+          p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL)) &&
         !p.includes(SPELL_PLACEHOLDER_SUBSTR)
     )
 
@@ -304,7 +306,8 @@ describe('recall spelling (interactive)', () => {
       (p) =>
         p.includes(secondStem) &&
         p.includes('Recalling') &&
-        !p.includes('Loading spelling question')
+        !p.includes('Loading spelling question') &&
+        !p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL)
     )
   })
 

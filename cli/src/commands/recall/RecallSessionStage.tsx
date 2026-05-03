@@ -313,7 +313,7 @@ export function RecallSessionStage({
   }
 
   return (
-    <RecallSessionChrome notebookName={card.payload.notebookName}>
+    <RecallSessionChrome>
       <JustReviewRecallStage
         payload={card.payload}
         inputBlockedRef={submittingRef}

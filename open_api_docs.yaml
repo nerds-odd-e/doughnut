@@ -4241,8 +4241,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FolderTrailSegment"
-        notebookName:
-          type: string
       required:
       - id
       - nextRecallAt

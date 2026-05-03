@@ -53,7 +53,6 @@ export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
   readonly detailsMarkdown: string
-  readonly notebookName?: string
   readonly breadcrumbTitles: readonly string[]
 }
 
@@ -64,16 +63,14 @@ function recallJustReviewPayloadFromMemoryTracker(
   const topo = note?.noteTopology
   const noteTitle = topo?.title?.trim() || 'Note'
   const detailsMarkdown = (note?.details ?? '').trim()
-  const notebookName = mt.notebookName?.trim()
   return {
     memoryTrackerId: mt.id,
     noteTitle,
     detailsMarkdown,
-    notebookName,
     breadcrumbTitles: noteBreadcrumbTrailTitles(
       note,
       mt.ancestorFolders,
-      mt.notebookName
+      undefined
     ),
   }
 }
@@ -142,6 +139,9 @@ export type SpellingRecallSessionPayload = {
   readonly notebookName?: string
   /** Cached from tracker load when available; answered scrollback prefers `note` on the submit response. */
   readonly detailsMarkdown: string
+  /** When set, `askAQuestion` was already done (e.g. in loadRecallCardForMemoryTrackerId). */
+  readonly recallPromptId?: number
+  readonly stemMarkdown?: string
 }
 
 export type RecallCard =
@@ -162,11 +162,38 @@ export async function loadRecallCardForMemoryTrackerId(
   signal?: AbortSignal
 ): Promise<RecallCard> {
   if (spelling) {
+    try {
+      const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
+        MemoryTrackerController.askAQuestion({
+          path: { memoryTracker: memoryTrackerId },
+          ...doughnutSdkOptions(signal),
+        })
+      )
+      if (prompt.questionType === 'SPELLING' && prompt.id !== undefined) {
+        const fromPrompt =
+          prompt.spellingQuestion?.notebook?.name ?? prompt.notebook?.name
+        const notebookName = fromPrompt?.trim()
+        return {
+          variant: 'spelling-session',
+          payload: {
+            memoryTrackerId,
+            notebookName:
+              notebookName !== undefined && notebookName.length > 0
+                ? notebookName
+                : undefined,
+            detailsMarkdown: '',
+            recallPromptId: prompt.id,
+            stemMarkdown: prompt.spellingQuestion?.stem ?? '',
+          },
+        }
+      }
+    } catch {
+      // Same as web when askAQuestion fails: stage will retry.
+    }
     return {
       variant: 'spelling-session',
       payload: {
         memoryTrackerId,
-        notebookName: undefined,
         detailsMarkdown: '',
       },
     }

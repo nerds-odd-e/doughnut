@@ -551,7 +551,6 @@ export type MemoryTracker = {
     removedFromTracking?: boolean;
     spelling?: boolean;
     ancestorFolders?: Array<FolderTrailSegment>;
-    notebookName?: string;
 };
 
 export type ConversationMessage = {
@@ -1000,7 +999,6 @@ export type MemoryTrackerWritable = {
     removedFromTracking?: boolean;
     spelling?: boolean;
     ancestorFolders?: Array<FolderTrailSegment>;
-    notebookName?: string;
 };
 
 export type ConversationWritable = {

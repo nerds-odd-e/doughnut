@@ -153,17 +153,13 @@ describe('recall just-review (interactive)', () => {
   }
 
   function mockShowMemoryTrackerCardForRealm(
-    noteRealm: ReturnType<typeof alphaNoteRealm>,
-    opts?: { includeNotebookName?: boolean }
+    noteRealm: ReturnType<typeof alphaNoteRealm>
   ) {
-    let mt = makeMe.aMemoryTracker
-      .nextRecallAt('2026-06-01T00:00:00Z')
-      .ofNote(noteRealm)
-    if (opts?.includeNotebookName !== false) {
-      mt = mt.notebookName('NB')
-    }
     showMemoryTrackerSpy.mockResolvedValue({
-      data: mt.please(),
+      data: makeMe.aMemoryTracker
+        .nextRecallAt('2026-06-01T00:00:00Z')
+        .ofNote(noteRealm)
+        .please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
   }
 
@@ -206,7 +202,6 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealm)
-            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -340,7 +335,6 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealmAlpha)
-            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -370,7 +364,6 @@ describe('recall just-review (interactive)', () => {
       data: makeMe.aMemoryTracker
         .nextRecallAt('2026-06-01T00:00:00Z')
         .ofNote(noteRealmBeta)
-        .notebookName('NB')
         .please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
 
@@ -405,7 +398,7 @@ describe('recall just-review (interactive)', () => {
     expect(out).toContain('Alpha')
   })
 
-  test('just-review answered block: breadcrumb notebook › folder › note, details, Reviewed line', async () => {
+  test('just-review answered block: breadcrumb folder › note, details, Reviewed line', async () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(childNoteUnderEnglish())
 
@@ -418,7 +411,7 @@ describe('recall just-review (interactive)', () => {
     await untilPlain(frames, (p) => {
       const plain = stripAnsi(p)
       return (
-        plain.includes('NB › English › Sedition') &&
+        plain.includes('English › Sedition') &&
         plain.includes('Sedition means incite violence') &&
         plain.includes('Reviewed: Sedition')
       )
@@ -664,7 +657,6 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealm)
-            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
@@ -729,8 +721,7 @@ describe('recall just-review (interactive)', () => {
         .details('')
         .createdAt(baseNoteTimes.createdAt)
         .updatedAt(baseNoteTimes.updatedAt)
-        .please(),
-      { includeNotebookName: false }
+        .please()
     )
 
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -831,7 +822,6 @@ describe('recall just-review (interactive)', () => {
           data: makeMe.aMemoryTracker
             .nextRecallAt('2026-06-01T00:00:00Z')
             .ofNote(noteRealm)
-            .notebookName('NB')
             .please(),
         } as Awaited<
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
