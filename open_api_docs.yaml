@@ -3648,15 +3648,11 @@ components:
           format: int32
         title:
           type: string
-        notebookId:
-          type: integer
-          format: int32
         folderId:
           type: integer
           format: int32
       required:
       - id
-      - notebookId
     WikiTitle:
       type: object
       properties:

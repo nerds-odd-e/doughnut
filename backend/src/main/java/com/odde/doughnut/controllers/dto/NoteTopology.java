@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -11,10 +10,6 @@ public class NoteTopology {
   @NonNull private Integer id;
 
   private String title;
-
-  @NonNull
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private Integer notebookId;
 
   /** Present when the note is assigned to a folder (folder-first containment). */
   private Integer folderId;

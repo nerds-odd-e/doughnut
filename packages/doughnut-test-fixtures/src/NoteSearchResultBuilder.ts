@@ -10,31 +10,25 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     const id = generateId()
     const notebookId = generateId()
     return {
-      noteTopology: { id, title: 'Untitled', notebookId },
+      noteTopology: { id, title: 'Untitled' },
       notebookId,
     }
   })()
 
   id(value: number): NoteSearchResultBuilder {
-    const notebookId = this.data.notebookId ?? generateId()
     if (!this.data.noteTopology) {
       this.data.noteTopology = {
         id: value,
         title: 'Untitled',
-        notebookId,
       }
     } else {
       this.data.noteTopology.id = value
-      this.data.noteTopology.notebookId = notebookId
     }
     return this
   }
 
   notebookId(value: number): NoteSearchResultBuilder {
     this.data.notebookId = value
-    if (this.data.noteTopology) {
-      this.data.noteTopology.notebookId = value
-    }
     return this
   }
 
@@ -44,10 +38,9 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
   }
 
   title(value: string): NoteSearchResultBuilder {
-    const notebookId = this.data.notebookId ?? generateId()
     if (!this.data.noteTopology) {
       const id = generateId()
-      this.data.noteTopology = { id, title: value, notebookId }
+      this.data.noteTopology = { id, title: value }
     } else {
       this.data.noteTopology.title = value
     }
@@ -61,7 +54,6 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
 
   noteTopology(value: NoteTopology): NoteSearchResultBuilder {
     this.data.noteTopology = value
-    this.data.notebookId = value.notebookId
     return this
   }
 
@@ -72,7 +64,6 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
       noteTopology: this.data.noteTopology ?? {
         id,
         title: 'Untitled',
-        notebookId,
       },
       notebookId,
       notebookName: this.data.notebookName,

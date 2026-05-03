@@ -38,7 +38,6 @@ describe("NotebookPage.spec", () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookId = notebook.id
-    indexRealm.note.noteTopology.notebookId = notebook.id
     mockSdkService("get", {
       notebook,
       hasAttachedBook: false,
@@ -78,7 +77,6 @@ describe("NotebookPage.spec", () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookId = notebook.id
-    indexRealm.note.noteTopology.notebookId = notebook.id
     mockSdkService("get", {
       notebook,
       hasAttachedBook: false,

@@ -15,16 +15,18 @@ function relationLabelToKebab(label: string): string {
 class NoteBuilder extends Builder<Note> {
   data: Note
 
+  /** Notebook id for paired NoteRealm fixtures; not part of API `NoteTopology`. */
+  realmNotebookId: number
+
   constructor() {
     super()
     const id = generateId()
-    const notebookId = generateId()
+    this.realmNotebookId = generateId()
     this.data = {
       id,
       noteTopology: {
         id,
         title: 'Note1.1.1',
-        notebookId,
       },
       details: '<p>Desc</p>',
       wikidataId: '',

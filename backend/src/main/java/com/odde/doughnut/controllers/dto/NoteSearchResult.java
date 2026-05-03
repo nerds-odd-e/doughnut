@@ -27,7 +27,8 @@ public class NoteSearchResult {
   public NoteSearchResult(Note note, Float distance) {
     NoteTopology topology = note != null ? note.getNoteTopology() : null;
     this.noteTopology = topology;
-    this.notebookId = topology != null ? topology.getNotebookId() : null;
+    this.notebookId =
+        note != null && note.getNotebook() != null ? note.getNotebook().getId() : null;
     this.notebookName =
         note != null && note.getNotebook() != null ? note.getNotebook().getName() : null;
     this.distance = distance;

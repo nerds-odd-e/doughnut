@@ -16,7 +16,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       note: noteData,
       references: [],
       wikiTitles: [],
-      notebookId: noteData.noteTopology.notebookId,
+      notebookId: this.noteBuilder.realmNotebookId,
       ancestorFolders: [],
     }
   }
@@ -69,7 +69,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
-    this.data.notebookId = this.data.note.noteTopology.notebookId
+    this.data.notebookId = this.noteBuilder.realmNotebookId
     this.data.wikiTitles ??= []
     return this.data
   }

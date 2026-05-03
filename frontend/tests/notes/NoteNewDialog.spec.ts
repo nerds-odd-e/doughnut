@@ -54,13 +54,11 @@ describe("adding new note", () => {
     vi.useRealTimers()
   })
 
-  const note = makeMe.aNote.title("mythical").please()
+  const realm = makeMe.aNoteRealm.title("mythical").please()
+  const note = realm.note
 
   const notebookRootProps = {
-    notebookRootNotebookId:
-      note.noteTopology.notebookId != null
-        ? Number(note.noteTopology.notebookId)
-        : 1,
+    notebookRootNotebookId: realm.notebookId,
     titleSearchAnchorNote: note,
   }
 
@@ -173,10 +171,7 @@ describe("adding new note", () => {
       await wrapper.find("form").trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: {
-          notebook:
-            note.noteTopology.notebookId != null
-              ? note.noteTopology.notebookId
-              : 1,
+          notebook: realm.notebookId,
         },
         body: expect.objectContaining({ newTitle: "note title" }),
       })

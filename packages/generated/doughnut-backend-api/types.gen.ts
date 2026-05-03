@@ -242,7 +242,6 @@ export type NoteRealm = {
 export type NoteTopology = {
     id: number;
     title?: string;
-    notebookId: number;
     folderId?: number;
 };
 

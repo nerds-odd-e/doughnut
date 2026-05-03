@@ -59,7 +59,7 @@ describe("AddRelationshipDialog", () => {
           hitKind: "FOLDER",
           folderId: targetFolderId,
           folderName: "Archive",
-          notebookId: note.noteTopology.notebookId ?? 1,
+          notebookId: 1,
           notebookName: "Nb",
           distance: 0.9,
         },
