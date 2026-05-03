@@ -10,6 +10,7 @@ import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { subscribedNotebooks } from './subscribedNotebooks'
+import router from 'start/router'
 
 const addNewNotebookButton = () =>
   cy.findByRole('button', { name: 'Add New Notebook' })
@@ -124,25 +125,7 @@ const myNotebooksPage = () => {
 }
 
 export const navigateToNotebooksPage = () => {
-  cy.url().then((url) => {
-    const { pathname } = new URL(url)
-    const normalized =
-      pathname.length > 1 && pathname.endsWith('/')
-        ? pathname.slice(0, -1)
-        : pathname
-    const onNotebooksCatalog = normalized === '/d/notebooks'
-    const inApp = pathname.startsWith('/d/')
-
-    if (inApp && onNotebooksCatalog) {
-      return
-    }
-    if (inApp && !onNotebooksCatalog) {
-      cy.findByRole('link', { name: 'Note' }).click()
-      return
-    }
-    cy.visit('/d/notebooks')
-  })
-  cy.wrap('yes').as('firstVisited')
+  router().push('/d/notebooks', 'notebooks', {})
   cy.get('.loading-bar').should('not.exist', { timeout: 30000 })
   return myNotebooksPage()
 }
