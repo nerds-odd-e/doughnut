@@ -4,7 +4,7 @@
     :class="{
       'active-item':
         activeNoteRealm != null &&
-        noteRealm.id === activeNoteRealm.note.id,
+        note.id === activeNoteRealm.note.id,
     }"
     @click="onNoteRowClick"
   >
@@ -15,11 +15,11 @@
         :class="{
           'active-title':
             activeNoteRealm != null &&
-            noteRealm.id === activeNoteRealm.note.id,
+            note.id === activeNoteRealm.note.id,
         }"
-        v-bind="{ noteTopology: noteRealm.note.noteTopology }"
+        v-bind="{ noteTopology: note.noteTopology }"
       />
-      <ScrollTo v-if="activeNoteRealm != null && noteRealm.id === activeNoteRealm.note.id" />
+      <ScrollTo v-if="activeNoteRealm != null && note.id === activeNoteRealm.note.id" />
     </div>
   </li>
 </template>
@@ -29,10 +29,8 @@ import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 import { sidebarUserActiveFolderIdKey } from "./sidebarFolderExpansion"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { inject } from "vue"
 
-const storageAccessor = useStorageAccessor()
 const userActiveFolderId = inject(sidebarUserActiveFolderIdKey, undefined)
 
 interface Props {
@@ -40,9 +38,7 @@ interface Props {
   activeNoteRealm?: NoteRealm
 }
 
-const props = defineProps<Props>()
-
-const noteRealm = storageAccessor.value.refOfNoteRealmWithFallback(props.note)
+defineProps<Props>()
 
 function onNoteRowClick() {
   if (userActiveFolderId != null) {

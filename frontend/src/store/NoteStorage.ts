@@ -1,4 +1,4 @@
-import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import type { Ref } from "vue"
 import { ref } from "vue"
 
@@ -6,7 +6,6 @@ export default interface NoteStorage {
   refreshNoteRealm(data: NoteRealm): NoteRealm
   removeNoteRealm(noteId: Doughnut.ID): void
   refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
-  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm>
 }
 
 export class StorageImplementation implements NoteStorage {
@@ -26,18 +25,5 @@ export class StorageImplementation implements NoteStorage {
       this.cache.set(noteId, ref(undefined))
     }
     return this.cache.get(noteId) as Ref<NoteRealm | undefined>
-  }
-
-  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm> {
-    const ref = this.refOfNoteRealm(note.id)
-    if (ref.value === undefined) {
-      ref.value = {
-        id: note.id,
-        note,
-        notebookId: note.noteTopology.notebookId,
-        wikiTitles: [],
-      }
-    }
-    return ref as Ref<NoteRealm>
   }
 }
