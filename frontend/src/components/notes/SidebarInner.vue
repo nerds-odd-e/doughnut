@@ -6,19 +6,8 @@
     <template v-for="row in displayRows" :key="rowKey(row)">
       <SidebarNoteItem
         v-if="row.kind === 'note'"
-        v-bind="{
-          note: row.note,
-          activeNoteRealm,
-          draggedNote,
-          isDraggedOver,
-          dropMode,
-          dropIndicatorStyle,
-          onDragStart: handleDragStart,
-          onDragOver: handleDragOver,
-          onDragLeave: handleDragLeave,
-          onDrop: handleDrop,
-          onDragEnd: handleDragEnd,
-        }"
+        :note="row.note"
+        :active-note-realm="activeNoteRealm"
       />
       <SidebarFolderItem
         v-else
@@ -36,20 +25,9 @@ import type {
 } from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
-import type { SidebarNoteDragState } from "./sidebarNoteDragContext"
-import { sidebarNoteDragStateKey } from "./sidebarNoteDragContext"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
-import { inject, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-
-function createFallbackDragState(): SidebarNoteDragState {
-  return {
-    draggedNote: ref(null),
-    isDraggedOver: ref(null),
-    dropMode: ref("after"),
-    dropIndicatorStyle: ref({}),
-  }
-}
 
 const storageAccessor = useStorageAccessor()
 
@@ -94,12 +72,6 @@ function buildStructuralRows(
   }
 
   return rows
-}
-
-function notesInOrderFromRows(rows: SidebarStructuralRow[]): Note[] {
-  return rows
-    .filter((r): r is { kind: "note"; note: Note } => r.kind === "note")
-    .map((r) => r.note)
 }
 
 function rowKey(row: SidebarStructuralRow): string {
@@ -151,118 +123,4 @@ watch(
 watch(sidebarStructuralRefreshKey, () => {
   refreshListing()
 })
-
-const dragState = inject(sidebarNoteDragStateKey) ?? createFallbackDragState()
-const { draggedNote, isDraggedOver, dropMode, dropIndicatorStyle } = dragState
-
-function structuralFolderId(note: Note): number | null {
-  const id = note.noteTopology.folderId
-  return id === undefined || id === null ? null : id
-}
-
-const handleDragStart = (event: DragEvent, note: Note) => {
-  draggedNote.value = note
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = "move"
-  }
-}
-
-const handleDragOver = (event: DragEvent, targetNote: Note) => {
-  event.preventDefault()
-  if (!draggedNote.value || draggedNote.value.id === targetNote.id) {
-    isDraggedOver.value = null
-    return
-  }
-
-  if (event.dataTransfer) {
-    event.dataTransfer.dropEffect = "move"
-  }
-
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  const mouseX = event.clientX - rect.left
-  const isRightHalf = mouseX > rect.width / 2
-
-  dropMode.value = isRightHalf ? "asFirstChild" : "after"
-
-  if (
-    dropMode.value === "after" &&
-    structuralFolderId(draggedNote.value) !== structuralFolderId(targetNote)
-  ) {
-    isDraggedOver.value = null
-    return
-  }
-
-  dropIndicatorStyle.value = {
-    top: "100%",
-    transform: "translateY(-2px)",
-    ...(dropMode.value === "asFirstChild"
-      ? {
-          left: "20px",
-          right: "0",
-        }
-      : {
-          left: "0",
-          right: "0",
-        }),
-  }
-  isDraggedOver.value = targetNote.id
-}
-
-const handleDragLeave = (event: DragEvent) => {
-  const relatedTarget = event.relatedTarget as HTMLElement | null
-  const currentTarget = event.currentTarget as HTMLElement
-  const aside = currentTarget.closest("aside")
-  if (relatedTarget && aside?.contains(relatedTarget)) {
-    return
-  }
-  isDraggedOver.value = null
-}
-
-const handleDrop = async (event: DragEvent, targetNote: Note) => {
-  event.preventDefault()
-
-  const dragged = draggedNote.value
-  if (!dragged || dragged.id === targetNote.id) return
-
-  if (
-    dropMode.value === "after" &&
-    structuralFolderId(dragged) !== structuralFolderId(targetNote)
-  )
-    return
-
-  const notes = notesInOrderFromRows(displayRows.value)
-  const targetIdx = notes.findIndex((n) => n.id === targetNote.id)
-  const dragIdx = notes.findIndex((n) => n.id === dragged.id)
-  const folderId = structuralFolderId(targetNote)
-  const placement =
-    dropMode.value === "after"
-      ? { folderId, afterNoteId: targetNote.id }
-      : {
-          folderId,
-          afterNoteId: targetIdx > 0 ? notes[targetIdx - 1]!.id : null,
-        }
-  const undoPlacement = {
-    folderId: structuralFolderId(dragged),
-    afterNoteId: dragIdx > 0 ? notes[dragIdx - 1]!.id : null,
-  }
-
-  try {
-    await storageAccessor.value
-      .storedApi()
-      .moveAfter(dragged.id, placement, undoPlacement)
-
-    await refreshListing()
-  } catch (error) {
-    console.error("Failed to move note:", error)
-  }
-
-  draggedNote.value = null
-  dropMode.value = "after"
-}
-
-const handleDragEnd = () => {
-  draggedNote.value = null
-  isDraggedOver.value = null
-  dropMode.value = "after"
-}
 </script>

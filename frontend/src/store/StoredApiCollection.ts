@@ -76,12 +76,6 @@ export interface StoredApi {
     data: RelationshipCreation
   ): Promise<void>
 
-  moveAfter(
-    noteId: number,
-    placement: { folderId: number | null; afterNoteId: number | null },
-    undoPlacement: { folderId: number | null; afterNoteId: number | null }
-  ): Promise<NoteRealm[]>
-
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit title" | "edit details",
@@ -361,25 +355,6 @@ export default class StoredApiCollection implements StoredApi {
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
-  }
-
-  async moveAfter(
-    noteId: number,
-    placement: { folderId: number | null; afterNoteId: number | null },
-    undoPlacement: { folderId: number | null; afterNoteId: number | null }
-  ): Promise<NoteRealm[]> {
-    const { data: updatedNotes, error } = await apiCallWithLoading(() =>
-      NoteController.reorder({
-        path: { note: noteId },
-        body: this.reorderBody(placement),
-      })
-    )
-    if (error || !updatedNotes) {
-      throw new Error(toErrorMessage(error, "Failed to move note"))
-    }
-    this.refreshNoteRealms(updatedNotes)
-    this.noteEditingHistory.moveNote(noteId, undoPlacement)
-    return updatedNotes
   }
 
   private reorderBody(placement: {

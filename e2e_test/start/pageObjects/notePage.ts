@@ -370,63 +370,6 @@ export const assumeNotePage = (
       )
     },
 
-    moveUpAmongSiblings() {
-      pageIsNotLoading()
-      noteSidebar()
-      // Find current note in sidebar
-      cy.findByRole('title')
-        .invoke('text')
-        .then((currentTopic) => {
-          // Find the note in sidebar
-          cy.get('.daisy-list-group-item')
-            .contains(currentTopic)
-            .as('currentNote')
-          // Find previous sibling
-          cy.get('@currentNote')
-            .parents('li')
-            .prev('li')
-            .prev('li')
-            .find('.note-content')
-            .first()
-            .as('targetNote')
-
-          // Perform drag and drop
-          cy.get('@currentNote').trigger('dragstart')
-          cy.get('@targetNote')
-            .trigger('dragenter')
-            .trigger('dragover', { clientX: 0 })
-            .trigger('drop')
-          cy.get('@currentNote').trigger('dragend')
-        })
-    },
-    moveDownAmongSiblings() {
-      pageIsNotLoading()
-      noteSidebar()
-      // Find current note in sidebar
-      cy.findByRole('title')
-        .invoke('text')
-        .then((currentTopic) => {
-          // Find the note in sidebar
-          cy.get('.daisy-list-group-item')
-            .contains(currentTopic)
-            .as('currentNote')
-          // Find next sibling
-          cy.get('@currentNote')
-            .parents('li')
-            .next('li')
-            .find('.note-content')
-            .first()
-            .as('targetNote')
-
-          // Perform drag and drop
-          cy.get('@currentNote').trigger('dragstart')
-          cy.get('@targetNote')
-            .trigger('dragenter')
-            .trigger('dragover', { clientX: 0 })
-            .trigger('drop')
-          cy.get('@currentNote').trigger('dragend')
-        })
-    },
     associateWikidataDialog() {
       toolbarButton('associate wikidata').click()
       return assumeAssociateWikidataDialog()

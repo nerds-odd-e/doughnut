@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import type { PropType, Ref } from "vue"
 import { computed, inject, provide, ref, watch } from "vue"
-import type { NoteRealm, Note, User } from "@generated/doughnut-backend-api"
+import type { NoteRealm, User } from "@generated/doughnut-backend-api"
 import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import {
@@ -29,10 +29,6 @@ import {
   sidebarToggleFolderIdKey,
   sidebarUserActiveFolderIdKey,
 } from "./sidebarFolderExpansion"
-import {
-  type SidebarNoteDragState,
-  sidebarNoteDragStateKey,
-} from "./sidebarNoteDragContext"
 import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
 import { structuralSidebarTitlesFromRealm } from "./sidebarStructuralTitles"
 
@@ -78,19 +74,11 @@ const activeNoteFolderIds = computed(() => {
   return ids
 })
 
-const sidebarNoteDrag: SidebarNoteDragState = {
-  draggedNote: ref<Note | null>(null),
-  isDraggedOver: ref<number | null>(null),
-  dropMode: ref<"after" | "asFirstChild">("after"),
-  dropIndicatorStyle: ref({}),
-}
-
 provide(sidebarExpandedFolderIdsKey, expandedFolderIds)
 provide(sidebarToggleFolderIdKey, toggleFolderId)
 provide(sidebarStructuralSidebarTitlesKey, structuralSidebarTitles)
 provide(sidebarActiveNoteFolderIdsKey, activeNoteFolderIds)
 provide(sidebarUserActiveFolderIdKey, userActiveFolderId)
-provide(sidebarNoteDragStateKey, sidebarNoteDrag)
 
 watch(
   () => props.activeNoteRealm,
@@ -106,10 +94,6 @@ watch(
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderIds.value = new Set()
       userActiveFolderId.value = null
-      sidebarNoteDrag.draggedNote.value = null
-      sidebarNoteDrag.isDraggedOver.value = null
-      sidebarNoteDrag.dropMode.value = "after"
-      sidebarNoteDrag.dropIndicatorStyle.value = {}
     }
   }
 )

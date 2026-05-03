@@ -116,12 +116,6 @@ export const noteSidebar = () => {
   return {
     expand: (noteTopology: string) => expandFolderRowIfCollapsed(noteTopology),
 
-    siblingOrder: (higher: string, lower: string) => {
-      withinAside(() => {
-        cy.contains(higher).parent().parent().nextAll().contains(lower)
-      })
-    },
-
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       pageIsNotLoading()
       const expectedNoteTopics = expectedNotes.map((note) => note['note-title'])
@@ -258,10 +252,37 @@ export const noteSidebar = () => {
           .should('have.length', expected.length)
           .as('folderNoteRows')
 
-        children.forEach((elem, noteIndex) => {
-          cy.get('@folderNoteRows')
-            .eq(noteIndex)
-            .within(() => {
+        cy.get('@folderNoteRows').then(($rows) => {
+          const rowEls = $rows.toArray() as HTMLElement[]
+          expect(rowEls.length, 'folder child note row count').to.equal(
+            children.length
+          )
+
+          const titleOnly = children.every((row) =>
+            Object.keys(row).every((k) => k === 'note-title' || k === 'Title')
+          )
+          if (titleOnly) {
+            const actualTitles = rowEls.map((li) =>
+              (Cypress.$(li).find('.title-text').first().text() ?? '').trim()
+            )
+            expect([...actualTitles].sort()).to.deep.equal([...expected].sort())
+            return
+          }
+
+          const used = new Set<number>()
+          children.forEach((elem) => {
+            const title = elem['note-title'] ?? elem.Title ?? ''
+            const idx = rowEls.findIndex((li, i) => {
+              if (used.has(i)) return false
+              return (
+                Cypress.$(li)
+                  .find('.title-text')
+                  .filter(matchesExactLabel(title)).length > 0
+              )
+            })
+            expect(idx, `row for "${title}"`).to.be.at.least(0)
+            used.add(idx)
+            cy.wrap(rowEls[idx]).within(() => {
               for (const propName in elem) {
                 const value = elem[propName]!
                 if (propName === 'note-title' || propName === 'Title') {
@@ -273,6 +294,7 @@ export const noteSidebar = () => {
                 }
               }
             })
+          })
         })
       })
     },

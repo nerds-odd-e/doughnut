@@ -27,22 +27,3 @@ When('I open the note {string} from the sidebar', (noteTopology: string) => {
 Then('I should see the note tree in the sidebar', (data: DataTable) => {
   start.noteSidebar().expectOrderedNotes(data.hashes())
 })
-
-Then('I move the note {string} up among its siblings', (noteToMove: string) => {
-  start.jumpToNotePage(noteToMove).moveUpAmongSiblings()
-})
-
-Then(
-  'I move the note {string} down among its siblings',
-  (noteToMove: string) => {
-    start.navigateToNotebooksPage()
-    start.jumpToNotePage(noteToMove).moveDownAmongSiblings()
-  }
-)
-
-Then(
-  'I should see the note {string} before the note {string} in the sidebar',
-  (noteMoved: string, noteStayed: string) => {
-    start.noteSidebar().siblingOrder(noteMoved, noteStayed)
-  }
-)
