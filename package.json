@@ -106,7 +106,7 @@
     "typescript": "6.0.3",
     "util": "^0.12.5",
     "wait-on": "^9.0.5",
-    "yaml": "^2.8.3"
+    "yaml": "^2.8.4"
   },
   "dependencies": {
     "vue-toastification": "2.0.0-rc.5"
@@ -151,7 +151,7 @@
       "flatted": ">=3.4.2",
       "yauzl": ">=3.2.1",
       "picomatch": ">=4.0.4",
-      "yaml": "^2.8.3",
+      "yaml": "^2.8.4",
       "handlebars": ">=4.7.9",
       "path-to-regexp": ">=8.4.0",
       "@xmldom/xmldom": ">=0.9.10",
