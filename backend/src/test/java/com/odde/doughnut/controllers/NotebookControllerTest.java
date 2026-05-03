@@ -436,6 +436,28 @@ class NotebookControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void nestedFolderListingStillShowsNotesAfterPeerTitleNoteSoftDeleted()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder fDt = makeMe.aFolder().notebook(nb).name("Descendants Test").please();
+      Folder fParent = makeMe.aFolder().notebook(nb).parentFolder(fDt).name("parent").please();
+      Folder fChild = makeMe.aFolder().notebook(nb).parentFolder(fParent).name("child").please();
+      makeMe.aNote("Descendants Test").inNotebook(nb).creatorAndOwner(owner).please();
+      makeMe.aNote("parent").inNotebook(nb).creatorAndOwner(owner).folder(fDt).please();
+      Note noteChild =
+          makeMe.aNote("child").inNotebook(nb).creatorAndOwner(owner).folder(fParent).please();
+      makeMe.aNote("Unit Test").inNotebook(nb).creatorAndOwner(owner).folder(fChild).please();
+
+      noteService.destroy(noteChild);
+      makeMe.entityPersister.flush();
+
+      FolderListing listing = controller.listFolderListing(nb, fChild);
+      assertEquals(1, listing.notes().size());
+      assertEquals("Unit Test", listing.notes().getFirst().getNote().getTitle());
+    }
+
+    @Test
     void requiresReadAuthorization() {
       User owner = makeMe.aUser().please();
       currentUser.setUser(owner);

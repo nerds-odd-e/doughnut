@@ -50,7 +50,9 @@ function expandFolderRowIfCollapsed(segment: string) {
   pageIsNotLoading()
   cy.get('aside').within(() => {
     folderRowByExactLabel(label).within(() => {
-      cy.get('.title-text', { timeout: 20000 }).should(
+      // After expand, scope may list only nested folder rows (no `.title-text`) when the
+      // folder-named note was deleted but child folders/notes remain.
+      cy.get('ul.daisy-list-group li, .title-text', { timeout: 20000 }).should(
         'have.length.at.least',
         1
       )
