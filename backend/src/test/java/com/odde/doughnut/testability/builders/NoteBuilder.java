@@ -81,7 +81,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder under(Note parentNote) {
+  private void attachAsChildOf(Note parentNote) {
     User user = entity.getCreator() != null ? entity.getCreator() : parentNote.getCreator();
     Timestamp createdAt = entity.getCreatedAt();
     Timestamp updatedAt = entity.getUpdatedAt();
@@ -93,7 +93,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
       creator(parentNote.getCreator());
     }
     parentNote.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
-    return this;
   }
 
   public NoteBuilder relateTo(Note referTo) {
@@ -237,13 +236,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder asFirstChildOf(Note note) {
-    under(note);
+    attachAsChildOf(note);
     entity.updateSiblingOrderAsFirstChild(note);
     return this;
   }
 
   public NoteBuilder after(Note note) {
-    under(note.getParent());
+    attachAsChildOf(note.getParent());
     entity.setSiblingOrderToInsertAfter(note);
     return this;
   }

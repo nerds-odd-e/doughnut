@@ -24,7 +24,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
     User owner = makeMe.aUser().please();
     Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
-    Note child = makeMe.aNote().title("Child").under(parent).please();
+    Note child = makeMe.aNote().title("Child").asFirstChildOf(parent).please();
     child.setDetails("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
     makeMe.entityPersister.merge(child);
     makeMe.entityPersister.flush();
@@ -36,7 +36,8 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   void wikiLinkResolver_findsPlainWikiLinkInBody() {
     User owner = makeMe.aUser().please();
     Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
-    Note child = makeMe.aNote().title("Child").under(parent).details("See [[Alpha]]").please();
+    Note child =
+        makeMe.aNote().title("Child").asFirstChildOf(parent).details("See [[Alpha]]").please();
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(parent);
 
