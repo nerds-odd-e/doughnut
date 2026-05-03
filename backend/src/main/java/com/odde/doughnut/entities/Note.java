@@ -319,14 +319,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void detachFromParentInMemory() {
-    if (getParent() != null) {
-      getParent().children.remove(this);
-      this.parent = null;
-    }
-  }
-
-  @JsonIgnore
   public String getNotebookAssistantInstructions() {
     NotebookAiAssistant notebookAiAssistant = getNotebook().getNotebookAiAssistant();
     if (notebookAiAssistant == null) {

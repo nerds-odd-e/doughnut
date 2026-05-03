@@ -22,18 +22,14 @@ public class NoteMotionService {
   }
 
   public void moveToTopLevel(Note note, User user) {
-    note.detachFromParentInMemory();
     note.setFolder(null);
     entityPersister.flush();
     entityPersister.merge(note);
     entityPersister.flush();
   }
 
-  /**
-   * Places {@code source} in {@code targetFolder} (folder placement; no structural parent note).
-   */
+  /** Places {@code source} in {@code targetFolder}. */
   public void executeMoveIntoFolder(Note source, Folder targetFolder) {
-    source.detachFromParentInMemory();
     Notebook targetNotebook = targetFolder.getNotebook();
     source.assignNotebook(targetNotebook);
     source.setFolder(targetFolder);
@@ -50,16 +46,12 @@ public class NoteMotionService {
   }
 
   /**
-   * Reorders {@code subject} within a notebook using folder placement + sibling order among peers
-   * ({@link NoteRepository#findNotesInFolderOrderBySiblingOrder} or notebook root scope), not the
-   * structural parent-child list.
+   * Reorders {@code subject} by folder placement and sibling order among peers ({@link
+   * NoteRepository#findNotesInFolderOrderBySiblingOrder} or notebook root scope).
    */
   public void executeReorderInPlacement(
       Note subject, Folder targetFolderOrNull, Note afterNoteOrNull)
       throws MovementNotPossibleException {
-    validateReorderPlacement(subject, targetFolderOrNull, afterNoteOrNull);
-
-    subject.detachFromParentInMemory();
     if (targetFolderOrNull != null) {
       Notebook targetNotebook = targetFolderOrNull.getNotebook();
       subject.assignNotebook(targetNotebook);
@@ -85,40 +77,6 @@ public class NoteMotionService {
     entityPersister.flush();
     entityPersister.merge(subject);
     entityPersister.flush();
-  }
-
-  private void validateReorderPlacement(Note subject, Folder targetFolderOrNull, Note afterNote)
-      throws MovementNotPossibleException {
-    Notebook targetNotebook =
-        targetFolderOrNull != null ? targetFolderOrNull.getNotebook() : subject.getNotebook();
-    if (afterNote != null) {
-      if (afterNote.getId().equals(subject.getId())) {
-        throw new MovementNotPossibleException();
-      }
-      if (isStructuralAncestorOf(subject, afterNote)) {
-        throw new MovementNotPossibleException();
-      }
-      boolean afterInScope =
-          targetFolderOrNull != null
-              ? afterNote.getFolder() != null
-                  && afterNote.getFolder().getId().equals(targetFolderOrNull.getId())
-              : afterNote.getFolder() == null;
-      if (!afterInScope) {
-        throw new MovementNotPossibleException();
-      }
-      if (!afterNote.getNotebook().getId().equals(targetNotebook.getId())) {
-        throw new MovementNotPossibleException();
-      }
-    }
-  }
-
-  private static boolean isStructuralAncestorOf(Note possibleAncestor, Note note) {
-    for (Note p = note.getParent(); p != null; p = p.getParent()) {
-      if (p.getId().equals(possibleAncestor.getId())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private static long computeSiblingOrderForPlacement(
