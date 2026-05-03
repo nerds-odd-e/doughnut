@@ -39,7 +39,7 @@ import {
   currentNotebookId,
   notebookSidebarNotebookPageContext,
 } from "@/composables/useCurrentNoteSidebarState"
-import { noteShowLocationFromNoteRealm } from "@/routes/noteShowLocation"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 const router = useRouter()
@@ -102,7 +102,7 @@ const toggleMaximize = () => {
 const handleCloseConversation = (conversationRealm: NoteRealm) => {
   isContentMinimized.value = false
   router.replace({
-    ...noteShowLocationFromNoteRealm(conversationRealm),
+    ...noteShowLocation(conversationRealm.id),
     query: {},
   })
 }

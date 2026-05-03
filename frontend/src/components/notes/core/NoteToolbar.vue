@@ -18,7 +18,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
         @click="() => router.push({
-          ...noteShowLocationFromNoteTopology(note.noteTopology),
+          ...noteShowLocation(note.noteTopology.id),
           query: { conversation: 'true' },
         })"
         title="Star a conversation about this note"
@@ -91,7 +91,7 @@ import { useRouter } from "vue-router"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
 import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
-import { noteShowLocationFromNoteTopology } from "@/routes/noteShowLocation"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 
 const { note } = defineProps<{
   note: Note
