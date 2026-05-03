@@ -2,158 +2,65 @@
 
 ## Concepts
 
-In Doughnut, notes are atomic knowledge points organized within notebooks and folders. Parent-note containment is being replaced by folder containment; see `ongoing/doughnut_wiki_architecture_north_star.md`. Graph sibling retrieval uses folder scope: siblings come from the same folder, or from the notebook root when a note has no folder. In the Graph RAG system, notes are represented as JSON objects with separate `uri` and `title` fields.
+In Doughnut, notes live in notebooks and optional folders. **GraphRAG** builds a bounded JSON snapshot for AI context: the **focus** note plus **related** notes that fit a token budget.
 
-A note becomes a relation when it relates to a target note, with its parent becoming the subject and its title serving as the predicate. Relation notes can still contain details, and their target notes may come from different notebooks.
+Semantic links come from the **wiki title cache** (Phase 5): outgoing wiki targets and inbound referrers authorized for the viewer. Structural neighborhood is **folder-scoped**: older and younger “siblings” are peers that share the same note-tree parent within the folder peer list from `NoteService.findStructuralPeerNotesInOrder` (see `GraphRAGService.peersSharingTreeParent`). That parent pointer is used only to partition peers until Phase 7 removes `Note.parent` from persistence; it is **not** parent-neighborhood graph expansion.
 
-Key relationships in the note graph include:
-- Folder/notebook-root structural relationships during and after the folder-first migration
-- Sibling relationships (prior and younger siblings from the note's folder scope)
-- Reference relationships (inbound references to the current note)
-- Extended relationships (parent siblings, cousins, etc.)
+There are no relationship notes as a separate graph entity: meaning lives in markdown/details, frontmatter, and wiki links.
 
-The contextual path represents the hierarchical chain from root to parent, providing navigational context for any note.
+## Data structures
 
-The Graph RAG system aims to retrieve a focused view of a note and its most relevant related notes within a specified token budget. This view includes both direct relationships (parent, children) and extended relationships (siblings, cousins), prioritized by relevance.
+### `BareNote`
 
-## Data Structures
+JSON shape (see `BareNote.java`):
 
-### Core Components
-- **BareNote**: Basic note representation containing:
-  - URI (string)
-  - Title (string)
-  - Details (truncated for non-focus notes)
-  - Parent and target references as `UriAndTitle` objects
-  - Relationship to focus note
+- **`uri`** — Graph-local wiki-style string from `GraphNoteWikiUri`: `[[title]]` when serialized as the focus note, otherwise `[[notebook name: title]]`.
+- **`title`**
+- **`relationToFocusNote`** — `RelationshipToFocusNote` when relevant (`OlderSibling`, `YoungerSibling`; `Self` on the focus note). Inbound wiki referrers added as related notes may have a null relation label.
+- **`details`** / **`detailsTruncated`** / **`createdAt`**
 
-- **UriAndTitle**: Object representation of a note reference containing:
-  - `uri` (string): The note's URI
-  - `title` (string): The note's title
+`equals` / `hashCode` use `UriAndTitle` (underlying `Note` identity), not the serialized wiki `uri` string.
 
-- **FocusNote**: Extended note representation including:
-  - All BareNote fields (untruncated)
-  - Contextual path: `List<String>` of ancestor URIs
-  - Lists of related note URIs: `List<String>` for:
-    - `children`: Direct child note URIs
-    - `olderSiblings`: Older sibling note URIs
-    - `youngerSiblings`: Younger sibling note URIs
-    - `inboundReferences`: Inbound reference note URIs
+### `FocusNote` (extends `BareNote`)
 
-- **RelationshipToFocusNote**: Enumeration of possible relationships:
-  - Direct: Self, Parent, RelationshipTarget, Child
-  - Sibling: OlderSibling, YoungerSibling
-  - Reference: ReferenceBy, ReferencingNote
-  - Contextual: ContextAncestor, TargetContextAncestor
-  - Relation: TargetOfRelationship
-  - Extended Family: ParentSibling, TargetParentSibling
-  - Cousins: ParentSiblingChild, TargetParentSiblingChild
-  - Reference Context: ReferenceContextAncestor, SiblingOfReferencingNote
-  - Related Child References: ReferencedTargetOfRelationship
+- **`contextualPath`** — Single string of folder-name crumbs (notebook root → note’s folder), not note ancestors.
+- **`links`** — Wiki URIs for outgoing resolved link targets from the focus note.
+- **`inboundReferences`** — Wiki URIs for notes that link to the focus (duplicates the list-driven related notes for string convenience on the focus object).
+- **`olderSiblings`** / **`youngerSiblings`** — Wiki URIs of related structural peers, in display order.
 
-- **GraphRAGResult**: Complete result containing:
-  - Focus note
-  - Prioritized list of related notes
+There is no `children` list on the focus note for graph expansion.
 
-## Priorities
+### `RelationshipToFocusNote`
 
-The system uses a layered priority approach with configurable notes-before-switching thresholds:
+Enum is minimal: `Self`, `OlderSibling`, `YoungerSibling` (`RelationshipToFocusNote.java`).
 
-1. **Core Context** (Priority 1) - 3 notes before switching
-   - `ParentRelationshipHandler`: Parent relationship
-   - `ContextAncestorRelationshipHandler`: Ancestors in contextual path
-   - Essential for understanding the note's immediate context
+### `GraphRAGResult`
 
-2. **Direct Relations** (Priority 2) - 3 notes before switching
-   - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelationship handlers to Priority 3)
-   - `OlderSiblingRelationshipHandler`: Older siblings
-   - `YoungerSiblingRelationshipHandler`: Younger siblings
-   - `ReferenceByRelationshipHandler`: Reference by notes (dynamically adds ReferencingNote to Priority 3, ReferenceContextAncestor to Priority 4)
-   - `TargetContextAncestorRelationshipHandler`: Ancestors in target's contextual path
-   - `ParentSiblingRelationshipHandler`: Siblings of parent (dynamically adds ParentSiblingChild to Priority 4)
-   - `TargetParentSiblingRelationshipHandler`: Siblings of parent of target (dynamically adds TargetParentSiblingChild to Priority 4)
+- **`focusNote`**
+- **`relatedNotes`** — Prioritized `BareNote` entries within the token budget.
 
-3. **Extended Relations** (Priority 3) - 2 notes before switching
-   - Dynamically populated by Priority 2 handlers:
-   - `TargetOfRelationshipRelationshipHandler`: Targets of relationships (dynamically adds ReferencedTargetOfRelationship to Priority 4)
-   - `ReferencingNoteRelationshipHandler`: Referencing notes (dynamically adds SiblingOfReferencingNote to Priority 4)
+### `UriAndTitle`
 
-4. **Distant Relations** (Priority 4) - 2 notes before switching
-   - Dynamically populated by Priority 2 and Priority 3 handlers:
-   - `ParentSiblingChildRelationshipHandler`: Children of parent's siblings (cousins)
-   - `TargetParentSiblingChildRelationshipHandler`: Children of target's parent's siblings
-   - `ReferenceContextAncestorRelationshipHandler`: Contextual path of reference by notes
-   - `SiblingOfReferencingNoteRelationshipHandler`: Siblings of referencing notes
-   - `ReferencedTargetOfRelationshipHandler`: Reference by notes to targets of relationships
+Internal helper for deduplication keyed by `Note` (still exposes legacy `/n{id}` style in its own JSON shape if ever serialized elsewhere); **GraphRAG** wire `uri` for `BareNote`/`FocusNote` comes from `GraphNoteWikiUri`, not from `UriAndTitle.getUri()`.
 
-## Retrieval Algorithm
+## Handlers and retrieval
 
-### Input
-- Focus Note
-- Token Budget (excluding focus note)
+`GraphRAGService.retrieve` builds one `PriorityLayer` (threshold: three notes per sweep before yielding, though only one layer is wired today):
 
-### Process
+1. **`ReferenceByRelationshipHandler`** — Emits inbound wiki referrer notes (from `WikiTitleCacheService.referencesNotesForViewer`). Updates `FocusNote.inboundReferences` with each added note’s wiki URI.
+2. **`OlderSiblingRelationshipHandler`** / **`YoungerSiblingRelationshipHandler`** — Walk structural peer lists; append wiki URIs to `olderSiblings` / `youngerSiblings` on the focus note.
 
-1. **Initialization**
-   - Create priority layers with their handlers
-   - Initialize the result builder with focus note
-   - Calculate initial token budget
+`GraphRAGResultBuilder` fills `links` and initial `inboundReferences` on the focus from `WikiTitleCacheService` before the layer runs, then consumes handlers until the token budget is exhausted.
 
-2. **Priority-Based Processing**
-   - For each priority layer:
-     - Process handlers in order, retrieving one note per handler per iteration
-     - After processing the configured number of notes (3 for Priority 1-2, 2 for Priority 3-4), yield to next layer
-     - Lower priority layers can dynamically add new handlers to higher priority layers
-     - Return to higher priority layers periodically when lower layers complete or hit limits
-     - Continue until budget exhausted or no more notes to process
+There are no dynamic handler injections, no parent/child/ancestor/cousin handlers, and no removed DTO fields (`linkFromFocus`, `linkHop2`, legacy `target` / `parent` / `relation_type` / `subject` on graph notes).
 
-3. **Relationship Handler Processing**
-   - Each handler manages a specific relationship type
-   - Handlers retrieve notes in relevance order
-   - Track processed notes to avoid duplicates
-   - Update focus note's relationship lists dynamically with note URIs
+## Algorithm (summary)
 
-4. **Budget Management**
-   - Track remaining tokens
-   - Consider relationship metadata in token counts
-   - Stop processing when budget exhausted
+1. Hydrate focus note; compute folder-scoped structural peers sharing the same tree parent.
+2. Construct builder → focus note with folder crumbs, wiki `links`, and `inboundReferences` strings.
+3. Run `PriorityLayer` over the handler list; each successful add decrements the related-note token budget via `TokenCountingStrategy`.
+4. Return `GraphRAGResult`.
 
-### Output
-- Complete GraphRAGResult with focus note and prioritized related notes
+## Usage
 
-## Relationship Dependencies
-
-The system manages complex relationship dependencies through dynamic handler injection:
-
-- **Priority 2 → Priority 3 Dependencies**
-  - `ChildRelationshipHandler` → adds `TargetOfRelationshipRelationshipHandler` (when child is related)
-  - `ReferenceByRelationshipHandler` → adds `ReferencingNoteRelationshipHandler`
-
-- **Priority 2 → Priority 4 Dependencies**
-  - `ReferenceByRelationshipHandler` → adds `ReferenceContextAncestorRelationshipHandler`
-  - `ParentSiblingRelationshipHandler` → adds `ParentSiblingChildRelationshipHandler`
-  - `TargetParentSiblingRelationshipHandler` → adds `TargetParentSiblingChildRelationshipHandler`
-
-- **Priority 3 → Priority 4 Dependencies**
-  - `TargetOfRelationshipRelationshipHandler` → adds `ReferencedTargetOfRelationshipHandler`
-  - `ReferencingNoteRelationshipHandler` → adds `SiblingOfReferencingNoteRelationshipHandler`
-
-## Implementation Considerations
-
-- Use priority layers to manage relationship processing order
-- Implement flexible token counting strategies
-- Handle dynamic relationship discovery
-- Maintain relationship consistency in focus note (URIs stored as strings)
-- Support efficient note deduplication
-- Enable extensibility for new relationship types
-- `UriAndTitle` serializes as JSON object with `uri` and `title` fields
-- `FocusNote` relationship lists store URIs as strings for efficient serialization
-
-## Usage Guidelines
-
-The Graph RAG system provides contextual information for:
-- AI-assisted note navigation
-- Context-aware question answering
-- Related content discovery
-- Knowledge graph exploration
-
-The retrieved context should be formatted to emphasize relationship hierarchies and relevance ordering when used with AI models.
+Graph JSON is consumed by services that need a compact, AI-oriented view of a note (e.g. question generation, assistants). Canonical product URLs for notes remain `/n{id}` (or routed equivalents); **only** GraphRAG serialization uses the `[[…]]` wiki-style `uri` strings.

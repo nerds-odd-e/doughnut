@@ -50,7 +50,7 @@ Phases **1–6** are shipped. **Phase 5 closeout:** relationship notes normalize
 - **2:** Full-path slugs, resolution by notebook + slug path and ambiguous basename; moves recompute `note.slug`.
 - **3:** Migrations dropped `notebook_head_note`; catalog → notebook page; optional index at slug `index`.
 - **4:** Frontmatter round-trip (markdown + rich); unsupported YAML shapes block rich body until fixed in markdown.
-- **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph (`linkFromFocus` / `linkHop2`); `relation_type` and `note.target_note_id` removed. Title-rename propagation → **Phase 14**.
+- **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph; `relation_type` and `note.target_note_id` removed. Transitional graph hop flags on related-note DTOs were removed in **Phase 7.13**. Title-rename propagation → **Phase 14**.
 - **6:** Primary containment UX is folder-scoped; topology has no `shortDetails`; graph siblings from folder (or notebook root without folder).
 
 ---

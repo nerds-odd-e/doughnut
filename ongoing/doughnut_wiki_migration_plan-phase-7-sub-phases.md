@@ -290,17 +290,17 @@ Apply the same rule to **new** fixtures: avoid introducing the same string as bo
 
 **Verify:** Focused backend controller/service tests for delete/restore.
 
-## Sub-Phase 7.13 - Remove Parent-Based Graph Relationships
+## Sub-Phase 7.13 - Remove Parent-Based Graph Relationships ✅ DONE
 
 **Type:** Structure (rolled out through `ongoing/doughnut_wiki_migration_plan-phase-7.13-sub-phases.md`).
 
 **Pre-condition:** Relationship and graph behavior already reads semantic links/cache from Phase 5 (including **5.23**: graph uses wiki-title cache; **`NoteRealm.inboundReferences`** / **`relationshipsDeprecating`** are gone in favor of **`NoteRealm.references`** where applicable) and structural peers from folders from Phase 6.
 
-**Trigger:** GraphRAG relationship handlers still add parent/child/sibling context from note parent edges.
+**Status:** Sub-sub-phases **7.13.1**–**7.13.10** in the dedicated plan are complete. GraphRAG related-note expansion uses wiki inbound referrers, older/younger structural peers, and folder crumbs on the focus note only—no parent/child/ancestor graph handlers.
 
-**Post-condition:** Graph context uses folder peers and wiki references only; no parent/child relationship handler relies on `Note.parent`. `FocusNote` exposes folder crumbs plus wiki `links` / `inboundReferences`; `BareNote` has the simplified wiki-link URI shape described in the detailed 7.13 plan.
+**Post-condition (met):** Graph context uses folder peers and wiki references for expansion; no parent/child relationship handler remains. `FocusNote` exposes folder crumbs plus wiki `links` / `inboundReferences`; `BareNote` uses the simplified wiki-link URI shape. **`GraphRAGService`** still calls `Note.getParent()` only inside `peersSharingTreeParent` to subset same-folder peers by tree parent until `Note.parent` is removed in broader Phase 7 persistence work (see 7.13.10 notes in the 7.13 plan).
 
-**Work:** Execute the 7.13 sub-sub-phases in the dedicated plan. Remove parent/child graph handlers outright rather than replacing children with another structural expansion; keep same-folder sibling context.
+**Work:** (Historical) Execute the 7.13 sub-sub-phases in the dedicated plan.
 
 **Verify:** Focused `GraphRAGServiceTest`.
 
