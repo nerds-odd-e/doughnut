@@ -70,7 +70,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
     this.data.notebookId = this.noteBuilder.realmNotebookId
-    this.data.folderId = this.data.note.noteTopology.folderId
     this.data.wikiTitles ??= []
     return this.data
   }

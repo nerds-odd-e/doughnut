@@ -15,7 +15,6 @@ import org.springframework.lang.NonNull;
   "note",
   "fromBazaar",
   "notebookId",
-  "folderId",
   "ancestorFolders",
   "references",
   "wikiTitles"
@@ -50,10 +49,5 @@ public class NoteRealm {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getNotebookId() {
     return Objects.requireNonNull(note.getNotebook()).getId();
-  }
-
-  @Schema(nullable = true)
-  public Integer getFolderId() {
-    return note.getNoteTopology().getFolderId();
   }
 }

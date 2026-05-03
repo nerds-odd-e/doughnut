@@ -3624,9 +3624,6 @@ components:
         notebookId:
           type: integer
           format: int32
-        folderId:
-          type: integer
-          format: int32
         ancestorFolders:
           type: array
           items:

@@ -366,7 +366,7 @@ export default class StoredApiCollection implements StoredApi {
     const realm = this.storage.refOfNoteRealm(sourceId).value
     if (!realm?.note) return null
     if (realm.notebookId == null) return null
-    const folderId = realm.folderId ?? null
+    const folderId = realm.note.noteTopology.folderId ?? null
     return { folderId }
   }
 
