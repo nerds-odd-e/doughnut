@@ -55,31 +55,16 @@ public class GraphRAGService {
 
     List<Note> focusStructuralPeers =
         peersSharingTreeParent(focusNote, noteService.findStructuralPeerNotesInOrder(focusNote));
-    Note primaryTarget =
-        wikiTitleCacheService.primaryWikiLinkedTargetForGraph(focusNote, viewer).orElse(null);
-
-    PriorityLayer priorityOneLayer =
-        new PriorityLayer(
-            3,
-            new RelationshipHandler[] {
-              new TargetRelationshipHandler(primaryTarget),
-            });
-    List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
+    List<RelationshipHandler> handlers = new ArrayList<>();
     List<Note> referencesForViewer =
         wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer);
     if (!referencesForViewer.isEmpty()) {
-      priorityTwoHandlers.add(new ReferenceByRelationshipHandler(referencesForViewer));
+      handlers.add(new ReferenceByRelationshipHandler(referencesForViewer));
     }
-    priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
-    priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
-    priorityTwoHandlers.add(
-        new SiblingOfTargetRelationshipHandler(
-            wikiTitleCacheService.siblingWikiLinkReferrersToPrimaryTargetForGraph(
-                focusNote, viewer)));
-    PriorityLayer priorityTwoLayer =
-        new PriorityLayer(3, priorityTwoHandlers.toArray(new RelationshipHandler[0]));
+    handlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
+    handlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
 
-    priorityOneLayer.setNextLayer(priorityTwoLayer);
+    PriorityLayer layer = new PriorityLayer(3, handlers.toArray(new RelationshipHandler[0]));
 
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(
@@ -88,7 +73,7 @@ public class GraphRAGService {
             tokenCountingStrategy,
             wikiTitleCacheService,
             viewer);
-    priorityOneLayer.handle(builder);
+    layer.handle(builder);
     return builder.build();
   }
 

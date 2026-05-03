@@ -123,154 +123,6 @@ public class GraphRAGServiceTest {
       assertThat(zero.getFocusNote().getContextualPath(), containsString("parent-child-peers"));
       assertThat(zero.getRelatedNotes(), empty());
     }
-
-    @Test
-    void truncatesLongDetailWikiTargetInRelatedNotes() {
-      String longDetails = "a".repeat(2000);
-      Notebook notebook = parent.getNotebook();
-      Folder wikiFolder = makeMe.aFolder().notebook(notebook).name("truncate-wiki-peers").please();
-      Note wikiTarget =
-          makeMe
-              .aNote()
-              .inNotebook(notebook)
-              .creator(note.getCreator())
-              .folder(wikiFolder)
-              .title("Long Wiki Target")
-              .details(longDetails)
-              .please();
-      makeMe.theNote(note).folder(wikiFolder).details("See [[Long Wiki Target]].").please();
-      refreshWikiCache(note);
-
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
-
-      BareNote bn =
-          result.getRelatedNotes().stream()
-              .filter(b -> b.equals(wikiTarget))
-              .findFirst()
-              .orElseThrow();
-      assertThat(
-          bn.getDetails(), equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
-    }
-  }
-
-  @Nested
-  class WhenNoteHasTarget {
-    private Note target;
-    private Note note;
-    private Folder peerFolder;
-
-    @BeforeEach
-    void setup() {
-      Note parentNote = makeMe.aNote().title("Parent Note").please();
-      Notebook notebook = parentNote.getNotebook();
-      peerFolder = makeMe.aFolder().notebook(notebook).name("target-relation-peers").please();
-      parentNote = makeMe.theNote(parentNote).folder(peerFolder).please();
-      target =
-          makeMe
-              .aNote()
-              .title("Target Note")
-              .details("Target Details")
-              .inNotebook(notebook)
-              .creator(parentNote.getCreator())
-              .folder(peerFolder)
-              .please();
-      note = makeMe.aRelation().between(parentNote, target).folder(peerFolder).please();
-    }
-
-    @Test
-    void wikiPrimaryTargetAppearsWhenBudgetAllowsAndSkippedWhenZero() {
-      GraphRAGResult full = graphRAGService.retrieve(note, 1000, note.getCreator());
-      assertThat(full.getFocusNote().getTitle(), equalTo(note.getTitle()));
-      assertThat(
-          full.getRelatedNotes().stream().filter(b -> b.equals(target)).count(), equalTo(1L));
-
-      GraphRAGResult zero = graphRAGService.retrieve(note, 0, note.getCreator());
-      assertThat(zero.getFocusNote().getTitle(), equalTo(note.getTitle()));
-      assertThat(zero.getRelatedNotes(), empty());
-    }
-
-    @Test
-    void shouldNotDuplicateNoteInRelatedNotesWhenItIsAlsoAChild() {
-      // Create a child note that is also the target of the focus note
-      makeMe.theNote(target).under(note).please();
-      makeMe.refresh(note);
-
-      GraphRAGResult result = graphRAGService.retrieve(note, 1000, note.getCreator());
-
-      assertThat(
-          result.getRelatedNotes().stream().filter(b -> b.equals(target)).count(), equalTo(1L));
-    }
-  }
-
-  @Nested
-  class WhenNoteHasSiblingsOfTarget {
-    private Note target;
-    private Note focusNote;
-    private Note targetSibling1;
-    private Note targetSibling2;
-
-    @BeforeEach
-    void setup() {
-      Note parent = makeMe.aNote().title("Parent Note").please();
-      Notebook notebook = parent.getNotebook();
-      target =
-          makeMe
-              .aNote()
-              .inNotebook(notebook)
-              .creator(parent.getCreator())
-              .title("Target Note")
-              .details("Target Details")
-              .please();
-      focusNote = makeMe.aRelation().between(parent, target).please();
-      refreshWikiCache(focusNote);
-
-      // Create other notes that share the same target
-      Note siblingParent1 =
-          makeMe
-              .aNote()
-              .inNotebook(notebook)
-              .creator(parent.getCreator())
-              .title("Sibling Parent 1")
-              .please();
-      targetSibling1 = makeMe.aRelation().between(siblingParent1, target).please();
-      refreshWikiCache(targetSibling1);
-
-      Note siblingParent2 =
-          makeMe
-              .aNote()
-              .inNotebook(notebook)
-              .creator(parent.getCreator())
-              .title("Sibling Parent 2")
-              .please();
-      targetSibling2 = makeMe.aRelation().between(siblingParent2, target).please();
-      refreshWikiCache(targetSibling2);
-    }
-
-    @Test
-    void sharedTargetSiblingsAppearWithWikiHopAndExcludeFocusCarrier() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
-
-      assertRelatedNotesIncludeNotes(result, targetSibling1, targetSibling2);
-
-      List<BareNote> siblingBare =
-          result.getRelatedNotes().stream()
-              .filter(n -> n.equals(targetSibling1) || n.equals(targetSibling2))
-              .toList();
-      assertThat(siblingBare, hasSize(2));
-      assertThat(siblingBare.stream().anyMatch(b -> b.equals(focusNote)), is(false));
-    }
-
-    @Test
-    void sharedTargetSiblingsOmittedWithZeroBudget() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 0, focusNote.getCreator());
-      assertRelatedNotesExcludeNotes(result, targetSibling1, targetSibling2);
-    }
-
-    @Test
-    void targetSiblingParentsNoLongerAppearsInRelatedNotes() {
-      GraphRAGResult full = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
-      assertRelatedNotesExcludeNotes(full, targetSibling1.getParent(), targetSibling2.getParent());
-    }
   }
 
   @Nested
@@ -390,41 +242,6 @@ public class GraphRAGServiceTest {
       assertThat(
           siblingNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
           containsInAnyOrder(olderSibling1, olderSibling2));
-    }
-  }
-
-  @Nested
-  class WhenNoteHasRelatedChildTarget {
-    private Note focusNote;
-    private Note relatedChild;
-    private Note targetNote;
-
-    @BeforeEach
-    void setup() {
-      focusNote = makeMe.aNote().title("Focus Note").please();
-      Notebook notebook = focusNote.getNotebook();
-
-      // Create the target note first
-      targetNote =
-          makeMe
-              .aNote()
-              .inNotebook(notebook)
-              .creator(focusNote.getCreator())
-              .title("Target Note")
-              .details("Target Details")
-              .please();
-
-      // Create a relationship between parent and target
-      relatedChild = makeMe.aRelation().between(focusNote, targetNote).please();
-      refreshWikiCache(relatedChild);
-      makeMe.refresh(relatedChild);
-    }
-
-    @Test
-    void targetAppearsAsWikiLinkNotAsStructuralChild() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000, focusNote.getCreator());
-
-      assertRelatedNotesIncludeNotes(result, targetNote);
     }
   }
 
@@ -742,23 +559,28 @@ public class GraphRAGServiceTest {
     @Test
     void shouldTruncateASCIICharactersCorrectly() {
       String longDetails = "a".repeat(2000);
-      Note parentSeed = makeMe.aNote().title("Truncate ASCII Parent").details(longDetails).please();
-      Notebook notebook = parentSeed.getNotebook();
+      Note treeParent = makeMe.aNote().title("Truncate ASCII Tree").please();
+      Notebook notebook = treeParent.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-peers").please();
-      Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
-      Note child =
+      treeParent = makeMe.theNote(treeParent).folder(peerFolder).please();
+      Note olderLong =
           makeMe
               .aNote()
-              .under(parent)
+              .under(treeParent)
               .folder(peerFolder)
-              .details("See [[Truncate ASCII Parent]].")
+              .title("Older Long")
+              .details(longDetails)
               .please();
-      refreshWikiCache(child);
+      Note focus = makeMe.aNote().under(treeParent).folder(peerFolder).title("Focus Note").please();
 
-      GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
+      GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
       BareNote bn =
-          result.getRelatedNotes().stream().filter(b -> b.equals(parent)).findFirst().orElseThrow();
+          result.getRelatedNotes().stream()
+              .filter(b -> b.equals(olderLong))
+              .findFirst()
+              .orElseThrow();
+      assertThat(bn.getRelationToFocusNote(), equalTo(RelationshipToFocusNote.OlderSibling));
       assertThat(
           bn.getDetails(), equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
     }
@@ -766,23 +588,29 @@ public class GraphRAGServiceTest {
     @Test
     void shouldTruncateCJKCharactersCorrectly() {
       String cjkText = "你好世界".repeat(500);
-      Note parentSeed = makeMe.aNote().title("Truncate CJK Parent").details(cjkText).please();
-      Notebook notebook = parentSeed.getNotebook();
+      Note treeParent = makeMe.aNote().title("Truncate CJK Tree").please();
+      Notebook notebook = treeParent.getNotebook();
       Folder peerFolder = makeMe.aFolder().notebook(notebook).name("truncate-cjk-peers").please();
-      Note parent = makeMe.theNote(parentSeed).folder(peerFolder).please();
-      Note child =
+      treeParent = makeMe.theNote(treeParent).folder(peerFolder).please();
+      Note olderLong =
           makeMe
               .aNote()
-              .under(parent)
+              .under(treeParent)
               .folder(peerFolder)
-              .details("See [[Truncate CJK Parent]].")
+              .title("Older Long CJK")
+              .details(cjkText)
               .please();
-      refreshWikiCache(child);
+      Note focus =
+          makeMe.aNote().under(treeParent).folder(peerFolder).title("Focus Note CJK").please();
 
-      GraphRAGResult result = graphRAGService.retrieve(child, 1000, child.getCreator());
+      GraphRAGResult result = graphRAGService.retrieve(focus, 1000, focus.getCreator());
 
       BareNote bn =
-          result.getRelatedNotes().stream().filter(b -> b.equals(parent)).findFirst().orElseThrow();
+          result.getRelatedNotes().stream()
+              .filter(b -> b.equals(olderLong))
+              .findFirst()
+              .orElseThrow();
+      assertThat(bn.getRelationToFocusNote(), equalTo(RelationshipToFocusNote.OlderSibling));
       String truncated = bn.getDetails();
 
       assertThat(truncated, endsWith("..."));

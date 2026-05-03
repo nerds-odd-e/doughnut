@@ -142,59 +142,6 @@ class WikiTitleCacheServiceTest {
     }
   }
 
-  @Nested
-  class wikiGraphTargets {
-
-    @Test
-    void carrier_primary_is_semantic_target_not_first_row_in_cache_order() {
-      User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note target = makeMe.aNote().under(root).title("Beta").please();
-      Note source =
-          makeMe
-              .aNote()
-              .under(root)
-              .title("Alpha")
-              .relateTo(target, RelationType.RELATED_TO)
-              .please();
-      Note carrier = source.getChildren().stream().filter(Note::isRelation).toList().get(0);
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      assertThat(
-          wikiTitleCacheService
-              .primaryWikiLinkedTargetForGraph(carrier, user)
-              .orElseThrow()
-              .getId(),
-          equalTo(target.getId()));
-    }
-
-    @Test
-    void primary_resolves_from_yaml_when_cache_rows_are_missing() {
-      User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note target = makeMe.aNote().under(root).title("Beta").please();
-      Note source =
-          makeMe
-              .aNote()
-              .under(root)
-              .title("Alpha")
-              .relateTo(target, RelationType.RELATED_TO)
-              .please();
-      Note carrier = source.getChildren().stream().filter(Note::isRelation).toList().get(0);
-      wikiTitleCacheService.refreshForNote(carrier, user);
-      noteWikiTitleCacheRepository.deleteByNote_Id(carrier.getId());
-
-      assertThat(wikiTitleCacheService.outgoingWikiLinkedTargetsForGraph(carrier, user), empty());
-      assertThat(
-          wikiTitleCacheService
-              .primaryWikiLinkedTargetForGraph(carrier, user)
-              .orElseThrow()
-              .getId(),
-          equalTo(target.getId()));
-    }
-  }
-
   @Test
   void merge_reference_notes_dedupes_and_orders_by_note_id() {
     User user = makeMe.aUser().please();

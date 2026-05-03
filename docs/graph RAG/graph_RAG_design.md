@@ -9,7 +9,6 @@ A note becomes a relation when it relates to a target note, with its parent beco
 Key relationships in the note graph include:
 - Folder/notebook-root structural relationships during and after the folder-first migration
 - Sibling relationships (prior and younger siblings from the note's folder scope)
-- Target relationships (for relation notes)
 - Reference relationships (inbound references to the current note)
 - Extended relationships (parent siblings, cousins, etc.)
 
@@ -61,7 +60,6 @@ The system uses a layered priority approach with configurable notes-before-switc
 
 1. **Core Context** (Priority 1) - 3 notes before switching
    - `ParentRelationshipHandler`: Parent relationship
-   - `TargetRelationshipHandler`: Target relationship (for relation notes)
    - `ContextAncestorRelationshipHandler`: Ancestors in contextual path
    - Essential for understanding the note's immediate context
 

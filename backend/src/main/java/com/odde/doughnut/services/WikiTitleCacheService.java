@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -15,10 +14,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,23 +27,17 @@ public class WikiTitleCacheService {
 
   private final WikiLinkResolver wikiLinkResolver;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
-  private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
-  private final RelationshipNoteEndpointResolver relationshipNoteEndpointResolver;
   private final JdbcTemplate jdbcTemplate;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
-      NoteRepository noteRepository,
       AuthorizationService authorizationService,
-      RelationshipNoteEndpointResolver relationshipNoteEndpointResolver,
       JdbcTemplate jdbcTemplate) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
-    this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
-    this.relationshipNoteEndpointResolver = relationshipNoteEndpointResolver;
     this.jdbcTemplate = jdbcTemplate;
   }
 
@@ -75,82 +66,6 @@ public class WikiTitleCacheService {
       }
     }
     return List.copyOf(notes);
-  }
-
-  /**
-   * Authorized wiki-link targets from the focus note’s cache rows only, deduped by target id in
-   * first-seen order. Used with {@link #primaryWikiLinkedTargetForGraph}; relationship semantic
-   * targets are resolved separately from relation children.
-   */
-  public List<Note> outgoingWikiLinkedTargetsForGraph(Note focus, User viewer) {
-    LinkedHashMap<Integer, Note> byTargetId = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row :
-        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focus.getId())) {
-      Note resolved = authorizedOutgoingTargetNote(focus, row, viewer);
-      if (resolved != null) {
-        byTargetId.putIfAbsent(resolved.getId(), resolved);
-      }
-    }
-    return List.copyOf(byTargetId.values());
-  }
-
-  /**
-   * Graph “primary” target: relationship {@code target:} semantics (YAML + wiki resolution) when
-   * they align with an authorized outgoing cache target or are readable; otherwise first outgoing
-   * from {@link #outgoingWikiLinkedTargetsForGraph}. Relationship targets are not stored on the
-   * {@code note} row.
-   */
-  public Optional<Note> primaryWikiLinkedTargetForGraph(Note focus, User viewer) {
-    List<Note> outgoing = outgoingWikiLinkedTargetsForGraph(focus, viewer);
-    List<Note> semanticCandidates = new ArrayList<>();
-    if (focus.isRelation()) {
-      relationshipNoteEndpointResolver
-          .resolveSemanticTarget(focus, viewer)
-          .ifPresent(semanticCandidates::add);
-    } else {
-      for (Note carrier : relationCarrierChildrenOrdered(focus)) {
-        relationshipNoteEndpointResolver
-            .resolveSemanticTarget(carrier, viewer)
-            .ifPresent(semanticCandidates::add);
-      }
-    }
-    for (Note sem : semanticCandidates) {
-      for (Note o : outgoing) {
-        if (o.getId().equals(sem.getId())) {
-          return Optional.of(o);
-        }
-      }
-    }
-    for (Note sem : semanticCandidates) {
-      Notebook nb = sem.getNotebook();
-      if (nb != null && authorizationService.userMayReadNotebook(viewer, nb)) {
-        return Optional.of(sem);
-      }
-    }
-    if (!outgoing.isEmpty()) {
-      return Optional.of(outgoing.get(0));
-    }
-    return Optional.empty();
-  }
-
-  public List<Note> siblingWikiLinkReferrersToPrimaryTargetForGraph(Note focus, User viewer) {
-    Optional<Note> primaryTarget = primaryWikiLinkedTargetForGraph(focus, viewer);
-    if (primaryTarget.isEmpty()) {
-      return List.of();
-    }
-    Set<Integer> excludedCarrierIds =
-        relationCarrierChildrenOrdered(focus).stream().map(Note::getId).collect(Collectors.toSet());
-    excludedCarrierIds.add(focus.getId());
-    return referencesNotesForViewer(primaryTarget.get(), viewer).stream()
-        .filter(n -> !excludedCarrierIds.contains(n.getId()))
-        .toList();
-  }
-
-  private List<Note> relationCarrierChildrenOrdered(Note focus) {
-    return noteRepository.findAllByParentId(focus.getId()).stream()
-        .filter(n -> n.getDeletedAt() == null && n.isRelation())
-        .sorted(Comparator.comparing(Note::getSiblingOrder).thenComparing(Note::getId))
-        .toList();
   }
 
   private Note authorizedOutgoingTargetNote(Note cacheOwner, NoteWikiTitleCache row, User viewer) {
