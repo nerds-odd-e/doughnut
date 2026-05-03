@@ -192,16 +192,6 @@ class NoteController {
     return List.of(noteRealmService.build(note, user));
   }
 
-  @PatchMapping(value = "/{note}/move-to-top-level")
-  @Transactional
-  public NoteRealm moveToTopLevel(@PathVariable @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(note);
-    User user = authorizationService.getCurrentUser();
-    noteMotionService.moveToTopLevel(note, user);
-    return noteRealmService.build(note, user);
-  }
-
   @GetMapping("/recent")
   public List<NoteSearchResult> getRecentNotes() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();

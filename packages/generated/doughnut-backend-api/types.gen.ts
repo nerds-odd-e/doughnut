@@ -2796,24 +2796,6 @@ export type UndoDeleteNoteResponses = {
 
 export type UndoDeleteNoteResponse = UndoDeleteNoteResponses[keyof UndoDeleteNoteResponses];
 
-export type MoveToTopLevelData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/move-to-top-level';
-};
-
-export type MoveToTopLevelResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type MoveToTopLevelResponse = MoveToTopLevelResponses[keyof MoveToTopLevelResponses];
-
 export type UpdateNotebookGroupData = {
     body: UpdateNotebookGroupRequest;
     path: {

@@ -40,21 +40,6 @@ public class NoteMotionServiceTest {
   }
 
   @Test
-  void moveToTopLevel_clearsFolder_keepsNotebook() {
-    User user = makeMe.aUser().please();
-    Note topNote = makeMe.aRootNote("topNote").creatorAndOwner(user).please();
-    Note peer = makeMe.aNote("peer").underSameNotebookAs(topNote).please();
-    Integer notebookIdBefore = topNote.getNotebook().getId();
-    makeMe.entityPersister.flush();
-
-    noteMotionService.moveToTopLevel(peer, user);
-    makeMe.entityPersister.flush();
-    makeMe.refresh(peer);
-    assertThat(peer.getFolder(), nullValue());
-    assertThat(peer.getNotebook().getId(), equalTo(notebookIdBefore));
-  }
-
-  @Test
   void executeReorderInPlacement_appendsAtEndInFolder() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();

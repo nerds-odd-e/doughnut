@@ -4,7 +4,6 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.List;
@@ -18,13 +17,6 @@ public class NoteMotionService {
   public NoteMotionService(EntityPersister entityPersister, NoteRepository noteRepository) {
     this.entityPersister = entityPersister;
     this.noteRepository = noteRepository;
-  }
-
-  public void moveToTopLevel(Note note, User user) {
-    note.setFolder(null);
-    entityPersister.flush();
-    entityPersister.merge(note);
-    entityPersister.flush();
   }
 
   /** Places {@code source} in {@code targetFolder}. */
