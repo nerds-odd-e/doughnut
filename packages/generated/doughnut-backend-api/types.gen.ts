@@ -702,7 +702,6 @@ export type NoteAccessoriesDto = {
     url?: string;
     imageUrl?: string;
     imageMask?: string;
-    useParentImage?: boolean;
     uploadImage?: Blob | File;
 };
 
@@ -716,7 +715,6 @@ export type NoteAccessory = {
     url?: string;
     imageUrl?: string;
     imageMask?: string;
-    useParentImage?: boolean;
     imageWithMask?: ImageWithMask;
 };
 

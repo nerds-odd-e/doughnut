@@ -39,11 +39,6 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @Setter
   private Image imageAttachment;
 
-  @Column(name = "use_parent_image")
-  @Getter
-  @Setter
-  private Boolean useParentImage = false;
-
   @JsonIgnore
   public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
     BeanUtils.copyProperties(noteAccessoriesDTO, this);
@@ -54,20 +49,13 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   }
 
   public ImageWithMask getImageWithMask() {
-    String url = getNoteAccessoryContainingImage().getUrlOfImage();
+    String url = getUrlOfImage();
     if (url == null) return null;
 
     ImageWithMask imageWithMask = new ImageWithMask();
     imageWithMask.noteImage = url;
     imageWithMask.imageMask = imageMask;
     return imageWithMask;
-  }
-
-  private NoteAccessory getNoteAccessoryContainingImage() {
-    if (useParentImage && note.getParent() != null && note.getParent().getNoteAccessory() != null) {
-      return this.note.getParent().getNoteAccessory();
-    }
-    return this;
   }
 
   private String getUrlOfImage() {

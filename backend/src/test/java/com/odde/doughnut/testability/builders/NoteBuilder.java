@@ -211,11 +211,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder useParentImage() {
-    entity.getOrInitializeNoteAccessory().setUseParentImage(true);
-    return this;
-  }
-
   public void withUploadedImage() {
     entity.getOrInitializeNoteAccessory().setImageAttachment(makeMe.anImage().please());
   }

@@ -23,8 +23,6 @@ public class NoteAccessoriesDTO {
   @Setter
   private String imageMask;
 
-  @Getter @Setter private Boolean useParentImage = false;
-
   @Getter @Setter private MultipartFile uploadImage;
 
   public Image fetchUploadedImage(User user) throws IOException {

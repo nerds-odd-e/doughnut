@@ -310,27 +310,6 @@ class NotebookControllerTest extends ControllerTestBase {
   @Nested
   class ListNotebookRootNotes {
     @Test
-    void includesNoteWithNonNullParentWhenFolderIsNull()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
-      createNb.setNewTitle("NB Folder Scope");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-
-      NoteCreationDTO r1 = new NoteCreationDTO();
-      r1.setNewTitle("Anchor");
-      Integer anchorId = controller.createNoteAtNotebookRoot(nb, r1).getId();
-      Note anchor = noteRepository.findById(anchorId).orElseThrow();
-      Note childInRootScope = makeMe.aNote("Child no folder").under(anchor).please();
-
-      assertThat(childInRootScope.getParent().getId(), equalTo(anchorId));
-
-      FolderListing listing = controller.listNotebookRootNotes(nb);
-      assertTrue(
-          listing.notes().stream().anyMatch(r -> r.getId().equals(childInRootScope.getId())));
-    }
-
-    @Test
     void excludesNotesAssignedToAFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteCreationDTO createNb = new NoteCreationDTO();

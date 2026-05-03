@@ -4594,8 +4594,6 @@ components:
         imageMask:
           type: string
           pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
-        useParentImage:
-          type: boolean
         uploadImage:
           type: string
           format: binary
@@ -4618,8 +4616,6 @@ components:
           type: string
         imageMask:
           type: string
-        useParentImage:
-          type: boolean
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
       required:

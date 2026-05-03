@@ -22,9 +22,6 @@ public class ValidateNoteImageValidator implements ConstraintValidator<ValidateN
     if (!Strings.isEmpty(noteAccessory.getImageUrl())) {
       fieldsWithValue.add("imageUrl");
     }
-    if (noteAccessory.getUseParentImage()) {
-      fieldsWithValue.add("useParentImage");
-    }
 
     if (fieldsWithValue.size() > 1) {
       context.disableDefaultConstraintViolation();

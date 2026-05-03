@@ -17,15 +17,6 @@
       $emit('update:modelValue', { ...modelValue, imageUrl: $event })
     "
   />
-  <CheckInput
-    scope-name="note"
-    field="useParentImage"
-    :model-value="modelValue.useParentImage"
-    :error-message="errors.useParentImage"
-    @update:model-value="
-      $emit('update:modelValue', { ...modelValue, useParentImage: $event })
-    "
-  />
   <TextInput
     scope-name="note"
     field="imageMask"
@@ -41,7 +32,6 @@
 import type { NoteAccessoriesDto } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { defineComponent, computed } from "vue"
-import CheckInput from "../../form/CheckInput.vue"
 import FileInput from "../../form/FileInput.vue"
 import TextInput from "../../form/TextInput.vue"
 
@@ -57,7 +47,7 @@ export default defineComponent({
     },
   },
   emits: ["update:modelValue"],
-  components: { TextInput, CheckInput, FileInput },
+  components: { TextInput, FileInput },
   setup(props, { emit }) {
     const uploadImageFileName = computed(() => {
       const uploadImage = props.modelValue.uploadImage
