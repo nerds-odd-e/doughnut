@@ -3,50 +3,53 @@ import noteCreationForm from './noteForms/noteCreationForm'
 
 const sidebarActionTimeoutMs = 20000
 
-const trimmedText = (el: Element) => el.textContent?.trim() ?? ''
-
-/** Cypress/jQuery filter: element text equals `label` after trim. */
-const matchesExactLabel = (label: string) => (_: number, el: HTMLElement) =>
-  trimmedText(el) === label.trim()
-
 type AsideSegmentKind = 'folder' | 'note'
 
+/** Detect whether `label` is a folder or note treeitem in the sidebar DOM. */
 function asideSegmentKind(
   aside: HTMLElement,
   label: string
 ): AsideSegmentKind | null {
-  const t = label.trim()
-  if (
-    [...aside.querySelectorAll('.sidebar-folder-label')].some(
-      (el) => trimmedText(el) === t
-    )
-  ) {
-    return 'folder'
-  }
-  if (
-    [...aside.querySelectorAll('.title-text')].some(
-      (el) => trimmedText(el) === t
-    )
-  ) {
-    return 'note'
+  for (const el of aside.querySelectorAll<HTMLElement>('[role="treeitem"]')) {
+    if (el.getAttribute('aria-label') !== label) continue
+    if (el.hasAttribute('aria-expanded')) return 'folder'
+    if (el.hasAttribute('aria-selected')) return 'note'
   }
   return null
 }
 
-function withinAside(fn: () => void) {
-  cy.get('aside').within(fn)
+/** Deepest visible folder treeitem matching `folderLabel`. */
+function folderTreitemByLabel(folderLabel: string) {
+  return cy
+    .get('aside')
+    .find(`[role="treeitem"][aria-expanded][aria-label="${folderLabel}"]`, {
+      timeout: sidebarActionTimeoutMs,
+    })
+    .filter(':visible')
+    .last()
 }
 
-function clickSidebarNoteTitleExact(label: string) {
-  const t = label.trim()
-  withinAside(() => {
-    cy.get('.title-text', { timeout: sidebarActionTimeoutMs })
-      .filter(matchesExactLabel(t))
-      .should('have.length.at.least', 1)
-      .first()
-      .should('be.visible')
-      .click()
+function expandFolderIfCollapsed(label: string) {
+  pageIsNotLoading()
+  folderTreitemByLabel(label).then(($li) => {
+    if ($li.attr('aria-expanded') !== 'true') {
+      cy.wrap($li).find('.folder-row .chevron-btn').first().click()
+    }
   })
+  pageIsNotLoading()
+  folderTreitemByLabel(label)
+    .should('have.attr', 'aria-expanded', 'true')
+    .find('[role="treeitem"]', { timeout: sidebarActionTimeoutMs })
+    .should('have.length.at.least', 1)
+}
+
+function openSidebarIfCollapsed() {
+  cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
+    if (!$button.hasClass('sidebar-expanded')) {
+      cy.wrap($button).click()
+    }
+  })
+  cy.get('aside').should('be.visible')
 }
 
 const sidebarAddNoteButton = (buttonName?: string) => {
@@ -63,48 +66,6 @@ const sidebarAddNoteButton = (buttonName?: string) => {
   }
 }
 
-function openSidebarIfCollapsed() {
-  cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
-    if (!$button.hasClass('sidebar-expanded')) {
-      cy.wrap($button).click()
-    }
-  })
-  cy.get('aside').should('be.visible')
-}
-
-/** Deepest visible `.sidebar-folder-label` row matching `folderLabel`. */
-function folderRowByExactLabel(folderLabel: string) {
-  return cy
-    .get('.sidebar-folder-label')
-    .filter(matchesExactLabel(folderLabel))
-    .filter(':visible')
-    .last()
-    .should('be.visible')
-    .closest('li')
-}
-
-function expandFolderRowIfCollapsed(segment: string) {
-  pageIsNotLoading()
-  const label = segment.trim()
-  withinAside(() => {
-    folderRowByExactLabel(label).then(($li) => {
-      if ($li.attr('data-sidebar-folder-expanded') !== 'true') {
-        cy.wrap($li).within(() => {
-          cy.findByTitle('expand children').click()
-        })
-      }
-    })
-  })
-  pageIsNotLoading()
-  withinAside(() => {
-    folderRowByExactLabel(label).within(() => {
-      cy.get('ul.daisy-list-group li, .title-text', {
-        timeout: sidebarActionTimeoutMs,
-      }).should('have.length.at.least', 1)
-    })
-  })
-}
-
 function newNoteSidebarButton() {
   pageIsNotLoading()
   return sidebarAddNoteButton('New note')
@@ -114,22 +75,24 @@ export const noteSidebar = () => {
   openSidebarIfCollapsed()
 
   return {
-    expand: (noteTopology: string) => expandFolderRowIfCollapsed(noteTopology),
+    expand: (label: string) => expandFolderIfCollapsed(label),
 
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       pageIsNotLoading()
-      const expectedNoteTopics = expectedNotes.map((note) => note['note-title'])
-
-      cy.get('aside ul li .title-text', { timeout: 15000 }).should(($els) => {
-        const actualNotes = Array.from($els, (el) => el.innerText)
-
-        expect(actualNotes.length, 'Number of notes should match').to.equal(
-          expectedNoteTopics.length
+      const expectedTitles = expectedNotes.map((note) => note['note-title'])
+      cy.get('aside [role="treeitem"][aria-selected]', {
+        timeout: 15000,
+      }).should(($els) => {
+        const actualNotes = Array.from(
+          $els,
+          (el) => (el as HTMLElement).getAttribute('aria-label') ?? ''
         )
-
+        expect(actualNotes.length, 'Number of notes should match').to.equal(
+          expectedTitles.length
+        )
         actualNotes.forEach((actualNote, index) => {
           expect(actualNote, `Note at position ${index + 1}`).to.equal(
-            expectedNoteTopics[index]
+            expectedTitles[index]
           )
         })
       })
@@ -146,12 +109,7 @@ export const noteSidebar = () => {
 
     activateFolderByLabel(folderLabel: string) {
       pageIsNotLoading()
-      withinAside(() => {
-        folderRowByExactLabel(folderLabel)
-          .find('.sidebar-folder-label')
-          .should('be.visible')
-          .click()
-      })
+      folderTreitemByLabel(folderLabel).find('.sidebar-folder-label').click()
       pageIsNotLoading()
     },
 
@@ -168,7 +126,7 @@ export const noteSidebar = () => {
 
     expectSidebarFolderVisible(folderLabel: string) {
       pageIsNotLoading()
-      folderRowByExactLabel(folderLabel)
+      folderTreitemByLabel(folderLabel).should('exist')
     },
 
     expectSidebarFolderUnderParent(
@@ -176,13 +134,12 @@ export const noteSidebar = () => {
       childFolderLabel: string
     ) {
       pageIsNotLoading()
-      expandFolderRowIfCollapsed(parentFolderLabel)
-      withinAside(() => {
-        folderRowByExactLabel(parentFolderLabel)
-          .find('ul.daisy-list-group .sidebar-folder-label')
-          .filter(matchesExactLabel(childFolderLabel))
-          .should('have.length.at.least', 1)
-      })
+      expandFolderIfCollapsed(parentFolderLabel)
+      folderTreitemByLabel(parentFolderLabel)
+        .find(
+          `[role="treeitem"][aria-expanded][aria-label="${childFolderLabel}"]`
+        )
+        .should('have.length.at.least', 1)
     },
 
     /**
@@ -194,32 +151,43 @@ export const noteSidebar = () => {
       const label = segment.trim()
 
       cy.get('aside', { timeout: sidebarActionTimeoutMs }).should(($aside) => {
-        const root = $aside.get(0)
-        expect(root, 'aside').to.exist
         expect(
-          asideSegmentKind(root!, label),
+          asideSegmentKind($aside.get(0)!, label),
           `sidebar should load "${label}" as folder or note row`
         ).to.not.be.null
       })
 
       cy.get('aside').then(($aside) => {
-        const root = $aside.get(0)!
-        if (asideSegmentKind(root, label) === 'folder') {
-          expandFolderRowIfCollapsed(segment)
+        if (asideSegmentKind($aside.get(0)!, label) === 'folder') {
+          expandFolderIfCollapsed(segment)
         } else {
-          clickSidebarNoteTitleExact(label)
+          cy.get('aside')
+            .find(`[role="treeitem"][aria-selected][aria-label="${label}"]`, {
+              timeout: sidebarActionTimeoutMs,
+            })
+            .filter(':visible')
+            .last()
+            .find('a')
+            .click()
           pageIsNotLoading()
         }
       })
     },
 
     expandStructuralIntermediateFolderOnly(segment: string) {
-      expandFolderRowIfCollapsed(segment)
+      expandFolderIfCollapsed(segment)
     },
 
-    navigateToNote(noteTopology: string) {
+    navigateToNote(title: string) {
       pageIsNotLoading()
-      clickSidebarNoteTitleExact(noteTopology)
+      cy.get('aside')
+        .find(`[role="treeitem"][aria-selected][aria-label="${title}"]`, {
+          timeout: sidebarActionTimeoutMs,
+        })
+        .filter(':visible')
+        .last()
+        .find('a')
+        .click()
       pageIsNotLoading()
     },
 
@@ -235,68 +203,25 @@ export const noteSidebar = () => {
         throw new Error('each row must include note-title or Title')
       }
 
-      withinAside(() => {
-        if (expected.length === 0) {
-          folderRowByExactLabel(folderLabel)
-            .children('ul.daisy-list-group')
-            .should('not.exist')
-          return
-        }
+      if (expected.length === 0) {
+        folderTreitemByLabel(folderLabel)
+          .find('[role="treeitem"]')
+          .should('not.exist')
+        return
+      }
 
-        folderRowByExactLabel(folderLabel)
-          .children('ul.daisy-list-group')
-          .first()
-          .should('be.visible')
-          .children('li')
-          .filter((_, li) => Cypress.$(li).find('.title-text').length > 0)
-          .should('have.length', expected.length)
-          .as('folderNoteRows')
-
-        cy.get('@folderNoteRows').then(($rows) => {
-          const rowEls = $rows.toArray() as HTMLElement[]
-          expect(rowEls.length, 'folder child note row count').to.equal(
-            children.length
-          )
-
-          const titleOnly = children.every((row) =>
-            Object.keys(row).every((k) => k === 'note-title' || k === 'Title')
-          )
-          if (titleOnly) {
-            const actualTitles = rowEls.map((li) =>
-              (Cypress.$(li).find('.title-text').first().text() ?? '').trim()
-            )
-            expect([...actualTitles].sort()).to.deep.equal([...expected].sort())
-            return
-          }
-
-          const used = new Set<number>()
-          children.forEach((elem) => {
-            const title = elem['note-title'] ?? elem.Title ?? ''
-            const idx = rowEls.findIndex((li, i) => {
-              if (used.has(i)) return false
-              return (
-                Cypress.$(li)
-                  .find('.title-text')
-                  .filter(matchesExactLabel(title)).length > 0
-              )
-            })
-            expect(idx, `row for "${title}"`).to.be.at.least(0)
-            used.add(idx)
-            cy.wrap(rowEls[idx]).within(() => {
-              for (const propName in elem) {
-                const value = elem[propName]!
-                if (propName === 'note-title' || propName === 'Title') {
-                  cy.get('.title-text')
-                    .filter(matchesExactLabel(value))
-                    .should('have.length.at.least', 1)
-                } else {
-                  cy.findByText(value)
-                }
-              }
-            })
-          })
+      folderTreitemByLabel(folderLabel)
+        .find(
+          '.folder-children > .sidebar-tree-list > [role="treeitem"][aria-selected]',
+          { timeout: sidebarActionTimeoutMs }
+        )
+        .should('have.length', expected.length)
+        .then(($items) => {
+          const actualTitles = $items
+            .toArray()
+            .map((el) => (el as HTMLElement).getAttribute('aria-label') ?? '')
+          expect([...actualTitles].sort()).to.deep.equal([...expected].sort())
         })
-      })
     },
   }
 }

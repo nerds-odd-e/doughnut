@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-ml-[-1rem]" data-note-sidebar-root>
+  <div data-note-sidebar-root>
     <NoteSidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"

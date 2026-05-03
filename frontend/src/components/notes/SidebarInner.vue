@@ -1,17 +1,20 @@
 <template>
   <ul
     v-if="displayRows.length > 0"
-    class="daisy-list-group daisy-text-sm daisy-pl-[1rem]"
+    class="sidebar-tree-list"
+    :role="ariaLevel === 1 ? 'tree' : 'group'"
+    :aria-label="ariaLevel === 1 ? 'Note tree' : undefined"
   >
     <template v-for="row in displayRows" :key="rowKey(row)">
       <SidebarNoteItem
         v-if="row.kind === 'note'"
         :note-topology="row.noteTopology"
         :active-note-topology="activeNoteTopology"
+        :aria-level="ariaLevel"
       />
       <SidebarFolderItem
         v-else
-        v-bind="{ notebookId, folder: row.folder, activeNoteTopology }"
+        v-bind="{ notebookId, folder: row.folder, activeNoteTopology, ariaLevel }"
       />
     </template>
   </ul>
@@ -25,7 +28,7 @@ import type {
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
@@ -91,9 +94,13 @@ interface Props {
   folderId?: number
   /** Notifies enclosing folder row (when nested) how many peers this listing renders. */
   onStructuralPeerCount?: (count: number) => void
+  /** ARIA level for treeitem descendants. Defaults to 1 (root tree). */
+  ariaLevel?: number
 }
 
 const props = defineProps<Props>()
+
+const ariaLevel = computed(() => props.ariaLevel ?? 1)
 
 const displayRows = ref<SidebarStructuralRow[]>([])
 
@@ -125,3 +132,12 @@ watch(sidebarStructuralRefreshKey, () => {
   refreshListing()
 })
 </script>
+
+<style lang="scss" scoped>
+.sidebar-tree-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.875rem;
+}
+</style>

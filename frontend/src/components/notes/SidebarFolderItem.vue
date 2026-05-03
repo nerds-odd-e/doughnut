@@ -1,40 +1,49 @@
 <template>
   <li
     v-if="folderId != null"
-    class="daisy-list-group-item daisy-list-group-item-action daisy-py-2 daisy-pb-0 daisy-pe-0 daisy-border-0"
+    class="sidebar-folder-li"
+    role="treeitem"
     tabindex="0"
-    :data-sidebar-folder-expanded="isExpanded"
+    :aria-level="ariaLevel"
+    :aria-expanded="isExpanded"
+    :aria-label="folder.name"
     :class="{
       'active-item': isNotePathFolder,
       'sidebar-folder-user-active': isUserActiveFolder,
     }"
     @focusout="onFolderRowFocusOut"
   >
-    <div
-      class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start folder-content"
-      @click="toggleExpand"
-    >
-      <span class="sidebar-folder-label daisy-cursor-default">{{
-        folder.name
-      }}</span>
-      <span
-        role="button"
-        title="expand children"
-        class="daisy-badge daisy-cursor-pointer"
+    <div class="folder-row" @click="toggleExpand">
+      <button
+        class="chevron-btn"
+        aria-label="expand children"
+        tabindex="-1"
         @click.stop="toggleExpand"
-        >{{ structuralChildCount ?? "..." }}</span
       >
+        <ChevronDown v-if="isExpanded" :size="14" />
+        <ChevronRight v-else :size="14" />
+      </button>
+      <span class="sidebar-folder-label">
+        <FolderOpen v-if="isExpanded" :size="14" class="daisy-shrink-0 daisy-opacity-70" />
+        <Folder v-else :size="14" class="daisy-shrink-0 daisy-opacity-70" />
+        {{ folder.name }}
+      </span>
+      <span v-if="structuralChildCount != null" class="child-count">{{
+        structuralChildCount
+      }}</span>
     </div>
-    <SidebarInner
-      v-if="isExpanded"
-      v-bind="{
-        notebookId,
-        folderId,
-        activeNoteTopology,
-        onStructuralPeerCount: setStructuralChildCount,
-      }"
-      :key="`folder-${folderId}`"
-    />
+    <div v-if="isExpanded" class="folder-children">
+      <SidebarInner
+        v-bind="{
+          notebookId,
+          folderId,
+          activeNoteTopology,
+          onStructuralPeerCount: setStructuralChildCount,
+          ariaLevel: ariaLevel + 1,
+        }"
+        :key="`folder-${folderId}`"
+      />
+    </div>
   </li>
 </template>
 
@@ -43,6 +52,7 @@ import type {
   NoteTopology,
   FolderTrailSegment,
 } from "@generated/doughnut-backend-api"
+import { ChevronDown, ChevronRight, Folder, FolderOpen } from "lucide-vue-next"
 import SidebarInner from "./SidebarInner.vue"
 import {
   sidebarStructuralSidebarTitlesKey,
@@ -57,7 +67,10 @@ const props = defineProps<{
   folder: FolderTrailSegment
   notebookId: number
   activeNoteTopology?: NoteTopology
+  ariaLevel?: number
 }>()
+
+const ariaLevel = computed(() => props.ariaLevel ?? 1)
 
 const expandedFolderIds = inject(sidebarExpandedFolderIdsKey)!
 const toggleFolderId = inject(sidebarToggleFolderIdKey)!
@@ -145,16 +158,71 @@ function toggleExpand() {
 </script>
 
 <style lang="scss" scoped>
-.active-item {
-  border-left: 1px solid gray !important;
+.sidebar-folder-li {
+  list-style: none;
 }
 
-.folder-content {
-  position: relative;
-  padding-bottom: 4px;
+.folder-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2rem;
+  padding: 0.125rem 0.25rem 0.125rem 0;
+  cursor: pointer;
+  border-radius: 0.25rem;
+
+  &:hover {
+    background-color: var(--color-base-300, rgba(0, 0, 0, 0.08));
+  }
 }
 
-.sidebar-folder-user-active {
+.chevron-btn {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0.125rem;
+  border: none;
+  background: transparent;
+  color: currentColor;
+  opacity: 0.6;
+  cursor: pointer;
+  border-radius: 0.2rem;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.sidebar-folder-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.child-count {
+  font-size: 0.7rem;
+  opacity: 0;
+  padding: 0 0.25rem;
+  transition: opacity 0.15s;
+
+  .folder-row:hover & {
+    opacity: 0.5;
+  }
+}
+
+.folder-children {
+  border-left: 1px solid var(--color-base-300, rgba(0, 0, 0, 0.12));
+  margin-left: 0.75rem;
+}
+
+.active-item > .folder-row {
+  background-color: var(--color-base-300, rgba(0, 0, 0, 0.08));
+}
+
+.sidebar-folder-user-active > .folder-row {
   background-color: color-mix(in srgb, var(--color-base-200, #f0f0f0) 75%, #3b82f6) !important;
   box-shadow: inset 2px 0 0 #3b82f6;
 }
