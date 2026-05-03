@@ -134,25 +134,6 @@ public class WikiTitleCacheService {
     return viewer.canReferTo(referrerNotebook);
   }
 
-  /**
-   * Replaces wiki link cache rows via JDBC—used by wiki admin migration inside a large Hibernate
-   * transaction so we never enqueue {@link NoteWikiTitleCache} entities (which led to Hibernate
-   * "flush after exception" failures and null identifiers).
-   */
-  public void replaceWikiTitleCacheRowsJdbc(Note note, User viewer) {
-    Integer noteId = note.getId();
-    jdbcTemplate.update("DELETE FROM note_wiki_title_cache WHERE note_id = ?", noteId);
-    for (WikiLinkResolver.ResolvedWikiLink link :
-        wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
-      jdbcTemplate.update(
-          "INSERT INTO note_wiki_title_cache (note_id, target_note_id, link_text) VALUES (?, ?, ?) "
-              + "AS new ON DUPLICATE KEY UPDATE target_note_id = new.target_note_id",
-          noteId,
-          link.targetNote().getId(),
-          link.linkText());
-    }
-  }
-
   @Transactional
   public void refreshForNote(Note note, User viewer) {
     rebuildWikiTitleCache(note, viewer);

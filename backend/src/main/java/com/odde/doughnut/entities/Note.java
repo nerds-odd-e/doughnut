@@ -137,14 +137,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<Note> getSiblings() {
-    if (getParent() == null) {
-      return new ArrayList<>();
-    }
-    return getParent().getChildren();
-  }
-
-  @JsonIgnore
   public ClozedString createMaskedDetailsForRecall() {
     if (isDetailsBlank()) return new ClozedString(null, "");
 
