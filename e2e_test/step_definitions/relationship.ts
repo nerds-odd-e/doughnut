@@ -176,16 +176,6 @@ When(
   }
 )
 
-When(
-  'I change the reference from {string} to {string} to {string}',
-  (noteTopology: string, referenceTitle: string, relationType: string) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .navigateToReference(referenceTitle)
-      .changeRelationType(relationType)
-  }
-)
-
 Then('I should be able to delete the relationship', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
 })

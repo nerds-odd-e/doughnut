@@ -24,11 +24,13 @@ Feature: add relationship
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
+  @focus
   @mockBrowserTime
   Scenario: creating relationship
     When I add relationship from note "Sedition" as "similar to" to note "Sedation"
-    And I add relationship from note "Sedition" as "similar to" to note "Sedative"
+     And I add relationship from note "Sedition" as "similar to" to note "Sedative"
     Then I should see "Sedition" has relationship "similar to" "Sedation, Sedative"
+     And I should see "Sedative" has relationship "similar to" "Sedition, Sedative"
 
   @mockBrowserTime
   Scenario: Show recently updated notes before search results
