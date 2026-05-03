@@ -108,19 +108,10 @@ export const NoteWithManyAncestors: Story = {
         isCorrect: true,
       })
 
-      let currentNote = makeMe.aNote.title("Ancestor 1").please()
-      for (let i = 2; i <= 10; i++) {
-        currentNote = makeMe.aNote
-          .title(`Ancestor ${i}`)
-          .underNote(currentNote)
-          .please()
-      }
-
       return {
         ...question,
         note: makeMe.aNote
           .title("TypeScript")
-          .underNote(currentNote)
           .details(
             "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
           )

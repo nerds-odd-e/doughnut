@@ -1,6 +1,5 @@
 import type {
   Note,
-  NoteRealm,
   RelationshipCreation,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
@@ -64,17 +63,6 @@ class NoteBuilder extends Builder<Note> {
 
   folder(folderId: number): NoteBuilder {
     this.data.noteTopology.folderId = folderId
-    return this
-  }
-
-  under(value: NoteRealm): NoteBuilder {
-    value.references ||= []
-    value.references.push(this.data)
-    this.underNote(value.note)
-    return this
-  }
-
-  underNote(_value: Note): NoteBuilder {
     return this
   }
 

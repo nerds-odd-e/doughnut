@@ -6,14 +6,7 @@ import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
 
 class RelationshipBuilder extends Builder<Note> {
-  sourceNoteBuilder = new NoteBuilder()
-
   internalType: RelationshipCreation['relationType'] = 'related to'
-
-  from(note: Note): RelationshipBuilder {
-    this.sourceNoteBuilder.data = note
-    return this
-  }
 
   type(t: RelationshipCreation['relationType']): RelationshipBuilder {
     this.internalType = t
@@ -21,10 +14,7 @@ class RelationshipBuilder extends Builder<Note> {
   }
 
   do(): Note {
-    return new NoteBuilder()
-      .relationType(this.internalType)
-      .underNote(this.sourceNoteBuilder.do())
-      .do()
+    return new NoteBuilder().relationType(this.internalType).do()
   }
 }
 

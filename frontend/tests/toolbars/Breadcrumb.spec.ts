@@ -6,8 +6,7 @@ import { describe, it, expect } from "vitest"
 
 describe("breadcrumb with circles", () => {
   const parentNote = makeMe.aNote.title("parent").please()
-  const child = makeMe.aNote.title("child").underNote(parentNote).please()
-  const grandChild = makeMe.aNote.underNote(child).please()
+  const grandChild = makeMe.aNote.please()
 
   it("view note belongs to other people in bazaar", async () => {
     helper

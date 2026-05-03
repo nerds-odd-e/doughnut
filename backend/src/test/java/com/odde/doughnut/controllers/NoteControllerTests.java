@@ -17,7 +17,6 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -42,13 +41,6 @@ class NoteControllerTests extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-  }
-
-  private void makeStructuralChildOf(Note child, Note parent) {
-    User user = child.getCreator() != null ? child.getCreator() : parent.getCreator();
-    child.initialize(user, parent, child.getCreatedAt(), child.getTitle());
-    makeMe.entityPersister.merge(child);
-    makeMe.entityPersister.flush();
   }
 
   @Nested
@@ -310,22 +302,17 @@ class NoteControllerTests extends ControllerTestBase {
   @Nested
   class DeleteNoteTest {
     Note subject;
-    Note parent;
     Note child;
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      subject =
-          makeMe.aNote().creator(currentUser.getUser()).inNotebook(parent.getNotebook()).please();
-      makeStructuralChildOf(subject, parent);
+      subject = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       child =
           makeMe
               .aNote("child")
               .creator(currentUser.getUser())
-              .inNotebook(parent.getNotebook())
+              .inNotebook(subject.getNotebook())
               .please();
-      makeStructuralChildOf(child, subject);
     }
 
     @Test
@@ -336,44 +323,9 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldDeleteTheNoteButNotTheUser() throws UnexpectedNoAccessRightException {
+    void shouldSoftDeleteNoteWhenDeleted() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject);
-      assertThat(parent.getChildren(), hasSize(0));
-    }
-
-    @Test
-    void shouldSoftDeleteSubjectWithoutRemovingSiblingUnderParent()
-        throws UnexpectedNoAccessRightException {
-      Note silbling =
-          makeMe
-              .aNote("silbling")
-              .creator(currentUser.getUser())
-              .inNotebook(parent.getNotebook())
-              .please();
-      makeStructuralChildOf(silbling, parent);
-      controller.deleteNote(subject);
-      assertThat(parent.getChildren(), hasSize(1));
-      assertThat(parent.getAllDescendants().toList(), hasSize(1));
-      assertThat(child.getDeletedAt(), is(nullValue()));
-    }
-
-    @Test
-    void shouldNotSoftDeleteStructuralDescendantsWhenNoteIsDeleted()
-        throws UnexpectedNoAccessRightException {
-      Note grandchild =
-          makeMe
-              .aNote("grandchild")
-              .creator(currentUser.getUser())
-              .inNotebook(parent.getNotebook())
-              .please();
-      makeStructuralChildOf(grandchild, child);
-      makeMe.refresh(parent);
-
-      controller.deleteNote(subject);
-
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(child.getDeletedAt(), is(nullValue()));
-      assertThat(grandchild.getDeletedAt(), is(nullValue()));
     }
 
     @Test
@@ -515,31 +467,6 @@ class NoteControllerTests extends ControllerTestBase {
         assertThat(status.totalAssimilatedCount, is(2));
       }
     }
-
-    @Nested
-    class UndoDeleteNoteTest {
-      @Test
-      void shouldUndoDeleteTheNote() throws UnexpectedNoAccessRightException {
-        controller.deleteNote(subject);
-        controller.undoDeleteNote(subject);
-        assertThat(parent.getChildren(), hasSize(1));
-        assertThat(parent.getAllDescendants().toList(), hasSize(2));
-      }
-
-      @Test
-      void shouldUndoOnlyLastChange() throws UnexpectedNoAccessRightException {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        testabilitySettings.timeTravelTo(timestamp);
-        controller.deleteNote(child);
-
-        timestamp = TimestampOperations.addHoursToTimestamp(timestamp, 1);
-        testabilitySettings.timeTravelTo(timestamp);
-        controller.deleteNote(subject);
-
-        controller.undoDeleteNote(subject);
-        assertThat(parent.getAllDescendants().toList(), hasSize(1));
-      }
-    }
   }
 
   @Nested
@@ -671,19 +598,10 @@ class NoteControllerTests extends ControllerTestBase {
   @Nested
   class GraphTests {
     Note rootNote;
-    Note child1;
 
     @BeforeEach
     void setup() {
       rootNote = makeMe.aNote("Root").creatorAndOwner(currentUser.getUser()).please();
-      child1 =
-          makeMe
-              .aNote("Child 1")
-              .creator(currentUser.getUser())
-              .inNotebook(rootNote.getNotebook())
-              .please();
-      makeStructuralChildOf(child1, rootNote);
-      makeMe.refresh(rootNote);
     }
 
     @Test
@@ -707,24 +625,6 @@ class NoteControllerTests extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getGraph(unauthorizedNote, 5000));
-    }
-
-    @Test
-    void shouldReturnAllDescendants() throws UnexpectedNoAccessRightException {
-      Note grandchild =
-          makeMe
-              .aNote("Grandchild")
-              .creator(currentUser.getUser())
-              .inNotebook(rootNote.getNotebook())
-              .please();
-      makeStructuralChildOf(grandchild, child1);
-      makeMe.refresh(rootNote);
-      GraphRAGResult result = controller.getDescendants(rootNote);
-      assertThat(result.getFocusNote().getUri(), equalTo("[[Root]]"));
-      assertThat(result.getRelatedNotes(), hasSize(2));
-      assertThat(
-          result.getRelatedNotes().stream().map(n -> n.getTitle()).toList(),
-          containsInAnyOrder("Child 1", "Grandchild"));
     }
 
     @Test
