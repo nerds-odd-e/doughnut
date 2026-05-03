@@ -45,6 +45,7 @@
     "openAPIToTypeScript": "openapi-ts",
     "openapi:lint": "redocly lint open_api_docs.yaml",
     "generateTypeScript": "pnpm --frozen-lockfile --silent install && pnpm backend:generateOpenAPIDocs && pnpm openAPIToTypeScript && node scripts/add-generated-package-json.mjs",
+    "export:database-erd": "python3 scripts/export_database_erd.py",
     "cy:format": "pnpm --frozen-lockfile --silent install && pnpm biome check --write .",
     "cy:lint": "pnpm --frozen-lockfile --silent install && pnpm biome check .",
     "validate:path-routing": "node scripts/validate-url-map-static-vs-backend-hints.mjs",

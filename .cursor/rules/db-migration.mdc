@@ -61,3 +61,7 @@ As noted in V300000101__db_migration_placeholder.sql, previous migrations were c
 * Migrations are version controlled and should never be modified once committed
 * New changes should always be added as new migration files
 * Clear, descriptive names should be used for migration files to indicate their purpose
+
+## Entity-relationship diagram
+
+After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.cursor/skills/database-erd/SKILL.md`): run `CURSOR_DEV=true nix develop -c pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema.

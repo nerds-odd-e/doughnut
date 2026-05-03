@@ -31,6 +31,10 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only
 
 Always run all unit tests instead of just selected file or test case, unlike for e2e test.
 
+## Relational schema (ERD)
+
+The **`docs/database-erd.md`** Mermaid diagram documents tables, foreign keys, and key columns. After Flyway migrations change the schema, regenerate it with the **`database-erd`** skill: `CURSOR_DEV=true nix develop -c pnpm export:database-erd`.
+
 ## Core Principles
 
 1. **Focus on Behavior, Not Implementation**
