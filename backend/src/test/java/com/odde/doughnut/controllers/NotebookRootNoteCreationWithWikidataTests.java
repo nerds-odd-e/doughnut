@@ -349,9 +349,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         Note persisted = noteRepository.findById(note.getId()).orElseThrow();
         assertThat(persisted.getFolder(), not(nullValue()));
         List<String> peerTitles =
-            noteRepository
-                .findNotesInFolderOrderBySiblingOrder(persisted.getFolder().getId())
-                .stream()
+            noteRepository.findNotesInFolderOrderByIdAsc(persisted.getFolder().getId()).stream()
                 .map(Note::getTitle)
                 .toList();
         assertThat(peerTitles, hasItems("Johnny boy", "Canada"));
@@ -387,9 +385,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         Note persisted = noteRepository.findById(note.getId()).orElseThrow();
         assertThat(persisted.getFolder(), not(nullValue()));
         List<String> peerTitles =
-            noteRepository
-                .findNotesInFolderOrderBySiblingOrder(persisted.getFolder().getId())
-                .stream()
+            noteRepository.findNotesInFolderOrderByIdAsc(persisted.getFolder().getId()).stream()
                 .map(Note::getTitle)
                 .toList();
         assertThat(peerTitles, hasItems("Harry Potter", "J. K. Rowling"));
@@ -414,9 +410,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         Note persisted = noteRepository.findById(note.getId()).orElseThrow();
         assertThat(persisted.getFolder(), not(nullValue()));
         List<String> peerTitles =
-            noteRepository
-                .findNotesInFolderOrderBySiblingOrder(persisted.getFolder().getId())
-                .stream()
+            noteRepository.findNotesInFolderOrderByIdAsc(persisted.getFolder().getId()).stream()
                 .map(Note::getTitle)
                 .toList();
         assertThat(

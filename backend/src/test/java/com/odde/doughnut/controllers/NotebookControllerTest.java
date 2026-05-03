@@ -281,7 +281,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller.createNoteAtNotebookRoot(nb, c);
 
       List<String> titles =
-          noteRepository.findNotesInFolderOrderBySiblingOrder(f.getId()).stream()
+          noteRepository.findNotesInFolderOrderByIdAsc(f.getId()).stream()
               .map(Note::getTitle)
               .toList();
       assertThat(titles, contains("A", "B", "C"));

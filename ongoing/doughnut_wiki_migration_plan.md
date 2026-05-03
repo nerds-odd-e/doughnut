@@ -211,7 +211,7 @@ Delete remaining legacy concepts once the new model is stable.
 
 ```text
 note parent for containment
-sibling order from old parent-child tree (replaced by explicit ordering when defined)
+structural peer list order by note id (folder / notebook root scope)
 head note / special relationship structure / tree-only navigation
 slug columns and path-primary routes as canonical identity (already removed at boundary)
 ```

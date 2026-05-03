@@ -8,7 +8,6 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
-import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.services.graphRAG.BareNote;
@@ -96,12 +95,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private String wikidataId;
-
-  @Column(name = "sibling_order")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
   @OneToMany(mappedBy = "note")
   @Getter

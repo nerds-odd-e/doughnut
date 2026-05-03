@@ -4,7 +4,7 @@
 
 In Doughnut, notes live in notebooks and optional folders. **GraphRAG** builds a bounded JSON snapshot for AI context: the **focus** note plus **related** notes that fit a token budget.
 
-Semantic links come from the **wiki title cache** (Phase 5): outgoing wiki targets and inbound referrers authorized for the viewer. Structural neighborhood is **folder-scoped**: older and younger “siblings” are the ordered peer list from `NoteService.findStructuralPeerNotesInOrder` (same folder, or notebook root when the note has no folder)—no structural note-parent chain.
+Semantic links come from the **wiki title cache** (Phase 5): outgoing wiki targets and inbound referrers authorized for the viewer. Structural neighborhood is **folder-scoped**: older and younger “siblings” are the ordered peer list from `NoteService.findStructuralPeerNotesInOrder` (same folder, or notebook root when the note has no folder), ordered by **ascending note `id`**—no structural note-parent chain.
 
 There are no relationship notes as a separate graph entity: meaning lives in markdown/details, frontmatter, and wiki links.
 
@@ -26,7 +26,7 @@ JSON shape (see `BareNote.java`):
 - **`contextualPath`** — Single string of folder-name crumbs (notebook root → note’s folder), not note ancestors.
 - **`links`** — Wiki URIs for outgoing resolved link targets from the focus note.
 - **`inboundReferences`** — Wiki URIs for notes that link to the focus (duplicates the list-driven related notes for string convenience on the focus object).
-- **`olderSiblings`** / **`youngerSiblings`** — Wiki URIs of related structural peers, in display order.
+- **`olderSiblings`** / **`youngerSiblings`** — Wiki URIs of related structural peers, in **ascending note `id`** order (same order as `findStructuralPeerNotesInOrder`).
 
 There is no `children` list on the focus note for graph expansion.
 
@@ -56,7 +56,7 @@ There are no dynamic handler injections, no parent/child/ancestor/cousin handler
 
 ## Algorithm (summary)
 
-1. Hydrate focus note; compute folder-scoped structural peers sharing the same tree parent.
+1. Hydrate focus note; compute folder-scoped structural peers in the same folder or notebook root, ordered by ascending note `id`.
 2. Construct builder → focus note with folder crumbs, wiki `links`, and `inboundReferences` strings.
 3. Run `PriorityLayer` over the handler list; each successful add decrements the related-note token budget via `TokenCountingStrategy`.
 4. Return `GraphRAGResult`.

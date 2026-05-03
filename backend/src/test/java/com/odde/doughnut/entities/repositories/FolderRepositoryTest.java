@@ -94,7 +94,6 @@ class FolderRepositoryTest {
 
     Note section = makeMe.aNote().title("Section").folder(folderForRootChildren).please();
     Note leaf = makeMe.aNote().title("Leaf").folder(folderForSectionChildren).please();
-    Long siblingOrder = leaf.getSiblingOrder();
     makeMe.entityPersister.flush();
 
     Note loadedSection = noteRepository.findById(section.getId()).orElseThrow();
@@ -104,6 +103,5 @@ class FolderRepositoryTest {
     assertThat(loadedLeaf.getFolder().getId(), equalTo(folderForSectionChildren.getId()));
     assertThat(
         loadedLeaf.getFolder().getParentFolder().getId(), equalTo(folderForRootChildren.getId()));
-    assertThat(loadedLeaf.getSiblingOrder(), equalTo(siblingOrder));
   }
 }

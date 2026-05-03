@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -81,7 +81,7 @@ class RelationControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void moveNoteIntoFolderAtEndAmongPeers() throws Throwable {
+    void moveNoteIntoFolder_collectsPeersInFolder() throws Throwable {
       User u = currentUser.getUser();
       Note anchor = makeMe.aRootNote("top").creatorAndOwner(u).please();
       Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F").please();
@@ -96,14 +96,14 @@ class RelationControllerTests extends ControllerTestBase {
       controller.moveNoteToFolder(mover, folder);
       makeMe.refresh(mover);
       assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
-      List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+      List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
       assertThat(
           ordered.stream().map(Note::getId).toList(),
-          contains(peerA.getId(), peerB.getId(), mover.getId()));
+          containsInAnyOrder(peerA.getId(), peerB.getId(), mover.getId()));
     }
 
     @Test
-    void moveNoteToSameFolderKeepsNoteAtEndAmongPeers() throws Throwable {
+    void moveNoteToSameFolder_isIdempotent() throws Throwable {
       User u = currentUser.getUser();
       Note anchor = makeMe.aRootNote("top2").creatorAndOwner(u).please();
       Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F2").please();
@@ -117,10 +117,10 @@ class RelationControllerTests extends ControllerTestBase {
       makeMe.entityPersister.flush();
 
       controller.moveNoteToFolder(mover, folder);
-      List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+      List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
       assertThat(
           ordered.stream().map(Note::getId).toList(),
-          contains(peerA.getId(), peerB.getId(), mover.getId()));
+          containsInAnyOrder(peerA.getId(), peerB.getId(), mover.getId()));
     }
   }
 

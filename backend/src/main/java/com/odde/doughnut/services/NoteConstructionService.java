@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
@@ -18,7 +17,6 @@ import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.SneakyThrows;
@@ -79,27 +77,10 @@ public class NoteConstructionService {
     User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeAsNotebookRoot(notebook, user, ts, title);
-    assignSiblingOrderAppendLast(note);
     if (entityPersister != null) {
       entityPersister.save(note);
     }
     return note;
-  }
-
-  private void assignSiblingOrderAppendLast(Note note) {
-    List<Note> peers;
-    if (note.getFolder() != null) {
-      peers = noteRepository.findNotesInFolderOrderBySiblingOrder(note.getFolder().getId());
-    } else {
-      peers =
-          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(note.getNotebook().getId());
-    }
-    long next =
-        peers.isEmpty()
-            ? SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT
-            : peers.get(peers.size() - 1).getSiblingOrder()
-                + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
-    note.setSiblingOrder(next);
   }
 
   private Note persistNewNoteInNotebookFolder(Notebook notebook, Folder folder, String title) {
@@ -111,7 +92,6 @@ public class NoteConstructionService {
     note.initializeNewNote(user, notebook, ts, title);
     note.assignNotebook(notebook);
     note.setFolder(folder);
-    assignSiblingOrderAppendLast(note);
     if (entityPersister != null) {
       entityPersister.save(note);
     }

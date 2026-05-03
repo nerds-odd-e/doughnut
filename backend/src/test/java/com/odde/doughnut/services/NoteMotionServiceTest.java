@@ -40,7 +40,7 @@ public class NoteMotionServiceTest {
   }
 
   @Test
-  void executeMoveIntoFolder_appendsAtEndAmongFolderPeers() {
+  void executeMoveIntoFolder_includesNoteAmongFolderPeers() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("box").please();
@@ -53,14 +53,14 @@ public class NoteMotionServiceTest {
     makeMe.entityPersister.flush();
 
     noteMotionService.executeMoveIntoFolder(mover, folder);
-    List<Note> ordered = noteRepository.findNotesInFolderOrderBySiblingOrder(folder.getId());
+    List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
     assertThat(
         ordered.stream().map(Note::getId).toList(),
-        contains(n1.getId(), n2.getId(), mover.getId()));
+        containsInAnyOrder(n1.getId(), n2.getId(), mover.getId()));
   }
 
   @Test
-  void executeMoveToNotebookRoot_appendsAtEndAmongRootPeers() {
+  void executeMoveToNotebookRoot_placesNoteInNotebookRoot() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
     makeMe.aNote("peer").creatorAndOwner(user).underSameNotebookAs(root).please();
@@ -71,8 +71,10 @@ public class NoteMotionServiceTest {
     makeMe.entityPersister.flush();
 
     noteMotionService.executeMoveToNotebookRoot(mover);
-    List<Note> ordered =
+    makeMe.refresh(mover);
+    assertThat(mover.getFolder(), nullValue());
+    List<Note> rootScope =
         noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(root.getNotebook().getId());
-    assertThat(ordered.getLast().getId(), equalTo(mover.getId()));
+    assertThat(rootScope.stream().map(Note::getId).toList(), hasItem(equalTo(mover.getId())));
   }
 }
