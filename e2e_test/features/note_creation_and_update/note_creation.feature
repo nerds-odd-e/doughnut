@@ -14,10 +14,10 @@ Feature: Nested Note creation
     When I create a note belonging to "LeSS in Action" with title "Re-quirement"
     Then I should see the note tree in the sidebar
       | note-title   |
-      | LeSS in Action |
+      | Re-quirement |
       | team         |
       | tech         |
-      | Re-quirement |
+      | LeSS in Action |
     And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title   |
       | team         |
@@ -32,10 +32,10 @@ Feature: Nested Note creation
     When I activate folder "LeSS in Action" in the sidebar and create a new note with title "coordination"
     Then I should see the note tree in the sidebar
       | note-title   |
-      | LeSS in Action |
+      | coordination |
       | team         |
       | tech         |
-      | coordination |
+      | LeSS in Action |
     And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title   |
       | team         |

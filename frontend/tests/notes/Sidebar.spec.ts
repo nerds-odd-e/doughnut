@@ -313,6 +313,65 @@ describe("Sidebar", () => {
     })
   })
 
+  it("lists folders above notes at the same level, both sorted alphabetically", async () => {
+    storageAccessor.value = createNoteStorage()
+    const nbId = topNoteRealm.notebookId
+    const realmZ = makeMe.aNoteRealm.title("zebra").under(topNoteRealm).please()
+    const realmA = makeMe.aNoteRealm.title("apple").under(topNoteRealm).please()
+    storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
+    storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
+    storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+
+    mockSdkService("listNotebookRootNotes", {
+      notes: [{ ...realmZ } as NoteRealm, { ...realmA } as NoteRealm],
+      folders: [
+        { id: "9002", name: "mango" },
+        { id: "9001", name: "banana" },
+      ],
+    })
+    mockSdkService("listFolderListing", { notes: [], folders: [] })
+    const fullRealmByNoteId: Record<number, NoteRealm> = {
+      [topNoteRealm.id]: topNoteRealm,
+      [realmZ.id]: realmZ,
+      [realmA.id]: realmA,
+    }
+    mockSdkServiceWithImplementation("showNote", (options) => {
+      const id = (options as Options<ShowNoteData>).path.note
+      const realm = fullRealmByNoteId[id]
+      if (realm === undefined) {
+        throw new Error(`unmocked showNote for note id ${id}`)
+      }
+      return realm
+    })
+
+    wrapper = helper
+      .component(Sidebar)
+      .withProps({
+        activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
+        notebookId: nbId,
+      })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+    await vi.waitUntil(
+      () => wrapper.findAll(".sidebar-folder-label").length >= 2
+    )
+
+    const rootUl = wrapper.get("ul.daisy-list-group")
+    const rowLabels = Array.from(rootUl.element.children).map((li) => {
+      const folder = li.querySelector(".sidebar-folder-label")
+      if (folder) return `folder:${folder.textContent?.trim()}`
+      const note = li.querySelector(".title-text")
+      if (note) return `note:${note.textContent?.trim()}`
+      return "?"
+    })
+    expect(rowLabels).toEqual([
+      "folder:banana",
+      "folder:mango",
+      "note:apple",
+      "note:zebra",
+    ])
+  })
+
   it("should call the api once if top note", async () => {
     mountSidebar(topNoteRealm)
     await vi.waitUntil(() =>

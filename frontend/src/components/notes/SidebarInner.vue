@@ -40,38 +40,40 @@ function folderNumericId(folder: NotebookRootFolder): number | undefined {
   return Number(folder.id)
 }
 
-function folderMatchesNote(folder: NotebookRootFolder, note: Note): boolean {
-  if (folderNumericId(folder) === undefined) return false
-  const title = note.noteTopology.title ?? ""
-  return folder.name === title
+function folderSortKey(folder: NotebookRootFolder): string {
+  return (folder.name ?? "").toLocaleLowerCase()
+}
+
+function noteSortKey(note: Note): string {
+  return (note.noteTopology?.title ?? "").toLocaleLowerCase()
 }
 
 function buildStructuralRows(
   realms: NoteRealm[],
   folders: NotebookRootFolder[] | undefined
 ): SidebarStructuralRow[] {
-  const unused = [...(folders ?? [])]
-  const rows: SidebarStructuralRow[] = []
+  type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
+  type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>
 
-  for (const realm of realms) {
-    const note = realm.note
-    rows.push({ kind: "note", note })
-    const index = unused.findIndex((folder) => folderMatchesNote(folder, note))
-    if (index !== -1) {
-      const [folder] = unused.splice(index, 1)
-      if (folder && folderNumericId(folder) !== undefined) {
-        rows.push({ kind: "folder", folder })
-      }
-    }
-  }
-
-  for (const folder of unused) {
+  const folderRows: FolderRow[] = []
+  for (const folder of folders ?? []) {
     if (folderNumericId(folder) !== undefined) {
-      rows.push({ kind: "folder", folder })
+      folderRows.push({ kind: "folder", folder })
     }
   }
+  folderRows.sort((a, b) =>
+    folderSortKey(a.folder).localeCompare(folderSortKey(b.folder))
+  )
 
-  return rows
+  const noteRows: NoteRow[] = realms.map((realm) => ({
+    kind: "note" as const,
+    note: realm.note,
+  }))
+  noteRows.sort((a, b) =>
+    noteSortKey(a.note).localeCompare(noteSortKey(b.note))
+  )
+
+  return [...folderRows, ...noteRows]
 }
 
 function rowKey(row: SidebarStructuralRow): string {
