@@ -17,6 +17,7 @@ Feature: Note tree view
     Given I am on a window 500 * 500
     And I navigate to "LeSS training/LeSS in Action" note
     When I expand the side bar
+    And I expand the children of note "LeSS in Action" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
       | ATDD           |
@@ -26,6 +27,7 @@ Feature: Note tree view
 
   Scenario: Side bar should show the whole notebook from TDD
     When I navigate to "LeSS training/LeSS in Action/TDD" note
+    And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
       | TPP            |
@@ -50,6 +52,7 @@ Feature: Note tree view
     Given I navigate to "LeSS training/LeSS in Action/TDD" note
     When I route to the note "ATDD"
     And I expand the children of note "TDD" in the sidebar
+    And I expand the children of note "ATDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
       | Pull           |
@@ -62,6 +65,7 @@ Feature: Note tree view
   Scenario: Sidebar tree stays populated when opening another note from the sidebar
     Given I navigate to "LeSS training/LeSS in Action/TDD" note
     When I expand the side bar
+    And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
       | TPP            |
@@ -80,7 +84,8 @@ Feature: Note tree view
 
   Scenario: expand and collapse children in the sidebar
     Given I navigate to "LeSS training/LeSS in Action" note
-    When I expand the children of note "TDD" in the sidebar
+    When I expand the children of note "LeSS in Action" in the sidebar
+    And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
       | TPP            |

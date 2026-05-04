@@ -12,8 +12,8 @@ function asideSegmentKind(
 ): AsideSegmentKind | null {
   for (const el of aside.querySelectorAll<HTMLElement>('[role="treeitem"]')) {
     if (el.getAttribute('aria-label') !== label) continue
-    if (el.hasAttribute('aria-expanded')) return 'folder'
-    if (el.hasAttribute('aria-selected')) return 'note'
+    if (el.classList.contains('sidebar-folder-li')) return 'folder'
+    if (el.classList.contains('sidebar-note-li')) return 'note'
   }
   return null
 }
@@ -22,7 +22,7 @@ function asideSegmentKind(
 function folderTreitemByLabel(folderLabel: string) {
   return cy
     .get('aside')
-    .find(`[role="treeitem"][aria-expanded][aria-label="${folderLabel}"]`, {
+    .find(`[role="treeitem"].sidebar-folder-li[aria-label="${folderLabel}"]`, {
       timeout: sidebarActionTimeoutMs,
     })
     .filter(':visible')
@@ -81,22 +81,24 @@ export const noteSidebar = () => {
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       pageIsNotLoading()
       const expectedTitles = expectedNotes.map((note) => note['note-title'])
-      cy.get('aside [role="treeitem"][aria-selected]', {
+      cy.get('aside [role="treeitem"].sidebar-note-li', {
         timeout: 15000,
-      }).should(($els) => {
-        const actualNotes = Array.from(
-          $els,
-          (el) => (el as HTMLElement).getAttribute('aria-label') ?? ''
-        )
-        expect(actualNotes.length, 'Number of notes should match').to.equal(
-          expectedTitles.length
-        )
-        actualNotes.forEach((actualNote, index) => {
-          expect(actualNote, `Note at position ${index + 1}`).to.equal(
-            expectedTitles[index]
-          )
-        })
       })
+        .filter(':visible')
+        .should(($els) => {
+          const actualNotes = Array.from(
+            $els,
+            (el) => (el as HTMLElement).getAttribute('aria-label') ?? ''
+          )
+          expect(actualNotes.length, 'Number of notes should match').to.equal(
+            expectedTitles.length
+          )
+          actualNotes.forEach((actualNote, index) => {
+            expect(actualNote, `Note at position ${index + 1}`).to.equal(
+              expectedTitles[index]
+            )
+          })
+        })
     },
 
     addingNoteButton: newNoteSidebarButton,
@@ -138,7 +140,7 @@ export const noteSidebar = () => {
       expandFolderIfCollapsed(parentFolderLabel)
       folderTreitemByLabel(parentFolderLabel)
         .find(
-          `[role="treeitem"][aria-expanded][aria-label="${childFolderLabel}"]`
+          `[role="treeitem"].sidebar-folder-li[aria-label="${childFolderLabel}"]`
         )
         .should('have.length.at.least', 1)
     },
@@ -163,7 +165,7 @@ export const noteSidebar = () => {
           expandFolderIfCollapsed(segment)
         } else {
           cy.get('aside')
-            .find(`[role="treeitem"][aria-selected][aria-label="${label}"]`, {
+            .find(`[role="treeitem"].sidebar-note-li[aria-label="${label}"]`, {
               timeout: sidebarActionTimeoutMs,
             })
             .filter(':visible')
@@ -182,7 +184,7 @@ export const noteSidebar = () => {
     navigateToNote(title: string) {
       pageIsNotLoading()
       cy.get('aside')
-        .find(`[role="treeitem"][aria-selected][aria-label="${title}"]`, {
+        .find(`[role="treeitem"].sidebar-note-li[aria-label="${title}"]`, {
           timeout: sidebarActionTimeoutMs,
         })
         .filter(':visible')
@@ -213,7 +215,7 @@ export const noteSidebar = () => {
 
       folderTreitemByLabel(folderLabel)
         .find(
-          '.folder-children > .sidebar-tree-list > [role="treeitem"][aria-selected]',
+          '.folder-children > .sidebar-tree-list > [role="treeitem"].sidebar-note-li',
           { timeout: sidebarActionTimeoutMs }
         )
         .should('have.length', expected.length)
