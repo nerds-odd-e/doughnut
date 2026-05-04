@@ -67,7 +67,7 @@
     </GlobalBar>
     <div
       v-if="!isMdOrLarger && sidebarOpened"
-      class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
+      class="notebook-sidebar-drawer-backdrop daisy-fixed daisy-inset-x-0 daisy-bottom-0 daisy-bg-black/50 daisy-z-30"
       @click="sidebarOpened = false"
     />
     <div
@@ -76,13 +76,14 @@
       <aside
         :class="[
           'daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-overflow-y-auto',
+          !isMdOrLarger && 'notebook-sidebar-drawer',
           isMdOrLarger
             ? sidebarOpened
               ? 'daisy-relative'
               : 'daisy-hidden'
             : sidebarOpened
-              ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full'
-              : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-h-full',
+              ? 'daisy-translate-x-0 daisy-fixed daisy-left-0 daisy-z-40'
+              : '-daisy-translate-x-full daisy-fixed daisy-left-0 daisy-z-40',
         ]"
       >
         <NoteSidebar
@@ -202,7 +203,23 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use "@/assets/menu-variables.scss" as *;
+
+.notebook-sidebar-drawer {
+  @media (max-width: theme("screens.md")) {
+    top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
+    bottom: 0;
+    height: auto;
+  }
+}
+
+.notebook-sidebar-drawer-backdrop {
+  @media (max-width: theme("screens.md")) {
+    top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
+  }
+}
+
 aside {
   max-height: 100%;
 }
