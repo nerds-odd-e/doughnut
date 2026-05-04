@@ -1,6 +1,7 @@
 <template>
-  <h3 v-if="note">Search for a target note</h3>
-  <h3 v-else>Searching</h3>
+  <h3 v-if="!note">Searching</h3>
+  <h3 v-else-if="targetNoteTopology">Complete relationship</h3>
+  <h3 v-else>Search for a target note</h3>
   <SearchNote
     v-if="!targetNoteTopology"
     v-bind="{ noteId: note?.id, notebookId: notebookId }"
