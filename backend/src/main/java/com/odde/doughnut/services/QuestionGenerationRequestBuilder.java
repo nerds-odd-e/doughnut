@@ -4,6 +4,10 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextResult;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
+import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +15,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
-  private final GraphRAGService graphRAGService;
+  private final FocusContextRetrievalService focusContextRetrievalService;
+  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   @Autowired
   public QuestionGenerationRequestBuilder(
-      GlobalSettingsService globalSettingsService, GraphRAGService graphRAGService) {
+      GlobalSettingsService globalSettingsService,
+      FocusContextRetrievalService focusContextRetrievalService,
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
     this.globalSettingsService = globalSettingsService;
-    this.graphRAGService = graphRAGService;
+    this.focusContextRetrievalService = focusContextRetrievalService;
+    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
   }
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
@@ -29,7 +37,7 @@ public class QuestionGenerationRequestBuilder {
   }
 
   /**
-   * Graph-RAG user message, optional notebook assistant system hints, and optional extra user
+   * Focus context user message, optional notebook assistant system hints, and optional extra user
    * message—in the same order as {@link #buildQuestionGenerationRequest}. The MCQ JSON schema
    * instruction is not attached here; {@link
    * com.odde.doughnut.services.openAiApis.OpenAiApiHandler#requestAndGetJsonSchemaResult} applies
@@ -55,12 +63,10 @@ public class QuestionGenerationRequestBuilder {
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    String noteDescription = graphRAGService.getGraphRAGDescription(note);
-    String noteInstructions =
-        "You are the Question Designer for this request, producing a multiple-choice question (MCQ) from hidden context. The JSON below is visible only to you—not to the user who will answer. You must NEVER refer to it explicitly or implicitly. Do NOT use words like \"this note\", \"above\", \"the focus note\", or anything revealing that the question or choices originate from hidden context.\n";
+    RetrievalConfig config = RetrievalConfig.depth1();
+    FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
+    String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
 
-    return new OpenAIChatRequestBuilder()
-        .model(modelName)
-        .addUserMessage(noteInstructions + noteDescription);
+    return new OpenAIChatRequestBuilder().model(modelName).addUserMessage(focusContextMarkdown);
   }
 }

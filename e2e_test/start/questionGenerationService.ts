@@ -44,6 +44,37 @@ export const questionGenerationService = () => ({
     })
   },
 
+  resetAndStubAskingMCQWhenPromptContainsRetrievedNote: (
+    record: Record<string, string>
+  ) => {
+    const mcqWithAnswer = createMcqWithAnswer(
+      record['Question Stem']!,
+      record['Correct Choice']!,
+      record['Incorrect Choice 1']!,
+      record['Incorrect Choice 2']!
+    )
+    const reply = JSON.stringify(mcqWithAnswer)
+    cy.then(async () => {
+      await mock_services.openAi().restartImposter()
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*Please generate an understanding checklist.*',
+        })
+        .stubJsonSchemaResponse(understandingChecklistReply)
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'user',
+          content: '.*Reached by: OutgoingWikiLink.*',
+        })
+        .stubJsonSchemaResponse(reply)
+    })
+  },
+
   stubEvaluationQuestion: (
     record: Record<string, boolean | string | number[]>
   ) => {

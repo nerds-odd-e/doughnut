@@ -60,9 +60,7 @@ class FineTuningServiceTest {
       List<ChatMessageForFineTuning> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Title"));
-      assertThat(
-          goodTrainingData.get(0).getContent(),
-          containsString("Please act as a Question Designer"));
+      assertThat(goodTrainingData.get(0).getContent(), containsString("Question Designer"));
     }
 
     @Test

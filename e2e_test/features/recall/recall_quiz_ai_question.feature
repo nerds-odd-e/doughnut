@@ -31,3 +31,20 @@ Feature: Recall Quiz
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to incite violence"
     Then I should see that my answer is correct as the last question
+
+  @wip
+  @usingMockedOpenAiService
+  Scenario: AI question generation prompt includes outgoing wiki-linked note content
+    And I have a notebook "English practice" with notes:
+      | Title   | Details                                        |
+      | Bahamas | The Bahamas is an archipelago in the Atlantic. |
+    When I update note "sedition" details using markdown to become:
+      """
+      Sedition means incite violence. Also see [[Bahamas]].
+      """
+    And OpenAI generates this question only when prompt includes a retrieved wiki-linked note:
+      | Question Stem        | Correct Choice  | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is the Bahamas? | An archipelago  | A continent        | An act of sedition |
+    And the note "sedition" was assimilated on day 1
+    When I am recalling my note on day 2
+    Then I should be asked "What is the Bahamas?"

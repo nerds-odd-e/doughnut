@@ -7,12 +7,13 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,7 +37,8 @@ class PredefinedQuestionController {
   private final ObjectMapper objectMapper;
   private final AuthorizationService authorizationService;
   private final GlobalSettingsService globalSettingsService;
-  private final GraphRAGService graphRAGService;
+  private final FocusContextRetrievalService focusContextRetrievalService;
+  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   @Autowired
   public PredefinedQuestionController(
@@ -47,11 +49,13 @@ class PredefinedQuestionController {
       AuthorizationService authorizationService,
       GlobalSettingsService globalSettingsService,
       AiQuestionGenerator aiQuestionGenerator,
-      GraphRAGService graphRAGService) {
+      FocusContextRetrievalService focusContextRetrievalService,
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.testabilitySettings = testabilitySettings;
-    this.graphRAGService = graphRAGService;
+    this.focusContextRetrievalService = focusContextRetrievalService;
+    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.globalSettingsService = globalSettingsService;
@@ -128,7 +132,8 @@ class PredefinedQuestionController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     QuestionGenerationRequestBuilder requestBuilder =
-        new QuestionGenerationRequestBuilder(globalSettingsService, graphRAGService);
+        new QuestionGenerationRequestBuilder(
+            globalSettingsService, focusContextRetrievalService, focusContextMarkdownRenderer);
     ChatCompletionCreateParams params = requestBuilder.buildQuestionGenerationRequest(note, null);
     return serializeChatCompletionCreateParams(params);
   }

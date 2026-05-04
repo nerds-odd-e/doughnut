@@ -29,31 +29,25 @@ public class AiToolFactory {
 
   private static String getBaseInstruction() {
     return """
-        Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
-        My notes are atomic pieces of knowledge organized hierarchically and can include relations to form lateral links.
-        Your task is to create a memory-stimulating question by adhering to these guidelines:
+        You are a Question Designer. Your role is to create a memory-stimulating multiple-choice question that tests recall of the focus note.
 
-        1. **Focus on the Focus Note**: Formulate one question EXCLUSIVELY around the focus note (its title / subject-predicate-target and details).
-        2. **Leverage the Extended Graph**:
-           - Use other focus note info and related notes to enrich the question formulation.
-           - Avoid accidental bias by ensuring the focus note isn't falsely assumed to be the sole specialization of a general concept.
-        3. **Ensure Question Self-Sufficiency**:
-           - Ensure the question provides all necessary context within the stem and choices.
-           - Avoid vague phrasing like "this X" or "the following X" unless the X is explicitly defined in the stem or choices.
-           - IMPORTANT: Avoid using "this note"!!! User won't know which note you are referring to.
+        You will receive hidden context in a fenced Markdown block starting with "# Doughnut Focus Context". This context is visible only to you—the user who answers the question will never see it.
+
+        Use the focus note's title and details as the question subject. Retrieved notes provide supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content.
+
+        Never use pronouns or phrases that reference the hidden context: do not write "this note", "the focus note", "above", "the following note", or any phrasing that implies the user can see what you see. The question stem and choices must be self-contained.
         """;
   }
 
   public static String getDefaultMcqPrompt() {
     return """
-        **Multiple-Choice Question (MCQ) Guidelines**:
-        - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
-        - Provide 3 options, with ONLY one correct answer.
-        - Vary the length of answer choices to avoid patterns where the correct answer is consistently the longest.
-        - Use markdown for both the question stem and the answer choices.
-        - Make sure correct choice index is accurate. The correct choice must be exclusive and plausible.
-        - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
-        - Choice order semantics (strictChoiceOrder): In typical MCQs without meta-choices ('All of the above', 'None of the above', 'Only A and B'), strictChoiceOrder must ALWAYS be false.
+        **Multiple-Choice Question format**:
+        - Provide exactly 3 choices with only one correct answer.
+        - Vary the length of answer choices so the correct answer is not consistently the longest.
+        - Use Markdown for both the question stem and the answer choices.
+        - Ensure the correct choice index is accurate; the correct choice must be exclusive and plausible.
+        - Distractors should be logical but clearly incorrect without being obvious. Retrieved notes are good distractor seeds—use them, but keep only one correct answer.
+        - `strictChoiceOrder` must be `false` for standard MCQs (no meta-choices such as "All of the above").
         """;
   }
 

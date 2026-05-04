@@ -14,7 +14,7 @@ class AiToolFactoryTest {
     InstructionAndSchema result = AiToolFactory.questionAiTool(customPrompt);
 
     assertThat(result.getMessageBody(), containsString(customPrompt));
-    assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
+    assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
 
@@ -22,7 +22,7 @@ class AiToolFactoryTest {
   void shouldHandleNullCustomPrompt() {
     InstructionAndSchema result = AiToolFactory.questionAiTool(null);
 
-    assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
+    assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
 
@@ -30,7 +30,7 @@ class AiToolFactoryTest {
   void shouldHandleBlankCustomPrompt() {
     InstructionAndSchema result = AiToolFactory.questionAiTool("   ");
 
-    assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
+    assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getMessageBody(), not(containsString("   \n")));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
@@ -39,8 +39,7 @@ class AiToolFactoryTest {
   void shouldMaintainBackwardCompatibilityWithMcqMethod() {
     InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool();
 
-    assertThat(result.getMessageBody(), containsString("Multiple-Choice Question"));
-    assertThat(result.getMessageBody(), containsString("Provide 3 options"));
+    assertThat(result.getMessageBody(), containsString("3 choices"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
 
@@ -48,9 +47,8 @@ class AiToolFactoryTest {
   void mcqWithAnswerAiToolShouldContainBaseInstruction() {
     InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool();
 
-    assertThat(result.getMessageBody(), containsString("Please act as a Question Designer"));
-    assertThat(result.getMessageBody(), containsString("Focus on the Focus Note"));
-    assertThat(result.getMessageBody(), containsString("Leverage the Extended Graph"));
-    assertThat(result.getMessageBody(), containsString("Ensure Question Self-Sufficiency"));
+    assertThat(result.getMessageBody(), containsString("Question Designer"));
+    assertThat(result.getMessageBody(), containsString("focus note"));
+    assertThat(result.getMessageBody(), containsString("hidden context"));
   }
 }

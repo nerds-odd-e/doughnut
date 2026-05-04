@@ -84,6 +84,17 @@ Given('OpenAI generates this question:', (questionTable: DataTable) => {
 })
 
 Given(
+  'OpenAI generates this question only when prompt includes a retrieved wiki-linked note:',
+  (questionTable: DataTable) => {
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMCQWhenPromptContainsRetrievedNote(
+        parseSingleRowQuestion(questionTable)
+      )
+  }
+)
+
+Given(
   'OpenAI generates this as first question:',
   (questionTable: DataTable) => {
     start

@@ -82,9 +82,7 @@ class NoteQuestionGenerationServiceTests {
       ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      assertThat(
-          systemMessageContains(paramsCaptor.getValue(), "Please act as a Question Designer"),
-          is(true));
+      assertThat(systemMessageContains(paramsCaptor.getValue(), "Question Designer"), is(true));
     }
 
     @Test
@@ -120,21 +118,21 @@ class NoteQuestionGenerationServiceTests {
 
       assertThat(request, is(notNullValue()));
       assertThat(request.model().toString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
-      assertThat(userMessageContains(request, "Focus Note and the notes related to it:"), is(true));
+      assertThat(userMessageContains(request, "# Doughnut Focus Context"), is(true));
     }
 
     @Test
     void shouldBuildRequestWithNoteInstructions() {
       ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
-      assertThat(userMessageContains(request, "The JSON below is visible only to you"), is(true));
+      assertThat(systemMessageContains(request, "Question Designer"), is(true));
     }
 
     @Test
     void shouldBuildRequestWithQuestionGenerationInstruction() {
       ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
-      assertThat(systemMessageContains(request, "Please act as a Question Designer"), is(true));
+      assertThat(systemMessageContains(request, "focus note"), is(true));
     }
 
     @Test
