@@ -6,7 +6,8 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.GraphRAGService;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -32,7 +33,8 @@ class ChatCompletionNoteAutomationServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired GraphRAGService graphRAGService;
+  @Autowired FocusContextRetrievalService focusContextRetrievalService;
+  @Autowired FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   @Autowired OpenAiApiHandler openAiApiHandler;
   @Autowired TestabilitySettings testabilitySettings;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -51,7 +53,11 @@ class ChatCompletionNoteAutomationServiceTest {
     // Initialize service
     service =
         new ChatCompletionNoteAutomationService(
-            openAiApiHandler, globalSettingsService, graphRAGService, testNote);
+            openAiApiHandler,
+            globalSettingsService,
+            focusContextRetrievalService,
+            focusContextMarkdownRenderer,
+            testNote);
   }
 
   @Nested

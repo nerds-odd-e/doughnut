@@ -23,7 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 class ConversationHistoryBuilderTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired com.odde.doughnut.services.GraphRAGService graphRAGService;
+
+  @Autowired
+  com.odde.doughnut.services.focusContext.FocusContextRetrievalService focusContextRetrievalService;
+
+  @Autowired
+  com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   @Nested
   class BuildHistory {
@@ -32,10 +37,13 @@ class ConversationHistoryBuilderTest {
     void shouldIncludeNoteContextAsFirstSystemMessage() {
       // Given a conversation about a note
       Note note = makeMe.aNote().please();
-      Conversation conversation = makeMe.aConversation().forANote(note).please();
+      Conversation conversation =
+          makeMe.aConversation().forANote(note).from(note.getCreator()).please();
 
       // When building history
-      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(graphRAGService);
+      ConversationHistoryBuilder builder =
+          new ConversationHistoryBuilder(
+              focusContextRetrievalService, focusContextMarkdownRenderer);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then first message should be system message with note context
@@ -43,14 +51,16 @@ class ConversationHistoryBuilderTest {
       ChatCompletionMessageParam firstMessage = history.get(0);
       assertTrue(firstMessage.system().isPresent());
       ChatCompletionSystemMessageParam systemMessage = firstMessage.system().get();
-      assertTrue(systemMessage.content().toString().contains(note.getTitle()));
+      String body = systemMessage.content().toString();
+      assertTrue(body.contains(note.getTitle()));
+      assertTrue(body.contains("# Doughnut Focus Context"));
     }
 
     @Test
     void shouldIncludeUserAndAssistantMessages() {
       // Given a conversation with messages
-      Note note = makeMe.aNote().please();
       User user = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
       Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
 
       ConversationMessage userMsg1 =
@@ -65,7 +75,9 @@ class ConversationHistoryBuilderTest {
               .please();
 
       // When building history
-      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(graphRAGService);
+      ConversationHistoryBuilder builder =
+          new ConversationHistoryBuilder(
+              focusContextRetrievalService, focusContextMarkdownRenderer);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions) + 3
@@ -82,10 +94,13 @@ class ConversationHistoryBuilderTest {
     void shouldHandleEmptyConversation() {
       // Given a conversation with no messages
       Note note = makeMe.aNote().please();
-      Conversation conversation = makeMe.aConversation().forANote(note).please();
+      Conversation conversation =
+          makeMe.aConversation().forANote(note).from(note.getCreator()).please();
 
       // When building history
-      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(graphRAGService);
+      ConversationHistoryBuilder builder =
+          new ConversationHistoryBuilder(
+              focusContextRetrievalService, focusContextMarkdownRenderer);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions)

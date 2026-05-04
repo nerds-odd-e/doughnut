@@ -1,4 +1,5 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import mock_services from '../start/mock_services/index'
 import start from '../start'
 import type { DataTable } from '@cucumber/cucumber'
 
@@ -98,6 +99,12 @@ When('I send the message {string} to AI', (question: string) => {
 
 Then('I should receive the following chat messages:', (data: DataTable) => {
   start.assumeConversationAboutNotePage().expectMessages(data.hashes())
+})
+
+Then('OpenAI chat completions were called with Doughnut focus context', () => {
+  mock_services
+    .openAi()
+    .expectLastChatCompletionsBodyContains('# Doughnut Focus Context')
 })
 
 When('I export the conversation', () => {

@@ -1,11 +1,18 @@
-import { FlexiPredicate, HttpMethod, Operator } from '@anev/ts-mountebank'
+import {
+  FlexiPredicate,
+  HttpMethod,
+  Mountebank,
+  Operator,
+} from '@anev/ts-mountebank'
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
 import { buildChatCompletionStreamEvent } from './openAiMessageComposer'
 
+const OPEN_AI_IMPOSTER_PORT = 5001
+
 const openAiService = () => {
-  const serviceMocker = new ServiceMocker('openAi', 5001)
+  const serviceMocker = new ServiceMocker('openAi', OPEN_AI_IMPOSTER_PORT)
   const MOCK_TOKEN = 'mock-token-for-e2e-testing'
   return {
     mock() {
@@ -127,6 +134,31 @@ const openAiService = () => {
       } else {
         return serviceMocker.stubPosterWithError500Response('/v1/files', {})
       }
+    },
+
+    expectLastChatCompletionsBodyContains(marker: string) {
+      const mountebank = new Mountebank()
+      cy.request(
+        'GET',
+        `${mountebank.mountebankUrl}/imposters/${OPEN_AI_IMPOSTER_PORT}`
+      ).then((res) => {
+        expect(res.status).to.eq(200)
+        const imposter = res.body as {
+          requests?: Array<{ method?: string; body?: string | object }>
+        }
+        const requests = imposter.requests ?? []
+        const postBodies = requests
+          .filter((r) => r.method === 'POST')
+          .map((r) =>
+            typeof r.body === 'string' ? r.body : JSON.stringify(r.body)
+          )
+        expect(
+          postBodies.length,
+          'OpenAI POST requests recorded'
+        ).to.be.greaterThan(0)
+        const combined = postBodies.join('\n')
+        expect(combined).to.include(marker)
+      })
     },
 
     stubChatCompletionStream(messages: Record<string, string>[]) {

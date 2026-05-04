@@ -4,8 +4,9 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
@@ -26,11 +27,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ChatCompletionConversationService {
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
-  private final GraphRAGService graphRAGService;
+  private final FocusContextRetrievalService focusContextRetrievalService;
+  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   public ChatCompletionCreateParams buildChatCompletionRequest(Conversation conversation) {
     // Build conversation history from database
-    ConversationHistoryBuilder historyBuilder = new ConversationHistoryBuilder(graphRAGService);
+    ConversationHistoryBuilder historyBuilder =
+        new ConversationHistoryBuilder(focusContextRetrievalService, focusContextMarkdownRenderer);
     List<ChatCompletionMessageParam> history = historyBuilder.buildHistory(conversation);
 
     // Get available tools for conversation

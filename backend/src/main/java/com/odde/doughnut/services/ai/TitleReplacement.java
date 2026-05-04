@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @JsonClassDescription(
-    "Generate a concise and accurate note title based on the note content and pass it to the function for the use to update their note. The title should be a single word, a phrase or at most a single sentence that captures the atomic concept of the note. It should be specific within the note's contextual path and do not need to include general information that's already in the contextual path. Keep the existing title if it's already correct and concise.")
+    "Generate a concise and accurate note title from the note content the model sees (including any hidden focus-context block) and pass it to the function for the user to update their note. The title should be a single word, a phrase, or at most one sentence that captures what the note is about. Prefer specificity over repeating notebook-wide themes. Keep the existing title if it's already correct and concise.")
 @Data
 public class TitleReplacement {
   @NotNull

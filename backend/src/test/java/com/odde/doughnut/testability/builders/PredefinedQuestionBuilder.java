@@ -42,4 +42,9 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     this.entity.setContested(true);
     return this;
   }
+
+  public PredefinedQuestionBuilder contextSeed(Long seed) {
+    this.entity.setContextSeed(seed);
+    return this;
+  }
 }

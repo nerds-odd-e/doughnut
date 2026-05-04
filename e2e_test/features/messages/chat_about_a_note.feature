@@ -19,6 +19,7 @@ Feature: Chat about a note with AI
       | role      | message              |
       | user      | Is Naba one of them? |
       | assistant | No. It is not.       |
+    And OpenAI chat completions were called with Doughnut focus context
     When I send the message "Is this note correct?" to AI
     Then I should receive the following chat messages:
       | role      | message                      |

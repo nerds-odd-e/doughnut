@@ -10,6 +10,7 @@ public class SuggestedQuestionForFineTuningBuilder
     extends EntityBuilder<SuggestedQuestionForFineTuning> {
   private Note note = null;
   private MCQWithAnswer preservedQuestion = null;
+  private String preservedNoteContentOverride = null;
 
   public SuggestedQuestionForFineTuningBuilder(MakeMe makeMe) {
     super(makeMe, new SuggestedQuestionForFineTuning());
@@ -19,7 +20,10 @@ public class SuggestedQuestionForFineTuningBuilder
   @Override
   protected void beforeCreate(boolean needPersist) {
     Note note = this.note == null ? makeMe.aNote().please() : this.note;
-    entity.setPreservedNoteContent(note.getNoteDescription());
+    entity.setPreservedNoteContent(
+        preservedNoteContentOverride != null
+            ? preservedNoteContentOverride
+            : note.getNoteDescription());
     if (this.preservedQuestion != null) {
       entity.preserveQuestion(this.preservedQuestion);
     } else {
@@ -34,6 +38,11 @@ public class SuggestedQuestionForFineTuningBuilder
 
   public SuggestedQuestionForFineTuningBuilder withPreservedQuestion(MCQWithAnswer question) {
     this.preservedQuestion = question;
+    return this;
+  }
+
+  public SuggestedQuestionForFineTuningBuilder preservedNoteContent(String content) {
+    this.preservedNoteContentOverride = content;
     return this;
   }
 

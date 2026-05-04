@@ -11,6 +11,8 @@ import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -34,7 +36,8 @@ class NoteAutomationServiceTests {
   OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
-  @Autowired GraphRAGService graphRAGService;
+  @Autowired FocusContextRetrievalService focusContextRetrievalService;
+  @Autowired FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -52,7 +55,11 @@ class NoteAutomationServiceTests {
     // Initialize common services
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
         new ChatCompletionNoteAutomationService(
-            openAiApiHandler, globalSettingsService, graphRAGService, testNote);
+            openAiApiHandler,
+            globalSettingsService,
+            focusContextRetrievalService,
+            focusContextMarkdownRenderer,
+            testNote);
     service = new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 

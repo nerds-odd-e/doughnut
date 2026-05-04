@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class OpenAIChatRequestBuilder {
   public static final String systemInstruction =
-      "This is a PKM system using hierarchical notes, each with a title and details, to capture atomic concepts.";
+      "This is a PKM system: wiki-style Markdown notes in notebooks, with [[wiki links]] between notes.";
   public final List<ChatCompletionMessageParam> messages = new ArrayList<>();
   private final List<String> overallSystemMessages = new ArrayList<>();
   ChatCompletionCreateParams.Builder builder = ChatCompletionCreateParams.builder();
@@ -23,9 +23,10 @@ public class OpenAIChatRequestBuilder {
   }
 
   /**
-   * @param focusNoteContextBlock same shape as {@link Note#getNoteDescription()} or {@link
-   *     com.odde.doughnut.services.GraphRAGService#getGraphRAGDescription(Note)} — plain text
-   *     placed in the overall system message.
+   * @param focusNoteContextBlock Markdown from {@link
+   *     com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer#render(com.odde.doughnut.services.focusContext.FocusContextResult,
+   *     com.odde.doughnut.services.focusContext.RetrievalConfig)} (or legacy {@link
+   *     Note#getNoteDescription()}), placed in the overall system message.
    */
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(
       String modelName, String focusNoteContextBlock) {

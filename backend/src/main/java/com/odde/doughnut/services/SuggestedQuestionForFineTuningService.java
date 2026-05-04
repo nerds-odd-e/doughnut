@@ -6,18 +6,26 @@ import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextResult;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
+import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SuggestedQuestionForFineTuningService {
   private final EntityPersister entityPersister;
-  private final GraphRAGService graphRAGService;
+  private final FocusContextRetrievalService focusContextRetrievalService;
+  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   public SuggestedQuestionForFineTuningService(
-      EntityPersister entityPersister, GraphRAGService graphRAGService) {
+      EntityPersister entityPersister,
+      FocusContextRetrievalService focusContextRetrievalService,
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
     this.entityPersister = entityPersister;
-    this.graphRAGService = graphRAGService;
+    this.focusContextRetrievalService = focusContextRetrievalService;
+    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
   }
 
   public SuggestedQuestionForFineTuning update(
@@ -38,8 +46,11 @@ public class SuggestedQuestionForFineTuningService {
       Timestamp currentUTCTimestamp) {
     entity.setUser(user);
     entity.setCreatedAt(currentUTCTimestamp);
-    entity.setPreservedNoteContent(
-        graphRAGService.getGraphRAGDescription(predefinedQuestion.getNote()));
+    RetrievalConfig config =
+        RetrievalConfig.forQuestionGeneration(predefinedQuestion.getContextSeed());
+    FocusContextResult focusContextResult =
+        focusContextRetrievalService.retrieve(predefinedQuestion.getNote(), user, config);
+    entity.setPreservedNoteContent(focusContextMarkdownRenderer.render(focusContextResult, config));
     entity.preserveQuestion(predefinedQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
