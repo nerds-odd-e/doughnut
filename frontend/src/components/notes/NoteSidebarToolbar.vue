@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="daisy-navbar daisy-bg-base-200 daisy-min-h-0 daisy-py-1 daisy-px-1 daisy-sticky daisy-top-0 daisy-z-10"
+    :class="[noteChromeToolbarNavClass, noteSidebarToolbarNavStickyClass]"
     data-note-sidebar-toolbar
   >
     <div class="daisy-btn-group daisy-btn-group-sm">
@@ -32,6 +32,10 @@ import { FilePlus, FolderPlus } from "lucide-vue-next"
 import { computed } from "vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
+import {
+  noteChromeToolbarNavClass,
+  noteSidebarToolbarNavStickyClass,
+} from "./noteChromeToolbarNavClass"
 
 const props = defineProps<{
   notebookId: number

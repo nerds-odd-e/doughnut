@@ -9,11 +9,14 @@
         activeNoteTopology != null &&
         noteTopology.id === activeNoteTopology.id,
     }"
-    @click="onNoteRowClick"
+    @click.capture="onNoteRowClick"
   >
-    <div class="note-row">
+    <RouterLink
+      :to="noteShowLocation(noteTopology.id)"
+      class="note-row daisy-text-decoration-none"
+    >
       <FileText :size="13" class="daisy-shrink-0 note-icon" />
-      <NoteTitleWithLink
+      <NoteTitleComponent
         :class="{
           'active-title':
             activeNoteTopology != null &&
@@ -27,15 +30,17 @@
           noteTopology.id === activeNoteTopology.id
         "
       />
-    </div>
+    </RouterLink>
   </li>
 </template>
 
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import { FileText } from "lucide-vue-next"
+import { RouterLink } from "vue-router"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
-import NoteTitleWithLink from "./NoteTitleWithLink.vue"
+import NoteTitleComponent from "./core/NoteTitleComponent.vue"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { inject } from "vue"
 
@@ -59,15 +64,19 @@ function onNoteRowClick() {
 <style lang="scss" scoped>
 .sidebar-note-li {
   list-style: none;
+  width: 100%;
 }
 
 .note-row {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  width: 100%;
   min-height: 2rem;
   padding: 0.125rem 0.25rem 0.125rem 1.5rem;
   border-radius: 0.25rem;
+  box-sizing: border-box;
+  color: inherit;
 
   &:hover {
     background-color: var(--fallback-b3, oklch(var(--b3) / 1));
@@ -79,7 +88,7 @@ function onNoteRowClick() {
   flex-shrink: 0;
 }
 
-.active-item > .note-row {
+.active-item .note-row {
   background-color: var(--fallback-b3, oklch(var(--b3) / 1));
 }
 

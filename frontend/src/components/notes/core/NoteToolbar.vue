@@ -1,5 +1,5 @@
 <template>
-  <nav class="daisy-navbar daisy-bg-base-200">
+  <nav :class="noteChromeToolbarNavClass">
     <div class="daisy-btn-group daisy-btn-group-sm">
       <PopButton v-if="!readonly" title="search and add relationship">
         <template #button_face>
@@ -91,6 +91,7 @@ import { useRouter } from "vue-router"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
 import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
+import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 
 const { note } = defineProps<{
