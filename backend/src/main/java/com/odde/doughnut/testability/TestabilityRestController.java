@@ -21,7 +21,8 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -42,7 +43,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/testability")
 class TestabilityRestController {
 
-  @Autowired EntityManagerFactory emf;
+  private static final Object E2E_DB_RESET_LOCK = new Object();
+
+  @PersistenceContext EntityManager entityManager;
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
   @Autowired UserRepository userRepository;
@@ -61,13 +64,15 @@ class TestabilityRestController {
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
   public String resetDBAndTestabilitySettings() {
-    new DBCleanerWorker(emf).truncateAllTables();
-    createUser("old_learner", "Old Learner");
-    createUser("another_old_learner", "Another Old Learner");
-    createUser("admin", "admin");
-    createUser("non_admin", "Non Admin");
-    createUser("a_trainer", "A Trainer");
-    testabilitySettings.init();
+    synchronized (E2E_DB_RESET_LOCK) {
+      new DBCleanerWorker().truncateAllTables(entityManager);
+      createUser("old_learner", "Old Learner");
+      createUser("another_old_learner", "Another Old Learner");
+      createUser("admin", "admin");
+      createUser("non_admin", "Non Admin");
+      createUser("a_trainer", "A Trainer");
+      testabilitySettings.init();
+    }
     return "OK";
   }
 
