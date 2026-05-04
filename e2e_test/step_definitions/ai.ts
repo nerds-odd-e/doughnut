@@ -21,6 +21,14 @@ function parseSingleRowQuestion(questionTable: DataTable) {
   return hashes[0]
 }
 
+function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
+  start
+    .questionGenerationService()
+    .resetAndStubAskingMCQByChatCompletion(
+      parseSingleRowQuestion(questionTable)
+    )
+}
+
 function stubExtractPointResponse(
   contentPattern: string,
   newNoteTitle: string,
@@ -75,56 +83,30 @@ Given('An OpenAI response is unavailable', () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
-Given('OpenAI generates this question:', (questionTable: DataTable) => {
-  start
-    .questionGenerationService()
-    .resetAndStubAskingMCQByChatCompletion(
-      parseSingleRowQuestion(questionTable)
-    )
-})
+Given('OpenAI generates this question:', stubOpenAiMcqFromSingleRowTable)
 
 Given(
-  'OpenAI generates this question only when prompt includes a retrieved wiki-linked note:',
+  'OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:',
   (questionTable: DataTable) => {
+    const rows = questionTable.hashes()
     start
       .questionGenerationService()
-      .resetAndStubAskingMCQWhenPromptContainsRetrievedNote(
-        parseSingleRowQuestion(questionTable)
-      )
+      .resetAndStubMcqForFocusContextRetrievalCases(rows)
   }
 )
 
-Given(
-  'OpenAI generates this question only when prompt shows depth-two wiki path to Far:',
-  (questionTable: DataTable) => {
-    start
-      .questionGenerationService()
-      .resetAndStubAskingMCQWhenPromptContainsDepthTwoFarNote(
-        parseSingleRowQuestion(questionTable)
-      )
-  }
-)
-
-Given(
-  'OpenAI generates this question only when the prompt includes two folder siblings:',
-  (questionTable: DataTable) => {
-    start
-      .questionGenerationService()
-      .resetAndStubAskingMcqWhenPromptContainsTwoFolderSiblings(
-        parseSingleRowQuestion(questionTable)
-      )
+Then(
+  'OpenAI chat completion requests include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts',
+  () => {
+    mock_services
+      .openAi()
+      .expectChatCompletionBodiesIncludeFocusContextRetrievalPromptShapes()
   }
 )
 
 Given(
   'OpenAI generates this as first question:',
-  (questionTable: DataTable) => {
-    start
-      .questionGenerationService()
-      .resetAndStubAskingMCQByChatCompletion(
-        parseSingleRowQuestion(questionTable)
-      )
-  }
+  stubOpenAiMcqFromSingleRowTable
 )
 
 Given(

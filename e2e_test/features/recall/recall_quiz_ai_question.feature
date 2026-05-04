@@ -38,42 +38,24 @@ Feature: Recall Quiz
     Then I should see that my answer is correct as the last question
 
   @usingMockedOpenAiService
-  Scenario: AI question generation prompt includes outgoing wiki-linked note content
+  Scenario: AI question generation includes wiki-linked, depth-two wiki path, and folder-sibling focus context
     Given I have a notebook "English practice" with notes:
-      | Title    | Details                                                                  |
-      | Bahamas  | The Bahamas is an archipelago in the Atlantic.                           |
-      | sedition | Sedition means incite violence. Also see [[Bahamas]].                    |
-    And OpenAI generates this question only when prompt includes a retrieved wiki-linked note:
-      | Question Stem        | Correct Choice  | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the Bahamas? | An archipelago  | A continent        | An act of sedition |
-    And the note "sedition" was assimilated on day 1
-    When I am recalling my note on day 2
-    Then I should be asked "What is the Bahamas?"
-
-  @usingMockedOpenAiService
-  Scenario: AI question generation prompt includes depth-two outgoing wiki path
-    Given I have a notebook "English practice" with notes:
-      | Title       | Details                                                |
-      | FarDepthTwo | K2 peak height is 8611 meters.                         |
-      | MidDepthTwo | Bridge [[FarDepthTwo]].                                |
-      | sedition    | Sedition means incite violence. See [[MidDepthTwo]].   |
-    And OpenAI generates this question only when prompt shows depth-two wiki path to Far:
+      | Title       | Details                                                | Skip Memory Tracking | Folder |
+      | Bahamas     | The Bahamas is an archipelago in the Atlantic.         |                      |        |
+      | FarDepthTwo | K2 peak height is 8611 meters.                         |                      |        |
+      | MidDepthTwo | Bridge [[FarDepthTwo]].                                |                      |        |
+      | WikiRecall  | Sedition means incite violence. Also see [[Bahamas]]. |                      |        |
+      | DepthRecall | Sedition means incite violence. See [[MidDepthTwo]].   |                      |        |
+      | SibOne      | sibling one details                                    | true                 | peers  |
+      | SibTwo      | sibling two details                                    | true                 | peers  |
+      | FocusFolder | Focus only content                                     |                      | peers  |
+    And OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:
       | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | How high is K2 in meters? | 8611           | 3776               | 8849               |
-    And the note "sedition" was assimilated on day 1
-    When I am recalling my note on day 2
-    Then I should be asked "How high is K2 in meters?"
-
-  @usingMockedOpenAiService
-  Scenario: AI question generation prompt includes folder sibling context
-    Given I have a notebook "English practice" with notes:
-      | Title       | Details             | Skip Memory Tracking | Folder |
-      | FocusFolder | Focus only content  |                      | peers  |
-      | SibOne      | sibling one details | true                 | peers  |
-      | SibTwo      | sibling two details | true                 | peers  |
-    And OpenAI generates this question only when the prompt includes two folder siblings:
-      | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | How high is K2 in meters?  | 8611           | 3776               | 8849               |
       | What is the focus content? | Focus only     | sibling one        | unrelated          |
+      | What is the Bahamas?       | An archipelago | A continent        | An act of sedition |
+    And the note "WikiRecall" was assimilated on day 1
+    And the note "DepthRecall" was assimilated on day 1
     And the note "FocusFolder" was assimilated on day 1
     When I am recalling my note on day 2
-    Then I should be asked "What is the focus content?"
+    Then OpenAI chat completion requests include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts

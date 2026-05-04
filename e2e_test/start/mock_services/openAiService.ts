@@ -161,6 +161,107 @@ const openAiService = () => {
       })
     },
 
+    expectChatCompletionBodiesIncludeFocusContextRetrievalPromptShapes() {
+      const mountebank = new Mountebank()
+      cy.request(
+        'GET',
+        `${mountebank.mountebankUrl}/imposters/${OPEN_AI_IMPOSTER_PORT}`
+      ).then((res) => {
+        expect(res.status).to.eq(200)
+        const imposter = res.body as {
+          requests?: Array<{ method?: string; body?: string | object }>
+        }
+        const requests = imposter.requests ?? []
+        const bodies = requests
+          .filter((r) => r.method === 'POST')
+          .map((r) =>
+            typeof r.body === 'string' ? r.body : JSON.stringify(r.body)
+          )
+          .filter(
+            (b) =>
+              b.includes('Doughnut Focus Context') && b.includes('"messages"')
+          )
+        expect(
+          bodies.length,
+          [
+            'Focus context recall E2E: expected at least 3 OpenAI chat completion POST bodies',
+            'that include the rendered focus block (# Doughnut Focus Context) and JSON "messages".',
+            'Recall eager-fetches one question per due memory tracker, so fewer bodies usually means',
+            'fewer assimilated notes, failed requests, or Mountebank stubs not matching.',
+            `Found ${bodies.length} matching body/bodies.`,
+          ].join('\n')
+        ).to.be.at.least(3)
+
+        const wikiLinked = bodies.some(
+          (b) =>
+            b.includes('Title: WikiRecall') &&
+            b.includes('Title: Bahamas') &&
+            b.includes('Reached by: OutgoingWikiLink')
+        )
+        const depthTwoWiki = bodies.some(
+          (b) =>
+            b.includes('Title: FarDepthTwo') &&
+            b.includes('Path:') &&
+            b.includes('->') &&
+            b.includes('Reached by: OutgoingWikiLink')
+        )
+        const folderSiblings = bodies.some((b) => {
+          const matches = b.match(/Reached by: FolderSibling/g)
+          return matches !== null && matches.length >= 2
+        })
+
+        const perBodyHints = bodies
+          .map((b, i) => {
+            const folderSiblingHits = b.match(/Reached by: FolderSibling/g)
+            return [
+              `--- body[${i}] (chars=${b.length}) ---`,
+              `  Title:WikiRecall: ${b.includes('Title: WikiRecall')}`,
+              `  Title:Bahamas: ${b.includes('Title: Bahamas')}`,
+              `  OutgoingWikiLink: ${b.includes('Reached by: OutgoingWikiLink')}`,
+              `  Title:FarDepthTwo: ${b.includes('Title: FarDepthTwo')}`,
+              `  Path+arrow: ${b.includes('Path:') && b.includes('->')}`,
+              `  FolderSibling count: ${folderSiblingHits?.length ?? 0}`,
+            ].join('\n')
+          })
+          .join('\n')
+
+        expect(
+          wikiLinked,
+          [
+            'Focus context recall E2E — wiki-linked retrieval: no single POST body matched all of:',
+            '  "Title: WikiRecall" (focus note title in the feature table),',
+            '  "Title: Bahamas" (outlinked note),',
+            '  "Reached by: OutgoingWikiLink".',
+            'Fix the scenario note titles/details (e.g. [[Bahamas]] on WikiRecall) or update this check if titles changed.',
+            perBodyHints,
+          ].join('\n')
+        ).to.eq(true)
+
+        expect(
+          depthTwoWiki,
+          [
+            'Focus context recall E2E — depth-two wiki path: no POST body matched all of:',
+            '  "Title: FarDepthTwo" (leaf note title in the feature table),',
+            '  "Path:", "->", and "Reached by: OutgoingWikiLink" (markdown path to depth 2).',
+            'If you renamed FarDepthTwo, update this assertion and the Mountebank stub regex in',
+            'e2e_test/start/questionGenerationService.ts (addFocusContextShapeMcqStubs).',
+            perBodyHints,
+          ].join('\n')
+        ).to.eq(true)
+
+        expect(
+          folderSiblings,
+          [
+            'Focus context recall E2E — folder siblings: no POST body contained',
+            '  "Reached by: FolderSibling" at least twice (two retrieved folder peers).',
+            'Fix the scenario: FocusFolder plus two peers in the same Folder column (e.g. peers),',
+            'or update this check if retrieval wording changed.',
+            perBodyHints,
+          ].join('\n')
+        ).to.eq(true)
+      })
+    },
+
     stubChatCompletionStream(messages: Record<string, string>[]) {
       // Create separate responses for each message
       const responses = messages.map((row) =>
