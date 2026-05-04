@@ -88,7 +88,7 @@ function onNoteRowClick() {
   flex-shrink: 0;
 }
 
-.active-item .note-row {
+.active-item > .note-row {
   background-color: var(--fallback-b3, oklch(var(--b3) / 1));
 }
 
