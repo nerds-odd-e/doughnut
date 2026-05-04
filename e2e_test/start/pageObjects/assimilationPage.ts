@@ -7,7 +7,10 @@ const keepForRecallButton = (options?: { timeout?: number }) =>
   cy.get('[data-test="keep-for-recall"]', options ?? {})
 
 const understandingChecklist = () =>
-  cy.contains('Understanding Checklist:').closest('.daisy-bg-accent')
+  cy
+    .get('[data-test="refine-note-modal"]')
+    .contains('Understanding Checklist:')
+    .closest('.daisy-bg-accent')
 
 const mainNoteTitle = () =>
   cy.get('#main-note-content [data-test="note-title"]', { timeout: 15000 })
@@ -37,6 +40,12 @@ export const assumeAssimilationPage = () => ({
   },
   clickKeepForRecall() {
     keepForRecallButton().click()
+    return this
+  },
+  openRefineNoteModal() {
+    cy.get('[data-test="open-refine-note-modal"]').scrollIntoView().click()
+    cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
+    pageIsNotLoading()
     return this
   },
   waitForAssimilationReady() {
@@ -139,7 +148,7 @@ export const assumeAssimilationPage = () => ({
     )
   },
   expectUnderstandingPointsCount(count: number) {
-    pageIsNotLoading()
+    this.openRefineNoteModal()
     understandingChecklist().scrollIntoView().should('be.visible')
     understandingChecklist().find('ul li').should('have.length', count)
     return this
@@ -159,6 +168,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   ignoreUnderstandingPointsAndComplete(pointTexts: string[]) {
+    this.openRefineNoteModal()
     understandingChecklist().within(() => {
       pointTexts.forEach((pointText) => {
         cy.contains('li', pointText).find('input[type="checkbox"]').check()
@@ -170,6 +180,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   deleteUnderstandingPointsAt(indices: number[]) {
+    this.openRefineNoteModal()
     indices.forEach((index) => this.checkUnderstandingPoint(index))
     cy.findByRole('button', { name: 'Delete selected points' }).click()
     cy.findByRole('button', { name: 'OK' }).click()
@@ -179,12 +190,14 @@ export const assumeAssimilationPage = () => ({
     cy.findByRole('button', { name: 'Ignore questions' }).click()
     return this
   },
+  /** Requires the refine-note modal to already be open (e.g. after openRefineNoteModal or expectUnderstandingPointsCount). */
   promotePointToSiblingNote(pointText: string) {
     understandingChecklist().within(() => {
       cy.contains('li', pointText)
         .findByRole('button', { name: 'Sibling' })
         .click()
     })
+    cy.get('[data-test="close-refine-note-modal"]').click()
     return this
   },
   checkRememberSpellingOption() {

@@ -79,6 +79,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "detailsUpdated", newDetails: string): void
+  (e: "understandingPointsIgnored"): void
 }>()
 
 const understandingPoints = ref<string[]>([])
@@ -167,6 +168,7 @@ const ignoreSelectedPoints = async () => {
   }
 
   selectedPointIndices.value = []
+  emit("understandingPointsIgnored")
 }
 
 const promotePoint = async (index: number, apiCall: () => Promise<unknown>) => {

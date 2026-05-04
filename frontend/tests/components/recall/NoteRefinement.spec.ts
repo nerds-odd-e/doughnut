@@ -373,6 +373,7 @@ describe("NoteRefinement component", () => {
       expect(
         checkboxes.every((cb) => !(cb.element as HTMLInputElement).checked)
       )
+      expect(wrapper.emitted("understandingPointsIgnored")).toEqual([[]])
     })
 
     it("keeps selection when cancel is clicked", async () => {

@@ -20,11 +20,51 @@
     @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
   />
-  <NoteRefinement
+  <button
     v-if="(note.details ?? '').trim()"
-    :note="note"
-    @details-updated="$emit('reloadNeeded')"
-  />
+    type="button"
+    data-test="open-refine-note-modal"
+    class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-mb-2 daisy-ml-2"
+    @click="showRefineNoteModal = true"
+  >
+    Refine note
+  </button>
+  <Teleport to="body">
+    <dialog
+      v-if="(note.details ?? '').trim()"
+      class="daisy-modal"
+      :class="{ 'daisy-modal-open': showRefineNoteModal }"
+      data-test="refine-note-modal"
+    >
+      <div
+        class="daisy-modal-box daisy-max-w-4xl daisy-max-h-[90vh] daisy-overflow-y-auto"
+      >
+        <h3 v-if="showRefineNoteModal" class="daisy-font-bold daisy-text-lg daisy-mb-3">
+          Refine note
+        </h3>
+        <NoteRefinement
+          v-if="showRefineNoteModal"
+          :key="note.id"
+          :note="note"
+          @details-updated="onRefinementDetailsUpdated"
+          @understanding-points-ignored="closeRefineNoteModal"
+        />
+        <div v-if="showRefineNoteModal" class="daisy-modal-action daisy-mt-4">
+          <button
+            type="button"
+            class="daisy-btn"
+            data-test="close-refine-note-modal"
+            @click="closeRefineNoteModal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="daisy-modal-backdrop">
+        <button type="button" @click="closeRefineNoteModal">close</button>
+      </form>
+    </dialog>
+  </Teleport>
   <AssimilationButtons
     :key="buttonKey"
     :disabled="!noteInfoLoaded"
@@ -59,7 +99,7 @@ import NoteRefinement from "./NoteRefinement.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
@@ -82,6 +122,14 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 // State
 const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
+const showRefineNoteModal = ref(false)
+
+watch(
+  () => note.id,
+  () => {
+    showRefineNoteModal.value = false
+  }
+)
 const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false)
 const noteRecallInfo = ref<{
@@ -170,6 +218,14 @@ const handleSpellingVerified = () => {
 
 const handleSpellingCancel = () => {
   showSpellingPopup.value = false
+}
+
+const closeRefineNoteModal = () => {
+  showRefineNoteModal.value = false
+}
+
+const onRefinementDetailsUpdated = () => {
+  emit("reloadNeeded")
 }
 </script>
 
