@@ -369,6 +369,7 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(toErrorMessage(error, "Failed to create relationship"))
     }
     this.refreshNoteRealms(noteRealms)
+    refreshSidebarStructuralListings()
     const relationNote = noteRealms[0]
     if (relationNote) {
       this.noteEditingHistory.createNote(relationNote.id)
