@@ -31,4 +31,12 @@ public final class ApproximateUtf8TokenBudget {
     }
     return text.substring(0, low);
   }
+
+  /** Approximate token count for budgeting (UTF-8 byte length / ~3.75 per token). */
+  public static int estimateApproxTokens(String text) {
+    if (text == null || text.isEmpty()) {
+      return 0;
+    }
+    return (int) Math.ceil(text.getBytes(StandardCharsets.UTF_8).length / BYTES_PER_TOKEN);
+  }
 }

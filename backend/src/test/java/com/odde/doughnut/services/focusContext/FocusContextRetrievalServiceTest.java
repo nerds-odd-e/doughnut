@@ -481,7 +481,7 @@ class FocusContextRetrievalServiceTest {
             .please();
       }
 
-      RetrievalConfig cfg = new RetrievalConfig(2, null);
+      RetrievalConfig cfg = new RetrievalConfig(2, null, null);
       FocusContextResult first = service.retrieve(focus, viewer, cfg);
       FocusContextResult second = service.retrieve(focus, viewer, cfg);
 
@@ -518,7 +518,7 @@ class FocusContextRetrievalServiceTest {
             .please();
       }
 
-      RetrievalConfig cfg = new RetrievalConfig(2, 42L);
+      RetrievalConfig cfg = new RetrievalConfig(2, 42L, null);
       FocusContextResult a = service.retrieve(focus, viewer, cfg);
       FocusContextResult b = service.retrieve(focus, viewer, cfg);
 
@@ -568,7 +568,8 @@ class FocusContextRetrievalServiceTest {
       refreshWikiCache(focus);
       refreshWikiCache(linkT);
 
-      FocusContextResult result = service.retrieve(focus, viewer, new RetrievalConfig(2, null));
+      FocusContextResult result =
+          service.retrieve(focus, viewer, new RetrievalConfig(2, null, null));
 
       List<String> siblingTitles =
           result.getRelatedNotes().stream()

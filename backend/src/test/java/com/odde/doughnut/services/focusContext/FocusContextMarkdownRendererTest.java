@@ -49,7 +49,17 @@ class FocusContextMarkdownRendererTest {
     @Test
     void focusNoteAlwaysEmittedEvenWithNoRelatedNotes() {
       FocusContextFocusNote focusNote =
-          new FocusContextFocusNote("My Notebook", "My Title", "", "Some content", false);
+          new FocusContextFocusNote(
+              "My Notebook",
+              "My Title",
+              "",
+              0,
+              List.of(),
+              List.of(),
+              List.of(),
+              null,
+              "Some content",
+              false);
       FocusContextResult result = new FocusContextResult(focusNote);
 
       String output = renderer.render(result, config);
@@ -65,7 +75,17 @@ class FocusContextMarkdownRendererTest {
     @Test
     void truncationFlagRenderedWhenSet() {
       FocusContextFocusNote focusNote =
-          new FocusContextFocusNote("NB", "Title", "", "truncated content...", true);
+          new FocusContextFocusNote(
+              "NB",
+              "Title",
+              "",
+              0,
+              List.of(),
+              List.of(),
+              List.of(),
+              null,
+              "truncated content...",
+              true);
       FocusContextResult result = new FocusContextResult(focusNote);
 
       String output = renderer.render(result, config);
@@ -76,7 +96,8 @@ class FocusContextMarkdownRendererTest {
     @Test
     void truncationFlagFalseWhenNotTruncated() {
       FocusContextFocusNote focusNote =
-          new FocusContextFocusNote("NB", "Title", "", "full content", false);
+          new FocusContextFocusNote(
+              "NB", "Title", "", 0, List.of(), List.of(), List.of(), null, "full content", false);
       FocusContextResult result = new FocusContextResult(focusNote);
 
       String output = renderer.render(result, config);
@@ -86,7 +107,9 @@ class FocusContextMarkdownRendererTest {
 
     @Test
     void headerContainsMaxDepth() {
-      FocusContextFocusNote focusNote = new FocusContextFocusNote(null, "T", "", null, false);
+      FocusContextFocusNote focusNote =
+          new FocusContextFocusNote(
+              null, "T", "", 0, List.of(), List.of(), List.of(), null, null, false);
       FocusContextResult result = new FocusContextResult(focusNote);
 
       String output = renderer.render(result, config);
@@ -104,7 +127,9 @@ class FocusContextMarkdownRendererTest {
   class RetrievedNoteBlock {
     @Test
     void retrievalPathFormattedCorrectlyForDepth1OutgoingLink() {
-      FocusContextFocusNote focusNote = new FocusContextFocusNote("NB", "A", "", "focus", false);
+      FocusContextFocusNote focusNote =
+          new FocusContextFocusNote(
+              "NB", "A", "", 0, List.of(), List.of(), List.of(), null, "focus", false);
       FocusContextResult result = new FocusContextResult(focusNote);
       result.addRelatedNote(
           new FocusContextNote(
@@ -114,6 +139,7 @@ class FocusContextMarkdownRendererTest {
               1,
               List.of("[[A]]", "[[NB: B]]"),
               FocusContextEdgeType.OutgoingWikiLink,
+              null,
               "content of B",
               false));
 
@@ -127,7 +153,9 @@ class FocusContextMarkdownRendererTest {
 
     @Test
     void emptyRelatedNotesProducesNoRetrievedNoteBlock() {
-      FocusContextFocusNote focusNote = new FocusContextFocusNote(null, "T", "", null, false);
+      FocusContextFocusNote focusNote =
+          new FocusContextFocusNote(
+              null, "T", "", 0, List.of(), List.of(), List.of(), null, null, false);
       FocusContextResult result = new FocusContextResult(focusNote);
 
       String output = renderer.render(result, config);
@@ -138,7 +166,8 @@ class FocusContextMarkdownRendererTest {
     @Test
     void depthTwoPathUsesArrowBetweenWikiUris() {
       FocusContextFocusNote focusNote =
-          new FocusContextFocusNote("NB", "Focus", "", "focus body", false);
+          new FocusContextFocusNote(
+              "NB", "Focus", "", 0, List.of(), List.of(), List.of(), null, "focus body", false);
       FocusContextResult result = new FocusContextResult(focusNote);
       result.addRelatedNote(
           new FocusContextNote(
@@ -148,6 +177,7 @@ class FocusContextMarkdownRendererTest {
               2,
               List.of("[[Focus]]", "[[NB: Mid]]", "[[NB: Far]]"),
               FocusContextEdgeType.OutgoingWikiLink,
+              null,
               "far details",
               true));
 
@@ -162,7 +192,8 @@ class FocusContextMarkdownRendererTest {
     @Test
     void folderSiblingShowsPathToAnchorAndEdgeType() {
       FocusContextFocusNote focusNote =
-          new FocusContextFocusNote("NB", "AnchorTitle", "", "focus", false);
+          new FocusContextFocusNote(
+              "NB", "AnchorTitle", "", 0, List.of(), List.of(), List.of(), null, "focus", false);
       FocusContextResult result = new FocusContextResult(focusNote);
       result.addRelatedNote(
           new FocusContextNote(
@@ -172,6 +203,7 @@ class FocusContextMarkdownRendererTest {
               1,
               List.of("[[AnchorTitle]]"),
               FocusContextEdgeType.FolderSibling,
+              null,
               "peer body",
               false));
 

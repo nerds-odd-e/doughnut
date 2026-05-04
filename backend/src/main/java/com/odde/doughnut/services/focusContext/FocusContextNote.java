@@ -14,7 +14,6 @@ public class FocusContextNote {
   private final int depth;
   private final List<String> retrievalPath;
   private final FocusContextEdgeType edgeType;
-  private final String reason;
   private final Timestamp createdAt;
   private final String details;
   private final boolean detailsTruncated;
@@ -26,29 +25,6 @@ public class FocusContextNote {
       int depth,
       List<String> retrievalPath,
       FocusContextEdgeType edgeType,
-      String details,
-      boolean detailsTruncated) {
-    this(
-        notebook,
-        title,
-        folderPath,
-        depth,
-        retrievalPath,
-        edgeType,
-        null,
-        null,
-        details,
-        detailsTruncated);
-  }
-
-  public FocusContextNote(
-      String notebook,
-      String title,
-      String folderPath,
-      int depth,
-      List<String> retrievalPath,
-      FocusContextEdgeType edgeType,
-      String reason,
       Timestamp createdAt,
       String details,
       boolean detailsTruncated) {
@@ -58,7 +34,6 @@ public class FocusContextNote {
     this.depth = depth;
     this.retrievalPath = retrievalPath;
     this.edgeType = edgeType;
-    this.reason = reason;
     this.createdAt = createdAt;
     this.details = details;
     this.detailsTruncated = detailsTruncated;

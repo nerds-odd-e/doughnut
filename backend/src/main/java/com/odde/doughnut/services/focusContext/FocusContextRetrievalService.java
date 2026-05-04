@@ -4,10 +4,10 @@ import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.ApproximateUtf8TokenBudget;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,7 +59,7 @@ public class FocusContextRetrievalService {
             .orElse(focusNote);
 
     String focusDetails =
-        truncateToTokens(
+        ApproximateUtf8TokenBudget.truncateByApproxTokens(
             hydrated.getDetails(), FocusContextConstants.FOCUS_NOTE_DETAILS_MAX_TOKENS);
     boolean focusTruncated =
         focusDetails != null
@@ -209,13 +209,13 @@ public class FocusContextRetrievalService {
           continue;
         }
         String details =
-            truncateToTokens(
+            ApproximateUtf8TokenBudget.truncateByApproxTokens(
                 hydratedNote.getDetails(), FocusContextConstants.RELATED_NOTE_DETAILS_MAX_TOKENS);
         boolean truncated =
             details != null
                 && hydratedNote.getDetails() != null
                 && details.length() < hydratedNote.getDetails().length();
-        int cost = Math.max(1, estimateTokens(details));
+        int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(details));
         wikiRemainingBudget -= cost;
         result.addRelatedNote(
             new FocusContextNote(
@@ -225,7 +225,6 @@ public class FocusContextRetrievalService {
                 p.depth,
                 p.retrievalPath,
                 p.edgeType,
-                null,
                 hydratedNote.getCreatedAt(),
                 details,
                 truncated));
@@ -332,13 +331,13 @@ public class FocusContextRetrievalService {
         continue;
       }
       String details =
-          truncateToTokens(
+          ApproximateUtf8TokenBudget.truncateByApproxTokens(
               hydratedNote.getDetails(), FocusContextConstants.RELATED_NOTE_DETAILS_MAX_TOKENS);
       boolean truncated =
           details != null
               && hydratedNote.getDetails() != null
               && details.length() < hydratedNote.getDetails().length();
-      int cost = Math.max(1, estimateTokens(details));
+      int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(details));
       if (cost > siblingRemaining) {
         continue;
       }
@@ -351,7 +350,6 @@ public class FocusContextRetrievalService {
               o.anchorWikiDepth + 1,
               o.pathToAnchor,
               FocusContextEdgeType.FolderSibling,
-              null,
               hydratedNote.getCreatedAt(),
               details,
               truncated));
@@ -389,31 +387,4 @@ public class FocusContextRetrievalService {
 
   private record Proposal(
       int noteId, int depth, List<String> retrievalPath, FocusContextEdgeType edgeType) {}
-
-  private static String truncateToTokens(String text, int maxTokens) {
-    if (text == null || text.isEmpty()) return text;
-    int maxBytes = (int) Math.floor(maxTokens * FocusContextConstants.BYTES_PER_TOKEN);
-    byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
-    if (bytes.length <= maxBytes) return text;
-
-    int low = 0;
-    int high = text.length();
-    while (low < high) {
-      int mid = (low + high + 1) / 2;
-      int len = text.substring(0, mid).getBytes(StandardCharsets.UTF_8).length;
-      if (len <= maxBytes) {
-        low = mid;
-      } else {
-        high = mid - 1;
-      }
-    }
-    return text.substring(0, low);
-  }
-
-  private static int estimateTokens(String text) {
-    if (text == null || text.isEmpty()) return 0;
-    return (int)
-        Math.ceil(
-            text.getBytes(StandardCharsets.UTF_8).length / FocusContextConstants.BYTES_PER_TOKEN);
-  }
 }

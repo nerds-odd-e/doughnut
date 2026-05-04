@@ -4735,8 +4735,6 @@ components:
           - OutgoingWikiLink
           - InboundWikiReference
           - FolderSibling
-        reason:
-          type: string
         createdAt:
           type: string
           format: date-time

@@ -11,6 +11,4 @@ public class FocusContextConstants {
    * siblings).
    */
   public static final double RELATED_NOTES_WIKI_BUDGET_FRACTION = 0.75;
-
-  static final double BYTES_PER_TOKEN = 3.75;
 }

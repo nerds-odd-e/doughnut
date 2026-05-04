@@ -25,8 +25,8 @@ public class OpenAIChatRequestBuilder {
   /**
    * @param focusNoteContextBlock Markdown from {@link
    *     com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer#render(com.odde.doughnut.services.focusContext.FocusContextResult,
-   *     com.odde.doughnut.services.focusContext.RetrievalConfig)} (or legacy {@link
-   *     Note#getNoteDescription()}), placed in the overall system message.
+   *     com.odde.doughnut.services.focusContext.RetrievalConfig)} or {@link
+   *     Note#getNoteDescription()}, placed in the overall system message.
    */
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(
       String modelName, String focusNoteContextBlock) {
@@ -66,17 +66,7 @@ public class OpenAIChatRequestBuilder {
   }
 
   public ChatCompletionCreateParams build() {
-    List<ChatCompletionMessageParam> finalMessages = new ArrayList<>();
-    if (!overallSystemMessages.isEmpty()) {
-      String joinedSystemMessage =
-          overallSystemMessages.stream().collect(Collectors.joining("\n\n\n"));
-      finalMessages.add(
-          ChatCompletionMessageParam.ofSystem(
-              ChatCompletionSystemMessageParam.builder().content(joinedSystemMessage).build()));
-    }
-    finalMessages.addAll(messages);
-    ChatCompletionCreateParams.Builder requestBuilder = builder.messages(finalMessages).n(1L);
-    return requestBuilder.build();
+    return builder.messages(buildMessages()).n(1L).build();
   }
 
   public OpenAIChatRequestBuilder addToOverallSystemMessage(String message) {

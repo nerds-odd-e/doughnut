@@ -9,10 +9,6 @@ public class RetrievalConfig {
   private final Long folderSiblingSampleSeed;
   private final Integer relatedNotesTotalBudgetTokens;
 
-  public RetrievalConfig(int maxDepth, Long folderSiblingSampleSeed) {
-    this(maxDepth, folderSiblingSampleSeed, null);
-  }
-
   public RetrievalConfig(int maxDepth, Long folderSiblingSampleSeed, Integer relatedNotesBudget) {
     this.maxDepth = maxDepth;
     this.folderSiblingSampleSeed = folderSiblingSampleSeed;

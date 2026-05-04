@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -20,5 +21,16 @@ class ApproximateUtf8TokenBudgetTest {
             String.format(
                 "CJK should truncate shorter at same token cap; ascii=%d cjk=%d",
                 asciiLen, cjkLen));
+  }
+
+  @Test
+  void estimateApproxTokens_emptyOrNullIsZero() {
+    assertEquals(0, ApproximateUtf8TokenBudget.estimateApproxTokens(null));
+    assertEquals(0, ApproximateUtf8TokenBudget.estimateApproxTokens(""));
+  }
+
+  @Test
+  void estimateApproxTokens_roundsUpFromByteLength() {
+    assertEquals(1, ApproximateUtf8TokenBudget.estimateApproxTokens("x"));
   }
 }

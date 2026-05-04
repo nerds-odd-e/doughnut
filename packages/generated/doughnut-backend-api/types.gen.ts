@@ -795,7 +795,6 @@ export type FocusContextNote = {
     depth?: number;
     retrievalPath?: Array<string>;
     edgeType?: 'OutgoingWikiLink' | 'InboundWikiReference' | 'FolderSibling';
-    reason?: string;
     createdAt?: string;
     details?: string;
     detailsTruncated?: boolean;

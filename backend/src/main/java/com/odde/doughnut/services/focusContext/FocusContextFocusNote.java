@@ -20,21 +20,6 @@ public class FocusContextFocusNote {
   private final boolean detailsTruncated;
 
   public FocusContextFocusNote(
-      String notebook, String title, String folderPath, String details, boolean detailsTruncated) {
-    this(
-        notebook,
-        title,
-        folderPath,
-        0,
-        List.of(),
-        List.of(),
-        List.of(),
-        null,
-        details,
-        detailsTruncated);
-  }
-
-  public FocusContextFocusNote(
       String notebook,
       String title,
       String folderPath,
