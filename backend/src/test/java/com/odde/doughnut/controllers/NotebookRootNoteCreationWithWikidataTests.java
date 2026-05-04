@@ -129,25 +129,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     }
 
     @Test
-    void duplicateTitlesUnderSameFolder_shareFolder()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("SharedParent").please();
-      noteCreation.setFolderId(folder.getId());
-      noteCreation.setNewTitle("dup");
-      Note n1 =
-          noteRepository
-              .findById(notebookController.createNoteAtNotebookRoot(notebook, noteCreation).getId())
-              .orElseThrow();
-      noteCreation.setNewTitle("dup");
-      Note n2 =
-          noteRepository
-              .findById(notebookController.createNoteAtNotebookRoot(notebook, noteCreation).getId())
-              .orElseThrow();
-      assertThat(n1.getFolder().getId(), equalTo(n2.getFolder().getId()));
-      assertThat(n1.getId(), not(equalTo(n2.getId())));
-    }
-
-    @Test
     void siblingsShareSameFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Folder folder = makeMe.aFolder().notebook(notebook).name("SharedParent").please();

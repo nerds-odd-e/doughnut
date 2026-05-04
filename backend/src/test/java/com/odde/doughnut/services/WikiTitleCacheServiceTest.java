@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.RelationType;
@@ -94,11 +95,14 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
-    void unqualified_link_picks_lowest_note_id_when_duplicate_titles_exist_in_subtree() {
+    void unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
-      Note firstCreated = makeMe.aNote().title("Dup").underSameNotebookAs(root).please();
-      makeMe.aNote().title("Dup").underSameNotebookAs(root).please();
+      Folder folderA = makeMe.aFolder().notebook(root.getNotebook()).name("A").please();
+      Folder folderB = makeMe.aFolder().notebook(root.getNotebook()).name("B").please();
+      Note firstCreated =
+          makeMe.aNote().title("Dup").underSameNotebookAs(root).folder(folderA).please();
+      makeMe.aNote().title("Dup").underSameNotebookAs(root).folder(folderB).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[Dup]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);

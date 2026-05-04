@@ -11,7 +11,7 @@
         button-title="New note"
         aria-label="New note"
       >
-        <FilePlus class="w-5 h-5" />
+        <NotebookPen class="w-5 h-5" />
       </NotebookRootNoteNewButton>
       <FolderNewButton
         :notebook-id="notebookId"
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import { FilePlus, FolderPlus } from "lucide-vue-next"
+import { FolderPlus, NotebookPen } from "lucide-vue-next"
 import { computed } from "vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"

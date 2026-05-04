@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
@@ -56,10 +57,14 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldPutMultipleExactMatchesFirstWhenSearching() {
+      Folder folder1 = makeMe.aFolder().notebook(parentNote.getNotebook()).name("f1").please();
+      Folder folder2 = makeMe.aFolder().notebook(parentNote.getNotebook()).name("f2").please();
       makeMe.aNote("Diazepam").underSameNotebookAs(parentNote).please();
-      Note exactMatch1 = makeMe.aNote("Pam").underSameNotebookAs(parentNote).please();
+      Note exactMatch1 =
+          makeMe.aNote("Pam").underSameNotebookAs(parentNote).folder(folder1).please();
       makeMe.aNote("Lorazepam").underSameNotebookAs(parentNote).please();
-      Note exactMatch2 = makeMe.aNote("pam").underSameNotebookAs(parentNote).please();
+      Note exactMatch2 =
+          makeMe.aNote("pam").underSameNotebookAs(parentNote).folder(folder2).please();
       makeMe.aNote("Clonazepam").underSameNotebookAs(parentNote).please();
 
       searchTerm.setSearchKey("pam");
