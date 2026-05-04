@@ -183,4 +183,22 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           "SELECT MAX(n.createdAt) FROM Note n WHERE n.creator.id = :userId AND n.deletedAt IS NULL")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
+
+  /**
+   * Soft-deleted notes matching title in the same notebook + folder placement (null folder =
+   * notebook root). Multiple rows are ordered by id ascending; callers take the first.
+   */
+  @Query(
+      value =
+          selectFromNote
+              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NOT NULL "
+              + " AND LOWER(n.title) = LOWER(:title) "
+              + " AND ((:folderId IS NULL AND n.folder IS NULL) "
+              + " OR (:folderId IS NOT NULL AND n.folder IS NOT NULL AND n.folder.id = :folderId)) "
+              + " ORDER BY n.id ASC")
+  List<Note> findSoftDeletedByNotebookFolderAndTitleOrderByIdAsc(
+      @Param("notebookId") Integer notebookId,
+      @Param("folderId") Integer folderId,
+      @Param("title") String title,
+      Pageable pageable);
 }

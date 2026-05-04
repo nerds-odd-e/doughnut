@@ -8,6 +8,19 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
+const popupsMock = {
+  confirm: vi.fn().mockResolvedValue(false),
+  alert: vi.fn(),
+  options: vi.fn(),
+  done: vi.fn(),
+  register: vi.fn(),
+  peek: vi.fn(),
+}
+
+vi.mock("@/components/commons/Popups/usePopups", () => ({
+  default: () => ({ popups: popupsMock }),
+}))
+
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
   return {
@@ -34,6 +47,8 @@ describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
+    popupsMock.confirm.mockReset()
+    popupsMock.confirm.mockResolvedValue(false)
     mockSdkService("searchForRelationshipTarget", [])
     searchForRelationshipTargetWithinSpy = mockSdkService(
       "searchForRelationshipTargetWithin",
@@ -168,7 +183,9 @@ describe("adding new note", () => {
     })
 
     it("call the api", async () => {
-      await wrapper.find("form").trigger("submit")
+      await wrapper
+        .find('[data-testid="note-new-dialog-form"]')
+        .trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: {
           notebook: realm.notebookId,
@@ -178,10 +195,38 @@ describe("adding new note", () => {
     })
 
     it("call the api once only", async () => {
-      wrapper.find("form").trigger("submit")
-      wrapper.find("form").trigger("submit")
+      wrapper.find('[data-testid="note-new-dialog-form"]').trigger("submit")
+      wrapper.find('[data-testid="note-new-dialog-form"]').trigger("submit")
       await flushPromises()
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledTimes(1)
+    })
+
+    it("asks confirmation on soft-deleted title conflict and calls undo delete when confirmed", async () => {
+      popupsMock.confirm.mockResolvedValueOnce(true)
+      const restoredRealm = makeMe.aNoteRealm.please()
+      const undoSpy = mockSdkService("undoDeleteNote", restoredRealm)
+      mockedCreateNoteAtRoot.mockResolvedValueOnce({
+        data: undefined,
+        error: {
+          message:
+            "A note with this title already exists here but was deleted.",
+          errorType: "SOFT_DELETED_TITLE_CONFLICT",
+          errors: { deletedNoteId: "99" },
+        },
+        request: {} as Request,
+        response: { status: 409, url: "" } as Response,
+        // biome-ignore lint/suspicious/noExplicitAny: SDK error result shape
+      } as any)
+
+      await wrapper
+        .find('[data-testid="note-new-dialog-form"]')
+        .trigger("submit")
+      await flushPromises()
+
+      expect(popupsMock.confirm).toHaveBeenCalledWith(
+        expect.stringContaining("deleted")
+      )
+      expect(undoSpy).toHaveBeenCalledWith({ path: { note: 99 } })
     })
   })
 

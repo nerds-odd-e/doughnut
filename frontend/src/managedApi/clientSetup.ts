@@ -138,6 +138,17 @@ function handleSdkError(result: SdkResult) {
     return
   }
 
+  if (
+    status === 409 &&
+    errorBody &&
+    typeof errorBody === "object" &&
+    "errorType" in errorBody &&
+    (errorBody as { errorType?: string }).errorType ===
+      "SOFT_DELETED_TITLE_CONFLICT"
+  ) {
+    return
+  }
+
   // Extract error message
   let msg = "API Error"
   if (

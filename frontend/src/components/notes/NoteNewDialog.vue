@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-card daisy-w-full">
     <div class="daisy-card-body">
-      <form @submit.prevent="processForm">
+      <form data-testid="note-new-dialog-form" @submit.prevent="processForm">
         <fieldset :disabled="processing">
           <div class="title-search-container">
             <NoteFormTitleOnly
@@ -53,9 +53,12 @@ import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { toOpenApiError } from "@/managedApi/openApiError"
+import usePopups from "@/components/commons/Popups/usePopups"
 
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
+const { popups } = usePopups()
 
 const props = defineProps<{
   notebookRootNotebookId: number
@@ -99,6 +102,38 @@ const effectiveSearchKey = computed(() => {
 })
 
 // Methods
+function parseCreateNoteFailure(e: unknown): {
+  fieldErrors: { newTitle?: string; wikidataId?: string }
+  softDeletedNoteId?: number
+} {
+  const err = e as { body?: unknown }
+  const body = err.body
+  if (body && typeof body === "object") {
+    const parsed = toOpenApiError(body)
+    const errorType =
+      "errorType" in body &&
+      typeof (body as { errorType: unknown }).errorType === "string"
+        ? (body as { errorType: string }).errorType
+        : parsed.errorType
+    if (
+      errorType === "SOFT_DELETED_TITLE_CONFLICT" &&
+      parsed.errors?.deletedNoteId
+    ) {
+      const id = Number(parsed.errors.deletedNoteId)
+      if (!Number.isNaN(id)) {
+        return { fieldErrors: {}, softDeletedNoteId: id }
+      }
+    }
+  }
+  return {
+    fieldErrors: {
+      newTitle: undefined,
+      wikidataId: undefined,
+      ...(typeof e === "object" && e !== null ? (e as object) : {}),
+    },
+  }
+}
+
 const processForm = async () => {
   if (processing.value) return
   processing.value = true
@@ -120,11 +155,31 @@ const processForm = async () => {
       }
     )
     emit("closeDialog")
-  } catch (res: unknown) {
-    noteFormErrors.value = {
-      newTitle: undefined,
-      wikidataId: undefined,
-      ...(res as object),
+  } catch (e: unknown) {
+    const { fieldErrors, softDeletedNoteId } = parseCreateNoteFailure(e)
+    if (softDeletedNoteId != null) {
+      const confirmed = await popups.confirm(
+        "A note with this title was deleted. OK restores that note instead of creating a new one."
+      )
+      if (confirmed) {
+        try {
+          await storageAccessor.value
+            .storedApi()
+            .restoreDeletedNote(router, softDeletedNoteId)
+          emit("closeDialog")
+        } catch (res: unknown) {
+          noteFormErrors.value = {
+            newTitle: undefined,
+            wikidataId: undefined,
+            ...(res as object),
+          }
+        }
+      }
+    } else {
+      noteFormErrors.value = {
+        newTitle: fieldErrors.newTitle,
+        wikidataId: fieldErrors.wikidataId,
+      }
     }
   } finally {
     processing.value = false

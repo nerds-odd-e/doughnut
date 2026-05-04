@@ -69,6 +69,9 @@ export interface StoredApi {
     }
   ): Promise<NoteRealm>
 
+  /** PATCH undo-delete for a soft-deleted note; refreshes storage and navigates to the note. */
+  restoreDeletedNote(router: Router, noteId: Doughnut.ID): Promise<NoteRealm>
+
   createRelationship(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
@@ -295,12 +298,13 @@ export default class StoredApiCollection implements StoredApi {
       options?.refreshWikiTitleCacheForNoteIds
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
-    const { data: nrwp, error } = await apiCallWithLoading(() =>
+    const result = await apiCallWithLoading(() =>
       NotebookController.createNoteAtNotebookRoot({
         path: { notebook: notebookId },
         body,
       })
     )
+    const { data: nrwp, error, response } = result
     if (error || !nrwp) {
       const apiError = new Error("Failed to create note") as Error & {
         body?: unknown
@@ -312,7 +316,9 @@ export default class StoredApiCollection implements StoredApi {
         setErrorObjectForFieldErrors(apiError)
         const errorObj = toOpenApiError(error)
         apiError.message = errorObj.message || "Failed to create note"
-        if (errorObj.errors) {
+        if (response?.status !== undefined) {
+          apiError.status = response.status
+        } else if (errorObj.errors) {
           apiError.status = 400
         }
       }
@@ -326,6 +332,21 @@ export default class StoredApiCollection implements StoredApi {
         await this.refreshWikiLinkCacheForNote(id)
       }
     }
+    await this.routerReplaceFocus(router, focus)
+    return focus
+  }
+
+  async restoreDeletedNote(router: Router, noteId: Doughnut.ID) {
+    const { data: noteRealm, error } = await apiCallWithLoading(() =>
+      NoteController.undoDeleteNote({
+        path: { note: noteId },
+      })
+    )
+    if (error || !noteRealm) {
+      throw new Error(toErrorMessage(error, "Failed to restore note"))
+    }
+    const focus = this.storage.refreshNoteRealm(noteRealm)
+    refreshSidebarStructuralListings()
     await this.routerReplaceFocus(router, focus)
     return focus
   }

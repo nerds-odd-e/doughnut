@@ -9,6 +9,7 @@ export type OpenApiError = {
   errors?: Record<string, string>
   message?: string
   status?: number
+  errorType?: string
 }
 
 // Module-level variable to store the error object for the current call
@@ -38,6 +39,10 @@ export function toOpenApiError(error: unknown): OpenApiError {
       message:
         typeof parsedError.message === "string"
           ? parsedError.message
+          : undefined,
+      errorType:
+        typeof parsedError.errorType === "string"
+          ? parsedError.errorType
           : undefined,
       status:
         typeof parsedError.status === "number" ? parsedError.status : undefined,

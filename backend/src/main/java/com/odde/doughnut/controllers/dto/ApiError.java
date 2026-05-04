@@ -23,6 +23,7 @@ public class ApiError {
     WIKIDATA_SERVICE_ERROR,
     ASSESSMENT_SERVICE_ERROR,
     QUESTION_ANSWER_ERROR,
+    SOFT_DELETED_TITLE_CONFLICT,
   };
 
   public ApiError(String message, ErrorType type) {

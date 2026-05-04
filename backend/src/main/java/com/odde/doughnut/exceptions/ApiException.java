@@ -11,6 +11,12 @@ public class ApiException extends RuntimeException {
     apiError.add("_originalMessage", getMessage());
   }
 
+  public ApiException(ApiError apiError) {
+    super(apiError.getMessage());
+    this.apiError = apiError;
+    apiError.add("_originalMessage", getMessage());
+  }
+
   public ApiError getErrorBody() {
     return apiError;
   }
