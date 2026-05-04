@@ -6,12 +6,13 @@ import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
-import com.odde.doughnut.services.graphRAG.GraphRAGResult;
+import com.odde.doughnut.services.focusContext.FocusContextResult;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
+import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +36,7 @@ class NoteController {
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
   private final UserService userService;
-  private final GraphRAGService graphRAGService;
+  private final FocusContextRetrievalService focusContextRetrievalService;
   private final TestabilitySettings testabilitySettings;
   private final NoteRealmService noteRealmService;
 
@@ -45,7 +46,7 @@ class NoteController {
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService,
-      GraphRAGService graphRAGService,
+      FocusContextRetrievalService focusContextRetrievalService,
       TestabilitySettings testabilitySettings,
       NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
@@ -53,7 +54,7 @@ class NoteController {
     this.noteService = noteService;
     this.authorizationService = authorizationService;
     this.userService = userService;
-    this.graphRAGService = graphRAGService;
+    this.focusContextRetrievalService = focusContextRetrievalService;
     this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
   }
@@ -172,13 +173,14 @@ class NoteController {
   }
 
   @GetMapping("/{note}/graph")
-  public GraphRAGResult getGraph(
+  public FocusContextResult getGraph(
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     User user = authorizationService.getCurrentUser();
 
-    return graphRAGService.retrieve(note, tokenLimit, user);
+    return focusContextRetrievalService.retrieve(
+        note, user, RetrievalConfig.forGraphApi(tokenLimit));
   }
 
   @PostMapping(value = "/{note}/verify-spelling")

@@ -33,7 +33,7 @@ public class FocusContextMarkdownRenderer {
     if (focusNote.getFolderPath() != null && !focusNote.getFolderPath().isEmpty()) {
       sb.append("Folder: ").append(focusNote.getFolderPath()).append("\n");
     }
-    sb.append("Depth: 0\n");
+    sb.append("Depth: ").append(focusNote.getDepth()).append("\n");
     sb.append("Truncated: ").append(focusNote.isDetailsTruncated()).append("\n");
     sb.append("\nContent:\n\n");
     appendFencedContent(sb, focusNote.getDetails());

@@ -52,7 +52,7 @@ public class NoteQuestionGenerationService {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage, null);
   }
 
-  /** Same message layout as MCQ generation / evaluation (GraphRAG context, notebook hints). */
+  /** Same message layout as MCQ generation / evaluation (focus context, notebook hints). */
   public OpenAIChatRequestBuilder openAiChatRequestForSharedNoteContext(
       Note note, String additionalMessage) {
     return requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, null);

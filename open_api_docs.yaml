@@ -2467,7 +2467,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/GraphRAGResult"
+                $ref: "#/components/schemas/FocusContextResult"
   /api/notes/{note}/accessory:
     get:
       tags:
@@ -4682,55 +4682,19 @@ components:
             $ref: "#/components/schemas/MemoryTracker"
         recallSetting:
           $ref: "#/components/schemas/NoteRecallSetting"
-    BareNote:
+    FocusContextFocusNote:
       type: object
       properties:
         notebook:
           type: string
         title:
           type: string
-        relationToFocusNote:
+        folderPath:
           type: string
-          enum:
-          - Self
-          - OlderSibling
-          - YoungerSibling
-          - OutboundWikiLink
-        details:
-          type: string
-        detailsTruncated:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-    FocusNote:
-      type: object
-      properties:
-        notebook:
-          type: string
-        title:
-          type: string
-        relationToFocusNote:
-          type: string
-          enum:
-          - Self
-          - OlderSibling
-          - YoungerSibling
-          - OutboundWikiLink
-        details:
-          type: string
-        detailsTruncated:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        contextualPath:
-          type: string
-        olderSiblings:
-          type: array
-          items:
-            type: string
-        youngerSiblings:
+        depth:
+          type: integer
+          format: int32
+        outgoingLinks:
           type: array
           items:
             type: string
@@ -4738,15 +4702,57 @@ components:
           type: array
           items:
             type: string
-    GraphRAGResult:
+        sampleSiblings:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        details:
+          type: string
+        detailsTruncated:
+          type: boolean
+    FocusContextNote:
+      type: object
+      properties:
+        notebook:
+          type: string
+        title:
+          type: string
+        folderPath:
+          type: string
+        depth:
+          type: integer
+          format: int32
+        retrievalPath:
+          type: array
+          items:
+            type: string
+        edgeType:
+          type: string
+          enum:
+          - OutgoingWikiLink
+          - InboundWikiReference
+          - FolderSibling
+        reason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        details:
+          type: string
+        detailsTruncated:
+          type: boolean
+    FocusContextResult:
       type: object
       properties:
         focusNote:
-          $ref: "#/components/schemas/FocusNote"
+          $ref: "#/components/schemas/FocusContextFocusNote"
         relatedNotes:
           type: array
           items:
-            $ref: "#/components/schemas/BareNote"
+            $ref: "#/components/schemas/FocusContextNote"
     NotebookCatalogGroupItem:
       allOf:
       - $ref: "#/components/schemas/NotebookCatalogItem"

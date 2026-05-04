@@ -10,7 +10,6 @@ import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -181,11 +180,12 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getNoteDescription() {
+    Map<String, Object> shape = new LinkedHashMap<>();
+    shape.put("notebook", getNotebook() != null ? getNotebook().getName() : null);
+    shape.put("title", getTitle());
+    shape.put("details", getDetails());
     String prettyString =
-        new ObjectMapperConfig()
-            .objectMapper()
-            .valueToTree(BareNote.fromNoteWithoutTruncate(this))
-            .toPrettyString();
+        new ObjectMapperConfig().objectMapper().valueToTree(shape).toPrettyString();
     return """
         The %s (in JSON format):
         %s

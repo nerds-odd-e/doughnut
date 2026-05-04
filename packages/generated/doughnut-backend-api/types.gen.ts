@@ -775,31 +775,35 @@ export type NoteRecallInfo = {
     recallSetting?: NoteRecallSetting;
 };
 
-export type BareNote = {
+export type FocusContextFocusNote = {
     notebook?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling' | 'OutboundWikiLink';
-    details?: string;
-    detailsTruncated?: boolean;
-    createdAt?: string;
-};
-
-export type FocusNote = {
-    notebook?: string;
-    title?: string;
-    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling' | 'OutboundWikiLink';
-    details?: string;
-    detailsTruncated?: boolean;
-    createdAt?: string;
-    contextualPath?: string;
-    olderSiblings?: Array<string>;
-    youngerSiblings?: Array<string>;
+    folderPath?: string;
+    depth?: number;
+    outgoingLinks?: Array<string>;
     inboundReferences?: Array<string>;
+    sampleSiblings?: Array<string>;
+    createdAt?: string;
+    details?: string;
+    detailsTruncated?: boolean;
 };
 
-export type GraphRagResult = {
-    focusNote?: FocusNote;
-    relatedNotes?: Array<BareNote>;
+export type FocusContextNote = {
+    notebook?: string;
+    title?: string;
+    folderPath?: string;
+    depth?: number;
+    retrievalPath?: Array<string>;
+    edgeType?: 'OutgoingWikiLink' | 'InboundWikiReference' | 'FolderSibling';
+    reason?: string;
+    createdAt?: string;
+    details?: string;
+    detailsTruncated?: boolean;
+};
+
+export type FocusContextResult = {
+    focusNote?: FocusContextFocusNote;
+    relatedNotes?: Array<FocusContextNote>;
 };
 
 export type NotebookCatalogGroupItem = Omit<NotebookCatalogItem, 'type'> & {
@@ -3190,7 +3194,7 @@ export type GetGraphResponses = {
     /**
      * OK
      */
-    200: GraphRagResult;
+    200: FocusContextResult;
 };
 
 export type GetGraphResponse = GetGraphResponses[keyof GetGraphResponses];

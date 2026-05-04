@@ -35,7 +35,9 @@ async function getNoteById(
 
   // OpenAPI client returns { data, error, request, response } structure by default
   if (response.error) {
-    throw new Error(`Graph retrieval error: ${JSON.stringify(response.error)}`)
+    throw new Error(
+      `Focus context retrieval error: ${JSON.stringify(response.error)}`
+    )
   }
 
   const graph = response.data
@@ -45,31 +47,26 @@ async function getNoteById(
 // Tool definition with co-located logic
 export const getNoteGraphTool = createTool(
   'get_note_graph',
-  `Retrieves the note graph - a specific note along with its surrounding context and relationships.
+  `Retrieves structured **focus context** for one note: the focus note plus related notes discovered through wiki links, inbound references, and sampled folder peers.
 
-What This Returns:
-- Focus note: The requested note with full details
-- Parent notes: Hierarchical path showing where this note sits in the knowledge structure
-- Child notes: Direct sub-notes under this note
-- Sibling notes: Other notes at the same level
-- Related notes: Semantically connected notes from other parts of the knowledge base
+What this returns (JSON):
+- **focusNote** — The requested note (depth 0) with title, notebook, folder path, truncated details when needed, and lightweight lists: **outgoingLinks** and **inboundReferences** (wiki-style link strings), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
+- **relatedNotes** — Notes reached within a token budget and max traversal depth. Each entry includes **depth**, **retrievalPath** (how the note was reached from the focus), **edgeType** (\`OutgoingWikiLink\`, \`InboundWikiReference\`, or \`FolderSibling\`), and truncated **details** when needed.
 
-Use Cases:
-- Understanding note context and position in knowledge hierarchy
-- Finding related information after a search
-- Exploring knowledge connections and discovering new insights
-- Building comprehensive understanding of a topic
+Use cases:
+- Inspect how a note connects to the rest of the notebook before answering questions about it.
+- After search, pull bounded context around a candidate note without loading the whole notebook.
 
 You MUST obtain a valid note ID first using 'find_most_relevant_note' unless the user explicitly provides a numeric note ID.
 You MUST provide a valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window. Example of a valid token limits:
 1. If the note is short and the context window is large, you might set a higher token limit (e.g., 5000 tokens).
 2. If the note is long or the context window is small, you might need to set a lower token limit (e.g., 500 tokens).
 
-Navigation Pattern:
+Navigation pattern:
 1. Use 'find_most_relevant_note' to find relevant notes
 2. Extract note ID from search results
-3. Use this tool to explore relationships and context
-4. Follow related notes for deeper exploration`,
+3. Use this tool to load focus context around that note
+4. Follow **outgoingLinks** / **relatedNotes** titles for deeper exploration if needed`,
   NoteIdParamsSchema
 ).handle(async (ctx, args, request) => {
   const noteId = extractNoteId(args, request)
@@ -88,6 +85,5 @@ Navigation Pattern:
   if (tokenLimit <= 5) {
     return createErrorResponse('tokenLimit too low to fetch any note')
   }
-  // You can use the tokenLimit variable as needed in your logic here
   return await getNoteById(noteId, tokenLimit)
 })

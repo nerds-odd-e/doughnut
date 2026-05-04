@@ -65,8 +65,17 @@ describe('get_note_graph tool', () => {
       // Mock the service response
       const mockGetGraph = vi.mocked(NoteController.getGraph)
       const mockResponse: GetGraphResponse = {
-        focusNote: { id: 1 },
-      } as GetGraphResponse
+        focusNote: {
+          title: 'Example',
+          depth: 0,
+          outgoingLinks: [],
+          inboundReferences: [],
+          sampleSiblings: [],
+          details: '',
+          detailsTruncated: false,
+        },
+        relatedNotes: [],
+      }
       // OpenAPI client returns { data, error, request, response } structure
       mockGetGraph.mockResolvedValue({
         data: mockResponse,
@@ -83,6 +92,7 @@ describe('get_note_graph tool', () => {
         query: { tokenLimit: 100 },
       })
       expect(result.content[0].text).toContain('"focusNote"')
+      expect(result.content[0].text).toContain('"outgoingLinks"')
     })
   })
 })

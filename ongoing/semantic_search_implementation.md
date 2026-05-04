@@ -190,7 +190,7 @@ Title: {title}
 Details:
 {optionalDetails}
 ```
-- Keep truncation using the existing `CharacterBasedTokenCountingStrategy` and token cap.
+- Keep truncation using `ApproximateUtf8TokenBudget` and token cap.
 - Include the ancestor context path to anchor meaning and disambiguate titles.
 
 ### Large/Long Notes (Phase 2)

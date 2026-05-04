@@ -41,7 +41,7 @@
 
 11. User can **sync deletion in both directions** under one story: local → Doughnut and Doughnut → local, with one explicit rule set (not two separate features).
 
-12. Use wiki-style links in **graph RAG**.
+12. Use wiki-style links in **focus context retrieval**.
 
 ---
 
@@ -88,4 +88,4 @@
 
 11. **deletion** は双方向を **ひとつのストーリー**で扱う：**local** → **Doughnut** と **Doughnut** → **local** を、ひと組の明示ルールで扱う（別機能に分けない）。
 
-12. **graph RAG** で wiki 形式の **link** を使う。
+12. **focus context retrieval** で wiki 形式の **link** を使う。

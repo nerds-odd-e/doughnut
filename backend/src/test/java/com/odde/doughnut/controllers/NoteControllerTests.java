@@ -15,7 +15,7 @@ import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
-import com.odde.doughnut.services.graphRAG.GraphRAGResult;
+import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -606,15 +606,27 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnGraphWithDefaultTokenLimit() throws UnexpectedNoAccessRightException {
-      GraphRAGResult result = controller.getGraph(rootNote, 5000);
+      FocusContextResult result = controller.getGraph(rootNote, 5000);
 
       assertThat(result.getFocusNote().getNotebook(), equalTo(rootNote.getNotebook().getName()));
+      assertThat(result.getFocusNote().getDepth(), equalTo(0));
+      assertThat(result.getFocusNote().getOutgoingLinks(), is(notNullValue()));
     }
 
     @Test
     void shouldRespectCustomTokenLimit() throws UnexpectedNoAccessRightException {
-      GraphRAGResult result = controller.getGraph(rootNote, 1);
+      FocusContextResult result = controller.getGraph(rootNote, 1);
       assertThat(result.getRelatedNotes(), is(empty()));
+    }
+
+    @Test
+    void relatedNotesExposeEdgeTypeDepthAndPath() throws UnexpectedNoAccessRightException {
+      FocusContextResult result = controller.getGraph(rootNote, 5000);
+      for (var n : result.getRelatedNotes()) {
+        assertThat(n.getEdgeType(), is(notNullValue()));
+        assertThat(n.getDepth(), greaterThan(0));
+        assertThat(n.getRetrievalPath(), is(notNullValue()));
+      }
     }
 
     @Test

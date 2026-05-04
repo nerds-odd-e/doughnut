@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
 import com.openai.client.OpenAIClient;
 import com.openai.models.embeddings.CreateEmbeddingResponse;
 import com.openai.models.embeddings.Embedding;
@@ -102,8 +101,8 @@ public class EmbeddingService {
   /** Generate an embedding vector for a free-form search query. */
   public List<Float> generateQueryEmbedding(String query) {
     String input =
-        new CharacterBasedTokenCountingStrategy()
-            .truncateByApproxTokens(query == null ? "" : query.trim(), MAX_TOKENS_PER_INPUT);
+        ApproximateUtf8TokenBudget.truncateByApproxTokens(
+            query == null ? "" : query.trim(), MAX_TOKENS_PER_INPUT);
     EmbeddingCreateParams params =
         EmbeddingCreateParams.builder().model(EMBEDDING_MODEL).input(input).build();
     CreateEmbeddingResponse response = officialClient.embeddings().create(params);
@@ -126,8 +125,7 @@ public class EmbeddingService {
     }
 
     String structured = sb.toString();
-    return new CharacterBasedTokenCountingStrategy()
-        .truncateByApproxTokens(structured, MAX_TOKENS_PER_INPUT);
+    return ApproximateUtf8TokenBudget.truncateByApproxTokens(structured, MAX_TOKENS_PER_INPUT);
   }
 
   public static class EmbeddingForNote {

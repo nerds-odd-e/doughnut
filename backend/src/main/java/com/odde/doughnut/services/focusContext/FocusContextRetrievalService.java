@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -65,31 +66,53 @@ public class FocusContextRetrievalService {
             && hydrated.getDetails() != null
             && focusDetails.length() < hydrated.getDetails().length();
 
+    Integer focusId = hydrated.getId();
+
+    List<String> outgoingLinkUris =
+        wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(hydrated, viewer).stream()
+            .map(FocusContextWikiUri::of)
+            .toList();
+    List<String> inboundRefUris =
+        wikiTitleCacheService.referencesNotesForViewer(hydrated, viewer).stream()
+            .map(FocusContextWikiUri::of)
+            .toList();
+    List<String> sampleSiblingUris = new ArrayList<>();
+    for (Note peer : noteService.findStructuralPeerNotesInOrder(hydrated)) {
+      if (peer.getId() == null || peer.getId().equals(focusId)) {
+        continue;
+      }
+      sampleSiblingUris.add(FocusContextWikiUri.of(peer));
+      if (sampleSiblingUris.size() >= FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE) {
+        break;
+      }
+    }
+
     FocusContextFocusNote focusNoteModel =
         new FocusContextFocusNote(
             hydrated.getNotebook() != null ? hydrated.getNotebook().getName() : null,
             hydrated.getTitle(),
             FolderTrailSegments.crumbPathJoinedBySlashSpace(hydrated),
+            0,
+            outgoingLinkUris,
+            inboundRefUris,
+            List.copyOf(sampleSiblingUris),
+            hydrated.getCreatedAt(),
             focusDetails,
             focusTruncated);
 
     FocusContextResult result = new FocusContextResult(focusNoteModel);
 
-    if (config.getMaxDepth() < 1) {
+    if (config.getMaxDepth() < 1 || config.getRelatedNotesTotalBudgetTokens() <= 0) {
       return result;
     }
 
+    int relatedTotal = config.getRelatedNotesTotalBudgetTokens();
     int wikiBudgetTotal =
-        (int)
-            Math.floor(
-                FocusContextConstants.RELATED_NOTES_TOTAL_BUDGET_TOKENS
-                    * FocusContextConstants.RELATED_NOTES_WIKI_BUDGET_FRACTION);
-    int siblingBudgetTotal =
-        FocusContextConstants.RELATED_NOTES_TOTAL_BUDGET_TOKENS - wikiBudgetTotal;
+        (int) Math.floor(relatedTotal * FocusContextConstants.RELATED_NOTES_WIKI_BUDGET_FRACTION);
+    int siblingBudgetTotal = relatedTotal - wikiBudgetTotal;
 
     int wikiRemainingBudget = wikiBudgetTotal;
     String focusWikiUri = FocusContextWikiUri.ofFocusNote(hydrated);
-    Integer focusId = hydrated.getId();
 
     Map<Integer, List<String>> pathEndingAtWikiUriByNoteId = new HashMap<>();
     if (focusId != null) {
@@ -192,7 +215,7 @@ public class FocusContextRetrievalService {
             details != null
                 && hydratedNote.getDetails() != null
                 && details.length() < hydratedNote.getDetails().length();
-        int cost = estimateTokens(details);
+        int cost = Math.max(1, estimateTokens(details));
         wikiRemainingBudget -= cost;
         result.addRelatedNote(
             new FocusContextNote(
@@ -202,6 +225,8 @@ public class FocusContextRetrievalService {
                 p.depth,
                 p.retrievalPath,
                 p.edgeType,
+                null,
+                hydratedNote.getCreatedAt(),
                 details,
                 truncated));
         wikiClaimedNoteIds.add(hydratedNote.getId());
@@ -249,7 +274,7 @@ public class FocusContextRetrievalService {
         if (focusId != null && p.getId().equals(focusId)) {
           continue;
         }
-        if (p.getId().equals(anchor.note.getId())) {
+        if (Objects.equals(p.getId(), anchor.note.getId())) {
           continue;
         }
         if (wikiClaimedNoteIds.contains(p.getId())) {
@@ -313,7 +338,7 @@ public class FocusContextRetrievalService {
           details != null
               && hydratedNote.getDetails() != null
               && details.length() < hydratedNote.getDetails().length();
-      int cost = estimateTokens(details);
+      int cost = Math.max(1, estimateTokens(details));
       if (cost > siblingRemaining) {
         continue;
       }
@@ -326,6 +351,8 @@ public class FocusContextRetrievalService {
               o.anchorWikiDepth + 1,
               o.pathToAnchor,
               FocusContextEdgeType.FolderSibling,
+              null,
+              hydratedNote.getCreatedAt(),
               details,
               truncated));
     }
