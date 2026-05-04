@@ -4686,6 +4686,7 @@ components:
           - Self
           - OlderSibling
           - YoungerSibling
+          - OutboundWikiLink
         details:
           type: string
         detailsTruncated:
@@ -4706,6 +4707,7 @@ components:
           - Self
           - OlderSibling
           - YoungerSibling
+          - OutboundWikiLink
         details:
           type: string
         detailsTruncated:

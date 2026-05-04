@@ -5,7 +5,8 @@ import com.odde.doughnut.services.graphRAG.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReferenceByRelationshipHandler extends RelationshipHandler {
+public class ReferenceByRelationshipHandler extends RelationshipHandler
+    implements PollableNoteRelationshipHandler {
   private final List<Note> inboundReferenceNotes;
   private int currentIndex = 0;
 
@@ -21,6 +22,11 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
 
   /** Next inbound referrer; null when exhausted. */
   public Note consumeNextInboundReferrer() {
+    return pollNext();
+  }
+
+  @Override
+  public Note pollNext() {
     if (currentIndex >= inboundReferenceNotes.size()) {
       return null;
     }

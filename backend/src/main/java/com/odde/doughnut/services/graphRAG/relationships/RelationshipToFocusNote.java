@@ -4,4 +4,5 @@ public enum RelationshipToFocusNote {
   Self,
   OlderSibling,
   YoungerSibling,
+  OutboundWikiLink,
 }

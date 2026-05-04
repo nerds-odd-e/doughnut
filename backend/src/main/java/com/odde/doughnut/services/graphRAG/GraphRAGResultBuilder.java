@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GraphRAGResultBuilder {
@@ -19,12 +20,11 @@ public class GraphRAGResultBuilder {
       int tokenBudget,
       TokenCountingStrategy tokenCountingStrategy,
       WikiTitleCacheService wikiTitleCacheService,
-      User viewer) {
+      User viewer,
+      List<Note> outgoingWikiLinkTargets) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     FocusNote focus = FocusNote.fromNote(focusNote);
-    wikiTitleCacheService
-        .outgoingWikiLinkTargetNotesForViewer(focusNote, viewer)
-        .forEach(n -> focus.getLinks().add(GraphNoteWikiUri.of(n, false)));
+    outgoingWikiLinkTargets.forEach(n -> focus.getLinks().add(GraphNoteWikiUri.of(n, false)));
     wikiTitleCacheService
         .referencesNotesForViewer(focusNote, viewer)
         .forEach(n -> focus.getInboundReferences().add(GraphNoteWikiUri.of(n, false)));

@@ -776,7 +776,7 @@ export type NoteRecallInfo = {
 export type BareNote = {
     uri?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling';
+    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling' | 'OutboundWikiLink';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -785,7 +785,7 @@ export type BareNote = {
 export type FocusNote = {
     uri?: string;
     title?: string;
-    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling';
+    relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling' | 'OutboundWikiLink';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;

@@ -56,8 +56,13 @@ public class GraphRAGService {
     List<RelationshipHandler> handlers = new ArrayList<>();
     List<Note> referencesForViewer =
         wikiTitleCacheService.referencesNotesForViewer(focusNote, viewer);
+    List<Note> outgoingWikiLinkTargets =
+        wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(focusNote, viewer);
     if (!referencesForViewer.isEmpty()) {
       handlers.add(new ReferenceByRelationshipHandler(referencesForViewer));
+    }
+    if (!outgoingWikiLinkTargets.isEmpty()) {
+      handlers.add(new OutgoingWikiLinkRelationshipHandler(outgoingWikiLinkTargets));
     }
     handlers.add(new OlderSiblingRelationshipHandler(focusNote, focusStructuralPeers));
     handlers.add(new YoungerSiblingRelationshipHandler(focusNote, focusStructuralPeers));
@@ -70,7 +75,8 @@ public class GraphRAGService {
             tokenBudgetForRelatedNotes,
             tokenCountingStrategy,
             wikiTitleCacheService,
-            viewer);
+            viewer,
+            outgoingWikiLinkTargets);
     layer.handle(builder);
     return builder.build();
   }

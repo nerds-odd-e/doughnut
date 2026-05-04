@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.graphRAG.relationships.ReferenceByRelationshipHandler;
+import com.odde.doughnut.services.graphRAG.relationships.PollableNoteRelationshipHandler;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +54,9 @@ public class PriorityLayer {
     boolean anyHandlerProcessed = false;
     layerSweep:
     for (RelationshipHandler handler : handlers) {
-      if (handler instanceof ReferenceByRelationshipHandler refHandler) {
+      if (handler instanceof PollableNoteRelationshipHandler poller) {
         Note relatedNote;
-        while ((relatedNote = refHandler.consumeNextInboundReferrer()) != null) {
+        while ((relatedNote = poller.pollNext()) != null) {
           BareNote result =
               builder.addNoteToRelatedNotes(relatedNote, handler.getRelationshipToFocusNote());
           if (result != null) {

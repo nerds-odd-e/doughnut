@@ -490,6 +490,41 @@ public class GraphRAGServiceTest {
       assertThat(
           jsonTextArrayElements(focusJson.get("inboundReferences")),
           hasItem(GraphNoteWikiUri.of(referrer, false)));
+
+      BareNote outboundRelated =
+          result.getRelatedNotes().stream()
+              .filter(b -> b.equals(outgoing))
+              .findFirst()
+              .orElseThrow(() -> new AssertionError(describeRelatedNotes(result)));
+      assertThat(
+          outboundRelated.getRelationToFocusNote(),
+          equalTo(RelationshipToFocusNote.OutboundWikiLink));
+    }
+
+    @Test
+    void outboundWikiLinkOnly_includesTargetWithOutboundWikiLinkRelation() {
+      Note target = makeMe.aNote().title("814 Out Target").details("Target body").please();
+      User viewer = target.getCreator();
+      Note focus =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(target)
+              .title("814 Out Focus")
+              .details("See [[814 Out Target]].")
+              .please();
+      refreshWikiCache(focus);
+
+      GraphRAGResult result = graphRAGService.retrieve(focus, 2500, viewer);
+
+      BareNote related =
+          result.getRelatedNotes().stream()
+              .filter(b -> b.equals(target))
+              .findFirst()
+              .orElseThrow(() -> new AssertionError(describeRelatedNotes(result)));
+      assertThat(
+          related.getRelationToFocusNote(), equalTo(RelationshipToFocusNote.OutboundWikiLink));
+      assertThat(related.getDetails(), containsString("Target body"));
     }
   }
 
