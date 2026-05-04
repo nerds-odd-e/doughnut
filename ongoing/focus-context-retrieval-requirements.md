@@ -43,10 +43,13 @@ Focus Context Retrieval builds a compact note neighborhood around a focus note b
 
 The graph consists of:
 
-- Outgoing wiki links from the focus note.
-- Inbound wiki references to the focus note.
-- Wiki links found in note details including its front matter.
-- Randomly selected folder-scoped structural peers (no older or younger siblings any more)
+- Outgoing wiki links discovered in Markdown note details and YAML front matter.
+- Inbound wiki references from the wiki title cache.
+- Bounded folder-scoped peer samples.
+
+Traversal is recursive up to the configured maximum depth. Notes reached at one depth may become expansion frontiers for the next depth, subject to edge priority, deduplication, and token budget.
+
+Folder sibling notes may be added as context, but they must not expand further. However, if another reached note becomes an expansion frontier through a wiki link or inbound reference, that note may also get its own folder sibling sample added when the traversal reaches it and budget allows.
 
 The result must fit within a token budget.
 
@@ -65,12 +68,13 @@ The retrieval algorithm should use **focus-centered weighted breadth-first trave
 Requirements:
 
 - Start from the focus note at depth `0`.
-- Expand outward through outbound wiki links and inbound references (both via wiki link cache).
+- Expand outward through outgoing wiki links and inbound wiki references.
 - Traverse breadth-first by depth.
-- Within each depth, prioritize stronger relationship types before weaker ones.
+- Within each depth, prioritize stronger edge types before weaker ones.
 - Stop when the token budget is exhausted.
 - Stop when the configured maximum depth is reached.
-- Deduplicate notes by internal note identity
+- Deduplicate notes by internal note identity.
+- Avoid revisiting the same note through repeated wiki URIs or aliases.
 
 ### Depth
 
@@ -78,7 +82,7 @@ The default maximum depth must be at least `3`.
 
 Rationale:
 
-Many Doughnut notes now represent relationships between two other notes. A shallow traversal may retrieve only the relationship note itself, without retrieving the source and target notes that contain the actual details.
+Many Doughnut notes now represent relationships between two other notes using ordinary Markdown and front matter links. A shallow traversal may retrieve only the relationship-description note itself, without retrieving the notes that contain the actual details.
 
 Example shape:
 
@@ -90,12 +94,10 @@ Focus Note
           -> Further Explanation Note
 ```
 
-A maximum depth of only `1` or `2` is often insufficient.
+defaults:
 
-Suggested defaults:
-
-- Default max depth: `3`
-- Configurable max depth: `3` to `5`
+- Default max depth: `2`
+- But developer can change it in code
 - Token budget remains the hard stopping constraint.
 
 ## Edge Types
@@ -108,27 +110,36 @@ Initial edge types:
 - `InboundWikiReference`
 - `FolderSibling`
 
-Special requirement:
-
-When the traversal reaches a relation-style note, its `source` and `target` notes should be expanded with high priority.
-
-This is necessary because relation-style notes often act as connectors rather than complete knowledge notes.
+`OutgoingWikiLink` includes wiki links found in both the Markdown body and YAML front matter. Front matter links are not a separate edge type unless a later use case needs that distinction.
 
 ## Prioritization
 
-The traversal must not be blind BFS. It should be weighted BFS.
+Traversal proceeds breadth-first from the focus note:
 
-Suggested initial priority order:
+0. Focus note itself.
+1. Outgoing wiki links.
+2. Inbound wiki references.
+3. Folder sibling sample.
 
-1. Relation-style note source/target links.
-2. Outgoing wiki links from the focus note.
-3. Frontmatter wiki links.
-4. Inbound wiki references.
-5. Outgoing links from high-priority retrieved notes.
-6. Nearby folder siblings.
-7. Links from siblings.
+Folder siblings are useful, especially for question generation, but they should generally be weaker than explicit wiki links.
 
-Folder siblings are useful, especially for question generation, but they should generally be weaker than explicit wiki links and relationship-note source/target links.
+Folder siblings must not be used as expansion frontiers by default.
+
+## Folder Sibling Sampling
+
+Folder sibling retrieval should be bounded and configurable.
+
+Requirements:
+
+- Select peers from the same folder as the reached note.
+- If the note has no folder, select peers from the notebook root.
+- Apply a maximum number of sampled siblings per note.
+- Sibling selection may be deterministic or randomized based on caller-supplied parameters.
+- For question generation, randomized sibling sampling is allowed and expected.
+- The random seed must be provided by the caller and stored by the caller when reproducibility is needed.
+- For `PredefinedQuestion`, the caller should store the seed used to generate the question context.
+
+The retrieval service should not invent an untracked random seed internally when deterministic reproduction is required.
 
 ## Token Budget
 
@@ -136,114 +147,82 @@ The system must respect a token budget.
 
 Requirements:
 
-- Always include the focus note, possibly truncated if necessary.
+- Always include the focus note.
+- If the focus note is too large, truncate its note details to `FOCUS_NOTE_DETAILS_MAX_TOKENS`.
+- Retrieved notes use a separate maximum detail allowance, `RELATED_NOTE_DETAILS_MAX_TOKENS`.
 - Add retrieved notes while budget allows.
 - Stop expansion when no more notes fit.
-- Track whether each note's content was truncated.
-- Track token usage for debugging.
 - Prefer higher-priority notes when budget is limited.
+- Avoid allowing folder siblings to consume too much of the budget.
+- If a note is too large, include a truncated version or a summary according to the later AI use case.
 
 Suggested budget behavior:
 
 - Reserve most of the budget for the focus note and explicitly linked notes.
-- Avoid allowing folder siblings to consume too much of the budget.
-- If a note is too large, include a truncated version or summary according to the later AI use case.
+- Use a smaller bounded allocation for inbound references and folder siblings.
+- Make truncation explicit in the result.
 
 ## Internal Result Model
 
-The retrieval service should return a structured internal result.
+The retrieval service should return a structured internal result, replacing the old `GraphRagResult` model.
 
-Do not make the retrieval service return only Markdown.
+The old fields related to `relationToFocusNote`, `olderSiblings`, and `youngerSiblings` must be removed.
 
-Suggested model:
+The old single `relationToFocusNote` enum must not be kept. It is too narrow for the wiki graph model and cannot represent multi-hop or multi-path retrieval well.
 
-```java
-class FocusContextResult {
-    RetrievedFocusNote focus;
-    List<RetrievedNote> retrievedNotes;
-    TokenBudgetReport budgetReport;
-}
+Instead, each retrieved note should expose lightweight retrieval evidence.
 
-class RetrievedNote {
-    Note note;
-    int depth;
-    double score;
-    List<RetrievalPath> paths;
-    boolean truncated;
-    int tokenCost;
-}
+Suggested new shape:
 
-class RetrievalPath {
-    List<PathStep> steps;
-}
+```typescript
+export type FocusContextNote = {
+    notebook?: string;
+    title?: string;
+    folderPath?: string;
+    depth?: number;
+    retrievalPath?: Array<string>;
+    edgeType?: 'OutgoingWikiLink' | 'InboundWikiReference' | 'FolderSibling';
+    reason?: string;
+    details?: string;
+    detailsTruncated?: boolean;
+    createdAt?: string;
+};
 
-class PathStep {
-    String fromWikiUri;
-    String toWikiUri;
-    EdgeType edgeType;
-}
+export type FocusContextFocusNote = {
+    notebook?: string;
+    title?: string;
+    folderPath?: string;
+    depth?: 0;
+    outgoingLinks?: Array<string>;
+    inboundReferences?: Array<string>;
+    sampleSiblings?: Array<string>;
+    details?: string;
+    detailsTruncated?: boolean;
+    createdAt?: string;
+};
+
+export type FocusContextResult = {
+    focusNote?: FocusContextFocusNote;
+    relatedNotes?: Array<FocusContextNote>;
+};
 ```
 
-The structured result is useful for:
+### Retrieval Evidence
 
-- Testing.
-- Debugging.
-- Deduplication.
-- Scoring.
-- Token budgeting.
-- Rendering into different prompt formats.
+The AI should be able to infer semantic relationships from the note content, but the retrieval mechanism should still provide basic retrieval evidence.
 
-## Removal of `RelationshipToFocusNote`
+Each retrieved note should include:
 
-The old `RelationshipToFocusNote` enum should be removed or deprecated.
+- Depth from the focus note.
+- Retrieval path.
+- Edge type or short reason for why it was included.
+- Truncation status.
 
-Rationale:
-
-- The old enum reflects the previous tree-based model.
-- A note can have multiple relationships to the focus note.
-- A single enum cannot represent depth-2 or depth-3 traversal paths well.
-- The enum would keep growing as new wiki-style relationship types are added.
-- The retrieval path is more useful than a single relationship label.
-
-However, relationship information should not be removed entirely.
-
-Instead of this:
-
-```json
-{
-  "relationshipToFocusNote": "OlderSibling"
-}
-```
-
-Use retrieval evidence:
-
-```json
-{
-  "depth": 2,
-  "paths": [
-    {
-      "steps": [
-        {"from": "[[Focus]]", "to": "[[Relation Note]]", "edgeType": "OutgoingWikiLink"},
-        {"from": "[[Relation Note]]", "to": "[[Target Note]]", "edgeType": "RelationTarget"}
-      ]
-    }
-  ]
-}
-```
-
-The AI should not be forced to infer all retrieval relationships from raw note content. The renderer should provide lightweight path and reason information.
+The retrieval path is important because a note's reason for inclusion may not be obvious from its own Markdown content. For example, a note may be included because it was reached through another note's front matter wiki link.
 
 ## AI Prompt Output Format
 
 The final context sent to AI should be rendered as Markdown-like text, not as a large JSON object.
-
-Rationale:
-
-- Doughnut notes are already Markdown.
-- Markdown is more natural for LLM consumption than deeply nested JSON.
-- Markdown preserves the source medium better.
-- It reduces JSON syntax noise.
-- It is easier to inspect during debugging.
 
 However, the note details are themselves arbitrary Markdown and may contain:
 
@@ -265,35 +244,38 @@ Example:
 # Doughnut Focus Context
 
 Purpose: Context around the focus note for AI use.
-Max depth: 3
+Max depth: 2
 
 ## Focus Note
 
-URI: [[Focus Note]]
+Title: TDD
 Notebook: Software Development
 Folder: TDD
 Depth: 0
+Truncated: false
 
 Content:
 
 ```doughnut-note-md
 ---
-tags: [tdd]
+blah: [[practices]]
 ---
 
 # Actual note heading
 
-Actual note content.
+Actual note content with [[wiki link]].
 ```
 
 ---
 
 ## Retrieved Note
 
-URI: [[Linked Note]]
+Title: Note Title
+Notebook: Software Development
+Folder: TDD
 Depth: 1
-Path: [[Focus Note]] -> [[Linked Note]]
-Reached by: outgoing wiki link
+Path: [[TDD]] -> [[Note Title]]
+Reached by: OutgoingWikiLink
 Truncated: false
 
 Content:
@@ -337,7 +319,7 @@ The outer fence is longer, so the content is safe.
 
 The Markdown renderer should include:
 
-- Focus note title and wiki URI.
+- Focus note title.
 - Notebook name.
 - Folder path.
 - Depth.
@@ -346,61 +328,31 @@ The Markdown renderer should include:
 - Truncation status.
 - Raw note Markdown content inside safe fenced blocks.
 
-The renderer should avoid:
+## Performance Requirements
 
-- Treating raw note headings as wrapper headings.
-- Concatenating raw Markdown directly into the wrapper without isolation.
-- Sending only JSON unless a specific downstream consumer requires JSON.
+The solution must consider performance and avoid excessive database queries.
 
-## Use Cases
+Requirements:
 
-Initial consumers:
+- Use the wiki title cache for outgoing link resolution and inbound reference lookup where possible.
+- Avoid per-note database queries during traversal when batch loading is possible.
+- Batch-fetch notes discovered at the same depth.
+- Batch-fetch folder sibling candidates where possible.
+- Deduplicate candidate note IDs before hydration.
+- Avoid repeatedly loading the same note, folder, notebook, or wiki-link metadata.
+- Cache traversal-local lookups inside a single retrieval request.
+- Apply token-budget and max-depth constraints early enough to avoid expanding unnecessary branches.
+- Avoid expanding folder siblings as frontiers, reducing graph explosion.
+- Make query count observable in tests or logs for large retrieval cases.
 
-- Question generation.
-- AI note assistant.
-- Note explanation or summarization.
-- Recall and learning support.
-
-Question generation should prioritize:
-
-1. Focus note content.
-2. Outgoing links from the focus note.
-3. Relation-style source/target notes.
-4. Frontmatter-linked notes.
-5. Inbound references.
-6. Nearby folder siblings.
-
-## Non-Goals
-
-The new mechanism does not need to:
-
-- Reconstruct the old tree structure.
-- Support parent/child/ancestor/cousin graph handlers.
-- Preserve relationship notes as separate graph entities.
-- Use a search phrase for the default focus-centered mode.
-- Implement Microsoft-style GraphRAG with entity extraction and community summaries.
-- Return the old `GraphRAGResult` JSON shape.
-
-## Compatibility Notes
-
-Canonical product URLs remain `/n{id}` or routed equivalents.
-
-Wiki-style URIs such as `[[Title]]` or `[[Notebook: Title]]` are used for AI context rendering and graph traversal explanation.
-
-The system should avoid confusing canonical product identity with prompt-facing wiki identity.
-
-## Summary
-
-Focus Context Retrieval should replace the old GraphRAG mechanism with a focus-centered, wiki-aware, token-budgeted traversal system.
-
-The core design is:
+Performance-sensitive implementation should prefer this general flow:
 
 ```text
-Focus note
-  -> weighted BFS over wiki links, backlinks, frontmatter links, relation-style notes, and folder peers
-  -> max depth at least 3
-  -> token-budgeted structured result
-  -> Markdown prompt rendering with safely fenced raw note bodies
+1. Resolve focus note.
+2. Use cached wiki-link/index data to discover candidate IDs by depth.
+3. Deduplicate IDs before hydration.
+4. Batch-load note details for the selected frontier.
+5. Apply budget and truncation.
+6. Repeat until budget or max depth is reached.
 ```
 
-The old `RelationshipToFocusNote` enum should be removed or deprecated in favor of retrieval paths, edge types, depth, and selection reasons.
