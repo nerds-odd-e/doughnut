@@ -44,9 +44,10 @@ function expandFolderIfCollapsed(label: string) {
 }
 
 function openSidebarIfCollapsed() {
-  cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
-    if (!$button.hasClass('sidebar-expanded')) {
-      cy.wrap($button).click()
+  cy.document().then((doc) => {
+    const show = doc.querySelector('button[aria-label="Show sidebar"]')
+    if (show) {
+      cy.wrap(show).click()
     }
   })
   cy.get('aside').should('be.visible')
