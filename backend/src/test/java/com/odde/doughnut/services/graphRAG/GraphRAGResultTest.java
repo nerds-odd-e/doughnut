@@ -37,7 +37,8 @@ class GraphRAGResultTest {
     assertThat(json.has("target"), is(false));
     assertThat(json.has("relation_type"), is(false));
     assertThat(json.get("title").asText(), containsString("Child Note"));
-    assertThat(json.has("uri"), is(true));
+    assertThat(json.has("notebook"), is(true));
+    assertThat(json.get("notebook").asText(), equalTo(note.getNotebook().getName()));
   }
 
   @Test
@@ -64,7 +65,7 @@ class GraphRAGResultTest {
 
     assertThat(
         json::fieldNames,
-        containsInAnyOrder("uri", "title", "details", "relationToFocusNote", "createdAt"));
+        containsInAnyOrder("notebook", "title", "details", "relationToFocusNote", "createdAt"));
     assertThat(json.has("detailsTruncated"), is(false));
     assertThat(json.get("details").asText(), is("Some details"));
   }

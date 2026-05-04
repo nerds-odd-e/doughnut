@@ -410,7 +410,7 @@ public class GraphRAGServiceTest {
 
   /**
    * Wiki-link graph contract on serialized GraphRAG: folder crumb string on the focus note, {@code
-   * links} plus {@code inboundReferences}, and folder-scoped peers in related notes.
+   * inboundReferences}, and folder-scoped peers in related notes.
    */
   @Nested
   class WikiLinkGraphContract {
@@ -424,7 +424,7 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void serializedFocusNote_exposesLinksInboundRefsAndFolderCrumbString() {
+    void serializedFocusNote_exposesInboundRefsAndFolderCrumbString() {
       Note anchor = makeMe.aNote().title("713 Folder Anchor").please();
       Notebook notebook = anchor.getNotebook();
       User viewer = anchor.getCreator();
@@ -480,11 +480,7 @@ public class GraphRAGServiceTest {
       String crumbs = focusJson.get("contextualPath").asText();
       assertThat(crumbs, allOf(containsString("OuterCrumb"), containsString("InnerCrumb")));
 
-      assertThat(focusJson.get("links").isMissingNode(), is(false));
-      assertThat(focusJson.get("links").isArray(), is(true));
-      assertThat(focusJson.get("links").size(), greaterThanOrEqualTo(1));
-      assertThat(
-          focusJson.get("links").toString(), containsString(GraphNoteWikiUri.of(outgoing, false)));
+      assertThat(focusJson.has("links"), is(false));
 
       assertThat(focusJson.get("inboundReferences").isArray(), is(true));
       assertThat(

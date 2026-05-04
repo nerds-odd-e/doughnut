@@ -27,6 +27,6 @@ public class OlderSiblingRelationshipHandler extends RelationshipHandler {
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
     // Add to back to maintain creation order (oldest to newest)
-    focus.getOlderSiblings().addFirst(addedNote.getUri());
+    focus.getOlderSiblings().addFirst(addedNote.wikiLinkReference());
   }
 }

@@ -775,7 +775,7 @@ export type NoteRecallInfo = {
 };
 
 export type BareNote = {
-    uri?: string;
+    notebook?: string;
     title?: string;
     relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling' | 'OutboundWikiLink';
     details?: string;
@@ -784,7 +784,7 @@ export type BareNote = {
 };
 
 export type FocusNote = {
-    uri?: string;
+    notebook?: string;
     title?: string;
     relationToFocusNote?: 'Self' | 'OlderSibling' | 'YoungerSibling' | 'OutboundWikiLink';
     details?: string;
@@ -793,7 +793,6 @@ export type FocusNote = {
     contextualPath?: string;
     olderSiblings?: Array<string>;
     youngerSiblings?: Array<string>;
-    links?: Array<string>;
     inboundReferences?: Array<string>;
 };
 

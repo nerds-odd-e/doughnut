@@ -4682,7 +4682,7 @@ components:
     BareNote:
       type: object
       properties:
-        uri:
+        notebook:
           type: string
         title:
           type: string
@@ -4703,7 +4703,7 @@ components:
     FocusNote:
       type: object
       properties:
-        uri:
+        notebook:
           type: string
         title:
           type: string
@@ -4728,10 +4728,6 @@ components:
           items:
             type: string
         youngerSiblings:
-          type: array
-          items:
-            type: string
-        links:
           type: array
           items:
             type: string

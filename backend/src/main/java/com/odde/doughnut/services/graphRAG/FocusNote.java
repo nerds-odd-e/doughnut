@@ -12,7 +12,6 @@ public class FocusNote extends BareNote {
   private final String contextualPath;
   private final List<String> olderSiblings = new ArrayList<>();
   private final List<String> youngerSiblings = new ArrayList<>();
-  private final List<String> links = new ArrayList<>();
 
   private final List<String> inboundReferences = new ArrayList<>();
 

@@ -13,7 +13,7 @@ import lombok.Getter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-  "uri",
+  "notebook",
   "title",
   "relationToFocusNote",
   "details",
@@ -51,9 +51,14 @@ public class BareNote {
     return UriAndTitle.fromNote(note);
   }
 
-  @JsonProperty("uri")
-  public String getUri() {
+  @JsonIgnore
+  public String wikiLinkReference() {
     return GraphNoteWikiUri.of(note, relationToFocusNote == RelationshipToFocusNote.Self);
+  }
+
+  @JsonProperty("notebook")
+  public String getNotebook() {
+    return note.getNotebook() != null ? note.getNotebook().getName() : null;
   }
 
   @JsonProperty("title")

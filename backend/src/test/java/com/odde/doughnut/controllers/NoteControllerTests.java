@@ -608,7 +608,7 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnGraphWithDefaultTokenLimit() throws UnexpectedNoAccessRightException {
       GraphRAGResult result = controller.getGraph(rootNote, 5000);
 
-      assertThat(result.getFocusNote().getUri(), equalTo("[[Root]]"));
+      assertThat(result.getFocusNote().getNotebook(), equalTo(rootNote.getNotebook().getName()));
     }
 
     @Test

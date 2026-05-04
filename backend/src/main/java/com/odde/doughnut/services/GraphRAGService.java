@@ -75,8 +75,7 @@ public class GraphRAGService {
             tokenBudgetForRelatedNotes,
             tokenCountingStrategy,
             wikiTitleCacheService,
-            viewer,
-            outgoingWikiLinkTargets);
+            viewer);
     layer.handle(builder);
     return builder.build();
   }
