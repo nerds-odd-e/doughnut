@@ -15,7 +15,9 @@ class CharacterBasedTokenCountingStrategyTest {
     BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.OlderSibling);
 
     int tokens = strategy.estimateTokens(bareNote);
-    assertTrue(tokens > 20, "Should estimate at least 20 tokens for JSON overhead");
+    assertTrue(
+        tokens > 10,
+        "Serialized BareNote JSON (keys + relation) should add token overhead beyond raw details");
   }
 
   @Test

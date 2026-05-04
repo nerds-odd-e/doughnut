@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Replace the existing GraphRAG mechanism with a new **Focus Context Retrieval** mechanism aligned with Donut's wiki/Obsidian-compatible note model.
+Replace the existing GraphRAG mechanism with a new **Focus Context Retrieval** mechanism aligned with Doughnut's wiki/Obsidian-compatible note model.
 
 The mechanism retrieves a bounded, AI-oriented context around a single focus note. It is used by AI features such as question generation, assistants, and note understanding workflows.
 
@@ -10,19 +10,15 @@ The retrieval is **focus-centered**, not query-centered. There is no search phra
 
 ## Background
 
-Donut has migrated from a tree-structured note model to a wiki-compatible model:
+Doughnut has migrated from a tree-structured note model to a wiki-compatible model:
 
 - Notes live inside notebooks.
-- A notebook roughly maps to an Obsidian vault.
 - Notes are Markdown files.
 - Notes may be organized in folders.
 - Note titles cannot be duplicated within the same folder.
 - Notes may contain YAML front matter.
 - Links use double-square-bracket wiki syntax, such as `[[Note Title]]`.
 - Cross-notebook links use a notebook prefix, such as `[[Notebook: Note Title]]`.
-- The old parent/child structure no longer exists as a structural graph.
-- Old parent data is migrated into front matter as a `parent` property using a wiki link.
-- Old relation notes are no longer separate graph entities; their source, target, and relation type are represented as Markdown/front matter properties.
 
 Because of this migration, the old GraphRAG design based on parent/child/relationship-note expansion is no longer appropriate.
 
@@ -39,20 +35,18 @@ Suggested code names:
 - `FocusContextResult`
 - `FocusContextMarkdownRenderer`
 
-Avoid continuing to use the name `GraphRAG` unless referring to the legacy mechanism.
+Eventually, remove the name `GraphRAG` completely.
 
 ## Core Concept
 
-Focus Context Retrieval builds a compact note neighborhood around a focus note by traversing Donut's wiki-style graph.
+Focus Context Retrieval builds a compact note neighborhood around a focus note by traversing Doughnut's wiki-style graph.
 
 The graph consists of:
 
 - Outgoing wiki links from the focus note.
 - Inbound wiki references to the focus note.
-- Wiki links found in front matter properties.
-- Relation-style notes with properties such as `source`, `target`, and `relationType`.
-- Folder-scoped structural peers, especially older and younger sibling notes in the same folder.
-- Optional future signals such as tags, aliases, shared properties, or semantic similarity.
+- Wiki links found in note details including its front matter.
+- Randomly selected folder-scoped structural peers (no older or younger siblings any more)
 
 The result must fit within a token budget.
 
@@ -71,12 +65,12 @@ The retrieval algorithm should use **focus-centered weighted breadth-first trave
 Requirements:
 
 - Start from the focus note at depth `0`.
-- Expand outward through wiki and structural relationships.
+- Expand outward through outbound wiki links and inbound references (both via wiki link cache).
 - Traverse breadth-first by depth.
 - Within each depth, prioritize stronger relationship types before weaker ones.
 - Stop when the token budget is exhausted.
 - Stop when the configured maximum depth is reached.
-- Deduplicate notes by internal note identity, not by serialized wiki URI.
+- Deduplicate notes by internal note identity
 
 ### Depth
 
@@ -84,7 +78,7 @@ The default maximum depth must be at least `3`.
 
 Rationale:
 
-Many Donut notes now represent relationships between two other notes. A shallow traversal may retrieve only the relationship note itself, without retrieving the source and target notes that contain the actual details.
+Many Doughnut notes now represent relationships between two other notes. A shallow traversal may retrieve only the relationship note itself, without retrieving the source and target notes that contain the actual details.
 
 Example shape:
 
@@ -112,30 +106,7 @@ Initial edge types:
 
 - `OutgoingWikiLink`
 - `InboundWikiReference`
-- `FrontmatterWikiLink`
-- `RelationSource`
-- `RelationTarget`
-- `FolderOlderSibling`
-- `FolderYoungerSibling`
-
-Possible future edge types:
-
-- `SharedTag`
-- `SharedProperty`
-- `AliasMatch`
-- `TwoHopBridge`
-- `SemanticSimilarity`
-- `LexicalMatch`
-
-## Relationship-Style Notes
-
-A note should be treated as relation-style when its front matter contains relationship-defining properties such as:
-
-```yaml
-source: [[Some Note]]
-target: [[Another Note]]
-relationType: confused with
-```
+- `FolderSibling`
 
 Special requirement:
 
@@ -268,7 +239,7 @@ The final context sent to AI should be rendered as Markdown-like text, not as a 
 
 Rationale:
 
-- Donut notes are already Markdown.
+- Doughnut notes are already Markdown.
 - Markdown is more natural for LLM consumption than deeply nested JSON.
 - Markdown preserves the source medium better.
 - It reduces JSON syntax noise.
@@ -291,7 +262,7 @@ Use a Markdown wrapper with each raw note body inside a fenced block.
 Example:
 
 ````markdown
-# Donut Focus Context
+# Doughnut Focus Context
 
 Purpose: Context around the focus note for AI use.
 Max depth: 3
@@ -305,7 +276,7 @@ Depth: 0
 
 Content:
 
-```donut-note-md
+```doughnut-note-md
 ---
 tags: [tdd]
 ---
@@ -327,7 +298,7 @@ Truncated: false
 
 Content:
 
-```donut-note-md
+```doughnut-note-md
 ---
 parent: [[Some Parent]]
 ---
@@ -351,7 +322,7 @@ Requirement:
 Example:
 
 `````markdown
-````donut-note-md
+````doughnut-note-md
 This note contains a normal fenced block:
 
 ```java
