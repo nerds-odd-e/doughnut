@@ -7,6 +7,7 @@
       <NoteNewDialog
         :notebook-root-notebook-id="notebookId"
         :target-folder-id="targetFolderId ?? undefined"
+        :parent-location-description="parentLocationDescription"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         @close-dialog="closer"
       />
@@ -24,6 +25,7 @@ defineProps<{
   buttonTitle: string
   ariaLabel?: string
   targetFolderId?: number | null
+  parentLocationDescription?: string
   titleSearchAnchorNote?: Note | null
 }>()
 </script>

@@ -3,6 +3,13 @@
     <div class="daisy-card-body">
       <form data-testid="note-new-dialog-form" @submit.prevent="processForm">
         <fieldset :disabled="processing">
+          <p
+            v-if="parentLocationDescription"
+            class="daisy-text-sm daisy-opacity-80 daisy-mb-3"
+            data-testid="note-new-dialog-parent-location"
+          >
+            {{ parentLocationDescription }}
+          </p>
           <div class="title-search-container">
             <NoteFormTitleOnly
               v-model="creationData.newTitle"
@@ -64,6 +71,8 @@ const props = defineProps<{
   notebookRootNotebookId: number
   /** Scope for create-note when using notebook root API (active sidebar folder). */
   targetFolderId?: number
+  /** Shown above the form (e.g. "Folder: …" or "Notebook root"). */
+  parentLocationDescription?: string
   initialTitle?: string
   /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
   titleSearchAnchorNote?: Note

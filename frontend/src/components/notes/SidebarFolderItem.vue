@@ -73,7 +73,7 @@ const {
   ancestorFolderIds,
   activeNoteFolderIds,
   activeNoteTitle,
-  userActiveFolderId,
+  userActiveFolder,
 } = tree
 
 const structuralChildCount = ref<number | undefined>(undefined)
@@ -124,9 +124,9 @@ const isNotePathFolder = computed(
 
 const isUserActiveFolder = computed(
   () =>
-    userActiveFolderId != null &&
+    userActiveFolder != null &&
     folderId.value != null &&
-    userActiveFolderId.value === folderId.value
+    userActiveFolder.value?.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -135,9 +135,9 @@ function setStructuralChildCount(count: number) {
 
 function onFolderRowFocusOut(event: FocusEvent) {
   if (
-    userActiveFolderId == null ||
+    userActiveFolder == null ||
     folderId.value == null ||
-    userActiveFolderId.value !== folderId.value
+    userActiveFolder.value?.id !== folderId.value
   ) {
     return
   }
@@ -153,12 +153,15 @@ function onFolderRowFocusOut(event: FocusEvent) {
   ) {
     return
   }
-  userActiveFolderId.value = null
+  userActiveFolder.value = null
 }
 
 function toggleExpand() {
-  if (userActiveFolderId != null && folderId.value != null) {
-    userActiveFolderId.value = folderId.value
+  if (userActiveFolder != null && folderId.value != null) {
+    userActiveFolder.value = {
+      id: folderId.value,
+      name: props.folder.name,
+    }
   }
   if (folderId.value != null) {
     toggleFolderId(folderId.value)

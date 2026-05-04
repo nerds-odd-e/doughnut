@@ -8,6 +8,7 @@
         :notebook-id="notebookId"
         :under-note-id="underNoteId"
         :under-folder-id="underFolderId"
+        :parent-location-description="parentLocationDescription"
         @close-dialog="closer"
       />
     </template>
@@ -22,6 +23,7 @@ defineProps<{
   notebookId: number
   underNoteId?: number
   underFolderId?: number
+  parentLocationDescription?: string
   buttonTitle: string
   ariaLabel?: string
 }>()

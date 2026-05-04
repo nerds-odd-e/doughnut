@@ -3,6 +3,13 @@
     <div class="daisy-card-body">
       <form @submit.prevent="processForm">
         <fieldset :disabled="processing">
+          <p
+            v-if="parentLocationDescription"
+            class="daisy-text-sm daisy-opacity-80 daisy-mb-3"
+            data-testid="folder-new-dialog-parent-location"
+          >
+            {{ parentLocationDescription }}
+          </p>
           <div class="daisy-form-control">
             <label class="daisy-label" for="sidebar-new-folder-name">
               <span class="daisy-label-text">Folder name</span>
@@ -39,6 +46,7 @@ const props = defineProps<{
   notebookId: number
   underNoteId?: number
   underFolderId?: number
+  parentLocationDescription?: string
 }>()
 
 const emit = defineEmits<{

@@ -5,7 +5,8 @@
       :notebook-id="notebookId"
       :note="activeNoteRealm?.note"
       :active-note-topology-resolved="noteContextResolved"
-      :user-active-folder-id="userActiveFolderId"
+      :resolved-create-parent-folder-id="resolvedCreateParentFolderId"
+      :create-parent-location-description="createParentLocationDescription"
     />
     <SidebarInner
       v-if="sidebarTreeShown"
@@ -22,7 +23,12 @@ import { computed, inject, provide, ref, watch } from "vue"
 import type { NoteRealm, User } from "@generated/doughnut-backend-api"
 import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
-import { sidebarTreeKey } from "./useNoteSidebarTree"
+import {
+  createParentLocationDescriptionFrom,
+  resolvedCreateParentFolderIdFrom,
+  sidebarTreeKey,
+  type SidebarUserActiveFolder,
+} from "./useNoteSidebarTree"
 import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
 
 const props = defineProps({
@@ -36,7 +42,7 @@ const props = defineProps({
 })
 
 const expandedFolderIds = ref<Set<number>>(new Set())
-const userActiveFolderId = ref<number | null>(null)
+const userActiveFolder = ref<SidebarUserActiveFolder | null>(null)
 
 function ensureFolderExpanded(folderId: number | undefined) {
   if (folderId == null) return
@@ -87,7 +93,7 @@ provide(sidebarTreeKey, {
   ancestorFolderIds,
   activeNoteFolderIds,
   activeNoteTitle,
-  userActiveFolderId,
+  userActiveFolder,
 })
 
 watch(
@@ -103,7 +109,7 @@ watch(
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderIds.value = new Set()
-      userActiveFolderId.value = null
+      userActiveFolder.value = null
     }
   }
 )
@@ -117,6 +123,22 @@ const sidebarReadonly = computed(
 )
 
 const noteContextResolved = computed(() => activeNoteTopology.value != null)
+
+const resolvedCreateParentFolderId = computed(() =>
+  resolvedCreateParentFolderIdFrom(
+    userActiveFolder.value,
+    props.activeNoteRealm,
+    noteContextResolved.value
+  )
+)
+
+const createParentLocationDescription = computed(() =>
+  createParentLocationDescriptionFrom(
+    userActiveFolder.value,
+    props.activeNoteRealm,
+    noteContextResolved.value
+  )
+)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(
