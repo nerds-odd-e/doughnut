@@ -58,6 +58,30 @@ export const questionGenerationService = () => ({
     })
   },
 
+  resetAndStubAskingMcqWhenPromptContainsTwoFolderSiblings: (
+    record: Record<string, string>
+  ) => {
+    const mcqWithAnswer = createMcqWithAnswer(
+      record['Question Stem']!,
+      record['Correct Choice']!,
+      record['Incorrect Choice 1']!,
+      record['Incorrect Choice 2']!
+    )
+    const reply = JSON.stringify(mcqWithAnswer)
+    cy.then(async () => {
+      await mock_services.openAi().restartImposter()
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'user',
+          content:
+            '[\\s\\S]*Reached by: FolderSibling[\\s\\S]*Reached by: FolderSibling[\\s\\S]*',
+        })
+        .stubJsonSchemaResponse(reply)
+    })
+  },
+
   resetAndStubAskingMCQWhenPromptContainsRetrievedNote: (
     record: Record<string, string>
   ) => {

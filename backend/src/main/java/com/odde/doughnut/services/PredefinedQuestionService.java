@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
+import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -69,12 +70,15 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAFeasibleQuestion(Note note) {
-    MCQWithAnswer mcqWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+    Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
+    MCQWithAnswer mcqWithAnswer =
+        aiQuestionGenerator.getAiGeneratedQuestion(note, null, null, contextSeedBoxed);
     if (mcqWithAnswer == null) {
       return null;
     }
 
-    PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+    PredefinedQuestion result =
+        PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note, contextSeedBoxed);
     entityPersister.save(result);
 
     // Auto-evaluate and regenerate up to regenerationTimes
@@ -85,13 +89,12 @@ public class PredefinedQuestionService {
         return result;
       }
 
-      // Try to regenerate with the contest feedback
+      Long regSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
       MCQWithAnswer regeneratedQuestion =
-          aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
+          aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer, regSeedBoxed);
       if (regeneratedQuestion != null) {
-        // Create and save the regenerated question
         PredefinedQuestion regenerated =
-            PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
+            PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note, regSeedBoxed);
         result = entityPersister.save(regenerated);
         mcqWithAnswer = regeneratedQuestion;
       } else {

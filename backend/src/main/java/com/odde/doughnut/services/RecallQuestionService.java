@@ -8,6 +8,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
+import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,12 +70,16 @@ public class RecallQuestionService {
       Note note,
       MCQWithAnswer mcqWithAnswer,
       RecallPrompt existingRecallPrompt) {
+    long contextSeed = ThreadLocalRandom.current().nextLong();
+    Long contextSeedBoxed = Long.valueOf(contextSeed);
     MCQWithAnswer MCQWithAnswer =
-        aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
+        aiQuestionGenerator.regenerateQuestion(
+            contestResult, note, mcqWithAnswer, contextSeedBoxed);
     if (MCQWithAnswer == null) {
       return null;
     }
-    PredefinedQuestion question = PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    PredefinedQuestion question =
+        PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note, contextSeedBoxed);
     entityPersister.save(question);
     MemoryTracker memoryTracker = existingRecallPrompt.getMemoryTracker();
     return createARecallPromptFromQuestion(question, memoryTracker);

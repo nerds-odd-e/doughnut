@@ -158,5 +158,28 @@ class FocusContextMarkdownRendererTest {
       assertThat(output, containsString("Path: [[Focus]] -> [[NB: Mid]] -> [[NB: Far]]"));
       assertThat(output, containsString("Truncated: true"));
     }
+
+    @Test
+    void folderSiblingShowsPathToAnchorAndEdgeType() {
+      FocusContextFocusNote focusNote =
+          new FocusContextFocusNote("NB", "AnchorTitle", "", "focus", false);
+      FocusContextResult result = new FocusContextResult(focusNote);
+      result.addRelatedNote(
+          new FocusContextNote(
+              "NB",
+              "Peer",
+              "",
+              1,
+              List.of("[[AnchorTitle]]"),
+              FocusContextEdgeType.FolderSibling,
+              "peer body",
+              false));
+
+      String output = renderer.render(result, config);
+
+      assertThat(output, containsString("Reached by: FolderSibling"));
+      assertThat(output, containsString("Path: [[AnchorTitle]]"));
+      assertThat(output, containsString("Depth: 1"));
+    }
   }
 }

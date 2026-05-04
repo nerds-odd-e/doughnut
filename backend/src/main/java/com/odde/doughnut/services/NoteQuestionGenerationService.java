@@ -33,31 +33,37 @@ public class NoteQuestionGenerationService {
 
   public MCQWithAnswer generateQuestion(Note note, String additionalMessage)
       throws JsonProcessingException {
-    return generateQuestionWithCustomPrompt(note, null, additionalMessage);
+    return generateQuestionWithCustomPrompt(note, null, additionalMessage, null);
   }
 
   public MCQWithAnswer generateQuestionWithCustomPrompt(
       Note note, String customPrompt, String additionalMessage) throws JsonProcessingException {
-    return generateQuestionWithChatCompletion(note, customPrompt, additionalMessage);
+    return generateQuestionWithCustomPrompt(note, customPrompt, additionalMessage, null);
+  }
+
+  public MCQWithAnswer generateQuestionWithCustomPrompt(
+      Note note, String customPrompt, String additionalMessage, Long contextSeed)
+      throws JsonProcessingException {
+    return generateQuestionWithChatCompletion(note, customPrompt, additionalMessage, contextSeed);
   }
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
-    return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
+    return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage, null);
   }
 
   /** Same message layout as MCQ generation / evaluation (GraphRAG context, notebook hints). */
   public OpenAIChatRequestBuilder openAiChatRequestForSharedNoteContext(
       Note note, String additionalMessage) {
-    return requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage);
+    return requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, null);
   }
 
   private MCQWithAnswer generateQuestionWithChatCompletion(
-      Note note, String customPrompt, String additionalMessage) {
+      Note note, String customPrompt, String additionalMessage, Long contextSeed) {
     String prompt = (customPrompt != null) ? customPrompt : AiToolFactory.getDefaultMcqPrompt();
     InstructionAndSchema tool = AiToolFactory.questionAiTool(prompt);
     OpenAIChatRequestBuilder chatRequestBuilder =
-        requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage);
+        requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
 
     return openAiApiHandler
         .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
@@ -86,7 +92,7 @@ public class NoteQuestionGenerationService {
   private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(
       Note note, MCQWithAnswer question) {
     OpenAIChatRequestBuilder chatRequestBuilder =
-        requestBuilder.openAiChatRequestForQuestionGeneration(note, null);
+        requestBuilder.openAiChatRequestForQuestionGeneration(note, null, null);
 
     Optional<JsonNode> result =
         openAiApiHandler.requestAndGetJsonSchemaResult(

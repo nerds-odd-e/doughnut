@@ -41,6 +41,9 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @Column(name = "is_contested")
   private boolean contested;
 
+  @Column(name = "context_seed")
+  private Long contextSeed;
+
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
@@ -55,10 +58,16 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   }
 
   public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
+    return fromMCQWithAnswer(MCQWithAnswer, note, null);
+  }
+
+  public static PredefinedQuestion fromMCQWithAnswer(
+      MCQWithAnswer MCQWithAnswer, Note note, Long contextSeed) {
     PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
     predefinedQuestion.setNote(note);
     predefinedQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getF0__multipleChoicesQuestion());
     predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getF1__correctChoiceIndex());
+    predefinedQuestion.setContextSeed(contextSeed);
     return predefinedQuestion;
   }
 

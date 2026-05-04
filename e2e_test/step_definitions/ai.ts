@@ -106,6 +106,17 @@ Given(
 )
 
 Given(
+  'OpenAI generates this question only when the prompt includes two folder siblings:',
+  (questionTable: DataTable) => {
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMcqWhenPromptContainsTwoFolderSiblings(
+        parseSingleRowQuestion(questionTable)
+      )
+  }
+)
+
+Given(
   'OpenAI generates this as first question:',
   (questionTable: DataTable) => {
     start

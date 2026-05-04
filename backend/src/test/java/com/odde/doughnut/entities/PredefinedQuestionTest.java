@@ -3,6 +3,8 @@ package com.odde.doughnut.entities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,7 +58,8 @@ class PredefinedQuestionTest {
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
@@ -80,7 +84,8 @@ class PredefinedQuestionTest {
 
     @Test
     void shouldReturnOriginalQuestionWhenEvaluationPassesOrFails() {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = false;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
 
@@ -90,8 +95,25 @@ class PredefinedQuestionTest {
     }
 
     @Test
+    void storesSameContextSeedOnPredefinedQuestionAsPassedToAiGenerator() {
+      contestResult.feasibleQuestion = false;
+      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
+
+      ArgumentCaptor<Long> seedCaptor = ArgumentCaptor.forClass(Long.class);
+      Mockito.reset(aiQuestionGenerator);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(
+              eq(note), isNull(), isNull(), seedCaptor.capture()))
+          .thenReturn(mcqWithAnswer);
+
+      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+
+      assertThat(result.getContextSeed(), equalTo(seedCaptor.getValue()));
+    }
+
+    @Test
     void shouldReturnOriginalQuestionWhenEvaluationApiFails() {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       // Simulate evaluation API failure by returning null
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(null);
 
@@ -104,10 +126,11 @@ class PredefinedQuestionTest {
     @Test
     void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = true;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
+      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any(), any()))
           .thenReturn(regeneratedQuestion);
 
       PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
@@ -119,10 +142,11 @@ class PredefinedQuestionTest {
     void shouldSaveBothOriginalAndRegeneratedQuestions() {
       // Setup
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
+          .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = true;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
+      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any(), any()))
           .thenReturn(regeneratedQuestion);
 
       // Use ArgumentCaptor to capture questions being saved

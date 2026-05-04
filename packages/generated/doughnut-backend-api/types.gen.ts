@@ -174,6 +174,7 @@ export type PredefinedQuestion = {
     multipleChoicesQuestion: MultipleChoicesQuestion;
     correctAnswerIndex?: number;
     approved?: boolean;
+    contextSeed?: number;
 };
 
 export type SubscriptionDto = {

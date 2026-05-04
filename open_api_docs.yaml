@@ -3499,6 +3499,9 @@ components:
           format: int32
         approved:
           type: boolean
+        contextSeed:
+          type: integer
+          format: int64
       required:
       - id
       - multipleChoicesQuestion

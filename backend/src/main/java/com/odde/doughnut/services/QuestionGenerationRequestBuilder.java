@@ -30,8 +30,13 @@ public class QuestionGenerationRequestBuilder {
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
+    return buildQuestionGenerationRequest(note, additionalMessage, null);
+  }
+
+  public ChatCompletionCreateParams buildQuestionGenerationRequest(
+      Note note, String additionalMessage, Long contextSeed) {
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool();
-    return openAiChatRequestForQuestionGeneration(note, additionalMessage)
+    return openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed)
         .responseJsonSchema(tool)
         .build();
   }
@@ -45,7 +50,12 @@ public class QuestionGenerationRequestBuilder {
    */
   public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
       Note note, String additionalMessage) {
-    OpenAIChatRequestBuilder chatRequestBuilder = getChatRequestBuilder(note);
+    return openAiChatRequestForQuestionGeneration(note, additionalMessage, null);
+  }
+
+  public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
+      Note note, String additionalMessage, Long contextSeed) {
+    OpenAIChatRequestBuilder chatRequestBuilder = getChatRequestBuilder(note, contextSeed);
     addNotebookAssistantInstructionsIfPresent(chatRequestBuilder, note);
     if (additionalMessage != null) {
       chatRequestBuilder.addUserMessage(additionalMessage);
@@ -62,8 +72,12 @@ public class QuestionGenerationRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
+    return getChatRequestBuilder(note, null);
+  }
+
+  public OpenAIChatRequestBuilder getChatRequestBuilder(Note note, Long contextSeed) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
+    RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed);
     FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
 

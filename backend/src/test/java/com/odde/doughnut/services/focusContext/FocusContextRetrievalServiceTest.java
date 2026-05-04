@@ -3,7 +3,9 @@ package com.odde.doughnut.services.focusContext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.MakeMe;
@@ -298,7 +300,10 @@ class FocusContextRetrievalServiceTest {
           result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList(),
           hasItem("MidShallow"));
       assertThat(
-          result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList(),
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink)
+              .map(FocusContextNote::getTitle)
+              .toList(),
           not(hasItem("LeafShallow")));
     }
 
@@ -405,7 +410,7 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void budgetExhaustedMidRingLeavesLaterDepthOneNotesAndDepthTwoUnreachable() {
-      String maxChunk = "z".repeat(1900);
+      String maxChunk = "z".repeat(2400);
       Note focus =
           makeMe
               .aNote()
@@ -443,10 +448,185 @@ class FocusContextRetrievalServiceTest {
       FocusContextResult result =
           service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 
+      List<String> wikiTitles =
+          result.getRelatedNotes().stream()
+              .filter(
+                  n ->
+                      n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink
+                          || n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
+              .map(FocusContextNote::getTitle)
+              .toList();
+      assertThat(wikiTitles, not(hasItem("BridgeBudget")));
+      assertThat(wikiTitles, not(hasItem("LeafAfterBudget")));
+    }
+  }
+
+  @Nested
+  class FolderSiblings {
+    @Test
+    void nullSeedUsesDeterministicSiblingOrderTwice() {
+      Notebook nb = makeMe.aNotebook().please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      Note focus =
+          makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSib").details("solo").please();
+      User viewer = focus.getCreator();
+      for (int i = 0; i < 6; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .inNotebook(nb)
+            .folder(folder)
+            .title("Peer" + i)
+            .details("x")
+            .please();
+      }
+
+      RetrievalConfig cfg = new RetrievalConfig(2, null);
+      FocusContextResult first = service.retrieve(focus, viewer, cfg);
+      FocusContextResult second = service.retrieve(focus, viewer, cfg);
+
+      List<String> titles1 =
+          first.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
+              .map(FocusContextNote::getTitle)
+              .toList();
+      List<String> titles2 =
+          second.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
+              .map(FocusContextNote::getTitle)
+              .toList();
+      assertThat(titles1, equalTo(titles2));
+      assertThat(
+          titles1.size(), lessThanOrEqualTo(FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE));
+    }
+
+    @Test
+    void fixedSeedProducesStableSiblingSample() {
+      Notebook nb = makeMe.aNotebook().please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      Note focus =
+          makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSeed").details("solo").please();
+      User viewer = focus.getCreator();
+      for (int i = 0; i < 6; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .inNotebook(nb)
+            .folder(folder)
+            .title("S" + i)
+            .details("x")
+            .please();
+      }
+
+      RetrievalConfig cfg = new RetrievalConfig(2, 42L);
+      FocusContextResult a = service.retrieve(focus, viewer, cfg);
+      FocusContextResult b = service.retrieve(focus, viewer, cfg);
+
+      List<String> ta =
+          a.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
+              .map(FocusContextNote::getTitle)
+              .toList();
+      List<String> tb =
+          b.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
+              .map(FocusContextNote::getTitle)
+              .toList();
+      assertThat(ta, equalTo(tb));
+    }
+
+    @Test
+    void folderSiblingsIncludeStructuralPeersInSameFolder() {
+      Notebook nb = makeMe.aNotebook().please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      Note focus =
+          makeMe
+              .aNote()
+              .inNotebook(nb)
+              .folder(folder)
+              .title("FocusF")
+              .details("See [[LinkT]].")
+              .please();
+      User viewer = focus.getCreator();
+      Note linkT =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("LinkT")
+              .details("target")
+              .please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .inNotebook(nb)
+          .folder(folder)
+          .title("OtherFolderPeer")
+          .details("from same folder as link target")
+          .please();
+      refreshWikiCache(focus);
+      refreshWikiCache(linkT);
+
+      FocusContextResult result = service.retrieve(focus, viewer, new RetrievalConfig(2, null));
+
+      List<String> siblingTitles =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
+              .map(FocusContextNote::getTitle)
+              .toList();
+      assertThat(siblingTitles, hasItem("LinkT"));
+      assertThat(siblingTitles, hasItem("OtherFolderPeer"));
+    }
+
+    @Test
+    void folderSiblingIsNotWikiExpansionFrontier() {
+      Note focus = makeMe.aNote().title("RootFS").details("[[MidFS]].").please();
+      User viewer = focus.getCreator();
+      Notebook nb = focus.getNotebook();
+      Folder folderB = makeMe.aFolder().notebook(nb).please();
+      Note mid =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .inNotebook(nb)
+              .folder(folderB)
+              .title("MidFS")
+              .details("no link to deep")
+              .please();
+      Note sideSib =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .inNotebook(nb)
+              .folder(folderB)
+              .title("SideSib")
+              .details("[[DeepOnly]].")
+              .please();
+      Folder folderDeep = makeMe.aFolder().notebook(nb).please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .inNotebook(nb)
+          .folder(folderDeep)
+          .title("DeepOnly")
+          .details("deep body")
+          .please();
+      refreshWikiCache(focus);
+      refreshWikiCache(mid);
+      refreshWikiCache(sideSib);
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
+
       List<String> titles =
           result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList();
-      assertThat(titles, not(hasItem("BridgeBudget")));
-      assertThat(titles, not(hasItem("LeafAfterBudget")));
+      assertThat(titles, hasItem("MidFS"));
+      assertThat(
+          result.getRelatedNotes().stream()
+              .filter(n -> "DeepOnly".equals(n.getTitle()))
+              .noneMatch(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink),
+          is(true));
     }
   }
 }

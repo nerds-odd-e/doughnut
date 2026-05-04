@@ -68,3 +68,17 @@ Feature: Recall Quiz
     And the note "sedition" was assimilated on day 1
     When I am recalling my note on day 2
     Then I should be asked "How high is K2 in meters?"
+
+  @usingMockedOpenAiService
+  Scenario: AI question generation prompt includes folder sibling context
+    And I have a notebook "English practice" with notes:
+      | Title       | Details             | Skip Memory Tracking | Folder |
+      | FocusFolder | Focus only content  |                      | peers  |
+      | SibOne      | sibling one details | true                 | peers  |
+      | SibTwo      | sibling two details | true                 | peers  |
+    And OpenAI generates this question only when the prompt includes two folder siblings:
+      | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is the focus content? | Focus only     | sibling one        | unrelated          |
+    And the note "FocusFolder" was assimilated on day 1
+    When I am recalling my note on day 2
+    Then I should be asked "What is the focus content?"

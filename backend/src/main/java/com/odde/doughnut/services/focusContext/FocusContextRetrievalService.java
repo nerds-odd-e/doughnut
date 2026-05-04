@@ -5,15 +5,19 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,15 +28,18 @@ public class FocusContextRetrievalService {
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
+  private final NoteService noteService;
 
   @Autowired
   public FocusContextRetrievalService(
       WikiTitleCacheService wikiTitleCacheService,
       NoteRepository noteRepository,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      NoteService noteService) {
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
+    this.noteService = noteService;
   }
 
   public FocusContextResult retrieve(Note focusNote, RetrievalConfig config) {
@@ -72,7 +79,15 @@ public class FocusContextRetrievalService {
       return result;
     }
 
-    int remainingBudget = FocusContextConstants.RELATED_NOTES_TOTAL_BUDGET_TOKENS;
+    int wikiBudgetTotal =
+        (int)
+            Math.floor(
+                FocusContextConstants.RELATED_NOTES_TOTAL_BUDGET_TOKENS
+                    * FocusContextConstants.RELATED_NOTES_WIKI_BUDGET_FRACTION);
+    int siblingBudgetTotal =
+        FocusContextConstants.RELATED_NOTES_TOTAL_BUDGET_TOKENS - wikiBudgetTotal;
+
+    int wikiRemainingBudget = wikiBudgetTotal;
     String focusWikiUri = FocusContextWikiUri.ofFocusNote(hydrated);
     Integer focusId = hydrated.getId();
 
@@ -84,8 +99,16 @@ public class FocusContextRetrievalService {
     List<Note> frontier = new ArrayList<>();
     frontier.add(hydrated);
 
+    Set<Integer> wikiClaimedNoteIds = new HashSet<>();
+    if (focusId != null) {
+      wikiClaimedNoteIds.add(focusId);
+    }
+
+    List<SiblingAnchor> siblingAnchors = new ArrayList<>();
+    siblingAnchors.add(new SiblingAnchor(hydrated, 0, List.of(focusWikiUri)));
+
     for (int depth = 1; depth <= config.getMaxDepth(); depth++) {
-      if (remainingBudget <= 0 || frontier.isEmpty()) {
+      if (wikiRemainingBudget <= 0 || frontier.isEmpty()) {
         break;
       }
 
@@ -155,7 +178,7 @@ public class FocusContextRetrievalService {
 
       List<Note> nextFrontier = new ArrayList<>();
       for (Proposal p : orderedUnique) {
-        if (remainingBudget <= 0) {
+        if (wikiRemainingBudget <= 0) {
           break;
         }
         Note hydratedNote = hydratedById.get(p.noteId);
@@ -170,7 +193,7 @@ public class FocusContextRetrievalService {
                 && hydratedNote.getDetails() != null
                 && details.length() < hydratedNote.getDetails().length();
         int cost = estimateTokens(details);
-        remainingBudget -= cost;
+        wikiRemainingBudget -= cost;
         result.addRelatedNote(
             new FocusContextNote(
                 hydratedNote.getNotebook() != null ? hydratedNote.getNotebook().getName() : null,
@@ -181,15 +204,137 @@ public class FocusContextRetrievalService {
                 p.edgeType,
                 details,
                 truncated));
+        wikiClaimedNoteIds.add(hydratedNote.getId());
         pathEndingAtWikiUriByNoteId.put(hydratedNote.getId(), p.retrievalPath);
         nextFrontier.add(hydratedNote);
+        siblingAnchors.add(new SiblingAnchor(hydratedNote, p.depth, p.retrievalPath));
       }
 
       frontier = nextFrontier;
     }
 
+    appendFolderSiblings(
+        result,
+        focusId,
+        siblingAnchors,
+        siblingBudgetTotal,
+        wikiClaimedNoteIds,
+        config.getFolderSiblingSampleSeed().orElse(null));
+
     return result;
   }
+
+  private void appendFolderSiblings(
+      FocusContextResult result,
+      Integer focusId,
+      List<SiblingAnchor> siblingAnchors,
+      int siblingBudgetTokens,
+      Set<Integer> wikiClaimedNoteIds,
+      Long folderSiblingSampleSeed) {
+    if (siblingBudgetTokens <= 0) {
+      return;
+    }
+
+    Random rng = folderSiblingSampleSeed == null ? null : new Random(folderSiblingSampleSeed);
+
+    List<SiblingOffer> offers = new ArrayList<>();
+    int anchorIndex = 0;
+    for (SiblingAnchor anchor : siblingAnchors) {
+      List<Note> rawPeers = noteService.findStructuralPeerNotesInOrder(anchor.note);
+      List<Note> candidates = new ArrayList<>();
+      for (Note p : rawPeers) {
+        if (p.getId() == null) {
+          continue;
+        }
+        if (focusId != null && p.getId().equals(focusId)) {
+          continue;
+        }
+        if (p.getId().equals(anchor.note.getId())) {
+          continue;
+        }
+        if (wikiClaimedNoteIds.contains(p.getId())) {
+          continue;
+        }
+        candidates.add(p);
+      }
+      if (rng != null) {
+        Collections.shuffle(candidates, rng);
+      }
+      int taken = 0;
+      for (Note p : candidates) {
+        if (taken >= FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE) {
+          break;
+        }
+        offers.add(
+            new SiblingOffer(
+                p.getId(),
+                anchor.wikiDepth,
+                anchorIndex,
+                List.copyOf(anchor.pathToAnchorWikiUris)));
+        taken++;
+      }
+      anchorIndex++;
+    }
+
+    offers.sort(
+        Comparator.comparingInt(SiblingOffer::anchorWikiDepth)
+            .thenComparingInt(SiblingOffer::anchorIndex));
+
+    Set<Integer> reservedSiblingIds = new HashSet<>(wikiClaimedNoteIds);
+    List<SiblingOffer> uniqueOffers = new ArrayList<>();
+    for (SiblingOffer o : offers) {
+      if (reservedSiblingIds.add(o.noteId)) {
+        uniqueOffers.add(o);
+      }
+    }
+
+    List<Integer> idsToHydrate = uniqueOffers.stream().map(SiblingOffer::noteId).toList();
+    if (idsToHydrate.isEmpty()) {
+      return;
+    }
+    Map<Integer, Note> hydratedById = new LinkedHashMap<>();
+    for (Note n : noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(idsToHydrate)) {
+      hydratedById.put(n.getId(), n);
+    }
+
+    int siblingRemaining = siblingBudgetTokens;
+    for (SiblingOffer o : uniqueOffers) {
+      if (siblingRemaining <= 0) {
+        break;
+      }
+      Note hydratedNote = hydratedById.get(o.noteId);
+      if (hydratedNote == null) {
+        continue;
+      }
+      String details =
+          truncateToTokens(
+              hydratedNote.getDetails(), FocusContextConstants.RELATED_NOTE_DETAILS_MAX_TOKENS);
+      boolean truncated =
+          details != null
+              && hydratedNote.getDetails() != null
+              && details.length() < hydratedNote.getDetails().length();
+      int cost = estimateTokens(details);
+      if (cost > siblingRemaining) {
+        continue;
+      }
+      siblingRemaining -= cost;
+      result.addRelatedNote(
+          new FocusContextNote(
+              hydratedNote.getNotebook() != null ? hydratedNote.getNotebook().getName() : null,
+              hydratedNote.getTitle(),
+              FolderTrailSegments.crumbPathJoinedBySlashSpace(hydratedNote),
+              o.anchorWikiDepth + 1,
+              o.pathToAnchor,
+              FocusContextEdgeType.FolderSibling,
+              details,
+              truncated));
+    }
+  }
+
+  private record SiblingAnchor(Note note, int wikiDepth, List<String> pathToAnchorWikiUris) {}
+
+  private record SiblingOffer(
+      int noteId, int anchorWikiDepth, int anchorIndex, List<String> pathToAnchor) {}
 
   private static List<String> appendWikiUri(List<String> prefix, Note target) {
     List<String> path = new ArrayList<>(prefix);
@@ -204,15 +349,15 @@ public class FocusContextRetrievalService {
     if (candidate.depth > existing.depth) {
       return false;
     }
-    if (candidate.edgeType == FocusContextEdgeType.OutgoingWikiLink
-        && existing.edgeType == FocusContextEdgeType.InboundWikiReference) {
-      return true;
-    }
-    if (candidate.edgeType == FocusContextEdgeType.InboundWikiReference
-        && existing.edgeType == FocusContextEdgeType.OutgoingWikiLink) {
-      return false;
-    }
-    return false;
+    return edgePriority(candidate.edgeType) < edgePriority(existing.edgeType);
+  }
+
+  private static int edgePriority(FocusContextEdgeType t) {
+    return switch (t) {
+      case OutgoingWikiLink -> 0;
+      case InboundWikiReference -> 1;
+      case FolderSibling -> 2;
+    };
   }
 
   private record Proposal(
