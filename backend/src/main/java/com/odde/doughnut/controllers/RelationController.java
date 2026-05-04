@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -85,13 +86,18 @@ class RelationController {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertReadAuthorization(targetNote);
     User user = authorizationService.getCurrentUser();
+    RelationshipNotePlacement placement =
+        relationshipCreation.relationshipNotePlacement != null
+            ? relationshipCreation.relationshipNotePlacement
+            : RelationshipNotePlacement.RELATIONS_SUBFOLDER;
     Note relation =
         noteService.createRelationship(
             sourceNote,
             targetNote,
             user,
             relationshipCreation.relationType,
-            testabilitySettings.getCurrentUTCTimestamp());
+            testabilitySettings.getCurrentUTCTimestamp(),
+            placement);
 
     return List.of(
         noteRealmService.build(relation, user), noteRealmService.build(sourceNote, user));

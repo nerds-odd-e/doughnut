@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
 import com.odde.doughnut.entities.RelationType;
+import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -113,7 +114,8 @@ public class NoteService {
       Note targetNote,
       User creator,
       RelationType type,
-      Timestamp currentUTCTimestamp) {
+      Timestamp currentUTCTimestamp,
+      RelationshipNotePlacement relationshipNotePlacement) {
     if (type == null) return null;
     Note relation = buildARelation(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     relation.setTitle(
@@ -122,7 +124,9 @@ public class NoteService {
     relation.setDetails(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, type, sourceNote, targetNote, null));
-    relation.setFolder(noteChildContainerFolderService.resolveForParent(sourceNote));
+    relation.setFolder(
+        noteChildContainerFolderService.resolveFolderForRelationshipNote(
+            sourceNote, relationshipNotePlacement));
     entityPersister.save(relation);
     wikiTitleCacheService.refreshForNote(relation, creator);
     return relation;

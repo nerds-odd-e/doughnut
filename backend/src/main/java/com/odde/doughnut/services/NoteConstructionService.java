@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
+import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -145,7 +146,8 @@ public class NoteConstructionService {
                           existingNote,
                           user,
                           RelationType.RELATED_TO,
-                          currentUTCTimestamp);
+                          currentUTCTimestamp,
+                          RelationshipNotePlacement.RELATIONS_SUBFOLDER);
                     },
                     () -> {
                       try {

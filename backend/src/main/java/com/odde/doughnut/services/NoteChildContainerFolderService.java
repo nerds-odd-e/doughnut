@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NoteChildContainerFolderService {
+
+  private static final String RELATIONS_SUBFOLDER_NAME = "relations";
 
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
@@ -29,23 +32,38 @@ public class NoteChildContainerFolderService {
     return findOrCreateChildContainer(parentNote);
   }
 
+  public Folder resolveFolderForRelationshipNote(
+      Note sourceNote, RelationshipNotePlacement placement) {
+    return switch (placement) {
+      case RELATIONS_SUBFOLDER ->
+          findOrCreateChildFolder(sourceNote, sourceNote.getFolder(), RELATIONS_SUBFOLDER_NAME);
+      case SAME_LEVEL_AS_SOURCE -> sourceNote.getFolder();
+      case NAMED_AFTER_SOURCE_NOTE -> resolveForParent(sourceNote);
+    };
+  }
+
   private Folder findOrCreateChildContainer(Note parentNote) {
-    Folder parentFolderContext = parentNote.getFolder();
+    return findOrCreateChildFolder(
+        parentNote, parentNote.getFolder(), folderNameForNote(parentNote));
+  }
+
+  private Folder findOrCreateChildFolder(
+      Note anchorNote, Folder parentFolderContext, String childFolderName) {
     Integer parentFolderId = parentFolderContext == null ? null : parentFolderContext.getId();
     List<Folder> candidates =
         folderRepository.findCandidateChildContainers(
-            parentNote.getNotebook().getId(), parentFolderId, folderNameForNote(parentNote));
+            anchorNote.getNotebook().getId(), parentFolderId, childFolderName);
     if (!candidates.isEmpty()) {
       return candidates.getFirst();
     }
-    return createFolder(parentNote, parentFolderContext);
+    return createFolder(anchorNote, parentFolderContext, childFolderName);
   }
 
-  private Folder createFolder(Note parentNote, Folder parentFolderContext) {
+  private Folder createFolder(Note anchorNote, Folder parentFolderContext, String name) {
     Folder folder = new Folder();
-    folder.setNotebook(parentNote.getNotebook());
+    folder.setNotebook(anchorNote.getNotebook());
     folder.setParentFolder(parentFolderContext);
-    folder.setName(folderNameForNote(parentNote));
+    folder.setName(name);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     folder.setCreatedAt(now);
     folder.setUpdatedAt(now);

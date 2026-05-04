@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
+import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
@@ -162,6 +163,7 @@ class RelationControllerTests extends ControllerTestBase {
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note2 = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
       relationshipCreation.relationType = RelationType.APPLICATION;
+      relationshipCreation.relationshipNotePlacement = null;
     }
 
     @Test
@@ -193,6 +195,81 @@ class RelationControllerTests extends ControllerTestBase {
           RelationshipNoteMarkdownFormatter.format(
               RelationType.APPLICATION, source.getTitle(), target.getTitle(), null);
       assertThat(result.getFirst().getNote().getDetails(), equalTo(expectedDetails));
+    }
+
+    @Test
+    void relationshipNote_defaultPlacement_usesRelationsSubfolderUnderSourceFolder()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Note anchor = makeMe.aRootNote("nb").creatorAndOwner(u).please();
+      Folder parentFolder = makeMe.aFolder().notebook(anchor.getNotebook()).name("Work").please();
+      Note source =
+          makeMe
+              .aNote("MySource")
+              .creatorAndOwner(u)
+              .underSameNotebookAs(anchor)
+              .folder(parentFolder)
+              .please();
+      Note target = makeMe.aNote("Tgt").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      makeMe.entityPersister.flush();
+      var result =
+          controller.addRelationshipFinalize(
+              source, target, relationshipCreation, makeMe.successfulBindingResult());
+      Note relation = noteRepository.findById(result.getFirst().getNote().getId()).orElseThrow();
+      makeMe.refresh(relation);
+      assertThat(relation.getFolder().getName(), equalTo("relations"));
+      assertThat(relation.getFolder().getParentFolder().getId(), equalTo(parentFolder.getId()));
+    }
+
+    @Test
+    void relationshipNote_sameLevelAsSource_usesSourceFolder()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Note anchor = makeMe.aRootNote("nb2").creatorAndOwner(u).please();
+      Folder parentFolder = makeMe.aFolder().notebook(anchor.getNotebook()).name("Scope").please();
+      Note source =
+          makeMe
+              .aNote("Src")
+              .creatorAndOwner(u)
+              .underSameNotebookAs(anchor)
+              .folder(parentFolder)
+              .please();
+      Note target = makeMe.aNote("T2").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      relationshipCreation.relationshipNotePlacement =
+          RelationshipNotePlacement.SAME_LEVEL_AS_SOURCE;
+      makeMe.entityPersister.flush();
+      var result =
+          controller.addRelationshipFinalize(
+              source, target, relationshipCreation, makeMe.successfulBindingResult());
+      Note relation = noteRepository.findById(result.getFirst().getNote().getId()).orElseThrow();
+      makeMe.refresh(relation);
+      assertThat(relation.getFolder().getId(), equalTo(parentFolder.getId()));
+    }
+
+    @Test
+    void relationshipNote_namedAfterSource_usesTitleSubfolder()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Note anchor = makeMe.aRootNote("nb3").creatorAndOwner(u).please();
+      Folder parentFolder = makeMe.aFolder().notebook(anchor.getNotebook()).name("Area").please();
+      Note source =
+          makeMe
+              .aNote("Alpha")
+              .creatorAndOwner(u)
+              .underSameNotebookAs(anchor)
+              .folder(parentFolder)
+              .please();
+      Note target = makeMe.aNote("T3").creatorAndOwner(u).underSameNotebookAs(anchor).please();
+      relationshipCreation.relationshipNotePlacement =
+          RelationshipNotePlacement.NAMED_AFTER_SOURCE_NOTE;
+      makeMe.entityPersister.flush();
+      var result =
+          controller.addRelationshipFinalize(
+              source, target, relationshipCreation, makeMe.successfulBindingResult());
+      Note relation = noteRepository.findById(result.getFirst().getNote().getId()).orElseThrow();
+      makeMe.refresh(relation);
+      assertThat(relation.getFolder().getName(), equalTo("Alpha"));
+      assertThat(relation.getFolder().getParentFolder().getId(), equalTo(parentFolder.getId()));
     }
   }
 }

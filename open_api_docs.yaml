@@ -3687,6 +3687,12 @@ components:
           - before
           - similar to
           - confused with
+        relationshipNotePlacement:
+          type: string
+          enum:
+          - relations_subfolder
+          - same_level_as_source
+          - named_after_source_note
       required:
       - relationType
     QuestionContestResult:

@@ -1,5 +1,12 @@
 <template>
   <div>
+    <span class="daisy-label daisy-p-0">Relation note location</span>
+    <RadioButtons
+      field=""
+      scope-name="relationship-placement"
+      v-model="formData.relationshipNotePlacement"
+      :options="placementOptions"
+    />
     <RelationTypeSelect
       field="relationType"
       scope-name="relationship"
@@ -28,6 +35,7 @@ import { ref } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import type { RelationshipCreation } from "@generated/doughnut-backend-api"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
+import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "lucide-vue-next"
@@ -45,8 +53,32 @@ const props = defineProps({
 
 const emit = defineEmits(["success", "goBack"])
 
+const placementOptions: {
+  value: NonNullable<RelationshipCreation["relationshipNotePlacement"]>
+  label: string
+  title: string
+}[] = [
+  {
+    value: "relations_subfolder",
+    label: "“relations” subfolder",
+    title:
+      "Create or use a folder named relations under the folder that contains the source note.",
+  },
+  {
+    value: "same_level_as_source",
+    label: "Same level as source",
+    title: "Place the relation note in the same folder as the source note.",
+  },
+  {
+    value: "named_after_source_note",
+    label: "Folder named like source",
+    title: "Create or use a subfolder with the same name as the source note.",
+  },
+]
+
 const formData = ref<Partial<RelationshipCreation>>({
   relationType: undefined,
+  relationshipNotePlacement: "relations_subfolder",
 })
 
 const relationshipFormErrors = ref({
@@ -62,6 +94,7 @@ const relationTypeSelected = async (
         .storedApi()
         .createRelationship(props.note.id, props.targetNoteTopology.id, {
           relationType: relationType,
+          relationshipNotePlacement: formData.value.relationshipNotePlacement,
         })
     }
 

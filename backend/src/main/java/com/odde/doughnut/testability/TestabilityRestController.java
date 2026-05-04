@@ -382,7 +382,13 @@ class TestabilityRestController {
     RelationType type = RelationType.fromLabel(relationshipInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     User creator = sourceNote.getCreator();
-    noteService.createRelationship(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    noteService.createRelationship(
+        sourceNote,
+        targetNote,
+        creator,
+        type,
+        currentUTCTimestamp,
+        RelationshipNotePlacement.RELATIONS_SUBFOLDER);
     return "OK";
   }
 

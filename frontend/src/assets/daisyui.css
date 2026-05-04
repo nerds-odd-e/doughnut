@@ -6,6 +6,10 @@ svg {
   display: initial;
 }
 
+svg.lucide {
+  stroke-width: 1.5;
+}
+
 h3 {
   font-size: 1.5rem;
   margin-top: 2rem;
