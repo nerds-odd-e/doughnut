@@ -41,6 +41,10 @@ app.directive("focus", {
       el.focus()
       return
     }
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+      el.focus()
+      return
+    }
     // Otherwise, look for input, textarea, or button inside
     const focusable = el.querySelector("input, textarea, button")
     if (focusable) {

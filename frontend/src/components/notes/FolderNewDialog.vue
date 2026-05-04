@@ -10,6 +10,7 @@
             <input
               id="sidebar-new-folder-name"
               v-model="name"
+              v-focus
               type="text"
               class="daisy-input daisy-input-bordered daisy-w-full"
               autocomplete="off"
@@ -45,7 +46,7 @@ const emit = defineEmits<{
 }>()
 
 const storageAccessor = useStorageAccessor()
-const name = ref("Untitled")
+const name = ref("")
 const nameError = ref<string | undefined>(undefined)
 const processing = ref(false)
 

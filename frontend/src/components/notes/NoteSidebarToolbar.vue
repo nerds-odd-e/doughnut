@@ -20,7 +20,7 @@
         button-title="New folder"
         aria-label="New folder"
       >
-        <FolderTree class="w-5 h-5" />
+        <FolderPlus class="w-5 h-5" />
       </FolderNewButton>
     </div>
   </nav>
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import { FilePlus, FolderTree } from "lucide-vue-next"
+import { FilePlus, FolderPlus } from "lucide-vue-next"
 import { computed } from "vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
