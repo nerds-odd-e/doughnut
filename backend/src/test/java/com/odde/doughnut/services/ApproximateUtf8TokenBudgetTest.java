@@ -24,13 +24,9 @@ class ApproximateUtf8TokenBudgetTest {
   }
 
   @Test
-  void estimateApproxTokens_emptyOrNullIsZero() {
+  void estimateApproxTokens_emptyNullAndSingleChar() {
     assertEquals(0, ApproximateUtf8TokenBudget.estimateApproxTokens(null));
     assertEquals(0, ApproximateUtf8TokenBudget.estimateApproxTokens(""));
-  }
-
-  @Test
-  void estimateApproxTokens_roundsUpFromByteLength() {
     assertEquals(1, ApproximateUtf8TokenBudget.estimateApproxTokens("x"));
   }
 }

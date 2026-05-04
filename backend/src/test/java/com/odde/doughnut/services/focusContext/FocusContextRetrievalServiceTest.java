@@ -31,6 +31,13 @@ class FocusContextRetrievalServiceTest {
     wikiTitleCacheService.refreshForNote(note, note.getCreator());
   }
 
+  private static List<String> folderSiblingTitles(FocusContextResult result) {
+    return result.getRelatedNotes().stream()
+        .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
+        .map(FocusContextNote::getTitle)
+        .toList();
+  }
+
   @Nested
   class FocusNoteOnly {
     @Test
@@ -44,50 +51,43 @@ class FocusContextRetrievalServiceTest {
     }
 
     @Test
-    void focusNoteDetailsTruncatedWhenExceedsMaxTokens() {
+    void focusNoteDetailsTruncationMatchesApproximateTokenBudget() {
       String longDetails = "a".repeat(10000);
-      Note note = makeMe.aNote().title("Long").details(longDetails).please();
-      FocusContextResult result =
-          service.retrieve(note, note.getCreator(), RetrievalConfig.depth1());
+      Note longNote = makeMe.aNote().title("Long").details(longDetails).please();
+      FocusContextResult longResult =
+          service.retrieve(longNote, longNote.getCreator(), RetrievalConfig.depth1());
+      assertThat(longResult.getFocusNote().isDetailsTruncated(), is(true));
+      assertThat(longResult.getFocusNote().getDetails().length(), lessThan(longDetails.length()));
 
-      assertThat(result.getFocusNote().isDetailsTruncated(), is(true));
-      assertThat(result.getFocusNote().getDetails().length(), lessThan(longDetails.length()));
-    }
-
-    @Test
-    void focusNoteDetailsNotTruncatedWhenWithinBudget() {
-      Note note = makeMe.aNote().title("Short").details("Small content").please();
-      FocusContextResult result =
-          service.retrieve(note, note.getCreator(), RetrievalConfig.depth1());
-
-      assertThat(result.getFocusNote().isDetailsTruncated(), is(false));
-      assertThat(result.getFocusNote().getDetails(), equalTo("Small content"));
+      Note shortNote = makeMe.aNote().title("Short").details("Small content").please();
+      FocusContextResult shortResult =
+          service.retrieve(shortNote, shortNote.getCreator(), RetrievalConfig.depth1());
+      assertThat(shortResult.getFocusNote().isDetailsTruncated(), is(false));
+      assertThat(shortResult.getFocusNote().getDetails(), equalTo("Small content"));
     }
   }
 
   @Nested
   class OutgoingWikiLinks {
     private Note focusNote;
-    private Note linkedNote;
     private User viewer;
 
     @BeforeEach
     void setup() {
       focusNote = makeMe.aNote().title("Focus").details("See [[Linked]].").please();
       viewer = focusNote.getCreator();
-      linkedNote =
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .underSameNotebookAs(focusNote)
-              .title("Linked")
-              .details("Linked content")
-              .please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .underSameNotebookAs(focusNote)
+          .title("Linked")
+          .details("Linked content")
+          .please();
       refreshWikiCache(focusNote);
     }
 
     @Test
-    void outgoingWikiLinkTargetEmittedWithCorrectEdgeType() {
+    void outgoingWikiLinkEmitsTargetWithEdgeTypeDepthAndPath() {
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
@@ -95,13 +95,6 @@ class FocusContextRetrievalServiceTest {
       assertThat(related.getTitle(), equalTo("Linked"));
       assertThat(related.getEdgeType(), equalTo(FocusContextEdgeType.OutgoingWikiLink));
       assertThat(related.getDepth(), equalTo(1));
-    }
-
-    @Test
-    void outgoingWikiLinkRetrievalPathContainsFocusAndTarget() {
-      FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
-
-      FocusContextNote related = result.getRelatedNotes().get(0);
       List<String> path = related.getRetrievalPath();
       assertThat(path, hasSize(2));
       assertThat(path.get(0), equalTo("[[Focus]]"));
@@ -179,48 +172,15 @@ class FocusContextRetrievalServiceTest {
               .please();
       User viewer = focusNote.getCreator();
       String largeDetails = "x".repeat(3500);
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .underSameNotebookAs(focusNote)
-          .title("A")
-          .details(largeDetails)
-          .please();
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .underSameNotebookAs(focusNote)
-          .title("B")
-          .details(largeDetails)
-          .please();
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .underSameNotebookAs(focusNote)
-          .title("C")
-          .details(largeDetails)
-          .please();
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .underSameNotebookAs(focusNote)
-          .title("D")
-          .details(largeDetails)
-          .please();
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .underSameNotebookAs(focusNote)
-          .title("E")
-          .details(largeDetails)
-          .please();
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .underSameNotebookAs(focusNote)
-          .title("F")
-          .details(largeDetails)
-          .please();
+      for (String title : List.of("A", "B", "C", "D", "E", "F")) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .underSameNotebookAs(focusNote)
+            .title(title)
+            .details(largeDetails)
+            .please();
+      }
       refreshWikiCache(focusNote);
 
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
@@ -243,14 +203,13 @@ class FocusContextRetrievalServiceTest {
               .title("MidDepth")
               .details("Bridge [[LeafDepth2]].")
               .please();
-      Note leaf =
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .underSameNotebookAs(focus)
-              .title("LeafDepth2")
-              .details("Only at depth 2")
-              .please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .underSameNotebookAs(focus)
+          .title("LeafDepth2")
+          .details("Only at depth 2")
+          .please();
       refreshWikiCache(focus);
       refreshWikiCache(mid);
 
@@ -333,14 +292,13 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe.aNote().title("ShortFocus").details("[[DirectShort]] [[ViaBridge]].").please();
       User viewer = focus.getCreator();
-      Note direct =
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .underSameNotebookAs(focus)
-              .title("DirectShort")
-              .details("direct body")
-              .please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .underSameNotebookAs(focus)
+          .title("DirectShort")
+          .details("direct body")
+          .please();
       Note bridge =
           makeMe
               .aNote()
@@ -463,76 +421,51 @@ class FocusContextRetrievalServiceTest {
 
   @Nested
   class FolderSiblings {
-    @Test
-    void nullSeedUsesDeterministicSiblingOrderTwice() {
-      Notebook nb = makeMe.aNotebook().please();
-      Folder folder = makeMe.aFolder().notebook(nb).please();
-      Note focus =
-          makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSib").details("solo").please();
-      User viewer = focus.getCreator();
-      for (int i = 0; i < 6; i++) {
-        makeMe
-            .aNote()
-            .creator(viewer)
-            .inNotebook(nb)
-            .folder(folder)
-            .title("Peer" + i)
-            .details("x")
-            .please();
+    @Nested
+    class SamplingStability {
+      private Notebook nb;
+      private Folder folder;
+      private Note focus;
+      private User viewer;
+
+      @BeforeEach
+      void setup() {
+        nb = makeMe.aNotebook().please();
+        folder = makeMe.aFolder().notebook(nb).please();
+        focus =
+            makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSib").details("solo").please();
+        viewer = focus.getCreator();
+        for (int i = 0; i < 6; i++) {
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("Peer" + i)
+              .details("x")
+              .please();
+        }
       }
 
-      RetrievalConfig cfg = new RetrievalConfig(2, null, null);
-      FocusContextResult first = service.retrieve(focus, viewer, cfg);
-      FocusContextResult second = service.retrieve(focus, viewer, cfg);
+      @Test
+      void nullSeedRepeatRetrieveSameSiblingOrder() {
+        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(null);
+        List<String> first = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
+        List<String> second = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
 
-      List<String> titles1 =
-          first.getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
-              .map(FocusContextNote::getTitle)
-              .toList();
-      List<String> titles2 =
-          second.getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
-              .map(FocusContextNote::getTitle)
-              .toList();
-      assertThat(titles1, equalTo(titles2));
-      assertThat(
-          titles1.size(), lessThanOrEqualTo(FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE));
-    }
-
-    @Test
-    void fixedSeedProducesStableSiblingSample() {
-      Notebook nb = makeMe.aNotebook().please();
-      Folder folder = makeMe.aFolder().notebook(nb).please();
-      Note focus =
-          makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSeed").details("solo").please();
-      User viewer = focus.getCreator();
-      for (int i = 0; i < 6; i++) {
-        makeMe
-            .aNote()
-            .creator(viewer)
-            .inNotebook(nb)
-            .folder(folder)
-            .title("S" + i)
-            .details("x")
-            .please();
+        assertThat(first, equalTo(second));
+        assertThat(
+            first.size(), lessThanOrEqualTo(FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE));
       }
 
-      RetrievalConfig cfg = new RetrievalConfig(2, 42L, null);
-      FocusContextResult a = service.retrieve(focus, viewer, cfg);
-      FocusContextResult b = service.retrieve(focus, viewer, cfg);
+      @Test
+      void fixedSeedRepeatRetrieveSameSiblingOrder() {
+        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(42L);
+        List<String> a = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
+        List<String> b = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
 
-      List<String> ta =
-          a.getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
-              .map(FocusContextNote::getTitle)
-              .toList();
-      List<String> tb =
-          b.getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
-              .map(FocusContextNote::getTitle)
-              .toList();
-      assertThat(ta, equalTo(tb));
+        assertThat(a, equalTo(b));
+      }
     }
 
     @Test
@@ -569,13 +502,9 @@ class FocusContextRetrievalServiceTest {
       refreshWikiCache(linkT);
 
       FocusContextResult result =
-          service.retrieve(focus, viewer, new RetrievalConfig(2, null, null));
+          service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
 
-      List<String> siblingTitles =
-          result.getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
-              .map(FocusContextNote::getTitle)
-              .toList();
+      List<String> siblingTitles = folderSiblingTitles(result);
       assertThat(siblingTitles, hasItem("LinkT"));
       assertThat(siblingTitles, hasItem("OtherFolderPeer"));
     }
