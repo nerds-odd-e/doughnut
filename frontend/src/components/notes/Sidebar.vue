@@ -85,14 +85,11 @@ const ancestorFolderIds = computed(() => {
   return ids
 })
 
-const activeNoteTitle = computed(() => activeNoteTopology.value?.title ?? null)
-
 provide(sidebarTreeKey, {
   expandedFolderIds,
   toggleFolder: toggleFolderId,
   ancestorFolderIds,
   activeNoteFolderIds,
-  activeNoteTitle,
   userActiveFolder,
 })
 

@@ -72,7 +72,6 @@ const {
   toggleFolder: toggleFolderId,
   ancestorFolderIds,
   activeNoteFolderIds,
-  activeNoteTitle,
   userActiveFolder,
 } = tree
 
@@ -91,20 +90,10 @@ function ensureFolderExpandedById(id: number | undefined) {
 }
 
 watch(
-  () =>
-    [
-      ancestorFolderIds.value,
-      activeNoteTitle.value,
-      props.folder.name,
-      folderId.value,
-    ] as const,
+  () => [ancestorFolderIds.value, folderId.value] as const,
   () => {
     if (folderId.value == null) return
-    if (
-      ancestorFolderIds.value.has(folderId.value) ||
-      (activeNoteTitle.value != null &&
-        props.folder.name === activeNoteTitle.value)
-    ) {
+    if (ancestorFolderIds.value.has(folderId.value)) {
       ensureFolderExpandedById(folderId.value)
     }
   },

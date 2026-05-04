@@ -49,7 +49,6 @@ export interface SidebarTreeContext {
   toggleFolder: (id: number) => void
   ancestorFolderIds: ComputedRef<Set<number>>
   activeNoteFolderIds: ComputedRef<Set<number>>
-  activeNoteTitle: ComputedRef<string | null>
   userActiveFolder: Ref<SidebarUserActiveFolder | null>
 }
 

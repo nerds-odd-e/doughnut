@@ -368,6 +368,14 @@ describe("Sidebar", () => {
 
   it("should call the api once if top note", async () => {
     mountSidebar(topNoteRealm)
+    await flushPromises()
+    const topTitle = topNoteRealm.note.noteTopology.title!
+    const folderRowLabel = wrapper
+      .findAll(".sidebar-folder-label")
+      .find((w) => w.text().trim() === topTitle)
+    expect(folderRowLabel?.exists()).toBe(true)
+    await folderRowLabel!.trigger("click")
+    await flushPromises()
     await vi.waitUntil(() =>
       findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
     )
@@ -530,6 +538,14 @@ describe("Sidebar", () => {
 
     it("should have child note of active first gen", async () => {
       mountSidebar(firstGeneration)
+      await flushPromises()
+      const firstTitle = firstGeneration.note.noteTopology.title!
+      const nestedFolderLabel = wrapper
+        .findAll(".sidebar-folder-label")
+        .find((w) => w.text().trim() === firstTitle)
+      expect(nestedFolderLabel?.exists()).toBe(true)
+      await nestedFolderLabel!.trigger("click")
+      await flushPromises()
       await vi.waitUntil(() =>
         findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
       )
