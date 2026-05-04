@@ -76,14 +76,20 @@ public class FocusContextRetrievalService {
         wikiTitleCacheService.referencesNotesForViewer(hydrated, viewer).stream()
             .map(FocusContextWikiUri::of)
             .toList();
+    int relatedTotalBudget = config.getRelatedNotesTotalBudgetTokens();
+    boolean includeFolderPeers =
+        relatedTotalBudget >= FocusContextConstants.MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT;
+
     List<String> sampleSiblingUris = new ArrayList<>();
-    for (Note peer : noteService.findStructuralPeerNotesInOrder(hydrated)) {
-      if (peer.getId() == null || peer.getId().equals(focusId)) {
-        continue;
-      }
-      sampleSiblingUris.add(FocusContextWikiUri.of(peer));
-      if (sampleSiblingUris.size() >= FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE) {
-        break;
+    if (includeFolderPeers) {
+      for (Note peer : noteService.findStructuralPeerNotesInOrder(hydrated)) {
+        if (peer.getId() == null || peer.getId().equals(focusId)) {
+          continue;
+        }
+        sampleSiblingUris.add(FocusContextWikiUri.of(peer));
+        if (sampleSiblingUris.size() >= FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE) {
+          break;
+        }
       }
     }
 
@@ -102,14 +108,22 @@ public class FocusContextRetrievalService {
 
     FocusContextResult result = new FocusContextResult(focusNoteModel);
 
-    if (config.getMaxDepth() < 1 || config.getRelatedNotesTotalBudgetTokens() <= 0) {
+    if (config.getMaxDepth() < 1 || relatedTotalBudget <= 0) {
       return result;
     }
 
-    int relatedTotal = config.getRelatedNotesTotalBudgetTokens();
-    int wikiBudgetTotal =
-        (int) Math.floor(relatedTotal * FocusContextConstants.RELATED_NOTES_WIKI_BUDGET_FRACTION);
-    int siblingBudgetTotal = relatedTotal - wikiBudgetTotal;
+    int wikiBudgetTotal;
+    int siblingBudgetTotal;
+    if (includeFolderPeers) {
+      wikiBudgetTotal =
+          (int)
+              Math.floor(
+                  relatedTotalBudget * FocusContextConstants.RELATED_NOTES_WIKI_BUDGET_FRACTION);
+      siblingBudgetTotal = relatedTotalBudget - wikiBudgetTotal;
+    } else {
+      wikiBudgetTotal = relatedTotalBudget;
+      siblingBudgetTotal = 0;
+    }
 
     int wikiRemainingBudget = wikiBudgetTotal;
     String focusWikiUri = FocusContextWikiUri.ofFocusNote(hydrated);

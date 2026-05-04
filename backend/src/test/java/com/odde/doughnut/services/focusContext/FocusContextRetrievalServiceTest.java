@@ -469,6 +469,35 @@ class FocusContextRetrievalServiceTest {
     }
 
     @Test
+    void graphApiWithTightBudgetOmitsFolderPeersAndSampleSiblings() {
+      Notebook nb = makeMe.aNotebook().please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      User viewer = makeMe.aUser().please();
+      Note focus =
+          makeMe
+              .aNote()
+              .creatorAndOwner(viewer)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("TightA")
+              .details("solo")
+              .please();
+      makeMe
+          .aNote()
+          .creatorAndOwner(viewer)
+          .inNotebook(nb)
+          .folder(folder)
+          .title("TightB")
+          .details("solo")
+          .please();
+
+      FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.forGraphApi(10));
+
+      assertThat(result.getFocusNote().getSampleSiblings(), is(empty()));
+      assertThat(folderSiblingTitles(result), is(empty()));
+    }
+
+    @Test
     void folderSiblingsIncludeStructuralPeersInSameFolder() {
       Notebook nb = makeMe.aNotebook().please();
       Folder folder = makeMe.aFolder().notebook(nb).please();
