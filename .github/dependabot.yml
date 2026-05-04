@@ -12,3 +12,5 @@ updates:
       - dependency-name: "fast-xml-parser"
       - dependency-name: "uuid"
       - dependency-name: "tailwindcss"
+      - dependency-name: "daisyui"
+      - dependency-name: "@types/jquery"
