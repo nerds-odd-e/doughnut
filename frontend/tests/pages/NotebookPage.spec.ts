@@ -56,7 +56,9 @@ describe("NotebookPage.spec", () => {
       })
       .render()
     await flushPromises()
-    expect(screen.getByTitle("toggle sidebar")).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: /hide sidebar|show sidebar/i })
+    ).toBeInTheDocument()
     expect(showSpy).toHaveBeenCalledWith({
       path: { note: indexRealm.id },
     })
@@ -129,7 +131,9 @@ describe("NotebookPage.spec", () => {
       })
       .render()
     await flushPromises()
-    expect(screen.getByTitle("toggle sidebar")).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: /hide sidebar|show sidebar/i })
+    ).toBeInTheDocument()
     expect(screen.getByTestId("notebook-add-first-note")).toBeInTheDocument()
   })
 })

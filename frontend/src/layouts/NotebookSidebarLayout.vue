@@ -2,33 +2,22 @@
   <div class="daisy-flex daisy-flex-col daisy-h-full">
     <GlobalBar>
       <button
-        role="button"
+        type="button"
         class="daisy-btn daisy-btn-sm daisy-btn-ghost"
-        :class="{ 'sidebar-expanded': sidebarOpened }"
-        title="toggle sidebar"
+        :aria-label="sidebarOpened ? 'Hide sidebar' : 'Show sidebar'"
+        :title="sidebarOpened ? 'Hide sidebar' : 'Show sidebar'"
         @click="sidebarOpened = !sidebarOpened"
       >
-        <div class="daisy-w-4 daisy-h-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="w-4 h-4"
-          >
-            <template v-if="sidebarOpened">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </template>
-            <template v-else>
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="6" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </template>
-          </svg>
-        </div>
+        <PanelLeftClose
+          v-if="sidebarOpened"
+          class="w-5 h-5"
+          aria-hidden="true"
+        />
+        <PanelLeft
+          v-else
+          class="w-5 h-5"
+          aria-hidden="true"
+        />
       </button>
       <BreadcrumbWithCircle
         v-if="noteRealmForBreadcrumb"
@@ -106,6 +95,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import type { NoteRealm, Notebook } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import NoteSidebar from "@/components/notes/NoteSidebar.vue"
