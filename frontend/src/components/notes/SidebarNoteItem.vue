@@ -15,7 +15,6 @@
       :to="noteShowLocation(noteTopology.id)"
       class="note-row daisy-text-decoration-none"
     >
-      <FileText :size="13" class="daisy-shrink-0 note-icon" />
       <NoteTitleComponent
         :class="{
           'active-title':
@@ -36,7 +35,6 @@
 
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/doughnut-backend-api"
-import { FileText } from "lucide-vue-next"
 import { RouterLink } from "vue-router"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"
@@ -73,7 +71,7 @@ function onNoteRowClick() {
   gap: 0.25rem;
   width: 100%;
   min-height: 2rem;
-  padding: 0.125rem 0.25rem 0.125rem 1.5rem;
+  padding: 0.125rem 0.25rem 0.125rem 1.625rem;
   border-radius: 0.25rem;
   box-sizing: border-box;
   color: inherit;
@@ -81,11 +79,6 @@ function onNoteRowClick() {
   &:hover {
     background-color: var(--fallback-b3, oklch(var(--b3) / 1));
   }
-}
-
-.note-icon {
-  opacity: 0.45;
-  flex-shrink: 0;
 }
 
 .active-item > .note-row {

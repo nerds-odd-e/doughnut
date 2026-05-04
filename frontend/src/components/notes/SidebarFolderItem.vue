@@ -20,14 +20,14 @@
         tabindex="-1"
         @click.stop="toggleExpand"
       >
-        <ChevronDown v-if="isExpanded" :size="14" />
-        <ChevronRight v-else :size="14" />
+        <ChevronRight
+          :size="14"
+          class="chevron-icon"
+          :class="{ 'chevron-icon--open': isExpanded }"
+          aria-hidden="true"
+        />
       </button>
-      <span class="sidebar-folder-label">
-        <FolderOpen v-if="isExpanded" :size="14" class="daisy-shrink-0 daisy-opacity-70" />
-        <Folder v-else :size="14" class="daisy-shrink-0 daisy-opacity-70" />
-        {{ folder.name }}
-      </span>
+      <span class="sidebar-folder-label">{{ folder.name }}</span>
       <span v-if="structuralChildCount != null" class="child-count">{{
         structuralChildCount
       }}</span>
@@ -52,7 +52,7 @@ import type {
   NoteTopology,
   FolderTrailSegment,
 } from "@generated/doughnut-backend-api"
-import { ChevronDown, ChevronRight, Folder, FolderOpen } from "lucide-vue-next"
+import { ChevronRight } from "lucide-vue-next"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { computed, inject, ref, watch } from "vue"
@@ -191,6 +191,7 @@ function toggleExpand() {
 .chevron-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   padding: 0.125rem;
   border: none;
@@ -202,6 +203,17 @@ function toggleExpand() {
 
   &:hover {
     opacity: 1;
+  }
+}
+
+.chevron-icon {
+  flex-shrink: 0;
+  transform: rotate(0deg);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+
+  &--open {
+    transform: rotate(90deg);
   }
 }
 
