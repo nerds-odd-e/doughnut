@@ -1,9 +1,11 @@
 package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.dto.ApiError;
+import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -28,6 +30,41 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
       final @NotNull HttpStatusCode status,
       final @NotNull WebRequest request) {
     return super.handleExceptionInternal(ex, body, headers, status, request);
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ApiError> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    if (!isDuplicateNoteTitleInNotebookFolder(ex)) {
+      throw ex;
+    }
+    return duplicateNoteTitleConflictResponse();
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ApiError> handleHibernateConstraintViolation(
+      ConstraintViolationException ex) {
+    if (!isDuplicateNoteTitleInNotebookFolder(ex)) {
+      throw ex;
+    }
+    return duplicateNoteTitleConflictResponse();
+  }
+
+  private static ResponseEntity<ApiError> duplicateNoteTitleConflictResponse() {
+    String message =
+        "A note with this title already exists in this notebook (folder or top level).";
+    ApiError apiError = new ApiError(message, ApiError.ErrorType.RESOURCE_CONFLICT);
+    apiError.add("newTitle", message);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+  }
+
+  private static boolean isDuplicateNoteTitleInNotebookFolder(Throwable ex) {
+    for (Throwable t = ex; t != null; t = t.getCause()) {
+      String msg = t.getMessage();
+      if (msg != null && msg.contains("uk_note_notebook_folder_title")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @ExceptionHandler({BindException.class})
