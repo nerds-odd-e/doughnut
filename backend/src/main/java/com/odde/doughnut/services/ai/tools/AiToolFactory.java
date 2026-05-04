@@ -33,7 +33,7 @@ public class AiToolFactory {
 
         You will receive hidden context in a fenced Markdown block starting with "# Doughnut Focus Context". This context is visible only to you—the user who answers the question will never see it.
 
-        Use the focus note's title and details as the question subject. Retrieved notes provide supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content.
+        Use the focus note's title and details as the question subject. Retrieved notes may include indirect neighbors (notes reached through wiki links on other retrieved notes); treat those only as supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content, especially not on facts that appear only in an indirect neighbor.
 
         Never use pronouns or phrases that reference the hidden context: do not write "this note", "the focus note", "above", "the following note", or any phrasing that implies the user can see what you see. The question stem and choices must be self-contained.
         """;
@@ -46,7 +46,7 @@ public class AiToolFactory {
         - Vary the length of answer choices so the correct answer is not consistently the longest.
         - Use Markdown for both the question stem and the answer choices.
         - Ensure the correct choice index is accurate; the correct choice must be exclusive and plausible.
-        - Distractors should be logical but clearly incorrect without being obvious. Retrieved notes are good distractor seeds—use them, but keep only one correct answer.
+        - Distractors should be logical but clearly incorrect without being obvious. Retrieved notes (including indirect ones) are good distractor seeds—use them, but keep only one correct answer.
         - `strictChoiceOrder` must be `false` for standard MCQs (no meta-choices such as "All of the above").
         """;
   }
@@ -56,13 +56,13 @@ public class AiToolFactory {
 
     String messageBody =
         """
-        You are an AI assistant evaluating a memory recall question for a user’s personal knowledge management (PKM) system. The user has provided a hierarchical knowledge graph centered around a focus note along with a multiple-choice question that is meant to test their recollection of that focus note. However, the user does not know which note is the focus note when answering.
+        You are an AI assistant evaluating a memory recall question for a user’s personal knowledge management (PKM) system. The user has hidden Markdown context around a focus note (wiki-linked notes and inbound references, possibly beyond one link away) along with a multiple-choice question meant to test recollection of that focus note. The user does not know which note is the focus note when answering.
 
         Your task is to analyze the provided question and determine whether it effectively tests the user’s memory of the focus note while adhering to the following evaluation criteria:
             1.	Selecting Correct Answers: Try to select all correct answers from the given choices.
             2.	Feasibility of the Question: Consider whether the question, without revealing the focus note title, is logically understandable and answerable based on what a user should reasonably remember.
-            3.	Logical Consistency: Ensure that the question logically follows from the focus note and its knowledge graph without assuming misleading or incorrect relationships.
-            4.	Relevance to the Focus Note: The question should not just be related to the extended knowledge graph; it should be closely tied to the focus note itself and not merely any related concepts.
+            3.	Logical Consistency: Ensure that the question logically follows from the focus note and its supporting context without assuming misleading or incorrect relationships.
+            4.	Relevance to the Focus Note: The question should not just be related to indirectly linked notes; it should be closely tied to the focus note itself and not merely any related concepts.
             5.	Avoiding Simplicity or Obviousness: The question should not be too trivial or easily guessable without requiring meaningful recall of the focus note.
 
         Output Requirements:
@@ -86,13 +86,13 @@ public class AiToolFactory {
 """
 Please assume the role of a Memory Assistant, which involves helping me recall and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
-      1. Examine the below MCQ which is based on the note in the current contextual path, the MCQ could be incomplete or incorrect.
-      2. Only the top-level of the contextual path is visible to the user.
+      1. Examine the below MCQ, which may be incomplete or incorrect. It was written against hidden Markdown context that includes the focus note and linked or referencing notes.
+      2. The user does not see that hidden context; the stem and choices must stand alone.
       3. Provide 2 to 4 choices with only 1 correct answer.
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
       5. Provide a better question based on my question and the note. Please correct any grammar.
 
-      Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
+      Note: The specific focus note and retrieved neighbors are not shown to the user. Focus on memory reinforcement and recall across various subjects.
 %s
 
 """

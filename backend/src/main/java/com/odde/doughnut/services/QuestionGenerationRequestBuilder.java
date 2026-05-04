@@ -63,7 +63,7 @@ public class QuestionGenerationRequestBuilder {
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    RetrievalConfig config = RetrievalConfig.depth1();
+    RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
     FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
 

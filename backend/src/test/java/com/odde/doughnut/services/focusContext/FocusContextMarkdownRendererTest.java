@@ -93,6 +93,11 @@ class FocusContextMarkdownRendererTest {
 
       assertThat(output, containsString("Max depth: 1"));
     }
+
+    @Test
+    void defaultRetrievalConfigMaxDepthIsTwo() {
+      assertThat(RetrievalConfig.defaultMaxDepth().getMaxDepth(), equalTo(2));
+    }
   }
 
   @Nested
@@ -128,6 +133,30 @@ class FocusContextMarkdownRendererTest {
       String output = renderer.render(result, config);
 
       assertThat(output, not(containsString("## Retrieved Note")));
+    }
+
+    @Test
+    void depthTwoPathUsesArrowBetweenWikiUris() {
+      FocusContextFocusNote focusNote =
+          new FocusContextFocusNote("NB", "Focus", "", "focus body", false);
+      FocusContextResult result = new FocusContextResult(focusNote);
+      result.addRelatedNote(
+          new FocusContextNote(
+              "NB",
+              "Far",
+              "",
+              2,
+              List.of("[[Focus]]", "[[NB: Mid]]", "[[NB: Far]]"),
+              FocusContextEdgeType.OutgoingWikiLink,
+              "far details",
+              true));
+
+      String output = renderer.render(result, RetrievalConfig.defaultMaxDepth());
+
+      assertThat(output, containsString("Max depth: 2"));
+      assertThat(output, containsString("Depth: 2"));
+      assertThat(output, containsString("Path: [[Focus]] -> [[NB: Mid]] -> [[NB: Far]]"));
+      assertThat(output, containsString("Truncated: true"));
     }
   }
 }

@@ -226,4 +226,227 @@ class FocusContextRetrievalServiceTest {
       assertThat(result.getRelatedNotes().size(), lessThan(6));
     }
   }
+
+  @Nested
+  class BreadthFirstDepth2 {
+    @Test
+    void outgoingChainReachesDepthTwoLeaf() {
+      Note focus = makeMe.aNote().title("ChainRoot").details("Start [[MidDepth]].").please();
+      User viewer = focus.getCreator();
+      Note mid =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("MidDepth")
+              .details("Bridge [[LeafDepth2]].")
+              .please();
+      Note leaf =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("LeafDepth2")
+              .details("Only at depth 2")
+              .please();
+      refreshWikiCache(focus);
+      refreshWikiCache(mid);
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
+
+      List<String> titles =
+          result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList();
+      assertThat(titles, hasItems("MidDepth", "LeafDepth2"));
+      FocusContextNote leafNote =
+          result.getRelatedNotes().stream()
+              .filter(n -> "LeafDepth2".equals(n.getTitle()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(leafNote.getDepth(), equalTo(2));
+      assertThat(leafNote.getEdgeType(), equalTo(FocusContextEdgeType.OutgoingWikiLink));
+      assertThat(leafNote.getRetrievalPath(), hasSize(3));
+      assertThat(leafNote.getRetrievalPath().get(0), equalTo("[[ChainRoot]]"));
+      assertThat(leafNote.getRetrievalPath().get(2), containsString("LeafDepth2"));
+    }
+
+    @Test
+    void maxDepthOneSkipsSecondHop() {
+      Note focus = makeMe.aNote().title("ShallowRoot").details("[[MidShallow]].").please();
+      User viewer = focus.getCreator();
+      Note mid =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("MidShallow")
+              .details("[[LeafShallow]].")
+              .please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .underSameNotebookAs(focus)
+          .title("LeafShallow")
+          .details("deep")
+          .please();
+      refreshWikiCache(focus);
+      refreshWikiCache(mid);
+
+      FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.depth1());
+
+      assertThat(
+          result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList(),
+          hasItem("MidShallow"));
+      assertThat(
+          result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList(),
+          not(hasItem("LeafShallow")));
+    }
+
+    @Test
+    void cycleBetweenTwoNotesDoesNotLoop() {
+      Note a = makeMe.aNote().title("CycleA").details("To [[CycleB]].").please();
+      User viewer = a.getCreator();
+      Note b =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(a)
+              .title("CycleB")
+              .details("Back [[CycleA]].")
+              .please();
+      refreshWikiCache(a);
+      refreshWikiCache(b);
+
+      FocusContextResult result = service.retrieve(a, viewer, RetrievalConfig.defaultMaxDepth());
+
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      assertThat(result.getRelatedNotes().get(0).getTitle(), equalTo("CycleB"));
+    }
+
+    @Test
+    void shorterPathWinsWhenSameNoteReachableAtDepthOneAndTwo() {
+      Note focus =
+          makeMe.aNote().title("ShortFocus").details("[[DirectShort]] [[ViaBridge]].").please();
+      User viewer = focus.getCreator();
+      Note direct =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("DirectShort")
+              .details("direct body")
+              .please();
+      Note bridge =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("ViaBridge")
+              .details("See [[DirectShort]].")
+              .please();
+      refreshWikiCache(focus);
+      refreshWikiCache(bridge);
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
+
+      FocusContextNote directNote =
+          result.getRelatedNotes().stream()
+              .filter(n -> "DirectShort".equals(n.getTitle()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(directNote.getDepth(), equalTo(1));
+      assertThat(directNote.getEdgeType(), equalTo(FocusContextEdgeType.OutgoingWikiLink));
+      assertThat(directNote.getRetrievalPath(), hasSize(2));
+    }
+
+    @Test
+    void depthTwoInboundFromExpandedNote() {
+      Note focus = makeMe.aNote().title("InboundRoot").please();
+      User viewer = focus.getCreator();
+      Note hub =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("HubInbound")
+              .details("Link [[InboundRoot]].")
+              .please();
+      Note depth2Referrer =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("RefersToHub")
+              .details("Hub is [[HubInbound]].")
+              .please();
+      refreshWikiCache(hub);
+      refreshWikiCache(depth2Referrer);
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
+
+      FocusContextNote hubNote =
+          result.getRelatedNotes().stream()
+              .filter(n -> "HubInbound".equals(n.getTitle()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(hubNote.getDepth(), equalTo(1));
+      assertThat(hubNote.getEdgeType(), equalTo(FocusContextEdgeType.InboundWikiReference));
+
+      FocusContextNote d2 =
+          result.getRelatedNotes().stream()
+              .filter(n -> "RefersToHub".equals(n.getTitle()))
+              .findFirst()
+              .orElseThrow();
+      assertThat(d2.getDepth(), equalTo(2));
+      assertThat(d2.getEdgeType(), equalTo(FocusContextEdgeType.InboundWikiReference));
+    }
+
+    @Test
+    void budgetExhaustedMidRingLeavesLaterDepthOneNotesAndDepthTwoUnreachable() {
+      String maxChunk = "z".repeat(1900);
+      Note focus =
+          makeMe
+              .aNote()
+              .title("BudgetRoot")
+              .details("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[Spend5]] [[BridgeBudget]]")
+              .please();
+      User viewer = focus.getCreator();
+      for (int i = 1; i <= 5; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .underSameNotebookAs(focus)
+            .title("Spend" + i)
+            .details(maxChunk)
+            .please();
+      }
+      Note bridge =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focus)
+              .title("BridgeBudget")
+              .details("[[LeafAfterBudget]].")
+              .please();
+      makeMe
+          .aNote()
+          .creator(viewer)
+          .underSameNotebookAs(focus)
+          .title("LeafAfterBudget")
+          .details("never reached")
+          .please();
+      refreshWikiCache(focus);
+      refreshWikiCache(bridge);
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
+
+      List<String> titles =
+          result.getRelatedNotes().stream().map(FocusContextNote::getTitle).toList();
+      assertThat(titles, not(hasItem("BridgeBudget")));
+      assertThat(titles, not(hasItem("LeafAfterBudget")));
+    }
+  }
 }

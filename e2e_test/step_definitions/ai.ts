@@ -95,6 +95,17 @@ Given(
 )
 
 Given(
+  'OpenAI generates this question only when prompt shows depth-two wiki path to Far:',
+  (questionTable: DataTable) => {
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMCQWhenPromptContainsDepthTwoFarNote(
+        parseSingleRowQuestion(questionTable)
+      )
+  }
+)
+
+Given(
   'OpenAI generates this as first question:',
   (questionTable: DataTable) => {
     start
