@@ -338,11 +338,11 @@ describe("WikidataAssociationForNoteDialog", () => {
       appendLabel.click()
       await flushPromises()
 
-      // Verify title is appended with / separator
+      // Verify title is appended with fullwidth alternative separator
       expect(updateNoteTitleSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
-          newTitle: "Canine / Dog",
+          newTitle: "Canine ／ Dog",
         },
       })
       // Verify wikidata ID is saved

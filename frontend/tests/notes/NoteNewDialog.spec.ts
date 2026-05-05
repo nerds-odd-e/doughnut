@@ -382,7 +382,7 @@ describe("adding new note", () => {
       ${"dog"}    | ${"dog"}      | ${"Q1"}    | ${undefined} | ${"dog"}
       ${"dog"}    | ${"Dog"}      | ${"Q1"}    | ${undefined} | ${"Dog"}
       ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"replace"} | ${"Canine"}
-      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog / Canine"}
+      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog ／ Canine"}
     `(
       "search $searchTitle get $wikidataTitle with action $titleAction results in $expectedTitle",
       async ({

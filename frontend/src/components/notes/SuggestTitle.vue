@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import RadioButtons from "../form/RadioButtons.vue"
+import { NOTE_TITLE_ALTERNATIVE_FORM_JOINER } from "@/utils/noteTitleAlternativeFormJoiner"
 
 const props = defineProps<{
   originalTitle: string
@@ -34,7 +35,7 @@ const updateModelValue = () => {
   }
 
   if (replaceOrAppendTitle.value === "Append") {
-    const newTitle = `${props.originalTitle} / ${props.suggestedTitle}`
+    const newTitle = `${props.originalTitle}${NOTE_TITLE_ALTERNATIVE_FORM_JOINER}${props.suggestedTitle}`
     emit("suggestedTitleSelected", newTitle)
   }
 }

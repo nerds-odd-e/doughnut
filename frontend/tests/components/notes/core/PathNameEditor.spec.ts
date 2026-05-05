@@ -39,7 +39,7 @@ describe("PathNameEditor.vue", () => {
     const warn = wrapper.find(".daisy-text-warning")
     expect(warn.exists()).toBe(true)
     expect(warn.text()).toContain(
-      "'/' is not a legal name, and it has been replaced with the fullwidth '／'"
+      "'/' was replaced with fullwidth '／' (the only separator between alternative title spellings)"
     )
     wrapper.unmount()
   })

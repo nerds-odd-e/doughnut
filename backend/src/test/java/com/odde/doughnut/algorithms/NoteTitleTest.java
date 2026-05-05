@@ -9,9 +9,16 @@ class NoteTitleTest {
 
   @Test
   void with_multiple_options() {
-    NoteTitle noteTitle = new NoteTitle("cat / kitten");
+    NoteTitle noteTitle = new NoteTitle("cat／kitten");
     assertThat(noteTitle.getTitles(), hasSize(2));
     assertThat(noteTitle.getSubtitles(), hasSize(0));
+  }
+
+  @Test
+  void ascii_slash_does_not_separate_alternatives() {
+    NoteTitle noteTitle = new NoteTitle("cat / kitten");
+    assertThat(noteTitle.getTitles(), hasSize(1));
+    assertThat(noteTitle.getTitles().get(0).stem(), equalTo("cat / kitten"));
   }
 
   @Test
@@ -23,7 +30,7 @@ class NoteTitleTest {
 
   @Test
   void replacing() {
-    NoteTitle noteTitle = new NoteTitle("~logy / ~logical");
+    NoteTitle noteTitle = new NoteTitle("~logy／~logical");
     TitleFragment titleFragment = noteTitle.getTitles().get(0);
     assertThat(titleFragment.replaceLiteralWords("technological", ".."), equalTo("techno.."));
   }
@@ -33,17 +40,17 @@ class NoteTitleTest {
     // Test that various Unicode whitespace characters are normalized to regular spaces
     // U+00A0: non-breaking space, U+3000: CJK ideographic space,
     // U+2000-U+2003: en/em spaces
-    NoteTitle noteTitle = new NoteTitle("nebulas /\u00A0nebula");
+    NoteTitle noteTitle = new NoteTitle("nebulas ／\u00A0nebula");
     assertThat(noteTitle.getTitles(), hasSize(2));
     assertThat(noteTitle.getTitles().get(0).stem(), equalTo("nebulas"));
     assertThat(noteTitle.getTitles().get(1).stem(), equalTo("nebula"));
 
-    noteTitle = new NoteTitle("cat\u3000/\u3000kitten");
+    noteTitle = new NoteTitle("cat\u3000／\u3000kitten");
     assertThat(noteTitle.getTitles(), hasSize(2));
     assertThat(noteTitle.getTitles().get(0).stem(), equalTo("kitten"));
     assertThat(noteTitle.getTitles().get(1).stem(), equalTo("cat"));
 
-    noteTitle = new NoteTitle("word1\u2000/\u2001word2\u2002/\u2003word3");
+    noteTitle = new NoteTitle("word1\u2000／\u2001word2\u2002／\u2003word3");
     assertThat(noteTitle.getTitles(), hasSize(3));
     assertThat(noteTitle.getTitles().get(0).stem(), equalTo("word3"));
     assertThat(noteTitle.getTitles().get(1).stem(), equalTo("word2"));

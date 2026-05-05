@@ -41,7 +41,9 @@ public class NoteTitle {
   }
 
   private Stream<TitleFragment> getFragments(String subString) {
-    return Arrays.stream(subString != null ? subString.split("(?<!/)[/／](?!/)") : new String[] {})
+    // Only U+FF0F (fullwidth solidus) separates alternatives; double ／／ is one literal ／.
+    return Arrays.stream(
+            subString != null ? subString.split("(?<![／])[／](?![／])") : new String[] {})
         .map(TitleFragment::from);
   }
 

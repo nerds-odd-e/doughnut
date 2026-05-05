@@ -72,7 +72,10 @@ function processIllegalPathChars(raw: string): {
     if (full !== undefined) {
       value += full
       if (!replacementNote) {
-        replacementNote = `'${c}' is not a legal name, and it has been replaced with the fullwidth '${full}'`
+        replacementNote =
+          c === "/"
+            ? "'/' was replaced with fullwidth '／' (the only separator between alternative title spellings)"
+            : `'${c}' is not a legal name, and it has been replaced with the fullwidth '${full}'`
       }
     } else {
       value += c

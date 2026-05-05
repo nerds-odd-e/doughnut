@@ -237,7 +237,7 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void returnsCorrectWhenAlternativeSpellingMatches() throws UnexpectedNoAccessRightException {
       Note note =
-          makeMe.aNote().title("colour / color").creatorAndOwner(currentUser.getUser()).please();
+          makeMe.aNote().title("colour／color").creatorAndOwner(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();
       dto.setSpellingAnswer("colour");
 

@@ -33,7 +33,7 @@ Feature: Assimilate With Remembering Spelling
     Examples:
       | note_title     | spelling_input | expected_result         |
       | sedition       | sedition       | "success"               |
-      | colour / color | colour         | "success"               |
+      | colour／color | colour         | "success"               |
       | sedition       | wrong answer   | "error: wrong spelling" |
 
   Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
