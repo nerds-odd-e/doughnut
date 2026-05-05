@@ -1103,6 +1103,38 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FolderTrailSegment"
+  /api/notebooks/{notebook}/folders/{folder}/move:
+    post:
+      tags:
+      - notebook-controller
+      summary: Move a folder
+      description: Reparents the folder within the same notebook. Notes keep their
+        folderId pointing at the same folder rows; descendant folders stay under the
+        moved subtree.
+      operationId: moveFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderMoveRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FolderTrailSegment"
   /api/notebooks/{notebook}/create-note:
     post:
       tags:
@@ -3955,6 +3987,16 @@ components:
             \ Must belong to the target notebook."
       required:
       - name
+    FolderMoveRequest:
+      type: object
+      description: Move a folder to a new parent in the same notebook. Omit newParentFolderId
+        or set it to null to place the folder at notebook root.
+      properties:
+        newParentFolderId:
+          type: integer
+          format: int32
+          description: "Target parent folder id. When null or omitted, the folder\
+            \ is moved to notebook root."
     NoteCreationDTO:
       type: object
       properties:

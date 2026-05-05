@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
+import com.odde.doughnut.controllers.dto.FolderMoveRequest;
 import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -579,6 +580,72 @@ class NotebookControllerTest extends ControllerTestBase {
       req.setUnderFolderId(folderInB.getId());
       ResponseStatusException ex =
           assertThrows(ResponseStatusException.class, () -> controller.createFolder(nbA, req));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+  }
+
+  @Nested
+  class MoveFolder {
+    @Test
+    void movesChildFolderToNotebookRoot() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      Folder child = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Child").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(null);
+      FolderTrailSegment result = controller.moveFolder(nb, child, req);
+      assertThat(result.name(), equalTo("Child"));
+
+      FolderListing root = controller.listNotebookRootNotes(nb);
+      assertTrue(root.folders().stream().anyMatch(f -> f.id() == child.getId()));
+      FolderListing underParent = controller.listFolderListing(nb, parent);
+      assertTrue(underParent.folders().stream().noneMatch(f -> f.id() == child.getId()));
+    }
+
+    @Test
+    void rejectsMoveIntoDescendant() {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+      Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(inner.getId());
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.moveFolder(nb, outer, req));
+      assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+    }
+
+    @Test
+    void rejectsDuplicateNameAtDestination() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aFolder().notebook(nb).name("Dup").please();
+      Folder holder = makeMe.aFolder().notebook(nb).name("Holder").please();
+      Folder nestedDup = makeMe.aFolder().notebook(nb).parentFolder(holder).name("Dup").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(null);
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.moveFolder(nb, nestedDup, req));
+      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+    }
+
+    @Test
+    void folderNotInNotebookReturns404() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderInB = makeMe.aFolder().notebook(nbB).name("Only B").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(null);
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.moveFolder(nbA, folderInB, req));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
   }

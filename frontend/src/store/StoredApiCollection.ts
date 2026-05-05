@@ -1,6 +1,7 @@
 import type {
   FolderCreationRequest,
   FolderListing,
+  FolderMoveRequest,
   FolderTrailSegment,
   NoteDetailsCompletion,
   NoteRealm,
@@ -57,6 +58,12 @@ export interface StoredApi {
   createFolder(
     notebookId: number,
     body: FolderCreationRequest
+  ): Promise<FolderTrailSegment>
+
+  moveFolder(
+    notebookId: number,
+    folderId: number,
+    newParentFolderId: number | null
   ): Promise<FolderTrailSegment>
 
   createRootNoteAtNotebook(
@@ -264,6 +271,26 @@ export default class StoredApiCollection implements StoredApi {
     )
     if (error || !data) {
       throw new Error(toErrorMessage(error, "Failed to create folder"))
+    }
+    refreshSidebarStructuralListings()
+    return data
+  }
+
+  async moveFolder(
+    notebookId: number,
+    folderId: number,
+    newParentFolderId: number | null
+  ): Promise<FolderTrailSegment> {
+    const body: FolderMoveRequest =
+      newParentFolderId == null ? {} : { newParentFolderId }
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.moveFolder({
+        path: { notebook: notebookId, folder: folderId },
+        body,
+      })
+    )
+    if (error || !data) {
+      throw new Error(toErrorMessage(error, "Failed to move folder"))
     }
     refreshSidebarStructuralListings()
     return data

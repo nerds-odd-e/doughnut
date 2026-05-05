@@ -404,6 +404,16 @@ export type FolderCreationRequest = {
     underNoteId?: number;
 };
 
+/**
+ * Move a folder to a new parent in the same notebook. Omit newParentFolderId or set it to null to place the folder at notebook root.
+ */
+export type FolderMoveRequest = {
+    /**
+     * Target parent folder id. When null or omitted, the folder is moved to notebook root.
+     */
+    newParentFolderId?: number;
+};
+
 export type NoteCreationDto = {
     newTitle: string;
     wikidataId?: string;
@@ -1955,6 +1965,25 @@ export type CreateFolderResponses = {
 };
 
 export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];
+
+export type MoveFolderData = {
+    body?: FolderMoveRequest;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}/move';
+};
+
+export type MoveFolderResponses = {
+    /**
+     * OK
+     */
+    200: FolderTrailSegment;
+};
+
+export type MoveFolderResponse = MoveFolderResponses[keyof MoveFolderResponses];
 
 export type CreateNoteAtNotebookRootData = {
     body: NoteCreationDto;

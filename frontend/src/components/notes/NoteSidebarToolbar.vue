@@ -21,17 +21,27 @@
       >
         <FolderPlus class="w-5 h-5" />
       </FolderNewButton>
+      <FolderOrganizeButton
+        v-if="userActiveFolder != null"
+        :notebook-id="notebookId"
+        :moving-folder-id="userActiveFolder.id"
+        :moving-folder-name="userActiveFolder.name"
+      >
+        <FolderInput class="w-5 h-5" />
+      </FolderOrganizeButton>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import { FolderPlus, NotebookPen } from "lucide-vue-next"
+import { FolderInput, FolderPlus, NotebookPen } from "lucide-vue-next"
 import { computed } from "vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
+import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
+import type { SidebarUserActiveFolder } from "./useNoteSidebarTree"
 
 const props = defineProps<{
   notebookId: number
@@ -40,6 +50,7 @@ const props = defineProps<{
   /** Parent folder for new note / new folder (active sidebar folder, else active note's folder). */
   resolvedCreateParentFolderId: number | null
   createParentLocationDescription: string
+  userActiveFolder: SidebarUserActiveFolder | null
 }>()
 
 const folderUnderFolderId = computed(() =>

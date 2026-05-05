@@ -342,6 +342,15 @@ Then(
   }
 )
 
+Then(
+  'I should not see sidebar folder {string} under folder {string}',
+  (childFolderLabel: string, parentFolderLabel: string) => {
+    start
+      .noteSidebar()
+      .expectSidebarFolderNotUnderParent(parentFolderLabel, childFolderLabel)
+  }
+)
+
 When(
   'I delete note {string} at {int}:00',
   (noteTopology: string, hour: number) => {

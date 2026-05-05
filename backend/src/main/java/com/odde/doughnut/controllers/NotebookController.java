@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
+import com.odde.doughnut.controllers.dto.FolderMoveRequest;
 import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -20,6 +21,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.FolderConstructionService;
+import com.odde.doughnut.services.FolderRelocationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCatalogService;
@@ -61,6 +63,7 @@ class NotebookController {
   private final NoteConstructionService noteConstructionService;
   private final WikidataService wikidataService;
   private final FolderConstructionService folderConstructionService;
+  private final FolderRelocationService folderRelocationService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -77,7 +80,8 @@ class NotebookController {
       NoteService noteService,
       NoteConstructionService noteConstructionService,
       WikidataService wikidataService,
-      FolderConstructionService folderConstructionService) {
+      FolderConstructionService folderConstructionService,
+      FolderRelocationService folderRelocationService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -93,6 +97,7 @@ class NotebookController {
     this.noteConstructionService = noteConstructionService;
     this.wikidataService = wikidataService;
     this.folderConstructionService = folderConstructionService;
+    this.folderRelocationService = folderRelocationService;
   }
 
   @GetMapping("")
@@ -152,6 +157,22 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     return folderConstructionService.createFolder(notebook, request);
+  }
+
+  @Operation(
+      summary = "Move a folder",
+      description =
+          "Reparents the folder within the same notebook. Notes keep their folderId pointing at"
+              + " the same folder rows; descendant folders stay under the moved subtree.")
+  @PostMapping("/{notebook}/folders/{folder}/move")
+  @Transactional
+  public FolderTrailSegment moveFolder(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder,
+      @Valid @RequestBody(required = false) FolderMoveRequest request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    return folderRelocationService.moveFolder(notebook, folder, request);
   }
 
   @PostMapping(value = "/{notebook}")
