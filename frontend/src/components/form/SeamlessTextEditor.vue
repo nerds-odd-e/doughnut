@@ -29,6 +29,38 @@ const props = defineProps({
 const emits = defineEmits(["update:modelValue", "blur"])
 const editor = ref<HTMLElement | null>(null)
 
+function getCaretOffsetsInSingleTextChild(el: HTMLElement): {
+  start: number
+  end: number
+} | null {
+  const sel = window.getSelection()
+  if (!sel?.rangeCount) return null
+  const range = sel.getRangeAt(0)
+  const tn = el.firstChild
+  if (!tn || tn.nodeType !== Node.TEXT_NODE) return null
+  if (range.startContainer !== tn || range.endContainer !== tn) return null
+  return { start: range.startOffset, end: range.endOffset }
+}
+
+function applyCaretOffsetsInSingleTextChild(
+  el: HTMLElement,
+  start: number,
+  end: number
+) {
+  const tn = el.firstChild as Text | null
+  if (!tn || tn.nodeType !== Node.TEXT_NODE) return
+  const len = tn.length
+  const a = Math.min(Math.max(0, start), len)
+  const b = Math.min(Math.max(0, end), len)
+  const sel = window.getSelection()
+  if (!sel) return
+  const range = document.createRange()
+  range.setStart(tn, a)
+  range.setEnd(tn, b)
+  sel.removeAllRanges()
+  sel.addRange(range)
+}
+
 const onInput = (event: Event) => {
   const target = event.target as HTMLElement
   // Strip any HTML that might have been pasted
@@ -141,15 +173,25 @@ const updateContent = (newValue: string) => {
     editor.value.replaceChildren()
     return
   }
-  if (editor.value.innerText !== newValue) {
-    editor.value.innerText = newValue
-    // Maintain single text node to prevent cursor jumping in Safari/Chrome mobile
-    if (editor.value.firstChild) {
-      ;(editor.value.firstChild as Text).data = newValue
-    } else {
-      const textNode = document.createTextNode(newValue)
-      editor.value.appendChild(textNode)
-    }
+  if (editor.value.innerText === newValue) return
+
+  const prevLen = editor.value.innerText.length
+  const offsets =
+    prevLen === newValue.length
+      ? getCaretOffsetsInSingleTextChild(editor.value)
+      : null
+
+  editor.value.innerText = newValue
+  // Maintain single text node to prevent cursor jumping in Safari/Chrome mobile
+  if (editor.value.firstChild) {
+    ;(editor.value.firstChild as Text).data = newValue
+  } else {
+    const textNode = document.createTextNode(newValue)
+    editor.value.appendChild(textNode)
+  }
+
+  if (offsets) {
+    applyCaretOffsetsInSingleTextChild(editor.value, offsets.start, offsets.end)
   }
 }
 

@@ -12,7 +12,7 @@
             :aria-label="hideLabel ? undefined : labelText"
             :role="editorRole"
             :data-test="editorDataTest"
-            @update:model-value="emit('update:modelValue', $event)"
+            @update:model-value="onModelUpdate"
             @blur="emit('blur')"
           />
         </h2>
@@ -32,7 +32,7 @@
         :aria-label="hideLabel ? undefined : labelText"
         :role="editorRole"
         :data-test="editorDataTest"
-        @update:model-value="emit('update:modelValue', $event)"
+        @update:model-value="onModelUpdate"
         @blur="emit('blur')"
       />
     </h2>
@@ -40,12 +40,53 @@
     <div v-if="errorMessage" class="daisy-text-error daisy-text-sm">
       {{ errorMessage }}
     </div>
+    <div v-else-if="displayWarning" class="daisy-text-warning daisy-text-sm">
+      {{ displayWarning }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from "vue"
+import { computed, nextTick, onMounted, ref } from "vue"
 import SeamlessTextEditor from "../../form/SeamlessTextEditor.vue"
+
+const FULLWIDTH_REPLACE: Record<string, string> = {
+  "\\": "＼",
+  "/": "／",
+  ":": "：",
+}
+
+const LINK_BREAK_CHARS = "#^[]|"
+
+const LINK_NAME_WARNING =
+  "Links will not work with names containing any of `#^[]|`"
+
+function processIllegalPathChars(raw: string): {
+  value: string
+  replacementNote: string
+} {
+  let replacementNote = ""
+  let value = ""
+  for (const c of raw) {
+    const full = FULLWIDTH_REPLACE[c]
+    if (full !== undefined) {
+      value += full
+      if (!replacementNote) {
+        replacementNote = `'${c}' is not a legal name, and it has been replaced with the fullwidth '${full}'`
+      }
+    } else {
+      value += c
+    }
+  }
+  return { value, replacementNote }
+}
+
+function hasLinkBreakChars(s: string): boolean {
+  for (const c of s) {
+    if (LINK_BREAK_CHARS.includes(c)) return true
+  }
+  return false
+}
 
 const props = withDefaults(
   defineProps<{
@@ -82,6 +123,26 @@ const emit = defineEmits<{
 }>()
 
 const root = ref<HTMLElement | null>(null)
+const replacementWarning = ref("")
+const linkWarning = ref("")
+
+const displayWarning = computed(() => {
+  const parts = [replacementWarning.value, linkWarning.value].filter(Boolean)
+  return parts.join(" ")
+})
+
+function onModelUpdate(raw: string) {
+  if (props.readonly) {
+    replacementWarning.value = ""
+    linkWarning.value = ""
+    emit("update:modelValue", raw)
+    return
+  }
+  const { value, replacementNote } = processIllegalPathChars(raw)
+  replacementWarning.value = replacementNote
+  linkWarning.value = hasLinkBreakChars(value) ? LINK_NAME_WARNING : ""
+  emit("update:modelValue", value)
+}
 
 function focusEditorAndMaybeSelectAll() {
   const el = root.value?.querySelector<HTMLElement>(".seamless-editor")

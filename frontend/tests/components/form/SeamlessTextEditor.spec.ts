@@ -29,6 +29,30 @@ describe("SeamlessTextEditor", () => {
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
   })
 
+  it("keeps caret offset when modelValue is synced with same-length text", async () => {
+    await mountEditor("x:y")
+    const editor = wrapper.find(".seamless-editor").element as HTMLElement
+    editor.focus()
+    await nextTick()
+    const textNode = editor.firstChild as Text
+    const selection = window.getSelection()
+    const range = document.createRange()
+    range.setStart(textNode, 1)
+    range.setEnd(textNode, 1)
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+
+    await wrapper.setProps({ modelValue: "x：y" })
+    await flushPromises()
+    await nextTick()
+
+    const sel = window.getSelection()
+    expect(sel?.rangeCount).toBe(1)
+    const r = sel?.getRangeAt(0)
+    expect(r?.startOffset).toBe(1)
+    expect(r?.startContainer).toBe(editor.firstChild)
+  })
+
   it("extracts plain text when pasting HTML content", async () => {
     await mountEditor("")
     await flushPromises()
