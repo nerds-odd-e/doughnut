@@ -210,6 +210,10 @@ onMounted(async () => {
           emits("deadLinkClick", anchor.textContent?.trim() ?? "")
           return
         }
+        if (/^https?:\/\//i.test(href) || href.startsWith("//")) {
+          window.open(href, "_blank", "noopener,noreferrer")
+          return
+        }
         router.push(href)
       },
       true

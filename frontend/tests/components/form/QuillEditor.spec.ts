@@ -141,4 +141,49 @@ describe("QuillEditor.vue", () => {
       await nextTick() // Wait for async processing
     }
   })
+
+  it("opens http(s) links in a new window and in-app links via the router", async () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null)
+    const pushSpy = vi.spyOn(router, "push").mockResolvedValue(undefined)
+
+    const html =
+      '<p><a href="https://example.com/path">ext</a> <a href="/d/n/1" class="doughnut-link">wiki</a></p>'
+    wrapper = mount(QuillEditor, {
+      props: { modelValue: html, readonly: true },
+      attachTo: document.body,
+      global: { plugins: [router] },
+    })
+    await nextTick()
+    await vi.waitUntil(() => document.querySelector(".ql-editor a"))
+
+    const ext = document.querySelector(
+      ".ql-editor a[href='https://example.com/path']"
+    ) as HTMLAnchorElement
+    ext.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
+    await nextTick()
+    expect(openSpy).toHaveBeenCalledWith(
+      "https://example.com/path",
+      "_blank",
+      "noopener,noreferrer"
+    )
+    expect(pushSpy).not.toHaveBeenCalled()
+
+    openSpy.mockClear()
+    pushSpy.mockClear()
+
+    const wiki = document.querySelector(
+      ".ql-editor a.doughnut-link"
+    ) as HTMLAnchorElement
+    wiki.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
+    await nextTick()
+    expect(openSpy).not.toHaveBeenCalled()
+    expect(pushSpy).toHaveBeenCalledWith("/d/n/1")
+
+    openSpy.mockRestore()
+    pushSpy.mockRestore()
+  })
 })
