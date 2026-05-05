@@ -13,7 +13,7 @@
     }"
     @focusout="onFolderRowFocusOut"
   >
-    <div class="folder-row" @click="toggleExpand">
+    <div class="folder-row" @click="setUserActiveFolderOnly">
       <button
         class="chevron-btn"
         aria-label="expand children"
@@ -27,7 +27,11 @@
           aria-hidden="true"
         />
       </button>
-      <span class="sidebar-folder-label">{{ folder.name }}</span>
+      <div class="folder-label-area">
+        <span class="sidebar-folder-label" @click.stop="toggleExpand">{{
+          folder.name
+        }}</span>
+      </div>
       <span v-if="structuralChildCount != null" class="child-count">{{
         structuralChildCount
       }}</span>
@@ -160,16 +164,18 @@ function onFolderRowFocusOut(event: FocusEvent) {
   userActiveFolder.value = null
 }
 
+function setUserActiveFolderOnly() {
+  if (folderId.value == null) return
+  userActiveFolder.value = {
+    id: folderId.value,
+    name: props.folder.name,
+  }
+}
+
 function toggleExpand() {
-  if (userActiveFolder != null && folderId.value != null) {
-    userActiveFolder.value = {
-      id: folderId.value,
-      name: props.folder.name,
-    }
-  }
-  if (folderId.value != null) {
-    toggleFolderId(folderId.value)
-  }
+  if (folderId.value == null) return
+  setUserActiveFolderOnly()
+  toggleFolderId(folderId.value)
 }
 </script>
 
@@ -221,13 +227,19 @@ function toggleExpand() {
   }
 }
 
-.sidebar-folder-label {
+.folder-label-area {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  flex: 1;
+}
+
+.sidebar-folder-label {
   font-size: 0.875rem;
   font-weight: 500;
+  cursor: pointer;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .child-count {

@@ -260,6 +260,22 @@ describe("Sidebar", () => {
       expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
     })
 
+    it("activates folder but does not toggle expand when only the folder label track padding is clicked", async () => {
+      mountSidebar(firstGeneration)
+      await vi.waitUntil(() =>
+        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      )
+      const folderRow = findRootFolderRowByTopTitle()
+      expect(folderRow?.exists()).toBe(true)
+      const expandedBefore = folderRow!.attributes("aria-expanded")
+      const track = folderRow!.find(".folder-label-area")
+      expect(track.exists()).toBe(true)
+      await track.trigger("click")
+      await flushPromises()
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+      expect(folderRow!.attributes("aria-expanded")).toBe(expandedBefore)
+    })
+
     it("clears user active folder styling when a note row is clicked", async () => {
       mountSidebar(firstGeneration)
       await vi.waitUntil(() =>
