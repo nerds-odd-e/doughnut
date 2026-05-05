@@ -5,8 +5,18 @@
       :class="{ 'modal-wrapper--align-top': alignTop }"
       @mousedown.self="$emit('close_request')"
     >
-        <div :class="sidebarStyle" class="daisy-bg-base-200">
-          <button class="close-button" @click="$emit('close_request')">
+        <div
+          :class="[
+            sidebarStyle,
+            'daisy-bg-base-200',
+            { 'modal-panel--no-close': !showCloseButton },
+          ]"
+        >
+          <button
+            v-if="showCloseButton"
+            class="close-button"
+            @click="$emit('close_request')"
+          >
             <X class="w-6 h-6" />
           </button>
 
@@ -34,8 +44,12 @@ interface Props {
   sidebar?: "left" | "right"
   isPopup?: boolean
   alignTop?: boolean
+  /** When false, the overlay X is omitted (e.g. in-dialog close control). */
+  showCloseButton?: boolean
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showCloseButton: true,
+})
 
 // Emits
 const emit = defineEmits<{
@@ -129,6 +143,15 @@ onUnmounted(() => {
 
 .modal-body {
   margin: 20px 0;
+}
+
+.modal-container.modal-panel--no-close {
+  padding-top: 12px;
+}
+
+.modal-panel--no-close .modal-body {
+  margin-top: 8px;
+  margin-bottom: 20px;
 }
 
 .close-button {

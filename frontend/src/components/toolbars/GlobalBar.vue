@@ -5,13 +5,19 @@
     </div>
     <div class="daisy-join daisy-join-horizontal daisy-flex-none">
       <slot name="right" />
-      <PopButton v-if="user" title="search note" align-modal-top>
+      <PopButton
+        v-if="user"
+        title="search note"
+        align-modal-top
+        :show-close-button="false"
+      >
         <template #button_face>
           <Search class="w-5 h-5" />
         </template>
         <template #default="{ closer }">
           <AddLinkDialog
             v-bind="{ storageAccessor }"
+            :modal-closer="closer"
             @close-dialog="closer"
           />
         </template>

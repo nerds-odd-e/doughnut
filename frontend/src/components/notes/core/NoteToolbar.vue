@@ -1,13 +1,19 @@
 <template>
   <nav :class="noteChromeToolbarNavClass">
     <div class="daisy-btn-group daisy-btn-group-sm">
-      <PopButton v-if="!readonly" title="Link" align-modal-top>
+      <PopButton
+        v-if="!readonly"
+        title="Link"
+        align-modal-top
+        :show-close-button="false"
+      >
         <template #button_face>
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
           <AddLinkDialog
             v-bind="{ note }"
+            :modal-closer="closer"
             @close-dialog="closer"
           />
         </template>

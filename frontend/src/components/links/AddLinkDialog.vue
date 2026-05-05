@@ -2,7 +2,7 @@
   <h3 v-if="targetNoteTopology">Complete relationship</h3>
   <SearchForNoteAndFolder
     v-if="!selectedSearchResult && !targetNoteTopology"
-    v-bind="{ noteId: note?.id, notebookId: notebookId }"
+    v-bind="{ noteId: note?.id, notebookId: notebookId, modalCloser }"
     @selected="selectedSearchResult = $event"
     @moveUnderFolder="moveUnderFolder($event)"
   />
@@ -44,8 +44,9 @@ const wikiPropertyOptionAvailable = computed(() =>
   canInsertWikiLinkAsProperty()
 )
 
-const { note } = defineProps<{
+const { note, modalCloser } = defineProps<{
   note?: Note
+  modalCloser?: () => void
 }>()
 
 const emit = defineEmits<{

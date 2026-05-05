@@ -16,6 +16,7 @@
     v-if="show"
     :sidebar="sidebar"
     :align-top="alignModalTop"
+    :show-close-button="showCloseButton"
     @close_request="closeDialog"
   >
     <template #body>
@@ -38,6 +39,10 @@ defineProps({
   btnClass: String,
   ariaLabel: String,
   alignModalTop: Boolean,
+  showCloseButton: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const show = ref(false)

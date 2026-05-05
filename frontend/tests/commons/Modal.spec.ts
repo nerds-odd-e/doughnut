@@ -85,6 +85,28 @@ describe("Modal", () => {
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 
+  it("omits close button when showCloseButton is false", async () => {
+    const NoClose = {
+      template: `
+        <Modal :show-close-button="false" @close_request="$emit('close_request')">
+          <template #body>x</template>
+        </Modal>
+      `,
+      components: { Modal: Comp },
+      emits: ["close_request"],
+    }
+    wrapper = mount(NoClose, {
+      global: { plugins: [router] },
+      attachTo: document.body,
+    })
+    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
+      timeout: 1000,
+    })
+    expect(document.querySelector(".close-button")).toBeNull()
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+    expect(wrapper.emitted("close_request")).toHaveLength(1)
+  })
+
   it("closes when ESC is pressed", async () => {
     wrapper = mountModal()
     await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {

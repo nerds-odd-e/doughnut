@@ -37,6 +37,16 @@
       >
         <Users class="w-5 h-5" />
       </button>
+      <button
+        v-if="modalCloser"
+        type="button"
+        title="Close"
+        aria-label="Close"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square"
+        @click="modalCloser()"
+      >
+        <X class="w-5 h-5" />
+      </button>
     </div>
     <SearchResults
       v-bind="{ noteId, inputSearchKey, notebookId }"
@@ -68,7 +78,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { BookOpen, Users } from "lucide-vue-next"
+import { BookOpen, Users, X } from "lucide-vue-next"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
@@ -76,6 +86,8 @@ import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 defineProps<{
   noteId?: number
   notebookId?: number
+  /** When set, shows a square close control after the search scope toggles. */
+  modalCloser?: () => void
 }>()
 
 const emit = defineEmits<{
