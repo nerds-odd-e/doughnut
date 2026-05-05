@@ -1,48 +1,9 @@
-import { marked, type Tokens } from "marked"
 import markdownizer from "@/components/form/markdownizer"
 import usePopups from "@/components/commons/Popups/usePopups"
-
-function countLinksAndImages(markdown: string) {
-  const tokens = marked.lexer(markdown)
-  let linkCount = 0
-  let imageCount = 0
-
-  marked.walkTokens(tokens, (token) => {
-    if (token.type === "link") linkCount++
-    else if (token.type === "image") imageCount++
-  })
-
-  return { linkCount, imageCount }
-}
-
-function removeLinksAndImages(
-  markdown: string,
-  removeLinks: boolean,
-  removeImages: boolean
-): string {
-  const tokens = marked.lexer(markdown)
-
-  marked.walkTokens(tokens, (token) => {
-    if (token.type === "link" && removeLinks) {
-      const linkToken = token as Tokens.Link
-      Object.assign(token, {
-        type: "text",
-        raw: linkToken.text || "",
-        text: linkToken.text || "",
-      } as Tokens.Text)
-    } else if (token.type === "image" && removeImages) {
-      const imageToken = token as Tokens.Image
-      Object.assign(token, {
-        type: "text",
-        raw: imageToken.text || "",
-        text: imageToken.text || "",
-      } as Tokens.Text)
-    }
-  })
-
-  const html = marked.parser(tokens)
-  return markdownizer.htmlToMarkdown(html).trim()
-}
+import {
+  countMarkdownLinksAndImagesInNoteDetails,
+  stripMarkdownLinksAndImagesInNoteDetails,
+} from "@/utils/stripPastedMarkdownLinks"
 
 export function usePasteWithLinkImageOptions() {
   const { popups } = usePopups()
@@ -53,7 +14,8 @@ export function usePasteWithLinkImageOptions() {
   const processContentAfterPaste = async (
     content: string
   ): Promise<string | null> => {
-    const { linkCount, imageCount } = countLinksAndImages(content)
+    const { linkCount, imageCount } =
+      countMarkdownLinksAndImagesInNoteDetails(content)
 
     if (linkCount === 0 && imageCount === 0) {
       return null
@@ -83,13 +45,13 @@ export function usePasteWithLinkImageOptions() {
     const result = await popups.options(message, options)
 
     if (result === "links") {
-      return removeLinksAndImages(content, true, false)
+      return stripMarkdownLinksAndImagesInNoteDetails(content, true, false)
     }
     if (result === "images") {
-      return removeLinksAndImages(content, false, true)
+      return stripMarkdownLinksAndImagesInNoteDetails(content, false, true)
     }
     if (result === "both") {
-      return removeLinksAndImages(content, true, true)
+      return stripMarkdownLinksAndImagesInNoteDetails(content, true, true)
     }
 
     return null

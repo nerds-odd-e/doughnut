@@ -22,7 +22,7 @@ function splitLeadingFrontmatter(
   details: string
 ):
   | { kind: "none" }
-  | { kind: "parsed"; yamlRaw: string; body: string }
+  | { kind: "parsed"; yamlRaw: string; body: string; verbatimPrefix: string }
   | { kind: "invalid"; message: string } {
   const text = stripBom(details)
   const lines = text.split(/\r?\n/)
@@ -35,7 +35,8 @@ function splitLeadingFrontmatter(
     if (lines[i] === "---") {
       const yamlRaw = lines.slice(1, i).join("\n")
       const body = lines.slice(i + 1).join("\n")
-      return { kind: "parsed", yamlRaw, body }
+      const verbatimPrefix = `---\n${yamlRaw}\n---\n`
+      return { kind: "parsed", yamlRaw, body, verbatimPrefix }
     }
   }
 
@@ -44,6 +45,15 @@ function splitLeadingFrontmatter(
     message:
       "Opening --- was found without a closing --- line for YAML frontmatter.",
   }
+}
+
+/** Leading `---` … `---` block including fences, or null when absent or malformed. */
+export function verbatimFrontmatterPrefixAndBody(
+  details: string
+): { prefix: string; body: string } | null {
+  const split = splitLeadingFrontmatter(details)
+  if (split.kind !== "parsed") return null
+  return { prefix: split.verbatimPrefix, body: split.body }
 }
 
 function yamlScalarToPropertyString(value: unknown): string | null {
