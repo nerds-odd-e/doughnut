@@ -19,6 +19,7 @@
       </span>
     </div>
     <QuillEditor
+      ref="quillRef"
       v-bind="{ multipleLine, scopeName, field, title, errors }"
       :model-value="htmlValue"
       :readonly="effectiveReadonly"
@@ -42,6 +43,8 @@ import {
   parseNoteDetailsMarkdown,
   type PropertyRow,
 } from "@/utils/noteDetailsFrontmatter"
+
+const quillRef = ref<InstanceType<typeof QuillEditor> | null>(null)
 
 const props = defineProps({
   multipleLine: Boolean,
@@ -151,5 +154,11 @@ function insertMarkdownAtEnd(text: string) {
   emits("update:modelValue", current + text)
 }
 
-defineExpose({ insertMarkdownAtEnd })
+function insertTextAtCursor(text: string) {
+  if (!quillRef.value?.insertTextAtCursor(text)) {
+    insertMarkdownAtEnd(text)
+  }
+}
+
+defineExpose({ insertMarkdownAtEnd, insertTextAtCursor })
 </script>

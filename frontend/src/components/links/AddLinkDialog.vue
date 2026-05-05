@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { ref, computed, nextTick } from "vue"
 import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
@@ -53,13 +53,16 @@ const noteRealm = computed(() =>
 )
 const notebookId = computed(() => noteRealm.value?.notebookId)
 
-function onInsertWikiLink() {
+async function onInsertWikiLink() {
   if (!selectedSearchResult.value) return
   const linkText = buildWikiLinkText(selectedSearchResult.value, {
     notebookId: notebookId.value,
   })
-  insert(linkText)
+  // Close the dialog first so the editor is back in a normal DOM state
+  // before Quill's insertText / setSelection are called.
   emit("closeDialog")
+  await nextTick()
+  insert(linkText)
 }
 
 async function moveUnderFolder(targetFolderId: number) {

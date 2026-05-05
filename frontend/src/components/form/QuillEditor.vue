@@ -91,6 +91,7 @@ const localValue = ref(modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 const isPasting = ref(false)
+const lastRange = ref<{ index: number; length: number } | null>(null)
 
 const onBlurTextField = () => {
   emits("blur")
@@ -228,6 +229,8 @@ onMounted(async () => {
     quill.value.on("selection-change", (range) => {
       if (!range) {
         onBlurTextField()
+      } else {
+        lastRange.value = { index: range.index, length: range.length }
       }
     })
 
@@ -252,6 +255,26 @@ watch(
 const onUpdateContent = () => {
   emits("update:modelValue", localValue.value ?? "")
 }
+
+function insertTextAtCursor(text: string) {
+  if (!quill.value) return
+  if (lastRange.value === null) {
+    // Editor had no cursor (e.g. note was in readonly/view mode).
+    // Fall through to the caller's insertMarkdownAtEnd path.
+    return false
+  }
+  const index = lastRange.value.index
+  // Tell the caller that we handled it
+  quill.value.insertText(index, text, Quill.sources.USER)
+  try {
+    quill.value.setSelection(index + text.length, 0, Quill.sources.SILENT)
+  } catch {
+    // ignore if editor DOM is not ready
+  }
+  return true
+}
+
+defineExpose({ insertTextAtCursor })
 </script>
 
 <style lang="sass">

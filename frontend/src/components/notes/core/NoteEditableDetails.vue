@@ -97,7 +97,15 @@ onMounted(() => {
         })
       }
     } else {
-      richEditorRef.value?.insertMarkdownAtEnd(text)
+      // Queue a microtask so we fire after the current synchronous call stack
+      // but before macrotasks (requestAnimationFrame / setTimeout). This gives
+      // Vue time to flush dialog-teardown DOM updates while still keeping the
+      // component state intact for the insertion.
+      // insertTextAtCursor uses the last known Quill cursor when available
+      // (note was in edit mode); otherwise falls back to insertMarkdownAtEnd.
+      queueMicrotask(() => {
+        richEditorRef.value?.insertTextAtCursor(text)
+      })
     }
   })
 })
