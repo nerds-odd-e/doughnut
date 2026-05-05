@@ -469,6 +469,17 @@ describe("replaceWikiLinksInHtml", () => {
     ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
   })
 
+  it("replaces every occurrence when the same wikilink appears multiple times", () => {
+    const html = "<p>[[MyNote]] then [[MyNote]]</p>"
+    const out = replaceWikiLinksInHtml(html, [
+      { linkText: "MyNote", noteId: 42 },
+    ])
+    expect(out).not.toContain("dead-link")
+    expect(out).toBe(
+      '<p><a href="/d/n/42" class="doughnut-link">MyNote</a> then <a href="/d/n/42" class="doughnut-link">MyNote</a></p>'
+    )
+  })
+
   it("marks unknown wikilinks as dead links", () => {
     expect(replaceWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toContain(
       'class="dead-link"'

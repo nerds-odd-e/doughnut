@@ -30,7 +30,7 @@ export function replaceWikiLinksInHtml(
 ): string {
   let result = html
   wikiTitles.forEach(({ linkText, noteId }) => {
-    result = result.replace(
+    result = result.replaceAll(
       `[[${linkText}]]`,
       `<a href="${noteShowHref(noteId)}" class="doughnut-link">${linkText}</a>`
     )
