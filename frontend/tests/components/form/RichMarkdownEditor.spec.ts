@@ -6,6 +6,16 @@ import helper from "@tests/helpers"
 describe("RichMarkdownEditor", () => {
   let wrapper: VueWrapper
 
+  async function setWikiPropertyValueField(
+    field: ReturnType<VueWrapper["find"]>,
+    text: string
+  ) {
+    const el = field.element as HTMLElement
+    el.textContent = text
+    await field.trigger("input")
+    await flushPromises()
+  }
+
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
@@ -209,7 +219,7 @@ Body`,
     const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
     const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue("status")
-    await valInput.setValue("draft")
+    await setWikiPropertyValueField(valInput, "draft")
     await valInput.trigger("blur")
     await flushPromises()
 
@@ -284,6 +294,25 @@ topic: training
     expect(last).toContain("Edited Heading")
   })
 
+  it("emits deadLinkClick when a dead wiki link in a property value is clicked", async () => {
+    const details = `---
+topic: "[[Missing Note]]"
+---
+
+Body`
+    await mountEditor(details)
+    await flushPromises()
+
+    const valField = wrapper.find(
+      '[data-testid="rich-note-property-row-value-input"]'
+    )
+    const dead = valField.find("a.dead-link")
+    expect(dead.exists()).toBe(true)
+    await dead.trigger("click")
+    await flushPromises()
+    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Missing Note"])
+  })
+
   it("editing an existing property row emits renamed keys and updated values", async () => {
     const details = `---
 topic: training
@@ -302,7 +331,7 @@ Workshop body.`
     await keyInput.setValue("domain")
     await keyInput.trigger("blur")
     await flushPromises()
-    await valInput.setValue("wiki")
+    await setWikiPropertyValueField(valInput, "wiki")
     await valInput.trigger("blur")
     await flushPromises()
 

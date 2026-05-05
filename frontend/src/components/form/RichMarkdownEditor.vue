@@ -4,7 +4,9 @@
       ref="frontmatterPropertiesRef"
       :details-markdown="modelValue ?? ''"
       :read-only="readonly"
+      :wiki-titles="wikiTitles"
       @properties-changed="onPropertiesChanged"
+      @dead-link-click="$emit('deadLinkClick', $event)"
     />
     <div
       v-if="frontmatterParseErrorMessage !== null"

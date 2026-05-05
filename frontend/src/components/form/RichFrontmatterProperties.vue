@@ -54,16 +54,16 @@
           :inverse-icon="true"
           @update:model-value="onRelationTypeSelected(idx, $event)"
         />
-        <input
+        <WikiPropertyValueField
           v-else
           v-model="propertyRows[idx]!.value"
-          type="text"
-          class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+          :wiki-titles="wikiTitles"
           :aria-label="`Existing note property value (row ${idx + 1})`"
           data-testid="rich-note-property-row-value-input"
           @focus="onRowFocus(idx)"
           @blur="commitRow(idx)"
-        >
+          @dead-link-click="emits('deadLinkClick', $event)"
+        />
         <button
           type="button"
           class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-shrink-0"
@@ -107,16 +107,15 @@
         </label>
         <label class="daisy-form-control daisy-w-full sm:daisy-flex-1 daisy-min-w-[8rem]">
           <span class="daisy-label daisy-text-xs">Property value</span>
-          <input
+          <WikiPropertyValueField
             ref="valueInputRef"
             v-model="draftValue"
-            type="text"
-            class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+            :wiki-titles="wikiTitles"
             aria-label="Property value"
             data-testid="rich-note-property-value"
-            @keydown.enter.prevent="tryCommitInsert"
             @blur="tryCommitInsert"
-          >
+            @dead-link-click="emits('deadLinkClick', $event)"
+          />
         </label>
       </div>
     </div>
@@ -125,7 +124,9 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from "vue"
+import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
+import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   relationKebabFromLabel,
   relationLabelFromKebab,
@@ -144,10 +145,12 @@ const props = defineProps<{
   detailsMarkdown: string
   /** When true, properties list is display-only and insert chrome is hidden. */
   readOnly?: boolean
+  wikiTitles: WikiTitle[]
 }>()
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
+  deadLinkClick: [title: string]
 }>()
 
 const headingId = useId()
@@ -161,7 +164,9 @@ const propertyRows = ref<PropertyRow[]>([])
 const insertOpen = ref(false)
 const draftKey = ref("")
 const draftValue = ref("")
-const valueInputRef = ref<HTMLInputElement | null>(null)
+const valueInputRef = ref<InstanceType<typeof WikiPropertyValueField> | null>(
+  null
+)
 
 const validationMessage = ref("")
 const rowSnapshots = ref<Record<number, PropertyRow>>({})

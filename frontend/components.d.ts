@@ -237,6 +237,7 @@ declare module 'vue' {
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataAssociationForNoteDialog: typeof import('./src/components/notes/WikidataAssociationForNoteDialog.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
+    WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
   }
 }
 
@@ -467,4 +468,5 @@ declare global {
   const WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
   const WikidataAssociationForNoteDialog: typeof import('./src/components/notes/WikidataAssociationForNoteDialog.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
+  const WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
 }
