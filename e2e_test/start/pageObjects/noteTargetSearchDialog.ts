@@ -23,8 +23,23 @@ function expectExactRelationshipTargetsWithRetry(targets: string[]) {
   tryMatch(0)
 }
 
+function ensureAllMyNotebooksAndSubscriptionsScopeOn() {
+  cy.findByRole('button', { name: 'All My Notebooks And Subscriptions' }).then(
+    ($btn) => {
+      if ($btn.is(':disabled')) {
+        return
+      }
+      if (!$btn.hasClass('daisy-text-primary')) {
+        cy.wrap($btn).click()
+      }
+    }
+  )
+}
+
 function searchNote(searchKey: string, options: string[]) {
-  options?.forEach((option: string) => form.getField(option).check())
+  if (options?.includes('All My Notebooks And Subscriptions')) {
+    ensureAllMyNotebooksAndSubscriptionsScopeOn()
+  }
   cy.findByPlaceholderText('Search').clear().type(searchKey)
   cy.tick(1000)
 }
