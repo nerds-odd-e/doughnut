@@ -1,6 +1,15 @@
 import { describe, it, expect, beforeEach } from "vitest"
+import { h } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
+import type { RouteRecordRaw } from "vue-router"
 import routes from "@/routes/routes"
+
+/** Absorbs otherwise-unmatched URLs so legacy-path tests do not trigger Vue Router warnings. */
+const testCatchAll: RouteRecordRaw = {
+  path: "/:pathMatch(.*)*",
+  name: "testCatchAll",
+  component: { render: () => h("div") },
+}
 
 describe("routes", () => {
   let router: ReturnType<typeof createRouter>
@@ -8,7 +17,7 @@ describe("routes", () => {
   beforeEach(() => {
     router = createRouter({
       history: createWebHistory(),
-      routes,
+      routes: [...routes, testCatchAll],
     })
   })
 
