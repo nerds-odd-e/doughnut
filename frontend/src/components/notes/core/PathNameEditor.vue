@@ -1,37 +1,37 @@
 <template>
-  <div ref="root" class="daisy-form-control note-title-editor">
-    <div v-if="$slots.append" class="daisy-join daisy-w-full note-title-editor-join">
+  <div ref="root" class="daisy-form-control path-name-editor">
+    <div v-if="$slots.append" class="daisy-join daisy-w-full path-name-editor-join">
       <div
-        class="note-title-editor-join-editor daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-l-lg"
+        class="path-name-editor-join-editor daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-l-lg"
       >
-        <h2 class="note-title note-title--inline">
+        <h2 class="path-name-heading path-name-heading--inline">
           <SeamlessTextEditor
             :model-value="modelValue"
             :readonly="readonly"
             :placeholder="placeholder"
             :aria-label="hideLabel ? undefined : labelText"
-            role="title"
-            data-test="note-title"
+            :role="editorRole"
+            :data-test="editorDataTest"
             @update:model-value="emit('update:modelValue', $event)"
             @blur="emit('blur')"
           />
         </h2>
       </div>
       <div
-        class="note-title-editor-join-append daisy-join-item daisy-flex daisy-shrink-0 daisy-self-stretch daisy-items-stretch"
+        class="path-name-editor-join-append daisy-join-item daisy-flex daisy-shrink-0 daisy-self-stretch daisy-items-stretch"
       >
         <slot name="append" />
       </div>
     </div>
 
-    <h2 v-else class="note-title">
+    <h2 v-else class="path-name-heading">
       <SeamlessTextEditor
         :model-value="modelValue"
         :readonly="readonly"
         :placeholder="placeholder"
         :aria-label="hideLabel ? undefined : labelText"
-        role="title"
-        data-test="note-title"
+        :role="editorRole"
+        :data-test="editorDataTest"
         @update:model-value="emit('update:modelValue', $event)"
         @blur="emit('blur')"
       />
@@ -60,6 +60,10 @@ const props = withDefaults(
     placeholder?: string
     /** Select all text once after mount (e.g. default "Untitled" in new-note dialog). */
     initialSelectAll?: boolean
+    /** Passed to the inner editor (e.g. `title` on the note page, `textbox` in dialogs). */
+    editorRole?: string
+    /** `data-test` on the inner editor (E2E note flows use `note-title`). */
+    editorDataTest?: string
   }>(),
   {
     readonly: false,
@@ -67,6 +71,8 @@ const props = withDefaults(
     hideLabel: false,
     labelText: "Title",
     initialSelectAll: false,
+    editorRole: "title",
+    editorDataTest: "note-title",
   }
 )
 
@@ -97,18 +103,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
-h2.note-title {
+h2.path-name-heading {
   font-size: 1.5rem;
   font-weight: 400;
   margin-bottom: 10px;
 }
 
-h2.note-title--inline {
+h2.path-name-heading--inline {
   margin-bottom: 0;
   width: 100%;
 }
 
-.note-title-editor-join-append :deep(button) {
+.path-name-editor-join-append :deep(button) {
   height: 100%;
   min-height: 2.75rem;
 }

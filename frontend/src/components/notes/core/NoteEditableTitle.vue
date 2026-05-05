@@ -4,7 +4,7 @@
     field="edit title"
   >
     <template #default="{ value, update, blur, errors }">
-      <NoteTitleEditor
+      <PathNameEditor
         :model-value="value || ''"
         :error-message="errors.title"
         :readonly="readonly"
@@ -20,7 +20,7 @@
 import type { PropType } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import TextContentWrapper from "./TextContentWrapper.vue"
-import NoteTitleEditor from "./NoteTitleEditor.vue"
+import PathNameEditor from "./PathNameEditor.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },

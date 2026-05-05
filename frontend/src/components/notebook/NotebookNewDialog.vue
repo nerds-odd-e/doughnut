@@ -1,9 +1,10 @@
 <template>
   <form @submit.prevent.once="processForm">
-    <NoteTitleEditor
+    <PathNameEditor
       v-model="noteFormData.newTitle"
       :error-message="errors.newTitle"
       autofocus
+      editor-role="textbox"
       placeholder="Notebook name"
     />
     <TextArea
@@ -19,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import NoteTitleEditor from "@/components/notes/core/NoteTitleEditor.vue"
+import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import type { Circle, NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
@@ -33,7 +34,7 @@ import type { PropType } from "vue"
 export default {
   props: { circle: { type: Object as PropType<Circle> } },
   components: {
-    NoteTitleEditor,
+    PathNameEditor,
     TextArea,
   },
   data() {

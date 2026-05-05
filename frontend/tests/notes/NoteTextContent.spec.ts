@@ -248,7 +248,7 @@ describe("in place edit on title", () => {
     })
 
     it("should display error when saving failed", async () => {
-      expect(wrapper.find(".note-title-editor .daisy-text-error").text()).toBe(
+      expect(wrapper.find(".path-name-editor .daisy-text-error").text()).toBe(
         "size must be between 1 and 100"
       )
     })
@@ -257,7 +257,7 @@ describe("in place edit on title", () => {
       await editTitleThenBlur(wrapper)
       await flushPromises()
       expect(
-        wrapper.findAll(".note-title-editor .daisy-text-error")
+        wrapper.findAll(".path-name-editor .daisy-text-error")
       ).toHaveLength(0)
       expect(mockedUpdateTitleCall).toBeCalledTimes(2)
     })
@@ -309,7 +309,7 @@ describe("in place edit on title", () => {
       )
       await editTitleThenBlur(wrapper)
       await flushPromises()
-      expect(wrapper.find(".note-title-editor .daisy-text-error").text()).toBe(
+      expect(wrapper.find(".path-name-editor .daisy-text-error").text()).toBe(
         "You are not authorized to edit this note. Perhaps you are not logged in?"
       )
     })

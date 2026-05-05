@@ -10,22 +10,15 @@
           >
             {{ parentLocationDescription }}
           </p>
-          <div class="daisy-form-control">
-            <label class="daisy-label" for="sidebar-new-folder-name">
-              <span class="daisy-label-text">Folder name</span>
-            </label>
-            <input
-              id="sidebar-new-folder-name"
-              v-model="name"
-              v-focus
-              type="text"
-              class="daisy-input daisy-input-bordered daisy-w-full"
-              autocomplete="off"
-            />
-            <p v-if="nameError" class="daisy-label">
-              <span class="daisy-label-text-alt text-error">{{ nameError }}</span>
-            </p>
-          </div>
+          <PathNameEditor
+            v-model="name"
+            :error-message="nameError"
+            autofocus
+            label-text="Folder name"
+            editor-role="textbox"
+            placeholder="Folder name"
+            editor-data-test="folder-name"
+          />
           <input
             type="submit"
             value="Submit"
@@ -39,6 +32,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
+import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
 

@@ -11,7 +11,7 @@
             {{ parentLocationDescription }}
           </p>
           <div class="title-search-container">
-            <NoteTitleEditor
+            <PathNameEditor
               v-model="creationData.newTitle"
               :error-message="noteFormErrors.newTitle"
               autofocus
@@ -26,7 +26,7 @@
                   @selected="onSelectWikidataEntry"
                 />
               </template>
-            </NoteTitleEditor>
+            </PathNameEditor>
             <SearchResults
               v-if="titleSearchScopeNote"
               v-bind="{
@@ -57,7 +57,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"
-import NoteTitleEditor from "./core/NoteTitleEditor.vue"
+import PathNameEditor from "./core/PathNameEditor.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
