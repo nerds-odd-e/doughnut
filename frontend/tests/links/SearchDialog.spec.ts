@@ -24,7 +24,9 @@ describe("AddRelationshipDialog", () => {
       .render()
     await screen.findByPlaceholderText("Search")
     expect(
-      await screen.findByLabelText("All My Notebooks And Subscriptions")
+      await screen.findByRole("button", {
+        name: "All My Notebooks And Subscriptions",
+      })
     ).toBeDisabled()
   })
 
@@ -35,15 +37,21 @@ describe("AddRelationshipDialog", () => {
       .withCleanStorage()
       .withProps({ note })
       .render()
-    ;(await screen.findByLabelText("All My Circles")).click()
+    ;(await screen.findByRole("button", { name: "All My Circles" })).click()
     expect(
-      await screen.findByLabelText("All My Notebooks And Subscriptions")
-    ).toBeChecked()
+      await screen.findByRole("button", {
+        name: "All My Notebooks And Subscriptions",
+      })
+    ).toHaveClass("daisy-text-primary")
     flushPromises()
     ;(
-      await screen.findByLabelText("All My Notebooks And Subscriptions")
+      await screen.findByRole("button", {
+        name: "All My Notebooks And Subscriptions",
+      })
     ).click()
-    expect(await screen.findByLabelText("All My Circles")).not.toBeChecked()
+    expect(
+      await screen.findByRole("button", { name: "All My Circles" })
+    ).not.toHaveClass("daisy-text-primary")
   })
 
   describe("Move Under folder hit", () => {

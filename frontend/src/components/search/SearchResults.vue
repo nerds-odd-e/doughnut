@@ -1,19 +1,5 @@
 <template>
   <div :class="{ 'dropdown-style': isDropdown }">
-    <div v-if="!isDropdown">
-      <CheckInput
-        scope-name="searchTerm"
-        field="allMyNotebooksAndSubscriptions"
-        v-model="searchTerm.allMyNotebooksAndSubscriptions"
-        :disabled="!noteId"
-      />
-      <CheckInput
-        scope-name="searchTerm"
-        field="allMyCircles"
-        v-model="searchTerm.allMyCircles"
-      />
-    </div>
-
     <div
       v-if="model.isSearchInProgress"
       class="searching-indicator"
@@ -128,15 +114,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
-import {
-  ref,
-  computed,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  shallowRef,
-} from "vue"
-import CheckInput from "../form/CheckInput.vue"
+import { ref, computed, watch, onBeforeUnmount, shallowRef } from "vue"
 import SearchResultList from "./SearchResultList.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
@@ -149,6 +127,12 @@ const props = defineProps({
   notebookId: { type: Number, default: undefined },
 })
 
+const allMyNotebooksAndSubscriptions = defineModel<boolean>(
+  "allMyNotebooksAndSubscriptions",
+  { default: true }
+)
+const allMyCircles = defineModel<boolean>("allMyCircles", { default: false })
+
 defineSlots<{
   button: (props: { noteTopology: NoteTopology }) => void
   folderButton: (props: {
@@ -158,15 +142,9 @@ defineSlots<{
   }) => void
 }>()
 
-const searchTerm = ref<SearchTerm>({
-  searchKey: "",
-  allMyNotebooksAndSubscriptions: false,
-  allMyCircles: false,
-})
-
 const oldSearchTerm = ref<SearchTerm>({
   searchKey: "",
-  allMyNotebooksAndSubscriptions: false,
+  allMyNotebooksAndSubscriptions: true,
   allMyCircles: false,
 })
 
@@ -175,9 +153,9 @@ const model = new SearchResultsModel()
 /** Bumps when a new debounced search starts so late responses from an older run are ignored. */
 const searchGeneration = shallowRef(0)
 
-const trimmedSearchKey = computed(() => searchTerm.value.searchKey.trim())
+const trimmedSearchKey = computed(() => props.inputSearchKey.trim())
 const isGlobalSearch = computed(
-  () => searchTerm.value.allMyNotebooksAndSubscriptions === true
+  () => allMyNotebooksAndSubscriptions.value === true
 )
 
 const searchResult = computed(() =>
@@ -238,7 +216,11 @@ const search = () => {
 
   timeoutId.value = debounced(async () => {
     const gen = ++searchGeneration.value
-    const term = searchTerm.value
+    const term: SearchTerm = {
+      searchKey: props.inputSearchKey,
+      allMyNotebooksAndSubscriptions: allMyNotebooksAndSubscriptions.value,
+      allMyCircles: allMyCircles.value,
+    }
     const snapshotTrimmed = term.searchKey.trim()
     const snapshotGlobal = term.allMyNotebooksAndSubscriptions === true
     const snapshotNotebookId = props.notebookId
@@ -290,18 +272,23 @@ const search = () => {
 }
 
 watch(
-  () => searchTerm.value,
+  () =>
+    [
+      props.inputSearchKey,
+      allMyNotebooksAndSubscriptions.value,
+      allMyCircles.value,
+    ] as const,
   () => {
     if (
-      searchTerm.value.allMyCircles &&
+      allMyCircles.value &&
       !oldSearchTerm.value.allMyNotebooksAndSubscriptions
     ) {
-      searchTerm.value.allMyNotebooksAndSubscriptions = true
+      allMyNotebooksAndSubscriptions.value = true
     } else if (
-      !searchTerm.value.allMyNotebooksAndSubscriptions &&
+      !allMyNotebooksAndSubscriptions.value &&
       oldSearchTerm.value.allMyCircles
     ) {
-      searchTerm.value.allMyCircles = false
+      allMyCircles.value = false
     }
 
     if (trimmedSearchKey.value !== "") {
@@ -309,15 +296,18 @@ watch(
     } else if (isGlobalSearch.value || props.noteId) {
       fetchRecentNotes()
     }
-    oldSearchTerm.value = { ...searchTerm.value }
+    oldSearchTerm.value = {
+      searchKey: props.inputSearchKey,
+      allMyNotebooksAndSubscriptions: allMyNotebooksAndSubscriptions.value,
+      allMyCircles: allMyCircles.value,
+    }
   },
-  { deep: true }
+  { immediate: true }
 )
 
 watch(
   () => props.inputSearchKey,
   () => {
-    searchTerm.value.searchKey = props.inputSearchKey
     if (props.inputSearchKey.trim() === "") {
       model.clearPreviousResult()
       if (
@@ -331,13 +321,6 @@ watch(
     }
   }
 )
-
-onMounted(() => {
-  searchTerm.value.allMyNotebooksAndSubscriptions = true
-  searchTerm.value.searchKey = props.inputSearchKey
-  // Note: fetchRecentNotes() is called by the watch on searchTerm.value
-  // when the search key is empty and noteId is set, so we don't need to call it here
-})
 
 onBeforeUnmount(() => {
   if (timeoutId.value) {

@@ -126,19 +126,6 @@ describe("SearchResults.vue", () => {
     })
   })
 
-  describe("checkboxes", () => {
-    it("shows checkboxes in non-dropdown mode", async () => {
-      const wrapper = mountSearchResults({
-        inputSearchKey: "",
-        isDropdown: false,
-      })
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("All My Notebooks And Subscriptions")
-      expect(wrapper.text()).toContain("All My Circles")
-    })
-  })
-
   describe("search caching", () => {
     it("triggers second API call when context changes (noteId added)", async () => {
       vi.useFakeTimers()
