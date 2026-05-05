@@ -15,6 +15,7 @@
               v-model="creationData.newTitle"
               :error-message="noteFormErrors.newTitle"
               autofocus
+              initial-select-all
               @update:model-value="onTitleChange"
             >
               <template #append>

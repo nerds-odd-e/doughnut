@@ -4,6 +4,7 @@
       v-model="noteFormData.newTitle"
       :error-message="errors.newTitle"
       autofocus
+      placeholder="Notebook name"
     />
     <TextArea
       scope-name="notebook"

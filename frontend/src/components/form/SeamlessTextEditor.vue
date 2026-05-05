@@ -5,6 +5,7 @@
     :role="role"
     :aria-labelledby="ariaLabelledby"
     :aria-label="ariaLabel"
+    :data-placeholder="placeholder || undefined"
     :contenteditable="!readonly"
     @input="onInput"
     @blur="onBlur"
@@ -22,6 +23,7 @@ const props = defineProps({
   role: { type: String, required: false },
   ariaLabelledby: { type: String, required: false },
   ariaLabel: { type: String, required: false },
+  placeholder: { type: String, required: false },
 })
 
 const emits = defineEmits(["update:modelValue", "blur"])
@@ -134,7 +136,12 @@ const onPaste = (event: ClipboardEvent) => {
 }
 
 const updateContent = (newValue: string) => {
-  if (editor.value && editor.value.innerText !== newValue) {
+  if (!editor.value) return
+  if (newValue === "") {
+    editor.value.replaceChildren()
+    return
+  }
+  if (editor.value.innerText !== newValue) {
     editor.value.innerText = newValue
     // Maintain single text node to prevent cursor jumping in Safari/Chrome mobile
     if (editor.value.firstChild) {
@@ -181,7 +188,7 @@ onMounted(() => {
 }
 
 .seamless-editor:empty:before {
-  content: attr(placeholder);
+  content: attr(data-placeholder);
   color: #888;
 }
 </style>
