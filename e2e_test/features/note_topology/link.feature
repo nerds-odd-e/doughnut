@@ -1,6 +1,7 @@
 Feature: Wiki links in notes
   As a learner, I want wiki-style links in my note content so I can open related notes,
-  add a note when a link has no target, and see unresolved links clearly.
+  add a note when a link has no target, and see unresolved links clearly,
+  and insert wiki links via the toolbar.
 
   Background:
     Given I am logged in as an existing user
@@ -54,3 +55,22 @@ Feature: Wiki links in notes
       | Tag               | Content               |
       | a:not(.dead-link) | WikiLinks E2E Missing |
       | a:not(.dead-link) | WikiLinks E2E Tech    |
+
+  @mockBrowserTime
+  Scenario: Insert a wiki link to a note in the same notebook via the toolbar
+    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
+    And I insert a wiki link to "WikiLinks E2E CI" via the link toolbar
+    Then I should see the rich content elements in the note details:
+      | Tag | Content          |
+      | a   | WikiLinks E2E CI |
+    And the link "WikiLinks E2E CI" should link to the note with the same title
+
+  @mockBrowserTime
+  Scenario: Insert a qualified wiki link to a note in another notebook via the toolbar
+    Given I have a notebook "WikiCross Tgt NB" with notes:
+      | Title          | Folder             |
+      | WikiCross Deep | WikiCross Tgt Root |
+    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
+    And I insert a wiki link to "WikiCross Deep" via the link toolbar
+    And I view the note details as markdown
+    Then the note details markdown source should contain "[[WikiCross Tgt NB:WikiCross Deep]]"

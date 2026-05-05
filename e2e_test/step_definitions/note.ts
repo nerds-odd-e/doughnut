@@ -595,6 +595,10 @@ When('I view the note details as rich content', () => {
   start.assumeNotePage().switchToRichDetails()
 })
 
+When('I view the note details as markdown', () => {
+  start.assumeNotePage().toolbarButton('Edit as markdown').click()
+})
+
 Then(
   'I should see the rich content elements in the note details:',
   (data: DataTable) => {

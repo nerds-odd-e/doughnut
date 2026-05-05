@@ -15,9 +15,14 @@
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste="(event) => handleTextareaPaste(event, value, update)"
+        @click="captureTextareaSelection"
+        @keyup="captureTextareaSelection"
+        @mouseup="captureTextareaSelection"
+        @focus="captureTextareaSelection"
       />
       <RichMarkdownEditor
         v-else
+        ref="richEditorRef"
         :multiple-line="true"
         scope-name="note"
         :model-value="value"
@@ -33,12 +38,13 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, type PropType } from "vue"
+import { nextTick, onMounted, onUnmounted, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
+import { useDetailsCursorInserter } from "@/composables/useDetailsCursorInserter"
 
 const emit = defineEmits<{
   deadLinkClick: [title: string]
@@ -53,8 +59,52 @@ const props = defineProps({
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
+const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =
   usePasteWithLinkImageOptions()
+const { registerInserter, unregisterInserter } = useDetailsCursorInserter()
+
+/** Tracks the last known textarea cursor position for markdown editor. */
+const textareaSelection = ref<{ start: number; end: number } | null>(null)
+
+function captureTextareaSelection() {
+  const textarea = textareaRef.value?.$el?.querySelector(
+    "textarea"
+  ) as HTMLTextAreaElement | null
+  if (textarea) {
+    textareaSelection.value = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    }
+  }
+}
+
+onMounted(() => {
+  registerInserter((text: string) => {
+    if (props.asMarkdown) {
+      const textarea = textareaRef.value?.$el?.querySelector(
+        "textarea"
+      ) as HTMLTextAreaElement | null
+      if (textarea) {
+        const start = textareaSelection.value?.start ?? textarea.value.length
+        const end = textareaSelection.value?.end ?? textarea.value.length
+        const current = textarea.value
+        const newValue = current.slice(0, start) + text + current.slice(end)
+        textarea.value = newValue
+        textarea.dispatchEvent(new Event("input", { bubbles: true }))
+        nextTick(() => {
+          textarea.selectionStart = textarea.selectionEnd = start + text.length
+        })
+      }
+    } else {
+      richEditorRef.value?.insertMarkdownAtEnd(text)
+    }
+  })
+})
+
+onUnmounted(() => {
+  unregisterInserter()
+})
 
 const offerToRemoveLinksAndImages = async (
   content: string,

@@ -104,7 +104,16 @@ export const assumeNoteTargetSearchDialog = () => {
         .closest('[role=listitem]')
         .findByRole('button', { name: 'Add link' })
         .click()
+      cy.findByRole('button', { name: 'Add a new relationship note' }).click()
       form.getField('Relation Type').clickOption(relationType)
+      pageIsNotLoading()
+    },
+    insertWikiLinkToTarget(toNoteTopic: string) {
+      cy.contains('.search-result .search-result-item-title', toNoteTopic)
+        .closest('[role=listitem]')
+        .findByRole('button', { name: 'Add link' })
+        .click()
+      cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
       pageIsNotLoading()
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {

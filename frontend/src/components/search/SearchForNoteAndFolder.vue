@@ -51,10 +51,10 @@
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"
     >
-      <template v-if="noteId" #button="{ noteTopology }">
+      <template v-if="noteId" #button="{ noteSearchResult }">
         <button
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
-          @click.prevent="emit('selected', noteTopology)"
+          @click.prevent="emit('selected', noteSearchResult)"
         >
           Add link
         </button>
@@ -79,7 +79,7 @@ import { ref } from "vue"
 import { BookOpen, Users } from "lucide-vue-next"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 
 defineProps<{
   noteId?: number
@@ -87,7 +87,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "selected", noteTopology: NoteTopology): void
+  (e: "selected", noteSearchResult: NoteSearchResult): void
   (e: "moveUnderFolder", folderId: number): void
 }>()
 

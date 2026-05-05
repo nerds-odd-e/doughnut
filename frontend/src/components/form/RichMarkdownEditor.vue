@@ -145,4 +145,11 @@ const onPasteComplete = (html: string) => {
   const markdown = markdownizer.htmlToMarkdown(html)
   emits("pasteComplete", markdown)
 }
+
+function insertMarkdownAtEnd(text: string) {
+  const current = props.modelValue ?? ""
+  emits("update:modelValue", current + text)
+}
+
+defineExpose({ insertMarkdownAtEnd })
 </script>

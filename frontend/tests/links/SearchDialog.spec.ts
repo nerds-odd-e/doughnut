@@ -6,6 +6,16 @@ import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+function makeNoteHit(title: string, notebookId: number) {
+  return {
+    hitKind: "NOTE" as const,
+    noteSearchResult: MakeMe.aNoteSearchResult
+      .title(title)
+      .notebookId(notebookId)
+      .please(),
+  }
+}
+
 describe("AddLinkDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -52,6 +62,68 @@ describe("AddLinkDialog", () => {
     expect(
       await screen.findByRole("button", { name: "All My Circles" })
     ).not.toHaveClass("daisy-text-primary")
+  })
+
+  describe("Add link choice step", () => {
+    it("shows choice buttons when Add link is clicked on a note hit", async () => {
+      const note = MakeMe.aNote.please()
+      mockSdkService("searchForRelationshipTargetWithin", [
+        makeNoteHit("Target Note", note.noteTopology.id + 100),
+      ])
+      helper
+        .component(AddLinkDialog)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "Target")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      const addLinkBtn = await screen.findByRole("button", { name: "Add link" })
+      fireEvent.click(addLinkBtn)
+      await flushPromises()
+
+      expect(
+        await screen.findByRole("button", { name: "Insert as a wiki link" })
+      ).toBeInTheDocument()
+      expect(
+        await screen.findByRole("button", {
+          name: "Add a new relationship note",
+        })
+      ).toBeInTheDocument()
+    })
+
+    it("shows relationship form when Add a new relationship note is clicked", async () => {
+      const note = MakeMe.aNote.please()
+      mockSdkService("searchForRelationshipTargetWithin", [
+        makeNoteHit("Target Note", note.noteTopology.id + 100),
+      ])
+      helper
+        .component(AddLinkDialog)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "Target")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
+      await flushPromises()
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: "Add a new relationship note",
+        })
+      )
+      await flushPromises()
+
+      expect(
+        await screen.findByText("Complete relationship")
+      ).toBeInTheDocument()
+    })
   })
 
   describe("Move Under folder hit", () => {

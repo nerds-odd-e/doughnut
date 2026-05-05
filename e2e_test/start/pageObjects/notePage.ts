@@ -334,6 +334,13 @@ export const assumeNotePage = (
       this.toolbarButton('Link').click()
       return assumeNoteTargetSearchDialog()
     },
+    insertWikiLinkToNote(toNoteTopic: string) {
+      this.toolbarButton('Link').click()
+      assumeNoteTargetSearchDialog()
+        .findTarget(toNoteTopic)
+        .insertWikiLinkToTarget(toNoteTopic)
+      return this
+    },
     ...sidebarChildNotePageMethods(),
     aiGenerateImage() {
       this.moreOptions().generateImageWithDALLE()

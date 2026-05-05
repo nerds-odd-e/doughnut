@@ -27,7 +27,7 @@
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
-          <slot name="button" :note-topology="result.noteTopology" />
+          <slot name="button" :note-search-result="result" />
         </template>
         <template
           #folderButton="{
@@ -81,7 +81,7 @@
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
-          <slot name="button" :note-topology="result.noteTopology" />
+          <slot name="button" :note-search-result="result" />
         </template>
         <template
           #folderButton="{
@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import type {
   SearchTerm,
-  NoteTopology,
+  NoteSearchResult,
   RelationshipLiteralSearchHit,
 } from "@generated/doughnut-backend-api"
 import {
@@ -134,7 +134,7 @@ const allMyNotebooksAndSubscriptions = defineModel<boolean>(
 const allMyCircles = defineModel<boolean>("allMyCircles", { default: false })
 
 defineSlots<{
-  button: (props: { noteTopology: NoteTopology }) => void
+  button: (props: { noteSearchResult: NoteSearchResult }) => void
   folderButton: (props: {
     folderId: number
     folderName?: string
