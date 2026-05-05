@@ -261,8 +261,9 @@ export const assumeNotePage = (
             key
           )
           cy.get('[data-testid="rich-note-property-row-value-input"]').should(
-            'have.value',
-            value
+            ($el) => {
+              expect($el.text().trim()).to.eq(value)
+            }
           )
         })
       })
