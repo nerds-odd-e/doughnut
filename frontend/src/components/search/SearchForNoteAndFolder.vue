@@ -10,41 +10,33 @@
         hide-label
         v-focus
       />
-      <div
-        class="daisy-tooltip daisy-tooltip-bottom"
-        data-tip="All My Notebooks And Subscriptions"
+      <button
+        type="button"
+        title="All My Notebooks And Subscriptions"
+        aria-label="All My Notebooks And Subscriptions"
+        :disabled="!noteId"
+        :class="[
+          'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
+          allMyNotebooksAndSubscriptions
+            ? 'daisy-text-primary'
+            : 'daisy-opacity-30',
+        ]"
+        @click="allMyNotebooksAndSubscriptions = !allMyNotebooksAndSubscriptions"
       >
-        <button
-          type="button"
-          aria-label="All My Notebooks And Subscriptions"
-          :disabled="!noteId"
-          :class="[
-            'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
-            allMyNotebooksAndSubscriptions
-              ? 'daisy-text-primary'
-              : 'daisy-opacity-30',
-          ]"
-          @click="allMyNotebooksAndSubscriptions = !allMyNotebooksAndSubscriptions"
-        >
-          <BookOpen class="w-5 h-5" />
-        </button>
-      </div>
-      <div
-        class="daisy-tooltip daisy-tooltip-bottom"
-        data-tip="All My Circles"
+        <BookOpen class="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        title="All My Circles"
+        aria-label="All My Circles"
+        :class="[
+          'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
+          allMyCircles ? 'daisy-text-primary' : 'daisy-opacity-30',
+        ]"
+        @click="allMyCircles = !allMyCircles"
       >
-        <button
-          type="button"
-          aria-label="All My Circles"
-          :class="[
-            'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
-            allMyCircles ? 'daisy-text-primary' : 'daisy-opacity-30',
-          ]"
-          @click="allMyCircles = !allMyCircles"
-        >
-          <Users class="w-5 h-5" />
-        </button>
-      </div>
+        <Users class="w-5 h-5" />
+      </button>
     </div>
     <SearchResults
       v-bind="{ noteId, inputSearchKey, notebookId }"
