@@ -5,6 +5,7 @@
 - **Phase 5.24 (drop `note.target_note_id` — optional detail):** `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`
 - **Phase 6 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md` (complete)
 - **Phase 7 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`
+- **Phase 8 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-8-sub-phases.md`
 
 ## Purpose
 
@@ -100,6 +101,8 @@ Navigation and creation are folder-based only, not parent-note hierarchy. “Sem
 ---
 
 # Phase 8 — Move a folder
+
+**Execution detail:** `ongoing/doughnut_wiki_migration_plan-phase-8-sub-phases.md` (move + remove-from-same-dialog, sidebar entry when a folder is active).
 
 ## Goal
 
