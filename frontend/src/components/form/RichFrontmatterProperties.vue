@@ -37,6 +37,7 @@
         <input
           v-model="propertyRows[idx]!.key"
           type="text"
+          autocapitalize="off"
           class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
           :aria-label="`Existing note property key (row ${idx + 1})`"
           data-testid="rich-note-property-row-key-input"
@@ -96,6 +97,7 @@
           <input
             v-model="draftKey"
             type="text"
+            autocapitalize="off"
             class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
             aria-label="Property key"
             data-testid="rich-note-property-key"
