@@ -3929,6 +3929,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
+          pattern: "^[^\\\\/:]*$"
     FolderCreationRequest:
       type: object
       description: "Create a folder under notebook root, nested under an explicit\
@@ -3939,6 +3940,7 @@ components:
           description: Display name for the new folder
           maxLength: 512
           minLength: 0
+          pattern: "^[^\\\\/:]*$"
         underFolderId:
           type: integer
           format: int32
@@ -3960,6 +3962,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
+          pattern: "^[^\\\\/:]*$"
         wikidataId:
           type: string
           pattern: ^$|Q\d+
@@ -4497,6 +4500,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
+          pattern: "^[^\\\\/:]*$"
       required:
       - newTitle
     NoteUpdateDetailsDTO:
