@@ -55,7 +55,7 @@ import type {
 import { ChevronRight } from "lucide-vue-next"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
-import { computed, inject, ref, watch } from "vue"
+import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue"
 
 const props = defineProps<{
   folder: FolderTrailSegment
@@ -122,6 +122,20 @@ function setStructuralChildCount(count: number) {
   structuralChildCount.value = count
 }
 
+// Safari doesn't focus buttons on click, so focusout relatedTarget can be null or point to a
+// modal element instead of the toolbar button. Track mousedown to detect toolbar interactions.
+let lastMousedownInToolbar = false
+
+function onDocumentMousedown(e: MouseEvent) {
+  const target = e.target as Element | null
+  lastMousedownInToolbar = !!target?.closest("[data-note-sidebar-toolbar]")
+}
+
+onMounted(() => document.addEventListener("mousedown", onDocumentMousedown))
+onUnmounted(() =>
+  document.removeEventListener("mousedown", onDocumentMousedown)
+)
+
 function onFolderRowFocusOut(event: FocusEvent) {
   if (
     userActiveFolder == null ||
@@ -142,6 +156,7 @@ function onFolderRowFocusOut(event: FocusEvent) {
   ) {
     return
   }
+  if (lastMousedownInToolbar) return
   userActiveFolder.value = null
 }
 

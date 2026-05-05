@@ -277,6 +277,48 @@ describe("Sidebar", () => {
       expect(folderRow!.classes()).not.toContain("sidebar-folder-user-active")
     })
 
+    it("does not clear user active folder when modal opens after toolbar click (Safari behavior)", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
+          notebookId: firstGeneration.notebookId,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      await vi.waitUntil(() =>
+        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      )
+      const folderRow = findRootFolderRowByTopTitle()
+      await folderRow!.find(".sidebar-folder-label").trigger("click")
+      await flushPromises()
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+
+      const toolbarBtn = wrapper.find('button[title="New note"]')
+      expect(toolbarBtn.exists()).toBe(true)
+
+      // Safari: mousedown fires on toolbar button but button doesn't receive focus
+      toolbarBtn.element.dispatchEvent(
+        new MouseEvent("mousedown", { bubbles: true })
+      )
+
+      // Safari: when the modal opens and autofocuses an element (teleported to body),
+      // focusout fires with relatedTarget = the modal element (not in toolbar)
+      const modalInput = document.createElement("input")
+      document.body.appendChild(modalInput)
+      folderRow!.element.focus()
+      const leave = new FocusEvent("focusout", {
+        bubbles: true,
+        relatedTarget: modalInput,
+      })
+      folderRow!.element.dispatchEvent(leave)
+      await flushPromises()
+      document.body.removeChild(modalInput)
+
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    })
+
     it("does not clear user active folder when focus moves to the sidebar toolbar", async () => {
       wrapper = helper
         .component(Sidebar)
