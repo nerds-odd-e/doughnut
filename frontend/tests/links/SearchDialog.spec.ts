@@ -22,7 +22,7 @@ describe("AddRelationshipDialog", () => {
       .withCleanStorage()
       .withProps({ note: null })
       .render()
-    await screen.findByText("Searching")
+    await screen.findByPlaceholderText("Search")
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")
     ).toBeDisabled()

@@ -331,7 +331,7 @@ export const assumeNotePage = (
     },
 
     startSearchingAndAddRelationship() {
-      this.toolbarButton('search and add relationship').click()
+      this.toolbarButton('Link').click()
       return assumeNoteTargetSearchDialog()
     },
     ...sidebarChildNotePageMethods(),

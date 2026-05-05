@@ -91,7 +91,7 @@ function mountSearchResults(props: {
 
 describe("SearchResults.vue", () => {
   describe("search indicators", () => {
-    it("shows 'Searching ...' before results arrive", async () => {
+    it("shows a loading indicator before results arrive", async () => {
       vi.useFakeTimers()
       setupDelayedSearchMocks()
       mockSdkService("getRecentNotes", [])
@@ -104,7 +104,9 @@ describe("SearchResults.vue", () => {
       await nextTick()
       vi.advanceTimersByTime(100)
 
-      expect(wrapper.text()).toContain("Searching ...")
+      expect(
+        wrapper.find(".searching-indicator .daisy-loading-spinner").exists()
+      ).toBe(true)
       vi.useRealTimers()
     })
 
@@ -393,7 +395,9 @@ describe("SearchResults.vue", () => {
       vi.advanceTimersByTime(100)
       await flushPromises()
 
-      expect(wrapper.text()).toContain("Searching ...")
+      expect(
+        wrapper.find(".searching-indicator .daisy-loading-spinner").exists()
+      ).toBe(true)
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).not.toContain("Search result")
@@ -528,7 +532,9 @@ describe("SearchResults.vue", () => {
       await nextTick()
       vi.advanceTimersByTime(100)
 
-      expect(wrapper.text()).toContain("Searching ...")
+      expect(
+        wrapper.find(".searching-indicator .daisy-loading-spinner").exists()
+      ).toBe(true)
       expect(wrapper.text()).toContain("First Result")
       expect(wrapper.text()).not.toContain("Recent Note 1")
 

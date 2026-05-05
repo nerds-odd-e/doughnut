@@ -1,5 +1,7 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, title, errorMessage, hint }">
+  <InputWithType
+    v-bind="{ scopeName, field, title, errorMessage, hint, hideLabel }"
+  >
     <template #input_prepend v-if="$slots.input_prepend">
       <slot name="input_prepend" />
     </template>
@@ -36,6 +38,7 @@ const props = defineProps({
   placeholder: { type: String, default: null },
   autofocus: { type: Boolean, default: false },
   errorMessage: String,
+  hideLabel: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   initialSelectAll: { type: Boolean, default: false },
 })

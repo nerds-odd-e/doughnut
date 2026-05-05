@@ -2,12 +2,16 @@
   <div class="daisy-form-control">
     <div v-if="beforeLabel" class="daisy-flex daisy-items-center daisy-gap-2">
       <slot />
-      <label v-if="!!field || !!title" :for="controlId" class="daisy-label">
+      <label
+        v-if="showLabel"
+        :for="controlId"
+        class="daisy-label"
+      >
         {{ titlized }}
       </label>
     </div>
     <template v-else>
-      <label v-if="!!field || !!title" :for="controlId" class="daisy-label">
+      <label v-if="showLabel" :for="controlId" class="daisy-label">
         {{ titlized }}
       </label>
       <i v-if="hint" class="hint" v-text="hint" />
@@ -45,12 +49,17 @@ const props = defineProps({
   hint: String,
   errorMessage: String,
   beforeLabel: { type: Boolean, default: false },
+  hideLabel: { type: Boolean, default: false },
 })
 
 const startCase = (str: string) => words(str).map(capitalize).join(" ")
 
 const titlized = computed(() =>
   props.title ? props.title : startCase(camelCase(props.field ?? ""))
+)
+
+const showLabel = computed(
+  () => !props.hideLabel && (!!props.field || !!props.title)
 )
 
 const controlId = computed(() => `${props.scopeName}-${props.field}`)

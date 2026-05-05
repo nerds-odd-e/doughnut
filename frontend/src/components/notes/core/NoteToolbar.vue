@@ -1,7 +1,7 @@
 <template>
   <nav :class="noteChromeToolbarNavClass">
     <div class="daisy-btn-group daisy-btn-group-sm">
-      <PopButton v-if="!readonly" title="search and add relationship">
+      <PopButton v-if="!readonly" title="Link">
         <template #button_face>
           <SvgSearchForLink />
         </template>

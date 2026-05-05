@@ -14,8 +14,15 @@
       />
     </div>
 
-    <div v-if="model.isSearchInProgress">
-      <em class="searching-indicator">Searching ...</em>
+    <div
+      v-if="model.isSearchInProgress"
+      class="searching-indicator"
+      role="status"
+      aria-busy="true"
+    >
+      <span
+        class="daisy-loading daisy-loading-spinner daisy-loading-sm"
+      />
     </div>
 
     <div v-if="displayState.showRecentNotes" :class="displayState.containerClass">
@@ -382,16 +389,8 @@ onBeforeUnmount(() => {
 }
 
 .searching-indicator {
-  display: inline-block;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  display: flex;
+  justify-content: center;
+  padding: 0.25rem 0;
 }
 </style>

@@ -5,6 +5,7 @@
       field="searchKey"
       v-model="inputSearchKey"
       placeholder="Search"
+      hide-label
       v-focus
     />
     <SearchResults v-bind="{ noteId, inputSearchKey, notebookId }">
