@@ -314,6 +314,29 @@ turndownService.addRule("doughnutDeadWikiLink", {
   },
 })
 
+/** Pasted HTML often has plain <a href="/d/n/…"> without doughnut-link class. */
+function hrefIsInternalNoteShow(href: string | null): boolean {
+  if (!href?.trim()) return false
+  try {
+    const pathname = new URL(href, "https://example.invalid").pathname
+    return /\/d\/n\/\d+/.test(pathname)
+  } catch {
+    return false
+  }
+}
+
+turndownService.addRule("doughnutNoteShowHrefWikiLink", {
+  filter(node) {
+    if (node.nodeName !== "A") return false
+    const el = node as HTMLAnchorElement
+    return hrefIsInternalNoteShow(el.getAttribute("href"))
+  },
+  replacement(_content, node) {
+    const text = (node as HTMLElement).textContent?.trim() ?? ""
+    return `[[${text}]]`
+  },
+})
+
 export default function htmlToMarkdown(html: string) {
   // Pre-process HTML to preserve code block content before DOM parsing
   const processedHtml = preserveCodeBlockContent(html)

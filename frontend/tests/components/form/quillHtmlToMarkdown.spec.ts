@@ -53,11 +53,13 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   it.each`
-    label                                   | html                                                            | expected
-    ${"preserves complete double brackets"} | ${"<p>[[WikiLink]]</p>"}                                        | ${"[[WikiLink]]"}
-    ${"converts doughnut-link anchors"}     | ${'<p><a href="/d/n/701" class="doughnut-link">MyNote</a></p>'} | ${"[[MyNote]]"}
-    ${"note href without doughnut-link"}    | ${'<p><a href="/n123">looks internal</a></p>'}                  | ${"[looks internal](/n123)"}
-    ${"converts dead wiki anchors"}         | ${'<p><a href="#" class="dead-link">Unknown</a></p>'}           | ${"[[Unknown]]"}
+    label                                     | html                                                            | expected
+    ${"preserves complete double brackets"}   | ${"<p>[[WikiLink]]</p>"}                                        | ${"[[WikiLink]]"}
+    ${"converts doughnut-link anchors"}       | ${'<p><a href="/d/n/701" class="doughnut-link">MyNote</a></p>'} | ${"[[MyNote]]"}
+    ${"note /d/n href without doughnut-link"} | ${'<p><a href="/d/n/701">MyNote</a></p>'}                       | ${"[[MyNote]]"}
+    ${"absolute URL to note show"}            | ${'<p><a href="https://app.test/d/n/42">T</a></p>'}             | ${"[[T]]"}
+    ${"note href without doughnut-link"}      | ${'<p><a href="/n123">looks internal</a></p>'}                  | ${"[looks internal](/n123)"}
+    ${"converts dead wiki anchors"}           | ${'<p><a href="#" class="dead-link">Unknown</a></p>'}           | ${"[[Unknown]]"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
