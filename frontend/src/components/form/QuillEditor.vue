@@ -292,8 +292,15 @@ defineExpose({ insertTextAtCursor })
     word-wrap: break-word
   a
     cursor: pointer
-  a:not(.dead-link)
-    color: oklch(var(--p))
+  a.doughnut-link
+    color: oklch(var(--a))
+    text-decoration: underline
+    text-decoration-style: dotted
+    text-underline-offset: 0.15em
+  a:not(.doughnut-link):not(.dead-link)
+    color: oklch(var(--in))
+    text-decoration: underline
+    text-underline-offset: 0.15em
   a.dead-link
     color: red
 .ql-container.ql-bubble
