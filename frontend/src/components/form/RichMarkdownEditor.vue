@@ -160,5 +160,9 @@ function insertTextAtCursor(text: string) {
   }
 }
 
-defineExpose({ insertMarkdownAtEnd, insertTextAtCursor })
+function addWikiLinkProperty(text: string) {
+  frontmatterPropertiesRef.value?.addWikiLinkProperty(text)
+}
+
+defineExpose({ insertMarkdownAtEnd, insertTextAtCursor, addWikiLinkProperty })
 </script>

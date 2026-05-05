@@ -271,11 +271,28 @@ describe("validatePropertyRowsForRichEdit", () => {
     ).toEqual({ ok: true })
   })
 
-  it("rejects empty keys", () => {
-    const r = validatePropertyRowsForRichEdit([{ key: "   ", value: "x" }])
+  it("allows one draft row with empty key when value is non-empty", () => {
+    expect(
+      validatePropertyRowsForRichEdit([{ key: "   ", value: "[[Note]]" }])
+    ).toEqual({ ok: true })
+  })
+
+  it("rejects empty key when value is empty", () => {
+    const r = validatePropertyRowsForRichEdit([{ key: "", value: "  " }])
     expect(r.ok).toBe(false)
     if (!r.ok) {
-      expect(r.message).toContain("empty")
+      expect(r.message).toContain("empty key")
+    }
+  })
+
+  it("rejects more than one row with empty key", () => {
+    const r = validatePropertyRowsForRichEdit([
+      { key: "", value: "a" },
+      { key: "  ", value: "b" },
+    ])
+    expect(r.ok).toBe(false)
+    if (!r.ok) {
+      expect(r.message).toContain("Only one property")
     }
   })
 

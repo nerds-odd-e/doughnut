@@ -32,6 +32,7 @@
         :key="idx"
         class="daisy-grid daisy-grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] daisy-gap-x-4 daisy-gap-y-1 daisy-items-center"
         data-testid="rich-note-property-row"
+        :data-row-index="idx"
         :data-property-key="row.key"
       >
         <input
@@ -123,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useId, watch } from "vue"
+import { computed, nextTick, ref, useId, watch } from "vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import {
   relationKebabFromLabel,
@@ -292,7 +293,32 @@ function commitRow(idx: number) {
   emits("properties-changed", [...propertyRows.value])
 }
 
+async function addWikiLinkProperty(wikiLinkText: string) {
+  const trimmedLink = wikiLinkText.trim()
+  const newRows = [...propertyRows.value, { key: "", value: wikiLinkText }]
+  const result = validatePropertyRowsForRichEdit(newRows)
+  if (!result.ok) {
+    validationMessage.value = result.message
+    return
+  }
+  validationMessage.value = ""
+  propertyRows.value = newRows
+  emits("properties-changed", [...newRows])
+  await nextTick()
+  const idx = propertyRows.value.findIndex(
+    (r) => !r.key.trim() && r.value.trim() === trimmedLink
+  )
+  const rowIndex = idx >= 0 ? idx : propertyRows.value.length - 1
+  requestAnimationFrame(() => {
+    const el = document.querySelector(
+      `[data-testid="rich-note-property-row"][data-row-index="${rowIndex}"] [data-testid="rich-note-property-row-key-input"]`
+    ) as HTMLInputElement | null
+    el?.focus()
+  })
+}
+
 defineExpose({
   getPropertyRows: (): PropertyRow[] => propertyRows.value,
+  addWikiLinkProperty,
 })
 </script>

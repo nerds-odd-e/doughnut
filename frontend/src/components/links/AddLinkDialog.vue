@@ -8,8 +8,10 @@
   />
   <LinkInsertionChoice
     v-if="selectedSearchResult && !targetNoteTopology && note"
-    v-bind="{ targetNoteTopology: selectedSearchResult.noteTopology }"
+    :target-note-topology="selectedSearchResult.noteTopology"
+    :wiki-property-option-available="wikiPropertyOptionAvailable"
     @choose-insert-wiki-link="onInsertWikiLink"
+    @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
     @choose-add-relationship="targetNoteTopology = selectedSearchResult!.noteTopology"
     @go-back="selectedSearchResult = undefined"
   />
@@ -35,7 +37,12 @@ import { useDetailsCursorInserter } from "@/composables/useDetailsCursorInserter
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
-const { insert } = useDetailsCursorInserter()
+const { insert, canInsertWikiLinkAsProperty, insertWikiLinkAsProperty } =
+  useDetailsCursorInserter()
+
+const wikiPropertyOptionAvailable = computed(() =>
+  canInsertWikiLinkAsProperty()
+)
 
 const { note } = defineProps<{
   note?: Note
@@ -63,6 +70,16 @@ async function onInsertWikiLink() {
   emit("closeDialog")
   await nextTick()
   insert(linkText)
+}
+
+async function onInsertWikiLinkAsProperty() {
+  if (!selectedSearchResult.value) return
+  const linkText = buildWikiLinkText(selectedSearchResult.value, {
+    notebookId: notebookId.value,
+  })
+  emit("closeDialog")
+  await nextTick()
+  insertWikiLinkAsProperty(linkText)
 }
 
 async function moveUnderFolder(targetFolderId: number) {

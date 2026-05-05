@@ -14,6 +14,13 @@
         Insert as a wiki link
       </button>
       <button
+        v-if="wikiPropertyOptionAvailable"
+        class="daisy-btn daisy-btn-accent"
+        @click="$emit('chooseInsertWikiLinkAsProperty')"
+      >
+        Add wiki link as a new property
+      </button>
+      <button
         class="daisy-btn daisy-btn-secondary"
         @click="$emit('chooseAddRelationship')"
       >
@@ -33,10 +40,12 @@ import { Reply } from "lucide-vue-next"
 
 defineProps<{
   targetNoteTopology: NoteTopology
+  wikiPropertyOptionAvailable?: boolean
 }>()
 
 defineEmits<{
   chooseInsertWikiLink: []
+  chooseInsertWikiLinkAsProperty: []
   chooseAddRelationship: []
   goBack: []
 }>()

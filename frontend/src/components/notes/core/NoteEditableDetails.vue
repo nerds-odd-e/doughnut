@@ -45,6 +45,12 @@ import TextArea from "@/components/form/TextArea.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 import { useDetailsCursorInserter } from "@/composables/useDetailsCursorInserter"
+import {
+  composeNoteDetailsFromPropertyRows,
+  parseNoteDetailsMarkdown,
+  sortedPropertyRowsFromRecord,
+  validatePropertyRowsForRichEdit,
+} from "@/utils/noteDetailsFrontmatter"
 
 const emit = defineEmits<{
   deadLinkClick: [title: string]
@@ -62,7 +68,19 @@ const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =
   usePasteWithLinkImageOptions()
-const { registerInserter, unregisterInserter } = useDetailsCursorInserter()
+const { registerInserter, registerWikiPropertyInserter, unregisterInserter } =
+  useDetailsCursorInserter()
+
+/** Byte offset in `details` of the `""` YAML key for the empty property name line, or null. */
+function caretOffsetForEmptyPropertyYamlKey(details: string): number | null {
+  if (!details.startsWith("---\n")) return null
+  const close = details.indexOf("\n---\n", 4)
+  if (close === -1) return null
+  const yamlInner = details.slice(4, close)
+  const m = /^""\s*:/m.exec(yamlInner)
+  if (!m || m.index === undefined) return null
+  return 4 + m.index
+}
 
 /** Tracks the last known textarea cursor position for markdown editor. */
 const textareaSelection = ref<{ start: number; end: number } | null>(null)
@@ -107,6 +125,38 @@ onMounted(() => {
         richEditorRef.value?.insertTextAtCursor(text)
       })
     }
+  })
+
+  registerWikiPropertyInserter({
+    canInsert: () => parseNoteDetailsMarkdown(props.noteDetails ?? "").ok,
+    insert: (text: string) => {
+      const parsed = parseNoteDetailsMarkdown(props.noteDetails ?? "")
+      if (!parsed.ok) return
+      const rows = [
+        ...sortedPropertyRowsFromRecord(parsed.properties),
+        { key: "", value: text },
+      ]
+      if (!validatePropertyRowsForRichEdit(rows).ok) return
+      const composed = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+      if (props.asMarkdown) {
+        const textarea = textareaRef.value?.$el?.querySelector(
+          "textarea"
+        ) as HTMLTextAreaElement | null
+        if (!textarea) return
+        textarea.value = composed
+        textarea.dispatchEvent(new Event("input", { bubbles: true }))
+        nextTick(() => {
+          const pos =
+            caretOffsetForEmptyPropertyYamlKey(composed) ??
+            (composed.startsWith("---\n") ? 4 : 0)
+          textarea.selectionStart = textarea.selectionEnd = pos
+        })
+      } else {
+        queueMicrotask(() => {
+          richEditorRef.value?.addWikiLinkProperty(text)
+        })
+      }
+    },
   })
 })
 

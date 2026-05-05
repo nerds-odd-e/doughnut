@@ -217,9 +217,23 @@ export function validatePropertyRowsForRichEdit(
     key: r.key.trim(),
     value: r.value.trim(),
   }))
-  for (let i = 0; i < trimmed.length; i++) {
-    if (!trimmed[i]!.key) {
-      return { ok: false, message: "Property keys cannot be empty." }
+  let emptyKeyCount = 0
+  for (const r of trimmed) {
+    if (!r.key) {
+      emptyKeyCount++
+      if (!r.value) {
+        return {
+          ok: false,
+          message:
+            "A property with an empty key must have a value until you name the key.",
+        }
+      }
+    }
+  }
+  if (emptyKeyCount > 1) {
+    return {
+      ok: false,
+      message: "Only one property may have an empty key at a time.",
     }
   }
   const keys = trimmed.map((r) => r.key)
