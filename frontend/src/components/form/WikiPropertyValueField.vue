@@ -21,6 +21,7 @@ import { ref, watch, onMounted, type PropType } from "vue"
 import { useRouter } from "vue-router"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
+  deadLinkCreateTitleFromAnchor,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
 } from "@/utils/wikiPropertyValueField"
@@ -96,14 +97,7 @@ function onClickCapture(event: MouseEvent) {
   const href = anchor.getAttribute("href")
   if (!href) return
   if (!props.readonly && anchor.classList.contains("dead-link")) {
-    const title =
-      anchor.getAttribute("data-wiki-title")?.trim() ??
-      anchor.textContent
-        ?.replace(/^\s*\[\[\s*/, "")
-        .replace(/\s*\]\]\s*$/, "")
-        .trim() ??
-      ""
-    emit("deadLinkClick", title)
+    emit("deadLinkClick", deadLinkCreateTitleFromAnchor(anchor))
     return
   }
   if (/^https?:\/\//i.test(href) || href.startsWith("//")) {

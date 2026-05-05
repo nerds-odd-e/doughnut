@@ -66,7 +66,20 @@ export function propertyValuePlainToDisplayHtml(
   return out
 }
 
-/** Serializes the editor root (top-level nodes) back to a plain scalar with `[[title]]` markers. */
+/**
+ * Title for dead-link create flow: prefer well-formed `[[title]]` inside visible text;
+ * otherwise text after `[[`, or full trimmed text (matches what the user actually typed).
+ */
+export function deadLinkCreateTitleFromAnchor(anchor: HTMLElement): string {
+  const raw = anchor.textContent?.trim() ?? ""
+  const closed = /^\[\[([^\[\]\r\n]*)\]\]$/.exec(raw)
+  if (closed?.[1] !== undefined) return closed[1].trim()
+  const open = /^\[\[([^\[\]\r\n]*)$/.exec(raw)
+  if (open?.[1] !== undefined) return open[1].trim()
+  return raw
+}
+
+/** Serializes the editor root (top-level nodes) back to a plain scalar. Wiki anchors use visible text only (so in-place edits are saved). */
 export function serializeWikiPropertyValueFieldRoot(el: HTMLElement): string {
   let out = ""
   for (const node of el.childNodes) {
@@ -79,17 +92,7 @@ export function serializeWikiPropertyValueFieldRoot(el: HTMLElement): string {
         node.classList.contains("doughnut-link") ||
         node.classList.contains("dead-link")
       ) {
-        const stored = node.getAttribute("data-wiki-title")
-        if (stored !== null && stored !== "") {
-          out += `[[${stored}]]`
-          continue
-        }
-        const t =
-          node.textContent
-            ?.replace(/^\s*\[\[\s*/, "")
-            .replace(/\s*\]\]\s*$/, "")
-            .trim() ?? ""
-        out += `[[${t}]]`
+        out += node.textContent ?? ""
         continue
       }
       out += node.textContent ?? ""

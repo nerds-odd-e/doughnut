@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  deadLinkCreateTitleFromAnchor,
   escapeHtmlForWikiPropertyValue,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
@@ -48,11 +49,35 @@ describe("wikiPropertyValueField utils", () => {
     expect(serializeWikiPropertyValueFieldRoot(root)).toBe("A [[B]] C")
   })
 
-  it("serializes live link anchors back to wiki syntax via data-wiki-title", () => {
+  it("serializes live link anchors from visible text (textContent)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[N]]", [
       { linkText: "N", noteId: 1 },
     ])
     expect(serializeWikiPropertyValueFieldRoot(root)).toBe("[[N]]")
+  })
+
+  it("serializes a wiki anchor as plain text when the user replaced inner content (broken link)", () => {
+    const root = document.createElement("div")
+    root.innerHTML = propertyValuePlainToDisplayHtml("[[English]]", [
+      { linkText: "English", noteId: 1 },
+    ])
+    const a = root.querySelector("a.doughnut-link") as HTMLAnchorElement
+    a.textContent = "[[Eng]"
+    expect(serializeWikiPropertyValueFieldRoot(root)).toBe("[[Eng]")
+  })
+
+  it("deadLinkCreateTitleFromAnchor uses visible closed wiki text", () => {
+    const wrap = document.createElement("div")
+    wrap.innerHTML = propertyValuePlainToDisplayHtml("see [[X]]", [])
+    const a = wrap.querySelector("a.dead-link") as HTMLAnchorElement
+    expect(deadLinkCreateTitleFromAnchor(a)).toBe("X")
+  })
+
+  it("deadLinkCreateTitleFromAnchor reads title from incomplete visible wiki text", () => {
+    const a = document.createElement("a")
+    a.className = "dead-link"
+    a.textContent = "[[Eng"
+    expect(deadLinkCreateTitleFromAnchor(a)).toBe("Eng")
   })
 })
