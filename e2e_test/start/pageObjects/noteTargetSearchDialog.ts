@@ -6,7 +6,7 @@ const relationshipTargetListRetryMs = 400
 
 function expectExactRelationshipTargetsWithRetry(targets: string[]) {
   const tryMatch = (attempt: number) => {
-    cy.get('.search-result .daisy-card-title').then((elms) => {
+    cy.get('.search-result .search-result-item-title').then((elms) => {
       const actual = Cypress._.map(elms, 'innerText')
       if (Cypress._.isEqual(actual, targets)) {
         return
@@ -68,8 +68,8 @@ export const assumeNoteTargetSearchDialog = () => {
         .should('deep.equal', targets)
     },
     moveUnder(folderTitle: string, notebookName?: string) {
-      let cards = cy.get('[role=card]').filter((_, el) => {
-        const t = el.querySelector('.folder-hit-card-title')
+      let cards = cy.get('[role=listitem]').filter((_, el) => {
+        const t = el.querySelector('.folder-hit-title')
         if (!t?.textContent?.includes(folderTitle)) return false
         if (notebookName && !el.textContent?.includes(notebookName))
           return false
@@ -85,8 +85,8 @@ export const assumeNoteTargetSearchDialog = () => {
       pageIsNotLoading()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
-      cy.contains('.search-result .daisy-card-title', toNoteTopic)
-        .closest('[role=card]')
+      cy.contains('.search-result .search-result-item-title', toNoteTopic)
+        .closest('[role=listitem]')
         .findByRole('button', { name: 'Add link' })
         .click()
       form.getField('Relation Type').clickOption(relationType)
@@ -96,7 +96,7 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByText('Recently updated notes', {
         selector: '.result-title',
       }).should('be.visible')
-      // Note can be in dropdown list or in cards, so search within the result section
+      // Note can be in the dropdown list or the scrollable list panel
       cy.contains('.result-section', noteTitle).should('be.visible')
       return this
     },

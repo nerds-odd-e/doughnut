@@ -27,11 +27,10 @@
           :noteTopology="result.noteTopology"
         />
       </div>
-      <SearchResultCards
+      <SearchResultList
         v-else
         class="search-result"
         :search-hits="recentNotesAsHits"
-        :columns="3"
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
@@ -51,7 +50,7 @@
             :notebook-id="folderNotebookId"
           />
         </template>
-      </SearchResultCards>
+      </SearchResultList>
     </div>
 
     <div v-if="displayState.showEmptyState" :class="displayState.containerClass">
@@ -82,11 +81,10 @@
           </div>
         </template>
       </div>
-      <SearchResultCards
+      <SearchResultList
         v-else
         class="search-result"
         :search-hits="searchResult"
-        :columns="3"
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
@@ -106,7 +104,7 @@
             :notebook-id="folderNotebookId"
           />
         </template>
-      </SearchResultCards>
+      </SearchResultList>
     </div>
   </div>
 </template>
@@ -132,7 +130,7 @@ import {
   shallowRef,
 } from "vue"
 import CheckInput from "../form/CheckInput.vue"
-import SearchResultCards from "./SearchResultCards.vue"
+import SearchResultList from "./SearchResultList.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
 import { searchHitRowKey } from "./searchHitRowKey"
@@ -355,20 +353,6 @@ onBeforeUnmount(() => {
   border-radius: 0 0 4px 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 1000;
-}
-
-.dropdown-cards {
-  max-height: 200px;
-  padding: 0.5rem;
-}
-
-.dropdown-cards :deep(.card) {
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-}
-
-.dropdown-cards :deep(.card:hover) {
-  background-color: #f8f9fa;
 }
 
 .dropdown-list {

@@ -1,4 +1,4 @@
-import SearchResultCard from "@/components/search/SearchResultCard.vue"
+import SearchResultListItem from "@/components/search/SearchResultListItem.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -12,8 +12,8 @@ function noteHit(r: NoteSearchResult): RelationshipLiteralSearchHit {
   return { hitKind: "NOTE", noteSearchResult: r }
 }
 
-describe("SearchResultCard", () => {
-  it("renders the card with title", async () => {
+describe("SearchResultListItem", () => {
+  it("renders the row with title", async () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
       .title("Test Note")
@@ -21,7 +21,7 @@ describe("SearchResultCard", () => {
       .please()
 
     helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult) })
       .render()
 
@@ -36,12 +36,12 @@ describe("SearchResultCard", () => {
       .please()
 
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult) })
       .mount()
 
-    const card = wrapper.find('[role="card"]')
-    expect(card.classes()).not.toContain("different-notebook-border")
+    const row = wrapper.find('[role="listitem"]')
+    expect(row.classes()).not.toContain("different-notebook-border")
   })
 
   it("does not add border when notebookId matches", async () => {
@@ -52,12 +52,12 @@ describe("SearchResultCard", () => {
       .please()
 
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult), notebookId: 10 })
       .mount()
 
-    const card = wrapper.find('[role="card"]')
-    expect(card.classes()).not.toContain("different-notebook-border")
+    const row = wrapper.find('[role="listitem"]')
+    expect(row.classes()).not.toContain("different-notebook-border")
   })
 
   it("adds border when notebookId does not match", async () => {
@@ -68,12 +68,12 @@ describe("SearchResultCard", () => {
       .please()
 
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult), notebookId: 20 })
       .mount()
 
-    const card = wrapper.find('[role="card"]')
-    expect(card.classes()).toContain("different-notebook-border")
+    const row = wrapper.find('[role="listitem"]')
+    expect(row.classes()).toContain("different-notebook-border")
   })
 
   it("displays notebook name when provided", async () => {
@@ -85,7 +85,7 @@ describe("SearchResultCard", () => {
       .please()
 
     helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult) })
       .render()
 
@@ -102,7 +102,7 @@ describe("SearchResultCard", () => {
       .please()
 
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult) })
       .mount()
 
@@ -119,7 +119,7 @@ describe("SearchResultCard", () => {
       distance: 0.9,
     }
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: hit })
       .mount()
 
@@ -137,7 +137,7 @@ describe("SearchResultCard", () => {
       distance: 0.9,
     }
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: hit })
       .mount({
         slots: {
@@ -156,7 +156,7 @@ describe("SearchResultCard", () => {
       .please()
 
     const wrapper = helper
-      .component(SearchResultCard)
+      .component(SearchResultListItem)
       .withProps({ searchHit: noteHit(searchResult) })
       .mount({
         slots: {

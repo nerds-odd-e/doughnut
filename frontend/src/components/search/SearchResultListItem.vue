@@ -1,40 +1,49 @@
 <template>
-  <div
-    role="card"
-    class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all"
-    :class="{ 'different-notebook-border daisy-border-primary': isDifferentNotebook }"
+  <li
+    role="listitem"
+    class="search-result-list-item daisy-flex daisy-flex-row daisy-items-start daisy-gap-3 daisy-border-b daisy-border-base-300 daisy-py-2 daisy-px-1 last:daisy-border-b-0 hover:daisy-bg-base-200 daisy-transition-colors"
+    :class="{
+      'different-notebook-border daisy-border-l-primary': isDifferentNotebook,
+    }"
   >
-    <div class="daisy-card-body daisy-p-4">
-      <h5 class="daisy-card-title">
+    <div class="daisy-min-w-0 daisy-flex-1">
+      <div class="search-result-item-title">
         <NoteTitleWithLink
           v-if="searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
           :note-topology="searchHit.noteSearchResult.noteTopology"
         />
         <span
           v-else-if="searchHit.hitKind === 'FOLDER'"
-          class="folder-hit-card-title"
+          class="folder-hit-title"
         >{{ searchHit.folderName }}</span>
-      </h5>
-      <div v-if="displayNotebookName" class="notebook-name-label">
-        {{ displayNotebookName }}
       </div>
-      <small
-        v-if="displayDistance != null"
-        class="similarity-distance daisy-mt-1 daisy-block daisy-text-right"
+      <div
+        v-if="displayNotebookName || displayDistance != null"
+        class="search-hit-meta daisy-flex daisy-flex-row daisy-flex-wrap daisy-items-baseline daisy-gap-1"
       >
-        {{ Number(displayDistance).toFixed(3) }}
-      </small>
-      <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
+        <span v-if="displayNotebookName" class="notebook-name-label">{{
+          displayNotebookName
+        }}</span>
+        <span v-if="displayDistance != null">{{ formattedDistance }}</span>
+      </div>
+    </div>
+    <div
+      class="daisy-flex daisy-shrink-0 daisy-flex-col daisy-items-end daisy-gap-1 daisy-self-center"
+    >
+      <div
+        v-if="$slots.button"
+        class="daisy-flex daisy-flex-row daisy-flex-wrap daisy-justify-end daisy-gap-1"
+      >
         <slot name="button" />
       </div>
       <div
-        class="daisy-card-actions daisy-justify-end"
         v-if="$slots.folderButton"
+        class="daisy-flex daisy-flex-row daisy-flex-wrap daisy-justify-end daisy-gap-1"
       >
         <slot name="folderButton" />
       </div>
     </div>
-  </div>
+  </li>
 </template>
 
 <script setup lang="ts">
@@ -81,26 +90,25 @@ const displayDistance = computed(() => {
   }
   return undefined
 })
+
+const formattedDistance = computed(() =>
+  displayDistance.value != null ? Number(displayDistance.value).toFixed(3) : ""
+)
 </script>
 
 <style scoped>
 .different-notebook-border {
-  border-width: 1px !important;
-  border-style: solid !important;
+  border-left-width: 4px;
+  border-left-style: solid;
 }
 
-.notebook-name-label {
+.search-hit-meta {
   font-size: 0.65rem;
   opacity: 0.7;
   margin-top: 0.125rem;
 }
 
-.folder-hit-card-title {
+.folder-hit-title {
   font-weight: 600;
-}
-
-.similarity-distance {
-  font-size: 0.75rem;
-  opacity: 0.75;
 }
 </style>
