@@ -3,6 +3,7 @@ import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
 } from "@generated/doughnut-backend-api"
+import { relationshipLiteralSearchHitKey } from "./relationshipLiteralSearchHitKey"
 
 export interface DisplayState {
   showRecentNotes: boolean
@@ -17,16 +18,6 @@ function noteHitFromSemantic(
   n: NoteSearchResult
 ): RelationshipLiteralSearchHit {
   return { hitKind: "NOTE", noteSearchResult: n }
-}
-
-function hitMergeKey(h: RelationshipLiteralSearchHit): string {
-  if (h.hitKind === "NOTE" && h.noteSearchResult?.noteTopology?.id != null) {
-    return `n:${h.noteSearchResult.noteTopology.id}`
-  }
-  if (h.hitKind === "FOLDER" && h.folderId != null) {
-    return `f:${h.folderId}`
-  }
-  return `x:${JSON.stringify(h)}`
 }
 
 function hitDistance(h: RelationshipLiteralSearchHit): number {
@@ -345,9 +336,9 @@ export class SearchResultsModel {
       return next
     }
 
-    existing.forEach((h) => byKey.set(hitMergeKey(h), h))
+    existing.forEach((h) => byKey.set(relationshipLiteralSearchHitKey(h), h))
     incoming.forEach((h) => {
-      const key = hitMergeKey(h)
+      const key = relationshipLiteralSearchHitKey(h)
       const prev = byKey.get(key)
       byKey.set(key, mergeHit(prev, h))
     })

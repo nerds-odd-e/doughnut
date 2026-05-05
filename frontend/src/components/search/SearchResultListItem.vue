@@ -1,7 +1,7 @@
 <template>
   <li
     role="listitem"
-    class="search-result-list-item daisy-flex daisy-flex-row daisy-items-start daisy-gap-3 daisy-border-b daisy-border-base-300 daisy-py-2 daisy-px-1 last:daisy-border-b-0 hover:daisy-bg-base-200 daisy-transition-colors"
+    class="daisy-flex daisy-flex-row daisy-items-start daisy-gap-3 daisy-border-b daisy-border-base-300 daisy-py-2 daisy-px-1 last:daisy-border-b-0 hover:daisy-bg-base-200 daisy-transition-colors"
     :class="{
       'different-notebook-border daisy-border-l-primary': isDifferentNotebook,
     }"

@@ -63,7 +63,7 @@
       <div v-if="isDropdown" class="dropdown-list">
         <template
           v-for="hit in searchResult"
-          :key="searchHitRowKey(hit)"
+          :key="relationshipLiteralSearchHitKey(hit)"
         >
           <NoteTitleWithLink
             v-if="hit.hitKind === 'NOTE' && hit.noteSearchResult"
@@ -133,7 +133,7 @@ import CheckInput from "../form/CheckInput.vue"
 import SearchResultList from "./SearchResultList.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
-import { searchHitRowKey } from "./searchHitRowKey"
+import { relationshipLiteralSearchHitKey } from "@/models/relationshipLiteralSearchHitKey"
 
 const props = defineProps({
   noteId: Number,

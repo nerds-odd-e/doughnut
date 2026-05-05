@@ -1,11 +1,11 @@
 <template>
   <ul
     role="list"
-    class="search-result-list daisy-m-0 daisy-list-none daisy-p-0 daisy-flex daisy-flex-col"
+    class="daisy-m-0 daisy-list-none daisy-p-0 daisy-flex daisy-flex-col"
   >
     <SearchResultListItem
       v-for="searchHit in searchHits"
-      :key="searchHitRowKey(searchHit)"
+      :key="relationshipLiteralSearchHitKey(searchHit)"
       v-bind="{ searchHit, notebookId }"
     >
       <template
@@ -37,7 +37,7 @@
 import type { PropType } from "vue"
 import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
 import SearchResultListItem from "./SearchResultListItem.vue"
-import { searchHitRowKey } from "./searchHitRowKey"
+import { relationshipLiteralSearchHitKey } from "@/models/relationshipLiteralSearchHitKey"
 
 defineProps({
   searchHits: {
