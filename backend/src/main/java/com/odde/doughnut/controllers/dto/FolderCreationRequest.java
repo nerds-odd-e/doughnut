@@ -1,7 +1,9 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +18,7 @@ public class FolderCreationRequest {
 
   @NotBlank
   @Size(max = 512)
+  @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
   @Schema(
       requiredMode = Schema.RequiredMode.REQUIRED,
       description = "Display name for the new folder")
