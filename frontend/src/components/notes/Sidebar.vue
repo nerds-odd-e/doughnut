@@ -1,5 +1,5 @@
 <template>
-  <div data-note-sidebar-root>
+  <div data-note-sidebar-root class="daisy-flex daisy-flex-col daisy-flex-1 daisy-min-h-0">
     <NoteSidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
@@ -8,12 +8,14 @@
       :resolved-create-parent-folder-id="resolvedCreateParentFolderId"
       :create-parent-location-description="createParentLocationDescription"
     />
-    <SidebarInner
-      v-if="sidebarTreeShown"
-      :key="notebookId"
-      :notebook-id="notebookId"
-      :active-note-topology="activeNoteTopology"
-    />
+    <div class="daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0">
+      <SidebarInner
+        v-if="sidebarTreeShown"
+        :key="notebookId"
+        :notebook-id="notebookId"
+        :active-note-topology="activeNoteTopology"
+      />
+    </div>
   </div>
 </template>
 

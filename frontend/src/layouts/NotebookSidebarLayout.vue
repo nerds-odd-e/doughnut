@@ -64,7 +64,7 @@
     >
       <aside
         :class="[
-          'daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-overflow-y-auto',
+          'daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-flex daisy-flex-col',
           !isMdOrLarger && 'notebook-sidebar-drawer',
           isMdOrLarger
             ? sidebarOpened
