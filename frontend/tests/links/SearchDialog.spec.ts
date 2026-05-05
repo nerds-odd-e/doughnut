@@ -1,4 +1,4 @@
-import AddRelationshipDialog from "@/components/links/AddRelationshipDialog.vue"
+import AddLinkDialog from "@/components/links/AddLinkDialog.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -6,7 +6,7 @@ import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-describe("AddRelationshipDialog", () => {
+describe("AddLinkDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
@@ -18,7 +18,7 @@ describe("AddRelationshipDialog", () => {
   })
   it("Search at the top level with no note", async () => {
     helper
-      .component(AddRelationshipDialog)
+      .component(AddLinkDialog)
       .withCleanStorage()
       .withProps({ note: null })
       .render()
@@ -33,7 +33,7 @@ describe("AddRelationshipDialog", () => {
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
     helper
-      .component(AddRelationshipDialog)
+      .component(AddLinkDialog)
       .withCleanStorage()
       .withProps({ note })
       .render()
@@ -75,7 +75,7 @@ describe("AddRelationshipDialog", () => {
       const moveNoteToFolderSpy = mockSdkService("moveNoteToFolder", [])
 
       helper
-        .component(AddRelationshipDialog)
+        .component(AddLinkDialog)
         .withCleanStorage()
         .withProps({ note })
         .render()

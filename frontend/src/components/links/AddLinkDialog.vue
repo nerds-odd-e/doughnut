@@ -1,6 +1,6 @@
 <template>
   <h3 v-if="targetNoteTopology">Complete relationship</h3>
-  <SearchNote
+  <SearchForNoteAndFolder
     v-if="!targetNoteTopology"
     v-bind="{ noteId: note?.id, notebookId: notebookId }"
     @selected="targetNoteTopology = $event"
@@ -19,7 +19,7 @@ import { ref, computed } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
-import SearchNote from "../search/SearchNote.vue"
+import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 

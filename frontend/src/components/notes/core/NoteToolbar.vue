@@ -6,7 +6,7 @@
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
-          <AddRelationshipDialog
+          <AddLinkDialog
             v-bind="{ note }"
             @close-dialog="closer"
           />
@@ -78,7 +78,7 @@ import { ref, watch } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
-import AddRelationshipDialog from "../../links/AddRelationshipDialog.vue"
+import AddLinkDialog from "../../links/AddLinkDialog.vue"
 import {
   FileCode,
   LayoutTemplate,

@@ -10,7 +10,7 @@
           <Search class="w-5 h-5" />
         </template>
         <template #default="{ closer }">
-          <AddRelationshipDialog
+          <AddLinkDialog
             v-bind="{ storageAccessor }"
             @close-dialog="closer"
           />
