@@ -43,6 +43,16 @@ let mockedCreateNoteAtRoot: ReturnType<
   typeof mockSdkService<"createNoteAtNotebookRoot">
 >
 
+async function setNoteNewDialogTitle(
+  wrapper: VueWrapper<ComponentPublicInstance>,
+  value: string
+) {
+  const el = wrapper.find('[data-test="note-title"]').element as HTMLElement
+  el.innerText = value
+  el.dispatchEvent(new Event("input", { bubbles: true }))
+  await flushPromises()
+}
+
 describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -114,7 +124,7 @@ describe("adding new note", () => {
       .mount({ attachTo: document.body })
 
     // First, change the title to something else (this marks it as edited)
-    await wrapper.find("input#note-title").setValue("myth")
+    await setNoteNewDialogTitle(wrapper, "myth")
     vi.runOnlyPendingTimers()
     await flushPromises()
 
@@ -122,7 +132,7 @@ describe("adding new note", () => {
     searchForRelationshipTargetWithinSpy.mockClear()
 
     // Now change it back to "Untitled"
-    await wrapper.find("input#note-title").setValue("Untitled")
+    await setNoteNewDialogTitle(wrapper, "Untitled")
     vi.runOnlyPendingTimers()
     await flushPromises()
 
@@ -152,7 +162,7 @@ describe("adding new note", () => {
       .withCleanStorage()
       .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
-    await wrapper.find("input#note-title").setValue("myth")
+    await setNoteNewDialogTitle(wrapper, "myth")
 
     vi.runOnlyPendingTimers()
     await flushPromises()
@@ -174,7 +184,7 @@ describe("adding new note", () => {
         .withCleanStorage()
         .withProps(notebookRootProps)
         .mount({ attachTo: document.body })
-      await wrapper.find("input#note-title").setValue("note title")
+      await setNoteNewDialogTitle(wrapper, "note title")
       vi.clearAllTimers()
     })
 
@@ -251,10 +261,8 @@ describe("adding new note", () => {
       wrapper?.unmount()
     })
 
-    const titleInput = () => wrapper.find("input#note-title")
-
     const openWikidataDialog = async (key: string) => {
-      await titleInput().setValue(key)
+      await setNoteNewDialogTitle(wrapper, key)
       await wrapper.find("button[title='Wikidata Id']").trigger("click")
       await flushPromises()
     }
@@ -406,9 +414,10 @@ describe("adding new note", () => {
         expect(searchWikidataSpy).toHaveBeenCalledWith({
           query: { search: searchTitle },
         })
-        expect((<HTMLInputElement>titleInput().element).value).toBe(
-          expectedTitle
-        )
+        expect(
+          (wrapper.find('[data-test="note-title"]').element as HTMLElement)
+            .innerText
+        ).toBe(expectedTitle)
       }
     )
   })

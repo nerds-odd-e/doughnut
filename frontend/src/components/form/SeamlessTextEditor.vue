@@ -3,6 +3,8 @@
     ref="editor"
     class="seamless-editor"
     :role="role"
+    :aria-labelledby="ariaLabelledby"
+    :aria-label="ariaLabel"
     :contenteditable="!readonly"
     @input="onInput"
     @blur="onBlur"
@@ -18,6 +20,8 @@ const props = defineProps({
   modelValue: { type: String, required: true },
   readonly: { type: Boolean, default: false },
   role: { type: String, required: false },
+  ariaLabelledby: { type: String, required: false },
+  ariaLabel: { type: String, required: false },
 })
 
 const emits = defineEmits(["update:modelValue", "blur"])

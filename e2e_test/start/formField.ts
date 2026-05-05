@@ -3,6 +3,9 @@ const formControl = (label: string) =>
 
 const inputElement = (label: string) => cy.findByLabelText(label)
 
+const isContentEditable = ($input: JQuery<HTMLElement>) =>
+  $input[0]?.isContentEditable === true
+
 const formField = (label: string) => {
   const self = {
     assignValue(value: string) {
@@ -20,6 +23,8 @@ const formField = (label: string) => {
         } else if ($input.attr('role') === 'button') {
           cy.wrap($input).click()
           self.clickOption(value)
+        } else if (isContentEditable($input)) {
+          cy.wrap($input).click().clear().type(value, { delay: 0 })
         } else {
           cy.wrap($input).clear().type(value)
         }
@@ -31,7 +36,15 @@ const formField = (label: string) => {
       return self
     },
     shouldHaveValue(value: string) {
-      inputElement(label).should('have.value', value)
+      inputElement(label).then(($input) => {
+        if (isContentEditable($input)) {
+          cy.wrap($input).should(($el) => {
+            expect($el.text().trim()).to.eq(value)
+          })
+        } else {
+          cy.wrap($input).should('have.value', value)
+        }
+      })
       return self
     },
     expectError(message: string) {
@@ -47,7 +60,13 @@ const formField = (label: string) => {
       return self
     },
     clear() {
-      inputElement(label).clear()
+      inputElement(label).then(($input) => {
+        if (isContentEditable($input)) {
+          cy.wrap($input).click().clear({ force: true })
+        } else {
+          cy.wrap($input).clear()
+        }
+      })
       return self
     },
     check() {

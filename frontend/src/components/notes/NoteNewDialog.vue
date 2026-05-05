@@ -11,12 +11,13 @@
             {{ parentLocationDescription }}
           </p>
           <div class="title-search-container">
-            <NoteFormTitleOnly
+            <NoteTitleEditor
               v-model="creationData.newTitle"
               :error-message="noteFormErrors.newTitle"
+              autofocus
               @update:model-value="onTitleChange"
             >
-              <template #input_append>
+              <template #append>
                 <WikidataSearchByLabel
                   :search-key="creationData.newTitle"
                   v-model="creationData.wikidataId"
@@ -24,7 +25,7 @@
                   @selected="onSelectWikidataEntry"
                 />
               </template>
-            </NoteFormTitleOnly>
+            </NoteTitleEditor>
             <SearchResults
               v-if="titleSearchScopeNote"
               v-bind="{
@@ -55,7 +56,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"
-import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
+import NoteTitleEditor from "./core/NoteTitleEditor.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
