@@ -1,5 +1,9 @@
 <template>
-  <PopButton :title="buttonTitle" :aria-label="ariaLabel ?? buttonTitle">
+  <PopButton
+    :title="buttonTitle"
+    :aria-label="ariaLabel ?? buttonTitle"
+    align-modal-top
+  >
     <template #button_face>
       <slot />
     </template>

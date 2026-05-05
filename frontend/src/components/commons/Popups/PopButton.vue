@@ -12,7 +12,12 @@
       {{ title }}
     </template>
   </button>
-  <Modal v-if="show" :sidebar="sidebar" @close_request="closeDialog">
+  <Modal
+    v-if="show"
+    :sidebar="sidebar"
+    :align-top="alignModalTop"
+    @close_request="closeDialog"
+  >
     <template #body>
       <slot name="default" :closer="closeDialog" />
     </template>
@@ -32,6 +37,7 @@ defineProps({
   sidebar: String as PropType<"left" | "right">,
   btnClass: String,
   ariaLabel: String,
+  alignModalTop: Boolean,
 })
 
 const show = ref(false)

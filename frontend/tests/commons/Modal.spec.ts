@@ -51,6 +51,29 @@ describe("Modal", () => {
     return wrapper
   }
 
+  it("adds top alignment class when alignTop is true", async () => {
+    const TopAligned = {
+      template: `
+        <Modal align-top @close_request="$emit('close_request')">
+          <template #body>x</template>
+        </Modal>
+      `,
+      components: { Modal: Comp },
+      emits: ["close_request"],
+    }
+    wrapper = mount(TopAligned, {
+      global: { plugins: [router] },
+      attachTo: document.body,
+    })
+    await vi.waitUntil(
+      () => document.querySelector(".modal-wrapper--align-top"),
+      {
+        timeout: 1000,
+      }
+    )
+    expect(document.querySelector(".modal-wrapper--align-top")).toBeTruthy()
+  })
+
   it("closes when close button is clicked", async () => {
     wrapper = mountModal()
     await vi.waitUntil(() => document.querySelector(".close-button"), {

@@ -1,6 +1,10 @@
 <template>
   <Overlay class="modal-mask daisy-text-base-content">
-    <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
+    <div
+      class="modal-wrapper"
+      :class="{ 'modal-wrapper--align-top': alignTop }"
+      @mousedown.self="$emit('close_request')"
+    >
         <div :class="sidebarStyle" class="daisy-bg-base-200">
           <button class="close-button" @click="$emit('close_request')">
             <X class="w-6 h-6" />
@@ -29,6 +33,7 @@ import { registerModal } from "./modalStack"
 interface Props {
   sidebar?: "left" | "right"
   isPopup?: boolean
+  alignTop?: boolean
 }
 const props = defineProps<Props>()
 
@@ -70,6 +75,11 @@ onUnmounted(() => {
 .modal-wrapper {
   display: table-cell;
   vertical-align: middle;
+}
+
+.modal-wrapper--align-top {
+  vertical-align: top;
+  padding-top: max(env(safe-area-inset-top, 0px), 20px);
 }
 
 .modal-container {
