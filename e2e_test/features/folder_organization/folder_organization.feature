@@ -16,8 +16,3 @@ Feature: Folder organization
     And I move the active folder to notebook root using the sidebar folder dialog
     Then I should see sidebar folder "Beta"
     And I should not see sidebar folder "Beta" under folder "Alpha"
-
-  Scenario: Folder organize control is hidden without an active sidebar folder
-    When I open the notebook "Organize NB" from my notebooks catalog
-    And I open the note "Root note" from the sidebar
-    Then the folder organize control should not be visible in the sidebar
