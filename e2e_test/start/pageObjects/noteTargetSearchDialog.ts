@@ -87,7 +87,7 @@ export const assumeNoteTargetSearchDialog = () => {
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
       cy.contains('.search-result .daisy-card-title', toNoteTopic)
         .closest('[role=card]')
-        .findByRole('button', { name: 'Add Relationship' })
+        .findByRole('button', { name: 'Add link' })
         .click()
       form.getField('Relation Type').clickOption(relationType)
       pageIsNotLoading()

@@ -13,7 +13,7 @@
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           @click.prevent="emit('selected', noteTopology)"
         >
-          Add Relationship
+          Add link
         </button>
       </template>
       <template

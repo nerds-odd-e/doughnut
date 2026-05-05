@@ -148,7 +148,7 @@ describe("SearchResultCard", () => {
     expect(wrapper.text()).toContain("Move Under")
   })
 
-  it("note hit button slot can show Add Relationship without Move Under", () => {
+  it("note hit button slot can show Add link without Move Under", () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
       .title("Test Note")
@@ -160,11 +160,11 @@ describe("SearchResultCard", () => {
       .withProps({ searchHit: noteHit(searchResult) })
       .mount({
         slots: {
-          button: '<button type="button">Add Relationship</button>',
+          button: '<button type="button">Add link</button>',
         },
       })
 
-    expect(wrapper.text()).toContain("Add Relationship")
+    expect(wrapper.text()).toContain("Add link")
     expect(wrapper.text()).not.toContain("Move Under")
   })
 })
