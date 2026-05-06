@@ -74,7 +74,18 @@ Quill.register(
   true
 )
 
-const { modelValue, readonly } = defineProps({
+/** Preserves `<mark>` cloze masks from recall stems when loading HTML into Quill. */
+const Inline = Quill.import("blots/inline") as typeof SoftLineBreakBlot
+class MarkBlot extends Inline {
+  static blotName = "mark"
+  static tagName = "mark"
+}
+Quill.register(
+  MarkBlot as unknown as Parameters<typeof Quill.register>[0],
+  true
+)
+
+const props = defineProps({
   modelValue: String,
   readonly: Boolean,
 })
@@ -87,7 +98,7 @@ const emits = defineEmits<{
 }>()
 
 const router = useRouter()
-const localValue = ref(modelValue)
+const localValue = ref(props.modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 const isPasting = ref(false)
@@ -117,15 +128,17 @@ const shiftEnterHandler = function (
 // BR matcher for clipboard operations
 const brMatcher = () => new Delta().insert({ softbreak: true })
 
+const toolbarRows = [
+  ["bold", "italic", "underline"],
+  [{ header: 1 }, { header: 2 }],
+  ["blockquote", "code-block"],
+  [{ list: "ordered" }, { list: "bullet" }],
+  ["link"],
+]
+
 const options: QuillOptions = {
   modules: {
-    toolbar: [
-      ["bold", "italic", "underline"],
-      [{ header: 1 }, { header: 2 }],
-      ["blockquote", "code-block"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link"],
-    ],
+    toolbar: props.readonly ? false : toolbarRows,
     keyboard: {
       bindings: {
         shiftEnter: {
@@ -149,12 +162,13 @@ const options: QuillOptions = {
     "code-block",
     "list",
     "link",
+    "mark",
     "softbreak",
     "horizontalrule",
     "table",
   ],
-  placeholder: readonly ? "" : "Enter note details here...",
-  readOnly: readonly,
+  placeholder: props.readonly ? "" : "Enter note details here...",
+  readOnly: props.readonly,
   theme: "bubble",
 }
 
@@ -168,7 +182,7 @@ onMounted(async () => {
     // Wait for next tick to ensure Quill is fully initialized
     await nextTick()
 
-    if (!readonly && quill.value) {
+    if (!props.readonly && quill.value) {
       quill.value.root.addEventListener(
         "paste",
         (event: ClipboardEvent) => {
@@ -206,7 +220,7 @@ onMounted(async () => {
         event.preventDefault()
         const href = anchor.getAttribute("href")
         if (!href) return
-        if (!readonly && anchor.classList.contains("dead-link")) {
+        if (!props.readonly && anchor.classList.contains("dead-link")) {
           emits("deadLinkClick", anchor.textContent?.trim() ?? "")
           return
         }
@@ -247,7 +261,7 @@ onMounted(async () => {
 
 // Watch for changes in modelValue prop
 watch(
-  () => modelValue,
+  () => props.modelValue,
   (newValue) => {
     if (quill.value && localValue.value !== newValue) {
       localValue.value = newValue
