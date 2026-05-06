@@ -84,7 +84,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
-    const nb = this.data.notebookView?.notebook
+    const nb = this.data.notebookView.notebook
     if (nb) {
       nb.id = this.noteBuilder.realmNotebookId
       nb.name = this.data.note.noteTopology.title

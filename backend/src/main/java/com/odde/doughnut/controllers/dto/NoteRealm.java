@@ -19,7 +19,7 @@ public class NoteRealm {
 
   @NotNull @Getter private Note note;
 
-  @Getter @Setter private NotebookClientView notebookView;
+  @NotNull @Getter @Setter private NotebookClientView notebookView;
 
   @Getter @Setter private List<Folder> ancestorFolders = List.of();
 

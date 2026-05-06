@@ -37,7 +37,7 @@ describe("storedApiCollection", () => {
       expect(routerReplace).toHaveBeenCalledTimes(1)
       expect(routerReplace).toHaveBeenCalledWith({
         name: "notebookPage",
-        params: { notebookId: parentNote.notebookView!.notebook.id },
+        params: { notebookId: parentNote.notebookView.notebook.id },
       })
     })
 
@@ -53,7 +53,7 @@ describe("storedApiCollection", () => {
       ).toBeUndefined()
       expect(routerReplace).toHaveBeenCalledWith({
         name: "notebookPage",
-        params: { notebookId: note.notebookView!.notebook.id },
+        params: { notebookId: note.notebookView.notebook.id },
       })
     })
 
@@ -66,7 +66,7 @@ describe("storedApiCollection", () => {
 
       expect(routerReplace).toHaveBeenCalledWith({
         name: "notebookPage",
-        params: { notebookId: note.notebookView!.notebook.id },
+        params: { notebookId: note.notebookView.notebook.id },
       })
     })
   })
@@ -108,7 +108,7 @@ describe("storedApiCollection", () => {
 
       expect(routerPush).toHaveBeenCalledWith({
         name: "notebookPage",
-        params: { notebookId: note.notebookView!.notebook.id },
+        params: { notebookId: note.notebookView.notebook.id },
       })
     })
   })

@@ -20,7 +20,7 @@
         />
       </button>
       <BreadcrumbWithCircle
-        v-if="noteRealmForBreadcrumb?.notebookView"
+        v-if="noteRealmForBreadcrumb"
         v-bind="{
           notebookView: noteRealmForBreadcrumb.notebookView,
           ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],

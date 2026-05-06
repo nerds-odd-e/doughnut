@@ -3709,6 +3709,7 @@ components:
       required:
       - id
       - note
+      - notebookView
     NoteTopology:
       type: object
       properties:

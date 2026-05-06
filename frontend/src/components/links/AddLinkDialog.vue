@@ -60,7 +60,7 @@ const targetNoteTopology = ref<NoteTopology | undefined>(undefined)
 const noteRealm = computed(() =>
   note ? storageAccessor.value.refOfNoteRealm(note.id).value : undefined
 )
-const notebookId = computed(() => noteRealm.value?.notebookView?.notebook?.id)
+const notebookId = computed(() => noteRealm.value?.notebookView.notebook.id)
 
 async function onInsertWikiLink() {
   if (!selectedSearchResult.value) return

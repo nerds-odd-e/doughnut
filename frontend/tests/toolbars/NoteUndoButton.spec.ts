@@ -164,7 +164,7 @@ describe("NoteUndoButton", () => {
         storageAccessor.value.refreshNoteRealm(noteRealm)
         noteEditingHistory.moveNote(noteRealm.id, {
           folderId: null,
-          notebookId: noteRealm.notebookView?.notebook?.id ?? 1,
+          notebookId: noteRealm.notebookView.notebook.id,
         })
         helper.component(NoteUndoButton).render()
 

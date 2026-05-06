@@ -1,14 +1,14 @@
 <template>
   <Breadcrumb v-bind="{ ancestorFolders }">
     <template #topLink>
-      <li v-if="notebookView?.readonly">
+      <li v-if="notebookView.readonly">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
         <li>
           <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
         </li>
-        <li v-if="notebookView?.notebook?.circle">
+        <li v-if="notebookView.notebook.circle">
           <router-link
             :to="{
               name: 'circleShow',
@@ -18,7 +18,7 @@
           >
         </li>
       </template>
-      <li v-if="notebookView?.notebook">
+      <li>
         <router-link
           v-if="notebookView.notebook.id != null"
           :to="{
@@ -48,7 +48,7 @@ defineProps({
   },
   notebookView: {
     type: Object as PropType<NotebookClientView>,
-    required: false,
+    required: true,
   },
 })
 </script>

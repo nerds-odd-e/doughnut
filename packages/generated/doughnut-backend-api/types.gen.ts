@@ -231,7 +231,7 @@ export type Note = {
 export type NoteRealm = {
     id: number;
     note: Note;
-    notebookView?: NotebookClientView;
+    notebookView: NotebookClientView;
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
@@ -965,7 +965,7 @@ export type NoteWritable = {
 export type NoteRealmWritable = {
     id: number;
     note: NoteWritable;
-    notebookView?: NotebookClientView;
+    notebookView: NotebookClientView;
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
