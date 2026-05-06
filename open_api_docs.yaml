@@ -4622,8 +4622,6 @@ components:
     NoteAccessoriesDTO:
       type: object
       properties:
-        url:
-          type: string
         imageUrl:
           type: string
         imageMask:
@@ -4645,8 +4643,6 @@ components:
         id:
           type: integer
           format: int32
-        url:
-          type: string
         imageUrl:
           type: string
         imageMask:

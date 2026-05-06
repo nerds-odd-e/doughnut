@@ -326,10 +326,6 @@ export const assumeNotePage = (
       cy.get('#note-image').should('be.visible')
       return this
     },
-    updateNoteUrl(attributes: Record<string, string>) {
-      this.moreOptions().editNoteUrl(attributes)
-      return this
-    },
 
     startSearchingAndAddRelationship() {
       this.toolbarButton('Link').click()

@@ -12,8 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @ValidateNoteImage
 public class NoteAccessoriesDTO {
-  @Getter @Setter private String url;
-
   @Getter @Setter private String imageUrl;
 
   @Pattern(

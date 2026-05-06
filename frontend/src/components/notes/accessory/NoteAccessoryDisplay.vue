@@ -6,12 +6,6 @@
       v-bind="noteAccessory.imageWithMask"
       :opacity="0.2"
     />
-    <div v-if="!!noteAccessory.url">
-      <label id="note-url" v-text="'Url:'" />
-      <a aria-labelledby="note-url" :href="noteAccessory.url" target="_blank">{{
-        noteAccessory.url
-      }}</a>
-    </div>
   </div>
 </template>
 

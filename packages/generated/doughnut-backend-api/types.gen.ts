@@ -695,7 +695,6 @@ export type UpdateNotebookGroupRequest = {
 };
 
 export type NoteAccessoriesDto = {
-    url?: string;
     imageUrl?: string;
     imageMask?: string;
     uploadImage?: Blob | File;
@@ -708,7 +707,6 @@ export type ImageWithMask = {
 
 export type NoteAccessory = {
     id: number;
-    url?: string;
     imageUrl?: string;
     imageMask?: string;
     imageWithMask?: ImageWithMask;

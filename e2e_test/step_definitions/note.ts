@@ -191,21 +191,14 @@ When(
 When(
   'I update note accessories of {string} to become:',
   (noteTopology: string, data: DataTable) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .updateNoteImage(data.hashes()[0]!)
-      .updateNoteUrl(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology).updateNoteImage(data.hashes()[0]!)
   }
 )
 
-When(
-  'I should see note {string} has a image and a url {string}',
-  (noteTopology: string, expectedUrl: string) => {
-    start.jumpToNotePage(noteTopology)
-    cy.get('#note-image').should('exist')
-    cy.findByLabelText('Url:').should('have.attr', 'href', expectedUrl)
-  }
-)
+When('I should see note {string} has an image', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology)
+  cy.get('#note-image').should('exist')
+})
 
 When(
   'I can change the title {string} to {string}',

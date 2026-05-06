@@ -7,12 +7,12 @@ Feature: Note Edit Accessories
 
   Scenario: Edit a note
     When I update note accessories of "lunar" to become:
-      | Url               | Upload Image  |
-      | https://moon.com  | moon.jpg        |
-    Then I should see note "lunar" has a image and a url "https://moon.com"
+      | Upload Image  |
+      | moon.jpg        |
+    Then I should see note "lunar" has an image
 
   Scenario: Edit a note with Image url
     When I update note accessories of "lunar" to become:
-      | Url               | Image Url     |
-      | https://moon.com  | moon.jpg        |
-    Then I should see note "lunar" has a image and a url "https://moon.com"
+      | Image Url     |
+      | moon.jpg        |
+    Then I should see note "lunar" has an image

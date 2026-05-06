@@ -63,11 +63,6 @@ const noteMoreOptionsDialog = () => {
           ])
         )
     },
-    editNoteUrl(attributes: Record<string, string>) {
-      toolbarButton('Edit Note URL')
-        .click()
-        .submitWith(filterAttributes(attributes, ['Url']))
-    },
     generateImageWithDALLE() {
       toolbarButton('Generate Image with DALL-E').click()
     },

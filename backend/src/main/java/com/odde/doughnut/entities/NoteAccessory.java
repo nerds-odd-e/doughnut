@@ -20,8 +20,6 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @Setter
   private Note note;
 
-  @Getter @Setter private String url;
-
   @Column(name = "image_url")
   @Getter
   @Setter

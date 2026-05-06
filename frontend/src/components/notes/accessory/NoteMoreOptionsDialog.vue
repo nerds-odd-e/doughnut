@@ -44,21 +44,6 @@
 
       <PopButton
         btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Edit Note URL"
-      >
-        <template #button_face>
-          <Globe class="daisy-w-6 daisy-h-6" />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditUrlDialog
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
-
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         title="Export..."
       >
         <template #button_face>
@@ -109,13 +94,11 @@ import Questions from "../Questions.vue"
 import {
   Bot,
   CircleCheck,
-  Globe,
   Image as ImageIcon,
   Trash2,
   Upload,
 } from "lucide-vue-next"
 import NoteEditImageDialog from "./NoteEditImageDialog.vue"
-import NoteEditUrlDialog from "./NoteEditUrlDialog.vue"
 import NoteExportDialog from "../core/NoteExportDialog.vue"
 import SvgAssessment from "../../svgs/SvgAssessment.vue"
 import { useRouter } from "vue-router"

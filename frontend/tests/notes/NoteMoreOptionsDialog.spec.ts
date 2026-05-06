@@ -188,7 +188,6 @@ describe("NoteMoreOptionsDialog", () => {
       expect(wrapper.find('button[title="Edit Note Image"]').exists()).toBe(
         true
       )
-      expect(wrapper.find('button[title="Edit Note URL"]').exists()).toBe(true)
       expect(wrapper.find('button[title="Export..."]').exists()).toBe(true)
       expect(
         wrapper.find('button[title="Questions for the note"]').exists()
