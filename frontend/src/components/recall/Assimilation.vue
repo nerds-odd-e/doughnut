@@ -165,8 +165,17 @@ const handleSpellingCancel = () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/assets/menu-variables.scss" as *;
+
+/* Space for fixed settings dock only when that dock is active (see AssimilationSettings). */
 .assimilation-main {
-  padding-bottom: clamp(11rem, 32vh, 22rem);
+  padding-bottom: 1rem;
+}
+
+@media (min-height: $assimilation-dock-min-height) {
+  .assimilation-main {
+    padding-bottom: clamp(11rem, 32vh, 22rem);
+  }
 }
 </style>
 

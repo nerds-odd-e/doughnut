@@ -129,15 +129,25 @@ const closeRefineNoteModal = () => {
 <style scoped lang="scss">
 @use "@/assets/menu-variables.scss" as *;
 
-/* Align with .main-content in DoughnutApp.vue (offset fixed main menu on desktop). */
+/* Short viewports: stay in document flow after the note. Taller: dock to bottom. */
 .assimilation-settings-bar {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: $main-menu-width;
+  position: relative;
+  width: 100%;
+  margin-top: 1rem;
 }
 
-@media (max-width: theme("screens.lg")) {
+@media (min-height: $assimilation-dock-min-height) {
+  .assimilation-settings-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: $main-menu-width;
+    width: auto;
+    margin-top: 0;
+  }
+}
+
+@media (min-height: $assimilation-dock-min-height) and (max-width: theme("screens.lg")) {
   .assimilation-settings-bar {
     left: 0;
   }
