@@ -86,11 +86,9 @@ public class UserService {
 
   public Optional<User> findUserByToken(String token) {
     UserToken usertoken = userTokenRepository.findByToken(token);
-
     if (usertoken == null) {
-      AuthorizationService.throwUserNotFound();
+      return Optional.empty();
     }
-
     return userRepository.findById(usertoken.getUserId());
   }
 

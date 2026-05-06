@@ -15,13 +15,24 @@ const mcpApi = () => {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
-          } as Parameters<typeof UserController.getTokenInfo>[0])
-            .then(() => {
-              return { status: 200, body: {} }
-            })
-            .catch((error) => {
-              return { status: error?.status ?? 500, body: error?.body ?? {} }
-            })
+            throwOnError: false,
+            responseStyle: 'fields',
+          } as Parameters<typeof UserController.getTokenInfo>[0]).then(
+            (result) => {
+              const res = result as {
+                response?: Response
+                data?: unknown
+                error?: unknown
+              }
+              if (res.response?.ok) {
+                return { status: 200, body: res.data ?? {} }
+              }
+              return {
+                status: res.response?.status ?? 500,
+                body: res.error ?? {},
+              }
+            }
+          )
 
           return cy.wrap(promise)
         })
