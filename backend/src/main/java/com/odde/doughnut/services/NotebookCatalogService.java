@@ -49,7 +49,7 @@ public class NotebookCatalogService {
    * Sort keys for the notebooks page catalog (merged list of ungrouped notebooks and groups):
    *
    * <ul>
-   *   <li><b>Notebook</b> row: {@link Notebook#getUpdated_at()}.
+   *   <li><b>Notebook</b> row: {@link Notebook#getUpdatedAt()}.
    *   <li><b>Group</b> row: {@link NotebookGroup#getCreatedAt()}.
    * </ul>
    */
@@ -185,7 +185,7 @@ public class NotebookCatalogService {
   private record SortableRow(NotebookCatalogItem item, Timestamp sortAt, int kind, int tieId) {}
 
   private static Timestamp catalogSortTimestamp(Notebook notebook) {
-    Timestamp at = notebook.getUpdated_at();
+    Timestamp at = notebook.getUpdatedAt();
     return at != null ? at : new Timestamp(0L);
   }
 }

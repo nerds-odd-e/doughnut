@@ -10,13 +10,15 @@ class NotebookBuilder extends Builder<Notebook> {
 
   constructor() {
     super()
+    const now = new Date().toISOString()
     this.data = {
       id: generateId(),
       name: this.notebuilder.data.noteTopology.title ?? '',
       notebookSettings: {
         skipMemoryTrackingEntirely: false,
       },
-      updated_at: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     }
   }
 

@@ -191,12 +191,12 @@ class TestabilityRestController {
           if (notebookFromRepositoryOrNull != null) {
             note.initializeAsNotebookRoot(
                 notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
-            notebookFromRepositoryOrNull.setUpdated_at(currentUTCTimestamp);
+            notebookFromRepositoryOrNull.setUpdatedAt(currentUTCTimestamp);
             entityPersister.merge(notebookFromRepositoryOrNull);
           } else if (firstRootCreatedInBatch == null) {
             note.attachToNewNotebook(ownership, user);
             note.getNotebook().setName(notebookName);
-            note.getNotebook().setUpdated_at(currentUTCTimestamp);
+            note.getNotebook().setUpdatedAt(currentUTCTimestamp);
             entityPersister.save(note.getNotebook());
             firstRootCreatedInBatch = note;
           } else {
@@ -208,14 +208,14 @@ class TestabilityRestController {
         if (notebookFromRepositoryOrNull != null) {
           note.initializeAsNotebookRoot(
               notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
-          notebookFromRepositoryOrNull.setUpdated_at(currentUTCTimestamp);
+          notebookFromRepositoryOrNull.setUpdatedAt(currentUTCTimestamp);
           entityPersister.merge(notebookFromRepositoryOrNull);
           continue;
         }
         if (firstRootCreatedInBatch == null) {
           note.attachToNewNotebook(ownership, user);
           note.getNotebook().setName(notebookName);
-          note.getNotebook().setUpdated_at(currentUTCTimestamp);
+          note.getNotebook().setUpdatedAt(currentUTCTimestamp);
           entityPersister.save(note.getNotebook());
           firstRootCreatedInBatch = note;
         } else {

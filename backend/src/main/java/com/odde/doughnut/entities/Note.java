@@ -227,7 +227,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     Timestamp ts =
         getCreatedAt() != null ? getCreatedAt() : new Timestamp(System.currentTimeMillis());
     notebook.setCreatedAt(ts);
-    notebook.setUpdated_at(ts);
+    notebook.setUpdatedAt(ts);
     setNotebook(notebook);
     String headTitle = getTitle();
     if (headTitle != null && !headTitle.isBlank()) {

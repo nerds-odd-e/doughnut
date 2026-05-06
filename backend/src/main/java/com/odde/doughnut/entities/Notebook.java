@@ -24,7 +24,9 @@ import org.springframework.lang.NonNull;
   "creatorId",
   "name",
   "circle",
-  "description"
+  "description",
+  "createdAt",
+  "updatedAt"
 })
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
@@ -65,12 +67,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @NonNull
-  private Timestamp updated_at;
+  private Timestamp updatedAt;
 
   @Column(name = "created_at", nullable = false)
   @Getter
   @Setter
-  @JsonIgnore
   @NonNull
   private Timestamp createdAt;
 

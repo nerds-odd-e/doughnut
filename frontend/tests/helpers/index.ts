@@ -307,11 +307,16 @@ export function mockSdkService<K extends SdkServiceName>(
 
 /** Mocks `NotebookController.get` for the notebook that owns `realm` (e.g. note show breadcrumb circle). */
 export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
+  const ts =
+    realm.note.noteTopology.updatedAt ??
+    realm.note.noteTopology.createdAt ??
+    new Date().toISOString()
   const notebook: Notebook = {
     id: realm.notebookId,
     name: "Notebook",
     notebookSettings: { skipMemoryTrackingEntirely: false },
-    updated_at: realm.note.noteTopology.updatedAt ?? "",
+    createdAt: realm.note.noteTopology.createdAt ?? ts,
+    updatedAt: ts,
     ...(circle ? { circle } : {}),
   }
   return mockSdkService("get", { notebook, hasAttachedBook: false })

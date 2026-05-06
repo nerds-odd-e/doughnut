@@ -3586,14 +3586,18 @@ components:
           $ref: "#/components/schemas/Circle"
         description:
           type: string
-        updated_at:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
       required:
+      - createdAt
       - id
       - name
       - notebookSettings
-      - updated_at
+      - updatedAt
     NotebookSettings:
       type: object
       properties:

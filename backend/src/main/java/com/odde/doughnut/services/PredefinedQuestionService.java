@@ -32,7 +32,7 @@ public class PredefinedQuestionService {
     predefinedQuestion.setNote(note);
 
     Notebook parentNotebook = note.getNotebook();
-    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
     entityPersister.save(parentNotebook);
     entityPersister.save(predefinedQuestion);
     return predefinedQuestion;

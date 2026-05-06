@@ -189,7 +189,8 @@ export type Notebook = {
     name: string;
     circle?: Circle;
     description?: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type NotebookSettings = {

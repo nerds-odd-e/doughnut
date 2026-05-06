@@ -60,7 +60,7 @@ public class Ownership {
     Notebook notebook = new Notebook();
     notebook.setCreatorEntity(creator);
     notebook.setOwnership(this);
-    notebook.setUpdated_at(currentUTCTimestamp);
+    notebook.setUpdatedAt(currentUTCTimestamp);
     notebook.setCreatedAt(currentUTCTimestamp);
     if (titleConstructor != null) {
       String trimmed = titleConstructor.trim();
