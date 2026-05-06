@@ -51,19 +51,6 @@
               >
             </li>
           </template>
-          <li>
-            <router-link
-              v-if="notebookPageContext.notebook.id != null"
-              :to="{
-                name: 'notebookPage',
-                params: {
-                  notebookId: String(notebookPageContext.notebook.id),
-                },
-              }"
-              >{{ notebookPageContext.notebook.name }}</router-link
-            >
-            <template v-else>{{ notebookPageContext.notebook.name }}</template>
-          </li>
         </ul>
       </div>
     </GlobalBar>
