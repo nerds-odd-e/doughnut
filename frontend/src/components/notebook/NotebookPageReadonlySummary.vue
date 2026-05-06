@@ -8,14 +8,12 @@
         {{ notebook.description }}
       </p>
     </div>
-    <NotebookAttachedBookSection :notebook-id="notebook.id" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { Notebook } from "@generated/doughnut-backend-api"
-import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 
 defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
