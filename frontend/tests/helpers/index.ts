@@ -311,14 +311,18 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
     realm.note.noteTopology.createdAt ??
     new Date().toISOString()
   const notebook: Notebook = {
-    id: realm.notebookId,
+    id: realm.notebookView!.notebook.id,
     name: "Notebook",
     notebookSettings: { skipMemoryTrackingEntirely: false },
     createdAt: realm.note.noteTopology.createdAt ?? ts,
     updatedAt: ts,
     ...(circle ? { circle } : {}),
   }
-  return mockSdkService("get", { notebook, hasAttachedBook: false })
+  return mockSdkService("get", {
+    notebook,
+    hasAttachedBook: false,
+    readonly: realm.notebookView?.readonly ?? false,
+  })
 }
 
 /**

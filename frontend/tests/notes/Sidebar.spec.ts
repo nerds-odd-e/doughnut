@@ -1,5 +1,5 @@
 import Sidebar from "@/components/notes/Sidebar.vue"
-import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
+import { notebookSidebarNotebookClientView } from "@/composables/useCurrentNoteSidebarState"
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type {
@@ -141,7 +141,7 @@ describe("Sidebar", () => {
       .component(Sidebar)
       .withProps({
         activeNoteRealm: realmAsActiveInSidebarStub(n),
-        notebookId: n.notebookId,
+        notebookId: n.notebookView!.notebook.id,
       })
       .mount({ attachTo: document.body })
     return wrapper
@@ -220,7 +220,7 @@ describe("Sidebar", () => {
   })
 
   afterEach(() => {
-    notebookSidebarNotebookPageContext.value = undefined
+    notebookSidebarNotebookClientView.value = undefined
     wrapper?.unmount()
     document.body.innerHTML = ""
     vi.restoreAllMocks()
@@ -297,7 +297,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookId,
+          notebookId: firstGeneration.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -339,7 +339,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookId,
+          notebookId: firstGeneration.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -365,7 +365,7 @@ describe("Sidebar", () => {
 
   it("lists folders above notes; each group sorted by title (A–Z)", async () => {
     storageAccessor.value = createNoteStorage()
-    const nbId = topNoteRealm.notebookId
+    const nbId = topNoteRealm.notebookView!.notebook.id
     const realmZ = makeMe.aNoteRealm.title("zebra").under(topNoteRealm).please()
     const realmA = makeMe.aNoteRealm.title("apple").under(topNoteRealm).please()
     storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
@@ -426,7 +426,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
-          notebookId: topNoteRealm.notebookId,
+          notebookId: topNoteRealm.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -435,7 +435,7 @@ describe("Sidebar", () => {
 
     it("reorders root peers when Title (Z–A) is chosen", async () => {
       storageAccessor.value = createNoteStorage()
-      const nbId = topNoteRealm.notebookId
+      const nbId = topNoteRealm.notebookView!.notebook.id
       const realmZ = makeMe.aNoteRealm
         .title("zebra")
         .under(topNoteRealm)
@@ -519,7 +519,7 @@ describe("Sidebar", () => {
         JSON.stringify({ field: "updated", direction: "desc" })
       )
       storageAccessor.value = createNoteStorage()
-      const nbId = topNoteRealm.notebookId
+      const nbId = topNoteRealm.notebookView!.notebook.id
       const realmZ = makeMe.aNoteRealm
         .title("zebra")
         .updatedAt("2015-06-01T00:00:00.000Z")
@@ -648,7 +648,7 @@ describe("Sidebar", () => {
 
     await wrapper.setProps({
       activeNoteRealm: realmAsActiveInSidebarStub(secondGeneration),
-      notebookId: firstGeneration.notebookId,
+      notebookId: firstGeneration.notebookView!.notebook.id,
     })
     await flushPromises()
     expect(rootSpy).toHaveBeenCalledTimes(1)
@@ -820,7 +820,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookId,
+          notebookId: firstGeneration.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -834,7 +834,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
-          notebookId: topNoteRealm.notebookId,
+          notebookId: topNoteRealm.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -847,7 +847,7 @@ describe("Sidebar", () => {
         .component(Sidebar)
         .withProps({
           activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookId,
+          notebookId: firstGeneration.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -857,14 +857,17 @@ describe("Sidebar", () => {
     it("hides New folder when note realm is from bazaar", async () => {
       const bazaarRealm = {
         ...realmAsActiveInSidebarStub(firstGeneration),
-        fromBazaar: true,
+        notebookView: {
+          ...firstGeneration.notebookView!,
+          readonly: true,
+        },
       } as NoteRealm
       wrapper = helper
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: bazaarRealm,
-          notebookId: bazaarRealm.notebookId,
+          notebookId: bazaarRealm.notebookView!.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -888,7 +891,7 @@ describe("Sidebar", () => {
       .withCurrentUser(makeMe.aUser.please())
       .withProps({
         activeNoteRealm: undefined,
-        notebookId: topNoteRealm.notebookId,
+        notebookId: topNoteRealm.notebookView!.notebook.id,
       })
       .mount({ attachTo: document.body })
     await flushPromises()
@@ -904,14 +907,14 @@ describe("Sidebar", () => {
       .withCurrentUser(makeMe.aUser.please())
       .withProps({
         activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
-        notebookId: topNoteRealm.notebookId,
+        notebookId: topNoteRealm.notebookView!.notebook.id,
       })
       .mount({ attachTo: document.body })
     await flushPromises()
 
     await wrapper.setProps({
       activeNoteRealm: undefined,
-      notebookId: topNoteRealm.notebookId,
+      notebookId: topNoteRealm.notebookView!.notebook.id,
     })
     await flushPromises()
 
@@ -922,16 +925,16 @@ describe("Sidebar", () => {
   })
 
   it("hides New note when notebook page is readonly and anchor realm is not loaded yet", async () => {
-    notebookSidebarNotebookPageContext.value = {
+    notebookSidebarNotebookClientView.value = {
       notebook: makeMe.aNotebook.please(),
-      isNotebookReadOnly: true,
+      readonly: true,
     }
     wrapper = helper
       .component(Sidebar)
       .withCurrentUser(makeMe.aUser.please())
       .withProps({
         activeNoteRealm: undefined,
-        notebookId: topNoteRealm.notebookId,
+        notebookId: topNoteRealm.notebookView!.notebook.id,
       })
       .mount({ attachTo: document.body })
     await flushPromises()

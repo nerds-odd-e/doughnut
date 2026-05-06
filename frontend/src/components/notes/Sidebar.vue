@@ -37,7 +37,7 @@ import {
   type SidebarUserActiveFolder,
 } from "./useNoteSidebarTree"
 import {
-  notebookSidebarNotebookPageContext,
+  notebookSidebarNotebookClientView,
   notebookSidebarUserActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
 
@@ -122,12 +122,13 @@ watch(
 )
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
-const sidebarReadonly = computed(
-  () =>
-    !currentUser?.value ||
-    notebookSidebarNotebookPageContext.value?.isNotebookReadOnly === true ||
-    (props.activeNoteRealm != null && props.activeNoteRealm.fromBazaar === true)
-)
+const sidebarReadonly = computed(() => {
+  if (!currentUser?.value) return true
+  const realmReadonly = props.activeNoteRealm?.notebookView?.readonly
+  if (realmReadonly === true) return true
+  if (props.activeNoteRealm != null) return false
+  return notebookSidebarNotebookClientView.value?.readonly === true
+})
 
 const noteContextResolved = computed(() => activeNoteTopology.value != null)
 

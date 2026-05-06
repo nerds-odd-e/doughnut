@@ -83,7 +83,7 @@ describe("adding new note", () => {
   const note = realm.note
 
   const notebookRootProps = {
-    notebookRootNotebookId: realm.notebookId,
+    notebookRootNotebookId: realm.notebookView!.notebook.id,
     titleSearchAnchorNote: note,
   }
 
@@ -198,7 +198,7 @@ describe("adding new note", () => {
         .trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: {
-          notebook: realm.notebookId,
+          notebook: realm.notebookView!.notebook.id,
         },
         body: expect.objectContaining({ newTitle: "note title" }),
       })

@@ -8,7 +8,13 @@ describe("breadcrumb with circles", () => {
   it("view note belongs to other people in bazaar", async () => {
     helper
       .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: true, ancestorFolders: [] })
+      .withProps({
+        notebookView: {
+          notebook: makeMe.aNotebook.please(),
+          readonly: true,
+        },
+        ancestorFolders: [],
+      })
       .render()
     await screen.findByText("Bazaar")
   })
@@ -18,8 +24,7 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        fromBazaar: false,
-        notebook,
+        notebookView: { notebook, readonly: false },
         ancestorFolders: [],
       })
       .render()
@@ -32,7 +37,10 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        fromBazaar: false,
+        notebookView: {
+          notebook: makeMe.aNotebook.please(),
+          readonly: false,
+        },
         ancestorFolders: [
           { id: "1", name: "parent" },
           { id: "2", name: "child" },
@@ -51,7 +59,10 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        fromBazaar: false,
+        notebookView: {
+          notebook: makeMe.aNotebook.please(),
+          readonly: false,
+        },
         ancestorFolders: [
           { id: 10, name: "Outer" },
           { id: 20, name: "Inner" },

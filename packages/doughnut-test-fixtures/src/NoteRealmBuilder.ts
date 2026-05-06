@@ -1,4 +1,7 @@
-import type { NoteRealm } from '@generated/doughnut-backend-api'
+import type {
+  NoteRealm,
+  NotebookClientView,
+} from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
 
@@ -11,12 +14,24 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     super()
     this.noteBuilder = new NoteBuilder()
     const noteData = this.noteBuilder.data
+    const ts = new Date().toISOString()
+    const notebook = {
+      id: this.noteBuilder.realmNotebookId,
+      name: noteData.noteTopology.title,
+      notebookSettings: { skipMemoryTrackingEntirely: false },
+      createdAt: ts,
+      updatedAt: ts,
+    }
+    const notebookView: NotebookClientView = {
+      notebook,
+      readonly: false,
+    }
     this.data = {
       id: noteData.id,
       note: noteData,
       references: [],
       wikiTitles: [],
-      notebookId: this.noteBuilder.realmNotebookId,
+      notebookView,
       ancestorFolders: [],
     }
   }
@@ -69,7 +84,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
-    this.data.notebookId = this.noteBuilder.realmNotebookId
+    const nb = this.data.notebookView?.notebook
+    if (nb) {
+      nb.id = this.noteBuilder.realmNotebookId
+      nb.name = this.data.note.noteTopology.title
+    }
     this.data.wikiTitles ??= []
     return this.data
   }

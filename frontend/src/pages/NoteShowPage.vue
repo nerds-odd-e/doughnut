@@ -37,7 +37,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
   currentNotebookId,
-  notebookSidebarNotebookPageContext,
+  notebookSidebarNotebookClientView,
 } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
@@ -80,7 +80,7 @@ watch(
   }),
   ({ realm, noteId }) => {
     if (noteId != null && !Number.isNaN(noteId)) {
-      const nb = realm?.notebookId
+      const nb = realm?.notebookView?.notebook?.id
       if (nb != null) {
         currentNotebookId.value = nb
       }
@@ -108,7 +108,7 @@ const handleCloseConversation = (conversationRealm: NoteRealm) => {
 }
 
 onMounted(() => {
-  notebookSidebarNotebookPageContext.value = undefined
+  notebookSidebarNotebookClientView.value = undefined
 })
 </script>
 

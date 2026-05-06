@@ -20,35 +20,47 @@
         />
       </button>
       <BreadcrumbWithCircle
-        v-if="noteRealmForBreadcrumb"
+        v-if="noteRealmForBreadcrumb?.notebookView"
         v-bind="{
-          fromBazaar: noteRealmForBreadcrumb.fromBazaar,
-          notebook: notebookForBreadcrumb,
+          notebookView: noteRealmForBreadcrumb.notebookView,
           ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],
         }"
       />
       <div
-        v-else-if="notebookPageContext"
+        v-else-if="sidebarNotebookClientView"
         class="daisy-text-sm daisy-breadcrumbs daisy-max-w-full daisy-min-w-0"
       >
         <ul class="daisy-m-0 daisy-pl-0">
-          <li v-if="notebookPageContext.isNotebookReadOnly">
+          <li v-if="sidebarNotebookClientView.readonly">
             <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
           </li>
           <template v-else>
             <li>
               <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
             </li>
-            <li v-if="notebookPageContext.notebook.circle">
+            <li v-if="sidebarNotebookClientView.notebook.circle">
               <router-link
                 :to="{
                   name: 'circleShow',
-                  params: { circleId: notebookPageContext.notebook.circle.id },
+                  params: {
+                    circleId: sidebarNotebookClientView.notebook.circle.id,
+                  },
                 }"
-                >{{ notebookPageContext.notebook.circle.name }}</router-link
+                >{{ sidebarNotebookClientView.notebook.circle.name }}</router-link
               >
             </li>
           </template>
+          <li>
+            <router-link
+              :to="{
+                name: 'notebookPage',
+                params: {
+                  notebookId: String(sidebarNotebookClientView.notebook.id),
+                },
+              }"
+              >{{ sidebarNotebookClientView.notebook.name }}</router-link
+            >
+          </li>
         </ul>
       </div>
     </GlobalBar>
@@ -91,8 +103,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import type { NoteRealm, Notebook } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
@@ -101,7 +112,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
   currentNotebookId,
-  notebookSidebarNotebookPageContext,
+  notebookSidebarNotebookClientView,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 
@@ -115,8 +126,8 @@ const windowWidth = ref(
 
 const isMdOrLarger = computed(() => windowWidth.value >= 768)
 
-const notebookPageContext = computed(
-  () => notebookSidebarNotebookPageContext.value
+const sidebarNotebookClientView = computed(
+  () => notebookSidebarNotebookClientView.value
 )
 
 const sidebarNotebookId = computed(() => currentNotebookId.value)
@@ -133,28 +144,6 @@ const noteRealmForBreadcrumb = computed(() => {
   }
   return sidebarRealm.value
 })
-
-const notebookForBreadcrumb = ref<Notebook | undefined>(undefined)
-
-watch(
-  () => noteRealmForBreadcrumb.value?.notebookId ?? currentNotebookId.value,
-  async (notebookId) => {
-    if (notebookId == null || Number.isNaN(Number(notebookId))) {
-      notebookForBreadcrumb.value = undefined
-      return
-    }
-    if (notebookForBreadcrumb.value?.id === notebookId) {
-      return
-    }
-    const { data, error } = await NotebookController.get({
-      path: { notebook: notebookId },
-    })
-    if (!error && data) {
-      notebookForBreadcrumb.value = data.notebook
-    }
-  },
-  { immediate: true }
-)
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth

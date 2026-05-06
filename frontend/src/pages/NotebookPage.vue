@@ -40,7 +40,7 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
   currentActiveNoteId,
   currentNotebookId,
-  notebookSidebarNotebookPageContext,
+  notebookSidebarNotebookClientView,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
@@ -82,15 +82,12 @@ watch(
   notebookClient,
   (c) => {
     if (!c) {
-      notebookSidebarNotebookPageContext.value = undefined
+      notebookSidebarNotebookClientView.value = undefined
       currentNotebookId.value = undefined
       return
     }
     currentNotebookId.value = c.notebook.id
-    notebookSidebarNotebookPageContext.value = {
-      notebook: c.notebook,
-      isNotebookReadOnly: c.readonly === true,
-    }
+    notebookSidebarNotebookClientView.value = c
   },
   { immediate: true, deep: true }
 )
@@ -154,6 +151,6 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  notebookSidebarNotebookPageContext.value = undefined
+  notebookSidebarNotebookClientView.value = undefined
 })
 </script>

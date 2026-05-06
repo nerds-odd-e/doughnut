@@ -15,11 +15,15 @@ public class NoteRealmService {
 
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
+  private final NotebookCatalogService notebookCatalogService;
 
   public NoteRealmService(
-      WikiTitleCacheService wikiTitleCacheService, NoteRepository noteRepository) {
+      WikiTitleCacheService wikiTitleCacheService,
+      NoteRepository noteRepository,
+      NotebookCatalogService notebookCatalogService) {
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteRepository = noteRepository;
+    this.notebookCatalogService = notebookCatalogService;
   }
 
   public NoteRealm build(Note note, User viewer) {
@@ -29,7 +33,7 @@ public class NoteRealmService {
     List<Note> refNotes =
         hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer));
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
-    realm.setFromBazaar(viewer == null || !viewer.owns(focus.getNotebook()));
+    realm.setNotebookView(notebookCatalogService.clientViewFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
     return realm;
   }

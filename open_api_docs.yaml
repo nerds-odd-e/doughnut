@@ -3692,11 +3692,8 @@ components:
           format: int32
         note:
           $ref: "#/components/schemas/Note"
-        fromBazaar:
-          type: boolean
-        notebookId:
-          type: integer
-          format: int32
+        notebookView:
+          $ref: "#/components/schemas/NotebookClientView"
         ancestorFolders:
           type: array
           items:
@@ -3712,7 +3709,6 @@ components:
       required:
       - id
       - note
-      - notebookId
     NoteTopology:
       type: object
       properties:
@@ -3734,6 +3730,25 @@ components:
       required:
       - id
       - title
+    NotebookClientView:
+      type: object
+      description: Notebook entity plus optional client-only fields (e.g. catalog
+        attachment hints).
+      properties:
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        hasAttachedBook:
+          type: boolean
+        readonly:
+          type: boolean
+        indexNoteId:
+          type: integer
+          format: int32
+          description: "Id of this notebook's index landing note when one exists (root\
+            \ folder scope, title equal to \"index\" case-insensitive); omitted when\
+            \ absent."
+      required:
+      - notebook
     WikiTitle:
       type: object
       properties:
@@ -4246,25 +4261,6 @@ components:
       required:
       - bookName
       - format
-    NotebookClientView:
-      type: object
-      description: Notebook entity plus optional client-only fields (e.g. catalog
-        attachment hints).
-      properties:
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        hasAttachedBook:
-          type: boolean
-        readonly:
-          type: boolean
-        indexNoteId:
-          type: integer
-          format: int32
-          description: "Id of this notebook's index landing note when one exists (root\
-            \ folder scope, title equal to \"index\" case-insensitive); omitted when\
-            \ absent."
-      required:
-      - notebook
     NotebookCertificateApproval:
       type: object
       properties:

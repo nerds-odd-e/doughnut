@@ -37,7 +37,7 @@ describe("NotebookPage.spec", () => {
   it("shows the note-show sidebar toggle and loads index state when notebook exposes landing id", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
-    indexRealm.notebookId = notebook.id
+    indexRealm.notebookView = { notebook, readonly: false }
     mockSdkService("get", {
       notebook,
       hasAttachedBook: false,
@@ -78,7 +78,7 @@ describe("NotebookPage.spec", () => {
   it("does not show empty-index prompt while landing note load is delayed", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
-    indexRealm.notebookId = notebook.id
+    indexRealm.notebookView = { notebook, readonly: false }
     mockSdkService("get", {
       notebook,
       hasAttachedBook: false,

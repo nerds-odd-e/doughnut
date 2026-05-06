@@ -231,8 +231,7 @@ export type Note = {
 export type NoteRealm = {
     id: number;
     note: Note;
-    fromBazaar?: boolean;
-    notebookId: number;
+    notebookView?: NotebookClientView;
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
@@ -244,6 +243,19 @@ export type NoteTopology = {
     folderId?: number;
     createdAt?: string;
     updatedAt?: string;
+};
+
+/**
+ * Notebook entity plus optional client-only fields (e.g. catalog attachment hints).
+ */
+export type NotebookClientView = {
+    notebook: Notebook;
+    hasAttachedBook?: boolean;
+    readonly?: boolean;
+    /**
+     * Id of this notebook's index landing note when one exists (root folder scope, title equal to "index" case-insensitive); omitted when absent.
+     */
+    indexNoteId?: number;
 };
 
 export type WikiTitle = {
@@ -515,19 +527,6 @@ export type AttachBookRequestFull = {
     format: 'pdf' | 'epub';
     layout?: AttachBookLayoutRequestFull;
     contentList?: Array<unknown>;
-};
-
-/**
- * Notebook entity plus optional client-only fields (e.g. catalog attachment hints).
- */
-export type NotebookClientView = {
-    notebook: Notebook;
-    hasAttachedBook?: boolean;
-    readonly?: boolean;
-    /**
-     * Id of this notebook's index landing note when one exists (root folder scope, title equal to "index" case-insensitive); omitted when absent.
-     */
-    indexNoteId?: number;
 };
 
 export type NotebookCertificateApproval = {
@@ -966,8 +965,7 @@ export type NoteWritable = {
 export type NoteRealmWritable = {
     id: number;
     note: NoteWritable;
-    fromBazaar?: boolean;
-    notebookId: number;
+    notebookView?: NotebookClientView;
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
