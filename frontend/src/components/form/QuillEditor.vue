@@ -3,8 +3,8 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, onMounted, watch } from "vue"
-import { useRouter } from "vue-router"
+import { getCurrentInstance, nextTick, ref, onMounted, watch } from "vue"
+import type { Router } from "vue-router"
 import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
@@ -97,7 +97,8 @@ const emits = defineEmits<{
   deadLinkClick: [title: string]
 }>()
 
-const router = useRouter()
+const router = getCurrentInstance()?.appContext.config.globalProperties
+  .$router as Router | undefined
 const localValue = ref(props.modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
@@ -228,7 +229,7 @@ onMounted(async () => {
           window.open(href, "_blank", "noopener,noreferrer")
           return
         }
-        router.push(href)
+        router?.push(href)
       },
       true
     )
