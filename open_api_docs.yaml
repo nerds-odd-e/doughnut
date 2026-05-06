@@ -3906,6 +3906,7 @@ components:
           enum:
           - NOTE
           - FOLDER
+          - NOTEBOOK
         noteSearchResult:
           $ref: "#/components/schemas/NoteSearchResult"
           description: Present when hitKind is NOTE
@@ -3919,14 +3920,15 @@ components:
         notebookId:
           type: integer
           format: int32
-          description: Notebook for a folder hit
+          description: Notebook id for a folder or notebook hit
         notebookName:
           type: string
-          description: Notebook display name for a folder hit
+          description: Notebook display name for a folder or notebook hit
         distance:
           type: number
           format: float
-          description: "Match score for a folder hit (0 exact, 0.9 partial)"
+          description: "Match score for folder or notebook literal hit (0 exact, 0.9\
+            \ partial)"
       required:
       - hitKind
     NoteRecallSetting:

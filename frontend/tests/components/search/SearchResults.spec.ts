@@ -80,6 +80,21 @@ function noteIdFromStubbedLinkTo(toAttr: string): number | undefined {
   }
 }
 
+function notebookIdFromStubbedLinkTo(toAttr: string): number | undefined {
+  try {
+    const to = JSON.parse(toAttr) as {
+      name?: string
+      params?: { notebookId?: string | number }
+    }
+    if (to.name === "notebookPage" && to.params?.notebookId != null) {
+      return Number(to.params.notebookId)
+    }
+    return
+  } catch {
+    return
+  }
+}
+
 function mountSearchResults(props: {
   inputSearchKey: string
   isDropdown?: boolean
@@ -299,6 +314,42 @@ describe("SearchResults.vue", () => {
       const folderRow = wrapper.find(".folder-search-hit")
       expect(folderRow.exists()).toBe(true)
       expect(folderRow.find(".router-link").exists()).toBe(false)
+      vi.useRealTimers()
+    })
+
+    it("dropdown shows notebook hit as router-link to notebook page", async () => {
+      vi.useFakeTimers()
+      const notebookHit: RelationshipLiteralSearchHit = {
+        hitKind: "NOTEBOOK",
+        notebookId: 99,
+        notebookName: "Field Guide",
+        distance: 0.0,
+      }
+      mockSdkServiceWithImplementation(
+        "searchForRelationshipTargetWithin",
+        vi.fn().mockResolvedValue([notebookHit])
+      )
+      mockSdkServiceWithImplementation(
+        "semanticSearchWithin",
+        vi.fn().mockResolvedValue([])
+      )
+      mockSdkService("searchForRelationshipTarget", [])
+      mockSdkService("semanticSearch", [])
+      mockSdkService("getRecentNotes", [])
+
+      const wrapper = mountSearchResults({
+        inputSearchKey: "field",
+        noteId: 1,
+        isDropdown: true,
+      })
+      await waitForDebounce()
+
+      expect(wrapper.text()).toContain("Field Guide")
+      const links = wrapper.findAll(".router-link")
+      const notebookIds = links
+        .map((a) => notebookIdFromStubbedLinkTo(a.attributes("to") ?? "{}"))
+        .filter((id): id is number => id != null)
+      expect(notebookIds).toContain(99)
       vi.useRealTimers()
     })
   })

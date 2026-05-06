@@ -339,7 +339,7 @@ export type NoteSearchResult = {
 };
 
 export type RelationshipLiteralSearchHit = {
-    hitKind: 'NOTE' | 'FOLDER';
+    hitKind: 'NOTE' | 'FOLDER' | 'NOTEBOOK';
     /**
      * Present when hitKind is NOTE
      */
@@ -353,15 +353,15 @@ export type RelationshipLiteralSearchHit = {
      */
     folderName?: string;
     /**
-     * Notebook for a folder hit
+     * Notebook id for a folder or notebook hit
      */
     notebookId?: number;
     /**
-     * Notebook display name for a folder hit
+     * Notebook display name for a folder or notebook hit
      */
     notebookName?: string;
     /**
-     * Match score for a folder hit (0 exact, 0.9 partial)
+     * Match score for folder or notebook literal hit (0 exact, 0.9 partial)
      */
     distance?: number;
 };

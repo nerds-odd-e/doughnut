@@ -127,6 +127,29 @@ describe("SearchResultListItem", () => {
     expect(wrapper.find(".router-link").exists()).toBe(false)
   })
 
+  it("renders notebook hit as router-link to notebook page", () => {
+    const hit: RelationshipLiteralSearchHit = {
+      hitKind: "NOTEBOOK",
+      notebookId: 42,
+      notebookName: "My Study",
+      distance: 0.0,
+    }
+    const wrapper = helper
+      .component(SearchResultListItem)
+      .withProps({ searchHit: hit })
+      .mount()
+
+    const link = wrapper.find("a.notebook-hit-title.router-link")
+    expect(link.exists()).toBe(true)
+    expect(link.text()).toContain("My Study")
+    const to = JSON.parse(link.attributes("to") ?? "{}") as {
+      name?: string
+      params?: { notebookId?: number }
+    }
+    expect(to.name).toBe("notebookPage")
+    expect(to.params?.notebookId).toBe(42)
+  })
+
   it("renders folderButton slot for folder hit", () => {
     const hit: RelationshipLiteralSearchHit = {
       hitKind: "FOLDER",

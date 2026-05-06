@@ -16,7 +16,8 @@ public class RelationshipLiteralSearchHit {
 
   public enum HitKind {
     NOTE,
-    FOLDER
+    FOLDER,
+    NOTEBOOK
   }
 
   @NotNull
@@ -32,13 +33,13 @@ public class RelationshipLiteralSearchHit {
   @Schema(description = "Present when hitKind is FOLDER")
   private String folderName;
 
-  @Schema(description = "Notebook for a folder hit")
+  @Schema(description = "Notebook id for a folder or notebook hit")
   private Integer notebookId;
 
-  @Schema(description = "Notebook display name for a folder hit")
+  @Schema(description = "Notebook display name for a folder or notebook hit")
   private String notebookName;
 
-  @Schema(description = "Match score for a folder hit (0 exact, 0.9 partial)")
+  @Schema(description = "Match score for folder or notebook literal hit (0 exact, 0.9 partial)")
   private Float distance;
 
   public static RelationshipLiteralSearchHit note(NoteSearchResult noteSearchResult) {
@@ -64,6 +65,16 @@ public class RelationshipLiteralSearchHit {
     return hit;
   }
 
+  public static RelationshipLiteralSearchHit notebook(
+      Integer notebookId, String notebookName, float distance) {
+    RelationshipLiteralSearchHit hit = new RelationshipLiteralSearchHit();
+    hit.setHitKind(HitKind.NOTEBOOK);
+    hit.setNotebookId(notebookId);
+    hit.setNotebookName(notebookName);
+    hit.setDistance(distance);
+    return hit;
+  }
+
   @JsonIgnore
   public boolean isNote() {
     return hitKind == HitKind.NOTE;
@@ -72,5 +83,10 @@ public class RelationshipLiteralSearchHit {
   @JsonIgnore
   public boolean isFolder() {
     return hitKind == HitKind.FOLDER;
+  }
+
+  @JsonIgnore
+  public boolean isNotebook() {
+    return hitKind == HitKind.NOTEBOOK;
   }
 }

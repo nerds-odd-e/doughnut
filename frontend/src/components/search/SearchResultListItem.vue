@@ -16,6 +16,11 @@
           v-else-if="searchHit.hitKind === 'FOLDER'"
           class="folder-hit-title"
         >{{ searchHit.folderName }}</span>
+        <router-link
+          v-else-if="searchHit.hitKind === 'NOTEBOOK' && searchHit.notebookId != null"
+          :to="{ name: 'notebookPage', params: { notebookId: searchHit.notebookId } }"
+          class="notebook-hit-title daisy-text-decoration-none"
+        >{{ searchHit.notebookName }}</router-link>
       </div>
       <div
         v-if="displayNotebookName || displayDistance != null"
@@ -85,7 +90,10 @@ const displayDistance = computed(() => {
   if (props.searchHit.hitKind === "NOTE" && props.searchHit.noteSearchResult) {
     return props.searchHit.noteSearchResult.distance
   }
-  if (props.searchHit.hitKind === "FOLDER") {
+  if (
+    props.searchHit.hitKind === "FOLDER" ||
+    props.searchHit.hitKind === "NOTEBOOK"
+  ) {
     return props.searchHit.distance
   }
   return undefined
@@ -108,7 +116,8 @@ const formattedDistance = computed(() =>
   margin-top: 0.125rem;
 }
 
-.folder-hit-title {
+.folder-hit-title,
+.notebook-hit-title {
   font-weight: 600;
 }
 </style>

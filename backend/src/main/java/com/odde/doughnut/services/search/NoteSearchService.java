@@ -5,10 +5,12 @@ import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.services.EmbeddingService;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,19 +27,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class NoteSearchService {
   private static final int FOLDER_LITERAL_MATCH_CAP = 12;
+  private static final int NOTEBOOK_LITERAL_MATCH_CAP = 12;
 
   private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
+  private final NotebookRepository notebookRepository;
   private final NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
   private final EmbeddingService embeddingService;
 
   public NoteSearchService(
       NoteRepository noteRepository,
       FolderRepository folderRepository,
+      NotebookRepository notebookRepository,
       NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository,
       EmbeddingService embeddingService) {
     this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
+    this.notebookRepository = notebookRepository;
     this.noteEmbeddingJdbcRepository = noteEmbeddingJdbcRepository;
     this.embeddingService = embeddingService;
   }
@@ -78,7 +84,109 @@ public class NoteSearchService {
     List<Folder> exactFolders = searchExactFolderMatches(user, searchTerm, notebookId);
     List<Folder> partialFolders = searchPartialFolderMatches(user, searchTerm, notebookId);
     hits.addAll(combineFolderExactAndPartialAsHits(exactFolders, partialFolders));
+    List<Notebook> exactNotebooks = searchExactNotebookMatches(user, searchTerm, notebookId);
+    List<Notebook> partialNotebooks = searchPartialNotebookMatches(user, searchTerm, notebookId);
+    hits.addAll(combineNotebookExactAndPartialAsHits(exactNotebooks, partialNotebooks));
     return sortRelationshipLiteralHits(hits, notebookId);
+  }
+
+  private boolean suppressNotebookLiteralHits(SearchTerm searchTerm, Integer notebookId) {
+    if (notebookId == null) {
+      return false;
+    }
+    return !Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())
+        && !Boolean.TRUE.equals(searchTerm.getAllMyCircles());
+  }
+
+  private List<RelationshipLiteralSearchHit> combineNotebookExactAndPartialAsHits(
+      List<Notebook> exactNotebooks, List<Notebook> partialNotebooks) {
+    List<RelationshipLiteralSearchHit> notebookHits = new ArrayList<>();
+    for (Notebook nb : exactNotebooks) {
+      notebookHits.add(notebookToHit(nb, 0.0f));
+    }
+    java.util.Set<Integer> exactNotebookIds =
+        exactNotebooks.stream().map(Notebook::getId).collect(Collectors.toSet());
+    int remaining = Math.max(0, NOTEBOOK_LITERAL_MATCH_CAP - exactNotebooks.size());
+    partialNotebooks.stream()
+        .filter(nb -> !exactNotebookIds.contains(nb.getId()))
+        .limit(remaining)
+        .forEach(nb -> notebookHits.add(notebookToHit(nb, 0.9f)));
+    return notebookHits;
+  }
+
+  private RelationshipLiteralSearchHit notebookToHit(Notebook notebook, float distance) {
+    return RelationshipLiteralSearchHit.notebook(notebook.getId(), notebook.getName(), distance);
+  }
+
+  private List<Notebook> searchExactNotebookMatches(
+      User user, SearchTerm searchTerm, Integer notebookId) {
+    String key = searchTerm.getTrimmedSearchKey();
+    if (Strings.isBlank(key)) {
+      return List.of();
+    }
+    if (suppressNotebookLiteralHits(searchTerm, notebookId)) {
+      return List.of();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
+      return Stream.concat(
+              searchExactNotebooksInMyNotebooksAndSubscriptions(user, key).stream(),
+              notebookRepository.searchExactForUserInAllMyCircle(user.getId(), key).stream())
+          .toList();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
+      return searchExactNotebooksInMyNotebooksAndSubscriptions(user, key);
+    }
+    return notebookRepository.searchExactInNotebook(notebookId, key);
+  }
+
+  private List<Notebook> searchExactNotebooksInMyNotebooksAndSubscriptions(User user, String key) {
+    return Stream.concat(
+            notebookRepository.searchExactForUserInAllMyNotebooks(user.getId(), key).stream(),
+            notebookRepository.searchExactForUserInAllMySubscriptions(user.getId(), key).stream())
+        .toList();
+  }
+
+  private List<Notebook> searchPartialNotebookMatches(
+      User user, SearchTerm searchTerm, Integer notebookId) {
+    String searchKey = searchTerm.getTrimmedSearchKey();
+    if (Strings.isBlank(searchKey)) {
+      return List.of();
+    }
+    if (suppressNotebookLiteralHits(searchTerm, notebookId)) {
+      return List.of();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
+      return Stream.concat(
+              searchPartialNotebooksInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
+              notebookRepository
+                  .searchForUserInAllMyCircle(
+                      user.getId(), getPattern(searchTerm), getNotebookPageable())
+                  .stream())
+          .toList();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
+      return searchPartialNotebooksInMyNotebooksAndSubscriptions(user, searchTerm);
+    }
+    return notebookRepository.searchInNotebook(
+        notebookId, getPattern(searchTerm), getNotebookPageable());
+  }
+
+  private List<Notebook> searchPartialNotebooksInMyNotebooksAndSubscriptions(
+      User user, SearchTerm searchTerm) {
+    return Stream.concat(
+            notebookRepository
+                .searchForUserInAllMyNotebooks(
+                    user.getId(), getPattern(searchTerm), getNotebookPageable())
+                .stream(),
+            notebookRepository
+                .searchForUserInAllMySubscriptions(
+                    user.getId(), getPattern(searchTerm), getNotebookPageable())
+                .stream())
+        .toList();
+  }
+
+  private Pageable getNotebookPageable() {
+    return PageRequest.of(0, NOTEBOOK_LITERAL_MATCH_CAP);
   }
 
   private List<RelationshipLiteralSearchHit> combineFolderExactAndPartialAsHits(
@@ -201,11 +309,16 @@ public class NoteSearchService {
                     ? (h.getNoteSearchResult().getNoteTopology().getTitle() != null
                         ? h.getNoteSearchResult().getNoteTopology().getTitle()
                         : "")
-                    : (h.getFolderName() != null ? h.getFolderName() : ""),
+                    : (h.isFolder()
+                        ? (h.getFolderName() != null ? h.getFolderName() : "")
+                        : (h.getNotebookName() != null ? h.getNotebookName() : "")),
             String.CASE_INSENSITIVE_ORDER);
     Comparator<RelationshipLiteralSearchHit> byId =
         Comparator.comparing(
-            h -> h.isNote() ? h.getNoteSearchResult().getNoteTopology().getId() : h.getFolderId());
+            h ->
+                h.isNote()
+                    ? h.getNoteSearchResult().getNoteTopology().getId()
+                    : (h.isFolder() ? h.getFolderId() : h.getNotebookId()));
     return hits.stream()
         .sorted(byDistance.thenComparing(byNotebook).thenComparing(byLabel).thenComparing(byId))
         .toList();

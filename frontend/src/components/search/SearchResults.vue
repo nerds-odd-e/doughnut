@@ -72,6 +72,13 @@
               class="daisy-block daisy-text-xs daisy-opacity-70"
             >{{ hit.notebookName }}</span>
           </div>
+          <router-link
+            v-else-if="hit.hitKind === 'NOTEBOOK' && hit.notebookId != null"
+            :to="{ name: 'notebookPage', params: { notebookId: hit.notebookId } }"
+            class="daisy-block daisy-py-1 daisy-px-2 daisy-text-decoration-none"
+          >
+            <span class="daisy-font-medium">{{ hit.notebookName }}</span>
+          </router-link>
         </template>
       </div>
       <SearchResultList

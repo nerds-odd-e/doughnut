@@ -24,7 +24,7 @@ function hitDistance(h: RelationshipLiteralSearchHit): number {
   if (h.hitKind === "NOTE" && h.noteSearchResult) {
     return h.noteSearchResult.distance ?? Number.POSITIVE_INFINITY
   }
-  if (h.hitKind === "FOLDER") {
+  if (h.hitKind === "FOLDER" || h.hitKind === "NOTEBOOK") {
     return h.distance ?? Number.POSITIVE_INFINITY
   }
   return Number.POSITIVE_INFINITY
@@ -37,6 +37,9 @@ function titleForSort(h: RelationshipLiteralSearchHit): string {
   if (h.hitKind === "FOLDER" && h.folderName) {
     return h.folderName.trim().toLowerCase()
   }
+  if (h.hitKind === "NOTEBOOK" && h.notebookName) {
+    return h.notebookName.trim().toLowerCase()
+  }
   return ""
 }
 
@@ -44,10 +47,17 @@ function notebookIdOf(h: RelationshipLiteralSearchHit): number | undefined {
   if (h.hitKind === "NOTE" && h.noteSearchResult) {
     return h.noteSearchResult.notebookId
   }
-  if (h.hitKind === "FOLDER") {
+  if (h.hitKind === "FOLDER" || h.hitKind === "NOTEBOOK") {
     return h.notebookId
   }
   return
+}
+
+function hitKindRank(kind: RelationshipLiteralSearchHit["hitKind"]): number {
+  if (kind === "NOTE") return 0
+  if (kind === "NOTEBOOK") return 1
+  if (kind === "FOLDER") return 2
+  return 3
 }
 
 export class SearchResultsModel {
@@ -333,6 +343,15 @@ export class SearchResultsModel {
           return next
         return db < da ? next : prev
       }
+      if (prev.hitKind === "NOTEBOOK" && next.hitKind === "NOTEBOOK") {
+        const da = prev.distance ?? Number.POSITIVE_INFINITY
+        const db = next.distance ?? Number.POSITIVE_INFINITY
+        if (isExactLiteralDistance(da) && !isExactLiteralDistance(db))
+          return prev
+        if (!isExactLiteralDistance(da) && isExactLiteralDistance(db))
+          return next
+        return db < da ? next : prev
+      }
       return next
     }
 
@@ -382,7 +401,10 @@ export class SearchResultsModel {
       if (a.hitKind === "FOLDER" && b.hitKind === "FOLDER") {
         return (a.folderId ?? 0) - (b.folderId ?? 0)
       }
-      return a.hitKind === b.hitKind ? 0 : a.hitKind === "NOTE" ? -1 : 1
+      if (a.hitKind === "NOTEBOOK" && b.hitKind === "NOTEBOOK") {
+        return (a.notebookId ?? 0) - (b.notebookId ?? 0)
+      }
+      return hitKindRank(a.hitKind) - hitKindRank(b.hitKind)
     })
   }
 }

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -132,6 +133,27 @@ class SearchControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldReturnNotebookHitsAlongsideNoteHits() throws UnexpectedNoAccessRightException {
+      makeMe.aNote("Recipe Ideas").creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aNote("My Recipe Card").creatorAndOwner(currentUser.getUser()).please();
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("Recipe");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      assertThat(
+          result.stream()
+              .anyMatch(
+                  h ->
+                      h.isNotebook()
+                          && "Recipe Ideas".equals(h.getNotebookName())
+                          && h.getNotebookId() != null),
+          is(true));
+    }
+
+    @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       currentUser.setUser(null);
 
@@ -211,6 +233,21 @@ class SearchControllerTests extends ControllerTestBase {
       var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
       assertThat(RelationshipLiteralSearchHits.noteMatches(result), hasSize(2));
+    }
+
+    @Test
+    void shouldSuppressNotebookLiteralHitsWhenScopedWithoutGlobalFlags()
+        throws UnexpectedNoAccessRightException {
+      makeMe.aNote("OrphanNotebookTitle").creatorAndOwner(currentUser.getUser()).please();
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("Orphan");
+      searchTerm.setAllMyNotebooksAndSubscriptions(false);
+      searchTerm.setAllMyCircles(false);
+
+      var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
+
+      assertThat(result.stream().noneMatch(RelationshipLiteralSearchHit::isNotebook), is(true));
     }
 
     @Test

@@ -13,5 +13,8 @@ export function relationshipLiteralSearchHitKey(
   if (hit.hitKind === "FOLDER" && hit.folderId != null) {
     return `f:${hit.folderId}`
   }
+  if (hit.hitKind === "NOTEBOOK" && hit.notebookId != null) {
+    return `nb:${hit.notebookId}`
+  }
   return `x:${JSON.stringify(hit)}`
 }
