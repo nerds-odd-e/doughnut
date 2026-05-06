@@ -182,9 +182,6 @@ describe("NoteMoreOptionsDialog", () => {
 
       await flushPromises()
 
-      expect(
-        wrapper.find('button[title="Generate Image with DALL-E"]').exists()
-      ).toBe(true)
       expect(wrapper.find('button[title="Edit Note Image"]').exists()).toBe(
         true
       )

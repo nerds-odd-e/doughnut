@@ -71,10 +71,6 @@ Given('OpenAI has models {string} available', (modelNames: string) => {
   })
 })
 
-Given('OpenAI always return image of a moon', () => {
-  mock_services.openAi().stubCreateImage()
-})
-
 Given('OpenAI returns embeddings successfully', () => {
   mock_services.openAi().stubCreateEmbeddings()
 })

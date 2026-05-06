@@ -17,18 +17,6 @@
     <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end">
       <PopButton
         btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Generate Image with DALL-E"
-      >
-        <template #button_face>
-          <Bot class="daisy-w-6 daisy-h-6" />
-        </template>
-        <template #default>
-          <AIGenerateImageDialog v-bind="{ note }" />
-        </template>
-      </PopButton>
-
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         title="Edit Note Image"
       >
         <template #button_face>
@@ -89,10 +77,8 @@
 import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
-import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import Questions from "../Questions.vue"
 import {
-  Bot,
   CircleCheck,
   Image as ImageIcon,
   Trash2,

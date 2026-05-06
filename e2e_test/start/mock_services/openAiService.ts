@@ -93,19 +93,6 @@ const openAiService = () => {
       )
     },
 
-    stubCreateImage() {
-      return serviceMocker.stubPoster(`/images/generations`, {
-        created: 1589478378,
-        data: [
-          {
-            url: 'https://moon',
-            b64_json:
-              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
-          },
-        ],
-      })
-    },
-
     stubOpenAiCompletionWithErrorResponse() {
       return serviceMocker.stubGetterWithError500Response(`/*`, {})
     },

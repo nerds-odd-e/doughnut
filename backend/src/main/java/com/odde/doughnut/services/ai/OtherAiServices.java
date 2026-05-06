@@ -21,10 +21,6 @@ public final class OtherAiServices {
     this.openAiApiHandler = openAiApiHandler;
   }
 
-  public String getTimage(String prompt) {
-    return openAiApiHandler.getOpenAiImage(prompt);
-  }
-
   public List<String> getAvailableGptModels() {
     List<String> modelVersionOptions = new ArrayList<>();
 

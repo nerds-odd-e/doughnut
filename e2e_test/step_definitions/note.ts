@@ -461,14 +461,6 @@ Then(
   }
 )
 
-When('I generate an image for {string}', (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology).aiGenerateImage()
-})
-
-Then('I should find an art created by the ai', () => {
-  cy.get('img.ai-art').should('be.visible')
-})
-
 Given(
   'I request to complete the details for the note {string}',
   (noteTopology: string) => {

@@ -339,9 +339,6 @@ export const assumeNotePage = (
       return this
     },
     ...sidebarChildNotePageMethods(),
-    aiGenerateImage() {
-      this.moreOptions().generateImageWithDALLE()
-    },
     deleteNote() {
       this.moreOptions().deleteNote()
     },

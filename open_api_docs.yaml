@@ -1905,24 +1905,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UnderstandingChecklistDTO"
-  /api/ai/generate-image:
-    post:
-      tags:
-      - ai-controller
-      operationId: generateImage
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AiGeneratedImage"
   /api/admin/data-migration/run-batch:
     post:
       tags:
@@ -4559,11 +4541,6 @@ components:
           type: array
           items:
             type: string
-    AiGeneratedImage:
-      type: object
-      properties:
-        b64encoded:
-          type: string
     AdminDataMigrationStatusDTO:
       type: object
       properties:

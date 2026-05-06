@@ -63,9 +63,6 @@ const noteMoreOptionsDialog = () => {
           ])
         )
     },
-    generateImageWithDALLE() {
-      toolbarButton('Generate Image with DALL-E').click()
-    },
     deleteNote() {
       toolbarButton('Delete note').click()
       cy.findByRole('button', { name: 'OK' }).click()

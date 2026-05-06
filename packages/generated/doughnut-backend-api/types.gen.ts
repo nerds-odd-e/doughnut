@@ -662,10 +662,6 @@ export type UnderstandingChecklistDto = {
     points?: Array<string>;
 };
 
-export type AiGeneratedImage = {
-    b64encoded?: string;
-};
-
 export type AdminDataMigrationStatusDto = {
     message?: string;
     dataMigrationComplete?: boolean;
@@ -2667,22 +2663,6 @@ export type GenerateUnderstandingChecklistResponses = {
 };
 
 export type GenerateUnderstandingChecklistResponse = GenerateUnderstandingChecklistResponses[keyof GenerateUnderstandingChecklistResponses];
-
-export type GenerateImageData = {
-    body: string;
-    path?: never;
-    query?: never;
-    url: '/api/ai/generate-image';
-};
-
-export type GenerateImageResponses = {
-    /**
-     * OK
-     */
-    200: AiGeneratedImage;
-};
-
-export type GenerateImageResponse = GenerateImageResponses[keyof GenerateImageResponses];
 
 export type RunDataMigrationBatchData = {
     body?: never;

@@ -18,9 +18,6 @@ import com.openai.models.chat.completions.ChatCompletionMessage;
 import com.openai.models.files.FileCreateParams;
 import com.openai.models.files.FileObject;
 import com.openai.models.files.FilePurpose;
-import com.openai.models.images.Image;
-import com.openai.models.images.ImageGenerateParams;
-import com.openai.models.images.ImagesResponse;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import java.io.File;
@@ -59,30 +56,6 @@ public class OpenAiApiHandler {
     if (effectiveToken == null || effectiveToken.isEmpty()) {
       throw new OpenAiNotAvailableException("OpenAI is not available (no API key configured).");
     }
-  }
-
-  public String getOpenAiImage(String prompt) {
-    assertOpenAiAvailable();
-    ImageGenerateParams params =
-        ImageGenerateParams.builder()
-            .prompt(prompt)
-            .responseFormat(ImageGenerateParams.ResponseFormat.B64_JSON)
-            .build();
-    ImagesResponse response = officialClient.images().generate(params);
-    Image image =
-        response
-            .data()
-            .orElseThrow(
-                () ->
-                    new OpenAIServiceErrorException(
-                        "Image generation returned no data", HttpStatus.INTERNAL_SERVER_ERROR))
-            .get(0);
-    return image
-        .b64Json()
-        .orElseThrow(
-            () ->
-                new OpenAIServiceErrorException(
-                    "Image generation did not return b64_json", HttpStatus.INTERNAL_SERVER_ERROR));
   }
 
   public Optional<ChatCompletion.Choice> chatCompletion(ChatCompletionCreateParams params) {

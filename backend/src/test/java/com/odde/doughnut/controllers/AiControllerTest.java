@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,11 +21,7 @@ import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.openai.models.images.Image;
-import com.openai.models.images.ImageGenerateParams;
-import com.openai.models.images.ImagesResponse;
 import com.openai.models.models.ModelListPage;
-import com.openai.services.blocking.ImageService;
 import com.openai.services.blocking.ModelService;
 import java.util.List;
 import java.util.stream.Stream;
@@ -57,52 +52,6 @@ class AiControllerTest extends ControllerTestBase {
   void Setup() {
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote().please();
-  }
-
-  @Nested
-  class GenerateImage {
-    Note aNote;
-
-    @BeforeEach
-    void setup() {
-      aNote = makeMe.aNote("sanskrit").creatorAndOwner(currentUser.getUser()).please();
-    }
-
-    @Test
-    void askWithNoteThatCannotAccess() {
-      currentUser.setUser(null);
-      assertThrows(
-          ResponseStatusException.class, () -> controller.generateImage("create an image"));
-    }
-
-    @Test
-    void askEngagingStoryWithRightPrompt() {
-      ImageService imageService = Mockito.mock(ImageService.class);
-      when(officialClient.images()).thenReturn(imageService);
-      when(imageService.generate(
-              argThat(
-                  (ImageGenerateParams params) -> {
-                    assertEquals("create an image", params.prompt());
-                    return true;
-                  })))
-          .thenReturn(buildOfficialImageResponse("This is an engaging story."));
-      controller.generateImage("create an image");
-    }
-
-    @Test
-    void generateImage() {
-      ImageService imageService = Mockito.mock(ImageService.class);
-      when(officialClient.images()).thenReturn(imageService);
-      when(imageService.generate(Mockito.any(ImageGenerateParams.class)))
-          .thenReturn(buildOfficialImageResponse("this is supposed to be a base64 image"));
-      final String aiImage = controller.generateImage("create an image").b64encoded();
-      assertEquals("this is supposed to be a base64 image", aiImage);
-    }
-
-    private ImagesResponse buildOfficialImageResponse(String b64Json) {
-      Image image = Image.builder().b64Json(b64Json).build();
-      return ImagesResponse.builder().created(1234567890L).data(List.of(image)).build();
-    }
   }
 
   @Nested

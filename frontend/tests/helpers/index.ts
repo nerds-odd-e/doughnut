@@ -178,7 +178,6 @@ const methodToController: Record<string, any> = {
   generateAssessmentQuestions: AssessmentController,
   getMyAssessments: AssessmentController,
   suggestTitle: AiController,
-  generateImage: AiController,
   generateUnderstandingChecklist: AiController,
   removePointFromNote: AiController,
   promotePointToSibling: AiController,

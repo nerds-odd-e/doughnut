@@ -158,16 +158,7 @@ The **`docs/database-erd.md`** Mermaid diagram documents tables, foreign keys, a
 
 3. **Mocking**
    - Use mocking sparingly, primarily for external services
-   - Example from RestAiControllerTest.java:
-   ```java
-   @Test
-   void generateImage() {
-     when(openAiApi.createImage(Mockito.any()))
-         .thenReturn(buildImageResult("this is supposed to be a base64 image"));
-     final String aiImage = controller.generateImage("create an image").b64encoded();
-     assertEquals("this is supposed to be a base64 image", aiImage);
-   }
-   ```
+   - Example: mock `OpenAIClient` chat completions with `OpenAIChatCompletionMock` in controller tests
 
 ## Best Practices
 

@@ -49,13 +49,6 @@ public class AiController {
     throw new HttpMediaTypeNotAcceptableException("dummy");
   }
 
-  @PostMapping("/generate-image")
-  @Transactional
-  public AiGeneratedImage generateImage(@RequestBody String prompt) {
-    authorizationService.assertLoggedIn();
-    return new AiGeneratedImage(otherAiServices.getTimage(prompt));
-  }
-
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
     return otherAiServices.getAvailableGptModels();
