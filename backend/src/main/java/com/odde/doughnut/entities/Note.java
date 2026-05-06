@@ -224,6 +224,10 @@ public class Note extends EntityIdentifiedByIdOnly {
     final Notebook notebook = new Notebook();
     notebook.setCreatorEntity(creator);
     notebook.setOwnership(ownership);
+    Timestamp ts =
+        getCreatedAt() != null ? getCreatedAt() : new Timestamp(System.currentTimeMillis());
+    notebook.setCreatedAt(ts);
+    notebook.setUpdated_at(ts);
     setNotebook(notebook);
     String headTitle = getTitle();
     if (headTitle != null && !headTitle.isBlank()) {

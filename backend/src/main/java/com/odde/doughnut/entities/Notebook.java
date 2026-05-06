@@ -67,6 +67,13 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   private Timestamp updated_at;
 
+  @Column(name = "created_at", nullable = false)
+  @Getter
+  @Setter
+  @JsonIgnore
+  @NonNull
+  private Timestamp createdAt;
+
   @OneToOne(mappedBy = "notebook", fetch = FetchType.LAZY)
   @JsonIgnore
   @Getter
