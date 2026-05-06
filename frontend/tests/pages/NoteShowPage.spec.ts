@@ -1,5 +1,5 @@
 import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
-import { screen } from "@testing-library/vue"
+import { within } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockNotebookGetForNoteRealm,
@@ -10,7 +10,7 @@ import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarSt
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import { describe, it, beforeEach, expect } from "vitest"
+import { describe, it, beforeEach, expect, vi } from "vitest"
 
 describe("all in note show page", () => {
   let router: ReturnType<typeof createRouter>
@@ -46,7 +46,15 @@ describe("all in note show page", () => {
         .render()
 
       await flushPromises()
-      await screen.findByText(noteRealm.note.noteTopology.title)
+      await vi.waitFor(() => {
+        const main = document.getElementById("main-note-content")
+        expect(main).not.toBeNull()
+        expect(
+          within(main as HTMLElement).getByText(
+            noteRealm.note.noteTopology.title
+          )
+        ).toBeInTheDocument()
+      })
 
       expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: noteRealm.id },
