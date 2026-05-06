@@ -20,7 +20,7 @@
                 )
               "
             >
-              <SkipBack class="w-8 h-8" />
+              <SkipBack class="daisy-w-8 daisy-h-8" />
             </button>
           </template>
           <button
@@ -30,7 +30,7 @@
             :disabled="finished === 0"
             @click="$emit('viewLastAnsweredQuestion', finished - 1)"
           >
-            <Pause class="w-8 h-8 text-green-600" />
+            <Pause class="daisy-w-8 daisy-h-8 daisy-text-green-600" />
           </button>
         </div>
         <RecallSessionOptionsDialog

@@ -17,7 +17,7 @@
             class="close-button"
             @click="$emit('close_request')"
           >
-            <X class="w-6 h-6" />
+            <X class="daisy-w-6 daisy-h-6" />
           </button>
 
           <div class="modal-header" v-if="$slots.header">

@@ -25,10 +25,10 @@
           :title="conversationMessage.sender?.name || 'AI Assistant'"
         >
           <template v-if="conversationMessage.sender?.id === undefined">
-            <Bot class="w-8 h-8" />
+            <Bot class="daisy-w-8 daisy-h-8" />
           </template>
           <template v-else>
-            <UserIcon class="w-8 h-8" />
+            <UserIcon class="daisy-w-8 daisy-h-8" />
           </template>
         </div>
 

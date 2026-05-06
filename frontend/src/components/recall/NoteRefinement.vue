@@ -31,7 +31,7 @@
               @click="promotePointToSiblingNote(point, index)"
               title="Promote to sibling note"
             >
-              <Folders class="w-4 h-4" />
+              <Folders class="daisy-w-4 daisy-h-4" />
               Sibling
             </button>
           </div>

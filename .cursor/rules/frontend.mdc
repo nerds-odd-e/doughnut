@@ -92,7 +92,8 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 
 ### Icons
 
-- Prefer **Lucide** for normal UI icons (navigation, actions, status outlines) via **`lucide-vue-next`** (`import { IconName } from 'lucide-vue-next'`). Import only the icons each file needs; size them with the component `size` prop and/or Tailwind classes; rely on **`currentColor`** so icons follow text/theme color.
+- Prefer **Lucide** for normal UI icons (navigation, actions, status outlines) via **`lucide-vue-next`** (`import { IconName } from 'lucide-vue-next'`). Import only the icons each file needs; rely on **`currentColor`** so icons follow text/theme color.
+- **Sizing:** `lucide-vue-next` defaults to **24×24** via the `size` prop. Use **`:size="…"`** (pixels) and/or **`daisy-w-*` / `daisy-h-*`** (or `daisy-size-*`) — **never bare `w-*` / `h-*`**: Tailwind uses the **`daisy-` prefix**, so unprefixed width/height classes are not generated and have no effect on icons.
 
 ## Component Rules
 

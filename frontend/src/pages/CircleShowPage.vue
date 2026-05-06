@@ -65,7 +65,7 @@
         </label>
         <div class="daisy-flex daisy-items-center daisy-gap-2">
           <div class="daisy-input daisy-input-bordered daisy-input-sm daisy-flex daisy-items-center daisy-gap-2 daisy-flex-1">
-            <Search class="h-4 w-4 daisy-text-base-content/50" />
+            <Search class="daisy-h-4 daisy-w-4 daisy-text-base-content/50" />
             <input
               id="circle-notebook-filter-input"
               v-model="filterText"
@@ -81,7 +81,7 @@
             aria-label="Clear filter"
             @click="clearFilter"
           >
-            <X class="h-4 w-4" />
+            <X class="daisy-h-4 daisy-w-4" />
           </button>
         </div>
       </div>
@@ -132,7 +132,7 @@
           v-for="member in circle.members"
           :key="member.name"
         >
-          <span :title="member.name"> <UserIcon class="w-6 h-6" /> </span>
+          <span :title="member.name"> <UserIcon class="daisy-w-6 daisy-h-6" /> </span>
         </div>
       </nav>
 

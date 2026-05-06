@@ -19,7 +19,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-4 h-4"
+        class="daisy-w-4 daisy-h-4"
       >
         <template v-if="opened">
           <path d="M19 12H5M12 19l-7-7 7-7" />

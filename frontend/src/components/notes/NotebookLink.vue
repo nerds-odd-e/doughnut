@@ -3,7 +3,7 @@
     :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
     class="daisy-text-decoration-none"
   >
-    <BookText class="me-1 w-4 h-4 inline-block" />
+    <BookText class="daisy-me-1 daisy-w-4 daisy-h-4 daisy-inline-block" />
     <span>{{ notebook.name }}</span>
   </router-link>
 </template>

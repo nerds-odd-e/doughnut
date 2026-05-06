@@ -7,7 +7,7 @@
       data-testid="pdf-zoom-out"
       @click="emit('zoomOut')"
     >
-      <ZoomOut class="w-4 h-4" />
+      <ZoomOut class="daisy-w-4 daisy-h-4" />
     </button>
     <span
       v-if="currentPage != null && pagesTotal != null && pagesTotal > 0"
@@ -24,7 +24,7 @@
       data-testid="pdf-zoom-in"
       @click="emit('zoomIn')"
     >
-      <ZoomIn class="w-4 h-4" />
+      <ZoomIn class="daisy-w-4 daisy-h-4" />
     </button>
   </div>
 </template>
