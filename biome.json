@@ -23,7 +23,6 @@
       "!**/index.html",
       "!**/backend",
       "!**/docs",
-      "!**/doughnut_mobile",
       "!**/infra",
       "!**/mysql",
       "!**/secrets_public_keys",
