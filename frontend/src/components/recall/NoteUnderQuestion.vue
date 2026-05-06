@@ -2,13 +2,11 @@
   <div class="note-under-question daisy-bg-base-200 daisy-border-base-300">
     <div class="note-label daisy-bg-base-200 daisy-text-base-content">Note under question</div>
     <div class="breadcrumb-wrapper">
-      <Breadcrumb
-        v-bind="{
-          noteTopology,
-          includingSelf: true,
-          ancestorFolders: ancestorFolders ?? [],
-        }"
-      />
+      <Breadcrumb :ancestor-folders="ancestorFolders ?? []">
+        <template #additional>
+          <NoteTitleWithLink v-bind="{ noteTopology }" />
+        </template>
+      </Breadcrumb>
     </div>
   </div>
 </template>
@@ -17,6 +15,7 @@
 import type { PropType } from "vue"
 import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
+import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 
 defineProps({
   noteTopology: {

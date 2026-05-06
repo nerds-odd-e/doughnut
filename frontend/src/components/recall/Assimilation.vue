@@ -1,13 +1,7 @@
 <template>
   <main class="assimilation-main">
     <div class="breadcrumb-wrapper daisy-mb-2">
-      <Breadcrumb
-        v-bind="{
-          noteTopology: note.noteTopology,
-          includingSelf: false,
-          ancestorFolders,
-        }"
-      />
+      <Breadcrumb v-bind="{ ancestorFolders }" />
     </div>
     <NoteShow
       v-bind="{ noteId: note.id, expandChildren: false }"

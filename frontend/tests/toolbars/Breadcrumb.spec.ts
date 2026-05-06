@@ -5,13 +5,10 @@ import helper from "@tests/helpers"
 import { describe, it, expect } from "vitest"
 
 describe("breadcrumb with circles", () => {
-  const parentNote = makeMe.aNote.title("parent").please()
-  const grandChild = makeMe.aNote.please()
-
   it("view note belongs to other people in bazaar", async () => {
     helper
       .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: true, noteTopology: parentNote.noteTopology })
+      .withProps({ fromBazaar: true, ancestorFolders: [] })
       .render()
     await screen.findByText("Bazaar")
   })
@@ -22,8 +19,8 @@ describe("breadcrumb with circles", () => {
       .component(BreadcrumbWithCircle)
       .withProps({
         fromBazaar: false,
-        noteTopology: parentNote.noteTopology,
         notebook,
+        ancestorFolders: [],
       })
       .render()
     await screen.findByText("Notebooks")
@@ -36,7 +33,6 @@ describe("breadcrumb with circles", () => {
       .component(BreadcrumbWithCircle)
       .withProps({
         fromBazaar: false,
-        noteTopology: grandChild.noteTopology,
         ancestorFolders: [
           { id: "1", name: "parent" },
           { id: "2", name: "child" },
@@ -56,7 +52,6 @@ describe("breadcrumb with circles", () => {
       .component(BreadcrumbWithCircle)
       .withProps({
         fromBazaar: false,
-        noteTopology: grandChild.noteTopology,
         ancestorFolders: [
           { id: 10, name: "Outer" },
           { id: 20, name: "Inner" },

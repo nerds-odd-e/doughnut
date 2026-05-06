@@ -24,7 +24,6 @@
         v-bind="{
           fromBazaar: noteRealmForBreadcrumb.fromBazaar,
           notebook: notebookForBreadcrumb,
-          noteTopology: noteRealmForBreadcrumb.note.noteTopology,
           ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],
         }"
       />

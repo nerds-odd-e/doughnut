@@ -1,41 +1,23 @@
 <template>
-  <BasicBreadcrumb v-bind="{ ancestors, folderSegments }">
+  <BasicBreadcrumb :folder-segments="ancestorFolders">
     <template #topLink>
       <slot name="topLink" />
+    </template>
+    <template #additional>
+      <slot name="additional" />
     </template>
   </BasicBreadcrumb>
 </template>
 
 <script setup lang="ts">
-import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
-import { computed } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"
 
-const props = defineProps({
-  noteTopology: {
-    type: Object as PropType<NoteTopology>,
-    required: true,
-  },
-  includingSelf: {
-    type: Boolean,
-    default: false,
-  },
+defineProps({
   ancestorFolders: {
     type: Array as PropType<Folder[]>,
     default: () => [],
   },
-})
-
-const folderSegments = computed(() => props.ancestorFolders ?? [])
-
-const ancestors = computed(() => {
-  if (folderSegments.value.length > 0) {
-    if (props.includingSelf) {
-      return [props.noteTopology]
-    }
-    return []
-  }
-  return props.includingSelf ? [props.noteTopology] : []
 })
 </script>
