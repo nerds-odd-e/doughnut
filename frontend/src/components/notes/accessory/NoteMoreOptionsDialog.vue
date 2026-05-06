@@ -38,7 +38,7 @@
         title="Questions for the note"
       >
         <template #button_face>
-          <SvgAssessment />
+          <MessageCircleQuestion class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default>
           <Questions v-bind="{ note }" />
@@ -72,12 +72,12 @@ import Questions from "../Questions.vue"
 import {
   CircleCheck,
   Image as ImageIcon,
+  MessageCircleQuestion,
   Trash2,
   Upload,
 } from "lucide-vue-next"
 import NoteEditImageDialog from "./NoteEditImageDialog.vue"
 import NoteExportDialog from "../core/NoteExportDialog.vue"
-import SvgAssessment from "../../svgs/SvgAssessment.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
