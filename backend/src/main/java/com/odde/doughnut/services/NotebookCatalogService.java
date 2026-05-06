@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
+import com.odde.doughnut.controllers.dto.NotebookPageClientView;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
 import com.odde.doughnut.entities.Note;
@@ -40,9 +41,14 @@ public class NotebookCatalogService {
     boolean hasAttachedBook =
         !bookRepository.findNotebookIdsWithAttachedBooksIn(List.of(notebook.getId())).isEmpty();
     boolean readonly = viewer == null || !viewer.owns(notebook);
+    return NotebookClientView.of(notebook, hasAttachedBook, readonly);
+  }
+
+  public NotebookPageClientView notebookPageClientViewFor(Notebook notebook, User viewer) {
+    NotebookClientView base = clientViewFor(notebook, viewer);
     Integer indexNoteId =
         notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
-    return NotebookClientView.of(notebook, hasAttachedBook, readonly, indexNoteId);
+    return NotebookPageClientView.of(base, indexNoteId);
   }
 
   /**
@@ -71,10 +77,7 @@ public class NotebookCatalogService {
                 nb.getId(),
                 __ ->
                     NotebookClientView.of(
-                        nb,
-                        withBook.contains(nb.getId()),
-                        viewer == null || !viewer.owns(nb),
-                        null));
+                        nb, withBook.contains(nb.getId()), viewer == null || !viewer.owns(nb)));
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();

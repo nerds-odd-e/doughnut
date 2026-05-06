@@ -252,10 +252,6 @@ export type NotebookClientView = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
-    /**
-     * Id of this notebook's index landing note when one exists (root folder scope, title equal to "index" case-insensitive); omitted when absent.
-     */
-    indexNoteId?: number;
 };
 
 export type WikiTitle = {
@@ -846,6 +842,19 @@ export type SubscriptionForNotebooksListing = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     name?: string;
+};
+
+/**
+ * Notebook client view for loading the notebook page: same payload as NotebookClientView plus optional index landing note id when present.
+ */
+export type NotebookPageClientView = {
+    notebook: Notebook;
+    hasAttachedBook?: boolean;
+    readonly?: boolean;
+    /**
+     * Id of this notebook's index landing note when one exists (root folder scope, title equal to "index" case-insensitive); omitted when absent.
+     */
+    indexNoteId?: number;
 };
 
 /**
@@ -1884,7 +1893,7 @@ export type GetResponses = {
     /**
      * OK
      */
-    200: NotebookClientView;
+    200: NotebookPageClientView;
 };
 
 export type GetResponse = GetResponses[keyof GetResponses];

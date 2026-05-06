@@ -31,7 +31,7 @@ import { useRoute } from "vue-router"
 import type {
   Notebook,
   User,
-  NotebookClientView,
+  NotebookPageClientView,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
@@ -47,7 +47,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 const user = inject<Ref<User | undefined>>("currentUser")
-const notebookClient = ref<NotebookClientView | undefined>(undefined)
+const notebookClient = ref<NotebookPageClientView | undefined>(undefined)
 
 const notebook = computed(() => notebookClient.value?.notebook)
 

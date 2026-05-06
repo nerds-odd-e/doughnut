@@ -11,16 +11,10 @@ import jakarta.validation.constraints.NotNull;
 public record NotebookClientView(
     @NotNull Notebook notebook,
     @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
-    boolean readonly,
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-        @Schema(
-            description =
-                "Id of this notebook's index landing note when one exists (root folder scope,"
-                    + " title equal to \"index\" case-insensitive); omitted when absent.")
-        Integer indexNoteId) {
+    boolean readonly) {
 
   public static NotebookClientView of(
-      Notebook notebook, Boolean hasAttachedBook, boolean readonly, Integer indexNoteId) {
-    return new NotebookClientView(notebook, hasAttachedBook, readonly, indexNoteId);
+      Notebook notebook, Boolean hasAttachedBook, boolean readonly) {
+    return new NotebookClientView(notebook, hasAttachedBook, readonly);
   }
 }

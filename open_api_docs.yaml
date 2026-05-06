@@ -1029,7 +1029,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebookClientView"
+                $ref: "#/components/schemas/NotebookPageClientView"
     post:
       tags:
       - notebook-controller
@@ -3742,12 +3742,6 @@ components:
           type: boolean
         readonly:
           type: boolean
-        indexNoteId:
-          type: integer
-          format: int32
-          description: "Id of this notebook's index landing note when one exists (root\
-            \ folder scope, title equal to \"index\" case-insensitive); omitted when\
-            \ absent."
       required:
       - notebook
     WikiTitle:
@@ -4931,6 +4925,25 @@ components:
       required:
       - dailyTargetOfNewNotes
       - id
+      - notebook
+    NotebookPageClientView:
+      type: object
+      description: "Notebook client view for loading the notebook page: same payload\
+        \ as NotebookClientView plus optional index landing note id when present."
+      properties:
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        hasAttachedBook:
+          type: boolean
+        readonly:
+          type: boolean
+        indexNoteId:
+          type: integer
+          format: int32
+          description: "Id of this notebook's index landing note when one exists (root\
+            \ folder scope, title equal to \"index\" case-insensitive); omitted when\
+            \ absent."
+      required:
       - notebook
     FolderListing:
       type: object

@@ -25,6 +25,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
+import com.odde.doughnut.controllers.dto.NotebookPageClientView;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
@@ -141,7 +142,7 @@ class NotebookControllerTest extends ControllerTestBase {
       NotebookClientView response = controller.createNotebook(noteCreation);
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
 
-      NotebookClientView wire = controller.get(nb);
+      NotebookPageClientView wire = controller.get(nb);
       String json = objectMapper.writeValueAsString(wire);
       JsonNode tree = objectMapper.readTree(json);
 
@@ -160,7 +161,7 @@ class NotebookControllerTest extends ControllerTestBase {
     void ownerGetsWritableNotebookClientView() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      NotebookClientView view = controller.get(nb);
+      NotebookPageClientView view = controller.get(nb);
       assertThat(view.notebook().getId(), equalTo(nb.getId()));
       assertThat(view.readonly(), is(false));
     }
@@ -172,7 +173,7 @@ class NotebookControllerTest extends ControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       makeMe.aBazaarNotebook(nb).please();
       currentUser.setUser(null);
-      NotebookClientView view = controller.get(nb);
+      NotebookPageClientView view = controller.get(nb);
       assertThat(view.notebook().getId(), equalTo(nb.getId()));
       assertThat(view.readonly(), is(true));
     }
@@ -192,7 +193,7 @@ class NotebookControllerTest extends ControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Note index = makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("index").please();
 
-      NotebookClientView view = controller.get(nb);
+      NotebookPageClientView view = controller.get(nb);
 
       assertThat(view.indexNoteId(), equalTo(index.getId()));
     }
@@ -211,7 +212,7 @@ class NotebookControllerTest extends ControllerTestBase {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
 
-      NotebookClientView view = controller.get(nb);
+      NotebookPageClientView view = controller.get(nb);
 
       assertThat(view.indexNoteId(), nullValue());
     }
