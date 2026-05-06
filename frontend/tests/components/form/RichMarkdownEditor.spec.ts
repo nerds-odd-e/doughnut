@@ -294,6 +294,29 @@ topic: training
     expect(last).toContain("Edited Heading")
   })
 
+  it("emits pasteComplete with full composed details so link-removal preserves frontmatter", async () => {
+    const details = `---
+topic: training
+---
+
+Hello`
+    await mountEditor(details)
+    await flushPromises()
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    quill.vm.$emit(
+      "pasteComplete",
+      '<p>Hello <a href="https://example.com" rel="noopener noreferrer" target="_blank">x</a></p>'
+    )
+    await flushPromises()
+
+    const emitted = wrapper.emitted("pasteComplete")
+    expect(emitted?.length).toBeGreaterThan(0)
+    const payload = emitted![emitted!.length - 1]![0] as string
+    expect(payload).toContain("topic: training")
+    expect(payload).toMatch(/^---\n/)
+  })
+
   it("emits deadLinkClick when a dead wiki link in a property value is clicked", async () => {
     const details = `---
 topic: "[[Missing Note]]"

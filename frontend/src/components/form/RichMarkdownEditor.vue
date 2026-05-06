@@ -147,8 +147,17 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
 }
 
 const onPasteComplete = (html: string) => {
-  const markdown = markdownizer.htmlToMarkdown(html)
-  emits("pasteComplete", markdown)
+  const bodyMarkdown = markdownizer.htmlToMarkdown(html)
+  const p = parsedDetails.value
+  if (!p.ok) {
+    emits("pasteComplete", bodyMarkdown)
+    return
+  }
+  const composed = composeNoteDetailsFromPropertyRows(
+    frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
+    bodyMarkdown
+  )
+  emits("pasteComplete", composed)
 }
 
 function insertMarkdownAtEnd(text: string) {
