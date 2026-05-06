@@ -4,10 +4,14 @@ import { form } from '../forms'
 const relationshipTargetListMaxAttempts = 5
 const relationshipTargetListRetryMs = 400
 
+/** Literal search lists note, folder, and notebook hits; relationship targets are notes only. */
+export const relationshipTargetNoteTitleSelector =
+  '.search-result .search-result-item-title a:not(.notebook-hit-title)'
+
 function expectExactRelationshipTargetsWithRetry(targets: string[]) {
   const tryMatch = (attempt: number) => {
-    cy.get('.search-result .search-result-item-title').then((elms) => {
-      const actual = Cypress._.map(elms, 'innerText')
+    cy.get(relationshipTargetNoteTitleSelector).then((elms) => {
+      const actual = Cypress._.map(elms, (e) => e.textContent?.trim() ?? '')
       if (Cypress._.isEqual(actual, targets)) {
         return
       }
@@ -54,6 +58,13 @@ export const assumeNoteTargetSearchDialog = () => {
       searchNote(target, [])
       return this
     },
+    expectNoRelationshipTargetNotes() {
+      cy.findByText('Search result', { selector: '.result-title' }).should(
+        'be.visible'
+      )
+      cy.get(relationshipTargetNoteTitleSelector).should('have.length', 0)
+      return this
+    },
     expectExactRelationshipTargets: (targets: string[]) => {
       if (targets.length === 0) {
         cy.findByText('Search result', { selector: '.result-title' }).should(
@@ -78,8 +89,8 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByText('Search result', { selector: '.result-title' }).should(
         'be.visible'
       )
-      cy.get('.dropdown-list a')
-        .then((elms) => Cypress._.map(elms, 'innerText'))
+      cy.get('.dropdown-list a:not(.notebook-hit-title)')
+        .then((elms) => Cypress._.map(elms, (e) => e.textContent?.trim() ?? ''))
         .should('deep.equal', targets)
     },
     moveUnder(folderTitle: string, notebookName?: string) {
@@ -100,8 +111,13 @@ export const assumeNoteTargetSearchDialog = () => {
       pageIsNotLoading()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
-      cy.contains('.search-result .search-result-item-title', toNoteTopic)
-        .closest('[role=listitem]')
+      cy.get('.search-result [role=listitem]')
+        .filter((_, el) => {
+          const a = el.querySelector(
+            '.search-result-item-title a:not(.notebook-hit-title)'
+          )
+          return a?.textContent?.trim() === toNoteTopic
+        })
         .findByRole('button', { name: 'Add link' })
         .click()
       cy.findByRole('button', { name: 'Add a new relationship note' }).click()
@@ -109,8 +125,13 @@ export const assumeNoteTargetSearchDialog = () => {
       pageIsNotLoading()
     },
     insertWikiLinkToTarget(toNoteTopic: string) {
-      cy.contains('.search-result .search-result-item-title', toNoteTopic)
-        .closest('[role=listitem]')
+      cy.get('.search-result [role=listitem]')
+        .filter((_, el) => {
+          const a = el.querySelector(
+            '.search-result-item-title a:not(.notebook-hit-title)'
+          )
+          return a?.textContent?.trim() === toNoteTopic
+        })
         .findByRole('button', { name: 'Add link' })
         .click()
       cy.findByRole('button', { name: 'Insert as a wiki link' }).click()

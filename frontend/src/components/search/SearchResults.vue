@@ -14,11 +14,24 @@
     <div v-if="displayState.showRecentNotes" :class="displayState.containerClass">
       <div class="result-title">{{ displayState.title }}</div>
       <div v-if="isDropdown" class="dropdown-list">
-        <NoteTitleWithLink
+        <div
           v-for="result in filteredRecentNotes"
           :key="result.noteTopology.id"
-          :noteTopology="result.noteTopology"
-        />
+          class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
+        >
+          <div
+            class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+          >
+            <FileText
+              :size="14"
+              class="dropdown-hit-kind-icon"
+              aria-hidden="true"
+            />
+          </div>
+          <div class="daisy-min-w-0 daisy-flex-1">
+            <NoteTitleWithLink :note-topology="result.noteTopology" />
+          </div>
+        </div>
       </div>
       <SearchResultList
         v-else
@@ -58,27 +71,52 @@
           v-for="hit in searchResult"
           :key="relationshipLiteralSearchHitKey(hit)"
         >
-          <NoteTitleWithLink
+          <div
             v-if="hit.hitKind === 'NOTE' && hit.noteSearchResult"
-            :note-topology="hit.noteSearchResult.noteTopology"
-          />
+            class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
+          >
+            <div
+              class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+            >
+              <FileText :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
+            </div>
+            <div class="daisy-min-w-0 daisy-flex-1">
+              <NoteTitleWithLink
+                :note-topology="hit.noteSearchResult.noteTopology"
+              />
+            </div>
+          </div>
           <div
             v-else-if="hit.hitKind === 'FOLDER'"
-            class="folder-search-hit daisy-py-1 daisy-px-2"
+            class="dropdown-hit-row folder-search-hit daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
           >
-            <span class="daisy-font-medium">{{ hit.folderName }}</span>
-            <span
-              v-if="hit.notebookName"
-              class="daisy-block daisy-text-xs daisy-opacity-70"
-            >{{ hit.notebookName }}</span>
+            <div
+              class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+            >
+              <Folder :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
+            </div>
+            <div class="daisy-min-w-0 daisy-flex-1">
+              <span class="daisy-font-medium">{{ hit.folderName }}</span>
+              <span
+                v-if="hit.notebookName"
+                class="daisy-block daisy-text-xs daisy-opacity-70"
+              >{{ hit.notebookName }}</span>
+            </div>
           </div>
-          <router-link
+          <div
             v-else-if="hit.hitKind === 'NOTEBOOK' && hit.notebookId != null"
-            :to="{ name: 'notebookPage', params: { notebookId: hit.notebookId } }"
-            class="daisy-block daisy-py-1 daisy-px-2 daisy-text-decoration-none"
+            class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
           >
-            <span class="daisy-font-medium">{{ hit.notebookName }}</span>
-          </router-link>
+            <div
+              class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+            >
+              <BookText :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
+            </div>
+            <router-link
+              :to="{ name: 'notebookPage', params: { notebookId: hit.notebookId } }"
+              class="daisy-min-w-0 daisy-flex-1 daisy-text-decoration-none daisy-font-medium"
+            >{{ hit.notebookName }}</router-link>
+          </div>
         </template>
       </div>
       <SearchResultList
@@ -122,6 +160,7 @@ import {
 import {} from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onBeforeUnmount, shallowRef } from "vue"
+import { BookText, FileText, Folder } from "lucide-vue-next"
 import SearchResultList from "./SearchResultList.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
@@ -358,13 +397,29 @@ onBeforeUnmount(() => {
   padding: 0.5rem;
 }
 
+.dropdown-hit-icon-col {
+  line-height: 0;
+}
+
+.dropdown-hit-kind-icon {
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
 .dropdown-list :deep(a) {
   display: block;
-  padding: 0.25rem 0.5rem;
   color: inherit;
 }
 
+.dropdown-hit-row :deep(a) {
+  padding: 0;
+}
+
 .dropdown-list :deep(a:hover) {
+  background-color: #f8f9fa;
+}
+
+.dropdown-hit-row:hover {
   background-color: #f8f9fa;
 }
 

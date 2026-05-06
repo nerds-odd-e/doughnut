@@ -106,8 +106,10 @@ Then(
 When(
   'I should see note cannot be found when searching in all my notebooks {string}',
   (searchKey: string) => {
-    start.assumeNoteTargetSearchDialog().findTarget(searchKey)
-    cy.findByText('No matching notes found.').should('be.visible')
+    start
+      .assumeNoteTargetSearchDialog()
+      .findTarget(searchKey)
+      .expectNoRelationshipTargetNotes()
   }
 )
 

@@ -1,11 +1,17 @@
 <template>
   <li
     role="listitem"
-    class="daisy-flex daisy-flex-row daisy-items-start daisy-gap-3 daisy-border-b daisy-border-base-300 daisy-py-2 daisy-px-1 last:daisy-border-b-0 hover:daisy-bg-base-200 daisy-transition-colors"
+    class="daisy-flex daisy-flex-row daisy-items-start daisy-gap-2 daisy-border-b daisy-border-base-300 daisy-py-2 daisy-px-1 last:daisy-border-b-0 hover:daisy-bg-base-200 daisy-transition-colors"
     :class="{
       'different-notebook-border daisy-border-l-primary': isDifferentNotebook,
     }"
   >
+    <div
+      class="search-hit-kind-icon daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-pt-0.5 daisy-text-base-content/50"
+      aria-hidden="true"
+    >
+      <component :is="kindIcon" :size="14" class="daisy-block" />
+    </div>
     <div class="daisy-min-w-0 daisy-flex-1">
       <div class="search-result-item-title">
         <NoteTitleWithLink
@@ -33,7 +39,7 @@
       </div>
     </div>
     <div
-      class="daisy-flex daisy-shrink-0 daisy-flex-col daisy-items-end daisy-gap-1 daisy-self-center"
+      class="daisy-ms-1 daisy-flex daisy-shrink-0 daisy-flex-col daisy-items-end daisy-gap-1 daisy-self-center"
     >
       <div
         v-if="$slots.button"
@@ -54,7 +60,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
-import { computed } from "vue"
+import { BookText, FileText, Folder } from "lucide-vue-next"
+import { computed, type Component } from "vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 const props = defineProps({
@@ -63,6 +70,12 @@ const props = defineProps({
     required: true,
   },
   notebookId: { type: Number, default: undefined },
+})
+
+const kindIcon = computed((): Component => {
+  if (props.searchHit.hitKind === "NOTEBOOK") return BookText
+  if (props.searchHit.hitKind === "FOLDER") return Folder
+  return FileText
 })
 
 const displayNotebookName = computed(() => {
@@ -119,5 +132,9 @@ const formattedDistance = computed(() =>
 .folder-hit-title,
 .notebook-hit-title {
   font-weight: 600;
+}
+
+.search-hit-kind-icon {
+  line-height: 0;
 }
 </style>
