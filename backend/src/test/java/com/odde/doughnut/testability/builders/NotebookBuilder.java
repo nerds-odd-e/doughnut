@@ -1,38 +1,52 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import java.sql.Timestamp;
 import java.util.function.Consumer;
 
 public class NotebookBuilder extends EntityBuilder<Notebook> {
-  private NoteBuilder noteBuilder;
   private final boolean existingNotebook;
   private BookBuilder bookAttachment;
+  private NoteBuilder childTreeBuilder;
 
   public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
-    super(makeMe, notebook);
+    super(makeMe, notebook != null ? notebook : new Notebook());
     this.existingNotebook = notebook != null;
-    if (existingNotebook) {
-      this.noteBuilder = null;
-    } else {
-      this.noteBuilder = makeMe.aNote().attachToNewNotebook(null);
-    }
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (noteBuilder != null) {
-      Note note = noteBuilder.please(needPersist);
-      this.entity = note.getNotebook();
+    if (existingNotebook) {
+      return;
+    }
+    Timestamp now = new Timestamp(System.currentTimeMillis());
+    if (entity.getCreatedAt() == null) {
+      entity.setCreatedAt(now);
+      entity.setUpdatedAt(now);
+    } else if (entity.getUpdatedAt() == null) {
+      entity.setUpdatedAt(entity.getCreatedAt());
+    }
+    if (entity.getName() == null || entity.getName().isBlank()) {
+      entity.setName(NoteBuilder.notebookTestNameCounter.generate());
+    }
+    if (entity.getCreatorEntity() == null && entity.getOwnership() == null) {
+      User user = makeMe.aUser().please(needPersist);
+      entity.setCreatorEntity(user);
+      entity.setOwnership(user.getOwnership());
+    } else if (entity.getOwnership() == null) {
+      entity.setOwnership(entity.getCreatorEntity().getOwnership());
     }
   }
 
   @Override
   protected void afterCreate(boolean needPersist) {
+    if (childTreeBuilder != null) {
+      childTreeBuilder.please(needPersist);
+    }
     if (bookAttachment != null) {
       bookAttachment.notebook(entity);
       bookAttachment.please(needPersist);
@@ -50,42 +64,34 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
   }
 
   public NotebookBuilder creatorAndOwner(User user) {
-    if (noteBuilder != null) {
-      noteBuilder.creatorAndOwner(user);
-    } else {
-      entity.setOwnership(user.getOwnership());
-      entity.setCreatorEntity(user);
-    }
+    entity.setOwnership(user.getOwnership());
+    entity.setCreatorEntity(user);
+    return this;
+  }
+
+  public NotebookBuilder name(String name) {
+    entity.setName(name);
     return this;
   }
 
   public NotebookBuilder withNChildrenThat(int count, Consumer<NoteBuilder> childNoteThat) {
-    if (noteBuilder == null) {
-      noteBuilder = makeMe.aNote().inNotebook(entity);
+    if (childTreeBuilder == null) {
+      childTreeBuilder = makeMe.aNote().inNotebook(entity);
       if (entity.getCreatorEntity() != null) {
-        noteBuilder.creator(entity.getCreatorEntity());
+        childTreeBuilder.creator(entity.getCreatorEntity());
       }
     }
-    noteBuilder.withNChildrenThat(count, childNoteThat);
+    childTreeBuilder.withNChildrenThat(count, childNoteThat);
     return this;
   }
 
   public NotebookBuilder owner(User user) {
-    if (noteBuilder != null) {
-      noteBuilder.ownership(user.getOwnership());
-    } else {
-      entity.setOwnership(user.getOwnership());
-    }
-
+    entity.setOwnership(user.getOwnership());
     return this;
   }
 
   public NotebookBuilder owner(Circle circle) {
-    if (noteBuilder != null) {
-      noteBuilder.ownership(circle.getOwnership());
-    } else {
-      entity.setOwnership(circle.getOwnership());
-    }
+    entity.setOwnership(circle.getOwnership());
     return this;
   }
 }

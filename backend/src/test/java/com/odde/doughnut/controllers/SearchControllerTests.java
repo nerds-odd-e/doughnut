@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
 import org.junit.jupiter.api.BeforeEach;
@@ -134,8 +136,11 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnNotebookHitsAlongsideNoteHits() throws UnexpectedNoAccessRightException {
-      makeMe.aNote("Recipe Ideas").creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aNote("My Recipe Card").creatorAndOwner(currentUser.getUser()).please();
+      User user = currentUser.getUser();
+      Notebook recipeNotebook =
+          makeMe.aNotebook().creatorAndOwner(user).name("Recipe Ideas").please();
+      makeMe.aNote().inNotebook(recipeNotebook).creatorAndOwner(user).please();
+      makeMe.aNote("My Recipe Card").creatorAndOwner(user).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Recipe");

@@ -39,8 +39,7 @@ class NotebookServiceTest {
   void findOptionalIndexNote_whenRootNoteTitleIsIndex_findsNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note root =
-        noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebook.getId()).getFirst();
+    Note root = makeMe.aNote().inNotebook(notebook).creatorAndOwner(owner).please();
     makeMe.theNote(root).title("index").please();
 
     Optional<Note> result = notebookService.findOptionalIndexNote(notebook);
@@ -53,8 +52,7 @@ class NotebookServiceTest {
   void findOptionalIndexNote_whenTitleIsIndexCaseInsensitive_findsNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note root =
-        noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebook.getId()).getFirst();
+    Note root = makeMe.aNote().inNotebook(notebook).creatorAndOwner(owner).please();
     makeMe.theNote(root).title("Index").please();
 
     Optional<Note> result = notebookService.findOptionalIndexNote(notebook);

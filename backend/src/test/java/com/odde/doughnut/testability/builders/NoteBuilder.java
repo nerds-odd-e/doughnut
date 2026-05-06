@@ -11,6 +11,8 @@ import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
+  static final TestObjectCounter notebookTestNameCounter =
+      new TestObjectCounter(n -> "notebook" + n);
 
   List<NoteBuilder> relationBuilders = new ArrayList<>();
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
@@ -41,15 +43,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
             : new Timestamp(System.currentTimeMillis());
     notebook.setCreatedAt(ts);
     notebook.setUpdatedAt(ts);
+    notebook.setName(notebookTestNameCounter.generate());
     entity.assignNotebook(notebook);
-    String headTitle = entity.getTitle();
-    if (headTitle != null && !headTitle.isBlank()) {
-      String trimmed = headTitle.trim();
-      notebook.setName(
-          trimmed.length() > Note.MAX_TITLE_LENGTH
-              ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
-              : trimmed);
-    }
     return this;
   }
 
@@ -75,7 +70,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder creatorAndOwner(User user) {
     if (entity.getNotebook() != null) {
-      ownership(user.getOwnership());
+      entity.getNotebook().setOwnership(user.getOwnership());
+      entity.getNotebook().setCreatorEntity(user);
     }
     return creator(user);
   }

@@ -97,20 +97,18 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnWikiTitlesForQualifiedLinkToNoteInAnotherNotebook()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Note headTarget = makeMe.aNote().creatorAndOwner(user).title("Other Notebook").please();
+      Notebook otherNotebook =
+          makeMe.aNotebook().creatorAndOwner(user).name("Other Notebook").please();
+      makeMe.aNote().creator(user).inNotebook(otherNotebook).please();
       Note targetInOther =
-          makeMe
-              .aNote()
-              .title("LinkedPage")
-              .creator(user)
-              .inNotebook(headTarget.getNotebook())
-              .please();
-      Note headSource = makeMe.aNote().creatorAndOwner(user).title("Main").please();
+          makeMe.aNote().title("LinkedPage").creator(user).inNotebook(otherNotebook).please();
+      Notebook mainNotebook = makeMe.aNotebook().creatorAndOwner(user).name("Main").please();
+      makeMe.aNote().creator(user).inNotebook(mainNotebook).please();
       Note viewer =
           makeMe
               .aNote()
               .creator(user)
-              .inNotebook(headSource.getNotebook())
+              .inNotebook(mainNotebook)
               .details("See [[Other Notebook:LinkedPage]] for more.")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
@@ -124,21 +122,20 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldOmitQualifiedWikiLinkWhenTargetNotebookIsNotReadable()
         throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
-      Note headSecret = makeMe.aNote().creatorAndOwner(otherUser).title("Secret Notebook").please();
-      makeMe
-          .aNote()
-          .title("Hidden Note")
-          .creator(otherUser)
-          .inNotebook(headSecret.getNotebook())
-          .please();
+      Notebook secretNotebook =
+          makeMe.aNotebook().creatorAndOwner(otherUser).name("Secret Notebook").please();
+      makeMe.aNote().creator(otherUser).inNotebook(secretNotebook).please();
+      makeMe.aNote().title("Hidden Note").creator(otherUser).inNotebook(secretNotebook).please();
 
       User viewerUser = currentUser.getUser();
-      Note headSource = makeMe.aNote().creatorAndOwner(viewerUser).title("My Notebook").please();
+      Notebook myNotebook =
+          makeMe.aNotebook().creatorAndOwner(viewerUser).name("My Notebook").please();
+      makeMe.aNote().creator(viewerUser).inNotebook(myNotebook).please();
       Note viewer =
           makeMe
               .aNote()
               .creator(viewerUser)
-              .inNotebook(headSource.getNotebook())
+              .inNotebook(myNotebook)
               .details("Try [[Secret Notebook:Hidden Note]].")
               .please();
       NoteRealm realm = controller.showNote(viewer);
