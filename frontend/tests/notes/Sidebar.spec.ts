@@ -1,5 +1,6 @@
 import Sidebar from "@/components/notes/Sidebar.vue"
 import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
+import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type {
   NoteRealm,
@@ -147,6 +148,7 @@ describe("Sidebar", () => {
   }
 
   beforeEach(() => {
+    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
     storageAccessor.value = createNoteStorage()
     storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
     storageAccessor.value.refOfNoteRealm(firstGeneration.id).value =
@@ -363,7 +365,7 @@ describe("Sidebar", () => {
     })
   })
 
-  it("lists folders above notes at the same level, both sorted alphabetically", async () => {
+  it("lists folders above notes; each group sorted by title (A–Z)", async () => {
     storageAccessor.value = createNoteStorage()
     const nbId = topNoteRealm.notebookId
     const realmZ = makeMe.aNoteRealm.title("zebra").under(topNoteRealm).please()
@@ -374,10 +376,7 @@ describe("Sidebar", () => {
 
     mockSdkService("listNotebookRootNotes", {
       noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
-      folders: [
-        { id: "9002", name: "mango" },
-        { id: "9001", name: "banana" },
-      ],
+      folders: [testFolderStub(9002, "mango"), testFolderStub(9001, "banana")],
     })
     mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
     const fullRealmByNoteId: Record<number, NoteRealm> = {
@@ -420,6 +419,205 @@ describe("Sidebar", () => {
       "note:apple",
       "note:zebra",
     ])
+  })
+
+  describe("sidebar peer sort", () => {
+    it("shows sort control in the sidebar toolbar", async () => {
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
+          notebookId: topNoteRealm.notebookId,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      expect(wrapper.find("[data-note-sidebar-sort]").exists()).toBe(true)
+    })
+
+    it("reorders root peers when Title (Z–A) is chosen", async () => {
+      storageAccessor.value = createNoteStorage()
+      const nbId = topNoteRealm.notebookId
+      const realmZ = makeMe.aNoteRealm
+        .title("zebra")
+        .under(topNoteRealm)
+        .please()
+      const realmA = makeMe.aNoteRealm
+        .title("apple")
+        .under(topNoteRealm)
+        .please()
+      storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
+      storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
+      storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+
+      mockSdkService("listNotebookRootNotes", {
+        noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
+        folders: [
+          testFolderStub(9002, "mango"),
+          testFolderStub(9001, "banana"),
+        ],
+      })
+      mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
+      const fullRealmByNoteId: Record<number, NoteRealm> = {
+        [topNoteRealm.id]: topNoteRealm,
+        [realmZ.id]: realmZ,
+        [realmA.id]: realmA,
+      }
+      mockSdkServiceWithImplementation("showNote", (options) => {
+        const id = (options as Options<ShowNoteData>).path.note
+        const realm = fullRealmByNoteId[id]
+        if (realm === undefined) {
+          throw new Error(`unmocked showNote for note id ${id}`)
+        }
+        return realm
+      })
+
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
+          notebookId: nbId,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      await vi.waitUntil(
+        () => wrapper.findAll(".sidebar-folder-label").length >= 2
+      )
+
+      const rootUl = () => wrapper.get("ul.sidebar-tree-list")
+      const rowLabels = () =>
+        Array.from(rootUl().element.children).map((li) => {
+          const folder = li.querySelector(".sidebar-folder-label")
+          if (folder) return `folder:${folder.textContent?.trim()}`
+          const note = li.querySelector(".title-text")
+          if (note) return `note:${note.textContent?.trim()}`
+          return "?"
+        })
+
+      expect(rowLabels()).toEqual([
+        "folder:banana",
+        "folder:mango",
+        "note:apple",
+        "note:zebra",
+      ])
+
+      await wrapper.find("[data-note-sidebar-sort] summary").trigger("click")
+      await flushPromises()
+      await wrapper.find('button[title="Title (Z–A)"]').trigger("click")
+      await flushPromises()
+
+      expect(rowLabels()).toEqual([
+        "folder:mango",
+        "folder:banana",
+        "note:zebra",
+        "note:apple",
+      ])
+    })
+
+    it("applies sort from sessionStorage on mount without opening the menu", async () => {
+      sessionStorage.setItem(
+        NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY,
+        JSON.stringify({ field: "updated", direction: "desc" })
+      )
+      storageAccessor.value = createNoteStorage()
+      const nbId = topNoteRealm.notebookId
+      const realmZ = makeMe.aNoteRealm
+        .title("zebra")
+        .updatedAt("2015-06-01T00:00:00.000Z")
+        .under(topNoteRealm)
+        .please()
+      const realmA = makeMe.aNoteRealm
+        .title("apple")
+        .updatedAt("2020-01-01T00:00:00.000Z")
+        .under(topNoteRealm)
+        .please()
+      storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
+      storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
+      storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+
+      const folderBanana = {
+        ...testFolderStub(9001, "banana"),
+        updatedAt: "2018-01-01T00:00:00.000Z",
+      }
+      const folderMango = {
+        ...testFolderStub(9002, "mango"),
+        updatedAt: "2005-01-01T00:00:00.000Z",
+      }
+
+      mockSdkService("listNotebookRootNotes", {
+        noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
+        folders: [folderMango, folderBanana],
+      })
+      mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
+      const fullRealmByNoteId: Record<number, NoteRealm> = {
+        [topNoteRealm.id]: topNoteRealm,
+        [realmZ.id]: realmZ,
+        [realmA.id]: realmA,
+      }
+      mockSdkServiceWithImplementation("showNote", (options) => {
+        const id = (options as Options<ShowNoteData>).path.note
+        const realm = fullRealmByNoteId[id]
+        if (realm === undefined) {
+          throw new Error(`unmocked showNote for note id ${id}`)
+        }
+        return realm
+      })
+
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
+          notebookId: nbId,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      await vi.waitUntil(
+        () => wrapper.findAll(".sidebar-folder-label").length >= 2
+      )
+
+      const rootUl = wrapper.get("ul.sidebar-tree-list")
+      const rowLabels = Array.from(rootUl.element.children).map((li) => {
+        const folder = li.querySelector(".sidebar-folder-label")
+        if (folder) return `folder:${folder.textContent?.trim()}`
+        const note = li.querySelector(".title-text")
+        if (note) return `note:${note.textContent?.trim()}`
+        return "?"
+      })
+
+      expect(rowLabels).toEqual([
+        "folder:banana",
+        "folder:mango",
+        "note:apple",
+        "note:zebra",
+      ])
+
+      wrapper.unmount()
+      wrapper = helper
+        .component(Sidebar)
+        .withCurrentUser(makeMe.aUser.please())
+        .withProps({
+          activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
+          notebookId: nbId,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      await vi.waitUntil(
+        () => wrapper.findAll(".sidebar-folder-label").length >= 2
+      )
+      const rootUlAfter = wrapper.get("ul.sidebar-tree-list")
+      const rowLabelsAfterRemount = Array.from(
+        rootUlAfter.element.children
+      ).map((li) => {
+        const folder = li.querySelector(".sidebar-folder-label")
+        if (folder) return `folder:${folder.textContent?.trim()}`
+        const note = li.querySelector(".title-text")
+        if (note) return `note:${note.textContent?.trim()}`
+        return "?"
+      })
+      expect(rowLabelsAfterRemount).toEqual(rowLabels)
+    })
   })
 
   it("should call the api once if top note", async () => {

@@ -1,5 +1,8 @@
 <template>
-  <div data-note-sidebar-root class="daisy-flex daisy-flex-col daisy-flex-1 daisy-min-h-0">
+  <div
+    data-note-sidebar-root
+    class="daisy-flex daisy-flex-col daisy-flex-1 daisy-min-h-0 daisy-overflow-x-visible"
+  >
     <NoteSidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"

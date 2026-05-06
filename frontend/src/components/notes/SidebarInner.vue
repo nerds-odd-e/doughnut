@@ -25,53 +25,20 @@ import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
+import {
+  buildUnsortedStructuralRows,
+  sortSidebarStructuralRows,
+  type SidebarStructuralRow,
+} from "./sidebarStructuralSort"
 import { computed, ref, watch } from "vue"
+import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
-
-type SidebarStructuralRow =
-  | { kind: "note"; noteTopology: NoteTopology }
-  | { kind: "folder"; folder: Folder }
+const { sortPeerSpec } = useNoteSidebarPeerSort()
 
 function folderNumericId(folder: Folder): number | undefined {
   return folder.id
-}
-
-function folderSortKey(folder: Folder): string {
-  return (folder.name ?? "").toLocaleLowerCase()
-}
-
-function noteSortKey(noteTopology: NoteTopology): string {
-  return (noteTopology.title ?? "").toLocaleLowerCase()
-}
-
-function buildStructuralRows(
-  noteTopologies: NoteTopology[],
-  folders: Folder[] | undefined
-): SidebarStructuralRow[] {
-  type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
-  type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>
-
-  const folderRows: FolderRow[] = []
-  for (const folder of folders ?? []) {
-    if (folderNumericId(folder) !== undefined) {
-      folderRows.push({ kind: "folder", folder })
-    }
-  }
-  folderRows.sort((a, b) =>
-    folderSortKey(a.folder).localeCompare(folderSortKey(b.folder))
-  )
-
-  const noteRows: NoteRow[] = noteTopologies.map((noteTopology) => ({
-    kind: "note" as const,
-    noteTopology,
-  }))
-  noteRows.sort((a, b) =>
-    noteSortKey(a.noteTopology).localeCompare(noteSortKey(b.noteTopology))
-  )
-
-  return [...folderRows, ...noteRows]
 }
 
 function rowKey(row: SidebarStructuralRow): string {
@@ -98,7 +65,11 @@ const props = defineProps<Props>()
 
 const currentLevel = computed(() => props.level ?? 1)
 
-const displayRows = ref<SidebarStructuralRow[]>([])
+const rawRows = ref<SidebarStructuralRow[]>([])
+
+const displayRows = computed(() =>
+  sortSidebarStructuralRows(rawRows.value, sortPeerSpec.value)
+)
 
 async function refreshListing() {
   const api = storageAccessor.value.storedApi()
@@ -108,10 +79,10 @@ async function refreshListing() {
         ? await api.loadNotebookRootNotes(props.notebookId)
         : await api.loadFolderListing(props.notebookId, props.folderId)
     const noteTopologies = listing.noteTopologies ?? []
-    displayRows.value = buildStructuralRows(noteTopologies, listing.folders)
-    props.onStructuralPeerCount?.(displayRows.value.length)
+    rawRows.value = buildUnsortedStructuralRows(noteTopologies, listing.folders)
+    props.onStructuralPeerCount?.(rawRows.value.length)
   } catch {
-    displayRows.value = []
+    rawRows.value = []
     props.onStructuralPeerCount?.(0)
   }
 }
