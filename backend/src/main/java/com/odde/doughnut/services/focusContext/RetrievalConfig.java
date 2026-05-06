@@ -6,12 +6,12 @@ public class RetrievalConfig {
   private static final int DEFAULT_MAX_DEPTH = 2;
 
   private final int maxDepth;
-  private final Long folderSiblingSampleSeed;
+  private final Long sampleSeed;
   private final Integer relatedNotesTotalBudgetTokens;
 
-  public RetrievalConfig(int maxDepth, Long folderSiblingSampleSeed, Integer relatedNotesBudget) {
+  public RetrievalConfig(int maxDepth, Long sampleSeed, Integer relatedNotesBudget) {
     this.maxDepth = maxDepth;
-    this.folderSiblingSampleSeed = folderSiblingSampleSeed;
+    this.sampleSeed = sampleSeed;
     this.relatedNotesTotalBudgetTokens = relatedNotesBudget;
   }
 
@@ -20,8 +20,8 @@ public class RetrievalConfig {
     return new RetrievalConfig(DEFAULT_MAX_DEPTH, null, null);
   }
 
-  public static RetrievalConfig forQuestionGeneration(Long folderSiblingSampleSeed) {
-    return new RetrievalConfig(DEFAULT_MAX_DEPTH, folderSiblingSampleSeed, null);
+  public static RetrievalConfig forQuestionGeneration(Long sampleSeed) {
+    return new RetrievalConfig(DEFAULT_MAX_DEPTH, sampleSeed, null);
   }
 
   public static RetrievalConfig depth1() {
@@ -38,10 +38,11 @@ public class RetrievalConfig {
   }
 
   /**
-   * When present, folder sibling candidates are shuffled with {@link java.util.Random} this seed.
+   * When present, inbound references and folder sibling candidates are shuffled with {@link
+   * java.util.Random} this seed.
    */
-  public Optional<Long> getFolderSiblingSampleSeed() {
-    return Optional.ofNullable(folderSiblingSampleSeed);
+  public Optional<Long> getSampleSeed() {
+    return Optional.ofNullable(sampleSeed);
   }
 
   public int getRelatedNotesTotalBudgetTokens() {

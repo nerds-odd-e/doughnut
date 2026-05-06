@@ -7,6 +7,23 @@ public class FocusContextConstants {
   public static final int MAX_FOLDER_SIBLINGS_PER_NOTE = 5;
 
   /**
+   * Maximum inbound referrers sampled at depth 1 (per parent). Halves by floor(prev/3) per depth.
+   */
+  public static final int INBOUND_TOP_DEPTH_CAP = 6;
+
+  /** Maximum URIs shown in the focus note's flat `inboundReferences` list. */
+  public static final int FOCUS_INBOUND_URI_CAP = 20;
+
+  /** Cap on inbound referrers for a given BFS depth (per parent). */
+  public static int inboundCapForDepth(int depth) {
+    int cap = INBOUND_TOP_DEPTH_CAP;
+    for (int d = 1; d < depth; d++) {
+      cap = cap / 3;
+    }
+    return cap;
+  }
+
+  /**
    * Below this related-note token budget (e.g. tight {@code GET /notes/{id}/graph} limits), omit
    * folder-peer sampling: no {@code sampleSiblings} on the focus note and no {@link
    * com.odde.doughnut.services.focusContext.FocusContextEdgeType#FolderSibling} rows. Wiki BFS

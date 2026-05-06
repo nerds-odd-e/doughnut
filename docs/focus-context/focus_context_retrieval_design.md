@@ -17,6 +17,18 @@ Doughnut gathers **bounded context around one focus note** for AI features (ques
 
 Within a depth, **OutgoingWikiLink** is preferred over **InboundWikiReference** when the same note is reached both ways. Notes dedupe by internal id; the **shortest** path wins.
 
+**Inbound sampling.** Inbound references are capped per parent, per depth:
+
+| Depth | Max inbound per parent |
+|-------|------------------------|
+| 1     | 6                      |
+| 2     | 2 (`floor(6 / 3)`)     |
+| 3+    | 0 (expansion stops)    |
+
+When a `sampleSeed` is provided in `RetrievalConfig`, candidates above the cap are randomly shuffled with that seed before truncation (deterministic, reproducible). Without a seed, the first N in existing cache order are taken.
+
+The focus note's flat `inboundReferences` URI list (no token cost) is also capped at **20** and seeded-shuffled when a seed is set.
+
 ## API shape (`FocusContextResult`)
 
 - `focusNote` — `notebook`, `title`, `folderPath`, `depth`, `outgoingLinks`, `inboundReferences`, `sampleSiblings` (wiki-style URI strings), `details`, `detailsTruncated`, optional `createdAt`.

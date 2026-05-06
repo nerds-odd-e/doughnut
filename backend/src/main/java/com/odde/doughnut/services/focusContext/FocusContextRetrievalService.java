@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,14 +69,17 @@ public class FocusContextRetrievalService {
 
     Integer focusId = hydrated.getId();
 
+    Random rng = config.getSampleSeed().map(Random::new).orElse(null);
+
     List<String> outgoingLinkUris =
         wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(hydrated, viewer).stream()
             .map(FocusContextWikiUri::of)
             .toList();
     List<String> inboundRefUris =
-        wikiTitleCacheService.referencesNotesForViewer(hydrated, viewer).stream()
-            .map(FocusContextWikiUri::of)
-            .toList();
+        sampleAndCapUris(
+            wikiTitleCacheService.referencesNotesForViewer(hydrated, viewer),
+            FocusContextConstants.FOCUS_INBOUND_URI_CAP,
+            rng);
     int relatedTotalBudget = config.getRelatedNotesTotalBudgetTokens();
     boolean includeFolderPeers =
         relatedTotalBudget >= FocusContextConstants.MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT;
@@ -170,16 +174,20 @@ public class FocusContextRetrievalService {
                   target.getId(), depth, childPath, FocusContextEdgeType.OutgoingWikiLink));
         }
 
-        for (Note target : inbound) {
-          if (target.getId() == null || target.getId().equals(focusId)) {
-            continue;
-          }
-          boolean inOutgoing =
-              outgoing.stream()
-                  .anyMatch(o -> o.getId() != null && o.getId().equals(target.getId()));
-          if (inOutgoing) {
-            continue;
-          }
+        List<Note> sampledInbound =
+            sampleAndCap(
+                inbound.stream()
+                    .filter(
+                        t ->
+                            t.getId() != null
+                                && !t.getId().equals(focusId)
+                                && outgoing.stream()
+                                    .noneMatch(
+                                        o -> o.getId() != null && o.getId().equals(t.getId())))
+                    .collect(Collectors.toList()),
+                FocusContextConstants.inboundCapForDepth(depth),
+                rng);
+        for (Note target : sampledInbound) {
           List<String> childPath = appendWikiUri(parentPath, target);
           proposals.add(
               new Proposal(
@@ -257,7 +265,7 @@ public class FocusContextRetrievalService {
         siblingAnchors,
         siblingBudgetTotal,
         wikiClaimedNoteIds,
-        config.getFolderSiblingSampleSeed().orElse(null));
+        config.getSampleSeed().orElse(null));
 
     return result;
   }
@@ -401,4 +409,22 @@ public class FocusContextRetrievalService {
 
   private record Proposal(
       int noteId, int depth, List<String> retrievalPath, FocusContextEdgeType edgeType) {}
+
+  private static <T> List<T> sampleAndCap(List<T> candidates, int cap, Random rng) {
+    if (cap <= 0 || candidates.isEmpty()) {
+      return List.of();
+    }
+    if (rng != null && candidates.size() > cap) {
+      List<T> mutable = new ArrayList<>(candidates);
+      Collections.shuffle(mutable, rng);
+      return List.copyOf(mutable.subList(0, cap));
+    }
+    return candidates.size() <= cap
+        ? List.copyOf(candidates)
+        : List.copyOf(candidates.subList(0, cap));
+  }
+
+  private static List<String> sampleAndCapUris(List<Note> notes, int cap, Random rng) {
+    return sampleAndCap(notes, cap, rng).stream().map(FocusContextWikiUri::of).toList();
+  }
 }
