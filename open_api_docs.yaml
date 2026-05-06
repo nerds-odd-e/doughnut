@@ -2507,6 +2507,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FocusContextResult"
+  /api/notes/{note}/ai-context-markdown:
+    get:
+      tags:
+      - note-controller
+      operationId: getAiContextMarkdown
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteAiContextMarkdown"
   /api/notes/{note}/accessory:
     get:
       tags:
@@ -4824,6 +4842,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FocusContextNote"
+    NoteAiContextMarkdown:
+      type: object
+      properties:
+        markdown:
+          type: string
     NotebookCatalogGroupItem:
       allOf:
       - $ref: "#/components/schemas/NotebookCatalogItem"

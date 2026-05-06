@@ -11,14 +11,14 @@
         :text="jsonData"
         :disabled="!jsonData || loading"
         :test-id="copyButtonTestId"
-        aria-label="Copy JSON"
+        :aria-label="copyAriaLabel"
       />
       <button
         class="daisy-btn daisy-btn-secondary daisy-btn-circle"
-        @click="downloadJson"
+        @click="downloadFile"
         :disabled="!jsonData || loading"
         :data-testid="downloadButtonTestId"
-        aria-label="Download JSON"
+        :aria-label="downloadAriaLabel"
       >
         <Download class="daisy-w-6 daisy-h-6" />
       </button>
@@ -39,16 +39,24 @@ const props = withDefaults(
     textareaTestId?: string
     copyButtonTestId?: string
     downloadButtonTestId?: string
+    downloadMimeType?: string
+    downloadExtension?: string
+    copyAriaLabel?: string
+    downloadAriaLabel?: string
   }>(),
   {
     loading: false,
+    downloadMimeType: "application/json",
+    downloadExtension: "json",
+    copyAriaLabel: "Copy JSON",
+    downloadAriaLabel: "Download JSON",
   }
 )
 
-function downloadJson() {
+function downloadFile() {
   if (!props.jsonData) return
-  const blob = new Blob([props.jsonData], { type: "application/json" })
-  saveAs(blob, `${props.filename}.json`)
+  const blob = new Blob([props.jsonData], { type: props.downloadMimeType })
+  saveAs(blob, `${props.filename}.${props.downloadExtension}`)
 }
 </script>
 

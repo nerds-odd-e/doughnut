@@ -2,6 +2,21 @@
   <div class="daisy-card">
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
+      <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2">
+        Markdown context sent to the AI assistant for this note (same retrieval as chat).
+      </p>
+      <JsonExportSection
+        :json-data="aiMarkdown"
+        :filename="`note-${note.id}-ai-context`"
+        :loading="loadingMarkdown"
+        textarea-test-id="ai-context-markdown-textarea"
+        copy-button-test-id="copy-ai-context-md-btn"
+        download-button-test-id="download-ai-context-md-btn"
+        download-mime-type="text/markdown;charset=utf-8"
+        download-extension="md"
+        copy-aria-label="Copy markdown"
+        download-aria-label="Download markdown"
+      />
       <details :open="expandedGraph" class="daisy-collapse daisy-bg-base-200 daisy-rounded-box daisy-mt-4">
         <summary
           class="daisy-flex daisy-items-center daisy-gap-2 daisy-underline daisy-cursor-pointer daisy-py-2 daisy-px-1"
@@ -49,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { onMounted, ref, watch } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
@@ -61,6 +76,24 @@ const expandedGraph = ref(false)
 const jsonGraph = ref("")
 const tokenLimit = ref(2000)
 const loadingGraph = ref(false)
+
+const aiMarkdown = ref("")
+const loadingMarkdown = ref(false)
+
+onMounted(async () => {
+  await fetchAiMarkdown()
+})
+
+async function fetchAiMarkdown() {
+  loadingMarkdown.value = true
+  const { data, error } = await NoteController.getAiContextMarkdown({
+    path: { note: props.note.id },
+  })
+  if (!error && data) {
+    aiMarkdown.value = data.markdown ?? ""
+  }
+  loadingMarkdown.value = false
+}
 
 watch(
   () => expandedGraph.value,

@@ -804,6 +804,10 @@ export type FocusContextResult = {
     relatedNotes?: Array<FocusContextNote>;
 };
 
+export type NoteAiContextMarkdown = {
+    markdown?: string;
+};
+
 export type NotebookCatalogGroupItem = Omit<NotebookCatalogItem, 'type'> & {
     id: number;
     name: string;
@@ -3228,6 +3232,24 @@ export type GetGraphResponses = {
 };
 
 export type GetGraphResponse = GetGraphResponses[keyof GetGraphResponses];
+
+export type GetAiContextMarkdownData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/ai-context-markdown';
+};
+
+export type GetAiContextMarkdownResponses = {
+    /**
+     * OK
+     */
+    200: NoteAiContextMarkdown;
+};
+
+export type GetAiContextMarkdownResponse = GetAiContextMarkdownResponses[keyof GetAiContextMarkdownResponses];
 
 export type ShowNoteAccessoryData = {
     body?: never;

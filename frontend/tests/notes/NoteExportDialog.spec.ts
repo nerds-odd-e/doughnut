@@ -2,21 +2,40 @@ import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"
 import { page } from "vitest/browser"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
+const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
+
 describe("NoteExportDialog", () => {
   let wrapper: VueWrapper
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSdkService("getAiContextMarkdown", aiMarkdownStub)
   })
 
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+  })
+
+  it("fetches and displays AI markdown on open", async () => {
+    const note = makeMe.aNote.please()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+    expect(NoteController.getAiContextMarkdown).toHaveBeenCalledWith({
+      path: { note: note.id },
+    })
+    const ta = page.getByTestId("ai-context-markdown-textarea")
+    await expect.element(ta).toBeVisible()
+    await expect.element(ta).toHaveValue(expect.stringContaining("AI context"))
   })
 
   it("fetches and displays graph JSON when expanded", async () => {
@@ -51,6 +70,19 @@ describe("NoteExportDialog", () => {
       path: { note: note.id },
       query: { tokenLimit: 2000 },
     })
+  })
+
+  it("downloads AI markdown when primary download is clicked", async () => {
+    const note = makeMe.aNote.please()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+    await page.getByTestId("download-ai-context-md-btn").click()
+    expect(saveAs).toHaveBeenCalled()
+    const blobArg = vi.mocked(saveAs).mock.calls[0][0] as Blob
+    expect(blobArg.type).toContain("markdown")
   })
 
   it("downloads graph JSON when download button is clicked", async () => {

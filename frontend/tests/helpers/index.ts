@@ -109,6 +109,7 @@ const methodToController: Record<string, any> = {
   undoDeleteNote: NoteController,
   getNoteInfo: NoteController,
   getGraph: NoteController,
+  getAiContextMarkdown: NoteController,
   showNoteAccessory: NoteController,
   getRecentNotes: NoteController,
   semanticSearchWithin: SearchController,

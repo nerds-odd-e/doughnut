@@ -10,6 +10,7 @@ import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
@@ -37,6 +38,7 @@ class NoteController {
   private final AuthorizationService authorizationService;
   private final UserService userService;
   private final FocusContextRetrievalService focusContextRetrievalService;
+  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final TestabilitySettings testabilitySettings;
   private final NoteRealmService noteRealmService;
 
@@ -47,6 +49,7 @@ class NoteController {
       AuthorizationService authorizationService,
       UserService userService,
       FocusContextRetrievalService focusContextRetrievalService,
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       TestabilitySettings testabilitySettings,
       NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
@@ -55,6 +58,7 @@ class NoteController {
     this.authorizationService = authorizationService;
     this.userService = userService;
     this.focusContextRetrievalService = focusContextRetrievalService;
+    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
   }
@@ -181,6 +185,28 @@ class NoteController {
 
     return focusContextRetrievalService.retrieve(
         note, user, RetrievalConfig.forGraphApi(tokenLimit));
+  }
+
+  /**
+   * Markdown note context as included in AI chat about this note (focus-context render plus
+   * notebook assistant instructions when set). Same retrieval profile as {@link
+   * com.odde.doughnut.services.ai.ConversationHistoryBuilder}.
+   */
+  @GetMapping("/{note}/ai-context-markdown")
+  public NoteAiContextMarkdown getAiContextMarkdown(
+      @PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(note);
+    User user = authorizationService.getCurrentUser();
+    RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
+    FocusContextResult focusContextResult =
+        focusContextRetrievalService.retrieve(note, user, config);
+    String markdown = focusContextMarkdownRenderer.render(focusContextResult, config);
+    String notebookInstructions = note.getNotebookAssistantInstructions();
+    if (notebookInstructions != null && !notebookInstructions.trim().isEmpty()) {
+      markdown = markdown + "\n\n" + notebookInstructions;
+    }
+    return new NoteAiContextMarkdown(markdown);
   }
 
   @PostMapping(value = "/{note}/verify-spelling")
