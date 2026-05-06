@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="assimilation-main">
     <div class="breadcrumb-wrapper daisy-mb-2">
       <Breadcrumb
         v-bind="{
@@ -13,63 +13,16 @@
       v-bind="{ noteId: note.id, expandChildren: false }"
     />
   </main>
-  <NoteInfoBar
-    :note-id="note.id"
+  <AssimilationSettings
     :key="note.id"
-    @level-changed="$emit('reloadNeeded')"
+    :note="note"
+    :note-info-loaded="noteInfoLoaded"
+    :keep-for-recall-disabled="keepForRecallDisabled"
+    @level-changed="emit('reloadNeeded')"
     @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
-  />
-  <button
-    v-if="(note.details ?? '').trim()"
-    type="button"
-    data-test="open-refine-note-modal"
-    class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-mb-2 daisy-ml-2"
-    @click="showRefineNoteModal = true"
-  >
-    Refine note
-  </button>
-  <Teleport to="body">
-    <dialog
-      v-if="(note.details ?? '').trim()"
-      class="daisy-modal"
-      :class="{ 'daisy-modal-open': showRefineNoteModal }"
-      data-test="refine-note-modal"
-    >
-      <div
-        class="daisy-modal-box daisy-max-w-4xl daisy-max-h-[90vh] daisy-overflow-y-auto"
-      >
-        <h3 v-if="showRefineNoteModal" class="daisy-font-bold daisy-text-lg daisy-mb-3">
-          Refine note
-        </h3>
-        <NoteRefinement
-          v-if="showRefineNoteModal"
-          :key="note.id"
-          :note="note"
-          @details-updated="onRefinementDetailsUpdated"
-          @understanding-points-ignored="closeRefineNoteModal"
-        />
-        <div v-if="showRefineNoteModal" class="daisy-modal-action daisy-mt-4">
-          <button
-            type="button"
-            class="daisy-btn"
-            data-test="close-refine-note-modal"
-            @click="closeRefineNoteModal"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-      <form method="dialog" class="daisy-modal-backdrop">
-        <button type="button" @click="closeRefineNoteModal">close</button>
-      </form>
-    </dialog>
-  </Teleport>
-  <AssimilationButtons
-    :key="buttonKey"
-    :disabled="!noteInfoLoaded"
-    :keep-for-recall-disabled="keepForRecallDisabled"
     @assimilate="processForm"
+    @refinement-details-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
     <div
@@ -93,13 +46,11 @@ import type { Folder, Note } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
-import NoteInfoBar from "../notes/NoteInfoBar.vue"
-import AssimilationButtons from "./AssimilationButtons.vue"
-import NoteRefinement from "./NoteRefinement.vue"
+import AssimilationSettings from "./AssimilationSettings.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
-import { computed, ref, watch } from "vue"
+import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
@@ -120,16 +71,8 @@ const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
-const buttonKey = computed(() => note.id)
 const showSpellingPopup = ref(false)
-const showRefineNoteModal = ref(false)
 
-watch(
-  () => note.id,
-  () => {
-    showRefineNoteModal.value = false
-  }
-)
 const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false)
 const noteRecallInfo = ref<{
@@ -219,15 +162,13 @@ const handleSpellingVerified = () => {
 const handleSpellingCancel = () => {
   showSpellingPopup.value = false
 }
-
-const closeRefineNoteModal = () => {
-  showRefineNoteModal.value = false
-}
-
-const onRefinementDetailsUpdated = () => {
-  emit("reloadNeeded")
-}
 </script>
+
+<style scoped lang="scss">
+.assimilation-main {
+  padding-bottom: clamp(11rem, 32vh, 22rem);
+}
+</style>
 
 <style>
 .assimilation-paused {
