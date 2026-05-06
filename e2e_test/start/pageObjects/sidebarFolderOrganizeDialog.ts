@@ -5,6 +5,8 @@ const submitTimeoutMs = 20000
 export type SidebarFolderOrganizeDialog = {
   selectNotebookRootAsDestination: () => SidebarFolderOrganizeDialog
   confirmMove: () => void
+  tryConfirmMove: () => SidebarFolderOrganizeDialog
+  expectErrorText: (text: string) => SidebarFolderOrganizeDialog
 }
 
 /**
@@ -22,6 +24,20 @@ export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog
         .should('not.be.disabled')
         .click()
       pageIsNotLoading()
+    },
+
+    tryConfirmMove() {
+      cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
+        .should('not.be.disabled')
+        .click()
+      return assumeSidebarFolderOrganizeDialog()
+    },
+
+    expectErrorText(text: string) {
+      cy.get('[data-testid="folder-move-dialog"]')
+        .find('.daisy-text-error')
+        .should('contain.text', text)
+      return assumeSidebarFolderOrganizeDialog()
     },
   }
 }

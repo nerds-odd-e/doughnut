@@ -615,6 +615,21 @@ class NotebookControllerTest extends ControllerTestBase {
       ResponseStatusException ex =
           assertThrows(ResponseStatusException.class, () -> controller.moveFolder(nb, outer, req));
       assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Cannot move folder into its descendant."));
+    }
+
+    @Test
+    void rejectsSelfAsDestination() {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Solo").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(folder.getId());
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.moveFolder(nb, folder, req));
+      assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Cannot move folder into itself."));
     }
 
     @Test
@@ -631,6 +646,7 @@ class NotebookControllerTest extends ControllerTestBase {
           assertThrows(
               ResponseStatusException.class, () -> controller.moveFolder(nb, nestedDup, req));
       assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("A folder with this name already exists here."));
     }
 
     @Test
@@ -646,6 +662,38 @@ class NotebookControllerTest extends ControllerTestBase {
           assertThrows(
               ResponseStatusException.class, () -> controller.moveFolder(nbA, folderInB, req));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Folder not in notebook."));
+    }
+
+    @Test
+    void rejectsParentNotFound() {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Movable").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(-99999);
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.moveFolder(nb, folder, req));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Parent folder not found."));
+    }
+
+    @Test
+    void rejectsParentInOtherNotebook() {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nbA).name("Movable").please();
+      Folder parentInB = makeMe.aFolder().notebook(nbB).name("Foreign").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(parentInB.getId());
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.moveFolder(nbA, folder, req));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Parent folder not in notebook."));
     }
   }
 

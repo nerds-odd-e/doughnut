@@ -16,3 +16,13 @@ Feature: Folder organization
     And I move the active folder to notebook root using the sidebar folder dialog
     Then I should see sidebar folder "Beta"
     And I should not see sidebar folder "Beta" under folder "Alpha"
+
+  Scenario: Sibling name clash blocks a folder move and shows inline error
+    Given I have a notebook "Organize NB" with notes:
+      | Title       | Folder      |
+      | Root Beta   | Beta        |
+      | Nested Beta | Alpha/Beta  |
+    When I view note "Nested Beta"
+    And I activate folder "Beta" under folder "Alpha" in the sidebar
+    And I attempt to move the active folder to notebook root using the sidebar folder dialog
+    Then the sidebar folder dialog shows error "A folder with this name already exists here."

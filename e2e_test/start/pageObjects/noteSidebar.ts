@@ -117,6 +117,22 @@ export const noteSidebar = () => {
       pageIsNotLoading()
     },
 
+    activateFolderUnderParent(parentLabel: string, childLabel: string) {
+      pageIsNotLoading()
+      expandFolderIfCollapsed(parentLabel)
+      folderTreitemByLabel(parentLabel)
+        .find(
+          `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
+          { timeout: sidebarActionTimeoutMs }
+        )
+        .filter(':visible')
+        .last()
+        .find('.sidebar-folder-label')
+        .first()
+        .click()
+      pageIsNotLoading()
+    },
+
     openFolderOrganizeDialog() {
       pageIsNotLoading()
       cy.get('aside').findByRole('button', { name: 'Folder…' }).click()
