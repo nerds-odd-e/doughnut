@@ -16,6 +16,21 @@ describe("breadcrumb with circles", () => {
     await screen.findByText("Bazaar")
   })
 
+  it("shows notebook name on the note breadcrumb when notebook is provided", async () => {
+    const notebook = makeMe.aNotebook.please()
+    helper
+      .component(BreadcrumbWithCircle)
+      .withProps({
+        fromBazaar: false,
+        noteTopology: parentNote.noteTopology,
+        notebook,
+      })
+      .render()
+    await screen.findByText("Notebooks")
+    const notebookName = screen.getByText(notebook.name)
+    expect(notebookName.closest("a")).not.toBeNull()
+  })
+
   it("shows folder trail in outer-to-inner order via ancestorFolders", async () => {
     helper
       .component(BreadcrumbWithCircle)

@@ -5,18 +5,30 @@
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
-        <template v-if="circle">
-          <li>
-            <router-link
-              :to="{
-                name: 'circleShow',
-                params: { circleId: circle.id },
-              }"
-              >{{ circle.name }}</router-link
-            >
-          </li>
-        </template>
+        <li>
+          <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
+        </li>
+        <li v-if="circle">
+          <router-link
+            :to="{
+              name: 'circleShow',
+              params: { circleId: circle.id },
+            }"
+            >{{ circle.name }}</router-link
+          >
+        </li>
       </template>
+      <li v-if="notebook">
+        <router-link
+          v-if="notebook.id != null"
+          :to="{
+            name: 'notebookPage',
+            params: { notebookId: String(notebook.id) },
+          }"
+          >{{ notebook.name }}</router-link
+        >
+        <template v-else>{{ notebook.name }}</template>
+      </li>
     </template>
   </Breadcrumb>
 </template>
@@ -25,6 +37,7 @@
 import type {
   Circle,
   Folder,
+  Notebook,
   NoteTopology,
 } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
@@ -44,6 +57,10 @@ defineProps({
   },
   fromBazaar: {
     type: Boolean,
+    required: false,
+  },
+  notebook: {
+    type: Object as PropType<Notebook>,
     required: false,
   },
 })
