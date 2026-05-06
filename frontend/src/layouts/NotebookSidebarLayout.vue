@@ -26,43 +26,11 @@
           ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],
         }"
       />
-      <div
+      <BreadcrumbWithCircle
         v-else-if="sidebarNotebookClientView"
-        class="daisy-text-sm daisy-breadcrumbs daisy-max-w-full daisy-min-w-0"
-      >
-        <ul class="daisy-m-0 daisy-pl-0">
-          <li v-if="sidebarNotebookClientView.readonly">
-            <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
-          </li>
-          <template v-else>
-            <li>
-              <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
-            </li>
-            <li v-if="sidebarNotebookClientView.notebook.circle">
-              <router-link
-                :to="{
-                  name: 'circleShow',
-                  params: {
-                    circleId: sidebarNotebookClientView.notebook.circle.id,
-                  },
-                }"
-                >{{ sidebarNotebookClientView.notebook.circle.name }}</router-link
-              >
-            </li>
-          </template>
-          <li>
-            <router-link
-              :to="{
-                name: 'notebookPage',
-                params: {
-                  notebookId: String(sidebarNotebookClientView.notebook.id),
-                },
-              }"
-              >{{ sidebarNotebookClientView.notebook.name }}</router-link
-            >
-          </li>
-        </ul>
-      </div>
+        :notebook-view="sidebarNotebookClientView"
+        :ancestor-folders="[]"
+      />
     </GlobalBar>
     <div
       v-if="!isMdOrLarger && sidebarOpened"

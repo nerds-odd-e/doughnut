@@ -20,14 +20,12 @@
       </template>
       <li>
         <router-link
-          v-if="notebookView.notebook.id != null"
           :to="{
             name: 'notebookPage',
             params: { notebookId: String(notebookView.notebook.id) },
           }"
           >{{ notebookView.notebook.name }}</router-link
         >
-        <template v-else>{{ notebookView.notebook.name }}</template>
       </li>
     </template>
   </Breadcrumb>
