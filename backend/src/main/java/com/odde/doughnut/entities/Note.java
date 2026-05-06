@@ -220,23 +220,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     initializeNewNote(user, notebook, currentUTCTimestamp, title);
   }
 
-  public void attachToNewNotebook(Ownership ownership, User creator) {
-    final Notebook notebook = new Notebook();
-    notebook.setCreatorEntity(creator);
-    notebook.setOwnership(ownership);
-    Timestamp ts =
-        getCreatedAt() != null ? getCreatedAt() : new Timestamp(System.currentTimeMillis());
-    notebook.setCreatedAt(ts);
-    notebook.setUpdatedAt(ts);
-    setNotebook(notebook);
-    String headTitle = getTitle();
-    if (headTitle != null && !headTitle.isBlank()) {
-      String trimmed = headTitle.trim();
-      notebook.setName(
-          trimmed.length() > MAX_TITLE_LENGTH ? trimmed.substring(0, MAX_TITLE_LENGTH) : trimmed);
-    }
-  }
-
   @JsonIgnore
   public String getNotebookAssistantInstructions() {
     NotebookAiAssistant notebookAiAssistant = getNotebook().getNotebookAiAssistant();

@@ -178,50 +178,15 @@ class TestabilityRestController {
 
     private void buildNoteTree(
         User user,
-        Ownership ownership,
-        String notebookName,
-        Notebook notebookFromRepositoryOrNull,
+        Notebook notebook,
         Timestamp currentUTCTimestamp,
         Map<String, Note> titleNoteMap,
         EntityPersister entityPersister) {
-      Note firstRootCreatedInBatch = null;
       for (NoteTestData injection : noteTestData) {
         Note note = titleNoteMap.get(injection.title);
-        if (!Strings.isBlank(injection.getFolder())) {
-          if (notebookFromRepositoryOrNull != null) {
-            note.initializeAsNotebookRoot(
-                notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
-            notebookFromRepositoryOrNull.setUpdatedAt(currentUTCTimestamp);
-            entityPersister.merge(notebookFromRepositoryOrNull);
-          } else if (firstRootCreatedInBatch == null) {
-            note.attachToNewNotebook(ownership, user);
-            note.getNotebook().setName(notebookName);
-            note.getNotebook().setUpdatedAt(currentUTCTimestamp);
-            entityPersister.save(note.getNotebook());
-            firstRootCreatedInBatch = note;
-          } else {
-            note.initializeAsNotebookRoot(
-                firstRootCreatedInBatch.getNotebook(), user, currentUTCTimestamp, injection.title);
-          }
-          continue;
-        }
-        if (notebookFromRepositoryOrNull != null) {
-          note.initializeAsNotebookRoot(
-              notebookFromRepositoryOrNull, user, currentUTCTimestamp, injection.title);
-          notebookFromRepositoryOrNull.setUpdatedAt(currentUTCTimestamp);
-          entityPersister.merge(notebookFromRepositoryOrNull);
-          continue;
-        }
-        if (firstRootCreatedInBatch == null) {
-          note.attachToNewNotebook(ownership, user);
-          note.getNotebook().setName(notebookName);
-          note.getNotebook().setUpdatedAt(currentUTCTimestamp);
-          entityPersister.save(note.getNotebook());
-          firstRootCreatedInBatch = note;
-        } else {
-          note.initializeAsNotebookRoot(
-              firstRootCreatedInBatch.getNotebook(), user, currentUTCTimestamp, injection.title);
-        }
+        note.initializeAsNotebookRoot(notebook, user, currentUTCTimestamp, injection.title);
+        notebook.setUpdatedAt(currentUTCTimestamp);
+        entityPersister.merge(notebook);
       }
     }
 
@@ -315,7 +280,7 @@ class TestabilityRestController {
       return Collections.emptyMap();
     }
 
-    Notebook notebookFromRepository =
+    Notebook notebook =
         notebookRepository
             .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(notesTestData.notebookName)
             .map(
@@ -328,16 +293,13 @@ class TestabilityRestController {
                   }
                   return nb;
                 })
-            .orElse(null);
+            .orElseGet(
+                () ->
+                    notebookService.createNotebookForOwnership(
+                        ownership, user, currentUTCTimestamp, notesTestData.notebookName, null));
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
     notesTestData.buildNoteTree(
-        user,
-        ownership,
-        notesTestData.notebookName,
-        notebookFromRepository,
-        currentUTCTimestamp,
-        titleNoteMap,
-        this.entityPersister);
+        user, notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     for (Note note : titleNoteMap.values()) {

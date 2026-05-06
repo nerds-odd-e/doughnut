@@ -32,7 +32,24 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder attachToNewNotebook(Ownership ownership) {
     if (entity.getNotebook() != null)
       throw new AssertionError("Can add notebook for `" + entity + "`, a notebook already exist.");
-    entity.attachToNewNotebook(ownership, null);
+    Notebook notebook = new Notebook();
+    notebook.setCreatorEntity(null);
+    notebook.setOwnership(ownership);
+    Timestamp ts =
+        entity.getCreatedAt() != null
+            ? entity.getCreatedAt()
+            : new Timestamp(System.currentTimeMillis());
+    notebook.setCreatedAt(ts);
+    notebook.setUpdatedAt(ts);
+    entity.assignNotebook(notebook);
+    String headTitle = entity.getTitle();
+    if (headTitle != null && !headTitle.isBlank()) {
+      String trimmed = headTitle.trim();
+      notebook.setName(
+          trimmed.length() > Note.MAX_TITLE_LENGTH
+              ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
+              : trimmed);
+    }
     return this;
   }
 
