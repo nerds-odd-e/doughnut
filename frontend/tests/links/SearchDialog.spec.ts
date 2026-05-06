@@ -183,4 +183,57 @@ describe("AddLinkDialog", () => {
       })
     })
   })
+
+  describe("Move to notebook root on NOTEBOOK hit", () => {
+    it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
+      mockSdkService("getRecentNotes", [])
+      mockSdkService("searchForRelationshipTarget", [])
+      mockSdkService("semanticSearch", [])
+      mockSdkService("semanticSearchWithin", [])
+      const note = MakeMe.aNote.please()
+      const targetNotebookId = 99
+      mockSdkService("searchForRelationshipTargetWithin", [
+        {
+          hitKind: "NOTEBOOK",
+          notebookId: targetNotebookId,
+          notebookName: "Other NB",
+          distance: 0,
+        },
+      ])
+      const spy = mockSdkService("moveNoteToNotebookRootInNotebook", [])
+
+      helper
+        .component(AddLinkDialog)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+
+      await flushPromises()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "Other")
+
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      expect(spy).not.toHaveBeenCalled()
+
+      await screen.findByRole("button", { name: "Move to notebook root" })
+      fireEvent.click(
+        screen.getByRole("button", { name: "Move to notebook root" })
+      )
+      await flushPromises()
+
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledWith({
+        path: {
+          sourceNote: note.id,
+          targetNotebook: targetNotebookId,
+        },
+      })
+    })
+  })
 })

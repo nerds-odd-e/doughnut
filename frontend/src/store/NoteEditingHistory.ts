@@ -9,6 +9,8 @@ export interface HistoryRecord {
   textContent?: string
   /** Previous folder before the move; null means notebook root. */
   originalFolderId?: number | null
+  /** Notebook the note was in before the move (needed to undo root placement across notebooks). */
+  originalNotebookId?: number
 }
 
 export default class NoteEditingHistory {
@@ -56,11 +58,15 @@ export default class NoteEditingHistory {
     this.noteUndoHistories.push({ type: "create note", noteId })
   }
 
-  moveNote(noteId: Doughnut.ID, undoPlacement: { folderId: number | null }) {
+  moveNote(
+    noteId: Doughnut.ID,
+    undoPlacement: { folderId: number | null; notebookId: number }
+  ) {
     this.noteUndoHistories.push({
       type: "move note",
       noteId,
       originalFolderId: undoPlacement.folderId,
+      originalNotebookId: undoPlacement.notebookId,
     })
   }
 }

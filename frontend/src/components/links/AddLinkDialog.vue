@@ -4,7 +4,8 @@
     v-if="!selectedSearchResult && !targetNoteTopology"
     v-bind="{ noteId: note?.id, notebookId: notebookId, modalCloser }"
     @selected="selectedSearchResult = $event"
-    @moveUnderFolder="moveUnderFolder($event)"
+    @move-under-folder="moveUnderFolder($event)"
+    @move-to-notebook-root="moveToNotebookRoot($event)"
   />
   <LinkInsertionChoice
     v-if="selectedSearchResult && !targetNoteTopology && note"
@@ -90,6 +91,18 @@ async function moveUnderFolder(targetFolderId: number) {
   storageAccessor.value
     .storedApi()
     .moveNoteToFolder(note!.id, targetFolderId)
+    .then(() => {
+      emit("closeDialog")
+    })
+}
+
+async function moveToNotebookRoot(targetNotebookId: number) {
+  if (!(await popups.confirm("Move note to this notebook's root?"))) {
+    return
+  }
+  storageAccessor.value
+    .storedApi()
+    .moveNoteToNotebookRoot(note!.id, targetNotebookId)
     .then(() => {
       emit("closeDialog")
     })

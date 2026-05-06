@@ -141,6 +141,7 @@ const methodToController: Record<string, any> = {
   getRecallPrompts: MemoryTrackerController,
   deleteUnansweredRecallPrompts: MemoryTrackerController,
   moveNoteToFolder: RelationController,
+  moveNoteToNotebookRootInNotebook: RelationController,
   addRelationshipFinalize: RelationController,
   duplicate: FineTuningDataController,
   delete: FineTuningDataController,

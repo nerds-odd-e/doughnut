@@ -56,6 +56,18 @@
             :notebook-id="folderNotebookId"
           />
         </template>
+        <template
+          #notebookButton="{
+            notebookId: hitNotebookId,
+            notebookName,
+          }"
+        >
+          <slot
+            name="notebookButton"
+            :notebook-id="hitNotebookId"
+            :notebook-name="notebookName"
+          />
+        </template>
       </SearchResultList>
     </div>
 
@@ -142,6 +154,18 @@
             :notebook-id="folderNotebookId"
           />
         </template>
+        <template
+          #notebookButton="{
+            notebookId: hitNotebookId,
+            notebookName,
+          }"
+        >
+          <slot
+            name="notebookButton"
+            :notebook-id="hitNotebookId"
+            :notebook-name="notebookName"
+          />
+        </template>
       </SearchResultList>
     </div>
   </div>
@@ -188,6 +212,7 @@ defineSlots<{
     folderName?: string
     notebookId?: number
   }) => void
+  notebookButton: (props: { notebookId: number; notebookName?: string }) => void
 }>()
 
 const oldSearchTerm = ref<SearchTerm>({

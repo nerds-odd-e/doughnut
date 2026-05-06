@@ -171,6 +171,26 @@ describe("SearchResultListItem", () => {
     expect(wrapper.text()).toContain("Move Under")
   })
 
+  it("renders notebookButton slot for notebook hit", () => {
+    const hit: RelationshipLiteralSearchHit = {
+      hitKind: "NOTEBOOK",
+      notebookId: 42,
+      notebookName: "My Study",
+      distance: 0.0,
+    }
+    const wrapper = helper
+      .component(SearchResultListItem)
+      .withProps({ searchHit: hit })
+      .mount({
+        slots: {
+          notebookButton:
+            '<button type="button">Move to notebook root</button>',
+        },
+      })
+
+    expect(wrapper.text()).toContain("Move to notebook root")
+  })
+
   it("note hit button slot can show Add link without Move Under", () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)

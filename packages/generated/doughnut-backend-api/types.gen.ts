@@ -1501,6 +1501,25 @@ export type MoveNoteToNotebookRootResponses = {
 
 export type MoveNoteToNotebookRootResponse = MoveNoteToNotebookRootResponses[keyof MoveNoteToNotebookRootResponses];
 
+export type MoveNoteToNotebookRootInNotebookData = {
+    body?: never;
+    path: {
+        sourceNote: number;
+        targetNotebook: number;
+    };
+    query?: never;
+    url: '/api/relations/move-to-notebook-root/{sourceNote}/{targetNotebook}';
+};
+
+export type MoveNoteToNotebookRootInNotebookResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type MoveNoteToNotebookRootInNotebookResponse = MoveNoteToNotebookRootInNotebookResponses[keyof MoveNoteToNotebookRootInNotebookResponses];
+
 export type MoveNoteToFolderData = {
     body?: never;
     path: {

@@ -29,6 +29,20 @@
           :notebook-id="searchHit.notebookId"
         />
       </template>
+      <template
+        #notebookButton
+        v-if="
+          $slots.notebookButton &&
+          searchHit.hitKind === 'NOTEBOOK' &&
+          searchHit.notebookId != null
+        "
+      >
+        <slot
+          name="notebookButton"
+          :notebook-id="searchHit.notebookId"
+          :notebook-name="searchHit.notebookName"
+        />
+      </template>
     </SearchResultListItem>
   </ul>
 </template>

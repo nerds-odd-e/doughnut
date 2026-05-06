@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
@@ -69,7 +70,20 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(sourceNote.getNotebook());
-    noteMotionService.executeMoveToNotebookRoot(sourceNote);
+    noteMotionService.executeMoveToNotebookRoot(sourceNote, sourceNote.getNotebook());
+    User user = authorizationService.getCurrentUser();
+    return List.of(noteRealmService.build(sourceNote, user));
+  }
+
+  @PostMapping(value = "/move-to-notebook-root/{sourceNote}/{targetNotebook}")
+  @Transactional
+  public List<NoteRealm> moveNoteToNotebookRootInNotebook(
+      @PathVariable @Schema(type = "integer") Note sourceNote,
+      @PathVariable @Schema(type = "integer") Notebook targetNotebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(sourceNote);
+    authorizationService.assertAuthorization(targetNotebook);
+    noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
     User user = authorizationService.getCurrentUser();
     return List.of(noteRealmService.build(sourceNote, user));
   }

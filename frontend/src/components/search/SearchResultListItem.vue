@@ -53,6 +53,12 @@
       >
         <slot name="folderButton" />
       </div>
+      <div
+        v-if="$slots.notebookButton"
+        class="daisy-flex daisy-flex-row daisy-flex-wrap daisy-justify-end daisy-gap-1"
+      >
+        <slot name="notebookButton" />
+      </div>
     </div>
   </li>
 </template>

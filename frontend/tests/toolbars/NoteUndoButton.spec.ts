@@ -53,7 +53,7 @@ describe("NoteUndoButton", () => {
 
   it("shows undo move note title when there is a move note to undo", () => {
     const note = makeMe.aNote.please()
-    noteEditingHistory.moveNote(note.id, { folderId: null })
+    noteEditingHistory.moveNote(note.id, { folderId: null, notebookId: 1 })
     const wrapper = helper.component(NoteUndoButton).mount()
     expect(wrapper.find("button").exists()).toBe(true)
     expect(wrapper.find("button").attributes("title")).toBe("undo move note")
@@ -162,7 +162,10 @@ describe("NoteUndoButton", () => {
         const noteRealm = makeMe.aNoteRealm.title("Moved Note").please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
-        noteEditingHistory.moveNote(noteRealm.id, { folderId: null })
+        noteEditingHistory.moveNote(noteRealm.id, {
+          folderId: null,
+          notebookId: noteRealm.notebookId ?? 1,
+        })
         helper.component(NoteUndoButton).render()
 
         const undoButton = screen.getByTitle("undo move note")

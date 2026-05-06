@@ -89,6 +89,17 @@
           Move Under
         </button>
       </template>
+      <template
+        v-if="noteId"
+        #notebookButton="{ notebookId: targetNotebookId }"
+      >
+        <button
+          class="daisy-btn daisy-btn-secondary daisy-btn-sm"
+          @click.prevent="emit('moveToNotebookRoot', targetNotebookId)"
+        >
+          Move to notebook root
+        </button>
+      </template>
     </SearchResults>
   </div>
 </template>
@@ -110,6 +121,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: "selected", noteSearchResult: NoteSearchResult): void
   (e: "moveUnderFolder", folderId: number): void
+  (e: "moveToNotebookRoot", targetNotebookId: number): void
 }>()
 
 const inputSearchKey = ref("")

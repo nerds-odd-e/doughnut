@@ -530,6 +530,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
+  /api/relations/move-to-notebook-root/{sourceNote}/{targetNotebook}:
+    post:
+      tags:
+      - relation-controller
+      operationId: moveNoteToNotebookRootInNotebook
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: targetNotebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/relations/move-to-folder/{sourceNote}/{targetFolder}:
     post:
       tags:

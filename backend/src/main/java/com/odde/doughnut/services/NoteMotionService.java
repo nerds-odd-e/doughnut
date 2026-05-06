@@ -24,12 +24,17 @@ public class NoteMotionService {
     entityPersister.flush();
   }
 
-  /** Clears {@code subject}'s folder so it sits in notebook root. */
+  /** Clears {@code subject}'s folder so it sits in its current notebook's root. */
   public void executeMoveToNotebookRoot(Note subject) {
-    subject.setFolder(null);
-    entityPersister.flush();
+    executeMoveToNotebookRoot(subject, subject.getNotebook());
+  }
 
-    entityPersister.merge(subject);
+  /** Assigns {@code source} to {@code targetNotebook} and clears folder (notebook root). */
+  public void executeMoveToNotebookRoot(Note source, Notebook targetNotebook) {
+    source.assignNotebook(targetNotebook);
+    source.setFolder(null);
+    entityPersister.flush();
+    entityPersister.merge(source);
     entityPersister.flush();
   }
 }

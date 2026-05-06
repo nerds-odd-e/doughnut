@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
@@ -147,6 +148,41 @@ class RelationControllerTests extends ControllerTestBase {
       controller.moveNoteToNotebookRoot(mover);
       makeMe.refresh(mover);
       assertThat(mover.getFolder(), nullValue());
+    }
+  }
+
+  @Nested
+  class MoveNoteToNotebookRootInNotebookTest {
+    @Test
+    void moveNoteToNotebookRootInNotebook_movesToTargetNotebookRoot()
+        throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Note nb1Root = makeMe.aRootNote("nb1").creatorAndOwner(u).please();
+      Note nb2Root = makeMe.aRootNote("nb2").creatorAndOwner(u).please();
+      Folder folder = makeMe.aFolder().notebook(nb1Root.getNotebook()).name("F").please();
+      Note mover = makeMe.aNote("M").creatorAndOwner(u).underSameNotebookAs(nb1Root).please();
+      makeMe.entityPersister.flush();
+      controller.moveNoteToFolder(mover, folder);
+      makeMe.entityPersister.flush();
+
+      Notebook targetNb = nb2Root.getNotebook();
+      controller.moveNoteToNotebookRootInNotebook(mover, targetNb);
+      makeMe.refresh(mover);
+      assertThat(mover.getFolder(), nullValue());
+      assertThat(mover.getNotebook().getId(), equalTo(targetNb.getId()));
+    }
+
+    @Test
+    void moveNoteToNotebookRootInNotebook_rejectsUnauthorizedTargetNotebook() {
+      User u = currentUser.getUser();
+      User other = makeMe.aUser().please();
+      Note nb1Root = makeMe.aRootNote("mine").creatorAndOwner(u).please();
+      makeMe.aRootNote("theirs").creatorAndOwner(other).please();
+      Note mover = makeMe.aNote("M").creatorAndOwner(u).underSameNotebookAs(nb1Root).please();
+      Notebook foreignNb = makeMe.aNote().creatorAndOwner(other).please().getNotebook();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.moveNoteToNotebookRootInNotebook(mover, foreignNb));
     }
   }
 

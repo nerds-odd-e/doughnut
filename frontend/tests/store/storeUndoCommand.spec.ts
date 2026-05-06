@@ -143,12 +143,13 @@ describe("storeUndoCommand", () => {
     it("should add move note entry to undo history", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
-      histories.moveNote(note1.id, { folderId: null })
+      histories.moveNote(note1.id, { folderId: null, notebookId: 42 })
 
       expect(histories.noteUndoHistories.length).toEqual(1)
       expect(histories.noteUndoHistories[0]!.type).toBe("move note")
       expect(histories.noteUndoHistories[0]!.noteId).toBe(note1.id)
       expect(histories.noteUndoHistories[0]!.originalFolderId).toBe(null)
+      expect(histories.noteUndoHistories[0]!.originalNotebookId).toBe(42)
     })
   })
 
