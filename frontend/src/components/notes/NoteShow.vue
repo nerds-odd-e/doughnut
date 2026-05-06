@@ -5,6 +5,14 @@
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
           <template v-if="!isMinimized">
+            <div v-if="showBreadcrumb" class="breadcrumb-wrapper daisy-mb-2">
+              <BreadcrumbWithCircle
+                v-bind="{
+                  ancestorFolders,
+                  notebookView: noteRealm.notebookView,
+                }"
+              />
+            </div>
             <NoteToolbar
               v-if="currentUser"
               v-bind="{
@@ -82,10 +90,13 @@ import { inject, ref, watch, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type {
+  Folder,
   NoteAccessory,
   NoteRealm,
   User,
 } from "@generated/doughnut-backend-api"
+import type { PropType } from "vue"
+import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
@@ -97,6 +108,11 @@ const props = defineProps({
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
   isMinimized: { type: Boolean, default: false },
+  showBreadcrumb: { type: Boolean, default: false },
+  ancestorFolders: {
+    type: Array as PropType<Folder[]>,
+    default: () => [],
+  },
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")

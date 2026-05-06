@@ -1,10 +1,12 @@
 <template>
   <main class="assimilation-main">
-    <div class="breadcrumb-wrapper daisy-mb-2">
-      <Breadcrumb v-bind="{ ancestorFolders }" />
-    </div>
     <NoteShow
-      v-bind="{ noteId: note.id, expandChildren: false }"
+      v-bind="{
+        noteId: note.id,
+        expandChildren: false,
+        showBreadcrumb: true,
+        ancestorFolders,
+      }"
     />
   </main>
   <AssimilationSettings
@@ -42,7 +44,6 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import AssimilationSettings from "./AssimilationSettings.vue"
 import NoteShow from "../notes/NoteShow.vue"
-import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
