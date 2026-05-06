@@ -158,17 +158,17 @@ function userVisibleMessageForSdkThrowable(cause: SdkThrowable): string {
   if (isLikelyTransportLayerFailure(cause)) {
     return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
   }
+  const status = httpStatusFromSdkThrowable(cause)
+  if (status === 401) {
+    return authenticatedBackendCallFailureAdvice.http401StoredTokenRejected
+  }
   const apiErr = doughnutApiErrorFromThrowable(cause)
   if (apiErr !== undefined) {
     if (apiErr.message !== undefined) return apiErr.message
     return userVisibleMessageForKnownApiErrorWithoutBodyMessage(
       apiErr.errorType,
-      httpStatusFromSdkThrowable(cause)
+      status
     )
-  }
-  const status = httpStatusFromSdkThrowable(cause)
-  if (status === 401) {
-    return authenticatedBackendCallFailureAdvice.http401StoredTokenRejected
   }
   if (status === 403) {
     return authenticatedBackendCallFailureAdvice.http403StoredTokenForbidden
