@@ -7,6 +7,7 @@ export type SidebarFolderOrganizeDialog = {
   confirmMove: () => void
   tryConfirmMove: () => SidebarFolderOrganizeDialog
   expectErrorText: (text: string) => SidebarFolderOrganizeDialog
+  dissolveFolder: () => void
 }
 
 /**
@@ -38,6 +39,16 @@ export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog
         .find('.daisy-text-error')
         .should('contain.text', text)
       return assumeSidebarFolderOrganizeDialog()
+    },
+
+    dissolveFolder() {
+      cy.get('[data-testid="folder-dissolve-button"]', {
+        timeout: submitTimeoutMs,
+      })
+        .should('not.be.disabled')
+        .click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      pageIsNotLoading()
     },
   }
 }

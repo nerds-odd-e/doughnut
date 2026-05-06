@@ -3866,6 +3866,23 @@ export type DeleteTokenResponses = {
     200: unknown;
 };
 
+export type DissolveFolderData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}';
+};
+
+export type DissolveFolderResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type CancelBookBlockData = {
     body?: never;
     path: {

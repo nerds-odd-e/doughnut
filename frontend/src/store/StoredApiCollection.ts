@@ -63,6 +63,8 @@ export interface StoredApi {
     newParentFolderId: number | null
   ): Promise<Folder>
 
+  dissolveFolder(notebookId: number, folderId: number): Promise<void>
+
   createRootNoteAtNotebook(
     router: Router,
     notebookId: number,
@@ -296,6 +298,18 @@ export default class StoredApiCollection implements StoredApi {
     }
     refreshSidebarStructuralListings()
     return data
+  }
+
+  async dissolveFolder(notebookId: number, folderId: number): Promise<void> {
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.dissolveFolder({
+        path: { notebook: notebookId, folder: folderId },
+      })
+    )
+    if (error) {
+      throw new Error(toErrorMessage(error, "Failed to dissolve folder"))
+    }
+    refreshSidebarStructuralListings()
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {

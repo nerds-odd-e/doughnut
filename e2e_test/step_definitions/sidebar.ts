@@ -62,6 +62,10 @@ When(
   }
 )
 
+When('I dissolve the active folder using the sidebar folder dialog', () => {
+  start.noteSidebar().openFolderOrganizeDialog().dissolveFolder()
+})
+
 Then('the sidebar folder dialog shows error {string}', (text: string) => {
   assumeSidebarFolderOrganizeDialog().expectErrorText(text)
 })

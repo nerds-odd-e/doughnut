@@ -3137,6 +3137,29 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/folders/{folder}:
+    delete:
+      tags:
+      - notebook-controller
+      summary: Dissolve a folder
+      description: Removes the folder row. Direct notes and subfolders are promoted
+        to the dissolved folder's parent (or notebook root). Deeper descendants stay
+        under the promoted subfolder.
+      operationId: dissolveFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/book/blocks/{bookBlock}:
     delete:
       tags:

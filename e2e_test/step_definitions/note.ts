@@ -351,6 +351,13 @@ Then(
   }
 )
 
+Then(
+  'I should see note {string} under folder {string}',
+  (noteTitle: string, folderLabel: string) => {
+    start.noteSidebar().expectSidebarNoteUnderFolder(folderLabel, noteTitle)
+  }
+)
+
 When(
   'I delete note {string} at {int}:00',
   (noteTopology: string, hour: number) => {

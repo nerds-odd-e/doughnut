@@ -698,6 +698,106 @@ class NotebookControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class DissolveFolder {
+    @Test
+    void promotesDirectNotesToParentFolder() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+      Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
+      Note loose = makeMe.aNote("Loose").inNotebook(nb).creatorAndOwner(owner).folder(mid).please();
+
+      controller.dissolveFolder(nb, mid);
+      makeMe.refresh(loose);
+
+      assertThat(loose.getFolder(), notNullValue());
+      assertThat(loose.getFolder().getId(), equalTo(outer.getId()));
+      FolderListing underOuter = controller.listFolderListing(nb, outer);
+      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
+    }
+
+    @Test
+    void promotesNotesAtRootWhenDissolvedFolderHadNoParent()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder rootFolder = makeMe.aFolder().notebook(nb).name("Root Folder").please();
+      Note inside =
+          makeMe.aNote("Inside").inNotebook(nb).creatorAndOwner(owner).folder(rootFolder).please();
+
+      controller.dissolveFolder(nb, rootFolder);
+      makeMe.refresh(inside);
+
+      assertThat(inside.getFolder(), nullValue());
+      FolderListing root = controller.listNotebookRootNotes(nb);
+      assertTrue(root.folders().stream().noneMatch(f -> f.getId().equals(rootFolder.getId())));
+    }
+
+    @Test
+    void promotesDirectSubfoldersAndKeepsDeepDescendants() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+      Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
+      Folder inner = makeMe.aFolder().notebook(nb).parentFolder(mid).name("Inner").please();
+      Note deep = makeMe.aNote("Deep").inNotebook(nb).creatorAndOwner(owner).folder(inner).please();
+
+      controller.dissolveFolder(nb, mid);
+      makeMe.refresh(inner);
+      makeMe.refresh(deep);
+
+      assertThat(inner.getParentFolder(), notNullValue());
+      assertThat(inner.getParentFolder().getId(), equalTo(outer.getId()));
+      assertThat(deep.getFolder().getId(), equalTo(inner.getId()));
+      FolderListing underOuter = controller.listFolderListing(nb, outer);
+      assertTrue(underOuter.folders().stream().anyMatch(f -> f.getId().equals(inner.getId())));
+      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
+    }
+
+    @Test
+    void rejectsDissolveWhenSubfolderNameClashesAtDestination() {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+      Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
+      makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
+      makeMe.aFolder().notebook(nb).parentFolder(mid).name("Inner").please();
+
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.dissolveFolder(nb, mid));
+      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      assertThat(
+          ex.getReason(),
+          equalTo("A folder with this name already exists at the destination: Inner"));
+    }
+
+    @Test
+    void folderNotInNotebookReturns404() {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderInB = makeMe.aFolder().notebook(nbB).name("Only B").please();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.dissolveFolder(nbA, folderInB));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Folder not in notebook."));
+    }
+
+    @Test
+    void requiresAuthorization() {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Solo").please();
+
+      currentUser.setUser(makeMe.aUser().please());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.dissolveFolder(nb, folder));
+    }
+  }
+
+  @Nested
   class UpdateNotebookIndexEndpoint {
     @Test
     void shouldCallServiceAndRequireAuthorization() throws UnexpectedNoAccessRightException {

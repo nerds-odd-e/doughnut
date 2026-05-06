@@ -181,6 +181,16 @@ export const noteSidebar = () => {
         .should('not.exist')
     },
 
+    expectSidebarNoteUnderFolder(folderLabel: string, noteTitle: string) {
+      pageIsNotLoading()
+      expandFolderIfCollapsed(folderLabel)
+      folderTreitemByLabel(folderLabel)
+        .find(`[role="treeitem"].sidebar-note-li[aria-label="${noteTitle}"]`, {
+          timeout: sidebarActionTimeoutMs,
+        })
+        .should('have.length.at.least', 1)
+    },
+
     /**
      * After the notebook card: expand a folder row for this segment, or open the note row.
      * Waits for sidebar hydration so a folder label is not mistaken for a missing note title.

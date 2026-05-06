@@ -174,6 +174,22 @@ class NotebookController {
     return folderRelocationService.moveFolder(notebook, folder, request);
   }
 
+  @Operation(
+      summary = "Dissolve a folder",
+      description =
+          "Removes the folder row. Direct notes and subfolders are promoted to the dissolved"
+              + " folder's parent (or notebook root). Deeper descendants stay under the promoted"
+              + " subfolder.")
+  @DeleteMapping("/{notebook}/folders/{folder}")
+  @Transactional
+  public void dissolveFolder(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    folderRelocationService.dissolveFolder(notebook, folder);
+  }
+
   @PostMapping(value = "/{notebook}")
   @Transactional
   public Notebook updateNotebook(

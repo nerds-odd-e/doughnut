@@ -26,3 +26,15 @@ Feature: Folder organization
     And I activate folder "Beta" under folder "Alpha" in the sidebar
     And I attempt to move the active folder to notebook root using the sidebar folder dialog
     Then the sidebar folder dialog shows error "A folder with this name already exists here."
+
+  Scenario: Dissolve a folder, promoting its notes and subfolders to the parent
+    Given I have a notebook "Organize NB" with notes:
+      | Title | Folder          |
+      | Loose | Outer/Mid       |
+      | Deep  | Outer/Mid/Inner |
+    When I view note "Loose"
+    And I activate folder "Mid" under folder "Outer" in the sidebar
+    And I dissolve the active folder using the sidebar folder dialog
+    Then I should not see sidebar folder "Mid" under folder "Outer"
+    And I should see sidebar folder "Inner" under folder "Outer"
+    And I should see note "Loose" under folder "Outer"

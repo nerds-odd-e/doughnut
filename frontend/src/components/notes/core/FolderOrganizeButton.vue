@@ -9,7 +9,7 @@
       <slot />
     </template>
     <template #default="{ closer }">
-      <FolderMoveDialog
+      <FolderOrganizeDialog
         :notebook-id="notebookId"
         :moving-folder-id="movingFolderId"
         :moving-folder-name="movingFolderName"
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
-import FolderMoveDialog from "../FolderMoveDialog.vue"
+import FolderOrganizeDialog from "../FolderOrganizeDialog.vue"
 
 defineProps<{
   notebookId: number
