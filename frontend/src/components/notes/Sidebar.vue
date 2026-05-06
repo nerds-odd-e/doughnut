@@ -12,7 +12,9 @@
       :create-parent-location-description="createParentLocationDescription"
       :user-active-folder="userActiveFolder"
     />
-    <div class="daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0">
+    <div
+      class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
+    >
       <SidebarInner
         v-if="sidebarTreeShown"
         :key="notebookId"
@@ -151,3 +153,11 @@ const sidebarTreeShown = computed(
   () => props.activeNoteRealm === undefined || activeNoteTopology.value != null
 )
 </script>
+
+<style scoped lang="scss">
+/* scrollIntoView respects scroll-padding on the scrollport */
+.sidebar-tree-scroll {
+  scroll-padding-top: 0.75rem;
+  scroll-padding-bottom: 0.5rem;
+}
+</style>

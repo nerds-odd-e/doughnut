@@ -11,6 +11,12 @@
     }"
     @click.capture="onNoteRowClick"
   >
+    <ScrollTo
+      v-if="
+        activeNoteTopology != null &&
+        noteTopology.id === activeNoteTopology.id
+      "
+    />
     <RouterLink
       :to="noteShowLocation(noteTopology.id)"
       class="note-row daisy-text-decoration-none"
@@ -22,12 +28,6 @@
             noteTopology.id === activeNoteTopology.id,
         }"
         v-bind="{ noteTopology }"
-      />
-      <ScrollTo
-        v-if="
-          activeNoteTopology != null &&
-          noteTopology.id === activeNoteTopology.id
-        "
       />
     </RouterLink>
   </li>
