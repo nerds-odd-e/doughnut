@@ -35,6 +35,11 @@ describe("AddLinkDialog", () => {
     await screen.findByPlaceholderText("Search")
     expect(
       await screen.findByRole("button", {
+        name: "Semantic search",
+      })
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByRole("button", {
         name: "All My Notebooks And Subscriptions",
       })
     ).toBeDisabled()

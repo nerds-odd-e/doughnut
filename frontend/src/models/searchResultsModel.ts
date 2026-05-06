@@ -94,6 +94,13 @@ export class SearchResultsModel {
     this.state.isSearchInProgress = false
   }
 
+  clearSearchCaches(): void {
+    this.state.cache.global = {}
+    this.state.cache.local = {}
+    this.state.recentResult = undefined
+    this.state.previousSearchResult = undefined
+  }
+
   getCachedSearches(
     isGlobal: boolean
   ): Record<string, RelationshipLiteralSearchHit[]> {

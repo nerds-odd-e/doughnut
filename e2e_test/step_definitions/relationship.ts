@@ -13,6 +13,10 @@ When('I start searching from all my notebooks page', () => {
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
+When('I enable semantic search in the note search dialog', () => {
+  start.assumeNoteTargetSearchDialog().enableSemanticSearch()
+})
+
 When(
   'I am creating a relationship under note {string}',
   (noteTopology: string) => {

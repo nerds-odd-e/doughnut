@@ -38,6 +38,18 @@
         <Users class="daisy-w-6 daisy-h-6" />
       </button>
       <button
+        type="button"
+        title="Semantic search"
+        aria-label="Semantic search"
+        :class="[
+          'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
+          semanticSearchEnabled ? 'daisy-text-primary' : 'daisy-opacity-30',
+        ]"
+        @click="semanticSearchEnabled = !semanticSearchEnabled"
+      >
+        <Sparkles class="daisy-w-6 daisy-h-6" />
+      </button>
+      <button
         v-if="modalCloser"
         type="button"
         title="Close"
@@ -49,7 +61,12 @@
       </button>
     </div>
     <SearchResults
-      v-bind="{ noteId, inputSearchKey, notebookId }"
+      v-bind="{
+        noteId,
+        inputSearchKey,
+        notebookId,
+        semanticSearchEnabled,
+      }"
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"
     >
@@ -78,7 +95,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { BookOpen, Users, X } from "lucide-vue-next"
+import { BookOpen, Sparkles, Users, X } from "lucide-vue-next"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
@@ -98,4 +115,5 @@ const emit = defineEmits<{
 const inputSearchKey = ref("")
 const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
+const semanticSearchEnabled = ref(false)
 </script>

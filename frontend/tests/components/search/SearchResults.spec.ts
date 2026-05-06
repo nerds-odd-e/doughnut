@@ -100,6 +100,7 @@ function mountSearchResults(props: {
   isDropdown?: boolean
   noteId?: number
   notebookId?: number
+  semanticSearchEnabled?: boolean
 }) {
   return helper.component(SearchResults).withProps(props).mount()
 }
@@ -137,6 +138,31 @@ describe("SearchResults.vue", () => {
       await waitForDebounce()
 
       expect(wrapper.text()).toContain("No matching notes found.")
+      vi.useRealTimers()
+    })
+  })
+
+  describe("semantic search toggle", () => {
+    it("does not call semantic search when semanticSearchEnabled is false", async () => {
+      vi.useFakeTimers()
+      const literalSpy = vi.fn().mockResolvedValue([])
+      const semanticSpy = vi.fn().mockResolvedValue([])
+      mockSdkServiceWithImplementation(
+        "searchForRelationshipTarget",
+        literalSpy
+      )
+      mockSdkServiceWithImplementation("semanticSearch", semanticSpy)
+      mockSdkService("getRecentNotes", [])
+
+      mountSearchResults({
+        inputSearchKey: "q",
+        isDropdown: true,
+        semanticSearchEnabled: false,
+      })
+      await waitForDebounce()
+
+      expect(literalSpy).toHaveBeenCalledTimes(1)
+      expect(semanticSpy).not.toHaveBeenCalled()
       vi.useRealTimers()
     })
   })

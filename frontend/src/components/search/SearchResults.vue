@@ -171,6 +171,8 @@ const props = defineProps({
   inputSearchKey: { type: String, required: true },
   isDropdown: { type: Boolean, default: false },
   notebookId: { type: Number, default: undefined },
+  /** When false, only literal search runs (modal defaults off via SearchForNoteAndFolder). */
+  semanticSearchEnabled: { type: Boolean, default: true },
 })
 
 const allMyNotebooksAndSubscriptions = defineModel<boolean>(
@@ -277,17 +279,21 @@ const search = () => {
           body: term,
         })
       : SearchController.searchForRelationshipTarget({ body: term })
-    const semanticPromise = props.noteId
-      ? SearchController.semanticSearchWithin({
-          path: { note: props.noteId },
-          body: term,
-        })
-      : SearchController.semanticSearch({ body: term })
+    const snapshotSemantic = props.semanticSearchEnabled
+    const semanticPromise = snapshotSemantic
+      ? props.noteId
+        ? SearchController.semanticSearchWithin({
+            path: { note: props.noteId },
+            body: term,
+          })
+        : SearchController.semanticSearch({ body: term })
+      : null
 
     const applyIfCurrent = () =>
       gen === searchGeneration.value &&
       snapshotTrimmed === trimmedSearchKey.value &&
-      snapshotGlobal === isGlobalSearch.value
+      snapshotGlobal === isGlobalSearch.value &&
+      snapshotSemantic === props.semanticSearchEnabled
 
     literalPromise.then((literalRes) => {
       if (!applyIfCurrent()) return
@@ -300,18 +306,24 @@ const search = () => {
       })
     })
 
-    semanticPromise.then((semanticRes) => {
-      if (!applyIfCurrent()) return
-      const semantic = semanticRes.error ? [] : semanticRes.data || []
-      model.mergeAndCacheResults({
-        trimmedSearchKey: snapshotTrimmed,
-        isGlobal: snapshotGlobal,
-        semanticResults: semantic,
-        currentNotebookId: snapshotNotebookId,
+    if (semanticPromise) {
+      semanticPromise.then((semanticRes) => {
+        if (!applyIfCurrent()) return
+        const semantic = semanticRes.error ? [] : semanticRes.data || []
+        model.mergeAndCacheResults({
+          trimmedSearchKey: snapshotTrimmed,
+          isGlobal: snapshotGlobal,
+          semanticResults: semantic,
+          currentNotebookId: snapshotNotebookId,
+        })
       })
-    })
+    }
 
-    await Promise.all([literalPromise, semanticPromise])
+    if (semanticPromise) {
+      await Promise.all([literalPromise, semanticPromise])
+    } else {
+      await literalPromise
+    }
     if (!applyIfCurrent()) return
     model.completeSearch()
   })
@@ -364,6 +376,17 @@ watch(
         model.clearRecentResult()
         fetchRecentNotes()
       }
+    }
+  }
+)
+
+watch(
+  () => props.semanticSearchEnabled,
+  () => {
+    searchGeneration.value++
+    model.clearSearchCaches()
+    if (trimmedSearchKey.value !== "") {
+      search()
     }
   }
 )

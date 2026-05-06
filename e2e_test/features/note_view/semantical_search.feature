@@ -16,6 +16,7 @@ Feature: semantical search
     Given OpenAI returns embeddings successfully
     And I reindex the notebook "Physics primer"
     When I start searching from all my notebooks page
+    And I enable semantic search in the note search dialog
     Then I should see "<targets>" as targets only when searching "<search key>"
 
     Examples:
@@ -29,5 +30,6 @@ Feature: semantical search
     Given OpenAI returns embeddings successfully
     And I reindex the notebook "Physics primer"
     When I start searching from all my notebooks page
+    And I enable semantic search in the note search dialog
     Then I should see "Physics" as targets only when searching "matching"
     And I should see notebook "Physics primer" in search results

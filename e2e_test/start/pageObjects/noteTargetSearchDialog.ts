@@ -40,6 +40,14 @@ function ensureAllMyNotebooksAndSubscriptionsScopeOn() {
   )
 }
 
+function ensureSemanticSearchOn() {
+  cy.findByRole('button', { name: 'Semantic search' }).then(($btn) => {
+    if (!$btn.hasClass('daisy-text-primary')) {
+      cy.wrap($btn).click()
+    }
+  })
+}
+
 function searchNote(searchKey: string, options: string[]) {
   if (options?.includes('All My Notebooks And Subscriptions')) {
     ensureAllMyNotebooksAndSubscriptionsScopeOn()
@@ -50,6 +58,10 @@ function searchNote(searchKey: string, options: string[]) {
 
 export const assumeNoteTargetSearchDialog = () => {
   return {
+    enableSemanticSearch() {
+      ensureSemanticSearchOn()
+      return this
+    },
     findTarget(target: string) {
       searchNote(target, ['All My Notebooks And Subscriptions'])
       return this
