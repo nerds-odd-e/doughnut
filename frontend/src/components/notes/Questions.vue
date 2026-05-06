@@ -18,7 +18,7 @@
         aria-label="Export question generation request"
         title="Export question generation request for ChatGPT"
       >
-        <Upload class="w-5 h-5" />
+        <Upload class="daisy-w-6 daisy-h-6" />
       </button>
     </div>
     <table class="question-table daisy-mt-2" v-if="questions.length">

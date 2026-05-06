@@ -5,7 +5,7 @@
       title="Add to my learning"
     >
       <template #button_face>
-        <Plus class="w-5 h-5" />
+        <Plus class="daisy-w-6 daisy-h-6" />
       </template>
       <template #default="{ closer }">
         <SubscribeDialog

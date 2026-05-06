@@ -9,7 +9,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer"
         aria-label="Notebook actions"
       >
-        <MoreHorizontal class="w-5 h-5" />
+        <MoreHorizontal class="daisy-w-6 daisy-h-6" />
       </summary>
       <ul
         tabindex="0"
@@ -42,7 +42,7 @@
       title="Unsubscribe"
       @click="processForm"
     >
-      <Minus class="w-5 h-5" />
+      <Minus class="daisy-w-6 daisy-h-6" />
     </button>
     <Modal v-if="showEdit" @close_request="closeEdit">
       <template #body>

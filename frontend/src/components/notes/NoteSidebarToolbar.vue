@@ -15,7 +15,7 @@
           button-title="New note"
           aria-label="New note"
         >
-          <NotebookPen class="w-5 h-5" />
+          <NotebookPen class="daisy-w-6 daisy-h-6" />
         </NotebookRootNoteNewButton>
         <FolderNewButton
           :notebook-id="notebookId"
@@ -25,7 +25,7 @@
           button-title="New folder"
           aria-label="New folder"
         >
-          <FolderPlus class="w-5 h-5" />
+          <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
         <FolderOrganizeButton
           v-if="userActiveFolder != null"
@@ -33,7 +33,7 @@
           :moving-folder-id="userActiveFolder.id"
           :moving-folder-name="userActiveFolder.name"
         >
-          <FolderInput class="w-5 h-5" />
+          <FolderInput class="daisy-w-6 daisy-h-6" />
         </FolderOrganizeButton>
       </div>
       <details
@@ -46,7 +46,7 @@
           aria-label="Sort sidebar"
           title="Sort sidebar"
         >
-          <component :is="triggerIcon" class="w-5 h-5" aria-hidden="true" />
+          <component :is="triggerIcon" class="daisy-w-6 daisy-h-6" aria-hidden="true" />
         </summary>
         <ul
           tabindex="0"

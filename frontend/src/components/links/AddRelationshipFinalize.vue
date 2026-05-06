@@ -24,7 +24,7 @@
       /></strong>
     </div>
     <button class="daisy-btn daisy-btn-secondary go-back-button" @click="$emit('goBack')">
-      <Reply class="w-5 h-5" />
+      <Reply class="daisy-w-6 daisy-h-6" />
     </button>
   </div>
 </template>

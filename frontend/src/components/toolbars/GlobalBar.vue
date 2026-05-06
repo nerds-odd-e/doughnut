@@ -12,7 +12,7 @@
         :show-close-button="false"
       >
         <template #button_face>
-          <Search class="w-5 h-5" />
+          <Search class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
           <AddLinkDialog

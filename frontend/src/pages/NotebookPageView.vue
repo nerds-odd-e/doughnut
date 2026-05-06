@@ -38,7 +38,7 @@
           title="Edit index note"
           data-testid="notebook-index-edit"
         >
-          <Pencil class="h-5 w-5" />
+          <Pencil class="daisy-h-6 daisy-w-6" />
         </router-link>
       </div>
       <p
@@ -85,7 +85,7 @@
         >
           <template #button_face>
             <div class="daisy-flex daisy-items-center daisy-gap-2">
-              <GitMerge class="w-5 h-5" />
+              <GitMerge class="daisy-w-6 daisy-h-6" />
               <span>Move to ...</span>
             </div>
           </template>
@@ -97,7 +97,7 @@
           title="Share notebook to bazaar"
         >
           <div class="daisy-flex daisy-items-center daisy-gap-2">
-            <Share2 class="w-5 h-5" />
+            <Share2 class="daisy-w-6 daisy-h-6" />
             <span>Share notebook to bazaar</span>
           </div>
         </button>

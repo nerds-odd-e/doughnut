@@ -24,7 +24,7 @@
             aria-label="Move to end of list"
             @click="handleMoveToEnd"
           >
-            <SkipForward class="w-5 h-5" />
+            <SkipForward class="daisy-w-6 daisy-h-6" />
             <span class="daisy-ml-2">Move to end of list</span>
           </button>
           <label class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2">

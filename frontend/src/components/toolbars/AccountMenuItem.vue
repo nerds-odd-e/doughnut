@@ -15,7 +15,7 @@
           </li>
           <li class="daisy-menu-item hover:daisy-bg-base-200">
             <router-link :to="{ name: 'recent' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
-              <CircleCheck class="daisy-mr-2 w-5 h-5 shrink-0" />Recent...
+              <CircleCheck class="daisy-mr-2 daisy-w-6 daisy-h-6 daisy-shrink-0" />Recent...
             </router-link>
           </li>
           <li class="daisy-menu-item hover:daisy-bg-base-200">

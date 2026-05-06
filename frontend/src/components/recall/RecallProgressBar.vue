@@ -51,7 +51,7 @@
       </div>
     </template>
     <template #cogIcon>
-      <Settings class="w-5 h-5" />
+      <Settings class="daisy-w-6 daisy-h-6" />
     </template>
   </ProgressBar>
 </template>

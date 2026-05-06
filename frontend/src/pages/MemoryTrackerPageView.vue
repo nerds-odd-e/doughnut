@@ -73,7 +73,7 @@
         aria-label="remove this note from recall"
         @click="removeFromRecall"
       >
-        <EyeOff class="w-5 h-5" />
+        <EyeOff class="daisy-w-6 daisy-h-6" />
         <span>Remove from Recall</span>
       </button>
     </div>

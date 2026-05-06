@@ -1,7 +1,7 @@
 <template>
   <div v-if="currentAiReply" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <Bot class="w-5 h-5" />
+      <Bot class="daisy-w-6 daisy-h-6" />
     </div>
     <div class="daisy-card daisy-py-2 daisy-px-3 daisy-bg-light ai-chat"
     v-html="markdowntToHtml(currentAiReply)"
@@ -10,7 +10,7 @@
 
   <div v-if="currentSuggestion" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <Bot class="w-5 h-5" />
+      <Bot class="daisy-w-6 daisy-h-6" />
     </div>
     <ToolCallHandler
       v-if="currentSuggestion"

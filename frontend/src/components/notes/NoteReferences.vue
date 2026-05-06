@@ -8,7 +8,7 @@
         title="collapse children"
         @click="collapse()"
       >
-        <ChevronsUpDown class="w-5 h-5 rotate-180" />
+        <ChevronsUpDown class="daisy-w-6 daisy-h-6 daisy-rotate-180" />
       </button>
       <button
         class="daisy-btn daisy-btn-sm"
@@ -17,7 +17,7 @@
         title="expand children"
         @click="expand()"
       >
-        <ChevronsUpDown class="w-5 h-5" />
+        <ChevronsUpDown class="daisy-w-6 daisy-h-6" />
       </button>
     </div>
     <div class="daisy-flex-1">

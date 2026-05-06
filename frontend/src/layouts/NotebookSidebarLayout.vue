@@ -10,12 +10,12 @@
       >
         <PanelLeftClose
           v-if="sidebarOpened"
-          class="w-5 h-5"
+          class="daisy-w-6 daisy-h-6"
           aria-hidden="true"
         />
         <PanelLeft
           v-else
-          class="w-5 h-5"
+          class="daisy-w-6 daisy-h-6"
           aria-hidden="true"
         />
       </button>

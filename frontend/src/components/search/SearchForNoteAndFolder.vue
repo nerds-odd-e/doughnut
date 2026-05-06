@@ -23,7 +23,7 @@
         ]"
         @click="allMyNotebooksAndSubscriptions = !allMyNotebooksAndSubscriptions"
       >
-        <BookOpen class="w-5 h-5" />
+        <BookOpen class="daisy-w-6 daisy-h-6" />
       </button>
       <button
         type="button"
@@ -35,7 +35,7 @@
         ]"
         @click="allMyCircles = !allMyCircles"
       >
-        <Users class="w-5 h-5" />
+        <Users class="daisy-w-6 daisy-h-6" />
       </button>
       <button
         v-if="modalCloser"
@@ -45,7 +45,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square"
         @click="modalCloser()"
       >
-        <X class="w-5 h-5" />
+        <X class="daisy-w-6 daisy-h-6" />
       </button>
     </div>
     <SearchResults

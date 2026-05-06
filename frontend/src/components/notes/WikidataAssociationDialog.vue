@@ -30,7 +30,7 @@
                       :disabled="isLoadingUrl || !hasValidWikidataId"
                       v-show="hasValidWikidataId"
                     >
-                      <ExternalLink class="w-5 h-5" />
+                      <ExternalLink class="daisy-w-6 daisy-h-6" />
                     </button>
             </template>
           </TextInput>

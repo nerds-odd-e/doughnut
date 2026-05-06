@@ -20,7 +20,7 @@
         title="Generate Image with DALL-E"
       >
         <template #button_face>
-          <Bot class="w-5 h-5" />
+          <Bot class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default>
           <AIGenerateImageDialog v-bind="{ note }" />
@@ -32,7 +32,7 @@
         title="Edit Note Image"
       >
         <template #button_face>
-          <ImageIcon class="w-5 h-5" />
+          <ImageIcon class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
           <NoteEditImageDialog
@@ -47,7 +47,7 @@
         title="Edit Note URL"
       >
         <template #button_face>
-          <Globe class="w-5 h-5" />
+          <Globe class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
           <NoteEditUrlDialog
@@ -62,7 +62,7 @@
         title="Export..."
       >
         <template #button_face>
-          <Upload class="w-5 h-5" />
+          <Upload class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
           <NoteExportDialog :note="note" @close-dialog="closer" />
@@ -86,7 +86,7 @@
         title="Assimilate this note"
         @click="assimilateNote"
       >
-        <CircleCheck class="w-5 h-5" />
+        <CircleCheck class="daisy-w-6 daisy-h-6" />
       </button>
 
       <button
@@ -94,7 +94,7 @@
         title="Delete note"
         @click="deleteNote"
       >
-        <Trash2 class="w-5 h-5" />
+        <Trash2 class="daisy-w-6 daisy-h-6" />
       </button>
     </div>
   </div>

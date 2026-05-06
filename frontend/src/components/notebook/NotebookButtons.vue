@@ -10,7 +10,7 @@
       data-testid="notebook-catalog-read-book"
       @click="onReadBook"
     >
-      <BookOpen class="h-5 w-5" />
+      <BookOpen class="daisy-h-6 daisy-w-6" />
     </button>
     <details
       ref="actionsDropdown"
@@ -21,7 +21,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer"
         aria-label="Notebook actions"
       >
-        <MoreHorizontal class="h-5 w-5" />
+        <MoreHorizontal class="daisy-h-6 daisy-w-6" />
       </summary>
       <ul
         tabindex="0"

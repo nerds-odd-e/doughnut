@@ -5,7 +5,7 @@
     title="Wiki Association"
     @click="onClickWikidata"
   >
-    <Link2 class="w-5 h-5" />
+    <Link2 class="daisy-w-6 daisy-h-6" />
     Go to Wikidata
   </button>
 </template>

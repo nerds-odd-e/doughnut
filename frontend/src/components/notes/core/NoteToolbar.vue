@@ -29,7 +29,7 @@
         })"
         title="Star a conversation about this note"
       >
-        <MessageCircle class="w-5 h-5" />
+        <MessageCircle class="daisy-w-6 daisy-h-6" />
       </a>
 
       <PopButton v-if="!readonly" title="associate wikidata">
@@ -45,14 +45,14 @@
       </PopButton>
 
       <button v-if="!readonly && !asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
-        <FileCode class="w-5 h-5" />
+        <FileCode class="daisy-w-6 daisy-h-6" />
       </button>
       <button v-else-if="!readonly" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
-        <LayoutTemplate class="w-5 h-5" />
+        <LayoutTemplate class="daisy-w-6 daisy-h-6" />
       </button>
 
       <button v-if="!readonly && !audioTools" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
-        <Mic class="w-5 h-5" />
+        <Mic class="daisy-w-6 daisy-h-6" />
       </button>
 
       <button
@@ -61,7 +61,7 @@
         title="more options"
         @click="moreOptions = !moreOptions"
       >
-        <Settings class="w-5 h-5" />
+        <Settings class="daisy-w-6 daisy-h-6" />
       </button>
     </div>
   </nav>

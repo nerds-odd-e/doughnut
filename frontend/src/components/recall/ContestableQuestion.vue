@@ -28,7 +28,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         @click="contestQuestion"
       >
-        <Target class="w-5 h-5" />
+        <Target class="daisy-w-6 daisy-h-6" />
       </a>
     </div>
   </div>

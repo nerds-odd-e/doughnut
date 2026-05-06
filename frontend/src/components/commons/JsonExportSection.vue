@@ -20,7 +20,7 @@
         :data-testid="downloadButtonTestId"
         aria-label="Download JSON"
       >
-        <Download class="w-5 h-5" />
+        <Download class="daisy-w-6 daisy-h-6" />
       </button>
     </div>
   </div>

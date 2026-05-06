@@ -17,7 +17,7 @@
             :aria-pressed="notebooksLayout === 'list'"
             @click="notebooksLayout = 'list'"
           >
-            <List class="h-5 w-5" />
+            <List class="daisy-h-6 daisy-w-6" />
           </button>
           <button
             type="button"
@@ -28,7 +28,7 @@
             :aria-pressed="notebooksLayout === 'grid'"
             @click="notebooksLayout = 'grid'"
           >
-            <LayoutGrid class="h-5 w-5" />
+            <LayoutGrid class="daisy-h-6 daisy-w-6" />
           </button>
         </div>
         <div class="daisy-form-control daisy-w-auto">
