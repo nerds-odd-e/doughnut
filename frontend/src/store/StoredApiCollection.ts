@@ -579,6 +579,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
+    const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
@@ -589,13 +590,21 @@ export default class StoredApiCollection implements StoredApi {
     }
     this.noteEditingHistory.deleteNote(noteId)
     this.storage.removeNoteRealm(noteId)
-    if (res.length === 0) {
-      await this.routerReplaceFocus(router)
-      return
+    let notebookId = cachedRealm?.notebookId
+    let focusRealm: NoteRealm | undefined
+    if (res.length > 0) {
+      focusRealm = this.storage.refreshNoteRealm(res[0]!)
+      notebookId = notebookId ?? focusRealm.notebookId
     }
-    const noteRealm = this.storage.refreshNoteRealm(res[0]!)
-    await this.routerReplaceFocus(router, noteRealm)
-    return noteRealm
+    if (notebookId !== undefined) {
+      await router.replace({
+        name: "notebookPage",
+        params: { notebookId },
+      })
+      return focusRealm
+    }
+    await this.routerReplaceFocus(router)
+    return focusRealm
   }
 
   async moveNoteToFolder(sourceId: Doughnut.ID, targetFolderId: Doughnut.ID) {

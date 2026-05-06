@@ -35,6 +35,10 @@ describe("storedApiCollection", () => {
       expect(deleteNoteSpy).toHaveBeenCalledTimes(1)
       expect(deleteNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
       expect(routerReplace).toHaveBeenCalledTimes(1)
+      expect(routerReplace).toHaveBeenCalledWith({
+        name: "notebookPage",
+        params: { notebookId: parentNote.notebookId },
+      })
     })
 
     it("should remove the deleted note from cache", async () => {
@@ -47,6 +51,23 @@ describe("storedApiCollection", () => {
       expect(
         storageAccessor.value.refOfNoteRealm(note.id).value
       ).toBeUndefined()
+      expect(routerReplace).toHaveBeenCalledWith({
+        name: "notebookPage",
+        params: { notebookId: note.notebookId },
+      })
+    })
+
+    it("should navigate to notebook when delete returns no realms", async () => {
+      mockSdkService("deleteNote", [])
+      storageAccessor.value.refreshNoteRealm(note)
+
+      const sa = storageAccessor.value.storedApi()
+      await sa.deleteNote(router, note.id)
+
+      expect(routerReplace).toHaveBeenCalledWith({
+        name: "notebookPage",
+        params: { notebookId: note.notebookId },
+      })
     })
   })
 
