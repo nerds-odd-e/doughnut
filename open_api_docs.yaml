@@ -3629,15 +3629,9 @@ components:
           $ref: "#/components/schemas/NoteTopology"
         details:
           type: string
-        updatedAt:
-          type: string
-          format: date-time
         id:
           type: integer
           format: int32
-        createdAt:
-          type: string
-          format: date-time
         deletedAt:
           type: string
           format: date-time
@@ -3645,10 +3639,8 @@ components:
         wikidataId:
           type: string
       required:
-      - createdAt
       - id
       - noteTopology
-      - updatedAt
     NoteRealm:
       type: object
       properties:
@@ -3689,6 +3681,12 @@ components:
         folderId:
           type: integer
           format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
       - id
     WikiTitle:

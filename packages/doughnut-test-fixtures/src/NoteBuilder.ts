@@ -27,12 +27,12 @@ class NoteBuilder extends Builder<Note> {
       noteTopology: {
         id,
         title: 'Note1.1.1',
+        createdAt: new Date().toISOString(),
+        updatedAt: '2021-08-24T08:46:44.000+00:00',
       },
       details: '<p>Desc</p>',
       wikidataId: '',
       deletedAt: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: '2021-08-24T08:46:44.000+00:00',
     }
   }
 
@@ -64,12 +64,12 @@ class NoteBuilder extends Builder<Note> {
   }
 
   createdAt(value: string): NoteBuilder {
-    this.data.createdAt = value
+    this.data.noteTopology.createdAt = value
     return this
   }
 
   updatedAt(value: string): NoteBuilder {
-    this.data.updatedAt = value
+    this.data.noteTopology.updatedAt = value
     return this
   }
 

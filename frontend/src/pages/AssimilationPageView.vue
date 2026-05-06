@@ -57,7 +57,7 @@
         }"
         @assimilation-done="assimilationDone"
         @reload-needed="onReloadNeeded"
-        :key="`${noteRealm.note.id}-${noteRealm.note.updatedAt}`"
+        :key="`${noteRealm.note.id}-${noteRealm.note.noteTopology.updatedAt}`"
       />
     </template>
   </div>

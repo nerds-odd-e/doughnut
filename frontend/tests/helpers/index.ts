@@ -297,7 +297,7 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
     id: realm.notebookId,
     name: "Notebook",
     notebookSettings: { skipMemoryTrackingEntirely: false },
-    updated_at: realm.note.updatedAt,
+    updated_at: realm.note.noteTopology.updatedAt ?? "",
     ...(circle ? { circle } : {}),
   }
   return mockSdkService("get", { notebook, hasAttachedBook: false })

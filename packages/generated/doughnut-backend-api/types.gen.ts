@@ -223,9 +223,7 @@ export type FolderTrailSegment = {
 export type Note = {
     noteTopology: NoteTopology;
     details?: string;
-    updatedAt: string;
     id: number;
-    createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
 };
@@ -244,6 +242,8 @@ export type NoteTopology = {
     id: number;
     title?: string;
     folderId?: number;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type WikiTitle = {
@@ -965,9 +965,7 @@ export type SubscriptionWritable = {
 export type NoteWritable = {
     noteTopology: NoteTopology;
     details?: string;
-    updatedAt: string;
     id: number;
-    createdAt: string;
     wikidataId?: string;
 };
 

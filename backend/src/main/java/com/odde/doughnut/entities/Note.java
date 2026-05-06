@@ -23,7 +23,7 @@ import org.springframework.lang.NonNull;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"noteTopology", "details", "updatedAt"})
+@JsonPropertyOrder({"noteTopology", "details"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -72,6 +72,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   @Getter
   @NotNull
+  @JsonIgnore
   private Timestamp createdAt;
 
   @Setter
@@ -88,6 +89,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @NotNull
+  @JsonIgnore
   private Timestamp updatedAt;
 
   @Column(name = "wikidata_id")
@@ -175,6 +177,8 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (getFolder() != null) {
       noteTopology.setFolderId(getFolder().getId());
     }
+    noteTopology.setCreatedAt(getCreatedAt());
+    noteTopology.setUpdatedAt(getUpdatedAt());
     return noteTopology;
   }
 

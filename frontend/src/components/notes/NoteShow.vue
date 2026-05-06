@@ -37,15 +37,15 @@
                 <NoteRecentUpdateIndicator
                   v-bind="{
                     id: noteRealm.id,
-                    updatedAt: noteRealm.note.updatedAt,
+                    updatedAt: noteRealm.note.noteTopology.updatedAt,
                   }"
                 >
                   <p>
                     <span class="daisy-mr-3">
-                      Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
+                      Created: {{ toLocalDateString(noteRealm.note.noteTopology.createdAt) }}
                     </span>
                     <span>
-                      Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
+                      Last updated: {{ toLocalDateString(noteRealm.note.noteTopology.updatedAt) }}
                     </span>
                   </p>
                 </NoteRecentUpdateIndicator>
@@ -123,7 +123,8 @@ watch(
   }
 )
 
-const toLocalDateString = (date: string) => new Date(date).toLocaleDateString()
+const toLocalDateString = (date: string | undefined) =>
+  date ? new Date(date).toLocaleDateString() : ""
 </script>
 <style scoped>
 .note-show-container {
