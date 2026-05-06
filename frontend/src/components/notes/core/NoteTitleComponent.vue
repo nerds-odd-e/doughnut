@@ -11,5 +11,5 @@ const props = defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
 })
 
-const title = computed(() => props.noteTopology.title ?? "")
+const title = computed(() => props.noteTopology.title)
 </script>

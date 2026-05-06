@@ -29,7 +29,7 @@ const FOLDER_TOP_NOTE_CHILDREN_ID = 77001
 const FOLDER_FIRST_GEN_CHILDREN_ID = 77002
 
 function structuralFolder(folderId: number, noteRealm: NoteRealm) {
-  return testFolderStub(folderId, noteRealm.note.noteTopology.title!)
+  return testFolderStub(folderId, noteRealm.note.noteTopology.title)
 }
 
 /** Aligns listing payloads with folder-first sidebar drag rules (same folderId = same drop column). */
@@ -93,8 +93,8 @@ describe("Sidebar", () => {
 
   /** Aligns active realm with folder-first API: ancestorFolders + folderId for this stub tree. */
   function realmAsActiveInSidebarStub(realm: NoteRealm): NoteRealm {
-    const topTitle = topNoteRealm.note.noteTopology.title!
-    const firstTitle = firstGeneration.note.noteTopology.title!
+    const topTitle = topNoteRealm.note.noteTopology.title
+    const firstTitle = firstGeneration.note.noteTopology.title
 
     if (realm.id === topNoteRealm.id) {
       return { ...realm, ancestorFolders: [] }
@@ -240,9 +240,7 @@ describe("Sidebar", () => {
     const findRootFolderRowByTopTitle = () => {
       const label = wrapper
         .findAll(".sidebar-folder-label")
-        .find((w) =>
-          w.text().includes(topNoteRealm.note.noteTopology.title ?? "")
-        )
+        .find((w) => w.text().includes(topNoteRealm.note.noteTopology.title))
       if (!label?.exists()) return
       const li = label.element.closest("li")
       return li ? new DOMWrapper(li) : undefined
@@ -251,7 +249,7 @@ describe("Sidebar", () => {
     it("applies sidebar-folder-user-active when a folder row is clicked", async () => {
       mountSidebar(firstGeneration)
       await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
       const folderRow = findRootFolderRowByTopTitle()
       expect(folderRow?.exists()).toBe(true)
@@ -263,7 +261,7 @@ describe("Sidebar", () => {
     it("activates folder but does not toggle expand when only the folder label track padding is clicked", async () => {
       mountSidebar(firstGeneration)
       await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
       const folderRow = findRootFolderRowByTopTitle()
       expect(folderRow?.exists()).toBe(true)
@@ -279,14 +277,14 @@ describe("Sidebar", () => {
     it("clears user active folder styling when a note row is clicked", async () => {
       mountSidebar(firstGeneration)
       await vi.waitUntil(() =>
-        findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+        findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
       )
       const folderRow = findRootFolderRowByTopTitle()
       await folderRow!.find(".sidebar-folder-label").trigger("click")
       await flushPromises()
       expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
 
-      const noteRow = findSidebarItem(topNoteRealm.note.noteTopology.title!)
+      const noteRow = findSidebarItem(topNoteRealm.note.noteTopology.title)
       expect(noteRow?.exists()).toBe(true)
       await noteRow!.trigger("click")
       await flushPromises()
@@ -304,7 +302,7 @@ describe("Sidebar", () => {
         .mount({ attachTo: document.body })
       await flushPromises()
       await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
       const folderRow = findRootFolderRowByTopTitle()
       await folderRow!.find(".sidebar-folder-label").trigger("click")
@@ -346,7 +344,7 @@ describe("Sidebar", () => {
         .mount({ attachTo: document.body })
       await flushPromises()
       await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
       const folderRow = findRootFolderRowByTopTitle()
       await folderRow!.find(".sidebar-folder-label").trigger("click")
@@ -623,7 +621,7 @@ describe("Sidebar", () => {
   it("should call the api once if top note", async () => {
     mountSidebar(topNoteRealm)
     await flushPromises()
-    const topTitle = topNoteRealm.note.noteTopology.title!
+    const topTitle = topNoteRealm.note.noteTopology.title
     const folderRowLabel = wrapper
       .findAll(".sidebar-folder-label")
       .find((w) => w.text().trim() === topTitle)
@@ -631,7 +629,7 @@ describe("Sidebar", () => {
     await folderRowLabel!.trigger("click")
     await flushPromises()
     await vi.waitUntil(() =>
-      findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
     )
   })
 
@@ -645,7 +643,7 @@ describe("Sidebar", () => {
     await flushPromises()
     expect(rootSpy).toHaveBeenCalledTimes(1)
     expect(
-      findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+      findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
     ).toBe(true)
 
     await wrapper.setProps({
@@ -655,7 +653,7 @@ describe("Sidebar", () => {
     await flushPromises()
     expect(rootSpy).toHaveBeenCalledTimes(1)
     expect(
-      findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+      findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
     ).toBe(true)
   })
 
@@ -692,25 +690,25 @@ describe("Sidebar", () => {
       expect(listedFolderIds).not.toContain(firstGenerationSibling.id)
 
       await vi.waitUntil(() =>
-        findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(secondGeneration.note.noteTopology.title)?.exists()
       )
       expect(
-        findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+        findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
       ).toBe(true)
       expect(
-        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       ).toBe(true)
       expect(
         findSidebarItem(
-          firstGenerationSibling.note.noteTopology.title!
+          firstGenerationSibling.note.noteTopology.title
         )?.exists()
       ).toBe(true)
 
       const secondGenEl = findSidebarItem(
-        secondGeneration.note.noteTopology.title!
+        secondGeneration.note.noteTopology.title
       )!.element
       const siblingEl = findSidebarItem(
-        firstGenerationSibling.note.noteTopology.title!
+        firstGenerationSibling.note.noteTopology.title
       )!.element
       expect(isBefore(secondGenEl, siblingEl)).toBe(true)
     })
@@ -729,7 +727,7 @@ describe("Sidebar", () => {
 
       // Browser Mode: Verify the active item is rendered correctly
       await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
 
       // Check for active class on parent li or similar
@@ -739,7 +737,7 @@ describe("Sidebar", () => {
       const activeElement = wrapper.find(".active-item")
       expect(activeElement.exists()).toBe(true)
       expect(activeElement.text()).toContain(
-        firstGeneration.note.noteTopology.title!
+        firstGeneration.note.noteTopology.title
       )
 
       const scrollSpy = HTMLElement.prototype.scrollIntoView as ReturnType<
@@ -785,7 +783,7 @@ describe("Sidebar", () => {
       mountSidebar(firstGeneration)
       await vi.waitUntil(() =>
         findSidebarItem(
-          firstGenerationSibling.note.noteTopology.title!
+          firstGenerationSibling.note.noteTopology.title
         )?.exists()
       )
     })
@@ -793,7 +791,7 @@ describe("Sidebar", () => {
     it("should have child note of active first gen", async () => {
       mountSidebar(firstGeneration)
       await flushPromises()
-      const firstTitle = firstGeneration.note.noteTopology.title!
+      const firstTitle = firstGeneration.note.noteTopology.title
       const nestedFolderLabel = wrapper
         .findAll(".sidebar-folder-label")
         .find((w) => w.text().trim() === firstTitle)
@@ -801,14 +799,14 @@ describe("Sidebar", () => {
       await nestedFolderLabel!.trigger("click")
       await flushPromises()
       await vi.waitUntil(() =>
-        findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
+        findSidebarItem(secondGeneration.note.noteTopology.title)?.exists()
       )
 
       const secondGen = findSidebarItem(
-        secondGeneration.note.noteTopology.title!
+        secondGeneration.note.noteTopology.title
       )!.element
       const sibling = findSidebarItem(
-        firstGenerationSibling.note.noteTopology.title!
+        firstGenerationSibling.note.noteTopology.title
       )!.element
 
       expect(isBefore(secondGen, sibling)).toBe(true)
@@ -877,10 +875,10 @@ describe("Sidebar", () => {
   it("should start from notebook top", async () => {
     mountSidebar(secondGeneration)
     await vi.waitUntil(() =>
-      findSidebarItem(firstGeneration.note.noteTopology.title!)?.exists()
+      findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
     )
     expect(
-      findSidebarItem(secondGeneration.note.noteTopology.title!)?.exists()
+      findSidebarItem(secondGeneration.note.noteTopology.title)?.exists()
     ).toBe(true)
   })
 
@@ -918,7 +916,7 @@ describe("Sidebar", () => {
     await flushPromises()
 
     expect(
-      findSidebarItem(topNoteRealm.note.noteTopology.title!)?.exists()
+      findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
     ).toBe(true)
     expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
   })

@@ -99,7 +99,7 @@ async function collectAllFolderPaths(): Promise<
   async function visitFolderTree(prefix: string, folder: Folder) {
     const id = folderNumericId(folder)
     if (id === undefined) return
-    const name = folder.name ?? ""
+    const name = folder.name
     const pathLabel = prefix === "" ? name : `${prefix} / ${name}`
     out.push({ id, pathLabel })
     const childListing = await api.loadFolderListing(props.notebookId, id)

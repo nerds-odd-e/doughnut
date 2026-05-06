@@ -13,8 +13,8 @@ function parseTime(iso: string | undefined): number {
 
 function peerTitle(row: SidebarStructuralRow): string {
   return row.kind === "folder"
-    ? (row.folder.name ?? "").toLocaleLowerCase()
-    : (row.noteTopology.title ?? "").toLocaleLowerCase()
+    ? row.folder.name.toLocaleLowerCase()
+    : row.noteTopology.title.toLocaleLowerCase()
 }
 
 function peerCreated(row: SidebarStructuralRow): number {

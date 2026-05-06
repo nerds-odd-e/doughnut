@@ -13,7 +13,7 @@ class NotebookBuilder extends Builder<Notebook> {
     const now = new Date().toISOString()
     this.data = {
       id: generateId(),
-      name: this.notebuilder.data.noteTopology.title ?? '',
+      name: this.notebuilder.data.noteTopology.title,
       notebookSettings: {
         skipMemoryTrackingEntirely: false,
       },
@@ -39,7 +39,7 @@ class NotebookBuilder extends Builder<Notebook> {
 
   do(): Notebook {
     const built = this.notebuilder.do()
-    this.data.name = built.noteTopology.title ?? ''
+    this.data.name = built.noteTopology.title
     this.data.description = built.details
       ? `${built.details}, just shorter`
       : undefined

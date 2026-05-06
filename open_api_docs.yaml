@@ -3716,6 +3716,7 @@ components:
           format: int32
         title:
           type: string
+          minLength: 1
         folderId:
           type: integer
           format: int32
@@ -3727,6 +3728,7 @@ components:
           format: date-time
       required:
       - id
+      - title
     WikiTitle:
       type: object
       properties:

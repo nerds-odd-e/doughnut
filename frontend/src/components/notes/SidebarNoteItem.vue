@@ -3,7 +3,7 @@
     class="sidebar-note-li"
     role="treeitem"
     :aria-selected="activeNoteTopology != null && noteTopology.id === activeNoteTopology.id"
-    :aria-label="noteTopology.title ?? undefined"
+    :aria-label="noteTopology.title"
     :class="{
       'active-item':
         activeNoteTopology != null &&

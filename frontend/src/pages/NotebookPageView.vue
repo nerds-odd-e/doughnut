@@ -278,7 +278,7 @@ const indexRealm = computed(() => {
 })
 
 const indexDisplayTitle = computed(() => {
-  const t = indexRealm.value?.note.noteTopology.title?.trim()
+  const t = indexRealm.value?.note.noteTopology.title.trim()
   return t && t.length > 0 ? t : "Index"
 })
 

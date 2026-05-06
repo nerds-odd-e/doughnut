@@ -306,12 +306,8 @@ public class NoteSearchService {
         Comparator.comparing(
             h ->
                 h.isNote()
-                    ? (h.getNoteSearchResult().getNoteTopology().getTitle() != null
-                        ? h.getNoteSearchResult().getNoteTopology().getTitle()
-                        : "")
-                    : (h.isFolder()
-                        ? (h.getFolderName() != null ? h.getFolderName() : "")
-                        : (h.getNotebookName() != null ? h.getNotebookName() : "")),
+                    ? h.getNoteSearchResult().getNoteTopology().getTitle()
+                    : (h.isFolder() ? h.getFolderName() : h.getNotebookName()),
             String.CASE_INSENSITIVE_ORDER);
     Comparator<RelationshipLiteralSearchHit> byId =
         Comparator.comparing(
