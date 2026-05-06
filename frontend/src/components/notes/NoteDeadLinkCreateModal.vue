@@ -3,7 +3,8 @@
     <template #body>
       <NoteNewDialog
         :notebook-root-notebook-id="notebookId"
-        :target-folder-id="folderId ?? undefined"
+        :target-folder-id="resolvedCreateParentFolderId ?? undefined"
+        :parent-location-description="createParentLocationDescription"
         :initial-title="modelValue"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         @close-dialog="close"
@@ -13,15 +14,31 @@
 </template>
 
 <script setup lang="ts">
+import type { NoteRealm } from "@generated/doughnut-backend-api"
+import { computed } from "vue"
 import Modal from "@/components/commons/Modal.vue"
+import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
+import { useNotebookRootCreateTarget } from "./useNoteSidebarTree"
 import NoteNewDialog from "./NoteNewDialog.vue"
 
-defineProps<{
+const props = defineProps<{
   notebookId: number
-  folderId?: number | null
+  noteRealm: NoteRealm
   modelValue: string | null
   sourceNoteId: number
 }>()
+
+const activeNoteRealmRef = computed(() => props.noteRealm)
+const noteContextResolved = computed(
+  () => props.noteRealm.note?.noteTopology != null
+)
+
+const { resolvedCreateParentFolderId, createParentLocationDescription } =
+  useNotebookRootCreateTarget(
+    notebookSidebarUserActiveFolder,
+    activeNoteRealmRef,
+    noteContextResolved
+  )
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | null]

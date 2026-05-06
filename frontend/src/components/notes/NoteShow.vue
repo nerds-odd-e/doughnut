@@ -68,7 +68,7 @@
           <NoteDeadLinkCreateModal
             v-model="pendingDeadLinkTitle"
             :notebook-id="noteRealm.notebookId"
-            :folder-id="noteRealm.note.noteTopology.folderId ?? undefined"
+            :note-realm="noteRealm"
             :source-note-id="noteRealm.id"
           />
         </template>

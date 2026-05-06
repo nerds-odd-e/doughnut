@@ -30,12 +30,14 @@ import type { NoteRealm, User } from "@generated/doughnut-backend-api"
 import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import {
-  createParentLocationDescriptionFrom,
-  resolvedCreateParentFolderIdFrom,
   sidebarTreeKey,
+  useNotebookRootCreateTarget,
   type SidebarUserActiveFolder,
 } from "./useNoteSidebarTree"
-import { notebookSidebarNotebookPageContext } from "@/composables/useCurrentNoteSidebarState"
+import {
+  notebookSidebarNotebookPageContext,
+  notebookSidebarUserActiveFolder,
+} from "@/composables/useCurrentNoteSidebarState"
 
 const props = defineProps({
   /** When set, highlights the active note and expands its ancestors */
@@ -127,20 +129,21 @@ const sidebarReadonly = computed(
 
 const noteContextResolved = computed(() => activeNoteTopology.value != null)
 
-const resolvedCreateParentFolderId = computed(() =>
-  resolvedCreateParentFolderIdFrom(
-    userActiveFolder.value,
-    props.activeNoteRealm,
-    noteContextResolved.value
-  )
-)
+const activeNoteRealmRef = computed(() => props.activeNoteRealm)
 
-const createParentLocationDescription = computed(() =>
-  createParentLocationDescriptionFrom(
-    userActiveFolder.value,
-    props.activeNoteRealm,
-    noteContextResolved.value
+const { resolvedCreateParentFolderId, createParentLocationDescription } =
+  useNotebookRootCreateTarget(
+    userActiveFolder,
+    activeNoteRealmRef,
+    noteContextResolved
   )
+
+watch(
+  userActiveFolder,
+  (v) => {
+    notebookSidebarUserActiveFolder.value = v
+  },
+  { deep: true, immediate: true }
 )
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */

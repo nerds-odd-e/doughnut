@@ -1,5 +1,5 @@
 import type { NoteRealm } from "@generated/doughnut-backend-api"
-import type { ComputedRef, InjectionKey, Ref } from "vue"
+import { computed, type ComputedRef, type InjectionKey, type Ref } from "vue"
 
 /** Folder the user explicitly selected in the sidebar tree (new note / new folder scope). */
 export type SidebarUserActiveFolder = { id: number; name: string }
@@ -40,6 +40,31 @@ export function createParentLocationDescriptionFrom(
   if (fid == null) return "Adds to the notebook root."
   const label = folderLabelForRealmFolderId(activeNoteRealm, fid)
   return `Adds to folder "${label}".`
+}
+
+export function useNotebookRootCreateTarget(
+  userActiveFolder: Ref<SidebarUserActiveFolder | null>,
+  activeNoteRealm: Ref<NoteRealm | undefined>,
+  noteContextResolved: Ref<boolean>
+): {
+  resolvedCreateParentFolderId: ComputedRef<number | null>
+  createParentLocationDescription: ComputedRef<string>
+} {
+  const resolvedCreateParentFolderId = computed(() =>
+    resolvedCreateParentFolderIdFrom(
+      userActiveFolder.value,
+      activeNoteRealm.value,
+      noteContextResolved.value
+    )
+  )
+  const createParentLocationDescription = computed(() =>
+    createParentLocationDescriptionFrom(
+      userActiveFolder.value,
+      activeNoteRealm.value,
+      noteContextResolved.value
+    )
+  )
+  return { resolvedCreateParentFolderId, createParentLocationDescription }
 }
 
 export interface SidebarTreeContext {

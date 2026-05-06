@@ -2,10 +2,12 @@ import {
   createParentLocationDescriptionFrom,
   folderLabelForRealmFolderId,
   resolvedCreateParentFolderIdFrom,
+  useNotebookRootCreateTarget,
 } from "@/components/notes/useNoteSidebarTree"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { testFolderStub } from "@tests/helpers"
+import { computed, ref } from "vue"
 import { describe, expect, it } from "vitest"
 
 describe("useNoteSidebarTree create context", () => {
@@ -95,5 +97,48 @@ describe("useNoteSidebarTree create context", () => {
 
   it("folderLabelForRealmFolderId falls back to Folder #id", () => {
     expect(folderLabelForRealmFolderId(undefined, 12)).toBe("Folder #12")
+  })
+
+  it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {
+    const realm = realmInFolder(8, "Lab")
+    const userActiveFolder = ref<{ id: number; name: string } | null>(null)
+    const activeNoteRealm = ref<NoteRealm | undefined>(realm)
+    const noteContextResolved = ref(true)
+    const { resolvedCreateParentFolderId, createParentLocationDescription } =
+      useNotebookRootCreateTarget(
+        userActiveFolder,
+        activeNoteRealm,
+        noteContextResolved
+      )
+    expect(resolvedCreateParentFolderId.value).toBe(
+      resolvedCreateParentFolderIdFrom(
+        userActiveFolder.value,
+        activeNoteRealm.value,
+        noteContextResolved.value
+      )
+    )
+    expect(createParentLocationDescription.value).toBe(
+      createParentLocationDescriptionFrom(
+        userActiveFolder.value,
+        activeNoteRealm.value,
+        noteContextResolved.value
+      )
+    )
+    userActiveFolder.value = { id: 9, name: "Pinned" }
+    expect(resolvedCreateParentFolderId.value).toBe(9)
+    expect(createParentLocationDescription.value).toBe(
+      'Adds to folder "Pinned".'
+    )
+  })
+
+  it("useNotebookRootCreateTarget accepts computed realm ref", () => {
+    const r = ref(realmInFolder(2, "Docs"))
+    const activeRealm = computed(() => r.value)
+    const { resolvedCreateParentFolderId } = useNotebookRootCreateTarget(
+      ref(null),
+      activeRealm,
+      ref(true)
+    )
+    expect(resolvedCreateParentFolderId.value).toBe(2)
   })
 })
