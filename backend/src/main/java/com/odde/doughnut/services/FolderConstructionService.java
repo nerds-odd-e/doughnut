@@ -18,16 +18,19 @@ public class FolderConstructionService {
 
   private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
+  private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
   public FolderConstructionService(
       NoteRepository noteRepository,
       FolderRepository folderRepository,
+      FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
+    this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -73,12 +76,8 @@ public class FolderConstructionService {
     }
 
     Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
-    if (!folderRepository
-        .findCandidateChildContainers(notebook.getId(), parentFolderId, trimmedName)
-        .isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "A folder with this name already exists here.");
-    }
+    folderSiblingNameValidation.requireNoConflictingSibling(
+        notebook.getId(), parentFolderId, trimmedName);
 
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Folder folder = new Folder();

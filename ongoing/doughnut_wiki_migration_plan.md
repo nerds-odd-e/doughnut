@@ -5,7 +5,6 @@
 - **Phase 5.24 (drop `note.target_note_id` — optional detail):** `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`
 - **Phase 6 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md` (complete)
 - **Phase 7 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`
-- **Phase 8 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-8-sub-phases.md`
 
 ## Purpose
 
@@ -23,7 +22,10 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 6 — Folder-first listing; remove `NoteTopology.shortDetails` | Done |
 | Boundary — slug retirement | Done (before Phase 7) |
 | 7 — Remove note parent | Done |
-| 8+ | Not started |
+| 8 — Move / dissolve folder (organize) | Done |
+| 9 — Wiki-link parser and link index | Not started |
+| 10 — Folder configuration | Not started |
+| 11 — Remove legacy assumptions | Not started |
 | 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
 ---
@@ -46,7 +48,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 ## Completed work (summary only)
 
-Phases **1–7** are shipped (Phase **7**: structural `note.parent_id` / `Note.parent` removed; folder placement only). **Phase 5 closeout:** relationship notes normalized; graph and note show use cached wiki links; legacy **`Note.target_note_id`** dropped per **5.24** migrations and `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md` where slice-level detail matters.
+Phases **1–8** are shipped (Phase **7**: structural `note.parent_id` / `Note.parent` removed; folder placement only; Phase **8**: move and dissolve folder). **Phase 5 closeout:** relationship notes normalized; graph and note show use cached wiki links; legacy **`Note.target_note_id`** dropped per **5.24** migrations and `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md` where slice-level detail matters.
 
 - **1:** `Folder`, `note.folder_id`, backfill from the former parent-note tree (historical migrations).
 - **2:** Full-path slugs, resolution by notebook + slug path and ambiguous basename; moves recompute `note.slug`.
@@ -55,6 +57,7 @@ Phases **1–7** are shipped (Phase **7**: structural `note.parent_id` / `Note.p
 - **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph; `relation_type` and `note.target_note_id` removed. Transitional graph hop flags on related-note DTOs were removed in **Phase 7.13**. Title-rename propagation → **Phase 12**.
 - **6:** Primary containment UX is folder-scoped; topology has no `shortDetails`; graph siblings from folder (or notebook root without folder).
 - **7:** Structural note parent removed from schema and APIs; notes use `folderId` / notebook root; see `doughnut_wiki_migration_plan-phase-7-sub-phases.md`.
+- **8:** Folder **move** (`POST …/folders/{folder}/move`) and **dissolve** (`DELETE …/folders/{folder}`): same-notebook reparenting; sibling name uniqueness at destination; dissolve promotes direct notes and **child folders** to the dissolved folder’s parent (with conflict checks); sidebar entry when a folder is active opens one organize dialog (`FolderOrganizeDialog.vue`); shared backend checks in `FolderSiblingNameValidation` and move graph rules in `FolderMoveDestinationRules`.
 
 ---
 
@@ -100,27 +103,34 @@ Navigation and creation are folder-based only, not parent-note hierarchy. “Sem
 
 ---
 
-# Phase 8 — Move a folder
+# Phase 8 — Move and dissolve folder
 
-**Execution detail:** `ongoing/doughnut_wiki_migration_plan-phase-8-sub-phases.md` (move + remove-from-same-dialog, sidebar entry when a folder is active).
+**Status:** Shipped.
 
 ## Goal
 
-Reparent a folder (`parentFolderId` or notebook root) while **notes** keep **`folderId`** on the same folder row; descendant folders move with the subtree.
+Users can **reparent** a folder within the same notebook (`parentFolderId` or notebook root) and **dissolve** a folder without deleting its notes. On a pure move, **notes** keep **`folderId`** on the same folder rows; descendant folders stay under the moved subtree.
 
-## Model and validation
+## Model and API
 
-- Update moved folder’s `parentFolderId` (or null for root).  
-- **Folder name uniqueness among siblings** at destination (same as create/rename; north star).  
-- Slug/path recomputation is **not** final behavior — no slug columns after boundary.
+- **Move:** `POST /api/notebooks/{notebook}/folders/{folder}/move` with optional `newParentFolderId` (omit or null for notebook root). Same-notebook only; cannot move into self or a descendant; sibling **name** uniqueness at the destination (aligned with folder create).
+- **Dissolve:** `DELETE /api/notebooks/{notebook}/folders/{folder}`. The folder row is removed. Direct notes in that folder get **`folderId`** set to the dissolved folder’s **parent** (notebook root if the folder was at root). **Subfolders:** promoted to that same parent, with sibling-name checks so promotions do not collide. User-facing label for removal: **Dissolve folder** (distinct from note delete).
+
+## UI
+
+One **organize** dialog hosts move and dissolve. Entry: sidebar toolbar when a **folder is active** (user-selected folder scope).
+
+## Validation (backend)
+
+Shared sibling-name checks: `FolderSiblingNameValidation`. Move destination graph rules (not self / not descendant): `FolderMoveDestinationRules`. Persistence query remains `FolderRepository.findCandidateChildContainers`.
 
 ## Non-goals
 
-Wiki-link parsing (**Phase 9**), folder templates (**Phase 10**).
+Cross-notebook moves, bulk note moves unrelated to dissolve, wiki-link parsing (**Phase 9**), folder templates (**Phase 10**), slug/path columns (retired at boundary).
 
 ## Expected result
 
-Users can move folders; descendants and contained notes stay attached without rewriting path-string columns.
+Tree and listings reflect new parents after move; after dissolve, notes and promoted subfolders appear under the former parent without orphaning content.
 
 ---
 
@@ -274,7 +284,7 @@ Renaming a note does not strand stale wiki tokens or cache rows in common cases;
 6. Folder-first listing; remove shortDetails
 → boundary: retire persisted slugs; /d/n/:noteId; folder by id
 7. Remove note parent
-8. Move folder
+8. Move / dissolve folder
 9. Wiki-link parser + indexes
 10. Folder config
 11. Legacy cleanup
@@ -290,7 +300,7 @@ folders + (historical slugs until boundary)
       → folder-first UX
         → slug retirement + id-canonical URLs
           → drop structural note parent (done)
-            → folder move
+            → folder move / dissolve (done)
               → wiki links + indexes
                 → folder config
                   → legacy cleanup

@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,16 +20,19 @@ public class FolderRelocationService {
 
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
+  private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
   public FolderRelocationService(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
+      FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
+    this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -52,24 +56,11 @@ public class FolderRelocationService {
       }
     }
 
-    if (newParentFolderId != null && newParentFolderId.equals(folder.getId())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot move folder into itself.");
-    }
-    if (newParent != null && folderIsStrictDescendantOf(folder, newParent)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Cannot move folder into its descendant.");
-    }
+    FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
 
     Integer destParentId = newParent == null ? null : newParent.getId();
-    boolean nameClash =
-        folderRepository
-            .findCandidateChildContainers(notebook.getId(), destParentId, folder.getName())
-            .stream()
-            .anyMatch(f -> !f.getId().equals(folder.getId()));
-    if (nameClash) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "A folder with this name already exists here.");
-    }
+    folderSiblingNameValidation.requireNoConflictingSibling(
+        notebook.getId(), destParentId, folder.getName(), folder.getId());
 
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
@@ -90,16 +81,12 @@ public class FolderRelocationService {
     List<Folder> directSubfolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
     for (Folder child : directSubfolders) {
-      boolean clash =
-          folderRepository
-              .findCandidateChildContainers(notebook.getId(), destinationId, child.getName())
-              .stream()
-              .anyMatch(f -> !f.getId().equals(child.getId()) && !f.getId().equals(folder.getId()));
-      if (clash) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT,
-            "A folder with this name already exists at the destination: " + child.getName());
-      }
+      folderSiblingNameValidation.requireNoConflictingSibling(
+          notebook.getId(),
+          destinationId,
+          child.getName(),
+          Set.of(child.getId(), folder.getId()),
+          "A folder with this name already exists at the destination: " + child.getName());
     }
 
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
@@ -117,17 +104,5 @@ public class FolderRelocationService {
 
     entityPersister.flush();
     entityPersister.remove(folder);
-  }
-
-  /** True if {@code possibleDescendant} is {@code ancestor} or strictly under {@code ancestor}. */
-  private static boolean folderIsStrictDescendantOf(Folder ancestor, Folder possibleDescendant) {
-    Folder x = possibleDescendant;
-    while (x != null) {
-      if (x.getId().equals(ancestor.getId())) {
-        return true;
-      }
-      x = x.getParentFolder();
-    }
-    return false;
   }
 }
