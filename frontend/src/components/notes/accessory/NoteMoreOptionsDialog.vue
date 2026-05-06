@@ -5,16 +5,7 @@
         <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
       </svg>
     </button>
-    <div class="daisy-flex daisy-flex-col daisy-gap-2">
-      <div v-if="noteRecallInfo && note" class="daisy-mb-4">
-        <NoteInfoComponent
-          :note="note"
-          :note-recall-info="noteRecallInfo"
-        />
-      </div>
-    </div>
-    <div class="daisy-divider daisy-my-2"></div>
-    <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end">
+    <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end daisy-mt-2">
       <PopButton
         btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         title="Edit Note Image"
@@ -56,7 +47,7 @@
 
       <button
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Assimilate this note"
+        title="Assimilation settings"
         @click="assimilateNote"
       >
         <CircleCheck class="daisy-w-6 daisy-h-6" />
@@ -90,10 +81,6 @@ import SvgAssessment from "../../svgs/SvgAssessment.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { ref, onMounted } from "vue"
-import NoteInfoComponent from "../NoteInfoComponent.vue"
 
 const { note } = defineProps<{
   note: Note
@@ -107,21 +94,6 @@ const emit = defineEmits<{
 const router = useRouter()
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
-
-const noteRecallInfo = ref<NoteRecallInfo | undefined>(undefined)
-
-const fetchNoteInfo = async () => {
-  const { data, error } = await NoteController.getNoteInfo({
-    path: { note: note.id },
-  })
-  if (!error && data) {
-    noteRecallInfo.value = data
-  }
-}
-
-onMounted(() => {
-  fetchNoteInfo()
-})
 
 const closeDialog = () => {
   emit("close-dialog")

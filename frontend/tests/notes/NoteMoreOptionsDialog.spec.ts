@@ -2,11 +2,7 @@ import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsD
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockSdkService,
-  wrapSdkResponse,
-  wrapSdkError,
-} from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -15,17 +11,7 @@ import routes from "@/routes/routes"
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsDialog>
 let router: ReturnType<typeof createRouter>
-let getNoteInfoSpy: ReturnType<typeof mockSdkService<"getNoteInfo">>
 let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
-
-const defaultRecallSetting = {
-  level: 0,
-  rememberSpelling: false,
-  skipMemoryTracking: false,
-}
-const mockNoteInfo = makeMe.aNoteRecallInfo
-  .recallSetting(defaultRecallSetting)
-  .please()
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -33,7 +19,6 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  getNoteInfoSpy = mockSdkService("getNoteInfo", mockNoteInfo)
   deleteNoteSpy = mockSdkService("deleteNote", undefined)
   router = createRouter({
     history: createWebHistory(),
@@ -47,28 +32,6 @@ beforeEach(() => {
 
 describe("NoteMoreOptionsDialog", () => {
   const note = makeMe.aNote.please()
-
-  describe("initialization", () => {
-    it("fetches note info on mount", async () => {
-      renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      expect(getNoteInfoSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-      })
-    })
-
-    it("displays recall settings from NoteInfoComponent", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      expect(
-        wrapper.findComponent({ name: "NoteRecallSettingForm" }).exists()
-      ).toBe(true)
-    })
-  })
 
   describe("close dialog", () => {
     it("emits close-dialog when close button is clicked", async () => {
@@ -151,31 +114,6 @@ describe("NoteMoreOptionsDialog", () => {
     })
   })
 
-  describe("NoteInfoComponent display", () => {
-    it("displays NoteInfoComponent when noteInfo is available", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const noteInfoComponent = wrapper.findComponent({
-        name: "NoteInfoComponent",
-      })
-      expect(noteInfoComponent.exists()).toBe(true)
-    })
-
-    it("does not display NoteInfoComponent when noteInfo is not available", async () => {
-      getNoteInfoSpy.mockResolvedValue(wrapSdkError("Not found"))
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const noteInfoComponent = wrapper.findComponent({
-        name: "NoteInfoComponent",
-      })
-      expect(noteInfoComponent.exists()).toBe(false)
-    })
-  })
-
   describe("action buttons", () => {
     it("displays all action buttons", async () => {
       const wrapper = renderer.withProps({ note }).mount()
@@ -190,21 +128,21 @@ describe("NoteMoreOptionsDialog", () => {
         wrapper.find('button[title="Questions for the note"]').exists()
       ).toBe(true)
       expect(
-        wrapper.find('button[title="Assimilate this note"]').exists()
+        wrapper.find('button[title="Assimilation settings"]').exists()
       ).toBe(true)
       expect(wrapper.find('button[title="Delete note"]').exists()).toBe(true)
     })
   })
 
   describe("assimilate note", () => {
-    it("navigates to assimilate page when assimilate button is clicked", async () => {
+    it("navigates to assimilate page when assimilation settings button is clicked", async () => {
       await router.push("/")
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
       const assimilateButton = wrapper.find(
-        'button[title="Assimilate this note"]'
+        'button[title="Assimilation settings"]'
       )
       await assimilateButton.trigger("click")
 
@@ -214,13 +152,13 @@ describe("NoteMoreOptionsDialog", () => {
       expect(router.currentRoute.value.params.noteId).toBe(String(note.id))
     })
 
-    it("emits close-dialog when assimilate button is clicked", async () => {
+    it("emits close-dialog when assimilation settings button is clicked", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
       const assimilateButton = wrapper.find(
-        'button[title="Assimilate this note"]'
+        'button[title="Assimilation settings"]'
       )
       await assimilateButton.trigger("click")
 

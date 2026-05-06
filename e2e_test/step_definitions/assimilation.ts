@@ -120,8 +120,7 @@ When('I keep for recall with remembering spelling', () => {
 })
 
 When('I add remember spelling to the note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle).moreOptions()
-  start.assumeNotePage(noteTitle).setRememberSpelling()
+  start.jumpToNotePage(noteTitle).setRememberSpelling()
 })
 
 When('I navigate to the assimilation page', () => {
@@ -143,7 +142,7 @@ Then(
       start.assumeAssimilationPage().expectPopupClosed()
       start
         .jumpToNotePage(noteTitle)
-        .moreOptions()
+        .openAssimilationSettings()
         .expectMemoryTrackerInfo([{ type: 'spelling', 'Recall Count': '0' }])
     } else {
       const errorMessage = expectedResult.replace(/^error: /, '')

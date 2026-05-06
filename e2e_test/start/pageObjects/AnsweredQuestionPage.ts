@@ -33,7 +33,7 @@ const assumeAnsweredQuestionPage = () => {
         .within(() => {
           cy.get('a').last().click()
         })
-      return assumeNotePage(noteTopology).moreOptions()
+      return assumeNotePage(noteTopology).openAssimilationSettings()
     },
     goToLastAnsweredQuestion: () => {
       cy.findByRole('button', { name: 'view last answered question' }).click()

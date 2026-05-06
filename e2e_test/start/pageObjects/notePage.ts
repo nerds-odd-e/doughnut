@@ -9,6 +9,7 @@ import { sidebarChildNotePageMethods } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
+import { assumeAssimilationPage } from './assimilationPage'
 
 const noteShowHref = /^\/d\/n\/\d+$/
 const noteShowPathInUrl = /\/d\/n\/\d+/
@@ -375,13 +376,28 @@ export const assumeNotePage = (
       toolbarButton('associate wikidata').click()
       return assumeAssociateWikidataDialog()
     },
+    openAssimilationSettings() {
+      cy.url().then((href) => {
+        if (!String(href).includes('/d/assimilate/')) {
+          makeSureNoteMoreOptionsDialogIsOpen().openAssimilationPage()
+        } else {
+          assumeAssimilationPage().waitForAssimilationReady()
+        }
+      })
+      cy.url().should('include', '/d/assimilate/')
+      pageIsNotLoading()
+      return assumeAssimilationPage()
+    },
     setLevel(level: number) {
+      this.openAssimilationSettings()
       form.getField('Level').within(() => {
         cy.findByRole('button', { name: `${level}` }).click()
       })
+      pageIsNotLoading()
       return this
     },
     setRememberSpelling() {
+      this.openAssimilationSettings()
       form.getField('Remember Spelling').check()
       pageIsNotLoading()
       return this

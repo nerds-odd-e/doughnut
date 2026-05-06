@@ -1,6 +1,5 @@
 import { pageIsNotLoading } from '../pageBase'
 import { assumeAssimilationPage } from './assimilationPage'
-import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
 
@@ -35,23 +34,6 @@ export const makeSureNoteMoreOptionsDialogIsOpen = () => {
 const noteMoreOptionsDialog = () => {
   return {
     toolbarButton,
-    expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
-      for (const k in expected) {
-        cy.contains('tr', expected[k]?.type ?? '').within(() => {
-          for (const attr in expected[k]) {
-            if (expected[k][attr] !== undefined) {
-              cy.contains('td', expected[k][attr])
-            }
-          }
-        })
-      }
-    },
-    removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
-      cy.contains('tr', type).click()
-      cy.url().should('include', '/d/memory-trackers/')
-      pageIsNotLoading()
-      return assumeMemoryTrackerPage().removeFromRecall()
-    },
     editNoteImage(attributes: Record<string, string>) {
       toolbarButton('Edit Note Image')
         .click()
@@ -73,7 +55,7 @@ const noteMoreOptionsDialog = () => {
       return questionListPage()
     },
     openAssimilationPage() {
-      toolbarButton('Assimilate this note').click()
+      toolbarButton('Assimilation settings').click()
       cy.url().should('include', '/d/assimilate/')
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()

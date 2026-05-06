@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteMoreOptionsDialog from "./NoteMoreOptionsDialog.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { Options } from "@generated/doughnut-backend-api/client/types.gen"
-import type { GetNoteInfoData } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Notes/Accessory/NoteMoreOptionsDialog",
@@ -16,37 +13,11 @@ const meta = {
     },
   },
   decorators: [
-    (story) => {
-      // Mock NoteController.getNoteInfo to avoid API calls
-      const originalGetNoteInfo = NoteController.getNoteInfo
-      const mockNoteInfo = makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-      NoteController.getNoteInfo = (async <
-        ThrowOnError extends boolean = false,
-      >(
-        _options: Options<GetNoteInfoData, ThrowOnError>
-      ) => ({
-        data: mockNoteInfo,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })) as typeof NoteController.getNoteInfo
-
-      return {
-        components: { story },
-        template:
-          '<div style="width: 100%; max-width: 600px; background: hsl(var(--b1)); padding: 1rem;"><story /></div>',
-        beforeUnmount() {
-          // Restore original method when story unmounts
-          NoteController.getNoteInfo = originalGetNoteInfo
-        },
-      }
-    },
+    (story) => ({
+      components: { story },
+      template:
+        '<div style="width: 100%; max-width: 600px; background: hsl(var(--b1)); padding: 1rem;"><story /></div>',
+    }),
   ],
   argTypes: {
     note: {

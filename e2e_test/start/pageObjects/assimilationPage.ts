@@ -2,6 +2,7 @@ import { commonSenseSplit } from 'support/string_util'
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import router from '../router'
+import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 const keepForRecallButton = (options?: { timeout?: number }) =>
   cy.get('[data-test="keep-for-recall"]', options ?? {})
@@ -235,6 +236,24 @@ export const assumeAssimilationPage = () => ({
   expectKeepForRecallDisabled() {
     keepForRecallButton().should('be.disabled')
     return this
+  },
+  expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
+    for (const k in expected) {
+      cy.contains('tr', expected[k]?.type ?? '').within(() => {
+        for (const attr in expected[k]) {
+          if (expected[k][attr] !== undefined) {
+            cy.contains('td', expected[k][attr])
+          }
+        }
+      })
+    }
+    return this
+  },
+  removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
+    cy.contains('tr', type).click()
+    cy.url().should('include', '/d/memory-trackers/')
+    pageIsNotLoading()
+    return assumeMemoryTrackerPage().removeFromRecall()
   },
 })
 
