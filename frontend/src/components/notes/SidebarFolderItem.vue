@@ -52,17 +52,14 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  NoteTopology,
-  FolderTrailSegment,
-} from "@generated/doughnut-backend-api"
+import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
 import { ChevronRight } from "lucide-vue-next"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue"
 
 const props = defineProps<{
-  folder: FolderTrailSegment
+  folder: Folder
   notebookId: number
   activeNoteTopology?: NoteTopology
   level?: number
@@ -81,11 +78,7 @@ const {
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
-const folderId = computed(() => {
-  const raw = props.folder.id
-  if (raw == null || raw === "") return undefined
-  return Number(raw)
-})
+const folderId = computed(() => props.folder.id)
 
 function ensureFolderExpandedById(id: number | undefined) {
   if (id == null) return

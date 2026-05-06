@@ -2,7 +2,7 @@ import type {
   FolderCreationRequest,
   FolderListing,
   FolderMoveRequest,
-  FolderTrailSegment,
+  Folder,
   NoteDetailsCompletion,
   NoteRealm,
   WikidataAssociationCreation,
@@ -55,16 +55,13 @@ export interface StoredApi {
     folderId: number
   ): Promise<FolderListing>
 
-  createFolder(
-    notebookId: number,
-    body: FolderCreationRequest
-  ): Promise<FolderTrailSegment>
+  createFolder(notebookId: number, body: FolderCreationRequest): Promise<Folder>
 
   moveFolder(
     notebookId: number,
     folderId: number,
     newParentFolderId: number | null
-  ): Promise<FolderTrailSegment>
+  ): Promise<Folder>
 
   createRootNoteAtNotebook(
     router: Router,
@@ -280,7 +277,7 @@ export default class StoredApiCollection implements StoredApi {
     notebookId: number,
     folderId: number,
     newParentFolderId: number | null
-  ): Promise<FolderTrailSegment> {
+  ): Promise<Folder> {
     const body: FolderMoveRequest =
       newParentFolderId == null ? {} : { newParentFolderId }
     const { data, error } = await apiCallWithLoading(() =>

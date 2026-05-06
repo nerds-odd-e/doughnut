@@ -1,6 +1,6 @@
 import type { Note, NoteTopology } from 'doughnut-api'
 
-/** Minimal shape for folder trail segments (matches API `FolderTrailSegment`). */
+/** Minimal shape for folder breadcrumb rows (matches API `Folder` name field). */
 type FolderTrailLike = { name?: string }
 
 /**

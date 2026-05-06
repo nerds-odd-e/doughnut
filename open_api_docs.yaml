@@ -1102,7 +1102,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/FolderTrailSegment"
+                $ref: "#/components/schemas/Folder"
   /api/notebooks/{notebook}/folders/{folder}/move:
     post:
       tags:
@@ -1134,7 +1134,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/FolderTrailSegment"
+                $ref: "#/components/schemas/Folder"
   /api/notebooks/{notebook}/create-note:
     post:
       tags:
@@ -3610,18 +3610,27 @@ components:
           type: string
         othersModel:
           type: string
-    FolderTrailSegment:
+    Folder:
       type: object
-      description: "Folder id and display name: ancestor breadcrumb segments (outermost\
-        \ first), notebook root listing rows, or direct child folders in a folder\
-        \ listing."
       properties:
         id:
-          type: string
+          type: integer
+          format: int32
         name:
           type: string
+          maxLength: 512
+          minLength: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
+      - createdAt
+      - id
       - name
+      - updatedAt
     Note:
       type: object
       properties:
@@ -3657,7 +3666,7 @@ components:
         ancestorFolders:
           type: array
           items:
-            $ref: "#/components/schemas/FolderTrailSegment"
+            $ref: "#/components/schemas/Folder"
         references:
           type: array
           items:
@@ -3777,7 +3786,7 @@ components:
         ancestorFolders:
           type: array
           items:
-            $ref: "#/components/schemas/FolderTrailSegment"
+            $ref: "#/components/schemas/Folder"
         questionGeneratedTime:
           type: string
           format: date-time
@@ -4287,7 +4296,7 @@ components:
         ancestorFolders:
           type: array
           items:
-            $ref: "#/components/schemas/FolderTrailSegment"
+            $ref: "#/components/schemas/Folder"
       required:
       - id
       - nextRecallAt
@@ -4909,7 +4918,7 @@ components:
         folders:
           type: array
           items:
-            $ref: "#/components/schemas/FolderTrailSegment"
+            $ref: "#/components/schemas/Folder"
     BookUserLastReadPosition:
       type: object
       properties:

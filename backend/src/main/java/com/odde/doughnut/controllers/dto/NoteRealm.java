@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +32,7 @@ public class NoteRealm {
 
   @Getter @Setter private Boolean fromBazaar;
 
-  @Getter @Setter private List<FolderTrailSegment> ancestorFolders = List.of();
+  @Getter @Setter private List<Folder> ancestorFolders = List.of();
 
   @Getter private final List<WikiTitle> wikiTitles;
 

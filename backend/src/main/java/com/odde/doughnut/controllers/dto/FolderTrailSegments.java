@@ -14,11 +14,11 @@ public final class FolderTrailSegments {
   /** Outer-most folder first, separated by {@code " / "} (empty when the note has no folder). */
   public static String crumbPathJoinedBySlashSpace(Note note) {
     return fromRootToContainingFolder(note).stream()
-        .map(FolderTrailSegment::name)
+        .map(Folder::getName)
         .collect(Collectors.joining(" / "));
   }
 
-  public static List<FolderTrailSegment> fromRootToContainingFolder(Note note) {
+  public static List<Folder> fromRootToContainingFolder(Note note) {
     Folder folder = note.getFolder();
     if (folder == null) {
       return List.of();
@@ -28,6 +28,6 @@ public final class FolderTrailSegments {
       leafToRoot.add(f);
     }
     Collections.reverse(leafToRoot);
-    return leafToRoot.stream().map(FolderTrailSegment::from).toList();
+    return List.copyOf(leafToRoot);
   }
 }

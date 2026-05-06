@@ -79,8 +79,8 @@ const activeNoteFolderIds = computed(() => {
 const ancestorFolderIds = computed(() => {
   const ids = new Set<number>()
   for (const seg of props.activeNoteRealm?.ancestorFolders ?? []) {
-    if (seg.id != null && seg.id !== "") {
-      ids.add(Number(seg.id))
+    if (seg.id != null) {
+      ids.add(seg.id)
     }
   }
   const fid = activeNoteTopology.value?.folderId

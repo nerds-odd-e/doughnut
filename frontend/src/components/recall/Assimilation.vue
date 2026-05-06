@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FolderTrailSegment, Note } from "@generated/doughnut-backend-api"
+import type { Folder, Note } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -105,7 +105,7 @@ import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 const { note, ancestorFolders = [] } = defineProps<{
   note: Note
-  ancestorFolders?: FolderTrailSegment[]
+  ancestorFolders?: Folder[]
 }>()
 
 const emit = defineEmits<{

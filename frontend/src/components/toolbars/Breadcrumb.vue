@@ -7,10 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  FolderTrailSegment,
-  NoteTopology,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"
@@ -25,7 +22,7 @@ const props = defineProps({
     default: false,
   },
   ancestorFolders: {
-    type: Array as PropType<FolderTrailSegment[]>,
+    type: Array as PropType<Folder[]>,
     default: () => [],
   },
 })

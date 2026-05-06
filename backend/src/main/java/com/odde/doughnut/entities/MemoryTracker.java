@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.CascadeType;
@@ -129,7 +128,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   @JsonProperty
-  public List<FolderTrailSegment> getAncestorFolders() {
+  public List<Folder> getAncestorFolders() {
     Note n = getNote();
     if (n == null) {
       return List.of();

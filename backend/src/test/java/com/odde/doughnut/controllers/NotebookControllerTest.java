@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
-import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -347,7 +346,7 @@ class NotebookControllerTest extends ControllerTestBase {
       assertEquals(2, listing.folders().size());
       assertEquals(
           List.of("Inbox", "Parent"),
-          listing.folders().stream().map(FolderTrailSegment::name).sorted().toList());
+          listing.folders().stream().map(Folder::getName).sorted().toList());
     }
 
     @Test
@@ -422,7 +421,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
       FolderListing listing = controller.listFolderListing(nb, parent);
       assertEquals(1, listing.folders().size());
-      assertEquals("Nested", listing.folders().getFirst().name());
+      assertEquals("Nested", listing.folders().getFirst().getName());
     }
 
     @Test
@@ -486,11 +485,11 @@ class NotebookControllerTest extends ControllerTestBase {
 
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("  Inbox  ");
-      FolderTrailSegment created = controller.createFolder(nb, req);
-      assertThat(created.name(), equalTo("Inbox"));
+      Folder created = controller.createFolder(nb, req);
+      assertThat(created.getName(), equalTo("Inbox"));
 
       FolderListing listing = controller.listNotebookRootNotes(nb);
-      assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
+      assertTrue(listing.folders().stream().anyMatch(f -> f.getId().equals(created.getId())));
     }
 
     @Test
@@ -508,11 +507,11 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("Sub");
       req.setUnderNoteId(noteInScope.getId());
-      FolderTrailSegment created = controller.createFolder(nb, req);
+      Folder created = controller.createFolder(nb, req);
 
       FolderListing listing = controller.listFolderListing(nb, scope);
-      assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
-      assertThat(created.name(), equalTo("Sub"));
+      assertTrue(listing.folders().stream().anyMatch(f -> f.getId().equals(created.getId())));
+      assertThat(created.getName(), equalTo("Sub"));
     }
 
     @Test
@@ -528,11 +527,11 @@ class NotebookControllerTest extends ControllerTestBase {
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("NestedByFolder");
       req.setUnderFolderId(scope.getId());
-      FolderTrailSegment created = controller.createFolder(nb, req);
+      Folder created = controller.createFolder(nb, req);
 
       FolderListing listing = controller.listFolderListing(nb, scope);
-      assertTrue(listing.folders().stream().anyMatch(f -> f.id() == created.id()));
-      assertThat(created.name(), equalTo("NestedByFolder"));
+      assertTrue(listing.folders().stream().anyMatch(f -> f.getId().equals(created.getId())));
+      assertThat(created.getName(), equalTo("NestedByFolder"));
     }
 
     @Test
@@ -595,13 +594,13 @@ class NotebookControllerTest extends ControllerTestBase {
 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setNewParentFolderId(null);
-      FolderTrailSegment result = controller.moveFolder(nb, child, req);
-      assertThat(result.name(), equalTo("Child"));
+      Folder result = controller.moveFolder(nb, child, req);
+      assertThat(result.getName(), equalTo("Child"));
 
       FolderListing root = controller.listNotebookRootNotes(nb);
-      assertTrue(root.folders().stream().anyMatch(f -> f.id() == child.getId()));
+      assertTrue(root.folders().stream().anyMatch(f -> f.getId().equals(child.getId())));
       FolderListing underParent = controller.listFolderListing(nb, parent);
-      assertTrue(underParent.folders().stream().noneMatch(f -> f.id() == child.getId()));
+      assertTrue(underParent.folders().stream().noneMatch(f -> f.getId().equals(child.getId())));
     }
 
     @Test

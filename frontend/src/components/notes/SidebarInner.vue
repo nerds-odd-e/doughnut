@@ -21,10 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  NoteTopology,
-  FolderTrailSegment,
-} from "@generated/doughnut-backend-api"
+import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
@@ -35,14 +32,13 @@ const storageAccessor = useStorageAccessor()
 
 type SidebarStructuralRow =
   | { kind: "note"; noteTopology: NoteTopology }
-  | { kind: "folder"; folder: FolderTrailSegment }
+  | { kind: "folder"; folder: Folder }
 
-function folderNumericId(folder: FolderTrailSegment): number | undefined {
-  if (folder.id == null || folder.id === "") return undefined
-  return Number(folder.id)
+function folderNumericId(folder: Folder): number | undefined {
+  return folder.id
 }
 
-function folderSortKey(folder: FolderTrailSegment): string {
+function folderSortKey(folder: Folder): string {
   return (folder.name ?? "").toLocaleLowerCase()
 }
 
@@ -52,7 +48,7 @@ function noteSortKey(noteTopology: NoteTopology): string {
 
 function buildStructuralRows(
   noteTopologies: NoteTopology[],
-  folders: FolderTrailSegment[] | undefined
+  folders: Folder[] | undefined
 ): SidebarStructuralRow[] {
   type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
   type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>

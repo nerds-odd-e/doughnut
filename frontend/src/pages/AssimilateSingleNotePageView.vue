@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FolderTrailSegment, Note } from "@generated/doughnut-backend-api"
+import type { Folder, Note } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import Assimilation from "@/components/recall/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
@@ -29,7 +29,7 @@ defineProps({
     required: false,
   },
   ancestorFolders: {
-    type: Array as PropType<FolderTrailSegment[]>,
+    type: Array as PropType<Folder[]>,
     default: () => [],
   },
 })

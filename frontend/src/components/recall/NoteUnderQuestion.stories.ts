@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import { testFolderStub } from "@tests/helpers"
 
 const meta = {
   title: "Recall/NoteUnderQuestion",
@@ -28,8 +29,8 @@ export const WithAncestors: Story = {
   args: {
     noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
     ancestorFolders: [
-      { id: "1", name: "Programming" },
-      { id: "2", name: "Languages" },
+      testFolderStub(1, "Programming"),
+      testFolderStub(2, "Languages"),
     ],
   },
 }
@@ -38,10 +39,9 @@ export const WithAncestors: Story = {
 export const WithManyAncestors: Story = {
   args: {
     noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
-    ancestorFolders: Array.from({ length: 10 }, (_, i) => ({
-      id: String(i + 1),
-      name: `Ancestor ${i + 1}`,
-    })),
+    ancestorFolders: Array.from({ length: 10 }, (_, i) =>
+      testFolderStub(i + 1, `Ancestor ${i + 1}`)
+    ),
   },
   decorators: [
     () => ({

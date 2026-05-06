@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import type {
   Circle,
-  FolderTrailSegment,
+  Folder,
   NoteTopology,
 } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
@@ -35,7 +35,7 @@ defineProps({
     required: true,
   },
   ancestorFolders: {
-    type: Array as PropType<FolderTrailSegment[]>,
+    type: Array as PropType<Folder[]>,
     default: () => [],
   },
   circle: {

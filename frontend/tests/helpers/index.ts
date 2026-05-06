@@ -34,9 +34,22 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type {
   Circle,
+  Folder,
   NoteRealm,
   Notebook,
 } from "@generated/doughnut-backend-api"
+
+const TEST_FOLDER_DATE_TIME = "2000-01-01T00:00:00.000Z"
+
+/** API-shaped `Folder` rows for tests and stories (timestamps required by the type). */
+export function testFolderStub(id: number, name: string): Folder {
+  return {
+    id,
+    name,
+    createdAt: TEST_FOLDER_DATE_TIME,
+    updatedAt: TEST_FOLDER_DATE_TIME,
+  }
+}
 import makeMe from "doughnut-test-fixtures/makeMe"
 
 // Mapping of method names to their controller classes

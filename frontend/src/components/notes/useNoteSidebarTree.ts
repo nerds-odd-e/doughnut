@@ -8,9 +8,7 @@ export function folderLabelForRealmFolderId(
   realm: NoteRealm | undefined,
   folderId: number
 ): string {
-  const seg = realm?.ancestorFolders?.find(
-    (s) => s.id != null && s.id !== "" && Number(s.id) === folderId
-  )
+  const seg = realm?.ancestorFolders?.find((s) => s.id === folderId)
   return seg?.name ?? `Folder #${folderId}`
 }
 

@@ -212,12 +212,11 @@ export type GlobalAiModelSettings = {
     othersModel?: string;
 };
 
-/**
- * Folder id and display name: ancestor breadcrumb segments (outermost first), notebook root listing rows, or direct child folders in a folder listing.
- */
-export type FolderTrailSegment = {
-    id?: string;
+export type Folder = {
+    id: number;
     name: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type Note = {
@@ -233,7 +232,7 @@ export type NoteRealm = {
     note: Note;
     fromBazaar?: boolean;
     notebookId: number;
-    ancestorFolders?: Array<FolderTrailSegment>;
+    ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
 };
@@ -276,7 +275,7 @@ export type RecallPrompt = {
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook: Notebook;
     note?: Note;
-    ancestorFolders?: Array<FolderTrailSegment>;
+    ancestorFolders?: Array<Folder>;
     questionGeneratedTime?: string;
     isContested?: boolean;
     answerTime?: string;
@@ -557,7 +556,7 @@ export type MemoryTracker = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
-    ancestorFolders?: Array<FolderTrailSegment>;
+    ancestorFolders?: Array<Folder>;
 };
 
 export type ConversationMessage = {
@@ -860,7 +859,7 @@ export type SubscriptionForNotebooksListing = {
  */
 export type FolderListing = {
     noteTopologies?: Array<NoteTopology>;
-    folders?: Array<FolderTrailSegment>;
+    folders?: Array<Folder>;
 };
 
 export type BookUserLastReadPosition = {
@@ -974,7 +973,7 @@ export type NoteRealmWritable = {
     note: NoteWritable;
     fromBazaar?: boolean;
     notebookId: number;
-    ancestorFolders?: Array<FolderTrailSegment>;
+    ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
 };
@@ -986,7 +985,7 @@ export type RecallPromptWritable = {
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook: Notebook;
     note?: NoteWritable;
-    ancestorFolders?: Array<FolderTrailSegment>;
+    ancestorFolders?: Array<Folder>;
     questionGeneratedTime?: string;
     isContested?: boolean;
     answerTime?: string;
@@ -1005,7 +1004,7 @@ export type MemoryTrackerWritable = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
-    ancestorFolders?: Array<FolderTrailSegment>;
+    ancestorFolders?: Array<Folder>;
 };
 
 export type ConversationWritable = {
@@ -1959,7 +1958,7 @@ export type CreateFolderResponses = {
     /**
      * OK
      */
-    200: FolderTrailSegment;
+    200: Folder;
 };
 
 export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];
@@ -1978,7 +1977,7 @@ export type MoveFolderResponses = {
     /**
      * OK
      */
-    200: FolderTrailSegment;
+    200: Folder;
 };
 
 export type MoveFolderResponse = MoveFolderResponses[keyof MoveFolderResponses];

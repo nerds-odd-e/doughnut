@@ -11,6 +11,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
+  testFolderStub,
 } from "@tests/helpers"
 import { type VueWrapper, DOMWrapper, flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
@@ -27,10 +28,7 @@ const FOLDER_TOP_NOTE_CHILDREN_ID = 77001
 const FOLDER_FIRST_GEN_CHILDREN_ID = 77002
 
 function structuralFolder(folderId: number, noteRealm: NoteRealm) {
-  return {
-    id: String(folderId),
-    name: noteRealm.note.noteTopology.title!,
-  }
+  return testFolderStub(folderId, noteRealm.note.noteTopology.title!)
 }
 
 /** Aligns listing payloads with folder-first sidebar drag rules (same folderId = same drop column). */
@@ -107,7 +105,7 @@ describe("Sidebar", () => {
       return {
         ...realm,
         ancestorFolders: [
-          { id: String(FOLDER_TOP_NOTE_CHILDREN_ID), name: topTitle },
+          testFolderStub(FOLDER_TOP_NOTE_CHILDREN_ID, topTitle),
         ],
         note: {
           ...realm.note,
@@ -122,8 +120,8 @@ describe("Sidebar", () => {
       return {
         ...realm,
         ancestorFolders: [
-          { id: String(FOLDER_TOP_NOTE_CHILDREN_ID), name: topTitle },
-          { id: String(FOLDER_FIRST_GEN_CHILDREN_ID), name: firstTitle },
+          testFolderStub(FOLDER_TOP_NOTE_CHILDREN_ID, topTitle),
+          testFolderStub(FOLDER_FIRST_GEN_CHILDREN_ID, firstTitle),
         ],
         note: {
           ...realm.note,

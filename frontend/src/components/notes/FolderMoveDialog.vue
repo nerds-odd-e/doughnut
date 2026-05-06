@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FolderTrailSegment } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/doughnut-backend-api"
 import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -69,10 +69,8 @@ const submitError = ref<string | undefined>(undefined)
 const selectedKey = ref("__root__")
 const destinationFolders = ref<{ id: number; pathLabel: string }[]>([])
 
-function folderNumericId(folder: FolderTrailSegment): number | undefined {
-  const raw = folder.id
-  if (raw == null || raw === "") return undefined
-  return Number(raw)
+function folderNumericId(folder: Folder): number | undefined {
+  return folder.id
 }
 
 async function collectSubtreeFolderIds(
@@ -98,7 +96,7 @@ async function collectAllFolderPaths(): Promise<
   const out: { id: number; pathLabel: string }[] = []
   const api = storageAccessor.value.storedApi()
 
-  async function visitFolderTree(prefix: string, folder: FolderTrailSegment) {
+  async function visitFolderTree(prefix: string, folder: Folder) {
     const id = folderNumericId(folder)
     if (id === undefined) return
     const name = folder.name ?? ""

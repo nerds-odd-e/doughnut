@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
-import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -151,7 +150,7 @@ class NotebookController {
               + " underNoteId is set (underFolderId takes precedence when both are set).")
   @PostMapping("/{notebook}/folders")
   @Transactional
-  public FolderTrailSegment createFolder(
+  public Folder createFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody FolderCreationRequest request)
       throws UnexpectedNoAccessRightException {
@@ -166,7 +165,7 @@ class NotebookController {
               + " the same folder rows; descendant folders stay under the moved subtree.")
   @PostMapping("/{notebook}/folders/{folder}/move")
   @Transactional
-  public FolderTrailSegment moveFolder(
+  public Folder moveFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder,
       @Valid @RequestBody(required = false) FolderMoveRequest request)
@@ -294,9 +293,8 @@ class NotebookController {
         noteService.findNotebookRootNotes(notebook.getId()).stream()
             .map(Note::getNoteTopology)
             .toList();
-    List<FolderTrailSegment> folders =
+    List<Folder> folders =
         folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-            .map(FolderTrailSegment::from)
             .toList();
     return new FolderListing(noteTopologies, folders);
   }
@@ -319,9 +317,8 @@ class NotebookController {
         noteService.findNotesInFolderScope(folder.getId()).stream()
             .map(Note::getNoteTopology)
             .toList();
-    List<FolderTrailSegment> childFolders =
+    List<Folder> childFolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
-            .map(FolderTrailSegment::from)
             .toList();
     return new FolderListing(noteTopologies, childFolders);
   }

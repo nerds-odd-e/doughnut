@@ -5,6 +5,7 @@ import {
 } from "@/components/notes/useNoteSidebarTree"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import { testFolderStub } from "@tests/helpers"
 import { describe, expect, it } from "vitest"
 
 describe("useNoteSidebarTree create context", () => {
@@ -12,7 +13,7 @@ describe("useNoteSidebarTree create context", () => {
     const r = makeMe.aNoteRealm.title("child").please()
     return {
       ...r,
-      ancestorFolders: [{ id: String(folderId), name: folderName }],
+      ancestorFolders: [testFolderStub(folderId, folderName)],
       note: {
         ...r.note,
         noteTopology: { ...r.note.noteTopology, folderId },

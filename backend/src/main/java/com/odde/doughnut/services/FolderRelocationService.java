@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
-import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.FolderRepository;
@@ -27,8 +26,7 @@ public class FolderRelocationService {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public FolderTrailSegment moveFolder(
-      Notebook notebook, Folder folder, FolderMoveRequest request) {
+  public Folder moveFolder(Notebook notebook, Folder folder, FolderMoveRequest request) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
@@ -71,7 +69,7 @@ public class FolderRelocationService {
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
-    return FolderTrailSegment.from(folder);
+    return folder;
   }
 
   /** True if {@code possibleDescendant} is {@code ancestor} or strictly under {@code ancestor}. */

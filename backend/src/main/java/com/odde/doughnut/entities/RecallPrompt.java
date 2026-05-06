@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.dto.FolderTrailSegment;
 import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -118,7 +117,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   }
 
   @JsonProperty
-  public List<FolderTrailSegment> getAncestorFolders() {
+  public List<Folder> getAncestorFolders() {
     Note n = getNote();
     if (n == null) {
       return List.of();
