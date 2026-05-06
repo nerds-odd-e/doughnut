@@ -23,7 +23,6 @@
         v-if="noteRealmForBreadcrumb"
         v-bind="{
           fromBazaar: noteRealmForBreadcrumb.fromBazaar,
-          circle: notebookForBreadcrumb?.circle,
           notebook: notebookForBreadcrumb,
           noteTopology: noteRealmForBreadcrumb.note.noteTopology,
           ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],

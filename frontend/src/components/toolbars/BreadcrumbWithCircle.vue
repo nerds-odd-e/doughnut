@@ -8,13 +8,13 @@
         <li>
           <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
         </li>
-        <li v-if="circle">
+        <li v-if="notebook?.circle">
           <router-link
             :to="{
               name: 'circleShow',
-              params: { circleId: circle.id },
+              params: { circleId: notebook.circle.id },
             }"
-            >{{ circle.name }}</router-link
+            >{{ notebook.circle.name }}</router-link
           >
         </li>
       </template>
@@ -35,7 +35,6 @@
 
 <script setup lang="ts">
 import type {
-  Circle,
   Folder,
   Notebook,
   NoteTopology,
@@ -50,10 +49,6 @@ defineProps({
   ancestorFolders: {
     type: Array as PropType<Folder[]>,
     default: () => [],
-  },
-  circle: {
-    type: Object as PropType<Circle>,
-    required: false,
   },
   fromBazaar: {
     type: Boolean,
