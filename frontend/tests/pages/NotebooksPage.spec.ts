@@ -6,13 +6,31 @@ import routes from "@/routes/routes"
 import makeMe, {
   type NotebookCatalogEntry,
 } from "doughnut-test-fixtures/makeMe"
+import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import helper, { mockSdkService } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
+
+async function pickNotebookCatalogPeerSort(
+  wrapper: VueWrapper,
+  field: "title" | "created" | "updated",
+  direction: "asc" | "desc"
+) {
+  ;(
+    wrapper.get('[data-testid="notebook-catalog-sort"]')
+      .element as HTMLDetailsElement
+  ).open = true
+  await flushPromises()
+  await wrapper
+    .get(`[data-catalog-sort="${field}-${direction}"]`)
+    .trigger("click")
+  await flushPromises()
+}
 
 describe("Notebooks Page", () => {
   beforeEach(() => {
     localStorage.removeItem("doughnut.notebooksPage.sortOrder")
     localStorage.removeItem("doughnut.notebooksPage.layout")
+    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
   })
 
   it("fetch API to be called ONCE", async () => {
@@ -388,7 +406,7 @@ describe("Notebooks Page", () => {
   })
 
   describe("catalog list", () => {
-    it("renders catalog items in document order (list layout)", async () => {
+    it("sorts catalog by title A–Z by default (list layout)", async () => {
       const catalogItems = makeMe.notebookCatalog
         .notebook("Top Loose")
         .group("Middle Group", "Inside One")
@@ -410,14 +428,14 @@ describe("Notebooks Page", () => {
 
       const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
       expect(headingTexts).toEqual([
-        "Top Loose",
+        "Bottom Loose",
         "Middle Group",
         "Inside One",
-        "Bottom Loose",
+        "Top Loose",
       ])
     })
 
-    it("sorts catalog alphabetically when sort order is alphabetical", async () => {
+    it("sorts catalog by title Z–A when selected", async () => {
       const catalogItems = makeMe.notebookCatalog
         .notebook("Top Loose")
         .group("Middle Group", "Inside One")
@@ -436,19 +454,18 @@ describe("Notebooks Page", () => {
         .mount()
 
       await flushPromises()
-      await wrapper.find("#notebook-catalog-sort").setValue("alphabetical")
-      await flushPromises()
+      await pickNotebookCatalogPeerSort(wrapper, "title", "desc")
 
       const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
       expect(headingTexts).toEqual([
-        "Bottom Loose",
+        "Top Loose",
         "Middle Group",
         "Inside One",
-        "Top Loose",
+        "Bottom Loose",
       ])
     })
 
-    it("restores API order when switching back to by created time", async () => {
+    it("returns to title A–Z after title Z–A", async () => {
       const catalogItems = makeMe.notebookCatalog
         .notebook("Top Loose")
         .group("Middle Group", "Inside One")
@@ -467,21 +484,19 @@ describe("Notebooks Page", () => {
         .mount()
 
       await flushPromises()
-      await wrapper.find("#notebook-catalog-sort").setValue("alphabetical")
-      await flushPromises()
-      await wrapper.find("#notebook-catalog-sort").setValue("created")
-      await flushPromises()
+      await pickNotebookCatalogPeerSort(wrapper, "title", "desc")
+      await pickNotebookCatalogPeerSort(wrapper, "title", "asc")
 
       const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
       expect(headingTexts).toEqual([
-        "Top Loose",
+        "Bottom Loose",
         "Middle Group",
         "Inside One",
-        "Bottom Loose",
+        "Top Loose",
       ])
     })
 
-    it("sorts notebooks inside a group alphabetically", async () => {
+    it("sorts group members by title A–Z by default", async () => {
       const catalogItems = makeMe.notebookCatalog
         .group("My Group", "Zebra", "Alpha")
         .please()
@@ -497,8 +512,6 @@ describe("Notebooks Page", () => {
         .withRouter()
         .mount()
 
-      await flushPromises()
-      await wrapper.find("#notebook-catalog-sort").setValue("alphabetical")
       await flushPromises()
 
       const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
@@ -536,8 +549,8 @@ describe("Notebooks Page", () => {
       expect(groupCard.findAll(".notebook-list-row").length).toBe(3)
       expect(groupCard.text()).toContain("Member Alpha")
       expect(groupCard.text()).toContain("Member Beta")
-      expect(groupCard.text()).toContain("Member Gamma")
-      expect(groupCard.text()).not.toContain("Member Delta")
+      expect(groupCard.text()).toContain("Member Delta")
+      expect(groupCard.text()).not.toContain("Member Gamma")
       expect(groupCard.attributes("aria-label")).toContain("Member Alpha")
       expect(groupCard.attributes("aria-label")).toContain("Member Delta")
     })

@@ -31,20 +31,51 @@
             <LayoutGrid class="daisy-h-6 daisy-w-6" />
           </button>
         </div>
-        <div class="daisy-form-control daisy-w-auto">
-          <label class="daisy-label daisy-sr-only" for="notebook-catalog-sort">
-            Sort notebooks
-          </label>
-          <select
-            id="notebook-catalog-sort"
-            v-model="notebooksSortOrder"
-            class="daisy-select daisy-select-bordered daisy-select-sm daisy-w-max daisy-max-w-[12rem]"
+        <details
+          ref="notebooksSortDropdownRef"
+          data-testid="notebook-catalog-sort"
+          class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom daisy-relative daisy-z-30 daisy-shrink-0"
+        >
+          <summary
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer"
+            aria-label="Sort notebooks"
             title="Sort notebooks"
           >
-            <option value="created">By created time</option>
-            <option value="alphabetical">Alphabetical</option>
-          </select>
-        </div>
+            <component
+              :is="catalogPeerSortTriggerIcon"
+              class="daisy-h-6 daisy-w-6"
+              aria-hidden="true"
+            />
+          </summary>
+          <ul
+            tabindex="0"
+            class="daisy-dropdown-content daisy-menu daisy-bg-base-100 daisy-rounded-box daisy-min-w-[16rem] daisy-w-[17.5rem] daisy-max-w-[17.5rem] daisy-p-2 daisy-shadow daisy-z-[1000]"
+          >
+            <li
+              v-for="row in SIDEBAR_PEER_SORT_MENU_ROWS"
+              :key="`${row.spec.field}-${row.spec.direction}`"
+              class="daisy-menu-item daisy-p-0"
+            >
+              <button
+                type="button"
+                class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal daisy-whitespace-normal daisy-items-start daisy-text-left"
+                :title="row.label"
+                :data-catalog-sort="`${row.spec.field}-${row.spec.direction}`"
+                @click="selectCatalogPeerSort(row.spec)"
+              >
+                <component
+                  :is="row.Icon"
+                  :size="14"
+                  class="daisy-mt-0.5 daisy-shrink-0"
+                  aria-hidden="true"
+                />
+                <span class="daisy-min-w-0 daisy-text-left daisy-leading-snug">{{
+                  row.label
+                }}</span>
+              </button>
+            </li>
+          </ul>
+        </details>
         <NotebookNewButton
           v-if="user"
           btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
@@ -138,16 +169,21 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, onMounted, ref, watch } from "vue"
-import { LayoutGrid, List, Search, X } from "lucide-vue-next"
+import { computed, onMounted, ref } from "vue"
+import { ArrowDownAZ, LayoutGrid, List, Search, X } from "lucide-vue-next"
 import type {
   Notebook,
   SubscriptionForNotebooksListing,
   User,
 } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-import { sortNotebookCatalogAlphabetically } from "@/components/notebook/sortNotebookCatalogAlphabetically"
+import { sortNotebookCatalogByPeerSpec } from "@/components/notebook/sortNotebookCatalogByPeerSpec"
+import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import { useNotebooksLayout } from "@/composables/useNotebooksLayout"
+import {
+  useNoteSidebarPeerSort,
+  type SidebarPeerSortSpec,
+} from "@/composables/useNoteSidebarPeerSort"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
 import { narrowGroupNotebooksForCatalogFilter } from "@/components/notebook/narrowGroupNotebooksForCatalogFilter"
@@ -177,10 +213,26 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
   emit("notebook-updated", updatedNotebook)
 }
 
-const NOTEBOOKS_SORT_STORAGE_KEY = "doughnut.notebooksPage.sortOrder"
-
 const { notebooksLayout } = useNotebooksLayout()
-const notebooksSortOrder = ref<"created" | "alphabetical">("created")
+const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
+
+const catalogPeerSortTriggerIcon = computed(() => {
+  const match = SIDEBAR_PEER_SORT_MENU_ROWS.find(
+    (row) =>
+      row.spec.field === sortPeerSpec.value.field &&
+      row.spec.direction === sortPeerSpec.value.direction
+  )
+  return match?.Icon ?? ArrowDownAZ
+})
+
+const notebooksSortDropdownRef = ref<HTMLDetailsElement | null>(null)
+
+function selectCatalogPeerSort(spec: SidebarPeerSortSpec) {
+  setSortPeerSpec(spec)
+  if (notebooksSortDropdownRef.value) {
+    notebooksSortDropdownRef.value.open = false
+  }
+}
 const filterText = ref("")
 const filterInputRef = ref<HTMLInputElement | null>(null)
 
@@ -211,29 +263,20 @@ const filteredOnlyCatalogItems = computed(() => {
   })
 })
 
-const filteredCatalogItems = computed(() => {
-  const items = filteredOnlyCatalogItems.value
-  if (notebooksSortOrder.value === "created") {
-    return items
-  }
-  return sortNotebookCatalogAlphabetically(items)
-})
+const filteredCatalogItems = computed(() =>
+  sortNotebookCatalogByPeerSpec(
+    filteredOnlyCatalogItems.value,
+    sortPeerSpec.value
+  )
+)
 
 const clearFilter = () => {
   filterText.value = ""
 }
 
 onMounted(() => {
-  const storedSort = localStorage.getItem(NOTEBOOKS_SORT_STORAGE_KEY)
-  if (storedSort === "created" || storedSort === "alphabetical") {
-    notebooksSortOrder.value = storedSort
-  }
   if (props.catalogItems.length > 0) {
     filterInputRef.value?.focus()
   }
-})
-
-watch(notebooksSortOrder, (value) => {
-  localStorage.setItem(NOTEBOOKS_SORT_STORAGE_KEY, value)
 })
 </script>

@@ -53,7 +53,7 @@
           class="daisy-dropdown-content daisy-menu daisy-bg-base-100 daisy-rounded-box daisy-min-w-[16rem] daisy-w-[17.5rem] daisy-max-w-[17.5rem] daisy-p-2 daisy-shadow daisy-z-[1000]"
         >
           <li
-            v-for="row in sortMenuRows"
+            v-for="row in SIDEBAR_PEER_SORT_MENU_ROWS"
             :key="`${row.spec.field}-${row.spec.direction}`"
             class="daisy-menu-item daisy-p-0"
           >
@@ -82,17 +82,13 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
+import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,
 } from "@/composables/useNoteSidebarPeerSort"
 import {
   ArrowDownAZ,
-  ArrowUpAZ,
-  CalendarArrowDown,
-  CalendarArrowUp,
-  ClockArrowDown,
-  ClockArrowUp,
   FolderInput,
   FolderPlus,
   NotebookPen,
@@ -118,45 +114,8 @@ const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
 
 const sortDropdownRef = ref<HTMLDetailsElement | null>(null)
 
-const sortMenuRows: {
-  spec: SidebarPeerSortSpec
-  label: string
-  Icon: typeof ArrowDownAZ
-}[] = [
-  {
-    spec: { field: "title", direction: "asc" },
-    label: "Title (A–Z)",
-    Icon: ArrowDownAZ,
-  },
-  {
-    spec: { field: "title", direction: "desc" },
-    label: "Title (Z–A)",
-    Icon: ArrowUpAZ,
-  },
-  {
-    spec: { field: "created", direction: "asc" },
-    label: "Created (oldest first)",
-    Icon: CalendarArrowDown,
-  },
-  {
-    spec: { field: "created", direction: "desc" },
-    label: "Created (newest first)",
-    Icon: CalendarArrowUp,
-  },
-  {
-    spec: { field: "updated", direction: "asc" },
-    label: "Updated (oldest first)",
-    Icon: ClockArrowDown,
-  },
-  {
-    spec: { field: "updated", direction: "desc" },
-    label: "Updated (newest first)",
-    Icon: ClockArrowUp,
-  },
-]
-
 const triggerIcon = computed(() => {
-  const match = sortMenuRows.find(
+  const match = SIDEBAR_PEER_SORT_MENU_ROWS.find(
     (row) =>
       row.spec.field === sortPeerSpec.value.field &&
       row.spec.direction === sortPeerSpec.value.direction
