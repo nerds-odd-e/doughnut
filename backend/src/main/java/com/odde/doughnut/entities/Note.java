@@ -54,7 +54,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private NoteAccessory noteAccessory;
 
-  @Column(name = "details", columnDefinition = "mediumtext")
+  @Column(name = "content", columnDefinition = "mediumtext")
   @Getter
   @Setter
   @JsonPropertyDescription("The details of the note is in markdown format.")
