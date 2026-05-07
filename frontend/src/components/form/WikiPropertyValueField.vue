@@ -90,13 +90,13 @@ function onInput() {
 }
 
 function onClickCapture(event: MouseEvent) {
-  if (!root.value) return
+  if (props.readonly || !root.value) return
   const anchor = (event.target as HTMLElement).closest("a")
   if (!anchor || !root.value.contains(anchor)) return
   event.preventDefault()
   const href = anchor.getAttribute("href")
   if (!href) return
-  if (anchor.classList.contains("dead-link")) {
+  if (!props.readonly && anchor.classList.contains("dead-link")) {
     emit("deadLinkClick", deadLinkCreateTitleFromAnchor(anchor))
     return
   }

@@ -336,63 +336,6 @@ Body`
     expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Missing Note"])
   })
 
-  it("readonly frontmatter shows label for known relation type as plain text", async () => {
-    const markdown = `---
-relation: a-part-of
----
-
-# Body`
-    await mountEditor(markdown, { readonly: true, wikiTitles: [] })
-    await flushPromises()
-
-    expect(
-      wrapper
-        .find('[data-testid="rich-note-property-readonly-relation-value"]')
-        .exists()
-    ).toBe(false)
-    expect(wrapper.text()).toContain("a part of")
-  })
-
-  it("readonly frontmatter renders unknown relation value as linkified wiki property field", async () => {
-    const markdown = `---
-relation: "[[Linked Note]]"
----
-
-# Body`
-    await mountEditor(markdown, {
-      readonly: true,
-      wikiTitles: [{ linkText: "Linked Note", noteId: 99 }],
-    })
-    await flushPromises()
-
-    const field = wrapper.find(
-      '[data-testid="rich-note-property-readonly-relation-value"]'
-    )
-    expect(field.exists()).toBe(true)
-    const link = field.find("a.doughnut-link")
-    expect(link.exists()).toBe(true)
-    expect(link.attributes("href")).toBe("/d/n/99")
-  })
-
-  it("readonly frontmatter emits deadLinkClick for unknown relation wiki link when title is missing", async () => {
-    const markdown = `---
-relation: "[[Missing Note]]"
----
-
-# Body`
-    await mountEditor(markdown, { readonly: true, wikiTitles: [] })
-    await flushPromises()
-
-    const field = wrapper.find(
-      '[data-testid="rich-note-property-readonly-relation-value"]'
-    )
-    const dead = field.find("a.dead-link")
-    expect(dead.exists()).toBe(true)
-    await dead.trigger("click")
-    await flushPromises()
-    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Missing Note"])
-  })
-
   it("editing an existing property row emits renamed keys and updated values", async () => {
     const markdown = `---
 topic: training
