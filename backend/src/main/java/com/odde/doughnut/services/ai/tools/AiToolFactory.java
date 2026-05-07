@@ -33,7 +33,7 @@ public class AiToolFactory {
 
         You will receive hidden context in a fenced Markdown block starting with "# Focus Context". This context is visible only to you—the user who answers the question will never see it.
 
-        Use the focus note's title and details as the question subject. Retrieved notes may include indirect neighbors (notes reached through wiki links on other retrieved notes); treat those only as supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content, especially not on facts that appear only in an indirect neighbor.
+        The MCQ must be about the focus note. Retrieved notes may include indirect neighbors (notes reached through wiki links on other retrieved notes); treat those only as supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content, especially not on facts that appear only in an indirect neighbor.
 
         Never use pronouns or phrases that reference the hidden context: do not write "this note", "the focus note", "above", "the following note", or any phrasing that implies the user can see what you see. The question stem and choices must be self-contained.
         """;
