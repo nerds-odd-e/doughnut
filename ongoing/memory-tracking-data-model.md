@@ -44,12 +44,14 @@ The `PredefinedQuestion` entity represents a question that can be asked about a 
 
 ## 3. RecallPrompt
 
-The `RecallPrompt` entity extends `AnswerableQuestionInstance` and represents a specific instance of a question being asked during a recall session.
+The `RecallPrompt` entity represents a specific instance of a question being asked during a recall session, linked to a `MemoryTracker`.
 
 **Key attributes:**
 
-- **predefinedQuestion**: The question being asked (inherited from AnswerableQuestionInstance)
-- **answer**: The user's answer to the question (inherited from AnswerableQuestionInstance)
+- **memoryTracker**: The tracker this prompt belongs to
+- **predefinedQuestion**: The question being asked (when applicable)
+- **answer**: The user's answer to the question
+- **questionType**: MCQ vs spelling, etc.
 
 **Key behaviors:**
 
@@ -57,21 +59,7 @@ The `RecallPrompt` entity extends `AnswerableQuestionInstance` and represents a 
 - Returns RecallPrompt when answered
 - Provides structured question fields for the prompt UI
 
-## 4. AnswerableQuestionInstance (abstract base class)
-
-This is the base class for question instances that can be answered.
-
-**Key attributes:**
-
-- **predefinedQuestion**: The question being asked
-- **answer**: The user's answer to the question
-
-**Key behaviors:**
-
-- Gets the multiple choice question from the predefined question
-- Builds an answer from an AnswerDTO
-
-## 5. Answer
+## 4. Answer
 
 The `Answer` entity represents a user's answer to a question.
 
