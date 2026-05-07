@@ -398,7 +398,7 @@ describe('recall just-review (interactive)', () => {
     expect(out).toContain('Alpha')
   })
 
-  test('just-review answered block: breadcrumb folder › note, details, Reviewed line', async () => {
+  test('just-review answered block: breadcrumb folder › note, content, Reviewed line', async () => {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(childNoteUnderEnglish())
 
@@ -714,7 +714,7 @@ describe('recall just-review (interactive)', () => {
     expect(dueindaysSeen).toEqual([0])
   })
 
-  test('missing note title falls back to Note; empty details; no notebook line', async () => {
+  test('missing note title falls back to Note; empty content; no notebook line', async () => {
     mockShowMemoryTrackerCardForRealm(
       makeMe.aNoteRealm
         .title('   ')

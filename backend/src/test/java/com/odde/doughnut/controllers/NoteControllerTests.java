@@ -155,13 +155,13 @@ class NoteControllerTests extends ControllerTestBase {
               .creator(user)
               .inNotebook(root.getNotebook())
               .please();
-      String details =
+      String markdown =
           "---\n"
               + "see: Summary with [[FrontmatterTarget]]\n"
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
       Note viewer =
-          makeMe.aNote().creator(user).inNotebook(root.getNotebook()).content(details).please();
+          makeMe.aNote().creator(user).inNotebook(root.getNotebook()).content(markdown).please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));

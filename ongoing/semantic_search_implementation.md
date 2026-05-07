@@ -2,7 +2,7 @@
 
 ## Overview
 
-Replace the current literal note title search with intelligent semantic search that understands context and meaning, providing fuzzy matching and relevance-ranked results for both note titles and details.
+Replace the current literal note title search with intelligent semantic search that understands context and meaning, providing fuzzy matching and relevance-ranked results for both note titles and content.
 
 ## Current State
 
@@ -11,7 +11,7 @@ Replace the current literal note title search with intelligent semantic search t
   - No semantic understanding
   - No fuzzy/typo tolerance
   - No relevance ranking
-  - Ignores note `details` content
+  - Ignores note `content` body
   - No title weighting
 
 ## Proposed Solution Architecture
@@ -39,8 +39,8 @@ Search Query → Generate Embedding → SQL KNN/ANN on VECTOR → Ranked Results
 ```
 Context: {ancestorPath}
 Title: {title}
-Details:
-{details}
+Content:
+{content}
 ```
 - **Output**: 1536-dimension vector
 - **Per-item token cap (current)**: 4,000
@@ -105,14 +105,14 @@ Notes:
 ```
 Context: {ancestorPath}
 Title: {title}
-Details:
-{details}
+Content:
+{content}
 ```
-   - Details chunk input (Phase 2, if chunking enabled): for each chunk `chunk_i` of details
+   - Content chunk input (Phase 2, if chunking enabled): for each chunk `chunk_i` of the note body
 ```
 Context: {ancestorPath}
 Title: {title}
-Details:
+Content:
 {chunk_i}
 ```
 3. Insert one row into `note_embeddings` per note
@@ -146,7 +146,7 @@ WITH q AS (
 SELECT
   ne.note_id,
   vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') AS title_dist,
-  1e9 AS details_dist,
+  1e9 AS content_dist,
   vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') AS combined_dist
 FROM note_embeddings ne
 JOIN q
@@ -165,7 +165,7 @@ Not implemented yet. Current endpoints return only semantic results.
 - [x] New table `note_embeddings(note_id, embedding)`
 - [x] CRUD flow to insert/update/delete embeddings on note changes (currently via notebook reindex/incremental update)
 - [x] Initial approach: single embedding per note
-- [x] Drop `kind` column; migrate existing data by deleting `DETAILS` and dropping column
+- [x] Drop `kind` column; migrate existing data by deleting legacy per-kind rows and dropping column
 - [x] Simple KNN similarity search with SQL (`vector_distance`) with local non-vector fallback
 - [x] New semantic search endpoints
 - [x] Flyway placeholders configured per profile for embedding column and optional vector index (implemented via `V200000196__create_note_embeddings.sql` and `application.yml`)
@@ -173,43 +173,43 @@ Not implemented yet. Current endpoints return only semantic results.
 ### Phase 2: Enhanced Features (1-2 weeks)  
 - [ ] Large note chunking support
 - [x] Notebook filtering implementation
-- [x] Title vs details weighting — no longer applicable with single embedding (simplified)
+- [x] Title vs content weighting — no longer applicable with single embedding (simplified)
 - [ ] Search result caching
 - [ ] Performance monitoring
 
 ## Design Decision Update: Single vs Multiple Embeddings and Context Path
 
 ### Problem
-Both `TITLE` and `DETAILS` rows currently reuse the same embedding built from `title + details`. This makes the per-kind weighting ineffective, and short titles can lose precision if mixed with long details.
+Both legacy per-title and per-body embedding rows previously reused the same vector built from `title + content`. This made the per-kind weighting ineffective, and short titles could lose precision if mixed with long bodies.
 
 ### Decision
 - Use a **single combined embedding** per note for Phase 1 (stored as a `TITLE` row) with structured input:
 ```
 Context: {ancestorPath}
 Title: {title}
-Details:
-{optionalDetails}
+Content:
+{optionalContent}
 ```
 - Keep truncation using `ApproximateUtf8TokenBudget` and token cap.
 - Include the ancestor context path to anchor meaning and disambiguate titles.
 
 ### Large/Long Notes (Phase 2)
-- For notes with long/heterogeneous details, **chunk the details** (e.g., ~250–500 tokens per chunk), prepend the same context header and title to each chunk, and store additional rows with a future schema extension (e.g., a `chunk_index` column). Aggregation would take the minimum chunk distance.
+- For notes with long/heterogeneous content, **chunk the body** (e.g., ~250–500 tokens per chunk), prepend the same context header and title to each chunk, and store additional rows with a future schema extension (e.g., a `chunk_index` column). Aggregation would take the minimum chunk distance.
 
 ### Search Aggregation
 - Current SQL/non-prod logic uses the single combined embedding distance directly.
-- Optional heuristic: for very short queries (≤ 3 words), boost the main embedding’s influence (or reduce any details/chunk influence) to emphasize entity-name matches.
+- Optional heuristic: for very short queries (≤ 3 words), boost the main embedding’s influence (or reduce any body/chunk influence) to emphasize entity-name matches.
 
 ### Ancestor/Path Context
 - Prepend the note’s ancestor path in the combined input for better scope and disambiguation (e.g., `Science/Physics/Quantum | Schrödinger equation`).
 
-### Answer to “Does including the details strengthen or weaken title matches?”
-- Mixing details into a title-only vector can weaken name-precision for very short queries, but for general semantic matching a combined embedding with path context is effective. We mitigate precision issues for short queries via a small boost heuristic rather than duplicating vectors.
+### Answer to “Does including the body strengthen or weaken title matches?”
+- Mixing body text into a title-only vector can weaken name-precision for very short queries, but for general semantic matching a combined embedding with path context is effective. We mitigate precision issues for short queries via a small boost heuristic rather than duplicating vectors.
 
 ### Implementation Notes
 - Update embedding generation to produce one combined input per note (Phase 1) and store a single row per note.
 - Reuse existing search logic; it remains compatible and needs no structural change.
-- Add details chunking later (Phase 2) only for long notes to avoid truncation.
+- Add body chunking later (Phase 2) only for long notes to avoid truncation.
 
 ### Phase 3: Production Optimization (1 week)
 - [ ] Async embedding generation

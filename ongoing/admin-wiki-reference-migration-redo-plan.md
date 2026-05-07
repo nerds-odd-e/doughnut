@@ -9,7 +9,7 @@ This plan extends the existing admin wiki reference migration without redoing co
 
 ## Target migration order (including future third active step)
 
-1. `relationship_wiki_backfill` — fill missing legacy relationship title/details/cache data for relationship notes.
+1. `relationship_wiki_backfill` — fill missing legacy relationship title/content/cache data for relationship notes.
 2. `legacy_parent_frontmatter` — parent wiki frontmatter on legacy child notes and cache refresh.
 3. **`relationship_wiki_reference_refresh`** _(planned)_ — rewrite relationship note YAML/frontmatter/body links for qualified cross-notebook tokens and refresh `note_wiki_title_cache`; should be ordered **after** `legacy_parent_frontmatter` when implemented.
 
@@ -25,7 +25,7 @@ Expected behavior:
 
 - Given a relationship note whose source or target lives in a different notebook from the relationship note,
 - when admin migration reaches the new step,
-- then the relationship note details are rewritten so `source` and `target` YAML values use qualified wiki links when needed, such as `[[Other Notebook: Target]]`.
+- then the relationship note content is rewritten so `source` and `target` YAML values use qualified wiki links when needed, such as `[[Other Notebook: Target]]`.
 - The body line should use the same link tokens as the YAML.
 - Existing user-authored suffix content below the generated relationship block is preserved.
 - `note_wiki_title_cache` rows for the relationship note are refreshed to match the rewritten links.
@@ -33,14 +33,14 @@ Expected behavior:
 Tests:
 
 - Add or extend `AdminDataMigrationServiceTest` so it drives `runBatch` through the real migration service.
-- Include at least one cross-notebook target case and assert both details and cache rows.
+- Include at least one cross-notebook target case and assert both content and cache rows.
 - Include a same-notebook case or assertion proving same-notebook links remain unqualified.
 
 ## Phase 2: Implement qualified relationship link formatting
 
 Type: Behavior
 
-Goal: make relationship details generation capable of using notebook-qualified wiki tokens.
+Goal: make relationship note content generation capable of using notebook-qualified wiki tokens.
 
 Code work:
 
@@ -97,7 +97,7 @@ Checks:
 - `wiki_reference_migration_progress` has completed rows for all **active** migration steps (including the third step when present).
 - Spot-check relationship notes with cross-notebook source/target links: YAML and body contain qualified wiki links where needed.
 - Spot-check same-notebook relationship notes: YAML and body remain unqualified.
-- Spot-check `note_wiki_title_cache` rows for rewritten relationship notes: link text and target note ids match the rewritten details.
+- Spot-check `note_wiki_title_cache` rows for rewritten relationship notes: link text and target note ids match the rewritten content.
 - Admin migration status reports completion and does not show a failed gate on active steps.
 
 Deployment and ops:

@@ -209,8 +209,8 @@ export const assumeNotePage = (
     flushPendingContentSave() {
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
-      }).then(($details) => {
-        const $textarea = $details.find('textarea').filter(':visible')
+      }).then(($noteField) => {
+        const $textarea = $noteField.find('textarea').filter(':visible')
         if ($textarea.length) {
           cy.wrap($textarea.first()).blur()
         }

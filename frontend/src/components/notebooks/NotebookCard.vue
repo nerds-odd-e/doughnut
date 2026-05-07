@@ -15,8 +15,8 @@
         </h5>
         <p
           v-if="notebook.description"
-          class="note-short-details"
-          :class="{ 'note-short-details--compact': compact }"
+          class="note-short-content"
+          :class="{ 'note-short-content--compact': compact }"
         >
           {{ notebook.description }}
         </p>
@@ -79,7 +79,7 @@ defineProps({
   }
 }
 
-.note-short-details {
+.note-short-content {
   color: oklch(var(--bc) / 0.6);
   line-height: 2rem; /* Align with ruled lines */
 }
@@ -88,7 +88,7 @@ defineProps({
   margin-bottom: 0;
 }
 
-.note-short-details--compact {
+.note-short-content--compact {
   font-size: 0.75rem;
   line-height: 1.25rem;
 }

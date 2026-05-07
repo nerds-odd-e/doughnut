@@ -95,7 +95,7 @@ export interface StoredApi {
     value?: NoteContentCompletion
   ): Promise<void>
 
-  /** PATCH note details with current stored body so the backend rebuilds wiki title cache. */
+  /** PATCH note content with current stored body so the backend rebuilds wiki title cache. */
   refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void>
 
   updateWikidataId(

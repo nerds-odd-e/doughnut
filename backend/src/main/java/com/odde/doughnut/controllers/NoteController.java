@@ -196,7 +196,7 @@ class NoteController {
   /**
    * Focus-context markdown for this note (same render as {@link
    * com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer}). {@code tokenLimit} is
-   * the combined focus-plus-related details budget, matching {@link #getGraph(Note, int)}.
+   * the combined focus-plus-related content budget, matching {@link #getGraph(Note, int)}.
    */
   @GetMapping("/{note}/ai-context-markdown")
   public NoteAiContextMarkdown getAiContextMarkdown(

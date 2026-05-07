@@ -40,7 +40,7 @@ function recallAnsweredJustReviewInk(
 ): ReactElement {
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(payload.breadcrumbTitles)
-  const detailLines = recallAnsweredMarkdownToDisplayLines(
+  const contentMarkdownLines = recallAnsweredMarkdownToDisplayLines(
     payload.contentMarkdown,
     width
   )
@@ -50,7 +50,7 @@ function recallAnsweredJustReviewInk(
   return (
     <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
-      {detailLines.map((line, i) => (
+      {contentMarkdownLines.map((line, i) => (
         <Text key={i}>{line.length > 0 ? line : ' '}</Text>
       ))}
       <Text>{justReviewOutcomeLine(outcome, payload.noteTitle)}</Text>
@@ -144,11 +144,11 @@ export function JustReviewRecallStage({
   }, [activeOperationAbortRef, inputBlockedRef])
 
   const width = resolvedTerminalWidth()
-  const detailsRendered = payload.contentMarkdown
+  const renderedContent = payload.contentMarkdown
     ? renderMarkdownToTerminal(payload.contentMarkdown, width)
     : ''
-  const detailLines =
-    detailsRendered.length > 0 ? detailsRendered.split('\n') : []
+  const contentLines =
+    renderedContent.length > 0 ? renderedContent.split('\n') : []
 
   const handleQuestionEsc = useCallback(() => {
     if (inputBlockedRef.current) {
@@ -179,7 +179,7 @@ export function JustReviewRecallStage({
       belowBuffer={
         <>
           <Text>{payload.noteTitle}</Text>
-          {detailLines.map((line, i) => (
+          {contentLines.map((line, i) => (
             <Text key={i}>{line.length > 0 ? line : ' '}</Text>
           ))}
         </>

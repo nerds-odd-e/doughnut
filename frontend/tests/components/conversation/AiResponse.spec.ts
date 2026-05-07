@@ -252,7 +252,7 @@ describe("AiResponse", () => {
   })
 
   describe("Tool Call Handling", () => {
-    const testDetails = "**bold completion**"
+    const suggestedCompletion = "**bold completion**"
     let updateNoteContentSpy: ReturnType<
       typeof mockSdkService<"updateNoteContent">
     >
@@ -266,20 +266,20 @@ describe("AiResponse", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: testDetails,
+          content: suggestedCompletion,
         })
       )
     })
 
     it("formats completion suggestion correctly based on existing content", async () => {
-      // Test empty note details
+      // Test empty note content
       noteRealm.note.content = ""
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const emptyDetails = "**bold completion**"
+      const emptyCompletion = "**bold completion**"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: emptyDetails,
+          content: emptyCompletion,
         })
       )
       // Markdown is rendered to HTML, so check for the rendered content
@@ -287,14 +287,14 @@ describe("AiResponse", () => {
         "<strong>bold completion</strong>"
       )
 
-      // Test with existing note details
+      // Test with existing note content
       noteRealm.note.content = "Existing content"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const newDetails = "Existing content\n**bold completion**"
+      const updatedCompletion = "Existing content\n**bold completion**"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: newDetails,
+          content: updatedCompletion,
         })
       )
       // Markdown is rendered to HTML, so check for the rendered content
@@ -306,18 +306,18 @@ describe("AiResponse", () => {
       )
     })
 
-    it("formats completion suggestion with details", async () => {
+    it("formats completion suggestion with note content", async () => {
       noteRealm.note.content = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const details = "Hello  friends!"
+      const completionBody = "Hello  friends!"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: details,
+          content: completionBody,
         })
       )
 
-      // The details should be displayed (markdown renders double spaces as single)
+      // The suggestion should be displayed (markdown renders double spaces as single)
       expect(wrapper.find(".completion-text").html()).toContain(
         "Hello friends!"
       )
@@ -326,15 +326,15 @@ describe("AiResponse", () => {
     it("handles replacement when replacing all content", async () => {
       noteRealm.note.content = "Short\ntext"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const details = "New content"
+      const completionBody = "New content"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: details,
+          content: completionBody,
         })
       )
 
-      // The details should show the replacement
+      // The suggestion should show the replacement
       expect(wrapper.find(".completion-text").html()).toContain("New content")
     })
 
@@ -345,7 +345,7 @@ describe("AiResponse", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      // The details should replace the content
+      // The accepted suggestion should replace the note content
       expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { content: "**bold completion**" },
@@ -393,15 +393,15 @@ describe("AiResponse", () => {
     it("handles completion with replacement", async () => {
       noteRealm.note.content = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const details = "Hello  friends!"
+      const completionBody = "Hello  friends!"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: details,
+          content: completionBody,
         })
       )
 
-      // Check the formatted suggestion shows the details (markdown renders double spaces as single)
+      // Check the formatted suggestion (markdown renders double spaces as single)
       expect(wrapper.find(".completion-text").html()).toContain(
         "Hello friends!"
       )
@@ -419,11 +419,11 @@ describe("AiResponse", () => {
     it("handles replacement by removing all content", async () => {
       noteRealm.note.content = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const details = "Completely new text"
+      const completionBody = "Completely new text"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteContentCompletion", {
-          content: details,
+          content: completionBody,
         })
       )
 
@@ -462,11 +462,11 @@ describe("AiResponse", () => {
         const wrapper = mountComponent(conversation)
 
         // Simulate completion suggestion
-        const details = "test completion"
+        const completionBody = "test completion"
         await submitMessageAndSimulateRunResponse(
           wrapper,
           createToolCallChunk("NoteContentCompletion", {
-            content: details,
+            content: completionBody,
           })
         )
 

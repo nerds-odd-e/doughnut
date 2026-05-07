@@ -94,11 +94,11 @@ export const assumeAssimilationPage = () => ({
 
         case 'image note': {
           if (additionalInfo) {
-            const [expectedDetails, expectedImage] = commonSenseSplit(
+            const [expectedBodyText, expectedImage] = commonSenseSplit(
               additionalInfo,
               '; '
             )
-            cy.get('.note-content').should('contain', expectedDetails)
+            cy.get('.note-content').should('contain', expectedBodyText)
             cy.get('#note-image')
               .find('img')
               .should('have.attr', 'src')

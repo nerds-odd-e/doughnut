@@ -51,13 +51,13 @@ class FocusContextRetrievalServiceTest {
     }
 
     @Test
-    void focusNoteDetailsTruncationMatchesApproximateTokenBudget() {
-      String longDetails = "a".repeat(10000);
-      Note longNote = makeMe.aNote().title("Long").content(longDetails).please();
+    void focusNoteContentTruncationMatchesApproximateTokenBudget() {
+      String longContent = "a".repeat(10000);
+      Note longNote = makeMe.aNote().title("Long").content(longContent).please();
       FocusContextResult longResult =
           service.retrieve(longNote, longNote.getCreator(), RetrievalConfig.depth1());
       assertThat(longResult.getFocusNote().isContentTruncated(), is(true));
-      assertThat(longResult.getFocusNote().getContent().length(), lessThan(longDetails.length()));
+      assertThat(longResult.getFocusNote().getContent().length(), lessThan(longContent.length()));
 
       Note shortNote = makeMe.aNote().title("Short").content("Small content").please();
       FocusContextResult shortResult =

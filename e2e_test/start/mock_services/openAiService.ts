@@ -218,7 +218,7 @@ const openAiService = () => {
             '  "Title: WikiRecall" (focus note title in the feature table),',
             '  "Title: Bahamas" (outlinked note),',
             '  "Reached by: OutgoingWikiLink".',
-            'Fix the scenario note titles/details (e.g. [[Bahamas]] on WikiRecall) or update this check if titles changed.',
+            'Fix the scenario note titles/content (e.g. [[Bahamas]] on WikiRecall) or update this check if titles changed.',
             perBodyHints,
           ].join('\n')
         ).to.eq(true)

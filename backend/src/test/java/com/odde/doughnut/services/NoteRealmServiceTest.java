@@ -30,7 +30,7 @@ class NoteRealmServiceTest {
   @Autowired WikiTitleCacheService wikiTitleCacheService;
 
   @Test
-  void wiki_titles_empty_when_details_have_links_but_cache_not_refreshed() {
+  void wiki_titles_empty_when_content_has_links_but_cache_not_refreshed() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     makeMe.aNote().title("LinkedPage").underSameNotebookAs(root).please();

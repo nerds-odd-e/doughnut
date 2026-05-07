@@ -106,13 +106,13 @@ Note
   notebookId
   folderId optional
   title
-  content (Markdown details, including optional YAML frontmatter)
+  content (Markdown body, including optional YAML frontmatter)
   properties (derived editing view of content frontmatter)
   createdAt
   updatedAt
 ```
 
-Listing and card surfaces use **title** (and ids internally); there is no separate derived **short-details** field on topology or wire DTOs—the body is **content** only.
+Listing and card surfaces use **title** (and ids internally); there is no separate derived **short preview** field on topology or wire DTOs—the body is **content** only.
 
 Note properties are represented as leading YAML frontmatter in the note's Markdown content. The Markdown content is the portable source of truth; rich editing surfaces may parse the frontmatter and show it as editable property rows, then serialize changes back into the same leading frontmatter block.
 

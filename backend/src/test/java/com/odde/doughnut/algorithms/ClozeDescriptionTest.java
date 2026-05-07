@@ -77,11 +77,11 @@ class ClozeDescriptionTest {
     "試みる,   わたしが試みてみよう。,  わたしが[..~]てみよう。",
     "熟す,      この語はまだ熟していない。,  この語はまだ[..~]ていない。",
   })
-  void clozeDescription(String title, String details, String expectedClozeDescription) {
+  void clozeDescription(String title, String markdown, String expectedClozeDescription) {
     assertThat(
-        new ClozedString(clozeReplacement, details)
+        new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle(title))
-            .maskedDetailsAsMarkdown(),
+            .maskedContentAsMarkdown(),
         containsString(expectedClozeDescription));
   }
 
@@ -90,7 +90,7 @@ class ClozeDescriptionTest {
     assertThat(
         new ClozedString(clozeReplacement, "a /b\nc/ d")
             .hide(new NoteTitle("title"))
-            .maskedDetailsAsMarkdown(),
+            .maskedContentAsMarkdown(),
         containsString("a /b\nc/ d"));
   }
 
@@ -99,7 +99,7 @@ class ClozeDescriptionTest {
     assertThat(
         new ClozedString(clozeReplacement, "$2")
             .hide(new NoteTitle("Stable Diffusion"))
-            .maskedDetailsAsMarkdown(),
+            .maskedContentAsMarkdown(),
         containsString("$2"));
   }
 
@@ -109,19 +109,19 @@ class ClozeDescriptionTest {
     assertThat(
         new ClozedString(clozeReplacement, "abc")
             .hide(new NoteTitle("abc"))
-            .maskedDetailsAsMarkdown(),
+            .maskedContentAsMarkdown(),
         containsString("/.../"));
   }
 
   @Test
-  void clozeShouldWorkWithSlashInTitleAndUrlsInDetails() {
+  void clozeShouldWorkWithSlashInTitleAndUrlsInContent() {
     String title = "archenemy／arch-enemy";
-    String details =
+    String markdown =
         "In literature, an **archenemy** (sometimes spelled as **arch-enemy**) or **nemesis** is the main [enemy](https://en.wikipedia.org/wiki/Enemy) of the [protagonist](https://en.wikipedia.org/wiki/Protagonist)—or sometimes, one of the other main characters—appearing as the most prominent and most-known enemy of the [hero](https://en.wikipedia.org/wiki/Hero)";
     String result =
-        new ClozedString(clozeReplacement, details)
+        new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle(title))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
 
     // The word "archenemy" and "arch-enemy" should be clozed
     assertThat(result, containsString("[...]"));
@@ -134,11 +134,11 @@ class ClozeDescriptionTest {
 
   @Test
   void clozeShouldMaskPronunciationFollowedByJapaneseParticle() {
-    String details = "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
+    String markdown = "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
     String result =
-        new ClozedString(clozeReplacement, details)
+        new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle("足利義満"))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
     assertThat(result, containsString("/.../"));
   }
 
@@ -147,17 +147,17 @@ class ClozeDescriptionTest {
     String result =
         new ClozedString(clozeReplacement, "_Bona fides_ is a Latin phrase meaning \"good faith\".")
             .hide(new NoteTitle("bona fide"))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
     assertThat(result, containsString("[...]"));
   }
 
   @Test
   void clozeShouldFullyMaskJapaneseTitleFollowedByParticle() {
-    String details = "如何，怎样。（どんなふう。） どのようなぐあいですか。／情况如何？ どのように致しましょうか。／应该怎样做？";
+    String markdown = "如何，怎样。（どんなふう。） どのようなぐあいですか。／情况如何？ どのように致しましょうか。／应该怎样做？";
     String result =
-        new ClozedString(clozeReplacement, details)
+        new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle("どのよう"))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
     assertThat(result, containsString("[...]"));
     assertThat(result, containsString("[...]なぐあいですか"));
     assertThat(result, containsString("[...]に致しましょうか"));
@@ -170,7 +170,7 @@ class ClozeDescriptionTest {
     String result =
         new ClozedString(clozeReplacement, "the cat dogma is a belief")
             .hide(new NoteTitle("cat dog"))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
     assertThat(result, containsString("dogma"));
   }
 
@@ -181,7 +181,7 @@ class ClozeDescriptionTest {
                 clozeReplacement,
                 "a single mother and her children have been **evicted from** their home")
             .hide(new NoteTitle("evict"))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
     assertThat(result, containsString("[...]"));
   }
 
@@ -192,11 +192,11 @@ class ClozeDescriptionTest {
     "archenemy／arch-enemy, the archenemy and arch-enemy are, the [...] and [...] are",
   })
   void clozeShouldHandleTitleWithAlternativeSeparator(
-      String title, String details, String expected) {
+      String title, String markdown, String expected) {
     String result =
-        new ClozedString(clozeReplacement, details)
+        new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle(title))
-            .maskedDetailsAsMarkdown();
+            .maskedContentAsMarkdown();
     assertThat(result, containsString(expected));
   }
 }

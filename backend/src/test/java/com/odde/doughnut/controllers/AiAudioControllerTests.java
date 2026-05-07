@@ -46,8 +46,8 @@ class AiAudioControllerTests {
   }
 
   private void setupMocks() {
-    String details = "test123";
-    NoteContentCompletion completion = new NoteContentCompletion(details);
+    String transcriptText = "test123";
+    NoteContentCompletion completion = new NoteContentCompletion(transcriptText);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(completion);
     mockTranscriptionSrtResponse("test transcription");

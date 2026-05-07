@@ -62,9 +62,9 @@ The **`docs/database-erd.md`** Mermaid diagram documents tables, foreign keys, a
      "moon,            partner of earth,                    partner of earth",
      "Sedition,        word sedition means this,           word [...] means this"
    })
-   void clozeDescription(String title, String details, String expectedClozeDescription) {
+   void clozeDescription(String title, String markdown, String expectedClozeDescription) {
      assertThat(
-         new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).maskedDetailsAsMarkdown(),
+         new ClozedString(clozeReplacement, markdown).hide(new NoteTitle(title)).maskedContentAsMarkdown(),
          containsString(expectedClozeDescription));
    }
    ```

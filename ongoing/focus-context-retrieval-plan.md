@@ -24,7 +24,7 @@ The legacy class names stay until phase 5 so that intermediate phases compile.
 - Drop legacy phrasing about "atomic notes organized hierarchically with relations / lateral links" — Doughnut is now wiki/Markdown with `[[Note Title]]` links and folders inside notebooks.
 - State the role declaratively (one short paragraph), not as numbered rules of the road.
 - Treat the focus context as **hidden context** delivered in a fenced Markdown block (`# Focus Context …`), and tell the model the user does **not** see it.
-- Tell the model to use the focus note's title and details as the question subject, and to use other retrieved notes only as evidence / distractor seed material.
+- Tell the model to use the focus note's title and content as the question subject, and to use other retrieved notes only as evidence / distractor seed material.
 - Forbid pronouns referring to the hidden context ("this note", "the focus note", "above", "the following note").
 - Move concrete MCQ formatting rules (3 choices, vary length, `strictChoiceOrder`, distractor plausibility) into a small, non-numbered section that sits next to the schema, since the structured-output schema already enforces shape.
 - Defer reasoning to the model (it already silently chains thoughts in modern OpenAI models); do not add explicit "think step by step" instructions.
@@ -39,7 +39,7 @@ The same modernization applies to `questionEvaluationAiTool` and `questionRefine
 The most-visible AI feature (predefined-question / recall question generation) starts using the new wiki-aware context. The model sees a Markdown-rendered focus note plus its directly linked notes and inbound referrers, instead of a JSON dump labeled "Focus Note and the notes related to it". Distractors and stems can already draw on actual outgoing wiki link targets, which the legacy GraphRAG only handled via `OutgoingWikiLinkRelationshipHandler` mixed into a JSON shape the model had to parse.
 
 ### Scope
-- Add internal models `FocusContextResult`, `FocusContextFocusNote`, `FocusContextNote`, `FocusContextEdgeType` matching the requirements doc shape (with `depth`, `retrievalPath`, `edgeType`, `reason`, `details`, `detailsTruncated`).
+- Add internal models `FocusContextResult`, `FocusContextFocusNote`, `FocusContextNote`, `FocusContextEdgeType` matching the requirements doc shape (with `depth`, `retrievalPath`, `edgeType`, `reason`, `content`, `contentTruncated`).
 - Add `FocusContextRetrievalService.retrieve(focusNote, viewer, RetrievalConfig)` returning a `FocusContextResult`. In this phase, traversal stops at depth 1 and only emits `OutgoingWikiLink` and `InboundWikiReference` edges. No folder siblings yet, no depth-2 expansion.
 - Reuse `WikiTitleCacheService` for outgoing targets and inbound referrers; reuse `NoteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds` for batch hydration.
 - Add `FocusContextMarkdownRenderer.render(FocusContextResult, RetrievalConfig)` producing the Markdown wrapper described in the requirements:
@@ -47,7 +47,7 @@ The most-visible AI feature (predefined-question / recall question generation) s
   - `## Focus Note` block with title, notebook, folder path, depth `0`, truncation flag, and content fenced as `doughnut-note-md`.
   - `## Retrieved Note` blocks per related note, with title, notebook, folder, depth, retrieval path (`[[A]] -> [[B]]`), edge type, truncation flag, and content fenced.
   - **Safe fence rule**: scan note content for the longest run of backticks and use `longestRun + 1` for the wrapper fence (focus and retrieved blocks each compute their own fence).
-- Add token-budget split: `FOCUS_NOTE_DETAILS_MAX_TOKENS` and `RELATED_NOTE_DETAILS_MAX_TOKENS` constants in a `FocusContextConstants` class. Always keep the focus note (truncated if needed); related notes consume the remaining budget in BFS order.
+- Add token-budget split: `FOCUS_NOTE_CONTENT_MAX_TOKENS` and `RELATED_NOTE_CONTENT_MAX_TOKENS` constants in a `FocusContextConstants` class. Always keep the focus note (truncated if needed); related notes consume the remaining budget in BFS order.
 - Wire `QuestionGenerationRequestBuilder.getChatRequestBuilder` and `PredefinedQuestionController` to call `FocusContextRetrievalService` + `FocusContextMarkdownRenderer` instead of `graphRAGService.getGraphRAGDescription(note)`.
 - Modernize `AiToolFactory.getBaseInstruction()` and `getDefaultMcqPrompt()` per the cross-cutting section above. Drop the "atomic / hierarchical / lateral links" wording and the "Leverage the Extended Graph" numbered point.
 - Leave `GraphRAGService` and the legacy `services/graphRAG` package in place; other consumers (`ChatCompletionConversationService`, `ChatCompletionNoteAutomationService`, `SuggestedQuestionForFineTuningService`, `NoteController.getGraph`, MCP `get_note_graph`) still use the old path until phases 4 / 5.
@@ -56,10 +56,10 @@ The most-visible AI feature (predefined-question / recall question generation) s
 - **E2E (extends existing capability files; no new files):**
   - `e2e_test/features/recall/recall_quiz_ai_question.feature` — existing scenarios still pass when generation is run via the mocked OpenAI service. The mock's recorded prompt body now contains `# Focus Context` and a `doughnut-note-md` fence instead of the legacy `Focus Note and the notes related to it: { ... }` JSON banner.
   - `e2e_test/features/ai_generated_recall_questions/user_feedback_for_question_generation.feature` — existing scenarios still pass.
-  - One new `@wip` scenario in `recall_quiz_ai_question.feature` where the focus note has an outgoing wiki link `[[Bahamas]]`, the linked note's details are the only place a fact lives, and the generated MCQ uses that fact (Mountebank verifies the prompt contains the linked-note content under a `## Retrieved Note` block with `Reached by: OutgoingWikiLink`). Remove `@wip` once the prompt body matches.
+  - One new `@wip` scenario in `recall_quiz_ai_question.feature` where the focus note has an outgoing wiki link `[[Bahamas]]`, the linked note's content is the only place a fact lives, and the generated MCQ uses that fact (Mountebank verifies the prompt contains the linked-note content under a `## Retrieved Note` block with `Reached by: OutgoingWikiLink`). Remove `@wip` once the prompt body matches.
 - **Unit (Java, package `services.focusContext`):**
   - `FocusContextMarkdownRendererTest`: safe-fence selection (note with no backticks → 3 backticks; note with `` ``` `` → 4; note with `` ```` `` → 5); focus block always emitted even with empty related notes; truncation flag rendered when set; retrievalPath of `[[A]] -> [[B]]` for a depth-1 outgoing link.
-  - `FocusContextRetrievalServiceTest` (Spring + `@Transactional`): focus only when no links; outgoing wiki targets emitted with `OutgoingWikiLink` and depth `1`; inbound referrers emitted with `InboundWikiReference`; deduplication when the same note is both an outgoing target and an inbound referrer (outgoing wins, single entry); token budget caps the related list; focus note details truncated to `FOCUS_NOTE_DETAILS_MAX_TOKENS` with `detailsTruncated=true`.
+  - `FocusContextRetrievalServiceTest` (Spring + `@Transactional`): focus only when no links; outgoing wiki targets emitted with `OutgoingWikiLink` and depth `1`; inbound referrers emitted with `InboundWikiReference`; deduplication when the same note is both an outgoing target and an inbound referrer (outgoing wins, single entry); token budget caps the related list; focus note content truncated to `FOCUS_NOTE_CONTENT_MAX_TOKENS` with `contentTruncated=true`.
 
 ### Definition of done
 - New scenario passes (`@wip` removed).

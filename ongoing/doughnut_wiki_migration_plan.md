@@ -17,9 +17,9 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 1 — Folder | Done |
 | 2 — Slug paths (`folder.slug`, `note.slug`, routing) | Done (retired at boundary before 7) |
 | 3 — Index note (no head note) | Done |
-| 4 — Properties / YAML frontmatter in `details` | Done |
+| 4 — Properties / YAML frontmatter in note `content` | Done |
 | 5 — Relationship notes → normal notes + wiki title cache | Done (title-rename propagation deferred to **Phase 12**; granular **5.24** notes in `doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`) |
-| 6 — Folder-first listing; remove `NoteTopology.shortDetails` | Done |
+| 6 — Folder-first listing; no derived short preview on topology | Done |
 | Boundary — slug retirement | Done (before Phase 7) |
 | 7 — Remove note parent | Done |
 | 8 — Move / dissolve folder (organize) | Done |
@@ -40,7 +40,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 **Index note** — Optional root note titled `index` / slug `index`; notebook has **`name`** and **`description`**; no `headNote` on APIs.
 
-**Properties** — Leading YAML in Markdown `details`; rich editor mirrors via frontmatter UI.
+**Properties** — Leading YAML in Markdown `content`; rich editor mirrors via frontmatter UI.
 
 **Phase 5 (shipped)** — Relationship notes are normal notes with frontmatter (`type: relationship`, `relation`, `source`/`target` as `[[…]]`). **`note_wiki_title_cache`** backs references and graph reads; **`NoteRealm.references`** is the unified note-show surface; titles are required (non-null/non-empty). Legacy parent may appear as migration-only `parent: "[[…]]"` in frontmatter for non-relationship notes. **`note.target_note_id`** is removed (**5.24**). **Reverse-updating referrers when a title changes** is **Phase 12** (formerly **5.25** before closeout).
 
@@ -55,7 +55,7 @@ Phases **1–8** are shipped (Phase **7**: structural `note.parent_id` / `Note.p
 - **3:** Migrations dropped `notebook_head_note`; catalog → notebook page; optional index at slug `index`.
 - **4:** Frontmatter round-trip (markdown + rich); unsupported YAML shapes block rich body until fixed in markdown.
 - **5:** Relationship notes as normal notes + `note_wiki_title_cache`; unified references on note show and graph; `relation_type` and `note.target_note_id` removed. Transitional graph hop flags on related-note DTOs were removed in **Phase 7.13**. Title-rename propagation → **Phase 12**.
-- **6:** Primary containment UX is folder-scoped; topology has no `shortDetails`; graph siblings from folder (or notebook root without folder).
+- **6:** Primary containment UX is folder-scoped; topology has no derived short preview field; graph siblings from folder (or notebook root without folder).
 - **7:** Structural note parent removed from schema and APIs; notes use `folderId` / notebook root; see `doughnut_wiki_migration_plan-phase-7-sub-phases.md`.
 - **8:** Folder **move** (`POST …/folders/{folder}/move`) and **dissolve** (`DELETE …/folders/{folder}`): same-notebook reparenting; sibling name uniqueness at destination; dissolve promotes direct notes and **child folders** to the dissolved folder’s parent (with conflict checks); sidebar entry when a folder is active opens one organize dialog (`FolderOrganizeDialog.vue`); shared backend checks in `FolderSiblingNameValidation` and move graph rules in `FolderMoveDestinationRules`.
 
@@ -234,7 +234,7 @@ slug columns and path-primary routes as canonical identity (already removed at b
 ```text
 Notebook — id, name, config
 Folder — id, notebookId, parentFolderId?, name (unique among siblings), config
-Note — id, notebookId, folderId?, title, Markdown details (+ frontmatter)
+Note — id, notebookId, folderId?, title, Markdown content (+ frontmatter)
 (no parentNoteId, no note.slug column)
 LinkIndex — derived from content
 ```
@@ -245,7 +245,7 @@ LinkIndex — derived from content
 
 ## Goal
 
-When a note’s **title** changes, notes that wiki-linked the **old** title are **reverse-updated** to the **new** title in their Markdown (`details` / frontmatter `[[…]]` tokens where applicable), and **`note_wiki_title_cache`** rows are refreshed so **`NoteRealm.references`**, graph, and search stay consistent.
+When a note’s **title** changes, notes that wiki-linked the **old** title are **reverse-updated** to the **new** title in their Markdown (`content` / frontmatter `[[…]]` tokens where applicable), and **`note_wiki_title_cache`** rows are refreshed so **`NoteRealm.references`**, graph, and search stay consistent.
 
 ## Rationale
 
@@ -279,9 +279,9 @@ Renaming a note does not strand stale wiki tokens or cache rows in common cases;
 1. Folder
 2. Slug paths (historical; removed at boundary before 7)
 3. Optional index note
-4. Properties / frontmatter in details
+4. Properties / frontmatter in content
 5. Relationship notes → normal + wiki title cache
-6. Folder-first listing; remove shortDetails
+6. Folder-first listing; no short preview on topology
 → boundary: retire persisted slugs; /d/n/:noteId; folder by id
 7. Remove note parent
 8. Move / dissolve folder

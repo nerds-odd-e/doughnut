@@ -133,8 +133,8 @@ describe("RichMarkdownEditor", () => {
     )
   })
 
-  it("shows read-only Properties above Quill when details include supported YAML frontmatter", async () => {
-    const details = `---
+  it("shows read-only Properties above Quill when content includes supported YAML frontmatter", async () => {
+    const markdown = `---
 diligence: high
 topic: training
 ---
@@ -142,7 +142,7 @@ topic: training
 # Workshop Body
 
 Main content here.`
-    await mountEditor(details, { readonly: true })
+    await mountEditor(markdown, { readonly: true })
     await flushPromises()
 
     expect(wrapper.text()).toContain("Properties")
@@ -158,7 +158,7 @@ Main content here.`
     expect(html).not.toContain("topic:")
   })
 
-  it("shows add-only insert chrome when editable details have no frontmatter", async () => {
+  it("shows add-only insert chrome when editable content has no frontmatter", async () => {
     await mountEditor("# Hello\n\nParagraph.")
     await flushPromises()
 
@@ -168,7 +168,7 @@ Main content here.`
     expect(wrapper.text()).toContain("Add note property")
   })
 
-  it("does not show Properties section when details have no frontmatter (readonly)", async () => {
+  it("does not show Properties section when content has no frontmatter (readonly)", async () => {
     await mountEditor("# Hello\n\nParagraph.", { readonly: true })
     await flushPromises()
 
@@ -232,13 +232,13 @@ Body`,
   })
 
   it("shows parse error and hides Properties when frontmatter fails to parse", async () => {
-    const details = `---
+    const markdown = `---
 bad:
   nested: value
 ---
 
 Still body`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(false)
@@ -251,14 +251,14 @@ Still body`
     expect(alert.text()).toContain("Markdown mode")
   })
 
-  it("forces Quill readonly and does not emit details updates when frontmatter fails to parse", async () => {
-    const details = `---
+  it("forces Quill readonly and does not emit content updates when frontmatter fails to parse", async () => {
+    const markdown = `---
 bad:
   nested: value
 ---
 
 Still body`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const quill = wrapper.findComponent({ name: "QuillEditor" })
@@ -273,13 +273,13 @@ Still body`
   })
 
   it("composes edited body with existing frontmatter when emitting updates", async () => {
-    const details = `---
+    const markdown = `---
 diligence: high
 topic: training
 ---
 
 # Original`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const quill = wrapper.findComponent({ name: "QuillEditor" })
@@ -294,13 +294,13 @@ topic: training
     expect(last).toContain("Edited Heading")
   })
 
-  it("emits pasteComplete with full composed details so link-removal preserves frontmatter", async () => {
-    const details = `---
+  it("emits pasteComplete with full composed markdown so link-removal preserves frontmatter", async () => {
+    const markdown = `---
 topic: training
 ---
 
 Hello`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const quill = wrapper.findComponent({ name: "QuillEditor" })
@@ -318,12 +318,12 @@ Hello`
   })
 
   it("emits deadLinkClick when a dead wiki link in a property value is clicked", async () => {
-    const details = `---
+    const markdown = `---
 topic: "[[Missing Note]]"
 ---
 
 Body`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const valField = wrapper.find(
@@ -337,12 +337,12 @@ Body`
   })
 
   it("editing an existing property row emits renamed keys and updated values", async () => {
-    const details = `---
+    const markdown = `---
 topic: training
 ---
 
 Workshop body.`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const keyInput = wrapper.find(
@@ -368,13 +368,13 @@ Workshop body.`
   })
 
   it("shows validation and does not emit corrupt duplicate keys when renaming a row", async () => {
-    const details = `---
+    const markdown = `---
 alpha: one
 beta: two
 ---
 
 Body`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
@@ -403,13 +403,13 @@ Body`
   })
 
   it("removing one property row emits markdown without that key and retains the rest", async () => {
-    const details = `---
+    const markdown = `---
 alpha: one
 beta: two
 ---
 
 Body line`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     const removeBtns = wrapper.findAll(
@@ -427,13 +427,13 @@ Body line`
     expect(last).toContain("Body line")
   })
 
-  it("removing every property row emits body-only details and shows add-only chrome without Properties heading", async () => {
-    const details = `---
+  it("removing every property row emits body-only markdown and shows add-only chrome without Properties heading", async () => {
+    const markdown = `---
 only: x
 ---
 
 Paragraph.\n`
-    await mountEditor(details)
+    await mountEditor(markdown)
     await flushPromises()
 
     expect(wrapper.text()).toContain("Properties")

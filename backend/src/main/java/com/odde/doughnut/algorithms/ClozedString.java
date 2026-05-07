@@ -38,7 +38,7 @@ public class ClozedString {
   }
 
   /** Returns markdown with masked portions. Frontend converts to HTML when rendering. */
-  public String maskedDetailsAsMarkdown() {
+  public String maskedContentAsMarkdown() {
     List<String> urls = new ArrayList<>();
     String protectedContent = protectMarkdownLinkUrls(originalContent, urls);
     return unprotectMarkdownLinkUrls(cloze(protectedContent), urls);

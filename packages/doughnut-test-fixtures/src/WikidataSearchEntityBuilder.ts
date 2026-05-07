@@ -9,7 +9,7 @@ class WikidataSearchEntityBuilder extends Builder<WikidataSearchEntity> {
     this.data = {
       id: 'Q1234',
       label: 'label',
-      description: 'details',
+      description: 'sample entity description',
     }
   }
 

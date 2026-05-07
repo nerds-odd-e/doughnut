@@ -46,7 +46,7 @@ class RelationshipNoteMarkdownFormatterTest {
   }
 
   @Test
-  void appends_preserved_details_below_body() {
+  void appends_preserved_section_below_body() {
     String markdown =
         RelationshipNoteMarkdownFormatter.format(
             RelationType.RELATED_TO, "S", "T", "  Legacy line one.\n\nLine two.  ");

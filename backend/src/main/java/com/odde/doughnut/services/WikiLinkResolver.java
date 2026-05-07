@@ -27,11 +27,11 @@ public class WikiLinkResolver {
   public record ResolvedWikiLink(String linkText, Note targetNote) {}
 
   public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
-    String details = focusNote.getContent();
-    if (details == null || details.isBlank()) {
+    String content = focusNote.getContent();
+    if (content == null || content.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(details);
+    List<String> linkTitlesOrdered = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(content);
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }

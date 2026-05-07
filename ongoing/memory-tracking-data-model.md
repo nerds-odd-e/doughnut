@@ -55,7 +55,7 @@ The `RecallPrompt` entity extends `AnswerableQuestionInstance` and represents a 
 
 - Gets the notebook associated with the question
 - Returns RecallPrompt when answered
-- Provides question details in a structured format
+- Provides structured question fields for the prompt UI
 
 ## 4. AnswerableQuestionInstance (abstract base class)
 

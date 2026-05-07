@@ -39,7 +39,7 @@ describe("NoteEditableContent", () => {
     document.body.innerHTML = ""
   })
 
-  it("should not save previous note's details to the new note when navigating", async () => {
+  it("should not save previous note's content to the new note when navigating", async () => {
     const firstNoteId = 1
     const secondNoteId = 2
 
@@ -49,7 +49,7 @@ describe("NoteEditableContent", () => {
       .withRouter()
       .withProps({
         noteId: firstNoteId,
-        noteContent: "First note details",
+        noteContent: "First note content",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -58,22 +58,23 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    detailsEl.value = "Edited details from first note"
-    detailsEl.dispatchEvent(new Event("input"))
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    contentTextarea.value = "Edited content from first note"
+    contentTextarea.dispatchEvent(new Event("input"))
     await flushPromises()
 
     await wrapper.setProps({
       noteId: secondNoteId,
-      noteContent: "Second note details",
+      noteContent: "Second note content",
     })
     await flushPromises()
 
-    expect(detailsEl.value).toBe("Second note details")
+    expect(contentTextarea.value).toBe("Second note content")
 
-    detailsEl.value = "New edits on second note"
-    detailsEl.dispatchEvent(new Event("input"))
-    detailsEl.dispatchEvent(new Event("blur"))
+    contentTextarea.value = "New edits on second note"
+    contentTextarea.dispatchEvent(new Event("input"))
+    contentTextarea.dispatchEvent(new Event("blur"))
     await flushPromises()
 
     const calls = updateNoteContentSpy.mock.calls as Array<
@@ -83,7 +84,7 @@ describe("NoteEditableContent", () => {
       calls.some(
         (call) =>
           call[0].path?.note === secondNoteId &&
-          call[0].body?.content === "Edited details from first note"
+          call[0].body?.content === "Edited content from first note"
       )
     ).toBe(false)
     expect(calls.some((call) => call[0].path?.note === firstNoteId)).toBe(false)
@@ -99,14 +100,14 @@ describe("NoteEditableContent", () => {
     wrapper.unmount()
   })
 
-  it("should update displayed details when navigating to a different note with no unsaved changes", async () => {
+  it("should update displayed content when navigating to a different note with no unsaved changes", async () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId: 1,
-        noteContent: "First note details",
+        noteContent: "First note content",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -117,18 +118,19 @@ describe("NoteEditableContent", () => {
 
     await wrapper.setProps({
       noteId: 2,
-      noteContent: "Second note details",
+      noteContent: "Second note content",
     })
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    expect(detailsEl.value).toBe("Second note details")
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    expect(contentTextarea.value).toBe("Second note content")
     wrapper.unmount()
   })
 
   it("should preserve unsaved edits if the noteContent prop doesn't actually change", async () => {
     const noteId = 1
-    const noteContent = "Original details"
+    const noteContent = "Original content"
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableContent)
@@ -145,9 +147,10 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    detailsEl.value = "Edited details"
-    detailsEl.dispatchEvent(new Event("input"))
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    contentTextarea.value = "Edited content"
+    contentTextarea.dispatchEvent(new Event("input"))
     await flushPromises()
 
     await wrapper.setProps({
@@ -157,19 +160,19 @@ describe("NoteEditableContent", () => {
     })
     await flushPromises()
 
-    expect(detailsEl.value).toBe("Edited details")
+    expect(contentTextarea.value).toBe("Edited content")
 
-    detailsEl.dispatchEvent(new Event("blur"))
+    contentTextarea.dispatchEvent(new Event("blur"))
     await flushPromises()
 
     expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: noteId },
-      body: { content: "Edited details" },
+      body: { content: "Edited content" },
     })
     wrapper.unmount()
   })
 
-  it("should save edited details to the correct note on blur before navigation", async () => {
+  it("should save edited content to the correct note on blur before navigation", async () => {
     const firstNoteId = 1
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
@@ -178,7 +181,7 @@ describe("NoteEditableContent", () => {
       .withRouter()
       .withProps({
         noteId: firstNoteId,
-        noteContent: "First note details",
+        noteContent: "First note content",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -187,20 +190,21 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    detailsEl.value = "Edited details"
-    detailsEl.dispatchEvent(new Event("input"))
-    detailsEl.dispatchEvent(new Event("blur"))
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    contentTextarea.value = "Edited content"
+    contentTextarea.dispatchEvent(new Event("input"))
+    contentTextarea.dispatchEvent(new Event("blur"))
     await flushPromises()
 
     expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: firstNoteId },
-      body: { content: "Edited details" },
+      body: { content: "Edited content" },
     })
     wrapper.unmount()
   })
 
-  it("should auto-save edited details after debounce timeout without blur", async () => {
+  it("should auto-save edited content after debounce timeout without blur", async () => {
     vi.useFakeTimers()
 
     const noteId = 1
@@ -210,7 +214,7 @@ describe("NoteEditableContent", () => {
       .withRouter()
       .withProps({
         noteId,
-        noteContent: "Original details",
+        noteContent: "Original content",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -219,9 +223,10 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    detailsEl.value = "Edited details"
-    detailsEl.dispatchEvent(new Event("input"))
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    contentTextarea.value = "Edited content"
+    contentTextarea.dispatchEvent(new Event("input"))
     await flushPromises()
 
     expect(wrapper.find(".dirty").exists()).toBe(true)
@@ -231,7 +236,7 @@ describe("NoteEditableContent", () => {
 
     expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: noteId },
-      body: { content: "Edited details" },
+      body: { content: "Edited content" },
     })
     expect(wrapper.find(".dirty").exists()).toBe(false)
 
@@ -239,7 +244,7 @@ describe("NoteEditableContent", () => {
     wrapper.unmount()
   })
 
-  it("should save details immediately when a new wiki link appears (flush debounce)", async () => {
+  it("should save content immediately when a new wiki link appears (flush debounce)", async () => {
     vi.useFakeTimers()
 
     const noteId = 1
@@ -258,9 +263,10 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    detailsEl.value = "Hello [[OtherNote]]"
-    detailsEl.dispatchEvent(new Event("input"))
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    contentTextarea.value = "Hello [[OtherNote]]"
+    contentTextarea.dispatchEvent(new Event("input"))
     await flushPromises()
 
     expect(updateNoteContentSpy).toHaveBeenCalledWith({
@@ -272,7 +278,7 @@ describe("NoteEditableContent", () => {
     wrapper.unmount()
   })
 
-  it("should not save details until debounce when edit adds no new wiki link", async () => {
+  it("should not save until debounce when edit adds no new wiki link", async () => {
     vi.useFakeTimers()
 
     const noteId = 1
@@ -291,9 +297,10 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    detailsEl.value = "Hello world"
-    detailsEl.dispatchEvent(new Event("input"))
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    contentTextarea.value = "Hello world"
+    contentTextarea.dispatchEvent(new Event("input"))
     await flushPromises()
 
     expect(updateNoteContentSpy).not.toHaveBeenCalled()
@@ -348,27 +355,28 @@ describe("NoteEditableContent", () => {
       .mount({ attachTo: document.body })
 
     await flushPromises()
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
 
-    detailsEl.value = "First edit"
-    detailsEl.dispatchEvent(new Event("input"))
-    detailsEl.dispatchEvent(new Event("blur"))
+    contentTextarea.value = "First edit"
+    contentTextarea.dispatchEvent(new Event("input"))
+    contentTextarea.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    detailsEl.value = "Second edit"
-    detailsEl.dispatchEvent(new Event("input"))
+    contentTextarea.value = "Second edit"
+    contentTextarea.dispatchEvent(new Event("input"))
     await flushPromises()
-    expect(detailsEl.value).toBe("Second edit")
+    expect(contentTextarea.value).toBe("Second edit")
 
     resolveFirstSave!()
     await wrapper.setProps({ noteContent: "First edit" })
     await flushPromises()
 
-    expect(detailsEl.value).toBe("Second edit")
+    expect(contentTextarea.value).toBe("Second edit")
     wrapper.unmount()
   })
 
-  it("should clear details when switching from a note with details to a note without details (undefined)", async () => {
+  it("should clear content when switching from a note with content to a note without content (undefined)", async () => {
     const firstNoteId = 1
     const secondNoteId = 2
 
@@ -378,7 +386,7 @@ describe("NoteEditableContent", () => {
       .withRouter()
       .withProps({
         noteId: firstNoteId,
-        noteContent: "This is the first note's details",
+        noteContent: "This is the first note's content",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -387,20 +395,23 @@ describe("NoteEditableContent", () => {
 
     await flushPromises()
 
-    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-    expect(detailsEl.value).toBe("This is the first note's details")
+    const contentTextarea = wrapper.find("textarea")
+      .element as HTMLTextAreaElement
+    expect(contentTextarea.value).toBe("This is the first note's content")
 
-    // Switch to a note with undefined details
+    // Switch to a note with undefined content
     await wrapper.setProps({
       noteId: secondNoteId,
       noteContent: undefined,
     })
     await flushPromises()
 
-    // The bug: details should be cleared but they're still showing
-    // This test should fail because the old details are still displayed
-    expect(detailsEl.value).not.toContain("This is the first note's details")
-    expect(detailsEl.value).toBe("")
+    // The bug: content should be cleared but it's still showing
+    // This test should fail because the old content is still displayed
+    expect(contentTextarea.value).not.toContain(
+      "This is the first note's content"
+    )
+    expect(contentTextarea.value).toBe("")
     wrapper.unmount()
   })
 
@@ -604,7 +615,7 @@ describe("NoteEditableContent", () => {
 
   describe("relation property row in rich mode", () => {
     it("shows RelationTypeSelectCompact when noteContent include relation frontmatter", async () => {
-      const details = `---
+      const markdown = `---
 relation: parent-of
 ---
 
@@ -615,7 +626,7 @@ relation: parent-of
         .withRouter()
         .withProps({
           noteId: 99,
-          noteContent: details,
+          noteContent: markdown,
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
@@ -634,7 +645,7 @@ relation: parent-of
     })
 
     it("omits RelationTypeSelectCompact when noteContent omit relation property", async () => {
-      const details = `---
+      const markdown = `---
 topic: training
 ---
 
@@ -645,7 +656,7 @@ topic: training
         .withRouter()
         .withProps({
           noteId: 99,
-          noteContent: details,
+          noteContent: markdown,
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
@@ -682,9 +693,10 @@ topic: training
 
       await flushPromises()
 
-      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-      detailsEl.value = "<p><br></p>"
-      detailsEl.dispatchEvent(new Event("input"))
+      const contentTextarea = wrapper.find("textarea")
+        .element as HTMLTextAreaElement
+      contentTextarea.value = "<p><br></p>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)
@@ -706,7 +718,7 @@ topic: training
         .withRouter()
         .withProps({
           noteId,
-          noteContent: "Original details",
+          noteContent: "Original content",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -715,9 +727,10 @@ topic: training
 
       await flushPromises()
 
-      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-      detailsEl.value = "<p><br></p>"
-      detailsEl.dispatchEvent(new Event("input"))
+      const contentTextarea = wrapper.find("textarea")
+        .element as HTMLTextAreaElement
+      contentTextarea.value = "<p><br></p>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)
@@ -742,7 +755,7 @@ topic: training
         .withRouter()
         .withProps({
           noteId,
-          noteContent: "Original details",
+          noteContent: "Original content",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -751,9 +764,10 @@ topic: training
 
       await flushPromises()
 
-      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-      detailsEl.value = "Original details\n\n<p><br></p>"
-      detailsEl.dispatchEvent(new Event("input"))
+      const contentTextarea = wrapper.find("textarea")
+        .element as HTMLTextAreaElement
+      contentTextarea.value = "Original content\n\n<p><br></p>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)
@@ -775,7 +789,7 @@ topic: training
         .withRouter()
         .withProps({
           noteId,
-          noteContent: "Original details",
+          noteContent: "Original content",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -784,9 +798,10 @@ topic: training
 
       await flushPromises()
 
-      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
-      detailsEl.value = "Modified details\n\n<p><br></p>"
-      detailsEl.dispatchEvent(new Event("input"))
+      const contentTextarea = wrapper.find("textarea")
+        .element as HTMLTextAreaElement
+      contentTextarea.value = "Modified content\n\n<p><br></p>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)
@@ -794,7 +809,7 @@ topic: training
 
       expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: noteId },
-        body: { content: "Modified details" },
+        body: { content: "Modified content" },
       })
 
       vi.useRealTimers()
@@ -811,7 +826,7 @@ topic: training
         .withRouter()
         .withProps({
           noteId,
-          noteContent: "Original details",
+          noteContent: "Original content",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -820,11 +835,12 @@ topic: training
 
       await flushPromises()
 
-      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+      const contentTextarea = wrapper.find("textarea")
+        .element as HTMLTextAreaElement
 
       // Test with trailing <br> tags
-      detailsEl.value = "Original details\n<br>\n<br>"
-      detailsEl.dispatchEvent(new Event("input"))
+      contentTextarea.value = "Original content\n<br>\n<br>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)
@@ -834,8 +850,8 @@ topic: training
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       // Test with trailing empty lines and <p><br></p>
-      detailsEl.value = "Original details\n\n\n<p><br></p>"
-      detailsEl.dispatchEvent(new Event("input"))
+      contentTextarea.value = "Original content\n\n\n<p><br></p>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)
@@ -845,8 +861,8 @@ topic: training
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       // Test with actual content change
-      detailsEl.value = "Modified content\n\n<br>\n<p><br></p>"
-      detailsEl.dispatchEvent(new Event("input"))
+      contentTextarea.value = "Modified content\n\n<br>\n<p><br></p>"
+      contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
 
       vi.advanceTimersByTime(1000)

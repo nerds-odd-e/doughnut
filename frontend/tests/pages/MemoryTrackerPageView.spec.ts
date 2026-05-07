@@ -673,7 +673,7 @@ describe("MemoryTrackerPageView", () => {
       expect(wrapper.text()).toContain("Thinking time: 1.5s")
     })
 
-    it("does not display question details for spelling questions", async () => {
+    it("does not display supplemental question text for spelling questions", async () => {
       const memoryTracker = makeMe.aMemoryTracker.please()
       const spellingPrompt = makeMe.aRecallPrompt
         .withQuestionType("SPELLING")

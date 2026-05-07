@@ -133,7 +133,7 @@ describe("storedApiCollection", () => {
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
     })
 
-    it("should update note details with completion", async () => {
+    it("should update note content with completion", async () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { content: "Hello " } }
 
@@ -149,7 +149,7 @@ describe("storedApiCollection", () => {
       })
     })
 
-    it("should replace entire note details with completion", async () => {
+    it("should replace entire note content with completion", async () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { content: "Hello world" } }
 
@@ -195,12 +195,12 @@ describe("storedApiCollection", () => {
       updateNoteContentSpy = mockSdkService("updateNoteContent", note)
     })
 
-    it("calls updateNoteContent even when details match stored note", async () => {
-      const detailsBody = "same details"
+    it("calls updateNoteContent even when content matches stored note", async () => {
+      const sameBody = "same body"
       const sa = storageAccessor.value.storedApi()
       storageAccessor.value.refreshNoteRealm({
         ...note,
-        note: { ...note.note, content: detailsBody },
+        note: { ...note.note, content: sameBody },
       })
 
       await sa.refreshWikiLinkCacheForNote(note.id)
@@ -208,7 +208,7 @@ describe("storedApiCollection", () => {
       expect(updateNoteContentSpy).toHaveBeenCalledTimes(1)
       expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { content: detailsBody },
+        body: { content: sameBody },
       })
     })
   })

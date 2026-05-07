@@ -78,14 +78,14 @@ class TextContentControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      noteUpdateContentDTO.setContent("new details");
+      noteUpdateContentDTO.setContent("new content");
     }
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
       NoteRealm response = controller.updateNoteContent(note, noteUpdateContentDTO);
       assertThat(response.getId(), equalTo(note.getId()));
-      assertThat(response.getNote().getContent(), equalTo("new details"));
+      assertThat(response.getNote().getContent(), equalTo("new content"));
     }
 
     @Test

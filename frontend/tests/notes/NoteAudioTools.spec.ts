@@ -496,7 +496,7 @@ describe("NoteAudioTools", () => {
     const flushButton = findButtonByTitle(wrapper, "Flush Audio")
 
     type AudioResponse = {
-      completionFromAudio: { details: string }
+      completionFromAudio: { content: string }
       endTimestamp: string
     }
 
@@ -522,7 +522,7 @@ describe("NoteAudioTools", () => {
 
     // Resolve the processing
     resolveProcess!({
-      completionFromAudio: { details: "test" },
+      completionFromAudio: { content: "test" },
       endTimestamp: "00:00:37,270",
     })
     await processPromise2
@@ -581,7 +581,7 @@ describe("NoteAudioTools", () => {
       vi.clearAllMocks()
       updateNoteTitleSpy = mockSdkService("updateNoteTitle", {} as never)
       mockSdkService("audioToText", {
-        completionFromAudio: { details: "text" },
+        completionFromAudio: { content: "text" },
         endTimestamp: "00:00:00,000",
       })
     })
@@ -632,7 +632,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { details: "text" },
+        completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
     })
@@ -643,12 +643,12 @@ describe("NoteAudioTools", () => {
 
     it("stores and reuses thread context between calls", async () => {
       const mockResponse1 = {
-        completionFromAudio: { details: "text1" },
+        completionFromAudio: { content: "text1" },
         endTimestamp: "00:00:37,270",
       }
 
       const mockResponse2 = {
-        completionFromAudio: { details: "text2" },
+        completionFromAudio: { content: "text2" },
         endTimestamp: "00:00:47,270",
       }
 
@@ -677,7 +677,7 @@ describe("NoteAudioTools", () => {
 
     it("maintains thread context even after errors", async () => {
       const mockResponse = {
-        completionFromAudio: { details: "text1" },
+        completionFromAudio: { content: "text1" },
         endTimestamp: "00:00:37,270",
       }
 
@@ -710,7 +710,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { details: "text" },
+        completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
     })
@@ -785,7 +785,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { details: "text" },
+        completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
     })
@@ -936,7 +936,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { details: "text" },
+        completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
     })

@@ -168,7 +168,7 @@ const options: QuillOptions = {
     "horizontalrule",
     "table",
   ],
-  placeholder: props.readonly ? "" : "Enter note details here...",
+  placeholder: props.readonly ? "" : "Enter note content here...",
   readOnly: props.readonly,
   theme: "bubble",
 }

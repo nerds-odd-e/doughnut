@@ -53,7 +53,7 @@ describe("storeUndoCommand", () => {
       histories.addEditingToUndoHistory(
         note1.id,
         "edit content",
-        "Original Details"
+        "Original content"
       )
       expect(histories.noteUndoHistories.length).toEqual(1)
 
@@ -61,11 +61,11 @@ describe("storeUndoCommand", () => {
       histories.addEditingToUndoHistory(
         note1.id,
         "edit content",
-        "Original Details"
+        "Original content"
       )
       expect(histories.noteUndoHistories.length).toEqual(1)
       expect(histories.noteUndoHistories[0]!.textContent).toBe(
-        "Original Details"
+        "Original content"
       )
     })
 
@@ -73,8 +73,8 @@ describe("storeUndoCommand", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       const note2 = makeMe.aNote.please()
-      histories.addEditingToUndoHistory(note1.id, "edit content", "Details 1")
-      histories.addEditingToUndoHistory(note2.id, "edit content", "Details 2")
+      histories.addEditingToUndoHistory(note1.id, "edit content", "Content A")
+      histories.addEditingToUndoHistory(note2.id, "edit content", "Content B")
 
       expect(histories.noteUndoHistories.length).toEqual(2)
     })
@@ -83,7 +83,7 @@ describe("storeUndoCommand", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
-      histories.addEditingToUndoHistory(note1.id, "edit content", "Details")
+      histories.addEditingToUndoHistory(note1.id, "edit content", "Body")
 
       expect(histories.noteUndoHistories.length).toEqual(2)
     })
@@ -91,7 +91,7 @@ describe("storeUndoCommand", () => {
     it("should create new entry for title edit after content edit to same note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
-      histories.addEditingToUndoHistory(note1.id, "edit content", "Details")
+      histories.addEditingToUndoHistory(note1.id, "edit content", "Body")
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
 
       expect(histories.noteUndoHistories.length).toEqual(2)

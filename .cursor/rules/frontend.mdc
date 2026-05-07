@@ -349,7 +349,7 @@ if (error) {
    ```typescript
    import { mockSdkServiceWithImplementation } from "@tests/helpers"
 
-   mockSdkServiceWithImplementation("updateNoteDetails", async (options) => {
+   mockSdkServiceWithImplementation("updateNoteContent", async (options) => {
      // Custom logic based on options
      return await someAsyncOperation(options)
    })

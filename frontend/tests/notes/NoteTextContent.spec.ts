@@ -105,14 +105,14 @@ describe("in place edit on title", () => {
   const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) =>
     wrapper.get("[data-placeholder]").attributes("data-placeholder")
 
-  it("should prompt people to add details", async () => {
+  it("should prompt people to add content", async () => {
     note.content = ""
     mountComponent(note)
     const placeholder = getPlaceholder(wrapper)
-    expect(placeholder).toBe("Enter note details here...")
+    expect(placeholder).toBe("Enter note content here...")
   })
 
-  it("should not prompt people to add details if readonly", async () => {
+  it("should not prompt people to add content if readonly", async () => {
     note.content = ""
     mountComponent(note, true)
     try {
@@ -263,7 +263,7 @@ describe("in place edit on title", () => {
     })
   })
 
-  it("should not trigger changes for initial details content", async () => {
+  it("should not trigger changes for initial note content", async () => {
     note.content = "initial\n\ndescription"
     mountComponent(note)
     await flushPromises()

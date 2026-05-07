@@ -56,7 +56,7 @@ describe("NoteExportDialog", () => {
       .element(page.getByTestId("graph-json-textarea"))
       .not.toBeInTheDocument()
 
-    // Expand the details
+    // Open the collapsible export section
     await page.getByText("Export Note Graph (JSON)").click()
     await flushPromises()
 

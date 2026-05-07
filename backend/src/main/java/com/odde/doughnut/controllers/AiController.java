@@ -71,8 +71,8 @@ public class AiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-    String details = note.getContent();
-    if (details == null || details.trim().isEmpty()) {
+    String content = note.getContent();
+    if (content == null || content.trim().isEmpty()) {
       return new UnderstandingChecklistDTO(List.of());
     }
     try {
@@ -99,8 +99,8 @@ public class AiController {
 
     authorizationService.assertAuthorization(note);
 
-    String details = note.getContent();
-    if (details == null || details.trim().isEmpty()) {
+    String content = note.getContent();
+    if (content == null || content.trim().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note content cannot be empty");
     }
     if (request.getPoints() == null || request.getPoints().isEmpty()) {

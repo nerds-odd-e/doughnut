@@ -14,7 +14,7 @@
 
     <div
       v-if="indexNoteStatus === 'pending'"
-      class="notebook-page-index-details daisy-mb-6 daisy-flex daisy-items-center daisy-gap-2"
+      class="notebook-page-index-body daisy-mb-6 daisy-flex daisy-items-center daisy-gap-2"
       data-testid="notebook-index-loading"
     >
       <span class="daisy-loading daisy-loading-spinner daisy-loading-sm" />
@@ -23,8 +23,8 @@
 
     <div
       v-else-if="indexNoteStatus === 'present'"
-      class="notebook-page-index-details daisy-mb-6"
-      data-testid="notebook-index-details"
+      class="notebook-page-index-body daisy-mb-6"
+      data-testid="notebook-index-body"
     >
       <div
         class="daisy-flex daisy-justify-between daisy-items-start daisy-gap-3 daisy-mb-1"
@@ -43,7 +43,7 @@
       </div>
       <p
         v-if="indexSummaryLine"
-        class="notebook-page-index-details-summary daisy-text-sm daisy-text-base-content/80"
+        class="notebook-page-index-body-summary daisy-text-sm daisy-text-base-content/80"
       >
         {{ indexSummaryLine }}
       </p>
@@ -473,13 +473,13 @@ const updateIndexNotebook = async () => {
   margin-top: 0.5rem;
 }
 
-.notebook-page-index-details {
+.notebook-page-index-body {
   background: oklch(var(--b2) / 0.8);
   border-radius: 8px;
   padding: 1rem 1.25rem;
 }
 
-.notebook-page-index-details-summary {
+.notebook-page-index-body-summary {
   line-height: 1.5;
   margin-top: 0.25rem;
 }

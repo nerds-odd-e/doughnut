@@ -53,7 +53,7 @@ describe("aiReplyState", () => {
                   type: "function",
                   function: {
                     name: "NoteContentCompletion",
-                    arguments: '{"details":',
+                    arguments: '{"content":',
                   },
                 },
               ],
@@ -102,7 +102,7 @@ describe("aiReplyState", () => {
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { details: "test content" },
+        content: { content: "test content" },
         toolCallId: "call-1",
       })
       // Tool calls are executed inline with Chat Completion API
@@ -179,7 +179,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   function: {
                     name: "NoteContentCompletion",
-                    arguments: '{"details":"test"}',
+                    arguments: '{"content":"test"}',
                   },
                 },
               ],
@@ -279,7 +279,7 @@ describe("aiReplyState", () => {
                   type: "function",
                   function: {
                     name: "NoteContentCompletion",
-                    arguments: '{"details":',
+                    arguments: '{"content":',
                   },
                 },
               ],
@@ -330,7 +330,7 @@ describe("aiReplyState", () => {
       // Verify the accumulated arguments were parsed correctly
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { details: "test content" },
+        content: { content: "test content" },
         toolCallId: "call-123",
       })
     })
@@ -352,7 +352,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   function: {
                     name: "NoteContentCompletion",
-                    arguments: '{"details":"first"}',
+                    arguments: '{"content":"first"}',
                   },
                 },
               ],
@@ -405,7 +405,7 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(2)
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { details: "first" },
+        content: { content: "first" },
         toolCallId: "call-1",
       })
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
@@ -433,7 +433,7 @@ describe("aiReplyState", () => {
                     id: "call-frag",
                     function: {
                       name: "NoteContentCompletion",
-                      arguments: '{"details":"This is a',
+                      arguments: '{"content":"This is a',
                     },
                   },
                 ],
@@ -517,7 +517,7 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
         content: {
-          details: "This is a long completion",
+          content: "This is a long completion",
         },
         toolCallId: "call-frag",
       })
@@ -540,7 +540,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   function: {
                     name: "NoteContentCompletion",
-                    arguments: '{"details":"first"}',
+                    arguments: '{"content":"first"}',
                   },
                 },
               ],
@@ -565,7 +565,7 @@ describe("aiReplyState", () => {
                   id: "call-2",
                   function: {
                     name: "NoteContentCompletion",
-                    arguments: '{"details":"second"}',
+                    arguments: '{"content":"second"}',
                   },
                 },
               ],
@@ -581,7 +581,7 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(2)
       expect(mockContext.handleSuggestion).toHaveBeenNthCalledWith(2, {
         suggestionType: "completion",
-        content: { details: "second" },
+        content: { content: "second" },
         toolCallId: "call-2",
       })
     })

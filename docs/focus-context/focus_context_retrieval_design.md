@@ -4,7 +4,7 @@ Doughnut gathers **bounded context around one focus note** for AI features (ques
 
 ## Model
 
-- **Focus note** — Depth `0`. Always included; details may be truncated to a fixed token budget.
+- **Focus note** — Depth `0`. Always included; content may be truncated to a fixed token budget.
 - **Related notes** — Reached by breadth-first expansion up to a configured **max depth** (default `2`), within a **related-note token budget** (default `2500`, overridable per graph request).
 
 ## Edges
@@ -35,8 +35,8 @@ For **folder siblings**, an anchor at wiki depth `d` uses `sampleCapAtGraphDepth
 
 ## API shape (`FocusContextResult`)
 
-- `focusNote` — `notebook`, `title`, `folderPath`, `depth`, `outgoingLinks`, `inboundReferences`, `sampleSiblings` (wiki-style URI strings), `details`, `detailsTruncated`, optional `createdAt`.
-- `relatedNotes` — Same core fields plus `depth`, `retrievalPath` (wiki URI chain), `edgeType`, optional `reason`, `createdAt`, `details`, `detailsTruncated`.
+- `focusNote` — `notebook`, `title`, `folderPath`, `depth`, `outgoingLinks`, `inboundReferences`, `sampleSiblings` (wiki-style URI strings), `content`, `contentTruncated`, optional `createdAt`.
+- `relatedNotes` — Same core fields plus `depth`, `retrievalPath` (wiki URI chain), `edgeType`, optional `reason`, `createdAt`, `content`, `contentTruncated`.
 
 ## Markdown rendering
 

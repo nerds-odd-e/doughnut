@@ -231,14 +231,14 @@ public class FocusContextRetrievalService {
         if (hydratedNote == null) {
           continue;
         }
-        String details =
+        String truncatedContent =
             ApproximateUtf8TokenBudget.truncateByApproxTokens(
                 hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
         boolean truncated =
-            details != null
+            truncatedContent != null
                 && hydratedNote.getContent() != null
-                && details.length() < hydratedNote.getContent().length();
-        int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(details));
+                && truncatedContent.length() < hydratedNote.getContent().length();
+        int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(truncatedContent));
         wikiRemainingBudget -= cost;
         result.addRelatedNote(
             new FocusContextNote(
@@ -249,7 +249,7 @@ public class FocusContextRetrievalService {
                 p.retrievalPath,
                 p.edgeType,
                 hydratedNote.getCreatedAt(),
-                details,
+                truncatedContent,
                 truncated));
         wikiClaimedNoteIds.add(hydratedNote.getId());
         pathEndingAtWikiUriByNoteId.put(hydratedNote.getId(), p.retrievalPath);
@@ -323,14 +323,14 @@ public class FocusContextRetrievalService {
       if (hydratedNote == null) {
         continue;
       }
-      String details =
+      String truncatedContent =
           ApproximateUtf8TokenBudget.truncateByApproxTokens(
               hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
       boolean truncated =
-          details != null
+          truncatedContent != null
               && hydratedNote.getContent() != null
-              && details.length() < hydratedNote.getContent().length();
-      int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(details));
+              && truncatedContent.length() < hydratedNote.getContent().length();
+      int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(truncatedContent));
       if (cost > siblingRemaining) {
         continue;
       }
@@ -344,7 +344,7 @@ public class FocusContextRetrievalService {
               o.pathToAnchor,
               FocusContextEdgeType.FolderSibling,
               hydratedNote.getCreatedAt(),
-              details,
+              truncatedContent,
               truncated));
     }
   }

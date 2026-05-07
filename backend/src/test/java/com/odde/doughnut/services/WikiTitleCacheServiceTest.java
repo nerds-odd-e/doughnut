@@ -39,10 +39,10 @@ class WikiTitleCacheServiceTest {
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Note source = makeMe.aNote().title("Alpha").underSameNotebookAs(root).please();
       Note target = makeMe.aNote().title("Beta").underSameNotebookAs(root).please();
-      String details =
+      String markdown =
           RelationshipNoteMarkdownFormatter.format(
               RelationType.RELATED_TO, source.getTitle(), target.getTitle(), null);
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content(details).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).content(markdown).please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -134,7 +134,7 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
-    void clears_rows_when_details_become_blank() {
+    void clears_rows_when_content_becomes_blank() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Note a = makeMe.aNote().title("A").underSameNotebookAs(root).please();

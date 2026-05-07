@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Heuristic cloze masking for Japanese dictionary-form titles against conjugated surface forms in
- * recall details: hide the stem, leave a visible ending (e.g. {@code 食べた} → mask+{@code た}).
+ * recall note content: hide the stem, leave a visible ending (e.g. {@code 食べた} → mask+{@code た}).
  */
 final class JapaneseLemmaStemMasker {
 
@@ -23,25 +23,25 @@ final class JapaneseLemmaStemMasker {
     return isGodanLemmaEnding(last);
   }
 
-  static String maskConjugations(String details, String lemma, String maskToken) {
+  static String maskConjugations(String text, String lemma, String maskToken) {
     List<ConjSpec> specs = buildSpecs(lemma);
-    if (specs.isEmpty()) return details;
+    if (specs.isEmpty()) return text;
     specs.sort(Comparator.comparingInt((ConjSpec s) -> s.full.length()).reversed());
 
     StringBuilder out = new StringBuilder();
     int i = 0;
-    while (i < details.length()) {
-      int cp = details.codePointAt(i);
-      if (!leftBoundaryOk(details, i)) {
+    while (i < text.length()) {
+      int cp = text.codePointAt(i);
+      if (!leftBoundaryOk(text, i)) {
         out.appendCodePoint(cp);
         i += Character.charCount(cp);
         continue;
       }
       ConjSpec chosen = null;
       for (ConjSpec s : specs) {
-        if (i + s.full.length() <= details.length()
-            && details.regionMatches(i, s.full, 0, s.full.length())
-            && rightBoundaryOk(details, i + s.full.length(), s)) {
+        if (i + s.full.length() <= text.length()
+            && text.regionMatches(i, s.full, 0, s.full.length())
+            && rightBoundaryOk(text, i + s.full.length(), s)) {
           chosen = s;
           break;
         }

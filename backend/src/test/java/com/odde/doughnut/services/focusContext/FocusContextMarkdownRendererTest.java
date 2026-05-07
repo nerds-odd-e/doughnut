@@ -110,7 +110,7 @@ class FocusContextMarkdownRendererTest {
               List.of("[[Focus]]", "[[NB: Mid]]", "[[NB: Far]]"),
               FocusContextEdgeType.OutgoingWikiLink,
               null,
-              "far details",
+              "far content",
               true));
 
       String output = renderer.render(result, RetrievalConfig.defaultMaxDepth());
