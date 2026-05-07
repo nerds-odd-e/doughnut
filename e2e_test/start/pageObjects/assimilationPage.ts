@@ -225,7 +225,7 @@ export const assumeAssimilationPage = () => ({
   expectRememberingSpellingUnavailable() {
     form
       .getField('Remember Spelling')
-      .expectError('Remember spelling note need to have detail')
+      .expectError('Remember spelling note need to have content')
       .shouldBeDisabled()
     return this
   },
