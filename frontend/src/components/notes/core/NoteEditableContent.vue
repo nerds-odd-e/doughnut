@@ -1,7 +1,7 @@
 <template>
   <TextContentWrapper
-    :value="noteDetails"
-    field="edit details"
+    :value="noteContent"
+    field="edit content"
   >
     <template #default="{ value, update, blur }">
       <TextArea
@@ -44,13 +44,13 @@ import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
-import { useDetailsCursorInserter } from "@/composables/useDetailsCursorInserter"
+import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import {
-  composeNoteDetailsFromPropertyRows,
-  parseNoteDetailsMarkdown,
+  composeNoteContentFromPropertyRows,
+  parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
-} from "@/utils/noteDetailsFrontmatter"
+} from "@/utils/noteContentFrontmatter"
 
 const emit = defineEmits<{
   deadLinkClick: [title: string]
@@ -58,7 +58,7 @@ const emit = defineEmits<{
 
 const props = defineProps({
   noteId: { type: Number, required: true },
-  noteDetails: { type: String, required: false },
+  noteContent: { type: String, required: false },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
@@ -69,14 +69,14 @@ const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =
   usePasteWithLinkImageOptions()
 const { registerInserter, registerWikiPropertyInserter, unregisterInserter } =
-  useDetailsCursorInserter()
+  useContentCursorInserter()
 
-/** Byte offset in `details` of the `""` YAML key for the empty property name line, or null. */
-function caretOffsetForEmptyPropertyYamlKey(details: string): number | null {
-  if (!details.startsWith("---\n")) return null
-  const close = details.indexOf("\n---\n", 4)
+/** Byte offset in `markdown` of the `""` YAML key for the empty property name line, or null. */
+function caretOffsetForEmptyPropertyYamlKey(markdown: string): number | null {
+  if (!markdown.startsWith("---\n")) return null
+  const close = markdown.indexOf("\n---\n", 4)
   if (close === -1) return null
-  const yamlInner = details.slice(4, close)
+  const yamlInner = markdown.slice(4, close)
   const m = /^""\s*:/m.exec(yamlInner)
   if (!m || m.index === undefined) return null
   return 4 + m.index
@@ -128,16 +128,16 @@ onMounted(() => {
   })
 
   registerWikiPropertyInserter({
-    canInsert: () => parseNoteDetailsMarkdown(props.noteDetails ?? "").ok,
+    canInsert: () => parseNoteContentMarkdown(props.noteContent ?? "").ok,
     insert: (text: string) => {
-      const parsed = parseNoteDetailsMarkdown(props.noteDetails ?? "")
+      const parsed = parseNoteContentMarkdown(props.noteContent ?? "")
       if (!parsed.ok) return
       const rows = [
         ...sortedPropertyRowsFromRecord(parsed.properties),
         { key: "", value: text },
       ]
       if (!validatePropertyRowsForRichEdit(rows).ok) return
-      const composed = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+      const composed = composeNoteContentFromPropertyRows(rows, parsed.body)
       if (props.asMarkdown) {
         const textarea = textareaRef.value?.$el?.querySelector(
           "textarea"

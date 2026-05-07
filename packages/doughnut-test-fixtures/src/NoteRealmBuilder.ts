@@ -61,8 +61,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
-  details(value: string): NoteRealmBuilder {
-    this.noteBuilder.details(value)
+  content(value: string): NoteRealmBuilder {
+    this.noteBuilder.content(value)
     return this
   }
 

@@ -34,8 +34,8 @@ class EmbeddingServiceTests {
 
   @Test
   void shouldStreamEmbeddingsForNotes() {
-    Note note1 = makeMe.aNote().title("T1").details("D1").please();
-    Note note2 = makeMe.aNote().title("T2").details("D2").please();
+    Note note1 = makeMe.aNote().title("T1").content("D1").please();
+    Note note2 = makeMe.aNote().title("T2").content("D2").please();
 
     Embedding embedding1 = Embedding.builder().index(0L).embedding(List.of(1.0f, 2.0f)).build();
     Embedding embedding2 = Embedding.builder().index(1L).embedding(List.of(3.0f, 4.0f)).build();
@@ -59,7 +59,7 @@ class EmbeddingServiceTests {
               List<String> inputs = params.input().arrayOfStrings().orElse(List.of());
               String first = inputs.get(0);
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Title: T1"));
-              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Details:"));
+              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Content:"));
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("D1"));
               return response;
             });

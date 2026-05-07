@@ -54,7 +54,7 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 })
 
 const setupTestData = () => {
-  const note = makeMe.aNote.details("").please()
+  const note = makeMe.aNote.content("").please()
   const conversation = makeMe.aConversation.forANote(note).please()
   const user = makeMe.aUser.please()
   return { note, conversation, user }

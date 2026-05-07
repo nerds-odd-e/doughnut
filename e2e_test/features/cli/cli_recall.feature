@@ -6,11 +6,11 @@ Feature: CLI recall status and recall session
     Given I am logged in as an existing user
     And I set the access token for "old_learner" in the interactive CLI
 
-  Rule: English notebook with two notes (sedition vs sedation; markdown in details)
+  Rule: English notebook with two notes (sedition vs sedation; markdown in note content)
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Details                        | Skip Memory Tracking |
+        | Title    | Content | Skip Memory Tracking |
         | English  |                                | true                 |
         | sedition | Sedition means incite violence |                      |
         | sedation | **Put** to sleep is _sedation_ |                      |
@@ -108,7 +108,7 @@ Feature: CLI recall status and recall session
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Details                        | Skip Memory Tracking | Remember Spelling |
+        | Title    | Content | Skip Memory Tracking | Remember Spelling |
         | English  |                                | true                 |                   |
         | sedition | Sedition means incite violence |                      | true              |
 

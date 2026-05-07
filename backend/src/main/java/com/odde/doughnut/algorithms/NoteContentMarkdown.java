@@ -2,22 +2,22 @@ package com.odde.doughnut.algorithms;
 
 import java.util.Optional;
 
-/** Leading YAML frontmatter fence handling for note details markdown. */
-public final class NoteDetailsMarkdown {
+/** Leading YAML frontmatter fence handling for note content markdown. */
+public final class NoteContentMarkdown {
 
-  private NoteDetailsMarkdown() {}
+  private NoteContentMarkdown() {}
 
   public record LeadingFrontmatter(String yamlRaw, String body) {}
 
-  public static String bodyWithoutLeadingFrontmatter(String details) {
-    return splitLeadingFrontmatter(details).map(LeadingFrontmatter::body).orElse(details);
+  public static String bodyWithoutLeadingFrontmatter(String content) {
+    return splitLeadingFrontmatter(content).map(LeadingFrontmatter::body).orElse(content);
   }
 
-  public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String details) {
-    if (details == null || details.isEmpty()) {
+  public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
+    if (content == null || content.isEmpty()) {
       return Optional.empty();
     }
-    String normalized = details.replace("\r\n", "\n").replace('\r', '\n');
+    String normalized = content.replace("\r\n", "\n").replace('\r', '\n');
     String work = stripUtf8Bom(normalized);
     String[] lines = work.split("\n", -1);
     if (lines.length == 0 || !"---".equals(lines[0])) {

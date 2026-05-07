@@ -5,9 +5,9 @@ Feature: add relationship
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Sedition law" with a note "Sedition" and details "Incite violence"
-    And I have a notebook "Sedation care" with a note "Sedation" and details "Put to sleep"
-    And I have a notebook "Sedative drugs" with a note "Sedative" and details "Sleep medicine"
+    And I have a notebook "Sedition law" with a note "Sedition" and content "Incite violence"
+    And I have a notebook "Sedation care" with a note "Sedation" and content "Put to sleep"
+    And I have a notebook "Sedative drugs" with a note "Sedative" and content "Sleep medicine"
 
   @mockBrowserTime
   Scenario: View all notes that can be related for a note when no relationship exists
@@ -33,7 +33,7 @@ Feature: add relationship
 
   @mockBrowserTime
   Scenario: Show recently updated notes before search results
-    Given I have a notebook "Recent scratch" with a note "Recent Note" and details "Recently added"
+    Given I have a notebook "Recent scratch" with a note "Recent Note" and content "Recently added"
     When I am creating a relationship under note "Sedition"
     Then I should see "Recent Note" in the recently updated notes section
     When I search for "Sed" in all my notebooks
@@ -46,9 +46,9 @@ Feature: add relationship
     Then I should see "Sedition" has relationship "similar to" "Sedation"
     When I open the relationship from "Sedition" to "Sedation"
     Then I should be on the relationship note page from "Sedition" with relation "similar to" to "Sedation"
-    When I open the note details markdown editor
-    Then the note details markdown source should contain "type: relationship"
-    And the note details markdown source should contain "relation: similar-to"
-    And the note details markdown source should contain "[[Sedition]] similar to [[Sedation care: Sedation]]"
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "type: relationship"
+    And the note content markdown source should contain "relation: similar-to"
+    And the note content markdown source should contain "[[Sedition]] similar to [[Sedation care: Sedation]]"
     When I undo "create note"
     Then I should see "Sedition" has no relationship to "Sedation"

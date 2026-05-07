@@ -53,7 +53,7 @@ public class ChatCompletionNoteAutomationService {
 
   public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
     String t = note.getTitle() != null ? note.getTitle() : "";
-    String d = note.getDetails() != null ? note.getDetails() : "";
+    String d = note.getContent() != null ? note.getContent() : "";
     InstructionAndSchema tool = AiToolFactory.promotePointToSiblingAiTool(point, t, d);
     return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
   }
@@ -95,15 +95,15 @@ public class ChatCompletionNoteAutomationService {
     return chatRequestBuilder;
   }
 
-  public String removePointsAndRegenerateDetails(List<String> pointsToRemove)
+  public String removePointsAndRegenerateContent(List<String> pointsToRemove)
       throws JsonProcessingException {
     if (pointsToRemove == null || pointsToRemove.isEmpty()) {
-      return note.getDetails();
+      return note.getContent();
     }
     return executeWithTool(
-        AiToolFactory.removePointsFromDetailsAiTool(pointsToRemove),
-        RegeneratedNoteDetails.class,
-        r -> r.details,
-        note.getDetails());
+        AiToolFactory.removePointsFromContentAiTool(pointsToRemove),
+        RegeneratedNoteContent.class,
+        r -> r.content,
+        note.getContent());
   }
 }

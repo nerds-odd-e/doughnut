@@ -87,7 +87,7 @@ export const assumeAssimilationPage = () => ({
         case 'single note': {
           if (title) mainNoteTitle().should('contain', title)
           if (additionalInfo) {
-            cy.get('.note-details').should('contain', additionalInfo)
+            cy.get('.note-content').should('contain', additionalInfo)
           }
           break
         }
@@ -98,7 +98,7 @@ export const assumeAssimilationPage = () => ({
               additionalInfo,
               '; '
             )
-            cy.get('.note-details').should('contain', expectedDetails)
+            cy.get('.note-content').should('contain', expectedDetails)
             cy.get('#note-image')
               .find('img')
               .should('have.attr', 'src')

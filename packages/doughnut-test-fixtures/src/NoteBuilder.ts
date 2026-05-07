@@ -30,7 +30,7 @@ class NoteBuilder extends Builder<Note> {
         createdAt: new Date().toISOString(),
         updatedAt: '2021-08-24T08:46:44.000+00:00',
       },
-      details: '<p>Desc</p>',
+      content: '<p>Desc</p>',
       wikidataId: '',
       deletedAt: '',
     }
@@ -53,8 +53,8 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  details(value: string | undefined): NoteBuilder {
-    this.data.details = value
+  content(value: string | undefined): NoteBuilder {
+    this.data.content = value
     return this
   }
 
@@ -76,7 +76,7 @@ class NoteBuilder extends Builder<Note> {
   relationType(value: RelationshipCreation['relationType']): NoteBuilder {
     this.title(`:${value}`)
     const kebab = relationLabelToKebab(value)
-    this.data.details = `---\nrelation: ${kebab}\n---\n`
+    this.data.content = `---\nrelation: ${kebab}\n---\n`
     return this
   }
 

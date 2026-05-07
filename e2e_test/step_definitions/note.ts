@@ -83,14 +83,14 @@ Given(
 )
 
 Given(
-  'I have a notebook {string} with a note {string} and details {string}',
-  (notebookName: string, noteTitle: string, details: string) => {
+  'I have a notebook {string} with a note {string} and content {string}',
+  (notebookName: string, noteTitle: string, content: string) => {
     cy.get<string>('@currentLoginUser').then((username) =>
       start.testability().injectNotes(
         [
           {
             Title: noteTitle,
-            Details: details,
+            Content: content,
           },
         ],
         username,
@@ -216,20 +216,18 @@ Given(
 )
 
 Given(
-  'I update note {string} details from {string} to become {string}',
-  (noteTopology: string, noteDetails: string, newNoteDetails: string) => {
-    cy.findByText(noteDetails).click({ force: true })
-    start
-      .assumeNotePage(noteTopology)
-      .editTextContent({ Details: newNoteDetails })
+  'I update note {string} content from {string} to become {string}',
+  (noteTopology: string, previousContent: string, newContent: string) => {
+    cy.findByText(previousContent).click({ force: true })
+    start.assumeNotePage(noteTopology).editTextContent({ Content: newContent })
   }
 )
 
 When(
-  'I update note {string} with details {string}',
-  (noteTopology: string, newDetails: string) => {
-    start.jumpToNotePage(noteTopology).editTextContent({ Details: newDetails })
-    start.assumeNotePage().findNoteDetails(newDetails)
+  'I update note {string} with content {string}',
+  (noteTopology: string, newContent: string) => {
+    start.jumpToNotePage(noteTopology).editTextContent({ Content: newContent })
+    start.assumeNotePage().findNoteContent(newContent)
   }
 )
 
@@ -288,8 +286,8 @@ Then('the note title should be {string}', (title: string) => {
   start.assumeNotePage().expectNoteTitleDisplayed(title)
 })
 
-Then('the note details should include {string}', (fragment: string) => {
-  start.assumeNotePage().expectDetailsContaining(fragment)
+Then('the note content should include {string}', (fragment: string) => {
+  start.assumeNotePage().expectContentContaining(fragment)
 })
 
 When('I visit all my notebooks', () => {
@@ -448,27 +446,27 @@ Then('I type {string} in the title', (content: string) => {
 })
 
 Then(
-  'the note details on the current page should be {string}',
-  (detailsText: string) => {
-    start.assumeNotePage().findNoteDetails(detailsText)
+  'the note content on the current page should be {string}',
+  (contentText: string) => {
+    start.assumeNotePage().findNoteContent(contentText)
   }
 )
 
 Then(
-  'the note details on the current page should be {string} within {int} seconds',
-  (detailsText: string, timeout: number) => {
-    start.assumeNotePage().findNoteDetails(detailsText, timeout * 1000)
+  'the note content on the current page should be {string} within {int} seconds',
+  (contentText: string, timeout: number) => {
+    start.assumeNotePage().findNoteContent(contentText, timeout * 1000)
   }
 )
 
 Given(
-  'I request to complete the details for the note {string}',
+  'I request to complete the content for the note {string}',
   (noteTopology: string) => {
     start
       .jumpToNotePage(noteTopology)
       .startAConversationAboutNote()
       .replyToConversationAndInviteAiToReply(
-        'Please complete the note details.'
+        'Please complete the note content.'
       )
     start.pageIsNotLoading()
   }
@@ -551,21 +549,21 @@ When(
 )
 
 When(
-  'I update note {string} details using markdown to become:',
-  (noteTopology: string, newDetails: string) => {
-    start.jumpToNotePage(noteTopology).updateDetailsAsMarkdown(newDetails)
+  'I update note {string} content using markdown to become:',
+  (noteTopology: string, newContent: string) => {
+    start.jumpToNotePage(noteTopology).updateContentAsMarkdown(newContent)
   }
 )
 
 When(
-  'I update the current note details using markdown to become:',
-  (newDetails: string) => {
-    start.assumeNotePage().updateDetailsAsMarkdown(newDetails)
+  'I update the current note content using markdown to become:',
+  (newContent: string) => {
+    start.assumeNotePage().updateContentAsMarkdown(newContent)
   }
 )
 
-When('I flush pending note details save', () => {
-  start.assumeNotePage().flushPendingDetailsSave()
+When('I flush pending note content save', () => {
+  start.assumeNotePage().flushPendingContentSave()
 })
 
 When('I reload the current page for note {string}', (noteTopology: string) => {
@@ -574,46 +572,46 @@ When('I reload the current page for note {string}', (noteTopology: string) => {
   start.assumeNotePage(noteTopology)
 })
 
-When('I open the note details markdown editor', () => {
-  start.assumeNotePage().openMarkdownDetailsEditor()
+When('I open the note content markdown editor', () => {
+  start.assumeNotePage().openMarkdownContentEditor()
 })
 
 Then(
-  'the note details markdown source should contain {string}',
+  'the note content markdown source should contain {string}',
   (fragment: string) => {
-    start.assumeNotePage().expectMarkdownDetailsSourceContains(fragment)
+    start.assumeNotePage().expectMarkdownContentSourceContains(fragment)
   }
 )
 
 Then(
-  'the note details markdown source should not contain {string}',
+  'the note content markdown source should not contain {string}',
   (fragment: string) => {
-    start.assumeNotePage().expectMarkdownDetailsSourceDoesNotContain(fragment)
+    start.assumeNotePage().expectMarkdownContentSourceDoesNotContain(fragment)
   }
 )
 
-When('I view the note details as rich content', () => {
-  start.assumeNotePage().switchToRichDetails()
+When('I view the note content as rich content', () => {
+  start.assumeNotePage().switchToRichContentMode()
 })
 
-When('I view the note details as markdown', () => {
+When('I view the note content as markdown', () => {
   start.assumeNotePage().toolbarButton('Edit as markdown').click()
 })
 
 Then(
-  'I should see the rich content elements in the note details:',
+  'I should see the rich content elements in the note content:',
   (data: DataTable) => {
-    start.assumeNotePage().expectRichDetails(data.hashes())
+    start.assumeNotePage().expectRichContent(data.hashes())
   }
 )
 
 Then(
-  'I should see the rich content of the note with details:',
+  'I should see the rich content of the note with content:',
   (data: DataTable) => {
     start
       .assumeNotePage()
       .switchToRichContent()
-      .expectRichDetails(data.hashes())
+      .expectRichContent(data.hashes())
   }
 )
 
@@ -628,17 +626,17 @@ When(
   }
 )
 Then(
-  'I should see note {notepath} has details {string}',
-  (notePath: NotePath, expectedDetails: string) => {
+  'I should see note {notepath} has content {string}',
+  (notePath: NotePath, expectedContent: string) => {
     start
       .navigateToNotebooksPage()
       .navigateToPath(notePath)
-      .findNoteDetails(expectedDetails)
+      .findNoteContent(expectedContent)
   }
 )
 
-Then('the note details should contain a line break', () => {
-  start.assumeNotePage().expectNoteDetailsContainLineBreak()
+Then('the note content should contain a line break', () => {
+  start.assumeNotePage().expectNoteContentContainLineBreak()
 })
 
 When('I promote the point {string} to a sibling note', (pointText: string) => {
@@ -650,7 +648,7 @@ Then(
   (linkText: string) => {
     start
       .assumeNotePage()
-      .wikiLinkInDetails(linkText)
+      .wikiLinkInNoteContent(linkText)
       .expectNoteShowHref()
       .followAndAssumeNote(linkText)
   }
@@ -661,7 +659,7 @@ Then(
   (linkText: string, noteTitle: string) => {
     start
       .assumeNotePage()
-      .wikiLinkInDetails(linkText)
+      .wikiLinkInNoteContent(linkText)
       .expectNoteShowHref()
       .followAndAssumeNote(noteTitle)
   }

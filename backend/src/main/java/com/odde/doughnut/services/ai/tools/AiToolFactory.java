@@ -33,7 +33,7 @@ public class AiToolFactory {
 
         You will receive hidden context in a fenced Markdown block starting with "# Focus Context". This context is visible only to you. The learner who answers the question will not see it.
 
-        The MCQ must be anchored on the focus note. Use the focus note's title and details as the primary source. Retrieved notes may be used only as supporting evidence or distractor material.
+        The MCQ must be anchored on the focus note. Use the focus note's title and content as the primary source. Retrieved notes may be used only as supporting evidence or distractor material.
 
         The question must be self-contained. Include enough explicit information in the stem or choices so the learner can understand what is being asked, but avoid copying the exact answer into the stem when that would make the question trivial.
 
@@ -109,7 +109,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return new InstructionAndSchema(
         """
             You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
-              •	Output only function calls with a unified diff showing how to append the processed text to existing note details, adding necessary whitespace or a new line at the beginning.
+              •	Output only function calls with a unified diff showing how to append the processed text to existing note content, adding necessary whitespace or a new line at the beginning.
               •	Do not translate the text unless requested.
               • Do not interpret the text. Do not use reported speech.
               •	Leave unclear parts unchanged.
@@ -121,7 +121,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
              ------------
             """
             + transcriptionFromAudio,
-        completeNoteDetails());
+        completeNoteContent());
   }
 
   public static InstructionAndSchema suggestNoteTitleAiTool() {
@@ -132,7 +132,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
 
   public static InstructionAndSchema generateUnderstandingChecklistAiTool() {
     return new InstructionAndSchema(
-        "Please generate an understanding checklist of the note details broken down into key points. Each point should be a complete sentence that captures an important aspect of the note content. The checklist should help the user check whether they truly understood the important points in the note. There should only be a maximum of 5 points.",
+        "Please generate an understanding checklist of the note content broken down into key points. Each point should be a complete sentence that captures an important aspect of the note. The checklist should help the user check whether they truly understood the important points in the note. There should only be a maximum of 5 points.",
         generateUnderstandingChecklist());
   }
 
@@ -156,29 +156,29 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return BookLayoutReorganizationSuggestion.class;
   }
 
-  public static InstructionAndSchema removePointsFromDetailsAiTool(List<String> pointsToRemove) {
+  public static InstructionAndSchema removePointsFromContentAiTool(List<String> pointsToRemove) {
     String pointsBlock = String.join("\n", pointsToRemove);
     String message =
         """
-            You need to remove specific points from the note details. Carefully identify and completely remove all content related to each of the following points. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information that is not related to the points to be removed.
+            You need to remove specific points from the note content. Carefully identify and completely remove all content related to each of the following points. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information that is not related to the points to be removed.
 
             Important guidelines:
             1. Identify content that matches or relates to each point listed below
             2. Completely remove all sentences, paragraphs, or sections that contain or relate to these points
             3. Ensure the remaining content flows naturally and maintains coherence
             4. Preserve all other information that is unrelated to the points to be removed
-            5. Output only the new details in markdown format
+            5. Output only the new content in markdown format
 
             Points to remove:
             %s
             """
             .formatted(pointsBlock);
-    return new InstructionAndSchema(message, RegeneratedNoteDetails.class);
+    return new InstructionAndSchema(message, RegeneratedNoteContent.class);
   }
 
   public static List<Class<?>> getAllAssistantTools() {
     return List.of(
-        completeNoteDetails(),
+        completeNoteContent(),
         suggestNoteTitle(),
         askSingleAnswerMultipleChoiceQuestion(),
         evaluateQuestion());
@@ -192,8 +192,8 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return UnderstandingChecklist.class;
   }
 
-  public static Class<?> completeNoteDetails() {
-    return NoteDetailsCompletion.class;
+  public static Class<?> completeNoteContent() {
+    return NoteContentCompletion.class;
   }
 
   public static Class<?> evaluateQuestion() {
@@ -201,13 +201,13 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
   }
 
   public static InstructionAndSchema promotePointToSiblingAiTool(
-      String point, String noteTitle, String noteDetails) {
+      String point, String noteTitle, String noteContent) {
     String instruction =
         """
         You are helping extract a point from a note to create a new sibling note.
 
         Current note title: "%s"
-        Current note details:
+        Current note content:
         ---
         %s
         ---
@@ -216,17 +216,17 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
 
         Tasks:
         1. Generate a concise, meaningful title for the new sibling note based on this point
-        2. Identify the related content in the current note's details for this point
-        3. Move that content to the new note's details - keep the original meaning but make it concise and avoid redundancy
-        4. Remove the extracted content from the current note's details
+        2. Identify the related content in the current note for this point
+        3. Move that content to the new note's content - keep the original meaning but make it concise and avoid redundancy
+        4. Remove the extracted content from the current note
 
         Guidelines:
-        - The new note's details should be based on the extracted content from current note, refined for clarity and conciseness
+        - The new note's content should be based on the extracted content from current note, refined for clarity and conciseness
         - Do not add new information that was not in the original content
-        - Keep all unrelated parts of current note details unchanged
+        - Keep all unrelated parts of the current note unchanged
         - Ensure the remaining content in current note still reads naturally
         """
-            .formatted(noteTitle, noteDetails, point);
+            .formatted(noteTitle, noteContent, point);
 
     return new InstructionAndSchema(instruction, promotePoint());
   }

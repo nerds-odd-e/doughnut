@@ -34,7 +34,7 @@ class NoteRealmServiceTest {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     makeMe.aNote().title("LinkedPage").underSameNotebookAs(root).please();
-    Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[LinkedPage]]").please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[LinkedPage]]").please();
 
     NoteRealm realm = noteRealmService.build(carrier, user);
 
@@ -49,7 +49,7 @@ class NoteRealmServiceTest {
 
     User viewer = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(viewer).please();
-    Note carrier = makeMe.aNote().underSameNotebookAs(root).details("plain").please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).content("plain").please();
 
     NoteWikiTitleCache row = new NoteWikiTitleCache();
     row.setNote(carrier);
@@ -68,7 +68,7 @@ class NoteRealmServiceTest {
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
     Note carrier =
-        makeMe.aNote().creator(user).underSameNotebookAs(root).details("[[Focal]]").please();
+        makeMe.aNote().creator(user).underSameNotebookAs(root).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -98,7 +98,7 @@ class NoteRealmServiceTest {
     Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
     Note subject = makeMe.aNote().underSameNotebookAs(root).please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
-    relation.setDetails(
+    relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, RelationType.SPECIALIZE, subject, focal, null));
     makeMe.entityPersister.merge(relation);
@@ -131,7 +131,7 @@ class NoteRealmServiceTest {
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
     Note carrier =
-        makeMe.aNote().creator(user).underSameNotebookAs(root).details("[[Focal]]").please();
+        makeMe.aNote().creator(user).underSameNotebookAs(root).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -146,7 +146,7 @@ class NoteRealmServiceTest {
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
     Note carrier = makeMe.aNote().title("Child").creator(user).underSameNotebookAs(root).please();
-    carrier.setDetails("---\nparent: \"[[Focal]]\"\n---\n\nBody.");
+    carrier.setContent("---\nparent: \"[[Focal]]\"\n---\n\nBody.");
     makeMe.entityPersister.merge(carrier);
     makeMe.entityPersister.flush();
     wikiTitleCacheService.refreshForNote(carrier, user);
@@ -164,7 +164,7 @@ class NoteRealmServiceTest {
     Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
     Note subject = makeMe.aNote().underSameNotebookAs(root).please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
-    relation.setDetails(
+    relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, RelationType.SPECIALIZE, subject, focal, null));
     makeMe.entityPersister.merge(relation);
@@ -225,7 +225,7 @@ class NoteRealmServiceTest {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
-    Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[Focal]]").please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     carrier.setDeletedAt(new Timestamp(System.currentTimeMillis()));

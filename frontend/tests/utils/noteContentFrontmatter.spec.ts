@@ -1,27 +1,27 @@
 import { describe, expect, it } from "vitest"
 import {
-  composeNoteDetailsFromPropertyRows,
-  composeNoteDetailsMarkdown,
-  detailsHasRelationProperty,
+  composeNoteContentFromPropertyRows,
+  composeNoteContentMarkdown,
+  contentHasRelationProperty,
   insertPropertyRowAt,
-  parseNoteDetailsMarkdown,
+  parseNoteContentMarkdown,
   propertyRecordHasRelationKey,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
-} from "@/utils/noteDetailsFrontmatter"
+} from "@/utils/noteContentFrontmatter"
 
-describe("parseNoteDetailsMarkdown", () => {
+describe("parseNoteContentMarkdown", () => {
   it("treats text without opening fence as body-only", () => {
     const md = "hello\n---\nnot-a-fence: true\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r).toEqual({ ok: true, properties: {}, body: md })
   })
 
   it("parses two scalar properties and body after closing fence", () => {
     const md = "---\nalpha: one\nbeta: 2\n---\nParagraph.\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r).toEqual({
       ok: true,
       properties: { alpha: "one", beta: "2" },
@@ -31,19 +31,19 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("places body immediately after closing fence without extra newline when absent", () => {
     const md = "---\nk: v\n---\nHello"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok && r.body).toBe("Hello")
   })
 
   it("parses empty frontmatter block as empty properties", () => {
     const md = "---\n---\nContent line\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r).toEqual({ ok: true, properties: {}, body: "Content line\n" })
   })
 
   it("rejects duplicate keys in frontmatter", () => {
     const md = "---\na: 1\na: 2\n---\nbody\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("duplicate_keys")
@@ -53,7 +53,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("rejects nested mapping values", () => {
     const md = "---\nouter:\n  inner: x\n---\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("unsupported_value")
@@ -62,7 +62,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("rejects array values", () => {
     const md = "---\ntags:\n  - a\n---\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("unsupported_value")
@@ -71,7 +71,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("rejects malformed YAML", () => {
     const md = "---\nfoo: [\n---\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("malformed_yaml")
@@ -80,7 +80,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("rejects opening fence without closing fence", () => {
     const md = "---\na: 1\nstill yaml\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("malformed_frontmatter_fence")
@@ -89,7 +89,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("coerces boolean and number scalars to strings", () => {
     const md = "---\nflag: true\nnum: 42\n---\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r).toEqual({
       ok: true,
       properties: { flag: "true", num: "42" },
@@ -99,7 +99,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("rejects explicit yaml null property value", () => {
     const md = "---\na: null\n---\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("unsupported_value")
@@ -108,7 +108,7 @@ describe("parseNoteDetailsMarkdown", () => {
 
   it("rejects root yaml null mapping position", () => {
     const md = "---\nnull\n---\n"
-    const r = parseNoteDetailsMarkdown(md)
+    const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.reason).toBe("unsupported_value")
@@ -116,9 +116,9 @@ describe("parseNoteDetailsMarkdown", () => {
   })
 })
 
-describe("composeNoteDetailsMarkdown", () => {
+describe("composeNoteContentMarkdown", () => {
   it("returns body only when properties empty", () => {
-    expect(composeNoteDetailsMarkdown({ properties: {}, body: "x\n" })).toBe(
+    expect(composeNoteContentMarkdown({ properties: {}, body: "x\n" })).toBe(
       "x\n"
     )
   })
@@ -126,10 +126,10 @@ describe("composeNoteDetailsMarkdown", () => {
   it("round-trips simple parse and compose", () => {
     const original =
       "---\ntitle: Hello\nalias: my-note\n---\n## Body\n\nMore.\n"
-    const parsed = parseNoteDetailsMarkdown(original)
+    const parsed = parseNoteContentMarkdown(original)
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    const composed = composeNoteDetailsMarkdown({
+    const composed = composeNoteContentMarkdown({
       properties: parsed.properties,
       body: parsed.body,
     })
@@ -138,11 +138,11 @@ describe("composeNoteDetailsMarkdown", () => {
 
   it("round-trips empty frontmatter parse with compose adding no fence when props empty", () => {
     const md = "---\n---\nOnly body\n"
-    const parsed = parseNoteDetailsMarkdown(md)
+    const parsed = parseNoteContentMarkdown(md)
     expect(parsed.ok && parsed.properties).toEqual({})
     if (!parsed.ok) return
     expect(
-      composeNoteDetailsMarkdown({
+      composeNoteContentMarkdown({
         properties: parsed.properties,
         body: parsed.body,
       })
@@ -153,8 +153,8 @@ describe("composeNoteDetailsMarkdown", () => {
 describe("property rows compose / mutate", () => {
   it("insert: composing first row yields parseable frontmatter with matching scalar props", () => {
     const rows = insertPropertyRowAt([], 0, { key: "topic", value: "training" })
-    const md = composeNoteDetailsFromPropertyRows(rows, "# Hello\n")
-    const parsed = parseNoteDetailsMarkdown(md)
+    const md = composeNoteContentFromPropertyRows(rows, "# Hello\n")
+    const parsed = parseNoteContentMarkdown(md)
     expect(parsed.ok && parsed.properties).toEqual({
       topic: "training",
     })
@@ -164,15 +164,15 @@ describe("property rows compose / mutate", () => {
   })
 
   it("rename: composed markdown loses old key and exposes new key", () => {
-    const parsed = parseNoteDetailsMarkdown(
+    const parsed = parseNoteContentMarkdown(
       "---\nalpha: one\nbeta: two\n---\nBody\n"
     )
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     let rows = sortedPropertyRowsFromRecord(parsed.properties)
     rows = renamePropertyRowKeyAt(rows, 0, "alphaRenamed")
-    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
-    const again = parseNoteDetailsMarkdown(md)
+    const md = composeNoteContentFromPropertyRows(rows, parsed.body)
+    const again = parseNoteContentMarkdown(md)
     expect(again.ok && again.properties).toEqual({
       alphaRenamed: "one",
       beta: "two",
@@ -181,75 +181,75 @@ describe("property rows compose / mutate", () => {
   })
 
   it("remove: dropping one row leaves remaining props only", () => {
-    const parsed = parseNoteDetailsMarkdown("---\na: 1\nb: 2\n---\nRest\n")
+    const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     let rows = sortedPropertyRowsFromRecord(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
-    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
-    const again = parseNoteDetailsMarkdown(md)
+    const md = composeNoteContentFromPropertyRows(rows, parsed.body)
+    const again = parseNoteContentMarkdown(md)
     expect(again.ok && again.properties).toEqual({ b: "2" })
   })
 
   it("remove: dropping second sorted row keeps first key only", () => {
-    const parsed = parseNoteDetailsMarkdown("---\na: 1\nb: 2\n---\nRest\n")
+    const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     let rows = sortedPropertyRowsFromRecord(parsed.properties)
     rows = removePropertyRowAt(rows, 1)
-    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
-    const again = parseNoteDetailsMarkdown(md)
+    const md = composeNoteContentFromPropertyRows(rows, parsed.body)
+    const again = parseNoteContentMarkdown(md)
     expect(again.ok && again.properties).toEqual({ a: "1" })
     expect(again.ok && again.properties.b).toBeUndefined()
   })
 
-  it("remove: clearing every row yields body-only details without frontmatter fence", () => {
-    const parsed = parseNoteDetailsMarkdown("---\na: 1\nb: 2\n---\nRest\n")
+  it("remove: clearing every row yields body-only content without frontmatter fence", () => {
+    const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     let rows = sortedPropertyRowsFromRecord(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     rows = removePropertyRowAt(rows, 0)
-    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Rest\n")
     expect(md.startsWith("---")).toBe(false)
-    const again = parseNoteDetailsMarkdown(md)
+    const again = parseNoteContentMarkdown(md)
     expect(again.ok && again.properties).toEqual({})
     if (again.ok) expect(again.body).toBe("Rest\n")
   })
 
   it("remove: dropping sole row yields omitted frontmatter and unchanged body", () => {
-    const parsed = parseNoteDetailsMarkdown("---\nonly: x\n---\nParagraph.\n")
+    const parsed = parseNoteContentMarkdown("---\nonly: x\n---\nParagraph.\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     let rows = sortedPropertyRowsFromRecord(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
-    const md = composeNoteDetailsFromPropertyRows(rows, parsed.body)
+    const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Paragraph.\n")
     expect(md.startsWith("---")).toBe(false)
-    const again = parseNoteDetailsMarkdown(md)
+    const again = parseNoteContentMarkdown(md)
     expect(again.ok && again.properties).toEqual({})
     if (again.ok) expect(again.body).toBe("Paragraph.\n")
   })
 })
 
-describe("detailsHasRelationProperty", () => {
+describe("contentHasRelationProperty", () => {
   it("returns true when relation key exists (case-insensitive)", () => {
     expect(
-      detailsHasRelationProperty("---\nrelation: parent-of\n---\n\nbody\n")
+      contentHasRelationProperty("---\nrelation: parent-of\n---\n\nbody\n")
     ).toBe(true)
-    expect(detailsHasRelationProperty("---\nRelation: child-of\n---\n\n")).toBe(
+    expect(contentHasRelationProperty("---\nRelation: child-of\n---\n\n")).toBe(
       true
     )
   })
 
   it("returns false without relation key", () => {
-    expect(detailsHasRelationProperty("---\ntopic: x\n---\n")).toBe(false)
-    expect(detailsHasRelationProperty("no frontmatter")).toBe(false)
+    expect(contentHasRelationProperty("---\ntopic: x\n---\n")).toBe(false)
+    expect(contentHasRelationProperty("no frontmatter")).toBe(false)
   })
 
   it("returns false on parse failure", () => {
-    expect(detailsHasRelationProperty("---\nbad:\n  nested: x\n---\n")).toBe(
+    expect(contentHasRelationProperty("---\nbad:\n  nested: x\n---\n")).toBe(
       false
     )
   })

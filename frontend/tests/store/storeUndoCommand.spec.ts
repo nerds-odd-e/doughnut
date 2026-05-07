@@ -47,20 +47,20 @@ describe("storeUndoCommand", () => {
       expect(histories.noteUndoHistories.length).toEqual(2)
     })
 
-    it("should accumulate continuous details edits to the same note", () => {
+    it("should accumulate continuous content edits to the same note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(
         note1.id,
-        "edit details",
+        "edit content",
         "Original Details"
       )
       expect(histories.noteUndoHistories.length).toEqual(1)
 
-      // Second edit to same note's details should not create a new entry
+      // Second edit to same note's content should not create a new entry
       histories.addEditingToUndoHistory(
         note1.id,
-        "edit details",
+        "edit content",
         "Original Details"
       )
       expect(histories.noteUndoHistories.length).toEqual(1)
@@ -69,29 +69,29 @@ describe("storeUndoCommand", () => {
       )
     })
 
-    it("should create new entry for details edit to different note", () => {
+    it("should create new entry for content edit to different note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       const note2 = makeMe.aNote.please()
-      histories.addEditingToUndoHistory(note1.id, "edit details", "Details 1")
-      histories.addEditingToUndoHistory(note2.id, "edit details", "Details 2")
+      histories.addEditingToUndoHistory(note1.id, "edit content", "Details 1")
+      histories.addEditingToUndoHistory(note2.id, "edit content", "Details 2")
 
       expect(histories.noteUndoHistories.length).toEqual(2)
     })
 
-    it("should create new entry when switching between title and details for same note", () => {
+    it("should create new entry when switching between title and content for same note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
-      histories.addEditingToUndoHistory(note1.id, "edit details", "Details")
+      histories.addEditingToUndoHistory(note1.id, "edit content", "Details")
 
       expect(histories.noteUndoHistories.length).toEqual(2)
     })
 
-    it("should create new entry for title edit after details edit to same note", () => {
+    it("should create new entry for title edit after content edit to same note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
-      histories.addEditingToUndoHistory(note1.id, "edit details", "Details")
+      histories.addEditingToUndoHistory(note1.id, "edit content", "Details")
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
 
       expect(histories.noteUndoHistories.length).toEqual(2)
@@ -160,8 +160,8 @@ describe("storeUndoCommand", () => {
     beforeEach(() => {
       histories.addEditingToUndoHistory(
         note.id,
-        "edit details",
-        note.note.details
+        "edit content",
+        note.note.content
       )
       initialUndoCount = histories.noteUndoHistories.length
     })

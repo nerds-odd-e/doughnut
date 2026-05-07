@@ -42,7 +42,7 @@ class WikiTitleCacheServiceTest {
       String details =
           RelationshipNoteMarkdownFormatter.format(
               RelationType.RELATED_TO, source.getTitle(), target.getTitle(), null);
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).details(details).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).content(details).please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -61,13 +61,13 @@ class WikiTitleCacheServiceTest {
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Note a = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       Note b = makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[OnlyA]]").please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[OnlyA]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
       assertThat(
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), hasSize(1));
 
-      carrier.setDetails("[[OnlyB]]");
+      carrier.setContent("[[OnlyB]]");
       makeMe.entityPersister.merge(carrier);
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -84,7 +84,7 @@ class WikiTitleCacheServiceTest {
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Note shared = makeMe.aNote().title("Same").underSameNotebookAs(root).please();
       Note carrier =
-          makeMe.aNote().underSameNotebookAs(root).details("[[Same]] and again [[Same]]").please();
+          makeMe.aNote().underSameNotebookAs(root).content("[[Same]] and again [[Same]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -103,7 +103,7 @@ class WikiTitleCacheServiceTest {
       Note firstCreated =
           makeMe.aNote().title("Dup").underSameNotebookAs(root).folder(folderA).please();
       makeMe.aNote().title("Dup").underSameNotebookAs(root).folder(folderB).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[Dup]]").please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[Dup]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -125,7 +125,7 @@ class WikiTitleCacheServiceTest {
           makeMe
               .aNote()
               .underSameNotebookAs(headSource)
-              .details("Try [[Secret Notebook:Hidden Note]].")
+              .content("Try [[Secret Notebook:Hidden Note]].")
               .please();
 
       wikiTitleCacheService.refreshForNote(carrier, viewer);
@@ -138,13 +138,13 @@ class WikiTitleCacheServiceTest {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Note a = makeMe.aNote().title("A").underSameNotebookAs(root).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).details("[[A]]").please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[A]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
       assertThat(
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), hasSize(1));
 
-      carrier.setDetails("   ");
+      carrier.setContent("   ");
       makeMe.entityPersister.merge(carrier);
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -163,14 +163,14 @@ class WikiTitleCacheServiceTest {
             .aNote()
             .underSameNotebookAs(root)
             .creatorAndOwner(user)
-            .details("[[Focal]]")
+            .content("[[Focal]]")
             .please();
     Note first =
         makeMe
             .aNote()
             .underSameNotebookAs(root)
             .creatorAndOwner(user)
-            .details("[[Focal]]")
+            .content("[[Focal]]")
             .please();
     wikiTitleCacheService.refreshForNote(first, user);
     wikiTitleCacheService.refreshForNote(second, user);
@@ -189,7 +189,7 @@ class WikiTitleCacheServiceTest {
     Note focal =
         makeMe.aNote().title("Focal").underSameNotebookAs(root).creatorAndOwner(user).please();
     Note referrerAtNotebookRoot =
-        makeMe.aNote().underSameNotebookAs(root).details("[[Focal]]").please();
+        makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(referrerAtNotebookRoot, user);
 
     List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);

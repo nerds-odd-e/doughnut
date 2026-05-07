@@ -41,7 +41,7 @@ function recallAnsweredJustReviewInk(
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(payload.breadcrumbTitles)
   const detailLines = recallAnsweredMarkdownToDisplayLines(
-    payload.detailsMarkdown,
+    payload.contentMarkdown,
     width
   )
   const outcome: 'remembered' | 'reduced' = remembered
@@ -144,8 +144,8 @@ export function JustReviewRecallStage({
   }, [activeOperationAbortRef, inputBlockedRef])
 
   const width = resolvedTerminalWidth()
-  const detailsRendered = payload.detailsMarkdown
-    ? renderMarkdownToTerminal(payload.detailsMarkdown, width)
+  const detailsRendered = payload.contentMarkdown
+    ? renderMarkdownToTerminal(payload.contentMarkdown, width)
     : ''
   const detailLines =
     detailsRendered.length > 0 ? detailsRendered.split('\n') : []

@@ -3,7 +3,7 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner" in notebook "Geometry set"
-      | Title            | Details                          | Folder              |
+      | Title            | Content | Folder              |
       | Shape            | The form of something            |                     |
       | Rectangle        | four equal straight sides        | Topics              |
       | Triangle         | three sides shape                | Topics              |

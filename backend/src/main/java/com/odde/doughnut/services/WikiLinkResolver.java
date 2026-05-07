@@ -27,7 +27,7 @@ public class WikiLinkResolver {
   public record ResolvedWikiLink(String linkText, Note targetNote) {}
 
   public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
-    String details = focusNote.getDetails();
+    String details = focusNote.getContent();
     if (details == null || details.isBlank()) {
       return List.of();
     }

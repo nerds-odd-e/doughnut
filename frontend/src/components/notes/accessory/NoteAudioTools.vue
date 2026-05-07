@@ -153,7 +153,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
         uploadAudioFile: chunk.data,
         additionalProcessingInstructions: processingInstructions.value,
         isMidSpeech: chunk.isMidSpeech,
-        previousNoteDetailsToAppendTo: getLastContentChunk(note.details),
+        previousNoteContentToAppendTo: getLastContentChunk(note.content),
       },
     })
 
@@ -163,7 +163,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
 
     await storageAccessor.value
       .storedApi()
-      .completeDetails(note.id, response.completionFromAudio)
+      .completeContent(note.id, response.completionFromAudio)
 
     callCount.value++
     if (shouldSuggestTitle(callCount.value)) {

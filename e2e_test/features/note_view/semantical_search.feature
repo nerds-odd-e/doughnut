@@ -8,8 +8,8 @@ Feature: semantical search
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Physics primer" with a note "Physics" and details "The study of nature"
-    And I have a notebook "Chemistry primer" with a note "Chemistry" and details "The study of substances"
+    And I have a notebook "Physics primer" with a note "Physics" and content "The study of nature"
+    And I have a notebook "Chemistry primer" with a note "Chemistry" and content "The study of substances"
 
   @mockBrowserTime @usingMockedOpenAiService
   Scenario Outline: Search with semantic search

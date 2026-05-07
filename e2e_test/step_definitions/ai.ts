@@ -32,13 +32,13 @@ function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
 function stubExtractPointResponse(
   contentPattern: string,
   newNoteTitle: string,
-  newNoteDetails: string,
-  updatedParentDetails: string
+  newNoteContent: string,
+  updatedParentContent: string
 ) {
   const reply = JSON.stringify({
     newNoteTitle,
-    newNoteDetails,
-    updatedParentDetails,
+    newNoteContent,
+    updatedParentContent,
   })
   cy.then(async () => {
     await mock_services
@@ -215,10 +215,10 @@ Given(
 )
 
 Given(
-  'OpenAI returns the following details when requested to delete points:',
+  'OpenAI returns the following content when requested to delete points:',
   (data: DataTable) => {
-    const details = data.raw().flat()[0]
-    const reply = JSON.stringify({ details })
+    const content = data.raw().flat()[0]
+    const reply = JSON.stringify({ content })
     cy.then(async () => {
       await mock_services
         .openAi()
@@ -233,18 +233,18 @@ Given(
 )
 
 Given(
-  'OpenAI will extract point {string} to sibling note with title {string} and details {string} and updated parent details {string}',
+  'OpenAI will extract point {string} to sibling note with title {string} and content {string} and updated parent content {string}',
   (
     _point: string,
     newNoteTitle: string,
-    newNoteDetails: string,
-    updatedParentDetails: string
+    newNoteContent: string,
+    updatedParentContent: string
   ) => {
     stubExtractPointResponse(
       '.*extract.*point.*sibling.*',
       newNoteTitle,
-      newNoteDetails,
-      updatedParentDetails
+      newNoteContent,
+      updatedParentContent
     )
   }
 )

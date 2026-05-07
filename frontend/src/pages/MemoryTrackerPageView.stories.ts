@@ -26,7 +26,7 @@ const createRecallPromptWithAnswer = (opts: {
 }) => {
   const note = makeMe.aNote
     .title("France")
-    .details(
+    .content(
       "France is a country in Western Europe. Paris is its capital and largest city."
     )
     .please()
@@ -90,7 +90,7 @@ export const NoteWithManyAncestors: Story = {
       (() => {
         const note = makeMe.aNote
           .title("TypeScript")
-          .details(
+          .content(
             "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
           )
           .please()

@@ -1,8 +1,8 @@
 const WIKI_LINK = /\[\[([^\]]+)]]/g
 
-export function extractWikiLinkTexts(details: string): Set<string> {
+export function extractWikiLinkTexts(markdown: string): Set<string> {
   const texts = new Set<string>()
-  for (const match of details.matchAll(WIKI_LINK)) {
+  for (const match of markdown.matchAll(WIKI_LINK)) {
     const inner = match[1]?.trim()
     if (inner) texts.add(inner)
   }

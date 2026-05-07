@@ -182,7 +182,7 @@ class NoteController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Parameter(
               description =
-                  "Approximate token budget for focus note details plus related note details combined (bodies).")
+                  "Approximate token budget for focus note content plus related note content combined (bodies).")
           @RequestParam()
           int tokenLimit)
       throws UnexpectedNoAccessRightException {
@@ -203,7 +203,7 @@ class NoteController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Parameter(
               description =
-                  "Approximate token budget for focus note details plus related note details combined (bodies).")
+                  "Approximate token budget for focus note content plus related note content combined (bodies).")
           @RequestParam()
           int tokenLimit)
       throws UnexpectedNoAccessRightException {

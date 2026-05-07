@@ -128,7 +128,7 @@ describe('recall just-review (interactive)', () => {
   function alphaNoteRealm() {
     return makeMe.aNoteRealm
       .title('Alpha')
-      .details('body')
+      .content('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
@@ -137,13 +137,13 @@ describe('recall just-review (interactive)', () => {
   function childNoteUnderEnglish() {
     const english = makeMe.aNoteRealm
       .title('English')
-      .details('')
+      .content('')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
     const child = makeMe.aNoteRealm
       .title('Sedition')
-      .details('Sedition means incite violence')
+      .content('Sedition means incite violence')
       .under(english)
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
@@ -193,7 +193,7 @@ describe('recall just-review (interactive)', () => {
         const title = id === 1 ? 'Alpha' : 'Beta'
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .details('body')
+          .content('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
           .please()
@@ -312,7 +312,7 @@ describe('recall just-review (interactive)', () => {
     const noteRealmAlpha = alphaNoteRealm()
     const noteRealmBeta = makeMe.aNoteRealm
       .title('Beta')
-      .details('body-beta')
+      .content('body-beta')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
@@ -649,7 +649,7 @@ describe('recall just-review (interactive)', () => {
         const title = id === 1 ? 'Alpha' : 'Beta'
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .details('body')
+          .content('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
           .please()
@@ -718,7 +718,7 @@ describe('recall just-review (interactive)', () => {
     mockShowMemoryTrackerCardForRealm(
       makeMe.aNoteRealm
         .title('   ')
-        .details('')
+        .content('')
         .createdAt(baseNoteTimes.createdAt)
         .updatedAt(baseNoteTimes.updatedAt)
         .please()
@@ -814,7 +814,7 @@ describe('recall just-review (interactive)', () => {
               : `unexpected-${String(id)}`
         const noteRealm = makeMe.aNoteRealm
           .title(title)
-          .details('body')
+          .content('body')
           .createdAt(baseNoteTimes.createdAt)
           .updatedAt(baseNoteTimes.updatedAt)
           .please()

@@ -110,29 +110,29 @@ describe("NoteUndoButton", () => {
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
       })
 
-      it("shows confirmation dialog with note title and diff for edit details", async () => {
-        const noteRealm = makeMe.aNoteRealm.title("Details Note").please()
+      it("shows confirmation dialog with note title and diff for edit content", async () => {
+        const noteRealm = makeMe.aNoteRealm.title("Content Note").please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
         noteEditingHistory.addEditingToUndoHistory(
           noteRealm.id,
-          "edit details",
-          "Old Details"
+          "edit content",
+          "Old Content"
         )
         helper.component(NoteUndoButton).render()
 
-        const undoButton = screen.getByTitle("undo edit details")
+        const undoButton = screen.getByTitle("undo edit content")
         await undoButton.click()
         await flushPromises()
 
         expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
         expect(
           screen.getByText(
-            /Are you sure you want to undo editing the details of /
+            /Are you sure you want to undo editing the content of /
           )
         ).toBeInTheDocument()
-        expect(screen.getByText("Details Note")).toBeInTheDocument()
-        const link = screen.getByText("Details Note").closest("a.router-link")
+        expect(screen.getByText("Content Note")).toBeInTheDocument()
+        const link = screen.getByText("Content Note").closest("a.router-link")
         expect(link).toBeInTheDocument()
         expect(screen.getByText("Current")).toBeInTheDocument()
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
@@ -181,19 +181,19 @@ describe("NoteUndoButton", () => {
         expect(link).toBeInTheDocument()
       })
 
-      it("shows diff view for edit details with long content", async () => {
-        const noteRealm = makeMe.aNoteRealm.title("Details Note").please()
+      it("shows diff view for edit content with long content", async () => {
+        const noteRealm = makeMe.aNoteRealm.title("Content Note").please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
         const longDetails = "A".repeat(150)
         noteEditingHistory.addEditingToUndoHistory(
           noteRealm.id,
-          "edit details",
+          "edit content",
           longDetails
         )
         helper.component(NoteUndoButton).render()
 
-        const undoButton = screen.getByTitle("undo edit details")
+        const undoButton = screen.getByTitle("undo edit content")
         await undoButton.click()
         await flushPromises()
 
@@ -202,17 +202,17 @@ describe("NoteUndoButton", () => {
       })
 
       it("shows HTML tags as part of markdown content in diff view", async () => {
-        const noteRealm = makeMe.aNoteRealm.title("Details Note").please()
+        const noteRealm = makeMe.aNoteRealm.title("Content Note").please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
         noteEditingHistory.addEditingToUndoHistory(
           noteRealm.id,
-          "edit details",
-          "<p>Old <strong>Details</strong> with <em>HTML</em></p>"
+          "edit content",
+          "<p>Old <strong>Content</strong> with <em>HTML</em></p>"
         )
         helper.component(NoteUndoButton).render()
 
-        const undoButton = screen.getByTitle("undo edit details")
+        const undoButton = screen.getByTitle("undo edit content")
         await undoButton.click()
         await flushPromises()
 
@@ -220,7 +220,7 @@ describe("NoteUndoButton", () => {
         // HTML tags should be shown as part of the content
         const diffContent = screen.getByText("Will restore to").parentElement
         expect(diffContent?.textContent).toContain(
-          "<p>Old <strong>Details</strong> with <em>HTML</em></p>"
+          "<p>Old <strong>Content</strong> with <em>HTML</em></p>"
         )
       })
     })
@@ -263,16 +263,16 @@ describe("NoteUndoButton", () => {
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
       })
 
-      it("shows confirmation dialog with note id and diff for edit details", async () => {
+      it("shows confirmation dialog with note id and diff for edit content", async () => {
         const note = makeMe.aNote.please()
         noteEditingHistory.addEditingToUndoHistory(
           note.id,
-          "edit details",
-          "Old Details"
+          "edit content",
+          "Old Content"
         )
         helper.component(NoteUndoButton).render()
 
-        const undoButton = screen.getByTitle("undo edit details")
+        const undoButton = screen.getByTitle("undo edit content")
         await undoButton.click()
         await flushPromises()
 
@@ -334,18 +334,18 @@ describe("NoteUndoButton", () => {
       })
     })
 
-    it("calls undo edit details when note had no prior details", async () => {
+    it("calls undo edit content when note had no prior content", async () => {
       const note = makeMe.aNote.please()
       const noteRealm = makeMe.aNoteRealm.please()
       noteEditingHistory.addEditingToUndoHistory(
         note.id,
-        "edit details",
+        "edit content",
         undefined
       )
-      mockSdkService("updateNoteDetails", noteRealm)
+      mockSdkService("updateNoteContent", noteRealm)
       helper.component(NoteUndoButton).render()
 
-      const undoButton = screen.getByTitle("undo edit details")
+      const undoButton = screen.getByTitle("undo edit content")
       await undoButton.click()
       await flushPromises()
 
@@ -494,7 +494,7 @@ describe("NoteUndoButton", () => {
         expect(screen.queryByText("First Note")).not.toBeInTheDocument()
       })
 
-      it("discards edit details item and shows next item", async () => {
+      it("discards edit content item and shows next item", async () => {
         const noteRealm1 = makeMe.aNoteRealm.title("First Note").please()
         const noteRealm2 = makeMe.aNoteRealm.title("Second Note").please()
         const storageAccessor = useStorageAccessor()
@@ -503,17 +503,17 @@ describe("NoteUndoButton", () => {
 
         noteEditingHistory.addEditingToUndoHistory(
           noteRealm2.id,
-          "edit details",
-          "Old Details 2"
+          "edit content",
+          "Old Content 2"
         )
         noteEditingHistory.addEditingToUndoHistory(
           noteRealm1.id,
-          "edit details",
-          "Old Details 1"
+          "edit content",
+          "Old Content 1"
         )
         helper.component(NoteUndoButton).render()
 
-        const undoButton = screen.getByTitle("undo edit details")
+        const undoButton = screen.getByTitle("undo edit content")
         await undoButton.click()
         await flushPromises()
 

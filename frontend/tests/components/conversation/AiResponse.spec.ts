@@ -253,33 +253,33 @@ describe("AiResponse", () => {
 
   describe("Tool Call Handling", () => {
     const testDetails = "**bold completion**"
-    let updateNoteDetailsSpy: ReturnType<
-      typeof mockSdkService<"updateNoteDetails">
+    let updateNoteContentSpy: ReturnType<
+      typeof mockSdkService<"updateNoteContent">
     >
 
     beforeEach(async () => {
-      updateNoteDetailsSpy = mockSdkService(
-        "updateNoteDetails",
+      updateNoteContentSpy = mockSdkService(
+        "updateNoteContent",
         makeMe.aNoteRealm.please()
       )
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details: testDetails,
+        createToolCallChunk("NoteContentCompletion", {
+          content: testDetails,
         })
       )
     })
 
     it("formats completion suggestion correctly based on existing content", async () => {
       // Test empty note details
-      noteRealm.note.details = ""
+      noteRealm.note.content = ""
       storageAccessor.value.refreshNoteRealm(noteRealm)
       const emptyDetails = "**bold completion**"
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details: emptyDetails,
+        createToolCallChunk("NoteContentCompletion", {
+          content: emptyDetails,
         })
       )
       // Markdown is rendered to HTML, so check for the rendered content
@@ -288,13 +288,13 @@ describe("AiResponse", () => {
       )
 
       // Test with existing note details
-      noteRealm.note.details = "Existing content"
+      noteRealm.note.content = "Existing content"
       storageAccessor.value.refreshNoteRealm(noteRealm)
       const newDetails = "Existing content\n**bold completion**"
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details: newDetails,
+        createToolCallChunk("NoteContentCompletion", {
+          content: newDetails,
         })
       )
       // Markdown is rendered to HTML, so check for the rendered content
@@ -307,13 +307,13 @@ describe("AiResponse", () => {
     })
 
     it("formats completion suggestion with details", async () => {
-      noteRealm.note.details = "Hello world"
+      noteRealm.note.content = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
       const details = "Hello  friends!"
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details,
+        createToolCallChunk("NoteContentCompletion", {
+          content: details,
         })
       )
 
@@ -324,13 +324,13 @@ describe("AiResponse", () => {
     })
 
     it("handles replacement when replacing all content", async () => {
-      noteRealm.note.details = "Short\ntext"
+      noteRealm.note.content = "Short\ntext"
       storageAccessor.value.refreshNoteRealm(noteRealm)
       const details = "New content"
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details,
+        createToolCallChunk("NoteContentCompletion", {
+          content: details,
         })
       )
 
@@ -339,16 +339,16 @@ describe("AiResponse", () => {
     })
 
     it("accepts the completion suggestion and updates the note", async () => {
-      noteRealm.note.details = ""
+      noteRealm.note.content = ""
       storageAccessor.value.refreshNoteRealm(noteRealm)
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
       // The details should replace the content
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: "**bold completion**" },
+        body: { content: "**bold completion**" },
       })
 
       // Tool calls are executed inline with Chat Completion API
@@ -365,7 +365,7 @@ describe("AiResponse", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -382,7 +382,7 @@ describe("AiResponse", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -391,13 +391,13 @@ describe("AiResponse", () => {
     })
 
     it("handles completion with replacement", async () => {
-      noteRealm.note.details = "Hello world"
+      noteRealm.note.content = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
       const details = "Hello  friends!"
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details,
+        createToolCallChunk("NoteContentCompletion", {
+          content: details,
         })
       )
 
@@ -410,20 +410,20 @@ describe("AiResponse", () => {
       await flushPromises()
 
       // Should replace with "Hello  friends!"
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: "Hello  friends!" },
+        body: { content: "Hello  friends!" },
       })
     })
 
     it("handles replacement by removing all content", async () => {
-      noteRealm.note.details = "Hello world"
+      noteRealm.note.content = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
       const details = "Completely new text"
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("NoteDetailsCompletion", {
-          details,
+        createToolCallChunk("NoteContentCompletion", {
+          content: details,
         })
       )
 
@@ -432,20 +432,20 @@ describe("AiResponse", () => {
       await flushPromises()
 
       // Should replace everything with new text
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: "Completely new text" },
+        body: { content: "Completely new text" },
       })
     })
 
     describe("Note Access", () => {
-      let updateNoteDetailsSpy: ReturnType<
-        typeof mockSdkService<"updateNoteDetails">
+      let updateNoteContentSpy: ReturnType<
+        typeof mockSdkService<"updateNoteContent">
       >
 
       beforeEach(async () => {
-        updateNoteDetailsSpy = mockSdkService(
-          "updateNoteDetails",
+        updateNoteContentSpy = mockSdkService(
+          "updateNoteContent",
           makeMe.aNoteRealm.please()
         )
       })
@@ -465,8 +465,8 @@ describe("AiResponse", () => {
         const details = "test completion"
         await submitMessageAndSimulateRunResponse(
           wrapper,
-          createToolCallChunk("NoteDetailsCompletion", {
-            details,
+          createToolCallChunk("NoteContentCompletion", {
+            content: details,
           })
         )
 
@@ -474,7 +474,7 @@ describe("AiResponse", () => {
         await wrapper.find('button[class*="btn-primary"]').trigger("click")
         await flushPromises()
 
-        expect(updateNoteDetailsSpy).toHaveBeenCalled()
+        expect(updateNoteContentSpy).toHaveBeenCalled()
       })
     })
   })

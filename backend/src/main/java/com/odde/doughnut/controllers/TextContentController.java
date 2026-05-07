@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
+import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -50,13 +50,13 @@ class TextContentController {
     return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()), false);
   }
 
-  @PatchMapping(path = "/{note}/details")
+  @PatchMapping(path = "/{note}/content")
   @Transactional
-  public NoteRealm updateNoteDetails(
+  public NoteRealm updateNoteContent(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody NoteUpdateDetailsDTO detailsDTO)
+      @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNote(note, n -> n.setDetails(detailsDTO.getDetails()), true);
+    return updateNote(note, n -> n.setContent(contentDTO.getContent()), true);
   }
 
   private NoteRealm updateNote(

@@ -4,7 +4,7 @@
       noteId: note.id,
       isLinkNote,
       noteRecallSetting: recallSetting,
-      noteDetails: note.details,
+      noteContent: note.content,
     }"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
@@ -43,7 +43,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
-import { relationTypeLabelFromNoteDetails } from "@/models/relationTypeOptions"
+import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
@@ -63,7 +63,7 @@ const memoryTrackers = ref(props.noteRecallInfo.memoryTrackers ?? [])
 const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
 
 const isLinkNote = computed(
-  () => relationTypeLabelFromNoteDetails(props.note.details) !== undefined
+  () => relationTypeLabelFromNoteContent(props.note.content) !== undefined
 )
 
 watch(

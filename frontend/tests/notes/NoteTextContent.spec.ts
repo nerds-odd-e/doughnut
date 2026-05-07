@@ -106,14 +106,14 @@ describe("in place edit on title", () => {
     wrapper.get("[data-placeholder]").attributes("data-placeholder")
 
   it("should prompt people to add details", async () => {
-    note.details = ""
+    note.content = ""
     mountComponent(note)
     const placeholder = getPlaceholder(wrapper)
     expect(placeholder).toBe("Enter note details here...")
   })
 
   it("should not prompt people to add details if readonly", async () => {
-    note.details = ""
+    note.content = ""
     mountComponent(note, true)
     try {
       getPlaceholder(wrapper)
@@ -264,7 +264,7 @@ describe("in place edit on title", () => {
   })
 
   it("should not trigger changes for initial details content", async () => {
-    note.details = "initial\n\ndescription"
+    note.content = "initial\n\ndescription"
     mountComponent(note)
     await flushPromises()
     wrapper.unmount()
@@ -319,7 +319,7 @@ describe("in place edit on title", () => {
     it("shows relation type picker when note has relation in frontmatter", async () => {
       const note = makeMe.aNote
         .title("Rel")
-        .details("---\nrelation: parent-of\n---\n\nbody\n")
+        .content("---\nrelation: parent-of\n---\n\nbody\n")
         .please()
       mountComponent(note)
       await flushPromises()

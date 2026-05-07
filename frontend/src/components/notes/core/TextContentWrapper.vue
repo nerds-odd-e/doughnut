@@ -14,14 +14,14 @@ import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { normalizeNoteDetails } from "@/utils/normalizeNoteDetails"
-import { hasNewWikiLinkTexts } from "@/utils/noteDetailsWikiLinks"
+import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
+import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 
 const storageAccessor = useStorageAccessor()
 
 const { field, value } = defineProps({
   field: {
-    type: String as PropType<"edit title" | "edit details">,
+    type: String as PropType<"edit title" | "edit content">,
     required: true,
   },
   value: {
@@ -58,9 +58,9 @@ const version = ref(0)
 const errors = ref({} as Record<string, string>)
 
 const hasUnsavedChanges = (): boolean => {
-  if (field === "edit details") {
-    const normalizedCurrent = normalizeNoteDetails(localValue.value ?? "")
-    const normalizedSaved = normalizeNoteDetails(lastSavedValue.value ?? "")
+  if (field === "edit content") {
+    const normalizedCurrent = normalizeNoteContent(localValue.value ?? "")
+    const normalizedSaved = normalizeNoteContent(lastSavedValue.value ?? "")
     return normalizedCurrent !== normalizedSaved
   }
   return localValue.value !== lastSavedValue.value
@@ -78,10 +78,10 @@ const onUpdate = (noteId: number, newValue: string) => {
     return
   }
 
-  if (field === "edit details") {
-    const normalizedNewValue = normalizeNoteDetails(newValue)
-    const normalizedLastSaved = normalizeNoteDetails(lastSavedValue.value ?? "")
-    const prevNormalized = normalizeNoteDetails(localValue.value ?? "")
+  if (field === "edit content") {
+    const normalizedNewValue = normalizeNoteContent(newValue)
+    const normalizedLastSaved = normalizeNoteContent(lastSavedValue.value ?? "")
+    const prevNormalized = normalizeNoteContent(localValue.value ?? "")
 
     errors.value = {}
     localValue.value = newValue

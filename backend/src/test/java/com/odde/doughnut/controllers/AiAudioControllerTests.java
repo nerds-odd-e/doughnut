@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.services.ai.NoteDetailsCompletion;
+import com.odde.doughnut.services.ai.NoteContentCompletion;
 import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -47,7 +47,7 @@ class AiAudioControllerTests {
 
   private void setupMocks() {
     String details = "test123";
-    NoteDetailsCompletion completion = new NoteDetailsCompletion(details);
+    NoteContentCompletion completion = new NoteContentCompletion(details);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(completion);
     mockTranscriptionSrtResponse("test transcription");
@@ -90,22 +90,22 @@ class AiAudioControllerTests {
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
     void convertingFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(createMockAudioFile(filename));
-      NoteDetailsCompletion result =
+      NoteContentCompletion result =
           controller
               .audioToText(audioUploadDTO)
               .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
               .orElseThrow();
-      assertEquals("test123", result.details);
+      assertEquals("test123", result.content);
     }
 
     @Test
     void convertAudioToText() throws IOException {
-      NoteDetailsCompletion resp =
+      NoteContentCompletion resp =
           controller
               .audioToText(audioUploadDTO)
               .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
               .orElseThrow();
-      assertThat(resp.details, equalTo("test123"));
+      assertThat(resp.content, equalTo("test123"));
     }
 
     @Test
@@ -180,7 +180,7 @@ class AiAudioControllerTests {
     void shouldIncludePreviousContentAsUserMessage() throws IOException {
       // Setup
       String previousContent = "Previous text with trailing space ";
-      audioUploadDTO.setPreviousNoteDetailsToAppendTo(previousContent);
+      audioUploadDTO.setPreviousNoteContentToAppendTo(previousContent);
 
       // Execute
       controller.audioToText(audioUploadDTO);
@@ -191,12 +191,12 @@ class AiAudioControllerTests {
               com.openai.models.chat.completions.ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
       String expectedJson =
-          "{\"previousNoteDetailsToAppendTo\": \"Previous text with trailing space \"}";
+          "{\"previousNoteContentToAppendTo\": \"Previous text with trailing space \"}";
       boolean hasPreviousContent =
           paramsCaptor.getValue().messages().stream()
               .map(Object::toString)
               .anyMatch(
-                  msg -> msg.contains("Previous note details (in JSON format):\n" + expectedJson));
+                  msg -> msg.contains("Previous note content (in JSON format):\n" + expectedJson));
       assertThat(hasPreviousContent, equalTo(true));
     }
 

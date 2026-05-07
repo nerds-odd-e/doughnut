@@ -35,7 +35,7 @@ import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
 import {
   noteBreadcrumbTrailTitles,
-  noteDetailsMarkdownOrFallback,
+  noteContentMarkdownOrFallback,
 } from './recallNoteContext.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
@@ -84,7 +84,7 @@ async function submitSpellingAnswer(
 
 function recallAnsweredSpellingInk(args: {
   readonly answeredPrompt: RecallPrompt
-  readonly detailsMarkdownFallback: string
+  readonly contentMarkdownFallback: string
   readonly spellingAnswerDisplay: string
 }): ReactElement {
   const width = resolvedTerminalWidth()
@@ -95,12 +95,12 @@ function recallAnsweredSpellingInk(args: {
       args.answeredPrompt.notebook?.name
     )
   )
-  const detailsMarkdown = noteDetailsMarkdownOrFallback(
+  const contentMarkdown = noteContentMarkdownOrFallback(
     args.answeredPrompt.note,
-    args.detailsMarkdownFallback
+    args.contentMarkdownFallback
   )
   const detailLines = recallAnsweredMarkdownToDisplayLines(
-    detailsMarkdown,
+    contentMarkdown,
     width
   )
   const ans = args.spellingAnswerDisplay
@@ -219,7 +219,7 @@ export function SpellingRecallStage({
         updated.answer?.spellingAnswer?.trim() || line
       const answeredBlock = recallAnsweredSpellingInk({
         answeredPrompt: updated,
-        detailsMarkdownFallback: payload.detailsMarkdown,
+        contentMarkdownFallback: payload.contentMarkdown,
         spellingAnswerDisplay,
       })
       if (!correct) {

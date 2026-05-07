@@ -84,7 +84,7 @@ describe('recall MCQ (interactive)', () => {
 
     mcqFixtureNoteRealm = makeMe.aNoteRealm
       .title('Alpha')
-      .details('body')
+      .content('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
@@ -275,7 +275,7 @@ describe('recall MCQ (interactive)', () => {
 
     const note1 = makeMe.aNoteRealm
       .title('Alpha')
-      .details('body')
+      .content('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
@@ -404,13 +404,13 @@ describe('recall MCQ (interactive)', () => {
 
     const note1 = makeMe.aNoteRealm
       .title('Alpha')
-      .details('body')
+      .content('body')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
     const note2 = makeMe.aNoteRealm
       .title('Beta')
-      .details('body2')
+      .content('body2')
       .createdAt(baseNoteTimes.createdAt)
       .updatedAt(baseNoteTimes.updatedAt)
       .please()

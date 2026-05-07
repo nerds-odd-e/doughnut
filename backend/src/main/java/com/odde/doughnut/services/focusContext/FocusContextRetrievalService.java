@@ -62,15 +62,15 @@ public class FocusContextRetrievalService {
     int combinedContentBudget = config.getFocusContextContentTokenBudget();
     int focusDetailTruncationCap =
         Math.min(
-            FocusContextConstants.FOCUS_NOTE_DETAILS_MAX_TOKENS,
+            FocusContextConstants.FOCUS_NOTE_CONTENT_MAX_TOKENS,
             Math.max(0, combinedContentBudget));
     String focusDetails =
         ApproximateUtf8TokenBudget.truncateByApproxTokens(
-            hydrated.getDetails(), focusDetailTruncationCap);
+            hydrated.getContent(), focusDetailTruncationCap);
     boolean focusTruncated =
         focusDetails != null
-            && hydrated.getDetails() != null
-            && focusDetails.length() < hydrated.getDetails().length();
+            && hydrated.getContent() != null
+            && focusDetails.length() < hydrated.getContent().length();
 
     Integer focusId = hydrated.getId();
 
@@ -233,11 +233,11 @@ public class FocusContextRetrievalService {
         }
         String details =
             ApproximateUtf8TokenBudget.truncateByApproxTokens(
-                hydratedNote.getDetails(), FocusContextConstants.RELATED_NOTE_DETAILS_MAX_TOKENS);
+                hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
         boolean truncated =
             details != null
-                && hydratedNote.getDetails() != null
-                && details.length() < hydratedNote.getDetails().length();
+                && hydratedNote.getContent() != null
+                && details.length() < hydratedNote.getContent().length();
         int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(details));
         wikiRemainingBudget -= cost;
         result.addRelatedNote(
@@ -325,11 +325,11 @@ public class FocusContextRetrievalService {
       }
       String details =
           ApproximateUtf8TokenBudget.truncateByApproxTokens(
-              hydratedNote.getDetails(), FocusContextConstants.RELATED_NOTE_DETAILS_MAX_TOKENS);
+              hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
       boolean truncated =
           details != null
-              && hydratedNote.getDetails() != null
-              && details.length() < hydratedNote.getDetails().length();
+              && hydratedNote.getContent() != null
+              && details.length() < hydratedNote.getContent().length();
       int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(details));
       if (cost > siblingRemaining) {
         continue;

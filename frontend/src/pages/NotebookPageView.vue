@@ -285,7 +285,7 @@ const indexDisplayTitle = computed(() => {
 const indexSummaryLine = computed(() => {
   const r = indexRealm.value
   if (!r) return ""
-  const d = r.note.details?.trim()
+  const d = r.note.content?.trim()
   if (!d) return ""
   return d.length > 160 ? `${d.slice(0, 157)}…` : d
 })

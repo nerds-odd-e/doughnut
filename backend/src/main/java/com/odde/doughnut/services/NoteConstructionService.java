@@ -242,12 +242,12 @@ public class NoteConstructionService {
     Note newNote =
         createNoteInNotebookScopeWithoutWikidata(
             originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    newNote.setDetails(aiResult.newNoteDetails);
+    newNote.setContent(aiResult.newNoteContent);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
 
     originalNote.setUpdatedAt(currentUTCTimestamp);
-    originalNote.setDetails(aiResult.updatedParentDetails);
+    originalNote.setContent(aiResult.updatedParentContent);
     entityPersister.save(originalNote);
 
     return noteRealmService.build(newNote, user);

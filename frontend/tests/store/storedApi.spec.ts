@@ -113,54 +113,54 @@ describe("storedApiCollection", () => {
     })
   })
 
-  describe("completeDetails", () => {
-    let updateNoteDetailsSpy: ReturnType<
-      typeof mockSdkService<"updateNoteDetails">
+  describe("completeContent", () => {
+    let updateNoteContentSpy: ReturnType<
+      typeof mockSdkService<"updateNoteContent">
     >
     let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
     let noteRef
 
     beforeEach(() => {
       vi.clearAllMocks()
-      updateNoteDetailsSpy = mockSdkService("updateNoteDetails", note)
+      updateNoteContentSpy = mockSdkService("updateNoteContent", note)
       showNoteSpy = mockSdkService("showNote", note)
       noteRef = storageAccessor.value.refOfNoteRealm(note.id)
     })
 
     it("should do nothing when no completion value is provided", async () => {
       const sa = storageAccessor.value.storedApi()
-      await sa.completeDetails(note.id)
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      await sa.completeContent(note.id)
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
     })
 
     it("should update note details with completion", async () => {
       const sa = storageAccessor.value.storedApi()
-      noteRef.value = { ...note, note: { details: "Hello " } }
+      noteRef.value = { ...note, note: { content: "Hello " } }
 
-      await sa.completeDetails(note.id, {
-        details: "Hello world!",
+      await sa.completeContent(note.id, {
+        content: "Hello world!",
       })
 
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
-          details: "Hello world!",
+          content: "Hello world!",
         },
       })
     })
 
     it("should replace entire note details with completion", async () => {
       const sa = storageAccessor.value.storedApi()
-      noteRef.value = { ...note, note: { details: "Hello world" } }
+      noteRef.value = { ...note, note: { content: "Hello world" } }
 
-      await sa.completeDetails(note.id, {
-        details: "Hello !",
+      await sa.completeContent(note.id, {
+        content: "Hello !",
       })
 
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
-          details: "Hello !",
+          content: "Hello !",
         },
       })
     })
@@ -169,46 +169,46 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = undefined
 
-      await sa.completeDetails(note.id, {
-        details: "<p>Desc</p>world!",
+      await sa.completeContent(note.id, {
+        content: "<p>Desc</p>world!",
       })
 
       expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: note.id },
       })
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
-          details: "<p>Desc</p>world!",
+          content: "<p>Desc</p>world!",
         },
       })
     })
   })
 
   describe("refreshWikiLinkCacheForNote", () => {
-    let updateNoteDetailsSpy: ReturnType<
-      typeof mockSdkService<"updateNoteDetails">
+    let updateNoteContentSpy: ReturnType<
+      typeof mockSdkService<"updateNoteContent">
     >
 
     beforeEach(() => {
       vi.clearAllMocks()
-      updateNoteDetailsSpy = mockSdkService("updateNoteDetails", note)
+      updateNoteContentSpy = mockSdkService("updateNoteContent", note)
     })
 
-    it("calls updateNoteDetails even when details match stored note", async () => {
+    it("calls updateNoteContent even when details match stored note", async () => {
       const detailsBody = "same details"
       const sa = storageAccessor.value.storedApi()
       storageAccessor.value.refreshNoteRealm({
         ...note,
-        note: { ...note.note, details: detailsBody },
+        note: { ...note.note, content: detailsBody },
       })
 
       await sa.refreshWikiLinkCacheForNote(note.id)
 
-      expect(updateNoteDetailsSpy).toHaveBeenCalledTimes(1)
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledTimes(1)
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: detailsBody },
+        body: { content: detailsBody },
       })
     })
   })

@@ -24,8 +24,8 @@ public final class NoteAutomationService {
     return chatCompletionNoteAutomationService.promotePointToSibling(point);
   }
 
-  public String removePointsAndRegenerateDetails(java.util.List<String> pointsToRemove)
+  public String removePointsAndRegenerateContent(java.util.List<String> pointsToRemove)
       throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.removePointsAndRegenerateDetails(pointsToRemove);
+    return chatCompletionNoteAutomationService.removePointsAndRegenerateContent(pointsToRemove);
   }
 }

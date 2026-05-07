@@ -1,22 +1,22 @@
 import { describe, expect, it } from "vitest"
 import {
-  countMarkdownLinksAndImagesInNoteDetails,
-  stripMarkdownLinksAndImagesInNoteDetails,
+  countMarkdownLinksAndImagesInNoteContent,
+  stripMarkdownLinksAndImagesInNoteContent,
 } from "@/utils/stripPastedMarkdownLinks"
 
-describe("stripMarkdownLinksAndImagesInNoteDetails", () => {
+describe("stripMarkdownLinksAndImagesInNoteContent", () => {
   it("leaves verbatim frontmatter untouched when stripping links in the body", () => {
-    const details =
+    const markdown =
       "---\nalpha: one\nbeta: 2\n---\nSee [a](https://example.com)\n"
-    expect(stripMarkdownLinksAndImagesInNoteDetails(details, true, false)).toBe(
-      "---\nalpha: one\nbeta: 2\n---\nSee a"
-    )
+    expect(
+      stripMarkdownLinksAndImagesInNoteContent(markdown, true, false)
+    ).toBe("---\nalpha: one\nbeta: 2\n---\nSee a")
   })
 
   it("does not count markdown links that only appear inside frontmatter YAML", () => {
-    const details =
+    const markdown =
       '---\nsummary: "[hidden](https://a.com)"\n---\nPlain body.\n'
-    expect(countMarkdownLinksAndImagesInNoteDetails(details)).toEqual({
+    expect(countMarkdownLinksAndImagesInNoteContent(markdown)).toEqual({
       linkCount: 0,
       imageCount: 0,
     })
@@ -24,14 +24,14 @@ describe("stripMarkdownLinksAndImagesInNoteDetails", () => {
 
   it("keeps [[wiki]] syntax and turns internal note href links into wiki links", () => {
     const md = "[[Alpha]] and [Beta](/d/n/99) then [x](https://z.test)"
-    expect(stripMarkdownLinksAndImagesInNoteDetails(md, true, false)).toBe(
+    expect(stripMarkdownLinksAndImagesInNoteContent(md, true, false)).toBe(
       "[[Alpha]] and [[Beta]] then x"
     )
   })
 
   it("counts only non-internal-note links for the paste options prompt", () => {
     expect(
-      countMarkdownLinksAndImagesInNoteDetails(
+      countMarkdownLinksAndImagesInNoteContent(
         "[A](/d/n/1) [B](https://b) [C](/d/n/2)"
       )
     ).toEqual({ linkCount: 1, imageCount: 0 })
@@ -39,7 +39,7 @@ describe("stripMarkdownLinksAndImagesInNoteDetails", () => {
 
   it("treats absolute note-show URLs as wiki links when stripping", () => {
     const md = "[Same](https://app.example/d/n/3) end"
-    expect(stripMarkdownLinksAndImagesInNoteDetails(md, true, false)).toBe(
+    expect(stripMarkdownLinksAndImagesInNoteContent(md, true, false)).toBe(
       "[[Same]] end"
     )
   })

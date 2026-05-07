@@ -6,41 +6,41 @@ Feature: Wiki links in notes
   Background:
     Given I am logged in as an existing user
     And I have a notebook "WikiLinks E2E NB" with notes:
-      | Title              | Details             | Folder             |
+      | Title              | Content | Folder             |
       | WikiLinks E2E Tech |                     | WikiLinks E2E Root |
       | WikiLinks E2E CI   |                     | WikiLinks E2E Root |
 
   Scenario: A wiki link points to the note with the same title
-    When I update note "WikiLinks E2E Tech" details using markdown to become:
+    When I update note "WikiLinks E2E Tech" content using markdown to become:
       """
       Technical excellence means supporting [[WikiLinks E2E CI]].
       """
-    Then I should see the rich content of the note with details:
+    Then I should see the rich content of the note with content:
       | Tag | Content          |
       | a   | WikiLinks E2E CI |
     And the link "WikiLinks E2E CI" should link to the note with the same title
 
   Scenario: A qualified wiki link opens a note in another notebook
-    Given I have a notebook "WikiCross Src NB" with a note "WikiCross From" and details "origin"
+    Given I have a notebook "WikiCross Src NB" with a note "WikiCross From" and content "origin"
     And I have a notebook "WikiCross Tgt NB" with notes:
       | Title           | Folder            |
       | WikiCross Deep  | WikiCross Tgt Root |
-    When I update note "WikiCross From" details using markdown to become:
+    When I update note "WikiCross From" content using markdown to become:
       """
       Read [[WikiCross Tgt NB:WikiCross Deep]].
       """
-    Then I should see the rich content of the note with details:
+    Then I should see the rich content of the note with content:
       | Tag | Content                            |
       | a   | WikiCross Tgt NB:WikiCross Deep    |
     And the link "WikiCross Tgt NB:WikiCross Deep" should open the note titled "WikiCross Deep"
 
   Scenario: A dead wiki link is shown and can create the missing note
-    When I update note "WikiLinks E2E CI" details using markdown to become:
+    When I update note "WikiLinks E2E CI" content using markdown to become:
       """
       Continuous integration is distinct from a [[WikiLinks E2E Missing]].
       We also rely on [[WikiLinks E2E Tech]] as a core practice.
       """
-    Then I should see the rich content of the note with details:
+    Then I should see the rich content of the note with content:
       | Tag               | Content            |
       | a.dead-link       | WikiLinks E2E Missing |
       | a:not(.dead-link) | WikiLinks E2E Tech |
@@ -51,7 +51,7 @@ Feature: Wiki links in notes
       | WikiLinks E2E CI      |
       | WikiLinks E2E Missing |
     When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E CI" note
-    Then I should see the rich content elements in the note details:
+    Then I should see the rich content elements in the note content:
       | Tag               | Content               |
       | a:not(.dead-link) | WikiLinks E2E Missing |
       | a:not(.dead-link) | WikiLinks E2E Tech    |
@@ -60,7 +60,7 @@ Feature: Wiki links in notes
   Scenario: Insert a wiki link to a note in the same notebook via the toolbar
     When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
     And I insert a wiki link to "WikiLinks E2E CI" via the link toolbar
-    Then I should see the rich content elements in the note details:
+    Then I should see the rich content elements in the note content:
       | Tag | Content          |
       | a   | WikiLinks E2E CI |
     And the link "WikiLinks E2E CI" should link to the note with the same title
@@ -72,5 +72,5 @@ Feature: Wiki links in notes
       | WikiCross Deep | WikiCross Tgt Root |
     When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
     And I insert a wiki link to "WikiCross Deep" via the link toolbar
-    And I view the note details as markdown
-    Then the note details markdown source should contain "[[WikiCross Tgt NB:WikiCross Deep]]"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiCross Tgt NB:WikiCross Deep]]"

@@ -2,7 +2,7 @@
   <div>
     <RichFrontmatterProperties
       ref="frontmatterPropertiesRef"
-      :details-markdown="modelValue ?? ''"
+      :content-markdown="modelValue ?? ''"
       :read-only="readonly"
       :wiki-titles="wikiTitles"
       @properties-changed="onPropertiesChanged"
@@ -41,10 +41,10 @@ import markdownizer from "./markdownizer"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
-  composeNoteDetailsFromPropertyRows,
-  parseNoteDetailsMarkdown,
+  composeNoteContentFromPropertyRows,
+  parseNoteContentMarkdown,
   type PropertyRow,
-} from "@/utils/noteDetailsFrontmatter"
+} from "@/utils/noteContentFrontmatter"
 
 const quillRef = ref<InstanceType<typeof QuillEditor> | null>(null)
 
@@ -66,7 +66,7 @@ const emits = defineEmits<{
   (e: "deadLinkClick", title: string): void
 }>()
 
-/** Body markdown (or full details when frontmatter could not be parsed). */
+/** Body markdown (or full note content when frontmatter could not be parsed). */
 let currentIntervalBodyMarkdown: string | undefined
 let currentIntervalHtml: string | undefined
 
@@ -74,27 +74,27 @@ const frontmatterPropertiesRef = ref<InstanceType<
   typeof RichFrontmatterProperties
 > | null>(null)
 
-const parsedDetails = computed(() =>
-  parseNoteDetailsMarkdown(props.modelValue ?? "")
+const parsedContent = computed(() =>
+  parseNoteContentMarkdown(props.modelValue ?? "")
 )
 
 const frontmatterParseErrorMessage = computed(() => {
-  const p = parsedDetails.value
+  const p = parsedContent.value
   return p.ok ? null : p.message
 })
 
 const effectiveReadonly = computed(
-  () => Boolean(props.readonly) || !parsedDetails.value.ok
+  () => Boolean(props.readonly) || !parsedContent.value.ok
 )
 
 const markdownForRichDisplay = computed(() => {
-  const p = parsedDetails.value
+  const p = parsedContent.value
   if (p.ok) return p.body
   return props.modelValue ?? ""
 })
 
 const htmlValue = computed(() => {
-  const p = parsedDetails.value
+  const p = parsedContent.value
   if (
     currentIntervalHtml !== undefined &&
     currentIntervalBodyMarkdown !== undefined &&
@@ -118,7 +118,7 @@ const htmlValue = computed(() => {
 })
 
 const htmlValueUpdated = (newHtmlValue: string) => {
-  const p = parsedDetails.value
+  const p = parsedContent.value
   if (!p.ok) return
 
   const bodyMarkdown = markdownizer.htmlToMarkdown(newHtmlValue)
@@ -126,7 +126,7 @@ const htmlValueUpdated = (newHtmlValue: string) => {
   currentIntervalHtml = newHtmlValue
 
   const prevFull = props.modelValue ?? ""
-  const composed = composeNoteDetailsFromPropertyRows(
+  const composed = composeNoteContentFromPropertyRows(
     frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
     bodyMarkdown
   )
@@ -135,25 +135,25 @@ const htmlValueUpdated = (newHtmlValue: string) => {
 }
 
 const onPropertiesChanged = (rows: PropertyRow[]) => {
-  const p = parsedDetails.value
+  const p = parsedContent.value
   if (!p.ok) return
   const prevFull = props.modelValue ?? ""
   const bodyMarkdown =
     currentIntervalBodyMarkdown !== undefined
       ? currentIntervalBodyMarkdown
       : p.body
-  const composed = composeNoteDetailsFromPropertyRows(rows, bodyMarkdown)
+  const composed = composeNoteContentFromPropertyRows(rows, bodyMarkdown)
   if (composed !== prevFull) emits("update:modelValue", composed)
 }
 
 const onPasteComplete = (html: string) => {
   const bodyMarkdown = markdownizer.htmlToMarkdown(html)
-  const p = parsedDetails.value
+  const p = parsedContent.value
   if (!p.ok) {
     emits("pasteComplete", bodyMarkdown)
     return
   }
-  const composed = composeNoteDetailsFromPropertyRows(
+  const composed = composeNoteContentFromPropertyRows(
     frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
     bodyMarkdown
   )

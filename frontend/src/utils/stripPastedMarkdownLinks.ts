@@ -1,6 +1,6 @@
 import { marked, type Tokens } from "marked"
 import markdownizer from "@/components/form/markdownizer"
-import { verbatimFrontmatterPrefixAndBody } from "@/utils/noteDetailsFrontmatter"
+import { verbatimFrontmatterPrefixAndBody } from "@/utils/noteContentFrontmatter"
 
 function isInternalNoteShowMarkdownHref(
   href: string | null | undefined
@@ -36,12 +36,12 @@ export function countMarkdownLinksAndImages(markdown: string): {
   return { linkCount, imageCount }
 }
 
-export function countMarkdownLinksAndImagesInNoteDetails(details: string): {
+export function countMarkdownLinksAndImagesInNoteContent(markdown: string): {
   linkCount: number
   imageCount: number
 } {
-  const split = verbatimFrontmatterPrefixAndBody(details)
-  return countMarkdownLinksAndImages(split?.body ?? details)
+  const split = verbatimFrontmatterPrefixAndBody(markdown)
+  return countMarkdownLinksAndImages(split?.body ?? markdown)
 }
 
 function stripMarkdownLinksAndImages(
@@ -94,14 +94,14 @@ function stripMarkdownLinksAndImages(
   return markdownizer.htmlToMarkdown(html).trim()
 }
 
-export function stripMarkdownLinksAndImagesInNoteDetails(
-  details: string,
+export function stripMarkdownLinksAndImagesInNoteContent(
+  markdown: string,
   removeLinks: boolean,
   removeImages: boolean
 ): string {
-  const split = verbatimFrontmatterPrefixAndBody(details)
+  const split = verbatimFrontmatterPrefixAndBody(markdown)
   if (!split) {
-    return stripMarkdownLinksAndImages(details, removeLinks, removeImages)
+    return stripMarkdownLinksAndImages(markdown, removeLinks, removeImages)
   }
   return (
     split.prefix +

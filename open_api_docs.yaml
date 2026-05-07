@@ -1839,8 +1839,8 @@ paths:
     post:
       tags:
       - ai-controller
-      summary: Remove points from note details (response only)
-      description: Returns AI-regenerated note details in the response. Does not persist
+      summary: Remove points from note content (response only)
+      description: Returns AI-regenerated note content in the response. Does not persist
         the note; the client must save the returned text (for example via the note
         update API).
       operationId: removePointFromNote
@@ -1965,11 +1965,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/text_content/{note}/details:
+  /api/text_content/{note}/content:
     patch:
       tags:
       - text-content-controller
-      operationId: updateNoteDetails
+      operationId: updateNoteContent
       parameters:
       - name: note
         in: path
@@ -1980,7 +1980,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteUpdateDetailsDTO"
+              $ref: "#/components/schemas/NoteUpdateContentDTO"
         required: true
       responses:
         "200":
@@ -2496,8 +2496,8 @@ paths:
           type: integer
       - name: tokenLimit
         in: query
-        description: Approximate token budget for focus note details plus related
-          note details combined (bodies).
+        description: Approximate token budget for focus note content plus related
+          note content combined (bodies).
         required: true
         schema:
           type: integer
@@ -2522,8 +2522,8 @@ paths:
           type: integer
       - name: tokenLimit
         in: query
-        description: Approximate token budget for focus note details plus related
-          note details combined (bodies).
+        description: Approximate token budget for focus note content plus related
+          note content combined (bodies).
         required: true
         schema:
           type: integer
@@ -3518,7 +3518,7 @@ components:
       properties:
         Title:
           type: string
-        Details:
+        Content:
           type: string
         Skip Memory Tracking:
           type: boolean
@@ -3698,7 +3698,7 @@ components:
       properties:
         noteTopology:
           $ref: "#/components/schemas/NoteTopology"
-        details:
+        content:
           type: string
         id:
           type: integer
@@ -4475,24 +4475,24 @@ components:
           format: binary
         additionalProcessingInstructions:
           type: string
-        previousNoteDetailsToAppendTo:
+        previousNoteContentToAppendTo:
           type: string
         midSpeech:
           type: boolean
         isMidSpeech:
           type: boolean
-    NoteDetailsCompletion:
+    NoteContentCompletion:
       type: object
       properties:
-        details:
+        content:
           type: string
       required:
-      - details
+      - content
     TextFromAudioWithCallInfo:
       type: object
       properties:
         completionFromAudio:
-          $ref: "#/components/schemas/NoteDetailsCompletion"
+          $ref: "#/components/schemas/NoteContentCompletion"
         rawSRT:
           type: string
         endTimestamp:
@@ -4551,7 +4551,7 @@ components:
     RemovePointsResponseDTO:
       type: object
       properties:
-        details:
+        content:
           type: string
     UnderstandingChecklistDTO:
       type: object
@@ -4604,10 +4604,10 @@ components:
           pattern: "^[^\\\\/:]*$"
       required:
       - newTitle
-    NoteUpdateDetailsDTO:
+    NoteUpdateContentDTO:
       type: object
       properties:
-        details:
+        content:
           type: string
     UpdateNotebookGroupRequest:
       type: object
@@ -4810,9 +4810,9 @@ components:
         createdAt:
           type: string
           format: date-time
-        details:
+        content:
           type: string
-        detailsTruncated:
+        contentTruncated:
           type: boolean
     FocusContextNote:
       type: object
@@ -4839,9 +4839,9 @@ components:
         createdAt:
           type: string
           format: date-time
-        details:
+        content:
           type: string
-        detailsTruncated:
+        contentTruncated:
           type: boolean
     FocusContextResult:
       type: object
@@ -5094,8 +5094,8 @@ components:
     DummyForGeneratingTypes:
       type: object
       properties:
-        noteDetailsCompletion:
-          $ref: "#/components/schemas/NoteDetailsCompletion"
+        noteContentCompletion:
+          $ref: "#/components/schemas/NoteContentCompletion"
         titleReplacement:
           $ref: "#/components/schemas/TitleReplacement"
     TitleReplacement:

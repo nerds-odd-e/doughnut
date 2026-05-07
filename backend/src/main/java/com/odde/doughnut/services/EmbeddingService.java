@@ -115,13 +115,13 @@ public class EmbeddingService {
 
   private String combineNoteContent(Note note) {
     String title = note.getTitle() != null ? note.getTitle() : "";
-    String details = note.getDetails() != null ? note.getDetails() : "";
+    String content = note.getContent() != null ? note.getContent() : "";
 
     StringBuilder sb = new StringBuilder(256);
     sb.append("Title: ").append(title).append('\n');
-    sb.append("Details:\n");
-    if (!details.isBlank()) {
-      sb.append(details);
+    sb.append("Content:\n");
+    if (!content.isBlank()) {
+      sb.append(content);
     }
 
     String structured = sb.toString();

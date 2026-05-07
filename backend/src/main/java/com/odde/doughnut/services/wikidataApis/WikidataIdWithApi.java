@@ -42,9 +42,7 @@ public final class WikidataIdWithApi {
 
   public void extractWikidataInfoToNote(Note note) throws IOException, InterruptedException {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
-    model
-        .map(entity -> entity.wikidataDescription(wikidataApi))
-        .ifPresent(note::prependDescription);
+    model.map(entity -> entity.wikidataDescription(wikidataApi)).ifPresent(note::prependContent);
   }
 
   public Optional<WikidataIdWithApi> getCountryOfOrigin() throws IOException, InterruptedException {

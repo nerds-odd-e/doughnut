@@ -24,7 +24,7 @@ class RecallPromptTest {
 
   @BeforeEach
   void setup() {
-    note = makeMe.aNote("sedition").details("Sedition means incite violence").please();
+    note = makeMe.aNote("sedition").content("Sedition means incite violence").please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).by(makeMe.aUser().please()).please();
   }
 
@@ -62,7 +62,7 @@ class RecallPromptTest {
       Note noteWithFm =
           makeMe
               .aNote("sedition")
-              .details(
+              .content(
                   "---\n" + "see: \"[[Other]]\"\n" + "---\n" + "Sedition means incite violence")
               .please();
       MemoryTracker tracker =

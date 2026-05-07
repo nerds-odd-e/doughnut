@@ -48,11 +48,11 @@ class AiAudioController {
             globalSettingsService.globalSettingOthers().getValue(),
             processedResult.getProcessedSRT(),
             audioFile.getAdditionalProcessingInstructions(),
-            audioFile.getPreviousNoteDetailsToAppendTo())
+            audioFile.getPreviousNoteContentToAppendTo())
         .map(
-            noteDetailsCompletion -> {
+            noteContentCompletion -> {
               TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
-              textFromAudioWithCallInfo.setCompletionFromAudio(noteDetailsCompletion);
+              textFromAudioWithCallInfo.setCompletionFromAudio(noteContentCompletion);
               textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
               textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
               return textFromAudioWithCallInfo;

@@ -86,7 +86,7 @@ class NoteControllerTests extends ControllerTestBase {
               .aNote()
               .creator(user)
               .inNotebook(root.getNotebook())
-              .details("Text [[LinkedPage]] and [[NoSuch]].")
+              .content("Text [[LinkedPage]] and [[NoSuch]].")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
@@ -111,7 +111,7 @@ class NoteControllerTests extends ControllerTestBase {
               .aNote()
               .creator(user)
               .inNotebook(mainNotebook)
-              .details("See [[Other Notebook:LinkedPage]] for more.")
+              .content("See [[Other Notebook:LinkedPage]] for more.")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
@@ -138,7 +138,7 @@ class NoteControllerTests extends ControllerTestBase {
               .aNote()
               .creator(viewerUser)
               .inNotebook(myNotebook)
-              .details("Try [[Secret Notebook:Hidden Note]].")
+              .content("Try [[Secret Notebook:Hidden Note]].")
               .please();
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), empty());
@@ -161,7 +161,7 @@ class NoteControllerTests extends ControllerTestBase {
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
       Note viewer =
-          makeMe.aNote().creator(user).inNotebook(root.getNotebook()).details(details).please();
+          makeMe.aNote().creator(user).inNotebook(root.getNotebook()).content(details).please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
@@ -644,7 +644,7 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldReturnMarkdownForReadableNote() throws UnexpectedNoAccessRightException {
       Note note =
-          makeMe.aNote("Focus").details("Body").creatorAndOwner(currentUser.getUser()).please();
+          makeMe.aNote("Focus").content("Body").creatorAndOwner(currentUser.getUser()).please();
       NoteAiContextMarkdown dto = controller.getAiContextMarkdown(note, 5000);
       assertThat(dto.markdown(), containsString("Focus"));
       assertThat(dto.markdown(), containsString("Body"));

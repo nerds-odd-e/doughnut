@@ -1,5 +1,5 @@
 import AddLinkDialog from "@/components/links/AddLinkDialog.vue"
-import { useDetailsCursorInserter } from "@/composables/useDetailsCursorInserter"
+import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
@@ -22,7 +22,7 @@ describe("InsertWikiLink", () => {
       registerInserter,
       registerWikiPropertyInserter,
       unregisterInserter,
-    } = useDetailsCursorInserter()
+    } = useContentCursorInserter()
     unregisterInserter()
     registerInserter((text) => insertedTexts.push(text))
     registerWikiPropertyInserter({
@@ -97,7 +97,7 @@ describe("InsertWikiLink", () => {
       registerInserter,
       registerWikiPropertyInserter,
       unregisterInserter,
-    } = useDetailsCursorInserter()
+    } = useContentCursorInserter()
     unregisterInserter()
     registerInserter((text) => insertedTexts.push(text))
     registerWikiPropertyInserter({

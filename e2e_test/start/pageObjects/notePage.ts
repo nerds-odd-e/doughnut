@@ -14,9 +14,14 @@ import { assumeAssimilationPage } from './assimilationPage'
 const noteShowHref = /^\/d\/n\/\d+$/
 const noteShowPathInUrl = /\/d\/n\/\d+/
 
-function wikiLinkInDetailsFluent(linkText: string) {
+const noteContentRegion = { role: 'region' as const, name: 'Note content' }
+
+function wikiLinkInNoteContentFluent(linkText: string) {
   const locator = () =>
-    cy.get('[role=details]').find('a.doughnut-link').contains(linkText)
+    cy
+      .findByRole(noteContentRegion.role, { name: noteContentRegion.name })
+      .find('a.doughnut-link')
+      .contains(linkText)
   return {
     expectNoteShowHref() {
       locator().should('have.attr', 'href').and('match', noteShowHref)
@@ -48,9 +53,9 @@ export const assumeNotePage = (
       findNoteTitle(title)
       return this
     },
-    /** Asserts the rendered note details body contains this substring (plain or rich) */
-    expectDetailsContaining(fragment: string) {
-      this.findNoteDetails(fragment)
+    /** Asserts the rendered note content body contains this substring (plain or rich) */
+    expectContentContaining(fragment: string) {
+      this.findNoteContent(fragment)
       return this
     },
     moreOptions: () => {
@@ -122,21 +127,26 @@ export const assumeNotePage = (
         )
       )
     },
-    findNoteDetails: (expected: string, timeout?: number) => {
+    findNoteContent: (expected: string, timeout?: number) => {
       const normalized = expected.replace(/\\n/g, '\n')
       const lines = normalized.split('\n').filter((line) => line.length > 0)
-      cy.get('[role=details]', timeout ? { timeout } : {}).should(($el) => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+        ...(timeout !== undefined ? { timeout } : {}),
+      }).should(($el) => {
         const text = $el.text()
         for (const line of lines) {
           expect(
             text,
-            `expected note details to include ${JSON.stringify(line)}`
+            `expected note content to include ${JSON.stringify(line)}`
           ).to.contain(line)
         }
       })
     },
-    expectNoteDetailsContainLineBreak: () => {
-      cy.get('[role=details]').within(() => {
+    expectNoteContentContainLineBreak: () => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         // Verify that "Hello" is immediately followed by a <br> tag
         cy.get('.ql-editor, [contenteditable]').should(($el) => {
           const html = $el.html()
@@ -165,8 +175,10 @@ export const assumeNotePage = (
       for (const propName in noteAttributes) {
         const value = noteAttributes[propName]
         if (value) {
-          if (propName === 'Details') {
-            cy.findByRole('details').within(() => {
+          if (propName === 'Content') {
+            cy.findByRole(noteContentRegion.role, {
+              name: noteContentRegion.name,
+            }).within(() => {
               cy.get('.ql-editor[contenteditable="true"], textarea')
                 .first()
                 .click()
@@ -191,11 +203,13 @@ export const assumeNotePage = (
       this.toolbarButton('Edit as rich content').click()
       return this
     },
-    switchToRichDetails() {
+    switchToRichContentMode() {
       return this.switchToRichContent()
     },
-    flushPendingDetailsSave() {
-      cy.get('[role=details]').then(($details) => {
+    flushPendingContentSave() {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).then(($details) => {
         const $textarea = $details.find('textarea').filter(':visible')
         if ($textarea.length) {
           cy.wrap($textarea.first()).blur()
@@ -206,32 +220,32 @@ export const assumeNotePage = (
       pageIsNotLoading()
       return this
     },
-    openMarkdownDetailsEditor() {
+    openMarkdownContentEditor() {
       this.toolbarButton('Edit as markdown').click()
       return this
     },
-    expectMarkdownDetailsSourceContains(fragment: string) {
+    expectMarkdownContentSourceContains(fragment: string) {
       cy.get('textarea').should(($ta) => {
         expect($ta.val()).to.include(fragment)
       })
       return this
     },
-    expectMarkdownDetailsSourceDoesNotContain(fragment: string) {
+    expectMarkdownContentSourceDoesNotContain(fragment: string) {
       cy.get('textarea').should(($ta) => {
         expect($ta.val()).to.not.include(fragment)
       })
       return this
     },
-    updateDetailsAsMarkdown(markdown: string) {
+    updateContentAsMarkdown(markdown: string) {
       this.toolbarButton('Edit as markdown').click()
       cy.get('textarea').clear().type(markdown)
       return this
     },
-    expectRichDetails(elements: Record<string, string>[]) {
+    expectRichContent(elements: Record<string, string>[]) {
       for (const element of elements) {
         const tag = element.Tag as string
         const content = element.Content
-        cy.get('#main-note-content .note-details .ql-editor').within(() => {
+        cy.get('#main-note-content .note-content .ql-editor').within(() => {
           if (content === '') {
             cy.get(tag).should('exist')
           } else {
@@ -241,18 +255,24 @@ export const assumeNotePage = (
       }
     },
     addRichNoteProperty(key: string, value: string) {
-      cy.get('[role=details]').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.findByRole('button', { name: 'Add note property' }).click()
         cy.findByTestId('rich-note-property-key').clear().type(key)
         cy.findByTestId('rich-note-property-value').clear().type(value)
       })
-      cy.findByRole('details').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.get('.ql-editor[contenteditable="true"]').first().click()
       })
       return this
     },
     expectRichNotePropertyDisplayed(key: string, value: string) {
-      cy.get('[role=details]').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.contains('h4', 'Properties')
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
@@ -271,7 +291,9 @@ export const assumeNotePage = (
       return this
     },
     expectRichNotePropertyAbsent(key: string) {
-      cy.get('[role=details]').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.contains('h4', 'Properties')
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
@@ -282,7 +304,9 @@ export const assumeNotePage = (
     editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
       // Edit value before key: changing the key updates `data-property-key` on the row,
       // which breaks a single `.within()` chain that queries by `oldKey` then touches both inputs.
-      cy.get('[role=details]').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.contains('h4', 'Properties')
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
@@ -293,7 +317,9 @@ export const assumeNotePage = (
             .type(newValue)
         })
       })
-      cy.get('[role=details]').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
           { timeout: 15000 }
@@ -303,21 +329,26 @@ export const assumeNotePage = (
             .type(newKey)
         })
       })
-      cy.findByRole('details').within(() => {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
         cy.get('.ql-editor[contenteditable="true"]').first().click()
       })
       return this
     },
     followDeadLink(linkTitle: string) {
-      cy.get('[role=details]').find('a.dead-link').contains(linkTitle).click()
+      cy.findByRole(noteContentRegion.role, { name: noteContentRegion.name })
+        .find('a.dead-link')
+        .contains(linkTitle)
+        .click()
       return {
         createNote: () => {
           noteCreationForm.submit()
         },
       }
     },
-    wikiLinkInDetails(linkText: string) {
-      return wikiLinkInDetailsFluent(linkText)
+    wikiLinkInNoteContent(linkText: string) {
+      return wikiLinkInNoteContentFluent(linkText)
     },
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)

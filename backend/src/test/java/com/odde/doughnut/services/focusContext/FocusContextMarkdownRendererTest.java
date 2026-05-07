@@ -20,9 +20,9 @@ class FocusContextMarkdownRendererTest {
   }
 
   private static FocusContextFocusNote focusNote(
-      String notebook, String title, String details, boolean detailsTruncated) {
+      String notebook, String title, String content, boolean contentTruncated) {
     return new FocusContextFocusNote(
-        notebook, title, "", 0, List.of(), List.of(), List.of(), null, details, detailsTruncated);
+        notebook, title, "", 0, List.of(), List.of(), List.of(), null, content, contentTruncated);
   }
 
   @Nested

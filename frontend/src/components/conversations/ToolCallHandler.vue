@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import type {
-  NoteDetailsCompletion,
+  NoteContentCompletion,
   Note,
 } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
@@ -72,10 +72,10 @@ const suggestionContentClass = computed(() => {
   }
 })
 
-const formatCompletionSuggestion = (completion: NoteDetailsCompletion) => {
-  if (!completion.details) return ""
+const formatCompletionSuggestion = (completion: NoteContentCompletion) => {
+  if (!completion.content) return ""
 
-  return completion.details
+  return completion.content
 }
 
 const formattedContent = computed(() => {
@@ -105,7 +105,7 @@ const handleAccept = async () => {
         const content = props.suggestion.content
         await storageAccessor.value
           .storedApi()
-          .completeDetails(props.note.id, content)
+          .completeContent(props.note.id, content)
         break
       }
       case "title": {

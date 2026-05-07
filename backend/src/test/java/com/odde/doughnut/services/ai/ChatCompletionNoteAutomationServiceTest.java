@@ -47,7 +47,7 @@ class ChatCompletionNoteAutomationServiceTest {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
     // Create common test data
-    testNote = makeMe.aNote().details("description long enough.").please();
+    testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
 
     // Initialize service

@@ -3,7 +3,7 @@ import type {
   FolderListing,
   FolderMoveRequest,
   Folder,
-  NoteDetailsCompletion,
+  NoteContentCompletion,
   NoteRealm,
   WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
@@ -86,13 +86,13 @@ export interface StoredApi {
 
   updateTextField(
     noteId: Doughnut.ID,
-    field: "edit title" | "edit details",
+    field: "edit title" | "edit content",
     value: string
   ): Promise<void>
 
-  completeDetails(
+  completeContent(
     noteId: Doughnut.ID,
-    value?: NoteDetailsCompletion
+    value?: NoteContentCompletion
   ): Promise<void>
 
   /** PATCH note details with current stored body so the backend rebuilds wiki title cache. */
@@ -140,7 +140,7 @@ export default class StoredApiCollection implements StoredApi {
 
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
-    field: "edit title" | "edit details",
+    field: "edit title" | "edit content",
     content: string
   ) {
     const realm = this.storage.refreshNoteRealm(
@@ -154,7 +154,7 @@ export default class StoredApiCollection implements StoredApi {
 
   private async callUpdateApi(
     noteId: Doughnut.ID,
-    field: "edit title" | "edit details",
+    field: "edit title" | "edit content",
     content: string
   ) {
     if (field === "edit title") {
@@ -172,15 +172,15 @@ export default class StoredApiCollection implements StoredApi {
       return data
     }
     const { data, error } = await apiCallWithLoading(() =>
-      TextContentController.updateNoteDetails({
+      TextContentController.updateNoteContent({
         path: { note: noteId },
         body: {
-          details: content,
+          content,
         },
       })
     )
     if (error || !data) {
-      throw new Error(toErrorMessage(error, "Failed to update note details"))
+      throw new Error(toErrorMessage(error, "Failed to update note content"))
     }
     return data
   }
@@ -437,7 +437,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateTextField(
     noteId: Doughnut.ID,
-    field: "edit title" | "edit details",
+    field: "edit title" | "edit content",
     value: string
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
@@ -445,7 +445,7 @@ export default class StoredApiCollection implements StoredApi {
       const old =
         field === "edit title"
           ? currentNote.noteTopology.title
-          : (currentNote.details ?? "")
+          : (currentNote.content ?? "")
       if (old === value) {
         return
       }
@@ -454,15 +454,15 @@ export default class StoredApiCollection implements StoredApi {
     await this.updateTextContentWithoutUndo(noteId, field, value)
   }
 
-  async completeDetails(noteId: Doughnut.ID, value?: NoteDetailsCompletion) {
-    if (!value || !value.details) return
+  async completeContent(noteId: Doughnut.ID, value?: NoteContentCompletion) {
+    if (!value || !value.content) return
 
     let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (!currentNote) {
       currentNote = (await this.loadNote(noteId)).note
     }
 
-    await this.updateTextField(noteId, "edit details", value.details)
+    await this.updateTextField(noteId, "edit content", value.content)
   }
 
   async refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void> {
@@ -470,8 +470,8 @@ export default class StoredApiCollection implements StoredApi {
     if (!realm?.note) {
       realm = await this.loadNote(noteId)
     }
-    const details = realm.note.details ?? ""
-    await this.updateTextContentWithoutUndo(noteId, "edit details", details)
+    const content = realm.note.content ?? ""
+    await this.updateTextContentWithoutUndo(noteId, "edit content", content)
   }
 
   private async undoInner(): Promise<{
@@ -481,7 +481,7 @@ export default class StoredApiCollection implements StoredApi {
     const undone = this.noteEditingHistory.peekUndo()
     if (!undone) throw new Error("undo history is empty")
     this.noteEditingHistory.popUndoHistory()
-    if (undone.type === "edit title" || undone.type === "edit details") {
+    if (undone.type === "edit title" || undone.type === "edit content") {
       const noteRealm = await this.updateTextContentWithoutUndo(
         undone.noteId,
         undone.type,

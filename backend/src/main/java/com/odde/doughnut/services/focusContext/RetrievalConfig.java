@@ -29,7 +29,7 @@ public class RetrievalConfig {
   }
 
   /**
-   * Combined approximate token budget for focus and related note details for {@code GET
+   * Combined approximate token budget for focus and related note content for {@code GET
    * /notes/{id}/graph}.
    */
   public static RetrievalConfig forGraphApi(int combinedContentTokenBudget) {
@@ -49,7 +49,7 @@ public class RetrievalConfig {
   }
 
   /**
-   * Approximate token budget for focus note details plus all related note details combined (bodies
+   * Approximate token budget for focus note content plus all related note content combined (bodies
    * only; same unit as {@link com.odde.doughnut.services.ApproximateUtf8TokenBudget}).
    */
   public int getFocusContextContentTokenBudget() {

@@ -28,7 +28,7 @@ class AIGeneratedQuizFactoryTest {
 
   @BeforeEach
   void setup() {
-    note = makeMe.aNote("saying").details("Rome is not built in a day").please();
+    note = makeMe.aNote("saying").content("Rome is not built in a day").please();
     mcqWithAnswer =
         makeMe
             .aMCQWithAnswer()

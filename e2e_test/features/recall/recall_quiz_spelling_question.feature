@@ -5,7 +5,7 @@ Feature: Recall Quiz
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Details                        | Skip Memory Tracking |
+      | Title    | Content | Skip Memory Tracking |
       | English  |                                | true                 |
       | sedition | Sedition means incite violence |                      |
       | sedation | Put to sleep is sedation       |                      |

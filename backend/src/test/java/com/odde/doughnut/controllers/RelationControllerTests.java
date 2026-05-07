@@ -230,7 +230,7 @@ class RelationControllerTests extends ControllerTestBase {
       String expectedDetails =
           RelationshipNoteMarkdownFormatter.format(
               RelationType.APPLICATION, source.getTitle(), target.getTitle(), null);
-      assertThat(result.getFirst().getNote().getDetails(), equalTo(expectedDetails));
+      assertThat(result.getFirst().getNote().getContent(), equalTo(expectedDetails));
     }
 
     @Test

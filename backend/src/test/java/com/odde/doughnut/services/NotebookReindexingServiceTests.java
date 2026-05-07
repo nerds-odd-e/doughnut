@@ -76,7 +76,7 @@ class NotebookReindexingServiceTests {
 
     // Make sure first note is not updated after embedding, and second is updated now
     // Update second's updatedAt to be "newer" by touching details
-    makeMe.theNote(second).details("newer details").please();
+    makeMe.theNote(second).content("newer details").please();
     makeMe.refresh(notebook);
 
     // Act

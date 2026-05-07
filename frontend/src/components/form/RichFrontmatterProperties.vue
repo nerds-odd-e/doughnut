@@ -134,15 +134,15 @@ import {
   type RelationTypeLabel,
 } from "@/models/relationTypeOptions"
 import {
-  parseNoteDetailsMarkdown,
+  parseNoteContentMarkdown,
   removePropertyRowAt,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
-} from "@/utils/noteDetailsFrontmatter"
+} from "@/utils/noteContentFrontmatter"
 
 const props = defineProps<{
-  detailsMarkdown: string
+  contentMarkdown: string
   /** When true, properties list is display-only and insert chrome is hidden. */
   readOnly?: boolean
   wikiTitles: WikiTitle[]
@@ -157,7 +157,7 @@ const headingId = useId()
 
 const isReadOnly = computed(() => props.readOnly ?? false)
 
-const parsed = computed(() => parseNoteDetailsMarkdown(props.detailsMarkdown))
+const parsed = computed(() => parseNoteContentMarkdown(props.contentMarkdown))
 
 const propertyRows = ref<PropertyRow[]>([])
 
@@ -172,7 +172,7 @@ const validationMessage = ref("")
 const rowSnapshots = ref<Record<number, PropertyRow>>({})
 
 watch(
-  () => props.detailsMarkdown,
+  () => props.contentMarkdown,
   () => {
     const p = parsed.value
     if (p.ok) {

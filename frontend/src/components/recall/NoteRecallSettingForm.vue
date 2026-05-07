@@ -44,7 +44,7 @@ export default defineComponent({
       type: Object as PropType<NoteRecallSetting>,
       required: false,
     },
-    noteDetails: {
+    noteContent: {
       type: String,
       required: false,
     },
@@ -69,12 +69,12 @@ export default defineComponent({
     )
 
     const isSpellingDisabled = computed(
-      () => !props.noteDetails || props.noteDetails.trim() === ""
+      () => !props.noteContent || props.noteContent.trim() === ""
     )
 
     const spellingDisabledMessage = computed(() =>
       isSpellingDisabled.value
-        ? "Remember spelling note need to have detail"
+        ? "Remember spelling note need to have content"
         : errors.value.rememberSpelling
     )
 

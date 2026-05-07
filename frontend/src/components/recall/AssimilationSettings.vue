@@ -28,7 +28,7 @@
             class="daisy-flex daisy-flex-col daisy-gap-3 sm:daisy-flex-row sm:daisy-items-center sm:daisy-justify-between"
           >
             <button
-              v-if="(note.details ?? '').trim()"
+              v-if="(note.content ?? '').trim()"
               type="button"
               data-test="open-refine-note-modal"
               class="daisy-btn daisy-btn-neutral daisy-shrink-0"
@@ -52,7 +52,7 @@
   </footer>
   <Teleport to="body">
     <dialog
-      v-if="(note.details ?? '').trim()"
+      v-if="(note.content ?? '').trim()"
       class="daisy-modal"
       :class="{ 'daisy-modal-open': showRefineNoteModal }"
       data-test="refine-note-modal"
@@ -70,7 +70,7 @@
           v-if="showRefineNoteModal"
           :key="note.id"
           :note="note"
-          @details-updated="emit('refinementDetailsUpdated')"
+          @content-updated="emit('refinementContentUpdated')"
           @understanding-points-ignored="closeRefineNoteModal"
         />
         <div v-if="showRefineNoteModal" class="daisy-modal-action daisy-mt-4">
@@ -109,7 +109,7 @@ const emit = defineEmits<{
   (e: "rememberSpellingChanged", value: boolean): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
   (e: "assimilate", skipMemoryTracking: boolean): void
-  (e: "refinementDetailsUpdated"): void
+  (e: "refinementContentUpdated"): void
 }>()
 
 const showRefineNoteModal = ref(false)

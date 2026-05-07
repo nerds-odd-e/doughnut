@@ -6,9 +6,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RemovePointsResponseDTO {
-  private String details;
+  private String content;
 
-  public RemovePointsResponseDTO(String details) {
-    this.details = details;
+  public RemovePointsResponseDTO(String content) {
+    this.content = content;
   }
 }

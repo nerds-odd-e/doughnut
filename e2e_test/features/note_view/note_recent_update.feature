@@ -6,7 +6,7 @@ Feature: see recent note update
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And I have a notebook "World atlas" with notes:
-      | Title   | Folder        | Details           |
+      | Title   | Folder        | Content |
       | Germany | World         |                   |
       | Japan   | World         |                   |
       | Berlin  | World/Germany | Berlin has a wall |
@@ -15,10 +15,10 @@ Feature: see recent note update
     And I let the server to time travel to 24 hours ago
 
   Scenario Outline: I should see the color of a newer note is fresher
-    And I update note "Berlin" with details "<new details>"
+    And I update note "Berlin" with content "<new content>"
     Then I should see "Berlin" is "<aging>" than "Japan"
 
     Examples:
-      | new details       | aging     |
+      | new content       | aging     |
       | Berlin had a wall | newer     |
       | Berlin has a wall | not newer |

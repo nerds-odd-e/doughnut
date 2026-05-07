@@ -71,8 +71,8 @@ describe('get_note_graph tool', () => {
           outgoingLinks: [],
           inboundReferences: [],
           sampleSiblings: [],
-          details: '',
-          detailsTruncated: false,
+          content: '',
+          contentTruncated: false,
         },
         relatedNotes: [],
       }

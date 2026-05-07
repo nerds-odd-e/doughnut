@@ -185,7 +185,7 @@ const methodToController: Record<string, any> = {
   dummyEntryToGenerateDataTypesThatAreRequiredInEventStream: AiController,
   getAvailableGptModels: AiController,
   updateNoteTitle: TextContentController,
-  updateNoteDetails: TextContentController,
+  updateNoteContent: TextContentController,
   searchWikidata: WikidataController,
   fetchWikidataEntityDataById: WikidataController,
   currentUserInfo: CurrentUserInfoController,
@@ -337,7 +337,7 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
  * @example
  * ```ts
  * const mockedCall = vi.fn()
- * mockSdkServiceWithImplementation("updateNoteDetails", async (options) => {
+ * mockSdkServiceWithImplementation("updateNoteContent", async (options) => {
  *   const result = await mockedCall(options)
  *   return result
  * })

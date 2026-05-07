@@ -7,12 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @JsonClassDescription(
-    "Rewrite the given points into coherent note details. Output the complete new details in markdown format.")
+    "Rewrite the given points into coherent note content. Output the complete new content in markdown format.")
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegeneratedNoteDetails {
+public class RegeneratedNoteContent {
 
-  @JsonPropertyDescription("The new note details in markdown, generated from the given points.")
+  @JsonPropertyDescription("The new note content in markdown, generated from the given points.")
   @JsonProperty(required = true)
-  public String details;
+  public String content;
 }

@@ -81,13 +81,13 @@ public class NoteEmbeddingJdbcRepository {
   public static class SimilarNoteRow {
     public final Integer noteId;
     public final float titleDist;
-    public final float detailsDist;
+    public final float contentDist;
     public final float combinedDist;
 
-    public SimilarNoteRow(Integer noteId, float titleDist, float detailsDist, float combinedDist) {
+    public SimilarNoteRow(Integer noteId, float titleDist, float contentDist, float combinedDist) {
       this.noteId = noteId;
       this.titleDist = titleDist;
-      this.detailsDist = detailsDist;
+      this.contentDist = contentDist;
       this.combinedDist = combinedDist;
     }
   }
@@ -133,7 +133,7 @@ public class NoteEmbeddingJdbcRepository {
             + " vector_distance("
             + embeddingColumn()
             + ", q.qv, 'distance_measure=l2_squared') AS title_dist, "
-            + " 1e9 AS details_dist, "
+            + " 1e9 AS content_dist, "
             + " vector_distance("
             + embeddingColumn()
             + ", q.qv, 'distance_measure=l2_squared') AS combined_dist "
@@ -173,7 +173,7 @@ public class NoteEmbeddingJdbcRepository {
             new SimilarNoteRow(
                 rs.getInt("note_id"),
                 rs.getFloat("title_dist"),
-                rs.getFloat("details_dist"),
+                rs.getFloat("content_dist"),
                 rs.getFloat("combined_dist")));
   }
 

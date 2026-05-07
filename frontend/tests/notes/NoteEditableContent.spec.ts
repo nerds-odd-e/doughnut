@@ -1,25 +1,25 @@
-import NoteEditableDetails from "@/components/notes/core/NoteEditableDetails.vue"
+import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { vi, describe, it, expect, beforeEach } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import type { UpdateNoteDetailsData } from "@generated/doughnut-backend-api"
+import type { UpdateNoteContentData } from "@generated/doughnut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 vi.mock("@/components/commons/Popups/usePopups")
 
-describe("NoteEditableDetails", () => {
-  let updateNoteDetailsSpy: ReturnType<
-    typeof mockSdkService<"updateNoteDetails">
+describe("NoteEditableContent", () => {
+  let updateNoteContentSpy: ReturnType<
+    typeof mockSdkService<"updateNoteContent">
   >
   // biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
   let mockPopupsOptions: any
 
   beforeEach(() => {
     vi.resetAllMocks()
-    updateNoteDetailsSpy = mockSdkService(
-      "updateNoteDetails",
+    updateNoteContentSpy = mockSdkService(
+      "updateNoteContent",
       makeMe.aNoteRealm.please()
     )
     mockPopupsOptions = vi.fn().mockResolvedValue(null)
@@ -44,12 +44,12 @@ describe("NoteEditableDetails", () => {
     const secondNoteId = 2
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId: firstNoteId,
-        noteDetails: "First note details",
+        noteContent: "First note details",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -65,7 +65,7 @@ describe("NoteEditableDetails", () => {
 
     await wrapper.setProps({
       noteId: secondNoteId,
-      noteDetails: "Second note details",
+      noteContent: "Second note details",
     })
     await flushPromises()
 
@@ -76,14 +76,14 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    const calls = updateNoteDetailsSpy.mock.calls as Array<
-      [UpdateNoteDetailsData]
+    const calls = updateNoteContentSpy.mock.calls as Array<
+      [UpdateNoteContentData]
     >
     expect(
       calls.some(
         (call) =>
           call[0].path?.note === secondNoteId &&
-          call[0].body?.details === "Edited details from first note"
+          call[0].body?.content === "Edited details from first note"
       )
     ).toBe(false)
     expect(calls.some((call) => call[0].path?.note === firstNoteId)).toBe(false)
@@ -92,7 +92,7 @@ describe("NoteEditableDetails", () => {
         calls.some(
           (call) =>
             call[0].path?.note === secondNoteId &&
-            call[0].body?.details === "New edits on second note"
+            call[0].body?.content === "New edits on second note"
         )
       ).toBe(true)
     }
@@ -101,12 +101,12 @@ describe("NoteEditableDetails", () => {
 
   it("should update displayed details when navigating to a different note with no unsaved changes", async () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId: 1,
-        noteDetails: "First note details",
+        noteContent: "First note details",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -117,7 +117,7 @@ describe("NoteEditableDetails", () => {
 
     await wrapper.setProps({
       noteId: 2,
-      noteDetails: "Second note details",
+      noteContent: "Second note details",
     })
     await flushPromises()
 
@@ -126,17 +126,17 @@ describe("NoteEditableDetails", () => {
     wrapper.unmount()
   })
 
-  it("should preserve unsaved edits if the noteDetails prop doesn't actually change", async () => {
+  it("should preserve unsaved edits if the noteContent prop doesn't actually change", async () => {
     const noteId = 1
-    const noteDetails = "Original details"
+    const noteContent = "Original details"
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId,
-        noteDetails,
+        noteContent,
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -152,7 +152,7 @@ describe("NoteEditableDetails", () => {
 
     await wrapper.setProps({
       noteId,
-      noteDetails,
+      noteContent,
       readonly: false,
     })
     await flushPromises()
@@ -162,9 +162,9 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+    expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: noteId },
-      body: { details: "Edited details" },
+      body: { content: "Edited details" },
     })
     wrapper.unmount()
   })
@@ -173,12 +173,12 @@ describe("NoteEditableDetails", () => {
     const firstNoteId = 1
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId: firstNoteId,
-        noteDetails: "First note details",
+        noteContent: "First note details",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -193,9 +193,9 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+    expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: firstNoteId },
-      body: { details: "Edited details" },
+      body: { content: "Edited details" },
     })
     wrapper.unmount()
   })
@@ -205,12 +205,12 @@ describe("NoteEditableDetails", () => {
 
     const noteId = 1
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId,
-        noteDetails: "Original details",
+        noteContent: "Original details",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -229,9 +229,9 @@ describe("NoteEditableDetails", () => {
     vi.advanceTimersByTime(1000)
     await flushPromises()
 
-    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+    expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: noteId },
-      body: { details: "Edited details" },
+      body: { content: "Edited details" },
     })
     expect(wrapper.find(".dirty").exists()).toBe(false)
 
@@ -244,12 +244,12 @@ describe("NoteEditableDetails", () => {
 
     const noteId = 1
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId,
-        noteDetails: "Hello",
+        noteContent: "Hello",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -263,9 +263,9 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("input"))
     await flushPromises()
 
-    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+    expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: noteId },
-      body: { details: "Hello [[OtherNote]]" },
+      body: { content: "Hello [[OtherNote]]" },
     })
 
     vi.useRealTimers()
@@ -277,12 +277,12 @@ describe("NoteEditableDetails", () => {
 
     const noteId = 1
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId,
-        noteDetails: "Hello",
+        noteContent: "Hello",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -296,14 +296,14 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("input"))
     await flushPromises()
 
-    expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+    expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
     vi.advanceTimersByTime(1000)
     await flushPromises()
 
-    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+    expect(updateNoteContentSpy).toHaveBeenCalledWith({
       path: { note: noteId },
-      body: { details: "Hello world" },
+      body: { content: "Hello world" },
     })
 
     vi.useRealTimers()
@@ -317,17 +317,17 @@ describe("NoteEditableDetails", () => {
       resolveFirstSave = resolve
     })
 
-    updateNoteDetailsSpy.mockImplementation((async (
-      options: UpdateNoteDetailsData
+    updateNoteContentSpy.mockImplementation((async (
+      options: UpdateNoteContentData
     ) => {
-      if (options.body?.details === "First edit") {
+      if (options.body?.content === "First edit") {
         await firstSavePromise
       }
       return wrapSdkResponse({
         id: noteId,
         note: {
           id: noteId,
-          details: options.body?.details,
+          content: options.body?.content,
           noteTopology: { id: noteId, title: "Test Note" },
         },
       })
@@ -335,12 +335,12 @@ describe("NoteEditableDetails", () => {
     }) as any)
 
     const wrapper = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId,
-        noteDetails: "Original",
+        noteContent: "Original",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -361,7 +361,7 @@ describe("NoteEditableDetails", () => {
     expect(detailsEl.value).toBe("Second edit")
 
     resolveFirstSave!()
-    await wrapper.setProps({ noteDetails: "First edit" })
+    await wrapper.setProps({ noteContent: "First edit" })
     await flushPromises()
 
     expect(detailsEl.value).toBe("Second edit")
@@ -373,12 +373,12 @@ describe("NoteEditableDetails", () => {
     const secondNoteId = 2
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId: firstNoteId,
-        noteDetails: "This is the first note's details",
+        noteContent: "This is the first note's details",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -393,7 +393,7 @@ describe("NoteEditableDetails", () => {
     // Switch to a note with undefined details
     await wrapper.setProps({
       noteId: secondNoteId,
-      noteDetails: undefined,
+      noteContent: undefined,
     })
     await flushPromises()
 
@@ -416,12 +416,12 @@ describe("NoteEditableDetails", () => {
 
   it("converts HTML to markdown when pasting HTML content", async () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableDetails)
+      .component(NoteEditableContent)
       .withCleanStorage()
       .withRouter()
       .withProps({
         noteId: 1,
-        noteDetails: "existing text",
+        noteContent: "existing text",
         readonly: false,
         asMarkdown: true,
         wikiTitles: [],
@@ -448,12 +448,12 @@ describe("NoteEditableDetails", () => {
   describe("paste with links and images in textarea", () => {
     it("shows options popup when content contains links after paste", async () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 1,
-          noteDetails: "",
+          noteContent: "",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -481,12 +481,12 @@ describe("NoteEditableDetails", () => {
       mockPopupsOptions.mockResolvedValue("links")
 
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 1,
-          noteDetails: "[existing link](https://existing.com) ",
+          noteContent: "[existing link](https://existing.com) ",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -513,12 +513,12 @@ describe("NoteEditableDetails", () => {
 
     it("does not show popup when entire content has no links or images", async () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 1,
-          noteDetails: "plain text",
+          noteContent: "plain text",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -544,12 +544,12 @@ describe("NoteEditableDetails", () => {
     it("shows options popup based on content AFTER paste, not before", async () => {
       // Start with plain text (no links)
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 1,
-          noteDetails: "plain text",
+          noteContent: "plain text",
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
@@ -577,12 +577,12 @@ describe("NoteEditableDetails", () => {
 
     it("does not show popup when quill content has no links or images", async () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 1,
-          noteDetails: "plain text",
+          noteContent: "plain text",
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
@@ -603,19 +603,19 @@ describe("NoteEditableDetails", () => {
   })
 
   describe("relation property row in rich mode", () => {
-    it("shows RelationTypeSelectCompact when noteDetails include relation frontmatter", async () => {
+    it("shows RelationTypeSelectCompact when noteContent include relation frontmatter", async () => {
       const details = `---
 relation: parent-of
 ---
 
 # Body`
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 99,
-          noteDetails: details,
+          noteContent: details,
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
@@ -633,19 +633,19 @@ relation: parent-of
       wrapper.unmount()
     })
 
-    it("omits RelationTypeSelectCompact when noteDetails omit relation property", async () => {
+    it("omits RelationTypeSelectCompact when noteContent omit relation property", async () => {
       const details = `---
 topic: training
 ---
 
 # Body`
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId: 99,
-          noteDetails: details,
+          noteContent: details,
           readonly: false,
           asMarkdown: false,
           wikiTitles: [],
@@ -668,12 +668,12 @@ topic: training
 
       const noteId = 1
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId,
-          noteDetails: "",
+          noteContent: "",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -690,7 +690,7 @@ topic: training
       vi.advanceTimersByTime(1000)
       await flushPromises()
 
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       vi.useRealTimers()
       wrapper.unmount()
@@ -701,12 +701,12 @@ topic: training
 
       const noteId = 1
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId,
-          noteDetails: "Original details",
+          noteContent: "Original details",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -723,9 +723,9 @@ topic: training
       vi.advanceTimersByTime(1000)
       await flushPromises()
 
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: noteId },
-        body: { details: "" },
+        body: { content: "" },
       })
 
       vi.useRealTimers()
@@ -737,12 +737,12 @@ topic: training
 
       const noteId = 1
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId,
-          noteDetails: "Original details",
+          noteContent: "Original details",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -759,7 +759,7 @@ topic: training
       vi.advanceTimersByTime(1000)
       await flushPromises()
 
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       vi.useRealTimers()
       wrapper.unmount()
@@ -770,12 +770,12 @@ topic: training
 
       const noteId = 1
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId,
-          noteDetails: "Original details",
+          noteContent: "Original details",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -792,9 +792,9 @@ topic: training
       vi.advanceTimersByTime(1000)
       await flushPromises()
 
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: noteId },
-        body: { details: "Modified details" },
+        body: { content: "Modified details" },
       })
 
       vi.useRealTimers()
@@ -806,12 +806,12 @@ topic: training
 
       const noteId = 1
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
+        .component(NoteEditableContent)
         .withCleanStorage()
         .withRouter()
         .withProps({
           noteId,
-          noteDetails: "Original details",
+          noteContent: "Original details",
           readonly: false,
           asMarkdown: true,
           wikiTitles: [],
@@ -831,7 +831,7 @@ topic: training
       await flushPromises()
 
       // Should not save because normalized value is the same
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       // Test with trailing empty lines and <p><br></p>
       detailsEl.value = "Original details\n\n\n<p><br></p>"
@@ -842,7 +842,7 @@ topic: training
       await flushPromises()
 
       // Should not save because normalized value is the same
-      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
       // Test with actual content change
       detailsEl.value = "Modified content\n\n<br>\n<p><br></p>"
@@ -853,9 +853,9 @@ topic: training
       await flushPromises()
 
       // Should save with normalized value (trailing content removed)
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: noteId },
-        body: { details: "Modified content" },
+        body: { content: "Modified content" },
       })
 
       vi.useRealTimers()

@@ -4,7 +4,7 @@ Feature: Recall Quiz
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title   | Details                  | Skip Memory Tracking |
+      | Title   | Content | Skip Memory Tracking |
       | English |                          | true                 |
       | sedation | Put to sleep is sedation |                      |
       | medical |                          |                      |
@@ -12,7 +12,7 @@ Feature: Recall Quiz
   @usingMockedOpenAiService
   Scenario: AI generated question - incorrect answer
     Given I have a notebook "English practice" with notes:
-      | Title    | Details                        |
+      | Title    | Content |
       | sedition | Sedition means incite violence |
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -26,7 +26,7 @@ Feature: Recall Quiz
   @usingMockedOpenAiService
   Scenario: AI generated question - correct answer
     Given I have a notebook "English practice" with notes:
-      | Title    | Details                        |
+      | Title    | Content |
       | sedition | Sedition means incite violence |
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -40,14 +40,14 @@ Feature: Recall Quiz
   @usingMockedOpenAiService
   Scenario: AI question generation includes wiki-linked, depth-two wiki path, and folder-sibling focus context
     Given I have a notebook "English practice" with notes:
-      | Title       | Details                                                | Skip Memory Tracking | Folder |
+      | Title       | Content | Skip Memory Tracking | Folder |
       | Bahamas     | The Bahamas is an archipelago in the Atlantic.         |                      |        |
       | FarDepthTwo | K2 peak height is 8611 meters.                         |                      |        |
       | MidDepthTwo | Bridge [[FarDepthTwo]].                                |                      |        |
       | WikiRecall  | Sedition means incite violence. Also see [[Bahamas]]. |                      |        |
       | DepthRecall | Sedition means incite violence. See [[MidDepthTwo]].   |                      |        |
-      | SibOne      | sibling one details                                    | true                 | peers  |
-      | SibTwo      | sibling two details                                    | true                 | peers  |
+      | SibOne      | sibling one body                                       | true                 | peers  |
+      | SibTwo      | sibling two body                                       | true                 | peers  |
       | FocusFolder | Focus only content                                     |                      | peers  |
     And OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:
       | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |

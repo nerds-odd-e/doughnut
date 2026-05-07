@@ -101,9 +101,9 @@ class TestabilityRestController {
     @JsonProperty("Title")
     public String title;
 
-    @JsonProperty("Details")
+    @JsonProperty("Content")
     @Setter
-    private String details;
+    private String content;
 
     @JsonProperty("Skip Memory Tracking")
     @Setter
@@ -139,10 +139,10 @@ class TestabilityRestController {
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = new Note();
       note.initializeNewNote(user, null, currentUTCTimestamp, title);
-      NoteAccessory content = note.getOrInitializeNoteAccessory();
+      NoteAccessory accessory = note.getOrInitializeNoteAccessory();
 
       note.setTitle(title);
-      note.setDetails(details);
+      note.setContent(content);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipMemoryTracking != null) {
         note.getRecallSetting().setSkipMemoryTracking(skipMemoryTracking);
@@ -150,8 +150,8 @@ class TestabilityRestController {
       if (rememberSpelling != null) {
         note.getRecallSetting().setRememberSpelling(rememberSpelling);
       }
-      content.setImageMask(imageMask);
-      content.setImageUrl(imageUrl);
+      accessory.setImageMask(imageMask);
+      accessory.setImageUrl(imageUrl);
 
       note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);

@@ -44,13 +44,13 @@ function titlesFromTopologyAndFolders(
 }
 
 /** Prefer note body from an answered prompt; else text cached when the session loaded the card. */
-export function noteDetailsMarkdownOrFallback(
+export function noteContentMarkdownOrFallback(
   note: Note | undefined,
-  fallbackDetailsMarkdown: string
+  fallbackContentMarkdown: string
 ): string {
-  const d = note?.details?.trim()
+  const d = note?.content?.trim()
   if (d !== undefined && d.length > 0) {
     return d
   }
-  return fallbackDetailsMarkdown.trim()
+  return fallbackContentMarkdown.trim()
 }

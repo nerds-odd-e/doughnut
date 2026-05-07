@@ -44,11 +44,11 @@ export const WithLongTitle: Story = {
   },
 }
 
-export const WithDetails: Story = {
+export const WithNoteBody: Story = {
   args: {
     note: makeMe.aNoteRealm
-      .title("Note with Details")
-      .details("This note has some details content")
+      .title("Note with body")
+      .content("This note has some body text")
       .please().note,
   },
 }

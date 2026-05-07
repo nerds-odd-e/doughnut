@@ -8,7 +8,7 @@ describe("Card", () => {
   it("renders the card with title", async () => {
     const note = makeMe.aNote
       .title("this is a note")
-      .details("the details")
+      .content("the details")
       .please()
     helper
       .component(Card)

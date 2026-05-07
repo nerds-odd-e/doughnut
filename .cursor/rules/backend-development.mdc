@@ -101,7 +101,7 @@ The **`docs/database-erd.md`** Mermaid diagram documents tables, foreign keys, a
    Note note = makeMe.aNote()
                     .creatorAndOwner(userModel)
                     .titleConstructor("title")
-                    .details("description")
+                    .content("description")
                     .please();
    ```
 

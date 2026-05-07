@@ -1,7 +1,7 @@
 export interface HistoryRecord {
   type:
     | "edit title"
-    | "edit details"
+    | "edit content"
     | "delete note"
     | "create note"
     | "move note"
@@ -27,7 +27,7 @@ export default class NoteEditingHistory {
 
   addEditingToUndoHistory(
     noteId: Doughnut.ID,
-    field: "edit title" | "edit details",
+    field: "edit title" | "edit content",
     textContent?: string
   ) {
     const lastEntry = this.peekUndo()

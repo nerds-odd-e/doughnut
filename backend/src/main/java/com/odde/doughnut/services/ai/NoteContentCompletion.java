@@ -8,19 +8,19 @@ import lombok.NoArgsConstructor;
 
 @JsonClassDescription(
     """
-    Replace the entire `details` field of the current focus note with the new content.
-    The details should be in markdown format.
+    Replace the entire `content` field of the current focus note with the new content.
+    The content should be in markdown format.
 
-    IMPORTANT: Keep all parts of the existing details that the user did not ask to change.
-    Copy those unchanged parts exactly as they appear in the original details, without any
+    IMPORTANT: Keep all parts of the existing content that the user did not ask to change.
+    Copy those unchanged parts exactly as they appear in the original content, without any
     modifications. Only modify or add the parts that the user specifically requested to change.
     """)
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteDetailsCompletion {
+public class NoteContentCompletion {
 
   @JsonPropertyDescription(
-      "The complete new details text that will replace the current note's details.")
+      "The complete new content text that will replace the current note's content.")
   @JsonProperty(required = true)
-  public String details;
+  public String content;
 }

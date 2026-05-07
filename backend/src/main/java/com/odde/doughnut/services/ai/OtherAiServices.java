@@ -46,7 +46,7 @@ public final class OtherAiServices {
     return openAiApiHandler.triggerFineTuning(fileId).fineTunedModel().orElse(null);
   }
 
-  public Optional<NoteDetailsCompletion> getTextFromAudio(
+  public Optional<NoteContentCompletion> getTextFromAudio(
       String modelName,
       String transcriptionFromAudio,
       String additionalInstructions,
@@ -63,10 +63,10 @@ public final class OtherAiServices {
       try {
         String jsonContent =
             String.format(
-                "{\"previousNoteDetailsToAppendTo\": %s}",
+                "{\"previousNoteContentToAppendTo\": %s}",
                 new ObjectMapperConfig().objectMapper().writeValueAsString(previousContent));
         chatAboutNoteRequestBuilder.addUserMessage(
-            "Previous note details (in JSON format):\n" + jsonContent);
+            "Previous note content (in JSON format):\n" + jsonContent);
       } catch (JsonProcessingException e) {
         return Optional.empty();
       }
@@ -81,7 +81,7 @@ public final class OtherAiServices {
               try {
                 ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                return Optional.of(mapper.treeToValue(jsonNode, NoteDetailsCompletion.class));
+                return Optional.of(mapper.treeToValue(jsonNode, NoteContentCompletion.class));
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }

@@ -78,7 +78,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "detailsUpdated", newDetails: string): void
+  (e: "contentUpdated", newContent: string): void
   (e: "understandingPointsIgnored"): void
 }>()
 
@@ -118,7 +118,7 @@ const deleteSelectedPoints = async () => {
   }
 
   const confirmed = await popups.confirm(
-    `Are you sure you want to delete ${selectedPointIndices.value.length} selected point(s)? The AI will remove related content from the note details.`
+    `Are you sure you want to delete ${selectedPointIndices.value.length} selected point(s)? The AI will remove related content from the note.`
   )
 
   if (!confirmed) {
@@ -138,16 +138,16 @@ const deleteSelectedPoints = async () => {
       })
     )
 
-    if (!error && data?.details !== undefined) {
+    if (!error && data?.content !== undefined) {
       const storedApi = storageAccessor.value?.storedApi()
       if (storedApi) {
         await storedApi.updateTextField(
           props.note.id,
-          "edit details",
-          data.details
+          "edit content",
+          data.content
         )
       }
-      emit("detailsUpdated", data.details)
+      emit("contentUpdated", data.content)
     }
   } finally {
     isDeletingPoints.value = false

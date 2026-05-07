@@ -65,7 +65,7 @@ class AiQuestionGeneratorTests {
     // Mock the chat completion API calls
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
-    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     // another note is needed, otherwise the note will be the only note in the notebook
     makeMe.aNote().please();
 
@@ -79,7 +79,7 @@ class AiQuestionGeneratorTests {
   @Test
   void shouldShuffleChoicesWhenStrictChoiceOrderIsFalse() {
     // Setup a note with enough content for question generation
-    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     makeMe.aNote().please();
 
     // Prepare the AI response with strictChoiceOrder = false
@@ -133,7 +133,7 @@ class AiQuestionGeneratorTests {
             testabilitySettings);
 
     // Setup a note with enough content for question generation
-    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     makeMe.aNote().please();
 
     // Prepare the AI response with strictChoiceOrder = false
@@ -165,7 +165,7 @@ class AiQuestionGeneratorTests {
   @Test
   void shouldRejectQuestionWithInvalidChoiceIndex() {
     // Setup a note with enough content for question generation
-    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     makeMe.aNote().please();
 
     // Prepare an AI response with an invalid choice index (3 for a list of 3 choices)
@@ -189,7 +189,7 @@ class AiQuestionGeneratorTests {
 
   @Test
   void shouldThrowWhenOpenAiIsNotAvailable() {
-    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     makeMe.aNote().please();
 
     testabilitySettings.setOpenAiTokenOverride("");

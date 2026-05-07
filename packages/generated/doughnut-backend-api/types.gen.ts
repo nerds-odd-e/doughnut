@@ -138,7 +138,7 @@ export type SuggestedQuestionsData = {
 
 export type NoteTestData = {
     Title?: string;
-    Details?: string;
+    Content?: string;
     'Skip Memory Tracking'?: boolean;
     'Remember Spelling'?: boolean;
     'Image Url'?: string;
@@ -222,7 +222,7 @@ export type Folder = {
 
 export type Note = {
     noteTopology: NoteTopology;
-    details?: string;
+    content?: string;
     id: number;
     readonly deletedAt?: string;
     wikidataId?: string;
@@ -609,17 +609,17 @@ export type BazaarNotebook = {
 export type AudioUploadDto = {
     uploadAudioFile?: Blob | File;
     additionalProcessingInstructions?: string;
-    previousNoteDetailsToAppendTo?: string;
+    previousNoteContentToAppendTo?: string;
     midSpeech?: boolean;
     isMidSpeech?: boolean;
 };
 
-export type NoteDetailsCompletion = {
-    details: string;
+export type NoteContentCompletion = {
+    content: string;
 };
 
 export type TextFromAudioWithCallInfo = {
-    completionFromAudio?: NoteDetailsCompletion;
+    completionFromAudio?: NoteContentCompletion;
     rawSRT?: string;
     endTimestamp?: string;
 };
@@ -650,7 +650,7 @@ export type PointsRequestDto = {
 };
 
 export type RemovePointsResponseDto = {
-    details?: string;
+    content?: string;
 };
 
 export type UnderstandingChecklistDto = {
@@ -677,8 +677,8 @@ export type NoteUpdateTitleDto = {
     newTitle: string;
 };
 
-export type NoteUpdateDetailsDto = {
-    details?: string;
+export type NoteUpdateContentDto = {
+    content?: string;
 };
 
 export type UpdateNotebookGroupRequest = {
@@ -783,8 +783,8 @@ export type FocusContextFocusNote = {
     inboundReferences?: Array<string>;
     sampleSiblings?: Array<string>;
     createdAt?: string;
-    details?: string;
-    detailsTruncated?: boolean;
+    content?: string;
+    contentTruncated?: boolean;
 };
 
 export type FocusContextNote = {
@@ -795,8 +795,8 @@ export type FocusContextNote = {
     retrievalPath?: Array<string>;
     edgeType?: 'OutgoingWikiLink' | 'InboundWikiReference' | 'FolderSibling';
     createdAt?: string;
-    details?: string;
-    detailsTruncated?: boolean;
+    content?: string;
+    contentTruncated?: boolean;
 };
 
 export type FocusContextResult = {
@@ -921,7 +921,7 @@ export type UserForOtherUserView = {
 };
 
 export type DummyForGeneratingTypes = {
-    noteDetailsCompletion?: NoteDetailsCompletion;
+    noteContentCompletion?: NoteContentCompletion;
     titleReplacement?: TitleReplacement;
 };
 
@@ -970,7 +970,7 @@ export type SubscriptionWritable = {
 
 export type NoteWritable = {
     noteTopology: NoteTopology;
-    details?: string;
+    content?: string;
     id: number;
     wikidataId?: string;
 };
@@ -2727,23 +2727,23 @@ export type UpdateNoteTitleResponses = {
 
 export type UpdateNoteTitleResponse = UpdateNoteTitleResponses[keyof UpdateNoteTitleResponses];
 
-export type UpdateNoteDetailsData = {
-    body: NoteUpdateDetailsDto;
+export type UpdateNoteContentData = {
+    body: NoteUpdateContentDto;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/text_content/{note}/details';
+    url: '/api/text_content/{note}/content';
 };
 
-export type UpdateNoteDetailsResponses = {
+export type UpdateNoteContentResponses = {
     /**
      * OK
      */
     200: NoteRealm;
 };
 
-export type UpdateNoteDetailsResponse = UpdateNoteDetailsResponses[keyof UpdateNoteDetailsResponses];
+export type UpdateNoteContentResponse = UpdateNoteContentResponses[keyof UpdateNoteContentResponses];
 
 export type UpdateSubscriptionGroupData = {
     body: UpdateNotebookGroupRequest;
@@ -3220,7 +3220,7 @@ export type GetGraphData = {
     };
     query: {
         /**
-         * Approximate token budget for focus note details plus related note details combined (bodies).
+         * Approximate token budget for focus note content plus related note content combined (bodies).
          */
         tokenLimit: number;
     };
@@ -3243,7 +3243,7 @@ export type GetAiContextMarkdownData = {
     };
     query: {
         /**
-         * Approximate token budget for focus note details plus related note details combined (bodies).
+         * Approximate token budget for focus note content plus related note content combined (bodies).
          */
         tokenLimit: number;
     };

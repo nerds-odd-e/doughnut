@@ -1,10 +1,10 @@
 import {
   extractWikiLinkTexts,
   hasNewWikiLinkTexts,
-} from "@/utils/noteDetailsWikiLinks"
+} from "@/utils/noteContentWikiLinks"
 import { describe, expect, it } from "vitest"
 
-describe("noteDetailsWikiLinks", () => {
+describe("noteContentWikiLinks", () => {
   describe("extractWikiLinkTexts", () => {
     it("collects inner text of complete wiki links", () => {
       expect(

@@ -11,7 +11,7 @@ Doughnut gathers **bounded context around one focus note** for AI features (ques
 
 | Type | Meaning |
 |------|---------|
-| `OutgoingWikiLink` | Target of a `[[wiki link]]` from note details or YAML front matter. |
+| `OutgoingWikiLink` | Target of a `[[wiki link]]` from note content or YAML front matter. |
 | `InboundWikiReference` | Another note in scope that links to this title (wiki title cache). |
 | `FolderSibling` | Sampled peer in the same folder or notebook root; not used as an expansion frontier. |
 

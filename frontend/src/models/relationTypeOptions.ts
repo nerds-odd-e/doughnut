@@ -1,5 +1,5 @@
 import type { RelationshipCreation } from "@generated/doughnut-backend-api"
-import { parseNoteDetailsMarkdown } from "@/utils/noteDetailsFrontmatter"
+import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 
 export type RelationTypeLabel = RelationshipCreation["relationType"]
 
@@ -110,11 +110,11 @@ function relationKebabFromProperties(
 }
 
 /** Relation type label for display from note Markdown `relation` frontmatter (same mapping as rich property editor). */
-export function relationTypeLabelFromNoteDetails(
-  details: string | undefined | null
+export function relationTypeLabelFromNoteContent(
+  markdown: string | undefined | null
 ): RelationTypeLabel | undefined {
-  if (details == null) return
-  const parsed = parseNoteDetailsMarkdown(details)
+  if (markdown == null) return
+  const parsed = parseNoteContentMarkdown(markdown)
   if (!parsed.ok) return
   const kebab = relationKebabFromProperties(parsed.properties)
   if (kebab === undefined) return

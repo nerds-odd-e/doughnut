@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
-import com.odde.doughnut.algorithms.NoteDetailsMarkdown;
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -23,7 +23,7 @@ import org.springframework.lang.NonNull;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"noteTopology", "details"})
+@JsonPropertyOrder({"noteTopology", "content"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -57,8 +57,8 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Column(name = "content", columnDefinition = "mediumtext")
   @Getter
   @Setter
-  @JsonPropertyDescription("The details of the note is in markdown format.")
-  private String details;
+  @JsonPropertyDescription("The note content is in markdown format.")
+  private String content;
 
   @NotBlank
   @Size(max = MAX_TITLE_LENGTH)
@@ -114,17 +114,17 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public ClozedString createMaskedDetailsForRecall() {
-    if (isDetailsBlank()) return new ClozedString(null, "");
+  public ClozedString createMaskedContentForRecall() {
+    if (isContentBlank()) return new ClozedString(null, "");
 
     return ClozedString.forMarkdownWithMarkMasks(
-            NoteDetailsMarkdown.bodyWithoutLeadingFrontmatter(getDetails()))
+            NoteContentMarkdown.bodyWithoutLeadingFrontmatter(getContent()))
         .hide(getNoteTitle());
   }
 
   @JsonIgnore
-  public boolean isDetailsBlank() {
-    return new HtmlOrMarkdown(getDetails()).isBlank();
+  public boolean isContentBlank() {
+    return new HtmlOrMarkdown(getContent()).isBlank();
   }
 
   @Override
@@ -148,10 +148,10 @@ public class Note extends EntityIdentifiedByIdOnly {
     return noteAccessory.getImageWithMask();
   }
 
-  public void prependDescription(String addition) {
-    String prevDesc = getDetails() != null ? getDetails() : "";
-    String desc = prevDesc.isEmpty() ? addition : addition + "\n\n" + prevDesc;
-    setDetails(desc);
+  public void prependContent(String addition) {
+    String prev = getContent() != null ? getContent() : "";
+    String merged = prev.isEmpty() ? addition : addition + "\n\n" + prev;
+    setContent(merged);
   }
 
   @JsonIgnore
@@ -187,7 +187,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     Map<String, Object> shape = new LinkedHashMap<>();
     shape.put("notebook", getNotebook() != null ? getNotebook().getName() : null);
     shape.put("title", getTitle());
-    shape.put("details", getDetails());
+    shape.put("content", getContent());
     String prettyString =
         new ObjectMapperConfig().objectMapper().valueToTree(shape).toPrettyString();
     return """

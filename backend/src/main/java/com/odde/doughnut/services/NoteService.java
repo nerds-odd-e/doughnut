@@ -121,7 +121,7 @@ public class NoteService {
     relation.setTitle(
         RelationshipNoteTitleFormatter.format(
             sourceNote.getTitle(), type.label, targetNote.getTitle()));
-    relation.setDetails(
+    relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, type, sourceNote, targetNote, null));
     relation.setFolder(

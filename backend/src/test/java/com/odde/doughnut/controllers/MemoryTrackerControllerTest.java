@@ -138,7 +138,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       Note note =
           makeMe
               .aNote("moon")
-              .details("partner of earth")
+              .content("partner of earth")
               .creatorAndOwner(currentUser.getUser())
               .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
@@ -155,7 +155,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       Note note =
           makeMe
               .aNote("moon")
-              .details("partner of earth")
+              .content("partner of earth")
               .creatorAndOwner(currentUser.getUser())
               .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
@@ -177,7 +177,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       Note note =
           makeMe
               .aNote("moon")
-              .details("partner of earth")
+              .content("partner of earth")
               .creatorAndOwner(currentUser.getUser())
               .rememberSpelling()
               .please();
@@ -213,7 +213,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       Note note =
           makeMe
               .aNote("moon")
-              .details("partner of earth")
+              .content("partner of earth")
               .creatorAndOwner(currentUser.getUser())
               .rememberSpelling()
               .please();

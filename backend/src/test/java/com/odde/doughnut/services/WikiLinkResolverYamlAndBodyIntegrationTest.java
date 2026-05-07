@@ -25,7 +25,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     User owner = makeMe.aUser().please();
     Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
     Note child = makeMe.aNote().title("Child").underSameNotebookAs(parent).please();
-    child.setDetails("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
+    child.setContent("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
     makeMe.entityPersister.merge(child);
     makeMe.entityPersister.flush();
 
@@ -37,7 +37,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     User owner = makeMe.aUser().please();
     Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
     Note child =
-        makeMe.aNote().title("Child").underSameNotebookAs(parent).details("See [[Alpha]]").please();
+        makeMe.aNote().title("Child").underSameNotebookAs(parent).content("See [[Alpha]]").please();
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(parent);
 

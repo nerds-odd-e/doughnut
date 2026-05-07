@@ -52,7 +52,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   type: "function",
                   function: {
-                    name: "NoteDetailsCompletion",
+                    name: "NoteContentCompletion",
                     arguments: '{"details":',
                   },
                 },
@@ -178,7 +178,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-1",
                   function: {
-                    name: "NoteDetailsCompletion",
+                    name: "NoteContentCompletion",
                     arguments: '{"details":"test"}',
                   },
                 },
@@ -278,7 +278,7 @@ describe("aiReplyState", () => {
                   id: "call-123",
                   type: "function",
                   function: {
-                    name: "NoteDetailsCompletion",
+                    name: "NoteContentCompletion",
                     arguments: '{"details":',
                   },
                 },
@@ -351,7 +351,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-1",
                   function: {
-                    name: "NoteDetailsCompletion",
+                    name: "NoteContentCompletion",
                     arguments: '{"details":"first"}',
                   },
                 },
@@ -432,7 +432,7 @@ describe("aiReplyState", () => {
                     index: 0,
                     id: "call-frag",
                     function: {
-                      name: "NoteDetailsCompletion",
+                      name: "NoteContentCompletion",
                       arguments: '{"details":"This is a',
                     },
                   },
@@ -539,7 +539,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-1",
                   function: {
-                    name: "NoteDetailsCompletion",
+                    name: "NoteContentCompletion",
                     arguments: '{"details":"first"}',
                   },
                 },
@@ -564,7 +564,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-2",
                   function: {
-                    name: "NoteDetailsCompletion",
+                    name: "NoteContentCompletion",
                     arguments: '{"details":"second"}',
                   },
                 },

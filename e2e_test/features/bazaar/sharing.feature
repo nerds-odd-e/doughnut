@@ -7,7 +7,7 @@ Feature: Bazaar sharing
 
   Scenario: Contributing To Bazaar
     Given I have a notebook "Geometry set" with notes:
-      | Title    | Details                   |
+      | Title    | Content |
       | Shape    | |
       | Square   | four equal straight sides |
       | Triangle | three sides shape         |

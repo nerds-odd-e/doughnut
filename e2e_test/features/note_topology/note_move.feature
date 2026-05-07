@@ -4,11 +4,11 @@ Feature: note move
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Sedition law" with a note "Sedition" and details "Incite violence"
+    And I have a notebook "Sedition law" with a note "Sedition" and content "Incite violence"
     And I have a notebook "Sedation care" with notes:
-      | Title    | Details      | Folder   |
+      | Title    | Content | Folder   |
       | Sedation | Put to sleep | Sedation |
-    And I have a notebook "Sedative drugs" with a note "Sedative" and details "Sleep medicine"
+    And I have a notebook "Sedative drugs" with a note "Sedative" and content "Sleep medicine"
 
   @mockBrowserTime
   Scenario: link and move

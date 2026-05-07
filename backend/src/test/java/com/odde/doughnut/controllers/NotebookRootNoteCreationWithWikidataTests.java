@@ -236,7 +236,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-        assertThat(note.getNote().getDetails(), containsString("Location: " + lnglat));
+        assertThat(note.getNote().getContent(), containsString("Location: " + lnglat));
       }
 
       @Test
@@ -248,7 +248,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
         assertThat(
-            note.getNote().getDetails(), stringContainsInOrder("Location: center of the earth"));
+            note.getNote().getContent(), stringContainsInOrder("Location: center of the earth"));
       }
     }
 
@@ -304,7 +304,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-        String description = note.getNote().getDetails();
+        String description = note.getNote().getContent();
         if (expectedBirthday != null) {
           assertThat(description, containsString(expectedBirthday));
         }

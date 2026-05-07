@@ -49,7 +49,7 @@ class NoteAutomationServiceTests {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
     // Create common test data
-    testNote = makeMe.aNote().details("description long enough.").please();
+    testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
 
     // Initialize common services
@@ -99,7 +99,7 @@ class NoteAutomationServiceTests {
                         com.openai.models.chat.completions.ChatCompletionUserMessageParam.builder()
                             .content("test")
                             .build())))
-            .addTool(com.odde.doughnut.services.ai.NoteDetailsCompletion.class)
+            .addTool(com.odde.doughnut.services.ai.NoteContentCompletion.class)
             .build();
 
     // Create a custom builder that returns the request with tools

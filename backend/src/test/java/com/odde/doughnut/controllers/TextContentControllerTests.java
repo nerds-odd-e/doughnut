@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
+import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
@@ -73,24 +73,24 @@ class TextContentControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class updateNoteDetailsTest {
-    NoteUpdateDetailsDTO noteUpdateDetailsDTO = new NoteUpdateDetailsDTO();
+  class updateNoteContentTest {
+    NoteUpdateContentDTO noteUpdateContentDTO = new NoteUpdateContentDTO();
 
     @BeforeEach
     void setup() {
-      noteUpdateDetailsDTO.setDetails("new details");
+      noteUpdateContentDTO.setContent("new details");
     }
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
-      NoteRealm response = controller.updateNoteDetails(note, noteUpdateDetailsDTO);
+      NoteRealm response = controller.updateNoteContent(note, noteUpdateContentDTO);
       assertThat(response.getId(), equalTo(note.getId()));
-      assertThat(response.getNote().getDetails(), equalTo("new details"));
+      assertThat(response.getNote().getContent(), equalTo("new details"));
     }
 
     @Test
-    void preservesLeadingYamlFrontmatterInDetails() throws UnexpectedNoAccessRightException {
-      String detailsWithFrontmatter =
+    void preservesLeadingYamlFrontmatterInContent() throws UnexpectedNoAccessRightException {
+      String contentWithFrontmatter =
           """
           ---
           key_one: alpha
@@ -101,25 +101,25 @@ class TextContentControllerTests extends ControllerTestBase {
 
           Paragraph content.
           """;
-      noteUpdateDetailsDTO.setDetails(detailsWithFrontmatter);
+      noteUpdateContentDTO.setContent(contentWithFrontmatter);
 
-      NoteRealm response = controller.updateNoteDetails(note, noteUpdateDetailsDTO);
+      NoteRealm response = controller.updateNoteContent(note, noteUpdateContentDTO);
 
-      assertThat(response.getNote().getDetails(), equalTo(detailsWithFrontmatter));
+      assertThat(response.getNote().getContent(), equalTo(contentWithFrontmatter));
       makeMe.refresh(note);
-      assertThat(note.getDetails(), equalTo(detailsWithFrontmatter));
+      assertThat(note.getContent(), equalTo(contentWithFrontmatter));
     }
 
     @Test
-    void refreshesWikiTitleCacheWhenDetailsContainResolvedWikiLink()
+    void refreshesWikiTitleCacheWhenContentContainResolvedWikiLink()
         throws UnexpectedNoAccessRightException {
       Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       Note onlyA = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
-      noteUpdateDetailsDTO.setDetails("[[OnlyA]]");
-      NoteRealm response = controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
+      noteUpdateContentDTO.setContent("[[OnlyA]]");
+      NoteRealm response = controller.updateNoteContent(carrier, noteUpdateContentDTO);
 
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
@@ -141,11 +141,11 @@ class TextContentControllerTests extends ControllerTestBase {
       Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
-      noteUpdateDetailsDTO.setDetails("[[OnlyA]]");
-      controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
+      noteUpdateContentDTO.setContent("[[OnlyA]]");
+      controller.updateNoteContent(carrier, noteUpdateContentDTO);
 
-      noteUpdateDetailsDTO.setDetails("[[OnlyB]]");
-      NoteRealm response = controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
+      noteUpdateContentDTO.setContent("[[OnlyB]]");
+      NoteRealm response = controller.updateNoteContent(carrier, noteUpdateContentDTO);
 
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
@@ -160,18 +160,18 @@ class TextContentControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void clearsWikiTitleCacheWhenDetailsBecomeBlank() throws UnexpectedNoAccessRightException {
+    void clearsWikiTitleCacheWhenContentBecomeBlank() throws UnexpectedNoAccessRightException {
       Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
-      noteUpdateDetailsDTO.setDetails("[[OnlyA]]");
-      controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
+      noteUpdateContentDTO.setContent("[[OnlyA]]");
+      controller.updateNoteContent(carrier, noteUpdateContentDTO);
       assertThat(
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), hasSize(1));
 
-      noteUpdateDetailsDTO.setDetails("");
-      NoteRealm response = controller.updateNoteDetails(carrier, noteUpdateDetailsDTO);
+      noteUpdateContentDTO.setContent("");
+      NoteRealm response = controller.updateNoteContent(carrier, noteUpdateContentDTO);
 
       assertThat(response.getWikiTitles(), empty());
       assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());

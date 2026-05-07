@@ -12,15 +12,15 @@ Feature: relationship edit and remove
 
   Scenario: change relation type
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
-    And I flush pending note details save
+    And I flush pending note content save
     When I open the relationship from "Moon" to "Earth"
-    When I open the note details markdown editor
-    Then the note details markdown source should contain "relation: a-specialization-of"
-    And the note details markdown source should not contain "relation: a-part-of"
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "relation: a-specialization-of"
+    And the note content markdown source should not contain "relation: a-part-of"
 
-  Scenario: change relation type keeps user-authored details suffix
+  Scenario: change relation type keeps user-authored content suffix
     When I open the relationship from "Moon" to "Earth"
-    And I update the current note details using markdown to become:
+    And I update the current note content using markdown to become:
       """
       ---
       type: relationship
@@ -33,12 +33,12 @@ Feature: relationship edit and remove
 
       Observations from orbit.
       """
-    And I flush pending note details save
+    And I flush pending note content save
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
-    When I open the note details markdown editor
-    Then the note details markdown source should contain "relation: a-specialization-of"
-    And the note details markdown source should contain "Observations from orbit."
-    And the note details markdown source should not contain "relation: a-part-of"
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "relation: a-specialization-of"
+    And the note content markdown source should contain "Observations from orbit."
+    And the note content markdown source should not contain "relation: a-part-of"
 
   Scenario: delete relationship
     When I delete the relationship from "Moon" to "Earth"

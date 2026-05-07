@@ -16,7 +16,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.PointExtractionResult;
-import com.odde.doughnut.services.ai.RegeneratedNoteDetails;
+import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -168,7 +168,7 @@ class AiControllerTest extends ControllerTestBase {
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
-      testNote.setDetails("English is a language that is spoken in many countries.");
+      testNote.setContent("English is a language that is spoken in many countries.");
 
       UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
@@ -181,7 +181,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnEmptyListWhenNoteDetailsIsNull()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setDetails(null);
+      testNote.setContent(null);
 
       UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
@@ -191,7 +191,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnEmptyListWhenNoteDetailsIsEmpty()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setDetails("");
+      testNote.setContent("");
 
       UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
@@ -201,7 +201,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnEmptyListWhenNoteDetailsIsWhitespace()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      testNote.setDetails("   ");
+      testNote.setContent("   ");
 
       UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
@@ -214,7 +214,7 @@ class AiControllerTest extends ControllerTestBase {
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(List.of("Point 1", "Point 2"));
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
-      testNote.setDetails("Some note details");
+      testNote.setContent("Some note details");
 
       controller.generateUnderstandingChecklist(testNote);
 
@@ -230,7 +230,7 @@ class AiControllerTest extends ControllerTestBase {
               .anyMatch(
                   msg ->
                       msg.contains(
-                          "Please generate an understanding checklist of the note details broken down into key points"));
+                          "Please generate an understanding checklist of the note content broken down into key points"));
       MatcherAssert.assertThat(
           "A message should contain the instruction", hasInstruction, is(true));
       MatcherAssert.assertThat(
@@ -267,35 +267,35 @@ class AiControllerTest extends ControllerTestBase {
     void shouldReturnDetailsAfterRemovingPoints()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
-          new RegeneratedNoteDetails("Remaining content."));
+          new RegeneratedNoteContent("Remaining content."));
       String originalDetails =
           "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
-      testNote.setDetails(originalDetails);
+      testNote.setContent(originalDetails);
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of("English is a language that is spoken in many countries.");
       RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
-      assertThat(response.getDetails()).isNotEqualTo(originalDetails);
-      assertThat(response.getDetails()).isEqualTo("Remaining content.");
+      assertThat(response.getContent()).isNotEqualTo(originalDetails);
+      assertThat(response.getContent()).isEqualTo("Remaining content.");
     }
 
     @Test
     void shouldNotModifyNoteInDatabase()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
-          new RegeneratedNoteDetails("Remaining content."));
+          new RegeneratedNoteContent("Remaining content."));
       String originalDetails = "Original content with point to remove.";
-      testNote.setDetails(originalDetails);
+      testNote.setContent(originalDetails);
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of("point to remove");
       controller.removePointFromNote(testNote, requestDTO);
       makeMe.entityPersister.flush();
       makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getDetails()).isEqualTo(originalDetails);
+      assertThat(testNote.getContent()).isEqualTo(originalDetails);
     }
 
     @Test
     void shouldThrowWhenPointsToRemoveIsEmpty() {
-      testNote.setDetails("Some note content.");
+      testNote.setContent("Some note content.");
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of();
       assertBadRequestContaining(
@@ -304,13 +304,13 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldThrowWhenNoteDetailsIsEmpty() {
-      testNote.setDetails("");
+    void shouldThrowWhenNoteContentIsEmpty() {
+      testNote.setContent("");
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.points = List.of("some point");
       assertBadRequestContaining(
           () -> controller.removePointFromNote(testNote, requestDTO),
-          "Note details cannot be empty");
+          "Note content cannot be empty");
     }
   }
 
@@ -325,7 +325,7 @@ class AiControllerTest extends ControllerTestBase {
 
     private Note newRootNoteWithPromotableDetails() {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      note.setDetails("Original content with a key point to promote.");
+      note.setContent("Original content with a key point to promote.");
       return note;
     }
 
@@ -335,8 +335,8 @@ class AiControllerTest extends ControllerTestBase {
       Note testNote = newRootNoteWithPromotableDetails();
       PointExtractionResult aiResult = new PointExtractionResult();
       aiResult.setNewNoteTitle("Extracted Sibling Note");
-      aiResult.setNewNoteDetails("Expanded details for the sibling.");
-      aiResult.setUpdatedParentDetails("Updated parent with summary.");
+      aiResult.setNewNoteContent("Expanded details for the sibling.");
+      aiResult.setUpdatedParentContent("Updated parent with summary.");
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
@@ -344,8 +344,8 @@ class AiControllerTest extends ControllerTestBase {
       NoteRealm response = controller.promotePointToSibling(testNote, requestDTO);
 
       assertThat(response.getNote().getTitle()).isEqualTo("Extracted Sibling Note");
-      assertThat(response.getNote().getDetails()).isEqualTo("Expanded details for the sibling.");
-      assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getDetails())
+      assertThat(response.getNote().getContent()).isEqualTo("Expanded details for the sibling.");
+      assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getContent())
           .isEqualTo("Updated parent with summary.");
       Note sibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(sibling.getFolder()).isNull();
@@ -363,13 +363,13 @@ class AiControllerTest extends ControllerTestBase {
               .creatorAndOwner(currentUser.getUser())
               .inNotebook(notebook)
               .folder(folder)
-              .details("Original content with a key point to promote.")
+              .content("Original content with a key point to promote.")
               .please();
 
       PointExtractionResult aiResult = new PointExtractionResult();
       aiResult.setNewNoteTitle("Point B");
-      aiResult.setNewNoteDetails("Extracted");
-      aiResult.setUpdatedParentDetails("A. C. D. E.");
+      aiResult.setNewNoteContent("Extracted");
+      aiResult.setUpdatedParentContent("A. C. D. E.");
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();

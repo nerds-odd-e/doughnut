@@ -1,16 +1,16 @@
 import YAML from "yaml"
 
-export type ParseNoteDetailsFailureReason =
+export type ParseNoteContentFailureReason =
   | "malformed_frontmatter_fence"
   | "malformed_yaml"
   | "duplicate_keys"
   | "unsupported_value"
 
-export type ParseNoteDetailsMarkdownResult =
+export type ParseNoteContentMarkdownResult =
   | { ok: true; properties: Record<string, string>; body: string }
   | {
       ok: false
-      reason: ParseNoteDetailsFailureReason
+      reason: ParseNoteContentFailureReason
       message: string
     }
 
@@ -19,12 +19,12 @@ function stripBom(s: string): string {
 }
 
 function splitLeadingFrontmatter(
-  details: string
+  markdown: string
 ):
   | { kind: "none" }
   | { kind: "parsed"; yamlRaw: string; body: string; verbatimPrefix: string }
   | { kind: "invalid"; message: string } {
-  const text = stripBom(details)
+  const text = stripBom(markdown)
   const lines = text.split(/\r?\n/)
 
   if (lines[0] !== "---") {
@@ -49,9 +49,9 @@ function splitLeadingFrontmatter(
 
 /** Leading `---` … `---` block including fences, or null when absent or malformed. */
 export function verbatimFrontmatterPrefixAndBody(
-  details: string
+  markdown: string
 ): { prefix: string; body: string } | null {
-  const split = splitLeadingFrontmatter(details)
+  const split = splitLeadingFrontmatter(markdown)
   if (split.kind !== "parsed") return null
   return { prefix: split.verbatimPrefix, body: split.body }
 }
@@ -70,7 +70,7 @@ function mappingToProperties(
   map: Record<string, unknown>
 ):
   | { ok: true; properties: Record<string, string> }
-  | Extract<ParseNoteDetailsMarkdownResult, { ok: false }> {
+  | Extract<ParseNoteContentMarkdownResult, { ok: false }> {
   const properties: Record<string, string> = {}
   for (const key of Object.keys(map)) {
     const value = yamlScalarToPropertyString(map[key])
@@ -87,13 +87,13 @@ function mappingToProperties(
   return { ok: true, properties }
 }
 
-/** Parses leading YAML frontmatter from persisted note Markdown details. */
-export function parseNoteDetailsMarkdown(
-  details: string
-): ParseNoteDetailsMarkdownResult {
-  const split = splitLeadingFrontmatter(details)
+/** Parses leading YAML frontmatter from persisted note Markdown content. */
+export function parseNoteContentMarkdown(
+  markdown: string
+): ParseNoteContentMarkdownResult {
+  const split = splitLeadingFrontmatter(markdown)
   if (split.kind === "none") {
-    return { ok: true, properties: {}, body: details }
+    return { ok: true, properties: {}, body: markdown }
   }
   if (split.kind === "invalid") {
     return {
@@ -160,15 +160,15 @@ export function propertyRecordHasRelationKey(
   return false
 }
 
-/** True when parsed details include a `relation` frontmatter key. */
-export function detailsHasRelationProperty(details: string): boolean {
-  const p = parseNoteDetailsMarkdown(details)
+/** True when parsed content includes a `relation` frontmatter key. */
+export function contentHasRelationProperty(markdown: string): boolean {
+  const p = parseNoteContentMarkdown(markdown)
   if (!p.ok) return false
   return propertyRecordHasRelationKey(p.properties)
 }
 
-/** Composes note Markdown details with optional leading YAML frontmatter. */
-export function composeNoteDetailsMarkdown(input: {
+/** Composes note Markdown content with optional leading YAML frontmatter. */
+export function composeNoteContentMarkdown(input: {
   properties: Record<string, string>
   body: string
 }): string {
@@ -197,8 +197,8 @@ export function sortedPropertyRowsFromRecord(
     .map((key) => ({ key, value: properties[key]! }))
 }
 
-/** Composes details from ordered rows; duplicate keys keep the last occurrence. */
-export function composeNoteDetailsFromPropertyRows(
+/** Composes content from ordered rows; duplicate keys keep the last occurrence. */
+export function composeNoteContentFromPropertyRows(
   rows: readonly PropertyRow[],
   body: string
 ): string {
@@ -206,7 +206,7 @@ export function composeNoteDetailsFromPropertyRows(
   for (const row of rows) {
     properties[row.key] = row.value
   }
-  return composeNoteDetailsMarkdown({ properties, body })
+  return composeNoteContentMarkdown({ properties, body })
 }
 
 /** Validates rich property rows before persisting or emitting updates (trimmed keys). */

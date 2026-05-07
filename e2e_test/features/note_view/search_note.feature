@@ -6,12 +6,12 @@ Feature: search note
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Sedation care" with notes:
-      | Title    | Details      |
+      | Title    | Content |
       | Sedation | Put to sleep |
       | Physical |              |
       | Magical  |              |
     And I have a notebook "Sedative drugs" with notes:
-      | Title      | Details        |
+      | Title      | Content |
       | Sedative   | Sleep medicine |
       | Diazepam   |                |
       | Lorazepam  |                |

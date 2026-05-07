@@ -597,7 +597,7 @@ describe("NoteAudioTools", () => {
       const suggestTitleSpy = mockSdkService("suggestTitle", {
         title: "Suggested Title",
       })
-      mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
+      mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -618,7 +618,7 @@ describe("NoteAudioTools", () => {
         .mount()
 
       const suggestTitleSpy = mockSdkService("suggestTitle", { title: "" })
-      mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
+      mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
 
       await wrapper.vm.processAudio(new Blob())
 
@@ -661,7 +661,7 @@ describe("NoteAudioTools", () => {
 
       expect(audioToTextMock).toHaveBeenLastCalledWith({
         body: expect.objectContaining({
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         }),
       })
 
@@ -670,7 +670,7 @@ describe("NoteAudioTools", () => {
 
       expect(audioToTextMock).toHaveBeenLastCalledWith({
         body: expect.objectContaining({
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         }),
       })
     })
@@ -699,7 +699,7 @@ describe("NoteAudioTools", () => {
       expect(lastCall).toBeDefined()
       expect(lastCall![0]).toMatchObject({
         body: {
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         },
       })
     })
@@ -743,7 +743,7 @@ describe("NoteAudioTools", () => {
       expect(audioToTextMock).toHaveBeenCalledWith({
         body: expect.objectContaining({
           additionalProcessingInstructions: "Test instructions",
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         }),
       })
     })
@@ -768,13 +768,13 @@ describe("NoteAudioTools", () => {
       expect(calls[0]?.[0]).toMatchObject({
         body: {
           additionalProcessingInstructions: "Test instructions",
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         },
       })
       expect(calls[1]?.[0]).toMatchObject({
         body: {
           additionalProcessingInstructions: "Test instructions",
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         },
       })
     })
@@ -805,7 +805,7 @@ describe("NoteAudioTools", () => {
       expect(audioToTextMock).toHaveBeenCalledWith({
         body: expect.objectContaining({
           isMidSpeech: true,
-          previousNoteDetailsToAppendTo: note.details,
+          previousNoteContentToAppendTo: note.content,
         }),
       })
     })
@@ -818,7 +818,7 @@ describe("NoteAudioTools", () => {
     }
 
     const audioToTextSpy = mockSdkService("audioToText", mockResponse)
-    mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
+    mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
 
     const testBlob = new Blob(["test"])
     const result = await wrapper.vm.processAudio({
@@ -832,7 +832,7 @@ describe("NoteAudioTools", () => {
     expect(audioToTextSpy).toHaveBeenCalledWith({
       body: expect.objectContaining({
         isMidSpeech: true,
-        previousNoteDetailsToAppendTo: note.details,
+        previousNoteContentToAppendTo: note.content,
       }),
     })
   })
@@ -947,7 +947,7 @@ describe("NoteAudioTools", () => {
 
     it("sends full content when under 500 characters", async () => {
       const shortContent = "Short content"
-      const noteWithShortContent = makeMe.aNote.details(shortContent).please()
+      const noteWithShortContent = makeMe.aNote.content(shortContent).please()
       wrapper = helper
         .component(NoteAudioTools)
         .withCleanStorage()
@@ -961,14 +961,14 @@ describe("NoteAudioTools", () => {
 
       expect(audioToTextMock).toHaveBeenCalledWith({
         body: expect.objectContaining({
-          previousNoteDetailsToAppendTo: shortContent,
+          previousNoteContentToAppendTo: shortContent,
         }),
       })
     })
 
     it("truncates content over 500 characters and adds ellipsis", async () => {
       const longContent = "a".repeat(600)
-      const noteWithLongContent = makeMe.aNote.details(longContent).please()
+      const noteWithLongContent = makeMe.aNote.content(longContent).please()
       wrapper = helper
         .component(NoteAudioTools)
         .withCleanStorage()
@@ -983,13 +983,13 @@ describe("NoteAudioTools", () => {
       const expectedContent = `...${"a".repeat(500)}`
       expect(audioToTextMock).toHaveBeenCalledWith({
         body: expect.objectContaining({
-          previousNoteDetailsToAppendTo: expectedContent,
+          previousNoteContentToAppendTo: expectedContent,
         }),
       })
     })
 
     it("handles null content", async () => {
-      const noteWithNullContent = makeMe.aNote.details(undefined).please()
+      const noteWithNullContent = makeMe.aNote.content(undefined).please()
       wrapper = helper
         .component(NoteAudioTools)
         .withCleanStorage()
@@ -1003,7 +1003,7 @@ describe("NoteAudioTools", () => {
 
       expect(audioToTextMock).toHaveBeenCalledWith({
         body: expect.objectContaining({
-          previousNoteDetailsToAppendTo: "",
+          previousNoteContentToAppendTo: "",
         }),
       })
     })

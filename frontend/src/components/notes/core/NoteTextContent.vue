@@ -3,12 +3,16 @@
     This note has been deleted
   </div>
   <NoteEditableTitle v-bind="{ noteTopology: note.noteTopology, readonly }" />
-  <div role="details" class="note-details">
-    <NoteEditableDetails
+  <div
+    role="region"
+    aria-label="Note content"
+    class="note-content"
+  >
+    <NoteEditableContent
       v-bind="{
         readonly,
         noteId: note.id,
-        noteDetails: note.details,
+        noteContent: note.content,
         asMarkdown,
         wikiTitles,
       }"
@@ -21,7 +25,7 @@
 import { type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
-import NoteEditableDetails from "./NoteEditableDetails.vue"
+import NoteEditableContent from "./NoteEditableContent.vue"
 
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },

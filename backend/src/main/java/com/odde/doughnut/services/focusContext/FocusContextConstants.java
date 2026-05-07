@@ -1,13 +1,13 @@
 package com.odde.doughnut.services.focusContext;
 
 public class FocusContextConstants {
-  public static final int FOCUS_NOTE_DETAILS_MAX_TOKENS = 1500;
-  public static final int RELATED_NOTE_DETAILS_MAX_TOKENS = 200;
+  public static final int FOCUS_NOTE_CONTENT_MAX_TOKENS = 1500;
+  public static final int RELATED_NOTE_CONTENT_MAX_TOKENS = 200;
 
   /**
-   * Approximate UTF-8 token budget for note details (body text) across the focus note and all
+   * Approximate UTF-8 token budget for note content (body text) across the focus note and all
    * related notes combined. Focus content is capped first (see {@link
-   * #FOCUS_NOTE_DETAILS_MAX_TOKENS}); the remainder funds wiki expansion and folder siblings.
+   * #FOCUS_NOTE_CONTENT_MAX_TOKENS}); the remainder funds wiki expansion and folder siblings.
    */
   public static final int FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET = 2000;
 
@@ -32,7 +32,7 @@ public class FocusContextConstants {
   }
 
   /**
-   * Below this many approximate tokens left <em>after</em> focus note details (e.g. tight {@code
+   * Below this many approximate tokens left <em>after</em> focus note content (e.g. tight {@code
    * GET /notes/{id}/graph} limits), omit folder-peer sampling: no {@code sampleSiblings} on the
    * focus note and no {@link
    * com.odde.doughnut.services.focusContext.FocusContextEdgeType#FolderSibling} rows. Wiki BFS
@@ -42,7 +42,7 @@ public class FocusContextConstants {
 
   /**
    * Share of the post-focus token remainder for wiki BFS (the rest is for folder siblings), after
-   * subtracting focus note details cost from the combined content budget.
+   * subtracting focus note content cost from the combined content budget.
    */
   public static final double RELATED_NOTES_WIKI_BUDGET_FRACTION = 0.75;
 }

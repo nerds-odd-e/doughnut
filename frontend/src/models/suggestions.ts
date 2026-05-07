@@ -1,4 +1,4 @@
-import type { NoteDetailsCompletion } from "@generated/doughnut-backend-api"
+import type { NoteContentCompletion } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "./aiReplyState"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 
@@ -8,7 +8,7 @@ interface BaseSuggestion {
 
 interface CompletionSuggestion extends BaseSuggestion {
   suggestionType: "completion"
-  content: NoteDetailsCompletion
+  content: NoteContentCompletion
 }
 
 interface TitleSuggestion extends BaseSuggestion {

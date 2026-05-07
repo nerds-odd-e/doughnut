@@ -33,11 +33,11 @@ export const WithNotes: Story = {
     notes: [
       makeMe.aNoteRealm
         .title("TypeScript")
-        .details("TypeScript is a typed superset of JavaScript.")
+        .content("TypeScript is a typed superset of JavaScript.")
         .please(),
       makeMe.aNoteRealm
         .title("Vue.js")
-        .details("Vue.js is a progressive JavaScript framework.")
+        .content("Vue.js is a progressive JavaScript framework.")
         .please(),
     ],
     assimilatedCountOfTheDay: 3,
@@ -51,7 +51,7 @@ export const WithSingleNote: Story = {
     notes: [
       makeMe.aNoteRealm
         .title("React")
-        .details("React is a JavaScript library for building user interfaces.")
+        .content("React is a JavaScript library for building user interfaces.")
         .please(),
     ],
     assimilatedCountOfTheDay: 5,
@@ -83,7 +83,7 @@ export const HighProgress: Story = {
     notes: [
       makeMe.aNoteRealm
         .title("Python")
-        .details("Python is a high-level programming language.")
+        .content("Python is a high-level programming language.")
         .please(),
     ],
     assimilatedCountOfTheDay: 8,
@@ -97,7 +97,7 @@ export const DailyProgressOnly: Story = {
     notes: [
       makeMe.aNoteRealm
         .title("JavaScript")
-        .details("JavaScript is a programming language.")
+        .content("JavaScript is a programming language.")
         .please(),
     ],
     assimilatedCountOfTheDay: 5,

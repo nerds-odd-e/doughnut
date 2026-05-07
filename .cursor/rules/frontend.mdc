@@ -375,7 +375,7 @@ if (error) {
    ```typescript
    const note = makeMe.aNoteRealm
      .topicConstructor("Dummy Title")
-     .details("Description")
+     .content("Description")
      .please()
    ```
 

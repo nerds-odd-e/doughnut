@@ -18,7 +18,7 @@
     @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
     @assimilate="processForm"
-    @refinement-details-updated="emit('reloadNeeded')"
+    @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
     <div

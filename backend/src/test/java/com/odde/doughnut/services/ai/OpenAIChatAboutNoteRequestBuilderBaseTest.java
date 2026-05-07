@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class OpenAIChatAboutNoteRequestBuilderBaseTest {
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  String DETAILS = "details";
+  String CONTENT_JSON_KEY = "content";
 
   @Test
   void messageShouldContainTitle() {
@@ -21,12 +21,12 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   }
 
   @Test
-  void messageShouldContainDetails() {
-    Note note = makeMe.aNote().details("description").inMemoryPlease();
+  void messageShouldContainNoteContentInJson() {
+    Note note = makeMe.aNote().content("description").inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
     assertThat(content, containsString("\"notebook\""));
-    assertThat(content, containsString(DETAILS));
-    assertThat(content, containsString(note.getDetails()));
+    assertThat(content, containsString("\"" + CONTENT_JSON_KEY + "\""));
+    assertThat(content, containsString(note.getContent()));
   }
 
   @Test
@@ -40,7 +40,7 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
 
   @Test
   void noteOverloadDelegatesToSameSystemContentAsStringOverload() {
-    Note note = makeMe.aNote().details("body").title("T").inMemoryPlease();
+    Note note = makeMe.aNote().content("body").title("T").inMemoryPlease();
     String fromNote =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note)
             .build()

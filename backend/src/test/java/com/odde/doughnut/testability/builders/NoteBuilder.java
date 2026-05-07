@@ -27,7 +27,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     super(makeMe, new Note());
     entity.initializeNewNote(null, null, new Timestamp(System.currentTimeMillis()), "");
     if (Strings.isEmpty(entity.getTitle())) title(titleCounter.generate());
-    details("descrption");
+    content("descrption");
     updatedAt(entity.getCreatedAt());
   }
 
@@ -147,7 +147,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder withNoDescription() {
-    return details("");
+    return content("");
   }
 
   public NoteBuilder folder(Folder folder) {
@@ -161,8 +161,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder details(String text) {
-    entity.setDetails(text);
+  public NoteBuilder content(String text) {
+    entity.setContent(text);
     return this;
   }
 

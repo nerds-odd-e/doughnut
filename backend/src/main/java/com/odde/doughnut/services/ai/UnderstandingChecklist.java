@@ -8,7 +8,7 @@ import java.util.List;
 import lombok.Data;
 
 @JsonClassDescription(
-    "Generate an understanding checklist of the note details broken down into key points. Each point should be a complete sentence that captures an important aspect of the note content. The checklist should help the user check whether they truly understood the important points in the note.")
+    "Generate an understanding checklist of the note content broken down into key points. Each point should be a complete sentence that captures an important aspect of the note. The checklist should help the user check whether they truly understood the important points in the note.")
 @Data
 public class UnderstandingChecklist {
   @NotNull

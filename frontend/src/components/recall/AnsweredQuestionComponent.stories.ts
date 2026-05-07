@@ -58,7 +58,7 @@ export const CorrectAnswer: Story = {
         ...question,
         note: makeMe.aNote
           .title("France")
-          .details(
+          .content(
             "France is a country in Western Europe. Paris is its capital and largest city."
           )
           .please(),
@@ -82,7 +82,7 @@ export const IncorrectAnswer: Story = {
         ...question,
         note: makeMe.aNote
           .title("France")
-          .details(
+          .content(
             "France is a country in Western Europe. Paris is its capital and largest city."
           )
           .please(),
@@ -112,7 +112,7 @@ export const NoteWithManyAncestors: Story = {
         ...question,
         note: makeMe.aNote
           .title("TypeScript")
-          .details(
+          .content(
             "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
           )
           .please(),
@@ -137,7 +137,7 @@ export const InSequence: Story = {
         id: 1,
         note: makeMe.aNote
           .title("React")
-          .details(
+          .content(
             "React is a JavaScript library for building user interfaces, particularly web applications."
           )
           .please(),
@@ -161,7 +161,7 @@ export const WithoutConversationButton: Story = {
         ...question,
         note: makeMe.aNote
           .title("Basic Arithmetic")
-          .details(
+          .content(
             "Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4."
           )
           .please(),
@@ -185,7 +185,7 @@ export const CustomQuestion: Story = {
         ...question,
         note: makeMe.aNote
           .title("Data Structures")
-          .details(
+          .content(
             "A stack is a linear data structure that follows the Last In First Out (LIFO) principle."
           )
           .please(),

@@ -10,7 +10,7 @@ describe("NoteRecallSettingForm", () => {
       rememberSpelling: false,
       skipMemoryTracking: false,
     },
-    noteDetails: "some details",
+    noteContent: "some body text",
     isLinkNote: false,
   }
 
@@ -47,10 +47,10 @@ describe("NoteRecallSettingForm", () => {
   })
 
   describe("Remember Spelling checkbox disabled state", () => {
-    it("should be disabled when noteDetails is empty", () => {
+    it("should be disabled when noteContent is empty", () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: "" })
+        .withProps({ ...defaultProps, noteContent: "" })
         .mount()
 
       const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
@@ -61,10 +61,10 @@ describe("NoteRecallSettingForm", () => {
       expect(rememberSpellingInput?.props("disabled")).toBe(true)
     })
 
-    it("should be disabled when noteDetails is undefined", () => {
+    it("should be disabled when noteContent is undefined", () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: undefined })
+        .withProps({ ...defaultProps, noteContent: undefined })
         .mount()
 
       const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
@@ -75,10 +75,10 @@ describe("NoteRecallSettingForm", () => {
       expect(rememberSpellingInput?.props("disabled")).toBe(true)
     })
 
-    it("should be disabled when noteDetails is whitespace only", () => {
+    it("should be disabled when noteContent is whitespace only", () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: "   " })
+        .withProps({ ...defaultProps, noteContent: "   " })
         .mount()
 
       const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
@@ -89,10 +89,10 @@ describe("NoteRecallSettingForm", () => {
       expect(rememberSpellingInput?.props("disabled")).toBe(true)
     })
 
-    it("should be enabled when noteDetails has content", () => {
+    it("should be enabled when noteContent has text", () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: "Some content" })
+        .withProps({ ...defaultProps, noteContent: "Some content" })
         .mount()
 
       const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
@@ -106,22 +106,22 @@ describe("NoteRecallSettingForm", () => {
     it("should show error message when disabled", () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: "" })
+        .withProps({ ...defaultProps, noteContent: "" })
         .mount()
 
       expect(wrapper.text()).toContain(
-        "Remember spelling note need to have detail"
+        "Remember spelling note need to have content"
       )
     })
 
     it("should not show error message when enabled", () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: "Some content" })
+        .withProps({ ...defaultProps, noteContent: "Some content" })
         .mount()
 
       expect(wrapper.text()).not.toContain(
-        "Remember spelling note need to have detail"
+        "Remember spelling note need to have content"
       )
     })
 
@@ -134,7 +134,7 @@ describe("NoteRecallSettingForm", () => {
             ...defaultProps.noteRecallSetting,
             rememberSpelling: true,
           },
-          noteDetails: "",
+          noteContent: "",
         })
         .mount()
 
@@ -146,10 +146,10 @@ describe("NoteRecallSettingForm", () => {
       expect(rememberSpellingInput?.props("modelValue")).toBe(false)
     })
 
-    it("should enable checkbox when noteDetails changes from empty to having content", async () => {
+    it("should enable checkbox when noteContent changes from empty to having content", async () => {
       const wrapper = helper
         .component(NoteRecallSettingForm)
-        .withProps({ ...defaultProps, noteDetails: "" })
+        .withProps({ ...defaultProps, noteContent: "" })
         .mount()
 
       const getRememberSpellingInput = () =>
@@ -159,7 +159,7 @@ describe("NoteRecallSettingForm", () => {
 
       expect(getRememberSpellingInput()?.props("disabled")).toBe(true)
 
-      await wrapper.setProps({ noteDetails: "This is the definition" })
+      await wrapper.setProps({ noteContent: "This is the definition" })
 
       expect(getRememberSpellingInput()?.props("disabled")).toBe(false)
     })

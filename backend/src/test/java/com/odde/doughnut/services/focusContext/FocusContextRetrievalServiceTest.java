@@ -42,7 +42,7 @@ class FocusContextRetrievalServiceTest {
   class FocusNoteOnly {
     @Test
     void noLinksProducesEmptyRelatedNotes() {
-      Note note = makeMe.aNote().title("Solo").details("Some content").please();
+      Note note = makeMe.aNote().title("Solo").content("Some content").please();
       FocusContextResult result =
           service.retrieve(note, note.getCreator(), RetrievalConfig.depth1());
 
@@ -53,17 +53,17 @@ class FocusContextRetrievalServiceTest {
     @Test
     void focusNoteDetailsTruncationMatchesApproximateTokenBudget() {
       String longDetails = "a".repeat(10000);
-      Note longNote = makeMe.aNote().title("Long").details(longDetails).please();
+      Note longNote = makeMe.aNote().title("Long").content(longDetails).please();
       FocusContextResult longResult =
           service.retrieve(longNote, longNote.getCreator(), RetrievalConfig.depth1());
-      assertThat(longResult.getFocusNote().isDetailsTruncated(), is(true));
-      assertThat(longResult.getFocusNote().getDetails().length(), lessThan(longDetails.length()));
+      assertThat(longResult.getFocusNote().isContentTruncated(), is(true));
+      assertThat(longResult.getFocusNote().getContent().length(), lessThan(longDetails.length()));
 
-      Note shortNote = makeMe.aNote().title("Short").details("Small content").please();
+      Note shortNote = makeMe.aNote().title("Short").content("Small content").please();
       FocusContextResult shortResult =
           service.retrieve(shortNote, shortNote.getCreator(), RetrievalConfig.depth1());
-      assertThat(shortResult.getFocusNote().isDetailsTruncated(), is(false));
-      assertThat(shortResult.getFocusNote().getDetails(), equalTo("Small content"));
+      assertThat(shortResult.getFocusNote().isContentTruncated(), is(false));
+      assertThat(shortResult.getFocusNote().getContent(), equalTo("Small content"));
     }
   }
 
@@ -74,14 +74,14 @@ class FocusContextRetrievalServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().title("Focus").details("See [[Linked]].").please();
+      focusNote = makeMe.aNote().title("Focus").content("See [[Linked]].").please();
       viewer = focusNote.getCreator();
       makeMe
           .aNote()
           .creator(viewer)
           .underSameNotebookAs(focusNote)
           .title("Linked")
-          .details("Linked content")
+          .content("Linked content")
           .please();
       refreshWikiCache(focusNote);
     }
@@ -118,7 +118,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focusNote)
               .title("Referrer")
-              .details("Links to [[Focus]].")
+              .content("Links to [[Focus]].")
               .please();
       refreshWikiCache(referrer);
     }
@@ -150,7 +150,7 @@ class FocusContextRetrievalServiceTest {
                 .creator(viewer)
                 .underSameNotebookAs(focusNote)
                 .title("Ref" + i)
-                .details("Links to [[HubFocus]].")
+                .content("Links to [[HubFocus]].")
                 .please();
         refreshWikiCache(r);
       }
@@ -226,7 +226,7 @@ class FocusContextRetrievalServiceTest {
                 .creator(viewer)
                 .underSameNotebookAs(focusNote)
                 .title("Extra" + i)
-                .details("Links to [[HubFocus]].")
+                .content("Links to [[HubFocus]].")
                 .please();
         refreshWikiCache(r);
       }
@@ -244,7 +244,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focusNote)
               .title("Depth1Hub")
-              .details("Links to [[HubFocus]].")
+              .content("Links to [[HubFocus]].")
               .please();
       refreshWikiCache(depth1Ref);
       for (int i = 0; i < 5; i++) {
@@ -254,7 +254,7 @@ class FocusContextRetrievalServiceTest {
                 .creator(viewer)
                 .underSameNotebookAs(focusNote)
                 .title("D2Ref" + i)
-                .details("Links to [[Depth1Hub]].")
+                .content("Links to [[Depth1Hub]].")
                 .please();
         refreshWikiCache(d2);
       }
@@ -277,7 +277,7 @@ class FocusContextRetrievalServiceTest {
   class Deduplication {
     @Test
     void noteReachedAsBothOutgoingAndInboundKeepsOutgoingEdgeType() {
-      Note focusNote = makeMe.aNote().title("Focus").details("See [[Both]].").please();
+      Note focusNote = makeMe.aNote().title("Focus").content("See [[Both]].").please();
       User viewer = focusNote.getCreator();
       Note both =
           makeMe
@@ -285,7 +285,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focusNote)
               .title("Both")
-              .details("Links back to [[Focus]].")
+              .content("Links back to [[Focus]].")
               .please();
       refreshWikiCache(focusNote);
       refreshWikiCache(both);
@@ -312,7 +312,7 @@ class FocusContextRetrievalServiceTest {
         linkLine.append("[[").append(t).append("]] ");
       }
       Note focusNote =
-          makeMe.aNote().title("Focus").details(linkLine.toString().trim() + ".").please();
+          makeMe.aNote().title("Focus").content(linkLine.toString().trim() + ".").please();
       User viewer = focusNote.getCreator();
       String largeDetails = "x".repeat(3500);
       for (String title : titles) {
@@ -321,7 +321,7 @@ class FocusContextRetrievalServiceTest {
             .creator(viewer)
             .underSameNotebookAs(focusNote)
             .title(title)
-            .details(largeDetails)
+            .content(largeDetails)
             .please();
       }
       refreshWikiCache(focusNote);
@@ -336,7 +336,7 @@ class FocusContextRetrievalServiceTest {
   class BreadthFirstDepth2 {
     @Test
     void outgoingChainReachesDepthTwoLeaf() {
-      Note focus = makeMe.aNote().title("ChainRoot").details("Start [[MidDepth]].").please();
+      Note focus = makeMe.aNote().title("ChainRoot").content("Start [[MidDepth]].").please();
       User viewer = focus.getCreator();
       Note mid =
           makeMe
@@ -344,14 +344,14 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focus)
               .title("MidDepth")
-              .details("Bridge [[LeafDepth2]].")
+              .content("Bridge [[LeafDepth2]].")
               .please();
       makeMe
           .aNote()
           .creator(viewer)
           .underSameNotebookAs(focus)
           .title("LeafDepth2")
-          .details("Only at depth 2")
+          .content("Only at depth 2")
           .please();
       refreshWikiCache(focus);
       refreshWikiCache(mid);
@@ -376,7 +376,7 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void maxDepthOneSkipsSecondHop() {
-      Note focus = makeMe.aNote().title("ShallowRoot").details("[[MidShallow]].").please();
+      Note focus = makeMe.aNote().title("ShallowRoot").content("[[MidShallow]].").please();
       User viewer = focus.getCreator();
       Note mid =
           makeMe
@@ -384,14 +384,14 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focus)
               .title("MidShallow")
-              .details("[[LeafShallow]].")
+              .content("[[LeafShallow]].")
               .please();
       makeMe
           .aNote()
           .creator(viewer)
           .underSameNotebookAs(focus)
           .title("LeafShallow")
-          .details("deep")
+          .content("deep")
           .please();
       refreshWikiCache(focus);
       refreshWikiCache(mid);
@@ -411,7 +411,7 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void cycleBetweenTwoNotesDoesNotLoop() {
-      Note a = makeMe.aNote().title("CycleA").details("To [[CycleB]].").please();
+      Note a = makeMe.aNote().title("CycleA").content("To [[CycleB]].").please();
       User viewer = a.getCreator();
       Note b =
           makeMe
@@ -419,7 +419,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(a)
               .title("CycleB")
-              .details("Back [[CycleA]].")
+              .content("Back [[CycleA]].")
               .please();
       refreshWikiCache(a);
       refreshWikiCache(b);
@@ -433,14 +433,14 @@ class FocusContextRetrievalServiceTest {
     @Test
     void shorterPathWinsWhenSameNoteReachableAtDepthOneAndTwo() {
       Note focus =
-          makeMe.aNote().title("ShortFocus").details("[[DirectShort]] [[ViaBridge]].").please();
+          makeMe.aNote().title("ShortFocus").content("[[DirectShort]] [[ViaBridge]].").please();
       User viewer = focus.getCreator();
       makeMe
           .aNote()
           .creator(viewer)
           .underSameNotebookAs(focus)
           .title("DirectShort")
-          .details("direct body")
+          .content("direct body")
           .please();
       Note bridge =
           makeMe
@@ -448,7 +448,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focus)
               .title("ViaBridge")
-              .details("See [[DirectShort]].")
+              .content("See [[DirectShort]].")
               .please();
       refreshWikiCache(focus);
       refreshWikiCache(bridge);
@@ -476,7 +476,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focus)
               .title("HubInbound")
-              .details("Link [[InboundRoot]].")
+              .content("Link [[InboundRoot]].")
               .please();
       Note depth2Referrer =
           makeMe
@@ -484,7 +484,7 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focus)
               .title("RefersToHub")
-              .details("Hub is [[HubInbound]].")
+              .content("Hub is [[HubInbound]].")
               .please();
       refreshWikiCache(hub);
       refreshWikiCache(depth2Referrer);
@@ -516,7 +516,7 @@ class FocusContextRetrievalServiceTest {
           makeMe
               .aNote()
               .title("BudgetRoot")
-              .details("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[Spend5]] [[BridgeBudget]]")
+              .content("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[Spend5]] [[BridgeBudget]]")
               .please();
       User viewer = focus.getCreator();
       for (int i = 1; i <= 5; i++) {
@@ -525,7 +525,7 @@ class FocusContextRetrievalServiceTest {
             .creator(viewer)
             .underSameNotebookAs(focus)
             .title("Spend" + i)
-            .details(maxChunk)
+            .content(maxChunk)
             .please();
       }
       Note bridge =
@@ -534,14 +534,14 @@ class FocusContextRetrievalServiceTest {
               .creator(viewer)
               .underSameNotebookAs(focus)
               .title("BridgeBudget")
-              .details("[[LeafAfterBudget]].")
+              .content("[[LeafAfterBudget]].")
               .please();
       makeMe
           .aNote()
           .creator(viewer)
           .underSameNotebookAs(focus)
           .title("LeafAfterBudget")
-          .details("never reached")
+          .content("never reached")
           .please();
       refreshWikiCache(focus);
       refreshWikiCache(bridge);
@@ -583,7 +583,7 @@ class FocusContextRetrievalServiceTest {
         nb = makeMe.aNotebook().please();
         folder = makeMe.aFolder().notebook(nb).please();
         focus =
-            makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSib").details("solo").please();
+            makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSib").content("solo").please();
         viewer = focus.getCreator();
         for (int i = 0; i < 6; i++) {
           makeMe
@@ -592,7 +592,7 @@ class FocusContextRetrievalServiceTest {
               .inNotebook(nb)
               .folder(folder)
               .title("Peer" + i)
-              .details("x")
+              .content("x")
               .please();
         }
       }
@@ -629,7 +629,7 @@ class FocusContextRetrievalServiceTest {
               .inNotebook(nb)
               .folder(folder)
               .title("TightA")
-              .details("solo")
+              .content("solo")
               .please();
       makeMe
           .aNote()
@@ -637,7 +637,7 @@ class FocusContextRetrievalServiceTest {
           .inNotebook(nb)
           .folder(folder)
           .title("TightB")
-          .details("solo")
+          .content("solo")
           .please();
 
       FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.forGraphApi(10));
@@ -656,7 +656,7 @@ class FocusContextRetrievalServiceTest {
               .inNotebook(nb)
               .folder(folder)
               .title("FocusF")
-              .details("See [[LinkT]].")
+              .content("See [[LinkT]].")
               .please();
       User viewer = focus.getCreator();
       Note linkT =
@@ -666,7 +666,7 @@ class FocusContextRetrievalServiceTest {
               .inNotebook(nb)
               .folder(folder)
               .title("LinkT")
-              .details("target")
+              .content("target")
               .please();
       makeMe
           .aNote()
@@ -674,7 +674,7 @@ class FocusContextRetrievalServiceTest {
           .inNotebook(nb)
           .folder(folder)
           .title("OtherFolderPeer")
-          .details("from same folder as link target")
+          .content("from same folder as link target")
           .please();
       refreshWikiCache(focus);
       refreshWikiCache(linkT);
@@ -689,7 +689,7 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void folderSiblingIsNotWikiExpansionFrontier() {
-      Note focus = makeMe.aNote().title("RootFS").details("[[MidFS]].").please();
+      Note focus = makeMe.aNote().title("RootFS").content("[[MidFS]].").please();
       User viewer = focus.getCreator();
       Notebook nb = focus.getNotebook();
       Folder folderB = makeMe.aFolder().notebook(nb).please();
@@ -700,7 +700,7 @@ class FocusContextRetrievalServiceTest {
               .inNotebook(nb)
               .folder(folderB)
               .title("MidFS")
-              .details("no link to deep")
+              .content("no link to deep")
               .please();
       Note sideSib =
           makeMe
@@ -709,7 +709,7 @@ class FocusContextRetrievalServiceTest {
               .inNotebook(nb)
               .folder(folderB)
               .title("SideSib")
-              .details("[[DeepOnly]].")
+              .content("[[DeepOnly]].")
               .please();
       Folder folderDeep = makeMe.aFolder().notebook(nb).please();
       makeMe
@@ -718,7 +718,7 @@ class FocusContextRetrievalServiceTest {
           .inNotebook(nb)
           .folder(folderDeep)
           .title("DeepOnly")
-          .details("deep body")
+          .content("deep body")
           .please();
       refreshWikiCache(focus);
       refreshWikiCache(mid);

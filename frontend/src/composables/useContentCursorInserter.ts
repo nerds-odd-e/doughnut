@@ -1,6 +1,6 @@
 import { ref } from "vue"
 
-/** Module-level singleton: holds the inserter registered by the currently mounted NoteEditableDetails. */
+/** Module-level singleton: holds the inserter registered by the currently mounted NoteEditableContent. */
 const _inserter = ref<((text: string) => void) | undefined>(undefined)
 
 export type WikiPropertyInserter = {
@@ -10,7 +10,7 @@ export type WikiPropertyInserter = {
 
 const _wikiPropertyInserter = ref<WikiPropertyInserter | undefined>(undefined)
 
-export function useDetailsCursorInserter() {
+export function useContentCursorInserter() {
   function registerInserter(fn: (text: string) => void) {
     _inserter.value = fn
   }

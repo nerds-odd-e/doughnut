@@ -26,5 +26,5 @@ public class AudioUploadDTO {
   @JsonProperty("isMidSpeech")
   private boolean isMidSpeech;
 
-  private String previousNoteDetailsToAppendTo;
+  private String previousNoteContentToAppendTo;
 }

@@ -1,8 +1,8 @@
 import markdownizer from "@/components/form/markdownizer"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  countMarkdownLinksAndImagesInNoteDetails,
-  stripMarkdownLinksAndImagesInNoteDetails,
+  countMarkdownLinksAndImagesInNoteContent,
+  stripMarkdownLinksAndImagesInNoteContent,
 } from "@/utils/stripPastedMarkdownLinks"
 
 export function usePasteWithLinkImageOptions() {
@@ -15,7 +15,7 @@ export function usePasteWithLinkImageOptions() {
     content: string
   ): Promise<string | null> => {
     const { linkCount, imageCount } =
-      countMarkdownLinksAndImagesInNoteDetails(content)
+      countMarkdownLinksAndImagesInNoteContent(content)
 
     if (linkCount === 0 && imageCount === 0) {
       return null
@@ -45,13 +45,13 @@ export function usePasteWithLinkImageOptions() {
     const result = await popups.options(message, options)
 
     if (result === "links") {
-      return stripMarkdownLinksAndImagesInNoteDetails(content, true, false)
+      return stripMarkdownLinksAndImagesInNoteContent(content, true, false)
     }
     if (result === "images") {
-      return stripMarkdownLinksAndImagesInNoteDetails(content, false, true)
+      return stripMarkdownLinksAndImagesInNoteContent(content, false, true)
     }
     if (result === "both") {
-      return stripMarkdownLinksAndImagesInNoteDetails(content, true, true)
+      return stripMarkdownLinksAndImagesInNoteContent(content, true, true)
     }
 
     return null

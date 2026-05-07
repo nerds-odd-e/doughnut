@@ -3,6 +3,6 @@ package com.odde.doughnut.controllers.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteUpdateDetailsDTO {
-  @Getter @Setter private String details = "";
+public class NoteUpdateContentDTO {
+  @Getter @Setter private String content = "";
 }

@@ -16,8 +16,8 @@ public class FocusContextFocusNote {
   private final List<String> inboundReferences;
   private final List<String> sampleSiblings;
   private final Timestamp createdAt;
-  private final String details;
-  private final boolean detailsTruncated;
+  private final String content;
+  private final boolean contentTruncated;
 
   public FocusContextFocusNote(
       String notebook,
@@ -28,8 +28,8 @@ public class FocusContextFocusNote {
       List<String> inboundReferences,
       List<String> sampleSiblings,
       Timestamp createdAt,
-      String details,
-      boolean detailsTruncated) {
+      String content,
+      boolean contentTruncated) {
     this.notebook = notebook;
     this.title = title;
     this.folderPath = folderPath;
@@ -38,7 +38,7 @@ public class FocusContextFocusNote {
     this.inboundReferences = inboundReferences;
     this.sampleSiblings = sampleSiblings;
     this.createdAt = createdAt;
-    this.details = details;
-    this.detailsTruncated = detailsTruncated;
+    this.content = content;
+    this.contentTruncated = contentTruncated;
   }
 }

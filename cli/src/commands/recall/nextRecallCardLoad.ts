@@ -52,7 +52,7 @@ export async function fetchShuffledDueMemoryTrackerIds(
 export type RecallJustReviewPayload = {
   readonly memoryTrackerId: number
   readonly noteTitle: string
-  readonly detailsMarkdown: string
+  readonly contentMarkdown: string
   readonly breadcrumbTitles: readonly string[]
 }
 
@@ -62,11 +62,11 @@ function recallJustReviewPayloadFromMemoryTracker(
   const note = mt.note
   const topo = note?.noteTopology
   const noteTitle = topo?.title?.trim() || 'Note'
-  const detailsMarkdown = (note?.details ?? '').trim()
+  const contentMarkdown = (note?.content ?? '').trim()
   return {
     memoryTrackerId: mt.id,
     noteTitle,
-    detailsMarkdown,
+    contentMarkdown,
     breadcrumbTitles: noteBreadcrumbTrailTitles(
       note,
       mt.ancestorFolders,
@@ -138,7 +138,7 @@ export type SpellingRecallSessionPayload = {
   readonly memoryTrackerId: number
   readonly notebookName?: string
   /** Cached from tracker load when available; answered scrollback prefers `note` on the submit response. */
-  readonly detailsMarkdown: string
+  readonly contentMarkdown: string
   /** When set, `askAQuestion` was already done (e.g. in loadRecallCardForMemoryTrackerId). */
   readonly recallPromptId?: number
   readonly stemMarkdown?: string
@@ -181,7 +181,7 @@ export async function loadRecallCardForMemoryTrackerId(
               notebookName !== undefined && notebookName.length > 0
                 ? notebookName
                 : undefined,
-            detailsMarkdown: '',
+            contentMarkdown: '',
             recallPromptId: prompt.id,
             stemMarkdown: prompt.spellingQuestion?.stem ?? '',
           },
@@ -194,7 +194,7 @@ export async function loadRecallCardForMemoryTrackerId(
       variant: 'spelling-session',
       payload: {
         memoryTrackerId,
-        detailsMarkdown: '',
+        contentMarkdown: '',
       },
     }
   }

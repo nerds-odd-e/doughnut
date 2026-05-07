@@ -74,7 +74,7 @@ class NonProdNoteEmbeddingSemanticSearcher {
 
     Set<Integer> noteIds = new HashSet<>();
     noteIds.addAll(titleDistances.keySet());
-    // detailsDistances removed
+    // content embedding distances removed in non-prod path
 
     List<NoteEmbeddingJdbcRepository.SimilarNoteRow> result = new ArrayList<>(noteIds.size());
     for (Integer nid : noteIds) {

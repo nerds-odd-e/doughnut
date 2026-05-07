@@ -34,12 +34,12 @@ import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
-import { useDetailsCursorInserter } from "@/composables/useDetailsCursorInserter"
+import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 const { insert, canInsertWikiLinkAsProperty, insertWikiLinkAsProperty } =
-  useDetailsCursorInserter()
+  useContentCursorInserter()
 
 const wikiPropertyOptionAvailable = computed(() =>
   canInsertWikiLinkAsProperty()

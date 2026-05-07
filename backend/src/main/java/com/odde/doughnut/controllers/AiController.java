@@ -71,7 +71,7 @@ public class AiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-    String details = note.getDetails();
+    String details = note.getContent();
     if (details == null || details.trim().isEmpty()) {
       return new UnderstandingChecklistDTO(List.of());
     }
@@ -87,9 +87,9 @@ public class AiController {
   }
 
   @Operation(
-      summary = "Remove points from note details (response only)",
+      summary = "Remove points from note content (response only)",
       description =
-          "Returns AI-regenerated note details in the response. Does not persist the note; the client must save the returned text (for example via the note update API).")
+          "Returns AI-regenerated note content in the response. Does not persist the note; the client must save the returned text (for example via the note update API).")
   @PostMapping("/remove-point-from-note/{note}")
   @Transactional
   public RemovePointsResponseDTO removePointFromNote(
@@ -99,20 +99,20 @@ public class AiController {
 
     authorizationService.assertAuthorization(note);
 
-    String details = note.getDetails();
+    String details = note.getContent();
     if (details == null || details.trim().isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note details cannot be empty");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note content cannot be empty");
     }
     if (request.getPoints() == null || request.getPoints().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Points to remove cannot be empty");
     }
 
-    String newDetails =
+    String newContent =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .removePointsAndRegenerateDetails(request.getPoints());
+            .removePointsAndRegenerateContent(request.getPoints());
 
-    return new RemovePointsResponseDTO(newDetails);
+    return new RemovePointsResponseDTO(newContent);
   }
 
   @PostMapping("/promote-point-to-sibling/{note}")

@@ -44,7 +44,7 @@ class NoteRealmJsonSerializationTest {
     Note focal = makeMe.aNote().title("Focal").please();
     Note subject = makeMe.aNote().please();
     Note relation = makeMe.aRelation().between(subject, focal).please();
-    relation.setDetails(
+    relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, RelationType.SPECIALIZE, subject, focal, null));
     makeMe.entityPersister.merge(relation);

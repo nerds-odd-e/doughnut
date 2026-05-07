@@ -4,7 +4,7 @@ Feature: Assimilation and Recall Pages
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Details         | Image Url   | Skip Memory Tracking |
+      | Title    | Content | Image Url   | Skip Memory Tracking |
       | English  |                 |             | true                   |
       | Sedition | Incite violence |             |                        |
       | Sedation | Put to sleep    |             |                        |

@@ -73,8 +73,8 @@ const getCurrentContent = (): string => {
   if (history.value.type === "edit title") {
     return noteRealm.note.noteTopology.title
   }
-  if (history.value.type === "edit details") {
-    return noteRealm.note.details || ""
+  if (history.value.type === "edit content") {
+    return noteRealm.note.content || ""
   }
   return ""
 }
@@ -96,10 +96,10 @@ const getUndoMessage = (): string => {
       return noteTopology
         ? "Are you sure you want to undo editing the title of "
         : `Are you sure you want to undo editing the title of ${noteIdentifier}?`
-    case "edit details":
+    case "edit content":
       return noteTopology
-        ? "Are you sure you want to undo editing the details of "
-        : `Are you sure you want to undo editing the details of ${noteIdentifier}?`
+        ? "Are you sure you want to undo editing the content of "
+        : `Are you sure you want to undo editing the content of ${noteIdentifier}?`
     case "delete note":
       return noteTopology
         ? "Are you sure you want to undo deleting "
@@ -124,7 +124,7 @@ const shouldShowDiff = computed(
     !!(
       history.value &&
       (history.value.type === "edit title" ||
-        history.value.type === "edit details")
+        history.value.type === "edit content")
     )
 )
 
