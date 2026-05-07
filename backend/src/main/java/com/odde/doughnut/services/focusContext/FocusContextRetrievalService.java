@@ -84,18 +84,13 @@ public class FocusContextRetrievalService {
     boolean includeFolderPeers =
         relatedTotalBudget >= FocusContextConstants.MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT;
 
-    List<String> sampleSiblingUris = new ArrayList<>();
-    if (includeFolderPeers) {
-      for (Note peer : noteService.findStructuralPeerNotesInOrder(hydrated)) {
-        if (peer.getId() == null || peer.getId().equals(focusId)) {
-          continue;
-        }
-        sampleSiblingUris.add(FocusContextWikiUri.of(peer));
-        if (sampleSiblingUris.size() >= FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE) {
-          break;
-        }
-      }
-    }
+    List<String> sampleSiblingUris =
+        includeFolderPeers
+            ? sampleAndCapUris(
+                structuralPeerCandidates(hydrated, focusId, Set.of()),
+                FocusContextConstants.sampleCapAtGraphDepth(1),
+                rng)
+            : List.of();
 
     FocusContextFocusNote focusNoteModel =
         new FocusContextFocusNote(
@@ -185,7 +180,7 @@ public class FocusContextRetrievalService {
                                     .noneMatch(
                                         o -> o.getId() != null && o.getId().equals(t.getId())))
                     .collect(Collectors.toList()),
-                FocusContextConstants.inboundCapForDepth(depth),
+                FocusContextConstants.sampleCapAtGraphDepth(depth),
                 rng);
         for (Note target : sampledInbound) {
           List<String> childPath = appendWikiUri(parentPath, target);
@@ -260,12 +255,7 @@ public class FocusContextRetrievalService {
     }
 
     appendFolderSiblings(
-        result,
-        focusId,
-        siblingAnchors,
-        siblingBudgetTotal,
-        wikiClaimedNoteIds,
-        config.getSampleSeed().orElse(null));
+        result, focusId, siblingAnchors, siblingBudgetTotal, wikiClaimedNoteIds, rng);
 
     return result;
   }
@@ -276,48 +266,23 @@ public class FocusContextRetrievalService {
       List<SiblingAnchor> siblingAnchors,
       int siblingBudgetTokens,
       Set<Integer> wikiClaimedNoteIds,
-      Long folderSiblingSampleSeed) {
+      Random rng) {
     if (siblingBudgetTokens <= 0) {
       return;
     }
 
-    Random rng = folderSiblingSampleSeed == null ? null : new Random(folderSiblingSampleSeed);
-
     List<SiblingOffer> offers = new ArrayList<>();
     int anchorIndex = 0;
     for (SiblingAnchor anchor : siblingAnchors) {
-      List<Note> rawPeers = noteService.findStructuralPeerNotesInOrder(anchor.note);
-      List<Note> candidates = new ArrayList<>();
-      for (Note p : rawPeers) {
-        if (p.getId() == null) {
-          continue;
-        }
-        if (focusId != null && p.getId().equals(focusId)) {
-          continue;
-        }
-        if (Objects.equals(p.getId(), anchor.note.getId())) {
-          continue;
-        }
-        if (wikiClaimedNoteIds.contains(p.getId())) {
-          continue;
-        }
-        candidates.add(p);
-      }
-      if (rng != null) {
-        Collections.shuffle(candidates, rng);
-      }
-      int taken = 0;
-      for (Note p : candidates) {
-        if (taken >= FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE) {
-          break;
-        }
+      List<Note> candidates = structuralPeerCandidates(anchor.note, focusId, wikiClaimedNoteIds);
+      int cap = FocusContextConstants.sampleCapAtGraphDepth(anchor.wikiDepth + 1);
+      for (Note p : sampleAndCap(candidates, cap, rng)) {
         offers.add(
             new SiblingOffer(
                 p.getId(),
                 anchor.wikiDepth,
                 anchorIndex,
                 List.copyOf(anchor.pathToAnchorWikiUris)));
-        taken++;
       }
       anchorIndex++;
     }
@@ -426,5 +391,26 @@ public class FocusContextRetrievalService {
 
   private static List<String> sampleAndCapUris(List<Note> notes, int cap, Random rng) {
     return sampleAndCap(notes, cap, rng).stream().map(FocusContextWikiUri::of).toList();
+  }
+
+  private List<Note> structuralPeerCandidates(
+      Note anchor, Integer focusId, Set<Integer> excludeNoteIds) {
+    List<Note> out = new ArrayList<>();
+    for (Note p : noteService.findStructuralPeerNotesInOrder(anchor)) {
+      if (p.getId() == null) {
+        continue;
+      }
+      if (focusId != null && p.getId().equals(focusId)) {
+        continue;
+      }
+      if (Objects.equals(p.getId(), anchor.getId())) {
+        continue;
+      }
+      if (excludeNoteIds.contains(p.getId())) {
+        continue;
+      }
+      out.add(p);
+    }
+    return out;
   }
 }

@@ -4,18 +4,20 @@ public class FocusContextConstants {
   public static final int FOCUS_NOTE_DETAILS_MAX_TOKENS = 2000;
   public static final int RELATED_NOTE_DETAILS_MAX_TOKENS = 500;
   public static final int RELATED_NOTES_TOTAL_BUDGET_TOKENS = 2500;
-  public static final int MAX_FOLDER_SIBLINGS_PER_NOTE = 5;
 
   /**
-   * Maximum inbound referrers sampled at depth 1 (per parent). Halves by floor(prev/3) per depth.
+   * Base cap at graph depth 1 for inbound referrers and folder-peer sampling (per parent/anchor).
    */
   public static final int INBOUND_TOP_DEPTH_CAP = 6;
 
   /** Maximum URIs shown in the focus note's flat `inboundReferences` list. */
   public static final int FOCUS_INBOUND_URI_CAP = 20;
 
-  /** Cap on inbound referrers for a given BFS depth (per parent). */
-  public static int inboundCapForDepth(int depth) {
+  /**
+   * Max sampled items at graph depth {@code depth} (1 = from focus, 2 = from depth-1 winners, …)
+   * for inbound wiki references and folder siblings: {@code floor(6 / 3^(depth-1))}.
+   */
+  public static int sampleCapAtGraphDepth(int depth) {
     int cap = INBOUND_TOP_DEPTH_CAP;
     for (int d = 1; d < depth; d++) {
       cap = cap / 3;

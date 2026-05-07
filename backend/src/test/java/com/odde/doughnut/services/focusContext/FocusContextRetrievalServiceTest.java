@@ -593,8 +593,7 @@ class FocusContextRetrievalServiceTest {
         List<String> second = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
 
         assertThat(first, equalTo(second));
-        assertThat(
-            first.size(), lessThanOrEqualTo(FocusContextConstants.MAX_FOLDER_SIBLINGS_PER_NOTE));
+        assertThat(first.size(), lessThanOrEqualTo(FocusContextConstants.sampleCapAtGraphDepth(1)));
       }
 
       @Test
