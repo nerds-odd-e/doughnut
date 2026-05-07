@@ -219,23 +219,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder hasAnApprovedQuestion() {
-    PredefinedQuestionBuilder predefinedQuestionBuilder =
-        makeMe.aPredefinedQuestion().approvedQuestionOf(entity);
-    this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
-    return this;
-  }
-
-  public NoteBuilder hasAnUnapprovedQuestion() {
+  public NoteBuilder hasAPredefinedQuestion() {
     PredefinedQuestionBuilder predefinedQuestionBuilder =
         makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(entity);
     this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
     return this;
   }
 
-  public NoteBuilder hasApprovedQuestions(int numQuestions) {
+  public NoteBuilder hasPredefinedQuestions(int numQuestions) {
     for (int i = 0; i < numQuestions; i++) {
-      this.hasAnApprovedQuestion();
+      this.hasAPredefinedQuestion();
     }
     return this;
   }

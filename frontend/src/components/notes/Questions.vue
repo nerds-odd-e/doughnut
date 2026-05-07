@@ -24,7 +24,6 @@
     <table class="question-table daisy-mt-2" v-if="questions.length">
       <thead>
         <tr>
-          <th>Approved</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -34,17 +33,9 @@
       </thead>
       <tbody>
         <tr
-          v-for="(question, outerIndex) in questions"
+          v-for="question in questions"
           :key="question.multipleChoicesQuestion.f0__stem"
         >
-          <td>
-            <input
-              :id="'checkbox-' + outerIndex"
-              type="checkbox"
-              v-model="question.approved"
-              @change="toggleApproval(question.id)"
-            />
-          </td>
           <td>
             {{ question.multipleChoicesQuestion.f0__stem }}
           </td>
@@ -81,7 +72,6 @@ import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/doughnut-backend-api"
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
@@ -110,15 +100,6 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
-}
-const toggleApproval = async (questionId?: number) => {
-  if (questionId) {
-    await apiCallWithLoading(() =>
-      PredefinedQuestionController.toggleApproval({
-        path: { predefinedQuestion: questionId },
-      })
-    )
-  }
 }
 onMounted(() => {
   fetchQuestions()

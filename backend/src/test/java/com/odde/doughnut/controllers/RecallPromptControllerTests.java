@@ -226,7 +226,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().approvedQuestionOf(note).please();
+      recallPrompt = makeMe.aRecallPrompt().withPredefinedQuestionForNote(note).please();
     }
 
     @Test
@@ -585,7 +585,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().approvedQuestionOf(note).please();
+      recallPrompt = makeMe.aRecallPrompt().withPredefinedQuestionForNote(note).please();
       questionEvaluation.correctChoices = new int[] {0};
       questionEvaluation.feasibleQuestion = false;
       questionEvaluation.improvementAdvices = "This is a valid contest";

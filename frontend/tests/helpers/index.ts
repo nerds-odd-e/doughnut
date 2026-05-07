@@ -86,7 +86,6 @@ const methodToController: Record<string, any> = {
   showQuestion: RecallPromptController,
   askAQuestion: MemoryTrackerController,
   getThresholdExceeded: MemoryTrackerController,
-  toggleApproval: PredefinedQuestionController,
   refineQuestion: PredefinedQuestionController,
   getAllQuestionByNote: PredefinedQuestionController,
   addQuestionManually: PredefinedQuestionController,

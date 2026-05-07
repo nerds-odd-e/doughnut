@@ -108,11 +108,23 @@ public class MemoryTrackerServiceTest {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
 
       RecallPrompt prompt1 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt prompt2 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt prompt3 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
 
       List<RecallPrompt> prompts = memoryTrackerService.getAllRecallPrompts(memoryTracker);
 
@@ -128,11 +140,15 @@ public class MemoryTrackerServiceTest {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
 
       RecallPrompt unansweredPrompt =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt answeredPrompt =
           makeMe
               .aRecallPrompt()
-              .approvedQuestionOf(note)
+              .withPredefinedQuestionForNote(note)
               .forMemoryTracker(memoryTracker)
               .answerChoiceIndex(0)
               .please();
@@ -160,7 +176,7 @@ public class MemoryTrackerServiceTest {
     void shouldSoftDeleteMemoryTrackerSoNoteReturnsToAssimilateState() {
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(1)
           .answerTimestamp(day1)
@@ -203,7 +219,7 @@ public class MemoryTrackerServiceTest {
       for (int i = 0; i < 5; i++) {
         makeMe
             .aRecallPrompt()
-            .approvedQuestionOf(note)
+            .withPredefinedQuestionForNote(note)
             .forMemoryTracker(memoryTracker)
             .answerChoiceIndex(1)
             .answerTimestamp(day1)

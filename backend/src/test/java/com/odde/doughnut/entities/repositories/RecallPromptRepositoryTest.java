@@ -50,7 +50,7 @@ public class RecallPromptRepositoryTest {
       // correctAnswerIndex defaults to 0, so answerChoiceIndex(1) = wrong
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(1) // wrong answer
           .answerTimestamp(now)
@@ -64,7 +64,7 @@ public class RecallPromptRepositoryTest {
     void shouldNotCountCorrectAnswers() {
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0) // correct answer
           .answerTimestamp(now)
@@ -79,7 +79,7 @@ public class RecallPromptRepositoryTest {
       Timestamp beforePeriod = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(1) // wrong answer
           .answerTimestamp(beforePeriod)
@@ -96,14 +96,14 @@ public class RecallPromptRepositoryTest {
 
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(1)
           .answerTimestamp(day5)
           .please();
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(1)
           .answerTimestamp(day10)
@@ -120,14 +120,14 @@ public class RecallPromptRepositoryTest {
 
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(1)
           .answerTimestamp(now)
           .please();
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(otherNote)
+          .withPredefinedQuestionForNote(otherNote)
           .forMemoryTracker(otherTracker)
           .answerChoiceIndex(1)
           .answerTimestamp(now)

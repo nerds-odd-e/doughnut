@@ -160,7 +160,7 @@ class RecallsControllerTests extends ControllerTestBase {
       // Create an answered recall prompt with answer timestamp within current window
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(currentTime)
@@ -184,7 +184,7 @@ class RecallsControllerTests extends ControllerTestBase {
 
       makeMe
           .aRecallPrompt()
-          .approvedQuestionOf(note)
+          .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(previousWindowTime)

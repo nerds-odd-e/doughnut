@@ -137,7 +137,6 @@ export type PredefinedQuestionTestData = {
     Question?: string;
     Answer?: string;
     'One Wrong Choice'?: string;
-    Approved?: boolean;
 };
 
 export type PredefinedQuestionsTestData = {
@@ -154,7 +153,6 @@ export type PredefinedQuestion = {
     id: number;
     multipleChoicesQuestion: MultipleChoicesQuestion;
     correctAnswerIndex?: number;
-    approved?: boolean;
     contextSeed?: number;
 };
 
@@ -1536,24 +1534,6 @@ export type AnswerSpellingResponses = {
 };
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
-
-export type ToggleApprovalData = {
-    body?: never;
-    path: {
-        predefinedQuestion: number;
-    };
-    query?: never;
-    url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval';
-};
-
-export type ToggleApprovalResponses = {
-    /**
-     * OK
-     */
-    200: PredefinedQuestion;
-};
-
-export type ToggleApprovalResponse = ToggleApprovalResponses[keyof ToggleApprovalResponses];
 
 export type RefineQuestionData = {
     body: PredefinedQuestion;

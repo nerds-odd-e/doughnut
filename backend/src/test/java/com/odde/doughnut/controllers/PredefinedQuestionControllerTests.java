@@ -58,7 +58,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
               .underSameNotebookAs(rootNote)
               .please();
       Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser.getUser()).please();
-      noteWithQuestions = makeMe.theNote(lila).hasAnApprovedQuestion().please();
+      noteWithQuestions = makeMe.theNote(lila).hasAPredefinedQuestion().please();
     }
 
     @Test
@@ -77,7 +77,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion questionOfNote =
-          makeMe.aPredefinedQuestion().approvedQuestionOf(noteWithoutQuestions).please();
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(noteWithoutQuestions).please();
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
     }
@@ -85,7 +85,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      makeMe.aPredefinedQuestion().approvedQuestionOf(noteWithQuestions).please();
+      makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(noteWithQuestions).please();
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
@@ -166,44 +166,6 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
           OpenAiNotAvailableException.class, () -> controller.generateQuestionWithoutSave(note));
-    }
-  }
-
-  @Nested
-  class ApproveQuestion {
-    Note subjectNote;
-
-    @BeforeEach
-    void setUp() {
-      subjectNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-    }
-
-    @Test
-    void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
-      Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-      PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedQuestionOf(note).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.toggleApproval(predefinedQuestion));
-    }
-
-    @Test
-    void approveQuestion() throws UnexpectedNoAccessRightException {
-      PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedQuestionOf(subjectNote).please();
-      predefinedQuestion.setApproved(false);
-      PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
-      assertTrue(approvedQuestion.isApproved());
-    }
-
-    @Test
-    void unApproveQuestion() throws UnexpectedNoAccessRightException {
-      PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedQuestionOf(subjectNote).please();
-      predefinedQuestion.setApproved(true);
-      PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
-      assertFalse(approvedQuestion.isApproved());
     }
   }
 

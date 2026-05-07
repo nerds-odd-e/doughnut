@@ -18,15 +18,6 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     }
   }
 
-  public PredefinedQuestionBuilder approved() {
-    this.entity.setApproved(true);
-    return this;
-  }
-
-  public PredefinedQuestionBuilder approvedQuestionOf(Note note) {
-    return ofAIGeneratedQuestionForNote(note).approved();
-  }
-
   public PredefinedQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
     this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     return this;

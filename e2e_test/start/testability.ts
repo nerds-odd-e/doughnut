@@ -239,7 +239,6 @@ const testability = () => {
           Question: `Is ${index} * ${index} = ${index * index}?`,
           Answer: 'Yes',
           'One Wrong Choice': 'No',
-          Approved: 'true',
         }))
       return this.injectPredefinedQuestionsToNotebook({
         notebookName: notebook,

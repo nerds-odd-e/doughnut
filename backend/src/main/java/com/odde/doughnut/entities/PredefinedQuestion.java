@@ -34,9 +34,6 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @Column(name = "correct_answer_index")
   private Integer correctAnswerIndex;
 
-  @Column(name = "is_approved")
-  private boolean approved;
-
   @JsonIgnore
   @Column(name = "is_contested")
   private boolean contested;

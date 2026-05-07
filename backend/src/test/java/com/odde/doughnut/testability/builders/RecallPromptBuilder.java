@@ -83,8 +83,8 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     return this;
   }
 
-  public RecallPromptBuilder approvedQuestionOf(Note note) {
-    this.predefinedQuestionBuilder.approvedQuestionOf(note);
+  public RecallPromptBuilder withPredefinedQuestionForNote(Note note) {
+    this.predefinedQuestionBuilder.ofAIGeneratedQuestionForNote(note);
     return this;
   }
 

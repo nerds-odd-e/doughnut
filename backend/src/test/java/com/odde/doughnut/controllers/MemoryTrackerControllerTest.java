@@ -54,7 +54,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       for (int i = 0; i < 4; i++) {
         makeMe
             .aRecallPrompt()
-            .approvedQuestionOf(note)
+            .withPredefinedQuestionForNote(note)
             .forMemoryTracker(memoryTracker)
             .answerChoiceIndex(1)
             .answerTimestamp(day1)
@@ -77,7 +77,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       for (int i = 0; i < 5; i++) {
         makeMe
             .aRecallPrompt()
-            .approvedQuestionOf(note)
+            .withPredefinedQuestionForNote(note)
             .forMemoryTracker(memoryTracker)
             .answerChoiceIndex(1)
             .answerTimestamp(day1)
@@ -100,7 +100,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       for (int i = 0; i < 6; i++) {
         makeMe
             .aRecallPrompt()
-            .approvedQuestionOf(note)
+            .withPredefinedQuestionForNote(note)
             .forMemoryTracker(memoryTracker)
             .answerChoiceIndex(1)
             .answerTimestamp(day1)
@@ -405,11 +405,23 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       RecallPrompt prompt1 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt prompt2 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt prompt3 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
 
       List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
 
@@ -437,11 +449,15 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       RecallPrompt unansweredPrompt =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt answeredPrompt =
           makeMe
               .aRecallPrompt()
-              .approvedQuestionOf(note)
+              .withPredefinedQuestionForNote(note)
               .forMemoryTracker(memoryTracker)
               .answerChoiceIndex(0)
               .please();
@@ -477,13 +493,21 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       RecallPrompt unansweredPrompt1 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt unansweredPrompt2 =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt answeredPrompt =
           makeMe
               .aRecallPrompt()
-              .approvedQuestionOf(note)
+              .withPredefinedQuestionForNote(note)
               .forMemoryTracker(memoryTracker)
               .answerChoiceIndex(0)
               .please();
@@ -504,14 +528,14 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       RecallPrompt answeredPrompt1 =
           makeMe
               .aRecallPrompt()
-              .approvedQuestionOf(note)
+              .withPredefinedQuestionForNote(note)
               .forMemoryTracker(memoryTracker)
               .answerChoiceIndex(0)
               .please();
       RecallPrompt answeredPrompt2 =
           makeMe
               .aRecallPrompt()
-              .approvedQuestionOf(note)
+              .withPredefinedQuestionForNote(note)
               .forMemoryTracker(memoryTracker)
               .answerChoiceIndex(0)
               .please();
@@ -559,11 +583,15 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       RecallPrompt unansweredPrompt =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       RecallPrompt contestedPrompt =
           makeMe
               .aRecallPrompt()
-              .approvedQuestionOf(note)
+              .withPredefinedQuestionForNote(note)
               .forMemoryTracker(memoryTracker)
               .contested()
               .please();
@@ -583,7 +611,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       RecallPrompt unansweredPrompt =
-          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
       Conversation conversation =
           makeMe
               .aConversation()

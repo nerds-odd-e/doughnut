@@ -310,7 +310,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void setup() {
       Note note = makeMe.aNote().please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.approvedQuestionOf(note).please();
+      recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(note).please();
     }
 
     @Test

@@ -683,24 +683,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/predefined-questions/{predefinedQuestion}/toggle-approval:
-    post:
-      tags:
-      - predefined-question-controller
-      operationId: toggleApproval
-      parameters:
-      - name: predefinedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
   /api/predefined-questions/{note}/refine-question:
     post:
       tags:
@@ -3185,8 +3167,6 @@ components:
           type: string
         One Wrong Choice:
           type: string
-        Approved:
-          type: boolean
     PredefinedQuestionsTestData:
       type: object
       properties:
@@ -3219,8 +3199,6 @@ components:
         correctAnswerIndex:
           type: integer
           format: int32
-        approved:
-          type: boolean
         contextSeed:
           type: integer
           format: int64

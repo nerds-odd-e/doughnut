@@ -123,7 +123,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
     void setup() {
       questionNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.approvedQuestionOf(questionNote).please();
+      recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(questionNote).please();
       recallConversation =
           makeMe
               .aConversation()

@@ -91,16 +91,6 @@ class PredefinedQuestionController {
     return predefinedQuestionService.refineAIQuestion(note, predefinedQuestion);
   }
 
-  @PostMapping("/{predefinedQuestion}/toggle-approval")
-  @Transactional
-  public PredefinedQuestion toggleApproval(
-      @PathVariable("predefinedQuestion") @Schema(type = "integer")
-          PredefinedQuestion predefinedQuestion)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(predefinedQuestion.getNote());
-    return predefinedQuestionService.toggleApproval(predefinedQuestion);
-  }
-
   @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")
   public Map<String, Object> exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)

@@ -48,12 +48,6 @@ public class PredefinedQuestionService {
     return PredefinedQuestion.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
   }
 
-  public PredefinedQuestion toggleApproval(PredefinedQuestion question) {
-    question.setApproved(!question.isApproved());
-    entityPersister.save(question);
-    return question;
-  }
-
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =

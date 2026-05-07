@@ -29,19 +29,15 @@ public class PredefinedQuestionsTestData {
     @JsonProperty("One Wrong Choice")
     private String oneWrongChoice;
 
-    @JsonProperty("Approved")
-    private boolean approved;
-
     public PredefinedQuestion buildPredefinedQuestion(Note note) {
       MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
       mcq.setF0__stem(question);
       mcq.setF1__choices(List.of(answer, oneWrongChoice));
-      PredefinedQuestion question = new PredefinedQuestion();
-      question.setNote(note);
-      question.setCorrectAnswerIndex(0);
-      question.setMultipleChoicesQuestion(mcq);
-      question.setApproved(approved);
-      return question;
+      PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
+      predefinedQuestion.setNote(note);
+      predefinedQuestion.setCorrectAnswerIndex(0);
+      predefinedQuestion.setMultipleChoicesQuestion(mcq);
+      return predefinedQuestion;
     }
   }
 

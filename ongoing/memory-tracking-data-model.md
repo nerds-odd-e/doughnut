@@ -33,7 +33,6 @@ The `PredefinedQuestion` entity represents a question that can be asked about a 
 - **note**: The note this question is about (Many-to-One relationship)
 - **multipleChoicesQuestion**: The actual question content stored as a JSON structure
 - **correctAnswerIndex**: Index of the correct answer in the choices array
-- **approved**: Boolean flag indicating if the question has been approved
 - **createdAt**: Timestamp when the question was created
 
 **Key behaviors:**
@@ -96,6 +95,5 @@ The `Answer` entity represents a user's answer to a question.
    - Questions are stored as multiple-choice questions
    - AI can be used to generate and refine questions
    - Questions can be contested if they don't make sense
-   - Questions can be approved for regular use
 
 This data model implements spaced repetition with AI-assisted question generation so users can memorize and recall information from notes.

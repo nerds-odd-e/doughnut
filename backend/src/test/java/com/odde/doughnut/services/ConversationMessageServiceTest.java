@@ -41,7 +41,8 @@ class ConversationMessageServiceTest {
     void setup() {
       note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.approvedQuestionOf(note).answerChoiceIndex(1).please();
+      recallPrompt =
+          recallPromptBuilder.withPredefinedQuestionForNote(note).answerChoiceIndex(1).please();
     }
 
     @Test
