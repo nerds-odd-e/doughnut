@@ -645,7 +645,7 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnMarkdownForReadableNote() throws UnexpectedNoAccessRightException {
       Note note =
           makeMe.aNote("Focus").details("Body").creatorAndOwner(currentUser.getUser()).please();
-      NoteAiContextMarkdown dto = controller.getAiContextMarkdown(note);
+      NoteAiContextMarkdown dto = controller.getAiContextMarkdown(note, 5000);
       assertThat(dto.markdown(), containsString("Focus"));
       assertThat(dto.markdown(), containsString("Body"));
     }
@@ -657,7 +657,7 @@ class NoteControllerTests extends ControllerTestBase {
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.getAiContextMarkdown(unauthorizedNote));
+          () -> controller.getAiContextMarkdown(unauthorizedNote, 5000));
     }
   }
 }

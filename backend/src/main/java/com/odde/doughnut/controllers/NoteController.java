@@ -188,24 +188,20 @@ class NoteController {
   }
 
   /**
-   * Markdown note context as included in AI chat about this note (focus-context render plus
-   * notebook assistant instructions when set). Same retrieval profile as {@link
-   * com.odde.doughnut.services.ai.ConversationHistoryBuilder}.
+   * Focus-context markdown for this note (same render as {@link
+   * com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer}). {@code tokenLimit} is
+   * the related-notes budget, matching {@link #getGraph(Note, int)}.
    */
   @GetMapping("/{note}/ai-context-markdown")
   public NoteAiContextMarkdown getAiContextMarkdown(
-      @PathVariable("note") @Schema(type = "integer") Note note)
+      @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     User user = authorizationService.getCurrentUser();
-    RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
+    RetrievalConfig config = RetrievalConfig.forGraphApi(tokenLimit);
     FocusContextResult focusContextResult =
         focusContextRetrievalService.retrieve(note, user, config);
     String markdown = focusContextMarkdownRenderer.render(focusContextResult, config);
-    String notebookInstructions = note.getNotebookAssistantInstructions();
-    if (notebookInstructions != null && !notebookInstructions.trim().isEmpty()) {
-      markdown = markdown + "\n\n" + notebookInstructions;
-    }
     return new NoteAiContextMarkdown(markdown);
   }
 

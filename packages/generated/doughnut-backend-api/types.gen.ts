@@ -3238,7 +3238,9 @@ export type GetAiContextMarkdownData = {
     path: {
         note: number;
     };
-    query?: never;
+    query: {
+        tokenLimit: number;
+    };
     url: '/api/notes/{note}/ai-context-markdown';
 };
 

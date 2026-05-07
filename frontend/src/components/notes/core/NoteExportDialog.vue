@@ -3,11 +3,35 @@
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
       <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2">
-        Markdown context sent to the AI assistant for this note (same retrieval as chat).
+        Focus-context markdown (related-notes token budget applies to linked context, same as graph export).
       </p>
+      <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
+        <label for="context-token-limit" class="daisy-label-text">Token budget:</label>
+        <input
+          id="context-token-limit"
+          type="number"
+          min="100"
+          max="10000"
+          step="100"
+          v-model.number="tokenLimit"
+          class="daisy-input daisy-input-sm daisy-w-24"
+          data-testid="token-limit-input"
+        />
+        <button
+          class="daisy-btn daisy-btn-ghost daisy-btn-xs"
+          type="button"
+          @click="refreshMarkdown"
+          :disabled="loadingMarkdown"
+          data-testid="refresh-context-md-btn"
+          aria-label="Refresh focus context markdown"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M19.418 9A7.994 7.994 0 0 0 12 4a8 8 0 1 0 7.418 5"/></svg>
+        </button>
+        <span v-if="loadingMarkdown" class="daisy-loading daisy-loading-spinner daisy-loading-xs"></span>
+      </div>
       <JsonExportSection
         :json-data="aiMarkdown"
-        :filename="`note-${note.id}-ai-context`"
+        :filename="`note-${note.id}-focus-context`"
         :loading="loadingMarkdown"
         textarea-test-id="ai-context-markdown-textarea"
         copy-button-test-id="copy-ai-context-md-btn"
@@ -26,20 +50,11 @@
           Export Note Graph (JSON)
         </summary>
         <div v-if="expandedGraph" class="daisy-mt-4">
+          <p class="daisy-text-xs daisy-text-base-content/60 daisy-mb-2">Uses the token budget above.</p>
           <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
-            <label for="token-limit" class="daisy-label-text">Token Limit:</label>
-            <input
-              id="token-limit"
-              type="number"
-              min="100"
-              max="10000"
-              step="100"
-              v-model.number="tokenLimit"
-              class="daisy-input daisy-input-sm daisy-w-24"
-              data-testid="token-limit-input"
-            />
             <button
               class="daisy-btn daisy-btn-ghost daisy-btn-xs"
+              type="button"
               @click="refreshGraph"
               :disabled="loadingGraph"
               data-testid="refresh-graph-btn"
@@ -88,11 +103,16 @@ async function fetchAiMarkdown() {
   loadingMarkdown.value = true
   const { data, error } = await NoteController.getAiContextMarkdown({
     path: { note: props.note.id },
+    query: { tokenLimit: tokenLimit.value },
   })
   if (!error && data) {
     aiMarkdown.value = data.markdown ?? ""
   }
   loadingMarkdown.value = false
+}
+
+function refreshMarkdown() {
+  fetchAiMarkdown()
 }
 
 watch(

@@ -2518,6 +2518,12 @@ paths:
         required: true
         schema:
           type: integer
+      - name: tokenLimit
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
       responses:
         "200":
           description: OK

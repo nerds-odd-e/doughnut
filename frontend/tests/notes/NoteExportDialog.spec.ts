@@ -32,6 +32,7 @@ describe("NoteExportDialog", () => {
     await flushPromises()
     expect(NoteController.getAiContextMarkdown).toHaveBeenCalledWith({
       path: { note: note.id },
+      query: { tokenLimit: 2000 },
     })
     const ta = page.getByTestId("ai-context-markdown-textarea")
     await expect.element(ta).toBeVisible()
@@ -172,6 +173,35 @@ describe("NoteExportDialog", () => {
     expect(getGraphMock).toHaveBeenLastCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 1234 },
+    })
+  })
+
+  it("refresh markdown refetches with current token budget", async () => {
+    const note = makeMe.aNote.please()
+    const md1 = { markdown: "first" }
+    const md2 = { markdown: "second-budget" }
+    vi.mocked(NoteController.getAiContextMarkdown).mockReset()
+    vi.mocked(NoteController.getAiContextMarkdown)
+      .mockResolvedValueOnce(wrapSdkResponse(md1))
+      .mockResolvedValueOnce(wrapSdkResponse(md2))
+
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+
+    await page.getByTestId("token-limit-input").fill("3000")
+    await page.getByTestId("refresh-context-md-btn").click()
+    await flushPromises()
+
+    await expect
+      .element(page.getByTestId("ai-context-markdown-textarea"))
+      .toHaveValue(expect.stringContaining("second-budget"))
+
+    expect(NoteController.getAiContextMarkdown).toHaveBeenLastCalledWith({
+      path: { note: note.id },
+      query: { tokenLimit: 3000 },
     })
   })
 })
