@@ -1446,30 +1446,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Conversation"
-  /api/conversation/assessment-question/{assessmentQuestion}:
-    post:
-      tags:
-      - conversation-message-controller
-      operationId: startConversationAboutAssessmentQuestion
-      parameters:
-      - name: assessmentQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Conversation"
   /api/circles:
     get:
       tags:
@@ -1600,66 +1576,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
-  /api/assessment/{assessmentQuestionInstance}/answer:
-    post:
-      tags:
-      - assessment-controller
-      operationId: answerQuestion
-      parameters:
-      - name: assessmentQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AnswerDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AssessmentQuestionInstance"
-  /api/assessment/{assessmentAttempt}:
-    post:
-      tags:
-      - assessment-controller
-      operationId: submitAssessmentResult
-      parameters:
-      - name: assessmentAttempt
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AssessmentAttempt"
-  /api/assessment/questions/{notebook}:
-    post:
-      tags:
-      - assessment-controller
-      operationId: generateAssessmentQuestions
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AssessmentAttempt"
   /api/ai/suggest-title/{note}:
     post:
       tags:
@@ -2826,20 +2742,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
-  /api/assessment:
-    get:
-      tags:
-      - assessment-controller
-      operationId: getMyAssessments
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AssessmentAttempt"
   /api/ai/dummy:
     get:
       tags:
@@ -3364,9 +3266,6 @@ components:
       properties:
         skipMemoryTrackingEntirely:
           type: boolean
-        numberOfQuestionsInAssessment:
-          type: integer
-          format: int32
     Subscription:
       type: object
       properties:
@@ -3724,9 +3623,6 @@ components:
       properties:
         skipMemoryTrackingEntirely:
           type: boolean
-        numberOfQuestionsInAssessment:
-          type: integer
-          format: int32
         description:
           type: string
           maxLength: 500
@@ -4059,18 +3955,6 @@ components:
         timeout:
           type: integer
           format: int64
-    AssessmentQuestionInstance:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        answer:
-          $ref: "#/components/schemas/Answer"
-      required:
-      - id
     Conversation:
       type: object
       properties:
@@ -4096,8 +3980,6 @@ components:
     ConversationSubject:
       type: object
       properties:
-        assessmentQuestionInstance:
-          $ref: "#/components/schemas/AssessmentQuestionInstance"
         note:
           $ref: "#/components/schemas/Note"
         recallPrompt:
@@ -4160,35 +4042,6 @@ components:
           format: int32
         skipMemoryTracking:
           type: boolean
-    AssessmentAttempt:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        totalQuestionCount:
-          type: integer
-          format: int32
-        answersCorrect:
-          type: integer
-          format: int32
-        notebookId:
-          type: integer
-          format: int32
-        notebookName:
-          type: string
-        submittedAt:
-          type: string
-          format: date-time
-        isPass:
-          type: boolean
-        assessmentQuestionInstances:
-          type: array
-          items:
-            $ref: "#/components/schemas/AssessmentQuestionInstance"
-      required:
-      - id
-      - notebookId
     SuggestedTitleDTO:
       type: object
       properties:

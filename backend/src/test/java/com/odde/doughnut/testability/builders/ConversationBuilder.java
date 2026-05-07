@@ -13,25 +13,13 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity.getSubject().isEmpty()) {
-      User assessmentOwner = makeMe.aUser().please(needPersist);
-      AssessmentQuestionInstance instance =
-          makeMe
-              .anAssessmentAttempt(assessmentOwner)
-              .withOneQuestion()
-              .please(needPersist)
-              .getAssessmentQuestionInstances()
-              .getFirst();
-      forAnAssessmentQuestionInstance(instance);
+      User noteOwner = makeMe.aUser().please(needPersist);
+      Note note = makeMe.aNote().creatorAndOwner(noteOwner).please(needPersist);
+      forANote(note);
     }
     if (this.entity.getConversationInitiator() == null) {
       entity.setConversationInitiator(makeMe.aUser().please(needPersist));
     }
-  }
-
-  public ConversationBuilder forAnAssessmentQuestionInstance(
-      AssessmentQuestionInstance assessmentQuestionInstance) {
-    this.entity.setAssessmentQuestionInstance(assessmentQuestionInstance);
-    return this;
   }
 
   public ConversationBuilder forANote(Note note) {

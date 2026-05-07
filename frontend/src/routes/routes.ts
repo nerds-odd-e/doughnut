@@ -3,8 +3,6 @@ import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
-import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
-import AssessmentPage from "@/pages/AssessmentPage.vue"
 import RecallPage from "@/pages/RecallPage.vue"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
 import AssimilateSingleNotePage from "@/pages/AssimilateSingleNotePage.vue"
@@ -35,11 +33,9 @@ const componentMap: Record<string, unknown> = {
   noteShow: NoteShowPage,
   circleShow: CircleShowPage,
   bazaar: BazaarPage,
-  assessmentHistory: AssessmentHistoryPage,
   adminDashboard: AdminDashboardPage,
   circleJoin: CircleJoinPage,
   messageCenter: MessageCenterPage,
-  assessment: AssessmentPage,
   assimilate: AssimilationPage,
   assimilateSingleNote: AssimilateSingleNotePage,
   recall: RecallPage,

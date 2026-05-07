@@ -59,10 +59,6 @@ export const routeMetadata: RouteMetadata[] = [
     name: "bazaar",
   },
   {
-    path: "/d/assessmentHistory",
-    name: "assessmentHistory",
-  },
-  {
     path: "/d/admin-dashboard",
     name: "adminDashboard",
     props: true,
@@ -81,13 +77,6 @@ export const routeMetadata: RouteMetadata[] = [
         : undefined,
     }),
     meta: { useNoteStorageAccessor: true },
-  },
-  {
-    path: "/d/assessment/notebook/:notebookId",
-    name: "assessment",
-    props: (route: RouteLocation) => ({
-      notebookId: Number(route.params.notebookId),
-    }),
   },
   {
     path: "/d/assimilate",

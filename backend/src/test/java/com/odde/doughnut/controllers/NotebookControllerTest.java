@@ -70,7 +70,6 @@ class NotebookControllerTest extends ControllerTestBase {
     var s = new NotebookSettings();
     var cur = notebook.getNotebookSettings();
     s.setSkipMemoryTrackingEntirely(cur.getSkipMemoryTrackingEntirely());
-    s.setNumberOfQuestionsInAssessment(cur.getNumberOfQuestionsInAssessment());
     return s;
   }
 

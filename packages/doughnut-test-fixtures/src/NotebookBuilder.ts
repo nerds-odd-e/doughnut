@@ -32,8 +32,8 @@ class NotebookBuilder extends Builder<Notebook> {
     return this
   }
 
-  numberOfQuestionsInAssessment(numberofQuestions: number) {
-    this.data.notebookSettings.numberOfQuestionsInAssessment = numberofQuestions
+  skipMemoryTrackingEntirely(value: boolean) {
+    this.data.notebookSettings.skipMemoryTrackingEntirely = value
     return this
   }
 

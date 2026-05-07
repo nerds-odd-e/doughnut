@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +9,5 @@ class NotebookSettingsTest {
   void defaults() {
     NotebookSettings notebookSettings = new NotebookSettings();
     assertEquals(false, notebookSettings.getSkipMemoryTrackingEntirely());
-    assertNull(notebookSettings.getNumberOfQuestionsInAssessment());
   }
 }

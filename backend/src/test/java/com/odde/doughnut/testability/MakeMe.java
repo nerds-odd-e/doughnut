@@ -87,16 +87,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new FolderBuilder(this, folder);
   }
 
-  public AssessmentAttemptBuilder anAssessmentAttempt(User currentUser) {
-    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
-
-    assessmentAttempt.setUser(currentUser);
-    assessmentAttempt.setSubmittedAt(aTimestamp().please());
-    assessmentAttempt.setTotalQuestionCount(2);
-    assessmentAttempt.setAnswersCorrect(2);
-    return new AssessmentAttemptBuilder(this, assessmentAttempt);
-  }
-
   public <T> T refresh(T object) {
     entityPersister.flush();
     entityPersister.refresh(object);

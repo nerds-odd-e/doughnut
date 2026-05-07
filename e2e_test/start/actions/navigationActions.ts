@@ -1,6 +1,5 @@
 import router from '../router'
 import { assumeNotePage } from '../pageObjects/notePage'
-import { mainMenu } from '../pageObjects/mainMenu'
 import testability from '../testability'
 
 export const navigationActions = {
@@ -14,9 +13,5 @@ export const navigationActions = {
       })
 
     return assumeNotePage(noteTopology)
-  },
-
-  navigateToAssessmentHistoryPage() {
-    return mainMenu().userOptions().myAssessmentHistory()
   },
 }

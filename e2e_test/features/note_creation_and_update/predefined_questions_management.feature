@@ -1,6 +1,6 @@
 Feature: Quiz Question Management
   As a trainer, I want to manage the quiz questions for the notes of a notebook,
-  so that I can use the questions for assessment.
+  so that learners can practice with consistent multiple-choice questions tied to each note.
 
   Background:
     Given I am logged in as an existing user

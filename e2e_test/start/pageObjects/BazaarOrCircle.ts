@@ -1,15 +1,10 @@
 import { findNotebookCardButton, notebookList } from './NotebookList'
-import { assumeAssessmentPage } from './AssessmentPage'
 
 const addToMyLearning = 'Add to my learning'
 
 export const bazaarOrCircle = () => {
   return {
     ...notebookList(),
-    beginAssessmentOnNotebook(notebook: string) {
-      findNotebookCardButton(notebook, 'Start Assessment').click()
-      return assumeAssessmentPage()
-    },
     expectNoAddToMyLearningButton(noteTopology: string) {
       findNotebookCardButton(noteTopology, addToMyLearning).shouldNotExist()
     },

@@ -1,5 +1,4 @@
 import type {
-  AssessmentQuestionInstance,
   Notebook,
   RecallPrompt,
   Note,
@@ -24,7 +23,6 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private questionTypeToUse?: string
   private memoryTrackerIdToUse?: number
   private spellingStemToUse?: string
-  private assessmentInstanceToUse?: AssessmentQuestionInstance
 
   withId(id: number) {
     this.idToUse = id
@@ -48,17 +46,6 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
 
   withNote(note: Note) {
     this.noteToUse = note
-    return this
-  }
-
-  forAssessmentQuestion(
-    instance: AssessmentQuestionInstance,
-    notebook?: Notebook
-  ) {
-    this.assessmentInstanceToUse = instance
-    if (notebook !== undefined) {
-      this.notebookToUse = notebook
-    }
     return this
   }
 
@@ -114,21 +101,6 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
         note: this.noteToUse,
         spellingQuestion: { stem: this.spellingStemToUse },
         answer: this.answerToUse,
-        answerTime: this.answerTimeToUse,
-        questionGeneratedTime: this.questionGeneratedTimeToUse,
-        isContested: this.isContestedToUse,
-      }
-    }
-    if (this.assessmentInstanceToUse !== undefined) {
-      const inst = this.assessmentInstanceToUse
-      return {
-        id: this.idToUse ?? inst.id,
-        memoryTrackerId: this.memoryTrackerIdToUse,
-        questionType: 'MCQ',
-        multipleChoicesQuestion: inst.multipleChoicesQuestion,
-        notebook,
-        note: this.noteToUse,
-        answer: this.answerToUse ?? inst.answer,
         answerTime: this.answerTimeToUse,
         questionGeneratedTime: this.questionGeneratedTimeToUse,
         isContested: this.isContestedToUse,

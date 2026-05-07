@@ -153,4 +153,4 @@ Table `note_wiki_title_cache`: `id`, source `note_id`, `target_note_id`, `link_t
 1. **Single structural truth** — Folder placement and wiki links are orthogonal; folders do not replace semantic links.
 2. **Stable ids** — Prefer note id everywhere the product must not break when titles change.
 3. **Markdown as source of truth** — Body and leading YAML frontmatter carry portable meaning.
-4. **Notebook boundary** — Sharing, assessment, and configuration attach to notebooks.
+4. **Notebook boundary** — Sharing and notebook-level configuration attach to notebooks.

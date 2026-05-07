@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.ConversationListItem;
-import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
@@ -31,13 +30,6 @@ public class ConversationService {
     Conversation conversation = new Conversation();
     conversation.setConversationInitiator(initiator);
     return conversation;
-  }
-
-  public Conversation startConversationAboutRecallPrompt(
-      AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
-    Conversation conversation = initializeConversation(initiator);
-    conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
-    return conversationRepository.save(conversation);
   }
 
   public Conversation startConversationAboutRecallPrompt(
@@ -131,12 +123,6 @@ public class ConversationService {
     Note note = conversation.getSubject().getNote();
     if (note != null) {
       return note.getTitle();
-    }
-
-    AssessmentQuestionInstance assessmentQuestionInstance =
-        conversation.getSubject().getAssessmentQuestionInstance();
-    if (assessmentQuestionInstance != null) {
-      return assessmentQuestionInstance.getMultipleChoicesQuestion().getF0__stem();
     }
 
     RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();

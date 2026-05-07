@@ -35,8 +35,6 @@ public class AuthorizationService {
       case Circle obj -> assertAuthorizationCircle(user, obj);
       case Subscription obj -> assertAuthorizationSubscription(user, obj);
       case User obj -> assertAuthorizationUser(user, obj);
-      case AssessmentAttempt obj -> assertAuthorizationUser(user, obj.getUser());
-      case AssessmentQuestionInstance obj -> assertAuthorization(user, obj.getAssessmentAttempt());
       case Conversation obj -> assertAuthorizationConversation(user, obj);
       default ->
           throw new ResponseStatusException(

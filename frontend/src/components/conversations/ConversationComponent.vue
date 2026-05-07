@@ -10,12 +10,6 @@
           noConversationButton: true,
         }"
       />
-      <AssessmentQuestion
-        v-else-if="conversation.subject?.assessmentQuestionInstance"
-        v-bind="{
-          assessmentQuestionInstance: conversation.subject?.assessmentQuestionInstance,
-        }"
-      />
       <AnsweredQuestionComponent
         v-else-if="conversation.subject?.recallPrompt"
         v-bind="{
@@ -46,7 +40,6 @@
 <script setup lang="ts">
 import type { User, Conversation } from "@generated/doughnut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
-import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"

@@ -15,24 +15,6 @@ describe("NotebookPage.spec", () => {
     mockSdkService("getAiAssistant", { additionalInstructionsToAi: "" })
   })
 
-  it("shows the current number of questions in assessment if set", async () => {
-    const notebook = makeMe.aNotebook.numberOfQuestionsInAssessment(4).please()
-    mockSdkService("get", { notebook, hasAttachedBook: false, readonly: false })
-    helper
-      .component(NotebookPageWithNotebookSidebarLayout)
-      .withCleanStorage()
-      .withRouter()
-      .withCurrentUser(makeMe.aUser.please())
-      .currentRoute({
-        name: "notebookPage",
-        params: { notebookId: String(notebook.id) },
-      })
-      .render()
-    await flushPromises()
-    const input = screen.getByLabelText(/Number Of Questions In Assessment/i)
-    expect((input as HTMLInputElement).value).toBe("4")
-  })
-
   it("shows the note-show sidebar toggle and loads index state when notebook exposes landing id", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()

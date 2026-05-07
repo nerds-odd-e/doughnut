@@ -17,16 +17,6 @@ const notebookPage = () => {
       clickButton('Update Settings')
       pageIsNotLoading()
     },
-    updateAssessmentSettings(settings: { numberOfQuestion?: number }) {
-      if (settings.numberOfQuestion !== undefined) {
-        form
-          .getField('Number of Questions in Assessment')
-          .assignValue(`${settings.numberOfQuestion}`)
-      }
-
-      clickButton('Update Settings')
-      pageIsNotLoading()
-    },
     updateAiAssistantInstructions(instruction: string) {
       form.getField('Additional Instructions to AI').type(instruction)
       clickButton('Update Notebook AI Assistant Settings')

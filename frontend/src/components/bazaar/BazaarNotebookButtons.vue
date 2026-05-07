@@ -14,42 +14,18 @@
         />
       </template>
     </PopButton>
-    <button
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-      title="Start Assessment"
-      @click="openAssessmentPage"
-    >
-      <SvgAssessment />
-    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { useRouter } from "vue-router"
 import type { Notebook } from "@generated/doughnut-backend-api"
 import PopButton from "../commons/Popups/PopButton.vue"
-import usePopups from "../commons/Popups/usePopups"
 import { Plus } from "lucide-vue-next"
-import SvgAssessment from "../svgs/SvgAssessment.vue"
 import SubscribeDialog from "./SubscribeDialog.vue"
 
-const props = defineProps({
+defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   loggedIn: Boolean,
 })
-
-const { popups } = usePopups()
-const router = useRouter()
-
-const openAssessmentPage = () => {
-  if (!props.loggedIn) {
-    popups.alert("You need to be logged in to start an assessment.")
-    return
-  }
-  router.push({
-    name: "assessment",
-    params: { notebookId: props.notebook.id },
-  })
-}
 </script>

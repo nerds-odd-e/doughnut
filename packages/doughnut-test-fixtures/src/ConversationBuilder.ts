@@ -37,7 +37,6 @@ class ConversationBuilder extends Builder<Conversation> {
   do() {
     if (
       this.data.subject?.note === undefined &&
-      this.data.subject?.assessmentQuestionInstance === undefined &&
       this.data.subject?.recallPrompt === undefined
     ) {
       this.data.subject!.note = new NoteBuilder().please()

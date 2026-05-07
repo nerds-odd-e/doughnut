@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.ConversationListItem;
-import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
@@ -36,19 +35,6 @@ public class ConversationMessageController {
     this.conversationService = conversationService;
     this.chatCompletionConversationService = chatCompletionConversationService;
     this.authorizationService = authorizationService;
-  }
-
-  @PostMapping("/assessment-question/{assessmentQuestion}")
-  public Conversation startConversationAboutAssessmentQuestion(
-      @RequestBody String feedback,
-      @PathVariable("assessmentQuestion") @Schema(type = "integer")
-          AssessmentQuestionInstance assessmentQuestionInstance) {
-    Conversation conversation =
-        conversationService.startConversationAboutRecallPrompt(
-            assessmentQuestionInstance, authorizationService.getCurrentUser());
-    conversationService.addMessageToConversation(
-        conversation, authorizationService.getCurrentUser(), feedback);
-    return conversation;
   }
 
   @PostMapping("/note/{note}")

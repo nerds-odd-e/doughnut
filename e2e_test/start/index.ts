@@ -23,7 +23,6 @@ import {
   assimilation,
   assumeAssimilationPage,
 } from './pageObjects/assimilationPage'
-import { assumeAssessmentPage } from './pageObjects/AssessmentPage'
 import { assumeAudioTools } from './pageObjects/audioToolsPage'
 import { navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeCirclePage, navigateToCircle } from './pageObjects/circlePage'
@@ -68,7 +67,6 @@ const start = {
   assimilation,
   assumeAdminDashboardPage,
   assumeAnsweredQuestionPage,
-  assumeAssessmentPage,
   assumeAssimilationPage,
   assumeAudioTools,
   assumeCirclePage,

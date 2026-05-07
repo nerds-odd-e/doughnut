@@ -109,7 +109,7 @@
       <div class="section-header">
         <h4 class="section-title">Notebook Settings</h4>
         <p class="section-description">
-          Configure memory tracking, assessment, and an optional short plain-text message
+          Configure memory tracking and an optional short plain-text message
           for this notebook.
         </p>
       </div>
@@ -137,18 +137,6 @@
           />
           <p class="field-hint">
             When enabled, notes in this notebook will not be included in memory tracking and recall sessions.
-          </p>
-        </div>
-        <div class="settings-item">
-          <TextInput
-            scope-name="notebook"
-            field="numberOfQuestionsInAssessment"
-            title="Number of Questions in Assessment"
-            v-model="formData.numberOfQuestionsInAssessment"
-            :error-message="errors.numberOfQuestionsInAssessment"
-          />
-          <p class="field-hint">
-            The number of questions to include in assessments for this notebook.
           </p>
         </div>
       </div>
@@ -220,7 +208,6 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { GitMerge, Pencil, Share2 } from "lucide-vue-next"
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
-import TextInput from "@/components/form/TextInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
@@ -325,12 +312,10 @@ const shareNotebook = async () => {
 }
 
 // Form data
-const { skipMemoryTrackingEntirely, numberOfQuestionsInAssessment } =
-  props.notebook.notebookSettings
+const { skipMemoryTrackingEntirely } = props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
-  numberOfQuestionsInAssessment,
   description: props.notebook.description ?? "",
 })
 
@@ -340,8 +325,6 @@ watch(
     formData.value = {
       skipMemoryTrackingEntirely:
         nb.notebookSettings.skipMemoryTrackingEntirely ?? false,
-      numberOfQuestionsInAssessment:
-        nb.notebookSettings.numberOfQuestionsInAssessment,
       description: nb.description ?? "",
     }
   },
@@ -350,7 +333,6 @@ watch(
 
 const errors = ref({
   skipMemoryTrackingEntirely: undefined as string | undefined,
-  numberOfQuestionsInAssessment: undefined as string | undefined,
 })
 
 // Indexing state

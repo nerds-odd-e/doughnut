@@ -78,8 +78,7 @@ public class ControllerSetup {
   private HttpStatus getHttpStatusForErrorType(ApiError.ErrorType errorType) {
     return switch (errorType) {
       case OPENAI_TIMEOUT -> HttpStatus.GATEWAY_TIMEOUT;
-      case OPENAI_SERVICE_ERROR, WIKIDATA_SERVICE_ERROR, ASSESSMENT_SERVICE_ERROR ->
-          HttpStatus.BAD_GATEWAY;
+      case OPENAI_SERVICE_ERROR, WIKIDATA_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
       case OPENAI_UNAUTHORIZED, QUESTION_ANSWER_ERROR, BINDING_ERROR, MULTIPART_ERROR ->
           HttpStatus.BAD_REQUEST;
       case MULTIPART_SIZE_EXCEEDED -> HttpStatus.PAYLOAD_TOO_LARGE;

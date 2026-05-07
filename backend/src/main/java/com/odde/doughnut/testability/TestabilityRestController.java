@@ -311,17 +311,7 @@ class TestabilityRestController {
     List<PredefinedQuestion> predefinedQuestions =
         predefinedQuestionsTestData.buildPredefinedQuestions(this.noteRepository);
     predefinedQuestions.forEach(question -> entityPersister.save(question));
-    updateNotebookSettings(predefinedQuestions);
     return predefinedQuestions;
-  }
-
-  private void updateNotebookSettings(List<PredefinedQuestion> predefinedQuestions) {
-    if (predefinedQuestions.isEmpty()) {
-      return;
-    }
-    Notebook notebook = predefinedQuestions.getFirst().getNote().getNotebook();
-    notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(predefinedQuestions.size());
-    entityPersister.save(notebook);
   }
 
   private Ownership getOwnership(NotesTestData notesTestData, User user) {

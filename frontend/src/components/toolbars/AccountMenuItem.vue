@@ -24,11 +24,6 @@
             </a>
           </li>
           <li class="daisy-menu-item hover:daisy-bg-base-200">
-            <router-link :to="{ name: 'assessmentHistory' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
-              My Assessment History
-            </router-link>
-          </li>
-          <li class="daisy-menu-item hover:daisy-bg-base-200">
             <router-link :to="{ name: 'manageAccessTokens' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
               Manage Access Tokens
             </router-link>

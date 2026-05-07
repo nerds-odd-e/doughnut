@@ -10,8 +10,6 @@ import {
 } from './bookReadingTopMathsLike'
 import { pdfLocatorPageIndexOnly, pdfLocatorWithBbox } from './pdfLocatorFull'
 import AnsweredQuestionBuilder from './AnsweredQuestionBuilder'
-import AssessmentAttemptBuilder from './AssessmentAttemptBuilder'
-import AssessmentQuestionInstanceBuilder from './AssessmentQuestionInstanceBuilder'
 import MultipleChoicesQuestionBuilder from './BareQuestionBuilder'
 import BazaarNotebooksBuilder from './BazaarNotebooksBuilder'
 import CircleBuilder from './CircleBuilder'
@@ -82,10 +80,6 @@ class MakeMe {
     return { ...base, ...overrides }
   }
 
-  static get anAssessmentQuestionInstance(): AssessmentQuestionInstanceBuilder {
-    return new AssessmentQuestionInstanceBuilder()
-  }
-
   static get aPredefinedQuestion(): PredefinedQuestionBuilder {
     return new PredefinedQuestionBuilder()
   }
@@ -144,10 +138,6 @@ class MakeMe {
 
   static get aWikidataEntity(): WikidataEntityBuilder {
     return new WikidataEntityBuilder()
-  }
-
-  static get anAssessmentAttempt(): AssessmentAttemptBuilder {
-    return new AssessmentAttemptBuilder()
   }
 
   static get aWikidataSearchEntity(): WikidataSearchEntityBuilder {

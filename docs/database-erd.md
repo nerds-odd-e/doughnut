@@ -4,8 +4,6 @@ Entity-relationship view of the application database: foreign keys as relationsh
 
 ```mermaid
 erDiagram
-    assessment_attempt ||--o{ assessment_question_instance : "assessment_attempt_id"
-    assessment_question_instance ||--o{ conversation : "assessment_question_instance_id"
     attachment_blob ||--o{ image : "attachment_blob_id"
     book ||--o{ book_block : "book_id"
     book ||--o{ book_user_last_read_position : "book_id"
@@ -26,7 +24,6 @@ erDiagram
     "note" ||--o{ note_wiki_title_cache : "note_id"
     "note" ||--o{ note_wiki_title_cache : "target_note_id"
     "note" ||--o{ predefined_question : "note_id"
-    notebook ||--o{ assessment_attempt : "notebook_id"
     notebook ||--o{ bazaar_notebook : "notebook_id"
     notebook ||--o{ book : "notebook_id"
     notebook ||--o{ folder : "notebook_id"
@@ -37,12 +34,9 @@ erDiagram
     ownership ||--o{ conversation : "subject_ownership_id"
     ownership ||--o{ notebook : "ownership_id"
     ownership ||--o{ notebook_group : "ownership_id"
-    predefined_question ||--o{ assessment_question_instance : "predefined_question_id"
     predefined_question ||--o{ recall_prompt : "predefined_question_id"
-    quiz_answer ||--o{ assessment_question_instance : "quiz_answer_id"
     quiz_answer ||--o{ recall_prompt : "quiz_answer_id"
     recall_prompt ||--o{ conversation : "recall_prompt_id"
-    "user" ||--o{ assessment_attempt : "user_id"
     "user" ||--o{ book_block_reading_record : "user_id"
     "user" ||--o{ book_user_last_read_position : "user_id"
     "user" ||--o{ circle_user : "user_id"
@@ -55,17 +49,6 @@ erDiagram
     "user" ||--o{ ownership : "user_id"
     "user" ||--o{ subscription : "user_id"
     "user" ||--o{ user_token : "user_id"
-    assessment_attempt {
-        int id PK
-        int user_id FK
-        int notebook_id FK
-    }
-    assessment_question_instance {
-        int id PK
-        int assessment_attempt_id FK
-        int predefined_question_id FK
-        int quiz_answer_id FK
-    }
     attachment_blob {
         int id PK
     }
@@ -109,7 +92,6 @@ erDiagram
         int id PK
         int subject_ownership_id FK
         int conversation_initiator_id FK
-        int assessment_question_instance_id FK
         int note_id FK
         int recall_prompt_id FK
     }

@@ -175,7 +175,6 @@ export type Notebook = {
 
 export type NotebookSettings = {
     skipMemoryTrackingEntirely?: boolean;
-    numberOfQuestionsInAssessment?: number;
 };
 
 export type Subscription = {
@@ -352,7 +351,6 @@ export type RedirectToNoteResponse = {
 
 export type NotebookUpdateRequest = {
     skipMemoryTrackingEntirely?: boolean;
-    numberOfQuestionsInAssessment?: number;
     description?: string;
     name?: string;
 };
@@ -524,12 +522,6 @@ export type SseEmitter = {
     timeout?: number;
 };
 
-export type AssessmentQuestionInstance = {
-    id: number;
-    multipleChoicesQuestion?: MultipleChoicesQuestion;
-    answer?: Answer;
-};
-
 export type Conversation = {
     id: number;
     subject?: ConversationSubject;
@@ -540,7 +532,6 @@ export type Conversation = {
 };
 
 export type ConversationSubject = {
-    assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: Note;
     recallPrompt?: RecallPrompt;
 };
@@ -575,17 +566,6 @@ export type TextFromAudioWithCallInfo = {
 export type AssimilationRequestDto = {
     noteId?: number;
     skipMemoryTracking?: boolean;
-};
-
-export type AssessmentAttempt = {
-    id: number;
-    totalQuestionCount?: number;
-    answersCorrect?: number;
-    notebookId: number;
-    notebookName?: string;
-    submittedAt?: string;
-    isPass?: boolean;
-    assessmentQuestionInstances?: Array<AssessmentQuestionInstance>;
 };
 
 export type SuggestedTitleDto = {
@@ -961,7 +941,6 @@ export type ConversationWritable = {
 };
 
 export type ConversationSubjectWritable = {
-    assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: NoteWritable;
     recallPrompt?: RecallPromptWritable;
 };
@@ -2197,24 +2176,6 @@ export type StartConversationAboutNoteResponses = {
 
 export type StartConversationAboutNoteResponse = StartConversationAboutNoteResponses[keyof StartConversationAboutNoteResponses];
 
-export type StartConversationAboutAssessmentQuestionData = {
-    body: string;
-    path: {
-        assessmentQuestion: number;
-    };
-    query?: never;
-    url: '/api/conversation/assessment-question/{assessmentQuestion}';
-};
-
-export type StartConversationAboutAssessmentQuestionResponses = {
-    /**
-     * OK
-     */
-    200: Conversation;
-};
-
-export type StartConversationAboutAssessmentQuestionResponse = StartConversationAboutAssessmentQuestionResponses[keyof StartConversationAboutAssessmentQuestionResponses];
-
 export type IndexData = {
     body?: never;
     path?: never;
@@ -2330,60 +2291,6 @@ export type AssimilateResponses = {
 };
 
 export type AssimilateResponse = AssimilateResponses[keyof AssimilateResponses];
-
-export type AnswerQuestionData = {
-    body: AnswerDto;
-    path: {
-        assessmentQuestionInstance: number;
-    };
-    query?: never;
-    url: '/api/assessment/{assessmentQuestionInstance}/answer';
-};
-
-export type AnswerQuestionResponses = {
-    /**
-     * OK
-     */
-    200: AssessmentQuestionInstance;
-};
-
-export type AnswerQuestionResponse = AnswerQuestionResponses[keyof AnswerQuestionResponses];
-
-export type SubmitAssessmentResultData = {
-    body?: never;
-    path: {
-        assessmentAttempt: number;
-    };
-    query?: never;
-    url: '/api/assessment/{assessmentAttempt}';
-};
-
-export type SubmitAssessmentResultResponses = {
-    /**
-     * OK
-     */
-    200: AssessmentAttempt;
-};
-
-export type SubmitAssessmentResultResponse = SubmitAssessmentResultResponses[keyof SubmitAssessmentResultResponses];
-
-export type GenerateAssessmentQuestionsData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/assessment/questions/{notebook}';
-};
-
-export type GenerateAssessmentQuestionsResponses = {
-    /**
-     * OK
-     */
-    200: AssessmentAttempt;
-};
-
-export type GenerateAssessmentQuestionsResponse = GenerateAssessmentQuestionsResponses[keyof GenerateAssessmentQuestionsResponses];
 
 export type SuggestTitleData = {
     body?: never;
@@ -3495,22 +3402,6 @@ export type AssimilatingResponses = {
 };
 
 export type AssimilatingResponse = AssimilatingResponses[keyof AssimilatingResponses];
-
-export type GetMyAssessmentsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/assessment';
-};
-
-export type GetMyAssessmentsResponses = {
-    /**
-     * OK
-     */
-    200: Array<AssessmentAttempt>;
-};
-
-export type GetMyAssessmentsResponse = GetMyAssessmentsResponses[keyof GetMyAssessmentsResponses];
 
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData = {
     body?: never;

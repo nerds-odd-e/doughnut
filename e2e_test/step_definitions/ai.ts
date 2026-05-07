@@ -82,6 +82,11 @@ Given('An OpenAI response is unavailable', () => {
 Given('OpenAI generates this question:', stubOpenAiMcqFromSingleRowTable)
 
 Given(
+  'OpenAI now refines the question to become:',
+  stubOpenAiMcqFromSingleRowTable
+)
+
+Given(
   'OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:',
   (questionTable: DataTable) => {
     const rows = questionTable.hashes()

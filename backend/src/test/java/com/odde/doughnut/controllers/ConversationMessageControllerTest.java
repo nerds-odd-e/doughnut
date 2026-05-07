@@ -28,73 +28,10 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
   @Autowired ConversationRepository conversationRepository;
   @Autowired ConversationMessageRepository conversationMessageRepository;
-  AssessmentQuestionInstance assessmentQuestionInstance;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    Notebook notebook = makeMe.aNotebook().please();
-    AssessmentAttempt assessmentAttempt =
-        makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
-    assessmentQuestionInstance = assessmentAttempt.getAssessmentQuestionInstances().get(0);
-  }
-
-  @Test
-  void teststartConversationAboutAssessmentQuestionReturnsOk() {
-    String feedback = "This is a feedback";
-    controller.startConversationAboutAssessmentQuestion(feedback, assessmentQuestionInstance);
-    List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
-    assertEquals(1, conversations.size());
-  }
-
-  @Test
-  void testGetMessageDetailWhenstartConversationAboutAssessmentQuestionReturnsOk() {
-    String feedback = "This is a feedback";
-    Conversation conversation =
-        controller.startConversationAboutAssessmentQuestion(feedback, assessmentQuestionInstance);
-
-    List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
-
-    makeMe.refresh(conversation);
-    var conversationDetail = conversation.getConversationMessages();
-    assertEquals(1, conversations.size());
-    assertEquals(1, conversationDetail.size());
-    assertEquals(feedback, conversationDetail.getFirst().getMessage());
-  }
-
-  @Test
-  void testGetFeedbackThreadsSendFromTheUser() {
-    makeMe
-        .aConversation()
-        .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-        .from(currentUser.getUser())
-        .please();
-    makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<ConversationListItem> conversations = controller.getConversationsOfCurrentUser();
-    assertEquals(1, conversations.size());
-  }
-
-  @Test
-  void testGetFeedbackThreadsAsReceiver() {
-    makeMe
-        .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
-        .owner(currentUser.getUser())
-        .please();
-    makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<ConversationListItem> conversations = controller.getConversationsOfCurrentUser();
-    assertEquals(1, conversations.size());
-  }
-
-  @Test
-  void testGetFeedbackThreadsAsAMemberOfACircle() {
-    Circle myCircle = makeMe.aCircle().hasMember(currentUser.getUser()).please();
-    makeMe
-        .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
-        .owner(myCircle)
-        .please();
-    makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<ConversationListItem> conversations = controller.getConversationsOfCurrentUser();
-    assertEquals(1, conversations.size());
   }
 
   @Nested
@@ -152,15 +89,9 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @Test
     void ownerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
-      makeMe
-          .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
-          .owner(currentUser.getUser())
-          .please();
-      Conversation conversation =
-          makeMe
-              .aConversation()
-              .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-              .please();
+      User initiator = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Conversation conversation = makeMe.aConversation().from(initiator).forANote(note).please();
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
       List<ConversationMessage> conversationMessages =
@@ -221,7 +152,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldstartConversationAboutAssessmentQuestionToConversation() {
+    void shouldStartConversationAboutNoteAddsInitialMessage() {
       Conversation conversation = controller.startConversationAboutNote(note, msg);
       makeMe.refresh(conversation);
       List<ConversationMessage> conversationMessages = conversation.getConversationMessages();

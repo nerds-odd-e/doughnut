@@ -39,7 +39,7 @@ export const Default: Story = {
 // Notebook with custom settings
 export const WithCustomSettings: Story = {
   args: {
-    notebook: makeMe.aNotebook.numberOfQuestionsInAssessment(5).please(),
+    notebook: makeMe.aNotebook.skipMemoryTrackingEntirely(true).please(),
     user: mockUser,
   },
 }

@@ -40,13 +40,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
   @JsonIgnore
-  public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
-    this.subject.setAssessmentQuestionInstance(assessmentQuestionInstance);
-    this.subjectOwnership =
-        assessmentQuestionInstance.getAssessmentAttempt().getNotebook().getOwnership();
-  }
-
-  @JsonIgnore
   public void setNote(Note note) {
     this.subject.setNote(note);
     this.subjectOwnership = note.getNotebook().getOwnership();
@@ -68,11 +61,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
     RecallPrompt recallPrompt = subject.getRecallPrompt();
     if (recallPrompt != null && recallPrompt.getPredefinedQuestion() != null) {
       return recallPrompt.getPredefinedQuestion().getNote();
-    }
-
-    AssessmentQuestionInstance assessmentQuestionInstance = subject.getAssessmentQuestionInstance();
-    if (assessmentQuestionInstance != null) {
-      return assessmentQuestionInstance.getPredefinedQuestion().getNote();
     }
 
     return null;

@@ -10,10 +10,6 @@ import lombok.Setter;
 @Setter
 public class ConversationSubject {
   @ManyToOne
-  @JoinColumn(name = "assessment_question_instance_id", referencedColumnName = "id")
-  private AssessmentQuestionInstance assessmentQuestionInstance;
-
-  @ManyToOne
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   private Note note;
 
@@ -23,6 +19,6 @@ public class ConversationSubject {
 
   @JsonIgnore
   public boolean isEmpty() {
-    return assessmentQuestionInstance == null && note == null && recallPrompt == null;
+    return note == null && recallPrompt == null;
   }
 }

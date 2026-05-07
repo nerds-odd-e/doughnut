@@ -189,12 +189,12 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
 
 1. **Assert with clear domain meaning**
    - Error messages should describe what went wrong in business/domain terms, not just technical selectors
-   - Example: Instead of "Expected to find text '80%'", use "Expected assessment score to be 80%, but found 75%"
+   - Example: Instead of "Expected to find text '80%'", use "Expected completion rate to be 80%, but found 75%"
 
 2. **Highlight actual values in failure messages**
    - Always show both expected and actual values when they differ
    - Include relevant context (e.g., page content, API response) when helpful
-   - Example: `expect(actualScore, \`Expected assessment score to be ${expectedScore}, but found ${actualScore}\`).to.equal(expectedScore)`
+   - Example: `expect(actualScore, \`Expected completion rate to be ${expectedScore}, but found ${actualScore}\`).to.equal(expectedScore)`
 
 3. **All steps (Given/When/Then) must be assertive and fail early**
    - Given steps should verify that setup actually succeeded (e.g., verify notes were created, API calls succeeded)
@@ -204,16 +204,17 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
 
 Example of good assertion:
 ```typescript
-expectEndOfAssessment(expectedScore?: string) {
+expectQuizScore(expectedScore?: string) {
   if (expectedScore) {
-    cy.get('[data-test="assessment-score"]').should($score => {
+    cy.get('[data-test="quiz-score"]').should(($score) => {
       const actualScore = $score.text().trim()
-      expect(actualScore, 
-        `Expected assessment score to be ${expectedScore}, but found ${actualScore}`
+      expect(
+        actualScore,
+        `Expected quiz score to be ${expectedScore}, but found ${actualScore}`
       ).to.equal(expectedScore)
     })
   }
-  return endOfAssessment()
+  return this
 }
 ```
 

@@ -56,7 +56,7 @@ describe("Notebooks Page", () => {
         name: "Updated Title",
         notebookSettings: {
           ...originalNotebook.notebookSettings,
-          numberOfQuestionsInAssessment: 10,
+          skipMemoryTrackingEntirely: true,
         },
       }
 

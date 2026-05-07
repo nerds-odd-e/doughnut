@@ -37,20 +37,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/AssessmentHistoryPage': RouteRecordInfo<
-      '/AssessmentHistoryPage',
-      '/AssessmentHistoryPage',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '/AssessmentPage': RouteRecordInfo<
-      '/AssessmentPage',
-      '/AssessmentPage',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/AssimilateSingleNotePage': RouteRecordInfo<
       '/AssimilateSingleNotePage',
       '/AssimilateSingleNotePage',
@@ -256,18 +242,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AdminDashboardPage.vue': {
       routes:
         | '/AdminDashboardPage'
-      views:
-        | never
-    }
-    'src/pages/AssessmentHistoryPage.vue': {
-      routes:
-        | '/AssessmentHistoryPage'
-      views:
-        | never
-    }
-    'src/pages/AssessmentPage.vue': {
-      routes:
-        | '/AssessmentPage'
       views:
         | never
     }
