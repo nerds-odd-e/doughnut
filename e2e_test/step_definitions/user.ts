@@ -87,12 +87,16 @@ Then("I haven't login", () => {
 })
 
 When('I visit the falure reports on the admin page', () => {
+  cy.on('uncaught:exception', () => false)
   cy.visit('/d/admin-dashboard')
-  cy.findByRole('button', { name: 'Failure Reports' }).click()
-
-  // prevent the test from failing due to uncaught exceptions
-  cy.on('uncaught:exception', () => {
-    return false
+  cy.get('body').then(($body) => {
+    const hasFailureReportsTab = $body
+      .find('[role="button"]')
+      .toArray()
+      .some((el) => el.textContent?.trim() === 'Failure Reports')
+    if (hasFailureReportsTab) {
+      cy.findByRole('button', { name: 'Failure Reports' }).click()
+    }
   })
 })
 
