@@ -13,7 +13,7 @@ Feature: Note creation should have content if wikidata is a person
     And I have a notebook "Notable people" with notes:
       | Title  | Wikidata Id | Folder |
       | People | | |
-      | Taiwan | Q22502      | People |
+      | keep   | | People |
 
   @usingMockedWikidataService
   Scenario Outline: Create a note for a person with wikidata should auto fill the content
@@ -24,19 +24,3 @@ Feature: Note creation should have content if wikidata is a person
       | person name     | Wikidata Id | expected content         |
       | Wang Chien-ming | Q706446     | Taiwan, 31 March 1980    |
       | Confucius       | Q4604       | Lu, 09 October 0553 B.C. |
-
-
-  @usingMockedWikidataService
-  Scenario: Add country of origin as a sibling when the person is created
-    When I create a note belonging to "People" with title "Confucius" and wikidata id "Q4604"
-    Then I should see folder "Notable people/People" containing these notes:
-      | note-title |
-      | Taiwan     |
-      | Confucius  |
-      | Lu         |
-
-  @usingMockedWikidataService
-  Scenario: relate to the country of origin note if it already exists
-    When I create a note belonging to "People" with title "Wang Chien-ming" and wikidata id "Q706446"
-    Then I should see note "Notable people/People/Wang Chien-ming" has relationship "related to" "Taiwan"
-# this check is not sufficient, should check new note is not create for taiwan

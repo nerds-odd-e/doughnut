@@ -2,12 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  type DataTable,
-  Given,
-  Then,
-  When,
-} from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
 import { assumeAssociateWikidataDialog } from '../start/pageObjects/associateWikidataDialog'
@@ -127,15 +122,5 @@ Then(
   'a map pointing to lat: {string}, lon: {string} is added to the note',
   (latitude: string, longitude: string) => {
     cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
-  }
-)
-
-Given(
-  'the Wikidata.org entity {string} is written by authors with ID',
-  (wikidataId: string, data: DataTable) => {
-    mock_services.wikidata().stubWikidataEntityBook(
-      wikidataId,
-      data.hashes().map((hash) => hash['Wikidata Id'] ?? '')
-    )
   }
 )

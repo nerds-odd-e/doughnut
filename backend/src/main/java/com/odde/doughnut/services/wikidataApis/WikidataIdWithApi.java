@@ -8,7 +8,6 @@ import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntity
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 
 public final class WikidataIdWithApi {
@@ -43,16 +42,6 @@ public final class WikidataIdWithApi {
   public void extractWikidataInfoToNote(Note note) throws IOException, InterruptedException {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
     model.map(entity -> entity.wikidataDescription(wikidataApi)).ifPresent(note::prependContent);
-  }
-
-  public Optional<WikidataIdWithApi> getCountryOfOrigin() throws IOException, InterruptedException {
-    Optional<WikidataEntityModel> model = getWikidataEntityModel();
-    return model.flatMap(entity -> entity.getCountryOfOrigin(wikidataApi));
-  }
-
-  public Stream<WikidataIdWithApi> getAuthors() throws IOException, InterruptedException {
-    Optional<WikidataEntityModel> model = getWikidataEntityModel();
-    return model.map(i -> i.getAuthorList(wikidataApi)).orElse(Stream.empty());
   }
 
   public void associateNoteToWikidata(Note note, NoteService noteService)

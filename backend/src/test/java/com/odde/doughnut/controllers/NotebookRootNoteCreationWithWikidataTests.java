@@ -14,7 +14,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -311,92 +310,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         if (countryName != null) {
           assertThat(description, containsString(countryName));
         }
-      }
-
-      @Test
-      void shouldAddPersonNoteWithCountryNoteWithWikidataId()
-          throws BindException,
-              InterruptedException,
-              UnexpectedNoAccessRightException,
-              IOException {
-        mockWikidataHumanEntity("Q8337", null, "Q34660");
-        mockWikidataEntity("Q34660", "Canada");
-        noteCreation.setWikidataId("Q8337");
-        noteCreation.setNewTitle("Johnny boy");
-        NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-
-        assertEquals("Johnny boy", note.getNote().getTitle());
-        assertEquals("Q8337", note.getNote().getWikidataId());
-        Note persisted = noteRepository.findById(note.getId()).orElseThrow();
-        assertThat(persisted.getFolder(), not(nullValue()));
-        List<String> peerTitles =
-            noteRepository.findNotesInFolderOrderByIdAsc(persisted.getFolder().getId()).stream()
-                .map(Note::getTitle)
-                .toList();
-        assertThat(peerTitles, hasItems("Johnny boy", "Canada"));
-      }
-    }
-
-    @Nested
-    class AddingBookNoteWithAuthorInformation {
-      Folder folder;
-
-      @BeforeEach
-      void setup() throws IOException, InterruptedException {
-        folder = makeMe.aFolder().notebook(notebook).name("Books").please();
-        noteCreation.setFolderId(folder.getId());
-        mockWikidataEntity("Q34660", "J. K. Rowling");
-        mockWikidataEntity("Q12345", "The girl sat next to the window");
-        noteCreation.setWikidataId("Q8337");
-        noteCreation.setNewTitle("Harry Potter");
-      }
-
-      @Test
-      void shouldAddBookNoteWithAuthorNoteWithWikidataId()
-          throws BindException,
-              InterruptedException,
-              UnexpectedNoAccessRightException,
-              IOException {
-        mockWikidataWBGetEntity(
-            "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
-        NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-
-        assertEquals("Harry Potter", note.getNote().getTitle());
-        assertEquals("Q8337", note.getNote().getWikidataId());
-        Note persisted = noteRepository.findById(note.getId()).orElseThrow();
-        assertThat(persisted.getFolder(), not(nullValue()));
-        List<String> peerTitles =
-            noteRepository.findNotesInFolderOrderByIdAsc(persisted.getFolder().getId()).stream()
-                .map(Note::getTitle)
-                .toList();
-        assertThat(peerTitles, hasItems("Harry Potter", "J. K. Rowling"));
-      }
-
-      @Test
-      void shouldAddBookNoteWithMultipleAuthorsNoteWithWikidataId()
-          throws BindException,
-              InterruptedException,
-              UnexpectedNoAccessRightException,
-              IOException {
-        mockWikidataWBGetEntity(
-            "Q8337",
-            makeMe
-                .wikidataClaimsJson("Q8337")
-                .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
-                .please());
-        NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-
-        assertEquals("Harry Potter", note.getNote().getTitle());
-        assertEquals("Q8337", note.getNote().getWikidataId());
-        Note persisted = noteRepository.findById(note.getId()).orElseThrow();
-        assertThat(persisted.getFolder(), not(nullValue()));
-        List<String> peerTitles =
-            noteRepository.findNotesInFolderOrderByIdAsc(persisted.getFolder().getId()).stream()
-                .map(Note::getTitle)
-                .toList();
-        assertThat(
-            peerTitles,
-            hasItems("Harry Potter", "J. K. Rowling", "The girl sat next to the window"));
       }
     }
   }

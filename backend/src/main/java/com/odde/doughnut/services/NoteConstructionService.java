@@ -6,8 +6,6 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.RelationType;
-import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -22,8 +20,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -41,7 +37,6 @@ public class NoteConstructionService {
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
   private final NoteService noteService;
-  private final NoteChildContainerFolderService noteChildContainerFolderService;
   private final NoteRealmService noteRealmService;
 
   @Autowired
@@ -52,7 +47,6 @@ public class NoteConstructionService {
       FolderRepository folderRepository,
       EntityPersister entityPersister,
       NoteService noteService,
-      NoteChildContainerFolderService noteChildContainerFolderService,
       NoteRealmService noteRealmService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
@@ -60,17 +54,7 @@ public class NoteConstructionService {
     this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
     this.noteService = noteService;
-    this.noteChildContainerFolderService = noteChildContainerFolderService;
     this.noteRealmService = noteRealmService;
-  }
-
-  public Note createNote(Notebook notebook, Note parentNote, String title) {
-    Objects.requireNonNull(notebook, "notebook");
-    if (parentNote != null) {
-      Folder folder = noteChildContainerFolderService.resolveForParent(parentNote);
-      return persistNewNoteInNotebookFolder(notebook, folder, title);
-    }
-    return createNoteInNotebookScopeWithoutWikidata(notebook, null, title);
   }
 
   private Note createNoteInNotebookScopeWithoutWikidata(
@@ -105,84 +89,20 @@ public class NoteConstructionService {
     return note;
   }
 
-  private Note createNoteWithWikidataInfo(
-      Notebook notebook, Note parentNote, WikidataIdWithApi wikidataIdWithApi, String title)
-      throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note = createNote(notebook, parentNote, title);
-    return attachWikidataAndRefresh(note, wikidataIdWithApi);
-  }
-
   private Note attachWikidataAndRefresh(Note note, WikidataIdWithApi wikidataIdWithApi)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, noteService);
-      wikidataIdWithApi
-          .getCountryOfOrigin()
-          .ifPresent(wwa -> addWikidataLinkedSiblingNote(note, wwa));
-      wikidataIdWithApi.getAuthors().forEach(wwa -> addWikidataLinkedSiblingNote(note, wwa));
     }
     entityPersister.flush();
     entityPersister.refresh(note);
     return note;
   }
 
-  @SneakyThrows
-  private void addWikidataLinkedSiblingNote(
-      Note focalNote, WikidataIdWithApi subWikidataIdWithApi) {
-    Optional<String> optionalTitle = subWikidataIdWithApi.fetchEnglishTitleFromApi();
-    User user = authorizationService.getCurrentUser();
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    optionalTitle.ifPresent(
-        siblingTitle ->
-            noteRepository
-                .noteWithWikidataIdWithinNotebook(
-                    focalNote.getNotebook().getId(), subWikidataIdWithApi.wikidataId())
-                .stream()
-                .findFirst()
-                .ifPresentOrElse(
-                    existingNote -> {
-                      noteService.createRelationship(
-                          focalNote,
-                          existingNote,
-                          user,
-                          RelationType.RELATED_TO,
-                          currentUTCTimestamp,
-                          RelationshipNotePlacement.RELATIONS_SUBFOLDER);
-                    },
-                    () -> {
-                      try {
-                        if (focalNote.getFolder() != null) {
-                          attachWikidataAndRefresh(
-                              persistNewNoteInNotebookFolder(
-                                  focalNote.getNotebook(), focalNote.getFolder(), siblingTitle),
-                              subWikidataIdWithApi);
-                        } else {
-                          createNoteWithWikidataInfo(
-                              focalNote.getNotebook(), null, subWikidataIdWithApi, siblingTitle);
-                        }
-                      } catch (Exception | DuplicateWikidataIdException e) {
-                        throw new RuntimeException(e);
-                      }
-                    }));
-  }
-
   private BindException duplicateWikidataBinding(NoteCreationDTO noteCreation) {
     BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
     bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
     return new BindException(bindingResult);
-  }
-
-  public NoteRealm createNoteWithWikidataService(
-      Note parentNote, NoteCreationDTO noteCreation, User user, WikidataIdWithApi wikidataIdWithApi)
-      throws InterruptedException, IOException, BindException {
-    try {
-      Note note =
-          createNoteWithWikidataInfo(
-              parentNote.getNotebook(), parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
-      return noteRealmService.build(note, user);
-    } catch (DuplicateWikidataIdException e) {
-      throw duplicateWikidataBinding(noteCreation);
-    }
   }
 
   public NoteRealm createRootNoteWithWikidataService(

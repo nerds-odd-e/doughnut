@@ -3,7 +3,6 @@ package com.odde.doughnut.services.wikidataApis;
 import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntity;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class WikidataEntityModelOfProperties {
   private final WikidataEntity entity;
@@ -30,9 +29,5 @@ public class WikidataEntityModelOfProperties {
 
   public Optional<WikidataId> getCountryOfOriginValue() {
     return entity.getFirstClaimValue("P27").map(WikidataValue::toWikiClass);
-  }
-
-  public Stream<WikidataId> getAuthors() {
-    return entity.getClaimValues("P50").map(WikidataValue::toWikiClass);
   }
 }

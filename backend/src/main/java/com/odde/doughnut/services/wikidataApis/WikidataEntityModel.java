@@ -37,12 +37,4 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
     }
     return getLocationDescription();
   }
-
-  public Optional<WikidataIdWithApi> getCountryOfOrigin(WikidataApi wikidataApi) {
-    return getCountryOfOriginValue().map(wikidataId1 -> wikidataId1.withApi(wikidataApi));
-  }
-
-  public Stream<WikidataIdWithApi> getAuthorList(WikidataApi wikidataApi) {
-    return getAuthors().map(wikidataId -> wikidataId.withApi(wikidataApi));
-  }
 }

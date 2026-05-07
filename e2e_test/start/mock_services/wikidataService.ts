@@ -85,21 +85,6 @@ const wikidataService = () => {
       ])
     },
 
-    stubWikidataEntityBook(
-      wikidataId: string,
-      authorWikidataIds: Array<string>
-    ) {
-      stubWikidataEntity(
-        serviceMocker,
-        wikidataId,
-        authorWikidataIds.map((id) => ({
-          claimId: 'P50',
-          type: 'wikibase-entityid',
-          value: { id },
-        }))
-      )
-    },
-
     stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
       stubWikidataApi(
         serviceMocker,

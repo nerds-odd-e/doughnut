@@ -119,13 +119,4 @@ public class WikidataClaimJsonBuilder {
     this.addClaim("P625", type, value);
     return this;
   }
-
-  public WikidataClaimJsonBuilder asABookWithSingleAuthor(String authorWikiDataId) {
-    return asABookWithMultipleAuthors(List.of(authorWikiDataId));
-  }
-
-  public WikidataClaimJsonBuilder asABookWithMultipleAuthors(List<String> authorWikiDataIds) {
-    this.addClaimsOfWikiBaseEntityIds("P50", authorWikiDataIds);
-    return this;
-  }
 }
