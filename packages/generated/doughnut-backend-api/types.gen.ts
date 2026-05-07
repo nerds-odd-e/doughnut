@@ -1274,24 +1274,6 @@ export type EnableFeatureToggleResponses = {
 
 export type EnableFeatureToggleResponse = EnableFeatureToggleResponses[keyof EnableFeatureToggleResponses];
 
-export type CreateRelationshipsData = {
-    body: {
-        [key: string]: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/testability/create_relationships';
-};
-
-export type CreateRelationshipsResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type CreateRelationshipsResponse = CreateRelationshipsResponses[keyof CreateRelationshipsResponses];
-
 export type ResetDbAndTestabilitySettingsData = {
     body?: never;
     path?: never;

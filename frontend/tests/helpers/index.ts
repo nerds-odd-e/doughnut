@@ -66,7 +66,6 @@ const methodToController: Record<string, any> = {
   shareToBazaar: TestabilityRestController,
   replaceServiceUrl: TestabilityRestController,
   randomizer: TestabilityRestController,
-  createRelationships: TestabilityRestController,
   injectNotes: TestabilityRestController,
   injectCircle: TestabilityRestController,
   injectPredefinedQuestion: TestabilityRestController,

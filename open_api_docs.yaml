@@ -362,26 +362,6 @@ paths:
               schema:
                 type: array
                 items: {}
-  /api/testability/create_relationships:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: createRelationships
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/clean_db_and_reset_testability_settings:
     post:
       tags:

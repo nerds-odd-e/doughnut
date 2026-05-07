@@ -12,7 +12,6 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
@@ -54,7 +53,6 @@ class TestabilityRestController {
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
   @Autowired NotebookService notebookService;
-  @Autowired NoteService noteService;
   @Autowired FolderRepository folderRepository;
   @Autowired WikiTitleCacheService wikiTitleCacheService;
 
@@ -320,26 +318,6 @@ class TestabilityRestController {
       return circle.getOwnership();
     }
     return user.getOwnership();
-  }
-
-  @PostMapping("/create_relationships")
-  @Transactional
-  public String createRelationships(@RequestBody HashMap<String, String> relationshipInfo) {
-    Note sourceNote =
-        entityPersister.find(Note.class, Integer.valueOf(relationshipInfo.get("source_id")));
-    Note targetNote =
-        entityPersister.find(Note.class, Integer.valueOf(relationshipInfo.get("target_id")));
-    RelationType type = RelationType.fromLabel(relationshipInfo.get("type"));
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    User creator = sourceNote.getCreator();
-    noteService.createRelationship(
-        sourceNote,
-        targetNote,
-        creator,
-        type,
-        currentUTCTimestamp,
-        RelationshipNotePlacement.RELATIONS_SUBFOLDER);
-    return "OK";
   }
 
   @PostMapping("/share_to_bazaar")
