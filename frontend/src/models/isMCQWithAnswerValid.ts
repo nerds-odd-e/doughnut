@@ -1,7 +1,7 @@
 import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
 
 function isMCQWithAnswerValid(predefinedQuestion: PredefinedQuestion): boolean {
-  const { f0__stem: stem, f1__choices: choices } =
+  const { questionStem: stem, responseChoices: choices } =
     predefinedQuestion.multipleChoicesQuestion
   const { correctAnswerIndex } = predefinedQuestion
 

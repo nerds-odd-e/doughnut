@@ -8,33 +8,33 @@ public class MCQWithAnswerBuilder {
   MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
 
   public MCQWithAnswer please() {
-    MultipleChoicesQuestion mcq = mcqWithAnswer.getF0__multipleChoicesQuestion();
-    if (mcq.getF0__stem() == null) {
-      mcq.setF0__stem("a default question stem");
+    MultipleChoicesQuestion mcq = mcqWithAnswer.getQuestion();
+    if (mcq.getQuestionStem() == null) {
+      mcq.setQuestionStem("a default question stem");
     }
-    if (mcq.getF1__choices() == null) {
-      mcq.setF1__choices(List.of("choice1", "choice2", "choice3"));
+    if (mcq.getResponseChoices() == null) {
+      mcq.setResponseChoices(List.of("choice1", "choice2", "choice3"));
     }
     return mcqWithAnswer;
   }
 
   public MCQWithAnswerBuilder stem(String stem) {
-    mcqWithAnswer.getF0__multipleChoicesQuestion().setF0__stem(stem);
+    mcqWithAnswer.getQuestion().setQuestionStem(stem);
     return this;
   }
 
   public MCQWithAnswerBuilder choices(String... choices) {
-    mcqWithAnswer.getF0__multipleChoicesQuestion().setF1__choices(List.of(choices));
+    mcqWithAnswer.getQuestion().setResponseChoices(List.of(choices));
     return this;
   }
 
   public MCQWithAnswerBuilder correctChoiceIndex(int i) {
-    mcqWithAnswer.setF1__correctChoiceIndex(i);
+    mcqWithAnswer.setSolutionChoiceIndex(i);
     return this;
   }
 
   public MCQWithAnswerBuilder strictChoiceOrder(boolean b) {
-    mcqWithAnswer.setF2__strictChoiceOrder(b);
+    mcqWithAnswer.setStrictChoiceOrder(b);
     return this;
   }
 }

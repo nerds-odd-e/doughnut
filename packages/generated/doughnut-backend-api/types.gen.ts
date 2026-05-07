@@ -145,8 +145,8 @@ export type PredefinedQuestionsTestData = {
 };
 
 export type MultipleChoicesQuestion = {
-    f0__stem: string;
-    f1__choices: Array<string>;
+    questionStem: string;
+    responseChoices: Array<string>;
 };
 
 export type PredefinedQuestion = {

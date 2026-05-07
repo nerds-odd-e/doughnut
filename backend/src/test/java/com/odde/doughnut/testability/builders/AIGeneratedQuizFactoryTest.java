@@ -42,7 +42,7 @@ class AIGeneratedQuizFactoryTest {
   void shouldIncludeQuestionStem() {
     RecallPrompt recallPrompt = buildQuestion();
     assertThat(
-        recallPrompt.getMultipleChoicesQuestion().getF0__stem(),
+        recallPrompt.getMultipleChoicesQuestion().getQuestionStem(),
         containsString("How long did it take to build Rome?"));
   }
 
@@ -58,9 +58,7 @@ class AIGeneratedQuizFactoryTest {
     @Test
     void correct() {
       RecallPrompt recallPrompt =
-          questionBuilder()
-              .answerChoiceIndex(mcqWithAnswer.getF1__correctChoiceIndex())
-              .please(false);
+          questionBuilder().answerChoiceIndex(mcqWithAnswer.getSolutionChoiceIndex()).please(false);
       assertTrue(recallPrompt.getAnswer().getCorrect());
     }
   }

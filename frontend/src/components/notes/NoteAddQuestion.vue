@@ -3,13 +3,13 @@
     <TextArea
       :rows="2"
       field="stem"
-      v-model="multipleChoicesQuestion.f0__stem"
+      v-model="multipleChoicesQuestion.questionStem"
     /><br />
-    <div v-for="(_, index) in multipleChoicesQuestion.f1__choices" :key="index">
+    <div v-for="(_, index) in multipleChoicesQuestion.responseChoices" :key="index">
       <TextArea
         :field="'choice ' + index"
         :rows="1"
-        v-model="multipleChoicesQuestion.f1__choices[index]"
+        v-model="multipleChoicesQuestion.responseChoices[index]"
       />
       <br />
     </div>
@@ -21,7 +21,7 @@
     <button
       @click="addChoice"
       :disabled="
-        multipleChoicesQuestion.f1__choices.length >= maximumNumberOfChoices
+        multipleChoicesQuestion.responseChoices.length >= maximumNumberOfChoices
       "
       class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-mr-2"
     >
@@ -30,7 +30,7 @@
     <button
       @click="removeChoice"
       :disabled="
-        multipleChoicesQuestion.f1__choices.length <= minimumNumberOfChoices
+        multipleChoicesQuestion.responseChoices.length <= minimumNumberOfChoices
       "
       class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-mr-2"
     >
@@ -80,8 +80,8 @@ const props = defineProps({
 const predefinedQuestion = ref<PredefinedQuestion>({
   correctAnswerIndex: 0,
   multipleChoicesQuestion: {
-    f0__stem: "",
-    f1__choices: ["", ""],
+    questionStem: "",
+    responseChoices: ["", ""],
   },
 } as PredefinedQuestion)
 
@@ -101,32 +101,34 @@ const multipleChoicesQuestion = computed(
 const dirty = computed(() => {
   for (
     let i = 0;
-    i < multipleChoicesQuestion.value.f1__choices.length;
+    i < multipleChoicesQuestion.value.responseChoices.length;
     i += 1
   ) {
-    if (multipleChoicesQuestion.value.f1__choices[i]) {
+    if (multipleChoicesQuestion.value.responseChoices[i]) {
       return true
     }
   }
   return (
-    multipleChoicesQuestion.value.f0__stem !== undefined &&
-    multipleChoicesQuestion.value.f0__stem.trim().length > 0
+    multipleChoicesQuestion.value.questionStem !== undefined &&
+    multipleChoicesQuestion.value.questionStem.trim().length > 0
   )
 })
 
 const addChoice = () => {
   if (
-    multipleChoicesQuestion.value.f1__choices.length < maximumNumberOfChoices
+    multipleChoicesQuestion.value.responseChoices.length <
+    maximumNumberOfChoices
   ) {
-    multipleChoicesQuestion.value.f1__choices.push("")
+    multipleChoicesQuestion.value.responseChoices.push("")
   }
 }
 
 const removeChoice = () => {
   if (
-    multipleChoicesQuestion.value.f1__choices.length > minimumNumberOfChoices
+    multipleChoicesQuestion.value.responseChoices.length >
+    minimumNumberOfChoices
   ) {
-    multipleChoicesQuestion.value.f1__choices.pop()
+    multipleChoicesQuestion.value.responseChoices.pop()
   }
 }
 

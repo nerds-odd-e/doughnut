@@ -3179,15 +3179,15 @@ components:
     MultipleChoicesQuestion:
       type: object
       properties:
-        f0__stem:
+        questionStem:
           type: string
-        f1__choices:
+        responseChoices:
           type: array
           items:
             type: string
       required:
-      - f0__stem
-      - f1__choices
+      - questionStem
+      - responseChoices
     PredefinedQuestion:
       type: object
       properties:

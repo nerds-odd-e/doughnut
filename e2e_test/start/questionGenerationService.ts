@@ -1,6 +1,17 @@
-import type { McqWithAnswer } from '@generated/doughnut-backend-api/types.gen'
 import type { TextMessageToMatch } from './mock_services/MessageToMatch'
 import mock_services from './mock_services'
+
+/** Shape of JSON returned by OpenAI tool calls for MCQ (not all fields are in OpenAPI). */
+type McqWithAnswer = {
+  question: {
+    questionStem: string
+    responseChoices: string[]
+  }
+  solutionChoiceIndex: number
+  strictChoiceOrder: boolean
+  testedFocus?: string
+  validationRationale?: string
+}
 
 const createMcqWithAnswer = (
   stem: string,
@@ -8,11 +19,11 @@ const createMcqWithAnswer = (
   incorrectChoice1: string,
   incorrectChoice2: string
 ): McqWithAnswer => ({
-  f1__correctChoiceIndex: 0,
-  f2__strictChoiceOrder: true,
-  f0__multipleChoicesQuestion: {
-    f0__stem: stem,
-    f1__choices: [correctChoice, incorrectChoice1, incorrectChoice2],
+  solutionChoiceIndex: 0,
+  strictChoiceOrder: true,
+  question: {
+    questionStem: stem,
+    responseChoices: [correctChoice, incorrectChoice1, incorrectChoice2],
   },
 })
 

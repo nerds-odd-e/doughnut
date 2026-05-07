@@ -68,7 +68,7 @@ class NoteQuestionGenerationServiceTests {
       MCQWithAnswer generatedQuestion = service.generateQuestion(testNote, null);
 
       assertThat(
-          generatedQuestion.getF0__multipleChoicesQuestion().getF0__stem(),
+          generatedQuestion.getQuestion().getQuestionStem(),
           containsString("What is the first color in the rainbow?"));
     }
 

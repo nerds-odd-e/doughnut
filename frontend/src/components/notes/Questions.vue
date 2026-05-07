@@ -34,17 +34,17 @@
       <tbody>
         <tr
           v-for="question in questions"
-          :key="question.multipleChoicesQuestion.f0__stem"
+          :key="question.multipleChoicesQuestion.questionStem"
         >
           <td>
-            {{ question.multipleChoicesQuestion.f0__stem }}
+            {{ question.multipleChoicesQuestion.questionStem }}
           </td>
           <template
-            v-if="question.multipleChoicesQuestion.f1__choices"
+            v-if="question.multipleChoicesQuestion.responseChoices"
           >
             <td
               v-for="(choice, index) in question
-                .multipleChoicesQuestion.f1__choices"
+                .multipleChoicesQuestion.responseChoices"
               :class="{
                 'correct-choice': index === question.correctAnswerIndex,
               }"

@@ -12,6 +12,6 @@ public class MCQWithAnswerForRefinement extends MCQWithAnswer {
       MultipleChoicesQuestion multipleChoicesQuestion,
       int correctChoiceIndex,
       boolean strictChoiceOrder) {
-    super(multipleChoicesQuestion, correctChoiceIndex, strictChoiceOrder);
+    super(multipleChoicesQuestion, correctChoiceIndex, strictChoiceOrder, null, null);
   }
 }

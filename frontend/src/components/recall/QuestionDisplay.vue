@@ -1,10 +1,10 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-max-w-6xl daisy-mx-auto" data-test="question-section">
     <InactiveRecallMask :show="isActiveQuestion && isPaused" />
-    <QuestionStem :stem="multipleChoicesQuestion.f0__stem" />
+    <QuestionStem :stem="multipleChoicesQuestion.questionStem" />
     <QuestionChoices
-      v-if="multipleChoicesQuestion.f1__choices"
-      :choices="multipleChoicesQuestion.f1__choices"
+      v-if="multipleChoicesQuestion.responseChoices"
+      :choices="multipleChoicesQuestion.responseChoices"
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answer?.choiceIndex"
       :disabled="disabled"

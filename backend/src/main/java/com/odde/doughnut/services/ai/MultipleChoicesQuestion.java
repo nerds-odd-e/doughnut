@@ -15,11 +15,11 @@ public class MultipleChoicesQuestion {
   @JsonPropertyDescription(
       "The question stem — the full, self-contained text of the prompt. Must not reference external context.")
   @JsonProperty(required = true)
-  @JsonAlias("stem")
-  private String f0__stem;
+  @JsonAlias({"f0__stem", "stem"})
+  private String questionStem;
 
   @JsonPropertyDescription("List of choices. Markdown allowed.")
   @JsonProperty(required = true)
-  @JsonAlias("choices")
-  private List<String> f1__choices;
+  @JsonAlias({"f1__choices", "choices"})
+  private List<String> responseChoices;
 }

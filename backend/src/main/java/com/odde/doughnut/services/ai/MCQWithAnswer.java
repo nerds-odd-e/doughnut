@@ -18,28 +18,35 @@ import lombok.NoArgsConstructor;
 public class MCQWithAnswer {
 
   @JsonProperty(required = true)
-  @JsonAlias("multipleChoicesQuestion")
-  private MultipleChoicesQuestion f0__multipleChoicesQuestion = new MultipleChoicesQuestion();
+  @JsonAlias({"f0__multipleChoicesQuestion", "multipleChoicesQuestion"})
+  private MultipleChoicesQuestion question = new MultipleChoicesQuestion();
 
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
-  @JsonAlias("correctChoiceIndex")
-  private int f1__correctChoiceIndex;
+  @JsonAlias({"f1__correctChoiceIndex", "correctChoiceIndex"})
+  private int solutionChoiceIndex;
 
   @JsonPropertyDescription(
       "If true, the order of choices must be preserved and must not be randomized.")
   @JsonProperty(required = true)
-  @JsonAlias("strictChoiceOrder")
-  private boolean f2__strictChoiceOrder;
+  @JsonAlias({"f2__strictChoiceOrder", "strictChoiceOrder"})
+  private boolean strictChoiceOrder;
+
+  @JsonPropertyDescription(
+      "Internal summary of the specific focus-note knowledge point tested. Not shown to the learner.")
+  private String testedFocus;
+
+  @JsonPropertyDescription(
+      "Internal explanation of why the solution choice is uniquely correct and the other choices are incorrect. Note ambiguity if any. Not shown to the learner.")
+  private String validationRationale;
 
   @JsonIgnore
   public boolean isValid() {
-    if (f0__multipleChoicesQuestion == null) return false;
-    if (f0__multipleChoicesQuestion.getF0__stem() == null
-        || f0__multipleChoicesQuestion.getF0__stem().isBlank()) return false;
-    if (f0__multipleChoicesQuestion.getF1__choices() == null) return false;
-    int choicesCount = f0__multipleChoicesQuestion.getF1__choices().size();
+    if (question == null) return false;
+    if (question.getQuestionStem() == null || question.getQuestionStem().isBlank()) return false;
+    if (question.getResponseChoices() == null) return false;
+    int choicesCount = question.getResponseChoices().size();
     if (choicesCount == 0) return false;
-    return f1__correctChoiceIndex >= 0 && f1__correctChoiceIndex < choicesCount;
+    return solutionChoiceIndex >= 0 && solutionChoiceIndex < choicesCount;
   }
 }

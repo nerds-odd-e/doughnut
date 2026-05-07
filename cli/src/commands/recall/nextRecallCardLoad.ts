@@ -93,12 +93,12 @@ export function recallMcqPayloadFromRecallPrompt(
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
   const mq = prompt.multipleChoicesQuestion
-  const choices = mq?.f1__choices
+  const choices = mq?.responseChoices
   if (choices === undefined || choices.length === 0) return null
   return {
     memoryTrackerId,
     recallPromptId: prompt.id,
-    stem: mq?.f0__stem?.trim() ?? '',
+    stem: mq?.questionStem?.trim() ?? '',
     choices,
     notebookName: prompt.notebook.name.trim(),
   }
