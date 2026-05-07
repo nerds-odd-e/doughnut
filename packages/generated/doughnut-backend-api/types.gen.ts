@@ -3219,6 +3219,9 @@ export type GetGraphData = {
         note: number;
     };
     query: {
+        /**
+         * Approximate token budget for focus note details plus related note details combined (bodies).
+         */
         tokenLimit: number;
     };
     url: '/api/notes/{note}/graph';
@@ -3239,6 +3242,9 @@ export type GetAiContextMarkdownData = {
         note: number;
     };
     query: {
+        /**
+         * Approximate token budget for focus note details plus related note details combined (bodies).
+         */
         tokenLimit: number;
     };
     url: '/api/notes/{note}/ai-context-markdown';

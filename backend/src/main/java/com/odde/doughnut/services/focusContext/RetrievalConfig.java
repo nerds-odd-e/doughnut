@@ -7,12 +7,12 @@ public class RetrievalConfig {
 
   private final int maxDepth;
   private final Long sampleSeed;
-  private final Integer relatedNotesTotalBudgetTokens;
+  private final Integer contentTokenBudgetOverride;
 
-  public RetrievalConfig(int maxDepth, Long sampleSeed, Integer relatedNotesBudget) {
+  public RetrievalConfig(int maxDepth, Long sampleSeed, Integer contentTokenBudgetOverride) {
     this.maxDepth = maxDepth;
     this.sampleSeed = sampleSeed;
-    this.relatedNotesTotalBudgetTokens = relatedNotesBudget;
+    this.contentTokenBudgetOverride = contentTokenBudgetOverride;
   }
 
   /** Default max traversal depth for question generation and similar flows. */
@@ -28,9 +28,12 @@ public class RetrievalConfig {
     return new RetrievalConfig(1, null, null);
   }
 
-  /** Related-note token budget for {@code GET /notes/{id}/graph}. */
-  public static RetrievalConfig forGraphApi(int relatedNotesTokenBudget) {
-    return new RetrievalConfig(DEFAULT_MAX_DEPTH, null, relatedNotesTokenBudget);
+  /**
+   * Combined approximate token budget for focus and related note details for {@code GET
+   * /notes/{id}/graph}.
+   */
+  public static RetrievalConfig forGraphApi(int combinedContentTokenBudget) {
+    return new RetrievalConfig(DEFAULT_MAX_DEPTH, null, combinedContentTokenBudget);
   }
 
   public int getMaxDepth() {
@@ -45,9 +48,13 @@ public class RetrievalConfig {
     return Optional.ofNullable(sampleSeed);
   }
 
-  public int getRelatedNotesTotalBudgetTokens() {
-    return relatedNotesTotalBudgetTokens != null
-        ? relatedNotesTotalBudgetTokens
-        : FocusContextConstants.RELATED_NOTES_TOTAL_BUDGET_TOKENS;
+  /**
+   * Approximate token budget for focus note details plus all related note details combined (bodies
+   * only; same unit as {@link com.odde.doughnut.services.ApproximateUtf8TokenBudget}).
+   */
+  public int getFocusContextContentTokenBudget() {
+    return contentTokenBudgetOverride != null
+        ? contentTokenBudgetOverride
+        : FocusContextConstants.FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET;
   }
 }

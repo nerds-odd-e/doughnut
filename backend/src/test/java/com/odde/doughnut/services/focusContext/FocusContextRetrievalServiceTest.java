@@ -303,15 +303,19 @@ class FocusContextRetrievalServiceTest {
   class TokenBudget {
     @Test
     void relatedNotesBudgetCapsNumberOfIncludedNotes() {
+      List<String> titles =
+          List.of(
+              "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
+              "R", "S", "T");
+      StringBuilder linkLine = new StringBuilder("See ");
+      for (String t : titles) {
+        linkLine.append("[[").append(t).append("]] ");
+      }
       Note focusNote =
-          makeMe
-              .aNote()
-              .title("Focus")
-              .details("See [[A]] [[B]] [[C]] [[D]] [[E]] [[F]].")
-              .please();
+          makeMe.aNote().title("Focus").details(linkLine.toString().trim() + ".").please();
       User viewer = focusNote.getCreator();
       String largeDetails = "x".repeat(3500);
-      for (String title : List.of("A", "B", "C", "D", "E", "F")) {
+      for (String title : titles) {
         makeMe
             .aNote()
             .creator(viewer)
@@ -324,7 +328,7 @@ class FocusContextRetrievalServiceTest {
 
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 
-      assertThat(result.getRelatedNotes().size(), lessThan(6));
+      assertThat(result.getRelatedNotes().size(), lessThan(titles.size()));
     }
   }
 
@@ -543,7 +547,14 @@ class FocusContextRetrievalServiceTest {
       refreshWikiCache(bridge);
 
       FocusContextResult result =
-          service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
+          service.retrieve(
+              focus,
+              viewer,
+              new RetrievalConfig(
+                  2,
+                  null,
+                  /* combined content budget: tight enough that depth-1 spends exhaust wiki share before BridgeBudget */
+                  800));
 
       List<String> wikiTitles =
           result.getRelatedNotes().stream()

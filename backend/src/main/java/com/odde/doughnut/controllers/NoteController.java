@@ -16,6 +16,7 @@ import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -178,7 +179,12 @@ class NoteController {
 
   @GetMapping("/{note}/graph")
   public FocusContextResult getGraph(
-      @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Parameter(
+              description =
+                  "Approximate token budget for focus note details plus related note details combined (bodies).")
+          @RequestParam()
+          int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     User user = authorizationService.getCurrentUser();
@@ -190,11 +196,16 @@ class NoteController {
   /**
    * Focus-context markdown for this note (same render as {@link
    * com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer}). {@code tokenLimit} is
-   * the related-notes budget, matching {@link #getGraph(Note, int)}.
+   * the combined focus-plus-related details budget, matching {@link #getGraph(Note, int)}.
    */
   @GetMapping("/{note}/ai-context-markdown")
   public NoteAiContextMarkdown getAiContextMarkdown(
-      @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Parameter(
+              description =
+                  "Approximate token budget for focus note details plus related note details combined (bodies).")
+          @RequestParam()
+          int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     User user = authorizationService.getCurrentUser();

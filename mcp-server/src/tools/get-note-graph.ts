@@ -19,7 +19,7 @@ const NoteIdParamsSchema = z.object({
   tokenLimit: z
     .number()
     .describe(
-      'A valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window.'
+      'Approximate token budget for the focus note body plus all related note bodies combined. Pick a value that fits your remaining context window.'
     ),
 })
 
@@ -51,16 +51,16 @@ export const getNoteGraphTool = createTool(
 
 What this returns (JSON):
 - **focusNote** — The requested note (depth 0) with title, notebook, folder path, truncated details when needed, and lightweight lists: **outgoingLinks** and **inboundReferences** (wiki-style link strings), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
-- **relatedNotes** — Notes reached within a token budget and max traversal depth. Each entry includes **depth**, **retrievalPath** (how the note was reached from the focus), **edgeType** (\`OutgoingWikiLink\`, \`InboundWikiReference\`, or \`FolderSibling\`), and truncated **details** when needed.
+- **relatedNotes** — Notes reached within the post-focus share of the combined token budget and max traversal depth. Each entry includes **depth**, **retrievalPath** (how the note was reached from the focus), **edgeType** (\`OutgoingWikiLink\`, \`InboundWikiReference\`, or \`FolderSibling\`), and truncated **details** when needed.
 
 Use cases:
 - Inspect how a note connects to the rest of the notebook before answering questions about it.
 - After search, pull bounded context around a candidate note without loading the whole notebook.
 
 You MUST obtain a valid note ID first using 'find_most_relevant_note' unless the user explicitly provides a numeric note ID.
-You MUST provide a valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window. Example of a valid token limits:
-1. If the note is short and the context window is large, you might set a higher token limit (e.g., 5000 tokens).
-2. If the note is long or the context window is small, you might need to set a lower token limit (e.g., 500 tokens).
+You MUST provide a valid token limit (combined budget for focus plus related note bodies). Example choices:
+1. Short focus note and a large context window → higher limit (e.g., 5000).
+2. Long focus note or a small context window → lower limit (e.g., 500); a large focus body consumes budget before related notes are included.
 
 Navigation pattern:
 1. Use 'find_most_relevant_note' to find relevant notes

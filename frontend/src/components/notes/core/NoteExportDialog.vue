@@ -3,7 +3,8 @@
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
       <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2">
-        Focus-context markdown (related-notes token budget applies to linked context, same as graph export).
+        Focus-context markdown. The token budget limits approximate size of the focus note body plus
+        all included related note bodies combined (same value for graph JSON below).
       </p>
       <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
         <label for="context-token-limit" class="daisy-label-text">Token budget:</label>
@@ -50,7 +51,9 @@
           Export Note Graph (JSON)
         </summary>
         <div v-if="expandedGraph" class="daisy-mt-4">
-          <p class="daisy-text-xs daisy-text-base-content/60 daisy-mb-2">Uses the token budget above.</p>
+          <p class="daisy-text-xs daisy-text-base-content/60 daisy-mb-2">
+            Uses the same combined token budget as above.
+          </p>
           <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
             <button
               class="daisy-btn daisy-btn-ghost daisy-btn-xs"

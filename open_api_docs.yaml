@@ -2496,6 +2496,8 @@ paths:
           type: integer
       - name: tokenLimit
         in: query
+        description: Approximate token budget for focus note details plus related
+          note details combined (bodies).
         required: true
         schema:
           type: integer
@@ -2520,6 +2522,8 @@ paths:
           type: integer
       - name: tokenLimit
         in: query
+        description: Approximate token budget for focus note details plus related
+          note details combined (bodies).
         required: true
         schema:
           type: integer

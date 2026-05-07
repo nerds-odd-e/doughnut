@@ -59,9 +59,14 @@ public class FocusContextRetrievalService {
                         .findFirst())
             .orElse(focusNote);
 
+    int combinedContentBudget = config.getFocusContextContentTokenBudget();
+    int focusDetailTruncationCap =
+        Math.min(
+            FocusContextConstants.FOCUS_NOTE_DETAILS_MAX_TOKENS,
+            Math.max(0, combinedContentBudget));
     String focusDetails =
         ApproximateUtf8TokenBudget.truncateByApproxTokens(
-            hydrated.getDetails(), FocusContextConstants.FOCUS_NOTE_DETAILS_MAX_TOKENS);
+            hydrated.getDetails(), focusDetailTruncationCap);
     boolean focusTruncated =
         focusDetails != null
             && hydrated.getDetails() != null
@@ -80,7 +85,8 @@ public class FocusContextRetrievalService {
             wikiTitleCacheService.referencesNotesForViewer(hydrated, viewer),
             FocusContextConstants.FOCUS_INBOUND_URI_CAP,
             rng);
-    int relatedTotalBudget = config.getRelatedNotesTotalBudgetTokens();
+    int focusContentTokens = ApproximateUtf8TokenBudget.estimateApproxTokens(focusDetails);
+    int relatedTotalBudget = Math.max(0, combinedContentBudget - focusContentTokens);
     boolean includeFolderPeers =
         relatedTotalBudget >= FocusContextConstants.MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT;
 
