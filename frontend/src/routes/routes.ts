@@ -3,7 +3,7 @@ import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
-import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
+import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
 import RecallPage from "@/pages/RecallPage.vue"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
@@ -35,7 +35,7 @@ const componentMap: Record<string, unknown> = {
   noteShow: NoteShowPage,
   circleShow: CircleShowPage,
   bazaar: BazaarPage,
-  assessmentAndCertificateHistory: AssessmentAndCertificateHistoryPage,
+  assessmentHistory: AssessmentHistoryPage,
   adminDashboard: AdminDashboardPage,
   circleJoin: CircleJoinPage,
   messageCenter: MessageCenterPage,

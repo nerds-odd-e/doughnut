@@ -30,20 +30,6 @@ When(
 )
 
 Then(
-  'I should see a certification icon on the {string} notebook card in the bazaar',
-  (notebook: string) => {
-    start.navigateToBazaar().expectCertificationIcon(notebook, true)
-  }
-)
-
-Then(
-  'I should see no certification icon on the {string} notebook card in the bazaar',
-  (notebook: string) => {
-    start.navigateToBazaar().expectCertificationIcon(notebook, false)
-  }
-)
-
-Then(
   'I can not see add the notebook {string} to my learning in the bazaar',
   (noteTopology: string) => {
     start.navigateToBazaar().expectNoAddToMyLearningButton(noteTopology)

@@ -21,8 +21,7 @@ import lombok.Setter;
   "notebookId",
   "notebookName",
   "submittedAt",
-  "isPass",
-  "isCertifiable"
+  "isPass"
 })
 public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @ManyToOne
@@ -58,10 +57,6 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
 
   public Boolean getIsPass() {
     return ((double) getAnswersCorrect() / getTotalQuestionCount()) >= 0.8;
-  }
-
-  public boolean isCertifiable() {
-    return getNotebook().isCertifiable();
   }
 
   public void buildAssessmentQuestionInstance(PredefinedQuestion predefinedQuestion) {

@@ -46,28 +46,6 @@ When('I change notebook {string} to skip recall', (noteTopology: string) => {
   start.navigateToNotebookPage(noteTopology).skipMemoryTracking()
 })
 
-When('I request for an approval for notebook {string}', (notebook: string) => {
-  start.navigateToNotebookPage(notebook).requestForNotebookApproval()
-})
-
-When(
-  'the approval for the notebook {string} is {string}',
-  (noteTopology: string, status: string) => {
-    start
-      .navigateToNotebookPage(noteTopology)
-      .expectNotebookApprovalStatus(status)
-  }
-)
-
-Then(
-  'I should see the status {string} of the approval for notebook {string}',
-  (status: string, noteTopology: string) => {
-    start
-      .navigateToNotebookPage(noteTopology)
-      .expectNotebookApprovalStatus(status)
-  }
-)
-
 Then('I unsubscribe from notebook {string}', (noteTopology: string) => {
   start.navigateToNotebooksPage().notebookCard(noteTopology).unsubscribe()
 })
@@ -104,13 +82,6 @@ When(
     })
   }
 )
-
-Given('following notebooks have pending approval:', (notebooks: DataTable) => {
-  notebooks.raw().forEach((notebookRaw: string[]) => {
-    const notebookName = notebookRaw[0]!
-    start.navigateToNotebookPage(notebookName).requestForNotebookApproval()
-  })
-})
 
 function wrongAnswerChoiceForAssessmentStem(stem: string): string {
   const normalized = stem.replace(/\s+/g, ' ').trim()

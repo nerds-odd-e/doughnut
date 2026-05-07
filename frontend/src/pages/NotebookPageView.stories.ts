@@ -39,14 +39,7 @@ export const Default: Story = {
 // Notebook with custom settings
 export const WithCustomSettings: Story = {
   args: {
-    notebook: {
-      ...makeMe.aNotebook.numberOfQuestionsInAssessment(5).please(),
-      notebookSettings: {
-        ...makeMe.aNotebook.numberOfQuestionsInAssessment(5).please()
-          .notebookSettings,
-        certificateExpiry: "2y 3m",
-      },
-    },
+    notebook: makeMe.aNotebook.numberOfQuestionsInAssessment(5).please(),
     user: mockUser,
   },
 }

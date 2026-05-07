@@ -29,10 +29,8 @@ erDiagram
     notebook ||--o{ assessment_attempt : "notebook_id"
     notebook ||--o{ bazaar_notebook : "notebook_id"
     notebook ||--o{ book : "notebook_id"
-    notebook ||--o{ certificate : "notebook_id"
     notebook ||--o{ folder : "notebook_id"
     notebook ||--o{ "note" : "notebook_id"
-    notebook ||--o{ notebook_certificate_approval : "notebook_id"
     notebook ||--o{ subscription : "notebook_id"
     notebook_group ||--o{ notebook : "notebook_group_id"
     notebook_group ||--o{ subscription : "notebook_group_id"
@@ -47,7 +45,6 @@ erDiagram
     "user" ||--o{ assessment_attempt : "user_id"
     "user" ||--o{ book_block_reading_record : "user_id"
     "user" ||--o{ book_user_last_read_position : "user_id"
-    "user" ||--o{ certificate : "user_id"
     "user" ||--o{ circle_user : "user_id"
     "user" ||--o{ conversation : "conversation_initiator_id"
     "user" ||--o{ conversation_message : "sender"
@@ -98,11 +95,6 @@ erDiagram
         int user_id FK
         int book_id FK
         int selected_book_block_id FK
-    }
-    certificate {
-        int id PK
-        int user_id FK
-        int notebook_id FK
     }
     circle {
         int id PK
@@ -176,10 +168,6 @@ erDiagram
     notebook_ai_assistant {
         bigint id PK
         int notebook_id UK
-    }
-    notebook_certificate_approval {
-        int id PK
-        int notebook_id UK FK
     }
     notebook_group {
         int id PK

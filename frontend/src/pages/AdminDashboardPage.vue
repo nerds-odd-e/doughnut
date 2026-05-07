@@ -20,12 +20,6 @@
       @click.prevent="setActivePage('manageBazaar')"
     >Manage Bazaar</a>
     <a
-      :class="`daisy-tab daisy-tab-lg ${activePage === 'certificateRequests' ? 'daisy-tab-active' : ''}`"
-      role="button"
-      href="#"
-      @click.prevent="setActivePage('certificateRequests')"
-    >Certification Requests</a>
-    <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'users' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
@@ -42,7 +36,6 @@
     <FailureReportList v-if="activePage === 'failureReport'" />
     <ManageModel v-if="activePage === 'manageModel'" />
     <ManageBazaar v-if="activePage === 'manageBazaar'" />
-    <CertificateRequests v-if="activePage === 'certificateRequests'" />
     <UserListing v-if="activePage === 'users'" />
     <DataMigrationPanel v-if="activePage === 'dataMigration'" />
   </div>
@@ -55,7 +48,6 @@ import FailureReportList from "../components/admin/FailureReportList.vue"
 import ManageModel from "../components/admin/ManageModel.vue"
 import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
-import CertificateRequests from "../components/admin/CertificateRequests.vue"
 import UserListing from "../components/admin/UserListing.vue"
 import DataMigrationPanel from "../components/admin/DataMigrationPanel.vue"
 
@@ -63,7 +55,6 @@ type TabType =
   | "failureReport"
   | "manageModel"
   | "manageBazaar"
-  | "certificateRequests"
   | "users"
   | "dataMigration"
 
@@ -77,7 +68,6 @@ const activePage = computed({
       tab === "failureReport" ||
       tab === "manageModel" ||
       tab === "manageBazaar" ||
-      tab === "certificateRequests" ||
       tab === "users" ||
       tab === "dataMigration"
     ) {

@@ -22,9 +22,6 @@
       <SvgAssessment />
     </button>
   </div>
-  <div v-if="notebook.certifiable" class="daisy-p-1 certification-icon" >
-    <SvgCertifiedAssessment/>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -36,7 +33,6 @@ import usePopups from "../commons/Popups/usePopups"
 import { Plus } from "lucide-vue-next"
 import SvgAssessment from "../svgs/SvgAssessment.vue"
 import SubscribeDialog from "./SubscribeDialog.vue"
-import SvgCertifiedAssessment from "../svgs/SvgCertifiedAssessment.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },

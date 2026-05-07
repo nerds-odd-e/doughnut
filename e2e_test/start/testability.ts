@@ -228,8 +228,7 @@ const testability = () => {
     },
     injectYesNoQuestionsForNumberNotes(
       notebook: string,
-      numberOfNotes: number,
-      notebookCertifiable?: boolean
+      numberOfNotes: number
     ) {
       const predefinedQuestion: Record<string, string>[] = new Array(
         numberOfNotes
@@ -244,23 +243,17 @@ const testability = () => {
         }))
       return this.injectPredefinedQuestionsToNotebook({
         notebookName: notebook,
-        notebookCertifiable,
         predefinedQuestionTestData: predefinedQuestion,
       })
     },
     injectNumbersNotebookWithQuestions(
       notebook: string,
       numberOfQuestion: number,
-      creatorId: string,
-      notebookCertifiable?: boolean
+      creatorId: string
     ) {
       return this.injectNumberNotes(notebook, numberOfQuestion, creatorId)
         .then(() =>
-          this.injectYesNoQuestionsForNumberNotes(
-            notebook,
-            numberOfQuestion,
-            notebookCertifiable
-          )
+          this.injectYesNoQuestionsForNumberNotes(notebook, numberOfQuestion)
         )
         .then(() => this.shareToBazaar(notebook))
     },

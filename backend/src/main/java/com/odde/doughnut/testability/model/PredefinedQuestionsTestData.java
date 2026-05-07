@@ -13,7 +13,6 @@ import lombok.Setter;
 @Data
 public class PredefinedQuestionsTestData {
   private String notebookName;
-  private Boolean notebookCertifiable;
   private List<PredefinedQuestionTestData> predefinedQuestionTestData;
 
   @Setter

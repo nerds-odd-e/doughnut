@@ -19,7 +19,6 @@ import org.springframework.lang.NonNull;
 @Table(name = "notebook")
 @JsonPropertyOrder({
   "id",
-  "certifiable",
   "notebookSettings",
   "creatorId",
   "name",
@@ -57,11 +56,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
   @JsonIgnore
   private List<Subscription> subscriptions;
-
-  @OneToOne(mappedBy = "notebook")
-  @Getter
-  @JsonIgnore
-  private NotebookCertificateApproval notebookCertificateApproval;
 
   @Column(name = "updated_at")
   @Getter
@@ -102,11 +96,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   public void setName(String name) {
     this.name = name == null ? "" : name;
-  }
-
-  public boolean isCertifiable() {
-    return notebookCertificateApproval != null
-        && notebookCertificateApproval.getLastApprovalTime() != null;
   }
 
   @JsonIgnore

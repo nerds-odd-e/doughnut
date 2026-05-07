@@ -2,7 +2,7 @@ import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import { navigateToNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
-import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
+import { assumeAssessmentHistoryPage } from './assessmentHistoryPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
 import { manageAccessTokensPage } from './manageAccessTokensPage'
 
@@ -39,11 +39,11 @@ export const mainMenu = () => {
         logout() {
           cy.findByRole('link', { name: 'Logout' }).click({ force: true })
         },
-        myAssessmentAndCertificateHistory() {
+        myAssessmentHistory() {
           cy.findByRole('link', {
-            name: 'My Assessments and Certificates',
+            name: 'My Assessment History',
           }).click({ force: true })
-          return assumeAssessmentAndCertificateHistoryPage()
+          return assumeAssessmentHistoryPage()
         },
         manageAccessTokens() {
           cy.findByRole('link', { name: 'Manage Access Tokens' }).click({

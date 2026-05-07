@@ -14,11 +14,6 @@
           <div class="daisy-alert daisy-alert-success">
             You have passed the assessment.
           </div>
-          <AssessmentClaimCertificate
-            v-if="localAssessmentAttempt.certifiable"
-            :notebook-id="localAssessmentAttempt.notebookId!"
-          />
-          <i v-else> (This is not a certifiable assessment.)</i>
         </div>
         <div class="daisy-alert daisy-alert-danger" v-else="">You have not passed the assessment.</div>
       </div>
@@ -34,7 +29,6 @@ import { AssessmentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { AssessmentAttempt } from "@generated/doughnut-backend-api"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
-import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
 const props = defineProps({
   assessmentAttempt: {
     type: Object as PropType<AssessmentAttempt>,

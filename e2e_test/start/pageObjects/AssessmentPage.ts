@@ -1,5 +1,4 @@
 import { pageIsNotLoading } from '../pageBase'
-import { CertificatePopup } from './CertificatePopup'
 import { assumeQuestionPage } from './QuizQuestionPage'
 
 const assumeWrongAnswerPage = () => {
@@ -53,26 +52,12 @@ const assumeQuestionSection = () => {
 }
 
 const endOfAssessment = () => {
-  const findCertificateButton = () =>
-    cy.findByRole('button', { name: 'View Certificate' })
-
   return {
     passAssessment() {
       cy.findByText('You have passed the assessment.').should('be.visible')
     },
     expectNotPassAssessment() {
       cy.findByText('You have not passed the assessment.').should('be.visible')
-    },
-    expectCertificate() {
-      findCertificateButton().click()
-      return CertificatePopup()
-    },
-    expectNoCertificate() {
-      findCertificateButton().should('not.exist')
-    },
-    expectCertificateCannotBeObtained() {
-      cy.findByText('(This is not a certifiable assessment.)')
-      this.expectNoCertificate()
     },
   }
 }

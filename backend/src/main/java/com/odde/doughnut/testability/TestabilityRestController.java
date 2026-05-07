@@ -13,7 +13,6 @@ import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
@@ -55,7 +54,6 @@ class TestabilityRestController {
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
   @Autowired NotebookService notebookService;
-  @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
   @Autowired NoteService noteService;
   @Autowired FolderRepository folderRepository;
   @Autowired WikiTitleCacheService wikiTitleCacheService;
@@ -313,24 +311,17 @@ class TestabilityRestController {
     List<PredefinedQuestion> predefinedQuestions =
         predefinedQuestionsTestData.buildPredefinedQuestions(this.noteRepository);
     predefinedQuestions.forEach(question -> entityPersister.save(question));
-    updateNotebookSettings(
-        predefinedQuestions, predefinedQuestionsTestData.getNotebookCertifiable());
+    updateNotebookSettings(predefinedQuestions);
     return predefinedQuestions;
   }
 
-  private void updateNotebookSettings(
-      List<PredefinedQuestion> predefinedQuestions, Boolean notebookCertifiable) {
+  private void updateNotebookSettings(List<PredefinedQuestion> predefinedQuestions) {
     if (predefinedQuestions.isEmpty()) {
       return;
     }
     Notebook notebook = predefinedQuestions.getFirst().getNote().getNotebook();
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(predefinedQuestions.size());
     entityPersister.save(notebook);
-    if (notebookCertifiable != null && notebookCertifiable) {
-      NotebookCertificateApproval approval = notebookService.requestNotebookApproval(notebook);
-      notebookCertificateApprovalService.approve(
-          approval, testabilitySettings.getCurrentUTCTimestamp());
-    }
   }
 
   private Ownership getOwnership(NotesTestData notesTestData, User user) {

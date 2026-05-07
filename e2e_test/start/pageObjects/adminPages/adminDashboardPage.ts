@@ -55,24 +55,5 @@ export function assumeAdminDashboardPage() {
         },
       }
     },
-    goToCertificationRequestPage() {
-      this.goToTabInAdminDashboard('Certification Requests')
-      return {
-        approve(notebook: string) {
-          cy.findByText(notebook)
-            .parentsUntil('tr')
-            .parent()
-            .findByRole('button', { name: 'Approve' })
-            .click()
-          cy.findByRole('button', { name: 'OK' }).click()
-        },
-        listContainsExactly(notebooks: string[]) {
-          cy.get('tbody tr').should('have.length', notebooks.length)
-          notebooks.forEach((notebook) => {
-            cy.findByText(notebook).should('exist')
-          })
-        },
-      }
-    },
   }
 }

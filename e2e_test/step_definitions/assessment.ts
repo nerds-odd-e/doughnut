@@ -82,17 +82,6 @@ When('I pass the assessment on {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).answerYesNoQuestionsToScore(2, 2)
 })
 
-Then('I can download a certificate after passing an assessment', () => {
-  start.assumeAssessmentPage().expectEndOfAssessment().expectCertificate()
-})
-
-Then('I cannot download a certificate after passing an assessment', () => {
-  start
-    .assumeAssessmentPage()
-    .expectEndOfAssessment()
-    .expectCertificateCannotBeObtained()
-})
-
 Then('I should pass the assessment of {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).expectEndOfAssessment().passAssessment()
 })
@@ -113,79 +102,19 @@ Given(
   }
 )
 
-Given(
-  'there is a certified notebook {string} by {string} with 2 questions, shared to the Bazaar',
-  (notebook: string, creatorId: string) => {
-    start
-      .testability()
-      .injectNumbersNotebookWithQuestions(notebook, 2, creatorId, true)
-  }
-)
-
 Then(
-  'I should see the result {string} for the notebook {string} in my assessment and certificate history',
+  'I should see the result {string} for the notebook {string} in my assessment history',
   (result: string, notebook: string) => {
     start
-      .navigateToAssessmentAndCertificatePage()
+      .navigateToAssessmentHistoryPage()
       .expectTableWithNumberOfRow(1)
       .checkAttemptResult(notebook, result)
-  }
-)
-
-When(
-  'I should get a certificate of {string} for {string} from {string}',
-  (notebook: string, user: string, creator: string) => {
-    start
-      .assumeAssessmentPage(notebook)
-      .expectEndOfAssessment()
-      .expectCertificate()
-      .expectCertificateFor(notebook)
-      .expectCertificateUser(user)
-      .expectCertificateCreator(creator)
-  }
-)
-
-Then(
-  'I should not get a certificate of {string} for {string} from {string}',
-  (notebook: string) => {
-    start
-      .assumeAssessmentPage(notebook)
-      .expectEndOfAssessment()
-      .expectNoCertificate()
   }
 )
 
 When('the current date is {string}', (dateString: string) => {
   start.testability().backendTimeTravelToDate(new Date(dateString))
 })
-
-When(
-  'I should see the original start date {string} on my renewed certificate for {string}',
-  (dateString: string, notebook: string) => {
-    start
-      .assumeAssessmentPage(notebook)
-      .expectEndOfAssessment()
-      .expectCertificate()
-      .expectDate(dateString)
-  }
-)
-
-Then(
-  'I can view the certificate for the notebook {string} in my assessment and certificate history',
-  (notebook: string) => {
-    start
-      .navigateToAssessmentAndCertificatePage()
-      .expectCertificate(notebook)
-      .expectCertificateFor(notebook)
-  }
-)
-
-Then(
-  'I cannot view the certificate for the notebook {string} in my assessment and certificate history',
-  (notebook: string) => {
-    start.navigateToAssessmentAndCertificatePage().expectNoCertificate(notebook)
-  }
-)
 
 Then(
   'I answer the question wrongly and submit feedback saying {string}',

@@ -6,7 +6,6 @@ import com.odde.doughnut.services.NoteEmbeddingService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.testability.builders.*;
-import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -86,11 +85,6 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public FolderBuilder theFolder(Folder folder) {
     return new FolderBuilder(this, folder);
-  }
-
-  public CertificateBuilder aCertificate(Notebook notebook, User user, Timestamp startDate) {
-
-    return new CertificateBuilder(notebook, user, startDate, this);
   }
 
   public AssessmentAttemptBuilder anAssessmentAttempt(User currentUser) {

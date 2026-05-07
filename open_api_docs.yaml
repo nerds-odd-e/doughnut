@@ -1263,42 +1263,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookClientView"
-  /api/notebook_certificate_approvals/{notebookCertificateApproval}/approve:
-    post:
-      tags:
-      - notebook-certificate-approval-controller
-      operationId: approve
-      parameters:
-      - name: notebookCertificateApproval
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NotebookCertificateApproval"
-  /api/notebook_certificate_approvals/request-approval/{notebook}:
-    post:
-      tags:
-      - notebook-certificate-approval-controller
-      operationId: requestApprovalForNotebook
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NotebookCertificateApproval"
   /api/notebook-groups:
     post:
       tags:
@@ -1579,41 +1543,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Circle"
-  /api/certificate/{notebook}:
-    get:
-      tags:
-      - certificate-controller
-      operationId: getCertificate
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Certificate"
-    post:
-      tags:
-      - certificate-controller
-      operationId: claimCertificate
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Certificate"
   /api/bazaar/{bazaarNotebook}/remove:
     post:
       tags:
@@ -2593,38 +2522,6 @@ paths:
               schema:
                 type: string
                 format: byte
-  /api/notebook_certificate_approvals/get-all-pending-request:
-    get:
-      tags:
-      - notebook-certificate-approval-controller
-      operationId: getAllPendingRequest
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NotebookCertificateApproval"
-  /api/notebook_certificate_approvals/for-notebook/{notebook}:
-    get:
-      tags:
-      - notebook-certificate-approval-controller
-      operationId: getApprovalForNotebook
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NotebookCertificateApprovalDTO"
   /api/memory-trackers/{memoryTracker}:
     get:
       tags:
@@ -3393,8 +3290,6 @@ components:
       properties:
         notebookName:
           type: string
-        notebookCertifiable:
-          type: boolean
         predefinedQuestionTestData:
           type: array
           items:
@@ -3442,8 +3337,6 @@ components:
         id:
           type: integer
           format: int32
-        certifiable:
-          type: boolean
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
@@ -3474,10 +3367,6 @@ components:
         numberOfQuestionsInAssessment:
           type: integer
           format: int32
-        certificateExpiry:
-          type: string
-          default: 1y
-          example: 1y 6m
     Subscription:
       type: object
       properties:
@@ -3838,10 +3727,6 @@ components:
         numberOfQuestionsInAssessment:
           type: integer
           format: int32
-        certificateExpiry:
-          type: string
-          default: 1y
-          example: 1y 6m
         description:
           type: string
           maxLength: 500
@@ -4090,20 +3975,6 @@ components:
       required:
       - bookName
       - format
-    NotebookCertificateApproval:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        lastApprovalTime:
-          type: string
-          format: date-time
-      required:
-      - id
-      - notebook
     CreateNotebookGroupRequest:
       type: object
       properties:
@@ -4240,28 +4111,6 @@ components:
           minLength: 10
       required:
       - invitationCode
-    Certificate:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        user:
-          $ref: "#/components/schemas/User"
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        startDate:
-          type: string
-          format: date-time
-        expiryDate:
-          type: string
-          format: date-time
-        creatorName:
-          type: string
-      required:
-      - expiryDate
-      - id
-      - startDate
     BazaarNotebook:
       type: object
       properties:
@@ -4337,8 +4186,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AssessmentQuestionInstance"
-        certifiable:
-          type: boolean
       required:
       - id
       - notebookId
@@ -4811,11 +4658,6 @@ components:
       required:
       - id
       - locator
-    NotebookCertificateApprovalDTO:
-      type: object
-      properties:
-        approval:
-          $ref: "#/components/schemas/NotebookCertificateApproval"
     ThresholdExceededResult:
       type: object
       properties:

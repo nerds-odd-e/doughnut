@@ -37,9 +37,9 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/AssessmentAndCertificateHistoryPage': RouteRecordInfo<
-      '/AssessmentAndCertificateHistoryPage',
-      '/AssessmentAndCertificateHistoryPage',
+    '/AssessmentHistoryPage': RouteRecordInfo<
+      '/AssessmentHistoryPage',
+      '/AssessmentHistoryPage',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -259,9 +259,9 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/AssessmentAndCertificateHistoryPage.vue': {
+    'src/pages/AssessmentHistoryPage.vue': {
       routes:
-        | '/AssessmentAndCertificateHistoryPage'
+        | '/AssessmentHistoryPage'
       views:
         | never
     }

@@ -59,8 +59,8 @@ export const routeMetadata: RouteMetadata[] = [
     name: "bazaar",
   },
   {
-    path: "/d/assessmentAndCertificateHistory",
-    name: "assessmentAndCertificateHistory",
+    path: "/d/assessmentHistory",
+    name: "assessmentHistory",
   },
   {
     path: "/d/admin-dashboard",

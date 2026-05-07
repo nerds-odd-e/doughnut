@@ -109,8 +109,8 @@
       <div class="section-header">
         <h4 class="section-title">Notebook Settings</h4>
         <p class="section-description">
-          Configure memory tracking, assessment, certificate settings, and an optional
-          short plain-text message for this notebook.
+          Configure memory tracking, assessment, and an optional short plain-text message
+          for this notebook.
         </p>
       </div>
       <div class="settings-grid">
@@ -148,39 +148,13 @@
             :error-message="errors.numberOfQuestionsInAssessment"
           />
           <p class="field-hint">
-            The number of questions to include in certificate assessments for this notebook.
-          </p>
-        </div>
-        <div class="settings-item">
-          <TextInput
-            scope-name="notebook"
-            field="certificateExpiry"
-            title="Certificate Expiry"
-            hint="Format: 1y 1m 1d"
-            v-model="formData.certificateExpiry"
-            :error-message="errors.certificateExpiry"
-          />
-          <p class="field-hint">
-            How long certificates issued for this notebook remain valid. Use format like "1y" for 1 year, "6m" for 6 months, or "1y 2m 3d" for combined periods.
+            The number of questions to include in assessments for this notebook.
           </p>
         </div>
       </div>
       <button class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-mt-4" @click="processForm">
         Update Settings
       </button>
-    </section>
-
-    <!-- Certificate Request Section -->
-    <section class="settings-section daisy-mb-6">
-      <div class="section-header">
-        <h4 class="section-title">Certificate Request</h4>
-        <p class="section-description">
-          Request approval to obtain a certificate from assessment completion.
-        </p>
-      </div>
-      <NotebookCertificateRequest 
-        v-bind="{ notebook, approval, loaded: approvalLoaded }" 
-      />
     </section>
 
     <section class="settings-section daisy-mb-6">
@@ -234,14 +208,10 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import type {
   Notebook,
   User,
-  NotebookCertificateApproval,
   NotebookAiAssistant,
 } from "@generated/doughnut-backend-api"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import {
-  NotebookController,
-  NotebookCertificateApprovalController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
@@ -253,7 +223,6 @@ import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
-import NotebookCertificateRequest from "@/components/notebook/NotebookCertificateRequest.vue"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
 import NotebookPageTitleEditor from "@/components/notebook/NotebookPageTitleEditor.vue"
 
@@ -294,27 +263,11 @@ const indexNoteEditLocation = computed(() =>
   noteShowLocation(props.indexNoteId!)
 )
 
-const approval = ref<NotebookCertificateApproval | undefined>(undefined)
-const approvalLoaded = ref(false)
 const aiAssistant = ref<NotebookAiAssistant | undefined>(undefined)
 
 const additionalInstructions = computed(
   () => aiAssistant.value?.additionalInstructionsToAi || ""
 )
-
-const fetchApproval = async () => {
-  const { data: dto, error } = await apiCallWithLoading(() =>
-    NotebookCertificateApprovalController.getApprovalForNotebook({
-      path: { notebook: props.notebook.id },
-    })
-  )
-  if (!error) {
-    approval.value = dto!.approval
-    approvalLoaded.value = true
-  } else {
-    approvalLoaded.value = true
-  }
-}
 
 const fetchAiAssistant = async () => {
   const { data: assistant, error } = await apiCallWithLoading(() =>
@@ -330,7 +283,6 @@ const fetchAiAssistant = async () => {
 watch(
   () => props.notebook.id,
   () => {
-    fetchApproval()
     fetchAiAssistant()
   },
   { immediate: true }
@@ -373,16 +325,12 @@ const shareNotebook = async () => {
 }
 
 // Form data
-const {
-  skipMemoryTrackingEntirely,
-  numberOfQuestionsInAssessment,
-  certificateExpiry = "1y",
-} = props.notebook.notebookSettings
+const { skipMemoryTrackingEntirely, numberOfQuestionsInAssessment } =
+  props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
-  certificateExpiry,
   description: props.notebook.description ?? "",
 })
 
@@ -394,7 +342,6 @@ watch(
         nb.notebookSettings.skipMemoryTrackingEntirely ?? false,
       numberOfQuestionsInAssessment:
         nb.notebookSettings.numberOfQuestionsInAssessment,
-      certificateExpiry: nb.notebookSettings.certificateExpiry ?? "1y",
       description: nb.description ?? "",
     }
   },
@@ -404,7 +351,6 @@ watch(
 const errors = ref({
   skipMemoryTrackingEntirely: undefined as string | undefined,
   numberOfQuestionsInAssessment: undefined as string | undefined,
-  certificateExpiry: undefined as string | undefined,
 })
 
 // Indexing state

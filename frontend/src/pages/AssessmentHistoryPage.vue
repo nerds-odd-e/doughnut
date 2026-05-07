@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{
       contentLoaded: assessmentHistories !== undefined,
-      title: 'My Assessment and Certificate History',
+      title: 'My Assessment History',
     }"
   >
     <input
@@ -11,10 +11,6 @@
       placeholder="Filter by notebook name"
       class="daisy-form-control daisy-mb-2"
     />
-    <input type="checkbox" v-model="filterByCertificate" class="daisy-check"
-      id="filterByCertificate"
-     />
-    <label class="daisy-label" for="filterByCertificate">Filter by Certificate</label>
     <div>
       <table class="assessment-table mt-2">
         <thead>
@@ -22,26 +18,13 @@
             <th>Notebook</th>
             <th>Attempt At</th>
             <th>Result</th>
-            <th>Certificate</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="assessmentAndCertificateHistory in filteredAssessmentHistories">
-            <td>{{ assessmentAndCertificateHistory.notebookName }}</td>
-            <td>{{ toLocalDateString(assessmentAndCertificateHistory.submittedAt) }}</td>
-            <td>{{ assessmentAndCertificateHistory.isPass ? "Pass" : "Fail" }}</td>
-            <td>
-              <PopButton
-                btn-class="daisy-btn daisy-btn-light"
-                title="View Certificate"
-                v-if="assessmentAndCertificateHistory.isPass"
-              >
-                <CertificatePopup
-                  :assessment-attempt="assessmentAndCertificateHistory"
-                  :notebook-id="assessmentAndCertificateHistory.notebookId"
-                ></CertificatePopup>
-              </PopButton>
-            </td>
+          <tr v-for="row in filteredAssessmentHistories" :key="row.id">
+            <td>{{ row.notebookName }}</td>
+            <td>{{ toLocalDateString(row.submittedAt) }}</td>
+            <td>{{ row.isPass ? "Pass" : "Fail" }}</td>
           </tr>
         </tbody>
       </table>
@@ -56,7 +39,6 @@ import { AssessmentController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-const filterByCertificate = ref(false)
 const assessmentHistories = ref<undefined | AssessmentAttempt[]>(undefined)
 const filterText = ref("")
 
@@ -71,14 +53,9 @@ const filteredAssessmentHistories = computed(() => {
   if (!assessmentHistories.value) {
     return []
   }
-  return assessmentHistories.value.filter((assessmentAndCertificateHistory) => {
-    const matchesTitle = assessmentAndCertificateHistory.notebookName
-      ?.toLowerCase()
-      .includes(filterText.value.toLowerCase())
-    const matchesCertificate =
-      !filterByCertificate.value || assessmentAndCertificateHistory.isPass
-    return matchesTitle && matchesCertificate
-  })
+  return assessmentHistories.value.filter((row) =>
+    row.notebookName?.toLowerCase().includes(filterText.value.toLowerCase())
+  )
 })
 
 onMounted(async () => {

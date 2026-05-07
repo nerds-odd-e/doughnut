@@ -142,7 +142,6 @@ export type PredefinedQuestionTestData = {
 
 export type PredefinedQuestionsTestData = {
     notebookName?: string;
-    notebookCertifiable?: boolean;
     predefinedQuestionTestData?: Array<PredefinedQuestionTestData>;
 };
 
@@ -165,7 +164,6 @@ export type SubscriptionDto = {
 
 export type Notebook = {
     id: number;
-    certifiable?: boolean;
     notebookSettings: NotebookSettings;
     creatorId?: string;
     name: string;
@@ -178,7 +176,6 @@ export type Notebook = {
 export type NotebookSettings = {
     skipMemoryTrackingEntirely?: boolean;
     numberOfQuestionsInAssessment?: number;
-    certificateExpiry?: string;
 };
 
 export type Subscription = {
@@ -356,7 +353,6 @@ export type RedirectToNoteResponse = {
 export type NotebookUpdateRequest = {
     skipMemoryTrackingEntirely?: boolean;
     numberOfQuestionsInAssessment?: number;
-    certificateExpiry?: string;
     description?: string;
     name?: string;
 };
@@ -492,12 +488,6 @@ export type AttachBookRequestFull = {
     contentList?: Array<unknown>;
 };
 
-export type NotebookCertificateApproval = {
-    id: number;
-    notebook: Notebook;
-    lastApprovalTime?: string;
-};
-
 export type CreateNotebookGroupRequest = {
     name: string;
     circleId?: number;
@@ -559,15 +549,6 @@ export type CircleJoiningByInvitation = {
     invitationCode: string;
 };
 
-export type Certificate = {
-    id: number;
-    user?: User;
-    notebook?: Notebook;
-    startDate: string;
-    expiryDate: string;
-    creatorName?: string;
-};
-
 export type BazaarNotebook = {
     id: number;
     notebook: Notebook;
@@ -605,7 +586,6 @@ export type AssessmentAttempt = {
     submittedAt?: string;
     isPass?: boolean;
     assessmentQuestionInstances?: Array<AssessmentQuestionInstance>;
-    certifiable?: boolean;
 };
 
 export type SuggestedTitleDto = {
@@ -840,10 +820,6 @@ export type BookUserLastReadPosition = {
     id: number;
     locator: ContentLocatorFull;
     selectedBookBlockId?: number;
-};
-
-export type NotebookCertificateApprovalDto = {
-    approval?: NotebookCertificateApproval;
 };
 
 export type ThresholdExceededResult = {
@@ -2047,42 +2023,6 @@ export type CreateNotebookResponses = {
 
 export type CreateNotebookResponse = CreateNotebookResponses[keyof CreateNotebookResponses];
 
-export type ApproveData = {
-    body?: never;
-    path: {
-        notebookCertificateApproval: number;
-    };
-    query?: never;
-    url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve';
-};
-
-export type ApproveResponses = {
-    /**
-     * OK
-     */
-    200: NotebookCertificateApproval;
-};
-
-export type ApproveResponse = ApproveResponses[keyof ApproveResponses];
-
-export type RequestApprovalForNotebookData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebook_certificate_approvals/request-approval/{notebook}';
-};
-
-export type RequestApprovalForNotebookResponses = {
-    /**
-     * OK
-     */
-    200: NotebookCertificateApproval;
-};
-
-export type RequestApprovalForNotebookResponse = RequestApprovalForNotebookResponses[keyof RequestApprovalForNotebookResponses];
-
 export type CreateGroupData = {
     body: CreateNotebookGroupRequest;
     path?: never;
@@ -2340,42 +2280,6 @@ export type JoinCircleResponses = {
 };
 
 export type JoinCircleResponse = JoinCircleResponses[keyof JoinCircleResponses];
-
-export type GetCertificateData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/certificate/{notebook}';
-};
-
-export type GetCertificateResponses = {
-    /**
-     * OK
-     */
-    200: Certificate;
-};
-
-export type GetCertificateResponse = GetCertificateResponses[keyof GetCertificateResponses];
-
-export type ClaimCertificateData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/certificate/{notebook}';
-};
-
-export type ClaimCertificateResponses = {
-    /**
-     * OK
-     */
-    200: Certificate;
-};
-
-export type ClaimCertificateResponse = ClaimCertificateResponses[keyof ClaimCertificateResponses];
 
 export type RemoveFromBazaarData = {
     body?: never;
@@ -3277,40 +3181,6 @@ export type GetBookFileResponses = {
 };
 
 export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
-
-export type GetAllPendingRequestData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/notebook_certificate_approvals/get-all-pending-request';
-};
-
-export type GetAllPendingRequestResponses = {
-    /**
-     * OK
-     */
-    200: Array<NotebookCertificateApproval>;
-};
-
-export type GetAllPendingRequestResponse = GetAllPendingRequestResponses[keyof GetAllPendingRequestResponses];
-
-export type GetApprovalForNotebookData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebook_certificate_approvals/for-notebook/{notebook}';
-};
-
-export type GetApprovalForNotebookResponses = {
-    /**
-     * OK
-     */
-    200: NotebookCertificateApprovalDto;
-};
-
-export type GetApprovalForNotebookResponse = GetApprovalForNotebookResponses[keyof GetApprovalForNotebookResponses];
 
 export type ShowMemoryTrackerData = {
     body?: never;

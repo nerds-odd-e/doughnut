@@ -39,7 +39,6 @@ import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,7 +71,6 @@ class NotebookControllerTest extends ControllerTestBase {
     var cur = notebook.getNotebookSettings();
     s.setSkipMemoryTrackingEntirely(cur.getSkipMemoryTrackingEntirely());
     s.setNumberOfQuestionsInAssessment(cur.getNumberOfQuestionsInAssessment());
-    s.setCertificateExpiry(cur.getCertificateExpiry());
     return s;
   }
 
@@ -1020,19 +1018,6 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebook(note.getNotebook(), new NotebookUpdateRequest()));
-    }
-
-    @Test
-    void shouldBeAbleToEditCertificateExpiry() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      var notebookSettings = new NotebookSettings();
-      notebookSettings.setCertificateExpiry(Period.parse("P2Y3M"));
-      var request = new NotebookUpdateRequest();
-      request.setNotebookSettings(notebookSettings);
-      controller.updateNotebook(note.getNotebook(), request);
-      assertThat(
-          note.getNotebook().getNotebookSettings().getCertificateExpiry(),
-          equalTo(Period.parse("P2Y3M")));
     }
 
     @Test

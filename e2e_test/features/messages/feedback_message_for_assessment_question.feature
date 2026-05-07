@@ -4,7 +4,7 @@ Feature: Learner gives feedback on an assessment question
 
   Background:
     Given I am logged in as "old_learner"
-    And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
+    And there is a notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
     And I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
     And I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
 

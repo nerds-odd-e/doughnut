@@ -1,5 +1,5 @@
 import { describe, it, beforeEach, vi, expect } from "vitest"
-import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
+import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { nextTick } from "vue"
@@ -15,7 +15,7 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-describe("assessment and certificate history page", () => {
+describe("assessment history page", () => {
   const user = makeMe.aUser.please()
   const assessmentForArt: AssessmentAttempt =
     makeMe.anAssessmentAttempt.please()
@@ -31,7 +31,7 @@ describe("assessment and certificate history page", () => {
       assessmentForTech,
     ])
     wrapper = helper
-      .component(AssessmentAndCertificateHistoryPage)
+      .component(AssessmentHistoryPage)
       .withCurrentUser(user)
       .mount()
   })
@@ -49,15 +49,6 @@ describe("assessment and certificate history page", () => {
       'input[placeholder="Filter by notebook name"]'
     )
     await filterInput.setValue(assessmentForArt.notebookName)
-    await nextTick()
-    expect(wrapper.findAll("tr")).toHaveLength(2)
-  })
-
-  it("filters by certificate", async () => {
-    const certificateDropdown = wrapper.find(
-      'input[type="checkbox"]#filterByCertificate'
-    )
-    await certificateDropdown.setValue("certificate-id")
     await nextTick()
     expect(wrapper.findAll("tr")).toHaveLength(2)
   })

@@ -16,7 +16,7 @@ export const navigationActions = {
     return assumeNotePage(noteTopology)
   },
 
-  navigateToAssessmentAndCertificatePage() {
-    return mainMenu().userOptions().myAssessmentAndCertificateHistory()
+  navigateToAssessmentHistoryPage() {
+    return mainMenu().userOptions().myAssessmentHistory()
   },
 }

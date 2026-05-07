@@ -6,10 +6,6 @@ import { sidebarChildNotePageMethods } from './noteSidebar'
 const notebookPage = () => {
   const clickButton = (name: string) =>
     cy.findByRole('button', { name }).click()
-  const assertButtonExists = (name: string) =>
-    cy.findByRole('button', { name }).should('exist')
-  const assertButtonNotExists = (name: string) =>
-    cy.findByRole('button', { name }).should('not.exist')
 
   return {
     assertNoteHasSettingWithValue(setting: string, value: string) {
@@ -21,29 +17,11 @@ const notebookPage = () => {
       clickButton('Update Settings')
       pageIsNotLoading()
     },
-    requestForNotebookApproval() {
-      clickButton('Send Request')
-    },
-    expectNotebookApprovalCanBeRequested() {
-      assertButtonExists('Send Request')
-    },
-    expectNotebookApprovalStatus(status: string) {
-      assertButtonNotExists('Send Request')
-      cy.findByText(`Approval ${status}`).should('exist')
-    },
-    updateAssessmentSettings(settings: {
-      numberOfQuestion?: number
-      certificateExpiry?: string
-    }) {
+    updateAssessmentSettings(settings: { numberOfQuestion?: number }) {
       if (settings.numberOfQuestion !== undefined) {
         form
           .getField('Number of Questions in Assessment')
           .assignValue(`${settings.numberOfQuestion}`)
-      }
-      if (settings.certificateExpiry) {
-        form
-          .getField('Certificate Expiry')
-          .assignValue(`${settings.certificateExpiry}`)
       }
 
       clickButton('Update Settings')
