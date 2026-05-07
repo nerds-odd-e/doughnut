@@ -90,6 +90,13 @@ export function relationLabelFromKebab(kebab: string): string {
   return kebab.trim()
 }
 
+export function isKnownRelationKebab(kebab: string): boolean {
+  const k = kebab.trim().toLowerCase()
+  return relationTypeOptions.some(
+    ({ label }) => relationKebabFromLabel(label) === k
+  )
+}
+
 export function relationTypeFromKebab(kebab: string): RelationTypeLabel {
   const label = relationLabelFromKebab(kebab)
   const found = relationTypeOptions.find(({ label: l }) => l === label)

@@ -50,7 +50,7 @@
           field="relationType"
           scope-name="rich-note-relation-property"
           hide-label
-          :model-value="relationTypeFromKebab(propertyRows[idx]!.value)"
+          :model-value="relationModelValue(propertyRows[idx]!)"
           :inverse-icon="true"
           @update:model-value="onRelationTypeSelected(idx, $event)"
         />
@@ -128,6 +128,7 @@ import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
+  isKnownRelationKebab,
   relationKebabFromLabel,
   relationLabelFromKebab,
   relationTypeFromKebab,
@@ -191,6 +192,11 @@ watch(
 
 function isRelationPropertyRow(row: PropertyRow): boolean {
   return row.key.trim().toLowerCase() === "relation"
+}
+
+function relationModelValue(row: PropertyRow): RelationTypeLabel {
+  if (isKnownRelationKebab(row.value)) return relationTypeFromKebab(row.value)
+  return row.value as RelationTypeLabel
 }
 
 function onRelationTypeSelected(

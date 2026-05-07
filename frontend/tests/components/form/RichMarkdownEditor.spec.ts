@@ -427,6 +427,44 @@ Body line`
     expect(last).toContain("Body line")
   })
 
+  describe("relation property in rich mode", () => {
+    it("shows the relation type label on the select button for a known relation", async () => {
+      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+
+      const btn = wrapper.find('[aria-label="Relation Type"]')
+      expect(btn.exists()).toBe(true)
+      expect(btn.text()).toContain("similar to")
+      expect(btn.text()).not.toContain("similar-to")
+    })
+
+    it("shows the raw unknown value on the select button for an unknown relation", async () => {
+      const markdown = `---\nrelation: my-custom-relation\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+
+      const btn = wrapper.find('[aria-label="Relation Type"]')
+      expect(btn.exists()).toBe(true)
+      expect(btn.text()).toContain("my-custom-relation")
+      expect(btn.text()).not.toContain("related to")
+    })
+
+    it("opens the relation type select dialog when the button is clicked for unknown relation", async () => {
+      const markdown = `---\nrelation: my-custom-relation\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+
+      const btn = wrapper.find('[aria-label="Relation Type"]')
+      await btn.trigger("click")
+      await flushPromises()
+
+      expect(
+        wrapper.findComponent({ name: "RelationTypeSelect" }).exists()
+      ).toBe(true)
+    })
+  })
+
   it("removing every property row emits body-only markdown and shows add-only chrome without Properties heading", async () => {
     const markdown = `---
 only: x
