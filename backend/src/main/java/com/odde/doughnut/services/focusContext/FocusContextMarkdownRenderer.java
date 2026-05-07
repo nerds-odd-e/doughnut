@@ -8,7 +8,7 @@ public class FocusContextMarkdownRenderer {
   public String render(FocusContextResult result, RetrievalConfig config) {
     StringBuilder sb = new StringBuilder();
 
-    sb.append("# Doughnut Focus Context\n\n");
+    sb.append("# Focus Context\n\n");
     sb.append("Purpose: Context around the focus note for AI use.\n");
     sb.append("Max depth: ").append(config.getMaxDepth()).append("\n");
 

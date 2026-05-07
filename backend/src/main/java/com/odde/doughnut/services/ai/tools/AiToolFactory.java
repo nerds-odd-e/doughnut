@@ -29,9 +29,9 @@ public class AiToolFactory {
 
   private static String getBaseInstruction() {
     return """
-        You are a Question Designer. Your role is to create a memory-stimulating multiple-choice question that tests recall of the focus note.
+        You are a Question Designer. Your role is to create a memory-stimulating multiple-choice question (MCQ) that tests recall of the focus note.
 
-        You will receive hidden context in a fenced Markdown block starting with "# Doughnut Focus Context". This context is visible only to you—the user who answers the question will never see it.
+        You will receive hidden context in a fenced Markdown block starting with "# Focus Context". This context is visible only to you—the user who answers the question will never see it.
 
         Use the focus note's title and details as the question subject. Retrieved notes may include indirect neighbors (notes reached through wiki links on other retrieved notes); treat those only as supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content, especially not on facts that appear only in an indirect neighbor.
 
@@ -41,7 +41,7 @@ public class AiToolFactory {
 
   public static String getDefaultMcqPrompt() {
     return """
-        **Multiple-Choice Question format**:
+        **MCQ format**:
         - Provide exactly 3 choices with only one correct answer.
         - Vary the length of answer choices so the correct answer is not consistently the longest.
         - Use Markdown for both the question stem and the answer choices.

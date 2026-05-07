@@ -118,7 +118,7 @@ class NoteQuestionGenerationServiceTests {
 
       assertThat(request, is(notNullValue()));
       assertThat(request.model().toString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
-      assertThat(userMessageContains(request, "# Doughnut Focus Context"), is(true));
+      assertThat(userMessageContains(request, "# Focus Context"), is(true));
     }
 
     @Test

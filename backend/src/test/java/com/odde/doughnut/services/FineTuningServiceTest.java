@@ -77,7 +77,7 @@ class FineTuningServiceTest {
       assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
       List<ChatMessageForFineTuning> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      assertThat(goodTrainingData.get(0).getContent(), containsString("# Doughnut Focus Context"));
+      assertThat(goodTrainingData.get(0).getContent(), containsString("# Focus Context"));
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Title"));
       assertThat(goodTrainingData.get(0).getContent(), containsString("Question Designer"));
     }

@@ -483,7 +483,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       java.util.Map<String, Object> request = controller.exportConversation(conversation);
       String export = formatExportResponse(request);
       assertThat(export).contains("## Context");
-      assertThat(export).contains("# Doughnut Focus Context");
+      assertThat(export).contains("# Focus Context");
       assertThat(export).contains("There are 42 prefectures in Japan");
       assertThat(export).contains("Make tool calls when user asks to update the note.");
     }

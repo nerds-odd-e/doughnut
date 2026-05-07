@@ -53,7 +53,7 @@ class ConversationHistoryBuilderTest {
       ChatCompletionSystemMessageParam systemMessage = firstMessage.system().get();
       String body = systemMessage.content().toString();
       assertTrue(body.contains(note.getTitle()));
-      assertTrue(body.contains("# Doughnut Focus Context"));
+      assertTrue(body.contains("# Focus Context"));
     }
 
     @Test

@@ -165,14 +165,13 @@ const openAiService = () => {
             typeof r.body === 'string' ? r.body : JSON.stringify(r.body)
           )
           .filter(
-            (b) =>
-              b.includes('Doughnut Focus Context') && b.includes('"messages"')
+            (b) => b.includes('Focus Context') && b.includes('"messages"')
           )
         expect(
           bodies.length,
           [
             'Focus context recall E2E: expected at least 3 OpenAI chat completion POST bodies',
-            'that include the rendered focus block (# Doughnut Focus Context) and JSON "messages".',
+            'that include the rendered focus block (# Focus Context) and JSON "messages".',
             'Recall eager-fetches one question per due memory tracker, so fewer bodies usually means',
             'fewer assimilated notes, failed requests, or Mountebank stubs not matching.',
             `Found ${bodies.length} matching body/bodies.`,

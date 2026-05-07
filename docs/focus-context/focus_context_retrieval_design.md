@@ -36,7 +36,7 @@ The focus note's flat `inboundReferences` URI list (no token cost) is also cappe
 
 ## Markdown rendering
 
-For LLM prompts, the same retrieval result is rendered as Markdown with a `# Doughnut Focus Context` header and fenced `doughnut-note-md` blocks (fence width chosen so note content cannot break out).
+For LLM prompts, the same retrieval result is rendered as Markdown with a `# Focus Context` header and fenced `doughnut-note-md` blocks (fence width chosen so note content cannot break out).
 
 ## Code
 
