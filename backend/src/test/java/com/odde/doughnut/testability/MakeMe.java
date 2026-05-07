@@ -158,10 +158,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new FailureReportBuilder(this);
   }
 
-  public SuggestedQuestionForFineTuningBuilder aQuestionSuggestionForFineTunining() {
-    return new SuggestedQuestionForFineTuningBuilder(this);
-  }
-
   public ConversationBuilder aConversation() {
     return new ConversationBuilder(this);
   }

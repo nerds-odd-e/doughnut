@@ -108,21 +108,6 @@ const openAiService = () => {
       })
     },
 
-    stubOpenAiUploadResponse(shouldSuccess: boolean) {
-      if (shouldSuccess) {
-        return serviceMocker.stubPoster(`/files`, {
-          id: 'file-abc123',
-          object: 'file',
-          bytes: 175,
-          created_at: 1613677385,
-          filename: 'Question-%s.jsonl',
-          purpose: 'fine-tune',
-        })
-      } else {
-        return serviceMocker.stubPosterWithError500Response('/v1/files', {})
-      }
-    },
-
     expectLastChatCompletionsBodyContains(marker: string) {
       const mountebank = new Mountebank()
       cy.request(
@@ -264,25 +249,6 @@ const openAiService = () => {
         { 'Content-Type': 'text/event-stream' }
       )
       return this
-    },
-
-    async stubFineTuningStatus(successful: boolean) {
-      // Official SDK endpoint - base URL already includes /v1, so path is /fine_tuning/jobs
-      return await serviceMocker.stubPoster(`/fine_tuning/jobs`, {
-        object: 'fine_tuning.job',
-        id: 'ftjob-abc123',
-        model: 'gpt-3.5-turbo-0613',
-        created_at: 1614807352,
-        fine_tuned_model: successful ? 'ft:gpt-3.5-turbo-1106:test' : null,
-        organization_id: 'org-123',
-        result_files: [],
-        status: successful ? 'succeeded' : 'failed',
-        validation_file: null,
-        training_file: 'file-abc123',
-        error: successful ? null : { message: 'Training failed' },
-        finished_at: successful ? 1614807352 : null,
-        hyperparameters: null,
-      })
     },
 
     async stubGetModels(modelNames: string) {

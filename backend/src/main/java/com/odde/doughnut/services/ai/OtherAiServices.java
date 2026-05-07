@@ -7,7 +7,6 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
-import com.odde.doughnut.services.openAiApis.FineTuningExamples;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.io.IOException;
 import java.util.*;
@@ -34,16 +33,6 @@ public final class OtherAiServices {
             });
 
     return modelVersionOptions;
-  }
-
-  public String uploadAndTriggerFineTuning(
-      List<OpenAIChatGPTFineTuningExample> examples, String question) throws IOException {
-    FineTuningExamples fineTuningExamples = new FineTuningExamples(examples);
-
-    String fileId =
-        openAiApiHandler.uploadTextFile(
-            question, fineTuningExamples.toJsonL(), "fine-tune", ".jsonl");
-    return openAiApiHandler.triggerFineTuning(fileId).fineTunedModel().orElse(null);
   }
 
   public Optional<NoteContentCompletion> getTextFromAudio(

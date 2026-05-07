@@ -1,5 +1,4 @@
 import { addQuestionPage } from './addQuestionPage'
-import { SuggestQuestionForFineTuningPage } from './SuggestQuestionForFineTuningPage'
 
 export const questionListPage = () => {
   return {
@@ -14,13 +13,6 @@ export const questionListPage = () => {
           cy.wrap($el).should('have.class', 'correct-choice')
         })
       })
-    },
-    suggestingQuestionForFineTuning(stem: string) {
-      cy.findByText(stem).click()
-      cy.findByRole('button', {
-        name: 'Send this question for fine tuning the question generation model',
-      }).click()
-      return SuggestQuestionForFineTuningPage()
     },
   }
 }

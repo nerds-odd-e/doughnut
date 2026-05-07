@@ -12,7 +12,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
-import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
+import com.odde.doughnut.services.ai.ChatMessageContent;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -141,12 +141,12 @@ public class ConversationMessageController {
         messageMap.put("role", "system");
         messageMap.put(
             "content",
-            ChatMessageForFineTuning.extractContentString(messageParam.system().get().content()));
+            ChatMessageContent.extractContentString(messageParam.system().get().content()));
       } else if (messageParam.user().isPresent()) {
         messageMap.put("role", "user");
         messageMap.put(
             "content",
-            ChatMessageForFineTuning.extractContentString(messageParam.user().get().content()));
+            ChatMessageContent.extractContentString(messageParam.user().get().content()));
       } else if (messageParam.assistant().isPresent()) {
         messageMap.put("role", "assistant");
         messageMap.put(
@@ -155,7 +155,7 @@ public class ConversationMessageController {
                 .assistant()
                 .get()
                 .content()
-                .map(ChatMessageForFineTuning::extractContentString)
+                .map(ChatMessageContent::extractContentString)
                 .orElse(null));
       }
       messagesList.add(messageMap);

@@ -1,13 +1,11 @@
 /// <reference types="Cypress" />
 // @ts-check
 import type { Randomization } from '@generated/doughnut-backend-api'
-import type { QuestionSuggestionParams } from '@generated/doughnut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
 import type { NoteTestData } from '@generated/doughnut-backend-api'
 import type { PredefinedQuestionsTestData } from '@generated/doughnut-backend-api'
 import type { TimeTravel } from '@generated/doughnut-backend-api'
 import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
-import type { SuggestedQuestionsData } from '@generated/doughnut-backend-api'
 import type {
   AttachBookRequestFull,
   NoteRealm,
@@ -290,34 +288,6 @@ const testability = () => {
           })
           return cy.wrap(promise, { log: false })
         })
-    },
-
-    injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
-      return cy.get<string>('@currentLoginUser').then((username) => {
-        const requestBody: SuggestedQuestionsData = { examples, username }
-        const promise = TestabilityRestController.injectSuggestedQuestion({
-          body: requestBody,
-        })
-        return cy.wrap(promise, { log: false })
-      })
-    },
-
-    injectSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
-      return this.injectSuggestedQuestions([
-        {
-          positiveFeedback,
-          preservedNoteContent: 'note content',
-          realCorrectAnswers: '',
-          preservedQuestion: {
-            f0__multipleChoicesQuestion: {
-              stem: questionStem,
-              choices: ['choice 1', 'choice 2'],
-            },
-            f1__correctChoiceIndex: 0,
-            f2__strictChoiceOrder: true,
-          },
-        },
-      ])
     },
 
     getInjectedNoteIdByTitle(noteTopology: string) {

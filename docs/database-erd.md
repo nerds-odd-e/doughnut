@@ -57,7 +57,6 @@ erDiagram
     "user" ||--o{ notebook : "creator_id"
     "user" ||--o{ ownership : "user_id"
     "user" ||--o{ subscription : "user_id"
-    "user" ||--o{ suggested_question_for_fine_tuning : "user_id"
     "user" ||--o{ user_token : "user_id"
     assessment_attempt {
         int id PK
@@ -209,10 +208,6 @@ erDiagram
         int user_id FK
         int notebook_id FK
         int notebook_group_id FK
-    }
-    suggested_question_for_fine_tuning {
-        int id PK
-        int user_id FK
     }
     "user" {
         int id PK

@@ -113,29 +113,6 @@ export type Randomization = {
     seed?: number;
 };
 
-export type McqWithAnswer = {
-    f0__multipleChoicesQuestion: MultipleChoicesQuestion;
-    f1__correctChoiceIndex: number;
-    f2__strictChoiceOrder: boolean;
-};
-
-export type MultipleChoicesQuestion = {
-    f0__stem: string;
-    f1__choices: Array<string>;
-};
-
-export type QuestionSuggestionParams = {
-    comment?: string;
-    preservedQuestion: McqWithAnswer;
-    preservedNoteContent?: string;
-    positiveFeedback?: boolean;
-    realCorrectAnswers: string;
-};
-
-export type SuggestedQuestionsData = {
-    [key: string]: unknown;
-};
-
 export type NoteTestData = {
     Title?: string;
     Content?: string;
@@ -167,6 +144,11 @@ export type PredefinedQuestionsTestData = {
     notebookName?: string;
     notebookCertifiable?: boolean;
     predefinedQuestionTestData?: Array<PredefinedQuestionTestData>;
+};
+
+export type MultipleChoicesQuestion = {
+    f0__stem: string;
+    f1__choices: Array<string>;
 };
 
 export type PredefinedQuestion = {
@@ -306,21 +288,6 @@ export type AnswerDto = {
 export type AnswerSpellingDto = {
     spellingAnswer?: string;
     thinkingTimeMs?: number;
-};
-
-export type QuestionSuggestionCreationParams = {
-    comment?: string;
-    isPositiveFeedback?: boolean;
-};
-
-export type SuggestedQuestionForFineTuning = {
-    id: number;
-    comment?: string;
-    preservedQuestion: McqWithAnswer;
-    preservedNoteContent?: string;
-    realCorrectAnswers?: string;
-    createdAt?: string;
-    positiveFeedback?: boolean;
 };
 
 export type SpellingVerificationResult = {
@@ -947,11 +914,6 @@ export type UserListingPage = {
     totalPages?: number;
 };
 
-export type SuggestedQuestionsDataWritable = {
-    examples?: Array<QuestionSuggestionParams>;
-    username?: string;
-};
-
 export type NotesTestDataWritable = {
     noteTestData?: Array<NoteTestData>;
     externalIdentifier?: string;
@@ -1266,22 +1228,6 @@ export type SetOpenAiTokenResponses = {
      */
     200: unknown;
 };
-
-export type InjectSuggestedQuestionData = {
-    body: SuggestedQuestionsDataWritable;
-    path?: never;
-    query?: never;
-    url: '/api/testability/inject_suggested_questions';
-};
-
-export type InjectSuggestedQuestionResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type InjectSuggestedQuestionResponse = InjectSuggestedQuestionResponses[keyof InjectSuggestedQuestionResponses];
 
 export type InjectNotesData = {
     body: NotesTestDataWritable;
@@ -1653,24 +1599,6 @@ export type ToggleApprovalResponses = {
 };
 
 export type ToggleApprovalResponse = ToggleApprovalResponses[keyof ToggleApprovalResponses];
-
-export type SuggestQuestionForFineTuningData = {
-    body: QuestionSuggestionCreationParams;
-    path: {
-        predefinedQuestion: number;
-    };
-    query?: never;
-    url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning';
-};
-
-export type SuggestQuestionForFineTuningResponses = {
-    /**
-     * OK
-     */
-    200: SuggestedQuestionForFineTuning;
-};
-
-export type SuggestQuestionForFineTuningResponse = SuggestQuestionForFineTuningResponses[keyof SuggestQuestionForFineTuningResponses];
 
 export type RefineQuestionData = {
     body: PredefinedQuestion;
@@ -2222,56 +2150,6 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
-
-export type DuplicateData = {
-    body?: never;
-    path: {
-        suggestedQuestion: number;
-    };
-    query?: never;
-    url: '/api/fine-tuning/{suggestedQuestion}/duplicate';
-};
-
-export type DuplicateResponses = {
-    /**
-     * OK
-     */
-    200: SuggestedQuestionForFineTuning;
-};
-
-export type DuplicateResponse = DuplicateResponses[keyof DuplicateResponses];
-
-export type DeleteData = {
-    body?: never;
-    path: {
-        suggestedQuestion: number;
-    };
-    query?: never;
-    url: '/api/fine-tuning/{suggestedQuestion}/delete';
-};
-
-export type DeleteResponses = {
-    /**
-     * OK
-     */
-    200: SuggestedQuestionForFineTuning;
-};
-
-export type DeleteResponse = DeleteResponses[keyof DeleteResponses];
-
-export type UploadAndTriggerFineTuningData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/fine-tuning/upload-and-trigger-fine-tuning';
-};
-
-export type UploadAndTriggerFineTuningResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type TriggerFailureData = {
     body?: never;
@@ -2950,24 +2828,6 @@ export type MarkAsRecalledResponses = {
 
 export type MarkAsRecalledResponse = MarkAsRecalledResponses[keyof MarkAsRecalledResponses];
 
-export type UpdateSuggestedQuestionForFineTuningData = {
-    body: QuestionSuggestionParams;
-    path: {
-        suggestedQuestion: number;
-    };
-    query?: never;
-    url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning';
-};
-
-export type UpdateSuggestedQuestionForFineTuningResponses = {
-    /**
-     * OK
-     */
-    200: SuggestedQuestionForFineTuning;
-};
-
-export type UpdateSuggestedQuestionForFineTuningResponse = UpdateSuggestedQuestionForFineTuningResponses[keyof UpdateSuggestedQuestionForFineTuningResponses];
-
 export type MarkConversationAsReadData = {
     body?: never;
     path: {
@@ -3571,22 +3431,6 @@ export type PingResponses = {
 };
 
 export type PingResponse = PingResponses[keyof PingResponses];
-
-export type GetAllSuggestedQuestionsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning';
-};
-
-export type GetAllSuggestedQuestionsResponses = {
-    /**
-     * OK
-     */
-    200: Array<SuggestedQuestionForFineTuning>;
-};
-
-export type GetAllSuggestedQuestionsResponse = GetAllSuggestedQuestionsResponses[keyof GetAllSuggestedQuestionsResponses];
 
 export type FailureReportsData = {
     body?: never;

@@ -2,12 +2,6 @@
   <ContainerPage v-bind="{ title: 'Admin Dashboard' }" />
   <div class="daisy-tabs daisy-tabs-boxed daisy-bg-base-200 daisy-p-2 daisy-flex daisy-justify-center daisy-mb-4">
     <a
-      :class="`daisy-tab daisy-tab-lg ${activePage === 'fineTuningData' ? 'daisy-tab-active' : ''}`"
-      role="button"
-      href="#"
-      @click.prevent="setActivePage('fineTuningData')"
-    >Fine Tuning Data</a>
-    <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
@@ -45,7 +39,6 @@
     >Data migration</a>
   </div>
   <div class="daisy-container daisy-mx-auto">
-    <FineTuningData v-if="activePage === 'fineTuningData'" />
     <FailureReportList v-if="activePage === 'failureReport'" />
     <ManageModel v-if="activePage === 'manageModel'" />
     <ManageBazaar v-if="activePage === 'manageBazaar'" />
@@ -58,7 +51,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import FineTuningData from "../components/admin/FineTuningData.vue"
 import FailureReportList from "../components/admin/FailureReportList.vue"
 import ManageModel from "../components/admin/ManageModel.vue"
 import ManageBazaar from "../components/admin/ManageBazaar.vue"
@@ -68,7 +60,6 @@ import UserListing from "../components/admin/UserListing.vue"
 import DataMigrationPanel from "../components/admin/DataMigrationPanel.vue"
 
 type TabType =
-  | "fineTuningData"
   | "failureReport"
   | "manageModel"
   | "manageBazaar"
@@ -83,7 +74,6 @@ const activePage = computed({
   get(): TabType {
     const tab = route.query.tab as string | undefined
     if (
-      tab === "fineTuningData" ||
       tab === "failureReport" ||
       tab === "manageModel" ||
       tab === "manageBazaar" ||
@@ -93,7 +83,7 @@ const activePage = computed({
     ) {
       return tab
     }
-    return "fineTuningData"
+    return "failureReport"
   },
   set(value: TabType) {
     router.push({

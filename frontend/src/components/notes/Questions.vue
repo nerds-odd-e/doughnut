@@ -46,9 +46,7 @@
             />
           </td>
           <td>
-            <span @click="openedQuestion=question">
-              {{ question.multipleChoicesQuestion.f0__stem }}
-            </span>
+            {{ question.multipleChoicesQuestion.f0__stem }}
           </td>
           <template
             v-if="question.multipleChoicesQuestion.f1__choices"
@@ -71,16 +69,6 @@
       <b>No questions</b>
     </div>
   </div>
-  <Modal
-    v-if="openedQuestion !== undefined"
-    @close_request="openedQuestion = undefined"
-  >
-    <template #body>
-      <QuestionManagement
-        :predefinedQuestion="openedQuestion"
-      />
-    </template>
-  </Modal>
   <QuestionExportDialog
     v-if="showExportDialog"
     :note-id="note.id"
@@ -95,7 +83,6 @@ import type { Note, PredefinedQuestion } from "@generated/doughnut-backend-api"
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
-import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import { Upload } from "lucide-vue-next"
@@ -107,7 +94,6 @@ const props = defineProps({
   },
 })
 const questions = ref<PredefinedQuestion[]>([])
-const openedQuestion = ref<PredefinedQuestion | undefined>()
 const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {

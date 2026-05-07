@@ -1,5 +1,4 @@
 import { pageIsNotLoading } from '../../pageBase'
-import { adminFineTuningPage } from './adminFineTuningPage'
 import { submittableForm } from '../../forms'
 
 export function assumeAdminDashboardPage() {
@@ -31,11 +30,6 @@ export function assumeAdminDashboardPage() {
 
     goToTabInAdminDashboard(tabName: string) {
       cy.findByRole('button', { name: tabName }).click()
-    },
-
-    goToFineTuningData() {
-      this.goToTabInAdminDashboard('Fine Tuning Data')
-      return adminFineTuningPage()
     },
 
     goToModelManagement() {

@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.CircleRepository;
@@ -16,7 +15,6 @@ import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
-import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
@@ -54,7 +52,6 @@ class TestabilityRestController {
   @Autowired EntityPersister entityPersister;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
-  @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
   @Autowired NotebookService notebookService;
@@ -408,27 +405,6 @@ class TestabilityRestController {
             s -> {
               circleService.joinAndSave(entity, getUserModelByExternalIdentifier(s));
             });
-    return "OK";
-  }
-
-  static class SuggestedQuestionsData {
-    @Setter private List<QuestionSuggestionParams> examples;
-    @Setter private String username;
-  }
-
-  @PostMapping("/inject_suggested_questions")
-  @Transactional
-  public String injectSuggestedQuestion(@RequestBody SuggestedQuestionsData testData) {
-    if (Strings.isEmpty(testData.username)) {
-      throw new RuntimeException("username is required and cannot be empty");
-    }
-    User user = getUserModelByExternalIdentifier(testData.username);
-    testData.examples.forEach(
-        example -> {
-          SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
-          suggestion.setUser(user);
-          suggestedQuestionForFineTuningService.update(suggestion, example);
-        });
     return "OK";
   }
 

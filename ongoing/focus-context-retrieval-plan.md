@@ -50,7 +50,7 @@ The most-visible AI feature (predefined-question / recall question generation) s
 - Add token-budget split: `FOCUS_NOTE_CONTENT_MAX_TOKENS` and `RELATED_NOTE_CONTENT_MAX_TOKENS` constants in a `FocusContextConstants` class. Always keep the focus note (truncated if needed); related notes consume the remaining budget in BFS order.
 - Wire `QuestionGenerationRequestBuilder.getChatRequestBuilder` and `PredefinedQuestionController` to call `FocusContextRetrievalService` + `FocusContextMarkdownRenderer` instead of `graphRAGService.getGraphRAGDescription(note)`.
 - Modernize `AiToolFactory.getBaseInstruction()` and `getDefaultMcqPrompt()` per the cross-cutting section above. Drop the "atomic / hierarchical / lateral links" wording and the "Leverage the Extended Graph" numbered point.
-- Leave `GraphRAGService` and the legacy `services/graphRAG` package in place; other consumers (`ChatCompletionConversationService`, `ChatCompletionNoteAutomationService`, `SuggestedQuestionForFineTuningService`, `NoteController.getGraph`, MCP `get_note_graph`) still use the old path until phases 4 / 5.
+- Leave `GraphRAGService` and the legacy `services/graphRAG` package in place; other consumers (`ChatCompletionConversationService`, `ChatCompletionNoteAutomationService`, `NoteController.getGraph`, MCP `get_note_graph`) still use the old path until phases 4 / 5.
 
 ### Test plan
 - **E2E (extends existing capability files; no new files):**
@@ -100,7 +100,7 @@ Many Doughnut notes use a "relationship note" pattern (a note whose body links t
 ## Phase 3 — Folder sibling sampling for question generation, with caller-supplied seed (Behavior)
 
 ### User value
-For question generation, peer notes from the same folder (or notebook root) are excellent distractor seeds. Sampling them randomly increases distractor variety across regenerations. Storing the seed on the generated `PredefinedQuestion` lets us reproduce the exact context that produced a given question (useful for the "contest / regenerate" flow and for fine-tuning data export).
+For question generation, peer notes from the same folder (or notebook root) are excellent distractor seeds. Sampling them randomly increases distractor variety across regenerations. Storing the seed on the generated `PredefinedQuestion` lets us reproduce the exact context that produced a given question (useful for the "contest / regenerate" flow).
 
 ### Scope
 - Add `FolderSibling` edge type. Sampling rules from the requirements:
@@ -112,7 +112,6 @@ For question generation, peer notes from the same folder (or notebook root) are 
 - Renderer emits `Reached by: FolderSibling` and a `Path:` line that ends at the parent note that produced the sibling.
 - DB migration `V300000173__predefined_question_context_seed.sql`: add nullable `context_seed BIGINT` column to `predefined_question`.
 - `PredefinedQuestion` entity: add `Long contextSeed`. `PredefinedQuestionController` (or `QuestionGenerationRequestBuilder`) generates a `ThreadLocalRandom.nextLong()` seed per generation, passes it to `FocusContextRetrievalService`, and stores it on the saved `PredefinedQuestion`.
-- Fine-tuning training-data export (`SuggestedQuestionForFineTuningService`) is **not** changed in this phase (still uses old GraphRAG path); Phase 4 will switch it and reuse the stored seed for replay.
 
 ### Test plan
 - **E2E (extends `recall_quiz_ai_question.feature`):**
@@ -128,31 +127,28 @@ For question generation, peer notes from the same folder (or notebook root) are 
 
 ---
 
-## Phase 4 — Note assistant chat, note automation, and fine-tuning export use the new Markdown context (Behavior)
+## Phase 4 — Note assistant chat and note automation use the new Markdown context (Behavior)
 
 ### User value
-Every AI feature that previously consumed `GraphRAGService.getGraphRAGDescription` now sees the same modern wiki-aware Markdown context as question generation. Consistency across features (chat about a note, suggest title, understanding checklist, promote-point-to-sibling, fine-tuning data export) and improved relevance because outgoing wiki links and depth-2 reasoning are now available to those flows too.
+Every AI feature that previously consumed `GraphRAGService.getGraphRAGDescription` now sees the same modern wiki-aware Markdown context as question generation. Consistency across features (chat about a note, suggest title, understanding checklist, promote-point-to-sibling) and improved relevance because outgoing wiki links and depth-2 reasoning are now available to those flows too.
 
 ### Scope
 - Switch the following call sites from `graphRAGService.getGraphRAGDescription(note)` to `focusContextRetrievalService.retrieve(...)` + `focusContextMarkdownRenderer.render(...)`:
   - `ChatCompletionConversationService` (via `ConversationHistoryBuilder.addNoteContext`).
   - `ChatCompletionNoteAutomationService.createChatRequestBuilder` (uses `OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder`).
-  - `SuggestedQuestionForFineTuningService` — when exporting a `PredefinedQuestion` as training data, replay the retrieval using the stored `contextSeed` from Phase 3 so the prompt matches what the model actually saw.
 - `OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder`'s docstring is updated to point at `FocusContextMarkdownRenderer` rather than `GraphRAGService#getGraphRAGDescription`.
 - Conversation/automation prompts are reviewed for stale GraphRAG-flavored wording (e.g. "this note", "the contextual path", references to "knowledge graph") and updated to the modernized style from the cross-cutting section.
 
 ### Test plan
 - **E2E:**
   - `e2e_test/features/messages/chat_about_a_note.feature` — existing scenarios pass; the recorded mocked-OpenAI request body for the system message contains the Markdown wrapper (`# Focus Context`) instead of the JSON banner.
-  - `e2e_test/features/ai_generated_recall_questions/user_feedback_for_question_generation.feature` — admin training-data retrieval (the fine-tuning export) returns rows whose `prompt` contains the rendered Markdown, and the example for a previously generated `PredefinedQuestion` reproduces the original sibling sample by replaying its `contextSeed`.
 - **Unit:**
   - `ConversationHistoryBuilderTest` — system message body switched from JSON to Markdown; assertions updated to match.
   - `ChatCompletionNoteAutomationServiceTest` and `NoteAutomationServiceTests` — same.
-  - `SuggestedQuestionForFineTuningServiceTest` (extend or add): given a `PredefinedQuestion` with a stored `contextSeed`, the exported prompt equals the original generation prompt for the same focus note.
 
 ### Definition of done
-- All four consumers no longer call `getGraphRAGDescription`.
-- Existing chat / note-automation / fine-tuning E2E and unit tests pass with updated expected bodies.
+- All consumers no longer call `getGraphRAGDescription`.
+- Existing chat / note-automation E2E and unit tests pass with updated expected bodies.
 
 ---
 
@@ -196,6 +192,6 @@ External integrators (the MCP server and any direct API consumers) see the new s
 
 - **Mocked OpenAI fixtures:** Mountebank stubs that pin specific request bodies will break the moment the Phase 1 prompt body changes. Update them in the same commit as the prompt change; rely on existing helpers (`@usingMockedOpenAiService`).
 - **Token-budget regressions:** the legacy code budgets in characters via `CharacterBasedTokenCountingStrategy`. The new constants are token-named but the implementation can keep the same character-based estimator under the hood; do **not** introduce a new tokenizer dependency in this work.
-- **Reproducibility of sibling sampling for already-stored questions:** before Phase 3 ships, existing `predefined_question` rows have no `context_seed`. The fine-tuning export (Phase 4) treats a null seed as "use deterministic id-ascending order" so historical rows still produce a stable prompt.
+- **Reproducibility of sibling sampling for already-stored questions:** before Phase 3 ships, existing `predefined_question` rows have no `context_seed`. Replay paths treat a null seed as "use deterministic id-ascending order" so historical rows still produce a stable prompt.
 - **Legacy `OutgoingWikiLinkRelationshipHandler` already exists** — its logic (resolve via `WikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer`) is reused inside the new BFS; the handler class itself is deleted in Phase 5.
 - **`GraphNoteWikiUri.of`** is still useful for rendering `[[Notebook: Title]]` strings in the new path / link lists. Move it into the new package as `FocusContextWikiUri` (or keep the name) in Phase 1; delete the old one in Phase 5.

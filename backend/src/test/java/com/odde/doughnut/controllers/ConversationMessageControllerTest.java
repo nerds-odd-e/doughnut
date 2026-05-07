@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
+import com.odde.doughnut.services.ai.ChatMessageContent;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -452,7 +452,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     }
 
     private String extractContentString(Object contentObj) {
-      return ChatMessageForFineTuning.extractContentString(contentObj);
+      return ChatMessageContent.extractContentString(contentObj);
     }
 
     @Test

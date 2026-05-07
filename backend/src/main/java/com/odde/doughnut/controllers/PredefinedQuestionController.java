@@ -2,19 +2,16 @@ package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
-import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -29,9 +26,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/predefined-questions")
 class PredefinedQuestionController {
   private final PredefinedQuestionService predefinedQuestionService;
-  private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
-
-  private final TestabilitySettings testabilitySettings;
 
   private final AiQuestionGenerator aiQuestionGenerator;
   private final ObjectMapper objectMapper;
@@ -43,8 +37,6 @@ class PredefinedQuestionController {
   @Autowired
   public PredefinedQuestionController(
       PredefinedQuestionService predefinedQuestionService,
-      SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
-      TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
       GlobalSettingsService globalSettingsService,
@@ -52,8 +44,6 @@ class PredefinedQuestionController {
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
     this.predefinedQuestionService = predefinedQuestionService;
-    this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
-    this.testabilitySettings = testabilitySettings;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.objectMapper = objectMapper;
@@ -71,21 +61,6 @@ class PredefinedQuestionController {
       return null;
     }
     return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-  }
-
-  @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")
-  @Transactional
-  public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("predefinedQuestion") @Schema(type = "integer")
-          PredefinedQuestion predefinedQuestion,
-      @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
-    SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
-    return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-        sqft,
-        predefinedQuestion,
-        suggestion,
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/{note}/note-questions")

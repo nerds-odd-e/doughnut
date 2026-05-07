@@ -7,57 +7,7 @@ import {
   Then,
   When,
 } from '@badeball/cypress-cucumber-preprocessor'
-import start, { mock_services } from '../start'
-
-Given(
-  'the admin modifies the question suggested {string} to:',
-  (originalQuestionStem: string, newQuestion: DataTable) => {
-    return start
-      .loginAsAdminAndGoToAdminDashboard()
-      .goToFineTuningData()
-      .updateQuestionSuggestionAndChoice(
-        originalQuestionStem,
-        newQuestion.hashes()[0] as Record<string, string>
-      )
-  }
-)
-
-Given('an admin duplicates the question {string}', (questionStem: string) => {
-  return start
-    .loginAsAdminAndGoToAdminDashboard()
-    .goToFineTuningData()
-    .duplicateNegativeQuestion(questionStem)
-})
-
-Given(
-  'an admin can retrieve the training data for question generation containing:',
-  (question: DataTable) => {
-    return start
-      .loginAsAdminAndGoToAdminDashboard()
-      .goToFineTuningData()
-      .expectExampleQuestions(question.hashes())
-  }
-)
-
-Given(
-  'an admin can retrieve the training data for question generation containing {int} examples',
-  (numberOfRecords: number) => {
-    return start
-      .loginAsAdminAndGoToAdminDashboard()
-      .goToFineTuningData()
-      .expectFineTuningExamplesCount(numberOfRecords)
-  }
-)
-
-Given(
-  'there should be {int} examples containing {string}',
-  (numOfOccurrence: number, expectedString: string) => {
-    return start
-      .assumeAdminDashboardPage()
-      .goToFineTuningData()
-      .expectString(numOfOccurrence, expectedString)
-  }
-)
+import start from '../start'
 
 Given(
   'I navigate to the {string} section in the admin dashboard',
@@ -66,64 +16,9 @@ Given(
   }
 )
 
-Given('OpenAI responds with {string} when uploading file', (result) => {
-  cy.then(async () => {
-    await mock_services.openAi().stubOpenAiUploadResponse(result === 'success')
-  })
-})
-
-Given('OpenAI responds with {string} when triggering fine-tuning', (result) => {
-  cy.then(async () => {
-    await mock_services.openAi().stubFineTuningStatus(result === 'success')
-  })
-})
-
-When('I attempt to trigger fine-tuning', () => {
-  return start
-    .loginAsAdminAndGoToAdminDashboard()
-    .goToFineTuningData()
-    .triggerFineTuning()
-})
-
 Then('I should see the message {string}', (message: string) => {
   cy.contains(message)
 })
-
-Given(
-  'I have {int} positive feedbacks and {int} negative feedbacks',
-  (positive: number, negative: number) => {
-    const positives = Array.from({ length: positive }, (_, index) => ({
-      positiveFeedback: true,
-      preservedNoteContent: 'note content',
-      realCorrectAnswers: '',
-      preservedQuestion: {
-        multipleChoicesQuestion: {
-          f0__stem: `good question #${index}`,
-          f1__choices: ['choice 1', 'choice 2'],
-        },
-        correctChoiceIndex: 0,
-        strictChoiceOrder: true,
-      },
-    }))
-    const negatives = Array.from({ length: negative }, (_, index) => ({
-      positiveFeedback: false,
-      preservedNoteContent: 'note content',
-      realCorrectAnswers: '',
-      preservedQuestion: {
-        multipleChoicesQuestion: {
-          f0__stem: `bad question #${index}`,
-          f1__choices: ['choice 1', 'choice 2'],
-        },
-        correctChoiceIndex: 0,
-        strictChoiceOrder: true,
-      },
-    }))
-
-    return start
-      .testability()
-      .injectSuggestedQuestions(positives.concat(negatives))
-  }
-)
 
 When('I choose model {string} for {string}', (model: string, task: string) => {
   return start

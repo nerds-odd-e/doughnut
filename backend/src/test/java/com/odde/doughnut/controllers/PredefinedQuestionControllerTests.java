@@ -7,12 +7,9 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
@@ -31,7 +28,6 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
-  @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   @Autowired PredefinedQuestionController controller;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -44,77 +40,6 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   PredefinedQuestionController nullUserController() {
     currentUser.setUser(null);
     return controller;
-  }
-
-  @Nested
-  class SuggestQuestionForFineTuning {
-    PredefinedQuestion predefinedQuestion;
-    MCQWithAnswer mcqWithAnswer;
-    Note note;
-
-    QuestionSuggestionCreationParams suggestionWithPositiveFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", true);
-
-    QuestionSuggestionCreationParams suggestionWithNegativeFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", false);
-
-    @BeforeEach
-    void setup() throws PredefinedQuestionNotPossibleException {
-      note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      predefinedQuestion =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
-    }
-
-    @Test
-    void suggestQuestionWithAPositiveFeedback() {
-
-      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              predefinedQuestion, suggestionWithPositiveFeedback);
-      assert suggestedQuestionForFineTuning != null;
-      assertEquals(
-          predefinedQuestion.getMcqWithAnswer(),
-          suggestedQuestionForFineTuning.getPreservedQuestion());
-      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
-      assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
-      assertEquals("0", suggestedQuestionForFineTuning.getRealCorrectAnswers());
-    }
-
-    @Test
-    void suggestQuestionWithANegativeFeedback() {
-      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              predefinedQuestion, suggestionWithNegativeFeedback);
-      assert suggestedQuestionForFineTuning != null;
-      assertEquals(
-          predefinedQuestion.getMcqWithAnswer(),
-          suggestedQuestionForFineTuning.getPreservedQuestion());
-      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
-      assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
-      assertEquals("", suggestedQuestionForFineTuning.getRealCorrectAnswers());
-    }
-
-    @Test
-    void suggestQuestionWithSnapshotQuestionStem() {
-      var suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              predefinedQuestion, suggestionWithPositiveFeedback);
-      assert suggestedQuestionForFineTuning != null;
-      assertThat(
-          suggestedQuestionForFineTuning
-              .getPreservedQuestion()
-              .getF0__multipleChoicesQuestion()
-              .getF0__stem(),
-          equalTo(mcqWithAnswer.getF0__multipleChoicesQuestion().getF0__stem()));
-    }
-
-    @Test
-    void createMarkedQuestionInDatabase() {
-      long oldCount = questionSuggestionForFineTuningRepository.count();
-      controller.suggestQuestionForFineTuning(predefinedQuestion, suggestionWithPositiveFeedback);
-      assertThat(questionSuggestionForFineTuningRepository.count(), equalTo(oldCount + 1));
-    }
   }
 
   @Nested

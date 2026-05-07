@@ -178,45 +178,9 @@ Then('I should be back to the current question', () => {
   start.recall().assumeRecallPage().expectCurrentQuestion()
 })
 
-When(
-  'I have the true false question {string} rated as a good example',
-  (questionStem: string) => {
-    return start.testability().injectSuggestedQuestion(questionStem, true)
-  }
-)
-
-When(
-  'I have the true false question {string} rated as a bad example',
-  (questionStem: string) => {
-    return start.testability().injectSuggestedQuestion(questionStem, false)
-  }
-)
-
 Then('I should be asked {string}', (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
-
-When(
-  'I suggest the question {string} of the note {string} as a good example',
-  (questionStem: string, noteTopology: string) => {
-    return start
-      .jumpToNotePage(noteTopology)
-      .openQuestionList()
-      .suggestingQuestionForFineTuning(questionStem)
-      .suggestingPositiveFeedbackForFineTuning()
-  }
-)
-
-When(
-  'I suggest the question {string} of the note {string} as a bad example',
-  (questionStem: string, noteTopology: string) => {
-    return start
-      .jumpToNotePage(noteTopology)
-      .openQuestionList()
-      .suggestingQuestionForFineTuning(questionStem)
-      .suggestingNegativeFeedbackFineTuningExclusion()
-  }
-)
 
 When('I confirm re-assimilation', () => {
   start.assumeAnsweredQuestionPage().confirmReAssimilation()

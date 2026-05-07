@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
-import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
+import com.odde.doughnut.services.ai.ChatMessageContent;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -15,20 +14,13 @@ import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
-import com.openai.models.files.FileCreateParams;
-import com.openai.models.files.FileObject;
-import com.openai.models.files.FilePurpose;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -121,58 +113,6 @@ public class OpenAiApiHandler {
     return new ArrayList<>();
   }
 
-  public String uploadTextFile(String subFileName, String content, String purpose, String suffix)
-      throws IOException {
-    assertOpenAiAvailable();
-    File tempFile = File.createTempFile(subFileName, suffix);
-    try {
-      Files.write(tempFile.toPath(), content.getBytes(), StandardOpenOption.WRITE);
-      try {
-        FilePurpose filePurpose =
-            "fine-tune".equals(purpose) ? FilePurpose.FINE_TUNE : FilePurpose.ASSISTANTS;
-        FileCreateParams params =
-            FileCreateParams.builder().purpose(filePurpose).file(tempFile.toPath()).build();
-        FileObject fileObject = officialClient.files().create(params);
-        return fileObject.id();
-      } catch (Exception e) {
-        throw new OpenAIServiceErrorException("Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-    } finally {
-      tempFile.delete();
-    }
-  }
-
-  public com.openai.models.finetuning.jobs.FineTuningJob triggerFineTuning(String fileId) {
-    assertOpenAiAvailable();
-    var params =
-        com.openai.models.finetuning.jobs.JobCreateParams.builder()
-            .trainingFile(fileId)
-            .model("gpt-3.5-turbo-1106")
-            .build();
-    var fineTuningJob = officialClient.fineTuning().jobs().create(params);
-    var status = fineTuningJob.status();
-    // Check if status indicates failure
-    // Handle both enum comparison and string comparison for robustness
-    boolean isFailed = false;
-    if (status != null) {
-      if (status == com.openai.models.finetuning.jobs.FineTuningJob.Status.FAILED
-          || status == com.openai.models.finetuning.jobs.FineTuningJob.Status.CANCELLED) {
-        isFailed = true;
-      } else {
-        // Fallback: check string representation (case-insensitive)
-        String statusStr = status.toString().toUpperCase();
-        if ("FAILED".equals(statusStr) || "CANCELLED".equals(statusStr)) {
-          isFailed = true;
-        }
-      }
-    }
-    if (isFailed) {
-      throw new OpenAIServiceErrorException(
-          "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
-    }
-    return fineTuningJob;
-  }
-
   public String getTranscription(String filename, byte[] audioBytes) throws IOException {
     assertOpenAiAvailable();
     var params =
@@ -212,7 +152,7 @@ public class OpenAiApiHandler {
       if (contentOpt.isEmpty()) {
         return Optional.empty();
       }
-      String content = ChatMessageForFineTuning.extractContentString(contentOpt.get());
+      String content = ChatMessageContent.extractContentString(contentOpt.get());
       if (content == null || content.isEmpty()) {
         return Optional.empty();
       }

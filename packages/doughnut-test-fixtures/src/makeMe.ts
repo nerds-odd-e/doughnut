@@ -35,7 +35,6 @@ import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBui
 import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubscribedNotebookItemBuilder'
 import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
-import SuggestedQuestionForFineTuningBuilder from './SuggestedQuestionForFineTuningBuilder'
 import NoteSearchResultBuilder from './NoteSearchResultBuilder'
 import UserBuilder from './UserBuilder'
 import UserForListingBuilder from './UserForListingBuilder'
@@ -153,10 +152,6 @@ class MakeMe {
 
   static get aWikidataSearchEntity(): WikidataSearchEntityBuilder {
     return new WikidataSearchEntityBuilder()
-  }
-
-  static get aSuggestedQuestionForFineTuning(): SuggestedQuestionForFineTuningBuilder {
-    return new SuggestedQuestionForFineTuningBuilder()
   }
 
   static get aConversation(): ConversationBuilder {
