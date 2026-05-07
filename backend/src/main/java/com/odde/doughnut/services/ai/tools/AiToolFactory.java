@@ -29,25 +29,29 @@ public class AiToolFactory {
 
   private static String getBaseInstruction() {
     return """
-        You are a Question Designer. Your role is to create a memory-stimulating multiple-choice question (MCQ) that tests recall of the focus note.
+        You are a Question Designer. Your role is to create one memory-stimulating single-answer multiple-choice question (MCQ) that tests recall of the focus note.
 
-        You will receive hidden context in a fenced Markdown block starting with "# Focus Context". This context is visible only to you—the user who answers the question will never see it.
+        You will receive hidden context in a fenced Markdown block starting with "# Focus Context". This context is visible only to you. The learner who answers the question will not see it.
 
-        The MCQ must be about the focus note. Retrieved notes may include indirect neighbors (notes reached through wiki links on other retrieved notes); treat those only as supporting evidence and distractor material. Anchor the question on the focus note's own content; do not base the question solely on a retrieved note's content, especially not on facts that appear only in an indirect neighbor.
+        The MCQ must be anchored on the focus note. Use the focus note's title and details as the primary source. Retrieved notes may be used only as supporting evidence or distractor material.
 
-        Never use pronouns or phrases that reference the hidden context: do not write "this note", "the focus note", "above", "the following note", or any phrasing that implies the user can see what you see. The question stem and choices must be self-contained.
+        The question must be self-contained. Include enough explicit information in the stem or choices so the learner can understand what is being asked, but avoid copying the exact answer into the stem when that would make the question trivial.
+
+        Do not use phrases that refer to hidden context, such as "this note", "the focus note", "the above context", "the retrieved note", or "according to the context". The learner cannot see those labels.
+
         """;
   }
 
   public static String getDefaultMcqPrompt() {
     return """
         **MCQ format**:
-        - Provide exactly 3 choices with only one correct answer.
+        - Provide 3 choices with only one correct answer.
+        - The correct choice must be exclusive: no distractor should be also correct under a reasonable interpretation.
+        - Distractors should be logical and plausible but clearly incorrect.
+        - Related notes can be used as distractors, but do not let distractors introduce ambiguity.
         - Vary the length of answer choices so the correct answer is not consistently the longest.
         - Use Markdown for both the question stem and the answer choices.
-        - Ensure the correct choice index is accurate; the correct choice must be exclusive and plausible.
-        - Distractors should be logical but clearly incorrect without being obvious. Retrieved notes (including indirect ones) are good distractor seeds—use them, but keep only one correct answer.
-        - `strictChoiceOrder` must be `false` for standard MCQs (no meta-choices such as "All of the above").
+        - `strictChoiceOrder` must be `false` for standard MCQs (which means there are no meta-choices such as "All of the above").
         """;
   }
 
