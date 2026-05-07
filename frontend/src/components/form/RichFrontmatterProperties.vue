@@ -19,7 +19,19 @@
       <template v-for="row in propertyRows" :key="row.key">
         <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
         <dd class="daisy-m-0">
-          {{ isRelationPropertyRow(row) ? relationLabelFromKebab(row.value) : row.value }}
+          <template v-if="!isRelationPropertyRow(row)">{{ row.value }}</template>
+          <template v-else-if="isKnownRelationKebab(row.value)">{{
+            relationLabelFromKebab(row.value)
+          }}</template>
+          <WikiPropertyValueField
+            v-else
+            :model-value="row.value"
+            :wiki-titles="wikiTitles"
+            readonly
+            :aria-label="`Note property ${row.key} value`"
+            data-testid="rich-note-property-readonly-relation-value"
+            @dead-link-click="emits('deadLinkClick', $event)"
+          />
         </dd>
       </template>
     </dl>
@@ -128,6 +140,7 @@ import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
+  isKnownRelationKebab,
   relationKebabFromLabel,
   relationLabelFromKebab,
   relationTypeFromKebab,
