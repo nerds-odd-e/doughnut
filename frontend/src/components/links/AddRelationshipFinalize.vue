@@ -38,7 +38,6 @@ import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "lucide-vue-next"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 import {
   formatRelationshipNoteMarkdown,
   formatRelationshipNoteTitle,
@@ -84,7 +83,7 @@ const placementOptions: {
 ]
 
 const formData = ref<{
-  relationType?: RelationTypeLabel
+  relationType?: string
   relationshipNotePlacement: RelationshipNotePlacement
 }>({
   relationType: undefined,
@@ -95,9 +94,7 @@ const relationshipFormErrors = ref({
   relationType: undefined as string | undefined,
 })
 
-const relationTypeSelected = async (
-  relationType: RelationTypeLabel | undefined
-) => {
+const relationTypeSelected = async (relationType: string | undefined) => {
   try {
     if (relationType === undefined) return
 

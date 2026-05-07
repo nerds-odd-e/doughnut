@@ -1,4 +1,5 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
+import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 import helper from "@tests/helpers"
@@ -462,6 +463,79 @@ Body line`
       expect(
         wrapper.findComponent({ name: "RelationTypeSelect" }).exists()
       ).toBe(true)
+    })
+
+    it("shows Custom relation option in the relation type dialog", async () => {
+      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+      await wrapper.find('[aria-label="Relation Type"]').trigger("click")
+      await flushPromises()
+
+      const rt = wrapper.findComponent({ name: "RelationTypeSelect" })
+      expect(rt.exists()).toBe(true)
+      expect(rt.text()).toContain("Custom…")
+    })
+
+    it("shows custom text input when Custom… is chosen", async () => {
+      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+      await wrapper.find('[aria-label="Relation Type"]').trigger("click")
+      await flushPromises()
+
+      const rt = wrapper.findComponent({ name: "RelationTypeSelect" })
+      await rt
+        .find(`input[value="${CUSTOM_RELATION_RADIO_SENTINEL}"]`)
+        .trigger("change")
+      await flushPromises()
+
+      const textInputs = rt.findAll('input[type="text"].daisy-input-bordered')
+      expect(textInputs.length).toBeGreaterThan(0)
+    })
+
+    it("commits custom relationship text from the dialog and emits updated frontmatter", async () => {
+      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+      await wrapper.find('[aria-label="Relation Type"]').trigger("click")
+      await flushPromises()
+
+      const rt = wrapper.findComponent({ name: "RelationTypeSelect" })
+      await rt
+        .find(`input[value="${CUSTOM_RELATION_RADIO_SENTINEL}"]`)
+        .trigger("change")
+      await flushPromises()
+
+      const field = rt.find('input[type="text"].daisy-input-bordered')
+      await field.setValue("novel connector phrase")
+      await field.trigger("blur")
+      await flushPromises()
+
+      const emitted = wrapper.emitted("update:modelValue")
+      expect(emitted?.length).toBeGreaterThan(0)
+      const last = emitted![emitted!.length - 1]![0] as string
+      expect(last).toContain("relation: novel-connector-phrase")
+    })
+
+    it("opens dialog with custom text prefilled for an unknown relation", async () => {
+      const markdown = `---\nrelation: xyz-unknown-kebab\ntype: relationship\n---\n\nBody`
+      await mountEditor(markdown)
+      await flushPromises()
+      await wrapper.find('[aria-label="Relation Type"]').trigger("click")
+      await flushPromises()
+
+      const rt = wrapper.findComponent({ name: "RelationTypeSelect" })
+      const field = rt.find('input[type="text"].daisy-input-bordered')
+      expect(field.exists()).toBe(true)
+      expect((field.element as HTMLInputElement).value).toBe(
+        "xyz-unknown-kebab"
+      )
+      const primaryLabelForCustom = rt.find(
+        `label[for="rich-note-relation-property-${CUSTOM_RELATION_RADIO_SENTINEL}"]`
+      )
+      expect(primaryLabelForCustom.exists()).toBe(true)
+      expect(primaryLabelForCustom.classes()).toContain("daisy-bg-primary")
     })
   })
 

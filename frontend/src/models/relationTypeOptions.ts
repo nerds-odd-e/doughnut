@@ -16,6 +16,9 @@ export type RelationTypeLabel =
   | "similar to"
   | "confused with"
 
+/** Radio `value` for the Custom… row in `RelationTypeSelect` (not persisted as relation text). */
+export const CUSTOM_RELATION_RADIO_SENTINEL = "__relation_custom__"
+
 interface RelationTypeOption {
   label: RelationTypeLabel
   reversedLabel: string

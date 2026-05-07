@@ -132,7 +132,6 @@ import {
   relationKebabFromLabel,
   relationLabelFromKebab,
   relationTypeFromKebab,
-  type RelationTypeLabel,
 } from "@/models/relationTypeOptions"
 import {
   parseNoteContentMarkdown,
@@ -194,21 +193,18 @@ function isRelationPropertyRow(row: PropertyRow): boolean {
   return row.key.trim().toLowerCase() === "relation"
 }
 
-function relationModelValue(row: PropertyRow): RelationTypeLabel {
+function relationModelValue(row: PropertyRow): string {
   if (isKnownRelationKebab(row.value)) return relationTypeFromKebab(row.value)
-  return row.value as RelationTypeLabel
+  return row.value.trim()
 }
 
-function onRelationTypeSelected(
-  idx: number,
-  newType: RelationTypeLabel | undefined
-) {
+function onRelationTypeSelected(idx: number, newType: string | undefined) {
   if (newType === undefined) return
   const row = propertyRows.value[idx]
   if (!row || !isRelationPropertyRow(row)) return
-  const current = relationTypeFromKebab(row.value)
-  if (current === newType) return
-  const kebab = relationKebabFromLabel(newType)
+  const nextKebab = relationKebabFromLabel(newType)
+  if (row.value.trim().toLowerCase() === nextKebab.toLowerCase()) return
+  const kebab = nextKebab
   const rows = propertyRows.value.map((r, i) =>
     i === idx
       ? { key: r.key.trim(), value: kebab }

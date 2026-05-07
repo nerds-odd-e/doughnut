@@ -41,7 +41,6 @@
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
-import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 import PopButton from "../commons/Popups/PopButton.vue"
 import InputWithType from "../form/InputWithType.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
@@ -50,7 +49,7 @@ import RelationTypeSelect from "./RelationTypeSelect.vue"
 const props = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<RelationTypeLabel>,
+    type: String as PropType<string>,
     default: undefined,
   },
   errorMessage: String,
