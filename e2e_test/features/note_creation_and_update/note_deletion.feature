@@ -15,7 +15,7 @@ Feature: Note deletion
     Then I should see the note "TDD" is marked as deleted
 
   Scenario: Deleting a note leaves folder peers; undo restores relationships
-    Given there is "a part of" relationship between note "TDD" and "tech"
+    Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
     And I should see "TDD" has relationship "a part of" "tech"
     When I delete note "TDD"
     Then I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
@@ -57,7 +57,7 @@ Feature: Note deletion
       | References Test | |
       | source | References Test |
       | target | References Test |
-    And there is "a part of" relationship between note "source" and "target"
+    And there is "a part of" relationship between note "source" and "target" in notebook "References suite"
     And I should see "source" has relationship "a part of" "target"
     When I delete note "target"
     And I navigate to References suite/References Test note

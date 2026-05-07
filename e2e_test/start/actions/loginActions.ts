@@ -23,6 +23,7 @@ export const loginActions = {
 
     // Call the service directly - it will use cy.request via our custom request function
     cy.wrap(username).as('currentLoginUser')
+    cy.wrap(username).as('injectNotesExternalIdentifier')
     return cy
       .wrap(
         HealthCheckController.ping({

@@ -50,6 +50,69 @@ const unwrapData = <T>(result: T | { data: T } | undefined): T => {
   return result as T
 }
 
+/** Same kebab-case rule as backend RelationshipNoteMarkdownFormatter.relationKebabFromLabel. */
+function relationKebabFromLabel(label: string): string {
+  const t = label.trim()
+  if (!t) {
+    return relationKebabFromLabel('related to')
+  }
+  return t.toLowerCase().replace(/\s+/g, '-')
+}
+
+/** Same title shape as backend RelationshipNoteTitleFormatter.format. */
+function relationshipNoteTitle(
+  sourceTitle: string,
+  relationLabel: string,
+  targetTitle: string
+): string {
+  const UNTITLED = 'Untitled'
+  const RELATED_TO_LABEL = 'related to'
+  const seg = (s: string, fallback: string) => {
+    const x = s.trim()
+    return x === '' ? fallback : x
+  }
+  const source = seg(sourceTitle, UNTITLED)
+  const relation = seg(relationLabel, RELATED_TO_LABEL)
+  const target = seg(targetTitle, UNTITLED)
+  const composed = `${source} ${relation} ${target}`.trim()
+  if (composed === '') {
+    return UNTITLED
+  }
+  const MAX_TITLE_LENGTH = 150
+  if (composed.length > MAX_TITLE_LENGTH) {
+    return composed.slice(0, MAX_TITLE_LENGTH)
+  }
+  return composed
+}
+
+/** Same markdown shape as backend RelationshipNoteMarkdownFormatter.format for same-notebook endpoints. */
+function relationshipNoteMarkdown(
+  relationLabel: string,
+  sourceTitle: string,
+  targetTitle: string
+): string {
+  const relationKebab = relationKebabFromLabel(relationLabel)
+  const UNTITLED = 'Untitled'
+  const sourceDisplay =
+    sourceTitle.trim() === '' ? UNTITLED : sourceTitle.trim()
+  const targetDisplay =
+    targetTitle.trim() === '' ? UNTITLED : targetTitle.trim()
+  const sourceLink = `[[${sourceDisplay}]]`
+  const targetLink = `[[${targetDisplay}]]`
+  const bodyLine = `${sourceLink} ${relationLabel} ${targetLink}.`
+  const yamlEscape = (s: string) =>
+    s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+  return `---
+type: relationship
+relation: ${relationKebab}
+source: "${yamlEscape(sourceLink)}"
+target: "${yamlEscape(targetLink)}"
+---
+
+${bodyLine}
+`
+}
+
 /** Must match page count in `e2e_test/fixtures/book_reading/blank_5_pages.pdf`. */
 const BLANK_BOOK_FIXTURE_PAGE_COUNT = 5
 
@@ -157,25 +220,30 @@ const testability = () => {
         noteTestData,
       }
 
-      return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-        return cy
-          .wrap(
-            TestabilityRestController.injectNotes({
-              body: requestBody,
-            }).then((response) => {
-              const data = unwrapData<Record<string, number>>(response)
-              const expectedCount = noteTestData.length
-              const actualCount = Object.keys(data).length
-              expect(
-                actualCount,
-                `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
-              ).to.equal(expectedCount)
-              return { ...existingMap, ...data }
-            }),
-            { log: false }
-          )
-          .as(injectedNoteIdMapAliasName)
-      })
+      return cy
+        .wrap(externalIdentifier)
+        .as('injectNotesExternalIdentifier')
+        .then(() =>
+          cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+            return cy
+              .wrap(
+                TestabilityRestController.injectNotes({
+                  body: requestBody,
+                }).then((response) => {
+                  const data = unwrapData<Record<string, number>>(response)
+                  const expectedCount = noteTestData.length
+                  const actualCount = Object.keys(data).length
+                  expect(
+                    actualCount,
+                    `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
+                  ).to.equal(expectedCount)
+                  return { ...existingMap, ...data }
+                }),
+                { log: false }
+              )
+              .as(injectedNoteIdMapAliasName)
+          })
+        )
     },
 
     rememberUiCreatedNote(noteTitle: string) {
@@ -256,29 +324,30 @@ const testability = () => {
         )
         .then(() => this.shareToBazaar(notebook))
     },
-    injectRelationship(
-      type: string,
+    injectRelationshipNote(
+      notebookName: string,
+      relationTypeLabel: string,
       fromNoteTopic: string,
       toNoteTopic: string
     ) {
       return cy
-        .get(`@${injectedNoteIdMapAliasName}`)
-        .then((injectedNoteIdMap) => {
-          expect(injectedNoteIdMap).to.have.property(fromNoteTopic)
-          expect(injectedNoteIdMap).to.have.property(toNoteTopic)
-          const fromNoteId = injectedNoteIdMap[fromNoteTopic]
-          const toNoteId = injectedNoteIdMap[toNoteTopic]
-
-          const requestBody = {
-            type,
-            source_id: fromNoteId.toString(),
-            target_id: toNoteId.toString(),
-          }
-
-          const promise = TestabilityRestController.createRelationships({
-            body: requestBody,
-          })
-          return cy.wrap(promise, { log: false })
+        .get<string>('@injectNotesExternalIdentifier')
+        .then((externalIdentifier) => {
+          const title = relationshipNoteTitle(
+            fromNoteTopic,
+            relationTypeLabel,
+            toNoteTopic
+          )
+          const content = relationshipNoteMarkdown(
+            relationTypeLabel,
+            fromNoteTopic,
+            toNoteTopic
+          )
+          return this.injectNotes(
+            [{ Title: title, Content: content }],
+            externalIdentifier,
+            notebookName
+          )
         })
     },
 

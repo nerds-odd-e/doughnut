@@ -12,7 +12,7 @@ Feature: Bazaar browsing
       | interface        | their interfaces are different   | Topics/Nested/Oop   |
       | precondition     | square has stronger precondition | Topics/Nested/Oop   |
       | Shapes are good  |                                  | Topics              |
-    And there is "a specialization of" relationship between note "Square" and "Rectangle"
+    And there is "a specialization of" relationship between note "Square" and "Rectangle" in notebook "Geometry set"
     And notebook "Geometry set" is shared to the Bazaar
 
   Scenario: Browsing as non-user

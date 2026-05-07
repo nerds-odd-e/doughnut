@@ -8,7 +8,7 @@ Feature: relationship edit and remove
       | Moon |
       | Earth |
       | Mars |
-    And there is "a part of" relationship between note "Moon" and "Earth"
+    And there is "a part of" relationship between note "Moon" and "Earth" in notebook "Space topics"
 
   Scenario: change relation type
     When I change the relationship from "Moon" to "Earth" to "a specialization of"

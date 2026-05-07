@@ -54,11 +54,21 @@ When(
 )
 
 When(
-  'there is {string} relationship between note {string} and {string}',
-  (relationType: string, fromNoteTopic: string, toNoteTopic: string) => {
+  'there is {string} relationship between note {string} and {string} in notebook {string}',
+  (
+    relationType: string,
+    fromNoteTopic: string,
+    toNoteTopic: string,
+    notebookName: string
+  ) => {
     start
       .testability()
-      .injectRelationship(relationType, fromNoteTopic, toNoteTopic)
+      .injectRelationshipNote(
+        notebookName,
+        relationType,
+        fromNoteTopic,
+        toNoteTopic
+      )
   }
 )
 
