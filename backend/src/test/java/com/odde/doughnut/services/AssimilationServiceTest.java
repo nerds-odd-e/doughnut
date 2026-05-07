@@ -76,7 +76,7 @@ public class AssimilationServiceTest {
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForRecall() {
-      makeMe.theNote(note1).skipMemoryTracking().relateTo(note2).please();
+      makeMe.theNote(note1).skipMemoryTracking().please();
       assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note2));
     }
 

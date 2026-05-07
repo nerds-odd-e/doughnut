@@ -94,15 +94,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder relateTo(Note referTo) {
-    return relateTo(referTo, RelationType.SPECIALIZE);
-  }
-
-  public NoteBuilder relateTo(Note referTo, RelationType relationType) {
-    relationBuilders.add(makeMe.aRelation().between(entity, referTo, relationType));
-    return this;
-  }
-
   public NoteBuilder inCircle(Circle circle) {
     return attachToNewNotebook(circle.getOwnership());
   }

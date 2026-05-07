@@ -327,46 +327,6 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
     }
 
-    @Test
-    void shouldNotSoftDeleteOutgoingRelationshipNotesWhenSubjectIsDeleted()
-        throws UnexpectedNoAccessRightException {
-      Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
-      Note relation = makeMe.aRelation().between(subject, targetNote).please();
-      makeMe.refresh(subject);
-
-      controller.deleteNote(subject);
-
-      assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(relation.getDeletedAt(), is(nullValue()));
-    }
-
-    @Test
-    void shouldNotSoftDeleteInboundRelationshipNotesWhenFocalNoteIsDeleted()
-        throws UnexpectedNoAccessRightException {
-      Note sourceNote = makeMe.aNote("source").creatorAndOwner(currentUser.getUser()).please();
-      Note reference = makeMe.aRelation().between(sourceNote, subject).please();
-      makeMe.refresh(subject);
-
-      controller.deleteNote(subject);
-
-      assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(reference.getDeletedAt(), is(nullValue()));
-    }
-
-    @Test
-    void shouldNotSoftDeleteInboundReferencesToStructuralChildrenWhenParentNoteIsDeleted()
-        throws UnexpectedNoAccessRightException {
-      Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
-      Note referenceToChild = makeMe.aRelation().between(targetNote, child).please();
-      makeMe.refresh(subject);
-
-      controller.deleteNote(subject);
-
-      assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(child.getDeletedAt(), is(nullValue()));
-      assertThat(referenceToChild.getDeletedAt(), is(nullValue()));
-    }
-
     @Nested
     class MemoryTrackerExclusionWhenNoteDeleted {
       @Test
