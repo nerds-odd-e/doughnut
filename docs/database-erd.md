@@ -26,7 +26,6 @@ erDiagram
     "note" ||--o{ note_wiki_title_cache : "note_id"
     "note" ||--o{ note_wiki_title_cache : "target_note_id"
     "note" ||--o{ predefined_question : "note_id"
-    "note" ||--o{ wiki_reference_migration_progress : "last_processed_note_id"
     notebook ||--o{ assessment_attempt : "notebook_id"
     notebook ||--o{ bazaar_notebook : "notebook_id"
     notebook ||--o{ book : "notebook_id"
@@ -223,11 +222,6 @@ erDiagram
         int id PK
         int user_id FK
         string token UK
-    }
-    wiki_reference_migration_progress {
-        int id PK
-        string step_name UK
-        int last_processed_note_id FK
     }
 ```
 

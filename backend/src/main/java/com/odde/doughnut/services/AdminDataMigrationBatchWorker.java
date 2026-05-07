@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
  * a no-op acknowledgement so the HTTP surface stays stable.
  *
  * <p>To add migration work later, populate {@link
- * AdminDataMigrationService#orderedAdminDataMigrationSteps} and extend this worker to drive {@link
- * WikiReferenceMigrationProgressService} accordingly.
+ * AdminDataMigrationService#orderedAdminDataMigrationSteps} and extend this worker (and status
+ * reporting in {@link AdminDataMigrationService}) accordingly.
  */
 @Service
 public class AdminDataMigrationBatchWorker {
