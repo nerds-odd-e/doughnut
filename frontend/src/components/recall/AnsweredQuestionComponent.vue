@@ -17,6 +17,8 @@
       multipleChoicesQuestion: answeredQuestion.predefinedQuestion!.multipleChoicesQuestion,
       correctChoiceIndex: answeredQuestion.predefinedQuestion!.correctAnswerIndex,
       answer: answeredQuestion.answer,
+      testedFocus: answeredQuestion.predefinedQuestion!.testedFocus,
+      validationRationale: answeredQuestion.predefinedQuestion!.validationRationale,
     }"
   />
   <ConversationButton

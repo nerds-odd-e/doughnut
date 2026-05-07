@@ -10,6 +10,27 @@
       :disabled="disabled"
       @answer="submitAnswer($event)"
     />
+    <div
+      v-if="answeredWithAiNotes"
+      class="daisy-mt-6 daisy-border daisy-border-base-300 daisy-rounded-lg daisy-p-4 daisy-bg-base-200/40"
+      data-test="question-ai-notes"
+    >
+      <p class="daisy-text-xs daisy-font-semibold daisy-opacity-60 daisy-mb-3 daisy-uppercase daisy-tracking-wide">
+        Question designer notes
+      </p>
+      <div v-if="testedFocus?.trim()" class="daisy-space-y-1">
+        <h3 class="daisy-text-sm daisy-font-semibold">Tested focus</h3>
+        <p class="daisy-text-sm daisy-whitespace-pre-wrap">{{ testedFocus }}</p>
+      </div>
+      <div
+        v-if="validationRationale?.trim()"
+        :class="{ 'daisy-mt-4': testedFocus?.trim() }"
+        class="daisy-space-y-1"
+      >
+        <h3 class="daisy-text-sm daisy-font-semibold">Why the answer fits</h3>
+        <p class="daisy-text-sm daisy-whitespace-pre-wrap">{{ validationRationale }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -34,11 +55,19 @@ const props = defineProps({
   correctChoiceIndex: Number,
   answer: Object as PropType<Answer>,
   disabled: Boolean,
+  testedFocus: String,
+  validationRationale: String,
 })
 
 const emits = defineEmits(["answer"])
 
 const isActiveQuestion = computed(() => !props.disabled && !props.answer)
+
+const answeredWithAiNotes = computed(
+  () =>
+    !!props.answer &&
+    !!(props.testedFocus?.trim() || props.validationRationale?.trim())
+)
 
 const { stop, isPaused } = useQuestionThinkingTime(isActiveQuestion)
 

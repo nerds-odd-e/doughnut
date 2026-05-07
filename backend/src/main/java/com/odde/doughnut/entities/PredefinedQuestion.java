@@ -41,11 +41,19 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @Column(name = "context_seed")
   private Long contextSeed;
 
+  @Column(name = "tested_focus", columnDefinition = "TEXT")
+  private String testedFocus;
+
+  @Column(name = "validation_rationale", columnDefinition = "TEXT")
+  private String validationRationale;
+
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
     mcqWithAnswer.setQuestion(getMultipleChoicesQuestion());
     mcqWithAnswer.setSolutionChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
+    mcqWithAnswer.setTestedFocus(testedFocus);
+    mcqWithAnswer.setValidationRationale(validationRationale);
     return mcqWithAnswer;
   }
 
@@ -65,6 +73,8 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
     predefinedQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getQuestion());
     predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getSolutionChoiceIndex());
     predefinedQuestion.setContextSeed(contextSeed);
+    predefinedQuestion.setTestedFocus(MCQWithAnswer.getTestedFocus());
+    predefinedQuestion.setValidationRationale(MCQWithAnswer.getValidationRationale());
     return predefinedQuestion;
   }
 

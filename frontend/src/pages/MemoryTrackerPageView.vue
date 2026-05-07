@@ -142,6 +142,8 @@
               correctChoiceIndex: prompt.predefinedQuestion.correctAnswerIndex,
               answer: prompt.answer,
               disabled: true,
+              testedFocus: prompt.predefinedQuestion.testedFocus,
+              validationRationale: prompt.predefinedQuestion.validationRationale,
             }"
           />
           <QuestionDisplay

@@ -3202,6 +3202,10 @@ components:
         contextSeed:
           type: integer
           format: int64
+        testedFocus:
+          type: string
+        validationRationale:
+          type: string
       required:
       - id
       - multipleChoicesQuestion

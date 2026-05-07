@@ -5,6 +5,7 @@ import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import markdownizer from "@/components/form/markdownizer"
+import type { Answer } from "@generated/doughnut-backend-api"
 
 describe("QuestionDisplay", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>
@@ -292,5 +293,56 @@ describe("QuestionDisplay", () => {
     // Should be ~1500ms (1000ms before + 500ms after), not 2500ms
     expect(answerData?.thinkingTimeMs).toBeLessThan(2000)
     expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(1000)
+  })
+
+  it("shows designer notes after answer when tested focus or rationale exist", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Q")
+      .withChoices(["A", "B"])
+      .please()
+    const answer = {
+      id: 1,
+      correct: true,
+      choiceIndex: 0,
+    } satisfies Answer
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({
+        multipleChoicesQuestion,
+        correctChoiceIndex: 0,
+        answer,
+        testedFocus: "Tests recall of the capital.",
+        validationRationale:
+          "Paris is correct; Berlin and Rome are wrong capitals.",
+      })
+      .mount()
+
+    await flushPromises()
+
+    const notes = wrapper.find("[data-test='question-ai-notes']")
+    expect(notes.exists()).toBe(true)
+    expect(notes.text()).toContain("Tests recall of the capital.")
+    expect(notes.text()).toContain("Paris is correct")
+  })
+
+  it("does not show designer notes before answering", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Q")
+      .withChoices(["A", "B"])
+      .please()
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({
+        multipleChoicesQuestion,
+        testedFocus: "Secret",
+        validationRationale: "Also secret",
+      })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.find("[data-test='question-ai-notes']").exists()).toBe(false)
   })
 })
