@@ -32,7 +32,7 @@
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
     "vue-toastification": "2.0.0-rc.5",
-    "yaml": "^2.8.4"
+    "yaml": ">=2.8.4"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.14",
@@ -59,7 +59,7 @@
     "marked": "^18.0.3",
     "optionator": "^0.9.4",
     "playwright": "^1.59.1",
-    "postcss": "8.5.14",
+    "postcss": ">=8.5.14",
     "postcss-load-config": "6.0.1",
     "sass": "1.99.0",
     "storybook": "10.3.6",

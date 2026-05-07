@@ -21,8 +21,8 @@ overrides:
   express: '>=5.2.0'
   systeminformation: '>=5.31.0'
   qs: '>=6.14.2'
-  hono: 4.12.17
-  '@hono/node-server': 2.0.1
+  hono: '>=4.12.17'
+  '@hono/node-server': '>=2.0.1'
   undici: '>=7.24.0'
   diff: '>=8.0.3'
   lodash-es: '>=4.18.0'
@@ -43,7 +43,7 @@ overrides:
   flatted: '>=3.4.2'
   yauzl: '>=3.2.1'
   picomatch: '>=4.0.4'
-  yaml: ^2.8.4
+  yaml: '>=2.8.4'
   handlebars: '>=4.7.9'
   path-to-regexp: '>=8.4.0'
   '@xmldom/xmldom': '>=0.9.10'
@@ -52,7 +52,8 @@ overrides:
   follow-redirects: '>=1.16.0'
   protobufjs: '>=7.5.5'
   uuid: '>=14.0.0'
-  postcss: 8.5.14
+  postcss: '>=8.5.14'
+  ip-address: '>=10.1.1'
 
 importers:
 
@@ -81,7 +82,7 @@ importers:
         specifier: 0.97.1
         version: 0.97.1(typescript@6.0.3)
       '@hono/node-server':
-        specifier: 2.0.1
+        specifier: '>=2.0.1'
         version: 2.0.1(hono@4.12.17)
       '@mbtest/mountebank':
         specifier: 2.9.4
@@ -117,7 +118,7 @@ importers:
         specifier: ^15.0.3
         version: 15.0.3
       hono:
-        specifier: 4.12.17
+        specifier: '>=4.12.17'
         version: 4.12.17
       npm-run-all2:
         specifier: ^8.0.4
@@ -150,7 +151,7 @@ importers:
         specifier: ^9.0.5
         version: 9.0.5
       yaml:
-        specifier: ^2.8.4
+        specifier: '>=2.8.4'
         version: 2.8.4
 
   cli:
@@ -247,7 +248,7 @@ importers:
         specifier: 2.0.0-rc.5
         version: 2.0.0-rc.5(vue@3.5.34(typescript@6.0.3))
       yaml:
-        specifier: ^2.8.4
+        specifier: '>=2.8.4'
         version: 2.8.4
     devDependencies:
       '@biomejs/biome':
@@ -323,7 +324,7 @@ importers:
         specifier: ^1.59.1
         version: 1.59.1
       postcss:
-        specifier: 8.5.14
+        specifier: '>=8.5.14'
         version: 8.5.14
       postcss-load-config:
         specifier: 6.0.1
@@ -1208,7 +1209,7 @@ packages:
     resolution: {integrity: sha512-jI9yMDyFpqBeSighf/zlXnQG/nl9AyBc6aAgy4XtxJMyt/CNyJpvPfzDD+bCc2zAOmhhqtF6TnmIaY+xV4mIrw==}
     engines: {node: '>=20'}
     peerDependencies:
-      hono: 4.12.17
+      hono: '>=4.12.17'
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
@@ -2515,7 +2516,7 @@ packages:
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -3176,7 +3177,7 @@ packages:
     resolution: {integrity: sha512-bEOVpHU9picRZux5XnwGsmCN4+8oZo7vSW0O0/Enq/TO5R2pIAP2279NsszpJR7ocnQt4WXU0+nnh/0JuK4KHQ==}
     engines: {node: ^14.0.0 || >=16.0.0}
     peerDependencies:
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
 
   detective-sass@6.0.2:
     resolution: {integrity: sha512-i3xpXHDKS0qI2aFW4asQ7fqlPK00ndOVZELvQapFJCaF0VxYmsNWtd0AmvXbTLMk7bfO5VdIeorhY9KfmHVoVA==}
@@ -3991,8 +3992,8 @@ packages:
     peerDependencies:
       fp-ts: ^2.5.0
 
-  ip-address@10.1.0:
-    resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
+  ip-address@10.2.0:
+    resolution: {integrity: sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA==}
     engines: {node: '>= 12'}
 
   ipaddr.js@1.9.1:
@@ -5271,22 +5272,22 @@ packages:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
 
   postcss-js@4.1.0:
     resolution: {integrity: sha512-oIAOTqgIo7q2EOwbhb8UalYePMvYoIeRY2YKntdpFQXNosSu3vLrniGgmH9OKs/qAkfoj5oB3le/7mINW1LCfw==}
     engines: {node: ^12 || ^14 || >= 16}
     peerDependencies:
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
 
   postcss-load-config@6.0.1:
     resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
     engines: {node: '>= 18'}
     peerDependencies:
       jiti: '>=1.21.0'
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
       tsx: ^4.8.1
-      yaml: ^2.8.4
+      yaml: '>=2.8.4'
     peerDependenciesMeta:
       jiti:
         optional: true
@@ -5301,7 +5302,7 @@ packages:
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
 
   postcss-selector-parser@6.1.2:
     resolution: {integrity: sha512-Q8qQfPiZ+THO/3ZrOrO0cJJKfpYCagtMUkXbnEfmgUjwXg6z/WBeOyS9APBBPCTSiDV+s4SwQGu8yFsiMRIudg==}
@@ -5314,7 +5315,7 @@ packages:
     resolution: {integrity: sha512-YLJpK0N1brcNJrs9WatuJFtHaV9q5aAOj+S4DI5S7jgHlRfm0PIbDCAFRYMQD5SHq7Fy6xsDhyutgS0QOAs0qw==}
     engines: {node: '>=10'}
     peerDependencies:
-      postcss: 8.5.14
+      postcss: '>=8.5.14'
 
   postcss@8.5.14:
     resolution: {integrity: sha512-SoSL4+OSEtR99LHFZQiJLkT59C5B1amGO1NzTwj7TT1qCUgUO6hxOvzkOYxD+vMrXBM3XJIKzokoERdqQq/Zmg==}
@@ -6584,7 +6585,7 @@ packages:
       sugarss: ^5.0.0
       terser: ^5.16.0
       tsx: ^4.8.1
-      yaml: ^2.8.4
+      yaml: '>=2.8.4'
     peerDependenciesMeta:
       '@types/node':
         optional: true
@@ -8887,7 +8888,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/browser-playwright@4.1.5)(@vitest/ui@4.1.5)(jsdom@26.1.0(canvas@3.2.3))(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@1.21.7)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.4))
+      vitest: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/browser-playwright@4.1.5)(@vitest/ui@4.1.5)(jsdom@26.1.0(canvas@3.2.3))(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.4))
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -10340,7 +10341,7 @@ snapshots:
   express-rate-limit@8.4.1(express@5.2.1):
     dependencies:
       express: 5.2.1
-      ip-address: 10.1.0
+      ip-address: 10.2.0
 
   express@5.2.1:
     dependencies:
@@ -10927,7 +10928,7 @@ snapshots:
     dependencies:
       fp-ts: 2.16.11
 
-  ip-address@10.1.0: {}
+  ip-address@10.2.0: {}
 
   ipaddr.js@1.9.1: {}
 
