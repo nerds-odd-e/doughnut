@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,7 @@ class NoteRealmJsonSerializationTest {
     Note relation = makeMe.aNote().please();
     relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, RelationType.SPECIALIZE, subject, focal, null));
+            relation, "a specialization of", subject, focal, null));
     makeMe.entityPersister.merge(relation);
     makeMe.entityPersister.flush();
     wikiTitleCacheService.refreshForNote(relation, user);

@@ -50,7 +50,7 @@ const unwrapData = <T>(result: T | { data: T } | undefined): T => {
   return result as T
 }
 
-/** Same kebab-case rule as backend RelationshipNoteMarkdownFormatter.relationKebabFromLabel. */
+/** Same kebab-case rule as relation type options / app compose. */
 function relationKebabFromLabel(label: string): string {
   const t = label.trim()
   if (!t) {
@@ -59,7 +59,7 @@ function relationKebabFromLabel(label: string): string {
   return t.toLowerCase().replace(/\s+/g, '-')
 }
 
-/** Same title shape as backend RelationshipNoteTitleFormatter.format. */
+/** Same title shape as relationship notes created in the app (150 char cap). */
 function relationshipNoteTitle(
   sourceTitle: string,
   relationLabel: string,
@@ -85,7 +85,7 @@ function relationshipNoteTitle(
   return composed
 }
 
-/** Same markdown shape as backend RelationshipNoteMarkdownFormatter.format for same-notebook endpoints. */
+/** Same markdown shape as `relationshipNoteMarkdown` for same-notebook endpoints. */
 function relationshipNoteMarkdown(
   relationLabel: string,
   sourceTitle: string,

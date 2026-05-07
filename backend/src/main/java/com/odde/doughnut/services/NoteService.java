@@ -4,8 +4,6 @@ import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
-import com.odde.doughnut.entities.RelationType;
-import com.odde.doughnut.entities.RelationshipNotePlacement;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -24,22 +22,16 @@ public class NoteService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final NoteChildContainerFolderService noteChildContainerFolderService;
-  private final WikiTitleCacheService wikiTitleCacheService;
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
-      NoteChildContainerFolderService noteChildContainerFolderService,
-      WikiTitleCacheService wikiTitleCacheService) {
+      TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.noteChildContainerFolderService = noteChildContainerFolderService;
-    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -107,30 +99,6 @@ public class NoteService {
         noteRepository.noteWithWikidataIdWithinNotebook(
             note.getNotebook().getId(), note.getWikidataId());
     return (existingNotes.stream().anyMatch(n -> !n.equals(note)));
-  }
-
-  public Note createRelationship(
-      Note sourceNote,
-      Note targetNote,
-      User creator,
-      RelationType type,
-      Timestamp currentUTCTimestamp,
-      RelationshipNotePlacement relationshipNotePlacement) {
-    if (type == null) return null;
-    Note relation = new Note();
-    relation.initializeNewNote(creator, sourceNote.getNotebook(), currentUTCTimestamp, null);
-    relation.setTitle(
-        RelationshipNoteTitleFormatter.format(
-            sourceNote.getTitle(), type.label, targetNote.getTitle()));
-    relation.setContent(
-        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, type, sourceNote, targetNote, null));
-    relation.setFolder(
-        noteChildContainerFolderService.resolveFolderForRelationshipNote(
-            sourceNote, relationshipNotePlacement));
-    entityPersister.save(relation);
-    wikiTitleCacheService.refreshForNote(relation, creator);
-    return relation;
   }
 
   public NoteAccessory updateNoteAccessories(

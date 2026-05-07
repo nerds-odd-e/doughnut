@@ -19,8 +19,8 @@
       Target:
       <strong
         ><NoteTitleComponent
-          v-if="targetNoteTopology"
-          v-bind="{ noteTopology: targetNoteTopology }"
+          v-if="targetSearchResult"
+          v-bind="{ noteTopology: targetSearchResult.noteTopology }"
       /></strong>
     </div>
     <button class="daisy-btn daisy-btn-secondary go-back-button" @click="$emit('goBack')">
@@ -32,21 +32,28 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { Note } from "@generated/doughnut-backend-api"
-import type { RelationshipCreation } from "@generated/doughnut-backend-api"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "lucide-vue-next"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import type { RelationTypeLabel } from "@/models/relationTypeOptions"
+import {
+  formatRelationshipNoteMarkdown,
+  formatRelationshipNoteTitle,
+} from "@/utils/relationshipNoteCompose"
+import {
+  resolveRelationshipNoteFolderId,
+  type RelationshipNotePlacement,
+} from "@/utils/relationshipFolderResolve"
 
 const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
-  targetNoteTopology: {
-    type: Object as PropType<NoteTopology>,
+  targetSearchResult: {
+    type: Object as PropType<NoteSearchResult>,
     required: true,
   },
 })
@@ -54,7 +61,7 @@ const props = defineProps({
 const emit = defineEmits(["success", "goBack"])
 
 const placementOptions: {
-  value: NonNullable<RelationshipCreation["relationshipNotePlacement"]>
+  value: RelationshipNotePlacement
   label: string
   title: string
 }[] = [
@@ -76,7 +83,10 @@ const placementOptions: {
   },
 ]
 
-const formData = ref<Partial<RelationshipCreation>>({
+const formData = ref<{
+  relationType?: RelationTypeLabel
+  relationshipNotePlacement: RelationshipNotePlacement
+}>({
   relationType: undefined,
   relationshipNotePlacement: "relations_subfolder",
 })
@@ -86,17 +96,64 @@ const relationshipFormErrors = ref({
 })
 
 const relationTypeSelected = async (
-  relationType: RelationshipCreation["relationType"]
+  relationType: RelationTypeLabel | undefined
 ) => {
   try {
-    if (relationType !== undefined) {
-      await storageAccessor.value
-        .storedApi()
-        .createRelationship(props.note.id, props.targetNoteTopology.id, {
-          relationType: relationType,
-          relationshipNotePlacement: formData.value.relationshipNotePlacement,
-        })
+    if (relationType === undefined) return
+
+    const { useRouter } = await import("vue-router")
+    const router = useRouter()
+    const realm = storageAccessor.value.refOfNoteRealm(props.note.id).value
+    const notebookId = realm?.notebookView.notebook.id
+    if (realm == null || notebookId == null) {
+      throw new Error("Missing notebook for source note")
     }
+
+    const sourceNotebookName = realm.notebookView.notebook.name
+    const sourceFolderId = props.note.noteTopology.folderId
+    const sourceTitle = props.note.noteTopology.title
+
+    const api = storageAccessor.value.storedApi()
+    const folderId = await resolveRelationshipNoteFolderId({
+      api,
+      notebookId,
+      sourceFolderId,
+      sourceTitle,
+      placement: formData.value.relationshipNotePlacement,
+    })
+
+    const metaTitle = formatRelationshipNoteTitle(
+      sourceTitle,
+      relationType,
+      props.targetSearchResult.noteTopology.title
+    )
+    const markdown = formatRelationshipNoteMarkdown({
+      relationLabel: relationType,
+      sourceEndpoint: {
+        title: sourceTitle,
+        notebookId,
+        notebookName: sourceNotebookName,
+      },
+      targetEndpoint: {
+        title: props.targetSearchResult.noteTopology.title,
+        notebookId: props.targetSearchResult.notebookId,
+        notebookName: props.targetSearchResult.notebookName,
+      },
+      relationshipNotebookId: notebookId,
+    })
+
+    const created = await api.createRootNoteAtNotebook(
+      router,
+      notebookId,
+      { newTitle: metaTitle, wikidataId: "" },
+      {
+        folderId: folderId ?? undefined,
+        skipRouterReplace: true,
+      }
+    )
+
+    await api.setNoteContentWithoutUndo(created.id, markdown)
+    await api.loadNoteRealm(props.note.id)
 
     emit("success")
   } catch (res) {

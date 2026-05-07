@@ -2,77 +2,65 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.RelationType;
 
+/**
+ * Test fixture: builds relationship-note markdown for DB and fixture setup (rules match the
+ * product’s relationship notes).
+ */
 public final class RelationshipNoteMarkdownFormatter {
 
   private static final String NOTE_TYPE = "relationship";
   private static final String UNTITLED = "Untitled";
+  private static final String DEFAULT_RELATION_LABEL = "related to";
 
   private RelationshipNoteMarkdownFormatter() {}
 
-  /**
-   * Same kebab rule as the frontend {@code relationKebabFromLabel} — must stay aligned with {@link
-   * #format} / {@link #formatForRelationshipNote}.
-   */
   public static String relationKebabFromLabel(String label) {
     String t = trimmedOrEmpty(label);
     if (t.isEmpty()) {
-      return relationKebabFromLabel(RelationType.RELATED_TO.label);
+      return relationKebabFromLabel(DEFAULT_RELATION_LABEL);
     }
     return t.toLowerCase().replaceAll("\\s+", "-");
   }
 
   public static String format(
-      RelationType relationType,
+      String relationLabelOrNull,
       String sourceTitle,
       String targetTitle,
       String preservedDetailsOrNull) {
-    RelationType type = relationType != null ? relationType : RelationType.RELATED_TO;
-    String relationLabel = type.label;
-    String relationKebab = relationKebabFromLabel(relationLabel);
-
-    String sourceDisplay = displayTitle(sourceTitle);
-    String targetDisplay = displayTitle(targetTitle);
-    String sourceLink = wikiLink(sourceDisplay);
-    String targetLink = wikiLink(targetDisplay);
-
-    String bodyLine = bodyLine(sourceLink, relationLabel, targetLink);
-
-    StringBuilder out = new StringBuilder();
-    out.append("---\n");
-    out.append("type: ").append(NOTE_TYPE).append('\n');
-    out.append("relation: ").append(relationKebab).append('\n');
-    out.append("source: \"").append(yamlDoubleQuotedInner(sourceLink)).append("\"\n");
-    out.append("target: \"").append(yamlDoubleQuotedInner(targetLink)).append("\"\n");
-    out.append("---\n\n");
-    out.append(bodyLine);
-
-    String preserved = trimmedOrNull(preservedDetailsOrNull);
-    if (preserved != null) {
-      out.append("\n\n").append(preserved);
-    }
-    return out.toString();
+    String relationLabel = resolveRelationLabel(relationLabelOrNull);
+    return buildDocument(
+        relationLabel,
+        wikiLink(displayTitle(sourceTitle)),
+        wikiLink(displayTitle(targetTitle)),
+        preservedDetailsOrNull);
   }
 
-  /**
-   * Like {@link #format(RelationType, String, String, String)} but uses {@code [[Title]]} when the
-   * endpoint shares the relationship note's notebook, otherwise {@code [[Notebook name: Title]]}.
-   */
   public static String formatForRelationshipNote(
       Note relationshipNote,
-      RelationType relationType,
+      String relationLabelOrNull,
       Note sourceEndpoint,
       Note targetEndpoint,
       String preservedDetailsOrNull) {
-    RelationType type = relationType != null ? relationType : RelationType.RELATED_TO;
-    String relationLabel = type.label;
+    String relationLabel = resolveRelationLabel(relationLabelOrNull);
+    return buildDocument(
+        relationLabel,
+        wikiTokenForEndpoint(relationshipNote, sourceEndpoint),
+        wikiTokenForEndpoint(relationshipNote, targetEndpoint),
+        preservedDetailsOrNull);
+  }
+
+  private static String resolveRelationLabel(String relationLabelOrNull) {
+    if (relationLabelOrNull == null || trimmedOrEmpty(relationLabelOrNull).isEmpty()) {
+      return DEFAULT_RELATION_LABEL;
+    }
+    return relationLabelOrNull.trim();
+  }
+
+  private static String buildDocument(
+      String relationLabel, String sourceLink, String targetLink, String preservedDetailsOrNull) {
     String relationKebab = relationKebabFromLabel(relationLabel);
-
-    String sourceLink = wikiTokenForEndpoint(relationshipNote, sourceEndpoint);
-    String targetLink = wikiTokenForEndpoint(relationshipNote, targetEndpoint);
-
-    String bodyLine = bodyLine(sourceLink, relationLabel, targetLink);
+    String bodyLine = sourceLink + " " + relationLabel + " " + targetLink + ".";
 
     StringBuilder out = new StringBuilder();
     out.append("---\n");
@@ -121,10 +109,6 @@ public final class RelationshipNoteMarkdownFormatter {
       return rid.equals(eid);
     }
     return relNb == endNb;
-  }
-
-  private static String bodyLine(String sourceLink, String relationLabel, String targetLink) {
-    return sourceLink + " " + relationLabel + " " + targetLink + ".";
   }
 
   private static String wikiLink(String displayTitle) {

@@ -7,15 +7,13 @@ import static org.hamcrest.Matchers.startsWith;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.RelationType;
 import org.junit.jupiter.api.Test;
 
 class RelationshipNoteMarkdownFormatterTest {
 
   @Test
   void formats_frontmatter_and_body_for_confused_with() {
-    String markdown =
-        RelationshipNoteMarkdownFormatter.format(RelationType.CONFUSE_WITH, "A", "B", null);
+    String markdown = RelationshipNoteMarkdownFormatter.format("confused with", "A", "B", null);
     assertThat(markdown, containsString("type: relationship"));
     assertThat(markdown, containsString("relation: confused-with"));
     assertThat(markdown, containsString("source: \"[[A]]\""));
@@ -25,7 +23,7 @@ class RelationshipNoteMarkdownFormatterTest {
 
   @Test
   void blank_source_and_target_use_untitled_in_frontmatter_and_body() {
-    String markdown = RelationshipNoteMarkdownFormatter.format(RelationType.PART, "", "  ", null);
+    String markdown = RelationshipNoteMarkdownFormatter.format("a part of", "", "  ", null);
     assertThat(markdown, containsString("source: \"[[Untitled]]\""));
     assertThat(markdown, containsString("target: \"[[Untitled]]\""));
     assertThat(markdown, containsString("[[Untitled]] a part of [[Untitled]]."));
@@ -41,7 +39,7 @@ class RelationshipNoteMarkdownFormatterTest {
   @Test
   void relationKebabFromLabel_matches_format_output() {
     assertThat(
-        RelationshipNoteMarkdownFormatter.relationKebabFromLabel(RelationType.CONFUSE_WITH.label),
+        RelationshipNoteMarkdownFormatter.relationKebabFromLabel("confused with"),
         equalTo("confused-with"));
   }
 
@@ -49,7 +47,7 @@ class RelationshipNoteMarkdownFormatterTest {
   void appends_preserved_section_below_body() {
     String markdown =
         RelationshipNoteMarkdownFormatter.format(
-            RelationType.RELATED_TO, "S", "T", "  Legacy line one.\n\nLine two.  ");
+            "related to", "S", "T", "  Legacy line one.\n\nLine two.  ");
     assertThat(
         markdown,
         equalTo(
@@ -66,8 +64,7 @@ class RelationshipNoteMarkdownFormatterTest {
   @Test
   void escapes_quotes_and_backslashes_in_yaml_quoted_titles() {
     String markdown =
-        RelationshipNoteMarkdownFormatter.format(
-            RelationType.RELATED_TO, "Say \"hi\"", "C:\\path", null);
+        RelationshipNoteMarkdownFormatter.format("related to", "Say \"hi\"", "C:\\path", null);
     assertThat(markdown, containsString("source: \"[[Say \\\"hi\\\"]]\""));
     assertThat(markdown, containsString("target: \"[[C:\\\\path]]\""));
     assertThat(markdown, startsWith("---\n"));
@@ -81,7 +78,7 @@ class RelationshipNoteMarkdownFormatterTest {
     Note relation = noteIn(nb, "");
     String markdown =
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, RelationType.RELATED_TO, source, target, null);
+            relation, "related to", source, target, null);
     assertThat(markdown, containsString("source: \"[[Alpha]]\""));
     assertThat(markdown, containsString("target: \"[[Beta]]\""));
     assertThat(markdown, containsString("[[Alpha]] related to [[Beta]]."));
@@ -96,7 +93,7 @@ class RelationshipNoteMarkdownFormatterTest {
     Note relation = noteIn(nbRel, "");
     String markdown =
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, RelationType.PART, source, target, null);
+            relation, "a part of", source, target, null);
     assertThat(markdown, containsString("source: \"[[Source]]\""));
     assertThat(markdown, containsString("target: \"[[OtherNb: Target]]\""));
     assertThat(markdown, containsString("[[Source]] a part of [[OtherNb: Target]]."));
@@ -110,7 +107,7 @@ class RelationshipNoteMarkdownFormatterTest {
     Note relation = noteIn(nb, "");
     String markdown =
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, RelationType.RELATED_TO, source, target, "User bit.\n");
+            relation, "related to", source, target, "User bit.\n");
     assertThat(markdown, containsString("[[A]] related to [[B]].\n\nUser bit."));
   }
 

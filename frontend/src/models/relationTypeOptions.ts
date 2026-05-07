@@ -1,71 +1,84 @@
-import type { RelationshipCreation } from "@generated/doughnut-backend-api"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 
-export type RelationTypeLabel = RelationshipCreation["relationType"]
+export type RelationTypeLabel =
+  | "related to"
+  | "a specialization of"
+  | "an application of"
+  | "an instance of"
+  | "a part of"
+  | "tagged by"
+  | "an attribute of"
+  | "the opposite of"
+  | "author of"
+  | "using"
+  | "an example of"
+  | "before"
+  | "similar to"
+  | "confused with"
 
 interface RelationTypeOption {
   label: RelationTypeLabel
   reversedLabel: string
 }
 
-const relationTypeOptions = [
+const relationTypeOptions: RelationTypeOption[] = [
   {
     reversedLabel: "related to",
-    label: "related to" as RelationTypeLabel,
+    label: "related to",
   },
   {
     reversedLabel: "a generalization of",
-    label: "a specialization of" as RelationTypeLabel,
+    label: "a specialization of",
   },
   {
     reversedLabel: "applied to",
-    label: "an application of" as RelationTypeLabel,
+    label: "an application of",
   },
   {
     reversedLabel: "has instances",
-    label: "an instance of" as RelationTypeLabel,
+    label: "an instance of",
   },
   {
     reversedLabel: "has parts",
-    label: "a part of" as RelationTypeLabel,
+    label: "a part of",
   },
   {
     reversedLabel: "tagging",
-    label: "tagged by" as RelationTypeLabel,
+    label: "tagged by",
   },
   {
     reversedLabel: "has attributes",
-    label: "an attribute of" as RelationTypeLabel,
+    label: "an attribute of",
   },
   {
     reversedLabel: "the opposite of",
-    label: "the opposite of" as RelationTypeLabel,
+    label: "the opposite of",
   },
   {
     reversedLabel: "brought by",
-    label: "author of" as RelationTypeLabel,
+    label: "author of",
   },
   {
     reversedLabel: "used by",
-    label: "using" as RelationTypeLabel,
+    label: "using",
   },
   {
     reversedLabel: "has examples",
-    label: "an example of" as RelationTypeLabel,
+    label: "an example of",
   },
   {
     reversedLabel: "after",
-    label: "before" as RelationTypeLabel,
+    label: "before",
   },
   {
     reversedLabel: "similar to",
-    label: "similar to" as RelationTypeLabel,
+    label: "similar to",
   },
   {
     reversedLabel: "confused with",
-    label: "confused with" as RelationTypeLabel,
+    label: "confused with",
   },
-] as RelationTypeOption[]
+]
 
 const reverseLabel = (lbl: RelationTypeLabel | undefined) => {
   if (!lbl) return
@@ -74,7 +87,7 @@ const reverseLabel = (lbl: RelationTypeLabel | undefined) => {
   return "*unknown relation type*"
 }
 
-/** Same rule as backend RelationshipNoteMarkdownFormatter.labelToKebab */
+/** Same kebab rule as `relationKebabFromLabel` below. */
 export function relationKebabFromLabel(label: string): string {
   const t = label.trim()
   if (!t) return relationKebabFromLabel(relationTypeOptions[0]!.label)

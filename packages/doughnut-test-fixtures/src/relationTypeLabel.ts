@@ -1,0 +1,16 @@
+/** Same allowed labels as the app relation picker (no backend enum). */
+export type RelationTypeLabel =
+  | 'related to'
+  | 'a specialization of'
+  | 'an application of'
+  | 'an instance of'
+  | 'a part of'
+  | 'tagged by'
+  | 'an attribute of'
+  | 'the opposite of'
+  | 'author of'
+  | 'using'
+  | 'an example of'
+  | 'before'
+  | 'similar to'
+  | 'confused with'

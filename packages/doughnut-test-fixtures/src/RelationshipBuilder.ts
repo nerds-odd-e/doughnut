@@ -1,14 +1,12 @@
-import type {
-  Note,
-  RelationshipCreation,
-} from '@generated/doughnut-backend-api'
+import type { Note } from '@generated/doughnut-backend-api'
+import type { RelationTypeLabel } from './relationTypeLabel'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
 
 class RelationshipBuilder extends Builder<Note> {
-  internalType: RelationshipCreation['relationType'] = 'related to'
+  internalType: RelationTypeLabel = 'related to'
 
-  type(t: RelationshipCreation['relationType']): RelationshipBuilder {
+  type(t: RelationTypeLabel): RelationshipBuilder {
     this.internalType = t
     return this
   }

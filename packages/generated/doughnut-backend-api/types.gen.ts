@@ -237,11 +237,6 @@ export type WikiTitle = {
     noteId: number;
 };
 
-export type RelationshipCreation = {
-    relationType: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
-    relationshipNotePlacement?: 'relations_subfolder' | 'same_level_as_source' | 'named_after_source_note';
-};
-
 export type QuestionContestResult = {
     advice?: string;
     rejected?: boolean;
@@ -1431,25 +1426,6 @@ export type MoveNoteToFolderResponses = {
 };
 
 export type MoveNoteToFolderResponse = MoveNoteToFolderResponses[keyof MoveNoteToFolderResponses];
-
-export type AddRelationshipFinalizeData = {
-    body: RelationshipCreation;
-    path: {
-        sourceNote: number;
-        targetNote: number;
-    };
-    query?: never;
-    url: '/api/relations/create/{sourceNote}/{targetNote}';
-};
-
-export type AddRelationshipFinalizeResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type AddRelationshipFinalizeResponse = AddRelationshipFinalizeResponses[keyof AddRelationshipFinalizeResponses];
 
 export type RegenerateData = {
     body: QuestionContestResult;

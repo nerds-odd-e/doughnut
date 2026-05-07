@@ -9,7 +9,6 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
-import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
@@ -41,7 +40,7 @@ class WikiTitleCacheServiceTest {
       Note target = makeMe.aNote().title("Beta").underSameNotebookAs(root).please();
       String markdown =
           RelationshipNoteMarkdownFormatter.format(
-              RelationType.RELATED_TO, source.getTitle(), target.getTitle(), null);
+              "related to", source.getTitle(), target.getTitle(), null);
       Note carrier = makeMe.aNote().underSameNotebookAs(root).content(markdown).please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);

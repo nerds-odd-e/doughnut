@@ -542,37 +542,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
-  /api/relations/create/{sourceNote}/{targetNote}:
-    post:
-      tags:
-      - relation-controller
-      operationId: addRelationshipFinalize
-      parameters:
-      - name: sourceNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RelationshipCreation"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/recall-prompts/{recallPrompt}/regenerate:
     post:
       tags:
@@ -3368,34 +3337,6 @@ components:
       required:
       - linkText
       - noteId
-    RelationshipCreation:
-      type: object
-      properties:
-        relationType:
-          type: string
-          enum:
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
-        relationshipNotePlacement:
-          type: string
-          enum:
-          - relations_subfolder
-          - same_level_as_source
-          - named_after_source_note
-      required:
-      - relationType
     QuestionContestResult:
       type: object
       properties:

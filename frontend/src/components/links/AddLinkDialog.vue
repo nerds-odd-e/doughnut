@@ -1,33 +1,32 @@
 <template>
-  <h3 v-if="targetNoteTopology">Complete relationship</h3>
+  <h3 v-if="targetSearchResult">Complete relationship</h3>
   <SearchForNoteAndFolder
-    v-if="!selectedSearchResult && !targetNoteTopology"
+    v-if="!selectedSearchResult && !targetSearchResult"
     v-bind="{ noteId: note?.id, notebookId: notebookId, modalCloser }"
     @selected="selectedSearchResult = $event"
     @move-under-folder="moveUnderFolder($event)"
     @move-to-notebook-root="moveToNotebookRoot($event)"
   />
   <LinkInsertionChoice
-    v-if="selectedSearchResult && !targetNoteTopology && note"
+    v-if="selectedSearchResult && !targetSearchResult && note"
     :target-note-topology="selectedSearchResult.noteTopology"
     :wiki-property-option-available="wikiPropertyOptionAvailable"
     @choose-insert-wiki-link="onInsertWikiLink"
     @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
-    @choose-add-relationship="targetNoteTopology = selectedSearchResult!.noteTopology"
+    @choose-add-relationship="targetSearchResult = selectedSearchResult!"
     @go-back="selectedSearchResult = undefined"
   />
   <AddRelationshipFinalize
-    v-if="targetNoteTopology && note"
-    v-bind="{ targetNoteTopology, note }"
+    v-if="targetSearchResult && note"
+    v-bind="{ targetSearchResult, note }"
     @success="$emit('closeDialog')"
-    @go-back="targetNoteTopology = undefined"
+    @go-back="targetSearchResult = undefined"
   />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue"
 import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
 import LinkInsertionChoice from "./LinkInsertionChoice.vue"
 import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
@@ -55,7 +54,7 @@ const emit = defineEmits<{
 }>()
 
 const selectedSearchResult = ref<NoteSearchResult | undefined>(undefined)
-const targetNoteTopology = ref<NoteTopology | undefined>(undefined)
+const targetSearchResult = ref<NoteSearchResult | undefined>(undefined)
 
 const noteRealm = computed(() =>
   note ? storageAccessor.value.refOfNoteRealm(note.id).value : undefined

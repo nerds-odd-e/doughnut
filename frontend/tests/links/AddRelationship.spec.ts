@@ -1,18 +1,22 @@
 import AddRelationshipFinalize from "@/components/links/AddRelationshipFinalize.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import helper from "@tests/helpers"
 import { describe, it, expect } from "vitest"
 
 describe("AddRelationshipFinalize", () => {
   it("shows placement options with relations subfolder selected by default", async () => {
-    const note = makeMe.aNoteRealm.please()
-    const targetTopology = makeMe.aNote.please().noteTopology
+    const note = makeMe.aNote.please()
+    const targetSearchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .title("Target")
+      .notebookId(1)
+      .do()
     const wrapper = helper
       .component(AddRelationshipFinalize)
       .withCleanStorage()
       .withProps({
         note,
-        targetNoteTopology: targetTopology,
+        targetSearchResult,
       })
       .mount()
     expect(wrapper.find('[role="radiogroup"]').exists()).toBe(true)
@@ -23,14 +27,17 @@ describe("AddRelationshipFinalize", () => {
   })
 
   it("going back", async () => {
-    const note = makeMe.aNoteRealm.please()
-    const targetTopology = makeMe.aNote.please().noteTopology
+    const note = makeMe.aNote.please()
+    const targetSearchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .title("Target")
+      .notebookId(1)
+      .do()
     const wrapper = helper
       .component(AddRelationshipFinalize)
       .withCleanStorage()
       .withProps({
         note,
-        targetNoteTopology: targetTopology,
+        targetSearchResult,
       })
       .mount()
     await wrapper.find(".go-back-button").trigger("click")

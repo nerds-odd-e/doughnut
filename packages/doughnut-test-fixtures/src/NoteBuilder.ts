@@ -1,11 +1,9 @@
-import type {
-  Note,
-  RelationshipCreation,
-} from '@generated/doughnut-backend-api'
+import type { Note } from '@generated/doughnut-backend-api'
+import type { RelationTypeLabel } from './relationTypeLabel'
 import Builder from './Builder'
 import generateId from './generateId'
 
-/** Same rule as backend RelationshipNoteMarkdownFormatter.labelToKebab */
+/** Same kebab rule as the app `relationKebabFromLabel`. */
 function relationLabelToKebab(label: string): string {
   const t = label.trim()
   if (!t) return 'related-to'
@@ -73,7 +71,7 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  relationType(value: RelationshipCreation['relationType']): NoteBuilder {
+  relationType(value: RelationTypeLabel): NoteBuilder {
     this.title(`:${value}`)
     const kebab = relationLabelToKebab(value)
     this.data.content = `---\nrelation: ${kebab}\n---\n`

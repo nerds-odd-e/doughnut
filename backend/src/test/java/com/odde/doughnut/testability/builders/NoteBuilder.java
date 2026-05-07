@@ -234,7 +234,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder withWikiLinksInFrontmatter(Note from, Note to) {
     entity.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            entity, RelationType.SPECIALIZE, from, to, null));
+            entity, "a specialization of", from, to, null));
     return this;
   }
 }

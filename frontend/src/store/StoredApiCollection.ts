@@ -7,10 +7,7 @@ import type {
   NoteRealm,
   WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
-import type {
-  RelationshipCreation,
-  NoteCreationDto,
-} from "@generated/doughnut-backend-api"
+import type { NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
   RelationController,
   NoteController,
@@ -72,23 +69,22 @@ export interface StoredApi {
     options?: {
       folderId?: number | null
       refreshWikiTitleCacheForNoteIds?: number[]
+      /** When true, refresh storage but do not navigate (e.g. relationship note creation). */
+      skipRouterReplace?: boolean
     }
   ): Promise<NoteRealm>
 
   /** PATCH undo-delete for a soft-deleted note; refreshes storage and navigates to the note. */
   restoreDeletedNote(router: Router, noteId: Doughnut.ID): Promise<NoteRealm>
 
-  createRelationship(
-    sourceId: Doughnut.ID,
-    targetId: Doughnut.ID,
-    data: RelationshipCreation
-  ): Promise<void>
-
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit title" | "edit content",
     value: string
   ): Promise<void>
+
+  /** Persists note content without recording undo (e.g. initial body after create). */
+  setNoteContentWithoutUndo(noteId: Doughnut.ID, content: string): Promise<void>
 
   completeContent(
     noteId: Doughnut.ID,
@@ -334,11 +330,13 @@ export default class StoredApiCollection implements StoredApi {
     options?: {
       folderId?: number | null
       refreshWikiTitleCacheForNoteIds?: number[]
+      skipRouterReplace?: boolean
     }
   ) {
     const folderId = options?.folderId
     const refreshWikiTitleCacheForNoteIds =
       options?.refreshWikiTitleCacheForNoteIds
+    const skipRouterReplace = options?.skipRouterReplace
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
     const result = await apiCallWithLoading(() =>
@@ -375,7 +373,9 @@ export default class StoredApiCollection implements StoredApi {
         await this.refreshWikiLinkCacheForNote(id)
       }
     }
-    await this.routerReplaceFocus(router, focus)
+    if (!skipRouterReplace) {
+      await this.routerReplaceFocus(router, focus)
+    }
     return focus
   }
 
@@ -392,31 +392,6 @@ export default class StoredApiCollection implements StoredApi {
     refreshSidebarStructuralListings()
     await this.routerReplaceFocus(router, focus)
     return focus
-  }
-
-  async createRelationship(
-    sourceId: Doughnut.ID,
-    targetId: Doughnut.ID,
-    data: RelationshipCreation
-  ) {
-    const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      RelationController.addRelationshipFinalize({
-        path: {
-          sourceNote: sourceId,
-          targetNote: targetId,
-        },
-        body: data,
-      })
-    )
-    if (error || !noteRealms) {
-      throw new Error(toErrorMessage(error, "Failed to create relationship"))
-    }
-    this.refreshNoteRealms(noteRealms)
-    refreshSidebarStructuralListings()
-    const relationNote = noteRealms[0]
-    if (relationNote) {
-      this.noteEditingHistory.createNote(relationNote.id)
-    }
   }
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
@@ -452,6 +427,10 @@ export default class StoredApiCollection implements StoredApi {
       this.noteEditingHistory.addEditingToUndoHistory(noteId, field, old)
     }
     await this.updateTextContentWithoutUndo(noteId, field, value)
+  }
+
+  async setNoteContentWithoutUndo(noteId: Doughnut.ID, content: string) {
+    await this.updateTextContentWithoutUndo(noteId, "edit content", content)
   }
 
   async completeContent(noteId: Doughnut.ID, value?: NoteContentCompletion) {
