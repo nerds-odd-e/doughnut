@@ -17,7 +17,6 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -493,43 +492,11 @@ class NoteControllerTests extends ControllerTestBase {
   class UpdateNoteRecallSetting {
     Note source;
     Note target;
-    Note relation;
 
     @BeforeEach
     void setup() {
       source = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       target = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      relation = makeMe.aRelation().between(source, target).please();
-    }
-
-    @Test
-    void shouldNotChangeRelationshipNoteRecallLevelWhenUpdatingSource()
-        throws UnexpectedNoAccessRightException {
-      int relationLevelBefore = getLevel(relation);
-      @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
-      noteRecallSetting.setLevel(4);
-      controller.updateNoteRecallSetting(source, noteRecallSetting);
-      assertThat(
-          getLevel(noteRepository.findById(relation.getId()).orElseThrow()),
-          is(relationLevelBefore));
-      assertThat(
-          noteRepository.findById(source.getId()).orElseThrow().getRecallSetting().getLevel(),
-          is(4));
-    }
-
-    @Test
-    void shouldNotChangeRelationshipNoteRecallLevelWhenUpdatingTarget()
-        throws UnexpectedNoAccessRightException {
-      int relationLevelBefore = getLevel(relation);
-      @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
-      noteRecallSetting.setLevel(4);
-      controller.updateNoteRecallSetting(target, noteRecallSetting);
-      assertThat(
-          getLevel(noteRepository.findById(relation.getId()).orElseThrow()),
-          is(relationLevelBefore));
-      assertThat(
-          noteRepository.findById(target.getId()).orElseThrow().getRecallSetting().getLevel(),
-          is(4));
     }
 
     @Test
@@ -547,10 +514,6 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(
           userService.getUnassimilatedNotes(currentUser.getUser()).toList(),
           hasItem(hasProperty("id", equalTo(source.getId()))));
-    }
-
-    private static Integer getLevel(Note relation) {
-      return relation.getRecallSetting().getLevel();
     }
   }
 

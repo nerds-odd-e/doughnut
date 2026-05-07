@@ -82,27 +82,15 @@ public class AssimilationServiceTest {
 
     @Nested
     class MemoryTrackerFromLink {
-      Note note1ToNote2;
       Note anotherNote;
 
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
-        note1ToNote2 = makeMe.aRelation().between(note1, note2).please();
         anotherNote = makeMe.aNote("another note").creatorAndOwner(user).please();
       }
 
       private List<Note> getAllDueMemoryTrackers() {
         return assimilationService.getNotesToAssimilate().collect(Collectors.toList());
-      }
-
-      @Test
-      void shouldReturnLinkBeforeAnotherNote() {
-        List<Note> memoryTrackers = getAllDueMemoryTrackers();
-        assertThat(memoryTrackers, hasSize(4));
-        assertThat(memoryTrackers.get(0), equalTo(note1));
-        assertThat(memoryTrackers.get(2), equalTo(note1ToNote2));
-        assertThat(memoryTrackers.get(1), equalTo(note2));
-        assertThat(memoryTrackers.get(3), equalTo(anotherNote));
       }
 
       @Nested
@@ -111,28 +99,15 @@ public class AssimilationServiceTest {
         void Note1And2HaveDifferentLevels() {
           makeMe.theNote(note1).level(5).please();
           makeMe.theNote(note2).level(2).please();
-          makeMe.theNote(note1ToNote2).level(5).please();
         }
 
         @Test
         void shouldReturnMemoryTrackerForLowerLevelNoteOrLink() {
           List<Note> memoryTrackers = getAllDueMemoryTrackers();
-          assertThat(memoryTrackers, hasSize(4));
+          assertThat(memoryTrackers, hasSize(3));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
           assertThat(memoryTrackers.get(2), equalTo(note1));
-          assertThat(memoryTrackers.get(3), equalTo(note1ToNote2));
-        }
-
-        @Test
-        void shouldReturnRelationshipsOrderedByLevels() {
-          Note aLevel2Relation = makeMe.aRelation().between(anotherNote, note2).please();
-          List<Note> memoryTrackers = getAllDueMemoryTrackers();
-          assertThat(memoryTrackers, hasSize(5));
-          assertThat(memoryTrackers.get(0), equalTo(anotherNote));
-          assertThat(memoryTrackers.get(1), equalTo(note2));
-          assertThat(memoryTrackers.get(2), equalTo(aLevel2Relation));
-          assertThat(memoryTrackers.get(4), equalTo(note1ToNote2));
         }
 
         @Test
@@ -223,7 +198,7 @@ public class AssimilationServiceTest {
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
       makeMe.theNote(note1).skipMemoryTracking().please();
-      Note link = makeMe.aRelation().between(note1, note2).please();
+      Note link = makeMe.aNote().underSameNotebookAs(note1).please();
       makeMe.refresh(user);
       Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();
       List<Integer> dueInSubscribedNotebook =

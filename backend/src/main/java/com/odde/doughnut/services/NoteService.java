@@ -117,7 +117,8 @@ public class NoteService {
       Timestamp currentUTCTimestamp,
       RelationshipNotePlacement relationshipNotePlacement) {
     if (type == null) return null;
-    Note relation = buildARelation(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    Note relation = new Note();
+    relation.initializeNewNote(creator, sourceNote.getNotebook(), currentUTCTimestamp, null);
     relation.setTitle(
         RelationshipNoteTitleFormatter.format(
             sourceNote.getTitle(), type.label, targetNote.getTitle()));
@@ -130,23 +131,6 @@ public class NoteService {
     entityPersister.save(relation);
     wikiTitleCacheService.refreshForNote(relation, creator);
     return relation;
-  }
-
-  public static Note buildARelation(
-      Note sourceNote,
-      Note targetNote,
-      User creator,
-      RelationType type,
-      Timestamp currentUTCTimestamp) {
-    final Note note = new Note();
-    note.initializeNewNote(creator, sourceNote.getNotebook(), currentUTCTimestamp, null);
-    note.getRecallSetting()
-        .setLevel(
-            Math.max(
-                sourceNote.getRecallSetting().getLevel(),
-                targetNote.getRecallSetting().getLevel()));
-
-    return note;
   }
 
   public NoteAccessory updateNoteAccessories(
