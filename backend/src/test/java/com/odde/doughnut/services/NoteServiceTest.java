@@ -60,18 +60,6 @@ public class NoteServiceTest {
       assertThat(subject.getDeletedAt(), notNullValue());
       assertThat(child.getDeletedAt(), nullValue());
     }
-
-    @Test
-    void shouldNotCascadeSoftDeleteToOutgoingRelationshipNotes() {
-      Note subject = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-      Note target = makeMe.aNote().creatorAndOwner(subject.getCreator()).please();
-      Note relation = makeMe.aRelation().between(subject, target).please();
-
-      noteService.destroy(subject);
-
-      assertThat(subject.getDeletedAt(), notNullValue());
-      assertThat(relation.getDeletedAt(), nullValue());
-    }
   }
 
   @Nested

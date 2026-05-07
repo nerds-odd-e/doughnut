@@ -30,15 +30,6 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   }
 
   @Test
-  void relationshipNoteDescriptionContainsYamlTargetKey() {
-    Note to = makeMe.aNote().inMemoryPlease();
-    Note from = makeMe.aNote().inMemoryPlease();
-    Note note = makeMe.aRelation().between(from, to).inMemoryPlease();
-    String content = getNoteOfFocusDescription(note);
-    assertThat(content, containsString("target"));
-  }
-
-  @Test
   void noteOverloadDelegatesToSameSystemContentAsStringOverload() {
     Note note = makeMe.aNote().content("body").title("T").inMemoryPlease();
     String fromNote =

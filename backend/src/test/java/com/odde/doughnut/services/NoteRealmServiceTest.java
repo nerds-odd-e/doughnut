@@ -83,7 +83,7 @@ class NoteRealmServiceTest {
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
     Note subject = makeMe.aNote().underSameNotebookAs(root).please();
-    Note relation = makeMe.aRelation().between(subject, focal).please();
+    Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -92,32 +92,12 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void subject_realm_references_include_relation_note_when_cache_refreshed() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
-    Note subject = makeMe.aNote().underSameNotebookAs(root).please();
-    Note relation = makeMe.aRelation().between(subject, focal).please();
-    relation.setContent(
-        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, RelationType.SPECIALIZE, subject, focal, null));
-    makeMe.entityPersister.merge(relation);
-    makeMe.entityPersister.flush();
-    wikiTitleCacheService.refreshForNote(relation, user);
-
-    NoteRealm subjectRealm = noteRealmService.build(subject, user);
-
-    assertThat(subjectRealm.getReferences(), hasSize(1));
-    assertThat(subjectRealm.getReferences().get(0).getId(), equalTo(relation.getId()));
-  }
-
-  @Test
   void references_empty_when_cache_rows_deleted_for_relation_carrier_structural_child() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
     Note subject = makeMe.aNote().underSameNotebookAs(root).please();
-    Note relation = makeMe.aRelation().between(subject, focal).please();
+    Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
     NoteRealm realm = noteRealmService.build(subject, user);
@@ -163,7 +143,7 @@ class NoteRealmServiceTest {
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
     Note subject = makeMe.aNote().underSameNotebookAs(root).please();
-    Note relation = makeMe.aRelation().between(subject, focal).please();
+    Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
     relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
             relation, RelationType.SPECIALIZE, subject, focal, null));

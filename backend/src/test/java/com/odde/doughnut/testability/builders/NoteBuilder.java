@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -227,6 +228,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder createdAt(Timestamp timestamp) {
     this.entity.setCreatedAt(timestamp);
     this.entity.setUpdatedAt(timestamp);
+    return this;
+  }
+
+  public NoteBuilder withWikiLinksInFrontmatter(Note from, Note to) {
+    entity.setContent(
+        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
+            entity, RelationType.SPECIALIZE, from, to, null));
     return this;
   }
 }

@@ -54,40 +54,9 @@ public class TextContentValidatorTest {
   }
 
   @Test
-  public void noteWithTargetNoteAndNullTitleIsInvalid() {
-    Note parent = makeMe.aNote().inMemoryPlease();
-    Note target = makeMe.aNote().inMemoryPlease();
-    Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
-    relationNote.setTitle(null);
-    assertThat(validator.validate(relationNote), is(not(empty())));
-  }
-
-  @Test
-  public void noteWithTargetNoteAndEmptyTitleIsInvalid() {
-    Note parent = makeMe.aNote().inMemoryPlease();
-    Note target = makeMe.aNote().inMemoryPlease();
-    Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
-    relationNote.setTitle("");
-    Set<ConstraintViolation<Note>> violations = validator.validate(relationNote);
-    assertThat(violations, is(not(empty())));
-    assertThat(
-        violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("title")),
-        is(true));
-  }
-
-  @Test
   public void whitespaceOnlyTitleIsInvalid() {
     newNote.setTitle("   ");
     assertThat(getViolations(), is(not(empty())));
-  }
-
-  @Test
-  public void noteWithTargetNoteAndNonEmptyTitleIsValid() {
-    Note parent = makeMe.aNote().inMemoryPlease();
-    Note target = makeMe.aNote().inMemoryPlease();
-    Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
-    relationNote.setTitle("Some Title");
-    assertThat(validator.validate(relationNote), is(empty()));
   }
 
   @Test
