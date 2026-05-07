@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
-import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
+import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
@@ -61,7 +61,7 @@ class CircleControllerTest extends ControllerTestBase {
     @Test
     void whenTheUserIsNotAMemberOfTheCircle() {
       Circle circle = makeMe.aCircle().please();
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("new title");
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -76,7 +76,7 @@ class CircleControllerTest extends ControllerTestBase {
       User user = currentUser.getUser();
       Circle circle = makeMe.aCircle().please();
       circleService.joinAndSave(circle, user);
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("Circle Owned Nb");
       noteCreation.setDescription("Circle catalog blurb");
       NotebookClientView response = controller.createNotebookInCircle(circle, noteCreation);

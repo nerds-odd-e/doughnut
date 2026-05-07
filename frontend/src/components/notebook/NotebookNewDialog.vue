@@ -22,7 +22,10 @@
 <script lang="ts">
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import TextArea from "@/components/form/TextArea.vue"
-import type { Circle, NoteCreationDto } from "@generated/doughnut-backend-api"
+import type {
+  Circle,
+  NotebookCreationRequest,
+} from "@generated/doughnut-backend-api"
 import {
   CircleController,
   NotebookController,
@@ -39,7 +42,10 @@ export default {
   },
   data() {
     return {
-      noteFormData: { newTitle: "", description: "" } as NoteCreationDto,
+      noteFormData: {
+        newTitle: "",
+        description: "",
+      } as NotebookCreationRequest,
       errors: {
         newTitle: undefined as undefined | string,
         description: undefined as undefined | string,

@@ -384,7 +384,6 @@ export type FolderMoveRequest = {
 export type NoteCreationDto = {
     newTitle: string;
     wikidataId?: string;
-    description?: string;
     folderId?: number;
 };
 
@@ -482,6 +481,11 @@ export type AttachBookRequestFull = {
     format: 'pdf' | 'epub';
     layout?: AttachBookLayoutRequestFull;
     contentList?: Array<unknown>;
+};
+
+export type NotebookCreationRequest = {
+    newTitle: string;
+    description?: string;
 };
 
 export type CreateNotebookGroupRequest = {
@@ -1967,7 +1971,7 @@ export type AttachBookResponses = {
 export type AttachBookResponse = AttachBookResponses[keyof AttachBookResponses];
 
 export type CreateNotebookData = {
-    body: NoteCreationDto;
+    body: NotebookCreationRequest;
     path?: never;
     query?: never;
     url: '/api/notebooks/create';
@@ -2189,7 +2193,7 @@ export type CreateCircleResponses = {
 export type CreateCircleResponse = CreateCircleResponses[keyof CreateCircleResponses];
 
 export type CreateNotebookInCircleData = {
-    body: NoteCreationDto;
+    body: NotebookCreationRequest;
     path: {
         circle: number;
     };

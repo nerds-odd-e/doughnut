@@ -1236,7 +1236,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteCreationDTO"
+              $ref: "#/components/schemas/NotebookCreationRequest"
         required: true
       responses:
         "200":
@@ -1474,7 +1474,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteCreationDTO"
+              $ref: "#/components/schemas/NotebookCreationRequest"
         required: true
       responses:
         "200":
@@ -3656,10 +3656,6 @@ components:
         wikidataId:
           type: string
           pattern: ^$|Q\d+
-        description:
-          type: string
-          maxLength: 500
-          minLength: 0
         folderId:
           type: integer
           format: int32
@@ -3849,6 +3845,20 @@ components:
       required:
       - bookName
       - format
+    NotebookCreationRequest:
+      type: object
+      properties:
+        newTitle:
+          type: string
+          maxLength: 150
+          minLength: 0
+          pattern: "^[^\\\\/:]*$"
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+      required:
+      - newTitle
     CreateNotebookGroupRequest:
       type: object
       properties:

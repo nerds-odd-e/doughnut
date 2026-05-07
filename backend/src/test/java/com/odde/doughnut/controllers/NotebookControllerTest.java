@@ -25,6 +25,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
+import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookPageClientView;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
@@ -96,7 +97,7 @@ class NotebookControllerTest extends ControllerTestBase {
   class CreateNotebook {
     @Test
     void returnsNotebookIdAndDoesNotCreateNotes() throws UnexpectedNoAccessRightException {
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("My Notebook Title");
       NotebookClientView response = controller.createNotebook(noteCreation);
       assertThat(response.notebook().getId(), notNullValue());
@@ -109,7 +110,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
     @Test
     void persistsDescriptionOnCreate() throws UnexpectedNoAccessRightException {
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("Notebook With Blurb");
       noteCreation.setDescription("  Catalog blurb  ");
       NotebookClientView response = controller.createNotebook(noteCreation);
@@ -120,7 +121,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
     @Test
     void leavesDescriptionNullWhenUnset() throws UnexpectedNoAccessRightException {
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("Notebook No Blurb");
       NotebookClientView response = controller.createNotebook(noteCreation);
       assertThat(response.notebook().getId(), notNullValue());
@@ -133,7 +134,7 @@ class NotebookControllerTest extends ControllerTestBase {
   class NotebookApiSerialization {
     @Test
     void getNotebookJsonDoesNotExposeLegacyNotebookIdentityWireKeys() throws Exception {
-      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("API Shape NB");
       noteCreation.setDescription("Blurb");
       NotebookClientView response = controller.createNotebook(noteCreation);
@@ -220,7 +221,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void createsTopLevelNoteWithNullParentFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("Notebook WithoutIndex");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -243,7 +244,7 @@ class NotebookControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       User owner = makeMe.aUser().please();
       currentUser.setUser(owner);
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("Owners NB");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -259,7 +260,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void createsNotesInFolderInAppendLastOrder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Folder Create");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -309,7 +310,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void excludesNotesAssignedToAFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Exclusion");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -331,7 +332,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void returnsTopLevelFoldersForNotebook()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Folders");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -364,7 +365,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void returnsOnlyNotesAssignedToFolder()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Folder Notes");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -410,7 +411,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void returnsDirectChildFolders()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Nested Folders");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -476,7 +477,7 @@ class NotebookControllerTest extends ControllerTestBase {
   class CreateFolder {
     @Test
     void createsRootFolder() throws UnexpectedNoAccessRightException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Create Folder Root");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -493,7 +494,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void createsNestedFolderUnderContextNotesFolder() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Create Nested");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -515,7 +516,7 @@ class NotebookControllerTest extends ControllerTestBase {
     @Test
     void createsNestedFolderUnderUnderFolderId() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Create Under Folder Id");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
@@ -534,7 +535,7 @@ class NotebookControllerTest extends ControllerTestBase {
 
     @Test
     void rejectsDuplicateSiblingFolderName() throws UnexpectedNoAccessRightException {
-      NoteCreationDTO createNb = new NoteCreationDTO();
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
       createNb.setNewTitle("NB Dup Folder");
       NotebookClientView redirect = controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
