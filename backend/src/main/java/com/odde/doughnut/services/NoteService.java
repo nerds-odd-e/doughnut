@@ -11,8 +11,10 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +61,69 @@ public class NoteService {
       return findNotesInFolderScope(note.getFolder().getId());
     }
     return findNotebookRootNotes(note.getNotebook().getId());
+  }
+
+  /**
+   * Structural peers (same folder, or notebook root when {@code anchor} has no folder), excluding
+   * the anchor, optional focus note, and {@code excludeNoteIds}, capped at {@code cap} rows from
+   * the database. Without a sample seed, peers are ordered by id ascending; with a seed, order is
+   * deterministic for that seed (CRC32-based) so repeated calls match.
+   */
+  public List<Note> findStructuralPeerNotesSample(
+      Note anchor,
+      Integer focusNoteId,
+      Set<Integer> excludeNoteIds,
+      int cap,
+      Optional<Long> sampleSeed) {
+    if (cap <= 0) {
+      return List.of();
+    }
+    List<Integer> excludeIds = structuralPeerExcludeIds(anchor, focusNoteId, excludeNoteIds);
+    if (anchor.getFolder() != null && anchor.getFolder().getId() != null) {
+      Integer folderId = anchor.getFolder().getId();
+      return sampleSeed
+          .map(
+              seed ->
+                  noteRepository.findStructuralPeersInFolderOrderBySeedLimited(
+                      folderId, excludeIds, Long.toString(seed), cap))
+          .orElseGet(
+              () ->
+                  noteRepository.findStructuralPeersInFolderOrderByIdAscLimited(
+                      folderId, excludeIds, cap));
+    }
+    if (anchor.getNotebook() == null || anchor.getNotebook().getId() == null) {
+      return List.of();
+    }
+    Integer notebookId = anchor.getNotebook().getId();
+    return sampleSeed
+        .map(
+            seed ->
+                noteRepository.findStructuralPeersInNotebookRootOrderBySeedLimited(
+                    notebookId, excludeIds, Long.toString(seed), cap))
+        .orElseGet(
+            () ->
+                noteRepository.findStructuralPeersInNotebookRootOrderByIdAscLimited(
+                    notebookId, excludeIds, cap));
+  }
+
+  private static List<Integer> structuralPeerExcludeIds(
+      Note anchor, Integer focusNoteId, Set<Integer> excludeNoteIds) {
+    LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+    if (anchor.getId() != null) {
+      ids.add(anchor.getId());
+    }
+    if (focusNoteId != null) {
+      ids.add(focusNoteId);
+    }
+    for (Integer id : excludeNoteIds) {
+      if (id != null) {
+        ids.add(id);
+      }
+    }
+    if (ids.isEmpty()) {
+      return List.of(-1);
+    }
+    return List.copyOf(ids);
   }
 
   public void destroy(Note note) {

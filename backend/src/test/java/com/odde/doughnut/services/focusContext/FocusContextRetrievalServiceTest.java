@@ -618,6 +618,110 @@ class FocusContextRetrievalServiceTest {
     }
 
     @Test
+    void largeFolderSampleSiblingsCappedAtSix() {
+      Notebook nb = makeMe.aNotebook().please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      User viewer = makeMe.aUser().please();
+      Note focus =
+          makeMe
+              .aNote()
+              .creatorAndOwner(viewer)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("FocusCap")
+              .content("x")
+              .please();
+      for (int i = 0; i < 25; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .inNotebook(nb)
+            .folder(folder)
+            .title("CapPeer" + i)
+            .content("y")
+            .please();
+      }
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
+
+      assertThat(result.getFocusNote().getSampleSiblings(), hasSize(6));
+    }
+
+    @Test
+    void differentSeedsProduceDifferentSampleSiblingsSelection() {
+      Notebook nb = makeMe.aNotebook().please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      User viewer = makeMe.aUser().please();
+      Note focus =
+          makeMe
+              .aNote()
+              .creatorAndOwner(viewer)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("FocusSeedSib")
+              .content("solo")
+              .please();
+      for (int i = 0; i < 15; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .inNotebook(nb)
+            .folder(folder)
+            .title("SeedSibPeer" + i)
+            .content("x")
+            .please();
+      }
+
+      List<String> seed1 =
+          service
+              .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(1L))
+              .getFocusNote()
+              .getSampleSiblings()
+              .stream()
+              .sorted()
+              .toList();
+      List<String> seed2 =
+          service
+              .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(999L))
+              .getFocusNote()
+              .getSampleSiblings()
+              .stream()
+              .sorted()
+              .toList();
+
+      assertThat(seed1, not(equalTo(seed2)));
+    }
+
+    @Test
+    void largeNotebookRootSampleSiblingsCappedAtSix() {
+      Notebook nb = makeMe.aNotebook().please();
+      User viewer = makeMe.aUser().please();
+      Note focus =
+          makeMe
+              .aNote()
+              .creatorAndOwner(viewer)
+              .inNotebook(nb)
+              .title("RootFocusCap")
+              .content("x")
+              .please();
+      for (int i = 0; i < 22; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .inNotebook(nb)
+            .title("RootCapPeer" + i)
+            .content("y")
+            .please();
+      }
+
+      FocusContextResult result =
+          service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
+
+      assertThat(result.getFocusNote().getSampleSiblings(), hasSize(6));
+    }
+
+    @Test
     void graphApiWithTightBudgetOmitsFolderPeersAndSampleSiblings() {
       Notebook nb = makeMe.aNotebook().please();
       Folder folder = makeMe.aFolder().notebook(nb).please();
