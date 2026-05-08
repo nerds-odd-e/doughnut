@@ -35,29 +35,15 @@ import {
 } from "@/lib/book-reading/pdfBookViewerGeometryResample"
 import { pdfScaleAfterPageWidth } from "@/lib/book-reading/pdfDefaultScale"
 import {
-  clampScrollAxis,
-  scrollAfterUniformContentScale,
-  wheelDeltaYToScaleFactor,
-} from "@/lib/book-reading/pdfBookViewerZoomAroundPoint"
-import {
   pdfViewerReadingPositionTopEdge,
   pdfViewerViewportTopYDown,
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import { attachBookBlockSelectionBboxHighlight } from "@/lib/book-reading/bookBlockSelectionBboxHighlight"
 import { createIntervalScrollSuppression } from "@/lib/book-reading/intervalScrollSuppression"
-import {
-  normalizedBboxToPdfJsXyzDestArray,
-  normalizedBboxToPixelRect,
-  normalizedYToViewportY,
-  type BookNavigationTarget,
-  type NormalizedPageBbox,
-} from "@/lib/book-reading/pdfOutlineV1Anchor"
-import {
-  locatorAsPdfNavigationTarget,
-  type PdfViewerScrollSuppressionApi,
-  type ViewerLocatorRect,
-} from "@/composables/bookReaderViewerRef"
+import { usePdfBlockHighlight } from "@/composables/book-reading/usePdfBlockHighlight"
+import { usePdfNavigation } from "@/composables/book-reading/usePdfNavigation"
+import { usePdfLocatorGeometry } from "@/composables/book-reading/usePdfLocatorGeometry"
+import { usePdfGestureZoom } from "@/composables/book-reading/usePdfGestureZoom"
 import type { ContentLocatorFull } from "@generated/doughnut-backend-api"
 import { getDocument, type PDFDocumentProxy } from "pdfjs-dist/build/pdf.mjs"
 import {
@@ -66,6 +52,7 @@ import {
   PDFViewer,
 } from "pdfjs-dist/web/pdf_viewer.mjs"
 import "pdfjs-dist/web/pdf_viewer.css"
+import type { PdfViewerScrollSuppressionApi } from "@/composables/bookReaderViewerRef"
 import { nextTick, onBeforeUnmount, ref, watch } from "vue"
 
 const props = withDefaults(
@@ -98,24 +85,6 @@ const emit = defineEmits<{
 const containerRef = ref<HTMLDivElement | null>(null)
 const viewerRef = ref<HTMLDivElement | null>(null)
 
-const holdCallout = ref<{
-  contentBlockId: number
-  clientX: number
-  clientY: number
-  derivedTitle: string | undefined
-} | null>(null)
-
-function onConfirmNewBlock() {
-  const callout = holdCallout.value
-  holdCallout.value = null
-  if (callout) {
-    emit("createBlockFromContent", {
-      contentBlockId: callout.contentBlockId,
-      derivedTitle: callout.derivedTitle,
-    })
-  }
-}
-
 let pdfViewer: PDFViewer | null = null
 let currentLoadingTask: ReturnType<typeof getDocument> | null = null
 let onPageChangingForViewport: (() => void) | null = null
@@ -132,9 +101,6 @@ let detachGeometryResampleListeners: (() => void) | null = null
 let intrinsicFirstPageWidth = 0
 let userAdjustedScale = false
 
-let onWheelForZoom: ((e: WheelEvent) => void) | null = null
-let onTouchStartForPinch: ((e: TouchEvent) => void) | null = null
-let onTouchMoveForPinch: ((e: TouchEvent) => void) | null = null
 let scrollSuppression: PdfViewerScrollSuppressionApi =
   createIntervalScrollSuppression()
 
@@ -146,8 +112,6 @@ function registerScrollSuppression(
     scrollSuppression = createIntervalScrollSuppression()
   }
 }
-let onTouchEndForPinch: ((e: TouchEvent) => void) | null = null
-let lastPinchDistance = 0
 
 const SCALE_EPSILON = 0.001
 
@@ -167,92 +131,9 @@ function detachViewportScrollListener(container: HTMLElement) {
   }
 }
 
-function detachGestureListeners(container: HTMLElement) {
-  lastPinchDistance = 0
-  if (onWheelForZoom) {
-    container.removeEventListener("wheel", onWheelForZoom)
-    onWheelForZoom = null
-  }
-  if (onTouchStartForPinch) {
-    container.removeEventListener("touchstart", onTouchStartForPinch)
-    onTouchStartForPinch = null
-  }
-  if (onTouchMoveForPinch) {
-    container.removeEventListener("touchmove", onTouchMoveForPinch)
-    onTouchMoveForPinch = null
-  }
-  if (onTouchEndForPinch) {
-    container.removeEventListener("touchend", onTouchEndForPinch)
-    container.removeEventListener("touchcancel", onTouchEndForPinch)
-    onTouchEndForPinch = null
-  }
-}
-
-function touchPairDistance(a: Touch, b: Touch) {
-  return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
-}
-
-function clampOriginInSpan(offset: number, span: number) {
-  if (span <= 0) return 0
-  return Math.min(span, Math.max(0, offset))
-}
-
-function applyGestureScaleFactor(
-  factor: number,
-  clientX: number,
-  clientY: number
-) {
-  const container = containerRef.value
-  if (!container || !pdfViewer) return
-  if (!(factor > 0) || !Number.isFinite(factor)) return
-
-  userAdjustedScale = true
-  const oldScale = pdfViewer.currentScale
-  if (oldScale <= 0) return
-
-  pdfViewer.currentScale = oldScale * factor
-  const newScale = pdfViewer.currentScale
-  const actualFactor = newScale / oldScale
-  if (Math.abs(actualFactor - 1) < 1e-9) {
-    emitViewportDescriptorIfChanged()
-    return
-  }
-
-  const rect = container.getBoundingClientRect()
-  const ox = clampOriginInSpan(clientX - rect.left, rect.width)
-  const oy = clampOriginInSpan(clientY - rect.top, rect.height)
-
-  const next = scrollAfterUniformContentScale({
-    scrollLeft: container.scrollLeft,
-    scrollTop: container.scrollTop,
-    originXInContainer: ox,
-    originYInContainer: oy,
-    scaleFactor: actualFactor,
-  })
-
-  requestAnimationFrame(() => {
-    const c = containerRef.value
-    if (!c || !pdfViewer) return
-    c.scrollLeft = clampScrollAxis(
-      next.scrollLeft,
-      c.scrollWidth,
-      c.clientWidth
-    )
-    c.scrollTop = clampScrollAxis(
-      next.scrollTop,
-      c.scrollHeight,
-      c.clientHeight
-    )
-    emitViewportDescriptorIfChanged()
-  })
-}
-
 /**
  * Samples the current scroll position via `pdfViewerViewportTopYDown` and emits
  * `viewportAnchorPage` when the anchor page or viewport midpoint changes.
- *
- * @see currentBlockIdFromVisiblePage — consumer of the emitted `ViewportYRange`
- *      (called in BookReadingContent.onViewportAnchorPage).
  */
 function emitViewportDescriptorIfChanged() {
   const container = containerRef.value
@@ -300,361 +181,54 @@ function applyResponsiveDefaultScale(options?: { force?: boolean }) {
   pdfViewer.currentScale = nextScale
 }
 
-type PendingNavigation = {
-  target: BookNavigationTarget
-  highlightBboxes: ReadonlyArray<BookNavigationTarget>
-}
+const blockHighlight = usePdfBlockHighlight({
+  getPdfViewer: () => pdfViewer,
+  onCreateBlock: (payload) => emit("createBlockFromContent", payload),
+})
 
-let pendingNavigation: PendingNavigation | null = null
-let bookBlockSelectionBboxHighlightCancels: (() => void)[] = []
-let currentHighlightBboxes: ReadonlyArray<BookNavigationTarget> = []
+const navigation = usePdfNavigation({
+  getPdfViewer: () => pdfViewer,
+  afterNavigate: () => emitViewportDescriptorIfChanged(),
+  showHighlights: (targets) =>
+    blockHighlight.showSelectionBboxHighlights(targets),
+})
 
-function clearBookBlockSelectionBboxHighlight() {
-  for (const c of bookBlockSelectionBboxHighlightCancels) {
-    c()
-  }
-  bookBlockSelectionBboxHighlightCancels = []
-  currentHighlightBboxes = []
-  holdCallout.value = null
-}
+const locatorGeometry = usePdfLocatorGeometry({
+  containerRef,
+  getPdfViewer: () => pdfViewer,
+})
 
-function appendBookBlockSelectionBboxHighlight(
-  pageNumber: number,
-  bbox: NormalizedPageBbox,
-  contentBlockId?: number,
-  derivedTitle?: string
-) {
-  if (!pdfViewer) return
-  const pageView = pdfViewer.getPageView(pageNumber - 1)
-  if (!pageView?.div) return
-  const rect = normalizedBboxToPixelRect(
-    bbox,
-    pageView.viewport.width,
-    pageView.viewport.height
-  )
-  bookBlockSelectionBboxHighlightCancels.push(
-    attachBookBlockSelectionBboxHighlight(pageView.div, {
-      ...rect,
-      contentBlockId,
-      derivedTitle,
-    })
-  )
-}
+const gestureZoom = usePdfGestureZoom({
+  containerRef,
+  getPdfViewer: () => pdfViewer,
+  getScrollSuppression: () => scrollSuppression,
+  onUserAdjusted: () => {
+    userAdjustedScale = true
+  },
+  afterScaleChange: () => emitViewportDescriptorIfChanged(),
+  onClearCallout: () => {
+    blockHighlight.holdCallout.value = null
+  },
+})
 
-function showSelectionBboxHighlights(
-  highlightBboxes: ReadonlyArray<BookNavigationTarget>
-) {
-  clearBookBlockSelectionBboxHighlight()
-  currentHighlightBboxes = highlightBboxes
-  if (!pdfViewer) return
-  for (const e of highlightBboxes) {
-    if (e.bbox === null) continue
-    if (
-      !Number.isInteger(e.pageIndex) ||
-      e.pageIndex < 0 ||
-      e.pageIndex >= pdfViewer.pagesCount
-    ) {
-      continue
-    }
-    appendBookBlockSelectionBboxHighlight(
-      e.pageIndex + 1,
-      e.bbox,
-      e.contentBlockId,
-      e.derivedTitle
-    )
-  }
-}
-
-function contentBlockAtClientPoint(
-  clientX: number,
-  clientY: number
-): { contentBlockId: number; derivedTitle: string | undefined } | null {
-  if (!pdfViewer) return null
-  for (const e of currentHighlightBboxes) {
-    if (e.contentBlockId === undefined || e.bbox === null) continue
-    if (
-      !Number.isInteger(e.pageIndex) ||
-      e.pageIndex < 0 ||
-      e.pageIndex >= pdfViewer.pagesCount
-    )
-      continue
-    const pageView = pdfViewer.getPageView(e.pageIndex)
-    if (!pageView?.div) continue
-    const pageRect = pageView.div.getBoundingClientRect()
-    const left = pageRect.left + (e.bbox[0] / 1000) * pageRect.width
-    const top = pageRect.top + (e.bbox[1] / 1000) * pageRect.height
-    const right = pageRect.left + (e.bbox[2] / 1000) * pageRect.width
-    const bottom = pageRect.top + (e.bbox[3] / 1000) * pageRect.height
-    if (
-      clientX >= left &&
-      clientX <= right &&
-      clientY >= top &&
-      clientY <= bottom
-    ) {
-      return { contentBlockId: e.contentBlockId, derivedTitle: e.derivedTitle }
-    }
-  }
-  return null
-}
-
-function onContainerClick(e: MouseEvent) {
-  const hit = contentBlockAtClientPoint(e.clientX, e.clientY)
-  if (hit) {
-    holdCallout.value = {
-      contentBlockId: hit.contentBlockId,
-      clientX: e.clientX,
-      clientY: e.clientY,
-      derivedTitle: hit.derivedTitle,
-    }
-  }
-}
-
-async function applyBookNavigationTarget(
-  target: BookNavigationTarget,
-  highlightBboxes: ReadonlyArray<BookNavigationTarget> = []
-) {
-  if (!pdfViewer?.pdfDocument) return
-  const { pageIndex, bbox } = target
-  if (
-    !Number.isInteger(pageIndex) ||
-    pageIndex < 0 ||
-    pageIndex >= pdfViewer.pagesCount
-  ) {
-    return
-  }
-  const pageNumber = pageIndex + 1
-  if (bbox === null) {
-    pdfViewer.scrollPageIntoView({ pageNumber })
-  } else {
-    const page = await pdfViewer.pdfDocument.getPage(pageNumber)
-    const vp = page.getViewport({ scale: 1 })
-    const destArray = normalizedBboxToPdfJsXyzDestArray(
-      vp.width,
-      vp.height,
-      bbox
-    )
-    pdfViewer.scrollPageIntoView({ pageNumber, destArray: [...destArray] })
-  }
-  showSelectionBboxHighlights(highlightBboxes)
-  queueMicrotask(() => emitViewportDescriptorIfChanged())
-}
-
-function flushPendingNavigation() {
-  if (pendingNavigation === null || !pdfViewer?.pdfDocument) {
-    return
-  }
-  const shot = pendingNavigation
-  pendingNavigation = null
-  applyBookNavigationTarget(shot.target, shot.highlightBboxes).catch(() => {
-    /* Outline jump failures from pdf.js must not reject pagesinit / viewer setup. */
-  })
-}
-
-async function scrollToBookNavigationTarget(
-  target: BookNavigationTarget,
-  highlightBboxes: ReadonlyArray<BookNavigationTarget> = []
-) {
-  if (!Number.isInteger(target.pageIndex) || target.pageIndex < 0) {
-    return
-  }
-  if (!pdfViewer?.pdfDocument) {
-    pendingNavigation = { target, highlightBboxes }
-    return
-  }
-  await applyBookNavigationTarget(target, highlightBboxes)
-}
-
-async function scrollToStoredReadingPosition(
-  pageIndexZeroBased: number,
-  normalizedY: number
-) {
-  if (!pdfViewer?.pdfDocument) return
-  if (
-    !Number.isInteger(pageIndexZeroBased) ||
-    pageIndexZeroBased < 0 ||
-    pageIndexZeroBased >= pdfViewer.pagesCount
-  ) {
-    return
-  }
-  const pageNumber = pageIndexZeroBased + 1
-  const page = await pdfViewer.pdfDocument.getPage(pageNumber)
-  const vp = page.getViewport({ scale: 1 })
-  const vx = vp.width / 2
-  const vy = normalizedYToViewportY(normalizedY, vp.height)
-  const [pdfX, pdfY] = vp.convertToPdfPoint(vx, vy)
-  pdfViewer.scrollPageIntoView({
-    pageNumber,
-    destArray: [null, { name: "XYZ" }, pdfX, pdfY, null],
-  })
-  queueMicrotask(() => emitViewportDescriptorIfChanged())
-}
-
-async function displayLocator(locator: ContentLocatorFull): Promise<void> {
-  const target = locatorAsPdfNavigationTarget(locator)
-  if (target === null) {
-    return
-  }
-  await scrollToBookNavigationTarget(target)
-}
-
-const ZOOM_STEP = 1.25
-
-function zoomIn() {
-  if (!pdfViewer) return
-  userAdjustedScale = true
-  pdfViewer.currentScale *= ZOOM_STEP
-  emitViewportDescriptorIfChanged()
-}
-
-function zoomOut() {
-  if (!pdfViewer) return
-  userAdjustedScale = true
-  pdfViewer.currentScale /= ZOOM_STEP
-  emitViewportDescriptorIfChanged()
-}
-
-function highlightBlockSelection(
-  highlightBboxes: ReadonlyArray<BookNavigationTarget>
-) {
-  showSelectionBboxHighlights(highlightBboxes)
-}
-
-function resolveLocatorRect(
-  locator: ContentLocatorFull
-): ViewerLocatorRect | null {
-  const container = containerRef.value
-  if (!container || !pdfViewer) return null
-  const target = locatorAsPdfNavigationTarget(locator)
-  if (target === null || target.bbox === null) return null
-  const { pageIndex, bbox } = target
-  if (
-    !Number.isInteger(pageIndex) ||
-    pageIndex < 0 ||
-    pageIndex >= pdfViewer.pagesCount
-  ) {
-    return null
-  }
-  const pageView = pdfViewer.getPageView(pageIndex)
-  if (!pageView?.div) return null
-  const pageRect = pageView.div.getBoundingClientRect()
-  const top = pageRect.top + (bbox[1] / 1000) * pageRect.height
-  const bottom = pageRect.top + (bbox[3] / 1000) * pageRect.height
-  const left = pageRect.left + (bbox[0] / 1000) * pageRect.width
-  const right = pageRect.left + (bbox[2] / 1000) * pageRect.width
-  return {
-    top,
-    bottom,
-    left,
-    right,
-    width: Math.max(0, right - left),
-    height: Math.max(0, bottom - top),
-  }
-}
-
-/**
- * Returns true when the bottom edge of the given bbox (0–1000 MinerU normalized, page-local) is
- * both visible in the scroll container's viewport and above `obstructionPx` from the container's
- * bottom edge (so the Reading Control Panel does not obscure it).
- */
-function isLocatorBottomVisible(
-  locator: ContentLocatorFull,
-  obstructionPx: number
-): boolean {
-  const container = containerRef.value
-  if (!container || !pdfViewer) return false
-  const rect = resolveLocatorRect(locator)
-  if (rect === null) return false
-  const containerRect = container.getBoundingClientRect()
-  const panelTop = containerRect.bottom - obstructionPx
-  return rect.bottom < panelTop && rect.bottom > containerRect.top
-}
-
-const READING_PANEL_ANCHOR_GAP_PX = 8
-
-/**
- * When `isLocatorBottomVisible` is true, distance from the viewer top edge to place
- * the Reading Control Panel wrapper immediately below the last direct-content bbox bottom.
- */
-function readingPanelAnchorTopPx(
-  locator: ContentLocatorFull,
-  obstructionPx: number
-): number | null {
-  if (!isLocatorBottomVisible(locator, obstructionPx)) {
-    return null
-  }
-  const container = containerRef.value
-  if (!container || !pdfViewer) return null
-  const rect = resolveLocatorRect(locator)
-  if (rect === null) return null
-  const containerRect = container.getBoundingClientRect()
-  return rect.bottom - containerRect.top + READING_PANEL_ANCHOR_GAP_PX
-}
-
-function getPageRect(pageIndex: number): { height: number } | null {
-  if (!pdfViewer) return null
-  if (
-    !Number.isInteger(pageIndex) ||
-    pageIndex < 0 ||
-    pageIndex >= pdfViewer.pagesCount
-  )
-    return null
-  const pageView = pdfViewer.getPageView(pageIndex)
-  if (!pageView?.div) return null
-  return { height: pageView.div.getBoundingClientRect().height }
-}
-
-function getScrollViewportHeightPx(): number | null {
-  const container = containerRef.value
-  if (!container) return null
-  return container.getBoundingClientRect().height
-}
-
-function scrollPageNormalizedYToReadingClearance(
-  pageIndex: number,
-  normalizedY: number,
-  obstructionPx: number
-): void {
-  const container = containerRef.value
-  if (!container || !pdfViewer) return
-  if (
-    !Number.isInteger(pageIndex) ||
-    pageIndex < 0 ||
-    pageIndex >= pdfViewer.pagesCount
-  )
-    return
-  const pageView = pdfViewer.getPageView(pageIndex)
-  if (!(pageView as { div?: HTMLDivElement } | null)?.div) return
-  const pageDiv = (pageView as { div: HTMLDivElement }).div
-  const pageRect = pageDiv.getBoundingClientRect()
-  const containerRect = container.getBoundingClientRect()
-  const pointClientY = pageRect.top + (normalizedY / 1000) * pageRect.height
-  const targetClient = containerRect.bottom - obstructionPx
-  container.scrollTop += pointClientY - targetClient
-}
-
-function afterNextViewUpdate(fn: () => void): void {
-  if (!pdfViewer) {
-    queueMicrotask(fn)
-    return
-  }
-  pdfViewer.eventBus.on("updateviewarea", fn, { once: true })
-}
+const { holdCallout, onContainerClick, onConfirmNewBlock } = blockHighlight
 
 defineExpose({
-  displayLocator,
-  resolveLocatorRect,
-  scrollToBookNavigationTarget,
-  highlightBlockSelection,
-  scrollToStoredReadingPosition,
-  scrollPageNormalizedYToReadingClearance,
-  afterNextViewUpdate,
+  displayLocator: navigation.displayLocator,
+  resolveLocatorRect: locatorGeometry.resolveLocatorRect,
+  scrollToBookNavigationTarget: navigation.scrollToBookNavigationTarget,
+  highlightBlockSelection: blockHighlight.highlightBlockSelection,
+  scrollToStoredReadingPosition: navigation.scrollToStoredReadingPosition,
+  scrollPageNormalizedYToReadingClearance:
+    locatorGeometry.scrollPageNormalizedYToReadingClearance,
+  afterNextViewUpdate: locatorGeometry.afterNextViewUpdate,
   registerScrollSuppression,
-  getPageRect,
-  getScrollViewportHeightPx,
-  zoomIn,
-  zoomOut,
-  isLocatorBottomVisible,
-  readingPanelAnchorTopPx,
+  getPageRect: locatorGeometry.getPageRect,
+  getScrollViewportHeightPx: locatorGeometry.getScrollViewportHeightPx,
+  zoomIn: gestureZoom.zoomIn,
+  zoomOut: gestureZoom.zoomOut,
+  isLocatorBottomVisible: locatorGeometry.isLocatorBottomVisible,
+  readingPanelAnchorTopPx: locatorGeometry.readingPanelAnchorTopPx,
 })
 
 async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
@@ -667,18 +241,18 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
     currentLoadingTask = null
   }
   if (pdfViewer) {
-    clearBookBlockSelectionBboxHighlight()
+    blockHighlight.clearBlockHighlight()
     if (onPageChangingForViewport) {
       pdfViewer.eventBus.off("pagechanging", onPageChangingForViewport)
       onPageChangingForViewport = null
     }
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
-    pendingNavigation = null
+    navigation.clearPendingNavigation()
   }
 
   detachViewportScrollListener(container)
-  detachGestureListeners(container)
+  gestureZoom.detachGestureListeners(container)
   teardownGeometryResample()
   lastEmittedPage = null
   lastEmittedYQuantized = null
@@ -707,75 +281,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   }
   container.addEventListener("scroll", onScrollForViewport, { passive: true })
 
-  onWheelForZoom = (e: WheelEvent) => {
-    if (scrollSuppression.checkEvent()) {
-      e.preventDefault()
-      return
-    }
-    if (e.ctrlKey || e.metaKey) {
-      if (!pdfViewer) return
-      e.preventDefault()
-      const factor = wheelDeltaYToScaleFactor(e.deltaY)
-      applyGestureScaleFactor(factor, e.clientX, e.clientY)
-    } else {
-      holdCallout.value = null
-    }
-  }
-  container.addEventListener("wheel", onWheelForZoom, { passive: false })
-
-  onTouchStartForPinch = (e: TouchEvent) => {
-    const a = e.touches[0]
-    const b = e.touches[1]
-    if (a && b) {
-      lastPinchDistance = touchPairDistance(a, b)
-    }
-  }
-  onTouchMoveForPinch = (e: TouchEvent) => {
-    if (scrollSuppression.checkEvent()) {
-      e.preventDefault()
-      return
-    }
-    const a = e.touches[0]
-    const b = e.touches[1]
-    if (!b) {
-      holdCallout.value = null
-      return
-    }
-    if (!a || !pdfViewer) return
-    e.preventDefault()
-    const d = touchPairDistance(a, b)
-    if (lastPinchDistance <= 0) {
-      lastPinchDistance = d
-      return
-    }
-    if (d <= 0) return
-    const pinchFactor = d / lastPinchDistance
-    lastPinchDistance = d
-    const cx = (a.clientX + b.clientX) / 2
-    const cy = (a.clientY + b.clientY) / 2
-    applyGestureScaleFactor(pinchFactor, cx, cy)
-  }
-  onTouchEndForPinch = (e: TouchEvent) => {
-    const a = e.touches[0]
-    const b = e.touches[1]
-    if (!a || !b) {
-      lastPinchDistance = 0
-    } else {
-      lastPinchDistance = touchPairDistance(a, b)
-    }
-  }
-  container.addEventListener("touchstart", onTouchStartForPinch, {
-    passive: true,
-  })
-  container.addEventListener("touchmove", onTouchMoveForPinch, {
-    passive: false,
-  })
-  container.addEventListener("touchend", onTouchEndForPinch, {
-    passive: true,
-  })
-  container.addEventListener("touchcancel", onTouchEndForPinch, {
-    passive: true,
-  })
+  gestureZoom.attachGestureListeners(container)
 
   geometryRafEmitter = createCoalescedRequestAnimationFrameEmitter({
     emit: () => {
@@ -797,7 +303,7 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
   eventBus.on("pagesinit", () => {
     if (pdfViewer) {
       applyResponsiveDefaultScale({ force: true })
-      flushPendingNavigation()
+      navigation.flushPendingNavigation()
       emitViewportDescriptorIfChanged()
       emit("pagesReady")
     }
@@ -849,7 +355,7 @@ onBeforeUnmount(async () => {
   const container = containerRef.value
   if (container) {
     detachViewportScrollListener(container)
-    detachGestureListeners(container)
+    gestureZoom.detachGestureListeners(container)
     teardownGeometryResample()
   }
   if (currentLoadingTask) {
@@ -864,8 +370,8 @@ onBeforeUnmount(async () => {
     pdfViewer.setDocument(null as unknown as PDFDocumentProxy)
     pdfViewer = null
   }
-  clearBookBlockSelectionBboxHighlight()
-  pendingNavigation = null
+  blockHighlight.clearBlockHighlight()
+  navigation.clearPendingNavigation()
 })
 </script>
 

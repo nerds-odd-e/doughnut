@@ -1,7 +1,7 @@
 <template>
   <div :class="{ 'dropdown-style': isDropdown }">
     <div
-      v-if="model.isSearchInProgress"
+      v-if="isSearchInProgress"
       class="searching-indicator"
       role="status"
       aria-busy="true"
@@ -13,26 +13,10 @@
 
     <div v-if="displayState.showRecentNotes" :class="displayState.containerClass">
       <div class="result-title">{{ displayState.title }}</div>
-      <div v-if="isDropdown" class="dropdown-list">
-        <div
-          v-for="result in filteredRecentNotes"
-          :key="result.noteTopology.id"
-          class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
-        >
-          <div
-            class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
-          >
-            <FileText
-              :size="14"
-              class="dropdown-hit-kind-icon"
-              aria-hidden="true"
-            />
-          </div>
-          <div class="daisy-min-w-0 daisy-flex-1">
-            <NoteTitleWithLink :note-topology="result.noteTopology" />
-          </div>
-        </div>
-      </div>
+      <SearchDropdownHitList
+        v-if="isDropdown"
+        :hits="recentNotesAsHits"
+      />
       <SearchResultList
         v-else
         class="search-result"
@@ -72,65 +56,16 @@
     </div>
 
     <div v-if="displayState.showEmptyState" :class="displayState.containerClass">
-      <div class="result-title" v-if="displayState.title">{{ displayState.title }}</div>
+      <div v-if="displayState.title" class="result-title">{{ displayState.title }}</div>
       <em>{{ displayState.emptyMessage }}</em>
     </div>
 
     <div v-if="displayState.showSearchResults && searchResult" :class="displayState.containerClass">
       <div class="result-title">{{ displayState.title }}</div>
-      <div v-if="isDropdown" class="dropdown-list">
-        <template
-          v-for="hit in searchResult"
-          :key="relationshipLiteralSearchHitKey(hit)"
-        >
-          <div
-            v-if="hit.hitKind === 'NOTE' && hit.noteSearchResult"
-            class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
-          >
-            <div
-              class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
-            >
-              <FileText :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
-            </div>
-            <div class="daisy-min-w-0 daisy-flex-1">
-              <NoteTitleWithLink
-                :note-topology="hit.noteSearchResult.noteTopology"
-              />
-            </div>
-          </div>
-          <div
-            v-else-if="hit.hitKind === 'FOLDER'"
-            class="dropdown-hit-row folder-search-hit daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
-          >
-            <div
-              class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
-            >
-              <Folder :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
-            </div>
-            <div class="daisy-min-w-0 daisy-flex-1">
-              <span class="daisy-font-medium">{{ hit.folderName }}</span>
-              <span
-                v-if="hit.notebookName"
-                class="daisy-block daisy-text-xs daisy-opacity-70"
-              >{{ hit.notebookName }}</span>
-            </div>
-          </div>
-          <div
-            v-else-if="hit.hitKind === 'NOTEBOOK' && hit.notebookId != null"
-            class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
-          >
-            <div
-              class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
-            >
-              <BookText :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
-            </div>
-            <router-link
-              :to="{ name: 'notebookPage', params: { notebookId: hit.notebookId } }"
-              class="daisy-min-w-0 daisy-flex-1 daisy-text-decoration-none daisy-font-medium"
-            >{{ hit.notebookName }}</router-link>
-          </div>
-        </template>
-      </div>
+      <SearchDropdownHitList
+        v-if="isDropdown"
+        :hits="searchResult"
+      />
       <SearchResultList
         v-else
         class="search-result"
@@ -172,23 +107,11 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  SearchTerm,
-  NoteSearchResult,
-  RelationshipLiteralSearchHit,
-} from "@generated/doughnut-backend-api"
-import {
-  NoteController,
-  SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import {} from "@/managedApi/clientSetup"
-import { debounce } from "mini-debounce"
-import { ref, computed, watch, onBeforeUnmount, shallowRef } from "vue"
-import { BookText, FileText, Folder } from "lucide-vue-next"
+import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import { computed, toRef } from "vue"
+import SearchDropdownHitList from "./SearchDropdownHitList.vue"
 import SearchResultList from "./SearchResultList.vue"
-import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
-import { SearchResultsModel } from "@/models/searchResultsModel"
-import { relationshipLiteralSearchHitKey } from "@/models/relationshipLiteralSearchHitKey"
+import { useSearchExecution } from "@/composables/useSearchExecution"
 
 const props = defineProps({
   noteId: Number,
@@ -215,37 +138,29 @@ defineSlots<{
   notebookButton: (props: { notebookId: number; notebookName?: string }) => void
 }>()
 
-const oldSearchTerm = ref<SearchTerm>({
-  searchKey: "",
-  allMyNotebooksAndSubscriptions: true,
-  allMyCircles: false,
-})
+const inputSearchKeyRef = toRef(props, "inputSearchKey")
+const noteIdRef = toRef(props, "noteId")
+const notebookIdRef = toRef(props, "notebookId")
+const semanticSearchEnabledRef = toRef(props, "semanticSearchEnabled")
 
-const timeoutId = ref<ReturnType<typeof setTimeout>>()
-const model = new SearchResultsModel()
-/** Bumps when a new debounced search starts so late responses from an older run are ignored. */
-const searchGeneration = shallowRef(0)
+const {
+  model,
+  isSearchInProgress,
+  searchResult,
+  filteredRecentNotes,
+  recentNotesAsHits,
+} = useSearchExecution({
+  inputSearchKey: inputSearchKeyRef,
+  noteId: noteIdRef,
+  notebookId: notebookIdRef,
+  semanticSearchEnabled: semanticSearchEnabledRef,
+  allMyNotebooksAndSubscriptions,
+  allMyCircles,
+})
 
 const trimmedSearchKey = computed(() => props.inputSearchKey.trim())
 const isGlobalSearch = computed(
   () => allMyNotebooksAndSubscriptions.value === true
-)
-
-const searchResult = computed(() =>
-  model.getSearchResult(trimmedSearchKey.value, isGlobalSearch.value)
-)
-
-const filteredRecentNotes = computed(() =>
-  props.noteId
-    ? model.recentNotes.filter((note) => note.noteTopology.id !== props.noteId)
-    : model.recentNotes
-)
-
-const recentNotesAsHits = computed((): RelationshipLiteralSearchHit[] =>
-  filteredRecentNotes.value.map((r) => ({
-    hitKind: "NOTE" as const,
-    noteSearchResult: r,
-  }))
 )
 
 const displayState = computed(() =>
@@ -257,170 +172,6 @@ const displayState = computed(() =>
     filteredRecentNotesCount: filteredRecentNotes.value.length,
   })
 )
-
-const SEARCH_DEBOUNCE_MS = 1000
-const debounced = debounce((callback) => callback(), SEARCH_DEBOUNCE_MS)
-
-const fetchRecentNotes = async () => {
-  if (
-    (isGlobalSearch.value || props.noteId) &&
-    model.recentNotes.length === 0
-  ) {
-    const { data: notes, error } = await NoteController.getRecentNotes({})
-    model.recentNotes = error ? [] : notes || []
-  }
-}
-
-const search = () => {
-  const originalTrimmedKey = trimmedSearchKey.value
-  model.prepareForNewSearch(originalTrimmedKey, isGlobalSearch.value)
-
-  if (
-    !model.hasPreviousResult() &&
-    (isGlobalSearch.value || props.noteId) &&
-    model.recentNotes.length === 0
-  ) {
-    fetchRecentNotes()
-  }
-
-  if (originalTrimmedKey !== "") {
-    model.startSearch()
-  }
-
-  timeoutId.value = debounced(async () => {
-    const gen = ++searchGeneration.value
-    const term: SearchTerm = {
-      searchKey: props.inputSearchKey,
-      allMyNotebooksAndSubscriptions: allMyNotebooksAndSubscriptions.value,
-      allMyCircles: allMyCircles.value,
-    }
-    const snapshotTrimmed = term.searchKey.trim()
-    const snapshotGlobal = term.allMyNotebooksAndSubscriptions === true
-    const snapshotNotebookId = props.notebookId
-
-    const literalPromise = props.noteId
-      ? SearchController.searchForRelationshipTargetWithin({
-          path: { note: props.noteId },
-          body: term,
-        })
-      : SearchController.searchForRelationshipTarget({ body: term })
-    const snapshotSemantic = props.semanticSearchEnabled
-    const semanticPromise = snapshotSemantic
-      ? props.noteId
-        ? SearchController.semanticSearchWithin({
-            path: { note: props.noteId },
-            body: term,
-          })
-        : SearchController.semanticSearch({ body: term })
-      : null
-
-    const applyIfCurrent = () =>
-      gen === searchGeneration.value &&
-      snapshotTrimmed === trimmedSearchKey.value &&
-      snapshotGlobal === isGlobalSearch.value &&
-      snapshotSemantic === props.semanticSearchEnabled
-
-    literalPromise.then((literalRes) => {
-      if (!applyIfCurrent()) return
-      const literal = literalRes.error ? [] : literalRes.data || []
-      model.mergeAndCacheResults({
-        trimmedSearchKey: snapshotTrimmed,
-        isGlobal: snapshotGlobal,
-        literalResults: literal,
-        currentNotebookId: snapshotNotebookId,
-      })
-    })
-
-    if (semanticPromise) {
-      semanticPromise.then((semanticRes) => {
-        if (!applyIfCurrent()) return
-        const semantic = semanticRes.error ? [] : semanticRes.data || []
-        model.mergeAndCacheResults({
-          trimmedSearchKey: snapshotTrimmed,
-          isGlobal: snapshotGlobal,
-          semanticResults: semantic,
-          currentNotebookId: snapshotNotebookId,
-        })
-      })
-    }
-
-    if (semanticPromise) {
-      await Promise.all([literalPromise, semanticPromise])
-    } else {
-      await literalPromise
-    }
-    if (!applyIfCurrent()) return
-    model.completeSearch()
-  })
-}
-
-watch(
-  () =>
-    [
-      props.inputSearchKey,
-      allMyNotebooksAndSubscriptions.value,
-      allMyCircles.value,
-    ] as const,
-  () => {
-    if (
-      allMyCircles.value &&
-      !oldSearchTerm.value.allMyNotebooksAndSubscriptions
-    ) {
-      allMyNotebooksAndSubscriptions.value = true
-    } else if (
-      !allMyNotebooksAndSubscriptions.value &&
-      oldSearchTerm.value.allMyCircles
-    ) {
-      allMyCircles.value = false
-    }
-
-    if (trimmedSearchKey.value !== "") {
-      search()
-    } else if (isGlobalSearch.value || props.noteId) {
-      fetchRecentNotes()
-    }
-    oldSearchTerm.value = {
-      searchKey: props.inputSearchKey,
-      allMyNotebooksAndSubscriptions: allMyNotebooksAndSubscriptions.value,
-      allMyCircles: allMyCircles.value,
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  () => props.inputSearchKey,
-  () => {
-    if (props.inputSearchKey.trim() === "") {
-      model.clearPreviousResult()
-      if (
-        (props.noteId && props.isDropdown) ||
-        isGlobalSearch.value ||
-        props.noteId
-      ) {
-        model.clearRecentResult()
-        fetchRecentNotes()
-      }
-    }
-  }
-)
-
-watch(
-  () => props.semanticSearchEnabled,
-  () => {
-    searchGeneration.value++
-    model.clearSearchCaches()
-    if (trimmedSearchKey.value !== "") {
-      search()
-    }
-  }
-)
-
-onBeforeUnmount(() => {
-  if (timeoutId.value) {
-    clearTimeout(timeoutId.value)
-  }
-})
 </script>
 
 <style scoped>
@@ -437,38 +188,6 @@ onBeforeUnmount(() => {
   border-radius: 0 0 4px 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 1000;
-}
-
-.dropdown-list {
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 0.5rem;
-}
-
-.dropdown-hit-icon-col {
-  line-height: 0;
-}
-
-.dropdown-hit-kind-icon {
-  opacity: 0.5;
-  flex-shrink: 0;
-}
-
-.dropdown-list :deep(a) {
-  display: block;
-  color: inherit;
-}
-
-.dropdown-hit-row :deep(a) {
-  padding: 0;
-}
-
-.dropdown-list :deep(a:hover) {
-  background-color: #f8f9fa;
-}
-
-.dropdown-hit-row:hover {
-  background-color: #f8f9fa;
 }
 
 .result-section {

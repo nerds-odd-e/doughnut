@@ -95,107 +95,27 @@
       </div>
     </main>
   </BookReadingBookLayout>
-  <dialog
-    class="daisy-modal"
-    :class="{ 'daisy-modal-open': pendingBlockCreation !== null }"
-    data-testid="new-block-title-dialog"
-  >
-    <div class="daisy-modal-box">
-      <h2 class="daisy-text-lg daisy-font-semibold">Name the new block</h2>
-      <input
-        v-if="pendingBlockCreation !== null"
-        v-model="pendingBlockTitleInput"
-        data-testid="new-block-title-input"
-        class="daisy-input daisy-input-bordered daisy-w-full daisy-mt-2"
-        type="text"
-      />
-      <div class="daisy-modal-action">
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-primary"
-          data-testid="new-block-title-confirm"
-          @click="onConfirmBlockTitle"
-        >
-          Confirm
-        </button>
-        <button
-          type="button"
-          class="daisy-btn"
-          @click="pendingBlockCreation = null"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-    <form method="dialog" class="daisy-modal-backdrop">
-      <button type="button" @click="pendingBlockCreation = null">close</button>
-    </form>
-  </dialog>
-  <dialog
-    class="daisy-modal"
-    :class="{ 'daisy-modal-open': aiSuggestion !== null }"
-    aria-labelledby="book-layout-reorganize-preview-title"
-    data-testid="book-layout-reorganize-preview-dialog"
-  >
-    <div class="daisy-modal-box">
-      <h2
-        id="book-layout-reorganize-preview-title"
-        class="daisy-text-lg daisy-font-semibold"
-      >
-        Reorganize layout (preview)
-      </h2>
-      <div
-        class="daisy-max-h-[min(24rem,50vh)] daisy-overflow-y-auto daisy-py-2"
-      >
-        <div
-          v-for="row in aiPreviewRows"
-          :key="row.block.id"
-          data-testid="book-layout-reorganize-preview-row"
-          class="daisy-rounded daisy-py-1.5 daisy-pr-2 daisy-text-sm daisy-leading-snug"
-          :class="{
-            'daisy-bg-warning/15': row.depthChanged,
-          }"
-          :data-suggested-depth="row.suggestedDepth"
-          :data-depth-changed="row.depthChanged ? 'true' : undefined"
-          :style="{
-            paddingInlineStart: `${0.75 * row.suggestedDepth}rem`,
-          }"
-        >
-          {{ row.block.title }}
-        </div>
-      </div>
-      <div class="daisy-modal-action">
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-primary"
-          data-testid="book-layout-reorganize-preview-confirm"
-          @click="onConfirmAiReorganize"
-        >
-          Confirm
-        </button>
-        <button
-          type="button"
-          class="daisy-btn"
-          data-testid="book-layout-reorganize-preview-cancel"
-          @click="dismissAiReorganizePreview"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-    <form method="dialog" class="daisy-modal-backdrop">
-      <button type="button" @click="dismissAiReorganizePreview">
-        close
-      </button>
-    </form>
-  </dialog>
+  <NewBookBlockTitleDialog
+    :open="pendingBlockCreation !== null"
+    :default-title="pendingBlockCreation?.structuralTitle"
+    @confirm="onConfirmBlockTitle"
+    @cancel="pendingBlockCreation = null"
+  />
+  <BookLayoutReorganizePreviewDialog
+    :open="aiSuggestion !== null"
+    :preview-rows="aiPreviewRows"
+    @confirm="onConfirmAiReorganize"
+    @cancel="dismissAiReorganizePreview"
+  />
 </template>
 
 <script setup lang="ts">
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
+import BookLayoutReorganizePreviewDialog from "@/components/book-reading/BookLayoutReorganizePreviewDialog.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitleDialog.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
@@ -207,7 +127,6 @@ import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
-import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
   READING_PANEL_OBSTRUCTION_PX,
@@ -219,10 +138,13 @@ import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentB
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
+import {
+  bookFullAfterLayoutMutation,
+  useBookLayoutMutations,
+} from "@/composables/book-reading/useBookLayoutMutations"
 import type {
   BookBlockFull,
   BookFull,
-  BookMutationResponseFull,
   PdfLocatorFull,
 } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -240,29 +162,9 @@ const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
 
-function bookFullAfterLayoutMutation(
-  previous: BookFull,
-  mutation: BookMutationResponseFull
-): BookFull {
-  const prevById = new Map(previous.blocks.map((b) => [b.id, b]))
-  const updatedBlocks = mutation.blocks.map((row) => {
-    const prev = prevById.get(row.id)
-    if (!prev) {
-      throw new Error(`book layout mutation: unknown block id ${row.id}`)
-    }
-    return {
-      ...prev,
-      id: row.id,
-      depth: row.depth,
-      title: row.title,
-      contentLocators: row.contentLocators ?? prev.contentLocators,
-    }
-  })
-  return { ...previous, ...mutation, blocks: updatedBlocks }
-}
-
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const SNAP_HOLD_MS = 500
+const STRUCTURAL_TITLE_MAX_CHARS = 512
 
 const props = withDefaults(
   defineProps<{
@@ -278,7 +180,6 @@ const notebookId = computed(() => Number(props.book.notebookId))
 const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const pdfViewerLoadError = ref<string | null>(null)
-
 const viewportPayload = ref<ViewportPayload | null>(null)
 
 const pdfBarCurrentPage = computed(() => {
@@ -331,10 +232,8 @@ function onPdfLoadError(message: string) {
 }
 
 const bookBlocks = computed(() => props.book.blocks)
-
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
 
-const pendingLayoutBlockId = ref<number | null>(null)
 const {
   suggestPending: aiSuggestPending,
   suggestion: aiSuggestion,
@@ -427,6 +326,16 @@ const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
     mainPaneRef: pdfPaneRef,
   })
 
+const { pendingLayoutBlockId, onBlockIndent, onBlockOutdent, onBlockCancel } =
+  useBookLayoutMutations({
+    notebookId,
+    bookBlocks,
+    getPropBook: () => props.book,
+    selectedBlockId,
+    applyBookBlockSelection,
+    onBookUpdated: (book) => emit("update:book", book),
+  })
+
 function commitCurrentBlockId(id: number | null): boolean {
   if (shouldSnapBack(id)) {
     performSnapBack()
@@ -441,13 +350,8 @@ const currentBlockLiveText = computed(() =>
 
 /**
  * Scroll → current-block pipeline:
- *   PdfBookViewer emits `viewportAnchorPage` (via `pdfViewerViewportTopYDown`)
- *   → here we call `currentBlockIdFromVisiblePage` to map anchor page + viewport Y-range to a block ID
+ *   PdfBookViewer emits `viewportAnchorPage` → here we map anchor page + viewport Y-range to a block ID
  *   → result is debounced through `currentBlockIdDebouncer`.
- *
- * @see currentBlockIdFromVisiblePage — midpoint rule: block whose `y0` is above viewport mid wins;
- *      otherwise the previous block is returned (scrolling a page into view is not enough when `y0 > 0`).
- * @see pdfViewerViewportTopYDown — produces the `ViewportYRange` consumed here.
  */
 function onViewportAnchorPage(payload: ViewportPayload) {
   viewportPayload.value = payload
@@ -491,81 +395,6 @@ async function onBookBlockClick(block: BookBlockFull) {
   await applyBookBlockSelection(block)
 }
 
-async function onBlockIndent(block: BookBlockFull) {
-  if (pendingLayoutBlockId.value !== null) {
-    return
-  }
-  pendingLayoutBlockId.value = block.id
-  try {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookBooksController.changeBookBlockDepth({
-        path: { notebook: notebookId.value, bookBlock: block.id },
-        body: { direction: "INDENT" },
-      })
-    )
-    if (!error && data) {
-      emit("update:book", bookFullAfterLayoutMutation(props.book, data))
-      selectedBlockId.value = block.id
-    }
-  } finally {
-    pendingLayoutBlockId.value = null
-  }
-}
-
-async function onBlockOutdent(block: BookBlockFull) {
-  if (pendingLayoutBlockId.value !== null) {
-    return
-  }
-  pendingLayoutBlockId.value = block.id
-  try {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookBooksController.changeBookBlockDepth({
-        path: { notebook: notebookId.value, bookBlock: block.id },
-        body: { direction: "OUTDENT" },
-      })
-    )
-    if (!error && data) {
-      emit("update:book", bookFullAfterLayoutMutation(props.book, data))
-      selectedBlockId.value = block.id
-    }
-  } finally {
-    pendingLayoutBlockId.value = null
-  }
-}
-
-async function onBlockCancel(block: BookBlockFull) {
-  if (pendingLayoutBlockId.value !== null) {
-    return
-  }
-  pendingLayoutBlockId.value = block.id
-  try {
-    const predecessorId = predecessorBookBlockIdInPreorder(
-      bookBlocks.value,
-      block.id
-    )
-    const { data, error } = await NotebookBooksController.cancelBookBlock({
-      path: { notebook: notebookId.value, bookBlock: block.id },
-    })
-    if (!error && data) {
-      const merged = bookFullAfterLayoutMutation(props.book, data)
-      if (
-        predecessorId !== null &&
-        merged.blocks.some((b) => b.id === predecessorId)
-      ) {
-        selectedBlockId.value = predecessorId
-        emit("update:book", merged)
-        const pred = merged.blocks.find((b) => b.id === predecessorId)!
-        await applyBookBlockSelection(pred)
-      } else {
-        selectedBlockId.value = null
-        emit("update:book", merged)
-      }
-    }
-  } finally {
-    pendingLayoutBlockId.value = null
-  }
-}
-
 async function onConfirmAiReorganize() {
   const mutation = await confirmAiReorganize()
   if (mutation) {
@@ -573,13 +402,10 @@ async function onConfirmAiReorganize() {
   }
 }
 
-const STRUCTURAL_TITLE_MAX_CHARS = 512
-
 const pendingBlockCreation = ref<{
   contentBlockId: number
   structuralTitle: string
 } | null>(null)
-const pendingBlockTitleInput = ref("")
 
 async function createBlock(contentBlockId: number, structuralTitle?: string) {
   const { data, error } = await apiCallWithLoading(() =>
@@ -610,7 +436,6 @@ function onCreateBlockFromContent({
     derivedTitle !== undefined &&
     derivedTitle.length >= STRUCTURAL_TITLE_MAX_CHARS
   ) {
-    pendingBlockTitleInput.value = derivedTitle
     pendingBlockCreation.value = {
       contentBlockId,
       structuralTitle: derivedTitle,
@@ -620,14 +445,11 @@ function onCreateBlockFromContent({
   }
 }
 
-async function onConfirmBlockTitle() {
+async function onConfirmBlockTitle(title: string | undefined) {
   const pending = pendingBlockCreation.value
   pendingBlockCreation.value = null
   if (pending) {
-    await createBlock(
-      pending.contentBlockId,
-      pendingBlockTitleInput.value || undefined
-    )
+    await createBlock(pending.contentBlockId, title)
   }
 }
 

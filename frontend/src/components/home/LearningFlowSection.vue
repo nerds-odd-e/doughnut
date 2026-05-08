@@ -1,0 +1,351 @@
+<template>
+  <div class="upper-half" ref="upperHalf">
+    <h1 class="welcome-text">Welcome {{ userName }}!</h1>
+
+    <div class="learning-process">
+      <div class="flow-container">
+        <div class="learning-flow-group">
+          <svg class="flow-background" preserveAspectRatio="none">
+            <rect width="100%" height="100%" fill="none" />
+            <g class="arrows" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path class="flow-path"/>
+              <path class="arrow-marker" />
+              <path class="arrow-marker" />
+              <path class="arrow-marker" />
+            </g>
+          </svg>
+
+          <div class="learning-steps">
+            <div v-for="(item, index) in navItems"
+                 :key="item.name"
+                 class="step-container"
+            >
+              <div class="step-content">
+                <div class="nav-item-wrapper">
+                  <NavigationItem
+                    v-bind="item"
+                    :class="{ 'will-fly': isScrolling }"
+                    class="nav-item"
+                  />
+                </div>
+                <div class="note-card">
+                  <h3>{{ cardTitles[index] }}</h3>
+                  <p>{{ cardDescriptions[index] }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import type { Component } from "vue"
+import { onMounted, onUnmounted, ref } from "vue"
+
+defineProps<{
+  userName: string
+  navItems: Array<{
+    name?: string
+    label: string
+    icon: Component
+    isActive: boolean
+    badge?: number
+    badgeClass?: string
+    hasDropdown?: boolean
+    nonClickable?: boolean
+  }>
+}>()
+
+const upperHalf = ref<HTMLElement>()
+const isScrolling = ref(false)
+
+const cardTitles = [
+  "Taking notes is only the beginning",
+  "Assimilate to become truely yours",
+  "Recall is better than review",
+]
+
+const cardDescriptions = [
+  "Capture what you saw, what you heard, what you read, your thoughts and ideas, with the help of AI tools. Your notebooks learn as you learn.",
+  "Start to understand your notes, and tracking your memories about them. Decide what to keep and what to let go.",
+  "Using AI generated questions to help you recall the notes to keep your memories alive. Improve the notes stucture continously as we learn.",
+]
+
+const handleScroll = () => {
+  if (!upperHalf.value) return
+
+  const upperRect = upperHalf.value.getBoundingClientRect()
+  const scrollPosition = window.scrollY
+  const threshold = upperRect.height * 0.7
+
+  isScrolling.value = scrollPosition > threshold
+}
+
+const updateFlowPath = () => {
+  const svg = document.querySelector(".flow-background") as SVGElement
+  const iconWrappers = document.querySelectorAll(
+    ".nav-item-wrapper"
+  ) as NodeListOf<HTMLElement>
+  if (!svg || iconWrappers.length !== 3) return
+
+  const svgRect = svg.getBoundingClientRect()
+  const positions = Array.from(iconWrappers).map((wrapper) => {
+    const rect = wrapper.getBoundingClientRect()
+    return {
+      x: rect.left + rect.width / 2 - svgRect.left,
+      y: rect.top + rect.height / 2 - svgRect.top,
+    }
+  })
+
+  const path = document.querySelector(".flow-path") as SVGPathElement
+  if (!path) return
+
+  const spacing = 30
+  const curveRadius = 20
+  const arrowSize = 8
+  const wrapPadding = 80
+  const edgeMargin = 60
+  const sideMargin = 60
+  const leftOffset = 60
+  const connectionGap = 40
+  const iconWidth = 70
+
+  if (positions[0] && positions[1] && positions[2]) {
+    const pathData = `
+      M ${positions[0].x + connectionGap + leftOffset - iconWidth},${positions[0].y}
+      H ${positions[1].x - connectionGap + leftOffset - iconWidth}
+      M ${positions[1].x + connectionGap + leftOffset - iconWidth},${positions[1].y}
+      H ${positions[2].x - connectionGap + leftOffset - iconWidth}
+      M ${positions[2].x + leftOffset},${positions[2].y}
+      h ${wrapPadding}
+      q ${curveRadius} 0 ${curveRadius} ${curveRadius}
+      v ${svgRect.height - positions[2].y - edgeMargin}
+      q 0 ${curveRadius} -${curveRadius} ${curveRadius}
+      h -${svgRect.width - sideMargin * 2}
+      q -${curveRadius} 0 -${curveRadius} -${curveRadius}
+      v -${svgRect.height - positions[0].y - edgeMargin}
+      q 0 -${curveRadius} ${curveRadius} -${curveRadius}
+      H ${positions[0].x - spacing + leftOffset - iconWidth}
+    `
+    path.setAttribute("d", pathData)
+
+    const arrowPositions = [
+      {
+        x: positions[1].x - connectionGap + leftOffset - iconWidth,
+        y: positions[1].y,
+      },
+      {
+        x: positions[2].x - connectionGap + leftOffset - iconWidth,
+        y: positions[2].y,
+      },
+      {
+        x: positions[0].x - spacing + leftOffset - iconWidth,
+        y: positions[0].y,
+      },
+    ]
+
+    const arrowHeads = document.querySelectorAll(
+      ".arrow-marker"
+    ) as NodeListOf<SVGPathElement>
+    arrowHeads.forEach((arrow, index) => {
+      const pos = arrowPositions[index]
+      if (pos) {
+        arrow.setAttribute(
+          "d",
+          `
+          M ${pos.x - arrowSize},${pos.y - arrowSize / 2}
+          L ${pos.x},${pos.y}
+          L ${pos.x - arrowSize},${pos.y + arrowSize / 2}
+        `
+        )
+      }
+    })
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll)
+  window.addEventListener("resize", updateFlowPath)
+  setTimeout(updateFlowPath, 100)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll)
+  window.removeEventListener("resize", updateFlowPath)
+})
+</script>
+
+<style lang="scss" scoped>
+.upper-half {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 2rem;
+  background: linear-gradient(to bottom, #ffffff, #f5f5f5);
+}
+
+.welcome-text {
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.learning-process {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  padding: 2rem 0;
+}
+
+.flow-container {
+  flex: 1;
+  position: relative;
+  max-width: 800px;
+}
+
+.nav-item {
+  flex: 0 0 auto;
+  margin: 0 1rem;
+}
+
+.will-fly {
+  transition: transform 0.3s ease-out;
+  transform: translateX(-100px);
+}
+
+.note-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.learning-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  margin: 0 100px;
+  padding: 2rem 0;
+}
+
+.step-container {
+  flex: 0 1 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.nav-item-wrapper {
+  transform: scale(1.5);
+  margin-bottom: 1rem;
+}
+
+.note-card {
+  width: 100%;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-height: 200px;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  p {
+    flex: 1;
+  }
+}
+
+.learning-flow-group {
+  position: relative;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+.flow-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: visible;
+
+  .arrows {
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
+
+    path {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 10 5;
+      filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+    }
+
+    .flow-path {
+      animation: glowPulse 1.5s ease-in-out infinite;
+    }
+
+    .arrow-marker {
+      animation: glowPulse 1.5s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes glowPulse {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+    stroke: rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.6));
+    stroke: rgba(0, 0, 0, 0.8);
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+    stroke: rgba(0, 0, 0, 0.6);
+  }
+}
+
+@media (max-width: 768px) {
+  .learning-steps {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    margin: 0 20px;
+  }
+
+  .step-container {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .nav-item-wrapper {
+    transform: scale(1.2);
+  }
+
+  .flow-background {
+    display: none;
+  }
+}
+</style>
