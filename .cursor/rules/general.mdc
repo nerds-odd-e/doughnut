@@ -3,108 +3,25 @@ description: General development guidelines, nix environment, service startup, d
 alwaysApply: true
 ---
 
-# The use of nix
+# General Development Rules
 
-**CRITICAL: This project uses nix to manage the development environment.**
+Start with `.cursor/agent-map.md` when you need repo navigation, common paths, or focused commands.
 
-**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true nix develop -c`:**
+## Commands and Services
 
-**For Cloud VM setup, see the `cloud-vm-setup` skill.**
+- This project uses Nix. Prefix repo commands with `CURSOR_DEV=true nix develop -c`, for example `CURSOR_DEV=true nix develop -c pnpm frontend:test`.
+- For Cursor Cloud VM without Nix, use the `cloud-vm-setup` skill.
+- Assume the developer has already started services with `pnpm sut`.
+- If service state matters, run `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`. If not OK, use `CURSOR_DEV=true nix develop -c pnpm sut:restart` or `CURSOR_DEV=true nix develop -c pnpm sut`.
+- Do not tell developers to restart `pnpm sut` after normal code changes. Backend and frontend auto-reload.
+- Run only relevant Cypress feature files with `cypress run --spec ...`; do not run the full E2E suite unless explicitly asked.
+- When deleting files, prefer `trash` from the Nix environment instead of `rm -f` or `rm -rf`.
 
-```bash
-CURSOR_DEV=true nix develop -c <command>
-```
+Detailed MySQL, Redis, direnv, and troubleshooting notes live in `CLAUDE.md`; read them only when working on environment setup or service failures.
 
-# Development Environment Setup
+## Development Preferences
 
-## Starting the Development Environment
-
-**IMPORTANT**: Always assume that the developer has already started all necessary services using:
-
-```bash
-pnpm sut
-```
-
-This command installs dependencies, bundles the CLI, starts all services **in the background**, waits until they are healthy, then **exits with code 0** (or exits 1 with diagnostics on failure). Service output is appended to **`sut.log`** (repo root, gitignored).
-
-Services started:
-
-- Backend (with auto-reload on Java code changes via Gradle continuous build)
-- Frontend Vite dev server (with hot module replacement on Vue code changes)
-- Local LB on **5173** proxying to Vite and backend
-- Mountebank (mock external services)
-
-**CRITICAL: All services automatically restart/reload when code changes are made.**
-
-**DO NOT tell developers to restart `pnpm sut` after making code changes!**
-
-- Backend: Uses Gradle continuous build (`-t` flag) which automatically detects changes, recompiles Java classes, and hot-reloads them into the running Spring Boot application
-- Frontend: Uses Vite with Hot Module Replacement (HMR) for instant Vue component updates
-- Developers should NEVER need to manually restart services during development
-
-**If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` (it will return once healthy). But once running, DO NOT suggest restarting after code changes.
-
-**Unsure if SUT is running?** Run **`CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`**. If not OK, run **`CURSOR_DEV=true nix develop -c pnpm sut:restart`** or **`CURSOR_DEV=true nix develop -c pnpm sut`**. Do **not** tell people to restart `pnpm sut` after normal code edits. **Cloud VM** (no Nix): same **`pnpm sut:healthcheck`** / **`pnpm sut:restart`** from repo root; **`sut:restart`** needs **`lsof`** — see the `cloud-vm-setup` skill.
-
-## Local MySQL and Redis (nix shell hook and process-compose)
-
-- **`scripts/nix_shell_hook.sh`** (via **`flake.nix`** shellHook) uses **`process-compose.yaml`** for supervised **`mysql`** and **`redis`**. It runs **`setup_mysql_env`** / **`setup_redis_env`** from **`scripts/shell_setup.sh`** (nix **`mysql84`** and **`redis`** paths come from **`flake.nix`**).
-- **MySQL:** When **`CURSOR_DEV` is unset**, if **nothing is listening on TCP 3309**, the hook runs **`process-compose -f process-compose.yaml up -D mysql`**, waits for readiness, then applies **`scripts/sql/init_doughnut_db.sql`**. If **3309 is already in use**, the hook **does not** start or restart MySQL.
-- **Redis:** When **`CURSOR_DEV` is unset**, if **nothing is listening on TCP 6380**, the hook runs **`process-compose -f process-compose.yaml up -D redis`**, then **`check_redis_ready`**. If **6380 is already in use** (including a stray non–process-compose **`redis-server`**), the hook **does not** start supervised Redis; free the port or stop the other process first.
-- With **`CURSOR_DEV=true`** (typical agent invocations), those blocks are **skipped**. Start MySQL and/or Redis explicitly (see below) or use an interactive shell without **`CURSOR_DEV=true`** when appropriate.
-
-**Stop MySQL and Redis** (detached process-compose project and supervised processes):
-
-```bash
-CURSOR_DEV=true nix develop -c process-compose down
-```
-
-(From repo root; same as **`process-compose down`** inside an active nix dev shell.)
-
-**Manual start** when the port is free and **`MYSQL_*`** / **`REDIS_*`** are set (after **`setup_mysql_env`** / **`setup_redis_env`** in **`scripts/shell_setup.sh`**, i.e. inside **`nix develop`**):
-
-```bash
-process-compose -f process-compose.yaml up -D mysql
-process-compose -f process-compose.yaml up -D redis
-```
-
-With only **`nix develop -c`**, set **`MYSQL_*`** / **`REDIS_*`** the same way as the hook (e.g. source **`scripts/shell_setup.sh`** and call **`setup_mysql_env`** / **`setup_redis_env`** with the nix package paths) before **`process-compose up`**, or use an interactive **`nix develop`** / **`direnv`** session once with **`CURSOR_DEV` unset** so the hook starts them.
-
-**Debug / restart — MySQL:** **`mysql/mysql.log`** (also **`$MYSQL_HOME/mysql.log`**); **`mysqladmin ping -h127.0.0.1 -P3309`**; **`CURSOR_DEV=true nix develop -c process-compose attach`**; **`CURSOR_DEV=true nix develop -c process-compose process logs mysql`**. If MySQL misbehaves: **`process-compose down`** or **`process-compose process stop mysql`**; if **3309** is still held, **`pkill mysqld`** / **`lsof -i :3309`**, then **`process-compose -f process-compose.yaml up -D mysql`**.
-
-**Debug / restart — Redis:** **`redis/redis.log`** (**`$REDIS_LOG_FILE`**); **`redis-cli -p 6380 ping`**; **`CURSOR_DEV=true nix develop -c process-compose process logs redis`**; stop only Redis: **`CURSOR_DEV=true nix develop -c process-compose process stop redis`**. If **6380** is still held, **`lsof -i :6380`** and stop the stray **`redis-server`**, then **`process-compose -f process-compose.yaml up -D redis`**.
-
-**direnv “taking a while” / post-hook pause:** After **`Environment setup complete!`**, Nix may still print **`removing profile version …`** while updating the dev profile (not the shell hook). **`.envrc`** sets **`DIRENV_WARN_TIMEOUT`** (e.g. **`120s`**); if the **5s** warning still appears, set **`warn_timeout`** in **`~/.config/direnv/direnv.toml`**. **`dev_setup.sh`** skips **`corepack`** + **`pnpm install`** when the workspace fingerprint is unchanged ( **`corepack use`** alone was still running a full install). The hook sets **`PC_DISABLE_TUI=1`** before **`process-compose`**. More: **`CLAUDE.md`** (Local MySQL / Redis / direnv).
-
-## Running Commands in Terminal
-
-**For Cloud VM setup, see the `cloud-vm-setup` skill.**
-
-Always use `CURSOR_DEV=true nix develop -c` prefix for commands (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`).
-
-**E2E (Cypress):** Run only **relevant** feature files with `cypress run --spec …`. Do **not** run the full E2E suite (`pnpm verify` or bare `cypress run` without `--spec`) unless the user **explicitly** asks. Details: `e2e_test.mdc`.
-
-When deleting files, instead of using `rm -f` or `rm -rf` prefer to use `trash` instead provided by `trash-cli` from flake.nix packages.
-
-# Development preferences
-
-## High Cohesion
-
-It is the top priority to keep high cohesion all the time.
-
-- Minimize the duplicate and make sure the same concept has one representation acroess the whole system
-- The code should have good mapping to the ubiquitous business domain
-- Thing belong together should be placed together or close by, so that they are easy to use
-
-## Keep it simple
-
-- DO NOT follow the defensive programming style
-- Use the simplest solution and minimum code to achieve what the prompt asked to do.
-
-## Name by capability, not by development history
-
-Permanent artifacts reflect **what the product does**, not **how or when it was built**. Phase numbers, sequence labels, and planning vocabulary must not appear in: file names, directories, test names, class names, Gherkin feature titles/files, or long-lived docs. Those markers belong only in `ongoing/` plans.
-
-- DO NOT add historical documentation, comments about past implementations, or completed task lists
-- Code readers only care about the current state, not development history
-- Exception: Temporary requirement documents in the `ongoing/` folder are allowed for active development
+- Keep high cohesion: minimize duplication, keep one representation for each concept, and place related code together.
+- Keep changes simple. Do not add defensive layers unless they are required by observed behavior.
+- Name permanent artifacts by product capability, not development history. Phase numbers and planning vocabulary belong only in `ongoing/` plans.
+- Do not add historical documentation or comments about past implementations. Code readers care about the current state.

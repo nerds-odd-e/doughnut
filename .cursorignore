@@ -1,1 +1,10 @@
-# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+# Keep Cursor retrieval focused on source files. Generated artifacts, planning
+# notes, and long reference docs can be opened explicitly when needed.
+
+# Generated API/OpenAPI output
+packages/generated/doughnut-backend-api/*.gen.ts
+open_api_docs.yaml
+
+# Planning and reference material that is noisy for default retrieval
+ongoing/
+docs/
