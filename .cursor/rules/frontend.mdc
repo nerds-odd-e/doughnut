@@ -151,6 +151,12 @@ onMounted(() => {
 </style>
 ```
 
+### Modals and dialogs
+
+- Use **`Modal`** from `@/components/commons/Modal.vue` for modal overlays. Its **`Overlay`** teleports to `body` and centralizes stacking, ESC, backdrop click, and route-change close.
+- Put panel content in **`#body`** (optional **`#header`**). Listen for **`@close_request`** to hide the modal (e.g. parent **`v-if`** or clearing model state). The overlay **X** is optional via **`showCloseButton`** on `Modal`.
+- Use **`v-if`** on `Modal` when the dialog opens, or keep `Modal` mounted and drive visibility from props; wire **`close_request`** and cancel buttons to the same close handler.
+
 ### Derived state: prefer `computed` over cached variables
 
 - **Avoid “cache state” in refs** — Do not keep a separate `ref` (or `reactive` field) that mirrors props, other refs, or store data and that you update in watchers, `onUpdated`, or event handlers to stay in sync. That duplicates the source of truth and is easy to get out of date.
