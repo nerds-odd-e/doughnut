@@ -186,6 +186,13 @@ export function composeNoteContentMarkdown(input: {
 /** One key/value row for rich property editing (order matches sorted keys). */
 export type PropertyRow = { key: string; value: string }
 
+/** Preset property keys offered in rich-mode property name UI. */
+export const RICH_MODE_PRESET_PROPERTY_KEYS = [
+  "image",
+  "wikidata_id",
+  "url",
+] as const
+
 /** Rich-mode property key for Wikidata Q-id (YAML may use `wikidata_id` or `wikidataId`). */
 export function isWikidataIdPropertyKey(key: string): boolean {
   const t = key.trim().toLowerCase()

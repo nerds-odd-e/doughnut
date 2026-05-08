@@ -54,16 +54,50 @@
         :data-row-index="idx"
         :data-property-key="row.key"
       >
-        <input
-          v-model="propertyRows[idx]!.key"
-          type="text"
-          autocapitalize="off"
-          class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
-          :aria-label="`Existing note property key (row ${idx + 1})`"
-          data-testid="rich-note-property-row-key-input"
-          @focus="onRowFocus(idx)"
-          @blur="commitRow(idx)"
+        <div
+          class="daisy-relative daisy-min-w-[8rem]"
+          @focusout="onKeyPresetWrapperFocusOut($event, 'row', idx)"
         >
+          <input
+            :id="rowKeyInputId(idx)"
+            v-model="propertyRows[idx]!.key"
+            type="text"
+            autocapitalize="off"
+            class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
+            :aria-label="`Existing note property key (row ${idx + 1})`"
+            :aria-expanded="presetPanelOpenForRow(idx)"
+            :aria-controls="
+              presetPanelOpenForRow(idx) ? rowKeyPresetListId(idx) : undefined
+            "
+            data-testid="rich-note-property-row-key-input"
+            @focus="onRowKeyInputFocus(idx)"
+            @blur="commitRow(idx)"
+          >
+          <ul
+            v-if="presetPanelOpenForRow(idx)"
+            :id="rowKeyPresetListId(idx)"
+            role="listbox"
+            class="daisy-menu daisy-absolute daisy-left-0 daisy-right-0 daisy-top-full daisy-z-20 daisy-mt-0.5 daisy-w-full daisy-rounded-box daisy-bg-base-100 daisy-p-1 daisy-shadow"
+            data-testid="rich-note-property-key-preset-list"
+          >
+            <li
+              v-for="presetKey in RICH_MODE_PRESET_PROPERTY_KEYS"
+              :key="presetKey"
+            >
+              <button
+                type="button"
+                role="option"
+                class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-w-full daisy-justify-start daisy-font-mono"
+                data-testid="rich-note-property-key-preset-option"
+                :data-preset-key="presetKey"
+                @mousedown.prevent
+                @click="selectPresetForRow(idx, presetKey)"
+              >
+                {{ presetKey }}
+              </button>
+            </li>
+          </ul>
+        </div>
         <RelationTypeSelectCompact
           v-if="isRelationPropertyRow(propertyRows[idx]!)"
           field="relationType"
@@ -143,15 +177,50 @@
       >
         <label class="daisy-form-control daisy-w-full sm:daisy-w-auto daisy-min-w-[8rem]">
           <span class="daisy-label daisy-text-xs">Property key</span>
-          <input
-            v-model="draftKey"
-            type="text"
-            autocapitalize="off"
-            class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
-            aria-label="Property key"
-            data-testid="rich-note-property-key"
-            @keydown.enter.prevent="focusValueInput"
+          <div
+            class="daisy-relative daisy-w-full"
+            @focusout="onKeyPresetWrapperFocusOut($event, 'insert')"
           >
+            <input
+              :id="insertKeyInputId"
+              v-model="draftKey"
+              type="text"
+              autocapitalize="off"
+              class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+              aria-label="Property key"
+              :aria-expanded="presetPanelOpenForInsert"
+              :aria-controls="
+                presetPanelOpenForInsert ? insertKeyPresetListId : undefined
+              "
+              data-testid="rich-note-property-key"
+              @focus="onInsertKeyInputFocus"
+              @keydown.enter.prevent="focusValueInput"
+            >
+            <ul
+              v-if="presetPanelOpenForInsert"
+              :id="insertKeyPresetListId"
+              role="listbox"
+              class="daisy-menu daisy-absolute daisy-left-0 daisy-right-0 daisy-top-full daisy-z-20 daisy-mt-0.5 daisy-w-full daisy-rounded-box daisy-bg-base-100 daisy-p-1 daisy-shadow"
+              data-testid="rich-note-property-key-preset-list"
+            >
+              <li
+                v-for="presetKey in RICH_MODE_PRESET_PROPERTY_KEYS"
+                :key="presetKey"
+              >
+                <button
+                  type="button"
+                  role="option"
+                  class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-w-full daisy-justify-start daisy-font-mono"
+                  data-testid="rich-note-property-key-preset-option"
+                  :data-preset-key="presetKey"
+                  @mousedown.prevent
+                  @click="selectPresetForInsert(presetKey)"
+                >
+                  {{ presetKey }}
+                </button>
+              </li>
+            </ul>
+          </div>
         </label>
         <label class="daisy-form-control daisy-w-full sm:daisy-flex-1 daisy-min-w-[8rem]">
           <span class="daisy-label daisy-text-xs">Property value</span>
@@ -223,6 +292,7 @@ import {
 import {
   isWikidataIdPropertyKey,
   parseNoteContentMarkdown,
+  RICH_MODE_PRESET_PROPERTY_KEYS,
   removePropertyRowAt,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
@@ -248,8 +318,76 @@ const emits = defineEmits<{
 }>()
 
 const headingId = useId()
+const insertKeyInputId = `${headingId}-insert-key`
+const insertKeyPresetListId = `${headingId}-insert-key-presets`
 
 const isReadOnly = computed(() => props.readOnly ?? false)
+
+type PresetPanelTarget = { kind: "row"; idx: number } | { kind: "insert" }
+
+const presetPanel = ref<PresetPanelTarget | null>(null)
+
+const presetPanelOpenForInsert = computed(
+  () => presetPanel.value?.kind === "insert"
+)
+
+function rowKeyInputId(idx: number) {
+  return `${headingId}-row-${idx}-key`
+}
+
+function rowKeyPresetListId(idx: number) {
+  return `${headingId}-row-${idx}-key-presets`
+}
+
+function presetPanelOpenForRow(idx: number) {
+  return presetPanel.value?.kind === "row" && presetPanel.value.idx === idx
+}
+
+function onRowKeyInputFocus(idx: number) {
+  onRowFocus(idx)
+  presetPanel.value = { kind: "row", idx }
+}
+
+function onInsertKeyInputFocus() {
+  presetPanel.value = { kind: "insert" }
+}
+
+function onKeyPresetWrapperFocusOut(
+  event: FocusEvent,
+  kind: "row" | "insert",
+  idx?: number
+) {
+  const root = event.currentTarget as HTMLElement | null
+  const next = event.relatedTarget as Node | null
+  if (root && next && root.contains(next)) return
+  if (kind === "row" && idx !== undefined) {
+    if (presetPanel.value?.kind === "row" && presetPanel.value.idx === idx) {
+      presetPanel.value = null
+    }
+    return
+  }
+  if (kind === "insert" && presetPanel.value?.kind === "insert") {
+    presetPanel.value = null
+  }
+}
+
+function selectPresetForRow(idx: number, key: string) {
+  const row = propertyRows.value[idx]
+  if (!row) return
+  row.key = key
+  presetPanel.value = null
+  requestAnimationFrame(() => {
+    document.getElementById(rowKeyInputId(idx))?.focus()
+  })
+}
+
+function selectPresetForInsert(key: string) {
+  draftKey.value = key
+  presetPanel.value = null
+  requestAnimationFrame(() => {
+    document.getElementById(insertKeyInputId)?.focus()
+  })
+}
 
 const parsed = computed(() => parseNoteContentMarkdown(props.contentMarkdown))
 
@@ -320,6 +458,7 @@ watch(
     wikidataEditContext.value = null
     wikidataIdError.value = undefined
     wikidataProcessing.value = false
+    presetPanel.value = null
   },
   { immediate: true }
 )

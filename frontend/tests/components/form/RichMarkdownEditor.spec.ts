@@ -1,5 +1,6 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
 import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
+import { RICH_MODE_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 import helper from "@tests/helpers"
@@ -14,6 +15,69 @@ describe("RichMarkdownEditor", () => {
     const el = field.element as HTMLElement
     el.textContent = text
     await field.trigger("input")
+    await flushPromises()
+  }
+
+  function lastEmittedMarkdown(): string {
+    const emitted = wrapper.emitted()["update:modelValue"]
+    expect(emitted?.length).toBeGreaterThan(0)
+    return emitted![emitted!.length - 1]![0] as string
+  }
+
+  function quillEditorEl(): HTMLElement {
+    return wrapper
+      .findComponent({ name: "QuillEditor" })
+      .vm.$el.querySelector(".ql-editor") as HTMLElement
+  }
+
+  async function dispatchPasteHtmlToQuill(html: string) {
+    const qlEditor = quillEditorEl()
+    qlEditor.focus()
+    await nextTick()
+    await flushPromises()
+    const clipboardData = new DataTransfer()
+    clipboardData.setData("text/html", html)
+    qlEditor.dispatchEvent(
+      new ClipboardEvent("paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      })
+    )
+    await nextTick()
+    await flushPromises()
+  }
+
+  async function openAddProperty() {
+    const addBtn = wrapper
+      .findAll("button")
+      .find((w) => w.text().includes("Add property"))
+    expect(addBtn).toBeDefined()
+    await addBtn!.trigger("click")
+    await flushPromises()
+  }
+
+  async function assertPresetOptionsVisible() {
+    const options = wrapper.findAll(
+      '[data-testid="rich-note-property-key-preset-option"]'
+    )
+    expect(options.length).toBe(RICH_MODE_PRESET_PROPERTY_KEYS.length)
+    for (const key of RICH_MODE_PRESET_PROPERTY_KEYS) {
+      expect(
+        options.find(
+          (o) => (o.element as HTMLElement).dataset.presetKey === key
+        )
+      ).toBeDefined()
+    }
+  }
+
+  async function selectPresetKey(presetKey: string) {
+    const btn = wrapper
+      .findAll('[data-testid="rich-note-property-key-preset-option"]')
+      .find((w) => (w.element as HTMLElement).dataset.presetKey === presetKey)
+    expect(btn).toBeDefined()
+    await btn!.trigger("mousedown")
+    await btn!.trigger("click")
     await flushPromises()
   }
 
@@ -36,85 +100,26 @@ describe("RichMarkdownEditor", () => {
     return wrapper
   }
 
-  it("not emit update when the change is from initial value", async () => {
+  it("does not emit update:modelValue on mount", async () => {
     await mountEditor("initial value")
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-  })
-
-  it("not emit update if readonly", async () => {
     await mountEditor("# Title", { readonly: true })
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
   })
 
-  it("will try to unify the markdown", async () => {
-    await mountEditor("# Title")
-    await flushPromises()
-    await nextTick()
-    await flushPromises()
-    const emitted = wrapper.emitted()["update:modelValue"]
-    if (emitted?.length) {
-      expect(emitted[emitted.length - 1]![0]).toContain("Title")
-    }
-  })
-
-  it("converts HTML to markdown then back to HTML when pasting", async () => {
+  it("converts pasted HTML to markdown and does not paste when readonly", async () => {
     await mountEditor("")
     await flushPromises()
     await nextTick()
-
-    const qlEditor = wrapper
-      .findComponent({ name: "QuillEditor" })
-      .vm.$el.querySelector(".ql-editor") as HTMLElement
-    expect(qlEditor).toBeTruthy()
-
-    // Browser Mode: Real focus() method!
-    qlEditor.focus()
-    await nextTick()
-    await flushPromises()
-
-    // Browser Mode: Use real ClipboardEvent with DataTransfer!
-    // Create a real clipboard event with HTML data
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/html", "<p><strong>Bold text</strong></p>")
-
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    qlEditor.dispatchEvent(pasteEvent)
-
-    await nextTick()
-    await flushPromises()
-
+    await dispatchPasteHtmlToQuill("<p><strong>Bold text</strong></p>")
     const emitted = wrapper.emitted()["update:modelValue"]
-    expect(wrapper.exists()).toBe(true)
     if (emitted?.length) {
       expect(emitted[emitted.length - 1]![0]).toContain("Bold text")
     }
-  })
 
-  it("does not handle paste when readonly", async () => {
     await mountEditor("", { readonly: true })
     await flushPromises()
-
-    const qlEditor = wrapper
-      .findComponent({ name: "QuillEditor" })
-      .vm.$el.querySelector(".ql-editor") as HTMLElement
-
-    // Browser Mode: Real ClipboardEvent!
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/html", "<p>Test</p>")
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    qlEditor.dispatchEvent(pasteEvent)
-    await flushPromises()
-
+    await dispatchPasteHtmlToQuill("<p>Test</p>")
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
   })
 
@@ -159,63 +164,31 @@ Main content here.`
     expect(html).not.toContain("topic:")
   })
 
-  it("shows add-only insert chrome when editable content has no frontmatter", async () => {
-    await mountEditor("# Hello\n\nParagraph.")
-    await flushPromises()
-
-    expect(wrapper.find("section").exists()).toBe(true)
-    expect(wrapper.find("h4").exists()).toBe(false)
-    expect(wrapper.text()).not.toContain("Properties")
-    expect(wrapper.text()).toContain("Add property")
-  })
-
-  it("does not show Properties section when content has no frontmatter (readonly)", async () => {
-    await mountEditor("# Hello\n\nParagraph.", { readonly: true })
-    await flushPromises()
-
-    expect(wrapper.find("section").exists()).toBe(false)
-  })
-
-  it("shows add-only insert chrome when editable empty frontmatter block", async () => {
-    await mountEditor(`---
-
-
----
-
-Body`)
-    await flushPromises()
-
-    expect(wrapper.find("section").exists()).toBe(true)
-    expect(wrapper.find("h4").exists()).toBe(false)
-    expect(wrapper.text()).not.toContain("Properties")
-    expect(wrapper.text()).toContain("Add property")
-  })
-
-  it("does not show Properties section when frontmatter block is empty (readonly)", async () => {
-    await mountEditor(
+  it("shows add-only chrome when content has no or empty frontmatter, hides section when readonly", async () => {
+    for (const md of [
+      "# Hello\n\nParagraph.",
       `---
 
 
 ---
 
 Body`,
-      { readonly: true }
-    )
-    await flushPromises()
+    ]) {
+      await mountEditor(md)
+      expect(wrapper.find("section").exists()).toBe(true)
+      expect(wrapper.find("h4").exists()).toBe(false)
+      expect(wrapper.text()).not.toContain("Properties")
+      expect(wrapper.text()).toContain("Add property")
 
-    expect(wrapper.find("section").exists()).toBe(false)
+      await mountEditor(md, { readonly: true })
+      expect(wrapper.find("section").exists()).toBe(false)
+    }
   })
 
   it("inserting a property emits composed frontmatter and preserves body", async () => {
     await mountEditor("# Hello Body")
     await flushPromises()
-
-    const addBtn = wrapper
-      .findAll("button")
-      .find((w) => w.text().includes("Add property"))
-    expect(addBtn).toBeDefined()
-    await addBtn!.trigger("click")
-    await flushPromises()
+    await openAddProperty()
 
     const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
     const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
@@ -224,15 +197,81 @@ Body`,
     await valInput.trigger("blur")
     await flushPromises()
 
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted?.length).toBeGreaterThan(0)
-    const last = emitted![emitted!.length - 1]![0] as string
+    const last = lastEmittedMarkdown()
     expect(last).toContain("---")
     expect(last).toContain("status: draft")
     expect(last).toContain("Hello Body")
   })
 
-  it("shows parse error and hides Properties when frontmatter fails to parse", async () => {
+  it("shows preset keys when insert or row key input is focused", async () => {
+    await mountEditor("# Hello Body")
+    await flushPromises()
+    await openAddProperty()
+    ;(
+      wrapper.find('[data-testid="rich-note-property-key"]')
+        .element as HTMLInputElement
+    ).focus()
+    await nextTick()
+    await flushPromises()
+    await assertPresetOptionsVisible()
+
+    const markdown = `---
+status: ok
+---
+
+# Body`
+    await mountEditor(markdown)
+    await flushPromises()
+    ;(
+      wrapper.find('[data-testid="rich-note-property-row-key-input"]')
+        .element as HTMLInputElement
+    ).focus()
+    await nextTick()
+    await flushPromises()
+    await assertPresetOptionsVisible()
+  })
+
+  it("sets property key when a preset is chosen (insert and existing row)", async () => {
+    await mountEditor("# Hello Body")
+    await flushPromises()
+    await openAddProperty()
+    ;(
+      wrapper.find('[data-testid="rich-note-property-key"]')
+        .element as HTMLInputElement
+    ).focus()
+    await nextTick()
+    await flushPromises()
+    await selectPresetKey("wikidata_id")
+    expect(
+      (
+        wrapper.find('[data-testid="rich-note-property-key"]')
+          .element as HTMLInputElement
+      ).value
+    ).toBe("wikidata_id")
+
+    const markdown = `---
+status: ok
+---
+
+# Body`
+    await mountEditor(markdown)
+    await flushPromises()
+    ;(
+      wrapper.find('[data-testid="rich-note-property-row-key-input"]')
+        .element as HTMLInputElement
+    ).focus()
+    await nextTick()
+    await flushPromises()
+    await selectPresetKey("url")
+    expect(
+      (
+        wrapper.find('[data-testid="rich-note-property-row-key-input"]')
+          .element as HTMLInputElement
+      ).value
+    ).toBe("url")
+  })
+
+  it("invalid YAML: hides Properties, shows alert, freezes Quill, ignores body edits", async () => {
     const markdown = `---
 bad:
   nested: value
@@ -243,34 +282,21 @@ Still body`
     await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(false)
-
     const alert = wrapper.find(
       '[data-testid="rich-note-frontmatter-parse-error"]'
     )
     expect(alert.exists()).toBe(true)
     expect(alert.text()).toContain("string")
     expect(alert.text()).toContain("Markdown mode")
-  })
-
-  it("forces Quill readonly and does not emit content updates when frontmatter fails to parse", async () => {
-    const markdown = `---
-bad:
-  nested: value
----
-
-Still body`
-    await mountEditor(markdown)
-    await flushPromises()
 
     const quill = wrapper.findComponent({ name: "QuillEditor" })
     expect(quill.props("readonly")).toBe(true)
-
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
     quill.vm.$emit("update:modelValue", "<p>Edited without fixing YAML</p>")
     await flushPromises()
-
-    const emitCountAfter = wrapper.emitted("update:modelValue")?.length ?? 0
-    expect(emitCountAfter).toBe(emitCountBefore)
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emitCountBefore
+    )
   })
 
   it("composes edited body with existing frontmatter when emitting updates", async () => {
@@ -287,9 +313,7 @@ topic: training
     quill.vm.$emit("update:modelValue", "<h1>Edited Heading</h1>")
     await flushPromises()
 
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted?.length).toBeGreaterThan(0)
-    const last = emitted![emitted!.length - 1]![0] as string
+    const last = lastEmittedMarkdown()
     expect(last).toContain("diligence:")
     expect(last).toContain("topic:")
     expect(last).toContain("Edited Heading")
@@ -359,9 +383,7 @@ Workshop body.`
     await valInput.trigger("blur")
     await flushPromises()
 
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted?.length).toBeGreaterThan(0)
-    const last = emitted![emitted!.length - 1]![0] as string
+    const last = lastEmittedMarkdown()
     expect(last).toContain("domain:")
     expect(last).toContain("wiki")
     expect(last).not.toContain("topic:")
@@ -394,8 +416,9 @@ Body`
       wrapper.find('[data-testid="rich-note-property-validation"]').text()
     ).toContain("Duplicate")
 
-    const emitCountAfter = wrapper.emitted("update:modelValue")?.length ?? 0
-    expect(emitCountAfter).toBe(emitCountBefore)
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emitCountBefore
+    )
 
     const betaKeyAfter = wrapper
       .findAll('[data-testid="rich-note-property-row"]')[1]!
@@ -420,84 +443,43 @@ Body line`
     await removeBtns[0]!.trigger("click")
     await flushPromises()
 
-    const emitted = wrapper.emitted("update:modelValue")
-    expect(emitted?.length).toBeGreaterThan(0)
-    const last = emitted![emitted!.length - 1]![0] as string
+    const last = lastEmittedMarkdown()
     expect(last).not.toContain("alpha:")
     expect(last).toContain("beta:")
     expect(last).toContain("Body line")
   })
 
   describe("relation property in rich mode", () => {
-    it("shows the relation type label on the select button for a known relation", async () => {
-      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
+    async function mountRelation(relation: string) {
+      await mountEditor(
+        `---\nrelation: ${relation}\ntype: relationship\n---\n\nBody`
+      )
       await flushPromises()
+    }
 
-      const btn = wrapper.find('[aria-label="Relation Type"]')
-      expect(btn.exists()).toBe(true)
+    it("relation button shows human label for known kebab and raw text for unknown", async () => {
+      await mountRelation("similar-to")
+      let btn = wrapper.find('[aria-label="Relation Type"]')
       expect(btn.text()).toContain("similar to")
       expect(btn.text()).not.toContain("similar-to")
-    })
 
-    it("shows the raw unknown value on the select button for an unknown relation", async () => {
-      const markdown = `---\nrelation: my-custom-relation\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
-      await flushPromises()
-
-      const btn = wrapper.find('[aria-label="Relation Type"]')
-      expect(btn.exists()).toBe(true)
+      await mountRelation("my-custom-relation")
+      btn = wrapper.find('[aria-label="Relation Type"]')
       expect(btn.text()).toContain("my-custom-relation")
       expect(btn.text()).not.toContain("related to")
     })
 
-    it("opens the relation type select dialog when the button is clicked for unknown relation", async () => {
-      const markdown = `---\nrelation: my-custom-relation\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
-      await flushPromises()
-
-      const btn = wrapper.find('[aria-label="Relation Type"]')
-      await btn.trigger("click")
-      await flushPromises()
-
-      expect(
-        wrapper.findComponent({ name: "RelationTypeSelect" }).exists()
-      ).toBe(true)
-    })
-
-    it("shows Custom relation option in the relation type dialog", async () => {
-      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
-      await flushPromises()
+    it("opens relation dialog for unknown relation with Custom option", async () => {
+      await mountRelation("my-custom-relation")
       await wrapper.find('[aria-label="Relation Type"]').trigger("click")
       await flushPromises()
-
       const rt = wrapper.findComponent({ name: "RelationTypeSelect" })
       expect(rt.exists()).toBe(true)
       expect(rt.text()).toContain("Custom…")
     })
 
-    it("shows custom text input when Custom… is chosen", async () => {
-      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
-      await flushPromises()
-      await wrapper.find('[aria-label="Relation Type"]').trigger("click")
-      await flushPromises()
-
-      const rt = wrapper.findComponent({ name: "RelationTypeSelect" })
-      await rt
-        .find(`input[value="${CUSTOM_RELATION_RADIO_SENTINEL}"]`)
-        .trigger("change")
-      await flushPromises()
-
-      const textInputs = rt.findAll('input[type="text"].daisy-input-bordered')
-      expect(textInputs.length).toBeGreaterThan(0)
-    })
-
     it("commits custom relationship text from the dialog and emits updated frontmatter", async () => {
-      const markdown = `---\nrelation: similar-to\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
-      await flushPromises()
+      await mountRelation("similar-to")
       await wrapper.find('[aria-label="Relation Type"]').trigger("click")
       await flushPromises()
 
@@ -508,20 +490,18 @@ Body line`
       await flushPromises()
 
       const field = rt.find('input[type="text"].daisy-input-bordered')
+      expect(field.exists()).toBe(true)
       await field.setValue("novel connector phrase")
       await field.trigger("keydown", { key: "Enter" })
       await flushPromises()
 
-      const emitted = wrapper.emitted("update:modelValue")
-      expect(emitted?.length).toBeGreaterThan(0)
-      const last = emitted![emitted!.length - 1]![0] as string
-      expect(last).toContain("relation: novel-connector-phrase")
+      expect(lastEmittedMarkdown()).toContain(
+        "relation: novel-connector-phrase"
+      )
     })
 
     it("opens dialog with custom text prefilled for an unknown relation", async () => {
-      const markdown = `---\nrelation: xyz-unknown-kebab\ntype: relationship\n---\n\nBody`
-      await mountEditor(markdown)
-      await flushPromises()
+      await mountRelation("xyz-unknown-kebab")
       await wrapper.find('[aria-label="Relation Type"]').trigger("click")
       await flushPromises()
 
@@ -555,9 +535,7 @@ Paragraph.\n`
       .trigger("click")
     await flushPromises()
 
-    const emitted = wrapper.emitted("update:modelValue")
-    expect(emitted?.length).toBeGreaterThan(0)
-    const last = emitted![emitted!.length - 1]![0] as string
+    const last = lastEmittedMarkdown()
     expect(last.startsWith("---")).toBe(false)
     expect(last).toContain("Paragraph.")
 
