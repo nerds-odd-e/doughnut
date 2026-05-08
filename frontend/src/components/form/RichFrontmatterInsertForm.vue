@@ -1,0 +1,170 @@
+<template>
+  <div
+    :class="
+      showInsertButton
+        ? 'daisy-mt-1 daisy-flex daisy-flex-col daisy-gap-2'
+        : 'daisy-mt-1'
+    "
+  >
+    <button
+      v-if="showInsertButton"
+      type="button"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-self-start daisy-items-center daisy-gap-1"
+      @click="emit('open-insert')"
+    >
+      <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+      Add property
+    </button>
+    <div
+      v-if="insertOpen"
+      class="daisy-flex daisy-flex-wrap daisy-gap-2 daisy-items-end"
+    >
+      <label
+        class="daisy-form-control daisy-w-full sm:daisy-w-auto daisy-min-w-[8rem]"
+      >
+        <span class="daisy-label daisy-text-xs">Property key</span>
+        <div
+          class="daisy-relative daisy-w-full"
+          @focusout="onKeyPresetWrapperFocusOut"
+        >
+          <input
+            :id="insertKeyInputId"
+            :value="draftKey"
+            type="text"
+            autocapitalize="off"
+            class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+            aria-label="Property key"
+            :aria-expanded="presetPanelOpen"
+            :aria-controls="presetPanelOpen ? insertKeyPresetListId : undefined"
+            data-testid="rich-note-property-key"
+            @input="onKeyInput"
+            @focus="presetPanelOpen = true"
+            @keydown.enter.prevent="focusValueInput"
+          />
+          <RichFrontmatterPropertyKeyPresets
+            v-if="presetPanelOpen"
+            :list-id="insertKeyPresetListId"
+            @select="onPresetSelected"
+          />
+        </div>
+      </label>
+      <label
+        class="daisy-form-control daisy-w-full sm:daisy-flex-1 daisy-min-w-[8rem]"
+      >
+        <span class="daisy-label daisy-text-xs">Property value</span>
+        <div
+          v-if="isWikidataIdPropertyKey(draftKey)"
+          class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
+        >
+          <span class="daisy-font-mono daisy-text-sm">{{
+            draftValue.trim() || "—"
+          }}</span>
+          <RichFrontmatterPropertyExternalLink
+            kind="wikidata"
+            :value="draftValue"
+          />
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-sm daisy-btn-outline"
+            data-testid="rich-note-wikidata-property-insert-edit"
+            @click="emit('wikidata-dialog-open')"
+          >
+            Set…
+          </button>
+        </div>
+        <div
+          v-else
+          :class="
+            isUrlPropertyKey(draftKey)
+              ? 'daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2'
+              : ''
+          "
+        >
+          <div
+            :class="
+              isUrlPropertyKey(draftKey) ? 'daisy-min-w-0 daisy-flex-1' : ''
+            "
+          >
+            <WikiPropertyValueField
+              ref="valueInputRef"
+              :model-value="draftValue"
+              :wiki-titles="wikiTitles"
+              aria-label="Property value"
+              data-testid="rich-note-property-value"
+              @update:model-value="emit('update:draftValue', $event)"
+              @blur="emit('value-blur')"
+              @dead-link-click="emit('dead-link-click', $event)"
+            />
+          </div>
+          <RichFrontmatterPropertyExternalLink
+            v-if="isUrlPropertyKey(draftKey) && draftValue.trim()"
+            kind="url"
+            :value="draftValue"
+          />
+        </div>
+      </label>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Plus } from "lucide-vue-next"
+import { ref } from "vue"
+import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
+import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
+import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
+import type { WikiTitle } from "@generated/doughnut-backend-api"
+import {
+  isUrlPropertyKey,
+  isWikidataIdPropertyKey,
+} from "@/utils/noteContentFrontmatter"
+
+const props = defineProps<{
+  insertOpen: boolean
+  showInsertButton: boolean
+  draftKey: string
+  draftValue: string
+  wikiTitles: WikiTitle[]
+  insertKeyInputId: string
+  insertKeyPresetListId: string
+}>()
+
+const emit = defineEmits<{
+  "open-insert": []
+  "update:draftKey": [string]
+  "update:draftValue": [string]
+  "value-blur": []
+  "dead-link-click": [title: string]
+  "wikidata-dialog-open": []
+}>()
+
+const presetPanelOpen = ref(false)
+const valueInputRef = ref<InstanceType<typeof WikiPropertyValueField> | null>(
+  null
+)
+
+function onKeyInput(event: Event) {
+  emit("update:draftKey", (event.target as HTMLInputElement).value)
+}
+
+function onKeyPresetWrapperFocusOut(event: FocusEvent) {
+  const root = event.currentTarget as HTMLElement | null
+  const next = event.relatedTarget as Node | null
+  if (root?.contains(next)) return
+  presetPanelOpen.value = false
+}
+
+function onPresetSelected(key: string) {
+  emit("update:draftKey", key)
+  presetPanelOpen.value = false
+  requestAnimationFrame(() => {
+    document.getElementById(props.insertKeyInputId)?.focus()
+  })
+}
+
+function focusValueInput() {
+  valueInputRef.value?.focus()
+}
+
+defineExpose({ focusValueInput })
+</script>

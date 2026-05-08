@@ -203,6 +203,10 @@ export function isUrlPropertyKey(key: string): boolean {
   return key.trim().toLowerCase() === "url"
 }
 
+export function isRelationPropertyKey(key: string): boolean {
+  return key.trim().toLowerCase() === "relation"
+}
+
 /** Maps parsed scalar properties into sorted rows for stable UI state. */
 export function sortedPropertyRowsFromRecord(
   properties: Record<string, string>
