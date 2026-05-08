@@ -4,6 +4,7 @@ import {
   composeNoteContentMarkdown,
   contentHasRelationProperty,
   insertPropertyRowAt,
+  isUrlPropertyKey,
   isWikidataIdPropertyKey,
   parseNoteContentMarkdown,
   propertyRecordHasRelationKey,
@@ -322,5 +323,17 @@ describe("isWikidataIdPropertyKey", () => {
   it("does not match unrelated keys", () => {
     expect(isWikidataIdPropertyKey("relation")).toBe(false)
     expect(isWikidataIdPropertyKey("wikidata")).toBe(false)
+  })
+})
+
+describe("isUrlPropertyKey", () => {
+  it("matches url with varied casing and spacing", () => {
+    expect(isUrlPropertyKey("url")).toBe(true)
+    expect(isUrlPropertyKey("  URL ")).toBe(true)
+  })
+
+  it("does not match other keys", () => {
+    expect(isUrlPropertyKey("urls")).toBe(false)
+    expect(isUrlPropertyKey("wikidata_id")).toBe(false)
   })
 })

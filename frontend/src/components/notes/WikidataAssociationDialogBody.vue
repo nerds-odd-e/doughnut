@@ -109,7 +109,7 @@ import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
-import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
+import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
 import { ExternalLink } from "lucide-vue-next"
 
 const props = defineProps<{
@@ -236,37 +236,14 @@ defineExpose({
   },
 })
 
-const getWikidataItem = async (wikidataId: string) => {
-  const { data: entityData, error } =
-    await WikidataController.fetchWikidataEntityDataById({
-      path: { wikidataId },
-    })
-  if (!error && entityData) {
-    return entityData.WikipediaEnglishUrl
-  }
-  return ""
-}
-
-const wikiUrl = async (wikidataId: string) => {
-  const wikipediaEnglishUrl = await getWikidataItem(wikidataId)
-  if (wikipediaEnglishUrl !== "") {
-    return wikipediaEnglishUrl
-  }
-  return `https://www.wikidata.org/wiki/${wikidataId}`
-}
-
 const handleOpenLink = () => {
   if (!hasValidWikidataId.value) return
   isLoadingUrl.value = true
-  const urlPromise = wikiUrl(localWikidataId.value)
-  nonBlockingPopup(urlPromise)
-  urlPromise
-    .then(() => {
+  openWikidataEntityBrowseUrlInNonBlockingPopup(localWikidataId.value).finally(
+    () => {
       isLoadingUrl.value = false
-    })
-    .catch(() => {
-      isLoadingUrl.value = false
-    })
+    }
+  )
 }
 
 const handleInputChange = (value: string) => {

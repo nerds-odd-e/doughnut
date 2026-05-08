@@ -32,13 +32,46 @@
       <template v-for="row in propertyRows" :key="row.key">
         <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
         <dd class="daisy-m-0">
-          {{
-            isRelationPropertyRow(row)
-              ? relationLabelFromKebab(row.value)
-              : isWikidataIdPropertyRow(row)
-                ? row.value.trim() || "—"
-                : row.value
-          }}
+          <template v-if="isRelationPropertyRow(row)">{{
+            relationLabelFromKebab(row.value)
+          }}</template>
+          <span
+            v-else-if="isWikidataIdPropertyRow(row)"
+            class="daisy-inline-flex daisy-min-w-0 daisy-max-w-full daisy-items-center daisy-gap-1"
+          >
+            <span class="daisy-truncate daisy-font-mono">{{
+              row.value.trim() || "—"
+            }}</span>
+            <button
+              v-if="row.value.trim()"
+              type="button"
+              class="daisy-btn daisy-btn-ghost daisy-btn-xs daisy-square daisy-shrink-0"
+              title="Open in browser"
+              :aria-label="`Open Wikidata entity ${row.value.trim()} in browser`"
+              data-testid="rich-note-property-external-link"
+              @click="openWikidataBrowseFromPropertyValue(row.value)"
+            >
+              <ExternalLink class="daisy-h-3.5 daisy-w-3.5" aria-hidden="true" />
+            </button>
+          </span>
+          <span
+            v-else-if="isUrlPropertyRow(row)"
+            class="daisy-inline-flex daisy-min-w-0 daisy-max-w-full daisy-items-center daisy-gap-1"
+          >
+            <span class="daisy-truncate">{{ row.value }}</span>
+            <button
+              v-if="row.value.trim()"
+              type="button"
+              class="daisy-btn daisy-btn-ghost daisy-btn-xs daisy-square daisy-shrink-0"
+              title="Open URL in new tab"
+              aria-label="Open URL in new tab"
+              data-testid="rich-note-property-external-link"
+              @click="openRichPropertyUrlInNewWindow(row.value)"
+            >
+              <ExternalLink class="daisy-h-3.5 daisy-w-3.5" aria-hidden="true" />
+            </button>
+          </span>
+          <template v-else>{{ row.value }}</template>
         </dd>
       </template>
     </dl>
@@ -127,6 +160,19 @@
           >
             {{ propertyRows[idx]!.value.trim() }}
           </button>
+          <button
+            v-if="propertyRows[idx]!.value.trim()"
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
+            title="Open in browser"
+            :aria-label="`Open Wikidata entity ${propertyRows[idx]!.value.trim()} in browser`"
+            data-testid="rich-note-property-external-link"
+            @click="
+              openWikidataBrowseFromPropertyValue(propertyRows[idx]!.value)
+            "
+          >
+            <ExternalLink class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+          </button>
           <template v-else>
             <span
               class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
@@ -142,6 +188,33 @@
               Set…
             </button>
           </template>
+        </div>
+        <div
+          v-else-if="isUrlPropertyRow(propertyRows[idx]!)"
+          class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
+        >
+          <div class="daisy-min-w-0 daisy-flex-1">
+            <WikiPropertyValueField
+              v-model="propertyRows[idx]!.value"
+              :wiki-titles="wikiTitles"
+              :aria-label="`Existing note property value (row ${idx + 1})`"
+              data-testid="rich-note-property-row-value-input"
+              @focus="onRowFocus(idx)"
+              @blur="commitRow(idx)"
+              @dead-link-click="emits('deadLinkClick', $event)"
+            />
+          </div>
+          <button
+            v-if="propertyRows[idx]!.value.trim()"
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
+            title="Open URL in new tab"
+            aria-label="Open URL in new tab"
+            data-testid="rich-note-property-external-link"
+            @click="openRichPropertyUrlInNewWindow(propertyRows[idx]!.value)"
+          >
+            <ExternalLink class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+          </button>
         </div>
         <WikiPropertyValueField
           v-else
@@ -249,12 +322,50 @@
           >
             <span class="daisy-font-mono daisy-text-sm">{{ draftValue.trim() || "—" }}</span>
             <button
+              v-if="draftValue.trim()"
+              type="button"
+              class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
+              title="Open in browser"
+              :aria-label="`Open Wikidata entity ${draftValue.trim()} in browser`"
+              data-testid="rich-note-property-external-link"
+              @click="openWikidataBrowseFromPropertyValue(draftValue)"
+            >
+              <ExternalLink class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+            </button>
+            <button
               type="button"
               class="daisy-btn daisy-btn-sm daisy-btn-outline"
               data-testid="rich-note-wikidata-property-insert-edit"
               @click="openWikidataDialogForInsert"
             >
               Set…
+            </button>
+          </div>
+          <div
+            v-else-if="isUrlPropertyKey(draftKey)"
+            class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
+          >
+            <div class="daisy-min-w-0 daisy-flex-1">
+              <WikiPropertyValueField
+                ref="valueInputRef"
+                v-model="draftValue"
+                :wiki-titles="wikiTitles"
+                aria-label="Property value"
+                data-testid="rich-note-property-value"
+                @blur="tryCommitInsert"
+                @dead-link-click="emits('deadLinkClick', $event)"
+              />
+            </div>
+            <button
+              v-if="draftValue.trim()"
+              type="button"
+              class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
+              title="Open URL in new tab"
+              aria-label="Open URL in new tab"
+              data-testid="rich-note-property-external-link"
+              @click="openRichPropertyUrlInNewWindow(draftValue)"
+            >
+              <ExternalLink class="daisy-h-4 daisy-w-4" aria-hidden="true" />
             </button>
           </div>
           <WikiPropertyValueField
@@ -288,7 +399,7 @@
 </template>
 
 <script setup lang="ts">
-import { Minus, Plus } from "lucide-vue-next"
+import { ExternalLink, Minus, Plus } from "lucide-vue-next"
 import { computed, nextTick, ref, useId, watch } from "vue"
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
@@ -309,6 +420,7 @@ import {
   relationTypeFromKebab,
 } from "@/models/relationTypeOptions"
 import {
+  isUrlPropertyKey,
   isWikidataIdPropertyKey,
   parseNoteContentMarkdown,
   RICH_MODE_PRESET_PROPERTY_KEYS,
@@ -317,6 +429,7 @@ import {
   validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
 
 const props = defineProps<{
   contentMarkdown: string
@@ -484,6 +597,28 @@ watch(
 
 function isWikidataIdPropertyRow(row: PropertyRow): boolean {
   return isWikidataIdPropertyKey(row.key)
+}
+
+function isUrlPropertyRow(row: PropertyRow): boolean {
+  return isUrlPropertyKey(row.key)
+}
+
+function openRichPropertyUrlInNewWindow(raw: string) {
+  const t = raw.trim()
+  if (!t) return
+  let href = t
+  if (href.startsWith("//")) {
+    window.open(`https:${href}`, "_blank", "noopener,noreferrer")
+    return
+  }
+  if (!/^https?:\/\//i.test(href)) {
+    href = `https://${href}`
+  }
+  window.open(href, "_blank", "noopener,noreferrer")
+}
+
+function openWikidataBrowseFromPropertyValue(raw: string) {
+  openWikidataEntityBrowseUrlInNonBlockingPopup(raw).catch(() => undefined)
 }
 
 function isRelationPropertyRow(row: PropertyRow): boolean {

@@ -199,6 +199,10 @@ export function isWikidataIdPropertyKey(key: string): boolean {
   return t === "wikidata_id" || t === "wikidataid"
 }
 
+export function isUrlPropertyKey(key: string): boolean {
+  return key.trim().toLowerCase() === "url"
+}
+
 /** Maps parsed scalar properties into sorted rows for stable UI state. */
 export function sortedPropertyRowsFromRecord(
   properties: Record<string, string>
