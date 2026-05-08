@@ -146,7 +146,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ---
 
-## Phase 6 — Slim API summary so endpoint lookup does not require reading `sdk.gen.ts` (planned)
+## Phase 6 — Slim API summary so endpoint lookup does not require reading `sdk.gen.ts` (done)
 
 **Type:** Behavior. **Why now:** With the always-loaded prompt and per-area rules trimmed, the next biggest "tax per task" is API discovery. `sdk.gen.ts` (1137 lines) and `types.gen.ts` (3527 lines) are the cheapest places today to learn an endpoint shape; both are oversized for that purpose.
 
@@ -160,6 +160,8 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 - Diff `api-summary.md` after a controller signature change matches expectations.
 
 **Risks:** Maintaining the generator. Keep it small (a single `openapi-ts` plugin or post-processing script).
+
+**Implementation notes:** `pnpm generateTypeScript` now writes `packages/generated/doughnut-backend-api/api-summary.md` after `openapi-ts` and generated package metadata. The summary is generated from `open_api_docs.yaml`, grouped by controller, and includes operation ID, method/path, generated request/response type names, path/query fields, body type, and response body type. `agent-map.md` points agents to the summary as the default API lookup while leaving `sdk.gen.ts` and `types.gen.ts` as exact-signature fallbacks.
 
 ---
 

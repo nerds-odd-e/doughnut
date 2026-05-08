@@ -15,19 +15,17 @@ Use this as the first stop for code navigation. It is intentionally short so age
 
 ## Generated API
 
-Generated API files are intentionally ignored by default indexing:
+Use `packages/generated/doughnut-backend-api/api-summary.md` as the default endpoint lookup. The larger generated API files are intentionally ignored by default indexing:
 
 - `packages/generated/doughnut-backend-api/types.gen.ts`
 - `packages/generated/doughnut-backend-api/sdk.gen.ts`
 - `open_api_docs.yaml`
 
-For frontend calls, import services from `@generated/doughnut-backend-api/sdk.gen`. For API-shaped fixtures, import `makeMe` from `doughnut-test-fixtures/makeMe`. After backend controller signature or DTO changes, run:
+For frontend calls, import services from `@generated/doughnut-backend-api/sdk.gen`. For API-shaped fixtures, import `makeMe` from `doughnut-test-fixtures/makeMe`. Open `sdk.gen.ts` or `types.gen.ts` only when checking an exact generated signature. After backend controller signature or DTO changes, run:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
-
-Open generated files only when checking an exact type or generated client signature.
 
 ## Commands
 
