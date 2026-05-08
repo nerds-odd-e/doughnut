@@ -67,6 +67,7 @@ describe("adding new note", () => {
     mockSdkService("semanticSearch", [])
     mockSdkService("semanticSearchWithin", [])
     mockSdkService("getRecentNotes", [])
+    mockSdkService("listNotebookFolderIndex", [])
     const createNoteResult = makeMe.aNoteRealm.please()
     mockedCreateNoteAtRoot = mockSdkService(
       "createNoteAtNotebookRoot",
@@ -200,7 +201,72 @@ describe("adding new note", () => {
         path: {
           notebook: realm.notebookView.notebook.id,
         },
-        body: expect.objectContaining({ newTitle: "note title" }),
+        body: expect.objectContaining({
+          newTitle: "note title",
+        }),
+      })
+      const createArgs = mockedCreateNoteAtRoot.mock.calls[0]![0] as {
+        body: Record<string, unknown>
+      }
+      expect(createArgs.body).not.toHaveProperty("folderId")
+    })
+
+    it("sends folderId when a target folder is pre-selected", async () => {
+      wrapper.unmount()
+      mockSdkService("listNotebookFolderIndex", [{ id: 42, name: "Alpha" }])
+      wrapper = helper
+        .component(NoteNewDialog)
+        .withCleanStorage()
+        .withProps({
+          ...notebookRootProps,
+          targetFolderId: 42,
+        })
+        .mount({ attachTo: document.body })
+      await setNoteNewDialogTitle(wrapper, "in folder")
+      await flushPromises()
+
+      await wrapper
+        .find('[data-testid="note-new-dialog-form"]')
+        .trigger("submit")
+      expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+        path: { notebook: realm.notebookView.notebook.id },
+        body: expect.objectContaining({
+          newTitle: "in folder",
+          folderId: 42,
+        }),
+      })
+    })
+
+    it("sends folderId after user picks a folder in FolderSelector", async () => {
+      wrapper.unmount()
+      mockSdkService("listNotebookFolderIndex", [
+        { id: 7, name: "One" },
+        { id: 8, name: "Two" },
+      ])
+      wrapper = helper
+        .component(NoteNewDialog)
+        .withCleanStorage()
+        .withProps({
+          ...notebookRootProps,
+          targetFolderId: 7,
+        })
+        .mount({ attachTo: document.body })
+      await setNoteNewDialogTitle(wrapper, "moved")
+      await flushPromises()
+
+      const select = wrapper.find('[data-testid="folder-move-parent-select"]')
+      await select.setValue("8")
+      await flushPromises()
+
+      await wrapper
+        .find('[data-testid="note-new-dialog-form"]')
+        .trigger("submit")
+      expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+        path: { notebook: realm.notebookView.notebook.id },
+        body: expect.objectContaining({
+          newTitle: "moved",
+          folderId: 8,
+        }),
       })
     })
 

@@ -116,7 +116,7 @@ describe("NotebookPageView.spec", () => {
       .mount()
 
     await wrapper
-      .get('[data-testid="notebook-page-title-edit"]')
+      .get('[data-testid="notebook-page-name-edit"]')
       .trigger("click")
     const input = wrapper.get('[data-testid="notebook-page-name-input"]')
       .element as HTMLInputElement

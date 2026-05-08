@@ -3,13 +3,18 @@
     <div class="daisy-card-body">
       <form data-testid="note-new-dialog-form" @submit.prevent="processForm">
         <fieldset :disabled="processing">
-          <p
-            v-if="parentLocationDescription"
-            class="daisy-text-sm daisy-opacity-80 daisy-mb-3"
-            data-testid="note-new-dialog-parent-location"
-          >
-            {{ parentLocationDescription }}
-          </p>
+          <div class="daisy-mb-4">
+            <p class="daisy-text-sm daisy-mb-2">
+              Folder
+            </p>
+            <FolderSelector
+              v-model="selectedFolderId"
+              :notebook-id="notebookRootNotebookId"
+              :context-folder-id="folderSelectorContextFolderId"
+              :excluded-folder-ids="emptyExcludedFolderIds"
+              :disabled="processing"
+            />
+          </div>
           <div class="title-search-container">
             <PathNameEditor
               v-model="creationData.newTitle"
@@ -55,8 +60,9 @@ import type {
   Note,
   NoteCreationDto,
 } from "@generated/doughnut-backend-api"
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import SearchResults from "../search/SearchResults.vue"
+import FolderSelector from "./FolderSelector.vue"
 import PathNameEditor from "./core/PathNameEditor.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
@@ -71,9 +77,8 @@ const { popups } = usePopups()
 
 const props = defineProps<{
   notebookRootNotebookId: number
-  /** Scope for create-note when using notebook root API (active sidebar folder). */
+  /** Initial folder scope for create-note (active sidebar folder). User can change via FolderSelector. */
   targetFolderId?: number
-  /** Shown above the form (e.g. "Folder: …" or "Notebook root"). */
   parentLocationDescription?: string
   initialTitle?: string
   /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
@@ -83,6 +88,26 @@ const props = defineProps<{
 }>()
 
 const titleSearchScopeNote = computed(() => props.titleSearchAnchorNote)
+
+const emptyExcludedFolderIds = new Set<number>()
+
+const selectedFolderId = ref<number | null>(props.targetFolderId ?? null)
+
+watch(
+  () => props.targetFolderId,
+  (v) => {
+    selectedFolderId.value = v ?? null
+  }
+)
+
+/** For FolderSelector quick picks; `0` is unused in the index when nothing else applies. */
+const folderSelectorContextFolderId = computed(() => {
+  const fromTarget = selectedFolderId.value ?? props.targetFolderId ?? null
+  if (fromTarget != null) return fromTarget
+  const anchorFolder = props.titleSearchAnchorNote?.noteTopology.folderId
+  if (anchorFolder != null) return anchorFolder
+  return 0
+})
 
 // Emits
 const emit = defineEmits<{
@@ -158,7 +183,7 @@ const processForm = async () => {
       props.notebookRootNotebookId,
       creationData.value,
       {
-        folderId: props.targetFolderId,
+        folderId: selectedFolderId.value ?? undefined,
         refreshWikiTitleCacheForNoteIds:
           props.wikiTitleCacheRefreshSourceNoteId != null
             ? [props.wikiTitleCacheRefreshSourceNoteId]

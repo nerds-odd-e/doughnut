@@ -7,7 +7,7 @@
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-p-0 daisy-normal-case daisy-text-xl daisy-font-semibold daisy-text-base-content daisy-justify-start daisy-text-left"
       title="Click to rename notebook"
-      data-testid="notebook-page-title-edit"
+      data-testid="notebook-page-name-edit"
       @click="startEditingNotebookName"
     >
       {{ name }}

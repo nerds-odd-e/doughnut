@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-container daisy-mx-auto daisy-py-4 daisy-max-w-6xl">
     <div class="notebook-page-summary daisy-mb-6" data-testid="notebook-page-summary">
-      <NotebookPageTitleEditor
+      <NotebookPageNameEditor
         :notebook-id="notebook.id"
         :name="notebook.name ?? ''"
         :settings-body="formData"
@@ -211,7 +211,7 @@ import CheckInput from "@/components/form/CheckInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
-import NotebookPageTitleEditor from "@/components/notebook/NotebookPageTitleEditor.vue"
+import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },

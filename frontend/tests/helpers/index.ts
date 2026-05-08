@@ -118,6 +118,7 @@ const methodToController: Record<string, any> = {
   getAiAssistant: NotebookController,
   updateAiAssistant: NotebookController,
   listNotebookRootNotes: NotebookController,
+  listNotebookFolderIndex: NotebookController,
   listFolderListing: NotebookController,
   myNotebooks: NotebookController,
   selfEvaluate: MemoryTrackerController,
