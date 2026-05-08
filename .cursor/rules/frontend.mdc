@@ -153,9 +153,11 @@ onMounted(() => {
 
 ### Modals and dialogs
 
-- Use **`Modal`** from `@/components/commons/Modal.vue` for modal overlays. Its **`Overlay`** teleports to `body` and centralizes stacking, ESC, backdrop click, and route-change close.
+- Use **`Modal`** from `@/components/commons/Modal.vue` for modal overlays. It wraps a native **`<dialog>`** (teleported to `body`) and centralizes stacking, ESC, backdrop click, and route-change close. The dim background is the native **`::backdrop`** pseudo-element.
 - Put panel content in **`#body`** (optional **`#header`**). Listen for **`@close_request`** to hide the modal (e.g. parent **`v-if`** or clearing model state). The overlay **X** is optional via **`showCloseButton`** on `Modal`.
 - Use **`v-if`** on `Modal` when the dialog opens, or keep `Modal` mounted and drive visibility from props; wire **`close_request`** and cancel buttons to the same close handler.
+- Layout variants: **`alignTop`** pins the panel to the top of the viewport, **`sidebar="left" | "right"`** renders a full-height side panel. Use **`isPopup`** for nested popups (alerts/confirms via `usePopups`) so they don't participate in the ESC modal stack.
+- In tests, the dialog renders inside `document.body`. Query the DOM via `document.querySelector('dialog')`, `.close-button`, `.modal-container`, `.modal-sidebar`, or `.modal-mask` — not the dialog's internal layout wrapper.
 
 ### Derived state: prefer `computed` over cached variables
 
