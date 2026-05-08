@@ -62,6 +62,19 @@ When(
   }
 )
 
+When(
+  'I move the active folder to folder {string} using folder search in the sidebar folder dialog',
+  (folderName: string) => {
+    start
+      .noteSidebar()
+      .openFolderOrganizeDialog()
+      .openFolderSearch()
+      .searchFolderDestination(folderName)
+      .selectFolderSearchResultByName(folderName)
+      .confirmMove()
+  }
+)
+
 When('I dissolve the active folder using the sidebar folder dialog', () => {
   start.noteSidebar().openFolderOrganizeDialog().dissolveFolder()
 })

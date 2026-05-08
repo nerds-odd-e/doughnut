@@ -795,6 +795,18 @@ export type FolderListing = {
     folders?: Array<Folder>;
 };
 
+/**
+ * Flat folder row for building folder trees and paths within a notebook.
+ */
+export type NotebookFolderIndexRow = {
+    id: number;
+    name: string;
+    /**
+     * Null when the folder is at notebook root.
+     */
+    parentFolderId?: number;
+};
+
 export type BookUserLastReadPosition = {
     id: number;
     locator: ContentLocatorFull;
@@ -2960,6 +2972,24 @@ export type ListFolderListingResponses = {
 };
 
 export type ListFolderListingResponse = ListFolderListingResponses[keyof ListFolderListingResponses];
+
+export type ListNotebookFolderIndexData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/index';
+};
+
+export type ListNotebookFolderIndexResponses = {
+    /**
+     * OK
+     */
+    200: Array<NotebookFolderIndexRow>;
+};
+
+export type ListNotebookFolderIndexResponse = ListNotebookFolderIndexResponses[keyof ListNotebookFolderIndexResponses];
 
 export type DeleteBookData = {
     body?: never;

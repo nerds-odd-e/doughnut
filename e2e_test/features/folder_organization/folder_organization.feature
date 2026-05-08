@@ -38,3 +38,14 @@ Feature: Folder organization
     Then I should not see sidebar folder "Mid" under folder "Outer"
     And I should see sidebar folder "Inner" under folder "Outer"
     And I should see note "Loose" under folder "Outer"
+
+  Scenario: Move a folder using search when the destination is not in quick picks
+    Given I have a notebook "Organize NB" with notes:
+      | Title | Folder     |
+      | n1    | Alpha/Beta |
+      | n2    | Gamma      |
+    When I view note "n1"
+    And I activate folder "Beta" under folder "Alpha" in the sidebar
+    And I move the active folder to folder "Gamma" using folder search in the sidebar folder dialog
+    Then I should see sidebar folder "Beta" under folder "Gamma"
+    And I should not see sidebar folder "Beta" under folder "Alpha"

@@ -4,6 +4,11 @@ const submitTimeoutMs = 20000
 
 export type SidebarFolderOrganizeDialog = {
   selectNotebookRootAsDestination: () => SidebarFolderOrganizeDialog
+  openFolderSearch: () => SidebarFolderOrganizeDialog
+  searchFolderDestination: (text: string) => SidebarFolderOrganizeDialog
+  selectFolderSearchResultByName: (
+    folderName: string
+  ) => SidebarFolderOrganizeDialog
   confirmMove: () => void
   tryConfirmMove: () => SidebarFolderOrganizeDialog
   expectErrorText: (text: string) => SidebarFolderOrganizeDialog
@@ -17,6 +22,27 @@ export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog
   return {
     selectNotebookRootAsDestination() {
       cy.get('[data-testid="folder-move-parent-select"]').select('__root__')
+      return assumeSidebarFolderOrganizeDialog()
+    },
+
+    openFolderSearch() {
+      cy.get('[data-testid="folder-selector-more-button"]').click()
+      cy.get('[data-testid="folder-selector-search-dialog"]').should(
+        'be.visible'
+      )
+      return assumeSidebarFolderOrganizeDialog()
+    },
+
+    searchFolderDestination(text: string) {
+      cy.get('[data-testid="folder-selector-search-input"]').clear().type(text)
+      return assumeSidebarFolderOrganizeDialog()
+    },
+
+    selectFolderSearchResultByName(folderName: string) {
+      cy.contains(
+        '[data-testid="folder-selector-search-result"]',
+        folderName
+      ).click()
       return assumeSidebarFolderOrganizeDialog()
     },
 

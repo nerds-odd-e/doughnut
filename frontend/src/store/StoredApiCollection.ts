@@ -5,6 +5,7 @@ import type {
   Folder,
   NoteContentCompletion,
   NoteRealm,
+  NotebookFolderIndexRow,
   WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
 import type { NoteCreationDto } from "@generated/doughnut-backend-api"
@@ -51,6 +52,8 @@ export interface StoredApi {
     notebookId: number,
     folderId: number
   ): Promise<FolderListing>
+
+  loadNotebookFolderIndex(notebookId: number): Promise<NotebookFolderIndexRow[]>
 
   createFolder(notebookId: number, body: FolderCreationRequest): Promise<Folder>
 
@@ -252,6 +255,22 @@ export default class StoredApiCollection implements StoredApi {
     )
     if (error || !data) {
       throw new Error(toErrorMessage(error, "Failed to load folder listing"))
+    }
+    return data
+  }
+
+  async loadNotebookFolderIndex(
+    notebookId: number
+  ): Promise<NotebookFolderIndexRow[]> {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.listNotebookFolderIndex({
+        path: { notebook: notebookId },
+      })
+    )
+    if (error || !data) {
+      throw new Error(
+        toErrorMessage(error, "Failed to load notebook folder index")
+      )
     }
     return data
   }

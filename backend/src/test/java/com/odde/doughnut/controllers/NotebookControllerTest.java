@@ -26,6 +26,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
+import com.odde.doughnut.controllers.dto.NotebookFolderIndexRow;
 import com.odde.doughnut.controllers.dto.NotebookPageClientView;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
@@ -357,6 +358,42 @@ class NotebookControllerTest extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.listNotebookRootNotes(nb));
+    }
+  }
+
+  @Nested
+  class ListNotebookFolderIndex {
+    @Test
+    void returnsFlatRowsWithParentIds() throws UnexpectedNoAccessRightException {
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
+      createNb.setNewTitle("NB Folder Index");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+      makeMe.aFolder().notebook(nb).name("SiblingRoot").please();
+
+      List<NotebookFolderIndexRow> rows = controller.listNotebookFolderIndex(nb);
+      assertEquals(3, rows.size());
+      NotebookFolderIndexRow nestedRow =
+          rows.stream().filter(r -> r.id().equals(nested.getId())).findFirst().orElseThrow();
+      assertThat(nestedRow.name(), equalTo("Nested"));
+      assertThat(nestedRow.parentFolderId(), equalTo(parent.getId()));
+
+      long rootLevelCount = rows.stream().filter(r -> r.parentFolderId() == null).count();
+      assertEquals(2, rootLevelCount);
+    }
+
+    @Test
+    void requiresReadAuthorization() {
+      User owner = makeMe.aUser().please();
+      currentUser.setUser(owner);
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+
+      currentUser.setUser(makeMe.aUser().please());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.listNotebookFolderIndex(nb));
     }
   }
 

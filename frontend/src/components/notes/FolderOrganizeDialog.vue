@@ -9,21 +9,23 @@
           <label class="daisy-label" for="folder-move-destination">
             <span class="daisy-label-text">Destination</span>
           </label>
-          <select
-            id="folder-move-destination"
-            v-model="selectedKey"
-            class="daisy-select daisy-select-bordered daisy-w-full daisy-max-w-full"
-            data-testid="folder-move-parent-select"
-          >
-            <option value="__root__">Notebook root</option>
-            <option
-              v-for="opt in destinationFolders"
-              :key="opt.id"
-              :value="String(opt.id)"
+          <div id="folder-move-destination">
+            <p
+              v-if="!optionsReady"
+              class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2"
             >
-              {{ opt.pathLabel }}
-            </option>
-          </select>
+              Loading destinations…
+            </p>
+            <FolderSelector
+              v-if="optionsReady"
+              v-model="selectedParentFolderId"
+              :notebook-id="notebookId"
+              :context-folder-id="movingFolderId"
+              :excluded-folder-ids="excludedSubtreeIds"
+              :folder-index-rows="folderIndexRows"
+              :disabled="processing"
+            />
+          </div>
           <p v-if="loadError" class="daisy-text-error daisy-text-sm daisy-mt-2">
             {{ loadError }}
           </p>
@@ -65,12 +67,18 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
 import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import usePopups from "../commons/Popups/usePopups"
 import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
+import FolderSelector from "./FolderSelector.vue"
+import {
+  collectSubtreeFolderIds,
+  dissolveParentQuotedLabel,
+  folderRowsById,
+} from "./folderSelectorUtils"
 
 const props = defineProps<{
   notebookId: number
@@ -90,74 +98,27 @@ const optionsReady = ref(false)
 const loadError = ref<string | undefined>(undefined)
 const moveError = ref<string | undefined>(undefined)
 const dissolveError = ref<string | undefined>(undefined)
-const selectedKey = ref("__root__")
-const destinationFolders = ref<{ id: number; pathLabel: string }[]>([])
+const selectedParentFolderId = ref<number | null>(null)
+const folderIndexRows = ref<NotebookFolderIndexRow[]>([])
+const excludedSubtreeIds = ref(new Set<number>())
 const parentLocationLabel = ref("notebook root")
-
-function folderNumericId(folder: Folder): number | undefined {
-  return folder.id
-}
-
-async function collectSubtreeFolderIds(
-  rootFolderId: number
-): Promise<Set<number>> {
-  const ids = new Set<number>()
-  const api = storageAccessor.value.storedApi()
-  async function dfs(id: number) {
-    ids.add(id)
-    const listing = await api.loadFolderListing(props.notebookId, id)
-    for (const ch of listing.folders ?? []) {
-      const cid = folderNumericId(ch)
-      if (cid !== undefined) await dfs(cid)
-    }
-  }
-  await dfs(rootFolderId)
-  return ids
-}
-
-async function collectAllFolderPaths(): Promise<
-  { id: number; pathLabel: string }[]
-> {
-  const out: { id: number; pathLabel: string }[] = []
-  const api = storageAccessor.value.storedApi()
-
-  async function visitFolderTree(prefix: string, folder: Folder) {
-    const id = folderNumericId(folder)
-    if (id === undefined) return
-    const name = folder.name
-    const pathLabel = prefix === "" ? name : `${prefix} / ${name}`
-    out.push({ id, pathLabel })
-    const childListing = await api.loadFolderListing(props.notebookId, id)
-    for (const ch of childListing.folders ?? []) {
-      await visitFolderTree(pathLabel, ch)
-    }
-  }
-
-  const root = await api.loadNotebookRootNotes(props.notebookId)
-  for (const f of root.folders ?? []) {
-    await visitFolderTree("", f)
-  }
-  return out
-}
-
-function findParentLabel(
-  all: { id: number; pathLabel: string }[],
-  movingFolderId: number
-): string {
-  const moving = all.find((o) => o.id === movingFolderId)
-  if (!moving) return "notebook root"
-  const segments = moving.pathLabel.split(" / ")
-  if (segments.length <= 1) return "notebook root"
-  return `"${segments.slice(0, -1).join(" / ")}"`
-}
 
 onMounted(async () => {
   loadError.value = undefined
   try {
-    const excluded = await collectSubtreeFolderIds(props.movingFolderId)
-    const all = await collectAllFolderPaths()
-    destinationFolders.value = all.filter((o) => !excluded.has(o.id))
-    parentLocationLabel.value = findParentLabel(all, props.movingFolderId)
+    const rows = await storageAccessor.value
+      .storedApi()
+      .loadNotebookFolderIndex(props.notebookId)
+    folderIndexRows.value = rows
+    excludedSubtreeIds.value = collectSubtreeFolderIds(
+      props.movingFolderId,
+      rows
+    )
+    const byId = folderRowsById(rows)
+    parentLocationLabel.value = dissolveParentQuotedLabel(
+      props.movingFolderId,
+      byId
+    )
     optionsReady.value = true
   } catch (e: unknown) {
     loadError.value = toOpenApiError(e).message ?? "Failed to load folders"
@@ -169,11 +130,13 @@ const submitMove = async () => {
   processing.value = true
   moveError.value = undefined
   try {
-    const newParentFolderId =
-      selectedKey.value === "__root__" ? null : Number(selectedKey.value)
     await storageAccessor.value
       .storedApi()
-      .moveFolder(props.notebookId, props.movingFolderId, newParentFolderId)
+      .moveFolder(
+        props.notebookId,
+        props.movingFolderId,
+        selectedParentFolderId.value
+      )
     emit("closeDialog")
   } catch (e: unknown) {
     moveError.value = toOpenApiError(e).message ?? "Failed to move folder"

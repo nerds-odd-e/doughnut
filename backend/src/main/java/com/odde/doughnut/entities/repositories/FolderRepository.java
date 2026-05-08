@@ -81,4 +81,15 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
       @Param("notebookId") Integer notebookId,
       @Param("parentFolderId") Integer parentFolderId,
       @Param("name") String name);
+
+  @Query(
+      """
+      SELECT f.id AS id, f.name AS name, p.id AS parentFolderId
+      FROM Folder f
+      LEFT JOIN f.parentFolder p
+      WHERE f.notebook.id = :notebookId
+      ORDER BY f.id ASC
+      """)
+  List<FolderIndexRowProjection> findIndexRowsByNotebookIdOrderByIdAsc(
+      @Param("notebookId") Integer notebookId);
 }
