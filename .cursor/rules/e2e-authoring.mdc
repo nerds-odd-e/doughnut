@@ -1,0 +1,176 @@
+---
+description: E2E testing with Cypress and Cucumber, feature files, step definitions, page objects, fluent interface, assertions, test execution
+globs: e2e_test/**/*.{feature,ts}
+alwaysApply: false
+---
+# E2E Authoring Rules
+
+Use this rule when writing or modifying E2E tests, Cypress/Cucumber feature files, step definitions, page objects, or E2E assertions. For OCR-specific canvas assertions, use `e2e-ocr.mdc`.
+
+## Environment Assumption
+
+Assume the developer has already started services with `pnpm sut`, including backend auto-reload, frontend HMR, and Mountebank. Services automatically restart when code changes are made.
+
+If services are not running, suggest starting `pnpm sut` in a separate terminal.
+
+## Cypress Origin
+
+`http://localhost:5173` is always the Cypress app origin through the local load balancer. CI vs `pnpm sut`, `wait-on`, `NO_PROXY`, and env vars are documented in `docs/gcp/prod_env.md`, Local dev / Cypress under section 6.
+
+## Run E2E Tests
+
+Agents should default to `pnpm cypress run --spec` with one or more `.feature` paths tied to the changed capability. Add adjacent specs only when regression risk warrants it. Do not run bare `pnpm cypress run`, `pnpm verify`, or the whole suite unless the user explicitly asks for a full E2E run or the instructions require reproducing CI.
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+```
+
+Important notes:
+
+- Do not use `cypress run -- --spec`; the empty `--` causes the `--spec` parameter to be ignored.
+- The default tag filter is `TAGS` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per run with `--env TAGS='...'` when needed.
+- `@focus` and `@only` are local debugging aids only. Do not commit them; CI runs `./scripts/check_focus_tags.sh` on `.feature` files to block `@focus`, and `@only` should be treated the same.
+- If any node in a feature file is tagged `@focus` or `@only`, `@badeball/cypress-cucumber-preprocessor` filters scenarios in that file to `@focus or @only` only.
+
+## Debugging
+
+Use the canonical log-tail command for backend E2E log inspection:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e
+```
+
+Frontend Vite checker terminal errors still matter even though the browser overlay is disabled for E2E stability. For canonical lint and format commands, use `linting_formating.mdc`.
+
+## Technology And Structure
+
+- Cypress for E2E testing.
+- Cucumber plugin for BDD-style tests.
+- TypeScript for type safety.
+- Mountebank mocks external services.
+- `e2e_test/features` contains BDD-style tests.
+- `e2e_test/step_definitions` contains step definitions.
+- `e2e_test/start/` contains page objects.
+- `e2e_test/start/pageObjects/cli/` contains CLI page objects with the `cli.xxx` prefix.
+- `e2e_test/support/` contains support files.
+
+## Gherkin
+
+- Write features in Gherkin syntax focused on business value.
+- Group related features in domain-specific folders.
+- Name feature files and titles by domain/capability, such as `note_creation.feature` or `spaced_repetition.feature`. Never name them by phase or delivery order.
+- Use tags, such as `@usingMockedOpenAiService` or `@mockBrowserTime`, to control test execution.
+- Keep scenarios focused and concise.
+
+## Step Definitions
+
+- Keep step definitions lightweight.
+- Delegate implementation details to page objects, preferably as fluent chains.
+- When user-visible behavior differs, use different steps and thin implementations. Do not hide variants behind one parameterized step.
+- Use TypeScript and reuse steps where practical.
+- Use parameter types for complex objects.
+
+```typescript
+When("I start a conversation about the note {string}", (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).startAConversationAboutNote()
+})
+```
+
+## Page Objects
+
+Use page objects with a fluent interface: methods perform an action and return the next page object, or `this` when staying on the same screen. This keeps step definitions short and navigation explicit in the types.
+
+- Centralize UI interactions in page objects.
+- Prefer fluent chaining over one-off helpers that do not return a navigable object.
+- Keep page objects focused on a single responsibility.
+- Use meaningful method names that reflect user actions.
+
+```typescript
+const notePage = {
+  startAConversationAboutNote() {
+    this.toolbarButton("Start a conversation").click()
+    return conversationPage()
+  },
+}
+```
+
+CLI steps use `cli.xxx` page objects, not `start.xxx`. For the install feature, use `cli.backend()`, `cli.installation()`, and `cli.nonInteractiveOutput()` for spawned `version` / `update` stdout. Other `features/cli/*.feature` files are `@ignore` in CI; extend Vitest under `cli/tests/interactive/` for interactive TTY coverage instead of adding a second Cypress PTY harness.
+
+```typescript
+Then("I should see {string} in the non-interactive output", (expected: string) => {
+  cli.nonInteractiveOutput().expectContains(expected)
+})
+```
+
+## Test Data And Service Mocking
+
+- Use Given steps to set up test data.
+- Mock external services, such as OpenAI, for reliable tests.
+- Use tags to indicate when mocks are required.
+- Keep mock responses consistent with real service behavior.
+- Store mock data separately from test code.
+- Clean up test data after each test.
+- Use data tables for complex test data.
+
+```gherkin
+Given I have a notebook "Geometry set" with notes:
+  | Title  |
+  | Shape  |
+  | Square |
+```
+
+Square is placed under Shape when the notebook is created in one inject batch. Do not add a `Folder` column; see testability inject ordering.
+
+```typescript
+Given("OpenAI assistant will reply below for user messages in a stream run:", (data: DataTable) => {
+  mock_services
+    .openAi()
+    .stubCreateThread("thread-123")
+    .createThreadAndStubMessages("thread-123", data.hashes())
+})
+```
+
+## Assertions
+
+Error messages must be immediately actionable:
+
+1. Assert with clear domain meaning, not just technical selectors.
+2. Show expected and actual values when they differ.
+3. Include relevant context, such as page content or API response, when helpful.
+4. Given, When, and Then steps should be assertive and fail early.
+5. Put assertions inside page objects where that keeps step definitions simple.
+
+```typescript
+expectQuizScore(expectedScore?: string) {
+  if (expectedScore) {
+    cy.get("[data-test='quiz-score']").should(($score) => {
+      const actualScore = $score.text().trim()
+      expect(
+        actualScore,
+        `Expected quiz score to be ${expectedScore}, but found ${actualScore}`
+      ).to.equal(expectedScore)
+    })
+  }
+  return this
+}
+```
+
+## Explicit Conditions
+
+A scenario describes one fixed path. Prefer dumb automation: the path is visible in Gherkin and in small, purpose-named page-object methods, not inferred at runtime from a string or flag.
+
+- Avoid large `if` / `switch` trees, parameter sniffing, and mode flags in steps and page objects except when the branch exists only to assert or fail fast with a clear error.
+- Distinguish variants at the caller with different steps and/or page-object methods, not one smart API.
+- State the condition in step wording when behavior differs, for example slash command vs plain line vs Enter alone vs ESC.
+- For CLI TTY sequences, add or extend Vitest under `cli/tests/interactive/` instead of adding a second Cypress PTY stack.
+
+## Pitfalls
+
+- Do not put complex logic in step definitions.
+- Do not create long scenarios with many steps.
+- Do not rely on test order.
+- Do not use hardcoded waits.
+- Do not skip error handling.
+- Do not mix different levels of abstraction in scenarios.
+- Do not ignore linting errors that appear in the terminal.
+- Do not add OCR or DOM text layers to production just to satisfy E2E; run OCR in Cypress Node tasks instead.

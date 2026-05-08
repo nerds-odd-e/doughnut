@@ -1,0 +1,30 @@
+---
+description: E2E OCR assertions with Tesseract.js for canvas-only UI such as PDF pages in Cypress page objects
+globs: e2e_test/start/pageObjects/**/*.ts
+alwaysApply: false
+---
+# E2E OCR Rules
+
+Use this rule when asserting text that is not in the DOM, such as PDF content drawn only to `<canvas>`. Keep OCR in test infrastructure, not product code.
+
+## Tesseract Setup
+
+- Use `tesseract.js`, a root devDependency, for canvas-only assertions via `cy.task`.
+- Register a Node task in `e2e_test/config/common.ts`.
+- The task should call `tesseract.js` `createWorker` and `recognize` on image bytes, such as base64 PNG without the `data:image/png;base64,` prefix.
+- Example task name: `ocrCanvasImage`.
+
+## Language Data
+
+- Commit `e2e_test/tesseract/eng.traineddata` uncompressed.
+- Pass `langPath` and `cachePath` to that directory when creating the worker.
+- This prevents Tesseract from writing `eng.traineddata` to the repo root. Root-level traineddata files are gitignored as a fallback.
+
+## Page Object Pattern
+
+- Wait until the canvas has real ink before OCR. Sampling `getImageData` for dark pixels is better than checking only non-zero alpha, because an empty white fill can still have alpha.
+- Export with `toDataURL("image/png")`.
+- Strip the data URL prefix.
+- Use `cy.task(..., { timeout: ... })` for slow OCR.
+- Assert the returned string contains the expected substring with a clear message.
+- Reference: `e2e_test/start/pageObjects/bookReadingPage.ts`, from `expectPdfBeginningVisible` through `expectCurrentPage(1).expectVisibleOCRContains`.

@@ -1,0 +1,134 @@
+---
+description: Backend Java tests, controller-level behavior tests, JUnit, @Nested, MakeMe builders, @Transactional, parameterized tests
+globs: backend/src/test/**/*.java
+alwaysApply: false
+---
+# Backend Testing Rules
+
+Use this rule when creating or updating backend Java tests.
+
+## Commands
+
+Run backend verification from the repo root:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:verify
+```
+
+When no database migration is involved, this is faster:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
+
+Always run all backend unit tests instead of a selected file or test case.
+
+## Core Principles
+
+1. Test behavior, not implementation. Verify system behavior through pre/post state transitions and keep tests resilient to internal structure changes.
+2. Prefer controller or other stable-boundary tests for behavior users see through HTTP. These tests often do not reference the internal class you edited.
+3. Do not mirror the package tree with one test class per production class. One observable test can cover several layers.
+4. Test services and algorithms directly only when they are an independent, intentional contract, such as pure logic or algorithms.
+5. Keep tests small and focused: one behavior per test and descriptive names that explain the behavior.
+
+Controller-style example:
+
+```java
+@Test
+void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
+  Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+  final NoteRealm noteRealm = controller.show(note);
+  assertThat(noteRealm.getId(), equalTo(note.getId()));
+}
+```
+
+Independent algorithm example:
+
+```java
+@ParameterizedTest
+@CsvSource({
+  "moon,     partner of earth,          partner of earth",
+  "Sedition, word sedition means this,  word [...] means this"
+})
+void clozeDescription(String title, String markdown, String expectedClozeDescription) {
+  assertThat(
+      new ClozedString(clozeReplacement, markdown).hide(new NoteTitle(title)).maskedContentAsMarkdown(),
+      containsString(expectedClozeDescription));
+}
+```
+
+## Database Tests
+
+- Tests use actual database interactions with `@Transactional`.
+- This gives confidence in database operations and repository behavior.
+
+```java
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class RestNoteControllerTests {
+  // ...
+}
+```
+
+## MakeMe Builders
+
+- Use the central `makeMe` factory to create test data.
+- Each entity has its own builder, such as `NoteBuilder` or `ConversationBuilder`.
+- Use method chaining for readability.
+- End with `please()` to build the object.
+- Use `please(boolean needPersist)` to control database persistence.
+- Builders handle relationships and dependencies automatically.
+
+```java
+Note note = makeMe.aNote()
+                 .creatorAndOwner(userModel)
+                 .titleConstructor("title")
+                 .content("description")
+                 .please();
+```
+
+## Test Organization
+
+- Group related tests with `@Nested`.
+- Use `@BeforeEach` for common setup, keeping setup minimal and relevant to the group.
+- Initialize test data using MakeMe builders.
+- Use mocking sparingly, mainly for external services.
+- Mock `OpenAIClient` chat completions with `OpenAIChatCompletionMock` in controller tests.
+
+```java
+@Nested
+class CreateNoteTest {
+  Note parent;
+  NoteCreationDTO noteCreation;
+
+  @BeforeEach
+  void setup() {
+    // ...
+  }
+
+  @Test
+  void shouldBeAbleToSaveNoteWhenValid() {
+    // ...
+  }
+}
+```
+
+## Assertions
+
+- Use `assertThat` with descriptive matchers for readable failures.
+- Test both happy paths and error cases.
+- Use `assertThrows` for exception testing.
+- Use `@ParameterizedTest` for multiple scenarios with less code.
+- Each test should create its own data and avoid sharing mutable state.
+
+```java
+assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
+assertThat(noteRealm.getFromBazaar(), is(true));
+```
+
+```java
+assertThrows(
+    UnexpectedNoAccessRightException.class,
+    () -> controller.show(note));
+```

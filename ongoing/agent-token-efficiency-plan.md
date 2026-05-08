@@ -127,7 +127,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ---
 
-## Phase 5 — Same treatment for backend and e2e rules (planned)
+## Phase 5 — Same treatment for backend and e2e rules (done)
 
 **Type:** Behavior. **Why after Phase 4:** the frontend split is the biggest single win; this phase applies the proven pattern to the next two largest rule files (`backend-development.mdc` 212 lines, `e2e_test.mdc` 266 lines).
 
@@ -141,6 +141,8 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 **Verification:** same pattern as Phase 4 — confirm rule attachment scopes shrink for representative files.
 
 **Risks:** Same as Phase 4.
+
+**Implementation notes:** `backend-development.mdc` has been replaced by `backend-code.mdc` for `backend/src/main/**/*.java` and `backend-testing.mdc` for `backend/src/test/**/*.java`. `e2e_test.mdc` has been replaced by `e2e-authoring.mdc` for `e2e_test/**/*.{feature,ts}` plus `e2e-ocr.mdc` for OCR-specific page-object guidance under `e2e_test/start/pageObjects/**/*.ts`. Stale references in the phased-planning skill and backend cloud-agent testing docs now point to the split rule files.
 
 ---
 

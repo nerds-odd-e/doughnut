@@ -1,0 +1,59 @@
+---
+description: Backend Java production code, Spring Boot controllers/services/repositories, controller return values, imports, schema ERD pointer
+globs: backend/src/main/**/*.java
+alwaysApply: false
+---
+# Backend Code Rules
+
+Use this rule when writing or modifying backend production Java code. For backend tests, use `backend-testing.mdc`; for database migrations, use `db-migration.mdc`.
+
+## Commands
+
+Run backend verification from the repo root:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:verify
+```
+
+When no database migration is involved, this is faster:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
+
+## Relational Schema
+
+The `docs/database-erd.md` Mermaid diagram documents tables, foreign keys, and key columns. After Flyway migrations change the schema, regenerate it with the `database-erd` skill:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm export:database-erd
+```
+
+## Controller Return Values
+
+- Prefer returning entities, or other types already used as API bodies, from controllers when the JSON shape fits.
+- Narrow the serialized surface with `@JsonIgnore`, `@JsonView`, and similar mechanisms already used in the codebase.
+- Introduce a response DTO only when necessary, such as a different wire shape, aggregating multiple sources, or decoupling from persistence without overloading the entity.
+
+## Import Style
+
+- Always use import statements at the top of files.
+- Do not use inline fully qualified class names in code.
+- Use fully qualified names only when there is a naming conflict between classes with the same simple name from different packages.
+
+Avoid:
+
+```java
+ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+List<com.theokanning.openai.completion.chat.ChatMessage> messages = ...;
+```
+
+Prefer:
+
+```java
+import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.theokanning.openai.completion.chat.ChatMessage;
+
+ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
+List<ChatMessage> messages = ...;
+```

@@ -90,7 +90,7 @@ Phases decide **when** you add or extend tests, but tests are grouped and named 
 - **Phase-complete:** Everything in a phase is **justified and tested inside that phase**. No separate "final integration phase" or deferred test pass for that slice.
 - **No dead code:** Production code must be **used** by current E2E tests **or** by unit tests that cover **non–happy-path** behavior. For **normal user paths**, unit tests alone are **not** enough to justify keeping the code — pair with E2E for that phase.
 
-**Scope of E2E:** "E2E for this phase" means Cypress (or equivalent) coverage for the **behavior and feature files touched in that phase** — run the relevant `--spec`(s), not the **entire** suite. See `e2e_test.mdc` for running a single feature.
+**Scope of E2E:** "E2E for this phase" means Cypress (or equivalent) coverage for the **behavior and feature files touched in that phase** — run the relevant `--spec`(s), not the **entire** suite. See `e2e-authoring.mdc` for running a single feature.
 
 ### E2E-led decomposition (sub-phases)
 
