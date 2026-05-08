@@ -237,6 +237,47 @@ class FocusContextRetrievalServiceTest {
     }
 
     @Test
+    void depth1InboundExcludesOutgoingTargetsBeforeCap() {
+      Note hub =
+          makeMe.aNote().creator(viewer).underSameNotebookAs(focusNote).title("XHub").please();
+      Note shared =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .underSameNotebookAs(focusNote)
+              .title("XShared")
+              .content("Links to [[XHub]].")
+              .please();
+      hub.setContent("[[XShared]].");
+      makeMe.entityPersister.merge(hub);
+      for (int i = 0; i < 8; i++) {
+        makeMe
+            .aNote()
+            .creator(viewer)
+            .underSameNotebookAs(focusNote)
+            .title("XRef" + i)
+            .content("Links to [[XHub]].")
+            .please();
+      }
+      refreshWikiCache(hub);
+      refreshWikiCache(shared);
+
+      FocusContextResult result =
+          service.retrieve(hub, viewer, RetrievalConfig.forQuestionGeneration(null));
+
+      assertThat(
+          result.getRelatedNotes().stream()
+              .filter(n -> "XShared".equals(n.getTitle()))
+              .noneMatch(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference),
+          is(true));
+      assertThat(
+          result.getRelatedNotes().stream()
+              .filter(n -> "XShared".equals(n.getTitle()))
+              .anyMatch(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink),
+          is(true));
+    }
+
+    @Test
     void depth2InboundCappedAtTwo() {
       Note depth1Ref =
           makeMe

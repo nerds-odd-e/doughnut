@@ -27,9 +27,9 @@ Within a depth, **OutgoingWikiLink** is preferred over **InboundWikiReference** 
 
 (`sampleCapAtGraphDepth(depth)` in code.)
 
-When a `sampleSeed` is provided in `RetrievalConfig`, **inbound wiki reference** candidates above the cap are randomly shuffled with that seed before truncation (deterministic, reproducible). Without a seed, the first N in existing order are taken.
+When a `sampleSeed` is provided in `RetrievalConfig`, **inbound wiki reference** candidates for focus context are ordered deterministically in SQL (CRC32-based on referrer id and seed) before the cap is applied—repeatable across runs, not an in-memory Java shuffle of the full referrer list. Without a seed, the lowest referrer **id** order is used up to the cap.
 
-The focus note's flat `inboundReferences` URI list (no token cost) is also capped at **20** and seeded-shuffled when a seed is set.
+The focus note's flat `inboundReferences` URI list (no token cost) is also capped at **20** using the same id- or seed-ordered capped query.
 
 For **folder siblings**, an anchor at wiki depth `d` uses `sampleCapAtGraphDepth(d + 1)` (same depth as related notes emitted from that anchor). The focus note's `sampleSiblings` URI list uses `sampleCapAtGraphDepth(1)`. Peers are loaded from the database already capped to that limit: without a seed they are the lowest **id** in the same folder or notebook root (after excluding the anchor, focus note, and wiki-claimed notes); with a seed they follow a deterministic **CRC32(id, seed)** order for the same exclusions—repeatable across runs, but not the same ordering as an in-memory Java shuffle of the full peer list.
 

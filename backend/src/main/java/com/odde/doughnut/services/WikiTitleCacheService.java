@@ -11,7 +11,10 @@ import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -119,6 +122,52 @@ public class WikiTitleCacheService {
     return inboundReferrerNotesForViewer(focalNote, viewer).stream()
         .sorted(Comparator.comparing(Note::getId))
         .toList();
+  }
+
+  /**
+   * Inbound referrers for focus-context only: same visibility as {@link #referencesNotesForViewer},
+   * distinct by referrer id, excluding {@code excludeNoteIds}, capped in the database.
+   */
+  public List<Note> sampledReferencesNotesForFocusContext(
+      Note focalNote,
+      User viewer,
+      Set<Integer> excludeNoteIds,
+      int cap,
+      Optional<Long> sampleSeed) {
+    if (cap <= 0 || focalNote.getId() == null) {
+      return List.of();
+    }
+    Integer focalNotebookId =
+        focalNote.getNotebook() != null ? focalNote.getNotebook().getId() : null;
+    Integer viewerId = viewer != null ? viewer.getId() : null;
+    List<Integer> excludeIds = excludeIdsForNativeIn(excludeNoteIds);
+    return sampleSeed
+        .map(
+            seed ->
+                noteWikiTitleCacheRepository.findInboundReferrersForTargetBySeedLimited(
+                    focalNote.getId(),
+                    focalNotebookId,
+                    viewerId,
+                    excludeIds,
+                    Long.toString(seed),
+                    cap))
+        .orElseGet(
+            () ->
+                noteWikiTitleCacheRepository.findInboundReferrersForTargetByIdAscLimited(
+                    focalNote.getId(), focalNotebookId, viewerId, excludeIds, cap));
+  }
+
+  private static List<Integer> excludeIdsForNativeIn(Set<Integer> excludeNoteIds) {
+    LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+    for (Integer id : excludeNoteIds) {
+      if (id != null) {
+        ids.add(id);
+      }
+    }
+    if (ids.isEmpty()) {
+      return List.of(-1);
+    }
+    return List.copyOf(ids);
   }
 
   private static boolean inboundReferrerVisible(Note referrer, Note focalNote, User viewer) {

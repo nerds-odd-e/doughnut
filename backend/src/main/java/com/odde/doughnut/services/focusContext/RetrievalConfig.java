@@ -41,9 +41,9 @@ public class RetrievalConfig {
   }
 
   /**
-   * When present, inbound wiki reference candidates above their cap are shuffled with {@link
-   * java.util.Random} this seed. Folder sibling sampling uses the same seed for deterministic
-   * ordering in SQL (CRC32-based), not an in-memory shuffle of the full peer list.
+   * When present, focus-context sampling (inbound wiki references and folder siblings) uses this
+   * seed for deterministic SQL ordering (CRC32-based), not an in-memory shuffle of full candidate
+   * lists.
    */
   public Optional<Long> getSampleSeed() {
     return Optional.ofNullable(sampleSeed);

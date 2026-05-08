@@ -9,7 +9,6 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,9 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,17 +70,25 @@ public class FocusContextRetrievalService {
 
     Integer focusId = hydrated.getId();
 
-    Random rng = config.getSampleSeed().map(Random::new).orElse(null);
-
     List<String> outgoingLinkUris =
         wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(hydrated, viewer).stream()
             .map(FocusContextWikiUri::of)
             .toList();
+    Set<Integer> focusInboundExclude = new HashSet<>();
+    if (focusId != null) {
+      focusInboundExclude.add(focusId);
+    }
     List<String> inboundRefUris =
-        sampleAndCapUris(
-            wikiTitleCacheService.referencesNotesForViewer(hydrated, viewer),
-            FocusContextConstants.FOCUS_INBOUND_URI_CAP,
-            rng);
+        wikiTitleCacheService
+            .sampledReferencesNotesForFocusContext(
+                hydrated,
+                viewer,
+                focusInboundExclude,
+                FocusContextConstants.FOCUS_INBOUND_URI_CAP,
+                config.getSampleSeed())
+            .stream()
+            .map(FocusContextWikiUri::of)
+            .toList();
     int focusContentTokens = ApproximateUtf8TokenBudget.estimateApproxTokens(focusDetails);
     int relatedTotalBudget = Math.max(0, combinedContentBudget - focusContentTokens);
     boolean includeFolderPeers =
@@ -168,7 +173,23 @@ public class FocusContextRetrievalService {
 
         List<Note> outgoing =
             wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(parent, viewer);
-        List<Note> inbound = wikiTitleCacheService.referencesNotesForViewer(parent, viewer);
+
+        Set<Integer> inboundExclude = new HashSet<>();
+        if (focusId != null) {
+          inboundExclude.add(focusId);
+        }
+        for (Note o : outgoing) {
+          if (o.getId() != null) {
+            inboundExclude.add(o.getId());
+          }
+        }
+        List<Note> sampledInbound =
+            wikiTitleCacheService.sampledReferencesNotesForFocusContext(
+                parent,
+                viewer,
+                inboundExclude,
+                FocusContextConstants.sampleCapAtGraphDepth(depth),
+                config.getSampleSeed());
 
         for (Note target : outgoing) {
           if (target.getId() == null || target.getId().equals(focusId)) {
@@ -180,19 +201,6 @@ public class FocusContextRetrievalService {
                   target.getId(), depth, childPath, FocusContextEdgeType.OutgoingWikiLink));
         }
 
-        List<Note> sampledInbound =
-            sampleAndCap(
-                inbound.stream()
-                    .filter(
-                        t ->
-                            t.getId() != null
-                                && !t.getId().equals(focusId)
-                                && outgoing.stream()
-                                    .noneMatch(
-                                        o -> o.getId() != null && o.getId().equals(t.getId())))
-                    .collect(Collectors.toList()),
-                FocusContextConstants.sampleCapAtGraphDepth(depth),
-                rng);
         for (Note target : sampledInbound) {
           List<String> childPath = appendWikiUri(parentPath, target);
           proposals.add(
@@ -392,22 +400,4 @@ public class FocusContextRetrievalService {
 
   private record Proposal(
       int noteId, int depth, List<String> retrievalPath, FocusContextEdgeType edgeType) {}
-
-  private static <T> List<T> sampleAndCap(List<T> candidates, int cap, Random rng) {
-    if (cap <= 0 || candidates.isEmpty()) {
-      return List.of();
-    }
-    if (rng != null && candidates.size() > cap) {
-      List<T> mutable = new ArrayList<>(candidates);
-      Collections.shuffle(mutable, rng);
-      return List.copyOf(mutable.subList(0, cap));
-    }
-    return candidates.size() <= cap
-        ? List.copyOf(candidates)
-        : List.copyOf(candidates.subList(0, cap));
-  }
-
-  private static List<String> sampleAndCapUris(List<Note> notes, int cap, Random rng) {
-    return sampleAndCap(notes, cap, rng).stream().map(FocusContextWikiUri::of).toList();
-  }
 }
