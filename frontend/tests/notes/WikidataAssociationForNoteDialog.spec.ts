@@ -224,24 +224,6 @@ describe("WikidataAssociationForNoteDialog", () => {
       )
     })
 
-    it("shows error when updateWikidataId fails", async () => {
-      const note = makeMe.aNote.title("dog").please()
-      const wikidata = makeMe.aWikidataEntity.wikidataTitle("dog").please()
-      fetchWikidataEntitySpy.mockResolvedValue(wrapSdkResponse(wikidata))
-      const error = { wikidataId: "Duplicate Wikidata ID Detected." }
-      updateWikidataIdSpy.mockResolvedValue(wrapSdkError({ errors: error }))
-
-      const wrapper = await inputWikidataIdAndSave(note, wikidataId)
-      await flushPromises()
-
-      expect(updateWikidataIdSpy).toHaveBeenCalledTimes(1)
-      expect(wrapper.emitted("closeDialog")).toBeFalsy()
-      const errorMessage = getModal()?.querySelector(".daisy-text-error")
-      expect(errorMessage?.textContent).toContain(
-        "Duplicate Wikidata ID Detected."
-      )
-    })
-
     it("searches using note title as searchKey", async () => {
       const note = makeMe.aNote.title("dog").please()
       const searchResult = makeMe.aWikidataSearchEntity

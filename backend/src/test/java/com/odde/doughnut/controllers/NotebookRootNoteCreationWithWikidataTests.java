@@ -185,27 +185,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       assertThat(response.getNote().getWikidataId(), equalTo(null));
     }
 
-    @Test
-    void shouldThrowWhenCreatingNoteWithWikidataIdExistsInAnotherNote() {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("DupW").please();
-      String conflictingWikidataId = "Q123";
-      makeMe
-          .aNote()
-          .creatorAndOwner(currentUser.getUser())
-          .inNotebook(notebook)
-          .folder(folder)
-          .wikidataId(conflictingWikidataId)
-          .please();
-      noteCreation.setFolderId(folder.getId());
-      noteCreation.setWikidataId(conflictingWikidataId);
-      BindException bindException =
-          assertThrows(
-              BindException.class,
-              () -> notebookController.createNoteAtNotebookRoot(notebook, noteCreation));
-      assertThat(
-          bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
-    }
-
     @Nested
     class AddingNoteWithLocationWikidataId {
       String wikidataIdOfALocation = "Q334";

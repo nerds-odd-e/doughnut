@@ -431,7 +431,6 @@ class NoteControllerTests extends ControllerTestBase {
   class UpdateWikidataId {
     Note note;
     Note parent;
-    String noteWikidataId = "Q1234";
 
     @BeforeEach
     void setup() {
@@ -448,25 +447,6 @@ class NoteControllerTests extends ControllerTestBase {
       controller.updateWikidataId(note, wikidataAssociationCreation);
       Note sameNote = noteRepository.findById(note.getId()).get();
       assertThat(sameNote.getWikidataId(), equalTo("Q123"));
-    }
-
-    @Test
-    void shouldNotUpdateWikidataIdIfParentNoteSameWikidataId() {
-      makeMe
-          .aNote()
-          .creator(currentUser.getUser())
-          .inNotebook(parent.getNotebook())
-          .wikidataId(noteWikidataId)
-          .please();
-
-      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
-      wikidataAssociationCreation.wikidataId = noteWikidataId;
-      BindException bindException =
-          assertThrows(
-              BindException.class,
-              () -> controller.updateWikidataId(note, wikidataAssociationCreation));
-      assertThat(
-          bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
     }
 
     @Test

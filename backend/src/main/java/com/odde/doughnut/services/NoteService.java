@@ -15,7 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -154,16 +153,6 @@ public class NoteService {
   private boolean sameTimestamp(Timestamp a, Timestamp b) {
     if (a == null || b == null) return a == b;
     return Math.abs(a.getTime() - b.getTime()) < 1000;
-  }
-
-  public boolean hasDuplicateWikidataId(Note note) {
-    if (Strings.isEmpty(note.getWikidataId())) {
-      return false;
-    }
-    List<Note> existingNotes =
-        noteRepository.noteWithWikidataIdWithinNotebook(
-            note.getNotebook().getId(), note.getWikidataId());
-    return (existingNotes.stream().anyMatch(n -> !n.equals(note)));
   }
 
   public NoteAccessory updateNoteAccessories(

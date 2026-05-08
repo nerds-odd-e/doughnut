@@ -107,14 +107,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
-              + " WHERE n.notebook.id = :notebookId "
-              + " AND n.wikidataId = :wikidataId AND n.wikidataId IS NOT NULL AND n.deletedAt IS NULL ")
-  List<Note> noteWithWikidataIdWithinNotebook(
-      @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
-
-  @Query(
-      value =
-          selectFromNote
               + " WHERE n.notebook.ownership.user.id = :userId"
               + " AND n.deletedAt IS NULL"
               + " ORDER BY n.updatedAt DESC"

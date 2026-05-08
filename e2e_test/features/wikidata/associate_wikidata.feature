@@ -33,16 +33,3 @@ Feature: associate wikidata ID to note
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different label "Count von Count"
     And the Wiki association of note "Count von Count" should link to "https://en.wikipedia.org/wiki/Count_von_Count"
-
-
-  @usingMockedWikidataService @mockBrowserTime
-  Scenario: Associate a new note with exisitng wikidata id
-    Given I have a notebook "Wildlife deck" with notes:
-      | Title            | Wikidata Id|
-      | Animals | |
-      | Dog              | Q123       |
-      | Canine           | Q456       |
-    And Wikidata search result always has "Canine" with ID "Q11399"
-    And Wikidata.org has an entity "Q123" with label "Canine"
-    And I change the note "Canine" to associate with wikidata id "Q123"
-    Then I should see an error "Duplicate Wikidata ID Detected." on Wikidata Id in association

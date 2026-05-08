@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.server.ResponseStatusException;
@@ -136,7 +135,7 @@ class NotebookController {
   public NoteRealm createNoteAtNotebookRoot(
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NoteCreationDTO noteCreation)
-      throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
+      throws UnexpectedNoAccessRightException, InterruptedException, IOException {
     authorizationService.assertAuthorization(notebook);
     User user = authorizationService.getCurrentUser();
     return noteConstructionService.createRootNoteWithWikidataService(

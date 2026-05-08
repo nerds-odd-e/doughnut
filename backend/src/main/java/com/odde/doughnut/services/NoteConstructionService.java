@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
-import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.PointExtractionResult;
@@ -24,9 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -36,7 +32,6 @@ public class NoteConstructionService {
   private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
-  private final NoteService noteService;
   private final NoteRealmService noteRealmService;
 
   @Autowired
@@ -46,14 +41,12 @@ public class NoteConstructionService {
       NoteRepository noteRepository,
       FolderRepository folderRepository,
       EntityPersister entityPersister,
-      NoteService noteService,
       NoteRealmService noteRealmService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
-    this.noteService = noteService;
     this.noteRealmService = noteRealmService;
   }
 
@@ -90,19 +83,13 @@ public class NoteConstructionService {
   }
 
   private Note attachWikidataAndRefresh(Note note, WikidataIdWithApi wikidataIdWithApi)
-      throws DuplicateWikidataIdException, IOException, InterruptedException {
+      throws IOException, InterruptedException {
     if (wikidataIdWithApi != null) {
-      wikidataIdWithApi.associateNoteToWikidata(note, noteService);
+      wikidataIdWithApi.associateNoteToWikidata(note);
     }
     entityPersister.flush();
     entityPersister.refresh(note);
     return note;
-  }
-
-  private BindException duplicateWikidataBinding(NoteCreationDTO noteCreation) {
-    BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
-    bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
-    return new BindException(bindingResult);
   }
 
   public NoteRealm createRootNoteWithWikidataService(
@@ -110,7 +97,7 @@ public class NoteConstructionService {
       NoteCreationDTO noteCreation,
       User user,
       WikidataIdWithApi wikidataIdWithApi)
-      throws InterruptedException, IOException, BindException {
+      throws InterruptedException, IOException {
     Folder folder = null;
     if (noteCreation.getFolderId() != null) {
       folder =
@@ -122,14 +109,10 @@ public class NoteConstructionService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder not in notebook.");
       }
     }
-    try {
-      Note note =
-          createNoteInNotebookScopeWithoutWikidata(notebook, folder, noteCreation.getNewTitle());
-      note = attachWikidataAndRefresh(note, wikidataIdWithApi);
-      return noteRealmService.build(note, user);
-    } catch (DuplicateWikidataIdException e) {
-      throw duplicateWikidataBinding(noteCreation);
-    }
+    Note note =
+        createNoteInNotebookScopeWithoutWikidata(notebook, folder, noteCreation.getNewTitle());
+    note = attachWikidataAndRefresh(note, wikidataIdWithApi);
+    return noteRealmService.build(note, user);
   }
 
   private void throwIfSoftDeletedTitleBlocks(Notebook notebook, Folder folderOrNull, String title) {

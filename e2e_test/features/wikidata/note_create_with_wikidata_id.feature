@@ -28,12 +28,3 @@ Feature: Nested Note Create with wikidata
     And I select wikidataID "Q11399" from the Wikidata search result
     Then I should see that the Title becomes "Dog"
     Then I should see that the Wikidata Id becomes "Q11399"
-
-  @usingMockedWikidataService @mockBrowserTime
-  Scenario: Create a new note with duplicate wikidata id within the same notebook
-    Given I have a notebook "Stargazing" with notes:
-      | Title | Wikidata Id | Folder |
-      | Star | | |
-      | Sun   | Q123        | Star   |
-    When I attempt to create a note belonging to "Star" with title "Solar" and wikidata id "Q123"
-    Then I should see an error "Duplicate Wikidata ID Detected." on Wikidata Id in note creation

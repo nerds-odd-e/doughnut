@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -76,15 +75,7 @@ class NoteController {
     if (wikidataIdWithApi == null) {
       note.setWikidataId(null);
     } else {
-      try {
-        wikidataIdWithApi.associateNoteToWikidata(note, noteService);
-      } catch (DuplicateWikidataIdException e) {
-        BindingResult bindingResult =
-            new BeanPropertyBindingResult(
-                wikidataAssociationCreation, "wikidataAssociationCreation");
-        bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
-        throw new BindException(bindingResult);
-      }
+      wikidataIdWithApi.associateNoteToWikidata(note);
     }
     entityPersister.save(note);
     return noteRealmService.build(note, authorizationService.getCurrentUser());

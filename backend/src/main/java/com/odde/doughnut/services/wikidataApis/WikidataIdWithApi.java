@@ -2,8 +2,6 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.odde.doughnut.controllers.dto.WikidataEntityData;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
-import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
 import java.util.Objects;
@@ -44,12 +42,8 @@ public final class WikidataIdWithApi {
     model.map(entity -> entity.wikidataDescription(wikidataApi)).ifPresent(note::prependContent);
   }
 
-  public void associateNoteToWikidata(Note note, NoteService noteService)
-      throws IOException, InterruptedException, DuplicateWikidataIdException {
+  public void associateNoteToWikidata(Note note) throws IOException, InterruptedException {
     note.setWikidataId(this.wikidataId);
-    if (noteService.hasDuplicateWikidataId(note)) {
-      throw new DuplicateWikidataIdException();
-    }
     extractWikidataInfoToNote(note);
   }
 
