@@ -60,7 +60,13 @@ describe("WikidataAssociationForNoteDialog", () => {
     return wrapper
   }
 
-  const getModal = () => document.querySelector(".modal-container")
+  /** Dialog may render inside Modal (`.modal-container`) or as body-only (`no-modal` → `.modal-body`). */
+  const getModal = () => {
+    const form = document.querySelector("#wikidata-association-form")
+    const root =
+      form?.closest(".modal-container") ?? form?.closest(".modal-body")
+    return root as HTMLElement | null
+  }
   const getInput = () =>
     getModal()?.querySelector(
       'input[id="wikidataID-wikidataID"]'
