@@ -114,6 +114,18 @@ class ConversationMessageControllerTest extends ControllerTestBase {
   class GetConversationDetails {
 
     @Test
+    void shouldReturnUnauthorizedWhenNotLoggedIn() {
+      Conversation conversation = makeMe.aConversation().please();
+      currentUser.setUser(null);
+
+      ResponseStatusException exception =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.getConversationMessages(conversation));
+      assertThat(exception.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(401));
+    }
+
+    @Test
     void shouldNotBeAbleToSeeAConversationIAmNotIn() {
       Conversation conversation = makeMe.aConversation().please();
       assertThrows(

@@ -44,6 +44,7 @@ public class AuthorizationService {
 
   private void assertAuthorizationConversation(User user, Conversation obj)
       throws UnexpectedNoAccessRightException {
+    assertLoggedIn(user);
     if (!obj.getSubjectOwnership().ownsBy(user) && !obj.getConversationInitiator().equals(user)) {
       throw new UnexpectedNoAccessRightException();
     }
