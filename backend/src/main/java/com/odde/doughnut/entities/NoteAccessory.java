@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.persistence.*;
 import java.io.IOException;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -34,8 +35,26 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "image_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
-  @Setter
   private Image imageAttachment;
+
+  public void setImageAttachment(Image image) {
+    Image previous = this.imageAttachment;
+    this.imageAttachment = image;
+    if (previous != null && previous != image) {
+      clearImageNoteIfOwnedByThisAccessory(previous);
+    }
+    if (image != null) {
+      image.setNote(getNote());
+    }
+  }
+
+  private void clearImageNoteIfOwnedByThisAccessory(Image previous) {
+    Note accessoryNote = getNote();
+    if (accessoryNote == null || previous.getNote() == null) return;
+    if (Objects.equals(accessoryNote.getId(), previous.getNote().getId())) {
+      previous.setNote(null);
+    }
+  }
 
   @JsonIgnore
   public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {

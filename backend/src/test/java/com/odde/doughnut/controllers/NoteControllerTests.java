@@ -276,6 +276,8 @@ class NoteControllerTests extends ControllerTestBase {
       noteAccessoriesDTO.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
+      assertThat(
+          note.getNoteAccessory().getImageAttachment().getNote().getId(), equalTo(note.getId()));
       note.getNoteAccessory().getImageAttachment().getBlob().getData();
     }
 
