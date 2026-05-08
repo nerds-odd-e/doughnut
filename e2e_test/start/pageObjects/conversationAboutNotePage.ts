@@ -52,6 +52,7 @@ export class ConversationAboutNotePage {
   }
 
   exportConversation() {
+    cy.get('.status-bar').should('not.exist')
     cy.findByRole('button', { name: 'Export conversation' }).click()
     return this
   }
