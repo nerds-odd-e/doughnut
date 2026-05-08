@@ -4,18 +4,11 @@
       <div
         class="path-name-editor-join-editor daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-l-lg"
       >
-        <h2 class="path-name-heading path-name-heading--inline">
-          <SeamlessTextEditor
-            :model-value="modelValue"
-            :readonly="readonly"
-            :placeholder="placeholder"
-            :aria-label="hideLabel ? undefined : labelText"
-            :role="editorRole"
-            :data-test="editorDataTest"
-            @update:model-value="onModelUpdate"
-            @blur="emit('blur')"
-          />
-        </h2>
+        <div class="daisy-w-full daisy-min-w-0">
+          <slot name="title" :bindings="seamlessBindings" :editor="SeamlessTextEditor">
+            <SeamlessTextEditor v-bind="seamlessBindings" />
+          </slot>
+        </div>
       </div>
       <div
         class="path-name-editor-join-append daisy-join-item daisy-flex daisy-shrink-0 daisy-self-stretch daisy-items-stretch"
@@ -24,18 +17,9 @@
       </div>
     </div>
 
-    <h2 v-else class="path-name-heading">
-      <SeamlessTextEditor
-        :model-value="modelValue"
-        :readonly="readonly"
-        :placeholder="placeholder"
-        :aria-label="hideLabel ? undefined : labelText"
-        :role="editorRole"
-        :data-test="editorDataTest"
-        @update:model-value="onModelUpdate"
-        @blur="emit('blur')"
-      />
-    </h2>
+    <slot v-else name="title" :bindings="seamlessBindings" :editor="SeamlessTextEditor">
+      <SeamlessTextEditor v-bind="seamlessBindings" />
+    </slot>
 
     <div v-if="errorMessage" class="daisy-text-error daisy-text-sm">
       {{ errorMessage }}
@@ -147,6 +131,17 @@ function onModelUpdate(raw: string) {
   emit("update:modelValue", value)
 }
 
+const seamlessBindings = computed(() => ({
+  modelValue: props.modelValue,
+  readonly: props.readonly,
+  placeholder: props.placeholder,
+  ariaLabel: props.hideLabel ? undefined : props.labelText,
+  role: props.editorRole,
+  "data-test": props.editorDataTest,
+  "onUpdate:modelValue": onModelUpdate,
+  onBlur: () => emit("blur"),
+}))
+
 function focusEditorAndMaybeSelectAll() {
   const el = root.value?.querySelector<HTMLElement>(".seamless-editor")
   el?.focus()
@@ -167,17 +162,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-h2.path-name-heading {
-  font-size: 1.5rem;
-  font-weight: 400;
-  margin-bottom: 10px;
-}
-
-h2.path-name-heading--inline {
-  margin-bottom: 0;
-  width: 100%;
-}
-
 .path-name-editor-join-append :deep(button) {
   height: 100%;
   min-height: 2.75rem;

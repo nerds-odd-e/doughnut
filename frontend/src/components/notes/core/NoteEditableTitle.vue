@@ -11,7 +11,13 @@
         hide-label
         @update:model-value="update(noteTopology.id, $event)"
         @blur="blur"
-      />
+      >
+        <template #title="{ bindings, editor }">
+          <h2 class="path-name-heading">
+            <component :is="editor" v-bind="bindings" />
+          </h2>
+        </template>
+      </PathNameEditor>
     </template>
   </TextContentWrapper>
 </template>
@@ -27,3 +33,12 @@ defineProps({
   readonly: { type: Boolean, default: true },
 })
 </script>
+
+<style scoped>
+h2.path-name-heading {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  width: 100%;
+}
+</style>
