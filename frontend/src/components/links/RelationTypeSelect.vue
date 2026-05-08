@@ -22,15 +22,26 @@
     :for="customInputId"
   >
     <span class="daisy-font-medium">Custom relationship</span>
-    <input
-      :id="customInputId"
-      v-model="customText"
-      type="text"
-      class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
-      autocomplete="off"
-      @blur="emitCustomCommitted"
-      @keydown.enter.prevent="emitCustomCommitted"
-    />
+    <div class="daisy-join daisy-join-horizontal daisy-w-full">
+      <input
+        :id="customInputId"
+        v-model="customText"
+        type="text"
+        class="daisy-input daisy-input-bordered daisy-input-sm daisy-join-item daisy-min-w-0 daisy-flex-1"
+        autocomplete="off"
+        @keydown.enter.prevent="emitCustomCommitted"
+      />
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-join-item daisy-shrink-0"
+        title="Apply custom relationship"
+        aria-label="Apply custom relationship"
+        @mousedown.prevent
+        @click="emitCustomCommitted"
+      >
+        <CornerDownLeft class="daisy-w-4 daisy-h-4" />
+      </button>
+    </div>
   </label>
 </template>
 
@@ -41,6 +52,7 @@ import {
   relationTypeOptions,
   type RelationTypeLabel,
 } from "../../models/relationTypeOptions"
+import { CornerDownLeft } from "lucide-vue-next"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 

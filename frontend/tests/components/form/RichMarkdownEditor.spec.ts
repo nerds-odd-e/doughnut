@@ -509,7 +509,7 @@ Body line`
 
       const field = rt.find('input[type="text"].daisy-input-bordered')
       await field.setValue("novel connector phrase")
-      await field.trigger("blur")
+      await field.trigger("keydown", { key: "Enter" })
       await flushPromises()
 
       const emitted = wrapper.emitted("update:modelValue")
