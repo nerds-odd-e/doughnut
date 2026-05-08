@@ -1,40 +1,42 @@
 <template>
-  <Overlay class="modal-mask daisy-text-base-content">
-    <div
-      class="modal-wrapper"
-      :class="{ 'modal-wrapper--align-top': alignTop }"
-      @mousedown.self="$emit('close_request')"
+  <Teleport to="body">
+    <dialog
+      ref="dialogRef"
+      class="modal-mask daisy-text-base-content"
+      :class="{ 'modal-align-top': alignTop }"
+      @cancel.prevent
     >
-        <div
-          :class="[
-            sidebarStyle,
-            'daisy-bg-base-200',
-            { 'modal-panel--no-close': !showCloseButton },
-          ]"
+    <div class="modal-panel-wrapper" @mousedown.self="$emit('close_request')">
+      <div
+        :class="[
+          sidebarStyle,
+          'daisy-bg-base-200',
+          { 'modal-panel--no-close': !showCloseButton },
+        ]"
+      >
+        <button
+          v-if="showCloseButton"
+          class="close-button"
+          @click="$emit('close_request')"
         >
-          <button
-            v-if="showCloseButton"
-            class="close-button"
-            @click="$emit('close_request')"
-          >
-            <X class="daisy-w-6 daisy-h-6" />
-          </button>
+          <X class="daisy-w-6 daisy-h-6" />
+        </button>
 
-          <div class="modal-header" v-if="$slots.header">
-            <slot name="header" />
-          </div>
+        <div v-if="$slots.header" class="modal-header">
+          <slot name="header" />
+        </div>
 
-          <div class="modal-body">
-            <slot name="body" />
-          </div>
+        <div class="modal-body">
+          <slot name="body" />
         </div>
       </div>
-  </Overlay>
+    </div>
+  </dialog>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, onUnmounted } from "vue"
-import Overlay from "./Overlay.vue"
+import { ref, computed, watch, onMounted, onUnmounted } from "vue"
 import { X } from "lucide-vue-next"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
@@ -56,6 +58,8 @@ const emit = defineEmits<{
   close_request: []
 }>()
 
+const dialogRef = ref<HTMLDialogElement | null>(null)
+
 // Computed
 const sidebarStyle = computed(() => {
   if (props.sidebar === "left") return "modal-sidebar modal-left"
@@ -72,9 +76,14 @@ watch(
   }
 )
 
-// ESC key: register with modal stack so only topmost modal closes
+// Open as modal and register ESC handler for non-popup modals
 let unregister: (() => void) | undefined
 onMounted(() => {
+  try {
+    dialogRef.value?.showModal()
+  } catch {
+    // Dialog not connected to document (e.g. Teleport stubbed in tests)
+  }
   if (!props.isPopup) {
     unregister = registerModal(() => emit("close_request"))
   }
@@ -86,12 +95,27 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.modal-wrapper {
+dialog.modal-mask {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  display: table;
+  transition: opacity 0.3s ease;
+}
+
+.modal-panel-wrapper {
   display: table-cell;
   vertical-align: middle;
 }
 
-.modal-wrapper--align-top {
+dialog.modal-align-top .modal-panel-wrapper {
   vertical-align: top;
   padding-top: max(env(safe-area-inset-top, 0px), 20px);
 }
@@ -163,5 +187,12 @@ onUnmounted(() => {
   height: 26px;
   border: none;
   background: none;
+}
+</style>
+
+<style lang="scss">
+dialog.modal-mask::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
 }
 </style>

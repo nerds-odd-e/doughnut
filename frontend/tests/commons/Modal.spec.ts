@@ -65,13 +65,10 @@ describe("Modal", () => {
       global: { plugins: [router] },
       attachTo: document.body,
     })
-    await vi.waitUntil(
-      () => document.querySelector(".modal-wrapper--align-top"),
-      {
-        timeout: 1000,
-      }
-    )
-    expect(document.querySelector(".modal-wrapper--align-top")).toBeTruthy()
+    await vi.waitUntil(() => document.querySelector("dialog.modal-align-top"), {
+      timeout: 1000,
+    })
+    expect(document.querySelector("dialog.modal-align-top")).toBeTruthy()
   })
 
   it("closes when close button is clicked", async () => {
@@ -99,7 +96,7 @@ describe("Modal", () => {
       global: { plugins: [router] },
       attachTo: document.body,
     })
-    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
+    await vi.waitUntil(() => document.querySelector("dialog"), {
       timeout: 1000,
     })
     expect(document.querySelector(".close-button")).toBeNull()
@@ -109,7 +106,7 @@ describe("Modal", () => {
 
   it("closes when ESC is pressed", async () => {
     wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
+    await vi.waitUntil(() => document.querySelector("dialog"), {
       timeout: 1000,
     })
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
@@ -118,12 +115,14 @@ describe("Modal", () => {
 
   it("closes when modal backdrop is clicked", async () => {
     wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), {
+    await vi.waitUntil(() => document.querySelector(".modal-panel-wrapper"), {
       timeout: 1000,
     })
-    const modalWrapper = document.querySelector(".modal-wrapper") as HTMLElement
-    expect(modalWrapper).toBeTruthy()
-    modalWrapper.dispatchEvent(
+    const panelWrapper = document.querySelector(
+      ".modal-panel-wrapper"
+    ) as HTMLElement
+    expect(panelWrapper).toBeTruthy()
+    panelWrapper.dispatchEvent(
       new MouseEvent("mousedown", { bubbles: true, cancelable: true })
     )
     expect(wrapper.emitted().close_request).toHaveLength(1)
@@ -165,10 +164,9 @@ describe("Modal", () => {
       attachTo: document.body,
     })
 
-    await vi.waitUntil(
-      () => document.querySelectorAll(".modal-wrapper").length === 2,
-      { timeout: 1000 }
-    )
+    await vi.waitUntil(() => document.querySelectorAll("dialog").length === 2, {
+      timeout: 1000,
+    })
 
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
     await wrapper.vm.$nextTick()

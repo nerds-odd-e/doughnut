@@ -63,7 +63,7 @@ describe("PopButton", () => {
     for (let i = 0; i < 10; i++) {
       await flushPromises()
       await wrapper.vm.$nextTick()
-      modalInBody = document.body.querySelector(".modal-wrapper")
+      modalInBody = document.body.querySelector("dialog")
       if (modalInBody) break
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(undefined))
@@ -114,7 +114,7 @@ describe("PopButton", () => {
     for (let i = 0; i < 20; i++) {
       await flushPromises()
       await wrapper.vm.$nextTick()
-      modalInBody = document.body.querySelector(".modal-wrapper")
+      modalInBody = document.body.querySelector("dialog")
       if (modalInBody) break
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(undefined))
