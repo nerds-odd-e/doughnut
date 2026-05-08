@@ -1,6 +1,7 @@
 <template>
   <WikidataAssociationDialog
     ref="dialogRef"
+    no-modal
     :search-key="note.noteTopology.title"
     :model-value="localWikidataId"
     :saved-value="note.wikidataId ?? ''"

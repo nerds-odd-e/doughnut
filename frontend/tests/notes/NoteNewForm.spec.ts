@@ -1,5 +1,6 @@
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
+import WikidataAssociationDialogBody from "@/components/notes/WikidataAssociationDialogBody.vue"
 import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
@@ -337,13 +338,13 @@ describe("adding new note", () => {
     const selectFromDropdown = async (wikidataId: string) => {
       await flushPromises()
 
-      // Find the WikidataAssociationDialog component
       const dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
       expect(dialogComponent.exists()).toBe(true)
+      const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
+      expect(bodyComponent.exists()).toBe(true)
 
-      // Call the selection method directly on the component
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = dialogComponent.vm as any
+      const vm = bodyComponent.vm as any
       expect(vm.searchResults).toBeDefined()
       expect(vm.searchResults.length).toBeGreaterThan(0)
 
@@ -358,7 +359,7 @@ describe("adding new note", () => {
       const newLabel = selected.label.toUpperCase()
 
       if (currentLabel === newLabel) {
-        dialogComponent.vm.$emit("selected", selected)
+        bodyComponent.vm.$emit("selected", selected)
       } else {
         vm.showTitleOptions = true
       }
@@ -372,10 +373,9 @@ describe("adding new note", () => {
 
       await flushPromises()
 
-      // Find the WikidataAssociationDialog component
-      const dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
+      const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = dialogComponent.vm as any
+      const vm = bodyComponent.vm as any
 
       // Set the title action and trigger the handler
       vm.titleAction = action
@@ -390,7 +390,7 @@ describe("adding new note", () => {
       }
       const actionValue = actionValueMap[action]
 
-      dialogComponent.vm.$emit("selected", vm.selectedItem, actionValue)
+      bodyComponent.vm.$emit("selected", vm.selectedItem, actionValue)
       await flushPromises()
     }
 
