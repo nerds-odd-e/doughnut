@@ -33,7 +33,7 @@ INNER JOIN (
           -- image: resolved attachment path wins over image_url
           IF(
             `img`.`id` IS NOT NULL,
-            CONCAT('image: /attachments/images/', `img`.`id`, '/', `img`.`name`, CHAR(10)),
+            CONCAT('image: /attachments/images/', `img`.`id`, '/', `img`.`name` COLLATE utf8mb4_unicode_ci, CHAR(10)),
             IF(
               `na`.`image_url` IS NOT NULL AND TRIM(`na`.`image_url`) <> '',
               CONCAT('image: ', TRIM(`na`.`image_url`), CHAR(10)),
@@ -48,11 +48,11 @@ INNER JOIN (
           ),
           -- wikidata_id from note
           IF(
-            `n2`.`wikidata_id` IS NOT NULL AND TRIM(`n2`.`wikidata_id`) <> '',
-            CONCAT('wikidata_id: ', TRIM(`n2`.`wikidata_id`), CHAR(10)),
+            `n2`.`wikidata_id` IS NOT NULL AND TRIM(`n2`.`wikidata_id`) COLLATE utf8mb4_unicode_ci <> '',
+            CONCAT('wikidata_id: ', TRIM(`n2`.`wikidata_id`) COLLATE utf8mb4_unicode_ci, CHAR(10)),
             ''
           )
-        ) AS `yaml_addition`,
+        ) COLLATE utf8mb4_unicode_ci AS `yaml_addition`,
         COALESCE(`n2`.`content`, '') AS `raw`,
         IF(
           LENGTH(COALESCE(`n2`.`content`, '')) >= 3
@@ -73,11 +73,11 @@ INNER JOIN (
             OR (`na`.`image_mask` IS NOT NULL AND TRIM(`na`.`image_mask`) <> '')
           )
         )
-        OR (`n2`.`wikidata_id` IS NOT NULL AND TRIM(`n2`.`wikidata_id`) <> '')
+        OR (`n2`.`wikidata_id` IS NOT NULL AND TRIM(`n2`.`wikidata_id`) COLLATE utf8mb4_unicode_ci <> '')
     ) `t`
   ) `x`
   -- Exclude rows where yaml_addition ended up empty (all values were blank).
-  WHERE `x`.`yaml_addition` <> ''
+  WHERE `x`.`yaml_addition` COLLATE utf8mb4_unicode_ci <> ''
 ) `m` ON `m`.`note_id` = `n`.`id`
 SET `n`.`content` = CASE
   -- No leading frontmatter: first line is not exactly `---`. Prepend a fresh
