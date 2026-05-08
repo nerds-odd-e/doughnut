@@ -81,7 +81,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ---
 
-## Phase 3 — Single source of truth for the always-loaded prompt (planned)
+## Phase 3 — Single source of truth for the always-loaded prompt (done)
 
 **Type:** Behavior. **Why next:** Every agent turn currently pays for the union of `CLAUDE.md` (80 lines), `general.mdc` (27 lines, `alwaysApply: true`), `planning.mdc` (91 lines, `alwaysApply: true`), and `agent-map.md` (53 lines). The Nix command prefix, `pnpm sut` assumptions, and lint commands are repeated across all four. This phase removes duplication on the per-turn hot path.
 
@@ -101,9 +101,11 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 **Risks:** Losing material that one rule had and another did not. Mitigation: do the trim by extraction (move, don't delete), and review every line that disappears against `git diff`.
 
+**Implementation notes:** `agent-map.md` is now the canonical hot-path home for environment, service assumptions, focused commands, generated API lookup, and log inspection. `CLAUDE.md` and `general.mdc` are short pointers with only unique baseline guidance. `planning.mdc` keeps the always-loaded phase invariants; the detailed testing strategy, observable-behavior guidance, test-driven workflow, and examples moved into the on-demand `phased-planning` skill. Frontend and E2E rules now point to `linting_formating.mdc` for lint and format commands.
+
 ---
 
-## Phase 4 — Split `frontend.mdc` (546 lines) into capability-scoped rule files (planned)
+## Phase 4 — Split `frontend.mdc` (532 lines) into capability-scoped rule files (planned)
 
 **Type:** Behavior. **Why next:** Today, editing any `*.vue` (even a CSS tweak) attaches all 546 lines, including Storybook setup and API integration prose. This phase makes the per-edit cost match the per-edit scope.
 
@@ -125,7 +127,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ## Phase 5 — Same treatment for backend and e2e rules (planned)
 
-**Type:** Behavior. **Why after Phase 4:** the frontend split is the biggest single win; this phase applies the proven pattern to the next two largest rule files (`backend-development.mdc` 212 lines, `e2e_test.mdc` 281 lines).
+**Type:** Behavior. **Why after Phase 4:** the frontend split is the biggest single win; this phase applies the proven pattern to the next two largest rule files (`backend-development.mdc` 212 lines, `e2e_test.mdc` 266 lines).
 
 **Concrete artifacts:**
 - `backend-code.mdc` — code style, controller return-value guidance, import rules. Globs: `backend/src/main/**/*.java`.

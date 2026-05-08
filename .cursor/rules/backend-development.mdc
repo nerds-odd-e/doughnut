@@ -40,7 +40,7 @@ The **`docs/database-erd.md`** Mermaid diagram documents tables, foreign keys, a
 1. **Focus on Behavior, Not Implementation**
    - Tests verify system behavior through pre/post state transitions
    - Tests should be resilient to internal code structure changes
-   - Prefer **controllers (or other stable boundaries)** over tests that only target internal helpers with **caller-specific parameters** no user sees — the controller test may **never import** the service you changed; same idea as **Observable behavior first** in `.cursor/rules/planning.mdc`
+   - Prefer **controllers (or other stable boundaries)** over tests that only target internal helpers with **caller-specific parameters** no user sees — the controller test may **never import** the service you changed; same idea as **Observable behavior first** in the `phased-planning` skill.
    - Example from RestNoteControllerTests.java:
    ```java
    @Test

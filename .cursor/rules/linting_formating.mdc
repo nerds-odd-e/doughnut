@@ -27,6 +27,8 @@ This project uses multiple linting tools to ensure code quality:
 
 ## Running Linting
 
+Run commands from the repo root through Nix.
+
 ### Lint All Code
 
 ```bash
@@ -52,8 +54,8 @@ This runs:
 
 ## Format vs Lint
 
-- **Use `pnpm format:all`** during development - it fixes formatting and catches most issues
-- **Use `pnpm lint:all`** for CI/CD validation - it checks without fixing
+- **Use `CURSOR_DEV=true nix develop -c pnpm format:all`** during development - it fixes formatting and catches most issues
+- **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation - it checks without fixing
 
 ## OpenAPI Linting
 

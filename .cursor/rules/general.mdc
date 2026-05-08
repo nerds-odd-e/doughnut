@@ -5,23 +5,10 @@ alwaysApply: true
 
 # General Development Rules
 
-Start with `.cursor/agent-map.md` when you need repo navigation, common paths, or focused commands.
-
-## Commands and Services
-
-- This project uses Nix. Prefix repo commands with `CURSOR_DEV=true nix develop -c`, for example `CURSOR_DEV=true nix develop -c pnpm frontend:test`.
+- Start with `.cursor/agent-map.md` for navigation, focused commands, service assumptions, generated API guidance, and log inspection.
 - For Cursor Cloud VM without Nix, use the `cloud-vm-setup` skill.
-- Assume the developer has already started services with `pnpm sut`.
-- If service state matters, run `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`. If not OK, use `CURSOR_DEV=true nix develop -c pnpm sut:restart` or `CURSOR_DEV=true nix develop -c pnpm sut`.
-- Do not tell developers to restart `pnpm sut` after normal code changes. Backend and frontend auto-reload.
-- Run only relevant Cypress feature files with `cypress run --spec ...`; do not run the full E2E suite unless explicitly asked.
 - When deleting files, prefer `trash` from the Nix environment instead of `rm -f` or `rm -rf`.
-
-Detailed MySQL, Redis, direnv, and troubleshooting notes live in `CLAUDE.md`; read them only when working on environment setup or service failures.
-
-## Development Preferences
-
 - Keep high cohesion: minimize duplication, keep one representation for each concept, and place related code together.
-- Keep changes simple. Do not add defensive layers unless they are required by observed behavior.
-- Name permanent artifacts by product capability, not development history. Phase numbers and planning vocabulary belong only in `ongoing/` plans.
-- Do not add historical documentation or comments about past implementations. Code readers care about the current state.
+- Keep changes simple. Do not add defensive layers unless observed behavior requires them.
+- Name permanent artifacts by product capability, not development history.
+- Do not add comments or docs about past implementations; code readers care about the current state.

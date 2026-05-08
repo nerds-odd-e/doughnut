@@ -252,21 +252,7 @@ A scenario describes **one fixed path**. Prefer **dumb** automation: the path is
 
 ## Linting Errors and E2E Tests
 
-**IMPORTANT**: The frontend Vite configuration has `overlay: false` set in the checker plugin to prevent linting/type errors from blocking e2e tests with overlay warnings.
-
-- **For AI Agents**: If you see linting or type errors in the terminal output during e2e tests, they won't block the tests but MUST be fixed before completing your task.
-- **For Developers**: Linting and type errors still appear in the terminal where `pnpm sut` is running, but won't show as overlays in the browser.
-- **Clean up requirement**: Always run `pnpm format:all` and fix any remaining linting errors before considering a task complete.
-
-To check for linting errors:
-```bash
-CURSOR_DEV=true nix develop -c pnpm lint:all
-```
-
-To fix formatting issues:
-```bash
-CURSOR_DEV=true nix develop -c pnpm format:all
-```
+The frontend Vite checker has `overlay: false` so linting/type errors do not block E2E with browser overlays, but terminal errors still matter. For canonical lint and format commands, use `.cursor/rules/linting_formating.mdc`.
 
 ## Common Pitfalls to Avoid
 
