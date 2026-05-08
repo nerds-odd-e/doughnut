@@ -11,4 +11,6 @@ public class NoteCreationDTO extends NoteUpdateTitleDTO {
   public String wikidataId;
 
   @Getter @Setter private Integer folderId;
+
+  @Getter @Setter private String content;
 }

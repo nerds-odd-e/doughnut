@@ -50,6 +50,22 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
+    void persistsInitialMarkdownContentWhenProvided() throws Exception {
+      NotebookCreationRequest createNb = new NotebookCreationRequest();
+      createNb.setNewTitle("NB With Initial Body");
+      NotebookClientView redirect = controller.createNotebook(createNb);
+      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
+      noteCreation.setNewTitle("Root With Body");
+      noteCreation.setContent("# Hello\n\n[[Link]]");
+      NoteRealm result = controller.createNoteAtNotebookRoot(nb, noteCreation);
+
+      Note created = noteRepository.findById(result.getId()).orElseThrow();
+      assertThat(created.getContent(), equalTo("# Hello\n\n[[Link]]"));
+    }
+
+    @Test
     void rejectsNotebookOwnedByAnotherUser() throws Exception {
       User owner = makeMe.aUser().please();
       currentUser.setUser(owner);

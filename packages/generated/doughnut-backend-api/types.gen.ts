@@ -382,6 +382,7 @@ export type NoteCreationDto = {
     newTitle: string;
     wikidataId?: string;
     folderId?: number;
+    content?: string;
 };
 
 /**

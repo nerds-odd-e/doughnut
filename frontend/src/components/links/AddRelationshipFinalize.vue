@@ -139,17 +139,15 @@ const relationTypeSelected = async (relationType: string | undefined) => {
       relationshipNotebookId: notebookId,
     })
 
-    const created = await api.createRootNoteAtNotebook(
+    await api.createRootNoteAtNotebook(
       router,
       notebookId,
-      { newTitle: metaTitle, wikidataId: "" },
+      { newTitle: metaTitle, wikidataId: "", content: markdown },
       {
         folderId: folderId ?? undefined,
         skipRouterReplace: true,
       }
     )
-
-    await api.setNoteContentWithoutUndo(created.id, markdown)
     await api.loadNoteRealm(props.note.id)
 
     emit("success")

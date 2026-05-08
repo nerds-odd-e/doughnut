@@ -33,6 +33,7 @@ public class NoteConstructionService {
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
   private final NoteRealmService noteRealmService;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
   @Autowired
   public NoteConstructionService(
@@ -41,13 +42,15 @@ public class NoteConstructionService {
       NoteRepository noteRepository,
       FolderRepository folderRepository,
       EntityPersister entityPersister,
-      NoteRealmService noteRealmService) {
+      NoteRealmService noteRealmService,
+      WikiTitleCacheService wikiTitleCacheService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
     this.noteRealmService = noteRealmService;
+    this.wikiTitleCacheService = wikiTitleCacheService;
   }
 
   private Note createNoteInNotebookScopeWithoutWikidata(
@@ -111,7 +114,16 @@ public class NoteConstructionService {
     }
     Note note =
         createNoteInNotebookScopeWithoutWikidata(notebook, folder, noteCreation.getNewTitle());
+    if (noteCreation.getContent() != null) {
+      Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
+      note.setContent(noteCreation.getContent());
+      note.setUpdatedAt(ts);
+      entityPersister.save(note);
+    }
     note = attachWikidataAndRefresh(note, wikidataIdWithApi);
+    if (noteCreation.getContent() != null || wikidataIdWithApi != null) {
+      wikiTitleCacheService.refreshForNote(note, user);
+    }
     return noteRealmService.build(note, user);
   }
 

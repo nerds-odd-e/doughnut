@@ -3607,6 +3607,8 @@ components:
         folderId:
           type: integer
           format: int32
+        content:
+          type: string
       required:
       - newTitle
     BlockDepthSuggestion:
