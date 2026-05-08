@@ -19,6 +19,7 @@ erDiagram
     image ||--o{ note_accessory : "image_id"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id"
     "note" ||--o{ conversation : "note_id"
+    "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
     "note" ||--o{ note_accessory : "note_id"
     "note" ||--o{ note_wiki_title_cache : "note_id"
@@ -115,6 +116,7 @@ erDiagram
         int id PK
         int user_id FK
         int attachment_blob_id FK
+        int note_id FK
     }
     memory_tracker {
         int id PK
