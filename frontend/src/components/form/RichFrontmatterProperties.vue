@@ -36,7 +36,7 @@
             relationLabelFromKebab(row.value)
           }}</template>
           <span
-            v-else-if="isWikidataIdPropertyRow(row)"
+            v-else-if="isWikidataIdPropertyKey(row.key)"
             class="daisy-inline-flex daisy-min-w-0 daisy-max-w-full daisy-items-center daisy-gap-1"
           >
             <span class="daisy-truncate daisy-font-mono">{{
@@ -49,7 +49,7 @@
             />
           </span>
           <span
-            v-else-if="isUrlPropertyRow(row)"
+            v-else-if="isUrlPropertyKey(row.key)"
             class="daisy-inline-flex daisy-min-w-0 daisy-max-w-full daisy-items-center daisy-gap-1"
           >
             <span class="daisy-truncate">{{ row.value }}</span>
@@ -110,7 +110,7 @@
           @update:model-value="onRelationTypeSelected(idx, $event)"
         />
         <div
-          v-else-if="isWikidataIdPropertyRow(propertyRows[idx]!)"
+          v-else-if="isWikidataIdPropertyKey(propertyRows[idx]!.key)"
           class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
           :class="
             propertyRows[idx]!.value.trim()
@@ -125,7 +125,7 @@
               :title="propertyRows[idx]!.value.trim()"
               data-testid="rich-note-wikidata-property-edit"
               :aria-label="`Edit Wikidata ID ${propertyRows[idx]!.value.trim()}`"
-              @click="openWikidataDialogForRow(idx)"
+              @click="openWikidataDialog({ type: 'row', idx })"
             >
               {{ propertyRows[idx]!.value.trim() }}
             </button>
@@ -144,7 +144,7 @@
               class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
               data-testid="rich-note-wikidata-property-edit"
               aria-label="Set Wikidata ID"
-              @click="openWikidataDialogForRow(idx)"
+              @click="openWikidataDialog({ type: 'row', idx })"
             >
               Set…
             </button>
@@ -154,14 +154,14 @@
           v-else
           class="daisy-min-w-0"
           :class="
-            isUrlPropertyRow(propertyRows[idx]!)
+            isUrlPropertyKey(propertyRows[idx]!.key)
               ? 'daisy-flex daisy-items-center daisy-gap-2'
               : ''
           "
         >
           <div
             :class="
-              isUrlPropertyRow(propertyRows[idx]!)
+              isUrlPropertyKey(propertyRows[idx]!.key)
                 ? 'daisy-min-w-0 daisy-flex-1'
                 : ''
             "
@@ -178,7 +178,7 @@
           </div>
           <RichFrontmatterPropertyExternalLink
             v-if="
-              isUrlPropertyRow(propertyRows[idx]!) &&
+              isUrlPropertyKey(propertyRows[idx]!.key) &&
               propertyRows[idx]!.value.trim()
             "
             kind="url"
@@ -269,7 +269,7 @@
               type="button"
               class="daisy-btn daisy-btn-sm daisy-btn-outline"
               data-testid="rich-note-wikidata-property-insert-edit"
-              @click="openWikidataDialogForInsert"
+              @click="openWikidataDialog({ type: 'insert' })"
             >
               Set…
             </button>
@@ -416,16 +416,11 @@ function onKeyPresetWrapperFocusOut(
 ) {
   const root = event.currentTarget as HTMLElement | null
   const next = event.relatedTarget as Node | null
-  if (root && next && root.contains(next)) return
-  if (kind === "row" && idx !== undefined) {
-    if (presetPanel.value?.kind === "row" && presetPanel.value.idx === idx) {
-      presetPanel.value = null
-    }
-    return
-  }
-  if (kind === "insert" && presetPanel.value?.kind === "insert") {
-    presetPanel.value = null
-  }
+  if (root?.contains(next)) return
+  const p = presetPanel.value
+  if (!p || p.kind !== kind) return
+  if (p.kind === "row" && p.idx !== idx) return
+  presetPanel.value = null
 }
 
 function selectPresetForRow(idx: number, key: string) {
@@ -520,14 +515,6 @@ watch(
   { immediate: true }
 )
 
-function isWikidataIdPropertyRow(row: PropertyRow): boolean {
-  return isWikidataIdPropertyKey(row.key)
-}
-
-function isUrlPropertyRow(row: PropertyRow): boolean {
-  return isUrlPropertyKey(row.key)
-}
-
 function isRelationPropertyRow(row: PropertyRow): boolean {
   return row.key.trim().toLowerCase() === "relation"
 }
@@ -543,10 +530,9 @@ function onRelationTypeSelected(idx: number, newType: string | undefined) {
   if (!row || !isRelationPropertyRow(row)) return
   const nextKebab = relationKebabFromLabel(newType)
   if (row.value.trim().toLowerCase() === nextKebab.toLowerCase()) return
-  const kebab = nextKebab
   const rows = propertyRows.value.map((r, i) =>
     i === idx
-      ? { key: r.key.trim(), value: kebab }
+      ? { key: r.key.trim(), value: nextKebab }
       : { key: r.key.trim(), value: r.value.trim() }
   )
   propertyRows.value = rows
@@ -671,16 +657,12 @@ async function addWikiLinkProperty(wikiLinkText: string) {
   })
 }
 
-function openWikidataDialogForRow(idx: number) {
-  wikidataEditContext.value = { type: "row", idx }
-  wikidataSavedSnapshot.value = propertyRows.value[idx]?.value.trim() ?? ""
-  wikidataIdError.value = undefined
-  wikidataDialogOpen.value = true
-}
-
-function openWikidataDialogForInsert() {
-  wikidataEditContext.value = { type: "insert" }
-  wikidataSavedSnapshot.value = draftValue.value.trim()
+function openWikidataDialog(ctx: WikidataEditContext) {
+  wikidataEditContext.value = ctx
+  wikidataSavedSnapshot.value =
+    ctx.type === "row"
+      ? (propertyRows.value[ctx.idx]?.value.trim() ?? "")
+      : draftValue.value.trim()
   wikidataIdError.value = undefined
   wikidataDialogOpen.value = true
 }
