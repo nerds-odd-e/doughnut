@@ -285,10 +285,6 @@ export type SpellingVerificationResult = {
     correct?: boolean;
 };
 
-export type WikidataAssociationCreation = {
-    wikidataId: string;
-};
-
 export type SearchTerm = {
     searchKey: string;
     allMyNotebooksAndSubscriptions?: boolean;
@@ -1600,24 +1596,6 @@ export type VerifySpellingResponses = {
 };
 
 export type VerifySpellingResponse = VerifySpellingResponses[keyof VerifySpellingResponses];
-
-export type UpdateWikidataIdData = {
-    body: WikidataAssociationCreation;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/updateWikidataId';
-};
-
-export type UpdateWikidataIdResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type UpdateWikidataIdResponse = UpdateWikidataIdResponses[keyof UpdateWikidataIdResponses];
 
 export type SemanticSearchWithinData = {
     body: SearchTerm;

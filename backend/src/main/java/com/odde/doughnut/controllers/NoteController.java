@@ -8,12 +8,10 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
-import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +31,6 @@ import org.springframework.web.context.annotation.SessionScope;
 class NoteController {
 
   private final EntityPersister entityPersister;
-  private final WikidataService wikidataService;
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
   private final UserService userService;
@@ -44,7 +41,6 @@ class NoteController {
 
   public NoteController(
       EntityPersister entityPersister,
-      WikidataService wikidataService,
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService,
@@ -53,7 +49,6 @@ class NoteController {
       TestabilitySettings testabilitySettings,
       NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
-    this.wikidataService = wikidataService;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
     this.userService = userService;
@@ -61,24 +56,6 @@ class NoteController {
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
-  }
-
-  @PostMapping(value = "/{note}/updateWikidataId")
-  @Transactional
-  public NoteRealm updateWikidataId(
-      @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
-      throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
-    authorizationService.assertAuthorization(note);
-    WikidataIdWithApi wikidataIdWithApi =
-        wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
-    if (wikidataIdWithApi == null) {
-      note.setWikidataId(null);
-    } else {
-      wikidataIdWithApi.associateNoteToWikidata(note);
-    }
-    entityPersister.save(note);
-    return noteRealmService.build(note, authorizationService.getCurrentUser());
   }
 
   @GetMapping("/{note}")

@@ -186,6 +186,12 @@ export function composeNoteContentMarkdown(input: {
 /** One key/value row for rich property editing (order matches sorted keys). */
 export type PropertyRow = { key: string; value: string }
 
+/** Rich-mode property key for Wikidata Q-id (YAML may use `wikidata_id` or `wikidataId`). */
+export function isWikidataIdPropertyKey(key: string): boolean {
+  const t = key.trim().toLowerCase()
+  return t === "wikidata_id" || t === "wikidataid"
+}
+
 /** Maps parsed scalar properties into sorted rows for stable UI state. */
 export function sortedPropertyRowsFromRecord(
   properties: Record<string, string>

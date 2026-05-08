@@ -6,7 +6,6 @@ import type {
   NoteContentCompletion,
   NoteRealm,
   NotebookFolderIndexRow,
-  WikidataAssociationCreation,
 } from "@generated/doughnut-backend-api"
 import type { NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
@@ -97,11 +96,6 @@ export interface StoredApi {
   /** PATCH note content with current stored body so the backend rebuilds wiki title cache. */
   refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void>
 
-  updateWikidataId(
-    noteId: Doughnut.ID,
-    data: WikidataAssociationCreation
-  ): Promise<NoteRealm>
-
   undo(router: Router): Promise<NoteRealm | undefined>
 
   deleteNote(
@@ -182,36 +176,6 @@ export default class StoredApiCollection implements StoredApi {
       throw new Error(toErrorMessage(error, "Failed to update note content"))
     }
     return data
-  }
-
-  async updateWikidataId(
-    noteId: Doughnut.ID,
-    data: WikidataAssociationCreation
-  ): Promise<NoteRealm> {
-    const { data: noteRealm, error } = await apiCallWithLoading(() =>
-      NoteController.updateWikidataId({
-        path: { note: noteId },
-        body: data,
-      })
-    )
-    if (error || !noteRealm) {
-      const apiError = new Error("Failed to update Wikidata ID") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to update Wikidata ID"
-        if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
-    }
-    return this.storage.refreshNoteRealm(noteRealm)
   }
 
   private async loadNote(noteId: Doughnut.ID) {

@@ -32,7 +32,13 @@
       <template v-for="row in propertyRows" :key="row.key">
         <dt class="daisy-font-medium daisy-text-base-content/80">{{ row.key }}</dt>
         <dd class="daisy-m-0">
-          {{ isRelationPropertyRow(row) ? relationLabelFromKebab(row.value) : row.value }}
+          {{
+            isRelationPropertyRow(row)
+              ? relationLabelFromKebab(row.value)
+              : isWikidataIdPropertyRow(row)
+                ? row.value.trim() || "—"
+                : row.value
+          }}
         </dd>
       </template>
     </dl>
@@ -67,6 +73,23 @@
           :inverse-icon="true"
           @update:model-value="onRelationTypeSelected(idx, $event)"
         />
+        <div
+          v-else-if="isWikidataIdPropertyRow(propertyRows[idx]!)"
+          class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2 daisy-justify-between"
+        >
+          <span
+            class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
+            :title="propertyRows[idx]!.value.trim()"
+          >{{ propertyRows[idx]!.value.trim() || "—" }}</span>
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
+            data-testid="rich-note-wikidata-property-edit"
+            @click="openWikidataDialogForRow(idx)"
+          >
+            Set…
+          </button>
+        </div>
         <WikiPropertyValueField
           v-else
           v-model="propertyRows[idx]!.value"
@@ -132,7 +155,22 @@
         </label>
         <label class="daisy-form-control daisy-w-full sm:daisy-flex-1 daisy-min-w-[8rem]">
           <span class="daisy-label daisy-text-xs">Property value</span>
+          <div
+            v-if="isWikidataIdPropertyKey(draftKey)"
+            class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
+          >
+            <span class="daisy-font-mono daisy-text-sm">{{ draftValue.trim() || "—" }}</span>
+            <button
+              type="button"
+              class="daisy-btn daisy-btn-sm daisy-btn-outline"
+              data-testid="rich-note-wikidata-property-insert-edit"
+              @click="openWikidataDialogForInsert"
+            >
+              Set…
+            </button>
+          </div>
           <WikiPropertyValueField
+            v-else
             ref="valueInputRef"
             v-model="draftValue"
             :wiki-titles="wikiTitles"
@@ -145,6 +183,20 @@
       </div>
     </div>
   </section>
+  <WikidataAssociationDialog
+    v-if="wikidataDialogOpen"
+    ref="wikidataAssociationDialogRef"
+    :search-key="wikidataSearchKeyForDialog"
+    :model-value="wikidataDialogModelValue"
+    :saved-value="wikidataSavedSnapshot"
+    :error-message="wikidataIdError"
+    :show-save-button="true"
+    :can-save-empty-to-clear="wikidataDialogCanSaveEmptyToClear"
+    :disabled="wikidataProcessing"
+    @close="closeWikidataDialog"
+    @save="handleWikidataSave"
+    @selected="handleWikidataSelected"
+  />
 </template>
 
 <script setup lang="ts">
@@ -152,7 +204,16 @@ import { Minus, Plus } from "lucide-vue-next"
 import { computed, nextTick, ref, useId, watch } from "vue"
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
+import type {
+  WikiTitle,
+  WikidataSearchEntity,
+} from "@generated/doughnut-backend-api"
+import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
+import {} from "@/managedApi/clientSetup"
+import { toOpenApiError } from "@/managedApi/openApiError"
+import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   isKnownRelationKebab,
   relationKebabFromLabel,
@@ -160,6 +221,7 @@ import {
   relationTypeFromKebab,
 } from "@/models/relationTypeOptions"
 import {
+  isWikidataIdPropertyKey,
   parseNoteContentMarkdown,
   removePropertyRowAt,
   sortedPropertyRowsFromRecord,
@@ -172,7 +234,13 @@ const props = defineProps<{
   /** When true, properties list is display-only and insert chrome is hidden. */
   readOnly?: boolean
   wikiTitles: WikiTitle[]
+  /** Note title for Wikidata search / title comparison when editing `wikidata_id`. */
+  noteTitleForWikidataSearch?: string
+  /** When set, Wikidata title replace/append updates the note title via the content API. */
+  noteId?: number
 }>()
+
+const storageAccessor = useStorageAccessor()
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
@@ -197,6 +265,43 @@ const valueInputRef = ref<InstanceType<typeof WikiPropertyValueField> | null>(
 const validationMessage = ref("")
 const rowSnapshots = ref<Record<number, PropertyRow>>({})
 
+type WikidataEditContext = { type: "row"; idx: number } | { type: "insert" }
+
+const wikidataDialogOpen = ref(false)
+const wikidataEditContext = ref<WikidataEditContext | null>(null)
+const wikidataIdError = ref<string | undefined>()
+const wikidataProcessing = ref(false)
+const wikidataSavedSnapshot = ref("")
+const wikidataAssociationDialogRef = ref<InstanceType<
+  typeof WikidataAssociationDialog
+> | null>(null)
+
+const wikidataSearchKeyForDialog = computed(
+  () => props.noteTitleForWikidataSearch ?? ""
+)
+
+const wikidataDialogModelValue = computed(() => {
+  const c = wikidataEditContext.value
+  if (!c) return ""
+  if (c.type === "row") return propertyRows.value[c.idx]?.value ?? ""
+  return draftValue.value
+})
+
+const wikidataDialogCanSaveEmptyToClear = computed(() => {
+  const c = wikidataEditContext.value
+  if (!c) return false
+  if (c.type === "row") return !!propertyRows.value[c.idx]?.value.trim()
+  return !!draftValue.value.trim()
+})
+
+const showTitleOptionsInDialog = computed(() => {
+  const d = wikidataAssociationDialogRef.value as
+    | { showTitleOptions?: boolean }
+    | null
+    | undefined
+  return d?.showTitleOptions ?? false
+})
+
 watch(
   () => props.contentMarkdown,
   () => {
@@ -211,9 +316,17 @@ watch(
     draftValue.value = ""
     validationMessage.value = ""
     rowSnapshots.value = {}
+    wikidataDialogOpen.value = false
+    wikidataEditContext.value = null
+    wikidataIdError.value = undefined
+    wikidataProcessing.value = false
   },
   { immediate: true }
 )
+
+function isWikidataIdPropertyRow(row: PropertyRow): boolean {
+  return isWikidataIdPropertyKey(row.key)
+}
 
 function isRelationPropertyRow(row: PropertyRow): boolean {
   return row.key.trim().toLowerCase() === "relation"
@@ -348,6 +461,165 @@ async function addWikiLinkProperty(wikiLinkText: string) {
     ) as HTMLInputElement | null
     el?.focus()
   })
+}
+
+function openWikidataDialogForRow(idx: number) {
+  wikidataEditContext.value = { type: "row", idx }
+  wikidataSavedSnapshot.value = propertyRows.value[idx]?.value.trim() ?? ""
+  wikidataIdError.value = undefined
+  wikidataDialogOpen.value = true
+}
+
+function openWikidataDialogForInsert() {
+  wikidataEditContext.value = { type: "insert" }
+  wikidataSavedSnapshot.value = draftValue.value.trim()
+  wikidataIdError.value = undefined
+  wikidataDialogOpen.value = true
+}
+
+function closeWikidataDialog() {
+  wikidataDialogOpen.value = false
+  wikidataEditContext.value = null
+  wikidataIdError.value = undefined
+  wikidataProcessing.value = false
+}
+
+function applyWikidataIdToRow(idx: number, wikidataId: string) {
+  const rows = propertyRows.value.map((r, i) =>
+    i === idx
+      ? { key: r.key.trim(), value: wikidataId }
+      : { key: r.key.trim(), value: r.value.trim() }
+  )
+  propertyRows.value = rows
+  const result = validatePropertyRowsForRichEdit(propertyRows.value)
+  if (!result.ok) {
+    validationMessage.value = result.message
+    wikidataIdError.value = result.message
+    return
+  }
+  validationMessage.value = ""
+  wikidataIdError.value = undefined
+  emits("properties-changed", [...propertyRows.value])
+  closeWikidataDialog()
+}
+
+function commitInsertWithWikidataValue(trimmed: string) {
+  const key = draftKey.value.trim()
+  if (!key || !trimmed) return
+  if (propertyRows.value.some((r) => r.key.trim() === key)) {
+    wikidataIdError.value = "Duplicate property keys are not allowed."
+    return
+  }
+  const nextRows = rowsAfterAdding({ key, value: trimmed })
+  const result = validatePropertyRowsForRichEdit(nextRows)
+  if (!result.ok) {
+    validationMessage.value = result.message
+    wikidataIdError.value = result.message
+    return
+  }
+  validationMessage.value = ""
+  wikidataIdError.value = undefined
+  emits("properties-changed", nextRows)
+  closeWikidataDialog()
+}
+
+async function applyWikidataIdAndClose(wikidataId: string) {
+  const ctx = wikidataEditContext.value
+  if (!ctx) return
+  const trimmed = wikidataId.trim()
+  if (ctx.type === "row") {
+    applyWikidataIdToRow(ctx.idx, trimmed)
+    return
+  }
+  draftValue.value = trimmed
+  if (!trimmed) {
+    closeWikidataDialog()
+    return
+  }
+  commitInsertWithWikidataValue(trimmed)
+}
+
+async function persistWikidataIdViaValidation(wikidataId: string) {
+  if (wikidataId.trim() === "") {
+    await applyWikidataIdAndClose("")
+    wikidataProcessing.value = false
+    return
+  }
+  wikidataProcessing.value = true
+  wikidataIdError.value = undefined
+  try {
+    const { data: entityData, error } =
+      await WikidataController.fetchWikidataEntityDataById({
+        path: { wikidataId: wikidataId.trim() },
+      })
+    if (error) {
+      wikidataIdError.value =
+        toOpenApiError(error).message || "Invalid Wikidata ID"
+      wikidataProcessing.value = false
+      return
+    }
+    const noteTitleUpper = wikidataSearchKeyForDialog.value.trim().toUpperCase()
+    const wikidataTitleUpper = entityData!.WikidataTitleInEnglish.toUpperCase()
+    if (
+      wikidataTitleUpper === noteTitleUpper ||
+      entityData!.WikidataTitleInEnglish === ""
+    ) {
+      await applyWikidataIdAndClose(wikidataId)
+      wikidataProcessing.value = false
+      return
+    }
+    wikidataProcessing.value = false
+    const entity: WikidataSearchEntity = {
+      id: wikidataId.trim(),
+      label: entityData!.WikidataTitleInEnglish,
+      description: "",
+    }
+    wikidataAssociationDialogRef.value?.showTitleOptionsForEntity(entity)
+  } catch (e: unknown) {
+    wikidataIdError.value =
+      toOpenApiError(e).message || "An unknown error occurred"
+    wikidataProcessing.value = false
+  }
+}
+
+async function handleWikidataSave(wikidataId: string) {
+  if (wikidataProcessing.value) return
+  if (wikidataId.trim() === "") {
+    await persistWikidataIdViaValidation("")
+    return
+  }
+  if (showTitleOptionsInDialog.value) {
+    await applyWikidataIdAndClose(wikidataId)
+    wikidataProcessing.value = false
+    return
+  }
+  await persistWikidataIdViaValidation(wikidataId)
+}
+
+async function handleWikidataSelected(
+  entity: WikidataSearchEntity,
+  titleAction?: "replace" | "append"
+) {
+  if (!entity.id || wikidataProcessing.value) return
+  wikidataProcessing.value = true
+  wikidataIdError.value = undefined
+  try {
+    if (titleAction && props.noteId != null) {
+      const currentTitle = wikidataSearchKeyForDialog.value.trim()
+      if (currentTitle) {
+        const newTitle = calculateNewTitle(currentTitle, entity, titleAction)
+        await storageAccessor.value
+          .storedApi()
+          .updateTextField(props.noteId, "edit title", newTitle)
+      }
+    }
+    await applyWikidataIdAndClose(entity.id)
+  } catch (e: unknown) {
+    wikidataIdError.value =
+      toOpenApiError(e).message || "An unknown error occurred"
+  } finally {
+    wikidataProcessing.value = false
+  }
 }
 
 defineExpose({

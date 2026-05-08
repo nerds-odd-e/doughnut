@@ -741,30 +741,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SpellingVerificationResult"
-  /api/notes/{note}/updateWikidataId:
-    post:
-      tags:
-      - note-controller
-      operationId: updateWikidataId
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WikidataAssociationCreation"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/semantic-search:
     post:
       tags:
@@ -3457,13 +3433,6 @@ components:
       properties:
         correct:
           type: boolean
-    WikidataAssociationCreation:
-      type: object
-      properties:
-        wikidataId:
-          type: string
-      required:
-      - wikidataId
     SearchTerm:
       type: object
       properties:

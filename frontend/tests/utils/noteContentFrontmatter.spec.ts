@@ -4,6 +4,7 @@ import {
   composeNoteContentMarkdown,
   contentHasRelationProperty,
   insertPropertyRowAt,
+  isWikidataIdPropertyKey,
   parseNoteContentMarkdown,
   propertyRecordHasRelationKey,
   removePropertyRowAt,
@@ -305,5 +306,21 @@ describe("validatePropertyRowsForRichEdit", () => {
     if (!r.ok) {
       expect(r.message).toContain("Duplicate")
     }
+  })
+})
+
+describe("isWikidataIdPropertyKey", () => {
+  it("matches wikidata_id with varied casing and spacing", () => {
+    expect(isWikidataIdPropertyKey("wikidata_id")).toBe(true)
+    expect(isWikidataIdPropertyKey("  WikiData_ID ")).toBe(true)
+  })
+
+  it("matches camelCase wikidataId from YAML", () => {
+    expect(isWikidataIdPropertyKey("wikidataId")).toBe(true)
+  })
+
+  it("does not match unrelated keys", () => {
+    expect(isWikidataIdPropertyKey("relation")).toBe(false)
+    expect(isWikidataIdPropertyKey("wikidata")).toBe(false)
   })
 })

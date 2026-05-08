@@ -281,11 +281,18 @@ export const assumeNotePage = (
             'have.value',
             key
           )
-          cy.get('[data-testid="rich-note-property-row-value-input"]').should(
-            ($el) => {
-              expect($el.text().trim()).to.eq(value)
-            }
-          )
+          const keyNorm = key.trim().toLowerCase()
+          const isWikidata =
+            keyNorm === 'wikidata_id' || keyNorm === 'wikidataid'
+          if (isWikidata) {
+            cy.contains('.daisy-font-mono', value).should('exist')
+          } else {
+            cy.get('[data-testid="rich-note-property-row-value-input"]').should(
+              ($el) => {
+                expect($el.text().trim()).to.eq(value)
+              }
+            )
+          }
         })
       })
       return this
@@ -404,7 +411,25 @@ export const assumeNotePage = (
     },
 
     associateWikidataDialog() {
-      toolbarButton('associate wikidata').click()
+      this.switchToRichContent()
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.root().then(($region) => {
+          const editBtn = $region.find(
+            '[data-testid="rich-note-wikidata-property-edit"]'
+          )
+          if (editBtn.length > 0) {
+            cy.wrap(editBtn.first()).click()
+          } else {
+            cy.findByRole('button', { name: 'Add property' }).click()
+            cy.findByTestId('rich-note-property-key')
+              .clear()
+              .type('wikidata_id')
+            cy.findByTestId('rich-note-wikidata-property-insert-edit').click()
+          }
+        })
+      })
       return assumeAssociateWikidataDialog()
     },
     openAssimilationSettings() {

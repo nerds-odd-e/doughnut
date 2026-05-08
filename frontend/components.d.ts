@@ -227,7 +227,6 @@ declare module 'vue' {
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
-    WikidataAssociationForNoteDialog: typeof import('./src/components/notes/WikidataAssociationForNoteDialog.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
     WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
   }
@@ -450,7 +449,6 @@ declare global {
   const Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
   const WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
   const WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
-  const WikidataAssociationForNoteDialog: typeof import('./src/components/notes/WikidataAssociationForNoteDialog.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   const WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
 }

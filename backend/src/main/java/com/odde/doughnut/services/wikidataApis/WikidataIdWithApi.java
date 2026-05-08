@@ -43,7 +43,6 @@ public final class WikidataIdWithApi {
   }
 
   public void associateNoteToWikidata(Note note) throws IOException, InterruptedException {
-    note.setWikidataId(this.wikidataId);
     extractWikidataInfoToNote(note);
   }
 

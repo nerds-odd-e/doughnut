@@ -86,7 +86,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Note Controller
 
 - `verifySpelling`: POST `/api/notes/{note}/verify-spelling` -> `VerifySpellingResponse` (request: `VerifySpellingData`; path: note; body: AnswerSpellingDto; response body: SpellingVerificationResult)
-- `updateWikidataId`: POST `/api/notes/{note}/updateWikidataId` -> `UpdateWikidataIdResponse` (request: `UpdateWikidataIdData`; path: note; body: WikidataAssociationCreation; response body: NoteRealm)
 - `updateNoteRecallSetting`: POST `/api/notes/{note}/recall-setting` -> `UpdateNoteRecallSettingResponse` (request: `UpdateNoteRecallSettingData`; path: note; body: NoteRecallSetting; response body: RedirectToNoteResponse)
 - `deleteNote`: POST `/api/notes/{note}/delete` -> `DeleteNoteResponse` (request: `DeleteNoteData`; path: note; response body: Array<NoteRealm>)
 - `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)

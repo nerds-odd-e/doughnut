@@ -15,6 +15,7 @@
         noteContent: note.content,
         asMarkdown,
         wikiTitles,
+        noteTitleForWikidataSearch: note.noteTopology.title,
       }"
       @dead-link-click="$emit('deadLinkClick', $event)"
     />

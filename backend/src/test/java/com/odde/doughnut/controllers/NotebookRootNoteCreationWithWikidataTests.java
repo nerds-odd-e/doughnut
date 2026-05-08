@@ -173,7 +173,8 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setContent("---\nwikidataId: Q12345\n---\n");
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      assertThat(response.getNote().getWikidataId(), equalTo("Q12345"));
+      assertThat(response.getNote().getWikidataId(), nullValue());
+      assertThat(response.getNote().getContent(), containsString("wikidataId: Q12345"));
     }
 
     @Test

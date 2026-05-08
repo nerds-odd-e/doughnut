@@ -32,18 +32,6 @@
         <MessageCircle class="daisy-w-6 daisy-h-6" />
       </a>
 
-      <PopButton v-if="!readonly" title="associate wikidata">
-        <template #button_face>
-          <SvgWikidata :class="{ 'wikidata-has-value': note.wikidataId }" />
-        </template>
-        <template #default="{ closer }">
-          <WikidataAssociationForNoteDialog
-            :note="note"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-
       <button v-if="!readonly && !asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <FileCode class="daisy-w-6 daisy-h-6" />
       </button>
@@ -94,8 +82,6 @@ import {
 } from "lucide-vue-next"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
-import SvgWikidata from "../../svgs/SvgWikidata.vue"
-import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
 import NoteMoreOptionsForm from "../accessory/NoteMoreOptionsForm.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
@@ -128,9 +114,3 @@ const noteAccessoriesUpdated = (na: NoteAccessory) => {
 }
 </script>
 
-<style scoped>
-.wikidata-has-value {
-  filter: drop-shadow(0 0 4px hsl(var(--p) / 0.6));
-  color: hsl(var(--p));
-}
-</style>

@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.validation.BindException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
@@ -424,47 +423,6 @@ class NoteControllerTests extends ControllerTestBase {
                 currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"), 0);
         assertThat(status.totalAssimilatedCount, is(2));
       }
-    }
-  }
-
-  @Nested
-  class UpdateWikidataId {
-    Note note;
-    Note parent;
-
-    @BeforeEach
-    void setup() {
-      parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      note =
-          makeMe.aNote().creator(currentUser.getUser()).inNotebook(parent.getNotebook()).please();
-    }
-
-    @Test
-    void shouldUpdateNoteWithUniqueWikidataId()
-        throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
-      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
-      wikidataAssociationCreation.wikidataId = "Q123";
-      controller.updateWikidataId(note, wikidataAssociationCreation);
-      Note sameNote = noteRepository.findById(note.getId()).get();
-      assertThat(sameNote.getWikidataId(), equalTo("Q123"));
-    }
-
-    @Test
-    void shouldClearWikidataIdWhenEmptyStringProvided()
-        throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
-      note =
-          makeMe
-              .aNote()
-              .creator(currentUser.getUser())
-              .inNotebook(parent.getNotebook())
-              .wikidataId("Q123")
-              .please();
-
-      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
-      wikidataAssociationCreation.wikidataId = "";
-      controller.updateWikidataId(note, wikidataAssociationCreation);
-      Note sameNote = noteRepository.findById(note.getId()).get();
-      assertThat(sameNote.getWikidataId(), equalTo(null));
     }
   }
 

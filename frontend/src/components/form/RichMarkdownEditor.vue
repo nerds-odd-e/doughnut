@@ -5,6 +5,8 @@
       :content-markdown="modelValue ?? ''"
       :read-only="readonly"
       :wiki-titles="wikiTitles"
+      :note-title-for-wikidata-search="noteTitleForWikidataSearch"
+      :note-id="noteId"
       @properties-changed="onPropertiesChanged"
       @dead-link-click="$emit('deadLinkClick', $event)"
     />
@@ -57,6 +59,8 @@ const props = defineProps({
   errors: Object,
   readonly: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  noteTitleForWikidataSearch: { type: String, default: "" },
+  noteId: { type: Number as PropType<number | undefined>, default: undefined },
 })
 
 const emits = defineEmits<{

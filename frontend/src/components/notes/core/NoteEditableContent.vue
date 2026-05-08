@@ -28,6 +28,8 @@
         :model-value="value"
         :readonly="readonly"
         :wiki-titles="wikiTitles"
+        :note-title-for-wikidata-search="noteTitleForWikidataSearch"
+        :note-id="noteId"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
@@ -62,6 +64,7 @@ const props = defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  noteTitleForWikidataSearch: { type: String, default: "" },
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)

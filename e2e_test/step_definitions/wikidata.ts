@@ -10,14 +10,18 @@ import { assumeAssociateWikidataDialog } from '../start/pageObjects/associateWik
 When(
   'I associate the note {string} with wikidata id {string}',
   (title: string, wikiID: string) => {
-    start.jumpToNotePage(title).associateWikidataDialog().associate(wikiID)
+    const page = start.jumpToNotePage(title)
+    page.associateWikidataDialog().associate(wikiID)
+    page.flushPendingContentSave()
   }
 )
 
 When(
   'I change the note {string} to associate with wikidata id {string}',
   (title: string, wikiID: string) => {
-    start.jumpToNotePage(title).associateWikidataDialog().associate(wikiID)
+    const page = start.jumpToNotePage(title)
+    page.associateWikidataDialog().associate(wikiID)
+    page.flushPendingContentSave()
   }
 )
 
@@ -27,6 +31,7 @@ When(
     assumeAssociateWikidataDialog().confirmAssociationWithDifferentLabel(
       wikidataTitle
     )
+    start.assumeNotePage().flushPendingContentSave()
   }
 )
 
