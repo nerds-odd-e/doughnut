@@ -1,0 +1,89 @@
+---
+description: Frontend API integration for files importing @generated/doughnut-backend-api/sdk.gen, apiCallWithLoading, wrapped responses, toOpenApiError
+alwaysApply: false
+---
+# Frontend API Rules
+
+Use this rule when frontend code imports services from `@generated/doughnut-backend-api/sdk.gen`, handles wrapped API responses, or maps backend validation errors.
+
+## API Integration
+
+- Import services directly from `@generated/doughnut-backend-api/sdk.gen`.
+- Use the wrapped response pattern: `{ data, error, request, response }`.
+- Follow the API types from generated code.
+- Use `apiCallWithLoading` for user-initiated actions that need loading indicators.
+- Wrapped calls show loading state and error toasts automatically.
+- Non-wrapped calls are silent: no loading state and no error toasts.
+
+```typescript
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+
+const { data: newUser, error } = await apiCallWithLoading(() =>
+  UserController.createUser({
+    body: formData,
+  })
+)
+
+const { data: users, error: loadError } = await UserController.getUserProfile()
+```
+
+## API Return Value Usage
+
+The global client is configured with `responseStyle: "fields"` and `throwOnError: false`, so services return a wrapped response: `{ data, error, request, response }`.
+
+```typescript
+import { getTokens } from "@generated/doughnut-backend-api/sdk.gen"
+
+const { data: tokens, error } = await getTokens()
+
+if (!error) {
+  tokens.value = tokens.map((token) => ({
+    id: token.id,
+    label: token.label,
+  }))
+}
+```
+
+Key points:
+
+1. Destructure with meaningful variable names: `const { data: updatedUser, error } = await updateUser(...)`.
+2. Check `!error` before using `data`; no separate `data` check is needed.
+3. When `error` is undefined, TypeScript guarantees `data` is the expected type.
+4. Do not add runtime property checks for required typed properties.
+5. Do not add `else if (data)` after checking `error`.
+6. Use `apiCallWithLoading` for user actions to enable error toasts and loading state.
+
+## Validation Errors
+
+When handling 400 Bad Request validation errors, use `toOpenApiError` to extract field-level errors. The `error` field in API responses is typed as `string` but can be an object at runtime after JSON parsing.
+
+```typescript
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { toOpenApiError } from "@/managedApi/openApiError"
+
+const errors = ref<Record<string, string>>({})
+
+const { data: updatedUser, error } = await apiCallWithLoading(() =>
+  UserController.updateUser({
+    path: { user: id },
+    body: formData,
+  })
+)
+
+if (error) {
+  const openApiError = toOpenApiError(error)
+  errors.value = openApiError.errors || {}
+} else {
+  errors.value = {}
+  user.value = updatedUser
+}
+```
+
+Key points:
+
+1. Use `toOpenApiError(error)` to convert the runtime error value to `OpenApiError`.
+2. `OpenApiError` shape: `{ errors?: Record<string, string>; message?: string }`.
+3. The helper safely handles both string and object errors.
+4. Extract `errors` for field-level validation errors, usually from 400 responses.
+5. `apiCallWithLoading` already shows error toasts; only extract field-level errors for form validation.

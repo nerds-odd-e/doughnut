@@ -1,0 +1,171 @@
+---
+description: Frontend Vitest browser-mode tests, Testing Library queries, mockSdkService, makeMe builders, deterministic Vue component testing
+globs: frontend/tests/**/*.ts, frontend/src/**/*.spec.ts
+alwaysApply: false
+---
+# Frontend Testing Rules
+
+Use this rule when creating or updating frontend Vitest tests. For canonical lint and format commands, use `linting_formating.mdc`.
+
+## Test Commands
+
+From the repo root:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test
+```
+
+Run tests with browser rendering UI:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test:ui
+```
+
+Run tests in browser-rendered watch mode:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test:watch
+```
+
+Run a single test file from the repo root:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts
+```
+
+Or only the frontend package:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/path/to/TestFile.spec.ts
+```
+
+Run a specific test case:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm -C frontend test -t "test name pattern"
+```
+
+The test file path is relative to `frontend/`. Do not use `pnpm ... test -- tests/...`; the `--` is forwarded to Vitest and file filtering is skipped.
+
+In most situations, run all unit tests instead of a selected file only. Use a single test file when actively debugging or iterating on a specific component.
+
+## Component Behavior
+
+- Test through user interactions.
+- Avoid testing implementation details.
+- For cross-cutting guidance about observable outcomes, high-level entry points, and avoiding 1:1 test/file mapping, use the `phased-planning` skill's Observable behavior first section.
+- Use `data-testid` for test selectors.
+- Use Vitest browser mode and prefer real browser rendering over mocking; stop using jsdom.
+
+## Avoid Role Queries
+
+- Do not use `getByRole`, `findByRole`, `queryByRole`, `getAllByRole`, and similar queries; they are slow due to expensive visibility checks.
+- Testing Library recommends role queries for accessibility, but this project prioritizes test performance.
+- Use faster alternatives: `getByText`, `getByLabelText`, `getByTitle`, or `querySelector` / `querySelectorAll`.
+
+## Mock SDK Services
+
+- Use `mockSdkService` from `@tests/helpers` for type-safe mocking.
+- It automatically wraps responses in the standard format `{ data, error, request, response }`.
+- It returns a spy that can be reconfigured in tests.
+- Use `wrapSdkResponse` when updating mock return values.
+- Use `mockSdkServiceWithImplementation` only for custom async logic based on options.
+
+```typescript
+import { mockSdkService } from "@tests/helpers"
+
+beforeEach(() => {
+  mockSdkService("getRecentNotes", [])
+  mockSdkService("showNote", makeMe.aNoteRealm.please())
+})
+```
+
+```typescript
+import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+
+const spy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+spy.mockResolvedValue(wrapSdkResponse(differentNote))
+```
+
+```typescript
+import { mockSdkServiceWithImplementation } from "@tests/helpers"
+
+mockSdkServiceWithImplementation("updateNoteContent", async (options) => {
+  return await someAsyncOperation(options)
+})
+```
+
+## Component Props
+
+- Use `helper.component(ComponentName).withStorageProps` if the component requires a `storageAccessor` prop.
+- Use `withProps` instead of `withStorageProps` if the component does not require `storageAccessor`.
+- Test prop changes and their effects.
+
+```typescript
+const wrapper = helper
+  .component(Component)
+  .withStorageProps({ value: initialValue })
+  .mount()
+
+await wrapper.setProps({ value: newValue })
+```
+
+## Data Builders
+
+- Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures`.
+- Import `doughnut-test-fixtures/makeMe` only. Do not import the bare package name or deep paths into `src/`.
+- Builders handle complex object creation.
+
+```typescript
+const note = makeMe.aNoteRealm
+  .topicConstructor("Dummy Title")
+  .content("Description")
+  .please()
+```
+
+## Browser Mode Mounting
+
+- Use `render()` from `@testing-library/vue` for most tests.
+- `render()` encourages user-perspective tests and returns fast queries such as `getByText`, `getByLabelText`, and `data-testid`.
+- Use `mount()` from `@vue/test-utils` only when you need direct access to Vue internals, emitted events, slots, or provide/inject edge cases.
+- Query the DOM, not Vue components.
+
+Prefer:
+
+```typescript
+page.getByText(/submit/i)
+screen.getByText("Loading...")
+```
+
+Avoid:
+
+```typescript
+wrapper.findComponent(MyButton)
+wrapper.find("[data-testid='my-component']")
+```
+
+## Deterministic Tests
+
+- Tests must always execute the same way.
+- Use assertions instead of if-conditions so failures are clear.
+- Use sequential async operations instead of loops where possible.
+
+Avoid:
+
+```typescript
+if (vm.searchResults) {
+  const selected = vm.searchResults.find((result) => result.id === wikidataId)
+  if (selected) {
+    // do something
+  }
+}
+```
+
+Prefer:
+
+```typescript
+expect(vm.searchResults).toBeDefined()
+expect(vm.searchResults.length).toBeGreaterThan(0)
+const selected = vm.searchResults.find((result) => result.id === wikidataId)
+expect(selected).toBeDefined()
+```

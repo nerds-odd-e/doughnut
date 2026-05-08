@@ -105,7 +105,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ---
 
-## Phase 4 — Split `frontend.mdc` (532 lines) into capability-scoped rule files (planned)
+## Phase 4 — Split `frontend.mdc` (532 lines) into capability-scoped rule files (done)
 
 **Type:** Behavior. **Why next:** Today, editing any `*.vue` (even a CSS tweak) attaches all 546 lines, including Storybook setup and API integration prose. This phase makes the per-edit cost match the per-edit scope.
 
@@ -122,6 +122,8 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 - Open a CSS-only diff in a `.vue` → only `frontend-component.mdc` attaches.
 
 **Risks:** Glob misses (e.g. component file that calls SDK). Mitigation: keep cross-references between rules small and explicit ("for API patterns see `frontend-api.mdc`").
+
+**Implementation notes:** `frontend.mdc` has been replaced by `frontend-component.mdc`, `frontend-testing.mdc`, `frontend-api.mdc`, and `frontend-storybook.mdc`. Story files match both storybook and component rules; specs match testing only; component `.vue`/`.scss` files match component only. `frontend-api.mdc` is intentionally requestable by description for files importing `@generated/doughnut-backend-api/sdk.gen` rather than attached to every Vue file, avoiding API prose on CSS-only component edits.
 
 ---
 

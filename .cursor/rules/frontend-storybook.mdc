@@ -1,0 +1,113 @@
+---
+description: Frontend Storybook stories for Vue components, story format, story variants, makeMe builders, Storybook aliases
+globs: frontend/src/**/*.stories.ts
+alwaysApply: false
+---
+# Frontend Storybook Rules
+
+Use this rule when creating or updating frontend Storybook stories. Component-level naming, styling, icon, and derived-state conventions live in `frontend-component.mdc`.
+
+## Running Storybook
+
+Start Storybook locally for component development and debugging:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm storybook
+```
+
+Storybook starts on `http://localhost:6006` by default.
+
+## Shared Test Data Builders
+
+Storybook stories reuse the same `makeMe` builders as unit tests. Source code lives in `packages/doughnut-test-fixtures`.
+
+```typescript
+import makeMe from "doughnut-test-fixtures/makeMe"
+```
+
+The `makeMe` object provides access to test data builders:
+
+- `makeMe.anAnsweredQuestion` creates recall prompts with answers.
+- `makeMe.aPredefinedQuestion` creates predefined question data.
+- `makeMe.aNote` creates note data.
+- `makeMe.aNoteRealm` creates note realm data.
+- Many other API-shaped builders are available.
+
+```typescript
+const correctQuestion = makeMe.anAnsweredQuestion
+  .answerCorrect(true)
+  .withChoiceIndex(0)
+  .please()
+
+const questionWithNote = makeMe.anAnsweredQuestion
+  .withNote(makeMe.aNote.topicConstructor("TypeScript").please())
+  .answerCorrect(true)
+  .please()
+```
+
+## Writing A Story
+
+1. Create a file named `ComponentName.stories.ts` in the same directory as the component.
+2. Import the component and necessary builders.
+3. Define the story meta and stories.
+
+```typescript
+import type { Meta, StoryObj } from "@storybook/vue3"
+import makeMe from "doughnut-test-fixtures/makeMe"
+import MyComponent from "./MyComponent.vue"
+
+const meta = {
+  title: "Category/MyComponent",
+  component: MyComponent,
+  tags: ["autodocs"],
+} satisfies Meta<typeof MyComponent>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {
+  args: {
+    prop1: makeMe.someBuilder.please(),
+  },
+}
+```
+
+## Story Variants
+
+Create multiple story variants to showcase different component states:
+
+```typescript
+export const Variant1: Story = {
+  args: {
+    // props for variant 1
+  },
+}
+
+export const Variant2: Story = {
+  args: {
+    // props for variant 2
+  },
+}
+```
+
+## Module Aliases
+
+Storybook supports the same module aliases as the main application:
+
+- `@/` points to `src/`.
+- `@tests/*` points to `tests/`, for example `@tests/helpers`.
+- `@generated/` points to `generated/`.
+
+For API-shaped fixtures, import `makeMe` from `doughnut-test-fixtures/makeMe`; do not use an `@tests/fixtures` alias.
+
+## Global Styles
+
+Storybook automatically loads global styles from `src/assets/daisyui.css`, including Tailwind CSS base styles, DaisyUI component styles, and custom application styles.
+
+## Best Practices
+
+1. Reuse builders: always use `makeMe` instead of ad-hoc mock objects that duplicate API shapes.
+2. Avoid duplication: use builders for consistency.
+3. Add multiple variants to showcase different component states.
+4. Use the `autodocs` tag to automatically generate documentation.
+5. Keep builders framework-neutral so they work in both tests and Storybook.

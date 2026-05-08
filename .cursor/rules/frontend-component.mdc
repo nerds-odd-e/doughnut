@@ -1,0 +1,90 @@
+---
+description: Vue component structure, styling, derived state, modals, icons, DaisyUI/Tailwind frontend component conventions
+globs: frontend/src/**/*.{vue,scss}, frontend/src/**/*.stories.ts
+alwaysApply: false
+---
+# Frontend Component Rules
+
+Use this rule when writing or modifying Vue components, component SCSS, or Storybook stories that need component conventions. For API call patterns see `frontend-api.mdc`; for frontend tests see `frontend-testing.mdc`.
+
+## File Organization
+
+- Frontend code lives in `frontend/src/`.
+- Test code lives in `frontend/tests/`.
+- Generated backend API code is in `frontend/src/generated/backend`.
+
+## Core Technologies
+
+- Vue 3 with TypeScript.
+- DaisyUI + Tailwind for styling, with the `daisy-` prefix.
+- Vitest for testing with Playwright browser mode.
+- Biome for linting and formatting.
+
+## Icons
+
+- Prefer Lucide for normal UI icons via `lucide-vue-next` (`import { IconName } from "lucide-vue-next"`). Import only the icons each file needs; rely on `currentColor` so icons follow text/theme color.
+- `lucide-vue-next` defaults to 24x24 via the `size` prop. Use `:size="..."` and/or `daisy-w-*`, `daisy-h-*`, or `daisy-size-*`. Never use bare `w-*` / `h-*`; Tailwind uses the `daisy-` prefix here.
+
+## Naming Conventions
+
+- Component files should use PascalCase, for example `NoteShow.vue` or `GlobalBar.vue`.
+- Test files should match component names with a `.spec.ts` suffix.
+- Use `.vue` for components and `.ts` for TypeScript files.
+
+## Component Structure
+
+```vue
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue"
+
+const props = defineProps<{
+  value: string
+}>()
+const emit = defineEmits<{
+  (e: "update:value", value: string): void
+}>()
+
+const loading = ref(false)
+const displayValue = computed(() => props.value.toUpperCase())
+
+const handleClick = () => {
+  emit("update:value", "new value")
+}
+
+onMounted(() => {
+  // ...
+})
+</script>
+
+<template>
+  <div class="daisy-component">
+    <!-- template content -->
+  </div>
+</template>
+
+<style scoped lang="scss">
+// scoped styles
+</style>
+```
+
+## Modals And Dialogs
+
+- Use `Modal` from `@/components/commons/Modal.vue` for modal overlays. It wraps a native `<dialog>` teleported to `body` and centralizes stacking, ESC, backdrop click, and route-change close. The dim background is the native `::backdrop` pseudo-element.
+- Put panel content in `#body`, optionally `#header`. Listen for `@close_request` to hide the modal, such as parent `v-if` or clearing model state. The overlay X is optional via `showCloseButton` on `Modal`.
+- Use `v-if` on `Modal` when the dialog opens, or keep `Modal` mounted and drive visibility from props; wire `close_request` and cancel buttons to the same close handler.
+- Layout variants: `alignTop` pins the panel to the top of the viewport, `sidebar="left" | "right"` renders a full-height side panel. Use `isPopup` for nested popups via `usePopups` so they do not participate in the ESC modal stack.
+- In tests, the dialog renders inside `document.body`. Query the DOM via `document.querySelector("dialog")`, `.close-button`, `.modal-container`, `.modal-sidebar`, or `.modal-mask`, not the dialog's internal layout wrapper.
+
+## Derived State
+
+- Avoid cache state in refs. Do not keep a separate `ref` or `reactive` field that mirrors props, other refs, or store data and that you update in watchers, `onUpdated`, or event handlers to stay in sync.
+- Prefer `computed` whenever a value is fully determined by reactive inputs. Computed values stay correct when dependencies change and avoid manual sync.
+- Use `ref` / `reactive` for real mutable state: user input, explicit UI toggles, or data you own and mutate.
+
+## CSS And Styling
+
+- Use DaisyUI classes with the `daisy-` prefix, for example `daisy-btn` or `daisy-alert`.
+- Avoid Bootstrap classes.
+- Choose theme-neutral colors.
+- Use scoped styles with SCSS.
+- Follow mobile-first responsive design.
