@@ -6,9 +6,9 @@
     <template #default="{ closer }">
       <FolderNewDialog
         :notebook-id="notebookId"
-        :under-note-id="underNoteId"
-        :under-folder-id="underFolderId"
-        :parent-location-description="parentLocationDescription"
+        :ancestor-folders="ancestorFolders"
+        :context-folder-id="contextFolderId"
+        :initial-parent-folder-id="initialParentFolderId"
         @close-dialog="closer"
       />
     </template>
@@ -16,14 +16,15 @@
 </template>
 
 <script setup lang="ts">
+import type { Folder } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import FolderNewDialog from "../FolderNewDialog.vue"
 
 defineProps<{
   notebookId: number
-  underNoteId?: number
-  underFolderId?: number
-  parentLocationDescription?: string
+  ancestorFolders: Folder[]
+  contextFolderId: number | null
+  initialParentFolderId: number | null
   buttonTitle: string
   ariaLabel?: string
 }>()

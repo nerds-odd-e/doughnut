@@ -1,9 +1,6 @@
 <template>
   <div class="daisy-w-full">
-    <p
-      v-if="loadError"
-      class="daisy-text-error daisy-text-sm daisy-mb-2"
-    >
+    <p v-if="loadError" class="daisy-text-error daisy-text-sm daisy-mb-2">
       {{ loadError }}
     </p>
     <div class="daisy-join daisy-w-full folder-selector-join">
@@ -14,45 +11,34 @@
           v-model="selectModel"
           class="daisy-select daisy-select-sm daisy-w-full daisy-min-h-0 daisy-flex-1 daisy-border-0 daisy-bg-transparent daisy-shadow-none focus:daisy-outline-none focus:daisy-ring-0"
           data-testid="folder-move-parent-select"
-          :disabled="disabled || rows.length === 0"
+          :disabled="disabled"
         >
-        <optgroup label="Notebook root">
-          <option value="__root__">
-            Notebook root
-          </option>
-        </optgroup>
-        <optgroup
-          v-if="ancestorIds.length > 0"
-          label="Ancestor folders"
-        >
-          <option
-            v-for="id in ancestorIds"
-            :key="`a-${id}`"
-            :value="String(id)"
-          >
-            {{ pathForOption(id) }}
-          </option>
-        </optgroup>
-        <optgroup
-          v-if="neighbourIds.length > 0"
-          label="Neighbour folders"
-        >
-          <option
-            v-for="id in neighbourIds"
-            :key="`n-${id}`"
-            :value="String(id)"
-          >
-            {{ pathForOption(id) }}
-          </option>
-        </optgroup>
-        <optgroup
-          v-if="needsSyntheticOption && modelValue != null"
-          label="Selected"
-        >
-          <option :value="String(modelValue)">
-            {{ pathForOption(modelValue) }}
-          </option>
-        </optgroup>
+          <optgroup label="Notebook root">
+            <option value="__root__">Notebook root</option>
+          </optgroup>
+          <optgroup v-if="ancestorIds.length > 0" label="Ancestor folders">
+            <option
+              v-for="id in ancestorIds"
+              :key="`a-${id}`"
+              :value="String(id)"
+            >
+              {{ quickPathLabel(id) }}
+            </option>
+          </optgroup>
+          <optgroup v-if="neighbourIds.length > 0" label="Neighbour folders">
+            <option
+              v-for="id in neighbourIds"
+              :key="`n-${id}`"
+              :value="String(id)"
+            >
+              {{ quickPathLabel(id) }}
+            </option>
+          </optgroup>
+          <optgroup v-if="needsSyntheticOption && modelValue != null" label="Selected">
+            <option :value="String(modelValue)">
+              {{ selectionSummary }}
+            </option>
+          </optgroup>
         </select>
       </div>
       <div
@@ -61,7 +47,7 @@
         <button
           type="button"
           class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-rounded-l-none daisy-rounded-r-lg"
-          :disabled="disabled || rows.length === 0"
+          :disabled="disabled"
           title="Search folders"
           aria-label="Search folders"
           data-testid="folder-selector-more-button"
@@ -73,35 +59,43 @@
     </div>
     <FolderSearchDialog
       :open="searchOpen"
-      :rows="rows"
-      :excluded-folder-ids="excludedFolderIds"
+      :notebook-id="notebookId"
+      :context-folder-id="searchContextFolderId"
       :current-path-display="selectionSummary"
       @close="searchOpen = false"
       @select="onSearchSelect"
+      @index-loaded="onIndexLoaded"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  NotebookFolderIndexRow,
+} from "@generated/doughnut-backend-api"
 import { MoreHorizontal } from "lucide-vue-next"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import FolderSearchDialog from "./FolderSearchDialog.vue"
 import {
-  ancestorFolderIdsOutermostFirst,
+  ancestorsFromChain,
+  folderChainToIndexRows,
   folderPathLabel,
   folderRowsById,
-  siblingFolderIds,
 } from "./folderSelectorUtils"
 
 const props = defineProps<{
   notebookId: number
-  contextFolderId: number
-  excludedFolderIds: Set<number>
+  /**
+   * Folder used for quick-pick neighbours (organize = moving folder; new folder = default parent).
+   * Null when the UI context is notebook root (no folder id).
+   */
+  contextFolderId: number | null
+  /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
+  ancestorFolders: Folder[]
   modelValue: number | null
   disabled?: boolean
-  folderIndexRows?: NotebookFolderIndexRow[]
 }>()
 
 const emit = defineEmits<{
@@ -109,44 +103,74 @@ const emit = defineEmits<{
 }>()
 
 const storageAccessor = useStorageAccessor()
-const rows = ref<NotebookFolderIndexRow[]>(props.folderIndexRows ?? [])
 const loadError = ref<string | undefined>(undefined)
 const searchOpen = ref(false)
 
+// Rows loaded only for the search dialog (full index, lazy)
+const searchIndexRows = ref<NotebookFolderIndexRow[]>([])
+
+// Neighbour folders loaded via one cheap listing call
+const neighbourRows = ref<NotebookFolderIndexRow[]>([])
+
+const ancestorRows = computed(() => {
+  if (props.contextFolderId == null) return []
+  return ancestorsFromChain(props.contextFolderId, props.ancestorFolders)
+    .ancestorRows
+})
+
+const parentFolderId = computed(() => {
+  if (props.contextFolderId == null) return null
+  return ancestorsFromChain(props.contextFolderId, props.ancestorFolders)
+    .parentFolderId
+})
+
+/** Omit when null so folder search does not exclude a subtree (new folder at root). */
+const searchContextFolderId = computed(() => props.contextFolderId ?? undefined)
+
 onMounted(async () => {
-  if (props.folderIndexRows != null) {
-    rows.value = props.folderIndexRows
-    return
-  }
+  const pid = parentFolderId.value
   try {
-    rows.value = await storageAccessor.value
-      .storedApi()
-      .loadNotebookFolderIndex(props.notebookId)
+    const api = storageAccessor.value.storedApi()
+    if (pid == null) {
+      // Moving folder is at notebook root: load root-level folders for neighbours
+      const listing = await api.loadNotebookRootNotes(props.notebookId)
+      neighbourRows.value = (listing.folders ?? [])
+        .filter((f) => f.id !== props.contextFolderId)
+        .map((f) => ({
+          id: f.id,
+          name: f.name,
+          parentFolderId: undefined,
+        }))
+    } else {
+      const listing = await api.loadFolderListing(props.notebookId, pid)
+      neighbourRows.value = (listing.folders ?? [])
+        .filter((f) => f.id !== props.contextFolderId)
+        .map((f) => ({
+          id: f.id,
+          name: f.name,
+          parentFolderId: pid,
+        }))
+    }
   } catch {
-    loadError.value = "Failed to load folders"
+    loadError.value = "Failed to load neighbouring folders"
   }
 })
 
-watch(
-  () => props.folderIndexRows,
-  (r) => {
-    if (r != null) rows.value = r
-  }
+/** Minimal byId map built from quick-pick data only. Used for path display in the dropdown. */
+const quickPickById = computed(() => {
+  const allAncestorRows = folderChainToIndexRows(props.ancestorFolders)
+  return folderRowsById([...allAncestorRows, ...neighbourRows.value])
+})
+
+/** Full byId for display when we have the search index (after search dialog opened). */
+const displayById = computed(() =>
+  searchIndexRows.value.length > 0
+    ? folderRowsById(searchIndexRows.value)
+    : quickPickById.value
 )
 
-const byId = computed(() => folderRowsById(rows.value))
-
-const ancestorIds = computed(() =>
-  ancestorFolderIdsOutermostFirst(props.contextFolderId, byId.value).filter(
-    (id) => !props.excludedFolderIds.has(id)
-  )
-)
-
-const neighbourIds = computed(() =>
-  siblingFolderIds(props.contextFolderId, rows.value, byId.value).filter(
-    (id) => !props.excludedFolderIds.has(id)
-  )
-)
+const ancestorIds = computed(() => ancestorRows.value.map((r) => r.id))
+const neighbourIds = computed(() => neighbourRows.value.map((r) => r.id))
 
 const quickPickIdSet = computed(() => {
   const s = new Set<number>()
@@ -159,11 +183,14 @@ const needsSyntheticOption = computed(
   () => props.modelValue != null && !quickPickIdSet.value.has(props.modelValue)
 )
 
-const selectionSummary = computed(() =>
-  props.modelValue == null
-    ? "Notebook root"
-    : folderPathLabel(props.modelValue, byId.value)
-)
+const selectionSummary = computed(() => {
+  if (props.modelValue == null) return "Notebook root"
+  return folderPathLabel(props.modelValue, displayById.value)
+})
+
+function quickPathLabel(id: number): string {
+  return folderPathLabel(id, quickPickById.value)
+}
 
 const selectModel = computed({
   get(): string {
@@ -176,13 +203,13 @@ const selectModel = computed({
   },
 })
 
-function pathForOption(id: number): string {
-  return folderPathLabel(id, byId.value)
-}
-
 function onSearchSelect(folderId: number | null) {
   emit("update:modelValue", folderId)
   searchOpen.value = false
+}
+
+function onIndexLoaded(rows: NotebookFolderIndexRow[]) {
+  searchIndexRows.value = rows
 }
 </script>
 

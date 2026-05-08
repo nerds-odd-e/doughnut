@@ -1,15 +1,20 @@
 <template>
-  <div class="daisy-card daisy-w-full">
+  <div class="daisy-card daisy-w-full" data-testid="folder-new-dialog">
     <div class="daisy-card-body">
       <form @submit.prevent="processForm">
         <fieldset :disabled="processing">
-          <p
-            v-if="parentLocationDescription"
-            class="daisy-text-sm daisy-opacity-80 daisy-mb-3"
-            data-testid="folder-new-dialog-parent-location"
-          >
-            {{ parentLocationDescription }}
-          </p>
+          <label class="daisy-label daisy-mb-2">
+            <span class="daisy-label-text">Parent folder</span>
+          </label>
+          <div class="daisy-mb-4">
+            <FolderSelector
+              v-model="selectedParentFolderId"
+              :notebook-id="notebookId"
+              :context-folder-id="contextFolderId"
+              :ancestor-folders="ancestorFolders"
+              :disabled="processing"
+            />
+          </div>
           <PathNameEditor
             v-model="name"
             :error-message="nameError"
@@ -23,6 +28,7 @@
             type="submit"
             value="Submit"
             class="daisy-btn daisy-btn-primary daisy-mt-4"
+            data-testid="folder-new-dialog-submit"
           />
         </fieldset>
       </form>
@@ -31,16 +37,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import type { Folder } from "@generated/doughnut-backend-api"
+import { ref, watch } from "vue"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import FolderSelector from "./FolderSelector.vue"
 
 const props = defineProps<{
   notebookId: number
-  underNoteId?: number
-  underFolderId?: number
-  parentLocationDescription?: string
+  ancestorFolders: Folder[]
+  contextFolderId: number | null
+  initialParentFolderId: number | null
 }>()
 
 const emit = defineEmits<{
@@ -52,6 +60,16 @@ const name = ref("")
 const nameError = ref<string | undefined>(undefined)
 const processing = ref(false)
 
+const selectedParentFolderId = ref<number | null>(null)
+
+watch(
+  () => props.initialParentFolderId,
+  (v) => {
+    selectedParentFolderId.value = v
+  },
+  { immediate: true }
+)
+
 const processForm = async () => {
   if (processing.value) return
   processing.value = true
@@ -59,11 +77,9 @@ const processForm = async () => {
   try {
     await storageAccessor.value.storedApi().createFolder(props.notebookId, {
       name: name.value,
-      ...(props.underFolderId != null
-        ? { underFolderId: props.underFolderId }
-        : props.underNoteId != null
-          ? { underNoteId: props.underNoteId }
-          : {}),
+      ...(selectedParentFolderId.value != null
+        ? { underFolderId: selectedParentFolderId.value }
+        : {}),
     })
     emit("closeDialog")
   } catch (res: unknown) {

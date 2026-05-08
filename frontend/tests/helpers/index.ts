@@ -120,6 +120,7 @@ const methodToController: Record<string, any> = {
   listNotebookRootNotes: NotebookController,
   listNotebookFolderIndex: NotebookController,
   listFolderListing: NotebookController,
+  createFolder: NotebookController,
   myNotebooks: NotebookController,
   selfEvaluate: MemoryTrackerController,
   removeFromRepeating: MemoryTrackerController,

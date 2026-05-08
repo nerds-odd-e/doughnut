@@ -12,6 +12,7 @@
           :target-folder-id="resolvedCreateParentFolderId ?? undefined"
           :parent-location-description="createParentLocationDescription"
           :title-search-anchor-note="note"
+          :ancestor-folders="ancestorFolders"
           button-title="New note"
           aria-label="New note"
         >
@@ -19,9 +20,9 @@
         </NotebookRootNoteNewButton>
         <FolderNewButton
           :notebook-id="notebookId"
-          :under-folder-id="folderUnderFolderId"
-          :under-note-id="folderContextNoteId"
-          :parent-location-description="createParentLocationDescription"
+          :ancestor-folders="ancestorFolders"
+          :context-folder-id="resolvedCreateParentFolderId"
+          :initial-parent-folder-id="resolvedCreateParentFolderId"
           button-title="New folder"
           aria-label="New folder"
         >
@@ -32,6 +33,7 @@
           :notebook-id="notebookId"
           :moving-folder-id="userActiveFolder.id"
           :moving-folder-name="userActiveFolder.name"
+          :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
         </FolderOrganizeButton>
@@ -81,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Folder, Note } from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
   useNoteSidebarPeerSort,
@@ -108,6 +110,8 @@ const props = defineProps<{
   resolvedCreateParentFolderId: number | null
   createParentLocationDescription: string
   userActiveFolder: SidebarUserActiveFolder | null
+  /** Root-to-leaf ancestor chain from NoteRealm, passed to folder organise dialog. */
+  ancestorFolders: Folder[]
 }>()
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
@@ -129,18 +133,4 @@ function selectSort(spec: SidebarPeerSortSpec) {
     sortDropdownRef.value.open = false
   }
 }
-
-const folderUnderFolderId = computed(() =>
-  props.resolvedCreateParentFolderId != null
-    ? props.resolvedCreateParentFolderId
-    : undefined
-)
-
-const folderContextNoteId = computed(() =>
-  props.resolvedCreateParentFolderId != null
-    ? undefined
-    : props.note != null && props.activeNoteTopologyResolved
-      ? props.note.id
-      : undefined
-)
 </script>

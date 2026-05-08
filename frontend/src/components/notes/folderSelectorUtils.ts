@@ -1,4 +1,7 @@
-import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  NotebookFolderIndexRow,
+} from "@generated/doughnut-backend-api"
 
 export function folderRowsById(
   rows: NotebookFolderIndexRow[]
@@ -22,39 +25,43 @@ export function folderPathLabel(
   return segments.reverse().join(" / ")
 }
 
-/** Outermost ancestor first: chain from root down to parent of `contextFolderId`. */
-export function ancestorFolderIdsOutermostFirst(
-  contextFolderId: number,
-  byId: Map<number, NotebookFolderIndexRow>
-): number[] {
-  const ctx = byId.get(contextFolderId)
-  if (!ctx) return []
-  let p = ctx.parentFolderId
-  const innerToOuter: number[] = []
-  while (p != null) {
-    innerToOuter.push(p)
-    const parent = byId.get(p)
-    p = parent?.parentFolderId
-  }
-  innerToOuter.reverse()
-  return innerToOuter
+/**
+ * Convert a root-to-leaf Folder array (as stored in NoteRealm.ancestorFolders)
+ * into NotebookFolderIndexRow entries with inferred parentFolderId.
+ */
+export function folderChainToIndexRows(
+  chain: readonly Folder[]
+): NotebookFolderIndexRow[] {
+  return chain.map((f, i) => ({
+    id: f.id,
+    name: f.name,
+    parentFolderId: i === 0 ? undefined : chain[i - 1]!.id,
+  }))
 }
 
-export function siblingFolderIds(
-  contextFolderId: number,
-  rows: NotebookFolderIndexRow[],
-  byId: Map<number, NotebookFolderIndexRow>
-): number[] {
-  const ctx = byId.get(contextFolderId)
-  if (!ctx) return []
-  const parentKey = ctx.parentFolderId
-  return rows
-    .filter(
-      (r) =>
-        r.id !== contextFolderId &&
-        (r.parentFolderId ?? undefined) === (parentKey ?? undefined)
-    )
-    .map((r) => r.id)
+/**
+ * From a root-to-leaf ancestor chain and the moving folder id, return the
+ * subset that are ancestors of the moving folder (outermost first), and the
+ * parent folder id. Returns `undefined` for parentFolderId when moving folder
+ * is at notebook root or not found in the chain.
+ */
+export function ancestorsFromChain(
+  movingFolderId: number,
+  chain: readonly Folder[]
+): { ancestorRows: NotebookFolderIndexRow[]; parentFolderId: number | null } {
+  const idx = chain.findIndex((f) => f.id === movingFolderId)
+  if (idx === -1) {
+    // Moving folder not in chain – return chain as ancestors (best-effort)
+    return {
+      ancestorRows: folderChainToIndexRows(chain),
+      parentFolderId: chain.length > 0 ? chain[chain.length - 1]!.id : null,
+    }
+  }
+  const ancestors = chain.slice(0, idx)
+  return {
+    ancestorRows: folderChainToIndexRows(ancestors),
+    parentFolderId: idx > 0 ? chain[idx - 1]!.id : null,
+  }
 }
 
 export function collectSubtreeFolderIds(
@@ -72,12 +79,16 @@ export function collectSubtreeFolderIds(
   return excluded
 }
 
-export function dissolveParentQuotedLabel(
+/**
+ * Quoted path label of the parent of the moving folder, for the dissolve
+ * confirmation text. Derived purely from the ancestor chain.
+ */
+export function dissolveParentLabelFromChain(
   movingFolderId: number,
-  byId: Map<number, NotebookFolderIndexRow>
+  chain: readonly Folder[]
 ): string {
-  const moving = byId.get(movingFolderId)
-  if (!moving || moving.parentFolderId == null) return "notebook root"
-  const path = folderPathLabel(moving.parentFolderId, byId)
-  return `"${path}"`
+  const idx = chain.findIndex((f) => f.id === movingFolderId)
+  if (idx <= 0) return "notebook root"
+  const parentChain = chain.slice(0, idx)
+  return `"${parentChain.map((f) => f.name).join(" / ")}"`
 }

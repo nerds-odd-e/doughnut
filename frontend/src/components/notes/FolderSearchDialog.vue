@@ -7,65 +7,72 @@
       style="z-index: 10050"
     >
       <div class="daisy-modal-box daisy-max-w-lg">
-      <h3 class="daisy-font-bold daisy-text-lg daisy-mb-2">Find folder</h3>
-      <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-1">Current selection</p>
-      <p
-        class="daisy-text-sm daisy-mb-4 daisy-break-words daisy-whitespace-normal daisy-max-w-full"
-        data-testid="folder-selector-search-current-path"
-      >
-        {{ currentPathDisplay }}
-      </p>
-      <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full daisy-mb-3 daisy-input daisy-input-bordered">
-        <Search class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50" />
-        <input
-          v-model="query"
-          type="search"
-          class="daisy-grow daisy-min-w-0 daisy-border-0 daisy-bg-transparent daisy-outline-none"
-          placeholder="Search by name or path"
-          data-testid="folder-selector-search-input"
-          autocomplete="off"
+        <h3 class="daisy-font-bold daisy-text-lg daisy-mb-2">Find folder</h3>
+        <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-1">
+          Current selection
+        </p>
+        <p
+          class="daisy-text-sm daisy-mb-4 daisy-break-words daisy-whitespace-normal daisy-max-w-full"
+          data-testid="folder-selector-search-current-path"
         >
-      </div>
-      <ul
-        class="daisy-menu daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto daisy-w-full"
-      >
-        <li v-if="showRootRow">
+          {{ currentPathDisplay }}
+        </p>
+        <p v-if="indexLoadError" class="daisy-text-error daisy-text-sm daisy-mb-2">
+          {{ indexLoadError }}
+        </p>
+        <div
+          class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full daisy-mb-3 daisy-input daisy-input-bordered"
+        >
+          <Search class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50" />
+          <input
+            v-model="query"
+            type="search"
+            class="daisy-grow daisy-min-w-0 daisy-border-0 daisy-bg-transparent daisy-outline-none"
+            placeholder="Search by name or path"
+            data-testid="folder-selector-search-input"
+            autocomplete="off"
+          />
+        </div>
+        <ul
+          class="daisy-menu daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto daisy-w-full"
+        >
+          <li v-if="showRootRow">
+            <button
+              type="button"
+              class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
+              data-testid="folder-selector-search-result"
+              data-folder-id="__root__"
+              @click="pick(null)"
+            >
+              Notebook root
+            </button>
+          </li>
+          <li v-for="r in filteredFolders" :key="r.id">
+            <button
+              type="button"
+              class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
+              data-testid="folder-selector-search-result"
+              :data-folder-id="String(r.id)"
+              @click="pick(r.id)"
+            >
+              {{ rowDisplay(r.id) }}
+            </button>
+          </li>
+        </ul>
+        <div class="daisy-modal-action daisy-mt-4">
           <button
             type="button"
-            class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
-            data-testid="folder-selector-search-result"
-            data-folder-id="__root__"
-            @click="pick(null)"
+            class="daisy-btn"
+            data-testid="folder-selector-search-cancel"
+            @click="close"
           >
-            Notebook root
+            Cancel
           </button>
-        </li>
-        <li v-for="r in filteredFolders" :key="r.id">
-          <button
-            type="button"
-            class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
-            data-testid="folder-selector-search-result"
-            :data-folder-id="String(r.id)"
-            @click="pick(r.id)"
-          >
-            {{ rowDisplay(r.id) }}
-          </button>
-        </li>
-      </ul>
-      <div class="daisy-modal-action daisy-mt-4">
-        <button
-          type="button"
-          class="daisy-btn"
-          data-testid="folder-selector-search-cancel"
-          @click="close"
-        >
-          Cancel
-        </button>
+        </div>
       </div>
-    </div>
-    <form method="dialog" class="daisy-modal-backdrop">
-      <button type="button" @click="close">close</button>
-    </form>
+      <form method="dialog" class="daisy-modal-backdrop">
+        <button type="button" @click="close">close</button>
+      </form>
     </dialog>
   </Teleport>
 </template>
@@ -74,12 +81,22 @@
 import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
 import { Search } from "lucide-vue-next"
 import { computed, ref, watch } from "vue"
-import { folderPathLabel, folderRowsById } from "./folderSelectorUtils"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { toOpenApiError } from "@/managedApi/openApiError"
+import {
+  collectSubtreeFolderIds,
+  folderPathLabel,
+  folderRowsById,
+} from "./folderSelectorUtils"
 
 const props = defineProps<{
   open: boolean
-  rows: NotebookFolderIndexRow[]
-  excludedFolderIds: Set<number>
+  notebookId: number
+  /**
+   * When set, search results exclude this folder and its descendants (move dialog).
+   * Omit or null for pickers where no subtree should be excluded (e.g. new folder).
+   */
+  contextFolderId?: number | null
   /** Line-wrapped summary for the current selection */
   currentPathDisplay: string
 }>()
@@ -87,19 +104,40 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   select: [folderId: number | null]
+  /** Emit loaded rows so caller can use them for path display after selection */
+  indexLoaded: [rows: NotebookFolderIndexRow[]]
 }>()
 
+const storageAccessor = useStorageAccessor()
+const indexRows = ref<NotebookFolderIndexRow[]>([])
+const indexLoadError = ref<string | undefined>(undefined)
 const query = ref("")
 
 watch(
   () => props.open,
-  (isOpen) => {
-    if (isOpen) query.value = ""
+  async (isOpen) => {
+    if (!isOpen) return
+    query.value = ""
+    if (indexRows.value.length > 0) return
+    indexLoadError.value = undefined
+    try {
+      indexRows.value = await storageAccessor.value
+        .storedApi()
+        .loadNotebookFolderIndex(props.notebookId)
+      emit("indexLoaded", indexRows.value)
+    } catch (e: unknown) {
+      indexLoadError.value =
+        toOpenApiError(e).message ?? "Failed to load folders"
+    }
   }
 )
 
-const byId = computed(() => folderRowsById(props.rows))
+const excludedFolderIds = computed(() => {
+  if (props.contextFolderId == null) return new Set<number>()
+  return collectSubtreeFolderIds(props.contextFolderId, indexRows.value)
+})
 
+const byId = computed(() => folderRowsById(indexRows.value))
 const q = computed(() => query.value.trim().toLowerCase())
 
 const showRootRow = computed(() => {
@@ -109,8 +147,8 @@ const showRootRow = computed(() => {
 
 const filteredFolders = computed(() => {
   const out: NotebookFolderIndexRow[] = []
-  for (const r of props.rows) {
-    if (props.excludedFolderIds.has(r.id)) continue
+  for (const r of indexRows.value) {
+    if (excludedFolderIds.value.has(r.id)) continue
     const path = folderPathLabel(r.id, byId.value).toLowerCase()
     const name = r.name.toLowerCase()
     if (!q.value || path.includes(q.value) || name.includes(q.value)) {

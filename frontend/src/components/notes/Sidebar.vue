@@ -11,6 +11,7 @@
       :resolved-create-parent-folder-id="resolvedCreateParentFolderId"
       :create-parent-location-description="createParentLocationDescription"
       :user-active-folder="userActiveFolder"
+      :ancestor-folders="activeNoteRealm?.ancestorFolders ?? []"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"

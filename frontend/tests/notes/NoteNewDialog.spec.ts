@@ -5,7 +5,11 @@ import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { nextTick } from "vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  testFolderStub,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 const popupsMock = {
@@ -68,6 +72,7 @@ describe("adding new note", () => {
     mockSdkService("semanticSearchWithin", [])
     mockSdkService("getRecentNotes", [])
     mockSdkService("listNotebookFolderIndex", [])
+    mockSdkService("listNotebookRootNotes", { folders: [] })
     const createNoteResult = makeMe.aNoteRealm.please()
     mockedCreateNoteAtRoot = mockSdkService(
       "createNoteAtNotebookRoot",
@@ -86,6 +91,7 @@ describe("adding new note", () => {
   const notebookRootProps = {
     notebookRootNotebookId: realm.notebookView.notebook.id,
     titleSearchAnchorNote: note,
+    ancestorFolders: realm.ancestorFolders ?? [],
   }
 
   it("does not search for initial default 'Untitled' title", async () => {
@@ -239,6 +245,9 @@ describe("adding new note", () => {
 
     it("sends folderId after user picks a folder in FolderSelector", async () => {
       wrapper.unmount()
+      mockSdkService("listNotebookRootNotes", {
+        folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
+      })
       mockSdkService("listNotebookFolderIndex", [
         { id: 7, name: "One" },
         { id: 8, name: "Two" },

@@ -7,6 +7,7 @@
         :parent-location-description="createParentLocationDescription"
         :initial-title="modelValue"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
+        :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
       />
     </template>

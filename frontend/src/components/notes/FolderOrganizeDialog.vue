@@ -10,25 +10,14 @@
             <span class="daisy-label-text">Destination</span>
           </label>
           <div id="folder-move-destination">
-            <p
-              v-if="!optionsReady"
-              class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2"
-            >
-              Loading destinations…
-            </p>
             <FolderSelector
-              v-if="optionsReady"
               v-model="selectedParentFolderId"
               :notebook-id="notebookId"
               :context-folder-id="movingFolderId"
-              :excluded-folder-ids="excludedSubtreeIds"
-              :folder-index-rows="folderIndexRows"
+              :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />
           </div>
-          <p v-if="loadError" class="daisy-text-error daisy-text-sm daisy-mt-2">
-            {{ loadError }}
-          </p>
           <p v-if="moveError" class="daisy-text-error daisy-text-sm daisy-mt-2">
             {{ moveError }}
           </p>
@@ -36,7 +25,7 @@
             type="submit"
             class="daisy-btn daisy-btn-primary daisy-mt-4"
             data-testid="folder-move-submit"
-            :disabled="processing || !optionsReady"
+            :disabled="processing"
           >
             Move folder
           </button>
@@ -45,7 +34,7 @@
       <div class="daisy-divider daisy-my-4">or</div>
       <p class="daisy-text-sm daisy-mb-2">
         Dissolve "{{ movingFolderName }}". Notes and subfolders will move to
-        {{ parentLocationLabel }}.
+        {{ dissolveParentLabel }}.
       </p>
       <p
         v-if="dissolveError"
@@ -67,23 +56,21 @@
 </template>
 
 <script setup lang="ts">
-import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
-import { onMounted, ref } from "vue"
+import type { Folder } from "@generated/doughnut-backend-api"
+import { computed, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import usePopups from "../commons/Popups/usePopups"
 import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import FolderSelector from "./FolderSelector.vue"
-import {
-  collectSubtreeFolderIds,
-  dissolveParentQuotedLabel,
-  folderRowsById,
-} from "./folderSelectorUtils"
+import { dissolveParentLabelFromChain } from "./folderSelectorUtils"
 
 const props = defineProps<{
   notebookId: number
   movingFolderId: number
   movingFolderName: string
+  /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
+  ancestorFolders: Folder[]
 }>()
 
 const emit = defineEmits<{
@@ -94,39 +81,16 @@ const storageAccessor = useStorageAccessor()
 const { popups } = usePopups()
 
 const processing = ref(false)
-const optionsReady = ref(false)
-const loadError = ref<string | undefined>(undefined)
 const moveError = ref<string | undefined>(undefined)
 const dissolveError = ref<string | undefined>(undefined)
 const selectedParentFolderId = ref<number | null>(null)
-const folderIndexRows = ref<NotebookFolderIndexRow[]>([])
-const excludedSubtreeIds = ref(new Set<number>())
-const parentLocationLabel = ref("notebook root")
 
-onMounted(async () => {
-  loadError.value = undefined
-  try {
-    const rows = await storageAccessor.value
-      .storedApi()
-      .loadNotebookFolderIndex(props.notebookId)
-    folderIndexRows.value = rows
-    excludedSubtreeIds.value = collectSubtreeFolderIds(
-      props.movingFolderId,
-      rows
-    )
-    const byId = folderRowsById(rows)
-    parentLocationLabel.value = dissolveParentQuotedLabel(
-      props.movingFolderId,
-      byId
-    )
-    optionsReady.value = true
-  } catch (e: unknown) {
-    loadError.value = toOpenApiError(e).message ?? "Failed to load folders"
-  }
-})
+const dissolveParentLabel = computed(() =>
+  dissolveParentLabelFromChain(props.movingFolderId, props.ancestorFolders)
+)
 
 const submitMove = async () => {
-  if (processing.value || !optionsReady.value) return
+  if (processing.value) return
   processing.value = true
   moveError.value = undefined
   try {

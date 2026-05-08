@@ -13,6 +13,7 @@
         :notebook-id="notebookId"
         :moving-folder-id="movingFolderId"
         :moving-folder-name="movingFolderName"
+        :ancestor-folders="ancestorFolders"
         @close-dialog="closer"
       />
     </template>
@@ -20,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Folder } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import FolderOrganizeDialog from "../FolderOrganizeDialog.vue"
 
@@ -27,5 +29,6 @@ defineProps<{
   notebookId: number
   movingFolderId: number
   movingFolderName: string
+  ancestorFolders: Folder[]
 }>()
 </script>

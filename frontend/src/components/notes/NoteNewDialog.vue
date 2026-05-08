@@ -11,7 +11,7 @@
               v-model="selectedFolderId"
               :notebook-id="notebookRootNotebookId"
               :context-folder-id="folderSelectorContextFolderId"
-              :excluded-folder-ids="emptyExcludedFolderIds"
+              :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />
           </div>
@@ -56,6 +56,7 @@
 
 <script setup lang="ts">
 import type {
+  Folder,
   WikidataSearchEntity,
   Note,
   NoteCreationDto,
@@ -75,21 +76,24 @@ const router = useRouter()
 const storageAccessor = useStorageAccessor()
 const { popups } = usePopups()
 
-const props = defineProps<{
-  notebookRootNotebookId: number
-  /** Initial folder scope for create-note (active sidebar folder). User can change via FolderSelector. */
-  targetFolderId?: number
-  parentLocationDescription?: string
-  initialTitle?: string
-  /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
-  titleSearchAnchorNote?: Note
-  /** After notebook-root create, refresh wiki title cache for this note before navigating away. */
-  wikiTitleCacheRefreshSourceNoteId?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    notebookRootNotebookId: number
+    /** Initial folder scope for create-note (active sidebar folder). User can change via FolderSelector. */
+    targetFolderId?: number
+    parentLocationDescription?: string
+    initialTitle?: string
+    /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
+    titleSearchAnchorNote?: Note
+    /** After notebook-root create, refresh wiki title cache for this note before navigating away. */
+    wikiTitleCacheRefreshSourceNoteId?: number
+    /** Root-to-leaf ancestor chain for FolderSelector (same as NoteRealm.ancestorFolders). */
+    ancestorFolders?: Folder[]
+  }>(),
+  { ancestorFolders: () => [] }
+)
 
 const titleSearchScopeNote = computed(() => props.titleSearchAnchorNote)
-
-const emptyExcludedFolderIds = new Set<number>()
 
 const selectedFolderId = ref<number | null>(props.targetFolderId ?? null)
 
@@ -100,13 +104,13 @@ watch(
   }
 )
 
-/** For FolderSelector quick picks; `0` is unused in the index when nothing else applies. */
-const folderSelectorContextFolderId = computed(() => {
+/** Context folder for FolderSelector quick picks; null at notebook root. */
+const folderSelectorContextFolderId = computed((): number | null => {
   const fromTarget = selectedFolderId.value ?? props.targetFolderId ?? null
   if (fromTarget != null) return fromTarget
   const anchorFolder = props.titleSearchAnchorNote?.noteTopology.folderId
   if (anchorFolder != null) return anchorFolder
-  return 0
+  return null
 })
 
 // Emits
