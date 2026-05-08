@@ -57,6 +57,10 @@ describe("RichMarkdownEditor", () => {
     await flushPromises()
   }
 
+  async function flushAnimationFrame() {
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  }
+
   async function assertPresetOptionsVisible() {
     const options = wrapper.findAll(
       '[data-testid="rich-note-property-key-preset-option"]'
@@ -183,6 +187,31 @@ Body`,
       await mountEditor(md, { readonly: true })
       expect(wrapper.find("section").exists()).toBe(false)
     }
+  })
+
+  it("focuses property key when Add property is clicked", async () => {
+    await mountEditor("# Hello Body")
+    await flushPromises()
+    await openAddProperty()
+    await flushAnimationFrame()
+    const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
+      .element as HTMLInputElement
+    expect(document.activeElement).toBe(keyInput)
+  })
+
+  it("focuses property key when Add property is clicked with existing rows", async () => {
+    const markdown = `---
+status: ok
+---
+
+# Body`
+    await mountEditor(markdown)
+    await flushPromises()
+    await openAddProperty()
+    await flushAnimationFrame()
+    const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
+      .element as HTMLInputElement
+    expect(document.activeElement).toBe(keyInput)
   })
 
   it("inserting a property emits composed frontmatter and preserves body", async () => {

@@ -19,7 +19,7 @@
         v-if="showInsertChrome && propertyRows.length > 0"
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-shrink-0 daisy-items-center daisy-gap-1"
-        @click="insertOpen = true"
+        @click="openPropertyInsert"
       >
         <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
         Add property
@@ -166,7 +166,7 @@
         v-if="propertyRows.length === 0"
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-self-start daisy-items-center daisy-gap-1"
-        @click="insertOpen = true"
+        @click="openPropertyInsert"
       >
         <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
         Add property
@@ -509,6 +509,14 @@ const showSection = computed(() => {
 })
 
 const showInsertChrome = computed(() => !isReadOnly.value && parsed.value.ok)
+
+async function openPropertyInsert() {
+  insertOpen.value = true
+  await nextTick()
+  requestAnimationFrame(() => {
+    document.getElementById(insertKeyInputId)?.focus()
+  })
+}
 
 function focusValueInput() {
   valueInputRef.value?.focus()
