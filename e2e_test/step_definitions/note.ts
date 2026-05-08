@@ -363,7 +363,10 @@ When('I delete note {string}', (noteTopology: string) => {
 
 When('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')
-  cy.get('.Vue-Toastification__close-button').click()
+  cy.get('body').then(($body) => {
+    const close = $body.find('.Vue-Toastification__close-button').get(0)
+    if (close) close.click()
+  })
 })
 
 Then(
