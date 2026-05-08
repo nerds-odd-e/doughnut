@@ -4,6 +4,7 @@ import {
   NotebookController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageView from "@/pages/NotebookPageView.vue"
+import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
@@ -118,12 +119,10 @@ describe("NotebookPageView.spec", () => {
     await wrapper
       .get('[data-testid="notebook-page-name-edit"]')
       .trigger("click")
-    const input = wrapper.get('[data-testid="notebook-page-name-input"]')
-      .element as HTMLInputElement
-    input.value = "Edited title"
-    await wrapper
-      .get('[data-testid="notebook-page-name-input"]')
-      .trigger("input")
+    wrapper
+      .findComponent(SeamlessTextEditor)
+      .vm.$emit("update:modelValue", "Edited title")
+    await flushPromises()
     await wrapper
       .get('[data-testid="notebook-page-name-update"]')
       .trigger("click")

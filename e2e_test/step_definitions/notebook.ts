@@ -93,7 +93,8 @@ When(
   'I rename the notebook from the notebook page summary to {string}',
   (newName: string) => {
     cy.get('[data-testid="notebook-page-name-edit"]').click()
-    cy.get('[data-testid="notebook-page-name-input"]').clear().type(newName)
+    cy.get('[data-test="notebook-page-name-input"]').click()
+    cy.clearFocusedText().type(newName)
     cy.get('[data-testid="notebook-page-name-update"]').click()
     cy.findByRole('button', { name: 'OK' }).click()
     pageIsNotLoading()
