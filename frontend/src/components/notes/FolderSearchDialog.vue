@@ -1,86 +1,75 @@
 <template>
-  <Teleport to="body">
-    <dialog
-      class="daisy-modal"
-      :class="{ 'daisy-modal-open': open }"
-      data-testid="folder-selector-search-dialog"
-      style="z-index: 10050"
+  <div class="daisy-w-full" data-testid="folder-selector-search-dialog">
+    <h3 class="daisy-font-bold daisy-text-lg daisy-mb-2">Find folder</h3>
+    <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-1">
+      Current selection
+    </p>
+    <p
+      class="daisy-text-sm daisy-mb-4 daisy-break-words daisy-whitespace-normal daisy-max-w-full"
+      data-testid="folder-selector-search-current-path"
     >
-      <div class="daisy-modal-box daisy-max-w-lg">
-        <h3 class="daisy-font-bold daisy-text-lg daisy-mb-2">Find folder</h3>
-        <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-1">
-          Current selection
-        </p>
-        <p
-          class="daisy-text-sm daisy-mb-4 daisy-break-words daisy-whitespace-normal daisy-max-w-full"
-          data-testid="folder-selector-search-current-path"
+      {{ currentPathDisplay }}
+    </p>
+    <p v-if="indexLoadError" class="daisy-text-error daisy-text-sm daisy-mb-2">
+      {{ indexLoadError }}
+    </p>
+    <div
+      class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full daisy-mb-3 daisy-input daisy-input-bordered"
+    >
+      <Search class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50" />
+      <input
+        v-model="query"
+        v-focus
+        type="search"
+        class="daisy-grow daisy-min-w-0 daisy-border-0 daisy-bg-transparent daisy-outline-none"
+        placeholder="Search by name or path"
+        data-testid="folder-selector-search-input"
+        autocomplete="off"
+      />
+    </div>
+    <ul
+      class="daisy-menu daisy-w-full daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto"
+    >
+      <li v-if="showRootRow" class="daisy-w-full">
+        <button
+          type="button"
+          class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
+          data-testid="folder-selector-search-result"
+          data-folder-id="__root__"
+          @click="pick(null)"
         >
-          {{ currentPathDisplay }}
-        </p>
-        <p v-if="indexLoadError" class="daisy-text-error daisy-text-sm daisy-mb-2">
-          {{ indexLoadError }}
-        </p>
-        <div
-          class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full daisy-mb-3 daisy-input daisy-input-bordered"
+          Notebook root
+        </button>
+      </li>
+      <li v-for="r in filteredFolders" :key="r.id" class="daisy-w-full">
+        <button
+          type="button"
+          class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
+          data-testid="folder-selector-search-result"
+          :data-folder-id="String(r.id)"
+          @click="pick(r.id)"
         >
-          <Search class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50" />
-          <input
-            v-model="query"
-            type="search"
-            class="daisy-grow daisy-min-w-0 daisy-border-0 daisy-bg-transparent daisy-outline-none"
-            placeholder="Search by name or path"
-            data-testid="folder-selector-search-input"
-            autocomplete="off"
-          />
-        </div>
-        <ul
-          class="daisy-menu daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto daisy-w-full"
-        >
-          <li v-if="showRootRow">
-            <button
-              type="button"
-              class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
-              data-testid="folder-selector-search-result"
-              data-folder-id="__root__"
-              @click="pick(null)"
-            >
-              Notebook root
-            </button>
-          </li>
-          <li v-for="r in filteredFolders" :key="r.id">
-            <button
-              type="button"
-              class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
-              data-testid="folder-selector-search-result"
-              :data-folder-id="String(r.id)"
-              @click="pick(r.id)"
-            >
-              {{ rowDisplay(r.id) }}
-            </button>
-          </li>
-        </ul>
-        <div class="daisy-modal-action daisy-mt-4">
-          <button
-            type="button"
-            class="daisy-btn"
-            data-testid="folder-selector-search-cancel"
-            @click="close"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-      <form method="dialog" class="daisy-modal-backdrop">
-        <button type="button" @click="close">close</button>
-      </form>
-    </dialog>
-  </Teleport>
+          {{ rowDisplay(r.id) }}
+        </button>
+      </li>
+    </ul>
+    <div class="daisy-flex daisy-w-full daisy-justify-end daisy-mt-4">
+      <button
+        type="button"
+        class="daisy-btn"
+        data-testid="folder-selector-search-cancel"
+        @click="close"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
 import { Search } from "lucide-vue-next"
-import { computed, ref, watch } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import {
@@ -90,7 +79,6 @@ import {
 } from "./folderSelectorUtils"
 
 const props = defineProps<{
-  open: boolean
   notebookId: number
   /**
    * When set, search results exclude this folder and its descendants (move dialog).
@@ -113,24 +101,18 @@ const indexRows = ref<NotebookFolderIndexRow[]>([])
 const indexLoadError = ref<string | undefined>(undefined)
 const query = ref("")
 
-watch(
-  () => props.open,
-  async (isOpen) => {
-    if (!isOpen) return
-    query.value = ""
-    if (indexRows.value.length > 0) return
-    indexLoadError.value = undefined
-    try {
-      indexRows.value = await storageAccessor.value
-        .storedApi()
-        .loadNotebookFolderIndex(props.notebookId)
-      emit("indexLoaded", indexRows.value)
-    } catch (e: unknown) {
-      indexLoadError.value =
-        toOpenApiError(e).message ?? "Failed to load folders"
-    }
+onMounted(async () => {
+  query.value = ""
+  indexLoadError.value = undefined
+  try {
+    indexRows.value = await storageAccessor.value
+      .storedApi()
+      .loadNotebookFolderIndex(props.notebookId)
+    emit("indexLoaded", indexRows.value)
+  } catch (e: unknown) {
+    indexLoadError.value = toOpenApiError(e).message ?? "Failed to load folders"
   }
-)
+})
 
 const excludedFolderIds = computed(() => {
   if (props.contextFolderId == null) return new Set<number>()

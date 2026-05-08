@@ -57,15 +57,18 @@
         </button>
       </div>
     </div>
-    <FolderSearchDialog
-      :open="searchOpen"
-      :notebook-id="notebookId"
-      :context-folder-id="searchContextFolderId"
-      :current-path-display="selectionSummary"
-      @close="searchOpen = false"
-      @select="onSearchSelect"
-      @index-loaded="onIndexLoaded"
-    />
+    <Modal v-if="searchOpen" @close_request="searchOpen = false">
+      <template #body>
+        <FolderSearchDialog
+          :notebook-id="notebookId"
+          :context-folder-id="searchContextFolderId"
+          :current-path-display="selectionSummary"
+          @close="searchOpen = false"
+          @select="onSearchSelect"
+          @index-loaded="onIndexLoaded"
+        />
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -76,6 +79,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { MoreHorizontal } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
+import Modal from "@/components/commons/Modal.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import FolderSearchDialog from "./FolderSearchDialog.vue"
 import {
