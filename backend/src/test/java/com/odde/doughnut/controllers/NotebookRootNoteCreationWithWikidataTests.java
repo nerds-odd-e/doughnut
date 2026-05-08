@@ -171,9 +171,9 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       noteCreation.setFolderId(folder.getId());
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
-      noteCreation.setContent("---\nwikidataId: Q12345\n---\n");
+      noteCreation.setContent("---\nwikidata_id: Q12345\n---\n");
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      assertThat(response.getNote().getContent(), containsString("wikidataId: Q12345"));
+      assertThat(response.getNote().getContent(), containsString("wikidata_id: Q12345"));
     }
 
     @Test
@@ -195,7 +195,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       void thereIsAWikidataEntryOfALocation() {
         folder = makeMe.aFolder().notebook(notebook).name("Places").please();
         noteCreation.setFolderId(folder.getId());
-        noteCreation.setContent("---\nwikidataId: " + wikidataIdOfALocation + "\n---\n");
+        noteCreation.setContent("---\nwikidata_id: " + wikidataIdOfALocation + "\n---\n");
       }
 
       private void mockApiResponseWithLocationInfo(String locationInfo, String type)
@@ -279,7 +279,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
               IOException {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
-        noteCreation.setContent("---\nwikidataId: " + wikidataIdOfHuman + "\n---\n");
+        noteCreation.setContent("---\nwikidata_id: " + wikidataIdOfHuman + "\n---\n");
         NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
         String description = note.getNote().getContent();
         if (expectedBirthday != null) {

@@ -14,20 +14,12 @@ public final class NoteContentMarkdown {
   }
 
   /**
-   * Reads a Wikidata Q-id from the first YAML frontmatter block when present. Accepts {@code
-   * wikidata_id} (canonical in rich-mode property rows) or legacy {@code wikidataId}.
+   * Reads a Wikidata Q-id from the first YAML frontmatter block when present, using {@code
+   * wikidata_id} (rich-mode property rows).
    */
   public static Optional<String> wikidataIdScalarFromLeadingFrontmatter(String content) {
     return splitLeadingFrontmatter(content)
-        .flatMap(
-            lf -> {
-              var fromSnake =
-                  NoteYamlFrontmatterScalars.firstScalarValue(lf.yamlRaw(), "wikidata_id");
-              if (fromSnake.isPresent()) {
-                return fromSnake;
-              }
-              return NoteYamlFrontmatterScalars.firstScalarValue(lf.yamlRaw(), "wikidataId");
-            });
+        .flatMap(lf -> NoteYamlFrontmatterScalars.firstScalarValue(lf.yamlRaw(), "wikidata_id"));
   }
 
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
