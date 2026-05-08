@@ -1,15 +1,9 @@
 package com.odde.doughnut.controllers.dto;
 
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
 public class NoteCreationDTO extends NoteUpdateTitleDTO {
-  @Getter
-  @Setter
-  @Pattern(regexp = "^$|Q\\d+", message = "The wikidata Id should be Q<numbers>")
-  public String wikidataId;
-
   @Getter @Setter private Integer folderId;
 
   @Getter @Setter private String content;

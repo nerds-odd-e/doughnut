@@ -171,7 +171,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       noteCreation.setFolderId(folder.getId());
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
-      noteCreation.setWikidataId("Q12345");
+      noteCreation.setContent("---\nwikidataId: Q12345\n---\n");
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
       assertThat(response.getNote().getWikidataId(), equalTo("Q12345"));
     }
@@ -195,7 +195,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       void thereIsAWikidataEntryOfALocation() {
         folder = makeMe.aFolder().notebook(notebook).name("Places").please();
         noteCreation.setFolderId(folder.getId());
-        noteCreation.setWikidataId(wikidataIdOfALocation);
+        noteCreation.setContent("---\nwikidataId: " + wikidataIdOfALocation + "\n---\n");
       }
 
       private void mockApiResponseWithLocationInfo(String locationInfo, String type)
@@ -238,7 +238,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       void thereIsAWikidataEntryOfAHuman() {
         folder = makeMe.aFolder().notebook(notebook).name("People").please();
         noteCreation.setFolderId(folder.getId());
-        noteCreation.setWikidataId("");
       }
 
       private void mockWikidataHumanEntity(
@@ -280,7 +279,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
               IOException {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
-        noteCreation.setWikidataId(wikidataIdOfHuman);
+        noteCreation.setContent("---\nwikidataId: " + wikidataIdOfHuman + "\n---\n");
         NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
         String description = note.getNote().getContent();
         if (expectedBirthday != null) {

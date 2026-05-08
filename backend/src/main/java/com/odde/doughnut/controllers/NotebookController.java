@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
@@ -142,7 +143,9 @@ class NotebookController {
         notebook,
         noteCreation,
         user,
-        wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
+        wikidataService.wrapWikidataIdWithApi(
+            NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter(noteCreation.getContent())
+                .orElse(null)));
   }
 
   @Operation(

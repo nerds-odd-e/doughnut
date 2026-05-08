@@ -291,7 +291,6 @@ const addFirstRootNote = async () => {
       .storedApi()
       .createRootNoteAtNotebook(router, props.notebook.id, {
         newTitle: "Untitled",
-        wikidataId: "",
       })
   } finally {
     addingRootNote.value = false

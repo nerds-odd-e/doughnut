@@ -17,7 +17,7 @@
           </div>
           <div class="title-search-container">
             <PathNameEditor
-              v-model="creationData.newTitle"
+              v-model="newTitle"
               :error-message="noteFormErrors.newTitle"
               autofocus
               initial-select-all
@@ -25,8 +25,8 @@
             >
               <template #append>
                 <WikidataSearchByLabel
-                  :search-key="creationData.newTitle"
-                  v-model="creationData.wikidataId"
+                  :search-key="newTitle"
+                  v-model="wikidataIdSelection"
                   :error-message="noteFormErrors.wikidataId"
                   @selected="onSelectWikidataEntry"
                 />
@@ -118,11 +118,17 @@ const emit = defineEmits<{
   closeDialog: []
 }>()
 
+function contentWithWikidataFrontmatter(
+  wikidataId: string
+): string | undefined {
+  const t = wikidataId.trim()
+  if (!t) return undefined
+  return `---\nwikidataId: ${t}\n---\n`
+}
+
 // Reactive state
-const creationData = ref<NoteCreationDto>({
-  newTitle: props.initialTitle ?? "Untitled",
-  wikidataId: "",
-})
+const newTitle = ref(props.initialTitle ?? "Untitled")
+const wikidataIdSelection = ref("")
 
 const noteFormErrors = ref({
   newTitle: undefined as undefined | string,
@@ -138,7 +144,7 @@ const effectiveSearchKey = computed(() => {
   if (!hasTitleBeenEdited.value) {
     return ""
   }
-  return creationData.value.newTitle
+  return newTitle.value
 })
 
 // Methods
@@ -181,11 +187,18 @@ const processForm = async () => {
   noteFormErrors.value.newTitle = undefined
 
   const api = storageAccessor.value.storedApi()
+  const wikidataContent = contentWithWikidataFrontmatter(
+    wikidataIdSelection.value
+  )
+  const body: NoteCreationDto = {
+    newTitle: newTitle.value,
+    ...(wikidataContent !== undefined ? { content: wikidataContent } : {}),
+  }
   try {
     await api.createRootNoteAtNotebook(
       router,
       props.notebookRootNotebookId,
-      creationData.value,
+      body,
       {
         folderId: selectedFolderId.value ?? undefined,
         refreshWikiTitleCacheForNoteIds:
@@ -230,18 +243,18 @@ const onSelectWikidataEntry = (
   selectedSuggestion: WikidataSearchEntity,
   titleAction?: "replace" | "append"
 ) => {
-  creationData.value.wikidataId = selectedSuggestion.id
+  wikidataIdSelection.value = selectedSuggestion.id ?? ""
 
   if (titleAction) {
-    creationData.value.newTitle = calculateNewTitle(
-      creationData.value.newTitle,
+    newTitle.value = calculateNewTitle(
+      newTitle.value,
       selectedSuggestion,
       titleAction
     )
     hasTitleBeenEdited.value = true
   } else {
     // When titles match (no titleAction), replace with the exact label from Wikidata
-    creationData.value.newTitle = selectedSuggestion.label
+    newTitle.value = selectedSuggestion.label
     hasTitleBeenEdited.value = true
   }
 }

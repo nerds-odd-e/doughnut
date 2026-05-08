@@ -13,6 +13,15 @@ public final class NoteContentMarkdown {
     return splitLeadingFrontmatter(content).map(LeadingFrontmatter::body).orElse(content);
   }
 
+  /**
+   * Reads {@code wikidataId} from the first YAML frontmatter block when present (same key style as
+   * note property rows).
+   */
+  public static Optional<String> wikidataIdScalarFromLeadingFrontmatter(String content) {
+    return splitLeadingFrontmatter(content)
+        .flatMap(lf -> NoteYamlFrontmatterScalars.firstScalarValue(lf.yamlRaw(), "wikidataId"));
+  }
+
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
     if (content == null || content.isEmpty()) {
       return Optional.empty();

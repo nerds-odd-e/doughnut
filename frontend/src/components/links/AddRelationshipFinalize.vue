@@ -142,7 +142,7 @@ const relationTypeSelected = async (relationType: string | undefined) => {
     await api.createRootNoteAtNotebook(
       router,
       notebookId,
-      { newTitle: metaTitle, wikidataId: "", content: markdown },
+      { newTitle: metaTitle, content: markdown },
       {
         folderId: folderId ?? undefined,
         skipRouterReplace: true,

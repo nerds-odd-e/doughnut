@@ -3601,9 +3601,6 @@ components:
           maxLength: 150
           minLength: 0
           pattern: "^[^\\\\/:]*$"
-        wikidataId:
-          type: string
-          pattern: ^$|Q\d+
         folderId:
           type: integer
           format: int32

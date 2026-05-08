@@ -55,4 +55,17 @@ class NoteContentMarkdownTest {
     String s = "Line1\r\nLine2";
     assertThat(NoteContentMarkdown.bodyWithoutLeadingFrontmatter(s), equalTo(s));
   }
+
+  @Test
+  void wikidataIdScalarFromLeadingFrontmatter_empty_when_no_frontmatter() {
+    assertTrue(NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("plain").isEmpty());
+  }
+
+  @Test
+  void wikidataIdScalarFromLeadingFrontmatter_reads_scalar() {
+    assertThat(
+        NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter(
+            "---\nwikidataId: Q42\n---\nBody"),
+        equalTo(Optional.of("Q42")));
+  }
 }
