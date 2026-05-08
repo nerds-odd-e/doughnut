@@ -6,13 +6,16 @@
     >
       {{ loadError }}
     </p>
-    <div class="daisy-flex daisy-gap-1 daisy-items-stretch daisy-w-full">
-      <select
-        v-model="selectModel"
-        class="daisy-select daisy-select-bordered daisy-flex-1 daisy-min-w-0 daisy-max-w-full"
-        data-testid="folder-move-parent-select"
-        :disabled="disabled || rows.length === 0"
+    <div class="daisy-join daisy-w-full folder-selector-join">
+      <div
+        class="folder-selector-join-select daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-pl-3 daisy-pr-2 daisy-rounded-l-lg daisy-min-h-[2.75rem]"
       >
+        <select
+          v-model="selectModel"
+          class="daisy-select daisy-select-sm daisy-w-full daisy-min-h-0 daisy-flex-1 daisy-border-0 daisy-bg-transparent daisy-shadow-none focus:daisy-outline-none focus:daisy-ring-0"
+          data-testid="folder-move-parent-select"
+          :disabled="disabled || rows.length === 0"
+        >
         <optgroup label="Notebook root">
           <option value="__root__">
             Notebook root
@@ -50,17 +53,23 @@
             {{ pathForOption(modelValue) }}
           </option>
         </optgroup>
-      </select>
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-square daisy-btn-outline daisy-shrink-0"
-        :disabled="disabled || rows.length === 0"
-        aria-label="Search folders"
-        data-testid="folder-selector-more-button"
-        @click="searchOpen = true"
+        </select>
+      </div>
+      <div
+        class="folder-selector-join-append daisy-join-item daisy-flex daisy-shrink-0 daisy-self-stretch daisy-items-stretch"
       >
-        <MoreHorizontal class="daisy-w-5 daisy-h-5" />
-      </button>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-rounded-l-none daisy-rounded-r-lg"
+          :disabled="disabled || rows.length === 0"
+          title="Search folders"
+          aria-label="Search folders"
+          data-testid="folder-selector-more-button"
+          @click="searchOpen = true"
+        >
+          <MoreHorizontal class="daisy-w-5 daisy-h-5" />
+        </button>
+      </div>
     </div>
     <FolderSearchDialog
       :open="searchOpen"
@@ -176,3 +185,10 @@ function onSearchSelect(folderId: number | null) {
   searchOpen.value = false
 }
 </script>
+
+<style scoped>
+.folder-selector-join-append :deep(button) {
+  height: 100%;
+  min-height: 2.75rem;
+}
+</style>
