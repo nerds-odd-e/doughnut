@@ -56,11 +56,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
-  wikidataId(value: string): NoteRealmBuilder {
-    this.noteBuilder.wikidataId(value)
-    return this
-  }
-
   content(value: string): NoteRealmBuilder {
     this.noteBuilder.content(value)
     return this

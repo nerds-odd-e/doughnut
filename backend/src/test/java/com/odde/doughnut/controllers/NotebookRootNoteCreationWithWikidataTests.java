@@ -173,7 +173,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setContent("---\nwikidataId: Q12345\n---\n");
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      assertThat(response.getNote().getWikidataId(), nullValue());
       assertThat(response.getNote().getContent(), containsString("wikidataId: Q12345"));
     }
 
@@ -183,7 +182,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       Folder folder = makeMe.aFolder().notebook(notebook).name("PlainHome").please();
       noteCreation.setFolderId(folder.getId());
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      assertThat(response.getNote().getWikidataId(), equalTo(null));
+      assertThat(response.getNote().getNoteTopology().getTitle(), equalTo("new title"));
     }
 
     @Nested

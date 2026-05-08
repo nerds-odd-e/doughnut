@@ -92,11 +92,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp updatedAt;
 
-  @Column(name = "wikidata_id")
-  @Getter
-  @Setter
-  private String wikidataId;
-
   @OneToMany(mappedBy = "note")
   @Getter
   @JsonIgnore

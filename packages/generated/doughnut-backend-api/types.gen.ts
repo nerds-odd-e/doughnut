@@ -202,7 +202,6 @@ export type Note = {
     content?: string;
     id: number;
     readonly deletedAt?: string;
-    wikidataId?: string;
 };
 
 export type NoteRealm = {
@@ -896,7 +895,6 @@ export type NoteWritable = {
     noteTopology: NoteTopology;
     content?: string;
     id: number;
-    wikidataId?: string;
 };
 
 export type NoteRealmWritable = {

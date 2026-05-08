@@ -29,7 +29,6 @@ class NoteBuilder extends Builder<Note> {
         updatedAt: '2021-08-24T08:46:44.000+00:00',
       },
       content: '<p>Desc</p>',
-      wikidataId: '',
       deletedAt: '',
     }
   }
@@ -43,11 +42,6 @@ class NoteBuilder extends Builder<Note> {
 
   title(value: string): NoteBuilder {
     this.data.noteTopology.title = value
-    return this
-  }
-
-  wikidataId(value: string): NoteBuilder {
-    this.data.wikidataId = value
     return this
   }
 

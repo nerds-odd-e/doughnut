@@ -201,11 +201,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder wikidataId(String wikidataId) {
-    entity.setWikidataId(wikidataId);
-    return this;
-  }
-
   public NoteBuilder level(int i) {
     entity.getRecallSetting().setLevel(i);
     return this;
