@@ -3080,8 +3080,6 @@ components:
           type: string
         Image Mask:
           type: string
-        Wikidata Id:
-          type: string
         Folder:
           type: string
           description: "Notebook-local folder path (segments separated by /). E2E/testability\

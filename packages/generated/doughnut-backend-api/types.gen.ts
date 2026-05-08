@@ -120,7 +120,6 @@ export type NoteTestData = {
     'Remember Spelling'?: boolean;
     'Image Url'?: string;
     'Image Mask'?: string;
-    'Wikidata Id'?: string;
     /**
      * Notebook-local folder path (segments separated by /). E2E/testability only: missing folder rows are created here, then the note is assigned that folder. Production note APIs do not accept or infer folder paths.
      */
