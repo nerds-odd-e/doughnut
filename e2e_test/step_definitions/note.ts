@@ -365,7 +365,9 @@ When('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')
   cy.get('body').then(($body) => {
     const close = $body.find('.Vue-Toastification__close-button').get(0)
-    if (close) close.click()
+    if (close) {
+      close.click()
+    }
   })
 })
 
