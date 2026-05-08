@@ -1,6 +1,8 @@
 <template>
   <RadioButtons
     :model-value="selectedRadioValue"
+    variant="chips"
+    radiogroup-class="daisy-max-h-[min(50vh,18rem)] daisy-overflow-y-auto daisy-overflow-x-hidden daisy-overscroll-y-contain daisy-pe-1"
     @update:model-value="onRadioSelection($event)"
     :scope-name="scopeName"
     :field="field"
@@ -8,32 +10,47 @@
     :error-message="errorMessage"
   >
     <template #labelAddition="{ value }">
-      <div v-if="value !== CUSTOM_SENTINEL" class="daisy-text-center">
+      <PenLine
+        v-if="value === CUSTOM_SENTINEL"
+        class="daisy-h-4 daisy-w-4 daisy-shrink-0 daisy-opacity-80"
+        aria-hidden="true"
+      />
+      <div
+        v-else
+        class="daisy-flex daisy-shrink-0 daisy-items-center"
+      >
         <SvgRelationTypeIcon
+          width="32px"
+          height="16px"
           :relation-type="value as RelationTypeLabel"
           :inverse-icon="inverseIcon"
         />
       </div>
     </template>
   </RadioButtons>
-  <label
+  <div
     v-if="selectedRadioValue === CUSTOM_SENTINEL"
-    class="daisy-flex daisy-flex-col daisy-gap-1 daisy-mt-2 daisy-text-sm"
-    :for="customInputId"
+    class="daisy-mt-3 daisy-rounded-box daisy-border daisy-border-base-content/15 daisy-bg-base-200/40 daisy-p-3"
   >
-    <span class="daisy-font-medium">Custom relationship</span>
+    <label
+      class="daisy-label daisy-mb-2 daisy-block daisy-p-0 daisy-text-sm daisy-font-medium"
+      :for="customInputId"
+    >
+      Custom relationship
+    </label>
     <div class="daisy-join daisy-join-horizontal daisy-w-full">
       <input
         :id="customInputId"
         v-model="customText"
         type="text"
         class="daisy-input daisy-input-bordered daisy-input-sm daisy-join-item daisy-min-w-0 daisy-flex-1"
+        placeholder="Type any phrase (e.g. inspired by)"
         autocomplete="off"
         @keydown.enter.prevent="emitCustomCommitted"
       />
       <button
         type="button"
-        class="daisy-btn daisy-btn-outline daisy-btn-sm daisy-join-item daisy-shrink-0"
+        class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-join-item daisy-shrink-0"
         title="Apply custom relationship"
         aria-label="Apply custom relationship"
         @mousedown.prevent
@@ -42,7 +59,10 @@
         <CornerDownLeft class="daisy-w-4 daisy-h-4" />
       </button>
     </div>
-  </label>
+    <p class="daisy-mb-0 daisy-mt-2 daisy-text-xs daisy-leading-snug daisy-text-base-content/60">
+      Confirm with Enter or the apply button (same as choosing a preset).
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -52,7 +72,7 @@ import {
   relationTypeOptions,
   type RelationTypeLabel,
 } from "../../models/relationTypeOptions"
-import { CornerDownLeft } from "lucide-vue-next"
+import { CornerDownLeft, PenLine } from "lucide-vue-next"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 
