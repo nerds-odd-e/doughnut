@@ -46,12 +46,12 @@
     </button>
     <Modal v-if="showEdit" @close_request="closeEdit">
       <template #body>
-        <SubscriptionEditDialog :subscription="subscription" />
+        <SubscriptionEditForm :subscription="subscription" />
       </template>
     </Modal>
     <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
       <template #body>
-        <NotebookCatalogMoveToGroupDialog
+        <NotebookCatalogMoveToGroupForm
           mode="subscribed"
           :notebook-id="notebookId"
           :subscription-id="subscription.id"
@@ -76,8 +76,8 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { Minus, MoreHorizontal } from "lucide-vue-next"
-import NotebookCatalogMoveToGroupDialog from "@/components/notebook/NotebookCatalogMoveToGroupDialog.vue"
-import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
+import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
+import SubscriptionEditForm from "./SubscriptionEditForm.vue"
 
 const props = defineProps({
   subscription: {

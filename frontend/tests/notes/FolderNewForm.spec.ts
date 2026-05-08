@@ -1,9 +1,9 @@
-import FolderNewDialog from "@/components/notes/FolderNewDialog.vue"
+import FolderNewForm from "@/components/notes/FolderNewForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-describe("FolderNewDialog", () => {
+describe("FolderNewForm", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     mockSdkService("listNotebookFolderIndex", [])
@@ -12,7 +12,7 @@ describe("FolderNewDialog", () => {
 
   it("includes FolderSelector for parent folder", async () => {
     const wrapper = helper
-      .component(FolderNewDialog)
+      .component(FolderNewForm)
       .withCleanStorage()
       .withProps({
         notebookId: 301,

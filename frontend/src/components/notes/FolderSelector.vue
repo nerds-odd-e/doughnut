@@ -59,7 +59,7 @@
     </div>
     <Modal v-if="searchOpen" @close_request="searchOpen = false">
       <template #body>
-        <FolderSearchDialog
+        <FolderSearchForm
           :notebook-id="notebookId"
           :context-folder-id="searchContextFolderId"
           :current-path-display="selectionSummary"
@@ -81,7 +81,7 @@ import { MoreHorizontal } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import FolderSearchDialog from "./FolderSearchDialog.vue"
+import FolderSearchForm from "./FolderSearchForm.vue"
 import {
   ancestorsFromChain,
   folderChainToIndexRows,

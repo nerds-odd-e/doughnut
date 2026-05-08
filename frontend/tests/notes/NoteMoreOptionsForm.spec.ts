@@ -1,4 +1,4 @@
-import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsDialog.vue"
+import NoteMoreOptionsForm from "@/components/notes/accessory/NoteMoreOptionsForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -9,7 +9,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 
-let renderer: RenderingHelper<typeof NoteMoreOptionsDialog>
+let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
 let router: ReturnType<typeof createRouter>
 let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
 
@@ -25,12 +25,12 @@ beforeEach(() => {
     routes,
   })
   renderer = helper
-    .component(NoteMoreOptionsDialog)
+    .component(NoteMoreOptionsForm)
     .withRouter(router)
     .withCleanStorage()
 })
 
-describe("NoteMoreOptionsDialog", () => {
+describe("NoteMoreOptionsForm", () => {
   const note = makeMe.aNote.please()
 
   describe("close dialog", () => {

@@ -480,7 +480,7 @@ describe("SearchResults.vue", () => {
       expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
     })
 
-    it("calls getRecentNotes only once on mount when isDropdown is true and noteId is set (like in NoteNewDialog)", async () => {
+    it("calls getRecentNotes only once on mount when isDropdown is true and noteId is set (like in NoteNewForm)", async () => {
       const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
       setupSearchMocks()
       getRecentNotesSpy.mockClear()

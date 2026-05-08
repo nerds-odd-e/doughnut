@@ -2,7 +2,7 @@
 
 import * as _story_0 from "@/components/commons/DiffView.stories"
 import * as _story_1 from "@/components/form/Quill.stories"
-import * as _story_2 from "@/components/notes/accessory/NoteMoreOptionsDialog.stories"
+import * as _story_2 from "@/components/notes/accessory/NoteMoreOptionsForm.stories"
 import * as _story_3 from "@/components/recall/AnsweredQuestionComponent.stories"
 import * as _story_4 from "@/components/recall/NoteUnderQuestion.stories"
 import * as _story_5 from "@/components/recall/QuestionDisplay.stories"
@@ -16,7 +16,7 @@ import * as _story_11 from "@/pages/NotebooksPage.stories"
 export const storyFiles = [
   { filePath: "components/commons/DiffView.stories.ts", storyFile: _story_0 },
   { filePath: "components/form/Quill.stories.ts", storyFile: _story_1 },
-  { filePath: "components/notes/accessory/NoteMoreOptionsDialog.stories.ts", storyFile: _story_2 },
+  { filePath: "components/notes/accessory/NoteMoreOptionsForm.stories.ts", storyFile: _story_2 },
   { filePath: "components/recall/AnsweredQuestionComponent.stories.ts", storyFile: _story_3 },
   { filePath: "components/recall/NoteUnderQuestion.stories.ts", storyFile: _story_4 },
   { filePath: "components/recall/QuestionDisplay.stories.ts", storyFile: _story_5 },

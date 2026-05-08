@@ -9,7 +9,7 @@ import {
   When,
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { assumeSidebarFolderOrganizeDialog } from '../start/pageObjects/sidebarFolderOrganizeDialog'
+import { assumeSidebarFolderOrganizeForm } from '../start/pageObjects/sidebarFolderOrganizeForm'
 
 Then('I am on a window {int} * {int}', (width: number, height: number) => {
   cy.viewport(width, height)
@@ -45,7 +45,7 @@ When(
   () => {
     start
       .noteSidebar()
-      .openFolderOrganizeDialog()
+      .openFolderOrganizeForm()
       .selectNotebookRootAsDestination()
       .confirmMove()
   }
@@ -56,7 +56,7 @@ When(
   () => {
     start
       .noteSidebar()
-      .openFolderOrganizeDialog()
+      .openFolderOrganizeForm()
       .selectNotebookRootAsDestination()
       .tryConfirmMove()
   }
@@ -67,7 +67,7 @@ When(
   (folderName: string) => {
     start
       .noteSidebar()
-      .openFolderOrganizeDialog()
+      .openFolderOrganizeForm()
       .openFolderSearch()
       .searchFolderDestination(folderName)
       .selectFolderSearchResultByName(folderName)
@@ -76,11 +76,11 @@ When(
 )
 
 When('I dissolve the active folder using the sidebar folder dialog', () => {
-  start.noteSidebar().openFolderOrganizeDialog().dissolveFolder()
+  start.noteSidebar().openFolderOrganizeForm().dissolveFolder()
 })
 
 Then('the sidebar folder dialog shows error {string}', (text: string) => {
-  assumeSidebarFolderOrganizeDialog().expectErrorText(text)
+  assumeSidebarFolderOrganizeForm().expectErrorText(text)
 })
 
 Then('I should see the note tree in the sidebar', (data: DataTable) => {

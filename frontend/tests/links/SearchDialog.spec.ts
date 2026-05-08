@@ -1,4 +1,4 @@
-import AddLinkDialog from "@/components/links/AddLinkDialog.vue"
+import AddLinkForm from "@/components/links/AddLinkForm.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -16,7 +16,7 @@ function makeNoteHit(title: string, notebookId: number) {
   }
 }
 
-describe("AddLinkDialog", () => {
+describe("AddLinkForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
@@ -28,7 +28,7 @@ describe("AddLinkDialog", () => {
   })
   it("Search at the top level with no note", async () => {
     helper
-      .component(AddLinkDialog)
+      .component(AddLinkForm)
       .withCleanStorage()
       .withProps({ note: null })
       .render()
@@ -48,7 +48,7 @@ describe("AddLinkDialog", () => {
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
     helper
-      .component(AddLinkDialog)
+      .component(AddLinkForm)
       .withCleanStorage()
       .withProps({ note })
       .render()
@@ -76,7 +76,7 @@ describe("AddLinkDialog", () => {
         makeNoteHit("Target Note", note.noteTopology.id + 100),
       ])
       helper
-        .component(AddLinkDialog)
+        .component(AddLinkForm)
         .withCleanStorage()
         .withProps({ note })
         .render()
@@ -106,7 +106,7 @@ describe("AddLinkDialog", () => {
         makeNoteHit("Target Note", note.noteTopology.id + 100),
       ])
       helper
-        .component(AddLinkDialog)
+        .component(AddLinkForm)
         .withCleanStorage()
         .withProps({ note })
         .render()
@@ -152,7 +152,7 @@ describe("AddLinkDialog", () => {
       const moveNoteToFolderSpy = mockSdkService("moveNoteToFolder", [])
 
       helper
-        .component(AddLinkDialog)
+        .component(AddLinkForm)
         .withCleanStorage()
         .withProps({ note })
         .render()
@@ -203,7 +203,7 @@ describe("AddLinkDialog", () => {
       const spy = mockSdkService("moveNoteToNotebookRootInNotebook", [])
 
       helper
-        .component(AddLinkDialog)
+        .component(AddLinkForm)
         .withCleanStorage()
         .withProps({ note })
         .render()

@@ -4,7 +4,7 @@
       <slot />
     </template>
     <template #default="{ closer }">
-      <FolderNewDialog
+      <FolderNewForm
         :notebook-id="notebookId"
         :ancestor-folders="ancestorFolders"
         :context-folder-id="contextFolderId"
@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
-import FolderNewDialog from "../FolderNewDialog.vue"
+import FolderNewForm from "../FolderNewForm.vue"
 
 defineProps<{
   notebookId: number

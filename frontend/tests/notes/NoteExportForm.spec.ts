@@ -1,7 +1,7 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
+import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"
 import { page } from "vitest/browser"
@@ -11,7 +11,7 @@ vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
 const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
 
-describe("NoteExportDialog", () => {
+describe("NoteExportForm", () => {
   let wrapper: VueWrapper
   beforeEach(() => {
     vi.clearAllMocks()
@@ -26,7 +26,7 @@ describe("NoteExportDialog", () => {
   it("fetches and displays AI markdown on open", async () => {
     const note = makeMe.aNote.please()
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
     await flushPromises()
@@ -47,7 +47,7 @@ describe("NoteExportDialog", () => {
     } as never
     const getGraphSpy = mockSdkService("getGraph", graphData)
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
 
@@ -76,7 +76,7 @@ describe("NoteExportDialog", () => {
   it("downloads AI markdown when primary download is clicked", async () => {
     const note = makeMe.aNote.please()
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
     await flushPromises()
@@ -94,7 +94,7 @@ describe("NoteExportDialog", () => {
     } as never
     mockSdkService("getGraph", graphData)
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
 
@@ -114,7 +114,7 @@ describe("NoteExportDialog", () => {
     } as never
     const getGraphMock = mockSdkService("getGraph", graphData)
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
 
@@ -151,7 +151,7 @@ describe("NoteExportDialog", () => {
       .mockResolvedValueOnce(wrapSdkResponse(graphData2))
 
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
 
@@ -186,7 +186,7 @@ describe("NoteExportDialog", () => {
       .mockResolvedValueOnce(wrapSdkResponse(md2))
 
     wrapper = helper
-      .component(NoteExportDialog)
+      .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
     await flushPromises()

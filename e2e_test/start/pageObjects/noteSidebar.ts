@@ -1,6 +1,6 @@
 import { pageIsNotLoading } from '../pageBase'
 import noteCreationForm from './noteForms/noteCreationForm'
-import { assumeSidebarFolderOrganizeDialog } from './sidebarFolderOrganizeDialog'
+import { assumeSidebarFolderOrganizeForm } from './sidebarFolderOrganizeForm'
 
 const sidebarActionTimeoutMs = 20000
 
@@ -133,10 +133,10 @@ export const noteSidebar = () => {
       pageIsNotLoading()
     },
 
-    openFolderOrganizeDialog() {
+    openFolderOrganizeForm() {
       pageIsNotLoading()
       cy.get('aside').findByRole('button', { name: 'Folder…' }).click()
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     addingNewNoteFromToolbar() {

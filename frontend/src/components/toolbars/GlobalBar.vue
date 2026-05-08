@@ -15,7 +15,7 @@
           <Search class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
-          <AddLinkDialog
+          <AddLinkForm
             v-bind="{ storageAccessor }"
             :modal-closer="closer"
             @close-dialog="closer"

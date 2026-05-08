@@ -8,7 +8,7 @@ import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { sidebarChildNotePageMethods } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
-import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
+import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { assumeAssimilationPage } from './assimilationPage'
 
 const noteShowHref = /^\/d\/n\/\d+$/
@@ -59,7 +59,7 @@ export const assumeNotePage = (
       return this
     },
     moreOptions: () => {
-      return makeSureNoteMoreOptionsDialogIsOpen()
+      return makeSureNoteMoreOptionsFormIsOpen()
     },
     expandChildren: () => {
       cy.findByRole('button', { name: 'expand children' }).click()
@@ -410,7 +410,7 @@ export const assumeNotePage = (
     openAssimilationSettings() {
       cy.url().then((href) => {
         if (!String(href).includes('/d/assimilate/')) {
-          makeSureNoteMoreOptionsDialogIsOpen().openAssimilationPage()
+          makeSureNoteMoreOptionsFormIsOpen().openAssimilationPage()
         } else {
           assumeAssimilationPage().waitForAssimilationReady()
         }

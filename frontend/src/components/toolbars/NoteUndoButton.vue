@@ -9,7 +9,7 @@
       <Undo2 class="daisy-w-6 daisy-h-6" />
     </template>
     <template #default="{ closer }">
-      <UndoConfirmationDialog
+      <UndoConfirmationForm
         :message="getUndoMessage()"
         :noteTopology="getNoteTopology()"
         :currentContent="getCurrentContent()"
@@ -29,7 +29,7 @@ import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { Undo2 } from "lucide-vue-next"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import UndoConfirmationDialog from "./UndoConfirmationDialog.vue"
+import UndoConfirmationForm from "./UndoConfirmationForm.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const router = useRouter()

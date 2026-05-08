@@ -89,7 +89,7 @@
               <span>Move to ...</span>
             </div>
           </template>
-          <NotebookMoveDialog v-bind="{ notebook }" />
+          <NotebookMoveForm v-bind="{ notebook }" />
         </PopButton>
         <button
           class="daisy-btn daisy-btn-outline daisy-btn-sm"
@@ -152,7 +152,7 @@
           Configure AI assistant settings and instructions for this notebook.
         </p>
       </div>
-      <NotebookAssistantManagementDialog 
+      <NotebookAssistantManagementForm 
         :notebook="notebook" 
         :additional-instructions="additionalInstructions"
       />
@@ -206,11 +206,11 @@ import { useToast } from "@/composables/useToast"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { GitMerge, Pencil, Share2 } from "lucide-vue-next"
-import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
+import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
-import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
+import NotebookAssistantManagementForm from "@/components/notebook/NotebookAssistantManagementForm.vue"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
 
 const props = defineProps({

@@ -1,7 +1,7 @@
 <template>
   <Modal v-if="modelValue !== null" @close_request="close">
     <template #body>
-      <NoteNewDialog
+      <NoteNewForm
         :notebook-root-notebook-id="notebookId"
         :target-folder-id="resolvedCreateParentFolderId ?? undefined"
         :parent-location-description="createParentLocationDescription"
@@ -20,7 +20,7 @@ import { computed } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import { useNotebookRootCreateTarget } from "./useNoteSidebarTree"
-import NoteNewDialog from "./NoteNewDialog.vue"
+import NoteNewForm from "./NoteNewForm.vue"
 
 const props = defineProps<{
   notebookId: number

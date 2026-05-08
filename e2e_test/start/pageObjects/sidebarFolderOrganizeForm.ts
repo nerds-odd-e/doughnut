@@ -2,27 +2,27 @@ import { pageIsNotLoading } from '../pageBase'
 
 const submitTimeoutMs = 20000
 
-export type SidebarFolderOrganizeDialog = {
-  selectNotebookRootAsDestination: () => SidebarFolderOrganizeDialog
-  openFolderSearch: () => SidebarFolderOrganizeDialog
-  searchFolderDestination: (text: string) => SidebarFolderOrganizeDialog
+export type SidebarFolderOrganizeForm = {
+  selectNotebookRootAsDestination: () => SidebarFolderOrganizeForm
+  openFolderSearch: () => SidebarFolderOrganizeForm
+  searchFolderDestination: (text: string) => SidebarFolderOrganizeForm
   selectFolderSearchResultByName: (
     folderName: string
-  ) => SidebarFolderOrganizeDialog
+  ) => SidebarFolderOrganizeForm
   confirmMove: () => void
-  tryConfirmMove: () => SidebarFolderOrganizeDialog
-  expectErrorText: (text: string) => SidebarFolderOrganizeDialog
+  tryConfirmMove: () => SidebarFolderOrganizeForm
+  expectErrorText: (text: string) => SidebarFolderOrganizeForm
   dissolveFolder: () => void
 }
 
 /**
  * Page object for the folder move dialog (opened from the sidebar toolbar Folder… control).
  */
-export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog {
+export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
   return {
     selectNotebookRootAsDestination() {
       cy.get('[data-testid="folder-move-parent-select"]').select('__root__')
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     openFolderSearch() {
@@ -30,12 +30,12 @@ export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog
       cy.get('[data-testid="folder-selector-search-dialog"]').should(
         'be.visible'
       )
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     searchFolderDestination(text: string) {
       cy.get('[data-testid="folder-selector-search-input"]').clear().type(text)
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     selectFolderSearchResultByName(folderName: string) {
@@ -43,7 +43,7 @@ export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog
         '[data-testid="folder-selector-search-result"]',
         folderName
       ).click()
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     confirmMove() {
@@ -57,14 +57,14 @@ export function assumeSidebarFolderOrganizeDialog(): SidebarFolderOrganizeDialog
       cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
         .should('not.be.disabled')
         .click()
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     expectErrorText(text: string) {
       cy.get('[data-testid="folder-move-dialog"]')
         .find('.daisy-text-error')
         .should('contain.text', text)
-      return assumeSidebarFolderOrganizeDialog()
+      return assumeSidebarFolderOrganizeForm()
     },
 
     dissolveFolder() {

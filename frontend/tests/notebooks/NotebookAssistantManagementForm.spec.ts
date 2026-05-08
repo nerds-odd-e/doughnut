@@ -1,10 +1,10 @@
 import { flushPromises } from "@vue/test-utils"
-import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
+import NotebookAssistantManagementForm from "@/components/notebook/NotebookAssistantManagementForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
-describe("NotebookAssistantManagementDialog.vue", () => {
+describe("NotebookAssistantManagementForm.vue", () => {
   let wrapper
   const notebook = makeMe.aNotebook.please()
   const mockedUpdateAiAssistant = vi.fn()
@@ -15,7 +15,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
       async (options) => await mockedUpdateAiAssistant(options)
     )
     wrapper = helper
-      .component(NotebookAssistantManagementDialog)
+      .component(NotebookAssistantManagementForm)
       .withProps({
         notebook,
         additionalInstructions: "",
@@ -49,7 +49,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   describe("Component Initialization", () => {
     it("loads empty settings when no assistant exists", async () => {
       wrapper = helper
-        .component(NotebookAssistantManagementDialog)
+        .component(NotebookAssistantManagementForm)
         .withProps({ notebook, additionalInstructions: "" })
         .mount()
       await flushPromises()
@@ -61,7 +61,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
     it("loads existing settings when assistant exists", async () => {
       const existingInstructions = "Existing instructions"
       wrapper = helper
-        .component(NotebookAssistantManagementDialog)
+        .component(NotebookAssistantManagementForm)
         .withProps({ notebook, additionalInstructions: existingInstructions })
         .mount()
       await flushPromises()

@@ -11,7 +11,7 @@
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
-          <AddLinkDialog
+          <AddLinkForm
             v-bind="{ note }"
             :modal-closer="closer"
             @close-dialog="closer"
@@ -70,7 +70,7 @@
     v-bind="{ note }"
     @close-dialog="audioTools = false"
   />
-  <NoteMoreOptionsDialog
+  <NoteMoreOptionsForm
     v-if="!readonly && moreOptions"
     v-bind="{ note }"
     @close-dialog="moreOptions = false"
@@ -84,7 +84,7 @@ import { ref, watch } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
-import AddLinkDialog from "../../links/AddLinkDialog.vue"
+import AddLinkForm from "../../links/AddLinkForm.vue"
 import {
   FileCode,
   LayoutTemplate,
@@ -96,7 +96,7 @@ import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
-import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
+import NoteMoreOptionsForm from "../accessory/NoteMoreOptionsForm.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 

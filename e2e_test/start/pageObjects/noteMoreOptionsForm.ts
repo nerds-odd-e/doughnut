@@ -21,17 +21,17 @@ function filterAttributes(
     )
 }
 
-export const makeSureNoteMoreOptionsDialogIsOpen = () => {
+export const makeSureNoteMoreOptionsFormIsOpen = () => {
   cy.findByRole('button', { name: 'more options' }).then(($button) => {
     if (!$button.hasClass('daisy-btn-active')) {
       cy.wrap($button).click()
     }
   })
 
-  return noteMoreOptionsDialog()
+  return noteMoreOptionsPage()
 }
 
-const noteMoreOptionsDialog = () => {
+const noteMoreOptionsPage = () => {
   return {
     toolbarButton,
     editNoteImage(attributes: Record<string, string>) {

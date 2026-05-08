@@ -1,4 +1,4 @@
-import NoteNewDialog from "@/components/notes/NoteNewDialog.vue"
+import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
@@ -47,7 +47,7 @@ let mockedCreateNoteAtRoot: ReturnType<
   typeof mockSdkService<"createNoteAtNotebookRoot">
 >
 
-async function setNoteNewDialogTitle(
+async function setNoteNewFormTitle(
   wrapper: VueWrapper<ComponentPublicInstance>,
   value: string
 ) {
@@ -97,7 +97,7 @@ describe("adding new note", () => {
   it("does not search for initial default 'Untitled' title", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
     const wrapper = helper
-      .component(NoteNewDialog)
+      .component(NoteNewForm)
       .withCleanStorage()
       .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
@@ -125,13 +125,13 @@ describe("adding new note", () => {
       ])
     )
     const wrapper = helper
-      .component(NoteNewDialog)
+      .component(NoteNewForm)
       .withCleanStorage()
       .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
 
     // First, change the title to something else (this marks it as edited)
-    await setNoteNewDialogTitle(wrapper, "myth")
+    await setNoteNewFormTitle(wrapper, "myth")
     vi.runOnlyPendingTimers()
     await flushPromises()
 
@@ -139,7 +139,7 @@ describe("adding new note", () => {
     searchForRelationshipTargetWithinSpy.mockClear()
 
     // Now change it back to "Untitled"
-    await setNoteNewDialogTitle(wrapper, "Untitled")
+    await setNoteNewFormTitle(wrapper, "Untitled")
     vi.runOnlyPendingTimers()
     await flushPromises()
 
@@ -165,11 +165,11 @@ describe("adding new note", () => {
       ])
     )
     const wrapper = helper
-      .component(NoteNewDialog)
+      .component(NoteNewForm)
       .withCleanStorage()
       .withProps(notebookRootProps)
       .mount({ attachTo: document.body })
-    await setNoteNewDialogTitle(wrapper, "myth")
+    await setNoteNewFormTitle(wrapper, "myth")
 
     vi.runOnlyPendingTimers()
     await flushPromises()
@@ -187,11 +187,11 @@ describe("adding new note", () => {
 
     beforeEach(async () => {
       wrapper = helper
-        .component(NoteNewDialog)
+        .component(NoteNewForm)
         .withCleanStorage()
         .withProps(notebookRootProps)
         .mount({ attachTo: document.body })
-      await setNoteNewDialogTitle(wrapper, "note title")
+      await setNoteNewFormTitle(wrapper, "note title")
       vi.clearAllTimers()
     })
 
@@ -200,9 +200,7 @@ describe("adding new note", () => {
     })
 
     it("call the api", async () => {
-      await wrapper
-        .find('[data-testid="note-new-dialog-form"]')
-        .trigger("submit")
+      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: {
           notebook: realm.notebookView.notebook.id,
@@ -221,19 +219,17 @@ describe("adding new note", () => {
       wrapper.unmount()
       mockSdkService("listNotebookFolderIndex", [{ id: 42, name: "Alpha" }])
       wrapper = helper
-        .component(NoteNewDialog)
+        .component(NoteNewForm)
         .withCleanStorage()
         .withProps({
           ...notebookRootProps,
           targetFolderId: 42,
         })
         .mount({ attachTo: document.body })
-      await setNoteNewDialogTitle(wrapper, "in folder")
+      await setNoteNewFormTitle(wrapper, "in folder")
       await flushPromises()
 
-      await wrapper
-        .find('[data-testid="note-new-dialog-form"]')
-        .trigger("submit")
+      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: { notebook: realm.notebookView.notebook.id },
         body: expect.objectContaining({
@@ -253,23 +249,21 @@ describe("adding new note", () => {
         { id: 8, name: "Two" },
       ])
       wrapper = helper
-        .component(NoteNewDialog)
+        .component(NoteNewForm)
         .withCleanStorage()
         .withProps({
           ...notebookRootProps,
           targetFolderId: 7,
         })
         .mount({ attachTo: document.body })
-      await setNoteNewDialogTitle(wrapper, "moved")
+      await setNoteNewFormTitle(wrapper, "moved")
       await flushPromises()
 
       const select = wrapper.find('[data-testid="folder-move-parent-select"]')
       await select.setValue("8")
       await flushPromises()
 
-      await wrapper
-        .find('[data-testid="note-new-dialog-form"]')
-        .trigger("submit")
+      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: { notebook: realm.notebookView.notebook.id },
         body: expect.objectContaining({
@@ -280,8 +274,8 @@ describe("adding new note", () => {
     })
 
     it("call the api once only", async () => {
-      wrapper.find('[data-testid="note-new-dialog-form"]').trigger("submit")
-      wrapper.find('[data-testid="note-new-dialog-form"]').trigger("submit")
+      wrapper.find('[data-testid="note-new-form"]').trigger("submit")
+      wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       await flushPromises()
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledTimes(1)
     })
@@ -303,9 +297,7 @@ describe("adding new note", () => {
         // biome-ignore lint/suspicious/noExplicitAny: SDK error result shape
       } as any)
 
-      await wrapper
-        .find('[data-testid="note-new-dialog-form"]')
-        .trigger("submit")
+      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       await flushPromises()
 
       expect(popupsMock.confirm).toHaveBeenCalledWith(
@@ -326,7 +318,7 @@ describe("adding new note", () => {
       )
       searchWikidataSpy = mockSdkService("searchWikidata", [])
       wrapper = helper
-        .component(NoteNewDialog)
+        .component(NoteNewForm)
         .withCleanStorage()
         .withProps(notebookRootProps)
         .mount({ attachTo: document.body })
@@ -337,7 +329,7 @@ describe("adding new note", () => {
     })
 
     const openWikidataDialog = async (key: string) => {
-      await setNoteNewDialogTitle(wrapper, key)
+      await setNoteNewFormTitle(wrapper, key)
       await wrapper.find("button[title='Wikidata Id']").trigger("click")
       await flushPromises()
     }

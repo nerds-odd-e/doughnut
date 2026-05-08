@@ -19,7 +19,7 @@
   />
   <Modal v-if="showUserSettings" @close_request="showUserSettings = false">
     <template #body>
-      <UserProfileDialog
+      <UserProfileForm
         v-bind="{ user }"
         @user-updated="
           if ($event) {
@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
-import UserProfileDialog from "./UserProfileDialog.vue"
+import UserProfileForm from "./UserProfileForm.vue"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { watch, computed, ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"

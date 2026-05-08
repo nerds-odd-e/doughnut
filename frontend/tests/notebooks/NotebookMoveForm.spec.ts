@@ -1,4 +1,4 @@
-import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
+import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import { describe, it, beforeEach, expect } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -16,12 +16,12 @@ describe("circle show page", () => {
   })
 
   it("fetch API to be called ONCE on mount", async () => {
-    helper.component(NotebookMoveDialog).withProps({ notebook }).render()
+    helper.component(NotebookMoveForm).withProps({ notebook }).render()
     expect(indexSpy).toBeCalled()
   })
 
   it("filters the current circle", async () => {
-    helper.component(NotebookMoveDialog).withProps({ notebook }).render()
+    helper.component(NotebookMoveForm).withProps({ notebook }).render()
     await flushPromises()
     await screen.findByText(circle2.name)
   })

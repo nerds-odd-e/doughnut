@@ -9,7 +9,7 @@
       <slot />
     </template>
     <template #default="{ closer }">
-      <FolderOrganizeDialog
+      <FolderOrganizeForm
         :notebook-id="notebookId"
         :moving-folder-id="movingFolderId"
         :moving-folder-name="movingFolderName"
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
-import FolderOrganizeDialog from "../FolderOrganizeDialog.vue"
+import FolderOrganizeForm from "../FolderOrganizeForm.vue"
 
 defineProps<{
   notebookId: number

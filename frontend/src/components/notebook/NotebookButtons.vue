@@ -41,7 +41,7 @@
     </details>
     <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
       <template #body>
-        <NotebookCatalogMoveToGroupDialog
+        <NotebookCatalogMoveToGroupForm
           mode="owned"
           :notebook-id="notebook.id"
           :catalog-group-id="catalogGroupId"
@@ -66,7 +66,7 @@ import {
   catalogMoveToGroupContextKey,
   type CatalogMoveToGroupInjected,
 } from "@/components/notebook/catalogMoveToGroupContext"
-import NotebookCatalogMoveToGroupDialog from "@/components/notebook/NotebookCatalogMoveToGroupDialog.vue"
+import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
 
 const router = useRouter()
 

@@ -4,7 +4,7 @@
       <BookPlus class="daisy-w-6 daisy-h-6" />
       <slot />
     </template>
-    <NotebookNewDialog :circle="circle" />
+    <NotebookNewForm :circle="circle" />
   </PopButton>
 </template>
 
@@ -13,7 +13,7 @@ import type { Circle } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import NotebookNewDialog from "./NotebookNewDialog.vue"
+import NotebookNewForm from "./NotebookNewForm.vue"
 import { BookPlus } from "lucide-vue-next"
 
 export default defineComponent({
@@ -21,6 +21,6 @@ export default defineComponent({
     circle: { type: Object as PropType<Circle> },
     btnClass: String,
   },
-  components: { BookPlus, NotebookNewDialog, PopButton },
+  components: { BookPlus, NotebookNewForm, PopButton },
 })
 </script>

@@ -14,7 +14,7 @@
           <ImageIcon class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
-          <NoteEditImageDialog
+          <NoteEditImageForm
             v-bind="{ noteId: note.id }"
             @close-dialog="noteAccessoriesUpdated(closer, $event)"
           />
@@ -29,7 +29,7 @@
           <Upload class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
-          <NoteExportDialog :note="note" @close-dialog="closer" />
+          <NoteExportForm :note="note" @close-dialog="closer" />
         </template>
       </PopButton>
 
@@ -76,8 +76,8 @@ import {
   Trash2,
   Upload,
 } from "lucide-vue-next"
-import NoteEditImageDialog from "./NoteEditImageDialog.vue"
-import NoteExportDialog from "../core/NoteExportDialog.vue"
+import NoteEditImageForm from "./NoteEditImageForm.vue"
+import NoteExportForm from "../core/NoteExportForm.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

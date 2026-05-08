@@ -8,7 +8,7 @@
         <Plus class="daisy-w-6 daisy-h-6" />
       </template>
       <template #default="{ closer }">
-        <SubscribeDialog
+        <SubscribeForm
           v-bind="{ notebook, loggedIn }"
           @close-dialog="closer"
         />
@@ -22,7 +22,7 @@ import type { PropType } from "vue"
 import type { Notebook } from "@generated/doughnut-backend-api"
 import PopButton from "../commons/Popups/PopButton.vue"
 import { Plus } from "lucide-vue-next"
-import SubscribeDialog from "./SubscribeDialog.vue"
+import SubscribeForm from "./SubscribeForm.vue"
 
 defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },

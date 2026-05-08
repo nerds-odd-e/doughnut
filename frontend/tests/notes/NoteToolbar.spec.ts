@@ -1,5 +1,5 @@
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
-import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsDialog.vue"
+import NoteMoreOptionsForm from "@/components/notes/accessory/NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
@@ -92,7 +92,7 @@ describe("NoteToolbar", () => {
     await flushPromises()
 
     // Check if the dialog component exists
-    const dialog = wrapper.findComponent(NoteMoreOptionsDialog)
+    const dialog = wrapper.findComponent(NoteMoreOptionsForm)
     expect(dialog.exists()).toBe(true)
 
     // Check if menu items exist in the dialog (by title attribute for toolbar buttons)
@@ -133,7 +133,7 @@ describe("NoteToolbar", () => {
     await flushPromises()
 
     // Verify dialog is open
-    let dialog = wrapper.findComponent(NoteMoreOptionsDialog)
+    let dialog = wrapper.findComponent(NoteMoreOptionsForm)
     expect(dialog.exists()).toBe(true)
 
     // Change the note id
@@ -144,7 +144,7 @@ describe("NoteToolbar", () => {
     await flushPromises()
 
     // Verify dialog is closed
-    dialog = wrapper.findComponent(NoteMoreOptionsDialog)
+    dialog = wrapper.findComponent(NoteMoreOptionsForm)
     expect(dialog.exists()).toBe(false)
   })
 })

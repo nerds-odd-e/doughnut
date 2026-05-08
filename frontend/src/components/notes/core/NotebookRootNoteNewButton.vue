@@ -8,7 +8,7 @@
       <slot />
     </template>
     <template #default="{ closer }">
-      <NoteNewDialog
+      <NoteNewForm
         :notebook-root-notebook-id="notebookId"
         :target-folder-id="targetFolderId ?? undefined"
         :parent-location-description="parentLocationDescription"
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
-import NoteNewDialog from "../NoteNewDialog.vue"
+import NoteNewForm from "../NoteNewForm.vue"
 
 defineProps<{
   notebookId: number

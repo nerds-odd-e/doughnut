@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
-import NoteMoreOptionsDialog from "./NoteMoreOptionsDialog.vue"
+import NoteMoreOptionsForm from "./NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 
 const meta = {
-  title: "Notes/Accessory/NoteMoreOptionsDialog",
-  component: NoteMoreOptionsDialog,
+  title: "Notes/Accessory/NoteMoreOptionsForm",
+  component: NoteMoreOptionsForm,
   tags: ["autodocs"],
   parameters: {
     layout: "padded",
@@ -25,7 +25,7 @@ const meta = {
       description: "The note for which to show more options",
     },
   },
-} satisfies Meta<typeof NoteMoreOptionsDialog>
+} satisfies Meta<typeof NoteMoreOptionsForm>
 
 export default meta
 type Story = StoryObj<typeof meta>

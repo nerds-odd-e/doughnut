@@ -1,4 +1,4 @@
-import AddLinkDialog from "@/components/links/AddLinkDialog.vue"
+import AddLinkForm from "@/components/links/AddLinkForm.vue"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -39,7 +39,7 @@ describe("InsertWikiLink", () => {
     ])
 
     helper
-      .component(AddLinkDialog)
+      .component(AddLinkForm)
       .withCleanStorage()
       .withProps({ note })
       .render()
@@ -68,7 +68,7 @@ describe("InsertWikiLink", () => {
     ])
 
     helper
-      .component(AddLinkDialog)
+      .component(AddLinkForm)
       .withCleanStorage()
       .withProps({ note })
       .render()
@@ -112,7 +112,7 @@ describe("InsertWikiLink", () => {
     ])
 
     helper
-      .component(AddLinkDialog)
+      .component(AddLinkForm)
       .withCleanStorage()
       .withProps({ note })
       .render()
@@ -144,7 +144,7 @@ describe("InsertWikiLink", () => {
     ])
 
     helper
-      .component(AddLinkDialog)
+      .component(AddLinkForm)
       .withCleanStorage()
       .withProps({ note })
       .render()

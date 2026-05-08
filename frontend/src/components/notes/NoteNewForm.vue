@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-card daisy-w-full">
     <div class="daisy-card-body">
-      <form data-testid="note-new-dialog-form" @submit.prevent="processForm">
+      <form data-testid="note-new-form" @submit.prevent="processForm">
         <fieldset :disabled="processing">
           <div class="daisy-mb-4">
             <p class="daisy-text-sm daisy-mb-2">

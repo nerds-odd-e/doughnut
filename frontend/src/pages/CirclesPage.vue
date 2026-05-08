@@ -17,7 +17,7 @@
     <div class="daisy-join mt-3">
       <PopButton btn-class="daisy-btn" title="Create a new circle">
         <template #default="{ closer }">
-          <CircleNewDialog @close-dialog="closer" />
+          <CircleNewForm @close-dialog="closer" />
         </template>
       </PopButton>
       <router-link class="daisy-btn daisy-btn-primary" :to="{ name: 'circleJoin' }">
@@ -32,7 +32,7 @@ import { ref, onMounted } from "vue"
 import type { Circle } from "@generated/doughnut-backend-api"
 import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
-import CircleNewDialog from "@/components/circles/CircleNewDialog.vue"
+import CircleNewForm from "@/components/circles/CircleNewForm.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
