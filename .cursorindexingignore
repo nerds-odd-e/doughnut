@@ -1,0 +1,7 @@
+# Exclude noisy reference material from default indexing, but keep it readable on demand.
+ongoing/
+docs/
+open_api_docs.yaml
+packages/generated/doughnut-backend-api/*.gen.ts
+packages/generated/doughnut-backend-api/index.ts
+packages/generated/doughnut-backend-api/client/

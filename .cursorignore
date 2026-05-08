@@ -1,10 +1,24 @@
-# Keep Cursor retrieval focused on source files. Generated artifacts, planning
-# notes, and long reference docs can be opened explicitly when needed.
+# Hard-block files Cursor should not read or index.
+docs/images/
+docs/practices/
+docs/teams/
 
-# Generated API/OpenAPI output
-packages/generated/doughnut-backend-api/*.gen.ts
-open_api_docs.yaml
+# Logs, dumps, and process files
+*.log
+core
+*.pid
 
-# Planning and reference material that is noisy for default retrieval
-ongoing/
-docs/
+# Runtime state and local build output
+backend/logs/
+mysql/
+redis/
+.venv*/
+dist/
+**/dist/
+
+# Secret material
+env.sh
+*.secret
+.gitsecret/
+**/.env
+**/.env.*
