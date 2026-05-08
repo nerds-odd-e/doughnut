@@ -109,20 +109,39 @@
         />
         <div
           v-else-if="isWikidataIdPropertyRow(propertyRows[idx]!)"
-          class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2 daisy-justify-between"
+          class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
+          :class="
+            propertyRows[idx]!.value.trim()
+              ? ''
+              : 'daisy-justify-between'
+          "
         >
-          <span
-            class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
-            :title="propertyRows[idx]!.value.trim()"
-          >{{ propertyRows[idx]!.value.trim() || "—" }}</span>
           <button
+            v-if="propertyRows[idx]!.value.trim()"
             type="button"
-            class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-min-w-0 daisy-max-w-full daisy-shrink daisy-truncate daisy-justify-start daisy-py-0.5 daisy-px-1 daisy-font-mono daisy-text-sm daisy-font-normal daisy-text-base-content/90 daisy-normal-case"
+            :title="propertyRows[idx]!.value.trim()"
             data-testid="rich-note-wikidata-property-edit"
+            :aria-label="`Edit Wikidata ID ${propertyRows[idx]!.value.trim()}`"
             @click="openWikidataDialogForRow(idx)"
           >
-            Set…
+            {{ propertyRows[idx]!.value.trim() }}
           </button>
+          <template v-else>
+            <span
+              class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
+              aria-hidden="true"
+            >—</span>
+            <button
+              type="button"
+              class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
+              data-testid="rich-note-wikidata-property-edit"
+              aria-label="Set Wikidata ID"
+              @click="openWikidataDialogForRow(idx)"
+            >
+              Set…
+            </button>
+          </template>
         </div>
         <WikiPropertyValueField
           v-else
