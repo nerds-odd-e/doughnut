@@ -5,13 +5,26 @@
     :aria-labelledby="headingVisible ? headingId : undefined"
     :aria-label="headingVisible ? undefined : 'Note properties'"
   >
-    <h4
+    <div
       v-if="headingVisible"
-      :id="headingId"
-      class="daisy-text-sm daisy-font-semibold daisy-mb-2"
+      class="daisy-flex daisy-items-center daisy-justify-between daisy-gap-2 daisy-mb-2"
     >
-      Properties
-    </h4>
+      <h4
+        :id="headingId"
+        class="daisy-mb-0 daisy-text-sm daisy-font-semibold"
+      >
+        Properties
+      </h4>
+      <button
+        v-if="showInsertChrome && propertyRows.length > 0"
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-shrink-0 daisy-items-center daisy-gap-1"
+        @click="insertOpen = true"
+      >
+        <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+        Add property
+      </button>
+    </div>
     <dl
       v-if="propertyRows.length > 0 && isReadOnly"
       class="daisy-grid daisy-grid-cols-[auto_minmax(0,1fr)] daisy-gap-x-4 daisy-gap-y-1 daisy-text-sm"
@@ -66,12 +79,12 @@
         />
         <button
           type="button"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-shrink-0"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
           :aria-label="`Remove note property ${row.key}`"
           data-testid="rich-note-property-row-remove"
           @click="removeRow(idx)"
         >
-          Remove
+          <Minus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -84,15 +97,27 @@
     >
       {{ validationMessage }}
     </p>
-    <div v-if="showInsertChrome" class="daisy-flex daisy-flex-col daisy-gap-2 daisy-mt-1">
+    <div
+      v-if="showInsertChrome && (propertyRows.length === 0 || insertOpen)"
+      :class="
+        propertyRows.length === 0
+          ? 'daisy-mt-1 daisy-flex daisy-flex-col daisy-gap-2'
+          : 'daisy-mt-1'
+      "
+    >
       <button
+        v-if="propertyRows.length === 0"
         type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-self-start"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-self-start daisy-items-center daisy-gap-1"
         @click="insertOpen = true"
       >
-        Add note property
+        <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+        Add property
       </button>
-      <div v-if="insertOpen" class="daisy-flex daisy-flex-wrap daisy-gap-2 daisy-items-end">
+      <div
+        v-if="insertOpen"
+        class="daisy-flex daisy-flex-wrap daisy-gap-2 daisy-items-end"
+      >
         <label class="daisy-form-control daisy-w-full sm:daisy-w-auto daisy-min-w-[8rem]">
           <span class="daisy-label daisy-text-xs">Property key</span>
           <input
@@ -123,6 +148,7 @@
 </template>
 
 <script setup lang="ts">
+import { Minus, Plus } from "lucide-vue-next"
 import { computed, nextTick, ref, useId, watch } from "vue"
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"

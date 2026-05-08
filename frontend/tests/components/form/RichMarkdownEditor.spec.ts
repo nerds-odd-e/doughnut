@@ -166,7 +166,7 @@ Main content here.`
     expect(wrapper.find("section").exists()).toBe(true)
     expect(wrapper.find("h4").exists()).toBe(false)
     expect(wrapper.text()).not.toContain("Properties")
-    expect(wrapper.text()).toContain("Add note property")
+    expect(wrapper.text()).toContain("Add property")
   })
 
   it("does not show Properties section when content has no frontmatter (readonly)", async () => {
@@ -188,7 +188,7 @@ Body`)
     expect(wrapper.find("section").exists()).toBe(true)
     expect(wrapper.find("h4").exists()).toBe(false)
     expect(wrapper.text()).not.toContain("Properties")
-    expect(wrapper.text()).toContain("Add note property")
+    expect(wrapper.text()).toContain("Add property")
   })
 
   it("does not show Properties section when frontmatter block is empty (readonly)", async () => {
@@ -212,7 +212,7 @@ Body`,
 
     const addBtn = wrapper
       .findAll("button")
-      .find((w) => w.text().includes("Add note property"))
+      .find((w) => w.text().includes("Add property"))
     expect(addBtn).toBeDefined()
     await addBtn!.trigger("click")
     await flushPromises()
@@ -566,6 +566,6 @@ Paragraph.\n`
 
     expect(wrapper.find("h4").exists()).toBe(false)
     expect(wrapper.text()).not.toContain("Properties")
-    expect(wrapper.text()).toContain("Add note property")
+    expect(wrapper.text()).toContain("Add property")
   })
 })

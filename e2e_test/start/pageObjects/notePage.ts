@@ -258,7 +258,7 @@ export const assumeNotePage = (
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
       }).within(() => {
-        cy.findByRole('button', { name: 'Add note property' }).click()
+        cy.findByRole('button', { name: 'Add property' }).click()
         cy.findByTestId('rich-note-property-key').clear().type(key)
         cy.findByTestId('rich-note-property-value').clear().type(value)
       })
