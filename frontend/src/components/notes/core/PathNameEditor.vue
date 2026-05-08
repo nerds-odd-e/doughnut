@@ -17,9 +17,21 @@
       </div>
     </div>
 
-    <slot v-else name="title" :bindings="seamlessBindings" :editor="SeamlessTextEditor">
-      <SeamlessTextEditor v-bind="seamlessBindings" />
-    </slot>
+    <div
+      v-else-if="!$slots.title"
+      class="path-name-editor-shell daisy-w-full daisy-min-w-0 daisy-flex daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-lg"
+    >
+      <div class="daisy-w-full daisy-min-w-0">
+        <SeamlessTextEditor v-bind="seamlessBindings" />
+      </div>
+    </div>
+
+    <slot
+      v-else
+      name="title"
+      :bindings="seamlessBindings"
+      :editor="SeamlessTextEditor"
+    />
 
     <div v-if="errorMessage" class="daisy-text-error daisy-text-sm">
       {{ errorMessage }}
