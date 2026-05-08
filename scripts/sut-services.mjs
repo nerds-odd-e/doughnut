@@ -40,13 +40,15 @@ export function runSutServices({
   process.once('SIGINT', forwardSignal)
   process.once('SIGTERM', forwardSignal)
 
+  child.on('error', (error) => {
+    logWriter.write(`Failed to start SUT services: ${error.message}\n`)
+    logWriter.close()
+    process.exit(1)
+  })
+
   child.on('close', (code, signal) => {
     logWriter.close()
-    if (signal) {
-      process.kill(process.pid, signal)
-      return
-    }
-    process.exit(code ?? 1)
+    process.exit(signal ? 1 : (code ?? 1))
   })
 
   return child
