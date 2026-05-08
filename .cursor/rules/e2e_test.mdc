@@ -73,7 +73,7 @@ Use when **text is not in the DOM** (e.g. PDF drawn only to `<canvas>`). Keep OC
 
 ## Debugging
 
-The backend service log is located at `backend/logs/doughnut-e2e.log`. Please make sure only get tail from it.
+Use `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` for backend E2E log inspection.
 
 ## Key Practices
 

@@ -59,7 +59,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ---
 
-## Phase 2 — Cap log growth and give agents a safe log-tail path (planned)
+## Phase 2 — Cap log growth and give agents a safe log-tail path (done)
 
 **Type:** Behavior. **Why next:** Phase 1 protects retrieval, but agents legitimately need to inspect logs when debugging. Today they have only "tail it manually" warnings buried in rule files. This phase replaces good intentions with bounded files and one obvious command.
 
@@ -76,6 +76,8 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 - A grep for "tail" in `.cursor/rules/` returns at most one canonical reference.
 
 **Risks:** Log rotation must not break tooling that watches the file by inode (anything tailing `sut.log`). Use copy-truncate or document any consumer changes.
+
+**Implementation notes:** `pnpm sut` now starts services through `scripts/sut-services.mjs`, which writes the combined SUT stream through a 5 MB rotating writer with three backups. Backend E2E logging uses the same 5 MB / three-backup size policy in Logback. `pnpm logs:tail [sut|backend-e2e|mountebank]` is the canonical log inspection command and defaults to 200 lines.
 
 ---
 

@@ -92,17 +92,13 @@ test('spawnSutServices spawns a detached child and returns child + logFile', asy
     assert.strictEqual(result.child, mockChild)
     assert.strictEqual(result.logFile, logFile)
     assert.strictEqual(spawnCalls.length, 1)
-    assert.strictEqual(spawnCalls[0].cmd, 'pnpm')
+    assert.strictEqual(spawnCalls[0].cmd, process.execPath)
     assert.deepStrictEqual(spawnCalls[0].args, [
-      'exec',
-      'run-p',
-      '-clnr',
-      'backend:sut',
-      'start:mb',
-      'local:lb:vite',
-      'frontend:sut',
+      path.resolve('scripts/sut-services.mjs'),
     ])
     assert.strictEqual(spawnCalls[0].opts.detached, true)
+    assert.strictEqual(spawnCalls[0].opts.env.SUT_LOG_FILE, logFile)
+    assert.strictEqual(spawnCalls[0].opts.stdio, 'ignore')
     assert.strictEqual(spawnCalls[0].opts.shell, false)
   } finally {
     await rm(dir, { recursive: true, force: true })

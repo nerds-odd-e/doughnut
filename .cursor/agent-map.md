@@ -42,6 +42,7 @@ Useful focused checks:
 - Backend: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`
 - E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature`
+- Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`)
 - Lint all: `CURSOR_DEV=true nix develop -c pnpm lint:all`
 - Format all: `CURSOR_DEV=true nix develop -c pnpm format:all`
 

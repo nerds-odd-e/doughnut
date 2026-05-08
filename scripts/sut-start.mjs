@@ -14,19 +14,19 @@
  *   SUT_TIMEOUT_MS  – max ms to wait for healthy (default: 120000)
  *   SUT_POLL_MS     – ms between healthcheck polls (default: 3000)
  */
-import { openSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
+import { LOG_TARGETS } from './log-utils.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 )
 
-export const LOG_FILE = path.join(repoRoot, 'sut.log')
+export const LOG_FILE = LOG_TARGETS.sut
 export const PID_FILE = path.join(repoRoot, 'sut.pid')
 
 const TIMEOUT_MS = Number(process.env.SUT_TIMEOUT_MS ?? 120_000)
@@ -51,29 +51,21 @@ async function tailFile(filePath, lines) {
 }
 
 /**
- * Spawn the run-p service group detached, redirecting stdout+stderr to the log
- * file. Returns the child process handle (already unref'd).
+ * Spawn the SUT service group detached. The wrapper keeps running after this
+ * startup helper exits and writes stdout+stderr through a rotating log.
  *
  * @param {{ spawnFn?: typeof spawn, logFile?: string }} [opts]
  * @returns {{ child: import('node:child_process').ChildProcess, logFile: string }}
  */
 export function spawnSutServices({ spawnFn = spawn, logFile = LOG_FILE } = {}) {
-  const logFd = openSync(logFile, 'a')
   const child = spawnFn(
-    'pnpm',
-    [
-      'exec',
-      'run-p',
-      '-clnr',
-      'backend:sut',
-      'start:mb',
-      'local:lb:vite',
-      'frontend:sut',
-    ],
+    process.execPath,
+    [path.join(repoRoot, 'scripts/sut-services.mjs')],
     {
       cwd: repoRoot,
       detached: true,
-      stdio: ['ignore', logFd, logFd],
+      env: { ...process.env, SUT_LOG_FILE: logFile },
+      stdio: 'ignore',
       shell: false,
     }
   )
