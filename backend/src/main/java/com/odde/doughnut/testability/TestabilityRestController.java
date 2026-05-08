@@ -114,10 +114,6 @@ class TestabilityRestController {
     @Setter
     private String imageMask;
 
-    @JsonProperty("Wikidata Id")
-    @Setter
-    private String wikidataId;
-
     @Schema(
         name = "Folder",
         description =
@@ -146,7 +142,6 @@ class TestabilityRestController {
       accessory.setImageMask(imageMask);
       accessory.setImageUrl(imageUrl);
 
-      note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);
       return note;
     }
