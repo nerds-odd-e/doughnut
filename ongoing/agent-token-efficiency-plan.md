@@ -165,7 +165,7 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 
 ---
 
-## Phase 7 — Break up the largest backend test classes (planned)
+## Phase 7 — Break up the largest backend test classes (done)
 
 **Type:** Structure (justified by ongoing test edits and Phase 8). **Why now:** With rules and API lookup trimmed, the remaining hot spot is "the file you have to open to make the change". `NotebookBooksControllerTest.java` (2327 lines) and `NotebookControllerTest.java` (1325 lines) are the worst offenders.
 
@@ -179,6 +179,8 @@ Create `.cursorindexingignore` (or move existing entries into it) for **retrieva
 - No file in `backend/src/test/java/com/odde/doughnut/controllers/` exceeds ~500 lines.
 
 **Risks:** Hidden inter-test ordering or shared mutable fixtures. Mitigation: each split file should be runnable in isolation; verify by running the new file alone.
+
+**Implementation notes:** `NotebookBooksControllerTest` (2327 lines) split into a shared base class `NotebookBooksControllerTestBase` plus 6 focused test files: `NotebookBooksAttachControllerTest`, `NotebookBooksRetrievalControllerTest`, `NotebookBooksReadingPositionControllerTest`, `NotebookBooksReadingRecordControllerTest`, `NotebookBooksBlockDepthControllerTest`, `NotebookBooksBlockContentControllerTest`. `NotebookControllerTest` (1325 lines) split into a shared base class `NotebookControllerTestBase` plus 4 focused test files: `NotebookCrudControllerTest`, `NotebookSharingGroupControllerTest`, `NotebookNotesFolderControllerTest`, `NotebookFolderManagementControllerTest`. All resulting files are ≤525 lines. All backend tests pass.
 
 ---
 
