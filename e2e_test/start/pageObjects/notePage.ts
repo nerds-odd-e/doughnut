@@ -411,7 +411,13 @@ export const assumeNotePage = (
     },
 
     associateWikidataDialog() {
-      this.switchToRichContent()
+      // Notes open in rich (frontmatter) mode by default; only switch when already in markdown mode.
+      cy.get('body').then(($body) => {
+        const toRich = $body.find('button[aria-label="Edit as rich content"]')
+        if (toRich.length > 0) {
+          cy.wrap(toRich.first()).click()
+        }
+      })
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
       }).within(() => {

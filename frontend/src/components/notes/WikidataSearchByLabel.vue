@@ -1,7 +1,8 @@
 <template>
   <button
-    title="Wikidata Id"
     type="button"
+    title="Wikidata Id"
+    aria-label="Wikidata Id"
     :class="buttonClasses"
     @click.prevent="openDialog"
   >

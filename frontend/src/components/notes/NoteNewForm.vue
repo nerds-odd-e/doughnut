@@ -123,7 +123,7 @@ function contentWithWikidataFrontmatter(
 ): string | undefined {
   const t = wikidataId.trim()
   if (!t) return undefined
-  return `---\nwikidataId: ${t}\n---\n`
+  return `---\nwikidata_id: ${t}\n---\n`
 }
 
 // Reactive state
@@ -185,6 +185,13 @@ const processForm = async () => {
   processing.value = true
   noteFormErrors.value.wikidataId = undefined
   noteFormErrors.value.newTitle = undefined
+
+  const trimmedWikidata = wikidataIdSelection.value.trim()
+  if (trimmedWikidata !== "" && !/^Q\d+$/i.test(trimmedWikidata)) {
+    noteFormErrors.value.wikidataId = "The wikidata Id should be Q<numbers>"
+    processing.value = false
+    return
+  }
 
   const api = storageAccessor.value.storedApi()
   const wikidataContent = contentWithWikidataFrontmatter(

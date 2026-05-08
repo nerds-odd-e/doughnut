@@ -23,6 +23,7 @@
         v-if="!conversationButton"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
+        aria-label="Star a conversation about this note"
         @click="() => router.push({
           ...noteShowLocation(note.noteTopology.id),
           query: { conversation: 'true' },
@@ -32,10 +33,10 @@
         <MessageCircle class="daisy-w-6 daisy-h-6" />
       </a>
 
-      <button v-if="!readonly && !asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+      <button v-if="!readonly && !asMarkdown" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" aria-label="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <FileCode class="daisy-w-6 daisy-h-6" />
       </button>
-      <button v-else-if="!readonly" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
+      <button v-else-if="!readonly" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" aria-label="Edit as rich content" @click="$emit('edit-as-markdown', false)">
         <LayoutTemplate class="daisy-w-6 daisy-h-6" />
       </button>
 

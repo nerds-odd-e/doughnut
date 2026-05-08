@@ -68,4 +68,11 @@ class NoteContentMarkdownTest {
             "---\nwikidataId: Q42\n---\nBody"),
         equalTo(Optional.of("Q42")));
   }
+
+  @Test
+  void wikidataIdScalarFromLeadingFrontmatter_prefers_wikidata_id_snake_case() {
+    assertThat(
+        NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("---\nwikidata_id: Q99\n---\n"),
+        equalTo(Optional.of("Q99")));
+  }
 }
