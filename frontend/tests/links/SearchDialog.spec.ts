@@ -1,4 +1,4 @@
-import AddLinkForm from "@/components/links/AddLinkForm.vue"
+import SearchForm from "@/components/links/SearchForm.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -16,7 +16,7 @@ function makeNoteHit(title: string, notebookId: number) {
   }
 }
 
-describe("AddLinkForm", () => {
+describe("SearchForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
@@ -28,7 +28,7 @@ describe("AddLinkForm", () => {
   })
   it("Search at the top level with no note", async () => {
     helper
-      .component(AddLinkForm)
+      .component(SearchForm)
       .withCleanStorage()
       .withProps({ note: null })
       .render()
@@ -47,11 +47,7 @@ describe("AddLinkForm", () => {
 
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
-    helper
-      .component(AddLinkForm)
-      .withCleanStorage()
-      .withProps({ note })
-      .render()
+    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
     ;(await screen.findByRole("button", { name: "All My Circles" })).click()
     expect(
       await screen.findByRole("button", {
@@ -76,7 +72,7 @@ describe("AddLinkForm", () => {
         makeNoteHit("Target Note", note.noteTopology.id + 100),
       ])
       helper
-        .component(AddLinkForm)
+        .component(SearchForm)
         .withCleanStorage()
         .withProps({ note })
         .render()
@@ -106,7 +102,7 @@ describe("AddLinkForm", () => {
         makeNoteHit("Target Note", note.noteTopology.id + 100),
       ])
       helper
-        .component(AddLinkForm)
+        .component(SearchForm)
         .withCleanStorage()
         .withProps({ note })
         .render()
@@ -152,7 +148,7 @@ describe("AddLinkForm", () => {
       const moveNoteToFolderSpy = mockSdkService("moveNoteToFolder", [])
 
       helper
-        .component(AddLinkForm)
+        .component(SearchForm)
         .withCleanStorage()
         .withProps({ note })
         .render()
@@ -203,7 +199,7 @@ describe("AddLinkForm", () => {
       const spy = mockSdkService("moveNoteToNotebookRootInNotebook", [])
 
       helper
-        .component(AddLinkForm)
+        .component(SearchForm)
         .withCleanStorage()
         .withProps({ note })
         .render()

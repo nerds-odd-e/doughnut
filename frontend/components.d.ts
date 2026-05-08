@@ -14,7 +14,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
     AccountMenuItem: typeof import('./src/components/toolbars/AccountMenuItem.vue')['default']
-    AddLinkForm: typeof import('./src/components/links/AddLinkForm.vue')['default']
     AddRelationshipFinalize: typeof import('./src/components/links/AddRelationshipFinalize.vue')['default']
     AiResponse: typeof import('./src/components/conversations/AiResponse.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/recall/AnsweredQuestionComponent.vue')['default']
@@ -163,6 +162,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     ScrollTo: typeof import('./src/components/commons/ScrollTo.vue')['default']
     SeamlessTextEditor: typeof import('./src/components/form/SeamlessTextEditor.vue')['default']
+    SearchForm: typeof import('./src/components/links/SearchForm.vue')['default']
     SearchForNoteAndFolder: typeof import('./src/components/search/SearchForNoteAndFolder.vue')['default']
     SearchResultList: typeof import('./src/components/search/SearchResultList.vue')['default']
     SearchResultListItem: typeof import('./src/components/search/SearchResultListItem.vue')['default']
@@ -232,7 +232,6 @@ declare module 'vue' {
 declare global {
   const AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
   const AccountMenuItem: typeof import('./src/components/toolbars/AccountMenuItem.vue')['default']
-  const AddLinkForm: typeof import('./src/components/links/AddLinkForm.vue')['default']
   const AddRelationshipFinalize: typeof import('./src/components/links/AddRelationshipFinalize.vue')['default']
   const AiResponse: typeof import('./src/components/conversations/AiResponse.vue')['default']
   const AnsweredQuestionComponent: typeof import('./src/components/recall/AnsweredQuestionComponent.vue')['default']
@@ -381,6 +380,7 @@ declare global {
   const RouterView: typeof import('vue-router')['RouterView']
   const ScrollTo: typeof import('./src/components/commons/ScrollTo.vue')['default']
   const SeamlessTextEditor: typeof import('./src/components/form/SeamlessTextEditor.vue')['default']
+  const SearchForm: typeof import('./src/components/links/SearchForm.vue')['default']
   const SearchForNoteAndFolder: typeof import('./src/components/search/SearchForNoteAndFolder.vue')['default']
   const SearchResultList: typeof import('./src/components/search/SearchResultList.vue')['default']
   const SearchResultListItem: typeof import('./src/components/search/SearchResultListItem.vue')['default']

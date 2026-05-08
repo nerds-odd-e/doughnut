@@ -1,4 +1,4 @@
-import AddLinkForm from "@/components/links/AddLinkForm.vue"
+import SearchForm from "@/components/links/SearchForm.vue"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -38,11 +38,7 @@ describe("InsertWikiLink", () => {
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
-    helper
-      .component(AddLinkForm)
-      .withCleanStorage()
-      .withProps({ note })
-      .render()
+    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
 
     const searchInput = await screen.findByPlaceholderText("Search")
     fireEvent.update(searchInput, "CI")
@@ -67,11 +63,7 @@ describe("InsertWikiLink", () => {
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
-    helper
-      .component(AddLinkForm)
-      .withCleanStorage()
-      .withProps({ note })
-      .render()
+    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
 
     const searchInput = await screen.findByPlaceholderText("Search")
     fireEvent.update(searchInput, "Sed")
@@ -111,11 +103,7 @@ describe("InsertWikiLink", () => {
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
-    helper
-      .component(AddLinkForm)
-      .withCleanStorage()
-      .withProps({ note })
-      .render()
+    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
 
     const searchInput = await screen.findByPlaceholderText("Search")
     fireEvent.update(searchInput, "Prop")
@@ -143,11 +131,7 @@ describe("InsertWikiLink", () => {
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
-    helper
-      .component(AddLinkForm)
-      .withCleanStorage()
-      .withProps({ note })
-      .render()
+    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
 
     const searchInput = await screen.findByPlaceholderText("Search")
     fireEvent.update(searchInput, "NoProp")

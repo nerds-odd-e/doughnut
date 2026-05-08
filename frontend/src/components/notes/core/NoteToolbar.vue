@@ -11,7 +11,7 @@
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
-          <AddLinkForm
+          <SearchForm
             v-bind="{ note }"
             :modal-closer="closer"
             @close-dialog="closer"
@@ -84,7 +84,7 @@ import { ref, watch } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
-import AddLinkForm from "../../links/AddLinkForm.vue"
+import SearchForm from "../../links/SearchForm.vue"
 import {
   FileCode,
   LayoutTemplate,
