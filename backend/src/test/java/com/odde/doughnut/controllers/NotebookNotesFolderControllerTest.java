@@ -27,18 +27,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
+  private Notebook createNotebookWithTitle(String title) {
+    NotebookCreationRequest createNb = new NotebookCreationRequest();
+    createNb.setNewTitle(title);
+    NotebookClientView redirect = controller.createNotebook(createNb);
+    return notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+  }
+
   @Nested
   class CreateNoteAtNotebookRoot {
     @Test
     void createsTopLevelNoteWithNullParentFolder() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("Notebook WithoutIndex");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Notebook nb = createNotebookWithTitle("Notebook WithoutIndex");
       assertThat(
-          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
-              redirect.notebook().getId()),
-          empty());
+          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(nb.getId()), empty());
 
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Root One");
@@ -51,10 +53,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
     @Test
     void persistsInitialMarkdownContentWhenProvided() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB With Initial Body");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Notebook nb = createNotebookWithTitle("NB With Initial Body");
 
       NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setNewTitle("Root With Body");
@@ -69,10 +68,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     void rejectsNotebookOwnedByAnotherUser() throws Exception {
       User owner = makeMe.aUser().please();
       currentUser.setUser(owner);
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("Owners NB");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Notebook nb = createNotebookWithTitle("Owners NB");
 
       currentUser.setUser(makeMe.aUser().please());
       NoteCreationDTO noteCreation = new NoteCreationDTO();
@@ -84,10 +80,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
     @Test
     void createsNotesInFolderInAppendLastOrder() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB Folder Create");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+      Notebook nb = createNotebookWithTitle("NB Folder Create");
       Folder f = makeMe.aFolder().notebook(nb).name("Box").please();
 
       NoteCreationDTO a = new NoteCreationDTO();
@@ -129,154 +122,70 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
   }
 
   @Nested
-  class ListNotebookRootNotes {
+  class ListNotebookFolderListing {
     @Test
-    void excludesNotesAssignedToAFolder() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB Exclusion");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
+    void filtersNotesByFolderAtRootAndInsideFolder() throws Exception {
+      Notebook nb = createNotebookWithTitle("NB Folder Notes");
+      Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
+      Folder other = makeMe.aFolder().notebook(nb).name("Other").please();
+      User user = currentUser.getUser();
 
-      Folder f = makeMe.aFolder().notebook(nb).name("Away").please();
-      NoteCreationDTO r1 = new NoteCreationDTO();
-      r1.setNewTitle("In Folder");
-      NoteRealm createdRoot = controller.createNoteAtNotebookRoot(nb, r1);
-      Note inFolder = noteRepository.findById(createdRoot.getId()).orElseThrow();
-      inFolder.setFolder(f);
-      noteRepository.save(inFolder);
+      Note inScopeA =
+          makeMe.aNote("In Scope A").inNotebook(nb).creatorAndOwner(user).folder(scope).please();
+      Note inScopeB =
+          makeMe.aNote("In Scope B").inNotebook(nb).creatorAndOwner(user).folder(scope).please();
+      Note elsewhere =
+          makeMe.aNote("Elsewhere").inNotebook(nb).creatorAndOwner(user).folder(other).please();
+      Note atRoot = makeMe.aNote("At Root").inNotebook(nb).creatorAndOwner(user).please();
 
-      FolderListing listing = controller.listNotebookFolderListing(nb, null);
+      FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(
-          listing.noteTopologies().stream()
-              .noneMatch(t -> Objects.equals(t.getId(), inFolder.getId())));
+          root.noteTopologies().stream().anyMatch(t -> Objects.equals(t.getId(), atRoot.getId())));
+      assertTrue(
+          root.noteTopologies().stream()
+              .noneMatch(t -> Objects.equals(t.getId(), inScopeA.getId())));
+      assertTrue(
+          root.noteTopologies().stream()
+              .noneMatch(t -> Objects.equals(t.getId(), elsewhere.getId())));
+
+      FolderListing inScope = controller.listNotebookFolderListing(nb, scope.getId());
+      assertEquals(
+          List.of(inScopeA.getId(), inScopeB.getId()).stream().sorted().toList(),
+          inScope.noteTopologies().stream().map(NoteTopology::getId).sorted().toList());
     }
 
     @Test
-    void returnsTopLevelFoldersForNotebook() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB Folders");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-
+    void listsRootLevelFoldersAndDirectChildrenUnderParent() throws Exception {
+      Notebook nb = createNotebookWithTitle("NB Folders");
       makeMe.aFolder().notebook(nb).name("Inbox").please();
-      Folder parentFolder = makeMe.aFolder().notebook(nb).name("Parent").please();
-      makeMe.aFolder().notebook(nb).parentFolder(parentFolder).name("Nested").please();
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
 
-      FolderListing listing = controller.listNotebookFolderListing(nb, null);
-      assertEquals(2, listing.folders().size());
+      FolderListing root = controller.listNotebookFolderListing(nb, null);
+      assertEquals(2, root.folders().size());
       assertEquals(
           List.of("Inbox", "Parent"),
-          listing.folders().stream().map(Folder::getName).sorted().toList());
+          root.folders().stream().map(Folder::getName).sorted().toList());
+
+      FolderListing underParent = controller.listNotebookFolderListing(nb, parent.getId());
+      assertEquals(1, underParent.folders().size());
+      assertEquals("Nested", underParent.folders().getFirst().getName());
     }
 
     @Test
-    void requiresReadAuthorization() {
+    void requiresReadAuthorizationForRootAndFolderContext() {
       User owner = makeMe.aUser().please();
       currentUser.setUser(owner);
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Secured").please();
 
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.listNotebookFolderListing(nb, null));
-    }
-  }
-
-  @Nested
-  class ListNotebookFolderIndex {
-    @Test
-    void returnsFlatRowsWithParentIds() throws UnexpectedNoAccessRightException {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB Folder Index");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-
-      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
-      makeMe.aFolder().notebook(nb).name("SiblingRoot").please();
-
-      List<NotebookFolderIndexRow> rows = controller.listNotebookFolderIndex(nb);
-      assertEquals(3, rows.size());
-      NotebookFolderIndexRow nestedRow =
-          rows.stream().filter(r -> r.id().equals(nested.getId())).findFirst().orElseThrow();
-      assertThat(nestedRow.name(), equalTo("Nested"));
-      assertThat(nestedRow.parentFolderId(), equalTo(parent.getId()));
-
-      long rootLevelCount = rows.stream().filter(r -> r.parentFolderId() == null).count();
-      assertEquals(2, rootLevelCount);
-    }
-
-    @Test
-    void requiresReadAuthorization() {
-      User owner = makeMe.aUser().please();
-      currentUser.setUser(owner);
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-
-      currentUser.setUser(makeMe.aUser().please());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.listNotebookFolderIndex(nb));
-    }
-  }
-
-  @Nested
-  class ListFolderListing {
-    @Test
-    void returnsOnlyNotesAssignedToFolder() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB Folder Notes");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-      Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
-      Folder other = makeMe.aFolder().notebook(nb).name("Other").please();
-
-      Note a =
-          makeMe
-              .aNote("In Scope A")
-              .inNotebook(nb)
-              .creatorAndOwner(currentUser.getUser())
-              .folder(scope)
-              .please();
-      Note b =
-          makeMe
-              .aNote("In Scope B")
-              .inNotebook(nb)
-              .creatorAndOwner(currentUser.getUser())
-              .folder(scope)
-              .please();
-      Note elsewhere =
-          makeMe
-              .aNote("Elsewhere")
-              .inNotebook(nb)
-              .creatorAndOwner(currentUser.getUser())
-              .folder(other)
-              .please();
-      Note atRoot =
-          makeMe.aNote("At Root").inNotebook(nb).creatorAndOwner(currentUser.getUser()).please();
-
-      FolderListing listing = controller.listNotebookFolderListing(nb, scope.getId());
-      assertEquals(
-          List.of(a.getId(), b.getId()).stream().sorted().toList(),
-          listing.noteTopologies().stream().map(NoteTopology::getId).sorted().toList());
-      assertTrue(
-          listing.noteTopologies().stream()
-              .noneMatch(t -> Objects.equals(t.getId(), elsewhere.getId())));
-      assertTrue(
-          listing.noteTopologies().stream()
-              .noneMatch(t -> Objects.equals(t.getId(), atRoot.getId())));
-    }
-
-    @Test
-    void returnsDirectChildFolders() throws Exception {
-      NotebookCreationRequest createNb = new NotebookCreationRequest();
-      createNb.setNewTitle("NB Nested Folders");
-      NotebookClientView redirect = controller.createNotebook(createNb);
-      Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
-      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
-
-      FolderListing listing = controller.listNotebookFolderListing(nb, parent.getId());
-      assertEquals(1, listing.folders().size());
-      assertEquals("Nested", listing.folders().getFirst().getName());
+          UnexpectedNoAccessRightException.class,
+          () -> controller.listNotebookFolderListing(nb, folder.getId()));
     }
 
     @Test
@@ -302,44 +211,58 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
+    void unknownOrForeignFolderIdReturnsNotFound() throws Exception {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();
+      Folder folderInOther = makeMe.aFolder().notebook(otherNb).name("Only Other").please();
+
+      assertEquals(
+          HttpStatus.NOT_FOUND,
+          assertThrows(
+                  ResponseStatusException.class,
+                  () -> controller.listNotebookFolderListing(nb, -99999))
+              .getStatusCode());
+      assertEquals(
+          HttpStatus.NOT_FOUND,
+          assertThrows(
+                  ResponseStatusException.class,
+                  () -> controller.listNotebookFolderListing(nb, folderInOther.getId()))
+              .getStatusCode());
+    }
+  }
+
+  @Nested
+  class ListNotebookFolderIndex {
+    @Test
+    void returnsFlatRowsWithParentIds() throws UnexpectedNoAccessRightException {
+      Notebook nb = createNotebookWithTitle("NB Folder Index");
+
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+      makeMe.aFolder().notebook(nb).name("SiblingRoot").please();
+
+      List<NotebookFolderIndexRow> rows = controller.listNotebookFolderIndex(nb);
+      assertEquals(3, rows.size());
+      NotebookFolderIndexRow nestedRow =
+          rows.stream().filter(r -> r.id().equals(nested.getId())).findFirst().orElseThrow();
+      assertThat(nestedRow.name(), equalTo("Nested"));
+      assertThat(nestedRow.parentFolderId(), equalTo(parent.getId()));
+
+      long rootLevelCount = rows.stream().filter(r -> r.parentFolderId() == null).count();
+      assertEquals(2, rootLevelCount);
+    }
+
+    @Test
     void requiresReadAuthorization() {
       User owner = makeMe.aUser().please();
       currentUser.setUser(owner);
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Folder folder = makeMe.aFolder().notebook(nb).name("Secured").please();
 
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.listNotebookFolderListing(nb, folder.getId()));
-    }
-
-    @Test
-    void unknownParentFolderIdReturns404() throws Exception {
-      User user = makeMe.aUser().please();
-      currentUser.setUser(user);
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class,
-              () -> controller.listNotebookFolderListing(nb, -99999));
-      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-    }
-
-    @Test
-    void folderNotInNotebookReturns404() throws Exception {
-      User user = makeMe.aUser().please();
-      currentUser.setUser(user);
-      Notebook nbA = makeMe.aNotebook().creatorAndOwner(user).please();
-      Notebook nbB = makeMe.aNotebook().creatorAndOwner(user).please();
-      Folder folderInB = makeMe.aFolder().notebook(nbB).name("Only B").please();
-
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class,
-              () -> controller.listNotebookFolderListing(nbA, folderInB.getId()));
-      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+          UnexpectedNoAccessRightException.class, () -> controller.listNotebookFolderIndex(nb));
     }
   }
 

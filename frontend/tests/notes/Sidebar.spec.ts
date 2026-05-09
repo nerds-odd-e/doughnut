@@ -42,6 +42,18 @@ function folderListingForQueryParent(
   return table[String(query?.parent)] ?? EMPTY_FOLDER_LISTING
 }
 
+function countFolderListingCallsForParent(
+  listingSpy: { mock: { calls: unknown[][] } },
+  parent: number | undefined
+) {
+  const want = String(parent)
+  return listingSpy.mock.calls.filter(
+    (call) =>
+      String((call[0] as ListNotebookFolderListingOptions).query?.parent) ===
+      want
+  ).length
+}
+
 /** Distinct from note ids — folder listing API uses folder entity ids. */
 const FOLDER_TOP_NOTE_CHILDREN_ID = 77001
 const FOLDER_FIRST_GEN_CHILDREN_ID = 77002
@@ -355,6 +367,21 @@ describe("Sidebar", () => {
       )
     }
 
+    /** Signed-in first-gen sidebar with root folder row in user-active state. */
+    async function mountSignedInFirstGenWithRootFolderUserActive() {
+      mountSidebarSignedIn(firstGeneration)
+      await flushPromises()
+      await vi.waitUntil(() =>
+        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
+      )
+      const folderRow = findRootFolderRowByTopTitle()
+      expect(folderRow?.exists()).toBe(true)
+      await folderRow!.find(".sidebar-folder-label").trigger("click")
+      await flushPromises()
+      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+      return folderRow!
+    }
+
     it("applies sidebar-folder-user-active when a folder row is clicked", async () => {
       await mountFirstGenSidebarAndWaitNoteRow()
       const folderRow = findRootFolderRowByTopTitle()
@@ -395,15 +422,7 @@ describe("Sidebar", () => {
     })
 
     it("does not clear user active folder when modal opens after toolbar click (Safari behavior)", async () => {
-      mountSidebarSignedIn(firstGeneration)
-      await flushPromises()
-      await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
-      )
-      const folderRow = findRootFolderRowByTopTitle()
-      await folderRow!.find(".sidebar-folder-label").trigger("click")
-      await flushPromises()
-      expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+      const folderRow = await mountSignedInFirstGenWithRootFolderUserActive()
 
       const toolbarBtn = wrapper.find('button[title="New note"]')
       expect(toolbarBtn.exists()).toBe(true)
@@ -425,14 +444,7 @@ describe("Sidebar", () => {
     })
 
     it("does not clear user active folder when focus moves to the sidebar toolbar", async () => {
-      mountSidebarSignedIn(firstGeneration)
-      await flushPromises()
-      await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
-      )
-      const folderRow = findRootFolderRowByTopTitle()
-      await folderRow!.find(".sidebar-folder-label").trigger("click")
-      await flushPromises()
+      const folderRow = await mountSignedInFirstGenWithRootFolderUserActive()
       const toolbarBtn = wrapper.find('button[title="New folder"]')
       expect(toolbarBtn.exists()).toBe(true)
       folderRow!.element.focus()
@@ -448,6 +460,22 @@ describe("Sidebar", () => {
   })
 
   describe("sidebar peer sort", () => {
+    function zebraApplePeerRealms(updates?: { z?: string; a?: string }) {
+      const z = makeMe.aNoteRealm.title("zebra").under(topNoteRealm)
+      const a = makeMe.aNoteRealm.title("apple").under(topNoteRealm)
+      return {
+        realmZ: (updates?.z ? z.updatedAt(updates.z) : z).please(),
+        realmA: (updates?.a ? a.updatedAt(updates.a) : a).please(),
+      }
+    }
+
+    async function flushUntilTwoRootFolderLabels() {
+      await flushPromises()
+      await vi.waitUntil(
+        () => wrapper.findAll(".sidebar-folder-label").length >= 2
+      )
+    }
+
     it("shows sort control in the sidebar toolbar", async () => {
       mountSidebarSignedIn(topNoteRealm)
       await flushPromises()
@@ -456,24 +484,14 @@ describe("Sidebar", () => {
 
     it("lists folders above notes (A–Z) and reorders root peers when Title (Z–A) is chosen", async () => {
       storageAccessor.value = createNoteStorage()
-      const realmZ = makeMe.aNoteRealm
-        .title("zebra")
-        .under(topNoteRealm)
-        .please()
-      const realmA = makeMe.aNoteRealm
-        .title("apple")
-        .under(topNoteRealm)
-        .please()
+      const { realmZ, realmA } = zebraApplePeerRealms()
       const { nbId, realmA: activeA } = setupRootPeersWithFolders(
         realmZ,
         realmA
       )
 
       mountSidebarSignedIn(activeA, nbId)
-      await flushPromises()
-      await vi.waitUntil(
-        () => wrapper.findAll(".sidebar-folder-label").length >= 2
-      )
+      await flushUntilTwoRootFolderLabels()
 
       expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
 
@@ -496,44 +514,20 @@ describe("Sidebar", () => {
         JSON.stringify({ field: "updated", direction: "desc" })
       )
       storageAccessor.value = createNoteStorage()
-      const realmZ = makeMe.aNoteRealm
-        .title("zebra")
-        .updatedAt("2015-06-01T00:00:00.000Z")
-        .under(topNoteRealm)
-        .please()
-      const realmA = makeMe.aNoteRealm
-        .title("apple")
-        .updatedAt("2020-01-01T00:00:00.000Z")
-        .under(topNoteRealm)
-        .please()
+      const { realmZ, realmA } = zebraApplePeerRealms({
+        z: "2015-06-01T00:00:00.000Z",
+        a: "2020-01-01T00:00:00.000Z",
+      })
       setupRootPeersWithFolders(realmZ, realmA, {
         banana: { updatedAt: "2018-01-01T00:00:00.000Z" },
         mango: { updatedAt: "2005-01-01T00:00:00.000Z" },
       })
 
       mountSidebarSignedIn(realmA, topNoteRealm.notebookView.notebook.id)
-      await flushPromises()
-      await vi.waitUntil(
-        () => wrapper.findAll(".sidebar-folder-label").length >= 2
-      )
+      await flushUntilTwoRootFolderLabels()
 
       expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
     })
-  })
-
-  it("should call the api once if top note", async () => {
-    mountSidebar(topNoteRealm)
-    await flushPromises()
-    const topTitle = topNoteRealm.note.noteTopology.title
-    const folderRowLabel = wrapper
-      .findAll(".sidebar-folder-label")
-      .find((w) => w.text().trim() === topTitle)
-    expect(folderRowLabel?.exists()).toBe(true)
-    await folderRowLabel!.trigger("click")
-    await flushPromises()
-    await vi.waitUntil(() =>
-      findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
-    )
   })
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
@@ -545,12 +539,7 @@ describe("Sidebar", () => {
     mountSidebar(firstGeneration)
     await flushPromises()
     const rootRequestCount = () =>
-      listingSpy.mock.calls.filter(
-        (call) =>
-          String(
-            (call[0] as ListNotebookFolderListingOptions).query?.parent
-          ) === String(undefined)
-      ).length
+      countFolderListingCallsForParent(listingSpy, undefined)
     expect(rootRequestCount()).toBe(1)
     expect(
       findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
@@ -585,14 +574,7 @@ describe("Sidebar", () => {
       mountSidebar(secondGeneration)
       await flushPromises()
 
-      expect(
-        listingSpy.mock.calls.filter(
-          (call) =>
-            String(
-              (call[0] as ListNotebookFolderListingOptions).query?.parent
-            ) === String(undefined)
-        ).length
-      ).toBe(1)
+      expect(countFolderListingCallsForParent(listingSpy, undefined)).toBe(1)
       expect(showNoteSpy).not.toHaveBeenCalled()
       const listedParentIds = listingSpy.mock.calls
         .map(
@@ -669,18 +651,14 @@ describe("Sidebar", () => {
       window.IntersectionObserver = originalIntersectionObserver
     })
 
-    it("should have siblings", async () => {
+    it("should have child note of active first gen", async () => {
       mountSidebar(firstGeneration)
+      await flushPromises()
       await vi.waitUntil(() =>
         findSidebarItem(
           firstGenerationSibling.note.noteTopology.title
         )?.exists()
       )
-    })
-
-    it("should have child note of active first gen", async () => {
-      mountSidebar(firstGeneration)
-      await flushPromises()
       const firstTitle = firstGeneration.note.noteTopology.title
       const nestedFolderLabel = wrapper
         .findAll(".sidebar-folder-label")
@@ -727,19 +705,8 @@ describe("Sidebar", () => {
     })
   })
 
-  it("should start from notebook top", async () => {
-    mountSidebar(secondGeneration)
-    await vi.waitUntil(() =>
-      findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
-    )
-    expect(
-      findSidebarItem(secondGeneration.note.noteTopology.title)?.exists()
-    ).toBe(true)
-  })
-
   it("shows folder expand control at notebook root with shallow folder listing", async () => {
     mountSidebarSignedIn(undefined, topNoteRealm.notebookView.notebook.id)
-    await flushPromises()
     await flushPromises()
     expect(wrapper.find('button[aria-label="expand children"]').exists()).toBe(
       true
