@@ -63,7 +63,6 @@
     v-if="!readonly && moreOptions"
     v-bind="{ note }"
     @close-dialog="moreOptions = false"
-    @note-accessory-updated="noteAccessoriesUpdated($event)"
   />
 
 </template>
@@ -71,7 +70,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
-import type { NoteAccessory } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import SearchForm from "../../links/SearchForm.vue"
 import {
@@ -99,7 +97,9 @@ const moreOptions = ref(false)
 
 const router = useRouter()
 
-const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
+defineEmits<{
+  (e: "edit-as-markdown", value: boolean): void
+}>()
 
 watch(
   () => note.id,
@@ -107,11 +107,5 @@ watch(
     moreOptions.value = false
   }
 )
-
-const noteAccessoriesUpdated = (na: NoteAccessory) => {
-  if (na) {
-    emit("note-accessory-updated", na)
-  }
-}
 </script>
 

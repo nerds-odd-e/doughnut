@@ -8,21 +8,6 @@
     <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end daisy-mt-2">
       <PopButton
         btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Edit Note Image"
-      >
-        <template #button_face>
-          <ImageIcon class="daisy-w-6 daisy-h-6" />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditImageForm
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
-
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         title="Export..."
       >
         <template #button_face>
@@ -65,17 +50,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteAccessory } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import Questions from "../Questions.vue"
 import {
   CircleCheck,
-  Image as ImageIcon,
   MessageCircleQuestion,
   Trash2,
   Upload,
 } from "lucide-vue-next"
-import NoteEditImageForm from "./NoteEditImageForm.vue"
 import NoteExportForm from "../core/NoteExportForm.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
@@ -88,7 +71,6 @@ const { note } = defineProps<{
 
 const emit = defineEmits<{
   (e: "close-dialog"): void
-  (e: "note-accessory-updated", na: NoteAccessory): void
 }>()
 
 const router = useRouter()
@@ -97,13 +79,6 @@ const storageAccessor = useStorageAccessor()
 
 const closeDialog = () => {
   emit("close-dialog")
-}
-
-const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
-  if (na) {
-    emit("note-accessory-updated", na)
-  }
-  closer()
 }
 
 const assimilateNote = () => {

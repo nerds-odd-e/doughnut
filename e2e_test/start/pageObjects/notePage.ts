@@ -413,14 +413,6 @@ export const assumeNotePage = (
     wikiLinkInNoteContent(linkText: string) {
       return wikiLinkInNoteContentFluent(linkText)
     },
-    updateNoteImage(attributes: Record<string, string>) {
-      // Before upload, the image should not be visible (simulate new upload)
-      cy.get('#note-image').should('not.exist')
-      this.moreOptions().editNoteImage(attributes)
-      // After upload and dialog closes, the image should be visible
-      cy.get('#note-image').should('be.visible')
-      return this
-    },
 
     startSearchingAndAddRelationship() {
       this.toolbarButton('Link').click()

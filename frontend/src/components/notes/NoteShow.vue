@@ -1,6 +1,6 @@
 <template>
   <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
-    <NoteRealmLoader v-bind="{ noteId }" :key="reloadKey">
+    <NoteRealmLoader v-bind="{ noteId }">
       <template #default="{ noteRealm }">
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
@@ -21,7 +21,6 @@
                 conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
               }"
-              @note-accessory-updated="onNoteAccessoryUpdated"
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
@@ -124,10 +123,6 @@ const onDeadLinkClick = (title: string) => {
   pendingDeadLinkTitle.value = title
 }
 
-const reloadKey = ref(0)
-const onNoteAccessoryUpdated = () => {
-  reloadKey.value += 1
-}
 const asMarkdown = ref(false)
 
 watch(

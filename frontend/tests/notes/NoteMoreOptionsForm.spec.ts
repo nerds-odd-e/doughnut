@@ -129,35 +129,12 @@ describe("NoteMoreOptionsForm", () => {
     })
   })
 
-  describe("note accessory updated", () => {
-    it("emits note-accessory-updated when accessory is updated", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const accessory = {
-        id: 1,
-        noteId: note.id,
-        imageUrl: "https://example.com/image.jpg",
-      }
-      wrapper.vm.$emit("note-accessory-updated", accessory)
-
-      expect(wrapper.emitted("note-accessory-updated")).toBeTruthy()
-      expect(wrapper.emitted("note-accessory-updated")?.[0]).toEqual([
-        accessory,
-      ])
-    })
-  })
-
   describe("action buttons", () => {
     it("displays all action buttons", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
-      expect(wrapper.find('button[title="Edit Note Image"]').exists()).toBe(
-        true
-      )
       expect(wrapper.find('button[title="Export..."]').exists()).toBe(true)
       expect(
         wrapper.find('button[title="Questions for the note"]').exists()

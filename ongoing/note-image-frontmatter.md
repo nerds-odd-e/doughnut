@@ -16,7 +16,7 @@
 | Area | Files / symbols |
 |------|-----------------|
 | Display | `NoteShow.vue`, `NoteAccessoryAsync.vue`, `NoteAccessoryDisplay.vue`, `ShowImage.vue` |
-| Legacy edit | `NoteMoreOptionsForm.vue`, `NoteEditImageForm.vue`, `ImageFormBody.vue` |
+| Legacy edit | Removed in Phase 3 (`NoteEditImageForm`, `ImageFormBody`; more-options no longer edits image) |
 | Rich editor | `RichMarkdownEditor.vue`, `RichFrontmatterProperties.vue`, `RichFrontmatterEditablePropertyRow.vue`, `noteContentFrontmatter.ts` |
 | Backend accessory | `NoteController` (`showNoteAccessory`, `updateNoteAccessories`), `NoteService`, `NoteAccessoriesDTO`, `ValidateNoteImage*`, `NoteAccessory` entity, `Note.getOrInitializeNoteAccessory` / relation |
 | Frontmatter algorithms | `NoteContentMarkdown.java`, `NoteYamlFrontmatterScalars.java` (extend or add `image` / `image_mask` helpers for server-side) |
@@ -54,8 +54,7 @@
 
 **Post-condition:** Toolbar / more-options no longer opens image-only accessory form; no frontend calls to `updateNoteAccessories` for images; `NoteEditImageForm` / `ImageFormBody` removed or stripped to dead-code-free state.
 
-- Remove `NoteEditImageForm` usage from `NoteMoreOptionsForm.vue`; delete obsolete components.
-- Clean test helpers that only existed for accessory image mocks where no longer needed.
+**Done.** Removed more-options image UI and components; dropped `note-accessory-updated` / `reloadKey` reload path (`NoteShow`, `NoteToolbar`); deleted `note_edit_accessories.feature` and related page objects / step; Vitest + Cypress `note_frontmatter_image.feature` passing.
 
 ### Phase 4 — **Behavior:** Orphan `Image` cleanup when note content is saved
 

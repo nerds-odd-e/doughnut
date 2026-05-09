@@ -188,13 +188,6 @@ When(
   }
 )
 
-When(
-  'I update note accessories of {string} to become:',
-  (noteTopology: string, data: DataTable) => {
-    start.jumpToNotePage(noteTopology).updateNoteImage(data.hashes()[0]!)
-  }
-)
-
 When('I should see note {string} has an image', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
   cy.get('#note-image').should('exist')
