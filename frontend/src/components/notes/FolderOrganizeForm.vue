@@ -57,9 +57,11 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, ref } from "vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import usePopups from "../commons/Popups/usePopups"
 import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import FolderSelector from "./FolderSelector.vue"
@@ -77,7 +79,6 @@ const emit = defineEmits<{
   closeDialog: []
 }>()
 
-const storageAccessor = useStorageAccessor()
 const { popups } = usePopups()
 
 const processing = ref(false)
@@ -94,13 +95,18 @@ const submitMove = async () => {
   processing.value = true
   moveError.value = undefined
   try {
-    await storageAccessor.value
-      .storedApi()
-      .moveFolder(
-        props.notebookId,
-        props.movingFolderId,
-        selectedParentFolderId.value
-      )
+    const body =
+      selectedParentFolderId.value == null
+        ? {}
+        : { newParentFolderId: selectedParentFolderId.value }
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.moveFolder({
+        path: { notebook: props.notebookId, folder: props.movingFolderId },
+        body,
+      })
+    )
+    if (error) throw error
+    refreshSidebarStructuralListings()
     emit("closeDialog")
   } catch (e: unknown) {
     moveError.value = toOpenApiError(e).message ?? "Failed to move folder"
@@ -118,9 +124,13 @@ const dissolve = async () => {
   processing.value = true
   dissolveError.value = undefined
   try {
-    await storageAccessor.value
-      .storedApi()
-      .dissolveFolder(props.notebookId, props.movingFolderId)
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.dissolveFolder({
+        path: { notebook: props.notebookId, folder: props.movingFolderId },
+      })
+    )
+    if (error) throw error
+    refreshSidebarStructuralListings()
     notebookSidebarUserActiveFolder.value = null
     emit("closeDialog")
   } catch (e: unknown) {

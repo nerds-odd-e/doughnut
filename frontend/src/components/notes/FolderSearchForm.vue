@@ -68,9 +68,10 @@
 
 <script setup lang="ts">
 import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { Search } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import {
   collectSubtreeFolderIds,
@@ -96,7 +97,6 @@ const emit = defineEmits<{
   indexLoaded: [rows: NotebookFolderIndexRow[]]
 }>()
 
-const storageAccessor = useStorageAccessor()
 const indexRows = ref<NotebookFolderIndexRow[]>([])
 const indexLoadError = ref<string | undefined>(undefined)
 const query = ref("")
@@ -105,9 +105,13 @@ onMounted(async () => {
   query.value = ""
   indexLoadError.value = undefined
   try {
-    indexRows.value = await storageAccessor.value
-      .storedApi()
-      .loadNotebookFolderIndex(props.notebookId)
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.listNotebookFolderIndex({
+        path: { notebook: props.notebookId },
+      })
+    )
+    if (error || !data) throw new Error("Failed to load folders")
+    indexRows.value = data
     emit("indexLoaded", indexRows.value)
   } catch (e: unknown) {
     indexLoadError.value = toOpenApiError(e).message ?? "Failed to load folders"

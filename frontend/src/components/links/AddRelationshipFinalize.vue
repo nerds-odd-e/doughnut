@@ -112,7 +112,6 @@ const relationTypeSelected = async (relationType: string | undefined) => {
 
     const api = storageAccessor.value.storedApi()
     const folderId = await resolveRelationshipNoteFolderId({
-      api,
       notebookId,
       sourceFolderId,
       sourceTitle,

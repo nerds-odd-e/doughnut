@@ -77,10 +77,11 @@ import type {
   Folder,
   NotebookFolderIndexRow,
 } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { MoreHorizontal } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
 import Modal from "@/components/commons/Modal.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import FolderSearchForm from "./FolderSearchForm.vue"
 import {
   ancestorsFromChain,
@@ -106,7 +107,6 @@ const emit = defineEmits<{
   "update:modelValue": [value: number | null]
 }>()
 
-const storageAccessor = useStorageAccessor()
 const loadError = ref<string | undefined>(undefined)
 const searchOpen = ref(false)
 
@@ -134,27 +134,24 @@ const searchContextFolderId = computed(() => props.contextFolderId ?? undefined)
 onMounted(async () => {
   const pid = parentFolderId.value
   try {
-    const api = storageAccessor.value.storedApi()
-    if (pid == null) {
-      // Moving folder is at notebook root: load root-level folders for neighbours
-      const listing = await api.loadNotebookRootNotes(props.notebookId)
-      neighbourRows.value = (listing.folders ?? [])
-        .filter((f) => f.id !== props.contextFolderId)
-        .map((f) => ({
-          id: f.id,
-          name: f.name,
-          parentFolderId: undefined,
-        }))
-    } else {
-      const listing = await api.loadFolderListing(props.notebookId, pid)
-      neighbourRows.value = (listing.folders ?? [])
-        .filter((f) => f.id !== props.contextFolderId)
-        .map((f) => ({
-          id: f.id,
-          name: f.name,
-          parentFolderId: pid,
-        }))
-    }
+    const { data: listing, error } = await apiCallWithLoading(() =>
+      pid == null
+        ? NotebookController.listNotebookRootNotes({
+            path: { notebook: props.notebookId },
+          })
+        : NotebookController.listFolderListing({
+            path: { notebook: props.notebookId, folder: pid },
+          })
+    )
+    if (error || !listing)
+      throw new Error("Failed to load neighbouring folders")
+    neighbourRows.value = (listing.folders ?? [])
+      .filter((f) => f.id !== props.contextFolderId)
+      .map((f) => ({
+        id: f.id,
+        name: f.name,
+        parentFolderId: pid ?? undefined,
+      }))
   } catch {
     loadError.value = "Failed to load neighbouring folders"
   }

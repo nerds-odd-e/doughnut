@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
@@ -32,9 +33,8 @@ import {
 } from "./sidebarStructuralSort"
 import { computed, ref, watch } from "vue"
 import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
-const storageAccessor = useStorageAccessor()
 const { sortPeerSpec } = useNoteSidebarPeerSort()
 
 function folderNumericId(folder: Folder): number | undefined {
@@ -72,12 +72,17 @@ const displayRows = computed(() =>
 )
 
 async function refreshListing() {
-  const api = storageAccessor.value.storedApi()
   try {
-    const listing =
+    const { data: listing, error } = await apiCallWithLoading(() =>
       props.folderId == null
-        ? await api.loadNotebookRootNotes(props.notebookId)
-        : await api.loadFolderListing(props.notebookId, props.folderId)
+        ? NotebookController.listNotebookRootNotes({
+            path: { notebook: props.notebookId },
+          })
+        : NotebookController.listFolderListing({
+            path: { notebook: props.notebookId, folder: props.folderId! },
+          })
+    )
+    if (error || !listing) throw new Error("Failed to load listing")
     const noteTopologies = listing.noteTopologies ?? []
     rawRows.value = buildUnsortedStructuralRows(noteTopologies, listing.folders)
     props.onStructuralPeerCount?.(rawRows.value.length)

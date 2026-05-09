@@ -1,4 +1,7 @@
-import type { StoredApi } from "@/store/StoredApiCollection"
+import type { FolderListing } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 
 export type RelationshipNotePlacement =
   | "relations_subfolder"
@@ -12,16 +15,29 @@ function folderNameForSourceNote(title: string | undefined | null): string {
   return title
 }
 
+async function loadFolderListing(
+  notebookId: number,
+  parentFolderId: number | null
+): Promise<FolderListing> {
+  const { data, error } = await apiCallWithLoading(() =>
+    parentFolderId == null
+      ? NotebookController.listNotebookRootNotes({
+          path: { notebook: notebookId },
+        })
+      : NotebookController.listFolderListing({
+          path: { notebook: notebookId, folder: parentFolderId },
+        })
+  )
+  if (error || !data) throw new Error("Failed to load folder listing")
+  return data
+}
+
 async function findOrCreateChildFolder(
-  api: StoredApi,
   notebookId: number,
   parentFolderId: number | null,
   childName: string
 ): Promise<number> {
-  const listing =
-    parentFolderId == null
-      ? await api.loadNotebookRootNotes(notebookId)
-      : await api.loadFolderListing(notebookId, parentFolderId)
+  const listing = await loadFolderListing(notebookId, parentFolderId)
   const match = listing.folders?.find((f) => f.name === childName)
   if (match?.id != null) {
     return match.id
@@ -30,15 +46,21 @@ async function findOrCreateChildFolder(
     parentFolderId == null
       ? { name: childName }
       : { name: childName, underFolderId: parentFolderId }
-  const created = await api.createFolder(notebookId, body)
+  const { data: created, error } = await apiCallWithLoading(() =>
+    NotebookController.createFolder({
+      path: { notebook: notebookId },
+      body,
+    })
+  )
+  if (error || !created) throw new Error("Failed to create folder")
   if (created.id == null) {
     throw new Error("createFolder did not return folder id")
   }
+  refreshSidebarStructuralListings()
   return created.id
 }
 
 export type ResolveRelationshipNoteFolderParams = {
-  api: StoredApi
   notebookId: number
   sourceFolderId: number | undefined
   sourceTitle: string | undefined
@@ -47,7 +69,6 @@ export type ResolveRelationshipNoteFolderParams = {
 
 /** Resolves target folder id for a new relationship note (matches former `NoteChildContainerFolderService` behavior). */
 export async function resolveRelationshipNoteFolderId({
-  api,
   notebookId,
   sourceFolderId,
   sourceTitle,
@@ -58,14 +79,12 @@ export async function resolveRelationshipNoteFolderId({
       return sourceFolderId
     case "relations_subfolder":
       return findOrCreateChildFolder(
-        api,
         notebookId,
         sourceFolderId ?? null,
         "relations"
       )
     case "named_after_source_note":
       return findOrCreateChildFolder(
-        api,
         notebookId,
         sourceFolderId ?? null,
         folderNameForSourceNote(sourceTitle)

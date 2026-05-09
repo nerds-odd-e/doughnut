@@ -1,12 +1,7 @@
 import type {
-  FolderCreationRequest,
-  FolderListing,
-  FolderMoveRequest,
-  Folder,
   NoteContentCompletion,
   NoteDeleteDto,
   NoteRealm,
-  NotebookFolderIndexRow,
 } from "@generated/doughnut-backend-api"
 import type { NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
@@ -47,25 +42,6 @@ export interface StoredApi {
 
   /** Loads a note realm into storage (same as navigating to the note-id route). */
   loadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm>
-
-  loadNotebookRootNotes(notebookId: number): Promise<FolderListing>
-
-  loadFolderListing(
-    notebookId: number,
-    folderId: number
-  ): Promise<FolderListing>
-
-  loadNotebookFolderIndex(notebookId: number): Promise<NotebookFolderIndexRow[]>
-
-  createFolder(notebookId: number, body: FolderCreationRequest): Promise<Folder>
-
-  moveFolder(
-    notebookId: number,
-    folderId: number,
-    newParentFolderId: number | null
-  ): Promise<Folder>
-
-  dissolveFolder(notebookId: number, folderId: number): Promise<void>
 
   createRootNoteAtNotebook(
     router: Router,
@@ -196,103 +172,6 @@ export default class StoredApiCollection implements StoredApi {
 
   async loadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm> {
     return this.loadNote(noteId)
-  }
-
-  async loadNotebookRootNotes(notebookId: number): Promise<FolderListing> {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.listNotebookRootNotes({
-        path: { notebook: notebookId },
-      })
-    )
-    if (error || !data) {
-      throw new Error(
-        toErrorMessage(error, "Failed to load notebook root notes")
-      )
-    }
-    return data
-  }
-
-  async loadFolderListing(
-    notebookId: number,
-    folderId: number
-  ): Promise<FolderListing> {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.listFolderListing({
-        path: { notebook: notebookId, folder: folderId },
-      })
-    )
-    if (error || !data) {
-      throw new Error(toErrorMessage(error, "Failed to load folder listing"))
-    }
-    return data
-  }
-
-  async loadNotebookFolderIndex(
-    notebookId: number
-  ): Promise<NotebookFolderIndexRow[]> {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.listNotebookFolderIndex({
-        path: { notebook: notebookId },
-      })
-    )
-    if (error || !data) {
-      throw new Error(
-        toErrorMessage(error, "Failed to load notebook folder index")
-      )
-    }
-    return data
-  }
-
-  async createFolder(notebookId: number, body: FolderCreationRequest) {
-    const payload: FolderCreationRequest =
-      body.underFolderId != null
-        ? { name: body.name, underFolderId: body.underFolderId }
-        : body.underNoteId != null
-          ? { name: body.name, underNoteId: body.underNoteId }
-          : { name: body.name }
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.createFolder({
-        path: { notebook: notebookId },
-        body: payload,
-      })
-    )
-    if (error || !data) {
-      throw new Error(toErrorMessage(error, "Failed to create folder"))
-    }
-    refreshSidebarStructuralListings()
-    return data
-  }
-
-  async moveFolder(
-    notebookId: number,
-    folderId: number,
-    newParentFolderId: number | null
-  ): Promise<Folder> {
-    const body: FolderMoveRequest =
-      newParentFolderId == null ? {} : { newParentFolderId }
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookController.moveFolder({
-        path: { notebook: notebookId, folder: folderId },
-        body,
-      })
-    )
-    if (error || !data) {
-      throw new Error(toErrorMessage(error, "Failed to move folder"))
-    }
-    refreshSidebarStructuralListings()
-    return data
-  }
-
-  async dissolveFolder(notebookId: number, folderId: number): Promise<void> {
-    const { error } = await apiCallWithLoading(() =>
-      NotebookController.dissolveFolder({
-        path: { notebook: notebookId, folder: folderId },
-      })
-    )
-    if (error) {
-      throw new Error(toErrorMessage(error, "Failed to dissolve folder"))
-    }
-    refreshSidebarStructuralListings()
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {

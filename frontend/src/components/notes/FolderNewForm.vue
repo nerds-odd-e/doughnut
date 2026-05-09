@@ -38,10 +38,12 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ref, watch } from "vue"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import FolderSelector from "./FolderSelector.vue"
 
 const props = defineProps<{
@@ -55,7 +57,6 @@ const emit = defineEmits<{
   closeDialog: []
 }>()
 
-const storageAccessor = useStorageAccessor()
 const name = ref("")
 const nameError = ref<string | undefined>(undefined)
 const processing = ref(false)
@@ -75,12 +76,19 @@ const processForm = async () => {
   processing.value = true
   nameError.value = undefined
   try {
-    await storageAccessor.value.storedApi().createFolder(props.notebookId, {
-      name: name.value,
-      ...(selectedParentFolderId.value != null
-        ? { underFolderId: selectedParentFolderId.value }
-        : {}),
-    })
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.createFolder({
+        path: { notebook: props.notebookId },
+        body: {
+          name: name.value,
+          ...(selectedParentFolderId.value != null
+            ? { underFolderId: selectedParentFolderId.value }
+            : {}),
+        },
+      })
+    )
+    if (error || !data) throw error ?? new Error("Failed to create folder")
+    refreshSidebarStructuralListings()
     emit("closeDialog")
   } catch (res: unknown) {
     nameError.value = toOpenApiError(res).message ?? "Failed to create folder"
