@@ -204,7 +204,12 @@ export const assumeNotePage = (
       return audioToolsPage()
     },
     switchToRichContent() {
-      this.toolbarButton('Edit as rich content').click()
+      cy.get('body').then(($body) => {
+        const toRich = $body.find('button[aria-label="Edit as rich content"]')
+        if (toRich.length > 0) {
+          cy.wrap(toRich.first()).click()
+        }
+      })
       return this
     },
     switchToRichContentMode() {
@@ -273,6 +278,24 @@ export const assumeNotePage = (
       })
       return this
     },
+    uploadRichNoteImagePropertyFromFixture(fixtureRelativePath: string) {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.findByRole('button', { name: 'Add property' }).click()
+        cy.findByTestId('rich-note-property-key').clear().type('image')
+        cy.get('[data-testid="rich-note-image-insert-file-input"]').selectFile(
+          `e2e_test/fixtures/${fixtureRelativePath}`,
+          { force: true }
+        )
+      })
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.get('.ql-editor[contenteditable="true"]').first().click()
+      })
+      return this
+    },
     expectRichNotePropertyDisplayed(key: string, value: string) {
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
@@ -290,6 +313,12 @@ export const assumeNotePage = (
             keyNorm === 'wikidata_id' || keyNorm === 'wikidataid'
           if (isWikidata) {
             cy.contains('.daisy-font-mono', value).should('exist')
+          } else if (keyNorm === 'image') {
+            cy.get('[data-testid="rich-note-image-property-path"]').should(
+              ($el) => {
+                expect($el.text().trim()).to.eq(value.trim())
+              }
+            )
           } else {
             cy.get('[data-testid="rich-note-property-row-value-input"]').should(
               ($el) => {
@@ -297,6 +326,24 @@ export const assumeNotePage = (
               }
             )
           }
+        })
+      })
+      return this
+    },
+    expectRichNoteImagePropertyAttachmentPath(key: string) {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.get(
+          `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
+        ).within(() => {
+          cy.get('[data-testid="rich-note-image-property-path"]').should(
+            ($el) => {
+              expect($el.text().trim()).to.match(
+                /^\/attachments\/images\/\d+\/.+/
+              )
+            }
+          )
         })
       })
       return this

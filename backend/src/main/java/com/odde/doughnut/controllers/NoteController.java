@@ -74,6 +74,17 @@ class NoteController {
         note, noteAccessoriesDTO, authorizationService.getCurrentUser());
   }
 
+  @PostMapping(value = "/{note}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Transactional
+  public NoteImageUploadResult uploadNoteImage(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @ModelAttribute NoteImageUploadDTO noteImageUploadDTO)
+      throws UnexpectedNoAccessRightException, IOException {
+    authorizationService.assertAuthorization(note);
+    return noteService.uploadNoteImage(
+        note, noteImageUploadDTO, authorizationService.getCurrentUser());
+  }
+
   @GetMapping("/{note}/accessory")
   public NoteAccessory showNoteAccessory(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {

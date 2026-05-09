@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -17,16 +18,19 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
+import jakarta.validation.Validation;
 import java.io.IOException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
+  @Autowired ImageRepository imageRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NoteController controller;
   @Autowired NoteService noteService;
@@ -283,6 +287,50 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.theNote(note).withUploadedImage();
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
+    }
+  }
+
+  @Nested
+  class UploadNoteImage {
+    @Test
+    void shouldReturnImagePathAndPersistImageLinkedToNote()
+        throws UnexpectedNoAccessRightException, IOException {
+      Note note = makeMe.aNote("n").creatorAndOwner(currentUser.getUser()).please();
+      NoteImageUploadDTO dto = new NoteImageUploadDTO();
+      dto.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
+
+      NoteImageUploadResult result = controller.uploadNoteImage(note, dto);
+
+      assertThat(result.imagePath(), startsWith("/attachments/images/"));
+      String[] segments = result.imagePath().split("/");
+      assertThat(segments.length, equalTo(5));
+      assertThat(segments[1], equalTo("attachments"));
+      assertThat(segments[2], equalTo("images"));
+      int imageId = Integer.parseInt(segments[3]);
+      assertThat(segments[4], equalTo("my.png"));
+      Image saved = imageRepository.findById(imageId).orElseThrow();
+      assertThat(saved.getNote().getId(), equalTo(note.getId()));
+    }
+
+    @Test
+    void shouldNotAllowUploadForNoteBelongingToAnotherUser() {
+      User other = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(other).please();
+      NoteImageUploadDTO dto = new NoteImageUploadDTO();
+      dto.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.uploadNoteImage(note, dto));
+    }
+
+    @Test
+    void shouldRejectInvalidUploadContentType() {
+      try (var factory = Validation.buildDefaultValidatorFactory()) {
+        NoteImageUploadDTO dto = new NoteImageUploadDTO();
+        dto.setUploadImage(
+            new MockMultipartFile(
+                "uploadImage", "x.pdf", "application/pdf", "not-empty".getBytes()));
+        assertThat(factory.getValidator().validate(dto), is(not(empty())));
+      }
     }
   }
 

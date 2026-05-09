@@ -2,6 +2,11 @@
   <section
     v-if="showSection"
     class="daisy-mb-3"
+    :class="
+      interactionLocked
+        ? 'daisy-pointer-events-none daisy-opacity-60'
+        : ''
+    "
     :aria-labelledby="headingVisible ? headingId : undefined"
     :aria-label="headingVisible ? undefined : 'Note properties'"
   >
@@ -39,6 +44,7 @@
         v-model="propertyRows[idx]!"
         :idx="idx"
         :wiki-titles="wikiTitles"
+        :note-id="noteId"
         :key-input-id="rowKeyInputId(idx)"
         :preset-list-id="rowKeyPresetListId(idx)"
         @row-focus="onRowFocus(idx)"
@@ -47,6 +53,7 @@
         @wikidata-dialog-open="openWikidataDialog({ type: 'row', idx })"
         @dead-link-click="emits('deadLinkClick', $event)"
         @relation-type-selected="onRelationTypeSelected(idx, $event)"
+        @image-upload-state="emits('image-upload-state', $event)"
       />
     </div>
     <p
@@ -65,6 +72,7 @@
       :draft-key="draftKey"
       :draft-value="draftValue"
       :wiki-titles="wikiTitles"
+      :note-id="noteId"
       :insert-key-input-id="insertKeyInputId"
       :insert-key-preset-list-id="insertKeyPresetListId"
       @open-insert="openPropertyInsert"
@@ -73,6 +81,7 @@
       @value-blur="tryCommitInsert"
       @dead-link-click="emits('deadLinkClick', $event)"
       @wikidata-dialog-open="openWikidataDialog({ type: 'insert' })"
+      @image-upload-state="emits('image-upload-state', $event)"
     />
   </section>
   <WikidataAssociationDialog
@@ -84,7 +93,7 @@
     :error-message="wikidataIdError"
     :show-save-button="true"
     :can-save-empty-to-clear="wikidataDialogCanSaveEmptyToClear"
-    :disabled="wikidataProcessing"
+    :disabled="wikidataProcessing || interactionLocked"
     @close="closeWikidataDialog"
     @save="handleWikidataSave"
     @selected="handleWikidataSelected"
@@ -119,12 +128,17 @@ const props = defineProps<{
   noteTitleForWikidataSearch?: string
   /** When set, Wikidata title replace/append updates the note title via the content API. */
   noteId?: number
+  /** When true, properties UI is non-interactive (e.g. during image upload). */
+  interactionLocked?: boolean
 }>()
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
   deadLinkClick: [title: string]
+  "image-upload-state": [inProgress: boolean]
 }>()
+
+const interactionLocked = computed(() => props.interactionLocked ?? false)
 
 const headingId = useId()
 const insertKeyInputId = `${headingId}-insert-key`

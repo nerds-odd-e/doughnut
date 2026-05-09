@@ -73,6 +73,43 @@
           </button>
         </div>
         <div
+          v-else-if="isImagePropertyKey(draftKey)"
+          class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
+        >
+          <input
+            ref="insertImageFileInputRef"
+            type="file"
+            accept="image/*"
+            class="daisy-hidden"
+            data-testid="rich-note-image-insert-file-input"
+            @change="onInsertImageFileSelected"
+          />
+          <span class="daisy-font-mono daisy-text-sm">{{
+            draftValue.trim() || "—"
+          }}</span>
+          <RichFrontmatterPropertyExternalLink
+            v-if="draftValue.trim()"
+            kind="url"
+            :value="draftValue"
+          />
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-sm daisy-btn-outline"
+            data-testid="rich-note-image-insert-choose"
+            :disabled="!noteId || insertImageUploading"
+            @click="openInsertImageFilePicker"
+          >
+            {{ draftValue.trim() ? "Replace…" : "Choose image…" }}
+          </button>
+          <span
+            v-if="!noteId"
+            class="daisy-text-xs daisy-text-base-content/70"
+            data-testid="rich-note-image-insert-requires-note"
+          >
+            Save the note before attaching an image.
+          </span>
+        </div>
+        <div
           v-else
           :class="
             isUrlPropertyKey(draftKey)
@@ -114,7 +151,10 @@ import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatt
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
+  isImagePropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
 } from "@/utils/noteContentFrontmatter"
@@ -127,6 +167,7 @@ const props = defineProps<{
   wikiTitles: WikiTitle[]
   insertKeyInputId: string
   insertKeyPresetListId: string
+  noteId?: number
 }>()
 
 const emit = defineEmits<{
@@ -136,12 +177,15 @@ const emit = defineEmits<{
   "value-blur": []
   "dead-link-click": [title: string]
   "wikidata-dialog-open": []
+  "image-upload-state": [inProgress: boolean]
 }>()
 
 const presetPanelOpen = ref(false)
 const valueInputRef = ref<InstanceType<typeof WikiPropertyValueField> | null>(
   null
 )
+const insertImageFileInputRef = ref<HTMLInputElement | null>(null)
+const insertImageUploading = ref(false)
 
 function onKeyInput(event: Event) {
   emit("update:draftKey", (event.target as HTMLInputElement).value)
@@ -164,6 +208,36 @@ function onPresetSelected(key: string) {
 
 function focusValueInput() {
   valueInputRef.value?.focus()
+}
+
+function openInsertImageFilePicker() {
+  insertImageFileInputRef.value?.click()
+}
+
+async function onInsertImageFileSelected(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ""
+  const noteId = props.noteId
+  if (!file || noteId === undefined) return
+
+  emit("image-upload-state", true)
+  insertImageUploading.value = true
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      NoteController.uploadNoteImage({
+        path: { note: noteId },
+        body: { uploadImage: file },
+      })
+    )
+    if (!error && data?.imagePath) {
+      emit("update:draftValue", data.imagePath)
+      emit("value-blur")
+    }
+  } finally {
+    insertImageUploading.value = false
+    emit("image-upload-state", false)
+  }
 }
 
 defineExpose({ focusValueInput })

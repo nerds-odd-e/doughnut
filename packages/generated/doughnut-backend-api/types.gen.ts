@@ -338,6 +338,17 @@ export type RedirectToNoteResponse = {
     notebookId?: number;
 };
 
+export type NoteImageUploadDto = {
+    uploadImage: Blob | File;
+};
+
+export type NoteImageUploadResult = {
+    /**
+     * Path suitable for the note frontmatter `image:` scalar (e.g. /attachments/images/{id}/{filename}).
+     */
+    imagePath: string;
+};
+
 export type NoteDeleteDto = {
     referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS';
 };
@@ -1651,6 +1662,24 @@ export type UpdateNoteRecallSettingResponses = {
 };
 
 export type UpdateNoteRecallSettingResponse = UpdateNoteRecallSettingResponses[keyof UpdateNoteRecallSettingResponses];
+
+export type UploadNoteImageData = {
+    body?: NoteImageUploadDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/images';
+};
+
+export type UploadNoteImageResponses = {
+    /**
+     * OK
+     */
+    200: NoteImageUploadResult;
+};
+
+export type UploadNoteImageResponse = UploadNoteImageResponses[keyof UploadNoteImageResponses];
 
 export type DeleteNoteData = {
     body: NoteDeleteDto;

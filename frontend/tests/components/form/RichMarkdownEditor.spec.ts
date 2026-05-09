@@ -1,9 +1,11 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
 import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
 import { RICH_MODE_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import helper, { mockSdkService } from "@tests/helpers"
 import { nextTick } from "vue"
-import helper from "@tests/helpers"
+import { vi } from "vitest"
 
 describe("RichMarkdownEditor", () => {
   let wrapper: VueWrapper
@@ -545,6 +547,47 @@ Body line`
       )
       expect(primaryLabelForCustom.exists()).toBe(true)
       expect(primaryLabelForCustom.classes()).toContain("daisy-bg-primary")
+    })
+  })
+
+  describe("image property upload", () => {
+    let uploadSpy: ReturnType<typeof mockSdkService>
+
+    beforeEach(() => {
+      uploadSpy = mockSdkService(NoteController, "uploadNoteImage", {
+        imagePath: "/attachments/images/99/e2e.png",
+      })
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it("sets image path from upload when choosing a file on the image row", async () => {
+      const markdown = `---
+image: /attachments/images/1/old.png
+---
+
+# Hi`
+      await mountEditor(markdown, { noteId: 42 })
+      await flushPromises()
+
+      const fileInput = wrapper.find(
+        '[data-testid="rich-note-image-property-file-input"]'
+      )
+      const inputEl = fileInput.element as HTMLInputElement
+      const file = new File(["fake"], "pic.png", { type: "image/png" })
+      Object.defineProperty(inputEl, "files", {
+        value: [file],
+        configurable: true,
+      })
+      await fileInput.trigger("change")
+      await flushPromises()
+
+      expect(uploadSpy).toHaveBeenCalled()
+      const last = lastEmittedMarkdown()
+      expect(last).toContain("image: /attachments/images/99/e2e.png")
+      expect(last).toContain("# Hi")
     })
   })
 

@@ -5,6 +5,7 @@ import {
   contentHasRelationProperty,
   firstScalarValueFromYamlBlock,
   insertPropertyRowAt,
+  isImagePropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
   noteImageScalarsFromMarkdown,
@@ -15,6 +16,16 @@ import {
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
+
+describe("isImagePropertyKey", () => {
+  it("matches image case-insensitively with trim", () => {
+    expect(isImagePropertyKey("image")).toBe(true)
+    expect(isImagePropertyKey(" Image ")).toBe(true)
+    expect(isImagePropertyKey("IMAGE")).toBe(true)
+    expect(isImagePropertyKey("image_mask")).toBe(false)
+    expect(isImagePropertyKey("imagery")).toBe(false)
+  })
+})
 
 describe("firstScalarValueFromYamlBlock", () => {
   it("reads first matching key case-insensitively with trim and quotes", () => {

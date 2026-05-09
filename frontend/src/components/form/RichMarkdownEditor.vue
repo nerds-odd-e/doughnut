@@ -7,8 +7,10 @@
       :wiki-titles="wikiTitles"
       :note-title-for-wikidata-search="noteTitleForWikidataSearch"
       :note-id="noteId"
+      :interaction-locked="imageUploadInProgress"
       @properties-changed="onPropertiesChanged"
       @dead-link-click="$emit('deadLinkClick', $event)"
+      @image-upload-state="imageUploadInProgress = $event"
     />
     <div
       v-if="frontmatterParseErrorMessage !== null"
@@ -78,6 +80,8 @@ const frontmatterPropertiesRef = ref<InstanceType<
   typeof RichFrontmatterProperties
 > | null>(null)
 
+const imageUploadInProgress = ref(false)
+
 const parsedContent = computed(() =>
   parseNoteContentMarkdown(props.modelValue ?? "")
 )
@@ -88,7 +92,10 @@ const frontmatterParseErrorMessage = computed(() => {
 })
 
 const effectiveReadonly = computed(
-  () => Boolean(props.readonly) || !parsedContent.value.ok
+  () =>
+    Boolean(props.readonly) ||
+    !parsedContent.value.ok ||
+    imageUploadInProgress.value
 )
 
 const markdownForRichDisplay = computed(() => {

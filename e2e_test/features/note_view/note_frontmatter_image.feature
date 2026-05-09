@@ -15,3 +15,21 @@ Feature: Note header image from frontmatter
       """
     And I flush pending note content save
     When I should see note "shown" has an image
+
+  Scenario: Rich editor uploads image property with attachment path in frontmatter
+    When I update note "shown" content using markdown to become:
+      """
+      ---
+      topic: t
+      ---
+      Body text
+      """
+    And I flush pending note content save
+    And I reload the current page for note "shown"
+    When I view the note content as rich content
+    When I upload a rich note image property from fixture "moon.jpg"
+    And I flush pending note content save
+    And I reload the current page for note "shown"
+    Then the rich note property "image" should show an attachment image path
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "image: /attachments/images/"

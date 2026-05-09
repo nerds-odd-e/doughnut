@@ -243,6 +243,14 @@ export function isWikidataIdPropertyKey(key: string): boolean {
   return t === "wikidata_id" || t === "wikidataid"
 }
 
+/**
+ * Rich-mode property key for header image upload (`image:` only).
+ * `image_mask` and other keys use the normal text/value editor.
+ */
+export function isImagePropertyKey(key: string): boolean {
+  return key.trim().toLowerCase() === "image"
+}
+
 export function isUrlPropertyKey(key: string): boolean {
   return key.trim().toLowerCase() === "url"
 }

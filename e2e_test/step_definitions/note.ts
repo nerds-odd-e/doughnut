@@ -545,6 +545,13 @@ Given('I open the note {string} for editing', (noteTopology: string) => {
 })
 
 When(
+  'I upload a rich note image property from fixture {string}',
+  (fixturePath: string) => {
+    start.assumeNotePage().uploadRichNoteImagePropertyFromFixture(fixturePath)
+  }
+)
+
+When(
   'I add a rich note property with key {string} and value {string}',
   (key: string, value: string) => {
     start.assumeNotePage().addRichNoteProperty(key, value)
@@ -555,6 +562,13 @@ Then(
   'I should see rich note property {string} with value {string}',
   (key: string, value: string) => {
     start.assumeNotePage().expectRichNotePropertyDisplayed(key, value)
+  }
+)
+
+Then(
+  'the rich note property {string} should show an attachment image path',
+  (key: string) => {
+    start.assumeNotePage().expectRichNoteImagePropertyAttachmentPath(key)
   }
 )
 

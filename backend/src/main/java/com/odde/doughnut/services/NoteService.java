@@ -3,6 +3,9 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.doughnut.controllers.dto.NoteImageUploadDTO;
+import com.odde.doughnut.controllers.dto.NoteImageUploadResult;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -14,6 +17,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.utils.ImageBuilder;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
@@ -201,6 +205,17 @@ public class NoteService {
   private boolean sameTimestamp(Timestamp a, Timestamp b) {
     if (a == null || b == null) return a == b;
     return Math.abs(a.getTime() - b.getTime()) < 1000;
+  }
+
+  public NoteImageUploadResult uploadNoteImage(
+      Note note, NoteImageUploadDTO noteImageUploadDTO, User user) throws IOException {
+    Image image =
+        new ImageBuilder().buildImageFromUploadedImage(user, noteImageUploadDTO.getUploadImage());
+    image.setNote(note);
+    entityPersister.save(image);
+    entityPersister.flush();
+    String imagePath = "/attachments/images/" + image.getId() + "/" + image.getName();
+    return new NoteImageUploadResult(imagePath);
   }
 
   public NoteAccessory updateNoteAccessories(

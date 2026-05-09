@@ -817,6 +817,29 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RedirectToNoteResponse"
+  /api/notes/{note}/images:
+    post:
+      tags:
+      - note-controller
+      operationId: uploadNoteImage
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/NoteImageUploadDTO"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteImageUploadResult"
   /api/notes/{note}/delete:
     post:
       tags:
@@ -3494,6 +3517,23 @@ components:
         notebookId:
           type: integer
           format: int32
+    NoteImageUploadDTO:
+      type: object
+      properties:
+        uploadImage:
+          type: string
+          format: binary
+      required:
+      - uploadImage
+    NoteImageUploadResult:
+      type: object
+      properties:
+        imagePath:
+          type: string
+          description: "Path suitable for the note frontmatter `image:` scalar (e.g.\
+            \ /attachments/images/{id}/{filename})."
+      required:
+      - imagePath
     NoteDeleteDTO:
       type: object
       properties:

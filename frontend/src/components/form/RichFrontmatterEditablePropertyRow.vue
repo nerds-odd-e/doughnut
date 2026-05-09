@@ -39,6 +39,56 @@
       @update:model-value="emit('relation-type-selected', $event)"
     />
     <div
+      v-else-if="isImagePropertyKey(modelValue.key)"
+      class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
+    >
+      <input
+        ref="imageFileInputRef"
+        type="file"
+        accept="image/*"
+        class="daisy-hidden"
+        data-testid="rich-note-image-property-file-input"
+        @change="onImageFileSelected"
+      />
+      <template v-if="modelValue.value.trim()">
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-min-w-0 daisy-max-w-full daisy-shrink daisy-truncate daisy-justify-start daisy-py-0.5 daisy-px-1 daisy-font-mono daisy-text-sm daisy-font-normal daisy-text-base-content/90 daisy-normal-case"
+          :title="modelValue.value.trim()"
+          data-testid="rich-note-image-property-path"
+        >
+          {{ modelValue.value.trim() }}
+        </button>
+        <RichFrontmatterPropertyExternalLink
+          kind="url"
+          :value="modelValue.value"
+        />
+      </template>
+      <template v-else>
+        <span
+          class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
+          aria-hidden="true"
+          >—</span
+        >
+      </template>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
+        data-testid="rich-note-image-property-choose"
+        :disabled="!noteId || imageUploading"
+        @click="openImageFilePicker"
+      >
+        {{ modelValue.value.trim() ? "Replace…" : "Choose image…" }}
+      </button>
+      <span
+        v-if="!noteId"
+        class="daisy-text-xs daisy-text-base-content/70"
+        data-testid="rich-note-image-upload-requires-note"
+      >
+        Save the note before attaching an image.
+      </span>
+    </div>
+    <div
       v-else-if="isWikidataIdPropertyKey(modelValue.key)"
       class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
       :class="modelValue.value.trim() ? '' : 'daisy-justify-between'"
@@ -127,7 +177,10 @@ import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatter
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
+  isImagePropertyKey,
   isRelationPropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
@@ -144,6 +197,7 @@ const props = defineProps<{
   wikiTitles: WikiTitle[]
   keyInputId: string
   presetListId: string
+  noteId?: number
 }>()
 
 const emit = defineEmits<{
@@ -154,9 +208,12 @@ const emit = defineEmits<{
   "wikidata-dialog-open": []
   "dead-link-click": [title: string]
   "relation-type-selected": [type: string | undefined]
+  "image-upload-state": [inProgress: boolean]
 }>()
 
 const presetPanelOpen = ref(false)
+const imageFileInputRef = ref<HTMLInputElement | null>(null)
+const imageUploading = ref(false)
 
 const relationModelValue = computed(() => {
   const v = props.modelValue.value
@@ -193,5 +250,38 @@ function onPresetSelected(key: string) {
   requestAnimationFrame(() => {
     document.getElementById(props.keyInputId)?.focus()
   })
+}
+
+function openImageFilePicker() {
+  imageFileInputRef.value?.click()
+}
+
+async function onImageFileSelected(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ""
+  const noteId = props.noteId
+  if (!file || noteId === undefined) return
+
+  emit("image-upload-state", true)
+  imageUploading.value = true
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      NoteController.uploadNoteImage({
+        path: { note: noteId },
+        body: { uploadImage: file },
+      })
+    )
+    if (!error && data?.imagePath) {
+      emit("update:modelValue", {
+        ...props.modelValue,
+        value: data.imagePath,
+      })
+      emit("commit")
+    }
+  } finally {
+    imageUploading.value = false
+    emit("image-upload-state", false)
+  }
 }
 </script>
