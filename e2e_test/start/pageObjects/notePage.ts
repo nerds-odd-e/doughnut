@@ -289,12 +289,11 @@ export const assumeNotePage = (
           { force: true }
         )
       })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get('.ql-editor[contenteditable="true"]').first().click()
-      })
-      return this
+      cy.get(
+        `[data-testid="rich-note-property-row"][data-property-key="image"]`,
+        { timeout: 20000 }
+      ).should('exist')
+      return this.flushPendingContentSave()
     },
     expectRichNotePropertyDisplayed(key: string, value: string) {
       cy.findByRole(noteContentRegion.role, {
