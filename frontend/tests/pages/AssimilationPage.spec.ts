@@ -7,11 +7,7 @@ import AssimilationPage from "@/pages/AssimilationPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockShowNoteAccessory,
-  mockSdkService,
-  wrapSdkResponse,
-} from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 
@@ -47,7 +43,6 @@ beforeEach(() => {
   mockSdkService(AiController, "generateUnderstandingChecklist", {
     points: [],
   })
-  mockShowNoteAccessory()
   renderer = helper.component(AssimilationPage).withCleanStorage().withProps({})
 })
 

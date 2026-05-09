@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.CircleRepository;
@@ -141,6 +142,22 @@ class TestabilityRestController {
       }
       accessory.setImageMask(imageMask);
       accessory.setImageUrl(imageUrl);
+
+      ImageWithMask imageWithMask = accessory.getImageWithMask();
+      boolean hasImage =
+          imageWithMask != null
+              && imageWithMask.noteImage != null
+              && !imageWithMask.noteImage.isBlank();
+      String imageUrl = "";
+      String mask = "";
+      if (hasImage) {
+        ImageWithMask iwm = Objects.requireNonNull(imageWithMask);
+        imageUrl = iwm.noteImage;
+        mask = iwm.imageMask != null ? iwm.imageMask : "";
+      }
+      note.setContent(
+          NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+              note.getContent(), hasImage, imageUrl, mask));
 
       note.setUpdatedAt(currentUTCTimestamp);
       return note;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.logging.log4j.util.Strings;
 
 /** Leading YAML frontmatter fence handling for note content markdown. */
 public final class NoteContentMarkdown {
@@ -43,6 +44,108 @@ public final class NoteContentMarkdown {
       }
     }
     return Optional.empty();
+  }
+
+  /**
+   * Updates or removes {@code image:} and {@code image_mask:} scalar lines in the first leading
+   * YAML frontmatter block so note display can read a single source of truth from {@code
+   * note.content}. When {@code hasImage} is false, both lines are removed if present.
+   */
+  public static String mergeNoteImageScalarsIntoContent(
+      String content, boolean hasImage, String imageUrl, String imageMask) {
+    if (content == null) {
+      content = "";
+    }
+    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
+    if (split.isEmpty()) {
+      if (!hasImage) {
+        return content;
+      }
+      String yamlAddition = yamlLinesForImageScalars(imageUrl, imageMask);
+      return "---\n" + yamlAddition + "---\n" + content;
+    }
+    LeadingFrontmatter lf = split.get();
+    List<String> kept =
+        yamlLinesWithoutImageKeys(lf.yamlRaw().split("\n", -1), hasImage, imageUrl, imageMask);
+    String body = lf.body();
+    if (kept.isEmpty()) {
+      return body;
+    }
+    return "---\n" + String.join("\n", kept) + "\n---\n" + body;
+  }
+
+  private static List<String> yamlLinesWithoutImageKeys(
+      String[] yamlLines, boolean hasImage, String imageUrl, String imageMask) {
+    List<String> kept = new ArrayList<>();
+    for (String line : yamlLines) {
+      if (!isImageOrImageMaskPropertyLine(line)) {
+        kept.add(line);
+      }
+    }
+    if (hasImage && !Strings.isBlank(imageUrl)) {
+      kept.add("image: " + formatYamlScalarValue(imageUrl.trim()));
+      if (!Strings.isBlank(imageMask)) {
+        kept.add("image_mask: " + formatYamlScalarValue(imageMask.trim()));
+      }
+    }
+    return kept;
+  }
+
+  private static String yamlLinesForImageScalars(String imageUrl, String imageMask) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("image: ").append(formatYamlScalarValue(imageUrl.trim())).append('\n');
+    if (!Strings.isBlank(imageMask)) {
+      sb.append("image_mask: ").append(formatYamlScalarValue(imageMask.trim())).append('\n');
+    }
+    return sb.toString();
+  }
+
+  private static boolean isImageOrImageMaskPropertyLine(String line) {
+    String t = line.trim();
+    if (t.isEmpty() || t.startsWith("#")) {
+      return false;
+    }
+    int colon = t.indexOf(':');
+    if (colon < 0) {
+      return false;
+    }
+    String key = t.substring(0, colon).trim();
+    return "image".equalsIgnoreCase(key) || "image_mask".equalsIgnoreCase(key);
+  }
+
+  /** Plain scalar when safe; else double-quoted with minimal escaping. */
+  static String formatYamlScalarValue(String value) {
+    if (value.isEmpty()) {
+      return "\"\"";
+    }
+    boolean safePlain =
+        value
+                .chars()
+                .noneMatch(
+                    c ->
+                        c == '\n' || c == '\r' || c == '"' || c == '\'' || c == '#' || c == ':'
+                            || c == ' ' || c == '\t')
+            && !value.startsWith("-")
+            && !value.startsWith("@")
+            && !value.startsWith("*")
+            && !value.startsWith("&")
+            && !value.startsWith("!")
+            && !value.startsWith("%")
+            && !value.startsWith("|")
+            && !value.startsWith(">")
+            && !value.equals("true")
+            && !value.equals("false")
+            && !value.equalsIgnoreCase("null");
+    if (safePlain) {
+      return value;
+    }
+    return "\""
+        + value
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+        + "\"";
   }
 
   public static Optional<String> removeWikiLinksFromLeadingFrontmatterProperties(

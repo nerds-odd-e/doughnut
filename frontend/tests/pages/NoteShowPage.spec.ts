@@ -7,7 +7,6 @@ import { within } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockNotebookGetForNoteRealm,
-  mockShowNoteAccessory,
   mockSdkService,
 } from "@tests/helpers"
 import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
@@ -25,7 +24,6 @@ describe("all in note show page", () => {
       history: createWebHistory(),
       routes,
     })
-    mockShowNoteAccessory()
   })
 
   describe("note show by note id", () => {

@@ -7,11 +7,7 @@ import Assimilation from "@/components/recall/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockShowNoteAccessory,
-  mockSdkService,
-  wrapSdkResponse,
-} from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -85,7 +81,6 @@ beforeEach(() => {
     setTotalUnassimilatedCount: vi.fn(),
   })
 
-  mockShowNoteAccessory()
   renderer = helper.component(Assimilation)
 })
 

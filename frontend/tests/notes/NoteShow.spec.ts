@@ -2,24 +2,12 @@ import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockShowNoteAccessory, mockSdkService } from "@tests/helpers"
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeAll,
-  beforeEach,
-  afterEach,
-} from "vitest"
+import helper, { mockSdkService } from "@tests/helpers"
+import { describe, it, expect, vi, beforeAll, afterEach } from "vitest"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf())
-  })
-
-  beforeEach(() => {
-    mockShowNoteAccessory()
   })
 
   it.each([
@@ -54,10 +42,6 @@ describe("new/updated pink banner", () => {
 
 describe("note wth children", () => {
   const note = makeMe.aNoteRealm.please()
-
-  beforeEach(() => {
-    mockShowNoteAccessory()
-  })
 
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>

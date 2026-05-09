@@ -89,4 +89,64 @@ class NoteContentMarkdownTest {
             content, Set.of("Target")),
         equalTo(Optional.of("---\nsource: \"[[Source]]\"\n---\nBody")));
   }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_prepends_frontmatter_when_none() {
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            "Hello", true, "/attachments/images/9/a.png", ""),
+        equalTo("---\nimage: /attachments/images/9/a.png\n---\nHello"));
+  }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_adds_mask_when_present() {
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            "Body", true, "/attachments/images/1/x.jpg", "0 0 10 10"),
+        equalTo(
+            "---\n"
+                + "image: /attachments/images/1/x.jpg\n"
+                + "image_mask: \"0 0 10 10\"\n"
+                + "---\n"
+                + "Body"));
+  }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_replaces_existing_image_lines() {
+    String in = "---\nimage: /old\nwikidata_id: Q1\n---\nB";
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            in, true, "/attachments/images/2/n.png", ""),
+        equalTo("---\nwikidata_id: Q1\nimage: /attachments/images/2/n.png\n---\nB"));
+  }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_removes_image_when_hasImage_false() {
+    String in = "---\nimage: /x\nimage_mask: 1 2 3 4\n---\nBody";
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(in, false, "", ""), equalTo("Body"));
+  }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_quotes_url_with_colon() {
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            "Hi", true, "https://example.com/a.png", ""),
+        equalTo("---\n" + "image: \"https://example.com/a.png\"\n" + "---\n" + "Hi"));
+  }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_plain_body_unchanged_when_clearing_without_frontmatter() {
+    String plain = "No frontmatter";
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(plain, false, "", ""), equalTo(plain));
+  }
+
+  @Test
+  void mergeNoteImageScalarsIntoContent_clears_image_but_keeps_other_frontmatter() {
+    String in = "---\nimage: /x\ntopic: t\n---\nBody";
+    assertThat(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(in, false, "", ""),
+        equalTo("---\ntopic: t\n---\nBody"));
+  }
 }

@@ -56,6 +56,50 @@ export function verbatimFrontmatterPrefixAndBody(
   return { prefix: split.verbatimPrefix, body: split.body }
 }
 
+/** First `key: value` scalar in a YAML block (line-based; case-insensitive key; trim; strip matching outer quotes). */
+export function firstScalarValueFromYamlBlock(
+  yamlRaw: string,
+  fieldKey: string
+): string | undefined {
+  if (!yamlRaw) return
+  const normalized = yamlRaw.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
+  const needle = fieldKey.toLowerCase()
+  for (const line of normalized.split("\n")) {
+    const t = line.trim()
+    if (t === "" || t.startsWith("#")) continue
+    const colon = t.indexOf(":")
+    if (colon < 0) continue
+    const key = t.slice(0, colon).trim()
+    if (key.toLowerCase() !== needle) continue
+    let value = t.slice(colon + 1).trim()
+    if (value === "") return
+    if (value.length >= 2) {
+      const first = value[0]!
+      const last = value[value.length - 1]!
+      if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+        value = value.slice(1, -1).trim()
+      }
+    }
+    return value
+  }
+  return
+}
+
+/** Resolved header image URL and optional mask from note Markdown (leading frontmatter only). */
+export function noteImageScalarsFromMarkdown(markdown: string): {
+  noteImage?: string
+  imageMask?: string
+} {
+  const split = splitLeadingFrontmatter(markdown)
+  if (split.kind !== "parsed") return {}
+  const noteImage = firstScalarValueFromYamlBlock(split.yamlRaw, "image")
+  const imageMask = firstScalarValueFromYamlBlock(split.yamlRaw, "image_mask")
+  const out: { noteImage?: string; imageMask?: string } = {}
+  if (noteImage !== undefined && noteImage !== "") out.noteImage = noteImage
+  if (imageMask !== undefined && imageMask !== "") out.imageMask = imageMask
+  return out
+}
+
 function yamlScalarToPropertyString(value: unknown): string | null {
   if (value === null || value === undefined) return null
   if (typeof value === "string") return value

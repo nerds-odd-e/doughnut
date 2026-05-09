@@ -38,8 +38,11 @@
                   }"
                   @dead-link-click="onDeadLinkClick"
                 />
-                <NoteAccessoryAsync
-                  v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly: readonly(noteRealm) }"
+                <ShowImage
+                  v-bind="{
+                    ...noteImageScalarsFromMarkdown(noteRealm.note.content ?? ''),
+                    opacity: 0.2,
+                  }"
                   :key="noteRealm.id"
                 />
                 <NoteRecentUpdateIndicator
@@ -89,17 +92,13 @@
 import { inject, ref, watch, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type {
-  Folder,
-  NoteAccessory,
-  NoteRealm,
-  User,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NoteRealm, User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
-import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
+import ShowImage from "./accessory/ShowImage.vue"
+import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
@@ -125,7 +124,6 @@ const onDeadLinkClick = (title: string) => {
   pendingDeadLinkTitle.value = title
 }
 
-const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const reloadKey = ref(0)
 const onNoteAccessoryUpdated = () => {
   reloadKey.value += 1

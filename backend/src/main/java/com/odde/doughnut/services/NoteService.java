@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
@@ -19,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -205,6 +207,21 @@ public class NoteService {
       Note note, NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
+    ImageWithMask imageWithMask = note.getNoteAccessory().getImageWithMask();
+    boolean hasImage =
+        imageWithMask != null
+            && imageWithMask.noteImage != null
+            && !imageWithMask.noteImage.isBlank();
+    String imageUrl = "";
+    String mask = "";
+    if (hasImage) {
+      ImageWithMask iwm = Objects.requireNonNull(imageWithMask);
+      imageUrl = iwm.noteImage;
+      mask = iwm.imageMask != null ? iwm.imageMask : "";
+    }
+    note.setContent(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            note.getContent(), hasImage, imageUrl, mask));
     entityPersister.save(note);
     return note.getNoteAccessory();
   }

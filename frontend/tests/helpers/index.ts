@@ -48,15 +48,6 @@ class StoredComponentTestHelper {
 }
 
 /**
- * Mocks showNoteAccessory service to prevent unhandled promise rejections
- * in tests that use NoteAccessoryAsync component.
- */
-export function mockShowNoteAccessory() {
-  // biome-ignore lint/suspicious/noExplicitAny: showNoteAccessory returns undefined which requires special handling
-  return mockSdkService(NoteController, "showNoteAccessory", undefined as any)
-}
-
-/**
  * Mocks showNote service to prevent unhandled promise rejections
  * in tests that use StoredApiCollection.loadNote (via storageAccessor).
  */

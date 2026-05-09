@@ -9,7 +9,6 @@ import { nextTick } from "vue"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
-  mockShowNoteAccessory,
   mockSdkService,
   mockSdkServiceWithImplementation,
   wrapSdkError,
@@ -42,7 +41,6 @@ beforeEach(() => {
     "promotePointToSibling",
     makeMe.aNoteRealm.please()
   )
-  mockShowNoteAccessory()
   renderer = helper.component(NoteRefinement)
 })
 
