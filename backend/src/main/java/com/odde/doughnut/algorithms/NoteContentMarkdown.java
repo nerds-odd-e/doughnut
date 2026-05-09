@@ -1,6 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -87,30 +86,17 @@ public final class NoteContentMarkdown {
     if (linkTexts.isEmpty()) {
       return Optional.empty();
     }
-    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
-    if (split.isEmpty()) {
-      return Optional.empty();
-    }
-
-    List<String> keptLines = new ArrayList<>();
-    boolean changed = false;
-    for (String line : split.get().yamlRaw().split("\n", -1)) {
-      String rewritten = line;
-      for (String linkText : linkTexts) {
-        rewritten = rewritten.replace("[[" + linkText + "]]", "");
-      }
-      if (!rewritten.equals(line)) {
-        changed = true;
-        if (new YamlBuilder("").isEmptyMappingValueLine(rewritten)) {
-          continue;
-        }
-      }
-      keptLines.add(rewritten);
-    }
-    if (!changed) {
-      return Optional.empty();
-    }
-    String body = split.get().body();
-    return Optional.of(NoteLeadingFrontmatter.contentWithLeadingFence(keptLines, body));
+    return splitLeadingFrontmatter(content)
+        .flatMap(
+            lf ->
+                new YamlBuilder(lf.yamlRaw())
+                    .transformValues(
+                        v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", "")))
+                    .map(
+                        updated ->
+                            updated.hasContent()
+                                ? NoteLeadingFrontmatter.contentWithLeadingFence(
+                                    updated.lines(), lf.body())
+                                : lf.body()));
   }
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /** Line-oriented helpers for simple {@code key: value} YAML fragments (no document model). */
 public final class YamlBuilder {
@@ -84,12 +85,48 @@ public final class YamlBuilder {
     return kept;
   }
 
+  /** {@code true} when the stored YAML has at least one non-blank line. */
+  public boolean hasContent() {
+    return Arrays.stream(yamlText.split("\n", -1)).anyMatch(s -> !s.isBlank());
+  }
+
+  /**
+   * Lines whose value becomes empty after the transform are dropped. Returns empty if nothing
+   * changed.
+   */
+  public Optional<YamlBuilder> transformValues(UnaryOperator<String> valueTransformer) {
+    List<String> result = new ArrayList<>();
+    boolean changed = false;
+    for (String line : yamlText.split("\n", -1)) {
+      if (mappingKeyFromLine(line).isEmpty()) {
+        result.add(line);
+        continue;
+      }
+      int colon = line.indexOf(':');
+      String rawValue = line.substring(colon + 1);
+      String newRawValue = valueTransformer.apply(rawValue);
+      if (!newRawValue.equals(rawValue)) {
+        changed = true;
+        String rewritten = line.substring(0, colon + 1) + newRawValue;
+        if (!isEmptyMappingValueLine(rewritten)) {
+          result.add(rewritten);
+        }
+      } else {
+        result.add(line);
+      }
+    }
+    if (!changed) {
+      return Optional.empty();
+    }
+    return Optional.of(new YamlBuilder(String.join("\n", result)));
+  }
+
   /** One {@code key: formatted-value} line for simple scalar serialization. */
   public String mappingLine(String key, String rawValue) {
     return key + ": " + formatYamlScalarValue(rawValue);
   }
 
-  public boolean isEmptyMappingValueLine(String line) {
+  public static boolean isEmptyMappingValueLine(String line) {
     String t = line.trim();
     int colon = t.indexOf(':');
     if (colon < 0) {
