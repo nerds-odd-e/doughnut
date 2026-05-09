@@ -9,23 +9,14 @@ Feature: Note header image from frontmatter
     When I update note "shown" content using markdown to become:
       """
       ---
-      image: /attachments/images/42/e2e-frontmatter.png
+      image: https://example.com/a.png
       ---
       Body text
       """
     When I should see note "shown" has an image
 
   Scenario: Rich editor uploads image property with attachment path in frontmatter
-    When I update note "shown" content using markdown to become:
-      """
-      ---
-      topic: t
-      ---
-      Body text
-      """
-    And I reload the current page for note "shown"
-    When I view the note content as rich content
-    When I upload a rich note image property from fixture "moon.jpg"
+    When I upload an image from fixture "moon.jpg" to the note "shown"
     And I reload the current page for note "shown"
     Then the rich note property "image" should show an attachment image path
     When I open the note content markdown editor

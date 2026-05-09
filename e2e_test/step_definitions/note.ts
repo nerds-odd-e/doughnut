@@ -538,9 +538,12 @@ Given('I open the note {string} for editing', (noteTopology: string) => {
 })
 
 When(
-  'I upload a rich note image property from fixture {string}',
-  (fixturePath: string) => {
-    start.assumeNotePage().uploadRichNoteImagePropertyFromFixture(fixturePath)
+  'I upload an image from fixture {string} to the note {string}',
+  (fixturePath: string, noteTopology: string) => {
+    start
+      .jumpToNotePage(noteTopology)
+      .switchToRichContentMode()
+      .uploadRichNoteImagePropertyFromFixture(fixturePath)
   }
 )
 
