@@ -1,13 +1,11 @@
 package com.odde.doughnut.algorithms;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.apache.logging.log4j.util.Strings;
 
 /**
  * Note content helpers for the leading YAML block: orchestrates fence parsing ({@link
- * NoteLeadingFrontmatter}) and generic YAML line handling ({@link YamlBuilder}).
+ * NoteLeadingFrontmatter}) and frontmatter manipulation ({@link Frontmatter}).
  */
 public final class NoteContentMarkdown {
 
@@ -21,16 +19,16 @@ public final class NoteContentMarkdown {
       Set.of(NOTE_IMAGE_KEY, NOTE_IMAGE_MASK_KEY);
 
   public static final class LeadingFrontmatter {
-    private final String yamlRaw;
+    private final Frontmatter frontmatter;
     private final String body;
 
-    private LeadingFrontmatter(String yamlRaw, String body) {
-      this.yamlRaw = yamlRaw;
+    private LeadingFrontmatter(Frontmatter frontmatter, String body) {
+      this.frontmatter = frontmatter;
       this.body = body;
     }
 
-    public YamlBuilder yamlBuilder() {
-      return new YamlBuilder(yamlRaw);
+    public Frontmatter frontmatter() {
+      return frontmatter;
     }
 
     public String body() {
@@ -48,12 +46,12 @@ public final class NoteContentMarkdown {
    */
   public static Optional<String> wikidataIdScalarFromLeadingFrontmatter(String content) {
     return splitLeadingFrontmatter(content)
-        .flatMap(lf -> lf.yamlBuilder().firstScalarValue(WIKIDATA_ID_KEY));
+        .flatMap(lf -> lf.frontmatter().getString(WIKIDATA_ID_KEY));
   }
 
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
     return NoteLeadingFrontmatter.split(content)
-        .map(s -> new LeadingFrontmatter(s.yamlRaw(), s.body()));
+        .map(s -> new LeadingFrontmatter(s.frontmatter(), s.body()));
   }
 
   /**
@@ -71,29 +69,21 @@ public final class NoteContentMarkdown {
       if (!hasImage) {
         return content;
       }
-      return NoteLeadingFrontmatter.contentWithLeadingFence(
-          prependNoteImageScalarLines(imageUrl, imageMask), content);
+      Frontmatter fm = Frontmatter.empty().set(NOTE_IMAGE_KEY, trimOrNull(imageUrl));
+      if (imageMask != null && !imageMask.isBlank()) {
+        fm = fm.set(NOTE_IMAGE_MASK_KEY, imageMask.trim());
+      }
+      return fm.fenced(content);
     }
     LeadingFrontmatter lf = split.get();
-    List<String> kept = lf.yamlBuilder().linesOmittingMappingKeys(NOTE_IMAGE_MAPPING_KEYS);
-    if (hasImage && !Strings.isBlank(imageUrl)) {
-      YamlBuilder scalars = new YamlBuilder("");
-      kept.add(scalars.mappingLine(NOTE_IMAGE_KEY, imageUrl.trim()));
-      if (!Strings.isBlank(imageMask)) {
-        kept.add(scalars.mappingLine(NOTE_IMAGE_MASK_KEY, imageMask.trim()));
+    Frontmatter fm = lf.frontmatter().remove(NOTE_IMAGE_MAPPING_KEYS);
+    if (hasImage && imageUrl != null && !imageUrl.isBlank()) {
+      fm = fm.set(NOTE_IMAGE_KEY, imageUrl.trim());
+      if (imageMask != null && !imageMask.isBlank()) {
+        fm = fm.set(NOTE_IMAGE_MASK_KEY, imageMask.trim());
       }
     }
-    return NoteLeadingFrontmatter.contentWithLeadingFence(kept, lf.body());
-  }
-
-  /** New leading block: always emit {@code image} (matches legacy prepend behavior). */
-  private static List<String> prependNoteImageScalarLines(String imageUrl, String imageMask) {
-    YamlBuilder b =
-        new YamlBuilder("").appendMapping(NOTE_IMAGE_KEY, imageUrl == null ? "" : imageUrl.trim());
-    if (!Strings.isBlank(imageMask)) {
-      b = b.appendMapping(NOTE_IMAGE_MASK_KEY, imageMask.trim());
-    }
-    return b.lines();
+    return fm.fenced(lf.body());
   }
 
   public static Optional<String> removeWikiLinksFromLeadingFrontmatterProperties(
@@ -104,14 +94,13 @@ public final class NoteContentMarkdown {
     return splitLeadingFrontmatter(content)
         .flatMap(
             lf ->
-                lf.yamlBuilder()
-                    .transformValues(
+                lf.frontmatter()
+                    .mapStringValues(
                         v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", "")))
-                    .map(
-                        updated ->
-                            updated.hasContent()
-                                ? NoteLeadingFrontmatter.contentWithLeadingFence(
-                                    updated.lines(), lf.body())
-                                : lf.body()));
+                    .map(updated -> updated.isEmpty() ? lf.body() : updated.fenced(lf.body())));
+  }
+
+  private static String trimOrNull(String s) {
+    return s == null ? null : s.trim();
   }
 }

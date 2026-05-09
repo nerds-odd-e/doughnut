@@ -35,7 +35,7 @@ class NoteContentMarkdownTest {
     Optional<NoteContentMarkdown.LeadingFrontmatter> split =
         NoteContentMarkdown.splitLeadingFrontmatter("---\nkey: v\n---\nHello");
     assertTrue(split.isPresent());
-    assertThat(split.get().yamlBuilder().firstScalarValue("key"), equalTo(Optional.of("v")));
+    assertThat(split.get().frontmatter().getString("key"), equalTo(Optional.of("v")));
     assertThat(split.get().body(), equalTo("Hello"));
   }
 
@@ -87,7 +87,7 @@ class NoteContentMarkdownTest {
     assertThat(
         NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
             content, Set.of("Target")),
-        equalTo(Optional.of("---\nsource: \"[[Source]]\"\n---\nBody")));
+        equalTo(Optional.of("---\nsource: '[[Source]]'\n---\nBody")));
   }
 
   @Test
@@ -106,7 +106,7 @@ class NoteContentMarkdownTest {
         equalTo(
             "---\n"
                 + "image: /attachments/images/1/x.jpg\n"
-                + "image_mask: \"0 0 10 10\"\n"
+                + "image_mask: 0 0 10 10\n"
                 + "---\n"
                 + "Body"));
   }
@@ -128,11 +128,11 @@ class NoteContentMarkdownTest {
   }
 
   @Test
-  void mergeNoteImageScalarsIntoContent_quotes_url_with_colon() {
+  void mergeNoteImageScalarsIntoContent_url_with_colon_is_plain() {
     assertThat(
         NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
             "Hi", true, "https://example.com/a.png", ""),
-        equalTo("---\n" + "image: \"https://example.com/a.png\"\n" + "---\n" + "Hi"));
+        equalTo("---\n" + "image: https://example.com/a.png\n" + "---\n" + "Hi"));
   }
 
   @Test

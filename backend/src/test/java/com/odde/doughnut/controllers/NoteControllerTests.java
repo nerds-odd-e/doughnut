@@ -334,7 +334,7 @@ class NoteControllerTests extends ControllerTestBase {
       controller.deleteNote(target, removeFromPropertiesDeleteRequest());
 
       assertThat(
-          referrer.getContent(), equalTo("---\nsource: \"[[Referrer]]\"\n---\nBody [[Target]]"));
+          referrer.getContent(), equalTo("---\nsource: '[[Referrer]]'\n---\nBody [[Target]]"));
     }
 
     @Nested
