@@ -77,11 +77,11 @@ import type {
   Folder,
   NotebookFolderIndexRow,
 } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { MoreHorizontal } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 import FolderSearchForm from "./FolderSearchForm.vue"
 import {
   ancestorsFromChain,
@@ -135,13 +135,7 @@ onMounted(async () => {
   const pid = parentFolderId.value
   try {
     const { data: listing, error } = await apiCallWithLoading(() =>
-      pid == null
-        ? NotebookController.listNotebookRootNotes({
-            path: { notebook: props.notebookId },
-          })
-        : NotebookController.listFolderListing({
-            path: { notebook: props.notebookId, folder: pid },
-          })
+      requestNotebookFolderListing(props.notebookId, pid)
     )
     if (error || !listing)
       throw new Error("Failed to load neighbouring folders")

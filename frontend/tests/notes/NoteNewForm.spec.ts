@@ -73,7 +73,7 @@ describe("adding new note", () => {
     mockSdkService("semanticSearchWithin", [])
     mockSdkService("getRecentNotes", [])
     mockSdkService("listNotebookFolderIndex", [])
-    mockSdkService("listNotebookRootNotes", { folders: [] })
+    mockSdkService("listNotebookFolderListing", { folders: [] })
     const createNoteResult = makeMe.aNoteRealm.please()
     mockedCreateNoteAtRoot = mockSdkService(
       "createNoteAtNotebookRoot",
@@ -242,7 +242,7 @@ describe("adding new note", () => {
 
     it("sends folderId after user picks a folder in FolderSelector", async () => {
       wrapper.unmount()
-      mockSdkService("listNotebookRootNotes", {
+      mockSdkService("listNotebookFolderListing", {
         folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
       })
       mockSdkService("listNotebookFolderIndex", [

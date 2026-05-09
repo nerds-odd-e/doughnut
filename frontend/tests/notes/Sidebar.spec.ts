@@ -3,14 +3,15 @@ import { notebookSidebarNotebookClientView } from "@/composables/useCurrentNoteS
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type {
+  FolderListing,
   NoteRealm,
   Options,
   ShowNoteData,
 } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
-  mockSdkService,
   mockSdkServiceWithImplementation,
   testFolderStub,
 } from "@tests/helpers"
@@ -22,6 +23,23 @@ function isBefore(node1: Node, node2: Node) {
     // eslint-disable-next-line no-bitwise
     (node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING)
   )
+}
+
+type ListNotebookFolderListingOptions = Parameters<
+  typeof NotebookController.listNotebookFolderListing
+>[0]
+
+const EMPTY_FOLDER_LISTING: FolderListing = {
+  noteTopologies: [],
+  folders: [],
+}
+
+function folderListingForQueryParent(
+  options: unknown,
+  table: Record<string, FolderListing>
+): FolderListing {
+  const query = (options as ListNotebookFolderListingOptions).query
+  return table[String(query?.parent)] ?? EMPTY_FOLDER_LISTING
 }
 
 /** Distinct from note ids — folder listing API uses folder entity ids. */
@@ -38,43 +56,6 @@ function noteTopologyInFolder(realm: NoteRealm, folderId: number) {
     ...realm.note.noteTopology,
     folderId,
   }
-}
-
-function stubFolderListingForTree(
-  firstGeneration: NoteRealm,
-  firstGenerationSibling: NoteRealm,
-  secondGeneration: NoteRealm
-) {
-  const listings: Record<
-    number,
-    {
-      noteTopologies: ReturnType<typeof noteTopologyInFolder>[]
-      folders: ReturnType<typeof structuralFolder>[]
-    }
-  > = {
-    [FOLDER_TOP_NOTE_CHILDREN_ID]: {
-      noteTopologies: [
-        noteTopologyInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
-        noteTopologyInFolder(
-          firstGenerationSibling,
-          FOLDER_TOP_NOTE_CHILDREN_ID
-        ),
-      ],
-      folders: [
-        structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
-      ],
-    },
-    [FOLDER_FIRST_GEN_CHILDREN_ID]: {
-      noteTopologies: [
-        noteTopologyInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
-      ],
-      folders: [],
-    },
-  }
-  return mockSdkServiceWithImplementation("listFolderListing", (options) => {
-    const folderId = (options as { path: { folder: number } }).path.folder
-    return listings[folderId] ?? { noteTopologies: [], folders: [] }
-  })
 }
 
 function mockShowNoteForRealms(realms: NoteRealm[]) {
@@ -132,6 +113,44 @@ describe("Sidebar", () => {
     .title("2nd gen")
     .under(firstGeneration)
     .please()
+
+  const defaultTreeFolderListings: Record<string, FolderListing> = {
+    [String(undefined)]: {
+      noteTopologies: [
+        {
+          ...topNoteRealm.note.noteTopology,
+          folderId: topNoteRealm.note.noteTopology.folderId ?? 0,
+        },
+      ],
+      folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
+    },
+    [String(FOLDER_TOP_NOTE_CHILDREN_ID)]: {
+      noteTopologies: [
+        noteTopologyInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
+        noteTopologyInFolder(
+          firstGenerationSibling,
+          FOLDER_TOP_NOTE_CHILDREN_ID
+        ),
+      ],
+      folders: [
+        structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
+      ],
+    },
+    [String(FOLDER_FIRST_GEN_CHILDREN_ID)]: {
+      noteTopologies: [
+        noteTopologyInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
+      ],
+      folders: [],
+    },
+  }
+
+  function stubNotebookFolderListings() {
+    return mockSdkServiceWithImplementation(
+      "listNotebookFolderListing",
+      (options) =>
+        folderListingForQueryParent(options, defaultTreeFolderListings)
+    )
+  }
 
   /** Folder context keyed by realm id — ancestorFolders and optional folderId override. */
   type FolderContext = {
@@ -205,8 +224,13 @@ describe("Sidebar", () => {
     active: NoteRealm | undefined,
     notebookId?: number
   ) {
-    // biome-ignore lint/style/noNonNullAssertion: callers must provide notebookId when active is undefined
-    const nb = notebookId ?? active!.notebookView.notebook.id
+    const nb =
+      notebookId ??
+      (active !== undefined
+        ? active.notebookView.notebook.id
+        : (() => {
+            throw new Error("notebookId is required when active is undefined")
+          })())
     wrapper = helper
       .component(Sidebar)
       .withCurrentUser(makeMe.aUser.please())
@@ -242,11 +266,15 @@ describe("Sidebar", () => {
       ...folderExtras?.mango,
     }
 
-    mockSdkService("listNotebookRootNotes", {
-      noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
-      folders: [folderMango, folderBanana],
-    })
-    mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
+    const rootPeersFolderListings: Record<string, FolderListing> = {
+      [String(undefined)]: {
+        noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
+        folders: [folderMango, folderBanana],
+      },
+    }
+    mockSdkServiceWithImplementation("listNotebookFolderListing", (options) =>
+      folderListingForQueryParent(options, rootPeersFolderListings)
+    )
     mockShowNoteForRealms([topNoteRealm, realmZ, realmA])
     return { nbId, realmA, realmZ }
   }
@@ -262,15 +290,7 @@ describe("Sidebar", () => {
     storageAccessor.value.refOfNoteRealm(secondGeneration.id).value =
       secondGeneration
 
-    mockSdkService("listNotebookRootNotes", {
-      noteTopologies: [topNoteRealm.note.noteTopology],
-      folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
-    })
-    stubFolderListingForTree(
-      firstGeneration,
-      firstGenerationSibling,
-      secondGeneration
-    )
+    stubNotebookFolderListings()
     mockShowNoteForRealms([
       topNoteRealm,
       firstGeneration,
@@ -517,13 +537,21 @@ describe("Sidebar", () => {
   })
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
-    const rootSpy = mockSdkService("listNotebookRootNotes", {
-      noteTopologies: [topNoteRealm.note.noteTopology],
-      folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
-    })
+    const listingSpy = mockSdkServiceWithImplementation(
+      "listNotebookFolderListing",
+      (options) =>
+        folderListingForQueryParent(options, defaultTreeFolderListings)
+    )
     mountSidebar(firstGeneration)
     await flushPromises()
-    expect(rootSpy).toHaveBeenCalledTimes(1)
+    const rootRequestCount = () =>
+      listingSpy.mock.calls.filter(
+        (call) =>
+          String(
+            (call[0] as ListNotebookFolderListingOptions).query?.parent
+          ) === String(undefined)
+      ).length
+    expect(rootRequestCount()).toBe(1)
     expect(
       findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
     ).toBe(true)
@@ -533,7 +561,7 @@ describe("Sidebar", () => {
       notebookId: firstGeneration.notebookView.notebook.id,
     })
     await flushPromises()
-    expect(rootSpy).toHaveBeenCalledTimes(1)
+    expect(rootRequestCount()).toBe(1)
     expect(
       findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
     ).toBe(true)
@@ -545,14 +573,10 @@ describe("Sidebar", () => {
     })
 
     it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
-      const rootSpy = mockSdkService("listNotebookRootNotes", {
-        noteTopologies: [topNoteRealm.note.noteTopology],
-        folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
-      })
-      const folderListingSpy = stubFolderListingForTree(
-        firstGeneration,
-        firstGenerationSibling,
-        secondGeneration
+      const listingSpy = mockSdkServiceWithImplementation(
+        "listNotebookFolderListing",
+        (options) =>
+          folderListingForQueryParent(options, defaultTreeFolderListings)
       )
       const showNoteSpy = mockSdkServiceWithImplementation("showNote", () => {
         throw new Error("Sidebar must not use showNote for structural branches")
@@ -561,14 +585,23 @@ describe("Sidebar", () => {
       mountSidebar(secondGeneration)
       await flushPromises()
 
-      expect(rootSpy).toHaveBeenCalledTimes(1)
+      expect(
+        listingSpy.mock.calls.filter(
+          (call) =>
+            String(
+              (call[0] as ListNotebookFolderListingOptions).query?.parent
+            ) === String(undefined)
+        ).length
+      ).toBe(1)
       expect(showNoteSpy).not.toHaveBeenCalled()
-      const listedFolderIds = folderListingSpy.mock.calls.map(
-        (call) => (call[0] as { path: { folder: number } }).path.folder
-      )
-      expect(listedFolderIds).toContain(FOLDER_TOP_NOTE_CHILDREN_ID)
-      expect(listedFolderIds).toContain(FOLDER_FIRST_GEN_CHILDREN_ID)
-      expect(listedFolderIds).not.toContain(firstGenerationSibling.id)
+      const listedParentIds = listingSpy.mock.calls
+        .map(
+          (call) => (call[0] as { query?: { parent?: number } }).query?.parent
+        )
+        .filter((id): id is number => id !== undefined)
+      expect(listedParentIds).toContain(FOLDER_TOP_NOTE_CHILDREN_ID)
+      expect(listedParentIds).toContain(FOLDER_FIRST_GEN_CHILDREN_ID)
+      expect(listedParentIds).not.toContain(firstGenerationSibling.id)
 
       await vi.waitUntil(() =>
         findSidebarItem(secondGeneration.note.noteTopology.title)?.exists()
@@ -704,7 +737,7 @@ describe("Sidebar", () => {
     ).toBe(true)
   })
 
-  it("shows folder expand control at notebook root with shallow listNotebookRootNotes", async () => {
+  it("shows folder expand control at notebook root with shallow folder listing", async () => {
     mountSidebarSignedIn(undefined, topNoteRealm.notebookView.notebook.id)
     await flushPromises()
     await flushPromises()

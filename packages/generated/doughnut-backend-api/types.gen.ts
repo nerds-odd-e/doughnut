@@ -786,14 +786,6 @@ export type NotebookPageClientView = {
 };
 
 /**
- * Note topologies and child folders in a structural listing scope (e.g. notebook root or a folder).
- */
-export type FolderListing = {
-    noteTopologies?: Array<NoteTopology>;
-    folders?: Array<Folder>;
-};
-
-/**
  * Flat folder row for building folder trees and paths within a notebook.
  */
 export type NotebookFolderIndexRow = {
@@ -803,6 +795,14 @@ export type NotebookFolderIndexRow = {
      * Null when the folder is at notebook root.
      */
     parentFolderId?: number;
+};
+
+/**
+ * Note topologies and child folders in a structural listing scope (e.g. notebook root or a folder).
+ */
+export type FolderListing = {
+    noteTopologies?: Array<NoteTopology>;
+    folders?: Array<Folder>;
 };
 
 export type BookUserLastReadPosition = {
@@ -2915,43 +2915,6 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
-export type ListNotebookRootNotesData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/root-notes';
-};
-
-export type ListNotebookRootNotesResponses = {
-    /**
-     * OK
-     */
-    200: FolderListing;
-};
-
-export type ListNotebookRootNotesResponse = ListNotebookRootNotesResponses[keyof ListNotebookRootNotesResponses];
-
-export type ListFolderListingData = {
-    body?: never;
-    path: {
-        notebook: number;
-        folder: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/folders/{folder}/listing';
-};
-
-export type ListFolderListingResponses = {
-    /**
-     * OK
-     */
-    200: FolderListing;
-};
-
-export type ListFolderListingResponse = ListFolderListingResponses[keyof ListFolderListingResponses];
-
 export type ListNotebookFolderIndexData = {
     body?: never;
     path: {
@@ -2969,6 +2932,26 @@ export type ListNotebookFolderIndexResponses = {
 };
 
 export type ListNotebookFolderIndexResponse = ListNotebookFolderIndexResponses[keyof ListNotebookFolderIndexResponses];
+
+export type ListNotebookFolderListingData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: {
+        parent?: number;
+    };
+    url: '/api/notebooks/{notebook}/folder-listing';
+};
+
+export type ListNotebookFolderListingResponses = {
+    /**
+     * OK
+     */
+    200: FolderListing;
+};
+
+export type ListNotebookFolderListingResponse = ListNotebookFolderListingResponses[keyof ListNotebookFolderListingResponses];
 
 export type DeleteBookData = {
     body?: never;

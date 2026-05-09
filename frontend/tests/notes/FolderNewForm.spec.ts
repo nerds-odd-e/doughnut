@@ -7,7 +7,7 @@ describe("FolderNewForm", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     mockSdkService("listNotebookFolderIndex", [])
-    mockSdkService("listNotebookRootNotes", { folders: [] })
+    mockSdkService("listNotebookFolderListing", { folders: [] })
   })
 
   it("includes FolderSelector for parent folder", async () => {

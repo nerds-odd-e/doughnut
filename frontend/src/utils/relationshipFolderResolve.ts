@@ -1,6 +1,7 @@
 import type { FolderListing } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 
 export type RelationshipNotePlacement =
@@ -20,13 +21,7 @@ async function loadFolderListing(
   parentFolderId: number | null
 ): Promise<FolderListing> {
   const { data, error } = await apiCallWithLoading(() =>
-    parentFolderId == null
-      ? NotebookController.listNotebookRootNotes({
-          path: { notebook: notebookId },
-        })
-      : NotebookController.listFolderListing({
-          path: { notebook: notebookId, folder: parentFolderId },
-        })
+    requestNotebookFolderListing(notebookId, parentFolderId)
   )
   if (error || !data) throw new Error("Failed to load folder listing")
   return data

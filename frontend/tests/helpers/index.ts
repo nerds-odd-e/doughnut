@@ -116,9 +116,8 @@ const methodToController: Record<string, any> = {
   moveToCircle: NotebookController,
   getAiAssistant: NotebookController,
   updateAiAssistant: NotebookController,
-  listNotebookRootNotes: NotebookController,
+  listNotebookFolderListing: NotebookController,
   listNotebookFolderIndex: NotebookController,
-  listFolderListing: NotebookController,
   createFolder: NotebookController,
   myNotebooks: NotebookController,
   selfEvaluate: MemoryTrackerController,
@@ -303,11 +302,11 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
 }
 
 /**
- * Type-safe helper to mock SDK service calls with a custom async implementation.
- * Automatically wraps the result in the standard format.
+ * Type-safe helper to mock SDK service calls with a custom implementation.
+ * Automatically wraps the result in the standard format (sync or Promise).
  *
  * @param serviceName - The name of the SDK service to mock (type-safe)
- * @param implementation - An async function that receives options and returns data
+ * @param implementation - Function that receives options and returns data (or a Promise of it)
  * @returns A Vitest Mock that can be further configured
  *
  * @example
@@ -331,15 +330,14 @@ export function mockSdkServiceWithImplementation<K extends SdkServiceName>(
   }
   // biome-ignore lint/suspicious/noExplicitAny: Vitest spy types are complex and require any for proper typing
   const spy = vi.spyOn(controller, serviceName) as any
-  spy.mockImplementation(async (options: SdkServiceOptions<K>) => {
-    const result = await implementation(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-      // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
-    } as any
+  spy.mockImplementation((options: SdkServiceOptions<K>) => {
+    const out = implementation(options)
+    if (out instanceof Promise) {
+      return out.then((result) =>
+        wrapSdkResponse(result)
+      ) as SdkServiceReturnType<K>
+    }
+    return wrapSdkResponse(out) as SdkServiceReturnType<K>
   })
   return spy
 }

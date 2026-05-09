@@ -302,23 +302,44 @@ class NotebookController {
   }
 
   @Operation(
-      summary = "List notebook root: notes without a folder and top-level folders",
+      summary = "List notes and folders at notebook root or under a parent folder",
       description =
-          "Notes are those in the notebook with no folder assignment (notebook root scope), not"
-              + " filtered by legacy parent. Folders are notebook root folders (no parent folder).")
-  @GetMapping("/{notebook}/root-notes")
-  public FolderListing listNotebookRootNotes(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+          "Without parent: notes with no folder assignment and top-level folders (notebook root"
+              + " scope). With parent: notes assigned to that folder and its immediate child"
+              + " folders. The parent folder must belong to the notebook.")
+  @GetMapping("/{notebook}/folder-listing")
+  public FolderListing listNotebookFolderListing(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestParam(value = "parent", required = false) @Schema(type = "integer")
+          Integer parentFolderId)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
+    if (parentFolderId == null) {
+      List<NoteTopology> noteTopologies =
+          noteService.findNotebookRootNotes(notebook.getId()).stream()
+              .map(Note::getNoteTopology)
+              .toList();
+      List<Folder> folders =
+          folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+              .toList();
+      return new FolderListing(noteTopologies, folders);
+    }
+    Folder folder =
+        folderRepository
+            .findById(parentFolderId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
+    if (!folder.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    }
     List<NoteTopology> noteTopologies =
-        noteService.findNotebookRootNotes(notebook.getId()).stream()
+        noteService.findNotesInFolderScope(folder.getId()).stream()
             .map(Note::getNoteTopology)
             .toList();
-    List<Folder> folders =
-        folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+    List<Folder> childFolders =
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
             .toList();
-    return new FolderListing(noteTopologies, folders);
+    return new FolderListing(noteTopologies, childFolders);
   }
 
   @Operation(
@@ -334,30 +355,6 @@ class NotebookController {
     return folderRepository.findIndexRowsByNotebookIdOrderByIdAsc(notebook.getId()).stream()
         .map(r -> new NotebookFolderIndexRow(r.getId(), r.getName(), r.getParentFolderId()))
         .toList();
-  }
-
-  @Operation(
-      summary = "List folder scope: notes in folder and direct child folders",
-      description =
-          "Notes are those assigned to the folder. Folders are immediate children of the given"
-              + " folder.")
-  @GetMapping("/{notebook}/folders/{folder}/listing")
-  public FolderListing listFolderListing(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @PathVariable("folder") @Schema(type = "integer") Folder folder)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-    }
-    List<NoteTopology> noteTopologies =
-        noteService.findNotesInFolderScope(folder.getId()).stream()
-            .map(Note::getNoteTopology)
-            .toList();
-    List<Folder> childFolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
-            .toList();
-    return new FolderListing(noteTopologies, childFolders);
   }
 
   @PostMapping("/{notebook}/update-index")

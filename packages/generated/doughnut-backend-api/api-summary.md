@@ -120,9 +120,8 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getAiAssistant`: GET `/api/notebooks/{notebook}/ai-assistant` -> `GetAiAssistantResponse` (request: `GetAiAssistantData`; path: notebook; response body: NotebookAiAssistant)
 - `updateAiAssistant`: PATCH `/api/notebooks/{notebook}/ai-assistant` -> `UpdateAiAssistantResponse` (request: `UpdateAiAssistantData`; path: notebook; body: UpdateAiAssistantRequest; response body: NotebookAiAssistant)
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
-- `listNotebookRootNotes`: GET `/api/notebooks/{notebook}/root-notes` -> `ListNotebookRootNotesResponse` (request: `ListNotebookRootNotesData`; path: notebook; response body: FolderListing)
-- `listFolderListing`: GET `/api/notebooks/{notebook}/folders/{folder}/listing` -> `ListFolderListingResponse` (request: `ListFolderListingData`; path: notebook, folder; response body: FolderListing)
 - `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<NotebookFolderIndexRow>)
+- `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 - `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; response body: void)
 
 ## Notebook Group Controller

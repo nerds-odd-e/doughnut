@@ -2227,54 +2227,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
-  /api/notebooks/{notebook}/root-notes:
-    get:
-      tags:
-      - notebook-controller
-      summary: "List notebook root: notes without a folder and top-level folders"
-      description: "Notes are those in the notebook with no folder assignment (notebook\
-        \ root scope), not filtered by legacy parent. Folders are notebook root folders\
-        \ (no parent folder)."
-      operationId: listNotebookRootNotes
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/FolderListing"
-  /api/notebooks/{notebook}/folders/{folder}/listing:
-    get:
-      tags:
-      - notebook-controller
-      summary: "List folder scope: notes in folder and direct child folders"
-      description: Notes are those assigned to the folder. Folders are immediate children
-        of the given folder.
-      operationId: listFolderListing
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: folder
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/FolderListing"
   /api/notebooks/{notebook}/folders/index:
     get:
       tags:
@@ -2298,6 +2250,33 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NotebookFolderIndexRow"
+  /api/notebooks/{notebook}/folder-listing:
+    get:
+      tags:
+      - notebook-controller
+      summary: List notes and folders at notebook root or under a parent folder
+      description: "Without parent: notes with no folder assignment and top-level\
+        \ folders (notebook root scope). With parent: notes assigned to that folder\
+        \ and its immediate child folders. The parent folder must belong to the notebook."
+      operationId: listNotebookFolderListing
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: parent
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FolderListing"
   /api/notebooks/{notebook}/book:
     get:
       tags:
@@ -4400,19 +4379,6 @@ components:
             \ absent."
       required:
       - notebook
-    FolderListing:
-      type: object
-      description: Note topologies and child folders in a structural listing scope
-        (e.g. notebook root or a folder).
-      properties:
-        noteTopologies:
-          type: array
-          items:
-            $ref: "#/components/schemas/NoteTopology"
-        folders:
-          type: array
-          items:
-            $ref: "#/components/schemas/Folder"
     NotebookFolderIndexRow:
       type: object
       description: Flat folder row for building folder trees and paths within a notebook.
@@ -4429,6 +4395,19 @@ components:
       required:
       - id
       - name
+    FolderListing:
+      type: object
+      description: Note topologies and child folders in a structural listing scope
+        (e.g. notebook root or a folder).
+      properties:
+        noteTopologies:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteTopology"
+        folders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Folder"
     BookUserLastReadPosition:
       type: object
       properties:

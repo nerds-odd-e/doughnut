@@ -145,7 +145,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       inFolder.setFolder(f);
       noteRepository.save(inFolder);
 
-      FolderListing listing = controller.listNotebookRootNotes(nb);
+      FolderListing listing = controller.listNotebookFolderListing(nb, null);
       assertTrue(
           listing.noteTopologies().stream()
               .noneMatch(t -> Objects.equals(t.getId(), inFolder.getId())));
@@ -162,7 +162,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder parentFolder = makeMe.aFolder().notebook(nb).name("Parent").please();
       makeMe.aFolder().notebook(nb).parentFolder(parentFolder).name("Nested").please();
 
-      FolderListing listing = controller.listNotebookRootNotes(nb);
+      FolderListing listing = controller.listNotebookFolderListing(nb, null);
       assertEquals(2, listing.folders().size());
       assertEquals(
           List.of("Inbox", "Parent"),
@@ -177,7 +177,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.listNotebookRootNotes(nb));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.listNotebookFolderListing(nb, null));
     }
   }
 
@@ -252,7 +253,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Note atRoot =
           makeMe.aNote("At Root").inNotebook(nb).creatorAndOwner(currentUser.getUser()).please();
 
-      FolderListing listing = controller.listFolderListing(nb, scope);
+      FolderListing listing = controller.listNotebookFolderListing(nb, scope.getId());
       assertEquals(
           List.of(a.getId(), b.getId()).stream().sorted().toList(),
           listing.noteTopologies().stream().map(NoteTopology::getId).sorted().toList());
@@ -273,7 +274,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
       makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
 
-      FolderListing listing = controller.listFolderListing(nb, parent);
+      FolderListing listing = controller.listNotebookFolderListing(nb, parent.getId());
       assertEquals(1, listing.folders().size());
       assertEquals("Nested", listing.folders().getFirst().getName());
     }
@@ -295,7 +296,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       noteService.destroy(noteChild);
       makeMe.entityPersister.flush();
 
-      FolderListing listing = controller.listFolderListing(nb, fChild);
+      FolderListing listing = controller.listNotebookFolderListing(nb, fChild.getId());
       assertEquals(1, listing.noteTopologies().size());
       assertEquals("Unit Test", listing.noteTopologies().getFirst().getTitle());
     }
@@ -309,7 +310,21 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.listFolderListing(nb, folder));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.listNotebookFolderListing(nb, folder.getId()));
+    }
+
+    @Test
+    void unknownParentFolderIdReturns404() throws Exception {
+      User user = makeMe.aUser().please();
+      currentUser.setUser(user);
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.listNotebookFolderListing(nb, -99999));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
 
     @Test
@@ -322,7 +337,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       ResponseStatusException ex =
           assertThrows(
-              ResponseStatusException.class, () -> controller.listFolderListing(nbA, folderInB));
+              ResponseStatusException.class,
+              () -> controller.listNotebookFolderListing(nbA, folderInB.getId()));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
   }

@@ -37,7 +37,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Folder created = controller.createFolder(nb, req);
       assertThat(created.getName(), equalTo("Inbox"));
 
-      FolderListing listing = controller.listNotebookRootNotes(nb);
+      FolderListing listing = controller.listNotebookFolderListing(nb, null);
       assertTrue(listing.folders().stream().anyMatch(f -> f.getId().equals(created.getId())));
     }
 
@@ -60,7 +60,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       req.setUnderNoteId(noteInScope.getId());
       Folder created = controller.createFolder(nb, req);
 
-      FolderListing listing = controller.listFolderListing(nb, scope);
+      FolderListing listing = controller.listNotebookFolderListing(nb, scope.getId());
       assertTrue(listing.folders().stream().anyMatch(f -> f.getId().equals(created.getId())));
       assertThat(created.getName(), equalTo("Sub"));
     }
@@ -81,7 +81,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       req.setUnderFolderId(scope.getId());
       Folder created = controller.createFolder(nb, req);
 
-      FolderListing listing = controller.listFolderListing(nb, scope);
+      FolderListing listing = controller.listNotebookFolderListing(nb, scope.getId());
       assertTrue(listing.folders().stream().anyMatch(f -> f.getId().equals(created.getId())));
       assertThat(created.getName(), equalTo("NestedByFolder"));
     }
@@ -151,9 +151,9 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Folder result = controller.moveFolder(nb, child, req);
       assertThat(result.getName(), equalTo("Child"));
 
-      FolderListing root = controller.listNotebookRootNotes(nb);
+      FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(root.folders().stream().anyMatch(f -> f.getId().equals(child.getId())));
-      FolderListing underParent = controller.listFolderListing(nb, parent);
+      FolderListing underParent = controller.listNotebookFolderListing(nb, parent.getId());
       assertTrue(underParent.folders().stream().noneMatch(f -> f.getId().equals(child.getId())));
     }
 
@@ -266,7 +266,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
 
       assertThat(loose.getFolder(), notNullValue());
       assertThat(loose.getFolder().getId(), equalTo(outer.getId()));
-      FolderListing underOuter = controller.listFolderListing(nb, outer);
+      FolderListing underOuter = controller.listNotebookFolderListing(nb, outer.getId());
       assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
     }
 
@@ -283,7 +283,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       makeMe.refresh(inside);
 
       assertThat(inside.getFolder(), nullValue());
-      FolderListing root = controller.listNotebookRootNotes(nb);
+      FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(root.folders().stream().noneMatch(f -> f.getId().equals(rootFolder.getId())));
     }
 
@@ -303,7 +303,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       assertThat(inner.getParentFolder(), notNullValue());
       assertThat(inner.getParentFolder().getId(), equalTo(outer.getId()));
       assertThat(deep.getFolder().getId(), equalTo(inner.getId()));
-      FolderListing underOuter = controller.listFolderListing(nb, outer);
+      FolderListing underOuter = controller.listNotebookFolderListing(nb, outer.getId());
       assertTrue(underOuter.folders().stream().anyMatch(f -> f.getId().equals(inner.getId())));
       assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
     }

@@ -15,6 +15,11 @@ export type WikidataEditContext =
   | { type: "row"; idx: number }
   | { type: "insert" }
 
+/** defineExpose on WikidataAssociationDialog; InstanceType<> does not include it reliably. */
+type WikidataAssociationDialogExpose = {
+  showTitleOptionsForEntity?: (entity: WikidataSearchEntity) => void
+}
+
 export function useWikidataPropertyDialog({
   propertyRows,
   draftKey,
@@ -185,7 +190,9 @@ export function useWikidataPropertyDialog({
         label: entityData!.WikidataTitleInEnglish,
         description: "",
       }
-      wikidataAssociationDialogRef.value?.showTitleOptionsForEntity(entity)
+      const expose =
+        wikidataAssociationDialogRef.value as WikidataAssociationDialogExpose | null
+      expose?.showTitleOptionsForEntity?.(entity)
     } catch (e: unknown) {
       wikidataIdError.value =
         toOpenApiError(e).message || "An unknown error occurred"
