@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -14,6 +15,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -419,5 +421,136 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.getIndexNoteContent(), nullValue());
+  }
+
+  @Test
+  void scoped_question_instruction_from_notebook_index_for_note_at_root() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+    Note index =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .inNotebook(nb)
+            .title("index")
+            .content("---\nquestion_generation_instruction: Focus on definitions\n---\n")
+            .please();
+    makeMe.theNotebook(nb).indexNote(index).please();
+    Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal),
+        equalTo(Optional.of("Focus on definitions")));
+  }
+
+  @Test
+  void scoped_question_instruction_recognizes_legacy_camel_case_key() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+    Note index =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .inNotebook(nb)
+            .title("index")
+            .content("---\nquestionGenerationInstruction: Legacy key text\n---\n")
+            .please();
+    makeMe.theNotebook(nb).indexNote(index).please();
+    Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal),
+        equalTo(Optional.of("Legacy key text")));
+  }
+
+  @Test
+  void scoped_question_instruction_prefers_inner_folder_index() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+    Note nbIndex =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .inNotebook(nb)
+            .title("index")
+            .content("---\nquestion_generation_instruction: nb\n---\n")
+            .please();
+    makeMe.theNotebook(nb).indexNote(nbIndex).please();
+
+    Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+    Note outerIdx =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .folder(outer)
+            .title("index")
+            .content("---\nquestion_generation_instruction: outer\n---\n")
+            .please();
+    makeMe.theFolder(outer).indexNote(outerIdx).please();
+
+    Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
+    Note innerIdx =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .folder(inner)
+            .title("index")
+            .content("---\nquestion_generation_instruction: inner\n---\n")
+            .please();
+    makeMe.theFolder(inner).indexNote(innerIdx).please();
+
+    Note inInner = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
+
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(inInner),
+        equalTo(Optional.of("inner")));
+  }
+
+  @Test
+  void scoped_question_instruction_skips_inner_when_blank_and_uses_parent() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+
+    Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+    Note outerIdx =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .folder(outer)
+            .title("index")
+            .content("---\nquestion_generation_instruction: outer-only\n---\n")
+            .please();
+    makeMe.theFolder(outer).indexNote(outerIdx).please();
+
+    Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
+    Note innerIdx =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .folder(inner)
+            .title("index")
+            .content("---\nother: x\n---\n")
+            .please();
+    makeMe.theFolder(inner).indexNote(innerIdx).please();
+
+    Note inInner = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
+
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(inInner),
+        equalTo(Optional.of("outer-only")));
+  }
+
+  @Test
+  void scoped_question_instruction_empty_when_no_scoped_index_has_instruction() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal), is(Optional.empty()));
   }
 }

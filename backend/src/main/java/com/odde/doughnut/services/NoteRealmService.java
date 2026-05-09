@@ -22,6 +22,10 @@ public class NoteRealmService {
   /** Canonical `title_pattern` first; legacy camelCase supported for existing notes. */
   private static final List<String> TITLE_PATTERN_KEYS = List.of("title_pattern", "titlePattern");
 
+  /** Canonical key first; legacy camelCase supported for existing notes. */
+  private static final List<String> QUESTION_GENERATION_INSTRUCTION_KEYS =
+      List.of("question_generation_instruction", "questionGenerationInstruction");
+
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
   private final NotebookCatalogService notebookCatalogService;
@@ -49,6 +53,33 @@ public class NoteRealmService {
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
     realm.setIndexNoteContent(resolveIndexNoteContentForScopedTitlePattern(focus));
     return realm;
+  }
+
+  /**
+   * Nearest non-blank {@code question_generation_instruction} from designated index notes: inner
+   * folder → parent folders → notebook root. The {@code focus} note must already carry notebook and
+   * folder associations (e.g. from {@link
+   * NoteRepository#hydrateNonDeletedNotesWithNotebookAndFolderByIds}).
+   */
+  public Optional<String> resolveScopedQuestionGenerationInstruction(Note focus) {
+    if (focus.getNotebook() == null) {
+      return Optional.empty();
+    }
+    List<Folder> outerToInner = FolderTrailSegments.fromRootToContainingFolder(focus);
+    for (int i = outerToInner.size() - 1; i >= 0; i--) {
+      Optional<Note> designated =
+          scopedIndexNoteService.findDesignatedIndexNote(
+              new IndexScope.FolderIndex(outerToInner.get(i)));
+      if (designated.isPresent()) {
+        Optional<String> instruction = questionGenerationInstructionFromIndexNote(designated.get());
+        if (instruction.isPresent()) {
+          return instruction;
+        }
+      }
+    }
+    return scopedIndexNoteService
+        .findDesignatedIndexNote(new IndexScope.NotebookRoot(focus.getNotebook()))
+        .flatMap(this::questionGenerationInstructionFromIndexNote);
   }
 
   private String resolveIndexNoteContentForScopedTitlePattern(Note focus) {
@@ -89,6 +120,26 @@ public class NoteRealmService {
       }
     }
     return false;
+  }
+
+  private Optional<String> questionGenerationInstructionFromIndexNote(Note indexNote) {
+    String content = indexNote.getContent();
+    if (content == null || content.isBlank()) {
+      return Optional.empty();
+    }
+    return NoteContentMarkdown.splitLeadingFrontmatter(content)
+        .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
+        .flatMap(this::questionInstructionFromFrontmatter);
+  }
+
+  private Optional<String> questionInstructionFromFrontmatter(Frontmatter fm) {
+    for (String key : QUESTION_GENERATION_INSTRUCTION_KEYS) {
+      Optional<String> value = fm.getString(key).map(String::trim).filter(s -> !s.isEmpty());
+      if (value.isPresent()) {
+        return value;
+      }
+    }
+    return Optional.empty();
   }
 
   /** Re-load notes with associations so JSON serialization does not hit Hibernate proxies. */

@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -10,6 +11,7 @@ import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.openai.models.ReasoningEffort;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +20,21 @@ public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
+  private final NoteRealmService noteRealmService;
+  private final NoteRepository noteRepository;
 
   @Autowired
   public QuestionGenerationRequestBuilder(
       GlobalSettingsService globalSettingsService,
       FocusContextRetrievalService focusContextRetrievalService,
-      FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer,
+      NoteRealmService noteRealmService,
+      NoteRepository noteRepository) {
     this.globalSettingsService = globalSettingsService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
+    this.noteRealmService = noteRealmService;
+    this.noteRepository = noteRepository;
   }
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
@@ -48,7 +56,8 @@ public class QuestionGenerationRequestBuilder {
   }
 
   /**
-   * Focus context as a user message and optional extra user message—in the same order as {@link
+   * Optional scoped {@code question_generation_instruction} as a user message, then focus context
+   * as a user message, then optional {@code additionalMessage}—same order as {@link
    * #buildQuestionGenerationRequest}. Notebook assistant hints and the MCQ JSON schema instruction
    * are not attached here; they are added after the schema instruction in {@link
    * #buildQuestionGenerationRequest} or when calling {@code OpenAiApiHandler}'s three-argument
@@ -82,10 +91,20 @@ public class QuestionGenerationRequestBuilder {
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note, Long contextSeed) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
+    Note focus =
+        noteRepository
+            .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(note.getId()))
+            .stream()
+            .findFirst()
+            .orElse(note);
     RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed);
-    FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
+    FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(focus, config);
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
 
-    return new OpenAIChatRequestBuilder().model(modelName).addUserMessage(focusContextMarkdown);
+    OpenAIChatRequestBuilder builder = new OpenAIChatRequestBuilder().model(modelName);
+    noteRealmService
+        .resolveScopedQuestionGenerationInstruction(focus)
+        .ifPresent(builder::addUserMessage);
+    return builder.addUserMessage(focusContextMarkdown);
   }
 }

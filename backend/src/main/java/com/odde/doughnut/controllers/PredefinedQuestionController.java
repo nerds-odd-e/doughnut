@@ -3,9 +3,11 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -33,6 +35,8 @@ class PredefinedQuestionController {
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
+  private final NoteRealmService noteRealmService;
+  private final NoteRepository noteRepository;
 
   @Autowired
   public PredefinedQuestionController(
@@ -42,10 +46,14 @@ class PredefinedQuestionController {
       GlobalSettingsService globalSettingsService,
       AiQuestionGenerator aiQuestionGenerator,
       FocusContextRetrievalService focusContextRetrievalService,
-      FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer,
+      NoteRealmService noteRealmService,
+      NoteRepository noteRepository) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
+    this.noteRealmService = noteRealmService;
+    this.noteRepository = noteRepository;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.globalSettingsService = globalSettingsService;
@@ -98,7 +106,11 @@ class PredefinedQuestionController {
     authorizationService.assertAuthorization(note);
     QuestionGenerationRequestBuilder requestBuilder =
         new QuestionGenerationRequestBuilder(
-            globalSettingsService, focusContextRetrievalService, focusContextMarkdownRenderer);
+            globalSettingsService,
+            focusContextRetrievalService,
+            focusContextMarkdownRenderer,
+            noteRealmService,
+            noteRepository);
     ChatCompletionCreateParams params = requestBuilder.buildQuestionGenerationRequest(note, null);
     return serializeChatCompletionCreateParams(params);
   }

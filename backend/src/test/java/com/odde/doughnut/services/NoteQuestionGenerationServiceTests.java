@@ -6,7 +6,9 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAiAssistant;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -14,6 +16,7 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -57,6 +60,13 @@ class NoteQuestionGenerationServiceTests {
         .anyMatch(message -> message.toString().contains(text));
   }
 
+  private List<String> userMessageContentStrings(ChatCompletionCreateParams request) {
+    return request.messages().stream()
+        .filter(message -> message.user().isPresent())
+        .map(message -> message.user().get().content().toString())
+        .toList();
+  }
+
   @Nested
   class GenerateQuestion {
     @Test
@@ -73,16 +83,35 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldPassQuestionGenerationInstructionAsUserMessage() throws JsonProcessingException {
+    void shouldPassScopedQuestionGenerationInstructionAsFirstUserMessage()
+        throws JsonProcessingException {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Notebook nb = root.getNotebook();
+      Note index =
+          makeMe
+              .aNote()
+              .creatorAndOwner(user)
+              .inNotebook(nb)
+              .title("index")
+              .content("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
+              .please();
+      makeMe.theNotebook(nb).indexNote(index).please();
+      Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
-      service.generateQuestion(testNote, null);
+      service.generateQuestion(noteInScope, null);
 
       ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      assertThat(systemMessageContains(paramsCaptor.getValue(), "Question Designer"), is(true));
+      List<String> userBodies = userMessageContentStrings(paramsCaptor.getValue());
+      assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
+      assertThat(userBodies.get(1), containsString("# Focus Context"));
+      assertThat(systemMessageContains(paramsCaptor.getValue(), "SCOPED_QGEN_MARKER"), is(false));
     }
 
     @Test
@@ -129,9 +158,29 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldBuildRequestWithQuestionGenerationInstruction() {
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+    void shouldPlaceScopedQuestionInstructionAsFirstUserMessageBeforeFocusContext() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Notebook nb = root.getNotebook();
+      Note index =
+          makeMe
+              .aNote()
+              .creatorAndOwner(user)
+              .inNotebook(nb)
+              .title("index")
+              .content("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
+              .please();
+      makeMe.theNotebook(nb).indexNote(index).please();
+      Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
+      ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(noteInScope, null);
+
+      List<String> userBodies = userMessageContentStrings(request);
+      assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
+      assertThat(userBodies.get(1), containsString("# Focus Context"));
+      assertThat(systemMessageContains(request, "SCOPED_QGEN_MARKER"), is(false));
       assertThat(systemMessageContains(request, "focus note"), is(true));
     }
 
@@ -177,13 +226,44 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldIncludeAdditionalMessageWhenProvided() {
+    void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Notebook nb = root.getNotebook();
+      Note index =
+          makeMe
+              .aNote()
+              .creatorAndOwner(user)
+              .inNotebook(nb)
+              .title("index")
+              .content("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
+              .please();
+      makeMe.theNotebook(nb).indexNote(index).please();
+      Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+      ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(
+              noteInScope, "Generate a question about the capital city");
+
+      List<String> userBodies = userMessageContentStrings(request);
+      assertThat(userBodies, hasSize(3));
+      assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
+      assertThat(userBodies.get(1), containsString("# Focus Context"));
+      assertThat(userBodies.get(2), containsString("Generate a question about the capital city"));
+    }
+
+    @Test
+    void shouldIncludeAdditionalMessageWhenNoScopedInstruction() {
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(
               testNote, "Generate a question about the capital city");
 
       assertThat(
           userMessageContains(request, "Generate a question about the capital city"), is(true));
+      List<String> userBodies = userMessageContentStrings(request);
+      assertThat(userBodies.get(0), containsString("# Focus Context"));
+      assertThat(userBodies.get(1), containsString("Generate a question about the capital city"));
     }
 
     @Test
