@@ -527,6 +527,40 @@ Paragraph.\n`
       }
     })
 
+    it("includes index-only preset keys in the key dropdown when insert key is focused", async () => {
+      await h.mountEditor("# Body", { isIndexContext: true })
+      await flushPromises()
+      await h.openAddProperty()
+      ;(
+        h.getWrapper().find('[data-testid="rich-note-property-key"]')
+          .element as HTMLInputElement
+      ).focus()
+      await nextTick()
+      await flushPromises()
+      await h.assertPresetOptionsVisible(true)
+    })
+
+    it("includes index-only preset keys in the key dropdown when a non-index row key is focused", async () => {
+      const markdown = `---
+status: ok
+---
+
+# Body`
+      await h.mountEditor(markdown, { isIndexContext: true })
+      await flushPromises()
+      const keyInputs = h
+        .getWrapper()
+        .findAll('[data-testid="rich-note-property-row-key-input"]')
+      const statusInput = keyInputs.find(
+        (w) => (w.element as HTMLInputElement).value === "status"
+      )
+      expect(statusInput).toBeDefined()
+      ;(statusInput!.element as HTMLInputElement).focus()
+      await nextTick()
+      await flushPromises()
+      await h.assertPresetOptionsVisible(true)
+    })
+
     it("saving a filled index-only field emits YAML with that key", async () => {
       const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
       await flushPromises()

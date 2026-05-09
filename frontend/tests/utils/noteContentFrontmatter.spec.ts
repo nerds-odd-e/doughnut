@@ -13,10 +13,28 @@ import {
   propertyRecordHasRelationKey,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
+  richModeKeyDropdownPresetKeys,
   sortedPropertyRowsFromRecord,
   titlePatternFromNoteMarkdown,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
+
+describe("richModeKeyDropdownPresetKeys", () => {
+  it("appends index-only keys when isIndexContext is true", () => {
+    expect(richModeKeyDropdownPresetKeys(false)).toEqual([
+      "image",
+      "wikidata_id",
+      "url",
+    ])
+    expect(richModeKeyDropdownPresetKeys(true)).toEqual([
+      "image",
+      "wikidata_id",
+      "url",
+      "title_pattern",
+      "question_generation_instruction",
+    ])
+  })
+})
 
 describe("isImagePropertyKey", () => {
   it("matches image case-insensitively with trim", () => {

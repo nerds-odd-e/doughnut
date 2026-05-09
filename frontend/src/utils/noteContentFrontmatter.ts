@@ -210,6 +210,15 @@ export const INDEX_ONLY_PRESET_PROPERTY_KEYS = [
   "question_generation_instruction",
 ] as const
 
+/** Keys offered in the rich-mode property key dropdown (insert and row key fields). */
+export function richModeKeyDropdownPresetKeys(
+  isIndexContext: boolean
+): string[] {
+  const keys: string[] = [...RICH_MODE_PRESET_PROPERTY_KEYS]
+  if (isIndexContext) keys.push(...INDEX_ONLY_PRESET_PROPERTY_KEYS)
+  return keys
+}
+
 /** Reads scoped title pattern from leading YAML (`title_pattern` or legacy `titlePattern`; key match ignores case and underscores). */
 export function titlePatternFromNoteMarkdown(
   markdown: string | undefined | null

@@ -109,10 +109,11 @@
 
 <script setup lang="ts">
 import { Plus } from "lucide-vue-next"
-import { computed, nextTick, ref, useId, watch } from "vue"
+import { computed, nextTick, provide, ref, useId, watch } from "vue"
 import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOnlyList.vue"
 import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
+import { richFrontmatterIsIndexContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
@@ -157,6 +158,9 @@ const insertKeyInputId = `${headingId}-insert-key`
 const insertKeyPresetListId = `${headingId}-insert-key-presets`
 
 const isReadOnly = computed(() => props.readOnly ?? false)
+
+const indexContextForProvide = computed(() => props.isIndexContext ?? false)
+provide(richFrontmatterIsIndexContextKey, indexContextForProvide)
 
 const parsed = computed(() => parseNoteContentMarkdown(props.contentMarkdown))
 

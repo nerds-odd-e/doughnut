@@ -1,9 +1,23 @@
 <script setup lang="ts">
-import { RICH_MODE_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
+import { computed, inject, unref } from "vue"
+import {
+  richFrontmatterIsIndexContextFallback,
+  richFrontmatterIsIndexContextKey,
+} from "@/components/form/richFrontmatterProvide"
+import { richModeKeyDropdownPresetKeys } from "@/utils/noteContentFrontmatter"
 
 defineProps<{
   listId: string
 }>()
+
+const isIndexContextRef = inject(
+  richFrontmatterIsIndexContextKey,
+  richFrontmatterIsIndexContextFallback
+)
+
+const presetKeys = computed(() =>
+  richModeKeyDropdownPresetKeys(unref(isIndexContextRef))
+)
 
 const emit = defineEmits<{
   select: [presetKey: string]
@@ -18,7 +32,7 @@ const emit = defineEmits<{
     data-testid="rich-note-property-key-preset-list"
   >
     <li
-      v-for="presetKey in RICH_MODE_PRESET_PROPERTY_KEYS"
+      v-for="presetKey in presetKeys"
       :key="presetKey"
     >
       <button
