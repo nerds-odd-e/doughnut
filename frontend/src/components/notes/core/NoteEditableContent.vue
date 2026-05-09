@@ -30,6 +30,7 @@
         :wiki-titles="wikiTitles"
         :note-title-for-wikidata-search="noteTitleForWikidataSearch"
         :note-id="noteId"
+        :is-index-context="isIndexContext"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
@@ -65,6 +66,7 @@ const props = defineProps({
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
   noteTitleForWikidataSearch: { type: String, default: "" },
+  isIndexContext: { type: Boolean, default: false },
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)

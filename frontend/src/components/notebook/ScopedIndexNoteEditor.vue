@@ -23,6 +23,7 @@
       :as-markdown="false"
       :wiki-titles="indexRealm.wikiTitles ?? []"
       :note-title-for-wikidata-search="indexRealm.note.noteTopology.title ?? ''"
+      :is-index-context="true"
       :data-testid="`${testIdPrefix}-editable-content`"
       @dead-link-click="pendingDeadLinkTitle = $event"
     />
@@ -54,6 +55,7 @@
         field="content"
         :readonly="false"
         :wiki-titles="[]"
+        :is-index-context="true"
       />
     </div>
     <button

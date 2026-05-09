@@ -1,4 +1,5 @@
 import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
+import { INDEX_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
@@ -493,5 +494,99 @@ Paragraph.\n`
     expect(wrapper.find("h4").exists()).toBe(false)
     expect(wrapper.text()).not.toContain("Properties")
     expect(wrapper.text()).toContain("Add property")
+  })
+
+  describe("index-only predefined properties", () => {
+    it("shows both index-only predefined rows when isIndexContext is true", async () => {
+      const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
+      await flushPromises()
+
+      const keyInputs = wrapper.findAll(
+        '[data-testid="rich-note-property-row-key-input"]'
+      )
+      const keyValues = keyInputs.map(
+        (el) => (el.element as HTMLInputElement).value
+      )
+      for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
+        expect(keyValues).toContain(key)
+      }
+    })
+
+    it("does not show index-only predefined rows when isIndexContext is false", async () => {
+      const wrapper = await h.mountEditor("# Body")
+      await flushPromises()
+
+      const keyInputs = wrapper.findAll(
+        '[data-testid="rich-note-property-row-key-input"]'
+      )
+      const keyValues = keyInputs.map(
+        (el) => (el.element as HTMLInputElement).value
+      )
+      for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
+        expect(keyValues).not.toContain(key)
+      }
+    })
+
+    it("saving a filled index-only field emits YAML with that key", async () => {
+      const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
+      await flushPromises()
+
+      const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
+      const titlePatternRow = rows.find((r) => {
+        const keyInput = r.find(
+          '[data-testid="rich-note-property-row-key-input"]'
+        )
+        return (keyInput.element as HTMLInputElement).value === "titlePattern"
+      })
+      expect(titlePatternRow).toBeDefined()
+
+      const valInput = titlePatternRow!.find(
+        '[data-testid="rich-note-property-row-value-input"]'
+      )
+      await h.setWikiPropertyValueField(valInput, "{{date}}")
+      await valInput.trigger("blur")
+      await flushPromises()
+
+      const last = h.lastEmittedMarkdown()
+      expect(last).toContain("titlePattern:")
+      expect(last).toContain("{{date}}")
+      expect(last).toContain("Body")
+    })
+
+    it("empty index-only fields are not included in emitted YAML", async () => {
+      const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
+      await flushPromises()
+
+      const quill = wrapper.findComponent({ name: "QuillEditor" })
+      quill.vm.$emit("update:modelValue", "<h1>Updated Body</h1>")
+      await flushPromises()
+
+      const last = h.lastEmittedMarkdown()
+      expect(last).not.toContain("titlePattern")
+      expect(last).not.toContain("questionGenerationInstruction")
+      expect(last).toContain("Updated Body")
+    })
+
+    it("index-only fields are shown when note already has those keys in frontmatter", async () => {
+      const markdown = `---
+titlePattern: "{{date}}"
+questionGenerationInstruction: Focus on facts.
+---
+
+# Body`
+      const wrapper = await h.mountEditor(markdown, { isIndexContext: true })
+      await flushPromises()
+
+      const keyInputs = wrapper.findAll(
+        '[data-testid="rich-note-property-row-key-input"]'
+      )
+      const keyValues = keyInputs.map(
+        (el) => (el.element as HTMLInputElement).value
+      )
+      expect(keyValues).toContain("titlePattern")
+      expect(keyValues).toContain("questionGenerationInstruction")
+      expect(wrapper.text()).toContain("{{date}}")
+      expect(wrapper.text()).toContain("Focus on facts.")
+    })
   })
 })

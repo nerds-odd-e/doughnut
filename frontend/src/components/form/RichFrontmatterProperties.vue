@@ -118,6 +118,7 @@ import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import {
+  INDEX_ONLY_PRESET_PROPERTY_KEYS,
   isRelationPropertyKey,
   parseNoteContentMarkdown,
   removePropertyRowAt,
@@ -137,6 +138,8 @@ const props = defineProps<{
   noteId?: number
   /** When true, properties UI is non-interactive (e.g. during image upload). */
   interactionLocked?: boolean
+  /** When true, shows index-only predefined property rows (titlePattern, questionGenerationInstruction). */
+  isIndexContext?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -205,7 +208,8 @@ const {
   clearValidation: () => {
     validationMessage.value = ""
   },
-  onPropertiesChanged: (rows) => emits("properties-changed", rows),
+  onPropertiesChanged: (rows) =>
+    emits("properties-changed", filterForEmit(rows)),
   wikidataAssociationDialogRef,
 })
 
@@ -217,12 +221,38 @@ function rowKeyPresetListId(idx: number) {
   return `${headingId}-row-${idx}-key-presets`
 }
 
+function buildPropertyRows(): PropertyRow[] {
+  const p = parsed.value
+  if (!p.ok) return []
+  let rows = sortedPropertyRowsFromRecord(p.properties)
+  if (props.isIndexContext && !isReadOnly.value) {
+    for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
+      if (!rows.some((r) => r.key === key)) {
+        rows = [...rows, { key, value: "" }]
+      }
+    }
+  }
+  return rows
+}
+
+function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
+  if (!props.isIndexContext) return rows
+  return rows.filter(
+    (r) =>
+      !(
+        (INDEX_ONLY_PRESET_PROPERTY_KEYS as readonly string[]).includes(
+          r.key
+        ) && !r.value.trim()
+      )
+  )
+}
+
 watch(
   () => props.contentMarkdown,
   () => {
     const p = parsed.value
     if (p.ok) {
-      propertyRows.value = sortedPropertyRowsFromRecord(p.properties)
+      propertyRows.value = buildPropertyRows()
     } else {
       propertyRows.value = []
     }
@@ -274,7 +304,7 @@ function tryCommitInsert() {
   }
 
   validationMessage.value = ""
-  emits("properties-changed", nextRows)
+  emits("properties-changed", filterForEmit(nextRows))
 }
 
 function onRowFocus(idx: number) {
@@ -287,7 +317,7 @@ function onRowFocus(idx: number) {
 function removeRow(idx: number) {
   propertyRows.value = removePropertyRowAt(propertyRows.value, idx)
   validationMessage.value = ""
-  emits("properties-changed", [...propertyRows.value])
+  emits("properties-changed", filterForEmit([...propertyRows.value]))
 }
 
 function commitRow(idx: number) {
@@ -309,7 +339,7 @@ function commitRow(idx: number) {
   }
 
   validationMessage.value = ""
-  emits("properties-changed", [...propertyRows.value])
+  emits("properties-changed", filterForEmit([...propertyRows.value]))
 }
 
 function onRelationTypeSelected(idx: number, newType: string | undefined) {
@@ -330,7 +360,7 @@ function onRelationTypeSelected(idx: number, newType: string | undefined) {
     return
   }
   validationMessage.value = ""
-  emits("properties-changed", [...propertyRows.value])
+  emits("properties-changed", filterForEmit([...propertyRows.value]))
 }
 
 async function addWikiLinkProperty(wikiLinkText: string) {
@@ -343,7 +373,7 @@ async function addWikiLinkProperty(wikiLinkText: string) {
   }
   validationMessage.value = ""
   propertyRows.value = newRows
-  emits("properties-changed", [...newRows])
+  emits("properties-changed", filterForEmit([...newRows]))
   await nextTick()
   const idx = propertyRows.value.findIndex(
     (r) => !r.key.trim() && r.value.trim() === trimmedLink
@@ -358,7 +388,7 @@ async function addWikiLinkProperty(wikiLinkText: string) {
 }
 
 defineExpose({
-  getPropertyRows: (): PropertyRow[] => propertyRows.value,
+  getPropertyRows: (): PropertyRow[] => filterForEmit(propertyRows.value),
   addWikiLinkProperty,
 })
 </script>

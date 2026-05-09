@@ -16,6 +16,7 @@
         asMarkdown,
         wikiTitles,
         noteTitleForWikidataSearch: note.noteTopology.title,
+        isIndexContext,
       }"
       @dead-link-click="$emit('deadLinkClick', $event)"
     />
@@ -33,6 +34,7 @@ const props = defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  isIndexContext: { type: Boolean, default: false },
 })
 
 defineEmits<{ deadLinkClick: [title: string] }>()

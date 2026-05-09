@@ -34,6 +34,7 @@
                     asMarkdown,
                     readonly: readonly(noteRealm),
                     wikiTitles: noteRealm.wikiTitles ?? [],
+                    isIndexContext: noteRealm.indexNote ?? false,
                   }"
                   @dead-link-click="onDeadLinkClick"
                 />

@@ -237,6 +237,15 @@ export const RICH_MODE_PRESET_PROPERTY_KEYS = [
   "url",
 ] as const
 
+/**
+ * Predefined property keys shown only when editing a designated index note
+ * (notebook index, folder index, or direct /d/n/:noteId for those notes).
+ */
+export const INDEX_ONLY_PRESET_PROPERTY_KEYS = [
+  "titlePattern",
+  "questionGenerationInstruction",
+] as const
+
 /** Rich-mode property key for Wikidata Q-id (YAML may use `wikidata_id` or `wikidataId`). */
 export function isWikidataIdPropertyKey(key: string): boolean {
   const t = key.trim().toLowerCase()
