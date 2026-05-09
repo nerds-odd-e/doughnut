@@ -5,33 +5,31 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookAiAssistantRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.index.IndexScope;
+import com.odde.doughnut.services.index.ScopedIndexNoteService;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotebookService {
   private final EntityPersister entityPersister;
   private final NotebookAiAssistantRepository notebookAiAssistantRepository;
-  private final NoteRepository noteRepository;
   private final NotebookRepository notebookRepository;
+  private final ScopedIndexNoteService scopedIndexNoteService;
 
   public NotebookService(
       EntityPersister entityPersister,
       NotebookAiAssistantRepository notebookAiAssistantRepository,
-      NoteRepository noteRepository,
-      NotebookRepository notebookRepository) {
+      NotebookRepository notebookRepository,
+      ScopedIndexNoteService scopedIndexNoteService) {
     this.entityPersister = entityPersister;
     this.notebookAiAssistantRepository = notebookAiAssistantRepository;
-    this.noteRepository = noteRepository;
     this.notebookRepository = notebookRepository;
+    this.scopedIndexNoteService = scopedIndexNoteService;
   }
 
   public NotebookAiAssistant findByNotebookId(Integer notebookId) {
@@ -56,7 +54,7 @@ public class NotebookService {
   }
 
   /**
-   * Sets {@code notebook.index_note_id} from the sole root note titled {@code index}, or clears it
+   * Sets {@link Notebook#getIndexNote()} from the sole root note titled {@code index}, or clears it
    * when none exists.
    */
   public void reconcileNotebookIndexNotePointer(Integer notebookId) {
@@ -66,50 +64,12 @@ public class NotebookService {
     notebookRepository
         .findById(notebookId)
         .ifPresent(
-            nb -> {
-              List<Note> candidates =
-                  noteRepository.findRootIndexNoteCandidatesForNotebook(
-                      nb.getId(), PageRequest.of(0, 2));
-              nb.setIndexNote(candidates.isEmpty() ? null : candidates.getFirst());
-              entityPersister.merge(nb);
-            });
+            nb ->
+                scopedIndexNoteService.reconcileDesignatedIndexPointer(
+                    new IndexScope.NotebookRoot(nb)));
   }
 
   public Optional<Note> findOptionalIndexNote(Notebook notebook) {
-    if (notebook == null || notebook.getId() == null) {
-      return Optional.empty();
-    }
-    Optional<Notebook> reloaded = notebookRepository.findById(notebook.getId());
-    if (reloaded.isEmpty()) {
-      return Optional.empty();
-    }
-    Notebook nb = reloaded.get();
-    entityPersister.refresh(nb);
-    Note cached = nb.getIndexNote();
-    if (cached != null) {
-      if (isValidNotebookIndexPointer(nb, cached)) {
-        return Optional.of(cached);
-      }
-      nb.setIndexNote(null);
-      entityPersister.merge(nb);
-      entityPersister.flush();
-    }
-    List<Note> found =
-        noteRepository.findRootIndexNoteCandidatesForNotebook(nb.getId(), PageRequest.of(0, 2));
-    if (found.isEmpty()) {
-      return Optional.empty();
-    }
-    Note candidate = found.getFirst();
-    nb.setIndexNote(candidate);
-    entityPersister.merge(nb);
-    entityPersister.flush();
-    return Optional.of(candidate);
-  }
-
-  private static boolean isValidNotebookIndexPointer(Notebook notebook, Note note) {
-    return note.getDeletedAt() == null
-        && note.getFolder() == null
-        && note.getNotebook() != null
-        && Objects.equals(notebook.getId(), note.getNotebook().getId());
+    return scopedIndexNoteService.findDesignatedIndexNote(new IndexScope.NotebookRoot(notebook));
   }
 }
