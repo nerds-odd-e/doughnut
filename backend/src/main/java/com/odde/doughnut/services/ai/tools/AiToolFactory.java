@@ -51,7 +51,7 @@ public class AiToolFactory {
         - Related notes can be used as distractors, but do not let distractors introduce ambiguity.
         - Vary the length of answer choices so the correct answer is not consistently the longest.
         - Use Markdown for both the question stem and the answer choices.
-        - `strictChoiceOrder` must be `false` for standard MCQs (which means there are no meta-choices such as "All of the above").
+        - `choicesMayBeShuffled` must be `true` for standard MCQs (which means there are no meta-choices such as "All of the above").
         """;
   }
 

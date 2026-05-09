@@ -76,19 +76,19 @@ class AiQuestionGeneratorTests {
   }
 
   @Test
-  void shouldShuffleChoicesWhenStrictChoiceOrderIsFalse() {
+  void shouldShuffleChoicesWhenChoicesMayBeShuffledIsTrue() {
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     makeMe.aNote().please();
 
-    // Prepare the AI response with strictChoiceOrder = false
+    // Prepare the AI response with choicesMayBeShuffled = true
     MCQWithAnswer originalQuestion =
         makeMe
             .aMCQWithAnswer()
             .stem("What is 2+2?")
             .choices("4", "3", "5", "6")
             .correctChoiceIndex(0)
-            .strictChoiceOrder(false)
+            .choicesMayBeShuffled(true)
             .please();
 
     // Mock the chat completion API calls
@@ -132,14 +132,14 @@ class AiQuestionGeneratorTests {
     Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     makeMe.aNote().please();
 
-    // Prepare the AI response with strictChoiceOrder = false
+    // Prepare the AI response with choicesMayBeShuffled = true
     MCQWithAnswer originalQuestion =
         makeMe
             .aMCQWithAnswer()
             .stem("What is 2+2?")
             .choices("4", "3", "5", "6")
             .correctChoiceIndex(0)
-            .strictChoiceOrder(false)
+            .choicesMayBeShuffled(true)
             .please();
 
     // Mock the randomizer to return a specific shuffled order

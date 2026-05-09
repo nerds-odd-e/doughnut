@@ -24,9 +24,9 @@ public class MCQWithAnswer {
   private int solutionChoiceIndex;
 
   @JsonPropertyDescription(
-      "If true, the order of choices must be preserved and must not be randomized.")
+      "Whether choices can be safely reordered before display. False if any choice depends on position or refers to another choice.")
   @JsonProperty(required = true)
-  private boolean strictChoiceOrder;
+  private boolean choicesMayBeShuffled = true;
 
   @JsonPropertyDescription(
       "Internal summary of the specific focus-note knowledge point tested. Not shown to the learner.")

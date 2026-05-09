@@ -33,8 +33,8 @@ public class MCQWithAnswerBuilder {
     return this;
   }
 
-  public MCQWithAnswerBuilder strictChoiceOrder(boolean b) {
-    mcqWithAnswer.setStrictChoiceOrder(b);
+  public MCQWithAnswerBuilder choicesMayBeShuffled(boolean b) {
+    mcqWithAnswer.setChoicesMayBeShuffled(b);
     return this;
   }
 }

@@ -65,7 +65,7 @@ public class AiQuestionGenerator {
       MCQWithAnswer original =
           noteQuestionGenerationService.generateQuestionWithCustomPrompt(
               note, customPrompt, additionalMessage, contextSeed);
-      if (original != null && !original.isStrictChoiceOrder()) {
+      if (original != null && original.isChoicesMayBeShuffled()) {
         return shuffleChoices(original);
       }
       return original;
@@ -86,7 +86,7 @@ public class AiQuestionGenerator {
     return new MCQWithAnswer(
         shuffledQuestion,
         newCorrectIndex,
-        false,
+        true,
         original.getTestedFocus(),
         original.getValidationRationale());
   }

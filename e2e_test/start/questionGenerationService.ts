@@ -8,7 +8,7 @@ type McqWithAnswer = {
     responseChoices: string[]
   }
   solutionChoiceIndex: number
-  strictChoiceOrder: boolean
+  choicesMayBeShuffled: boolean
   testedFocus?: string
   validationRationale?: string
 }
@@ -20,7 +20,7 @@ const createMcqWithAnswer = (
   incorrectChoice2: string
 ): McqWithAnswer => ({
   solutionChoiceIndex: 0,
-  strictChoiceOrder: true,
+  choicesMayBeShuffled: false,
   question: {
     questionStem: stem,
     responseChoices: [correctChoice, incorrectChoice1, incorrectChoice2],
