@@ -28,7 +28,7 @@
           aria-hidden="true"
         />
       </button>
-      <div class="folder-label-area">
+      <div class="folder-label-area" @click="setUserActiveFolderOnly">
         <router-link
           class="sidebar-folder-label"
           data-testid="sidebar-folder-open-page-link"
@@ -39,7 +39,6 @@
               folderId: String(folderId),
             },
           }"
-          @click="setUserActiveFolderOnly"
         >
           {{ folder.name }}
         </router-link>

@@ -255,23 +255,27 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 
 ### 10.12 — Behavior: new notes can use scoped `titlePattern`
 
-**Why now:** This is the first concrete behavior powered by index frontmatter, and it is simpler than AI prompt inheritance.
+**Why now:** This is the first concrete behavior powered by index frontmatter, and it can be delivered as a mostly frontend capability once the active context already carries the resolved index properties.
 
-**Pre-condition:** Notebook or folder index frontmatter contains `titlePattern`.
+**Pre-condition:** Notebook or folder index frontmatter contains `titlePattern`, and the frontend has loaded the relevant index properties with the active note or active folder context.
 
-**Trigger:** User creates a note in that scope.
+**Trigger:** User creates a note from the sidebar or note-creation UI while a note or folder is active.
 
-**Post-condition:** The initial title follows the nearest scoped title pattern; existing explicit-title creation remains explicit.
+**Post-condition:** The create-note request is sent with an initial title rendered from the nearest loaded scoped `titlePattern`; existing explicit-title creation remains explicit.
 
 **Scope:**
-- Define inheritance order: folder → parent folders → notebook index.
-- Apply the pattern only where the creation flow lacks an explicit user title, or clearly document the chosen overwrite policy.
-- Start with a small supported pattern set (e.g. date) rather than a broad template language.
+- Treat this as a frontend-owned defaulting feature: the backend create-note API should continue to receive an ordinary explicit title, not learn template rendering or implicit scoped defaults in this slice.
+- Ensure the active note payload and active folder/page payload expose enough resolved index properties for note creation to decide immediately which pattern applies. Prefer one frontend shape for "current scoped index properties" whether the user is on a note page, notebook page, or folder page.
+- Resolve inheritance before or during payload construction so the frontend does not need extra round trips at creation time. If the existing payload cannot include this without a small DTO/API addition, keep that backend change narrowly limited to exposing already-resolved index properties.
+- Apply the pattern only where the creation flow lacks an explicit user title.
+- Start with a small supported pattern set (e.g. date) implemented in a frontend utility rather than a broad template language.
+- Keep the resolved properties refreshed when the active note changes, the active folder changes, or the user edits the relevant index note in the current page.
 
 **Tests:**
-- Backend/controller or frontend creation-flow test depending on where title defaulting lives.
+- Frontend creation-flow tests: active note in a configured folder creates a note with the rendered patterned title; active folder page creates a note with the folder pattern; explicit title input still wins.
+- Frontend state/payload test: active note and active folder contexts expose the same resolved index-properties shape to note creation.
 - E2E: create a note in a configured folder and observe the patterned title.
-- Unit tests for pattern rendering edge cases (unknown token, invalid pattern) if rendering is non-trivial.
+- Unit tests for the frontend pattern renderer edge cases (unknown token, invalid pattern) if rendering is non-trivial.
 
 ### 10.13 — Behavior: question generation uses scoped instruction
 

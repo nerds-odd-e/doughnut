@@ -20,6 +20,12 @@ import {
 import { type VueWrapper, DOMWrapper } from "@vue/test-utils"
 import { expect, vi } from "vitest"
 
+/** Avoid real navigation during sidebar tests (would break folder expansion / listing). */
+const sidebarRouterLinkStub = {
+  props: ["to"],
+  template: `<a class="router-link"><slot /></a>`,
+}
+
 export function isBefore(node1: Node, node2: Node) {
   return !!(
     // eslint-disable-next-line no-bitwise
@@ -204,6 +210,7 @@ export function mountSidebar(
 ) {
   return h
     .component(Sidebar)
+    .withRouter()
     .withProps({
       activeNoteRealm: realmAsActiveInSidebarStub(
         active,
@@ -211,7 +218,15 @@ export function mountSidebar(
       ),
       notebookId: active.notebookView.notebook.id,
     })
-    .mount({ attachTo: document.body })
+    .mount({
+      attachTo: document.body,
+      global: {
+        stubs: {
+          RouterLink: sidebarRouterLinkStub,
+          "router-link": sidebarRouterLinkStub,
+        },
+      },
+    })
 }
 
 export function mountSidebarSignedIn(
@@ -222,6 +237,7 @@ export function mountSidebarSignedIn(
 ) {
   return h
     .component(Sidebar)
+    .withRouter()
     .withCurrentUser(makeMe.aUser.please())
     .withProps({
       activeNoteRealm:
@@ -230,7 +246,15 @@ export function mountSidebarSignedIn(
           : undefined,
       notebookId,
     })
-    .mount({ attachTo: document.body })
+    .mount({
+      attachTo: document.body,
+      global: {
+        stubs: {
+          RouterLink: sidebarRouterLinkStub,
+          "router-link": sidebarRouterLinkStub,
+        },
+      },
+    })
 }
 
 /** Root list: two folders + zebra/apple notes; empty folder listings. */

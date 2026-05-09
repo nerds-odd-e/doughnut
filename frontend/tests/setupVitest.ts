@@ -40,11 +40,18 @@ console.log = (...args: unknown[]) => {
   throw new Error(`Failing due to console.log while running test!`)
 }
 
-// Fail only on Vue warnings, allow other warnings
+// Fail only on Vue warnings; suppress known library noise in test output
 console.warn = (...args: unknown[]) => {
+  const message = args.join(" ")
+  if (
+    message.includes("decodeEntities option is passed") ||
+    message.includes("Indexing all PDF objects")
+  ) {
+    return
+  }
+
   originalConsoleWarn(...args)
 
-  const message = args.join(" ")
   if (message.includes("[Vue warn]")) {
     throw new Error(`Failing due to Vue warning while running test!`)
   }
