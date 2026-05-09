@@ -32,6 +32,10 @@ describe("NotebookPageView.spec", () => {
     ...makeMe.aNotebook.please(),
   }
 
+  const noopFetchNotebookPage = async (): Promise<void> => {
+    await Promise.resolve()
+  }
+
   it("shows notebook name and description in summary with no link row in the summary", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
@@ -41,7 +45,7 @@ describe("NotebookPageView.spec", () => {
     const wrapper = helper
       .component(NotebookPageView)
       .withRouter()
-      .withProps({ notebook: nb })
+      .withProps({ notebook: nb, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
 
     const summary = wrapper.find('[data-testid="notebook-page-summary"]')
@@ -61,7 +65,7 @@ describe("NotebookPageView.spec", () => {
     const wrapper = helper
       .component(NotebookPageView)
       .withRouter()
-      .withProps({ notebook: nb })
+      .withProps({ notebook: nb, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
 
     const summary = wrapper.find('[data-testid="notebook-page-summary"]')
@@ -82,7 +86,7 @@ describe("NotebookPageView.spec", () => {
     const wrapper = helper
       .component(NotebookPageView)
       .withRouter()
-      .withProps({ notebook: nb })
+      .withProps({ notebook: nb, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
 
     await wrapper.find("[name='description']").setValue("Saved blurb")
@@ -113,7 +117,7 @@ describe("NotebookPageView.spec", () => {
     const wrapper = helper
       .component(NotebookPageView)
       .withRouter()
-      .withProps({ notebook: nb })
+      .withProps({ notebook: nb, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
 
     await wrapper
@@ -150,7 +154,7 @@ describe("NotebookPageView.spec", () => {
     const wrapper = helper
       .component(NotebookPageView)
       .withRouter()
-      .withProps({ notebook })
+      .withProps({ notebook, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
     await flushPromises()
 
