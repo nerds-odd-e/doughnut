@@ -7,8 +7,8 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import com.openai.models.chat.completions.ChatCompletionDeveloperMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
-import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,12 +46,12 @@ class ConversationHistoryBuilderTest {
               focusContextRetrievalService, focusContextMarkdownRenderer);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
-      // Then first message should be system message with note context
+      // Then first message should be developer message with note context
       assertFalse(history.isEmpty());
       ChatCompletionMessageParam firstMessage = history.get(0);
-      assertTrue(firstMessage.system().isPresent());
-      ChatCompletionSystemMessageParam systemMessage = firstMessage.system().get();
-      String body = systemMessage.content().toString();
+      assertTrue(firstMessage.developer().isPresent());
+      ChatCompletionDeveloperMessageParam developerMessage = firstMessage.developer().get();
+      String body = developerMessage.content().toString();
       assertTrue(body.contains(note.getTitle()));
       assertTrue(body.contains("# Focus Context"));
     }
@@ -83,8 +83,8 @@ class ConversationHistoryBuilderTest {
       // Then should have system messages (note context + conversation instructions) + 3
       // conversation messages
       assertEquals(5, history.size());
-      assertTrue(history.get(0).system().isPresent()); // Note context
-      assertTrue(history.get(1).system().isPresent()); // Conversation instructions
+      assertTrue(history.get(0).developer().isPresent()); // Note context
+      assertTrue(history.get(1).developer().isPresent()); // Conversation instructions
       assertTrue(history.get(2).user().isPresent());
       // AI messages will be assistant
       assertTrue(history.get(4).user().isPresent());
@@ -105,8 +105,8 @@ class ConversationHistoryBuilderTest {
 
       // Then should have system messages (note context + conversation instructions)
       assertEquals(2, history.size());
-      assertTrue(history.get(0).system().isPresent()); // Note context
-      assertTrue(history.get(1).system().isPresent()); // Conversation instructions
+      assertTrue(history.get(0).developer().isPresent()); // Note context
+      assertTrue(history.get(1).developer().isPresent()); // Conversation instructions
     }
   }
 }

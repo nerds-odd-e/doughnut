@@ -9,8 +9,8 @@ import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
+import com.openai.models.chat.completions.ChatCompletionDeveloperMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
-import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,21 +70,21 @@ public class ConversationHistoryBuilder {
       }
 
       messages.add(
-          ChatCompletionMessageParam.ofSystem(
-              ChatCompletionSystemMessageParam.builder().content(systemMessageContent).build()));
+          ChatCompletionMessageParam.ofDeveloper(
+              ChatCompletionDeveloperMessageParam.builder().content(systemMessageContent).build()));
 
       // Add additional context for recall prompts
       String additionalContext = conversation.getAdditionalContextForSubject();
       if (additionalContext != null) {
         messages.add(
-            ChatCompletionMessageParam.ofSystem(
-                ChatCompletionSystemMessageParam.builder().content(additionalContext).build()));
+            ChatCompletionMessageParam.ofDeveloper(
+                ChatCompletionDeveloperMessageParam.builder().content(additionalContext).build()));
       }
 
       // Add conversation instructions
       messages.add(
-          ChatCompletionMessageParam.ofSystem(
-              ChatCompletionSystemMessageParam.builder()
+          ChatCompletionMessageParam.ofDeveloper(
+              ChatCompletionDeveloperMessageParam.builder()
                   .content("Make tool calls when user asks to update the note.")
                   .build()));
     }

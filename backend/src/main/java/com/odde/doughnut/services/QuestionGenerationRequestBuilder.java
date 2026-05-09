@@ -8,6 +8,7 @@ import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
+import com.openai.models.ReasoningEffort;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class QuestionGenerationRequestBuilder {
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool();
     return openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed)
         .responseJsonSchema(tool)
+        .reasoningEffort(ReasoningEffort.LOW)
+        .maxCompletionTokens(1000L)
         .build();
   }
 

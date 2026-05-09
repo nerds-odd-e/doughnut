@@ -3,9 +3,10 @@ package com.odde.doughnut.services.ai.builder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.openai.models.ChatModel;
+import com.openai.models.ReasoningEffort;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.ChatCompletionDeveloperMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
-import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +59,31 @@ public class OpenAIChatRequestBuilder {
       String joinedSystemMessage =
           overallSystemMessages.stream().collect(Collectors.joining("\n\n\n"));
       finalMessages.add(
-          ChatCompletionMessageParam.ofSystem(
-              ChatCompletionSystemMessageParam.builder().content(joinedSystemMessage).build()));
+          ChatCompletionMessageParam.ofDeveloper(
+              ChatCompletionDeveloperMessageParam.builder().content(joinedSystemMessage).build()));
     }
     finalMessages.addAll(messages);
     return finalMessages;
   }
 
   public ChatCompletionCreateParams build() {
-    return builder.messages(buildMessages()).n(1L).build();
+    return builder
+        .messages(buildMessages())
+        .n(1L)
+        .reasoningEffort(ReasoningEffort.NONE)
+        .verbosity(ChatCompletionCreateParams.Verbosity.LOW)
+        .maxCompletionTokens(700L)
+        .build();
+  }
+
+  public OpenAIChatRequestBuilder reasoningEffort(ReasoningEffort effort) {
+    builder.reasoningEffort(effort);
+    return this;
+  }
+
+  public OpenAIChatRequestBuilder maxCompletionTokens(long tokens) {
+    builder.maxCompletionTokens(tokens);
+    return this;
   }
 
   public OpenAIChatRequestBuilder addToOverallSystemMessage(String message) {

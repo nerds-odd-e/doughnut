@@ -373,7 +373,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       java.util.List<java.util.Map<String, Object>> messages =
           (java.util.List<java.util.Map<String, Object>>) request.get("messages");
       for (java.util.Map<String, Object> message : messages) {
-        if ("system".equals(message.get("role"))) {
+        if ("developer".equals(message.get("role"))) {
           export.append(formatMessage((String) message.get("content"))).append("\n\n");
         }
       }

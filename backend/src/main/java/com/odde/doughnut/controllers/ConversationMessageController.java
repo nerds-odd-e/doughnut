@@ -123,11 +123,11 @@ public class ConversationMessageController {
     java.util.List<java.util.Map<String, Object>> messagesList = new java.util.ArrayList<>();
     for (ChatCompletionMessageParam messageParam : params.messages()) {
       java.util.Map<String, Object> messageMap = new java.util.HashMap<>();
-      if (messageParam.system().isPresent()) {
-        messageMap.put("role", "system");
+      if (messageParam.developer().isPresent()) {
+        messageMap.put("role", "developer");
         messageMap.put(
             "content",
-            ChatMessageContent.extractContentString(messageParam.system().get().content()));
+            ChatMessageContent.extractContentString(messageParam.developer().get().content()));
       } else if (messageParam.user().isPresent()) {
         messageMap.put("role", "user");
         messageMap.put(

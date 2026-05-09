@@ -47,8 +47,8 @@ class NoteQuestionGenerationServiceTests {
 
   private boolean systemMessageContains(ChatCompletionCreateParams request, String text) {
     return request.messages().stream()
-        .filter(message -> message.system().isPresent())
-        .anyMatch(message -> message.system().get().content().toString().contains(text));
+        .filter(message -> message.developer().isPresent())
+        .anyMatch(message -> message.developer().get().content().toString().contains(text));
   }
 
   private boolean userMessageContains(ChatCompletionCreateParams request, String text) {
@@ -166,7 +166,7 @@ class NoteQuestionGenerationServiceTests {
       ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
       long systemMessageCount =
-          request.messages().stream().filter(message -> message.system().isPresent()).count();
+          request.messages().stream().filter(message -> message.developer().isPresent()).count();
       assertThat(systemMessageCount, is(1L));
     }
 
