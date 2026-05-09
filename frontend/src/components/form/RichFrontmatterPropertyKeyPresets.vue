@@ -4,11 +4,16 @@ import {
   richFrontmatterIsIndexContextFallback,
   richFrontmatterIsIndexContextKey,
 } from "@/components/form/richFrontmatterProvide"
-import { richModeKeyDropdownPresetKeys } from "@/utils/noteContentFrontmatter"
+import type { PropertyRow } from "@/utils/noteContentFrontmatter"
+import { richModeKeyDropdownPresetKeysForPropertyRows } from "@/utils/noteContentFrontmatter"
 
-defineProps<{
-  listId: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    listId: string
+    propertyRows?: PropertyRow[]
+  }>(),
+  { propertyRows: () => [] }
+)
 
 const isIndexContextRef = inject(
   richFrontmatterIsIndexContextKey,
@@ -16,7 +21,10 @@ const isIndexContextRef = inject(
 )
 
 const presetKeys = computed(() =>
-  richModeKeyDropdownPresetKeys(unref(isIndexContextRef))
+  richModeKeyDropdownPresetKeysForPropertyRows(
+    unref(isIndexContextRef),
+    props.propertyRows
+  )
 )
 
 const emit = defineEmits<{
@@ -26,6 +34,7 @@ const emit = defineEmits<{
 
 <template>
   <ul
+    v-if="presetKeys.length"
     :id="listId"
     role="listbox"
     class="daisy-menu daisy-absolute daisy-left-0 daisy-right-0 daisy-top-full daisy-z-20 daisy-mt-0.5 daisy-w-full daisy-rounded-box daisy-bg-base-100 daisy-p-1 daisy-shadow"

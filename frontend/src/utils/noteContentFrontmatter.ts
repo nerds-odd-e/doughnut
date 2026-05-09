@@ -327,6 +327,45 @@ export function isUrlPropertyKey(key: string): boolean {
   return key.trim().toLowerCase() === "url"
 }
 
+function presetKeyOccupiedByRowKey(presetKey: string, rowKey: string): boolean {
+  switch (presetKey) {
+    case "image":
+      return isImagePropertyKey(rowKey)
+    case "wikidata_id":
+      return isWikidataIdPropertyKey(rowKey)
+    case "url":
+      return isUrlPropertyKey(rowKey)
+    case "title_pattern":
+      return rowFillsIndexOnlyPresetSlot(rowKey, "title_pattern")
+    case "question_generation_instruction":
+      return rowFillsIndexOnlyPresetSlot(
+        rowKey,
+        "question_generation_instruction"
+      )
+    default:
+      return false
+  }
+}
+
+/**
+ * Preset keys for the rich-mode property key dropdown, excluding slots already
+ * taken by any row with a non-empty key (semantic match, e.g. `wikidataId` ↔ `wikidata_id`).
+ */
+export function richModeKeyDropdownPresetKeysForPropertyRows(
+  isIndexContext: boolean,
+  rows: readonly PropertyRow[]
+): string[] {
+  const candidates = richModeKeyDropdownPresetKeys(isIndexContext)
+  return candidates.filter(
+    (preset) =>
+      !rows.some((row) => {
+        const k = row.key.trim()
+        if (!k) return false
+        return presetKeyOccupiedByRowKey(preset, k)
+      })
+  )
+}
+
 export function isRelationPropertyKey(key: string): boolean {
   return key.trim().toLowerCase() === "relation"
 }

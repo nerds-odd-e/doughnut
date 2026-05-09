@@ -14,10 +14,69 @@ import {
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   richModeKeyDropdownPresetKeys,
+  richModeKeyDropdownPresetKeysForPropertyRows,
   sortedPropertyRowsFromRecord,
   titlePatternFromNoteMarkdown,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
+
+describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
+  it("matches full list when no rows have keys that occupy preset slots", () => {
+    expect(richModeKeyDropdownPresetKeysForPropertyRows(false, [])).toEqual(
+      richModeKeyDropdownPresetKeys(false)
+    )
+    expect(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "status", value: "ok" },
+      ])
+    ).toEqual(richModeKeyDropdownPresetKeys(false))
+  })
+
+  it("removes image when a row uses the image key", () => {
+    expect(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "image", value: "/a.png" },
+      ])
+    ).toEqual(["wikidata_id", "url"])
+  })
+
+  it("removes wikidata_id for wikidataId alias", () => {
+    expect(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "wikidataId", value: "Q1" },
+      ])
+    ).toEqual(["image", "url"])
+  })
+
+  it("removes url when url is present", () => {
+    expect(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "url", value: "https://x" },
+      ])
+    ).toEqual(["image", "wikidata_id"])
+  })
+
+  it("ignores rows with empty keys", () => {
+    expect(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "", value: "x" },
+        { key: "  ", value: "y" },
+      ])
+    ).toEqual(richModeKeyDropdownPresetKeys(false))
+  })
+
+  it("in index context, removes index-only presets when placeholder rows exist", () => {
+    const rows = [
+      { key: "title_pattern", value: "" },
+      { key: "question_generation_instruction", value: "" },
+    ]
+    expect(richModeKeyDropdownPresetKeysForPropertyRows(true, rows)).toEqual([
+      "image",
+      "wikidata_id",
+      "url",
+    ])
+  })
+})
 
 describe("richModeKeyDropdownPresetKeys", () => {
   it("appends index-only keys when isIndexContext is true", () => {

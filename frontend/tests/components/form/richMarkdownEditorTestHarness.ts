@@ -1,5 +1,4 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
-import { richModeKeyDropdownPresetKeys } from "@/utils/noteContentFrontmatter"
 import helper from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
@@ -60,13 +59,12 @@ export function createRichMarkdownEditorTestHarness() {
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
   }
 
-  async function assertPresetOptionsVisible(isIndexContext = false) {
-    const expected = richModeKeyDropdownPresetKeys(isIndexContext)
+  async function assertPresetOptionsVisible(expectedKeys: readonly string[]) {
     const options = wrapper.findAll(
       '[data-testid="rich-note-property-key-preset-option"]'
     )
-    expect(options.length).toBe(expected.length)
-    for (const key of expected) {
+    expect(options.length).toBe(expectedKeys.length)
+    for (const key of expectedKeys) {
       expect(
         options.find(
           (o) => (o.element as HTMLElement).dataset.presetKey === key

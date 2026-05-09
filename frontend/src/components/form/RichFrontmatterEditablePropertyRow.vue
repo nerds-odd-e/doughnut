@@ -26,6 +26,7 @@
       <RichFrontmatterPropertyKeyPresets
         v-if="presetPanelOpen"
         :list-id="presetListId"
+        :property-rows="propertyRows"
         @select="onPresetSelected"
       />
     </div>
@@ -197,6 +198,7 @@ const props = defineProps<{
   wikiTitles: WikiTitle[]
   keyInputId: string
   presetListId: string
+  propertyRows: PropertyRow[]
   noteId?: number
 }>()
 

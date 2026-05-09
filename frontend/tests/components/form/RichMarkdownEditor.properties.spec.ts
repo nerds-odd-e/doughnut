@@ -1,5 +1,8 @@
 import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
-import { INDEX_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
+import {
+  INDEX_ONLY_PRESET_PROPERTY_KEYS,
+  richModeKeyDropdownPresetKeysForPropertyRows,
+} from "@/utils/noteContentFrontmatter"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
@@ -121,7 +124,9 @@ status: ok
     ).focus()
     await nextTick()
     await flushPromises()
-    await h.assertPresetOptionsVisible()
+    await h.assertPresetOptionsVisible(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [])
+    )
 
     const markdown = `---
 status: ok
@@ -136,7 +141,11 @@ status: ok
     ).focus()
     await nextTick()
     await flushPromises()
-    await h.assertPresetOptionsVisible()
+    await h.assertPresetOptionsVisible(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "status", value: "ok" },
+      ])
+    )
   })
 
   it("sets property key when a preset is chosen (insert and existing row)", async () => {
@@ -177,6 +186,28 @@ status: ok
           .element as HTMLInputElement
       ).value
     ).toBe("url")
+  })
+
+  it("property key preset dropdown excludes keys already in frontmatter", async () => {
+    const markdown = `---
+image: /x.png
+---
+
+# Body`
+    await h.mountEditor(markdown)
+    await flushPromises()
+    await h.openAddProperty()
+    ;(
+      h.getWrapper().find('[data-testid="rich-note-property-key"]')
+        .element as HTMLInputElement
+    ).focus()
+    await nextTick()
+    await flushPromises()
+    await h.assertPresetOptionsVisible(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        { key: "image", value: "/x.png" },
+      ])
+    )
   })
 
   it("invalid YAML: hides Properties, shows alert, freezes Quill, ignores body edits", async () => {
@@ -527,7 +558,7 @@ Paragraph.\n`
       }
     })
 
-    it("includes index-only preset keys in the key dropdown when insert key is focused", async () => {
+    it("insert key dropdown omits index-only presets already present as placeholder rows", async () => {
       await h.mountEditor("# Body", { isIndexContext: true })
       await flushPromises()
       await h.openAddProperty()
@@ -537,10 +568,15 @@ Paragraph.\n`
       ).focus()
       await nextTick()
       await flushPromises()
-      await h.assertPresetOptionsVisible(true)
+      const indexPlaceholderRows = INDEX_ONLY_PRESET_PROPERTY_KEYS.map(
+        (key) => ({ key, value: "" })
+      )
+      await h.assertPresetOptionsVisible(
+        richModeKeyDropdownPresetKeysForPropertyRows(true, indexPlaceholderRows)
+      )
     })
 
-    it("includes index-only preset keys in the key dropdown when a non-index row key is focused", async () => {
+    it("key dropdown when focusing a custom row omits occupied presets in index context", async () => {
       const markdown = `---
 status: ok
 ---
@@ -558,7 +594,13 @@ status: ok
       ;(statusInput!.element as HTMLInputElement).focus()
       await nextTick()
       await flushPromises()
-      await h.assertPresetOptionsVisible(true)
+      const indexRows = [
+        ...INDEX_ONLY_PRESET_PROPERTY_KEYS.map((key) => ({ key, value: "" })),
+        { key: "status", value: "ok" },
+      ]
+      await h.assertPresetOptionsVisible(
+        richModeKeyDropdownPresetKeysForPropertyRows(true, indexRows)
+      )
     })
 
     it("saving a filled index-only field emits YAML with that key", async () => {

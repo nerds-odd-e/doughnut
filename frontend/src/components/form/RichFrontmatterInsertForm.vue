@@ -29,6 +29,7 @@
           <RichFrontmatterPropertyKeyPresets
             v-if="presetPanelOpen"
             :list-id="insertKeyPresetListId"
+            :property-rows="propertyRows"
             @select="onPresetSelected"
           />
         </div>
@@ -141,6 +142,7 @@ import {
   isImagePropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
+  type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 
 const props = defineProps<{
@@ -150,6 +152,7 @@ const props = defineProps<{
   wikiTitles: WikiTitle[]
   insertKeyInputId: string
   insertKeyPresetListId: string
+  propertyRows: PropertyRow[]
   noteId?: number
 }>()
 
