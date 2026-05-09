@@ -87,7 +87,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `verifySpelling`: POST `/api/notes/{note}/verify-spelling` -> `VerifySpellingResponse` (request: `VerifySpellingData`; path: note; body: AnswerSpellingDto; response body: SpellingVerificationResult)
 - `updateNoteRecallSetting`: POST `/api/notes/{note}/recall-setting` -> `UpdateNoteRecallSettingResponse` (request: `UpdateNoteRecallSettingData`; path: note; body: NoteRecallSetting; response body: RedirectToNoteResponse)
-- `deleteNote`: POST `/api/notes/{note}/delete` -> `DeleteNoteResponse` (request: `DeleteNoteData`; path: note; response body: Array<NoteRealm>)
+- `deleteNote`: POST `/api/notes/{note}/delete` -> `DeleteNoteResponse` (request: `DeleteNoteData`; path: note; body: NoteDeleteDto; response body: Array<NoteRealm>)
 - `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
 - `updateNoteAccessories`: PATCH `/api/notes/{note}` -> `UpdateNoteAccessoriesResponse` (request: `UpdateNoteAccessoriesData`; path: note; body: NoteAccessoriesDto; response body: NoteAccessory)
 - `undoDeleteNote`: PATCH `/api/notes/{note}/undo-delete` -> `UndoDeleteNoteResponse` (request: `UndoDeleteNoteData`; path: note; response body: NoteRealm)

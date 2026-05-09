@@ -70,6 +70,9 @@ public class WikiTitleCacheService {
 
   private Note authorizedOutgoingTargetNote(Note cacheOwner, NoteWikiTitleCache row, User viewer) {
     Note target = row.getTargetNote();
+    if (target.getDeletedAt() != null) {
+      return null;
+    }
     Notebook notebook =
         target.getNotebook() != null ? target.getNotebook() : cacheOwner.getNotebook();
     if (!authorizationService.userMayReadNotebook(viewer, notebook)) {

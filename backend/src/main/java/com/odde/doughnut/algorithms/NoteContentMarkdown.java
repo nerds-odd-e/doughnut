@@ -1,6 +1,9 @@
 package com.odde.doughnut.algorithms;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /** Leading YAML frontmatter fence handling for note content markdown. */
 public final class NoteContentMarkdown {
@@ -40,6 +43,51 @@ public final class NoteContentMarkdown {
       }
     }
     return Optional.empty();
+  }
+
+  public static Optional<String> removeWikiLinksFromLeadingFrontmatterProperties(
+      String content, Set<String> linkTexts) {
+    if (linkTexts.isEmpty()) {
+      return Optional.empty();
+    }
+    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
+    if (split.isEmpty()) {
+      return Optional.empty();
+    }
+
+    List<String> keptLines = new ArrayList<>();
+    boolean changed = false;
+    for (String line : split.get().yamlRaw().split("\n", -1)) {
+      String rewritten = line;
+      for (String linkText : linkTexts) {
+        rewritten = rewritten.replace("[[" + linkText + "]]", "");
+      }
+      if (!rewritten.equals(line)) {
+        changed = true;
+        if (isEmptyPropertyLine(rewritten)) {
+          continue;
+        }
+      }
+      keptLines.add(rewritten);
+    }
+    if (!changed) {
+      return Optional.empty();
+    }
+    String body = split.get().body();
+    if (keptLines.isEmpty()) {
+      return Optional.of(body);
+    }
+    return Optional.of("---\n" + String.join("\n", keptLines) + "\n---\n" + body);
+  }
+
+  private static boolean isEmptyPropertyLine(String line) {
+    String t = line.trim();
+    int colon = t.indexOf(':');
+    if (colon < 0) {
+      return false;
+    }
+    String value = t.substring(colon + 1).trim();
+    return value.isEmpty() || value.equals("\"\"") || value.equals("''");
   }
 
   private static String stripUtf8Bom(String s) {

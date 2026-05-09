@@ -1,18 +1,24 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
+import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -21,16 +27,22 @@ import org.springframework.stereotype.Service;
 public class NoteService {
   private final NoteRepository noteRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
+  private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  private final WikiTitleCacheService wikiTitleCacheService;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
+      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
+      WikiTitleCacheService wikiTitleCacheService,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
+    this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
+    this.wikiTitleCacheService = wikiTitleCacheService;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -126,13 +138,47 @@ public class NoteService {
   }
 
   public void destroy(Note note) {
+    destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, note.getCreator());
+  }
+
+  public void destroy(Note note, NoteDeleteReferenceHandling referenceHandling) {
+    destroy(note, referenceHandling, note.getCreator());
+  }
+
+  public void destroy(Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
+      removeNoteLinksFromReferrerProperties(note, viewer, currentUTCTimestamp);
+    }
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
     for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
+    }
+  }
+
+  private void removeNoteLinksFromReferrerProperties(
+      Note target, User viewer, Timestamp updatedAt) {
+    Map<Note, Set<String>> referrersByLinkTexts = new LinkedHashMap<>();
+    for (NoteWikiTitleCache row :
+        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(target.getId())) {
+      referrersByLinkTexts
+          .computeIfAbsent(row.getNote(), ignored -> new LinkedHashSet<>())
+          .add(row.getLinkText());
+    }
+    for (Map.Entry<Note, Set<String>> entry : referrersByLinkTexts.entrySet()) {
+      Note referrer = entry.getKey();
+      NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
+              referrer.getContent(), entry.getValue())
+          .ifPresent(
+              updatedContent -> {
+                referrer.setContent(updatedContent);
+                referrer.setUpdatedAt(updatedAt);
+                entityPersister.merge(referrer);
+                wikiTitleCacheService.refreshForNote(referrer, viewer);
+              });
     }
   }
 

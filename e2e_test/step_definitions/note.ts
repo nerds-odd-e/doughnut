@@ -361,6 +361,22 @@ When('I delete note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology).deleteNote()
 })
 
+When(
+  'I delete note {string} and leave references as dead links',
+  (noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).deleteNoteAndLeaveReferencesAsDeadLinks()
+  }
+)
+
+When(
+  'I delete note {string} and remove it from properties of references',
+  (noteTopology: string) => {
+    start
+      .jumpToNotePage(noteTopology)
+      .deleteNoteAndRemoveFromReferenceProperties()
+  }
+)
+
 When('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')
   cy.get('body').then(($body) => {
@@ -544,6 +560,10 @@ Then(
 
 Then('I should not see rich note property {string}', (key: string) => {
   start.assumeNotePage().expectRichNotePropertyAbsent(key)
+})
+
+Then('I should see wiki link {string} as a dead link', (linkText: string) => {
+  start.assumeNotePage().expectDeadWikiLink(linkText)
 })
 
 When(

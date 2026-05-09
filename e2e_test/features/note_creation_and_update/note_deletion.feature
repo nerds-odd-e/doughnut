@@ -17,7 +17,7 @@ Feature: Note deletion
   Scenario: Deleting a note leaves folder peers; undo restores relationships
     Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
     And I should see "TDD" has relationship "a part of" "tech"
-    When I delete note "TDD"
+    When I delete note "TDD" and leave references as dead links
     Then I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
@@ -59,9 +59,27 @@ Feature: Note deletion
       | target | References Test |
     And there is "a part of" relationship between note "source" and "target" in notebook "References suite"
     And I should see "source" has relationship "a part of" "target"
-    When I delete note "target"
+    When I delete note "target" and leave references as dead links
     And I navigate to References suite/References Test note
     Then I should see folder "References suite/References Test" containing these notes:
       | note-title |
       | source     |
     And I should see note "References suite/References Test/source" has relationship "a part of" "target"
+
+  Scenario: Deleting a referenced note can remove it from reference properties while leaving body links dead
+    Given I have a notebook "Reference cleanup suite" with notes:
+      | Title  | Folder            |
+      | Reference Cleanup | |
+      | source | Reference Cleanup |
+      | target | Reference Cleanup |
+    And I update note "source" content using markdown to become:
+      """
+      ---
+      target: "[[target]]"
+      ---
+      Body keeps [[target]]
+      """
+    When I delete note "target" and remove it from properties of references
+    And I navigate to Reference cleanup suite/Reference Cleanup/source note
+    Then I should not see rich note property "target"
+    And I should see wiki link "target" as a dead link

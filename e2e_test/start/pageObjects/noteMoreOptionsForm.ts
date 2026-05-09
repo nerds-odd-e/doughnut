@@ -50,6 +50,20 @@ const noteMoreOptionsPage = () => {
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
     },
+    deleteNoteAndLeaveReferencesAsDeadLinks() {
+      toolbarButton('Delete note').click()
+      cy.findByRole('button', {
+        name: 'Leave all references as dead link',
+      }).click()
+      pageIsNotLoading()
+    },
+    deleteNoteAndRemoveFromReferenceProperties() {
+      toolbarButton('Delete note').click()
+      cy.findByRole('button', {
+        name: 'Remove from properties of references (undo will not recover the removed property)',
+      }).click()
+      pageIsNotLoading()
+    },
     openQuestionList() {
       toolbarButton('Questions for the note').click()
       return questionListPage()

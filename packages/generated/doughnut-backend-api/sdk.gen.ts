@@ -519,7 +519,14 @@ export class NoteController {
     }
     
     public static deleteNote<ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>) {
-        return (options.client ?? client).post<DeleteNoteResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/delete', ...options });
+        return (options.client ?? client).post<DeleteNoteResponses, unknown, ThrowOnError>({
+            url: '/api/notes/{note}/delete',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
     }
     
     public static showNote<ThrowOnError extends boolean = false>(options: Options<ShowNoteData, ThrowOnError>) {

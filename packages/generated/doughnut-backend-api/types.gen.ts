@@ -338,6 +338,10 @@ export type RedirectToNoteResponse = {
     notebookId?: number;
 };
 
+export type NoteDeleteDto = {
+    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS';
+};
+
 export type NotebookUpdateRequest = {
     skipMemoryTrackingEntirely?: boolean;
     description?: string;
@@ -1649,7 +1653,7 @@ export type UpdateNoteRecallSettingResponses = {
 export type UpdateNoteRecallSettingResponse = UpdateNoteRecallSettingResponses[keyof UpdateNoteRecallSettingResponses];
 
 export type DeleteNoteData = {
-    body?: never;
+    body: NoteDeleteDto;
     path: {
         note: number;
     };

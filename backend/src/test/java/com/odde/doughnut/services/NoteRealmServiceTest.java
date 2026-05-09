@@ -62,6 +62,22 @@ class NoteRealmServiceTest {
   }
 
   @Test
+  void omits_cached_target_when_target_note_is_soft_deleted() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note target = makeMe.aNote().title("Target").creator(user).underSameNotebookAs(root).please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[Target]]").please();
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    target.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+    makeMe.entityPersister.merge(target);
+
+    NoteRealm realm = noteRealmService.build(carrier, user);
+
+    assertThat(realm.getWikiTitles(), empty());
+  }
+
+  @Test
   void references_use_cache_rows_pointing_at_focal_same_notebook() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();

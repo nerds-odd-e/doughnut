@@ -12,7 +12,6 @@ import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -21,7 +20,6 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -36,7 +34,6 @@ class NoteController {
   private final UserService userService;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
-  private final TestabilitySettings testabilitySettings;
   private final NoteRealmService noteRealmService;
 
   public NoteController(
@@ -46,7 +43,6 @@ class NoteController {
       UserService userService,
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
-      TestabilitySettings testabilitySettings,
       NoteRealmService noteRealmService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
@@ -54,7 +50,6 @@ class NoteController {
     this.userService = userService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
-    this.testabilitySettings = testabilitySettings;
     this.noteRealmService = noteRealmService;
   }
 
@@ -99,10 +94,13 @@ class NoteController {
 
   @PostMapping(value = "/{note}/delete")
   @Transactional
-  public List<NoteRealm> deleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
+  public List<NoteRealm> deleteNote(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody NoteDeleteDTO noteDeleteDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    noteService.destroy(note);
+    noteService.destroy(
+        note, noteDeleteDTO.getReferenceHandling(), authorizationService.getCurrentUser());
     entityPersister.flush();
     return List.of();
   }

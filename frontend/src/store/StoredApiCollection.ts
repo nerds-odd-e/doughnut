@@ -4,6 +4,7 @@ import type {
   FolderMoveRequest,
   Folder,
   NoteContentCompletion,
+  NoteDeleteDto,
   NoteRealm,
   NotebookFolderIndexRow,
 } from "@generated/doughnut-backend-api"
@@ -25,6 +26,8 @@ import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
+
+export type NoteDeleteReferenceHandling = NoteDeleteDto["referenceHandling"]
 
 function toErrorMessage(error: unknown, fallback: string): string {
   if (typeof error === "string") return error
@@ -100,7 +103,8 @@ export interface StoredApi {
 
   deleteNote(
     router: Router,
-    noteId: Doughnut.ID
+    noteId: Doughnut.ID,
+    referenceHandling: NoteDeleteReferenceHandling
   ): Promise<NoteRealm | undefined>
 
   moveNoteToFolder(
@@ -523,6 +527,7 @@ export default class StoredApiCollection implements StoredApi {
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
+        body: { referenceHandling: "LEAVE_DEAD_LINKS" },
       })
     )
     if (error || !res) {
@@ -555,11 +560,16 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm
   }
 
-  async deleteNote(router: Router, noteId: Doughnut.ID) {
+  async deleteNote(
+    router: Router,
+    noteId: Doughnut.ID,
+    referenceHandling: NoteDeleteReferenceHandling
+  ) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
+        body: { referenceHandling },
       })
     )
     if (error || !res) {

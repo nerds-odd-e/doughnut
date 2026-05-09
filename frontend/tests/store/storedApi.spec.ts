@@ -31,9 +31,12 @@ describe("storedApiCollection", () => {
 
     it("should call the api", async () => {
       const sa = storageAccessor.value.storedApi()
-      await sa.deleteNote(router, note.id)
+      await sa.deleteNote(router, note.id, "REMOVE_FROM_PROPERTIES")
       expect(deleteNoteSpy).toHaveBeenCalledTimes(1)
-      expect(deleteNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
+      expect(deleteNoteSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { referenceHandling: "REMOVE_FROM_PROPERTIES" },
+      })
       expect(routerReplace).toHaveBeenCalledTimes(1)
       expect(routerReplace).toHaveBeenCalledWith({
         name: "notebookPage",
@@ -46,7 +49,7 @@ describe("storedApiCollection", () => {
       expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
 
       const sa = storageAccessor.value.storedApi()
-      await sa.deleteNote(router, note.id)
+      await sa.deleteNote(router, note.id, "LEAVE_DEAD_LINKS")
 
       expect(
         storageAccessor.value.refOfNoteRealm(note.id).value
@@ -62,7 +65,7 @@ describe("storedApiCollection", () => {
       storageAccessor.value.refreshNoteRealm(note)
 
       const sa = storageAccessor.value.storedApi()
-      await sa.deleteNote(router, note.id)
+      await sa.deleteNote(router, note.id, "LEAVE_DEAD_LINKS")
 
       expect(routerReplace).toHaveBeenCalledWith({
         name: "notebookPage",

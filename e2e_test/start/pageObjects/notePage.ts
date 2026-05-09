@@ -186,8 +186,12 @@ export const assumeNotePage = (
           } else {
             cy.findByRole(propName.toLowerCase()).click()
           }
-          // Only call cy.tick if the clock is mocked
-          cy.state && cy.state('clock') && cy.tick(5000)
+          const cypressState = cy as unknown as {
+            state?: (key: string) => unknown
+          }
+          if (cypressState.state?.('clock')) {
+            cy.tick(5000)
+          }
           const parsedValue = parseSpecialKeys(value)
           cy.clearFocusedText().type(parsedValue).blur()
           cy.get('.dirty').should('not.exist')
@@ -244,7 +248,7 @@ export const assumeNotePage = (
     expectRichContent(elements: Record<string, string>[]) {
       for (const element of elements) {
         const tag = element.Tag as string
-        const content = element.Content
+        const content = element.Content ?? ''
         cy.get('#main-note-content .note-content .ql-editor').within(() => {
           if (content === '') {
             cy.get(tag).should('exist')
@@ -301,11 +305,16 @@ export const assumeNotePage = (
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
       }).within(() => {
-        cy.contains('h4', 'Properties')
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
         ).should('not.exist')
       })
+      return this
+    },
+    expectDeadWikiLink(linkText: string) {
+      cy.findByRole(noteContentRegion.role, { name: noteContentRegion.name })
+        .find('a.dead-link')
+        .contains(linkText)
       return this
     },
     editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
@@ -380,6 +389,12 @@ export const assumeNotePage = (
     ...sidebarChildNotePageMethods(),
     deleteNote() {
       this.moreOptions().deleteNote()
+    },
+    deleteNoteAndLeaveReferencesAsDeadLinks() {
+      this.moreOptions().deleteNoteAndLeaveReferencesAsDeadLinks()
+    },
+    deleteNoteAndRemoveFromReferenceProperties() {
+      this.moreOptions().deleteNoteAndRemoveFromReferenceProperties()
     },
     openQuestionList() {
       return this.moreOptions().openQuestionList()

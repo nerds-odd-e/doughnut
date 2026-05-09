@@ -41,6 +41,18 @@ class NoteControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
+  private NoteDeleteDTO leaveDeadLinksDeleteRequest() {
+    NoteDeleteDTO dto = new NoteDeleteDTO();
+    dto.setReferenceHandling(NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS);
+    return dto;
+  }
+
+  private NoteDeleteDTO removeFromPropertiesDeleteRequest() {
+    NoteDeleteDTO dto = new NoteDeleteDTO();
+    dto.setReferenceHandling(NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES);
+    return dto;
+  }
+
   @Nested
   class showNoteTest {
     @Test
@@ -318,13 +330,35 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.deleteNote(note));
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteNote(note, leaveDeadLinksDeleteRequest()));
     }
 
     @Test
     void shouldSoftDeleteNoteWhenDeleted() throws UnexpectedNoAccessRightException {
-      controller.deleteNote(subject);
+      controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
+    }
+
+    @Test
+    void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
+        throws UnexpectedNoAccessRightException {
+      Note target = makeMe.aNote("Target").creatorAndOwner(currentUser.getUser()).please();
+      Note referrer =
+          makeMe
+              .aNote("Referrer")
+              .creator(currentUser.getUser())
+              .underSameNotebookAs(target)
+              .content(
+                  "---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
+              .please();
+      wikiTitleCacheService.refreshForNote(referrer, currentUser.getUser());
+
+      controller.deleteNote(target, removeFromPropertiesDeleteRequest());
+
+      assertThat(
+          referrer.getContent(), equalTo("---\nsource: \"[[Referrer]]\"\n---\nBody [[Target]]"));
     }
 
     @Nested
@@ -337,7 +371,7 @@ class NoteControllerTests extends ControllerTestBase {
         makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
         testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
 
-        controller.deleteNote(subject);
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
         int toRecallCount =
@@ -355,7 +389,7 @@ class NoteControllerTests extends ControllerTestBase {
         MemoryTracker activeTracker =
             makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
-        controller.deleteNote(subject);
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         assertThat(
             memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()), hasSize(1));
@@ -376,7 +410,7 @@ class NoteControllerTests extends ControllerTestBase {
         MemoryTracker activeTracker =
             makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
-        controller.deleteNote(subject);
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         assertThat(
             memoryTrackerService.findLast100RecalledByUser(currentUser.getUser().getId()),
@@ -390,7 +424,7 @@ class NoteControllerTests extends ControllerTestBase {
         Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
         makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
-        controller.deleteNote(subject);
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
         var status =
@@ -404,7 +438,7 @@ class NoteControllerTests extends ControllerTestBase {
           throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
 
-        controller.deleteNote(subject);
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(0));
       }
@@ -415,7 +449,7 @@ class NoteControllerTests extends ControllerTestBase {
         Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
         makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
-        controller.deleteNote(subject);
+        controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
         controller.undoDeleteNote(subject);
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));

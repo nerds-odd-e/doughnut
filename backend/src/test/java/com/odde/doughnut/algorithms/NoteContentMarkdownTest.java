@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class NoteContentMarkdownTest {
@@ -66,5 +67,26 @@ class NoteContentMarkdownTest {
     assertThat(
         NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("---\nwikidata_id: Q99\n---\n"),
         equalTo(Optional.of("Q99")));
+  }
+
+  @Test
+  void
+      removeWikiLinksFromLeadingFrontmatterProperties_removes_empty_property_and_keeps_body_link() {
+    String content = "---\ntarget: \"[[Target]]\"\n---\nBody still links [[Target]]";
+
+    assertThat(
+        NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
+            content, Set.of("Target")),
+        equalTo(Optional.of("Body still links [[Target]]")));
+  }
+
+  @Test
+  void removeWikiLinksFromLeadingFrontmatterProperties_removes_only_matching_property_link() {
+    String content = "---\nsource: \"[[Source]]\"\ntarget: \"[[Target]]\"\n---\nBody";
+
+    assertThat(
+        NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
+            content, Set.of("Target")),
+        equalTo(Optional.of("---\nsource: \"[[Source]]\"\n---\nBody")));
   }
 }

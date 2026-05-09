@@ -828,6 +828,12 @@ paths:
         required: true
         schema:
           type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteDeleteDTO"
+        required: true
       responses:
         "200":
           description: OK
@@ -3509,6 +3515,16 @@ components:
         notebookId:
           type: integer
           format: int32
+    NoteDeleteDTO:
+      type: object
+      properties:
+        referenceHandling:
+          type: string
+          enum:
+          - REMOVE_FROM_PROPERTIES
+          - LEAVE_DEAD_LINKS
+      required:
+      - referenceHandling
     NotebookUpdateRequest:
       type: object
       properties:
