@@ -36,6 +36,7 @@ public class NoteConstructionService {
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteService noteService;
   private final NotebookService notebookService;
+  private final FolderService folderService;
 
   @Autowired
   public NoteConstructionService(
@@ -47,7 +48,8 @@ public class NoteConstructionService {
       NoteRealmService noteRealmService,
       WikiTitleCacheService wikiTitleCacheService,
       NoteService noteService,
-      NotebookService notebookService) {
+      NotebookService notebookService,
+      FolderService folderService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
@@ -57,6 +59,7 @@ public class NoteConstructionService {
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteService = noteService;
     this.notebookService = notebookService;
+    this.folderService = folderService;
   }
 
   private Note createNoteInNotebookScopeWithoutWikidata(
@@ -132,6 +135,9 @@ public class NoteConstructionService {
       wikiTitleCacheService.refreshForNote(note, user);
     }
     notebookService.reconcileNotebookIndexNotePointer(notebook.getId());
+    if (folder != null) {
+      folderService.reconcileFolderIndexNotePointer(folder.getId());
+    }
     return noteRealmService.build(note, user);
   }
 
@@ -177,6 +183,9 @@ public class NoteConstructionService {
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
 
     notebookService.reconcileNotebookIndexNotePointer(originalNote.getNotebook().getId());
+    if (originalNote.getFolder() != null) {
+      folderService.reconcileFolderIndexNotePointer(originalNote.getFolder().getId());
+    }
     return noteRealmService.build(newNote, user);
   }
 }

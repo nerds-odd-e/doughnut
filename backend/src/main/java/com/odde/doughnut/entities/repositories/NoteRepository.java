@@ -71,6 +71,14 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
+              + " WHERE n.folder.id = :folderId AND n.deletedAt IS NULL "
+              + " AND LOWER(n.title) = 'index' ORDER BY n.id ASC")
+  List<Note> findFolderIndexNoteCandidatesForFolder(
+      @Param("folderId") Integer folderId, Pageable pageable);
+
+  @Query(
+      value =
+          selectFromNote
               + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL AND n.folder IS NULL"
               + " ORDER BY n.id ASC")
   List<Note> findNotesInNotebookRootFolderScopeByNotebookId(

@@ -36,6 +36,7 @@ public class NoteService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NotebookService notebookService;
+  private final FolderService folderService;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -45,7 +46,8 @@ public class NoteService {
       ImageRepository imageRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NotebookService notebookService) {
+      NotebookService notebookService,
+      FolderService folderService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
@@ -54,6 +56,7 @@ public class NoteService {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookService = notebookService;
+    this.folderService = folderService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -168,6 +171,9 @@ public class NoteService {
       entityPersister.merge(mt);
     }
     notebookService.reconcileNotebookIndexNotePointer(notebookId);
+    if (note.getFolder() != null) {
+      folderService.reconcileFolderIndexNotePointer(note.getFolder().getId());
+    }
   }
 
   private void removeNoteLinksFromReferrerProperties(
@@ -233,6 +239,9 @@ public class NoteService {
     note.setDeletedAt(null);
     entityPersister.merge(note);
     notebookService.reconcileNotebookIndexNotePointer(note.getNotebook().getId());
+    if (note.getFolder() != null) {
+      folderService.reconcileFolderIndexNotePointer(note.getFolder().getId());
+    }
   }
 
   private boolean sameTimestamp(Timestamp a, Timestamp b) {

@@ -18,6 +18,7 @@ erDiagram
     image ||--o{ "note" : "image_id"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id"
     "note" ||--o{ conversation : "note_id"
+    "note" ||--o{ folder : "index_note_id"
     "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
     "note" ||--o{ note_wiki_title_cache : "note_id"
@@ -107,6 +108,7 @@ erDiagram
         int id PK
         int notebook_id FK
         int parent_folder_id FK
+        int index_note_id FK
     }
     global_settings {
         int id PK

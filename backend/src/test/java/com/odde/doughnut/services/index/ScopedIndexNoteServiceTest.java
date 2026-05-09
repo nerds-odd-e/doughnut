@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.index;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -25,15 +26,49 @@ class ScopedIndexNoteServiceTest {
   @Autowired MakeMe makeMe;
 
   @Test
-  void findDesignatedIndexNote_forFolderScope_returnsEmpty() {
+  void findDesignatedIndexNote_forFolderScope_returnsSoleIndexNote() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
     Folder folder = makeMe.aFolder().notebook(notebook).please();
+    Note index = makeMe.aNote().creatorAndOwner(owner).folder(folder).title("index").please();
 
     Optional<Note> result =
         scopedIndexNoteService.findDesignatedIndexNote(new IndexScope.FolderIndex(folder));
 
-    assertThat(result.isEmpty(), is(true));
+    assertThat(result.map(Note::getId), equalTo(Optional.of(index.getId())));
+    makeMe.refresh(folder);
+    assertThat(folder.getIndexNote().getId(), equalTo(index.getId()));
+  }
+
+  @Test
+  void reconcileDesignatedIndexPointer_forFolder_setsPointerFromSoleIndexTitledNote() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder folder = makeMe.aFolder().notebook(notebook).please();
+    Note index = makeMe.aNote().creatorAndOwner(owner).folder(folder).title("index").please();
+
+    scopedIndexNoteService.reconcileDesignatedIndexPointer(new IndexScope.FolderIndex(folder));
+
+    makeMe.refresh(folder);
+    assertThat(folder.getIndexNote().getId(), equalTo(index.getId()));
+  }
+
+  @Test
+  void findDesignatedIndexNote_forFolder_clearsInvalidCachedPointerThenRepairsFromCandidates() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder folderA = makeMe.aFolder().notebook(notebook).please();
+    Folder folderB = makeMe.aFolder().notebook(notebook).please();
+    Note indexInA = makeMe.aNote().creatorAndOwner(owner).folder(folderA).title("index").please();
+    Note wrongPointer = makeMe.aNote().creatorAndOwner(owner).folder(folderB).title("x").please();
+    makeMe.theFolder(folderA).indexNote(wrongPointer).please();
+
+    Optional<Note> result =
+        scopedIndexNoteService.findDesignatedIndexNote(new IndexScope.FolderIndex(folderA));
+
+    assertThat(result.map(Note::getId), equalTo(Optional.of(indexInA.getId())));
+    makeMe.refresh(folderA);
+    assertThat(folderA.getIndexNote().getId(), equalTo(indexInA.getId()));
   }
 
   @Test

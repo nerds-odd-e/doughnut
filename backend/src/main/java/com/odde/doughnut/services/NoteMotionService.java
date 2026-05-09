@@ -11,14 +11,20 @@ import org.springframework.stereotype.Service;
 public class NoteMotionService {
   private final EntityPersister entityPersister;
   private final NotebookService notebookService;
+  private final FolderService folderService;
 
-  public NoteMotionService(EntityPersister entityPersister, NotebookService notebookService) {
+  public NoteMotionService(
+      EntityPersister entityPersister,
+      NotebookService notebookService,
+      FolderService folderService) {
     this.entityPersister = entityPersister;
     this.notebookService = notebookService;
+    this.folderService = folderService;
   }
 
   /** Places {@code source} in {@code targetFolder}. */
   public void executeMoveIntoFolder(Note source, Folder targetFolder) {
+    Integer fromFolderId = source.getFolder() != null ? source.getFolder().getId() : null;
     Integer notebookIdBefore = source.getNotebook().getId();
     Notebook targetNotebook = targetFolder.getNotebook();
     Integer notebookIdAfter = targetNotebook.getId();
@@ -31,6 +37,13 @@ public class NoteMotionService {
     if (!Objects.equals(notebookIdBefore, notebookIdAfter)) {
       notebookService.reconcileNotebookIndexNotePointer(notebookIdAfter);
     }
+    Integer toFolderId = source.getFolder() != null ? source.getFolder().getId() : null;
+    if (fromFolderId != null) {
+      folderService.reconcileFolderIndexNotePointer(fromFolderId);
+    }
+    if (!Objects.equals(fromFolderId, toFolderId) && toFolderId != null) {
+      folderService.reconcileFolderIndexNotePointer(toFolderId);
+    }
   }
 
   /** Clears {@code subject}'s folder so it sits in its current notebook's root. */
@@ -40,6 +53,7 @@ public class NoteMotionService {
 
   /** Assigns {@code source} to {@code targetNotebook} and clears folder (notebook root). */
   public void executeMoveToNotebookRoot(Note source, Notebook targetNotebook) {
+    Integer fromFolderId = source.getFolder() != null ? source.getFolder().getId() : null;
     Integer notebookIdBefore = source.getNotebook().getId();
     Integer notebookIdAfter = targetNotebook.getId();
     source.assignNotebook(targetNotebook);
@@ -50,6 +64,13 @@ public class NoteMotionService {
     notebookService.reconcileNotebookIndexNotePointer(notebookIdBefore);
     if (!Objects.equals(notebookIdBefore, notebookIdAfter)) {
       notebookService.reconcileNotebookIndexNotePointer(notebookIdAfter);
+    }
+    Integer toFolderId = source.getFolder() != null ? source.getFolder().getId() : null;
+    if (fromFolderId != null) {
+      folderService.reconcileFolderIndexNotePointer(fromFolderId);
+    }
+    if (!Objects.equals(fromFolderId, toFolderId) && toFolderId != null) {
+      folderService.reconcileFolderIndexNotePointer(toFolderId);
     }
   }
 }

@@ -3,6 +3,7 @@ package com.odde.doughnut.services.index;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -19,44 +20,45 @@ public class ScopedIndexNoteService {
   private final EntityPersister entityPersister;
   private final NoteRepository noteRepository;
   private final NotebookRepository notebookRepository;
+  private final FolderRepository folderRepository;
 
   public ScopedIndexNoteService(
       EntityPersister entityPersister,
       NoteRepository noteRepository,
-      NotebookRepository notebookRepository) {
+      NotebookRepository notebookRepository,
+      FolderRepository folderRepository) {
     this.entityPersister = entityPersister;
     this.noteRepository = noteRepository;
     this.notebookRepository = notebookRepository;
+    this.folderRepository = folderRepository;
   }
 
   /**
-   * Resolves the designated index note for {@code scope}. Folder scope returns empty until folder
-   * index persistence exists (Phase 10.5).
+   * Resolves the designated index note for {@code scope} using cached pointer with title repair.
    */
   @Transactional
   public Optional<Note> findDesignatedIndexNote(IndexScope scope) {
     return switch (scope) {
       case IndexScope.NotebookRoot nr -> findNotebookRootIndexNote(nr.notebook());
-      case IndexScope.FolderIndex _ -> Optional.empty();
+      case IndexScope.FolderIndex fi -> findFolderIndexNote(fi.folder());
     };
   }
 
   /**
-   * Sets {@link Notebook#getIndexNote()} from the sole root note titled {@code index}, or clears it
-   * when none exists. Folder scope is a no-op until Phase 10.5.
+   * Sets the cached designated index pointer from notes titled {@code index} in scope, or clears it
+   * when none exist.
    */
   @Transactional
   public void reconcileDesignatedIndexPointer(IndexScope scope) {
     switch (scope) {
       case IndexScope.NotebookRoot nr -> reconcileNotebookRootPointer(nr.notebook().getId());
-      case IndexScope.FolderIndex _ -> {}
+      case IndexScope.FolderIndex fi -> reconcileFolderIndexPointer(fi.folder().getId());
     }
   }
 
   /**
-   * Whether {@code note} is structurally valid as the designated index for {@code scope}. Used for
-   * validation and future pointer checks; folder scope does not require a cached FK on {@link
-   * Folder} yet.
+   * Whether {@code note} is structurally valid as the designated index for {@code scope} (same
+   * notebook, correct folder or root placement, not soft-deleted).
    */
   public boolean isDesignatedIndexNote(IndexScope scope, Note note) {
     if (note == null || note.getDeletedAt() != null) {
@@ -99,6 +101,37 @@ public class ScopedIndexNoteService {
     return Optional.of(candidate);
   }
 
+  private Optional<Note> findFolderIndexNote(Folder folder) {
+    if (folder == null || folder.getId() == null) {
+      return Optional.empty();
+    }
+    Optional<Folder> reloaded = folderRepository.findById(folder.getId());
+    if (reloaded.isEmpty()) {
+      return Optional.empty();
+    }
+    Folder f = reloaded.get();
+    entityPersister.refresh(f);
+    Note cached = f.getIndexNote();
+    if (cached != null) {
+      if (isValidFolderIndexNote(f, cached)) {
+        return Optional.of(cached);
+      }
+      f.setIndexNote(null);
+      entityPersister.merge(f);
+      entityPersister.flush();
+    }
+    List<Note> found =
+        noteRepository.findFolderIndexNoteCandidatesForFolder(f.getId(), PageRequest.of(0, 2));
+    if (found.isEmpty()) {
+      return Optional.empty();
+    }
+    Note candidate = found.getFirst();
+    f.setIndexNote(candidate);
+    entityPersister.merge(f);
+    entityPersister.flush();
+    return Optional.of(candidate);
+  }
+
   private void reconcileNotebookRootPointer(Integer notebookId) {
     if (notebookId == null) {
       return;
@@ -112,6 +145,22 @@ public class ScopedIndexNoteService {
                       nb.getId(), PageRequest.of(0, 2));
               nb.setIndexNote(candidates.isEmpty() ? null : candidates.getFirst());
               entityPersister.merge(nb);
+            });
+  }
+
+  private void reconcileFolderIndexPointer(Integer folderId) {
+    if (folderId == null) {
+      return;
+    }
+    folderRepository
+        .findById(folderId)
+        .ifPresent(
+            f -> {
+              List<Note> candidates =
+                  noteRepository.findFolderIndexNoteCandidatesForFolder(
+                      f.getId(), PageRequest.of(0, 2));
+              f.setIndexNote(candidates.isEmpty() ? null : candidates.getFirst());
+              entityPersister.merge(f);
             });
   }
 

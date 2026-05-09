@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Folder;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -64,6 +65,11 @@ public class FolderBuilder extends EntityBuilder<Folder> {
 
   public FolderBuilder parentFolder(Folder parentFolder) {
     this.parentFolder = parentFolder;
+    return this;
+  }
+
+  public FolderBuilder indexNote(Note note) {
+    entity.setIndexNote(note);
     return this;
   }
 }

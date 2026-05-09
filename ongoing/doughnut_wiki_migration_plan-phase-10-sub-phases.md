@@ -53,6 +53,21 @@ These are visible/editable only for designated index notes: notebook page, folde
 
 ---
 
+## Lessons learned — why original 10.5 was split
+
+An attempt to ship **folder index persistence + reconciliation + HTTP folder page + OpenAPI/codegen + Vue route/layout + sidebar navigation + shared index editor extraction + E2E** in one change set was **too large** for review and risk: many layers moved together, and regressions would be hard to attribute.
+
+**Concrete findings:**
+
+- **Persistence and hooks are a full slice:** `folder.index_note_id`, `ScopedIndexNoteService` folder branch, and reconciliation at **note create, move, soft-delete/restore, title update, and folder dissolve** mirror the notebook pointer story; missing one call site breaks pointer integrity without any UI.
+- **API + generated client are a discrete step:** A new controller method changes the approved OpenAPI snapshot; `pnpm generateTypeScript` must run in the same slice as the Java change, which is already a sizable diff on its own.
+- **Notebook UI refactor is separable structure:** Extracting the index editor block from `NotebookPageView` is **internally observable** (tests) but can ship **before** any folder route if it keeps notebook behavior equivalent — it directly enables a smaller folder-page slice.
+- **Routing and shell are easy to get wrong in one go:** `folderPage` must be registered **before** the generic `/d/notebooks/:notebookId` pattern; `NotebookSidebarLayout` must treat the folder route as a **container** (like the notebook page) for breadcrumbs; sidebar click behavior is its own product contract.
+
+**Decomposition approach (see sub-phases below):** one **structure** slice for folder pointer + hooks (no new folder-page route), one **behavior** slice for the folder-page **GET** API + codegen, one **structure** slice that **only** extracts the shared index editor from the notebook page, then one **behavior** slice for folder route, `FolderPage`, sidebar navigation, and wiring the shared editor with `folderId`. Remaining Phase 10 items are renumbered so each slice stays stop-safe and review-sized.
+
+---
+
 ## Sub-phases
 
 Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, routes, DTOs, and classes should be named by product capability.
@@ -126,30 +141,65 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Existing notebook index tests stay green.
 - Focused backend tests for scope validation: notebook-root index note has `folderId` null; folder scope rejects notes from another notebook/folder once folder support is added.
 
-### 10.5 — Behavior: folder page opens from sidebar and lazily edits its index
+### 10.5 — Structure: persist `folder.index_note_id` and folder index reconciliation
 
-**Why now:** This is the core new Phase 10 navigation behavior: folders become pages, not only filters.
+**Why now:** Completes the folder side of the scoped-index **model** before introducing a folder-page read API or SPA route; keeps pointer integrity when notes are created, moved, deleted, retitled, or when folders are dissolved.
+
+**Scope:**
+- Flyway: nullable `folder.index_note_id` FK to `note`, plus backfill where exactly one non-deleted note titled `index` exists in that folder (same ambiguity rules as notebook backfill).
+- `Folder` entity: JPA `@ManyToOne` `indexNote`; optional wire `indexNoteId` in JSON for types that already serialize `Folder` (if exposing the pointer in listing payloads is undesirable in this slice, keep the association `@JsonIgnore` only and defer wire exposure to the folder-page API slice).
+- `NoteRepository`: folder-scoped index candidates query (`LOWER(title) = 'index'`, non-deleted, `folder.id` match), analogous to notebook root candidates.
+- `ScopedIndexNoteService`: implement folder `findDesignatedIndexNote` / `reconcileDesignatedIndexPointer` (replace stubs).
+- Thin entry point parallel to notebook: e.g. `FolderService.reconcileFolderIndexNotePointer(folderId)` delegating to the scoped service.
+- **Reconciliation hooks** (mirror every notebook pointer touchpoint that depends on folder membership): `NoteConstructionService` (create with `folderId`), `NoteMotionService` (old and new folder), `NoteService` destroy/restore, `TextContentController` title update path, `FolderRelocationService.dissolveFolder` (destination folder + notebook).
+
+**Not in this slice:** `GET` folder page endpoint, new Vue routes, sidebar navigation changes, shared index component extraction.
+
+**Tests:** Focused backend tests for folder pointer maintenance and folder scope validation in `ScopedIndexNoteService`; migration verification if the repo uses it for similar FK additions.
+
+### 10.6 — Behavior: folder page data API
+
+**Why now:** Establishes a single HTTP contract for notebook chrome + folder row + resolved designated `indexNoteId` before the SPA consumes it.
+
+**Pre-condition:** Caller has read access to the notebook and folder.
+
+**Trigger:** `GET` folder page for a folder that belongs to the notebook.
+
+**Post-condition:** Response aggregates `NotebookClientView` (or equivalent chrome) and `Folder` with `indexNoteId` populated after designated-index resolution (cached pointer + repair), without requiring a note-show route.
+
+**Scope:** DTO (e.g. `FolderPageClientView`), controller method on `NotebookCatalogService` / `NotebookController`, authorization and "folder in notebook" guards. Run `pnpm generateTypeScript` so `open_api_docs.yaml` and the TS client stay in sync (OpenAPI approval test).
+
+**Tests:** Controller or integration test through the HTTP entry point; pointer/create behavior may be asserted here or remain covered in 10.5 depending on where create-note tests already live.
+
+### 10.7 — Structure: extract shared index editor from the notebook page
+
+**Why now:** Folder page should reuse the same index UX (loading, absent draft + save, present `NoteEditableContent`, 409 race handling) **without** copying a large block; this slice keeps the following folder-route slice thin and reviewable.
+
+**Scope:** Extract the notebook index block from `NotebookPageView` into a reusable component parameterized by `notebookId`, optional `folderId` for create options, user-facing copy, `fetchPage` callback, and stable `data-testid` props so existing notebook tests stay aligned.
+
+**External behavior:** Notebook page index editing is unchanged from a user perspective; regression = existing notebook page tests stay green.
+
+**Not in this slice:** `FolderPage`, new routes, sidebar navigation.
+
+**Tests:** Existing notebook page / component tests; add tests only if coverage would otherwise drop.
+
+### 10.8 — Behavior: folder page route, shell, sidebar navigation, and folder index editing
+
+**Why now:** Delivers the core product outcome: **folders are pages**, not only sidebar selection targets.
 
 **Pre-condition:** User has a notebook with at least one folder.
 
-**Trigger:** User clicks the folder in the sidebar.
+**Trigger:** User activates folder navigation from the sidebar (per UX: e.g. folder label opens the page; chevron expands — match the tree pattern documented when implementing).
 
-**Post-condition:** App navigates to the folder page, clears active note mode, shows an index editor, and saves to that folder's `index` note (creating it if missing).
+**Post-condition:** App navigates to the folder container route (not `noteShow`), shows the index editor via the shared component with `folderId`, lazy-creates the folder `index` note on first save using the existing create-note API with `folderId`; folder listing and organize flows still work.
 
-**Scope:**
-- Add nullable `folder.index_note_id` FK and API fields needed by the folder page.
-- Add a folder page route and page/component that embeds the shared index editor.
-- Sidebar folder click navigates to the folder page instead of only selecting active folder.
-- Preserve existing folder listing/organize behavior.
+**Scope:** `routeMetadata` entry **before** `/d/notebooks/:notebookId`, `routes.ts`, `DoughnutApp` notebook-sidebar route set, `NotebookSidebarLayout` breadcrumb handling for folder as container, `FolderPage.vue` loading 10.6 API, syncing `useCurrentNoteSidebarState` (notebook id, notebook chrome ref, active index note when present, `notebookSidebarUserActiveFolder`), `SidebarFolderItem` navigation to `folderPage`.
 
-**Tests:**
-- Backend tests: folder API returns/maintains `indexNoteId`; creating a folder index sets `folderId` to the folder.
-- Frontend test: sidebar click routes to folder page and does not leave a note page active.
-- E2E scenario in a folder/navigation capability feature: click folder, edit folder index, reload/open folder page, body remains.
+**Tests:** Frontend test for sidebar navigation to `folderPage`; E2E in folder/navigation capability: open folder page, edit/save folder index, reload, body remains.
 
-### 10.6 — Behavior: folder page auto-scrolls the sidebar to the active folder
+### 10.9 — Behavior: folder page auto-scrolls the sidebar to the active folder
 
-**Why now:** It is a small user-visible behavior that depends on the folder page route from 10.5.
+**Why now:** Small user-visible behavior that depends on the folder page route from 10.8.
 
 **Pre-condition:** User opens a deeply nested folder page whose sidebar row is outside the visible scroll area.
 
@@ -165,9 +215,9 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Frontend component test for invoking scroll behavior on active folder row if practical.
 - Manual/targeted E2E only if reliable scroll assertions already exist; otherwise keep unit/component coverage and record the manual verification in the phase notes.
 
-### 10.7 — Behavior: breadcrumb folder links navigate to folder pages
+### 10.10 — Behavior: breadcrumb folder links navigate to folder pages
 
-**Why now:** Breadcrumbs should match the new folder-page route before more index-specific properties are added.
+**Why now:** Breadcrumbs should match the folder-page route before more index-specific properties are added.
 
 **Pre-condition:** User views a note inside nested folders and sees breadcrumb folder segments.
 
@@ -183,7 +233,7 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Frontend test around breadcrumb link destinations.
 - E2E extension if an existing note-navigation feature already clicks breadcrumbs.
 
-### 10.8 — Behavior: index notes show index-only predefined properties everywhere they are edited
+### 10.11 — Behavior: index notes show index-only predefined properties everywhere they are edited
 
 **Why now:** Once notebook and folder pages both have index editors, the user should see the first scoped configuration fields consistently.
 
@@ -203,7 +253,7 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Frontend editor tests: normal note does not show those index-only predefined rows.
 - Backend test only if the API needs to expose an explicit "isIndexNote" field.
 
-### 10.9 — Behavior: new notes can use scoped `titlePattern`
+### 10.12 — Behavior: new notes can use scoped `titlePattern`
 
 **Why now:** This is the first concrete behavior powered by index frontmatter, and it is simpler than AI prompt inheritance.
 
@@ -223,7 +273,7 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - E2E: create a note in a configured folder and observe the patterned title.
 - Unit tests for pattern rendering edge cases (unknown token, invalid pattern) if rendering is non-trivial.
 
-### 10.10 — Behavior: question generation uses scoped instruction
+### 10.13 — Behavior: question generation uses scoped instruction
 
 **Why now:** It delivers the second planned property after the scoped config and inheritance mechanism are proven by `titlePattern`.
 
@@ -242,7 +292,7 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Backend service/controller test proving the resolved instruction is included in the generation request.
 - Existing AI/question generation tests stay green.
 
-### 10.11 — Behavior: folder index notes are excluded from default search
+### 10.14 — Behavior: folder index notes are excluded from default search
 
 **Why now:** After folder index pointers exist, search can apply the full Phase 10 exclusion rule.
 
@@ -260,7 +310,7 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Backend search test for folder index exclusion.
 - Existing notebook-index exclusion test from 10.3 stays green.
 
-### 10.12 — Cleanup and Phase 10 closeout
+### 10.15 — Cleanup and Phase 10 closeout
 
 **Why last:** Cleanup is meaningful only after all user-facing Phase 10 behaviors are present.
 
@@ -285,14 +335,17 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 | `notebook.index_note_id` cached pointer | 10.2 |
 | Default search excludes notebook index | 10.3 |
 | Shared notebook/folder index handling | 10.4 |
-| Folder page and `folder.index_note_id` | 10.5 |
-| Sidebar scrolls to active folder page | 10.6 |
-| Breadcrumb folder links open folder pages | 10.7 |
-| Index-only predefined properties | 10.8 |
-| `titlePattern` applies to note creation | 10.9 |
-| `questionGenerationInstruction` applies to question generation | 10.10 |
-| Default search excludes folder index | 10.11 |
-| Interim cleanup and plan refresh | 10.12 |
+| `folder.index_note_id` + reconciliation hooks | 10.5 |
+| Folder page GET API + client regen | 10.6 |
+| Shared index editor extraction (notebook) | 10.7 |
+| Folder page route, sidebar nav, folder index editing | 10.8 |
+| Sidebar scrolls to active folder page | 10.9 |
+| Breadcrumb folder links open folder pages | 10.10 |
+| Index-only predefined properties | 10.11 |
+| `titlePattern` applies to note creation | 10.12 |
+| `questionGenerationInstruction` applies to question generation | 10.13 |
+| Default search excludes folder index | 10.14 |
+| Interim cleanup and plan refresh | 10.15 |
 
 ## Stop-safety check per sub-phase
 
@@ -302,14 +355,17 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 | 10.2 | Notebook index has a cached pointer; notebook editing still works |
 | 10.3 | Default search no longer returns the notebook index |
 | 10.4 | Shared index service exists; external behavior unchanged from 10.3 |
-| 10.5 | Folders have pages with lazy index editing |
-| 10.6 | Folder page reveals its folder in the sidebar |
-| 10.7 | Breadcrumb folder links use folder pages |
-| 10.8 | Index-only properties are visible and saved consistently |
-| 10.9 | Scoped title pattern affects new note titles |
-| 10.10 | Scoped question instruction affects question generation |
-| 10.11 | Default search excludes all designated index notes |
-| 10.12 | Interim code and planning notes are cleaned up |
+| 10.5 | Folder index pointer + hooks; no folder SPA page yet |
+| 10.6 | Folder page payload available over HTTP; UI may not consume it |
+| 10.7 | Notebook index UX factored into shared component; behavior unchanged |
+| 10.8 | Folders have pages with lazy index editing |
+| 10.9 | Folder page reveals its folder in the sidebar scroll |
+| 10.10 | Breadcrumb folder links use folder pages |
+| 10.11 | Index-only properties are visible and saved consistently |
+| 10.12 | Scoped title pattern affects new note titles |
+| 10.13 | Scoped question instruction affects question generation |
+| 10.14 | Default search excludes all designated index notes |
+| 10.15 | Interim code and planning notes are cleaned up |
 
 ## Commit checklist per sub-phase
 
