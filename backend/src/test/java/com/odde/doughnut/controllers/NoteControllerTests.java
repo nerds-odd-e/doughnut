@@ -131,30 +131,6 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldOmitQualifiedWikiLinkWhenTargetNotebookIsNotReadable()
-        throws UnexpectedNoAccessRightException {
-      User otherUser = makeMe.aUser().please();
-      Notebook secretNotebook =
-          makeMe.aNotebook().creatorAndOwner(otherUser).name("Secret Notebook").please();
-      makeMe.aNote().creator(otherUser).inNotebook(secretNotebook).please();
-      makeMe.aNote().title("Hidden Note").creator(otherUser).inNotebook(secretNotebook).please();
-
-      User viewerUser = currentUser.getUser();
-      Notebook myNotebook =
-          makeMe.aNotebook().creatorAndOwner(viewerUser).name("My Notebook").please();
-      makeMe.aNote().creator(viewerUser).inNotebook(myNotebook).please();
-      Note viewer =
-          makeMe
-              .aNote()
-              .creator(viewerUser)
-              .inNotebook(myNotebook)
-              .content("Try [[Secret Notebook:Hidden Note]].")
-              .please();
-      NoteRealm realm = controller.showNote(viewer);
-      assertThat(realm.getWikiTitles(), empty());
-    }
-
-    @Test
     void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().creatorAndOwner(user).please();

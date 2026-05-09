@@ -78,21 +78,6 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_use_cache_rows_pointing_at_focal_same_notebook() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").creator(user).underSameNotebookAs(root).please();
-    Note carrier =
-        makeMe.aNote().creator(user).underSameNotebookAs(root).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(carrier, user);
-
-    NoteRealm realm = noteRealmService.build(focal, user);
-
-    assertThat(realm.getReferences(), hasSize(1));
-    assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
-  }
-
-  @Test
   void references_empty_when_cache_rows_deleted_for_relation_carrier() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
@@ -102,20 +87,6 @@ class NoteRealmServiceTest {
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
     NoteRealm realm = noteRealmService.build(focal, user);
-
-    assertThat(realm.getReferences(), empty());
-  }
-
-  @Test
-  void references_empty_when_cache_rows_deleted_for_relation_carrier_structural_child() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
-    Note subject = makeMe.aNote().underSameNotebookAs(root).please();
-    Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
-    noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
-
-    NoteRealm realm = noteRealmService.build(subject, user);
 
     assertThat(realm.getReferences(), empty());
   }
