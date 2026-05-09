@@ -1,0 +1,68 @@
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
+import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
+import {
+  countFolderListingCallsForParent,
+  findSidebarItem,
+  folderListingForQueryParent,
+  mountSidebar,
+  prepareSidebarDefaultMountContext,
+  realmAsActiveInSidebarStub,
+  teardownSidebarComponentTest,
+} from "./sidebarTestSupport"
+
+describe("Sidebar folder listing reload", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: import("@vue/test-utils").VueWrapper<any>
+  const storageAccessor = useStorageAccessor()
+  const fixtures = sidebarDefaultTreeFixtures
+
+  beforeEach(() => {
+    prepareSidebarDefaultMountContext({
+      storageAccessor,
+      fixtures,
+      vi,
+    })
+  })
+
+  afterEach(() => {
+    teardownSidebarComponentTest(wrapper)
+  })
+
+  it("does not reload notebook root notes when active note changes within the same notebook", async () => {
+    const listingSpy = mockSdkServiceWithImplementation(
+      "listNotebookFolderListing",
+      (options) =>
+        folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)
+    )
+    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    await flushPromises()
+    const rootRequestCount = () =>
+      countFolderListingCallsForParent(listingSpy, undefined)
+    expect(rootRequestCount()).toBe(1)
+    expect(
+      findSidebarItem(
+        wrapper,
+        fixtures.topNoteRealm.note.noteTopology.title
+      )?.exists()
+    ).toBe(true)
+
+    await wrapper.setProps({
+      activeNoteRealm: realmAsActiveInSidebarStub(
+        fixtures.secondGeneration,
+        fixtures.folderContextByRealmId
+      ),
+      notebookId: fixtures.firstGeneration.notebookView.notebook.id,
+    })
+    await flushPromises()
+    expect(rootRequestCount()).toBe(1)
+    expect(
+      findSidebarItem(
+        wrapper,
+        fixtures.topNoteRealm.note.noteTopology.title
+      )?.exists()
+    ).toBe(true)
+  })
+})
