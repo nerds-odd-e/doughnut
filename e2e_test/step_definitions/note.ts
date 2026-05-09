@@ -594,10 +594,6 @@ When(
   }
 )
 
-When('I flush pending note content save', () => {
-  start.assumeNotePage().flushPendingContentSave()
-})
-
 When('I reload the current page for note {string}', (noteTopology: string) => {
   cy.reload()
   start.pageIsNotLoading()

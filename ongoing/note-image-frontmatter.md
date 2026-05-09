@@ -72,7 +72,7 @@
 
 ### Phase 6 — **Structure:** Drop `note_accessory` (and accessory-only columns)
 
-**Post-condition:** Flyway migration drops `note_accessory` table; JPA entity removed; CI schema matches; `docs/database-erd.md` regenerated.
+**Done.** Flyway `V300000190__drop_note_accessory.sql`; removed `NoteAccessory` and `NoteAccessoryRepository`; `NoteService.deleteOrphanImagesForPersistedContent` no longer clears accessory FKs; `docs/database-erd.md` regenerated from migrated schema.
 
 - User confirmed **no data migration** — table must be empty or already redundant in production per team assumption; migration is `DROP TABLE` only.
 - If any environment still has rows, resolve operationally before deploy (out of scope for code plan).
@@ -92,4 +92,4 @@
 
 - **Concurrency:** Two tabs editing — last write wins; orphan cleanup still correct for final persisted content.  
 - **`image_mask` validation:** Today `NoteAccessoriesDTO` has a regex; decide whether rich-mode free text keeps the same validation on save (server-side on full note update vs. property row only).  
-- **Testability / fixtures:** `NoteBuilder` and E2E seeds that still create `note_accessory` rows need conversion to frontmatter-only setup before Phase 6.
+- **Testability / fixtures:** Any remaining seeds or builders that assumed `note_accessory` rows should use frontmatter-only setup (resolved before Phase 6 deploy).

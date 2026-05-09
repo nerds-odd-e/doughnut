@@ -3,7 +3,7 @@
     v-if="showSection"
     class="daisy-mb-3"
     :class="
-      interactionLocked
+      isInteractionLocked
         ? 'daisy-pointer-events-none daisy-opacity-60'
         : ''
     "
@@ -100,7 +100,7 @@
     :error-message="wikidataIdError"
     :show-save-button="true"
     :can-save-empty-to-clear="wikidataDialogCanSaveEmptyToClear"
-    :disabled="wikidataProcessing || interactionLocked"
+    :disabled="wikidataProcessing || isInteractionLocked"
     @close="closeWikidataDialog"
     @save="handleWikidataSave"
     @selected="handleWikidataSelected"
@@ -145,7 +145,7 @@ const emits = defineEmits<{
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const interactionLocked = computed(() => props.interactionLocked ?? false)
+const isInteractionLocked = computed(() => props.interactionLocked ?? false)
 
 const headingId = useId()
 const insertKeyInputId = `${headingId}-insert-key`

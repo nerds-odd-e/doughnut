@@ -94,7 +94,6 @@ Feature: Note Edit
       # Workshop Body
       Main content here.
       """
-    And I flush pending note content save
     And I reload the current page for note "LeSS in Action"
     And I open the note content markdown editor
     Then the note content markdown source should contain "diligence: high"
@@ -104,11 +103,9 @@ Feature: Note Edit
       | Tag | Content       |
       | h1  | Workshop Body |
     When I add a rich note property with key "status" and value "draft"
-    And I flush pending note content save
     And I reload the current page for note "LeSS in Action"
     Then I should see rich note property "status" with value "draft"
     When I edit the rich note property with key "topic" to key "domain" and value "wiki"
-    And I flush pending note content save
     And I reload the current page for note "LeSS in Action"
     Then I should not see rich note property "topic"
     And I should see rich note property "domain" with value "wiki"

@@ -16,12 +16,10 @@ erDiagram
     folder ||--o{ folder : "parent_folder_id"
     folder ||--o{ "note" : "folder_id"
     image ||--o{ "note" : "image_id"
-    image ||--o{ note_accessory : "image_id"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id"
     "note" ||--o{ conversation : "note_id"
     "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
-    "note" ||--o{ note_accessory : "note_id"
     "note" ||--o{ note_wiki_title_cache : "note_id"
     "note" ||--o{ note_wiki_title_cache : "target_note_id"
     "note" ||--o{ predefined_question : "note_id"
@@ -129,11 +127,6 @@ erDiagram
         int notebook_id FK
         int folder_id FK
         int creator_id FK
-    }
-    note_accessory {
-        int id PK
-        int note_id UK FK
-        int image_id FK
     }
     note_embeddings {
         bigint id PK

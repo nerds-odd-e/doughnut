@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from "vue"
+import { computed, nextTick, ref, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
@@ -154,7 +154,11 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
       ? currentIntervalBodyMarkdown
       : p.body
   const composed = composeNoteContentFromPropertyRows(rows, bodyMarkdown)
-  if (composed !== prevFull) emits("update:modelValue", composed)
+  if (composed === prevFull) return
+  emits("update:modelValue", composed)
+  nextTick(() => {
+    emits("blur")
+  })
 }
 
 const onPasteComplete = (html: string) => {

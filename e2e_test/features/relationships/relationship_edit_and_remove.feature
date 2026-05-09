@@ -12,7 +12,6 @@ Feature: relationship edit and remove
 
   Scenario: change relation type
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
-    And I flush pending note content save
     When I open the relationship from "Moon" to "Earth"
     When I open the note content markdown editor
     Then the note content markdown source should contain "relation: a-specialization-of"
@@ -33,7 +32,6 @@ Feature: relationship edit and remove
 
       Observations from orbit.
       """
-    And I flush pending note content save
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
     When I open the note content markdown editor
     Then the note content markdown source should contain "relation: a-specialization-of"

@@ -248,7 +248,7 @@ export const assumeNotePage = (
     updateContentAsMarkdown(markdown: string) {
       this.toolbarButton('Edit as markdown').click()
       cy.get('textarea').clear().type(markdown)
-      return this
+      return this.flushPendingContentSave()
     },
     expectRichContent(elements: Record<string, string>[]) {
       for (const element of elements) {
@@ -269,7 +269,7 @@ export const assumeNotePage = (
       }).within(() => {
         cy.findByRole('button', { name: 'Add property' }).click()
         cy.findByTestId('rich-note-property-key').clear().type(key)
-        cy.findByTestId('rich-note-property-value').clear().type(value)
+        cy.findByTestId('rich-note-property-value').clear().type(value).blur()
       })
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
@@ -378,6 +378,7 @@ export const assumeNotePage = (
           cy.get('[data-testid="rich-note-property-row-value-input"]')
             .clear()
             .type(newValue)
+            .blur()
         })
       })
       cy.findByRole(noteContentRegion.role, {
@@ -390,6 +391,7 @@ export const assumeNotePage = (
           cy.get('[data-testid="rich-note-property-row-key-input"]')
             .clear()
             .type(newKey)
+            .blur()
         })
       })
       cy.findByRole(noteContentRegion.role, {

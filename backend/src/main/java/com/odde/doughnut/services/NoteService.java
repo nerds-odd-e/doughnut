@@ -11,7 +11,6 @@ import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
-import com.odde.doughnut.entities.repositories.NoteAccessoryRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -23,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,6 @@ public class NoteService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final WikiTitleCacheService wikiTitleCacheService;
   private final ImageRepository imageRepository;
-  private final NoteAccessoryRepository noteAccessoryRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
@@ -45,7 +42,6 @@ public class NoteService {
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       WikiTitleCacheService wikiTitleCacheService,
       ImageRepository imageRepository,
-      NoteAccessoryRepository noteAccessoryRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
@@ -53,7 +49,6 @@ public class NoteService {
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.imageRepository = imageRepository;
-    this.noteAccessoryRepository = noteAccessoryRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -216,22 +211,8 @@ public class NoteService {
       if (keepId != null && keepId.equals(image.getId())) {
         continue;
       }
-      clearAccessoryImageFkIfPointsTo(note, image);
       entityPersister.remove(image);
     }
-  }
-
-  private void clearAccessoryImageFkIfPointsTo(Note note, Image image) {
-    noteAccessoryRepository
-        .findByNote_Id(note.getId())
-        .ifPresent(
-            acc -> {
-              Image attached = acc.getImageAttachment();
-              if (attached != null && Objects.equals(attached.getId(), image.getId())) {
-                acc.setImageAttachment(null);
-                entityPersister.merge(acc);
-              }
-            });
   }
 
   public void restore(Note note) {
