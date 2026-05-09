@@ -264,17 +264,35 @@ export const assumeNotePage = (
       }
     },
     addRichNoteProperty(key: string, value: string) {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.findByRole('button', { name: 'Add property' }).click()
-        cy.findByTestId('rich-note-property-key').clear().type(key)
-        cy.findByTestId('rich-note-property-value').clear().type(value).blur()
-      })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get('.ql-editor[contenteditable="true"]').first().click()
+      cy.get('body').then(($body) => {
+        const folderDraft = $body.find(
+          '[data-testid="folder-index-draft-editor"]'
+        )
+        const scope =
+          folderDraft.length > 0
+            ? cy.wrap(folderDraft.first())
+            : cy.findByRole(noteContentRegion.role, {
+                name: noteContentRegion.name,
+              })
+        scope.within(() => {
+          cy.findByRole('button', { name: 'Add property' }).click()
+          cy.findByTestId('rich-note-property-key')
+            .clear()
+            .type(key, { parseSpecialCharSequences: false })
+          cy.findByTestId('rich-note-property-value')
+            .clear()
+            .type(value, { parseSpecialCharSequences: false })
+            .blur()
+        })
+        const focusScope =
+          folderDraft.length > 0
+            ? cy.wrap(folderDraft.first())
+            : cy.findByRole(noteContentRegion.role, {
+                name: noteContentRegion.name,
+              })
+        focusScope.within(() => {
+          cy.get('.ql-editor[contenteditable="true"]').first().click()
+        })
       })
       return this
     },

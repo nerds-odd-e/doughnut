@@ -20,10 +20,6 @@ When('I type and save the folder index with text {string}', (text: string) => {
   folderPage().typeFolderIndexDraftAndSave(text)
 })
 
-When('I save the folder index lazy body with:', (markdown: string) => {
-  folderPage().typeFolderIndexDraftMarkdownAndSave(markdown)
-})
-
 When(
   'I create a new note from the sidebar submitting the default title',
   () => {
