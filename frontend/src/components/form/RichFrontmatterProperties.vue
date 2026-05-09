@@ -65,17 +65,24 @@
     >
       {{ validationMessage }}
     </p>
+    <button
+      v-if="showInsertChrome && !insertOpen && propertyRows.length === 0"
+      type="button"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-self-start daisy-items-center daisy-gap-1"
+      @click="openPropertyInsert"
+    >
+      <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+      Add property
+    </button>
     <RichFrontmatterInsertForm
-      v-if="showInsertChrome && (propertyRows.length === 0 || insertOpen)"
+      v-if="showInsertChrome && insertOpen"
       :insert-open="insertOpen"
-      :show-insert-button="propertyRows.length === 0"
       :draft-key="draftKey"
       :draft-value="draftValue"
       :wiki-titles="wikiTitles"
       :note-id="noteId"
       :insert-key-input-id="insertKeyInputId"
       :insert-key-preset-list-id="insertKeyPresetListId"
-      @open-insert="openPropertyInsert"
       @update:draft-key="draftKey = $event"
       @update:draft-value="draftValue = $event"
       @value-blur="tryCommitInsert"

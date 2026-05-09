@@ -1,20 +1,5 @@
 <template>
-  <div
-    :class="
-      showInsertButton
-        ? 'daisy-mt-1 daisy-flex daisy-flex-col daisy-gap-2'
-        : 'daisy-mt-1'
-    "
-  >
-    <button
-      v-if="showInsertButton"
-      type="button"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-self-start daisy-items-center daisy-gap-1"
-      @click="emit('open-insert')"
-    >
-      <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
-      Add property
-    </button>
+  <div class="daisy-mt-1">
     <div
       v-if="insertOpen"
       class="daisy-flex daisy-flex-wrap daisy-gap-2 daisy-items-end"
@@ -145,7 +130,6 @@
 </template>
 
 <script setup lang="ts">
-import { Plus } from "lucide-vue-next"
 import { ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
@@ -161,7 +145,6 @@ import {
 
 const props = defineProps<{
   insertOpen: boolean
-  showInsertButton: boolean
   draftKey: string
   draftValue: string
   wikiTitles: WikiTitle[]
@@ -171,7 +154,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "open-insert": []
   "update:draftKey": [string]
   "update:draftValue": [string]
   "value-blur": []
