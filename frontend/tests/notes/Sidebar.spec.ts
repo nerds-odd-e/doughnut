@@ -45,31 +45,35 @@ function stubFolderListingForTree(
   firstGenerationSibling: NoteRealm,
   secondGeneration: NoteRealm
 ) {
+  const listings: Record<
+    number,
+    {
+      noteTopologies: ReturnType<typeof noteTopologyInFolder>[]
+      folders: ReturnType<typeof structuralFolder>[]
+    }
+  > = {
+    [FOLDER_TOP_NOTE_CHILDREN_ID]: {
+      noteTopologies: [
+        noteTopologyInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
+        noteTopologyInFolder(
+          firstGenerationSibling,
+          FOLDER_TOP_NOTE_CHILDREN_ID
+        ),
+      ],
+      folders: [
+        structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
+      ],
+    },
+    [FOLDER_FIRST_GEN_CHILDREN_ID]: {
+      noteTopologies: [
+        noteTopologyInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
+      ],
+      folders: [],
+    },
+  }
   return mockSdkServiceWithImplementation("listFolderListing", (options) => {
     const folderId = (options as { path: { folder: number } }).path.folder
-    if (folderId === FOLDER_TOP_NOTE_CHILDREN_ID) {
-      return {
-        noteTopologies: [
-          noteTopologyInFolder(firstGeneration, FOLDER_TOP_NOTE_CHILDREN_ID),
-          noteTopologyInFolder(
-            firstGenerationSibling,
-            FOLDER_TOP_NOTE_CHILDREN_ID
-          ),
-        ],
-        folders: [
-          structuralFolder(FOLDER_FIRST_GEN_CHILDREN_ID, firstGeneration),
-        ],
-      }
-    }
-    if (folderId === FOLDER_FIRST_GEN_CHILDREN_ID) {
-      return {
-        noteTopologies: [
-          noteTopologyInFolder(secondGeneration, FOLDER_FIRST_GEN_CHILDREN_ID),
-        ],
-        folders: [],
-      }
-    }
-    return { noteTopologies: [], folders: [] }
+    return listings[folderId] ?? { noteTopologies: [], folders: [] }
   })
 }
 
@@ -81,21 +85,26 @@ function mockShowNoteForRealms(realms: NoteRealm[]) {
   mockSdkServiceWithImplementation("showNote", (options) => {
     const id = (options as Options<ShowNoteData>).path.note
     const realm = byId[id]
-    if (realm === undefined) {
-      throw new Error(`Sidebar.spec: unmocked showNote for note id ${id}`)
-    }
-    return realm
+    expect(
+      realm,
+      `Sidebar.spec: unmocked showNote for note id ${id}`
+    ).toBeDefined()
+    return realm!
   })
 }
 
 function rootRowLabels(w: VueWrapper<unknown>): string[] {
   const rootUl = w.get("ul.sidebar-tree-list")
   return Array.from(rootUl.element.children).map((li) => {
-    const folder = li.querySelector(".sidebar-folder-label")
-    if (folder) return `folder:${folder.textContent?.trim()}`
-    const note = li.querySelector(".title-text")
-    if (note) return `note:${note.textContent?.trim()}`
-    return "?"
+    const folderText = li
+      .querySelector(".sidebar-folder-label")
+      ?.textContent?.trim()
+    const noteText = li.querySelector(".title-text")?.textContent?.trim()
+    return folderText
+      ? `folder:${folderText}`
+      : noteText
+        ? `note:${noteText}`
+        : "?"
   })
 }
 
@@ -124,49 +133,60 @@ describe("Sidebar", () => {
     .under(firstGeneration)
     .please()
 
+  /** Folder context keyed by realm id — ancestorFolders and optional folderId override. */
+  type FolderContext = {
+    ancestorFolders: ReturnType<typeof testFolderStub>[]
+    folderId?: number
+  }
+  const folderContextByRealmId: Record<number, FolderContext> = {
+    [topNoteRealm.id]: { ancestorFolders: [] },
+    [firstGeneration.id]: {
+      ancestorFolders: [
+        testFolderStub(
+          FOLDER_TOP_NOTE_CHILDREN_ID,
+          topNoteRealm.note.noteTopology.title
+        ),
+      ],
+      folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
+    },
+    [firstGenerationSibling.id]: {
+      ancestorFolders: [
+        testFolderStub(
+          FOLDER_TOP_NOTE_CHILDREN_ID,
+          topNoteRealm.note.noteTopology.title
+        ),
+      ],
+      folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
+    },
+    [secondGeneration.id]: {
+      ancestorFolders: [
+        testFolderStub(
+          FOLDER_TOP_NOTE_CHILDREN_ID,
+          topNoteRealm.note.noteTopology.title
+        ),
+        testFolderStub(
+          FOLDER_FIRST_GEN_CHILDREN_ID,
+          firstGeneration.note.noteTopology.title
+        ),
+      ],
+      folderId: FOLDER_FIRST_GEN_CHILDREN_ID,
+    },
+  }
+
   /** Aligns active realm with folder-first API: ancestorFolders + folderId for this stub tree. */
   function realmAsActiveInSidebarStub(realm: NoteRealm): NoteRealm {
-    const topTitle = topNoteRealm.note.noteTopology.title
-    const firstTitle = firstGeneration.note.noteTopology.title
-
-    if (realm.id === topNoteRealm.id) {
-      return { ...realm, ancestorFolders: [] }
+    const ctx = folderContextByRealmId[realm.id] ?? {
+      ancestorFolders: realm.ancestorFolders ?? [],
     }
-    if (
-      realm.id === firstGeneration.id ||
-      realm.id === firstGenerationSibling.id
-    ) {
-      return {
-        ...realm,
-        ancestorFolders: [
-          testFolderStub(FOLDER_TOP_NOTE_CHILDREN_ID, topTitle),
-        ],
-        note: {
-          ...realm.note,
-          noteTopology: {
-            ...realm.note.noteTopology,
-            folderId: FOLDER_TOP_NOTE_CHILDREN_ID,
-          },
-        },
-      } as NoteRealm
-    }
-    if (realm.id === secondGeneration.id) {
-      return {
-        ...realm,
-        ancestorFolders: [
-          testFolderStub(FOLDER_TOP_NOTE_CHILDREN_ID, topTitle),
-          testFolderStub(FOLDER_FIRST_GEN_CHILDREN_ID, firstTitle),
-        ],
-        note: {
-          ...realm.note,
-          noteTopology: {
-            ...realm.note.noteTopology,
-            folderId: FOLDER_FIRST_GEN_CHILDREN_ID,
-          },
-        },
-      } as NoteRealm
-    }
-    return { ...realm, ancestorFolders: realm.ancestorFolders ?? [] }
+    const noteTopology =
+      ctx.folderId !== undefined
+        ? { ...realm.note.noteTopology, folderId: ctx.folderId }
+        : realm.note.noteTopology
+    return {
+      ...realm,
+      ancestorFolders: ctx.ancestorFolders,
+      note: { ...realm.note, noteTopology },
+    } as NoteRealm
   }
 
   const mountSidebar = (n: NoteRealm) => {
@@ -295,9 +315,8 @@ describe("Sidebar", () => {
     const inner = wrapper
       .findAll(".title-text")
       .find((el) => el.text().includes(text))
-    if (!inner) return
-    const li = inner.element.closest("li")
-    return li ? new DOMWrapper(li) : undefined
+    const li = inner?.element.closest("li")
+    return li != null ? new DOMWrapper(li) : undefined
   }
 
   describe("user active folder", () => {
@@ -305,9 +324,8 @@ describe("Sidebar", () => {
       const label = wrapper
         .findAll(".sidebar-folder-label")
         .find((w) => w.text().includes(topNoteRealm.note.noteTopology.title))
-      if (!label?.exists()) return
-      const li = label.element.closest("li")
-      return li ? new DOMWrapper(li) : undefined
+      const li = label?.element.closest("li")
+      return li != null ? new DOMWrapper(li) : undefined
     }
 
     async function mountFirstGenSidebarAndWaitNoteRow() {
