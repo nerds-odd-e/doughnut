@@ -1,29 +1,39 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.index.IndexScope;
+import com.odde.doughnut.services.index.ScopedIndexNoteService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteRealmService {
 
+  private static final String TITLE_PATTERN_KEY = "titlePattern";
+
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
   private final NotebookCatalogService notebookCatalogService;
+  private final ScopedIndexNoteService scopedIndexNoteService;
 
   public NoteRealmService(
       WikiTitleCacheService wikiTitleCacheService,
       NoteRepository noteRepository,
-      NotebookCatalogService notebookCatalogService) {
+      NotebookCatalogService notebookCatalogService,
+      ScopedIndexNoteService scopedIndexNoteService) {
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteRepository = noteRepository;
     this.notebookCatalogService = notebookCatalogService;
+    this.scopedIndexNoteService = scopedIndexNoteService;
   }
 
   public NoteRealm build(Note note, User viewer) {
@@ -35,7 +45,40 @@ public class NoteRealmService {
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     realm.setNotebookView(notebookCatalogService.clientViewFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
+    realm.setIndexNoteContent(resolveIndexNoteContentForScopedTitlePattern(focus));
     return realm;
+  }
+
+  private String resolveIndexNoteContentForScopedTitlePattern(Note focus) {
+    if (focus.getNotebook() == null) {
+      return null;
+    }
+    List<Folder> outerToInner = FolderTrailSegments.fromRootToContainingFolder(focus);
+    for (int i = outerToInner.size() - 1; i >= 0; i--) {
+      Optional<Note> designated =
+          scopedIndexNoteService.findDesignatedIndexNote(
+              new IndexScope.FolderIndex(outerToInner.get(i)));
+      if (designated.isPresent() && hasNonBlankTitlePattern(designated.get())) {
+        return designated.get().getContent();
+      }
+    }
+    return scopedIndexNoteService
+        .findDesignatedIndexNote(new IndexScope.NotebookRoot(focus.getNotebook()))
+        .filter(this::hasNonBlankTitlePattern)
+        .map(Note::getContent)
+        .orElse(null);
+  }
+
+  private boolean hasNonBlankTitlePattern(Note indexNote) {
+    String content = indexNote.getContent();
+    if (content == null || content.isBlank()) {
+      return false;
+    }
+    return NoteContentMarkdown.splitLeadingFrontmatter(content)
+        .flatMap(lf -> lf.frontmatter().getString(TITLE_PATTERN_KEY))
+        .map(String::trim)
+        .filter(s -> !s.isEmpty())
+        .isPresent();
   }
 
   /** Re-load notes with associations so JSON serialization does not hit Hibernate proxies. */

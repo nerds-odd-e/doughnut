@@ -118,6 +118,63 @@ describe("adding new note", () => {
     wrapper.unmount()
   })
 
+  it("uses defaultTitleFromScopedPattern without title search until user edits", async () => {
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+    const wrapper = helper
+      .component(NoteNewForm)
+      .withCleanStorage()
+      .withProps({
+        ...notebookRootProps,
+        defaultTitleFromScopedPattern: "2026-05-09",
+      })
+      .mount({ attachTo: document.body })
+
+    const titleEl = wrapper.find('[data-test="note-title"]')
+      .element as HTMLElement
+    expect(titleEl.innerText).toContain("2026-05-09")
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+    expect(searchForRelationshipTargetWithinSpy).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it("submits defaultTitleFromScopedPattern as newTitle when unchanged", async () => {
+    const wrapper = helper
+      .component(NoteNewForm)
+      .withCleanStorage()
+      .withProps({
+        ...notebookRootProps,
+        defaultTitleFromScopedPattern: "2026-05-09",
+      })
+      .mount({ attachTo: document.body })
+
+    await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
+    await flushPromises()
+    expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+      path: { notebook: realm.notebookView.notebook.id },
+      body: expect.objectContaining({ newTitle: "2026-05-09" }),
+    })
+    wrapper.unmount()
+  })
+
+  it("initialTitle wins over defaultTitleFromScopedPattern for displayed title", async () => {
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+    const wrapper = helper
+      .component(NoteNewForm)
+      .withCleanStorage()
+      .withProps({
+        ...notebookRootProps,
+        initialTitle: "Explicit",
+        defaultTitleFromScopedPattern: "2026-05-09",
+      })
+      .mount({ attachTo: document.body })
+
+    const titleEl = wrapper.find('[data-test="note-title"]')
+      .element as HTMLElement
+    expect(titleEl.innerText.trim()).toBe("Explicit")
+    wrapper.unmount()
+  })
+
   it("searches when user edits title back to 'Untitled'", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([

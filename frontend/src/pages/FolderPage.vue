@@ -47,9 +47,10 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
   currentActiveNoteId,
   currentNotebookId,
+  folderPageBreadcrumbFolders,
+  folderSidebarFolderPageClientView,
   notebookSidebarNotebookClientView,
   notebookSidebarUserActiveFolder,
-  folderPageBreadcrumbFolders,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
@@ -104,6 +105,7 @@ const fetchFolderPage = async () => {
 watch(
   folderPageClient,
   (c) => {
+    folderSidebarFolderPageClientView.value = c
     if (!c) {
       notebookSidebarNotebookClientView.value = undefined
       currentNotebookId.value = undefined
@@ -175,6 +177,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   notebookSidebarNotebookClientView.value = undefined
+  folderSidebarFolderPageClientView.value = undefined
   folderPageBreadcrumbFolders.value = []
 })
 </script>

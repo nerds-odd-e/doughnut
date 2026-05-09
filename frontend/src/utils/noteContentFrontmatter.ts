@@ -194,6 +194,22 @@ export function parseNoteContentMarkdown(
   return { ok: true, properties: mapped.properties, body }
 }
 
+/** Reads `titlePattern` from leading YAML (case-insensitive key) when present and non-blank. */
+export function titlePatternFromNoteMarkdown(
+  markdown: string | undefined | null
+): string | undefined {
+  if (markdown == null || markdown === "") return
+  const p = parseNoteContentMarkdown(markdown)
+  if (!p.ok) return
+  for (const [k, v] of Object.entries(p.properties)) {
+    if (k.trim().toLowerCase() === "titlepattern") {
+      const t = (v ?? "").trim()
+      return t.length > 0 ? t : undefined
+    }
+  }
+  return
+}
+
 /** True when any key is the `relation` property (trimmed, case-insensitive), matching rich editor rows. */
 export function propertyRecordHasRelationKey(
   properties: Record<string, string>

@@ -3276,6 +3276,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WikiTitle"
+        indexNoteContent:
+          type: string
       required:
       - id
       - note

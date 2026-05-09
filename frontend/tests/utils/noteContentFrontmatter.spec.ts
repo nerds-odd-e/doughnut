@@ -14,6 +14,7 @@ import {
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   sortedPropertyRowsFromRecord,
+  titlePatternFromNoteMarkdown,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
 
@@ -386,5 +387,19 @@ describe("isUrlPropertyKey", () => {
   it("does not match other keys", () => {
     expect(isUrlPropertyKey("urls")).toBe(false)
     expect(isUrlPropertyKey("wikidata_id")).toBe(false)
+  })
+})
+
+describe("titlePatternFromNoteMarkdown", () => {
+  it("reads titlePattern case-insensitively", () => {
+    const md = '---\nTitlePattern: "{{date}}"\n---\n'
+    expect(titlePatternFromNoteMarkdown(md)).toBe("{{date}}")
+  })
+
+  it("returns undefined when key missing or blank", () => {
+    expect(titlePatternFromNoteMarkdown("---\na: 1\n---\n")).toBeUndefined()
+    expect(
+      titlePatternFromNoteMarkdown('---\ntitlePattern: ""\n---\n')
+    ).toBeUndefined()
   })
 })

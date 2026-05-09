@@ -14,6 +14,7 @@
         :parent-location-description="parentLocationDescription"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         :ancestor-folders="ancestorFolders ?? []"
+        :default-title-from-scoped-pattern="defaultTitleFromScopedPattern"
         @close-dialog="closer"
       />
     </template>
@@ -23,6 +24,7 @@
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
+import { useDefaultNewNoteTitleFromPattern } from "@/composables/useScopedTitlePatternForNewNote"
 import NoteNewForm from "../NoteNewForm.vue"
 
 defineProps<{
@@ -34,4 +36,6 @@ defineProps<{
   titleSearchAnchorNote?: Note | null
   ancestorFolders?: Folder[]
 }>()
+
+const defaultTitleFromScopedPattern = useDefaultNewNoteTitleFromPattern()
 </script>

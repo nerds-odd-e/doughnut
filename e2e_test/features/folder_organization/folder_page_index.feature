@@ -15,3 +15,16 @@ Feature: Folder page index
     Then the folder index should contain "Persistent folder landing"
     When I reload the folder page
     Then the folder index should contain "Persistent folder landing"
+
+  Scenario: New note from folder page uses folder index titlePattern default
+    When I view note "In Alpha"
+    And I open the folder page for "Alpha" from the sidebar
+    And I save the folder index lazy body with:
+      """
+      ---
+      titlePattern: "{{date}}"
+      ---
+
+      Scoped index marker
+      """
+    When I create a new note from the sidebar submitting the default title

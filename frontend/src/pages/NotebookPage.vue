@@ -42,6 +42,7 @@ import {
   currentActiveNoteId,
   currentNotebookId,
   folderPageBreadcrumbFolders,
+  folderSidebarFolderPageClientView,
   notebookSidebarNotebookClientView,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -150,10 +151,12 @@ watch(
 
 onMounted(async () => {
   folderPageBreadcrumbFolders.value = []
+  folderSidebarFolderPageClientView.value = undefined
   await fetchNotebook()
 })
 
 onBeforeUnmount(() => {
   notebookSidebarNotebookClientView.value = undefined
+  folderSidebarFolderPageClientView.value = undefined
 })
 </script>

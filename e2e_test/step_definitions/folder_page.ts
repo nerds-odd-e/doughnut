@@ -6,6 +6,7 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import folderPage from '../start/pageObjects/folderPage'
+import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
 import { pageIsNotLoading } from '../start/pageBase'
 
 When(
@@ -18,6 +19,21 @@ When(
 When('I type and save the folder index with text {string}', (text: string) => {
   folderPage().typeFolderIndexDraftAndSave(text)
 })
+
+When('I save the folder index lazy body with:', (markdown: string) => {
+  folderPage().typeFolderIndexDraftMarkdownAndSave(markdown)
+})
+
+When(
+  'I create a new note from the sidebar submitting the default title',
+  () => {
+    const expectedTitle = new Date().toISOString().slice(0, 10)
+    start.noteSidebar().addingNewNoteFromToolbar()
+    noteCreationForm.submit()
+    pageIsNotLoading()
+    start.assumeNotePage().expectNoteTitleDisplayed(expectedTitle)
+  }
+)
 
 Then('the folder index should contain {string}', (fragment: string) => {
   folderPage().expectFolderIndexBodyContains(fragment)

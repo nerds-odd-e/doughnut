@@ -83,6 +83,11 @@ const props = withDefaults(
     targetFolderId?: number
     parentLocationDescription?: string
     initialTitle?: string
+    /**
+     * Default title from scoped index `titlePattern` (already rendered). Does not mark the title
+     * as user-edited; ignored when `initialTitle` is set.
+     */
+    defaultTitleFromScopedPattern?: string
     /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
     titleSearchAnchorNote?: Note
     /** After notebook-root create, refresh wiki title cache for this note before navigating away. */
@@ -127,7 +132,9 @@ function contentWithWikidataFrontmatter(
 }
 
 // Reactive state
-const newTitle = ref(props.initialTitle ?? "Untitled")
+const newTitle = ref(
+  props.initialTitle ?? props.defaultTitleFromScopedPattern ?? "Untitled"
+)
 const wikidataIdSelection = ref("")
 
 const noteFormErrors = ref({
@@ -137,6 +144,16 @@ const noteFormErrors = ref({
 
 const processing = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
+
+watch(
+  () => [props.defaultTitleFromScopedPattern, props.initialTitle] as const,
+  ([def, init]) => {
+    if (init !== undefined) return
+    if (!hasTitleBeenEdited.value) {
+      newTitle.value = def ?? "Untitled"
+    }
+  }
+)
 
 // Computed property to determine effective search key
 const effectiveSearchKey = computed(() => {

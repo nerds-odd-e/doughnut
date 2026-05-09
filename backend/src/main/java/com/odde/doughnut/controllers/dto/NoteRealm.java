@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
@@ -8,7 +9,15 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@JsonPropertyOrder({"id", "note", "notebookView", "ancestorFolders", "references", "wikiTitles"})
+@JsonPropertyOrder({
+  "id",
+  "note",
+  "notebookView",
+  "ancestorFolders",
+  "references",
+  "wikiTitles",
+  "indexNoteContent"
+})
 public class NoteRealm {
   /**
    * Referring notes (wiki-title cache inbound links), as {@link NoteTopology}, deduplicated by
@@ -22,6 +31,15 @@ public class NoteRealm {
   @NotNull @Getter @Setter private NotebookClientView notebookView;
 
   @Getter @Setter private List<Folder> ancestorFolders = List.of();
+
+  /**
+   * Full markdown of the designated index note that supplies the nearest non-blank {@code
+   * titlePattern} (leaf folder → parent folders → notebook root). Omitted when none applies.
+   */
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Getter
+  @Setter
+  private String indexNoteContent;
 
   @Getter private final List<WikiTitle> wikiTitles;
 

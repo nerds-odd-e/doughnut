@@ -211,6 +211,7 @@ export type NoteRealm = {
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
+    indexNoteContent?: string;
 };
 
 export type NoteTopology = {
@@ -919,6 +920,7 @@ export type NoteRealmWritable = {
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
+    indexNoteContent?: string;
 };
 
 export type RecallPromptWritable = {
