@@ -15,6 +15,7 @@ import com.odde.doughnut.services.EmbeddingService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
@@ -375,6 +376,7 @@ public class NoteSearchService {
         orderedIds.stream()
             .map(id -> idToNote.get(id))
             .filter(java.util.Objects::nonNull)
+            .filter(n -> !isDesignatedNotebookIndexNote(n))
             .map(n -> noteToSearchResult(n, noteIdToDistance.get(n.getId())))
             .toList();
 
@@ -449,20 +451,24 @@ public class NoteSearchService {
 
   private List<NoteSearchResult> combineExactAndPartialMatches(
       List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId, Integer notebookId) {
+    List<Note> filteredExactMatches = excludeDesignatedNotebookIndexNotes(exactMatches);
+    List<Note> filteredPartialMatchesInput = excludeDesignatedNotebookIndexNotes(partialMatches);
+
     List<Note> filteredPartialMatches =
-        partialMatches.stream()
+        filteredPartialMatchesInput.stream()
             .filter(
                 note ->
-                    exactMatches.stream().noneMatch(exact -> exact.getId().equals(note.getId())))
+                    filteredExactMatches.stream()
+                        .noneMatch(exact -> exact.getId().equals(note.getId())))
             .toList();
 
     List<NoteSearchResult> results =
-        exactMatches.stream()
+        filteredExactMatches.stream()
             .filter(note -> !note.getId().equals(avoidNoteId))
             .map(note -> noteToSearchResult(note, 0.0f))
             .collect(Collectors.toList());
 
-    int remainingSlots = exactMatches.isEmpty() ? 20 : 20 + exactMatches.size();
+    int remainingSlots = filteredExactMatches.isEmpty() ? 20 : 20 + filteredExactMatches.size();
 
     if (remainingSlots > 0) {
       results.addAll(
@@ -474,6 +480,19 @@ public class NoteSearchService {
     }
 
     return sortByDistanceThenNotebook(results, notebookId);
+  }
+
+  private static boolean isDesignatedNotebookIndexNote(Note note) {
+    var notebook = note.getNotebook();
+    if (notebook == null) {
+      return false;
+    }
+    var indexNote = notebook.getIndexNote();
+    return indexNote != null && Objects.equals(note.getId(), indexNote.getId());
+  }
+
+  private static List<Note> excludeDesignatedNotebookIndexNotes(List<Note> notes) {
+    return notes.stream().filter(n -> !isDesignatedNotebookIndexNote(n)).toList();
   }
 
   private NoteSearchResult noteToSearchResult(Note note, Float distance) {

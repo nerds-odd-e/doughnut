@@ -11,14 +11,18 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 class SearchControllerTests extends ControllerTestBase {
   @Autowired SearchController controller;
+  @Autowired JdbcTemplate jdbcTemplate;
+  @Autowired EntityManager entityManager;
 
   @BeforeEach
   void setup() {
@@ -156,6 +160,34 @@ class SearchControllerTests extends ControllerTestBase {
                           && "Recipe Ideas".equals(h.getNotebookName())
                           && h.getNotebookId() != null),
           is(true));
+    }
+
+    @Test
+    void shouldExcludeDesignatedNotebookIndexNoteFromLiteralSearch()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note designatedIndex =
+          makeMe.aNote("IdxTok999 Welcome Page").creatorAndOwner(user).inNotebook(nb).please();
+      Note regularNote =
+          makeMe.aNote("Regular IdxTok999 Topic").creatorAndOwner(user).inNotebook(nb).please();
+
+      jdbcTemplate.update(
+          "UPDATE notebook SET index_note_id = ? WHERE id = ?",
+          designatedIndex.getId(),
+          nb.getId());
+      entityManager.clear();
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("IdxTok999");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(
+          notes.stream().map(r -> r.getNoteTopology().getId()).toList(),
+          containsInAnyOrder(regularNote.getId()));
     }
 
     @Test
