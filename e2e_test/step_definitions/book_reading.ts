@@ -213,7 +213,7 @@ Given(
                 .openAi()
                 .chatCompletion()
                 .requestMessageMatches({
-                  role: 'system',
+                  role: 'developer',
                   content: '.*You reorganize the outline nesting.*',
                 })
                 .stubJsonSchemaResponse(reply)

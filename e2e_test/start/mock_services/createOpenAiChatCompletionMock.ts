@@ -16,7 +16,7 @@ type ToolCalls = {
 }
 
 type TextBasedMessage = {
-  role: 'user' | 'assistant' | 'system'
+  role: 'user' | 'assistant' | 'system' | 'developer'
   content: string
 }
 

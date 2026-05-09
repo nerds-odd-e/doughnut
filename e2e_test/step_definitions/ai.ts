@@ -45,7 +45,7 @@ function stubExtractPointResponse(
       .openAi()
       .chatCompletion()
       .requestMessageMatches({
-        role: 'system',
+        role: 'developer',
         content: contentPattern,
       })
       .stubJsonSchemaResponse(reply)
@@ -211,7 +211,7 @@ Given(
         .openAi()
         .chatCompletion()
         .requestMessageMatches({
-          role: 'system',
+          role: 'developer',
           content: '.*Please generate an understanding checklist.*',
         })
         .stubJsonSchemaResponse(reply)
@@ -229,7 +229,7 @@ Given(
         .openAi()
         .chatCompletion()
         .requestMessageMatches({
-          role: 'system',
+          role: 'developer',
           content: '.*remove.*points.*',
         })
         .stubJsonSchemaResponse(reply)
