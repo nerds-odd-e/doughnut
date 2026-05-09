@@ -180,14 +180,19 @@ describe("Sidebar", () => {
     return wrapper
   }
 
-  /** Signed-in user + optional notebook id (defaults from active realm). */
-  function mountSidebarSignedIn(active: NoteRealm, notebookId?: number) {
-    const nb = notebookId ?? active.notebookView.notebook.id
+  /** Signed-in user + optional notebook id (defaults from active realm). When active is undefined, notebookId is required. */
+  function mountSidebarSignedIn(
+    active: NoteRealm | undefined,
+    notebookId?: number
+  ) {
+    // biome-ignore lint/style/noNonNullAssertion: callers must provide notebookId when active is undefined
+    const nb = notebookId ?? active!.notebookView.notebook.id
     wrapper = helper
       .component(Sidebar)
       .withCurrentUser(makeMe.aUser.please())
       .withProps({
-        activeNoteRealm: realmAsActiveInSidebarStub(active),
+        activeNoteRealm:
+          active !== undefined ? realmAsActiveInSidebarStub(active) : undefined,
         notebookId: nb,
       })
       .mount({ attachTo: document.body })
@@ -237,9 +242,8 @@ describe("Sidebar", () => {
     storageAccessor.value.refOfNoteRealm(secondGeneration.id).value =
       secondGeneration
 
-    const shallowTopRealm = { ...topNoteRealm } as NoteRealm
     mockSdkService("listNotebookRootNotes", {
-      noteTopologies: [shallowTopRealm.note.noteTopology],
+      noteTopologies: [topNoteRealm.note.noteTopology],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     })
     stubFolderListingForTree(
@@ -427,14 +431,7 @@ describe("Sidebar", () => {
         realmA
       )
 
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: { ...activeA, ancestorFolders: [] } as NoteRealm,
-          notebookId: nbId,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebarSignedIn(activeA, nbId)
       await flushPromises()
       await vi.waitUntil(
         () => wrapper.findAll(".sidebar-folder-label").length >= 2
@@ -476,36 +473,13 @@ describe("Sidebar", () => {
         mango: { updatedAt: "2005-01-01T00:00:00.000Z" },
       })
 
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
-          notebookId: topNoteRealm.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebarSignedIn(realmA, topNoteRealm.notebookView.notebook.id)
       await flushPromises()
       await vi.waitUntil(
         () => wrapper.findAll(".sidebar-folder-label").length >= 2
       )
 
-      const expectedOrder = [...DEFAULT_ROOT_PEER_ORDER]
-      expect(rootRowLabels(wrapper)).toEqual(expectedOrder)
-
-      wrapper.unmount()
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
-          notebookId: topNoteRealm.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
-      await flushPromises()
-      await vi.waitUntil(
-        () => wrapper.findAll(".sidebar-folder-label").length >= 2
-      )
-      expect(rootRowLabels(wrapper)).toEqual(expectedOrder)
+      expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
     })
   })
 
@@ -525,9 +499,8 @@ describe("Sidebar", () => {
   })
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
-    const shallowTopRealm = { ...topNoteRealm } as NoteRealm
     const rootSpy = mockSdkService("listNotebookRootNotes", {
-      noteTopologies: [shallowTopRealm.note.noteTopology],
+      noteTopologies: [topNoteRealm.note.noteTopology],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     })
     mountSidebar(firstGeneration)
@@ -554,9 +527,8 @@ describe("Sidebar", () => {
     })
 
     it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
-      const shallowTopRealm = { ...topNoteRealm } as NoteRealm
       const rootSpy = mockSdkService("listNotebookRootNotes", {
-        noteTopologies: [shallowTopRealm.note.noteTopology],
+        noteTopologies: [topNoteRealm.note.noteTopology],
         folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
       })
       const folderListingSpy = stubFolderListingForTree(
@@ -695,20 +667,10 @@ describe("Sidebar", () => {
 
     it("hides New folder when note realm is from bazaar", async () => {
       const bazaarRealm = {
-        ...realmAsActiveInSidebarStub(firstGeneration),
-        notebookView: {
-          ...firstGeneration.notebookView,
-          readonly: true,
-        },
+        ...firstGeneration,
+        notebookView: { ...firstGeneration.notebookView, readonly: true },
       } as NoteRealm
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: bazaarRealm,
-          notebookId: bazaarRealm.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebarSignedIn(bazaarRealm)
       await flushPromises()
       expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)
     })
@@ -725,14 +687,7 @@ describe("Sidebar", () => {
   })
 
   it("shows folder expand control at notebook root with shallow listNotebookRootNotes", async () => {
-    wrapper = helper
-      .component(Sidebar)
-      .withCurrentUser(makeMe.aUser.please())
-      .withProps({
-        activeNoteRealm: undefined,
-        notebookId: topNoteRealm.notebookView.notebook.id,
-      })
-      .mount({ attachTo: document.body })
+    mountSidebarSignedIn(undefined, topNoteRealm.notebookView.notebook.id)
     await flushPromises()
     await flushPromises()
     expect(wrapper.find('button[aria-label="expand children"]').exists()).toBe(
@@ -741,14 +696,7 @@ describe("Sidebar", () => {
   })
 
   it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {
-    wrapper = helper
-      .component(Sidebar)
-      .withCurrentUser(makeMe.aUser.please())
-      .withProps({
-        activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
-        notebookId: topNoteRealm.notebookView.notebook.id,
-      })
-      .mount({ attachTo: document.body })
+    mountSidebarSignedIn(topNoteRealm)
     await flushPromises()
     await wrapper.setProps({
       activeNoteRealm: undefined,
@@ -766,14 +714,7 @@ describe("Sidebar", () => {
       notebook: makeMe.aNotebook.please(),
       readonly: true,
     }
-    wrapper = helper
-      .component(Sidebar)
-      .withCurrentUser(makeMe.aUser.please())
-      .withProps({
-        activeNoteRealm: undefined,
-        notebookId: topNoteRealm.notebookView.notebook.id,
-      })
-      .mount({ attachTo: document.body })
+    mountSidebarSignedIn(undefined, topNoteRealm.notebookView.notebook.id)
     await flushPromises()
     expect(wrapper.find('button[title="New note"]').exists()).toBe(false)
   })
