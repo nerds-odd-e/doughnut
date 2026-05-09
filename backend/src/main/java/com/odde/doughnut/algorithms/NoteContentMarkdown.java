@@ -8,7 +8,7 @@ import org.apache.logging.log4j.util.Strings;
 
 /**
  * Note content helpers for the leading YAML block: orchestrates fence parsing ({@link
- * NoteLeadingFrontmatter}) and generic YAML line handling ({@link YamlHandler}).
+ * NoteLeadingFrontmatter}) and generic YAML line handling ({@link YamlBuilder}).
  */
 public final class NoteContentMarkdown {
 
@@ -33,7 +33,7 @@ public final class NoteContentMarkdown {
    */
   public static Optional<String> wikidataIdScalarFromLeadingFrontmatter(String content) {
     return splitLeadingFrontmatter(content)
-        .flatMap(lf -> YamlHandler.firstScalarValue(lf.yamlRaw(), WIKIDATA_ID_KEY));
+        .flatMap(lf -> new YamlBuilder(lf.yamlRaw()).firstScalarValue(WIKIDATA_ID_KEY));
   }
 
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
@@ -61,11 +61,12 @@ public final class NoteContentMarkdown {
     }
     LeadingFrontmatter lf = split.get();
     List<String> kept =
-        YamlHandler.linesOmittingMappingKeys(lf.yamlRaw().split("\n", -1), NOTE_IMAGE_MAPPING_KEYS);
+        new YamlBuilder(lf.yamlRaw()).linesOmittingMappingKeys(NOTE_IMAGE_MAPPING_KEYS);
     if (hasImage && !Strings.isBlank(imageUrl)) {
-      kept.add(YamlHandler.mappingLine(NOTE_IMAGE_KEY, imageUrl.trim()));
+      YamlBuilder scalars = new YamlBuilder("");
+      kept.add(scalars.mappingLine(NOTE_IMAGE_KEY, imageUrl.trim()));
       if (!Strings.isBlank(imageMask)) {
-        kept.add(YamlHandler.mappingLine(NOTE_IMAGE_MASK_KEY, imageMask.trim()));
+        kept.add(scalars.mappingLine(NOTE_IMAGE_MASK_KEY, imageMask.trim()));
       }
     }
     return NoteLeadingFrontmatter.contentWithLeadingFence(kept, lf.body());
@@ -73,12 +74,12 @@ public final class NoteContentMarkdown {
 
   /** New leading block: always emit {@code image} (matches legacy prepend behavior). */
   private static List<String> prependNoteImageScalarLines(String imageUrl, String imageMask) {
-    List<String> lines = new ArrayList<>();
-    lines.add(YamlHandler.mappingLine(NOTE_IMAGE_KEY, imageUrl == null ? "" : imageUrl.trim()));
+    YamlBuilder b =
+        new YamlBuilder("").appendMapping(NOTE_IMAGE_KEY, imageUrl == null ? "" : imageUrl.trim());
     if (!Strings.isBlank(imageMask)) {
-      lines.add(YamlHandler.mappingLine(NOTE_IMAGE_MASK_KEY, imageMask.trim()));
+      b = b.appendMapping(NOTE_IMAGE_MASK_KEY, imageMask.trim());
     }
-    return lines;
+    return b.lines();
   }
 
   public static Optional<String> removeWikiLinksFromLeadingFrontmatterProperties(
@@ -100,7 +101,7 @@ public final class NoteContentMarkdown {
       }
       if (!rewritten.equals(line)) {
         changed = true;
-        if (YamlHandler.isEmptyMappingValueLine(rewritten)) {
+        if (new YamlBuilder("").isEmptyMappingValueLine(rewritten)) {
           continue;
         }
       }

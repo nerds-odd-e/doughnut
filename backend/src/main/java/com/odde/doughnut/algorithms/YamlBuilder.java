@@ -1,25 +1,48 @@
 package com.odde.doughnut.algorithms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 /** Line-oriented helpers for simple {@code key: value} YAML fragments (no document model). */
-public final class YamlHandler {
+public final class YamlBuilder {
 
-  private YamlHandler() {}
+  private final String yamlText;
+
+  public YamlBuilder(String yamlText) {
+    this.yamlText = yamlText == null ? "" : yamlText.replace("\r\n", "\n").replace('\r', '\n');
+  }
+
+  /**
+   * Returns a new builder with one more {@code key: formatted-value} line (does not read stored
+   * content).
+   */
+  public YamlBuilder appendMapping(String key, String rawValue) {
+    String line = mappingLine(key, rawValue);
+    if (yamlText.isEmpty()) {
+      return new YamlBuilder(line);
+    }
+    return new YamlBuilder(yamlText + "\n" + line);
+  }
+
+  /**
+   * Lines of the stored YAML, split like {@link String#split(String, int)} with limit {@code -1}.
+   */
+  public List<String> lines() {
+    return new ArrayList<>(Arrays.asList(yamlText.split("\n", -1)));
+  }
 
   /**
    * The trimmed value for the first line whose key equals {@code key} (case-insensitive), with
    * optional surrounding single/double quotes removed from the value.
    */
-  public static Optional<String> firstScalarValue(String yamlText, String key) {
-    if (yamlText == null || yamlText.isEmpty()) {
+  public Optional<String> firstScalarValue(String key) {
+    if (yamlText.isEmpty()) {
       return Optional.empty();
     }
-    String normalized = yamlText.replace("\r\n", "\n").replace('\r', '\n');
-    for (String line : normalized.split("\n", -1)) {
+    for (String line : yamlText.split("\n", -1)) {
       String t = line.trim();
       if (t.isEmpty() || t.startsWith("#")) {
         continue;
@@ -51,9 +74,9 @@ public final class YamlHandler {
   /**
    * Drops lines that start a mapping entry whose key is in {@code keysToOmit} (case-insensitive).
    */
-  public static List<String> linesOmittingMappingKeys(String[] yamlLines, Set<String> keysToOmit) {
+  public List<String> linesOmittingMappingKeys(Set<String> keysToOmit) {
     List<String> kept = new ArrayList<>();
-    for (String line : yamlLines) {
+    for (String line : yamlText.split("\n", -1)) {
       if (!lineOpensMappingWithKeyIn(line, keysToOmit)) {
         kept.add(line);
       }
@@ -62,11 +85,11 @@ public final class YamlHandler {
   }
 
   /** One {@code key: formatted-value} line for simple scalar serialization. */
-  public static String mappingLine(String key, String rawValue) {
+  public String mappingLine(String key, String rawValue) {
     return key + ": " + formatYamlScalarValue(rawValue);
   }
 
-  public static boolean isEmptyMappingValueLine(String line) {
+  public boolean isEmptyMappingValueLine(String line) {
     String t = line.trim();
     int colon = t.indexOf(':');
     if (colon < 0) {
@@ -77,7 +100,7 @@ public final class YamlHandler {
   }
 
   /** Plain scalar when safe; else double-quoted with minimal escaping. */
-  public static String formatYamlScalarValue(String value) {
+  public String formatYamlScalarValue(String value) {
     if (value.isEmpty()) {
       return "\"\"";
     }
@@ -111,13 +134,13 @@ public final class YamlHandler {
         + "\"";
   }
 
-  private static boolean lineOpensMappingWithKeyIn(String line, Set<String> keys) {
+  private boolean lineOpensMappingWithKeyIn(String line, Set<String> keys) {
     return mappingKeyFromLine(line)
         .filter(k -> keys.stream().anyMatch(k::equalsIgnoreCase))
         .isPresent();
   }
 
-  private static Optional<String> mappingKeyFromLine(String line) {
+  private Optional<String> mappingKeyFromLine(String line) {
     String t = line.trim();
     if (t.isEmpty() || t.startsWith("#")) {
       return Optional.empty();
