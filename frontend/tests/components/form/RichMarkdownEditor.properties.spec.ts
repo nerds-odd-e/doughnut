@@ -528,21 +528,6 @@ Paragraph.\n`
   })
 
   describe("index-only predefined properties", () => {
-    it("shows both index-only predefined rows when isIndexContext is true", async () => {
-      const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
-      await flushPromises()
-
-      const keyInputs = wrapper.findAll(
-        '[data-testid="rich-note-property-row-key-input"]'
-      )
-      const keyValues = keyInputs.map(
-        (el) => (el.element as HTMLInputElement).value
-      )
-      for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
-        expect(keyValues).toContain(key)
-      }
-    })
-
     it("does not show index-only predefined rows when isIndexContext is false", async () => {
       const wrapper = await h.mountEditor("# Body")
       await flushPromises()
@@ -556,77 +541,6 @@ Paragraph.\n`
       for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
         expect(keyValues).not.toContain(key)
       }
-    })
-
-    it("insert key dropdown omits index-only presets already present as placeholder rows", async () => {
-      await h.mountEditor("# Body", { isIndexContext: true })
-      await flushPromises()
-      await h.openAddProperty()
-      ;(
-        h.getWrapper().find('[data-testid="rich-note-property-key"]')
-          .element as HTMLInputElement
-      ).focus()
-      await nextTick()
-      await flushPromises()
-      const indexPlaceholderRows = INDEX_ONLY_PRESET_PROPERTY_KEYS.map(
-        (key) => ({ key, value: "" })
-      )
-      await h.assertPresetOptionsVisible(
-        richModeKeyDropdownPresetKeysForPropertyRows(true, indexPlaceholderRows)
-      )
-    })
-
-    it("key dropdown when focusing a custom row omits occupied presets in index context", async () => {
-      const markdown = `---
-status: ok
----
-
-# Body`
-      await h.mountEditor(markdown, { isIndexContext: true })
-      await flushPromises()
-      const keyInputs = h
-        .getWrapper()
-        .findAll('[data-testid="rich-note-property-row-key-input"]')
-      const statusInput = keyInputs.find(
-        (w) => (w.element as HTMLInputElement).value === "status"
-      )
-      expect(statusInput).toBeDefined()
-      ;(statusInput!.element as HTMLInputElement).focus()
-      await nextTick()
-      await flushPromises()
-      const indexRows = [
-        ...INDEX_ONLY_PRESET_PROPERTY_KEYS.map((key) => ({ key, value: "" })),
-        { key: "status", value: "ok" },
-      ]
-      await h.assertPresetOptionsVisible(
-        richModeKeyDropdownPresetKeysForPropertyRows(true, indexRows)
-      )
-    })
-
-    it("saving a filled index-only field emits YAML with that key", async () => {
-      const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
-      await flushPromises()
-
-      const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
-      const titlePatternRow = rows.find((r) => {
-        const keyInput = r.find(
-          '[data-testid="rich-note-property-row-key-input"]'
-        )
-        return (keyInput.element as HTMLInputElement).value === "title_pattern"
-      })
-      expect(titlePatternRow).toBeDefined()
-
-      const valInput = titlePatternRow!.find(
-        '[data-testid="rich-note-property-row-value-input"]'
-      )
-      await h.setWikiPropertyValueField(valInput, "{{date}}")
-      await valInput.trigger("blur")
-      await flushPromises()
-
-      const last = h.lastEmittedMarkdown()
-      expect(last).toContain("title_pattern:")
-      expect(last).toContain("{{date}}")
-      expect(last).toContain("Body")
     })
 
     it("empty index-only fields are not included in emitted YAML", async () => {

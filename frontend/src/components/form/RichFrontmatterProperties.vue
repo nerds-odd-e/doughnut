@@ -121,12 +121,10 @@ import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import {
-  INDEX_ONLY_PRESET_PROPERTY_KEYS,
   isRelationPropertyKey,
   isReservedIndexOnlyPropertyKey,
   parseNoteContentMarkdown,
   removePropertyRowAt,
-  rowFillsIndexOnlyPresetSlot,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
@@ -143,7 +141,7 @@ const props = defineProps<{
   noteId?: number
   /** When true, properties UI is non-interactive (e.g. during image upload). */
   interactionLocked?: boolean
-  /** When true, shows index-only predefined property rows (`title_pattern`, `question_generation_instruction`). */
+  /** When true, insert/key presets include index-only keys (`title_pattern`, `question_generation_instruction`). */
   isIndexContext?: boolean
 }>()
 
@@ -232,15 +230,7 @@ function rowKeyPresetListId(idx: number) {
 function buildPropertyRows(): PropertyRow[] {
   const p = parsed.value
   if (!p.ok) return []
-  let rows = sortedPropertyRowsFromRecord(p.properties)
-  if (props.isIndexContext && !isReadOnly.value) {
-    for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
-      if (!rows.some((r) => rowFillsIndexOnlyPresetSlot(r.key, key))) {
-        rows = [...rows, { key, value: "" }]
-      }
-    }
-  }
-  return rows
+  return sortedPropertyRowsFromRecord(p.properties)
 }
 
 function filterForEmit(rows: PropertyRow[]): PropertyRow[] {

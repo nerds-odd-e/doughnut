@@ -64,18 +64,6 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
       ])
     ).toEqual(richModeKeyDropdownPresetKeys(false))
   })
-
-  it("in index context, removes index-only presets when placeholder rows exist", () => {
-    const rows = [
-      { key: "title_pattern", value: "" },
-      { key: "question_generation_instruction", value: "" },
-    ]
-    expect(richModeKeyDropdownPresetKeysForPropertyRows(true, rows)).toEqual([
-      "image",
-      "wikidata_id",
-      "url",
-    ])
-  })
 })
 
 describe("richModeKeyDropdownPresetKeys", () => {
