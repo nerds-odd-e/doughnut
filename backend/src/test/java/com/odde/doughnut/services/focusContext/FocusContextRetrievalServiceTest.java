@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -186,25 +187,15 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void differentSeedsProduceDifferentInboundSelection() {
-      List<String> seed1 =
-          service
-              .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L))
-              .getRelatedNotes()
-              .stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .map(FocusContextNote::getTitle)
-              .sorted()
-              .toList();
-      List<String> seed2 =
-          service
-              .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(99L))
-              .getRelatedNotes()
-              .stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .map(FocusContextNote::getTitle)
-              .sorted()
-              .toList();
-      assertThat(seed1, not(equalTo(seed2)));
+      List<String> baseline = sortedInboundReferrerTitles(1L);
+      boolean foundDistinct =
+          LongStream.rangeClosed(2, 10)
+              .anyMatch(seed -> !baseline.equals(sortedInboundReferrerTitles(seed)));
+      assertThat(
+          "CRC32(concat(noteId, seed)) can rank the same six referrers for two arbitrary seeds; "
+              + "expect some seed in range to change the capped set",
+          foundDistinct,
+          is(true));
     }
 
     @Test
@@ -311,6 +302,17 @@ class FocusContextRetrievalServiceTest {
                           && n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
               .count();
       assertThat(depth2InboundCount, lessThanOrEqualTo(2L));
+    }
+
+    private List<String> sortedInboundReferrerTitles(long seed) {
+      return service
+          .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(seed))
+          .getRelatedNotes()
+          .stream()
+          .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
+          .map(FocusContextNote::getTitle)
+          .sorted()
+          .toList();
     }
   }
 
@@ -714,7 +716,7 @@ class FocusContextRetrievalServiceTest {
             .please();
       }
 
-      List<String> seed1 =
+      List<String> baseline =
           service
               .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(1L))
               .getFocusNote()
@@ -722,16 +724,23 @@ class FocusContextRetrievalServiceTest {
               .stream()
               .sorted()
               .toList();
-      List<String> seed2 =
-          service
-              .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(999L))
-              .getFocusNote()
-              .getSampleSiblings()
-              .stream()
-              .sorted()
-              .toList();
+      boolean foundDistinct =
+          LongStream.rangeClosed(2, 10)
+              .anyMatch(
+                  seed ->
+                      !baseline.equals(
+                          service
+                              .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(seed))
+                              .getFocusNote()
+                              .getSampleSiblings()
+                              .stream()
+                              .sorted()
+                              .toList()));
 
-      assertThat(seed1, not(equalTo(seed2)));
+      assertThat(
+          "CRC32(concat(noteId, seed)) can yield the same sibling sample for two arbitrary seeds",
+          foundDistinct,
+          is(true));
     }
 
     @Test
