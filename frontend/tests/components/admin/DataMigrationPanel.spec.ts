@@ -14,12 +14,20 @@ describe("DataMigrationPanel", () => {
     message: "stub message",
   }
 
-  let runBatchSpy: ReturnType<typeof mockSdkService<"runDataMigrationBatch">>
-  let getSpy: ReturnType<typeof mockSdkService<"getAdminDataMigrationStatus">>
+  let runBatchSpy: ReturnType<typeof mockSdkService>
+  let getSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
-    getSpy = mockSdkService("getAdminDataMigrationStatus", idleDto)
-    runBatchSpy = mockSdkService("runDataMigrationBatch", idleDto)
+    getSpy = mockSdkService(
+      AdminDataMigrationController,
+      "getAdminDataMigrationStatus",
+      idleDto
+    )
+    runBatchSpy = mockSdkService(
+      AdminDataMigrationController,
+      "runDataMigrationBatch",
+      idleDto
+    )
   })
 
   it("loads status when mounted", async () => {

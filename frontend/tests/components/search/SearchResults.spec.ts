@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import SearchResults from "@/components/search/SearchResults.vue"
 import helper, {
   mockSdkService,
@@ -38,10 +42,10 @@ function setupSearchMocks(
   semanticResults: NoteSearchResult[] = []
 ) {
   const literal = asLiteralHits(literalResults)
-  mockSdkService("searchForRelationshipTarget", literal)
-  mockSdkService("semanticSearch", semanticResults)
-  mockSdkService("searchForRelationshipTargetWithin", literal)
-  mockSdkService("semanticSearchWithin", semanticResults)
+  mockSdkService(SearchController, "searchForRelationshipTarget", literal)
+  mockSdkService(SearchController, "semanticSearch", semanticResults)
+  mockSdkService(SearchController, "searchForRelationshipTargetWithin", literal)
+  mockSdkService(SearchController, "semanticSearchWithin", semanticResults)
 }
 
 function setupDelayedSearchMocks() {
@@ -49,8 +53,12 @@ function setupDelayedSearchMocks() {
     setTimeout(() => resolve([]), 1)
   )
 
-  const searchSpy = mockSdkService("searchForRelationshipTarget", [])
-  const semanticSpy = mockSdkService("semanticSearch", [])
+  const searchSpy = mockSdkService(
+    SearchController,
+    "searchForRelationshipTarget",
+    []
+  )
+  const semanticSpy = mockSdkService(SearchController, "semanticSearch", [])
   searchSpy.mockReturnValue(
     delayed.then((data) => wrapSdkResponse(data)) as never
   )
@@ -110,7 +118,7 @@ describe("SearchResults.vue", () => {
     it("shows a loading indicator before results arrive", async () => {
       vi.useFakeTimers()
       setupDelayedSearchMocks()
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "q",
@@ -129,7 +137,7 @@ describe("SearchResults.vue", () => {
     it("shows 'No matching notes found.' when results are empty after search", async () => {
       vi.useFakeTimers()
       setupSearchMocks()
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "z",
@@ -148,11 +156,16 @@ describe("SearchResults.vue", () => {
       const literalSpy = vi.fn().mockResolvedValue([])
       const semanticSpy = vi.fn().mockResolvedValue([])
       mockSdkServiceWithImplementation(
+        SearchController,
         "searchForRelationshipTarget",
         literalSpy
       )
-      mockSdkServiceWithImplementation("semanticSearch", semanticSpy)
-      mockSdkService("getRecentNotes", [])
+      mockSdkServiceWithImplementation(
+        SearchController,
+        "semanticSearch",
+        semanticSpy
+      )
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       mountSearchResults({
         inputSearchKey: "q",
@@ -177,17 +190,27 @@ describe("SearchResults.vue", () => {
       const semanticSpy = vi.fn().mockResolvedValue([])
       const semanticWithinSpy = vi.fn().mockResolvedValue([])
 
-      mockSdkServiceWithImplementation("searchForRelationshipTarget", firstSpy)
       mockSdkServiceWithImplementation(
+        SearchController,
+        "searchForRelationshipTarget",
+        firstSpy
+      )
+      mockSdkServiceWithImplementation(
+        SearchController,
         "searchForRelationshipTargetWithin",
         withinSpy
       )
-      mockSdkServiceWithImplementation("semanticSearch", semanticSpy)
       mockSdkServiceWithImplementation(
+        SearchController,
+        "semanticSearch",
+        semanticSpy
+      )
+      mockSdkServiceWithImplementation(
+        SearchController,
         "semanticSearchWithin",
         semanticWithinSpy
       )
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "a",
@@ -225,17 +248,27 @@ describe("SearchResults.vue", () => {
       const mockSemanticTop = vi.fn().mockResolvedValueOnce([])
       const mockSemanticWithin = vi.fn().mockResolvedValueOnce([])
 
-      mockSdkServiceWithImplementation("searchForRelationshipTarget", mockTop)
       mockSdkServiceWithImplementation(
+        SearchController,
+        "searchForRelationshipTarget",
+        mockTop
+      )
+      mockSdkServiceWithImplementation(
+        SearchController,
         "searchForRelationshipTargetWithin",
         mockWithin
       )
-      mockSdkServiceWithImplementation("semanticSearch", mockSemanticTop)
       mockSdkServiceWithImplementation(
+        SearchController,
+        "semanticSearch",
+        mockSemanticTop
+      )
+      mockSdkServiceWithImplementation(
+        SearchController,
         "semanticSearchWithin",
         mockSemanticWithin
       )
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "x",
@@ -273,6 +306,7 @@ describe("SearchResults.vue", () => {
         .please()
 
       mockSdkServiceWithImplementation(
+        SearchController,
         "searchForRelationshipTargetWithin",
         vi
           .fn()
@@ -281,12 +315,13 @@ describe("SearchResults.vue", () => {
           )
       )
       mockSdkServiceWithImplementation(
+        SearchController,
         "semanticSearchWithin",
         vi.fn().mockResolvedValue([])
       )
-      mockSdkService("searchForRelationshipTarget", [])
-      mockSdkService("semanticSearch", [])
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      mockSdkService(SearchController, "semanticSearch", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "test",
@@ -317,16 +352,18 @@ describe("SearchResults.vue", () => {
         distance: 0.9,
       }
       mockSdkServiceWithImplementation(
+        SearchController,
         "searchForRelationshipTargetWithin",
         vi.fn().mockResolvedValue([folderHit])
       )
       mockSdkServiceWithImplementation(
+        SearchController,
         "semanticSearchWithin",
         vi.fn().mockResolvedValue([])
       )
-      mockSdkService("searchForRelationshipTarget", [])
-      mockSdkService("semanticSearch", [])
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      mockSdkService(SearchController, "semanticSearch", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "spec",
@@ -352,16 +389,18 @@ describe("SearchResults.vue", () => {
         distance: 0.0,
       }
       mockSdkServiceWithImplementation(
+        SearchController,
         "searchForRelationshipTargetWithin",
         vi.fn().mockResolvedValue([notebookHit])
       )
       mockSdkServiceWithImplementation(
+        SearchController,
         "semanticSearchWithin",
         vi.fn().mockResolvedValue([])
       )
-      mockSdkService("searchForRelationshipTarget", [])
-      mockSdkService("semanticSearch", [])
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      mockSdkService(SearchController, "semanticSearch", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "field",
@@ -382,7 +421,11 @@ describe("SearchResults.vue", () => {
 
   describe("recent notes", () => {
     it("shows recently updated notes when search key is empty", async () => {
-      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
+      const getRecentNotesSpy = mockSdkService(
+        NoteController,
+        "getRecentNotes",
+        recentNotes
+      )
       setupSearchMocks()
 
       const wrapper = mountSearchResults({
@@ -398,7 +441,7 @@ describe("SearchResults.vue", () => {
     })
 
     it("shows empty message when no recent notes available with noteId", async () => {
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "",
@@ -430,7 +473,7 @@ describe("SearchResults.vue", () => {
     it("shows 'Search result' title when results are found", async () => {
       vi.useFakeTimers()
       setupSearchMocks([searchResult(3, "Search Result")])
-      mockSdkService("getRecentNotes", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "test",
@@ -448,7 +491,7 @@ describe("SearchResults.vue", () => {
     it("shows recent notes while waiting for first search", async () => {
       vi.useFakeTimers()
       setupDelayedSearchMocks()
-      mockSdkService("getRecentNotes", recentNotes)
+      mockSdkService(NoteController, "getRecentNotes", recentNotes)
 
       const wrapper = mountSearchResults({
         inputSearchKey: "test",
@@ -470,7 +513,11 @@ describe("SearchResults.vue", () => {
     })
 
     it("calls getRecentNotes only once on mount", async () => {
-      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
+      const getRecentNotesSpy = mockSdkService(
+        NoteController,
+        "getRecentNotes",
+        recentNotes
+      )
       setupSearchMocks()
       getRecentNotesSpy.mockClear()
 
@@ -481,7 +528,11 @@ describe("SearchResults.vue", () => {
     })
 
     it("calls getRecentNotes only once on mount when isDropdown is true and noteId is set (like in NoteNewForm)", async () => {
-      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
+      const getRecentNotesSpy = mockSdkService(
+        NoteController,
+        "getRecentNotes",
+        recentNotes
+      )
       setupSearchMocks()
       getRecentNotesSpy.mockClear()
 
@@ -498,7 +549,7 @@ describe("SearchResults.vue", () => {
     it("switches back to recent notes when search key is cleared", async () => {
       vi.useFakeTimers()
       setupSearchMocks([searchResult(3, "Search Result")])
-      mockSdkService("getRecentNotes", recentNotes)
+      mockSdkService(NoteController, "getRecentNotes", recentNotes)
 
       const wrapper = mountSearchResults({
         inputSearchKey: "test",
@@ -520,7 +571,11 @@ describe("SearchResults.vue", () => {
     })
 
     it("shows recent notes for relationship target search with noteId", async () => {
-      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
+      const getRecentNotesSpy = mockSdkService(
+        NoteController,
+        "getRecentNotes",
+        recentNotes
+      )
       setupSearchMocks()
 
       const wrapper = mountSearchResults({
@@ -545,7 +600,7 @@ describe("SearchResults.vue", () => {
         ...recentNotes,
       ]
 
-      mockSdkService("getRecentNotes", recentNotesWithCurrent)
+      mockSdkService(NoteController, "getRecentNotes", recentNotesWithCurrent)
       setupSearchMocks()
 
       const wrapper = mountSearchResults({
@@ -567,7 +622,11 @@ describe("SearchResults.vue", () => {
         setTimeout(() => resolve([]), 2000)
       )
 
-      const searchSpy = mockSdkService("searchForRelationshipTarget", [])
+      const searchSpy = mockSdkService(
+        SearchController,
+        "searchForRelationshipTarget",
+        []
+      )
       searchSpy.mockResolvedValueOnce(
         wrapSdkResponse(asLiteralHits(firstSearchResults))
       )
@@ -575,13 +634,13 @@ describe("SearchResults.vue", () => {
         secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
       )
 
-      const semanticSpy = mockSdkService("semanticSearch", [])
+      const semanticSpy = mockSdkService(SearchController, "semanticSearch", [])
       semanticSpy.mockResolvedValueOnce(wrapSdkResponse([]))
       semanticSpy.mockReturnValue(
         secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
       )
 
-      mockSdkService("getRecentNotes", recentNotes)
+      mockSdkService(NoteController, "getRecentNotes", recentNotes)
 
       const wrapper = mountSearchResults({
         inputSearchKey: "first",

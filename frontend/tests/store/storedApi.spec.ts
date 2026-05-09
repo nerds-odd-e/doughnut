@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  TextContentController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
@@ -23,10 +27,10 @@ describe("storedApiCollection", () => {
 
   describe("delete note", () => {
     const parentNote = makeMe.aNoteRealm.please()
-    let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
+    let deleteNoteSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
-      deleteNoteSpy = mockSdkService("deleteNote", [parentNote])
+      deleteNoteSpy = mockSdkService(NoteController, "deleteNote", [parentNote])
     })
 
     it("should call the api", async () => {
@@ -61,7 +65,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should navigate to notebook when delete returns no realms", async () => {
-      mockSdkService("deleteNote", [])
+      mockSdkService(NoteController, "deleteNote", [])
       storageAccessor.value.refreshNoteRealm(note)
 
       const sa = storageAccessor.value.storedApi()
@@ -78,7 +82,7 @@ describe("storedApiCollection", () => {
     const parentNote = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
-      mockSdkService("deleteNote", [parentNote])
+      mockSdkService(NoteController, "deleteNote", [parentNote])
     })
 
     it("should remove the created note from cache after undo", async () => {
@@ -99,7 +103,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should navigate to notebook page when delete returns no realms", async () => {
-      mockSdkService("deleteNote", [])
+      mockSdkService(NoteController, "deleteNote", [])
       const noteEditingHistory = new NoteEditingHistory()
       storageAccessor.value = createNoteStorage(noteEditingHistory)
 
@@ -117,16 +121,18 @@ describe("storedApiCollection", () => {
   })
 
   describe("completeContent", () => {
-    let updateNoteContentSpy: ReturnType<
-      typeof mockSdkService<"updateNoteContent">
-    >
-    let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
+    let updateNoteContentSpy: ReturnType<typeof mockSdkService>
+    let showNoteSpy: ReturnType<typeof mockSdkService>
     let noteRef
 
     beforeEach(() => {
       vi.clearAllMocks()
-      updateNoteContentSpy = mockSdkService("updateNoteContent", note)
-      showNoteSpy = mockSdkService("showNote", note)
+      updateNoteContentSpy = mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        note
+      )
+      showNoteSpy = mockSdkService(NoteController, "showNote", note)
       noteRef = storageAccessor.value.refOfNoteRealm(note.id)
     })
 
@@ -189,13 +195,15 @@ describe("storedApiCollection", () => {
   })
 
   describe("refreshWikiLinkCacheForNote", () => {
-    let updateNoteContentSpy: ReturnType<
-      typeof mockSdkService<"updateNoteContent">
-    >
+    let updateNoteContentSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
       vi.clearAllMocks()
-      updateNoteContentSpy = mockSdkService("updateNoteContent", note)
+      updateNoteContentSpy = mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        note
+      )
     })
 
     it("calls updateNoteContent even when content matches stored note", async () => {

@@ -1,3 +1,7 @@
+import {
+  AiController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilateSingleNotePage from "@/pages/AssimilateSingleNotePage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
@@ -10,13 +14,14 @@ import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 let renderer: RenderingHelper<typeof AssimilateSingleNotePage>
 let router: ReturnType<typeof createRouter>
-let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
+let showNoteSpy: ReturnType<typeof mockSdkService>
 let noteRealm: NoteRealm
 
 beforeEach(() => {
   noteRealm = makeMe.aNoteRealm.please()
-  showNoteSpy = mockSdkService("showNote", noteRealm)
+  showNoteSpy = mockSdkService(NoteController, "showNote", noteRealm)
   mockSdkService(
+    NoteController,
     "getNoteInfo",
     makeMe.aNoteRecallInfo
       .recallSetting({
@@ -26,8 +31,8 @@ beforeEach(() => {
       })
       .please()
   )
-  mockSdkService("showNoteAccessory", {})
-  mockSdkService("generateUnderstandingChecklist", { points: [] })
+  mockSdkService(NoteController, "showNoteAccessory", { id: 0 })
+  mockSdkService(AiController, "generateUnderstandingChecklist", { points: [] })
   router = createRouter({
     history: createWebHistory(),
     routes,

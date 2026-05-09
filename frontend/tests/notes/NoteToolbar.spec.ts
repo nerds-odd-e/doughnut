@@ -1,3 +1,4 @@
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import NoteMoreOptionsForm from "@/components/notes/accessory/NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -25,6 +26,7 @@ describe("NoteToolbar", () => {
     const pushSpy = vi.spyOn(router, "push")
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(
+      NoteController,
       "getNoteInfo",
       makeMe.aNoteRecallInfo
         .recallSetting({
@@ -63,6 +65,7 @@ describe("NoteToolbar", () => {
   it("displays menu items when dropdown is open", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(
+      NoteController,
       "getNoteInfo",
       makeMe.aNoteRecallInfo
         .recallSetting({
@@ -104,6 +107,7 @@ describe("NoteToolbar", () => {
   it("closes more options dialog when note id changes", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(
+      NoteController,
       "getNoteInfo",
       makeMe.aNoteRecallInfo
         .recallSetting({

@@ -1,3 +1,4 @@
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -36,8 +37,8 @@ describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please()
 
-    const myNotebooksSpy = mockSdkService("myNotebooks", {
-      notebooks: [notebook],
+    const myNotebooksSpy = mockSdkService(NotebookController, "myNotebooks", {
+      notebooks: [{ notebook }],
       catalogItems: makeMe.notebookCatalog.notebooks(notebook).please(),
       subscriptions: [],
     })
@@ -60,14 +61,14 @@ describe("Notebooks Page", () => {
         },
       }
 
-      mockSdkService("myNotebooks", {
-        notebooks: [originalNotebook],
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: originalNotebook }],
         catalogItems: makeMe.notebookCatalog
           .notebooks(originalNotebook)
           .please(),
         subscriptions: [],
       })
-      mockSdkService("updateNotebook", updatedNotebook)
+      mockSdkService(NotebookController, "updateNotebook", updatedNotebook)
 
       const wrapper = helper
         .component(NotebooksPage)
@@ -114,8 +115,8 @@ describe("Notebooks Page", () => {
         name: "Updated Notebook 1",
       }
 
-      mockSdkService("myNotebooks", {
-        notebooks: [notebook1, notebook2],
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: notebook1 }, { notebook: notebook2 }],
         catalogItems: makeMe.notebookCatalog
           .notebooks(notebook1, notebook2)
           .please(),
@@ -160,7 +161,7 @@ describe("Notebooks Page", () => {
 
     it("should handle empty notebooks array gracefully", async () => {
       // Start with empty notebooks array
-      mockSdkService("myNotebooks", {
+      mockSdkService(NotebookController, "myNotebooks", {
         notebooks: [],
         catalogItems: [],
         subscriptions: [],
@@ -195,8 +196,8 @@ describe("Notebooks Page", () => {
         name: "After Update",
       }
 
-      mockSdkService("myNotebooks", {
-        notebooks: [originalNotebook],
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: originalNotebook }],
         catalogItems: makeMe.notebookCatalog
           .notebooks(originalNotebook)
           .please(),
@@ -243,8 +244,8 @@ describe("Notebooks Page", () => {
           .please(),
       ]
 
-      mockSdkService("myNotebooks", {
-        notebooks: [member],
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: member }],
         catalogItems,
         subscriptions: [],
       })
@@ -277,7 +278,7 @@ describe("Notebooks Page", () => {
       const notebookEntity = { ...makeMe.aNotebook.please(), name: "T" }
       const updatedNotebook = { ...notebookEntity, name: "Updated" }
 
-      mockSdkService("myNotebooks", {
+      mockSdkService(NotebookController, "myNotebooks", {
         notebooks: [{ notebook: notebookEntity, hasAttachedBook: true }],
         catalogItems: makeMe.notebookCatalog
           .notebooks({ ...notebookEntity, hasAttachedBook: true })
@@ -311,7 +312,7 @@ describe("Notebooks Page", () => {
   describe("read book catalog button", () => {
     it("shows read book control when hasAttachedBook is true", async () => {
       const nb = makeMe.aNotebook.please()
-      mockSdkService("myNotebooks", {
+      mockSdkService(NotebookController, "myNotebooks", {
         notebooks: [{ notebook: nb, hasAttachedBook: true }],
         catalogItems: makeMe.notebookCatalog
           .notebooks({ ...nb, hasAttachedBook: true })
@@ -331,7 +332,7 @@ describe("Notebooks Page", () => {
 
     it("navigates to book reading when read book is clicked", async () => {
       const nb = makeMe.aNotebook.please()
-      mockSdkService("myNotebooks", {
+      mockSdkService(NotebookController, "myNotebooks", {
         notebooks: [{ notebook: nb, hasAttachedBook: true }],
         catalogItems: makeMe.notebookCatalog
           .notebooks({ ...nb, hasAttachedBook: true })
@@ -361,7 +362,7 @@ describe("Notebooks Page", () => {
 
     it("hides read book control when hasAttachedBook is false", async () => {
       const nb = makeMe.aNotebook.please()
-      mockSdkService("myNotebooks", {
+      mockSdkService(NotebookController, "myNotebooks", {
         notebooks: [{ notebook: nb, hasAttachedBook: false }],
         catalogItems: makeMe.notebookCatalog
           .notebooks({ ...nb, hasAttachedBook: false })
@@ -383,8 +384,8 @@ describe("Notebooks Page", () => {
   describe("catalog overflow menu", () => {
     it("offers move to group without edit notebook settings", async () => {
       const nb = { ...makeMe.aNotebook.please(), name: "Owned Catalog" }
-      mockSdkService("myNotebooks", {
-        notebooks: [nb],
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: nb }],
         catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
         subscriptions: [],
       })

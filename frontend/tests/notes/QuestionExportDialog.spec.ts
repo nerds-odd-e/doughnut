@@ -1,3 +1,4 @@
+import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkError } from "../helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -39,7 +40,11 @@ describe("QuestionExportDialog", () => {
       },
       title: "Test Note",
     } as never
-    const spy = mockSdkService("exportQuestionGeneration", exportData)
+    const spy = mockSdkService(
+      PredefinedQuestionController,
+      "exportQuestionGeneration",
+      exportData
+    )
 
     wrapper = helper
       .component(QuestionExportDialog)
@@ -66,10 +71,14 @@ describe("QuestionExportDialog", () => {
 
   it("displays error message when API call fails", async () => {
     const note = makeMe.aNote.please()
-    const spy = mockSdkService("exportQuestionGeneration", {
-      request: { model: "gpt-4", messages: [] },
-      title: "Test Note",
-    } as never)
+    const spy = mockSdkService(
+      PredefinedQuestionController,
+      "exportQuestionGeneration",
+      {
+        request: { model: "gpt-4", messages: [] },
+        title: "Test Note",
+      } as never
+    )
     spy.mockResolvedValue(wrapSdkError("API Error"))
 
     wrapper = helper

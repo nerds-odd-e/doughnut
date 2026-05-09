@@ -1,3 +1,4 @@
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -13,7 +14,7 @@ describe("SpellingQuestionDisplay", () => {
     const recallPrompt = makeMe.aRecallPrompt
       .withQuestionType("SPELLING")
       .please()
-    mockSdkService("askAQuestion", recallPrompt)
+    mockSdkService(MemoryTrackerController, "askAQuestion", recallPrompt)
     const memoryTracker = makeMe.aMemoryTracker.please()
     // Add clozeDescription method to note for stem computation
     if (memoryTracker.note) {
@@ -22,7 +23,7 @@ describe("SpellingQuestionDisplay", () => {
         clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
       }
     }
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
   })
 
   afterEach(() => {

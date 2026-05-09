@@ -1,3 +1,4 @@
+import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import AiResponse from "@/components/conversations/AiResponse.vue"
 import createNoteStorage from "@/store/createNoteStorage"
 import type { TitleReplacement } from "@generated/doughnut-backend-api"
@@ -253,12 +254,11 @@ describe("AiResponse", () => {
 
   describe("Tool Call Handling", () => {
     const suggestedCompletion = "**bold completion**"
-    let updateNoteContentSpy: ReturnType<
-      typeof mockSdkService<"updateNoteContent">
-    >
+    let updateNoteContentSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(async () => {
       updateNoteContentSpy = mockSdkService(
+        TextContentController,
         "updateNoteContent",
         makeMe.aNoteRealm.please()
       )
@@ -439,12 +439,11 @@ describe("AiResponse", () => {
     })
 
     describe("Note Access", () => {
-      let updateNoteContentSpy: ReturnType<
-        typeof mockSdkService<"updateNoteContent">
-      >
+      let updateNoteContentSpy: ReturnType<typeof mockSdkService>
 
       beforeEach(async () => {
         updateNoteContentSpy = mockSdkService(
+          TextContentController,
           "updateNoteContent",
           makeMe.aNoteRealm.please()
         )
@@ -481,10 +480,11 @@ describe("AiResponse", () => {
 
   describe("Title Title Generation", () => {
     const testTitle = "Generated Title"
-    let updateNoteTitleSpy: ReturnType<typeof mockSdkService<"updateNoteTitle">>
+    let updateNoteTitleSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(async () => {
       updateNoteTitleSpy = mockSdkService(
+        TextContentController,
         "updateNoteTitle",
         makeMe.aNoteRealm.please()
       )

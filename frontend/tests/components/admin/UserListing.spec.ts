@@ -1,3 +1,4 @@
+import { AdminUserController } from "@generated/doughnut-backend-api/sdk.gen"
 import UserListing from "@/components/admin/UserListing.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
@@ -6,7 +7,11 @@ import helper, { mockSdkService } from "@tests/helpers"
 
 describe("UserListing", () => {
   it("displays loading message initially", async () => {
-    mockSdkService("listUsers", makeMe.aUserListingPage.please())
+    mockSdkService(
+      AdminUserController,
+      "listUsers",
+      makeMe.aUserListingPage.please()
+    )
     const wrapper = helper.component(UserListing).mount()
     expect(wrapper.text()).toContain("Loading users...")
   })
@@ -15,7 +20,7 @@ describe("UserListing", () => {
     const user1 = makeMe.aUserForListing.withName("Alice").please()
     const user2 = makeMe.aUserForListing.withName("Bob").please()
     const userPage = makeMe.aUserListingPage.withUsers([user1, user2]).please()
-    mockSdkService("listUsers", userPage)
+    mockSdkService(AdminUserController, "listUsers", userPage)
 
     const wrapper = helper.component(UserListing).mount()
     await flushPromises()
@@ -30,7 +35,7 @@ describe("UserListing", () => {
       .withNoteCount(42)
       .please()
     const userPage = makeMe.aUserListingPage.withUsers([user]).please()
-    mockSdkService("listUsers", userPage)
+    mockSdkService(AdminUserController, "listUsers", userPage)
 
     const wrapper = helper.component(UserListing).mount()
     await flushPromises()
@@ -44,7 +49,7 @@ describe("UserListing", () => {
       .withMemoryTrackerCount(15)
       .please()
     const userPage = makeMe.aUserListingPage.withUsers([user]).please()
-    mockSdkService("listUsers", userPage)
+    mockSdkService(AdminUserController, "listUsers", userPage)
 
     const wrapper = helper.component(UserListing).mount()
     await flushPromises()
@@ -58,7 +63,7 @@ describe("UserListing", () => {
       .withLastNoteTime("2025-06-15T10:30:00Z")
       .please()
     const userPage = makeMe.aUserListingPage.withUsers([user]).please()
-    mockSdkService("listUsers", userPage)
+    mockSdkService(AdminUserController, "listUsers", userPage)
 
     const wrapper = helper.component(UserListing).mount()
     await flushPromises()
@@ -69,7 +74,7 @@ describe("UserListing", () => {
   it("displays dash for missing times", async () => {
     const user = makeMe.aUserForListing.withName("Alice").please()
     const userPage = makeMe.aUserListingPage.withUsers([user]).please()
-    mockSdkService("listUsers", userPage)
+    mockSdkService(AdminUserController, "listUsers", userPage)
 
     const wrapper = helper.component(UserListing).mount()
     await flushPromises()
@@ -84,7 +89,7 @@ describe("UserListing", () => {
         .withUsers([user])
         .withTotalCount(25)
         .please()
-      mockSdkService("listUsers", userPage)
+      mockSdkService(AdminUserController, "listUsers", userPage)
 
       const wrapper = helper.component(UserListing).mount()
       await flushPromises()
@@ -95,7 +100,7 @@ describe("UserListing", () => {
     it("hides pagination when there is only one page", async () => {
       const user = makeMe.aUserForListing.please()
       const userPage = makeMe.aUserListingPage.withUsers([user]).please()
-      mockSdkService("listUsers", userPage)
+      mockSdkService(AdminUserController, "listUsers", userPage)
 
       const wrapper = helper.component(UserListing).mount()
       await flushPromises()

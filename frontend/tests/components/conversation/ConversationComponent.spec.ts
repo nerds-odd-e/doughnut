@@ -1,3 +1,7 @@
+import {
+  ConversationMessageController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { expect, vi, beforeEach, afterEach, describe, it } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -31,10 +35,14 @@ describe("ConversationComponent", () => {
 
   beforeEach(() => {
     mockedPush.mockClear()
-    mockSdkService("getConversationsAboutNote", [])
-    mockSdkService("getConversationMessages", [])
+    mockSdkService(
+      ConversationMessageController,
+      "getConversationsAboutNote",
+      []
+    )
+    mockSdkService(ConversationMessageController, "getConversationMessages", [])
     // Mock showNote to prevent real API calls from StoredApiCollection
-    mockSdkService("showNote", makeMe.aNoteRealm.please())
+    mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
     wrapper = helper
       .component(ConversationComponent)
       .withCleanStorage()
@@ -60,7 +68,11 @@ describe("ConversationComponent", () => {
       const conversation = makeMe.aConversation.forANote(note).please()
       const user = makeMe.aUser.please()
 
-      mockSdkService("getConversationMessages", [])
+      mockSdkService(
+        ConversationMessageController,
+        "getConversationMessages",
+        []
+      )
       const wrapper = helper
         .component(ConversationComponent)
         .withCleanStorage()

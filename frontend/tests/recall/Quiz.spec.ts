@@ -1,3 +1,8 @@
+import {
+  MemoryTrackerController,
+  NoteController,
+  RecallPromptController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import Quiz from "@/components/recall/Quiz.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, it, vi, afterEach, expect } from "vitest"
@@ -14,15 +19,23 @@ import type {
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
-  let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
+  let askAQuestionSpy: ReturnType<typeof mockSdkService>
   let wrapper: VueWrapper
 
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    mockSdkService("showNote", makeMe.aNoteRealm.please())
-    mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
-    askAQuestionSpy = mockSdkService("askAQuestion", recallPrompt)
+    mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
+    mockSdkService(
+      MemoryTrackerController,
+      "showMemoryTracker",
+      makeMe.aMemoryTracker.please()
+    )
+    askAQuestionSpy = mockSdkService(
+      MemoryTrackerController,
+      "askAQuestion",
+      recallPrompt
+    )
   })
 
   afterEach(() => {
@@ -144,13 +157,18 @@ describe("repeat page", () => {
           clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
         }
       }
-      mockSdkService("showMemoryTracker", memoryTracker)
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        memoryTracker
+      )
 
       const answerResult: RecallPrompt = makeMe.aRecallPrompt
         .withQuestionType("SPELLING")
         .withAnswer({ id: 1, correct: true, spellingAnswer: "cat" })
         .please()
       const mockedAnswerSpelling = mockSdkService(
+        RecallPromptController,
         "answerSpelling",
         answerResult
       )

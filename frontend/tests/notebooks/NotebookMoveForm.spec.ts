@@ -1,3 +1,4 @@
+import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import { describe, it, beforeEach, expect } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -9,10 +10,10 @@ describe("circle show page", () => {
   const notebook = makeMe.aNotebook.please()
   const circle1 = makeMe.aCircle.please()
   const circle2 = makeMe.aCircle.please()
-  let indexSpy: ReturnType<typeof mockSdkService<"index">>
+  let indexSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
-    indexSpy = mockSdkService("index", [circle1, circle2])
+    indexSpy = mockSdkService(CircleController, "index", [circle1, circle2])
   })
 
   it("fetch API to be called ONCE on mount", async () => {

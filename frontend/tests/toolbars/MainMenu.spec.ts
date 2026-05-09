@@ -1,3 +1,4 @@
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import MainMenu from "@/components/toolbars/MainMenu.vue"
 import { useRecallData } from "@/composables/useRecallData"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -138,7 +139,7 @@ describe("main menu", () => {
     vi.clearAllMocks()
     // Browser Mode: Default to lg or larger (vertical menu) for tests
     createMatchMediaSpy(true)
-    mockSdkService("getMenuData", defaultMenuData)
+    mockSdkService(UserController, "getMenuData", defaultMenuData)
     vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())
     user = makeMe.aUser.please()
   })
@@ -207,6 +208,7 @@ describe("main menu", () => {
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
       mockSdkService(
+        UserController,
         "getMenuData",
         createMenuData({
           assimilationCount: {
@@ -243,6 +245,7 @@ describe("main menu", () => {
 
     it("fetches menu data when user changes", async () => {
       const getMenuDataSpy = mockSdkService(
+        UserController,
         "getMenuData",
         createMenuData({
           assimilationCount: {
@@ -269,6 +272,7 @@ describe("main menu", () => {
 
     it("calls getMenuData with the correct timezone", async () => {
       const getMenuDataSpy = mockSdkService(
+        UserController,
         "getMenuData",
         createMenuData({
           assimilationCount: {
@@ -291,6 +295,7 @@ describe("main menu", () => {
   describe("recall count", () => {
     it("shows recall count when there are items to repeat", async () => {
       mockSdkService(
+        UserController,
         "getMenuData",
         createMenuData({
           recallStatus: {
@@ -534,6 +539,7 @@ describe("main menu", () => {
 
     it("shows recall count badge on resume item when there are items to repeat", async () => {
       mockSdkService(
+        UserController,
         "getMenuData",
         createMenuData({
           recallStatus: {

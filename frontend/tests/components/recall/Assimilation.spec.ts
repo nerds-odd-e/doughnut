@@ -1,3 +1,8 @@
+import {
+  AiController,
+  AssimilationController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import Assimilation from "@/components/recall/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -18,8 +23,8 @@ vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
 
 let renderer: RenderingHelper<typeof Assimilation>
-let assimilateSpy: ReturnType<typeof mockSdkService<"assimilate">>
-let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
+let assimilateSpy: ReturnType<typeof mockSdkService>
+let showNoteSpy: ReturnType<typeof mockSdkService>
 const mockedIncrementAssimilatedCount = vi.fn()
 const mockedRequestDueRecallsRefresh = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
@@ -36,10 +41,14 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  assimilateSpy = mockSdkService("assimilate", [])
-  showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
-  mockSdkService("getNoteInfo", {})
-  mockSdkService("generateUnderstandingChecklist", {
+  assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
+  showNoteSpy = mockSdkService(
+    NoteController,
+    "showNote",
+    makeMe.aNoteRealm.please()
+  )
+  mockSdkService(NoteController, "getNoteInfo", {})
+  mockSdkService(AiController, "generateUnderstandingChecklist", {
     points: [],
   })
 
@@ -136,7 +145,7 @@ describe("Assimilation component", () => {
 
   describe("SpellingVerificationPopup", () => {
     beforeEach(() => {
-      mockSdkService("getNoteInfo", {
+      mockSdkService(NoteController, "getNoteInfo", {
         recallSetting: { rememberSpelling: true },
       })
     })
@@ -204,8 +213,10 @@ describe("Assimilation component", () => {
 
   describe("keep for repetition when note has memory trackers", () => {
     it("disables keep for repetition when note has memory trackers and no add-spelling-only mode", async () => {
-      mockSdkService("getNoteInfo", {
-        memoryTrackers: [{ id: 1, spelling: false }],
+      mockSdkService(NoteController, "getNoteInfo", {
+        memoryTrackers: [
+          { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
+        ],
       })
       const wrapper = mount()
       await flushPromises()
@@ -215,9 +226,11 @@ describe("Assimilation component", () => {
     })
 
     it("enables keep for repetition when remember spelling on and no spelling tracker", async () => {
-      mockSdkService("getNoteInfo", {
+      mockSdkService(NoteController, "getNoteInfo", {
         recallSetting: { rememberSpelling: true },
-        memoryTrackers: [{ id: 1, spelling: false }],
+        memoryTrackers: [
+          { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
+        ],
       })
       const wrapper = mount()
       await flushPromises()
@@ -227,13 +240,22 @@ describe("Assimilation component", () => {
     })
 
     it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
-      mockSdkService("getNoteInfo", {
+      mockSdkService(NoteController, "getNoteInfo", {
         recallSetting: { rememberSpelling: true },
-        memoryTrackers: [{ id: 1, spelling: false }],
+        memoryTrackers: [
+          { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
+        ],
       })
-      mockSdkService("verifySpelling", { correct: true })
+      mockSdkService(NoteController, "verifySpelling", { correct: true })
       assimilateSpy.mockResolvedValue(
-        wrapSdkResponse([{ id: 2, spelling: true, removedFromTracking: false }])
+        wrapSdkResponse([
+          {
+            ...makeMe.aMemoryTracker.please(),
+            id: 2,
+            spelling: true,
+            removedFromTracking: false,
+          },
+        ])
       )
       const wrapper = mount()
       await flushPromises()

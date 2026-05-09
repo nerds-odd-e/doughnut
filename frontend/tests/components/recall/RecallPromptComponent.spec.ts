@@ -1,3 +1,4 @@
+import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import RecallPromptComponent from "@/components/recall/RecallPromptComponent.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, {
@@ -11,7 +12,11 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 describe("RecallPromptComponent", () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    mockSdkService("answerQuiz", makeMe.anAnsweredQuestion.please())
+    mockSdkService(
+      RecallPromptController,
+      "answerQuiz",
+      makeMe.anAnsweredQuestion.please()
+    )
   })
 
   afterEach(() => {
@@ -35,6 +40,7 @@ describe("RecallPromptComponent", () => {
     it("shows loading state while submitting answer", async () => {
       // Setup API to delay response
       const answerQuizSpy = mockSdkService(
+        RecallPromptController,
         "answerQuiz",
         makeMe.anAnsweredQuestion.please()
       )
@@ -78,6 +84,7 @@ describe("RecallPromptComponent", () => {
     it("allows retrying on API error", async () => {
       // Setup API to fail first time
       const answerQuizSpy = mockSdkService(
+        RecallPromptController,
         "answerQuiz",
         makeMe.anAnsweredQuestion.answerCorrect(true).please()
       )
@@ -117,7 +124,7 @@ describe("RecallPromptComponent", () => {
       const answerResult = makeMe.anAnsweredQuestion
         .answerCorrect(true)
         .please()
-      mockSdkService("answerQuiz", answerResult)
+      mockSdkService(RecallPromptController, "answerQuiz", answerResult)
 
       const wrapper = mountComponent()
 

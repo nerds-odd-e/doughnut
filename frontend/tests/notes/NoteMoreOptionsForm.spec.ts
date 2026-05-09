@@ -1,3 +1,4 @@
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteMoreOptionsForm from "@/components/notes/accessory/NoteMoreOptionsForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -11,7 +12,7 @@ import routes from "@/routes/routes"
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
 let router: ReturnType<typeof createRouter>
-let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
+let deleteNoteSpy: ReturnType<typeof mockSdkService>
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -19,7 +20,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  deleteNoteSpy = mockSdkService("deleteNote", undefined)
+  deleteNoteSpy = mockSdkService(NoteController, "deleteNote", undefined)
   router = createRouter({
     history: createWebHistory(),
     routes,

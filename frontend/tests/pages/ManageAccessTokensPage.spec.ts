@@ -1,3 +1,4 @@
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -17,12 +18,12 @@ describe("ManageAccessTokensPage", () => {
   })
 
   it('displays "No Label" when token label is empty', async () => {
-    mockSdkService("generateToken", {
+    mockSdkService(UserController, "generateToken", {
       token: "mocked-token",
       label: "",
       id: 1,
     })
-    mockSdkService("getTokens", [])
+    mockSdkService(UserController, "getTokens", [])
 
     helper.component(ManageAccessTokensPage).withRouter(router).render()
 

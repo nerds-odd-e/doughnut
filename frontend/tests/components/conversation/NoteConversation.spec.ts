@@ -1,3 +1,4 @@
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
@@ -52,22 +53,25 @@ describe("NoteConversation", () => {
     return wrapper
   }
 
-  let startConversationSpy: ReturnType<
-    typeof mockSdkService<"startConversationAboutNote">
-  >
+  let startConversationSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     vi.useFakeTimers()
     startConversationSpy = mockSdkService(
+      ConversationMessageController,
       "startConversationAboutNote",
       conversation
     )
-    mockSdkService("getConversationMessages", [])
+    mockSdkService(ConversationMessageController, "getConversationMessages", [])
   })
 
   it("calls api to start conversation and shows ConversationInner when successful", async () => {
-    mockSdkService("getConversationsAboutNote", [])
+    mockSdkService(
+      ConversationMessageController,
+      "getConversationsAboutNote",
+      []
+    )
     const wrapper = await mount()
 
     await wrapper.find("textarea").setValue("Hello")
@@ -85,7 +89,9 @@ describe("NoteConversation", () => {
   })
 
   it("shows the first conversation if conversation exists", async () => {
-    mockSdkService("getConversationsAboutNote", [conversation])
+    mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
+      conversation,
+    ])
     const wrapper = await mount()
     const conversationInner = wrapper.findComponent(ConversationInner)
 
@@ -94,7 +100,11 @@ describe("NoteConversation", () => {
   })
 
   it("shows ConversationTemplate when no conversation exists", async () => {
-    mockSdkService("getConversationsAboutNote", [])
+    mockSdkService(
+      ConversationMessageController,
+      "getConversationsAboutNote",
+      []
+    )
     const wrapper = await mount()
     const conversationTemplate = wrapper.findComponent(ConversationTemplate)
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -119,7 +129,11 @@ describe("NoteConversation", () => {
       },
     ]
 
-    mockSdkService("getConversationsAboutNote", conversations)
+    mockSdkService(
+      ConversationMessageController,
+      "getConversationsAboutNote",
+      conversations
+    )
 
     const wrapper = await mount()
 
@@ -139,7 +153,9 @@ describe("NoteConversation", () => {
   })
 
   it("shows conversation selector only when multiple conversations exist", async () => {
-    mockSdkService("getConversationsAboutNote", [conversation])
+    mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
+      conversation,
+    ])
 
     const wrapper = await mount()
 
@@ -155,7 +171,9 @@ describe("NoteConversation", () => {
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-01T00:00:00Z",
     }
-    mockSdkService("getConversationsAboutNote", [existingConversation])
+    mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
+      existingConversation,
+    ])
 
     const wrapper = await mount()
 
@@ -185,7 +203,11 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when starting new conversation with AI invite", async () => {
-    mockSdkService("getConversationsAboutNote", [])
+    mockSdkService(
+      ConversationMessageController,
+      "getConversationsAboutNote",
+      []
+    )
     const mockStart = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
       mockStart
@@ -215,8 +237,14 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when sending message with AI invite in existing conversation", async () => {
-    mockSdkService("getConversationsAboutNote", [conversation])
-    const replySpy = mockSdkService("replyToConversation", undefined)
+    mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
+      conversation,
+    ])
+    const replySpy = mockSdkService(
+      ConversationMessageController,
+      "replyToConversation",
+      undefined
+    )
     const mockStart = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
       mockStart

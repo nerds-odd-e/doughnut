@@ -1,3 +1,7 @@
+import {
+  ConversationMessageController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
 import { within } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -28,7 +32,7 @@ describe("all in note show page", () => {
     const noteRealm = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
-      mockSdkService("showNote", noteRealm)
+      mockSdkService(NoteController, "showNote", noteRealm)
       mockNotebookGetForNoteRealm(noteRealm, {
         id: 101,
         name: "a circle",
@@ -36,7 +40,7 @@ describe("all in note show page", () => {
     })
 
     it("loads note by id from route", async () => {
-      const showNoteSpy = mockSdkService("showNote", noteRealm)
+      const showNoteSpy = mockSdkService(NoteController, "showNote", noteRealm)
 
       helper
         .component(NoteShowPageWithNotebookSidebarLayout)
@@ -66,8 +70,12 @@ describe("all in note show page", () => {
     const note = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
-      mockSdkService("showNote", note)
-      mockSdkService("getConversationsAboutNote", [])
+      mockSdkService(NoteController, "showNote", note)
+      mockSdkService(
+        ConversationMessageController,
+        "getConversationsAboutNote",
+        []
+      )
       mockNotebookGetForNoteRealm(note)
     })
 

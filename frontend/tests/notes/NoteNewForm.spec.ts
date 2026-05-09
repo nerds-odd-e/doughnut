@@ -1,3 +1,9 @@
+import {
+  NoteController,
+  NotebookController,
+  SearchController,
+  WikidataController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import WikidataAssociationDialogBody from "@/components/notes/WikidataAssociationDialogBody.vue"
@@ -41,12 +47,8 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-let searchForRelationshipTargetWithinSpy: ReturnType<
-  typeof mockSdkService<"searchForRelationshipTargetWithin">
->
-let mockedCreateNoteAtRoot: ReturnType<
-  typeof mockSdkService<"createNoteAtNotebookRoot">
->
+let searchForRelationshipTargetWithinSpy: ReturnType<typeof mockSdkService>
+let mockedCreateNoteAtRoot: ReturnType<typeof mockSdkService>
 
 async function setNoteNewFormTitle(
   wrapper: VueWrapper<ComponentPublicInstance>,
@@ -64,18 +66,22 @@ describe("adding new note", () => {
     vi.resetAllMocks()
     popupsMock.confirm.mockReset()
     popupsMock.confirm.mockResolvedValue(false)
-    mockSdkService("searchForRelationshipTarget", [])
+    mockSdkService(SearchController, "searchForRelationshipTarget", [])
     searchForRelationshipTargetWithinSpy = mockSdkService(
+      SearchController,
       "searchForRelationshipTargetWithin",
       []
     )
-    mockSdkService("semanticSearch", [])
-    mockSdkService("semanticSearchWithin", [])
-    mockSdkService("getRecentNotes", [])
-    mockSdkService("listNotebookFolderIndex", [])
-    mockSdkService("listNotebookFolderListing", { folders: [] })
+    mockSdkService(SearchController, "semanticSearch", [])
+    mockSdkService(SearchController, "semanticSearchWithin", [])
+    mockSdkService(NoteController, "getRecentNotes", [])
+    mockSdkService(NotebookController, "listNotebookFolderIndex", [])
+    mockSdkService(NotebookController, "listNotebookFolderListing", {
+      folders: [],
+    })
     const createNoteResult = makeMe.aNoteRealm.please()
     mockedCreateNoteAtRoot = mockSdkService(
+      NotebookController,
       "createNoteAtNotebookRoot",
       createNoteResult
     )
@@ -218,7 +224,9 @@ describe("adding new note", () => {
 
     it("sends folderId when a target folder is pre-selected", async () => {
       wrapper.unmount()
-      mockSdkService("listNotebookFolderIndex", [{ id: 42, name: "Alpha" }])
+      mockSdkService(NotebookController, "listNotebookFolderIndex", [
+        { id: 42, name: "Alpha" },
+      ])
       wrapper = helper
         .component(NoteNewForm)
         .withCleanStorage()
@@ -242,10 +250,10 @@ describe("adding new note", () => {
 
     it("sends folderId after user picks a folder in FolderSelector", async () => {
       wrapper.unmount()
-      mockSdkService("listNotebookFolderListing", {
+      mockSdkService(NotebookController, "listNotebookFolderListing", {
         folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
       })
-      mockSdkService("listNotebookFolderIndex", [
+      mockSdkService(NotebookController, "listNotebookFolderIndex", [
         { id: 7, name: "One" },
         { id: 8, name: "Two" },
       ])
@@ -284,7 +292,11 @@ describe("adding new note", () => {
     it("asks confirmation on soft-deleted title conflict and calls undo delete when confirmed", async () => {
       popupsMock.confirm.mockResolvedValueOnce(true)
       const restoredRealm = makeMe.aNoteRealm.please()
-      const undoSpy = mockSdkService("undoDeleteNote", restoredRealm)
+      const undoSpy = mockSdkService(
+        NoteController,
+        "undoDeleteNote",
+        restoredRealm
+      )
       mockedCreateNoteAtRoot.mockResolvedValueOnce({
         data: undefined,
         error: {
@@ -311,13 +323,17 @@ describe("adding new note", () => {
   describe("search wikidata entry", () => {
     // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
     let wrapper: VueWrapper<any>
-    let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
+    let searchWikidataSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
       searchForRelationshipTargetWithinSpy.mockResolvedValue(
         wrapSdkResponse([])
       )
-      searchWikidataSpy = mockSdkService("searchWikidata", [])
+      searchWikidataSpy = mockSdkService(
+        WikidataController,
+        "searchWikidata",
+        []
+      )
       wrapper = helper
         .component(NoteNewForm)
         .withCleanStorage()

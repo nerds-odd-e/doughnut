@@ -1,3 +1,4 @@
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import { type ConversationMessage } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -79,15 +80,17 @@ describe("ConversationInner", () => {
   let wrapper
   let conversation
   let user
-  let replyToConversationSpy: ReturnType<
-    typeof mockSdkService<"replyToConversation">
-  >
+  let replyToConversationSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     mockShowNote()
-    replyToConversationSpy = mockSdkService("replyToConversation", undefined)
-    mockSdkService("getConversationMessages", [])
+    replyToConversationSpy = mockSdkService(
+      ConversationMessageController,
+      "replyToConversation",
+      undefined
+    )
+    mockSdkService(ConversationMessageController, "getConversationMessages", [])
     resetInstance()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
 

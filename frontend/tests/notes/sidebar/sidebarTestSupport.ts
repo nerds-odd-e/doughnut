@@ -8,7 +8,10 @@ import type {
   Options,
   ShowNoteData,
 } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  NoteController,
+  NotebookController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   mockSdkServiceWithImplementation,
@@ -74,7 +77,7 @@ export function mockShowNoteForRealms(realms: NoteRealm[]) {
     number,
     NoteRealm
   >
-  mockSdkServiceWithImplementation("showNote", (options) => {
+  mockSdkServiceWithImplementation(NoteController, "showNote", (options) => {
     const id = (options as Options<ShowNoteData>).path.note
     const realm = byId[id]
     expect(
@@ -145,6 +148,7 @@ export function stubNotebookFolderListings(
   defaultTreeFolderListings: Record<string, FolderListing>
 ) {
   return mockSdkServiceWithImplementation(
+    NotebookController,
     "listNotebookFolderListing",
     (options) => folderListingForQueryParent(options, defaultTreeFolderListings)
   )
@@ -319,8 +323,10 @@ export function setupRootPeersWithFolders(options: {
       folders: [folderMango, folderBanana],
     },
   }
-  mockSdkServiceWithImplementation("listNotebookFolderListing", (options) =>
-    folderListingForQueryParent(options, rootPeersFolderListings)
+  mockSdkServiceWithImplementation(
+    NotebookController,
+    "listNotebookFolderListing",
+    (options) => folderListingForQueryParent(options, rootPeersFolderListings)
   )
   mockShowNoteForRealms([topNoteRealm, realmZ, realmA])
   return { nbId, realmA, realmZ }

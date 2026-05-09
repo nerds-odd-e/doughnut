@@ -65,32 +65,35 @@ In most situations, run all unit tests instead of a selected file only. Use a si
 
 ## Mock SDK Services
 
-- Use `mockSdkService` from `@tests/helpers` for type-safe mocking.
+- Use `mockSdkService` from `@tests/helpers` for type-safe mocking: pass the generated **controller class** and the **method name** (same static methods as `@generated/doughnut-backend-api/sdk.gen`).
 - It automatically wraps responses in the standard format `{ data, error, request, response }`.
 - It returns a spy that can be reconfigured in tests.
 - Use `wrapSdkResponse` when updating mock return values.
 - Use `mockSdkServiceWithImplementation` only for custom async logic based on options.
 
 ```typescript
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { mockSdkService } from "@tests/helpers"
 
 beforeEach(() => {
-  mockSdkService("getRecentNotes", [])
-  mockSdkService("showNote", makeMe.aNoteRealm.please())
+  mockSdkService(NoteController, "getRecentNotes", [])
+  mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
 })
 ```
 
 ```typescript
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
-const spy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+const spy = mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
 spy.mockResolvedValue(wrapSdkResponse(differentNote))
 ```
 
 ```typescript
+import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 
-mockSdkServiceWithImplementation("updateNoteContent", async (options) => {
+mockSdkServiceWithImplementation(TextContentController, "updateNoteContent", async (options) => {
   return await someAsyncOperation(options)
 })
 ```

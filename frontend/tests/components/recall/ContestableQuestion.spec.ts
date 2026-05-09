@@ -1,3 +1,4 @@
+import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import ContestableQuestion from "@/components/recall/ContestableQuestion.vue"
@@ -88,15 +89,19 @@ describe("ContestableQuestion.vue", () => {
       .withChoices(["X", "Y", "Z"])
       .please()
 
-    const contestSpy = mockSdkService("contest", {
+    const contestSpy = mockSdkService(RecallPromptController, "contest", {
       rejected: false,
       advice: "Question was contested",
-      isContested: true,
     })
 
-    const regenerateSpy = mockSdkService("regenerate", regeneratedQuestion)
+    const regenerateSpy = mockSdkService(
+      RecallPromptController,
+      "regenerate",
+      regeneratedQuestion
+    )
 
     const answerQuizSpy = mockSdkService(
+      RecallPromptController,
       "answerQuiz",
       makeMe.anAnsweredQuestion.answerCorrect(true).please()
     )

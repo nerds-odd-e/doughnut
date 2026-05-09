@@ -1,3 +1,4 @@
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -25,11 +26,16 @@ describe("RecentlyRecalledNotes", () => {
   ]
 
   beforeEach(() => {
-    mockSdkService("getRecentlyRecalled", mockMemoryTrackers)
+    mockSdkService(
+      MemoryTrackerController,
+      "getRecentlyRecalled",
+      mockMemoryTrackers
+    )
   })
 
   it("fetches and displays recently recalled points", async () => {
     const getRecentlyRecalledSpy = mockSdkService(
+      MemoryTrackerController,
       "getRecentlyRecalled",
       mockMemoryTrackers
     )
@@ -60,7 +66,11 @@ describe("RecentlyRecalledNotes", () => {
     })
     const pushSpy = vi.spyOn(router, "push")
 
-    mockSdkService("getRecentlyRecalled", mockMemoryTrackers)
+    mockSdkService(
+      MemoryTrackerController,
+      "getRecentlyRecalled",
+      mockMemoryTrackers
+    )
     const wrapper = helper
       .component(RecentlyRecalledNotes)
       .withRouter(router)

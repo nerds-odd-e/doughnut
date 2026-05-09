@@ -1,3 +1,4 @@
+import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -34,6 +35,7 @@ describe("in place edit on title", () => {
     vi.resetAllMocks()
     vi.useFakeTimers()
     mockSdkServiceWithImplementation(
+      TextContentController,
       "updateNoteTitle",
       async (options) => await mockedUpdateTitleCall(options)
     )

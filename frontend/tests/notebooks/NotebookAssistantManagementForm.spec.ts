@@ -1,3 +1,4 @@
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import NotebookAssistantManagementForm from "@/components/notebook/NotebookAssistantManagementForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -11,6 +12,7 @@ describe("NotebookAssistantManagementForm.vue", () => {
 
   beforeEach(() => {
     mockSdkServiceWithImplementation(
+      NotebookController,
       "updateAiAssistant",
       async (options) => await mockedUpdateAiAssistant(options)
     )

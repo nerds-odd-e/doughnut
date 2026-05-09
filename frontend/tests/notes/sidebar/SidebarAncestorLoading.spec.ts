@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  NotebookController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
@@ -40,13 +44,18 @@ describe("Sidebar gradual ancestor population", () => {
 
   it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
     const listingSpy = mockSdkServiceWithImplementation(
+      NotebookController,
       "listNotebookFolderListing",
       (options) =>
         folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)
     )
-    const showNoteSpy = mockSdkServiceWithImplementation("showNote", () => {
-      throw new Error("Sidebar must not use showNote for structural branches")
-    })
+    const showNoteSpy = mockSdkServiceWithImplementation(
+      NoteController,
+      "showNote",
+      () => {
+        throw new Error("Sidebar must not use showNote for structural branches")
+      }
+    )
 
     wrapper = mountSidebar(helper, fixtures, fixtures.secondGeneration)
     await flushPromises()

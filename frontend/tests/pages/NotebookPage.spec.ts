@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  NotebookController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import NotebookPageWithNotebookSidebarLayout from "@tests/fixtures/NotebookPageWithNotebookSidebarLayout.vue"
 import helper, {
@@ -12,20 +16,23 @@ import { beforeEach, describe, it, expect } from "vitest"
 describe("NotebookPage.spec", () => {
   beforeEach(() => {
     resetNotebookSidebarState()
-    mockSdkService("getAiAssistant", { additionalInstructionsToAi: "" })
+    mockSdkService(NotebookController, "getAiAssistant", {
+      id: 1,
+      additionalInstructionsToAi: "",
+    })
   })
 
   it("shows the note-show sidebar toggle and loads index state when notebook exposes landing id", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookView = { notebook, readonly: false }
-    mockSdkService("get", {
+    mockSdkService(NotebookController, "get", {
       notebook,
       hasAttachedBook: false,
       readonly: false,
       indexNoteId: indexRealm.id,
     })
-    const showSpy = mockSdkService("showNote", indexRealm)
+    const showSpy = mockSdkService(NoteController, "showNote", indexRealm)
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
@@ -60,7 +67,7 @@ describe("NotebookPage.spec", () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
     indexRealm.notebookView = { notebook, readonly: false }
-    mockSdkService("get", {
+    mockSdkService(NotebookController, "get", {
       notebook,
       hasAttachedBook: false,
       readonly: false,
@@ -70,7 +77,7 @@ describe("NotebookPage.spec", () => {
     const gate = new Promise<void>((resolve) => {
       release = resolve
     })
-    mockSdkServiceWithImplementation("showNote", async () => {
+    mockSdkServiceWithImplementation(NoteController, "showNote", async () => {
       await gate
       return indexRealm
     })
@@ -96,7 +103,7 @@ describe("NotebookPage.spec", () => {
 
   it("shows add-first-note prompt when notebook omits landing index id", async () => {
     const notebook = makeMe.aNotebook.please()
-    mockSdkService("get", {
+    mockSdkService(NotebookController, "get", {
       notebook,
       hasAttachedBook: false,
       readonly: false,

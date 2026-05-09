@@ -1,3 +1,4 @@
+import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -31,7 +32,11 @@ describe("Questions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService("getAllQuestionByNote", questions)
+    mockSdkService(
+      PredefinedQuestionController,
+      "getAllQuestionByNote",
+      questions
+    )
   })
 
   afterEach(() => {
@@ -58,6 +63,7 @@ describe("Questions", () => {
       title: "Test Note",
     } as never
     const exportQuestionGenerationSpy = mockSdkService(
+      PredefinedQuestionController,
       "exportQuestionGeneration",
       exportData
     )

@@ -17,7 +17,7 @@ import { beforeEach, describe, it, expect, vi } from "vitest"
 
 describe("NotebookPageView.spec", () => {
   beforeEach(() => {
-    mockSdkService("getAiAssistant", {
+    mockSdkService(NotebookController, "getAiAssistant", {
       id: 1,
       additionalInstructionsToAi: "",
     })

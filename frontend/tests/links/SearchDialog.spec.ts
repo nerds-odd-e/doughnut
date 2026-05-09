@@ -1,3 +1,8 @@
+import {
+  NoteController,
+  RelationController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import SearchForm from "@/components/links/SearchForm.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
@@ -20,11 +25,11 @@ describe("SearchForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
-    mockSdkService("getRecentNotes", [])
-    mockSdkService("searchForRelationshipTarget", [])
-    mockSdkService("searchForRelationshipTargetWithin", [])
-    mockSdkService("semanticSearch", [])
-    mockSdkService("semanticSearchWithin", [])
+    mockSdkService(NoteController, "getRecentNotes", [])
+    mockSdkService(SearchController, "searchForRelationshipTarget", [])
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
+    mockSdkService(SearchController, "semanticSearch", [])
+    mockSdkService(SearchController, "semanticSearchWithin", [])
   })
   it("Search at the top level with no note", async () => {
     helper
@@ -68,7 +73,7 @@ describe("SearchForm", () => {
   describe("Add link choice step", () => {
     it("shows choice buttons when Add link is clicked on a note hit", async () => {
       const note = MakeMe.aNote.please()
-      mockSdkService("searchForRelationshipTargetWithin", [
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
         makeNoteHit("Target Note", note.noteTopology.id + 100),
       ])
       helper
@@ -98,7 +103,7 @@ describe("SearchForm", () => {
 
     it("shows relationship form when Add a new relationship note is clicked", async () => {
       const note = MakeMe.aNote.please()
-      mockSdkService("searchForRelationshipTargetWithin", [
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
         makeNoteHit("Target Note", note.noteTopology.id + 100),
       ])
       helper
@@ -129,13 +134,13 @@ describe("SearchForm", () => {
 
   describe("Move Under folder hit", () => {
     it("calls moveNoteToFolder with folder id after confirm", async () => {
-      mockSdkService("getRecentNotes", [])
-      mockSdkService("searchForRelationshipTarget", [])
-      mockSdkService("semanticSearch", [])
-      mockSdkService("semanticSearchWithin", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      mockSdkService(SearchController, "semanticSearch", [])
+      mockSdkService(SearchController, "semanticSearchWithin", [])
       const note = MakeMe.aNote.please()
       const targetFolderId = 42
-      mockSdkService("searchForRelationshipTargetWithin", [
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
         {
           hitKind: "FOLDER",
           folderId: targetFolderId,
@@ -145,7 +150,11 @@ describe("SearchForm", () => {
           distance: 0.9,
         },
       ])
-      const moveNoteToFolderSpy = mockSdkService("moveNoteToFolder", [])
+      const moveNoteToFolderSpy = mockSdkService(
+        RelationController,
+        "moveNoteToFolder",
+        []
+      )
 
       helper
         .component(SearchForm)
@@ -182,13 +191,13 @@ describe("SearchForm", () => {
 
   describe("Move to notebook root on NOTEBOOK hit", () => {
     it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
-      mockSdkService("getRecentNotes", [])
-      mockSdkService("searchForRelationshipTarget", [])
-      mockSdkService("semanticSearch", [])
-      mockSdkService("semanticSearchWithin", [])
+      mockSdkService(NoteController, "getRecentNotes", [])
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      mockSdkService(SearchController, "semanticSearch", [])
+      mockSdkService(SearchController, "semanticSearchWithin", [])
       const note = MakeMe.aNote.please()
       const targetNotebookId = 99
-      mockSdkService("searchForRelationshipTargetWithin", [
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
         {
           hitKind: "NOTEBOOK",
           notebookId: targetNotebookId,
@@ -196,7 +205,11 @@ describe("SearchForm", () => {
           distance: 0,
         },
       ])
-      const spy = mockSdkService("moveNoteToNotebookRootInNotebook", [])
+      const spy = mockSdkService(
+        RelationController,
+        "moveNoteToNotebookRootInNotebook",
+        []
+      )
 
       helper
         .component(SearchForm)

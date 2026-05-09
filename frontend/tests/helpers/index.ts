@@ -1,32 +1,9 @@
 import RenderingHelper from "./RenderingHelper"
 import matchByText from "./matchByText"
-import { vi } from "vitest"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import {
-  UserController,
-  TestabilityRestController,
-  SubscriptionController,
-  GlobalSettingsController,
-  RecallPromptController,
-  PredefinedQuestionController,
   NoteController,
-  SearchController,
   NotebookController,
-  MemoryTrackerController,
-  RelationController,
-  ConversationMessageController,
-  CircleController,
-  BazaarController,
-  AiAudioController,
-  AssimilationController,
-  AiController,
-  TextContentController,
-  WikidataController,
-  CurrentUserInfoController,
-  RecallsController,
-  HealthCheckController,
-  FailureReportController,
-  AdminDataMigrationController,
-  AdminUserController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type {
   Circle,
@@ -34,6 +11,7 @@ import type {
   NoteRealm,
   Notebook,
 } from "@generated/doughnut-backend-api"
+import { vi } from "vitest"
 
 const TEST_FOLDER_DATE_TIME = "2000-01-01T00:00:00.000Z"
 
@@ -46,149 +24,22 @@ export function testFolderStub(id: number, name: string): Folder {
     updatedAt: TEST_FOLDER_DATE_TIME,
   }
 }
-import makeMe from "doughnut-test-fixtures/makeMe"
 
-// Mapping of method names to their controller classes
-// biome-ignore lint/suspicious/noExplicitAny: Controller classes have different types and need any for dynamic access
-const methodToController: Record<string, any> = {
-  getUserProfile: UserController,
-  createUser: UserController,
-  generateToken: UserController,
-  updateUser: UserController,
-  getTokens: UserController,
-  deleteToken: UserController,
-  getMenuData: UserController,
-  closeAllGithubIssues: TestabilityRestController,
-  triggerException: TestabilityRestController,
-  timeTravelRelativeToNow: TestabilityRestController,
-  timeTravel: TestabilityRestController,
-  testabilityUpdateUser: TestabilityRestController,
-  shareToBazaar: TestabilityRestController,
-  replaceServiceUrl: TestabilityRestController,
-  randomizer: TestabilityRestController,
-  injectNotes: TestabilityRestController,
-  injectCircle: TestabilityRestController,
-  injectPredefinedQuestion: TestabilityRestController,
-  getFeatureToggle: TestabilityRestController,
-  enableFeatureToggle: TestabilityRestController,
-  resetDbAndTestabilitySettings: TestabilityRestController,
-  githubIssues: TestabilityRestController,
-  updateSubscription: SubscriptionController,
-  destroySubscription: SubscriptionController,
-  createSubscription: SubscriptionController,
-  getCurrentModelVersions: GlobalSettingsController,
-  setCurrentModelVersions: GlobalSettingsController,
-  regenerate: RecallPromptController,
-  contest: RecallPromptController,
-  answerQuiz: RecallPromptController,
-  answerSpelling: RecallPromptController,
-  showQuestion: RecallPromptController,
-  askAQuestion: MemoryTrackerController,
-  getThresholdExceeded: MemoryTrackerController,
-  refineQuestion: PredefinedQuestionController,
-  getAllQuestionByNote: PredefinedQuestionController,
-  addQuestionManually: PredefinedQuestionController,
-  generateQuestionWithoutSave: PredefinedQuestionController,
-  exportQuestionGeneration: PredefinedQuestionController,
-  createNoteAtNotebookRoot: NotebookController,
-  updateNoteRecallSetting: NoteController,
-  verifySpelling: NoteController,
-  deleteNote: NoteController,
-  moveNoteToNotebookRoot: RelationController,
-  showNote: NoteController,
-  updateNoteAccessories: NoteController,
-  undoDeleteNote: NoteController,
-  getNoteInfo: NoteController,
-  getGraph: NoteController,
-  getAiContextMarkdown: NoteController,
-  showNoteAccessory: NoteController,
-  getRecentNotes: NoteController,
-  semanticSearchWithin: SearchController,
-  searchForRelationshipTargetWithin: SearchController,
-  semanticSearch: SearchController,
-  searchForRelationshipTarget: SearchController,
-  get: NotebookController,
-  updateNotebook: NotebookController,
-  updateNotebookIndex: NotebookController,
-  shareNotebook: NotebookController,
-  resetNotebookIndex: NotebookController,
-  createNotebook: NotebookController,
-  moveToCircle: NotebookController,
-  getAiAssistant: NotebookController,
-  updateAiAssistant: NotebookController,
-  listNotebookFolderListing: NotebookController,
-  listNotebookFolderIndex: NotebookController,
-  createFolder: NotebookController,
-  myNotebooks: NotebookController,
-  selfEvaluate: MemoryTrackerController,
-  removeFromRepeating: MemoryTrackerController,
-  reEnable: MemoryTrackerController,
-  markAsRecalled: MemoryTrackerController,
-  showMemoryTracker: MemoryTrackerController,
-  getRecentlyRecalled: MemoryTrackerController,
-  getRecentMemoryTrackers: MemoryTrackerController,
-  getRecallPrompts: MemoryTrackerController,
-  deleteUnansweredRecallPrompts: MemoryTrackerController,
-  moveNoteToFolder: RelationController,
-  moveNoteToNotebookRootInNotebook: RelationController,
-  replyToConversation: ConversationMessageController,
-  getAiReply: ConversationMessageController,
-  startConversationAboutRecallPrompt: ConversationMessageController,
-  getConversationsAboutNote: ConversationMessageController,
-  startConversationAboutNote: ConversationMessageController,
-  markConversationAsRead: ConversationMessageController,
-  getConversation: ConversationMessageController,
-  getConversationMessages: ConversationMessageController,
-  exportConversation: ConversationMessageController,
-  getUnreadConversations: ConversationMessageController,
-  getConversationsOfCurrentUser: ConversationMessageController,
-  index: CircleController,
-  createCircle: CircleController,
-  createNotebookInCircle: CircleController,
-  joinCircle: CircleController,
-  showCircle: CircleController,
-  removeFromBazaar: BazaarController,
-  bazaar: BazaarController,
-  audioToText: AiAudioController,
-  assimilate: AssimilationController,
-  getAssimilationCount: AssimilationController,
-  assimilating: AssimilationController,
-  suggestTitle: AiController,
-  generateUnderstandingChecklist: AiController,
-  removePointFromNote: AiController,
-  promotePointToSibling: AiController,
-  dummyEntryToGenerateDataTypesThatAreRequiredInEventStream: AiController,
-  getAvailableGptModels: AiController,
-  updateNoteTitle: TextContentController,
-  updateNoteContent: TextContentController,
-  searchWikidata: WikidataController,
-  fetchWikidataEntityDataById: WikidataController,
-  currentUserInfo: CurrentUserInfoController,
-  recalling: RecallsController,
-  previouslyAnswered: RecallsController,
-  overview: RecallsController,
-  ping: HealthCheckController,
-  dataUpgrade: HealthCheckController,
-  failureReports: FailureReportController,
-  showFailureReport: FailureReportController,
-  deleteFailureReports: FailureReportController,
-  triggerFailure: FailureReportController,
-  listUsers: AdminUserController,
-  getAdminDataMigrationStatus: AdminDataMigrationController,
-  runDataMigrationBatch: AdminDataMigrationController,
-}
+// biome-ignore lint/suspicious/noExplicitAny: controller statics are heterogeneous; any is required for Parameters/ReturnType plumbing
+type ControllerMethod = (...args: any[]) => any
 
-type SdkServiceName = keyof typeof methodToController
-type SdkController<K extends SdkServiceName> = (typeof methodToController)[K]
-type SdkService<K extends SdkServiceName> = SdkController<K>[K]
-type SdkServiceReturnType<K extends SdkServiceName> = ReturnType<SdkService<K>>
-type SdkServiceData<K extends SdkServiceName> =
-  Awaited<SdkServiceReturnType<K>> extends {
-    data: infer D
-  }
-    ? D
-    : never
-type SdkServiceOptions<K extends SdkServiceName> = Parameters<SdkService<K>>[0]
+type StaticSdkKeys<C> = {
+  [K in keyof C]: C[K] extends ControllerMethod ? K : never
+}[keyof C] &
+  string
+
+type SdkMethod<C, K extends StaticSdkKeys<C>> = Extract<C[K], ControllerMethod>
+
+type SdkUnpackedData<R> = Awaited<R> extends { data: infer D } ? D : never
+
+type SdkMethodReturn<C, K extends StaticSdkKeys<C>> = ReturnType<
+  SdkMethod<C, K>
+>
 
 class StoredComponentTestHelper {
   component<T>(comp: T) {
@@ -202,7 +53,7 @@ class StoredComponentTestHelper {
  */
 export function mockShowNoteAccessory() {
   // biome-ignore lint/suspicious/noExplicitAny: showNoteAccessory returns undefined which requires special handling
-  return mockSdkService("showNoteAccessory", undefined as any)
+  return mockSdkService(NoteController, "showNoteAccessory", undefined as any)
 }
 
 /**
@@ -210,7 +61,11 @@ export function mockShowNoteAccessory() {
  * in tests that use StoredApiCollection.loadNote (via storageAccessor).
  */
 export function mockShowNote(noteRealm?: NoteRealm) {
-  return mockSdkService("showNote", noteRealm ?? makeMe.aNoteRealm.please())
+  return mockSdkService(
+    NoteController,
+    "showNote",
+    noteRealm ?? makeMe.aNoteRealm.please()
+  )
 }
 
 /**
@@ -250,31 +105,22 @@ export function wrapSdkError(error: string | Record<string, unknown>) {
  * Automatically wraps the response in the standard format.
  * Returns a spy that can be reconfigured with `.mockResolvedValue(wrapSdkResponse(newData))`.
  *
- * @param serviceName - The name of the SDK service to mock (type-safe)
- * @param data - The data value to return (type-safe based on service)
- * @returns A Vitest Mock that can be further configured
- *
  * @example
  * ```ts
- * // Simple usage
- * mockSdkService("getRecentNotes", [])
- *
- * // Reconfiguring the mock in tests
- * const spy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+ * mockSdkService(NoteController, "getRecentNotes", [])
+ * const spy = mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
  * spy.mockResolvedValue(wrapSdkResponse(differentNote))
  * ```
  */
-export function mockSdkService<K extends SdkServiceName>(
-  serviceName: K,
-  data: SdkServiceData<K>
-) {
-  const controller = methodToController[serviceName]
-  if (!controller) {
-    throw new Error(`Unknown service: ${serviceName}`)
-  }
+export function mockSdkService<
+  // biome-ignore lint/suspicious/noExplicitAny: generated controller classes are not `Record<string, unknown>`; `any` bounds the static object for Vitest
+  C extends Record<string, any>,
+  K extends StaticSdkKeys<C>,
+>(controller: C, methodName: K, data: SdkUnpackedData<SdkMethodReturn<C, K>>) {
   return (
     vi
-      .spyOn(controller, serviceName)
+      // biome-ignore lint/suspicious/noExplicitAny: Vitest spyOn key type does not align with StaticSdkKeys<C>
+      .spyOn(controller, methodName as any)
       // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
       .mockResolvedValue(wrapSdkResponse(data) as any)
   )
@@ -294,7 +140,7 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
     updatedAt: ts,
     ...(circle ? { circle } : {}),
   }
-  return mockSdkService("get", {
+  return mockSdkService(NotebookController, "get", {
     notebook,
     hasAttachedBook: false,
     readonly: realm.notebookView.readonly ?? false,
@@ -305,39 +151,38 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
  * Type-safe helper to mock SDK service calls with a custom implementation.
  * Automatically wraps the result in the standard format (sync or Promise).
  *
- * @param serviceName - The name of the SDK service to mock (type-safe)
- * @param implementation - Function that receives options and returns data (or a Promise of it)
- * @returns A Vitest Mock that can be further configured
- *
  * @example
  * ```ts
  * const mockedCall = vi.fn()
- * mockSdkServiceWithImplementation("updateNoteContent", async (options) => {
- *   const result = await mockedCall(options)
- *   return result
+ * mockSdkServiceWithImplementation(TextContentController, "updateNoteContent", async (options) => {
+ *   return await mockedCall(options)
  * })
  * ```
  */
-export function mockSdkServiceWithImplementation<K extends SdkServiceName>(
-  serviceName: K,
+export function mockSdkServiceWithImplementation<
+  // biome-ignore lint/suspicious/noExplicitAny: generated controller classes are not `Record<string, unknown>`; `any` bounds the static object for Vitest
+  C extends Record<string, any>,
+  K extends StaticSdkKeys<C>,
+>(
+  controller: C,
+  methodName: K,
   implementation: (
-    options: SdkServiceOptions<K>
-  ) => Promise<SdkServiceData<K>> | SdkServiceData<K>
+    options: Parameters<SdkMethod<C, K>>[0]
+  ) =>
+    | Promise<SdkUnpackedData<SdkMethodReturn<C, K>>>
+    | SdkUnpackedData<SdkMethodReturn<C, K>>
 ) {
-  const controller = methodToController[serviceName]
-  if (!controller) {
-    throw new Error(`Unknown service: ${serviceName}`)
-  }
-  // biome-ignore lint/suspicious/noExplicitAny: Vitest spy types are complex and require any for proper typing
-  const spy = vi.spyOn(controller, serviceName) as any
-  spy.mockImplementation((options: SdkServiceOptions<K>) => {
+  // biome-ignore lint/suspicious/noExplicitAny: Vitest spy types and spyOn key do not align with StaticSdkKeys<C>
+  const spy = vi.spyOn(controller, methodName as any) as any
+  spy.mockImplementation((options: Parameters<SdkMethod<C, K>>[0]) => {
     const out = implementation(options)
     if (out instanceof Promise) {
-      return out.then((result) =>
-        wrapSdkResponse(result)
-      ) as SdkServiceReturnType<K>
+      return out.then((result) => wrapSdkResponse(result)) as SdkMethodReturn<
+        C,
+        K
+      >
     }
-    return wrapSdkResponse(out) as SdkServiceReturnType<K>
+    return wrapSdkResponse(out) as SdkMethodReturn<C, K>
   })
   return spy
 }

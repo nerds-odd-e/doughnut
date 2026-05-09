@@ -1,8 +1,21 @@
+import type {
+  FailureReport,
+  FailureReportsResponse,
+} from "@generated/doughnut-backend-api"
+import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+
+function mockFailureReportsList(reports: FailureReport[]) {
+  return mockSdkService(
+    FailureReportController,
+    "failureReports",
+    reports as unknown as FailureReportsResponse
+  )
+}
 
 describe("FailureReportList", () => {
   describe("displaying failure reports", () => {
@@ -15,7 +28,7 @@ describe("FailureReportList", () => {
         .withId(2)
         .withErrorName("NullPointerException")
         .please()
-      mockSdkService("failureReports", [report1, report2])
+      mockFailureReportsList([report1, report2])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -29,7 +42,7 @@ describe("FailureReportList", () => {
         makeMe.aFailureReport.withId(1).please(),
         makeMe.aFailureReport.withId(2).please(),
       ]
-      mockSdkService("failureReports", reports)
+      mockFailureReportsList(reports)
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -38,7 +51,7 @@ describe("FailureReportList", () => {
     })
 
     it("shows empty state when no failure reports exist", async () => {
-      mockSdkService("failureReports", [])
+      mockFailureReportsList([])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -52,7 +65,7 @@ describe("FailureReportList", () => {
         .withId(1)
         .withCreateDatetime("2026-03-01T10:30:00Z")
         .please()
-      mockSdkService("failureReports", [report])
+      mockFailureReportsList([report])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -63,7 +76,7 @@ describe("FailureReportList", () => {
 
     it("shows report ID badge", async () => {
       const report = makeMe.aFailureReport.withId(42).please()
-      mockSdkService("failureReports", [report])
+      mockFailureReportsList([report])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -75,7 +88,7 @@ describe("FailureReportList", () => {
   describe("selecting and deleting reports", () => {
     it("shows delete button when reports are selected", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      mockSdkService("failureReports", [report])
+      mockFailureReportsList([report])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -97,7 +110,7 @@ describe("FailureReportList", () => {
 
     it("opens confirmation modal when delete button is clicked", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      mockSdkService("failureReports", [report])
+      mockFailureReportsList([report])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -116,8 +129,12 @@ describe("FailureReportList", () => {
 
     it("deletes selected reports when confirmed", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      const failureReportsSpy = mockSdkService("failureReports", [report])
-      const deleteSpy = mockSdkService("deleteFailureReports", undefined)
+      const failureReportsSpy = mockFailureReportsList([report])
+      const deleteSpy = mockSdkService(
+        FailureReportController,
+        "deleteFailureReports",
+        undefined
+      )
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -144,7 +161,7 @@ describe("FailureReportList", () => {
 
     it("closes modal when cancel is clicked", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      mockSdkService("failureReports", [report])
+      mockFailureReportsList([report])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -168,7 +185,7 @@ describe("FailureReportList", () => {
     it("allows selecting multiple reports", async () => {
       const report1 = makeMe.aFailureReport.withId(1).please()
       const report2 = makeMe.aFailureReport.withId(2).please()
-      mockSdkService("failureReports", [report1, report2])
+      mockFailureReportsList([report1, report2])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -186,7 +203,7 @@ describe("FailureReportList", () => {
 
   describe("trigger test exception", () => {
     it("shows trigger button", async () => {
-      mockSdkService("failureReports", [])
+      mockFailureReportsList([])
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -198,8 +215,12 @@ describe("FailureReportList", () => {
     })
 
     it("calls triggerFailure API and refreshes list when clicked", async () => {
-      mockSdkService("failureReports", [])
-      const triggerSpy = mockSdkService("triggerFailure", undefined)
+      mockFailureReportsList([])
+      const triggerSpy = mockSdkService(
+        FailureReportController,
+        "triggerFailure",
+        undefined
+      )
 
       const wrapper = helper.component(FailureReportList).withRouter().mount()
       await flushPromises()
@@ -216,8 +237,7 @@ describe("FailureReportList", () => {
 
   describe("error handling", () => {
     it("displays error alert when API returns an error", async () => {
-      mockSdkService("failureReports", [])
-      const spy = mockSdkService("failureReports", [])
+      const spy = mockFailureReportsList([])
       spy.mockResolvedValue({
         data: undefined,
         error: { message: "Access denied" },

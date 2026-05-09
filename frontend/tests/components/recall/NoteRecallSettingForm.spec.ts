@@ -1,3 +1,4 @@
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import NoteRecallSettingForm from "@/components/recall/NoteRecallSettingForm.vue"
@@ -15,7 +16,7 @@ describe("NoteRecallSettingForm", () => {
   }
 
   beforeEach(() => {
-    mockSdkService("updateNoteRecallSetting", undefined)
+    mockSdkService(NoteController, "updateNoteRecallSetting", undefined)
   })
 
   it("should show remember spelling checkbox when isLinkNote is false", () => {

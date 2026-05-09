@@ -1,3 +1,4 @@
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { reactive } from "vue"
 import RecentPage from "@/pages/RecentPage.vue"
@@ -26,8 +27,8 @@ describe("RecentPage.vue", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockRoute.query = {}
-    mockSdkService("getRecentMemoryTrackers", [])
-    mockSdkService("getRecentlyRecalled", [])
+    mockSdkService(MemoryTrackerController, "getRecentMemoryTrackers", [])
+    mockSdkService(MemoryTrackerController, "getRecentlyRecalled", [])
   })
 
   describe("Tab Navigation", () => {

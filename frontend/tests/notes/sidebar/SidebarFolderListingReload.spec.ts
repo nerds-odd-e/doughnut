@@ -1,3 +1,4 @@
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -33,6 +34,7 @@ describe("Sidebar folder listing reload", () => {
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {
     const listingSpy = mockSdkServiceWithImplementation(
+      NotebookController,
       "listNotebookFolderListing",
       (options) =>
         folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)

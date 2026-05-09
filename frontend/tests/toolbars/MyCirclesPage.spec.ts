@@ -1,13 +1,14 @@
+import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
 import CirclesPage from "@/pages/CirclesPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import { describe, it, expect, beforeEach } from "vitest"
 
 describe("global bar", () => {
-  let indexSpy: ReturnType<typeof mockSdkService<"index">>
+  let indexSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
-    indexSpy = mockSdkService("index", [])
+    indexSpy = mockSdkService(CircleController, "index", [])
   })
 
   it("opens the circles selection", async () => {

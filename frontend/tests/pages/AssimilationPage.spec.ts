@@ -1,3 +1,8 @@
+import {
+  AiController,
+  AssimilationController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -23,7 +28,7 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 let renderer: RenderingHelper<typeof AssimilationPage>
-let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
+let showNoteSpy: ReturnType<typeof mockSdkService>
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -32,10 +37,14 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  mockSdkService("assimilating", [])
-  mockSdkService("getNoteInfo", {})
-  showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
-  mockSdkService("generateUnderstandingChecklist", {
+  mockSdkService(AssimilationController, "assimilating", [])
+  mockSdkService(NoteController, "getNoteInfo", {})
+  showNoteSpy = mockSdkService(
+    NoteController,
+    "showNote",
+    makeMe.aNoteRealm.please()
+  )
+  mockSdkService(AiController, "generateUnderstandingChecklist", {
     points: [],
   })
   mockShowNoteAccessory()
@@ -44,7 +53,11 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   it("shows completion message when nothing to recall", async () => {
-    const assimilatingSpy = mockSdkService("assimilating", [])
+    const assimilatingSpy = mockSdkService(
+      AssimilationController,
+      "assimilating",
+      []
+    )
     const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
 
     await flushPromises()
@@ -61,7 +74,10 @@ describe("repeat page", () => {
     const noteRealm = makeMe.aNoteRealm.please()
 
     beforeEach(() => {
-      mockSdkService("assimilating", [noteRealm, noteRealm])
+      mockSdkService(AssimilationController, "assimilating", [
+        noteRealm,
+        noteRealm,
+      ])
       showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
     })
 

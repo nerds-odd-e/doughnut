@@ -1,3 +1,4 @@
+import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -17,15 +18,14 @@ vi.mock("vue-router", async (importOriginal) => {
 describe("WikidataAssociationDialog", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
-  let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
-  let fetchWikidataEntitySpy: ReturnType<
-    typeof mockSdkService<"fetchWikidataEntityDataById">
-  >
+  let searchWikidataSpy: ReturnType<typeof mockSdkService>
+  let fetchWikidataEntitySpy: ReturnType<typeof mockSdkService>
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    searchWikidataSpy = mockSdkService("searchWikidata", [])
+    searchWikidataSpy = mockSdkService(WikidataController, "searchWikidata", [])
     fetchWikidataEntitySpy = mockSdkService(
+      WikidataController,
       "fetchWikidataEntityDataById",
       makeMe.aWikidataEntity.please()
     )

@@ -1,3 +1,4 @@
+import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
 import FailureReportPage from "@/pages/FailureReportPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
@@ -16,7 +17,11 @@ describe("FailureReportPage", () => {
         .withFailureReport(report)
         .withGithubIssueUrl("https://github.com/test/repo/issues/123")
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -32,7 +37,11 @@ describe("FailureReportPage", () => {
 
     it("fetches data with correct parameters", async () => {
       const reportForView = makeMe.aFailureReportForView.please()
-      const spy = mockSdkService("showFailureReport", reportForView)
+      const spy = mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       helper
         .component(FailureReportPage)
@@ -51,7 +60,11 @@ describe("FailureReportPage", () => {
       const reportForView = makeMe.aFailureReportForView
         .withFailureReport(report)
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -70,7 +83,11 @@ describe("FailureReportPage", () => {
       const reportForView = makeMe.aFailureReportForView
         .withFailureReport(report)
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -89,7 +106,11 @@ describe("FailureReportPage", () => {
       const reportForView = makeMe.aFailureReportForView
         .withGithubIssueUrl("https://github.com/test/repo/issues/456")
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -110,7 +131,11 @@ describe("FailureReportPage", () => {
       const reportForView = makeMe.aFailureReportForView
         .withoutGithubIssueUrl()
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -126,7 +151,11 @@ describe("FailureReportPage", () => {
   describe("navigation", () => {
     it("has back to list link", async () => {
       const reportForView = makeMe.aFailureReportForView.please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -149,7 +178,11 @@ describe("FailureReportPage", () => {
       const reportForView = makeMe.aFailureReportForView
         .withFailureReport(report)
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)
@@ -170,7 +203,11 @@ describe("FailureReportPage", () => {
       const reportForView = makeMe.aFailureReportForView
         .withFailureReport(report)
         .please()
-      mockSdkService("showFailureReport", reportForView)
+      mockSdkService(
+        FailureReportController,
+        "showFailureReport",
+        reportForView
+      )
 
       const wrapper = helper
         .component(FailureReportPage)

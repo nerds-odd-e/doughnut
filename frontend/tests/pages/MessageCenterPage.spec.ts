@@ -1,3 +1,4 @@
+import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -21,6 +22,7 @@ vi.mock("vue-router", async (importOriginal) => {
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
     const getConversationsSpy = mockSdkService(
+      ConversationMessageController,
       "getConversationsOfCurrentUser",
       []
     )
@@ -34,7 +36,11 @@ describe("MessageCenterPage", () => {
 
   it("should render no conversation selected by default", async () => {
     const conversation = makeMe.aConversationListItem.please()
-    mockSdkService("getConversationsOfCurrentUser", [conversation])
+    mockSdkService(
+      ConversationMessageController,
+      "getConversationsOfCurrentUser",
+      [conversation]
+    )
     helper
       .component(MessageCenterPage)
       .withCleanStorage()
@@ -52,8 +58,13 @@ describe("MessageCenterPage", () => {
     ]
     beforeEach(async () => {
       vi.clearAllMocks()
-      mockSdkService("getConversationsOfCurrentUser", conversations)
       mockSdkService(
+        ConversationMessageController,
+        "getConversationsOfCurrentUser",
+        conversations
+      )
+      mockSdkService(
+        ConversationMessageController,
         "getConversation",
         makeMe.aConversation.withId(conversations[1]!.id).please()
       )

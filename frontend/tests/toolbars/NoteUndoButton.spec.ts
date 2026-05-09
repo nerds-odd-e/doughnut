@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  TextContentController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import NoteUndoButton from "@/components/toolbars/NoteUndoButton.vue"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
@@ -286,7 +290,7 @@ describe("NoteUndoButton", () => {
       const note = makeMe.aNote.please()
       const noteRealm = makeMe.aNoteRealm.please()
       noteEditingHistory.deleteNote(note.id)
-      mockSdkService("undoDeleteNote", noteRealm)
+      mockSdkService(NoteController, "undoDeleteNote", noteRealm)
       helper.component(NoteUndoButton).render()
 
       const undoButton = screen.getByTitle("undo delete note")
@@ -314,7 +318,7 @@ describe("NoteUndoButton", () => {
         "edit title",
         "Old Title"
       )
-      mockSdkService("updateNoteTitle", noteRealm)
+      mockSdkService(TextContentController, "updateNoteTitle", noteRealm)
       helper.component(NoteUndoButton).render()
 
       const undoButton = screen.getByTitle("undo edit title")
@@ -342,7 +346,7 @@ describe("NoteUndoButton", () => {
         "edit content",
         undefined
       )
-      mockSdkService("updateNoteContent", noteRealm)
+      mockSdkService(TextContentController, "updateNoteContent", noteRealm)
       helper.component(NoteUndoButton).render()
 
       const undoButton = screen.getByTitle("undo edit content")
@@ -365,7 +369,7 @@ describe("NoteUndoButton", () => {
       const noteRealm = makeMe.aNoteRealm.please()
       const parentNoteRealm = makeMe.aNoteRealm.please()
       noteEditingHistory.createNote(noteRealm.id)
-      mockSdkService("deleteNote", [parentNoteRealm])
+      mockSdkService(NoteController, "deleteNote", [parentNoteRealm])
       helper.component(NoteUndoButton).render()
 
       const undoButton = screen.getByTitle("undo create note")

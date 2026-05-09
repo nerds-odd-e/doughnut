@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import SearchForm from "@/components/links/SearchForm.vue"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { fireEvent, screen } from "@testing-library/vue"
@@ -14,10 +18,10 @@ describe("InsertWikiLink", () => {
     vi.clearAllMocks()
     insertedTexts.length = 0
     wikiPropertyInserted.length = 0
-    mockSdkService("getRecentNotes", [])
-    mockSdkService("searchForRelationshipTarget", [])
-    mockSdkService("semanticSearch", [])
-    mockSdkService("semanticSearchWithin", [])
+    mockSdkService(NoteController, "getRecentNotes", [])
+    mockSdkService(SearchController, "searchForRelationshipTarget", [])
+    mockSdkService(SearchController, "semanticSearch", [])
+    mockSdkService(SearchController, "semanticSearchWithin", [])
     const {
       registerInserter,
       registerWikiPropertyInserter,
@@ -34,7 +38,7 @@ describe("InsertWikiLink", () => {
   it("calls the registered inserter with a wiki link text when Insert as a wiki link is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
-    mockSdkService("searchForRelationshipTargetWithin", [
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
@@ -59,7 +63,7 @@ describe("InsertWikiLink", () => {
   it("does not call the inserter when Add a new relationship note is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Sedation").please()
-    mockSdkService("searchForRelationshipTargetWithin", [
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
@@ -99,7 +103,7 @@ describe("InsertWikiLink", () => {
 
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
-    mockSdkService("searchForRelationshipTargetWithin", [
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
@@ -127,7 +131,7 @@ describe("InsertWikiLink", () => {
   it("does not offer Add wiki link as a new property when the wiki-property inserter is unavailable", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("NoPropBtn").please()
-    mockSdkService("searchForRelationshipTargetWithin", [
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 

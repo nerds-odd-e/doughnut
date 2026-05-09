@@ -1,3 +1,4 @@
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -28,7 +29,7 @@ describe("new/updated pink banner", () => {
     [new Date(Date.UTC(2016, 1, 12)), "rgb(150,150,150)"],
   ])("should show fresher color if recently updated", async (updatedAt, expectedColor) => {
     const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
-    mockSdkService("showNote", note)
+    mockSdkService(NoteController, "showNote", note)
 
     const wrapper = helper
       .component(NoteShow)
@@ -62,7 +63,7 @@ describe("note wth children", () => {
   let wrapper: VueWrapper<any>
 
   const render = (n: typeof note) => {
-    mockSdkService("showNote", n)
+    mockSdkService(NoteController, "showNote", n)
     wrapper = helper
       .component(NoteShow)
       .withRouter()
@@ -80,7 +81,7 @@ describe("note wth children", () => {
   })
 
   it("should call the api", () => {
-    const showNoteSpy = mockSdkService("showNote", note)
+    const showNoteSpy = mockSdkService(NoteController, "showNote", note)
     render(note)
 
     expect(showNoteSpy).toHaveBeenCalledWith({

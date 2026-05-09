@@ -1,3 +1,4 @@
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -19,7 +20,11 @@ describe("note info", () => {
   })
 
   it("should render values", async () => {
-    const getNoteInfoSpy = mockSdkService("getNoteInfo", stubResponse)
+    const getNoteInfoSpy = mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      stubResponse
+    )
     useStorageAccessor().value?.refreshNoteRealm(noteRealm)
 
     wrapper = helper

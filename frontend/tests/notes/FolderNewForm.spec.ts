@@ -1,3 +1,4 @@
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import FolderNewForm from "@/components/notes/FolderNewForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -6,8 +7,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 describe("FolderNewForm", () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    mockSdkService("listNotebookFolderIndex", [])
-    mockSdkService("listNotebookFolderListing", { folders: [] })
+    mockSdkService(NotebookController, "listNotebookFolderIndex", [])
+    mockSdkService(NotebookController, "listNotebookFolderListing", {
+      folders: [],
+    })
   })
 
   it("includes FolderSelector for parent folder", async () => {

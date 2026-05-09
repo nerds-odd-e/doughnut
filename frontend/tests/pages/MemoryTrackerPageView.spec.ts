@@ -1,3 +1,4 @@
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"
@@ -18,7 +19,11 @@ vi.mock("vue-router", async (importOriginal) => {
 
 describe("MemoryTrackerPageView", () => {
   beforeEach(() => {
-    mockSdkService("removeFromRepeating", { removedFromTracking: false })
+    mockSdkService(
+      MemoryTrackerController,
+      "removeFromRepeating",
+      makeMe.aMemoryTracker.please()
+    )
   })
 
   it("displays thinking time for answered questions", async () => {
@@ -146,7 +151,11 @@ describe("MemoryTrackerPageView", () => {
         .please()
       const memoryTracker = makeMe.aMemoryTracker.please()
 
-      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+      mockSdkService(
+        MemoryTrackerController,
+        "deleteUnansweredRecallPrompts",
+        undefined
+      )
 
       const wrapper = helper
         .component(MemoryTrackerPageView)
@@ -215,6 +224,7 @@ describe("MemoryTrackerPageView", () => {
       const memoryTracker = makeMe.aMemoryTracker.please()
 
       const deleteSpy = mockSdkService(
+        MemoryTrackerController,
         "deleteUnansweredRecallPrompts",
         undefined
       )
@@ -285,7 +295,11 @@ describe("MemoryTrackerPageView", () => {
         .please()
       const memoryTracker = makeMe.aMemoryTracker.please()
 
-      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+      mockSdkService(
+        MemoryTrackerController,
+        "deleteUnansweredRecallPrompts",
+        undefined
+      )
 
       const wrapper = helper
         .component(MemoryTrackerPageView)
@@ -323,7 +337,11 @@ describe("MemoryTrackerPageView", () => {
         .please()
       const memoryTracker = makeMe.aMemoryTracker.please()
 
-      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+      mockSdkService(
+        MemoryTrackerController,
+        "deleteUnansweredRecallPrompts",
+        undefined
+      )
 
       const wrapper = helper
         .component(MemoryTrackerPageView)
@@ -386,7 +404,11 @@ describe("MemoryTrackerPageView", () => {
         .please()
       const memoryTracker = makeMe.aMemoryTracker.please()
 
-      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+      mockSdkService(
+        MemoryTrackerController,
+        "deleteUnansweredRecallPrompts",
+        undefined
+      )
 
       const wrapper = helper
         .component(MemoryTrackerPageView)
@@ -526,7 +548,7 @@ describe("MemoryTrackerPageView", () => {
         .withQuestionStem("Test question")
         .please()
 
-      const reEnableSpy = mockSdkService("reEnable", {
+      const reEnableSpy = mockSdkService(MemoryTrackerController, "reEnable", {
         ...memoryTracker,
         removedFromTracking: false,
       })

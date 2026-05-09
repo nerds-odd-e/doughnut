@@ -1,3 +1,4 @@
+import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
@@ -10,15 +11,14 @@ import usePopups from "@/components/commons/Popups/usePopups"
 vi.mock("@/components/commons/Popups/usePopups")
 
 describe("NoteEditableContent", () => {
-  let updateNoteContentSpy: ReturnType<
-    typeof mockSdkService<"updateNoteContent">
-  >
+  let updateNoteContentSpy: ReturnType<typeof mockSdkService>
   // biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
   let mockPopupsOptions: any
 
   beforeEach(() => {
     vi.resetAllMocks()
     updateNoteContentSpy = mockSdkService(
+      TextContentController,
       "updateNoteContent",
       makeMe.aNoteRealm.please()
     )

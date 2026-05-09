@@ -25,10 +25,12 @@ describe("MemoryTrackerPage", () => {
     const memoryTracker = makeMe.aMemoryTracker.please()
 
     const getRecallPromptsSpy = mockSdkService(
+      MemoryTrackerController,
       "getRecallPrompts",
       recallPrompts
     )
     const showMemoryTrackerSpy = mockSdkService(
+      MemoryTrackerController,
       "showMemoryTracker",
       memoryTracker
     )
@@ -58,8 +60,8 @@ describe("MemoryTrackerPage", () => {
   it("shows loading state while fetching", async () => {
     const recallPrompts = [makeMe.aRecallPrompt.please()]
     const memoryTracker = makeMe.aMemoryTracker.please()
-    mockSdkService("getRecallPrompts", recallPrompts)
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", recallPrompts)
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -76,8 +78,8 @@ describe("MemoryTrackerPage", () => {
 
   it("shows message when no recall prompts exist", async () => {
     const memoryTracker = makeMe.aMemoryTracker.please()
-    mockSdkService("getRecallPrompts", [])
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", [])
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -122,8 +124,8 @@ describe("MemoryTrackerPage", () => {
     const recallPrompts = [recallPrompt3, recallPrompt2, recallPrompt1]
     const memoryTracker = makeMe.aMemoryTracker.please()
 
-    mockSdkService("getRecallPrompts", recallPrompts)
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", recallPrompts)
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -143,8 +145,8 @@ describe("MemoryTrackerPage", () => {
     const recallPrompts = [recallPrompt1, recallPrompt2]
     const memoryTracker = makeMe.aMemoryTracker.please()
 
-    mockSdkService("getRecallPrompts", recallPrompts)
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", recallPrompts)
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -167,8 +169,8 @@ describe("MemoryTrackerPage", () => {
       .please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
-    mockSdkService("getRecallPrompts", [recallPrompt])
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", [recallPrompt])
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -190,8 +192,8 @@ describe("MemoryTrackerPage", () => {
       .please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
-    mockSdkService("getRecallPrompts", [recallPrompt])
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", [recallPrompt])
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -219,8 +221,8 @@ describe("MemoryTrackerPage", () => {
       .please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
-    mockSdkService("getRecallPrompts", [recallPrompt])
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", [recallPrompt])
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -241,8 +243,8 @@ describe("MemoryTrackerPage", () => {
     const recallPrompt = makeMe.aRecallPrompt.withNote(note).please()
     const memoryTracker = makeMe.aMemoryTracker.please()
 
-    mockSdkService("getRecallPrompts", [recallPrompt])
-    mockSdkService("showMemoryTracker", memoryTracker)
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", [recallPrompt])
+    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })

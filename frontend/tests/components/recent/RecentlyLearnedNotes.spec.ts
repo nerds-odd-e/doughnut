@@ -1,3 +1,4 @@
+import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -17,11 +18,16 @@ describe("RecentlyLearnedNotes", () => {
   ]
 
   beforeEach(() => {
-    mockSdkService("getRecentMemoryTrackers", mockMemoryTrackers)
+    mockSdkService(
+      MemoryTrackerController,
+      "getRecentMemoryTrackers",
+      mockMemoryTrackers
+    )
   })
 
   it("fetches and displays recent memory trackers", async () => {
     const getRecentMemoryTrackersSpy = mockSdkService(
+      MemoryTrackerController,
       "getRecentMemoryTrackers",
       mockMemoryTrackers
     )

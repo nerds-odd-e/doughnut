@@ -1,3 +1,8 @@
+import {
+  AiAudioController,
+  AiController,
+  TextContentController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import FullScreen from "@/components/common/FullScreen.vue"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
@@ -506,6 +511,7 @@ describe("NoteAudioTools", () => {
       resolveProcess = resolve
     })
     mockSdkServiceWithImplementation(
+      AiAudioController,
       "audioToText",
       async () => await processPromise
     )
@@ -574,13 +580,17 @@ describe("NoteAudioTools", () => {
   })
 
   describe("Title suggestion", () => {
-    let updateNoteTitleSpy: ReturnType<typeof mockSdkService<"updateNoteTitle">>
+    let updateNoteTitleSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
-      updateNoteTitleSpy = mockSdkService("updateNoteTitle", {} as never)
-      mockSdkService("audioToText", {
+      updateNoteTitleSpy = mockSdkService(
+        TextContentController,
+        "updateNoteTitle",
+        {} as never
+      )
+      mockSdkService(AiAudioController, "audioToText", {
         completionFromAudio: { content: "text" },
         endTimestamp: "00:00:00,000",
       })
@@ -594,10 +604,14 @@ describe("NoteAudioTools", () => {
         .withProps({ note })
         .mount()
 
-      const suggestTitleSpy = mockSdkService("suggestTitle", {
+      const suggestTitleSpy = mockSdkService(AiController, "suggestTitle", {
         title: "Suggested Title",
       })
-      mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
+      mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        makeMe.aNoteRealm.please()
+      )
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -617,8 +631,14 @@ describe("NoteAudioTools", () => {
         .withProps({ note })
         .mount()
 
-      const suggestTitleSpy = mockSdkService("suggestTitle", { title: "" })
-      mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
+      const suggestTitleSpy = mockSdkService(AiController, "suggestTitle", {
+        title: "",
+      })
+      mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        makeMe.aNoteRealm.please()
+      )
 
       await wrapper.vm.processAudio(new Blob())
 
@@ -631,7 +651,7 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = mockSdkService("audioToText", {
+      audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
         completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
@@ -709,7 +729,7 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = mockSdkService("audioToText", {
+      audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
         completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
@@ -784,7 +804,7 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = mockSdkService("audioToText", {
+      audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
         completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })
@@ -813,12 +833,22 @@ describe("NoteAudioTools", () => {
 
   it("should handle returned timestamp from audio processing", async () => {
     const mockResponse = {
-      completionFromAudio: { patch: "--- a\n+++ b\n@@ -0,0 +1 @@\n+text\n" },
+      completionFromAudio: {
+        content: "--- a\n+++ b\n@@ -0,0 +1 @@\n+text\n",
+      },
       endTimestamp: "00:00:37,270",
     }
 
-    const audioToTextSpy = mockSdkService("audioToText", mockResponse)
-    mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
+    const audioToTextSpy = mockSdkService(
+      AiAudioController,
+      "audioToText",
+      mockResponse
+    )
+    mockSdkService(
+      TextContentController,
+      "updateNoteContent",
+      makeMe.aNoteRealm.please()
+    )
 
     const testBlob = new Blob(["test"])
     const result = await wrapper.vm.processAudio({
@@ -935,7 +965,7 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = mockSdkService("audioToText", {
+      audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
         completionFromAudio: { content: "text" },
         endTimestamp: "00:00:37,270",
       })

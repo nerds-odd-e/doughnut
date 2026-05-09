@@ -1,3 +1,8 @@
+import {
+  AiController,
+  NoteController,
+  TextContentController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
@@ -23,10 +28,20 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  mockSdkService("removePointFromNote", { content: "Updated content" })
-  mockSdkService("updateNoteContent", makeMe.aNoteRealm.please())
-  mockSdkService("showNote", makeMe.aNoteRealm.please())
-  mockSdkService("promotePointToSibling", makeMe.aNoteRealm.please())
+  mockSdkService(AiController, "removePointFromNote", {
+    content: "Updated content",
+  })
+  mockSdkService(
+    TextContentController,
+    "updateNoteContent",
+    makeMe.aNoteRealm.please()
+  )
+  mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
+  mockSdkService(
+    AiController,
+    "promotePointToSibling",
+    makeMe.aNoteRealm.please()
+  )
   mockShowNoteAccessory()
   renderer = helper.component(NoteRefinement)
 })
@@ -37,7 +52,7 @@ describe("NoteRefinement component", () => {
   const { note } = memoryTracker
 
   const mount = (points: string[], overrides?: { note?: typeof note }) => {
-    mockSdkService("generateUnderstandingChecklist", { points })
+    mockSdkService(AiController, "generateUnderstandingChecklist", { points })
     return renderer
       .withCleanStorage()
       .withProps({
@@ -75,6 +90,7 @@ describe("NoteRefinement component", () => {
 
     it("calls promotePointToSibling API when sibling button is clicked", async () => {
       const promotePointToSiblingSpy = mockSdkService(
+        AiController,
         "promotePointToSibling",
         makeMe.aNoteRealm.please()
       )
@@ -91,7 +107,11 @@ describe("NoteRefinement component", () => {
     })
 
     it("removes point from checklist after successful promotion", async () => {
-      mockSdkService("promotePointToSibling", makeMe.aNoteRealm.please())
+      mockSdkService(
+        AiController,
+        "promotePointToSibling",
+        makeMe.aNoteRealm.please()
+      )
       const wrapper = mount(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
@@ -105,9 +125,11 @@ describe("NoteRefinement component", () => {
     })
 
     it("keeps point in checklist when API fails", async () => {
-      mockSdkService("promotePointToSibling", undefined).mockResolvedValue(
-        wrapSdkError("API Error")
-      )
+      mockSdkService(
+        AiController,
+        "promotePointToSibling",
+        undefined
+      ).mockResolvedValue(wrapSdkError("API Error"))
       const wrapper = mount(["Test Point"])
       await flushPromises()
 
@@ -125,10 +147,14 @@ describe("NoteRefinement component", () => {
       const apiPromise = new Promise<void>((r) => {
         resolveApi = r
       })
-      mockSdkServiceWithImplementation("promotePointToSibling", async () => {
-        await apiPromise
-        return makeMe.aNoteRealm.please()
-      })
+      mockSdkServiceWithImplementation(
+        AiController,
+        "promotePointToSibling",
+        async () => {
+          await apiPromise
+          return makeMe.aNoteRealm.please()
+        }
+      )
       const wrapper = mount(["Test understanding point"])
       await flushPromises()
 
@@ -146,12 +172,16 @@ describe("NoteRefinement component", () => {
 
     it("hides LoadingModal when API fails", async () => {
       let resolveApi: () => void
-      mockSdkServiceWithImplementation("promotePointToSibling", async () => {
-        await new Promise<void>((r) => {
-          resolveApi = r
-        })
-        return wrapSdkError({})
-      })
+      mockSdkServiceWithImplementation(
+        AiController,
+        "promotePointToSibling",
+        async () => {
+          await new Promise<void>((r) => {
+            resolveApi = r
+          })
+          return wrapSdkError({})
+        }
+      )
       const wrapper = mount(["Test understanding point"])
       await flushPromises()
 
@@ -218,10 +248,15 @@ describe("NoteRefinement component", () => {
     })
 
     it("calls API and emits contentUpdated when deletion is confirmed", async () => {
-      const deletePointsSpy = mockSdkService("removePointFromNote", {
-        content: "Updated content",
-      })
+      const deletePointsSpy = mockSdkService(
+        AiController,
+        "removePointFromNote",
+        {
+          content: "Updated content",
+        }
+      )
       const updateDetailsSpy = mockSdkService(
+        TextContentController,
         "updateNoteContent",
         makeMe.aNoteRealm.please()
       )
@@ -248,9 +283,13 @@ describe("NoteRefinement component", () => {
     })
 
     it("does not call API when deletion is cancelled", async () => {
-      const deletePointsSpy = mockSdkService("removePointFromNote", {
-        content: "Updated content",
-      })
+      const deletePointsSpy = mockSdkService(
+        AiController,
+        "removePointFromNote",
+        {
+          content: "Updated content",
+        }
+      )
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)
@@ -269,12 +308,16 @@ describe("NoteRefinement component", () => {
   describe("LoadingModal for Delete Points", () => {
     it("shows LoadingModal while deleting points", async () => {
       let resolveApi: () => void
-      mockSdkServiceWithImplementation("removePointFromNote", async () => {
-        await new Promise<void>((r) => {
-          resolveApi = r
-        })
-        return { content: "Updated content" }
-      })
+      mockSdkServiceWithImplementation(
+        AiController,
+        "removePointFromNote",
+        async () => {
+          await new Promise<void>((r) => {
+            resolveApi = r
+          })
+          return { content: "Updated content" }
+        }
+      )
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)
@@ -295,12 +338,16 @@ describe("NoteRefinement component", () => {
 
     it("hides LoadingModal when delete API fails", async () => {
       let resolveApi: () => void
-      mockSdkServiceWithImplementation("removePointFromNote", async () => {
-        await new Promise<void>((r) => {
-          resolveApi = r
-        })
-        return wrapSdkError("API Error")
-      })
+      mockSdkServiceWithImplementation(
+        AiController,
+        "removePointFromNote",
+        async () => {
+          await new Promise<void>((r) => {
+            resolveApi = r
+          })
+          return wrapSdkError("API Error")
+        }
+      )
       const wrapper = mount(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstCheckpoint(wrapper)

@@ -1,3 +1,7 @@
+import {
+  NoteController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/doughnut-backend-api"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
@@ -27,11 +31,11 @@ describe("global bar", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults (used by LinkNoteDialog in GlobalBar)
-    mockSdkService("getRecentNotes", [])
-    mockSdkService("searchForRelationshipTarget", [])
-    mockSdkService("searchForRelationshipTargetWithin", [])
-    mockSdkService("semanticSearch", [])
-    mockSdkService("semanticSearchWithin", [])
+    mockSdkService(NoteController, "getRecentNotes", [])
+    mockSdkService(SearchController, "searchForRelationshipTarget", [])
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
+    mockSdkService(SearchController, "semanticSearch", [])
+    mockSdkService(SearchController, "semanticSearchWithin", [])
     user = makeMe.aUser.please()
     noteEditingHistory = new NoteEditingHistory()
     const storageAccessor = useStorageAccessor()

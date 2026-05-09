@@ -1,3 +1,9 @@
+import {
+  MemoryTrackerController,
+  NoteController,
+  RecallPromptController,
+  RecallsController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
 import type {
@@ -38,10 +44,8 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 let renderer: RenderingHelper<typeof RecallPage>
-let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
-let previouslyAnsweredSpy: ReturnType<
-  typeof mockSdkService<"previouslyAnswered">
->
+let recallingSpy: ReturnType<typeof mockSdkService>
+let previouslyAnsweredSpy: ReturnType<typeof mockSdkService>
 let toRepeatRef: ReturnType<typeof ref<MemoryTrackerLite[] | undefined>>
 
 // Helper to create useRecallData mock return value
@@ -100,13 +104,19 @@ afterEach(() => {
 
 beforeEach(() => {
   vi.resetAllMocks()
-  mockSdkService("showNote", makeMe.aNoteRealm.please())
+  mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
   recallingSpy = mockSdkService(
+    RecallsController,
     "recalling",
     makeMe.aDueMemoryTrackersList.please()
   )
-  previouslyAnsweredSpy = mockSdkService("previouslyAnswered", [])
+  previouslyAnsweredSpy = mockSdkService(
+    RecallsController,
+    "previouslyAnswered",
+    []
+  )
   mockSdkService(
+    MemoryTrackerController,
     "askAQuestion",
     makeMe.aRecallPrompt.withQuestionType("SPELLING").please()
   )
@@ -195,12 +205,17 @@ describe("repeat page", () => {
   describe('repeat page with "just review" quiz', () => {
     const firstMemoryTrackerId = 123
     const secondMemoryTrackerId = 456
-    let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
+    let askAQuestionSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
       vi.useFakeTimers()
-      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        makeMe.aMemoryTracker.please()
+      )
       askAQuestionSpy = mockSdkService(
+        MemoryTrackerController,
         "askAQuestion",
         makeMe.aRecallPrompt.please()
       )
@@ -229,6 +244,7 @@ describe("repeat page", () => {
     it("should show progress", async () => {
       const wrapper = await mountPage()
       const mockedMarkAsRepeatedCall = mockSdkService(
+        MemoryTrackerController,
         "markAsRecalled",
         makeMe.aMemoryTracker.please()
       )
@@ -303,8 +319,16 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
-      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        makeMe.aMemoryTracker.please()
+      )
+      mockSdkService(
+        MemoryTrackerController,
+        "askAQuestion",
+        makeMe.aRecallPrompt.please()
+      )
 
       const trackers = [createMemoryTrackerLite(firstMemoryTrackerId, true)]
       vi.mocked(useRecallData).mockReturnValue(
@@ -323,10 +347,13 @@ describe("repeat page", () => {
         .please()
 
       const mockedAnswerSpellingCall = mockSdkService(
+        RecallPromptController,
         "answerSpelling",
         answerResult
       )
-      mockSdkService("getThresholdExceeded", { thresholdExceeded: false })
+      mockSdkService(MemoryTrackerController, "getThresholdExceeded", {
+        thresholdExceeded: false,
+      })
 
       const wrapper = await mountPage()
       await flushPromises()
@@ -369,12 +396,17 @@ describe("repeat page", () => {
     const normalMemoryTrackerId = 123
     const spellingMemoryTrackerId = 456
     const anotherNormalMemoryTrackerId = 789
-    let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
+    let askAQuestionSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
       vi.useFakeTimers()
-      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        makeMe.aMemoryTracker.please()
+      )
       askAQuestionSpy = mockSdkService(
+        MemoryTrackerController,
         "askAQuestion",
         makeMe.aRecallPrompt.please()
       )
@@ -613,17 +645,27 @@ describe("repeat page", () => {
 
   describe("re-assimilation threshold check", () => {
     const memoryTrackerId = 123
-    let getThresholdExceededSpy: ReturnType<
-      typeof mockSdkService<"getThresholdExceeded">
-    >
+    let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
       vi.useFakeTimers()
-      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
-      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
-      getThresholdExceededSpy = mockSdkService("getThresholdExceeded", {
-        thresholdExceeded: false,
-      })
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        makeMe.aMemoryTracker.please()
+      )
+      mockSdkService(
+        MemoryTrackerController,
+        "askAQuestion",
+        makeMe.aRecallPrompt.please()
+      )
+      getThresholdExceededSpy = mockSdkService(
+        MemoryTrackerController,
+        "getThresholdExceeded",
+        {
+          thresholdExceeded: false,
+        }
+      )
       const trackers = [createMemoryTrackerLite(memoryTrackerId)]
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({ toRepeat: trackers })
@@ -678,8 +720,16 @@ describe("repeat page", () => {
   describe("diligent mode", () => {
     beforeEach(() => {
       vi.useFakeTimers()
-      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
-      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        makeMe.aMemoryTracker.please()
+      )
+      mockSdkService(
+        MemoryTrackerController,
+        "askAQuestion",
+        makeMe.aRecallPrompt.please()
+      )
     })
 
     it("should set diligent mode to true when loadMore is called with dueInDays > 0", async () => {

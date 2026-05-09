@@ -15,7 +15,7 @@ describe("NoteExportForm", () => {
   let wrapper: VueWrapper
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService("getAiContextMarkdown", aiMarkdownStub)
+    mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
   })
 
   afterEach(() => {
@@ -45,7 +45,7 @@ describe("NoteExportForm", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    const getGraphSpy = mockSdkService("getGraph", graphData)
+    const getGraphSpy = mockSdkService(NoteController, "getGraph", graphData)
     wrapper = helper
       .component(NoteExportForm)
       .withProps({ note })
@@ -92,7 +92,7 @@ describe("NoteExportForm", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    mockSdkService("getGraph", graphData)
+    mockSdkService(NoteController, "getGraph", graphData)
     wrapper = helper
       .component(NoteExportForm)
       .withProps({ note })
@@ -112,7 +112,7 @@ describe("NoteExportForm", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    const getGraphMock = mockSdkService("getGraph", graphData)
+    const getGraphMock = mockSdkService(NoteController, "getGraph", graphData)
     wrapper = helper
       .component(NoteExportForm)
       .withProps({ note })
@@ -145,7 +145,7 @@ describe("NoteExportForm", () => {
       focusNote: { id: note.id, token: 1234 },
       relatedNotes: [],
     } as never
-    const getGraphMock = mockSdkService("getGraph", graphData1)
+    const getGraphMock = mockSdkService(NoteController, "getGraph", graphData1)
     getGraphMock
       .mockResolvedValueOnce(wrapSdkResponse(graphData1))
       .mockResolvedValueOnce(wrapSdkResponse(graphData2))
