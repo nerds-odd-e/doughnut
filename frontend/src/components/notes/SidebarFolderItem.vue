@@ -13,6 +13,7 @@
     }"
     @focusout="onFolderRowFocusOut"
   >
+    <ScrollTo v-if="isFolderPageForThisFolder" />
     <div class="folder-row">
       <button
         class="chevron-btn"
@@ -65,6 +66,7 @@
 <script setup lang="ts">
 import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
 import { ChevronRight } from "lucide-vue-next"
+import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue"
