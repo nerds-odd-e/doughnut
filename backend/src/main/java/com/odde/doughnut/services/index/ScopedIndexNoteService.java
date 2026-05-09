@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ScopedIndexNoteService {
@@ -32,6 +33,7 @@ public class ScopedIndexNoteService {
    * Resolves the designated index note for {@code scope}. Folder scope returns empty until folder
    * index persistence exists (Phase 10.5).
    */
+  @Transactional
   public Optional<Note> findDesignatedIndexNote(IndexScope scope) {
     return switch (scope) {
       case IndexScope.NotebookRoot nr -> findNotebookRootIndexNote(nr.notebook());
@@ -43,6 +45,7 @@ public class ScopedIndexNoteService {
    * Sets {@link Notebook#getIndexNote()} from the sole root note titled {@code index}, or clears it
    * when none exists. Folder scope is a no-op until Phase 10.5.
    */
+  @Transactional
   public void reconcileDesignatedIndexPointer(IndexScope scope) {
     switch (scope) {
       case IndexScope.NotebookRoot nr -> reconcileNotebookRootPointer(nr.notebook().getId());
