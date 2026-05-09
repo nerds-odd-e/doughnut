@@ -4,7 +4,7 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import FullScreen from "@/components/common/FullScreen.vue"
-import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
+import NoteAudioTools from "@/components/notes/widgets/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {

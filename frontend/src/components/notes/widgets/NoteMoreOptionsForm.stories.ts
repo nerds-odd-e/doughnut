@@ -3,7 +3,7 @@ import NoteMoreOptionsForm from "./NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 
 const meta = {
-  title: "Notes/Accessory/NoteMoreOptionsForm",
+  title: "Notes/MoreOptions/NoteMoreOptionsForm",
   component: NoteMoreOptionsForm,
   tags: ["autodocs"],
   parameters: {

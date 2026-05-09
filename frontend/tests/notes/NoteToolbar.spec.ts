@@ -1,6 +1,6 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
-import NoteMoreOptionsForm from "@/components/notes/accessory/NoteMoreOptionsForm.vue"
+import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"

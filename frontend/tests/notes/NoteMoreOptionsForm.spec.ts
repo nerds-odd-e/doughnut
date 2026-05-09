@@ -1,5 +1,5 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import NoteMoreOptionsForm from "@/components/notes/accessory/NoteMoreOptionsForm.vue"
+import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
