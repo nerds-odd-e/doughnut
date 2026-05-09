@@ -8,6 +8,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteRealmService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,18 +28,21 @@ class TextContentController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final NoteService noteService;
 
   public TextContentController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      NoteService noteService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.noteService = noteService;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -56,20 +60,32 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNote(note, n -> n.setContent(contentDTO.getContent()), true);
+    return updateNote(note, n -> n.setContent(contentDTO.getContent()), true, true);
   }
 
   private NoteRealm updateNote(
-      Note note, Consumer<Note> updateFunction, boolean refreshWikiTitleCache)
+      Note note,
+      Consumer<Note> updateFunction,
+      boolean refreshWikiTitleCache,
+      boolean deleteOrphanImagesAfterSave)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     entityPersister.save(note);
+    if (deleteOrphanImagesAfterSave) {
+      noteService.deleteOrphanImagesForPersistedContent(note);
+    }
     if (refreshWikiTitleCache) {
       wikiTitleCacheService.refreshForNote(note, authorizationService.getCurrentUser());
     }
     return noteRealmService.build(note, authorizationService.getCurrentUser());
+  }
+
+  private NoteRealm updateNote(
+      Note note, Consumer<Note> updateFunction, boolean refreshWikiTitleCache)
+      throws UnexpectedNoAccessRightException {
+    return updateNote(note, updateFunction, refreshWikiTitleCache, false);
   }
 }

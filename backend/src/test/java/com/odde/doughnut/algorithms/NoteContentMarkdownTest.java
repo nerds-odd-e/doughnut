@@ -7,9 +7,71 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class NoteContentMarkdownTest {
+
+  static Stream<Arguments> referencedImagePaths() {
+    return Stream.of(
+        Arguments.of("---\nimage: /attachments/images/12/a.png\n---\n", 12),
+        Arguments.of("---\nIMAGE: /attachments/images/3/z.png\n---\n", 3),
+        Arguments.of("---\nimage: \"/attachments/images/9/x.png\"\n---\n", 9),
+        Arguments.of("---\nimage: '/attachments/images/8/y.png'\n---\n", 8));
+  }
+
+  @ParameterizedTest
+  @MethodSource("referencedImagePaths")
+  void leadingFrontmatterImageReference_referenced_for_canonical_paths(
+      String content, int expectedId) {
+    NoteContentMarkdown.LeadingFrontmatterImageReference ref =
+        NoteContentMarkdown.leadingFrontmatterImageReference(content);
+    assertThat(
+        ref,
+        equalTo(new NoteContentMarkdown.LeadingFrontmatterImageReference.Referenced(expectedId)));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "plain",
+        "---\na: 1\n---\nBody",
+        "---\nimage:\n---\nBody",
+        "---\nimage: ''\n---\nBody",
+        "---\nimage: \"\"\n---\nBody",
+      })
+  void leadingFrontmatterImageReference_none_when_no_usable_image_scalar(String content) {
+    NoteContentMarkdown.LeadingFrontmatterImageReference ref =
+        NoteContentMarkdown.leadingFrontmatterImageReference(content);
+    assertThat(ref, equalTo(new NoteContentMarkdown.LeadingFrontmatterImageReference.None()));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "---\nimage: https://example.com/a.png\n---\n",
+        "---\nimage: /wrong/prefix/1/x.png\n---\n",
+        "---\nimage: attachments/images/1/x.png\n---\n",
+      })
+  void leadingFrontmatterImageReference_invalid_skips_cleanup_when_scalar_not_attachment_path(
+      String content) {
+    NoteContentMarkdown.LeadingFrontmatterImageReference ref =
+        NoteContentMarkdown.leadingFrontmatterImageReference(content);
+    assertThat(
+        ref,
+        equalTo(new NoteContentMarkdown.LeadingFrontmatterImageReference.InvalidPathPresent()));
+  }
+
+  @Test
+  void attachmentImageIdFromPath_empty_for_non_matching_paths() {
+    assertTrue(NoteContentMarkdown.attachmentImageIdFromPath("").isEmpty());
+    assertTrue(NoteContentMarkdown.attachmentImageIdFromPath("/attachments/images//x").isEmpty());
+    assertTrue(NoteContentMarkdown.attachmentImageIdFromPath("/attachments/image/1/x").isEmpty());
+  }
 
   @Test
   void bodyWithoutLeadingFrontmatter_handles_null_and_empty() {

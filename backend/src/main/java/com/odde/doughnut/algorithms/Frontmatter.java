@@ -53,6 +53,16 @@ public final class Frontmatter {
     return Optional.empty();
   }
 
+  /** Case-insensitive key presence (including entries whose value is null). */
+  public boolean containsKeyIgnoreCase(String key) {
+    for (String k : data.keySet()) {
+      if (k.equalsIgnoreCase(key)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Returns a new {@code Frontmatter} with the given key set to {@code value}. If a key exists
    * (case-insensitive), it is replaced in-place; otherwise it is appended.

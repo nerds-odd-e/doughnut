@@ -10,8 +10,10 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.controllers.dto.WikiTitle;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
+import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class TextContentControllerTests extends ControllerTestBase {
   @Autowired TextContentController controller;
   @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ImageRepository imageRepository;
 
   Note note;
 
@@ -175,6 +178,61 @@ class TextContentControllerTests extends ControllerTestBase {
 
       assertThat(response.getWikiTitles(), empty());
       assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+    }
+
+    @Test
+    void deletesOrphanImagesWhenContentReferencesSingleAttachmentPath()
+        throws UnexpectedNoAccessRightException {
+      Image kept = makeMe.anImage().please();
+      kept.setNote(note);
+      kept = imageRepository.save(kept);
+      Image orphan = makeMe.anImage().please();
+      orphan.setNote(note);
+      orphan = imageRepository.save(orphan);
+
+      noteUpdateContentDTO.setContent(
+          "---\nimage: /attachments/images/" + kept.getId() + "/" + kept.getName() + "\n---\nbody");
+
+      controller.updateNoteContent(note, noteUpdateContentDTO);
+
+      assertThat(imageRepository.findById(kept.getId()).isPresent(), equalTo(true));
+      assertThat(imageRepository.findById(orphan.getId()).isPresent(), equalTo(false));
+    }
+
+    @Test
+    void deletesAllNoteImagesWhenFrontmatterHasNoImageScalar()
+        throws UnexpectedNoAccessRightException {
+      Image first = makeMe.anImage().please();
+      first.setNote(note);
+      first = imageRepository.save(first);
+      Image second = makeMe.anImage().please();
+      second.setNote(note);
+      second = imageRepository.save(second);
+
+      noteUpdateContentDTO.setContent("just markdown");
+
+      controller.updateNoteContent(note, noteUpdateContentDTO);
+
+      assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(false));
+      assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(false));
+    }
+
+    @Test
+    void skipsOrphanCleanupWhenImageScalarIsNotCanonicalAttachmentPath()
+        throws UnexpectedNoAccessRightException {
+      Image first = makeMe.anImage().please();
+      first.setNote(note);
+      first = imageRepository.save(first);
+      Image second = makeMe.anImage().please();
+      second.setNote(note);
+      second = imageRepository.save(second);
+
+      noteUpdateContentDTO.setContent("---\nimage: https://example.com/a.png\n---\nbody");
+
+      controller.updateNoteContent(note, noteUpdateContentDTO);
+
+      assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(true));
+      assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(true));
     }
   }
 }

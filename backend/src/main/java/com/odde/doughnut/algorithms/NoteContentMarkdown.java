@@ -2,6 +2,8 @@ package com.odde.doughnut.algorithms;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Note content helpers for the leading YAML block: orchestrates fence parsing ({@link
@@ -17,6 +19,79 @@ public final class NoteContentMarkdown {
 
   private static final Set<String> NOTE_IMAGE_MAPPING_KEYS =
       Set.of(NOTE_IMAGE_KEY, NOTE_IMAGE_MASK_KEY);
+
+  private static final Pattern ATTACHMENT_IMAGE_PATH_PREFIX =
+      Pattern.compile("^/attachments/images/(\\d+)/");
+
+  /**
+   * How the leading {@code image:} scalar relates to persisted attachment paths for orphan {@link
+   * com.odde.doughnut.entities.Image} cleanup.
+   */
+  public sealed interface LeadingFrontmatterImageReference
+      permits LeadingFrontmatterImageReference.None,
+          LeadingFrontmatterImageReference.Referenced,
+          LeadingFrontmatterImageReference.InvalidPathPresent {
+
+    /** No {@code image:} line, blank value, or no leading frontmatter — delete all note images. */
+    record None() implements LeadingFrontmatterImageReference {}
+
+    /**
+     * Frontmatter references this attachment image id — keep this row, delete other note images.
+     */
+    record Referenced(int imageId) implements LeadingFrontmatterImageReference {}
+
+    /**
+     * Non-blank {@code image:} value that is not a canonical attachment path — skip cleanup (avoid
+     * deleting blobs on typos).
+     */
+    record InvalidPathPresent() implements LeadingFrontmatterImageReference {}
+  }
+
+  /**
+   * Parses the first leading YAML block's {@code image:} scalar for attachment id resolution used
+   * when deleting orphaned {@link com.odde.doughnut.entities.Image} rows.
+   */
+  public static LeadingFrontmatterImageReference leadingFrontmatterImageReference(String content) {
+    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content == null ? "" : content);
+    if (split.isEmpty()) {
+      return new LeadingFrontmatterImageReference.None();
+    }
+    Frontmatter fm = split.get().frontmatter();
+    if (!fm.containsKeyIgnoreCase(NOTE_IMAGE_KEY)) {
+      return new LeadingFrontmatterImageReference.None();
+    }
+    Optional<String> raw = fm.getString(NOTE_IMAGE_KEY);
+    String trimmed = raw.map(String::trim).orElse("");
+    if (trimmed.isEmpty()) {
+      return new LeadingFrontmatterImageReference.None();
+    }
+    String normalized = stripSurroundingQuotes(trimmed);
+    Optional<Integer> id = attachmentImageIdFromPath(normalized);
+    if (id.isPresent()) {
+      return new LeadingFrontmatterImageReference.Referenced(id.get());
+    }
+    return new LeadingFrontmatterImageReference.InvalidPathPresent();
+  }
+
+  /** Extracts the numeric image id from a canonical {@code /attachments/images/{id}/…} path. */
+  public static Optional<Integer> attachmentImageIdFromPath(String path) {
+    if (path == null) {
+      return Optional.empty();
+    }
+    Matcher m = ATTACHMENT_IMAGE_PATH_PREFIX.matcher(path.trim());
+    if (!m.find() || m.start() != 0) {
+      return Optional.empty();
+    }
+    return Optional.of(Integer.parseInt(m.group(1)));
+  }
+
+  private static String stripSurroundingQuotes(String s) {
+    if (s.length() >= 2
+        && ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")))) {
+      return s.substring(1, s.length() - 1).trim();
+    }
+    return s;
+  }
 
   public static final class LeadingFrontmatter {
     private final Frontmatter frontmatter;

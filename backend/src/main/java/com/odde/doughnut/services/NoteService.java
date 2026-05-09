@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
@@ -35,6 +36,7 @@ public class NoteService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final ImageRepository imageRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
@@ -43,12 +45,14 @@ public class NoteService {
       MemoryTrackerRepository memoryTrackerRepository,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       WikiTitleCacheService wikiTitleCacheService,
+      ImageRepository imageRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -183,8 +187,48 @@ public class NoteService {
                 referrer.setContent(updatedContent);
                 referrer.setUpdatedAt(updatedAt);
                 entityPersister.merge(referrer);
+                deleteOrphanImagesForPersistedContent(referrer);
                 wikiTitleCacheService.refreshForNote(referrer, viewer);
               });
+    }
+  }
+
+  /**
+   * Deletes {@link Image} rows for this note that are not referenced by the saved {@code image:}
+   * scalar in {@link Note#getContent()}, within the current transaction. Skips entirely when the
+   * scalar is present but not a canonical attachment path.
+   */
+  public void deleteOrphanImagesForPersistedContent(Note note) {
+    if (note == null || note.getId() == null) {
+      return;
+    }
+    NoteContentMarkdown.LeadingFrontmatterImageReference ref =
+        NoteContentMarkdown.leadingFrontmatterImageReference(note.getContent());
+    if (ref instanceof NoteContentMarkdown.LeadingFrontmatterImageReference.InvalidPathPresent) {
+      return;
+    }
+    Integer keepId =
+        ref instanceof NoteContentMarkdown.LeadingFrontmatterImageReference.Referenced referenced
+            ? referenced.imageId()
+            : null;
+    for (Image image : imageRepository.findByNote_Id(note.getId())) {
+      if (keepId != null && keepId.equals(image.getId())) {
+        continue;
+      }
+      clearAccessoryImageFkIfPointsTo(note, image);
+      entityPersister.remove(image);
+    }
+  }
+
+  private void clearAccessoryImageFkIfPointsTo(Note note, Image image) {
+    NoteAccessory acc = note.getNoteAccessory();
+    if (acc == null) {
+      return;
+    }
+    Image attached = acc.getImageAttachment();
+    if (attached != null && Objects.equals(attached.getId(), image.getId())) {
+      acc.setImageAttachment(null);
+      entityPersister.merge(acc);
     }
   }
 
@@ -238,6 +282,7 @@ public class NoteService {
         NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
             note.getContent(), hasImage, imageUrl, mask));
     entityPersister.save(note);
+    deleteOrphanImagesForPersistedContent(note);
     return note.getNoteAccessory();
   }
 }
