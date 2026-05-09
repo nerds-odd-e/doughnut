@@ -129,9 +129,24 @@ public class OpenAiApiHandler {
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(
       InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
+    return requestAndGetJsonSchemaResult(tool, openAIChatRequestBuilder, null);
+  }
+
+  /**
+   * Appends {@code developerInstructionAfterSchemaInstruction} to the developer message after the
+   * tool/schema instruction from {@link OpenAIChatRequestBuilder#responseJsonSchema}.
+   */
+  public Optional<JsonNode> requestAndGetJsonSchemaResult(
+      InstructionAndSchema tool,
+      OpenAIChatRequestBuilder openAIChatRequestBuilder,
+      String developerInstructionAfterSchemaInstruction) {
     assertOpenAiAvailable();
-    ChatCompletionCreateParams chatRequest =
-        openAIChatRequestBuilder.responseJsonSchema(tool).build();
+    OpenAIChatRequestBuilder prepared = openAIChatRequestBuilder.responseJsonSchema(tool);
+    if (developerInstructionAfterSchemaInstruction != null
+        && !developerInstructionAfterSchemaInstruction.isBlank()) {
+      prepared.addToOverallSystemMessage(developerInstructionAfterSchemaInstruction);
+    }
+    ChatCompletionCreateParams chatRequest = prepared.build();
 
     // Guard against misuse: requestAndGetJsonSchemaResult must not be used with tools
     if (chatRequest.tools().map(list -> !list.isEmpty()).orElse(false)) {

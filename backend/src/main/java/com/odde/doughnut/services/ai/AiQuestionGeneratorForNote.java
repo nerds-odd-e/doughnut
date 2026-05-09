@@ -9,12 +9,17 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.util.Optional;
 
 public record AiQuestionGeneratorForNote(
-    OpenAiApiHandler openAiApiHandler, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder) {
+    OpenAiApiHandler openAiApiHandler,
+    OpenAIChatRequestBuilder chatAboutNoteRequestBuilder,
+    String notebookAssistantInstructionsAfterSchema) {
 
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
     InstructionAndSchema questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
     return openAiApiHandler
-        .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
+        .requestAndGetJsonSchemaResult(
+            questionEvaluationAiTool,
+            chatAboutNoteRequestBuilder,
+            notebookAssistantInstructionsAfterSchema)
         .flatMap(
             jsonNode -> {
               try {

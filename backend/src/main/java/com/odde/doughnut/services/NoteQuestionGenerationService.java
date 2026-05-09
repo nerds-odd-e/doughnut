@@ -46,7 +46,7 @@ public class NoteQuestionGenerationService {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage, null);
   }
 
-  /** Same message layout as MCQ generation / evaluation (focus context, notebook hints). */
+  /** Same user-message layout as MCQ generation / evaluation (focus context; no developer text). */
   public OpenAIChatRequestBuilder openAiChatRequestForSharedNoteContext(
       Note note, String additionalMessage) {
     return requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, null);
@@ -59,7 +59,8 @@ public class NoteQuestionGenerationService {
         requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
 
     return openAiApiHandler
-        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
+        .requestAndGetJsonSchemaResult(
+            tool, chatRequestBuilder, note.getNotebookAssistantInstructions())
         .map(
             jsonNode -> {
               try {
@@ -89,7 +90,9 @@ public class NoteQuestionGenerationService {
 
     Optional<JsonNode> result =
         openAiApiHandler.requestAndGetJsonSchemaResult(
-            AiToolFactory.questionEvaluationAiTool(question), chatRequestBuilder);
+            AiToolFactory.questionEvaluationAiTool(question),
+            chatRequestBuilder,
+            note.getNotebookAssistantInstructions());
 
     if (result.isEmpty()) {
       return Optional.empty();

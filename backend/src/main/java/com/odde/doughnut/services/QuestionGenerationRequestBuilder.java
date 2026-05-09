@@ -37,19 +37,22 @@ public class QuestionGenerationRequestBuilder {
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, String additionalMessage, Long contextSeed) {
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool();
-    return openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed)
-        .responseJsonSchema(tool)
+    OpenAIChatRequestBuilder chatRequestBuilder =
+        openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
+    chatRequestBuilder.responseJsonSchema(tool);
+    addNotebookAssistantInstructionsIfPresent(chatRequestBuilder, note);
+    return chatRequestBuilder
         .reasoningEffort(ReasoningEffort.LOW)
         .maxCompletionTokens(1000L)
         .build();
   }
 
   /**
-   * Focus context user message, optional notebook assistant system hints, and optional extra user
-   * message—in the same order as {@link #buildQuestionGenerationRequest}. The MCQ JSON schema
-   * instruction is not attached here; {@link
-   * com.odde.doughnut.services.openAiApis.OpenAiApiHandler#requestAndGetJsonSchemaResult} applies
-   * it when calling the API.
+   * Focus context as a user message and optional extra user message—in the same order as {@link
+   * #buildQuestionGenerationRequest}. Notebook assistant hints and the MCQ JSON schema instruction
+   * are not attached here; they are added after the schema instruction in {@link
+   * #buildQuestionGenerationRequest} or when calling {@code OpenAiApiHandler}'s three-argument
+   * {@code requestAndGetJsonSchemaResult}.
    */
   public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
       Note note, String additionalMessage) {
@@ -59,7 +62,6 @@ public class QuestionGenerationRequestBuilder {
   public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
       Note note, String additionalMessage, Long contextSeed) {
     OpenAIChatRequestBuilder chatRequestBuilder = getChatRequestBuilder(note, contextSeed);
-    addNotebookAssistantInstructionsIfPresent(chatRequestBuilder, note);
     if (additionalMessage != null) {
       chatRequestBuilder.addUserMessage(additionalMessage);
     }

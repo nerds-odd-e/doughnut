@@ -152,6 +152,31 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
+    void shouldPlaceNotebookAssistantInstructionsAfterMainQuestionDesignerInstruction() {
+      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
+      notebookAiAssistant.setNotebook(testNote.getNotebook());
+      notebookAiAssistant.setAdditionalInstructionsToAi("Custom notebook instructions");
+      Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+      notebookAiAssistant.setCreatedAt(currentTime);
+      notebookAiAssistant.setUpdatedAt(currentTime);
+      makeMe.entityPersister.save(notebookAiAssistant);
+      makeMe.refresh(testNote.getNotebook());
+
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+      String developerBody =
+          request.messages().stream()
+              .filter(message -> message.developer().isPresent())
+              .findFirst()
+              .map(m -> m.developer().get().content().toString())
+              .orElse("");
+
+      assertThat(developerBody.indexOf("Question Designer"), greaterThan(-1));
+      assertThat(
+          developerBody.indexOf("Question Designer"),
+          lessThan(developerBody.indexOf("Custom notebook instructions")));
+    }
+
+    @Test
     void shouldIncludeAdditionalMessageWhenProvided() {
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(

@@ -23,15 +23,18 @@ public class AiToolFactory {
 
   private static String getBaseInstruction() {
     return """
-    You are a Question Designer for a personal knowledge system.
-
     Create one memory-stimulating, single-answer MCQ that helps the learner recall the Focus Note.
 
+    You are a Question Designer for a personal knowledge system.
+
+    Context:
+ .  '''
     Input:
     - The user message contains hidden "# Focus Context".
     - The learner cannot see this context.
     - "Focus Note" is the primary source.
     - "Retrieved Note" sections are secondary context only.
+    '''
 
     Rules:
     - The correct answer must be supported by the Focus Note title or content.
@@ -51,15 +54,16 @@ public class AiToolFactory {
     - Markdown is allowed only when useful for clarity.
 
     Before output, silently verify:
-    - one and only one correct answer;
-    - correct answer grounded in the Focus Note;
-    - no hidden-context labels in learner-facing text;
-    - no choice labels or numbering inside the choices;
-    - no meta-choices or order-dependent choices;
-    - choicesMayBeShuffled is true;
-    - question tests recall rather than outside knowledge.
+    - One and only one correct answer.
+    - The correct answer is grounded in the Focus Note.
+    - No hidden-context labels appear in learner-facing text.
+    - No choice labels or numbering appear inside the choices.
+    - No meta-choices or order-dependent choices are used.
+    - choicesMayBeShuffled is true.
+    - The question tests recall rather than outside knowledge.
 
-    Return only JSON matching the provided schema.
+    Output:
+    - Return only JSON matching the provided schema.
 
         """;
   }

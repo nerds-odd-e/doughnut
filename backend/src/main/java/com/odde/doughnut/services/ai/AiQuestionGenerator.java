@@ -103,7 +103,8 @@ public class AiQuestionGenerator {
     OpenAIChatRequestBuilder chatRequestBuilder =
         noteQuestionGenerationService.openAiChatRequestForSharedNoteContext(note, null);
     chatRequestBuilder.model(modelName1);
-    return new AiQuestionGeneratorForNote(openAiApiHandler, chatRequestBuilder);
+    return new AiQuestionGeneratorForNote(
+        openAiApiHandler, chatRequestBuilder, note.getNotebookAssistantInstructions());
   }
 
   public MCQWithAnswer regenerateQuestion(
