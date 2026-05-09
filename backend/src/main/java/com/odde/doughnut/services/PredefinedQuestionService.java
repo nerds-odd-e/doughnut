@@ -66,7 +66,7 @@ public class PredefinedQuestionService {
   public PredefinedQuestion generateAFeasibleQuestion(Note note) {
     Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
     MCQWithAnswer mcqWithAnswer =
-        aiQuestionGenerator.getAiGeneratedQuestion(note, null, null, contextSeedBoxed);
+        aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed);
     if (mcqWithAnswer == null) {
       return null;
     }

@@ -9,29 +9,13 @@ import org.junit.jupiter.api.Test;
 class AiToolFactoryTest {
 
   @Test
-  void shouldIncludeCustomPromptInInstruction() {
-    String customPrompt = "Generate a True/False question with choices ['True', 'False']";
-    InstructionAndSchema result = AiToolFactory.questionAiTool(customPrompt);
-
-    assertThat(result.getMessageBody(), containsString(customPrompt));
-    assertThat(result.getMessageBody(), containsString("Question Designer"));
-    assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
-  }
-
-  @Test
-  void shouldHandleNullCustomPrompt() {
-    InstructionAndSchema result = AiToolFactory.questionAiTool(null);
+  void questionAiToolContainsMergedQuestionDesignerInstruction() {
+    InstructionAndSchema result = AiToolFactory.questionAiTool();
 
     assertThat(result.getMessageBody(), containsString("Question Designer"));
-    assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
-  }
-
-  @Test
-  void shouldHandleBlankCustomPrompt() {
-    InstructionAndSchema result = AiToolFactory.questionAiTool("   ");
-
-    assertThat(result.getMessageBody(), containsString("Question Designer"));
-    assertThat(result.getMessageBody(), not(containsString("   \n")));
+    assertThat(result.getMessageBody(), containsString("focus note"));
+    assertThat(result.getMessageBody(), containsString("**MCQ format**"));
+    assertThat(result.getMessageBody(), containsString("3 choices"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
 

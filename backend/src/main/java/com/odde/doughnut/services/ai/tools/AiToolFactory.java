@@ -14,17 +14,11 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return questionAiTool(getDefaultMcqPrompt());
+    return questionAiTool();
   }
 
-  public static InstructionAndSchema questionAiTool(String customPrompt) {
-    StringBuilder fullInstruction = new StringBuilder(getBaseInstruction());
-
-    if (customPrompt != null && !customPrompt.isBlank()) {
-      fullInstruction.append("\n").append(customPrompt);
-    }
-    return new InstructionAndSchema(
-        fullInstruction.toString(), askSingleAnswerMultipleChoiceQuestion());
+  public static InstructionAndSchema questionAiTool() {
+    return new InstructionAndSchema(getBaseInstruction(), askSingleAnswerMultipleChoiceQuestion());
   }
 
   private static String getBaseInstruction() {
@@ -39,11 +33,6 @@ public class AiToolFactory {
 
         Do not use phrases that refer to hidden context, such as "this note", "the focus note", "the above context", "the retrieved note", or "according to the context". The learner cannot see those labels.
 
-        """;
-  }
-
-  public static String getDefaultMcqPrompt() {
-    return """
         **MCQ format**:
         - Provide 3 choices with only one correct answer.
         - The correct choice must be exclusive: no distractor should be also correct under a reasonable interpretation.
