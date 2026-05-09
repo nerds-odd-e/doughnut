@@ -79,9 +79,9 @@ import {
   Mic,
   Settings,
 } from "lucide-vue-next"
-import NoteAudioTools from "../accessory/NoteAudioTools.vue"
+import NoteAudioTools from "../widgets/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
-import NoteMoreOptionsForm from "../accessory/NoteMoreOptionsForm.vue"
+import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 
