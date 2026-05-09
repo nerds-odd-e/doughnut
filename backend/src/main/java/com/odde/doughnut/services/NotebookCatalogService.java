@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.FolderPageClientView;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
@@ -8,12 +9,14 @@ import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookPageClientView;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,10 +33,18 @@ import org.springframework.stereotype.Service;
 public class NotebookCatalogService {
 
   private final BookRepository bookRepository;
+  private final FolderRepository folderRepository;
+  private final FolderService folderService;
   private final NotebookService notebookService;
 
-  public NotebookCatalogService(BookRepository bookRepository, NotebookService notebookService) {
+  public NotebookCatalogService(
+      BookRepository bookRepository,
+      FolderRepository folderRepository,
+      FolderService folderService,
+      NotebookService notebookService) {
     this.bookRepository = bookRepository;
+    this.folderRepository = folderRepository;
+    this.folderService = folderService;
     this.notebookService = notebookService;
   }
 
@@ -49,6 +60,20 @@ public class NotebookCatalogService {
     Integer indexNoteId =
         notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
     return NotebookPageClientView.of(base, indexNoteId);
+  }
+
+  public FolderPageClientView folderPageClientViewFor(
+      Notebook notebook, Folder folder, User viewer) {
+    Folder loaded =
+        folderRepository
+            .findById(folder.getId())
+            .orElseThrow(() -> new IllegalStateException("Folder not found."));
+    NotebookClientView chrome = clientViewFor(notebook, viewer);
+    Integer parentFolderId =
+        loaded.getParentFolder() == null ? null : loaded.getParentFolder().getId();
+    Integer folderIndexNoteId =
+        folderService.findOptionalIndexNote(loaded).map(Note::getId).orElse(null);
+    return FolderPageClientView.of(chrome, loaded, parentFolderId, folderIndexNoteId);
   }
 
   /**

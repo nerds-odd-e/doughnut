@@ -779,6 +779,24 @@ export type NotebookPageClientView = {
 };
 
 /**
+ * Notebook chrome plus folder row for loading the folder page: same notebook fields as NotebookPageClientView (without notebook-level indexNoteId), plus folder identity, optional parent folder id, and optional designated folder index note id.
+ */
+export type FolderPageClientView = {
+    notebook: Notebook;
+    hasAttachedBook?: boolean;
+    readonly?: boolean;
+    folder: Folder;
+    /**
+     * Parent folder id when this folder is nested; omitted at notebook root.
+     */
+    parentFolderId?: number;
+    /**
+     * Folder index landing note id from cached folder.index_note_id when valid; otherwise repaired from notes titled "index" in this folder (case-insensitive). Omitted when absent.
+     */
+    folderIndexNoteId?: number;
+};
+
+/**
  * Flat folder row for building folder trees and paths within a notebook.
  */
 export type NotebookFolderIndexRow = {
@@ -2890,6 +2908,42 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
+export type DissolveFolderData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}';
+};
+
+export type DissolveFolderResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetFolderPageData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}';
+};
+
+export type GetFolderPageResponses = {
+    /**
+     * OK
+     */
+    200: FolderPageClientView;
+};
+
+export type GetFolderPageResponse = GetFolderPageResponses[keyof GetFolderPageResponses];
+
 export type ListNotebookFolderIndexData = {
     body?: never;
     path: {
@@ -3391,23 +3445,6 @@ export type DeleteTokenData = {
 };
 
 export type DeleteTokenResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type DissolveFolderData = {
-    body?: never;
-    path: {
-        notebook: number;
-        folder: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/folders/{folder}';
-};
-
-export type DissolveFolderResponses = {
     /**
      * OK
      */

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.FolderListing;
+import com.odde.doughnut.controllers.dto.FolderPageClientView;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -230,6 +231,128 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
                   ResponseStatusException.class,
                   () -> controller.listNotebookFolderListing(nb, folderInOther.getId()))
               .getStatusCode());
+    }
+  }
+
+  @Nested
+  class GetFolderPage {
+    @Test
+    void ownerGetsFolderChromeAndFolderPayload() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
+
+      FolderPageClientView view = controller.getFolderPage(nb, folder);
+
+      assertThat(view.notebook().getId(), equalTo(nb.getId()));
+      assertThat(view.folder().getId(), equalTo(folder.getId()));
+      assertThat(view.folder().getName(), equalTo("Box"));
+      assertThat(view.readonly(), is(false));
+      assertThat(view.parentFolderId(), nullValue());
+    }
+
+    @Test
+    void includesFolderIndexNoteIdWhenEligibleIndexNoteExists()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
+      Note index =
+          makeMe
+              .aNote()
+              .creatorAndOwner(owner)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("index")
+              .please();
+
+      FolderPageClientView view = controller.getFolderPage(nb, folder);
+
+      assertThat(view.folderIndexNoteId(), equalTo(index.getId()));
+    }
+
+    @Test
+    void includesFolderIndexNoteIdFromCachedFolderPointer()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
+      Note designated =
+          makeMe
+              .aNote()
+              .creatorAndOwner(owner)
+              .inNotebook(nb)
+              .folder(folder)
+              .title("Welcome")
+              .please();
+      makeMe.theFolder(folder).indexNote(designated).please();
+      makeMe.entityPersister.flush();
+
+      FolderPageClientView view = controller.getFolderPage(nb, folder);
+
+      assertThat(view.folderIndexNoteId(), equalTo(designated.getId()));
+    }
+
+    @Test
+    void omitsFolderIndexNoteIdWhenNoDesignatedIndexYet() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Empty").please();
+
+      FolderPageClientView view = controller.getFolderPage(nb, folder);
+
+      assertThat(view.folderIndexNoteId(), nullValue());
+    }
+
+    @Test
+    void nestedFolderIncludesParentFolderId() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+
+      FolderPageClientView view = controller.getFolderPage(nb, nested);
+
+      assertThat(view.parentFolderId(), equalTo(parent.getId()));
+    }
+
+    @Test
+    void folderFromAnotherNotebookReturnsNotFound() {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder foreign = makeMe.aFolder().notebook(otherNb).name("Other").please();
+
+      ResponseStatusException ex =
+          assertThrows(ResponseStatusException.class, () -> controller.getFolderPage(nb, foreign));
+
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void anonymousGetsReadonlyFolderPageWhenNotebookInBazaar()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Shared").please();
+      makeMe.aBazaarNotebook(nb).please();
+      currentUser.setUser(null);
+
+      FolderPageClientView view = controller.getFolderPage(nb, folder);
+
+      assertThat(view.notebook().getId(), equalTo(nb.getId()));
+      assertThat(view.readonly(), is(true));
+    }
+
+    @Test
+    void requiresReadAuthorizationWhenNotebookNotInBazaar() {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Private").please();
+      currentUser.setUser(makeMe.aUser().please());
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.getFolderPage(nb, folder));
     }
   }
 

@@ -1,8 +1,11 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.Folder;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.services.index.IndexScope;
 import com.odde.doughnut.services.index.ScopedIndexNoteService;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,5 +34,9 @@ public class FolderService {
             folder ->
                 scopedIndexNoteService.reconcileDesignatedIndexPointer(
                     new IndexScope.FolderIndex(folder)));
+  }
+
+  public Optional<Note> findOptionalIndexNote(Folder folder) {
+    return scopedIndexNoteService.findDesignatedIndexNote(new IndexScope.FolderIndex(folder));
   }
 }

@@ -2210,6 +2210,54 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/folders/{folder}:
+    get:
+      tags:
+      - notebook-controller
+      summary: Get folder page payload
+      description: "Notebook chrome, folder metadata, parent folder id when nested,\
+        \ and designated folder index note id when resolved."
+      operationId: getFolderPage
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FolderPageClientView"
+    delete:
+      tags:
+      - notebook-controller
+      summary: Dissolve a folder
+      description: Removes the folder row. Direct notes and subfolders are promoted
+        to the dissolved folder's parent (or notebook root). Deeper descendants stay
+        under the promoted subfolder.
+      operationId: dissolveFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/folders/index:
     get:
       tags:
@@ -2713,29 +2761,6 @@ paths:
       operationId: deleteToken
       parameters:
       - name: tokenId
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-  /api/notebooks/{notebook}/folders/{folder}:
-    delete:
-      tags:
-      - notebook-controller
-      summary: Dissolve a folder
-      description: Removes the folder row. Direct notes and subfolders are promoted
-        to the dissolved folder's parent (or notebook root). Deeper descendants stay
-        under the promoted subfolder.
-      operationId: dissolveFolder
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: folder
         in: path
         required: true
         schema:
@@ -4346,6 +4371,35 @@ components:
             when valid; otherwise repaired from the sole root note titled "index"
             (case-insensitive). Omitted when absent.
       required:
+      - notebook
+    FolderPageClientView:
+      type: object
+      description: "Notebook chrome plus folder row for loading the folder page: same\
+        \ notebook fields as NotebookPageClientView (without notebook-level indexNoteId),\
+        \ plus folder identity, optional parent folder id, and optional designated\
+        \ folder index note id."
+      properties:
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        hasAttachedBook:
+          type: boolean
+        readonly:
+          type: boolean
+        folder:
+          $ref: "#/components/schemas/Folder"
+        parentFolderId:
+          type: integer
+          format: int32
+          description: Parent folder id when this folder is nested; omitted at notebook
+            root.
+        folderIndexNoteId:
+          type: integer
+          format: int32
+          description: Folder index landing note id from cached folder.index_note_id
+            when valid; otherwise repaired from notes titled "index" in this folder
+            (case-insensitive). Omitted when absent.
+      required:
+      - folder
       - notebook
     NotebookFolderIndexRow:
       type: object
