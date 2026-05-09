@@ -4,14 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.logging.log4j.util.Strings;
 
 /**
- * Note content helpers for the leading YAML frontmatter block: orchestrates fence parsing ({@link
- * NoteLeadingFrontmatter}) and YAML line edits ({@link NoteYamlFrontmatterEditing}).
+ * Note content helpers for the leading YAML block: orchestrates fence parsing ({@link
+ * NoteLeadingFrontmatter}) and generic YAML line handling ({@link YamlHandler}).
  */
 public final class NoteContentMarkdown {
 
   private NoteContentMarkdown() {}
+
+  private static final String WIKIDATA_ID_KEY = "wikidata_id";
+  private static final String NOTE_IMAGE_KEY = "image";
+  private static final String NOTE_IMAGE_MASK_KEY = "image_mask";
+
+  private static final Set<String> NOTE_IMAGE_MAPPING_KEYS =
+      Set.of(NOTE_IMAGE_KEY, NOTE_IMAGE_MASK_KEY);
 
   public record LeadingFrontmatter(String yamlRaw, String body) {}
 
@@ -25,7 +33,7 @@ public final class NoteContentMarkdown {
    */
   public static Optional<String> wikidataIdScalarFromLeadingFrontmatter(String content) {
     return splitLeadingFrontmatter(content)
-        .flatMap(lf -> NoteYamlFrontmatterScalars.firstScalarValue(lf.yamlRaw(), "wikidata_id"));
+        .flatMap(lf -> YamlHandler.firstScalarValue(lf.yamlRaw(), WIKIDATA_ID_KEY));
   }
 
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
@@ -49,13 +57,28 @@ public final class NoteContentMarkdown {
         return content;
       }
       return NoteLeadingFrontmatter.contentWithLeadingFence(
-          NoteYamlFrontmatterEditing.imageScalarLinesOnly(imageUrl, imageMask), content);
+          prependNoteImageScalarLines(imageUrl, imageMask), content);
     }
     LeadingFrontmatter lf = split.get();
     List<String> kept =
-        NoteYamlFrontmatterEditing.yamlLinesReplacingImageScalars(
-            lf.yamlRaw().split("\n", -1), hasImage, imageUrl, imageMask);
+        YamlHandler.linesOmittingMappingKeys(lf.yamlRaw().split("\n", -1), NOTE_IMAGE_MAPPING_KEYS);
+    if (hasImage && !Strings.isBlank(imageUrl)) {
+      kept.add(YamlHandler.mappingLine(NOTE_IMAGE_KEY, imageUrl.trim()));
+      if (!Strings.isBlank(imageMask)) {
+        kept.add(YamlHandler.mappingLine(NOTE_IMAGE_MASK_KEY, imageMask.trim()));
+      }
+    }
     return NoteLeadingFrontmatter.contentWithLeadingFence(kept, lf.body());
+  }
+
+  /** New leading block: always emit {@code image} (matches legacy prepend behavior). */
+  private static List<String> prependNoteImageScalarLines(String imageUrl, String imageMask) {
+    List<String> lines = new ArrayList<>();
+    lines.add(YamlHandler.mappingLine(NOTE_IMAGE_KEY, imageUrl == null ? "" : imageUrl.trim()));
+    if (!Strings.isBlank(imageMask)) {
+      lines.add(YamlHandler.mappingLine(NOTE_IMAGE_MASK_KEY, imageMask.trim()));
+    }
+    return lines;
   }
 
   public static Optional<String> removeWikiLinksFromLeadingFrontmatterProperties(
@@ -77,7 +100,7 @@ public final class NoteContentMarkdown {
       }
       if (!rewritten.equals(line)) {
         changed = true;
-        if (NoteYamlFrontmatterEditing.isEmptyPropertyLine(rewritten)) {
+        if (YamlHandler.isEmptyMappingValueLine(rewritten)) {
           continue;
         }
       }
