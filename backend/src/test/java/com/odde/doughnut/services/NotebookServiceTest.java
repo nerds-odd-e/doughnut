@@ -14,7 +14,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,6 @@ class NotebookServiceTest {
 
   @Autowired NotebookService notebookService;
   @Autowired NotebookRepository notebookRepository;
-  @Autowired JdbcTemplate jdbcTemplate;
   @Autowired MakeMe makeMe;
 
   @Test
@@ -70,8 +68,8 @@ class NotebookServiceTest {
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
     Note landing =
         makeMe.aNote().creatorAndOwner(owner).inNotebook(notebook).title("Welcome").please();
-    jdbcTemplate.update(
-        "UPDATE notebook SET index_note_id = ? WHERE id = ?", landing.getId(), notebook.getId());
+    makeMe.theNotebook(notebook).indexNote(landing).please();
+    makeMe.entityPersister.flush();
 
     Notebook managed = notebookRepository.findById(notebook.getId()).orElseThrow();
     Optional<Note> result = notebookService.findOptionalIndexNote(managed);
@@ -87,8 +85,8 @@ class NotebookServiceTest {
     Note wrong = makeMe.aNote().creatorAndOwner(owner).folder(folder).title("misc").please();
     Note indexNote =
         makeMe.aNote().creatorAndOwner(owner).inNotebook(notebook).title("index").please();
-    jdbcTemplate.update(
-        "UPDATE notebook SET index_note_id = ? WHERE id = ?", wrong.getId(), notebook.getId());
+    makeMe.theNotebook(notebook).indexNote(wrong).please();
+    makeMe.entityPersister.flush();
 
     Notebook managed = notebookRepository.findById(notebook.getId()).orElseThrow();
     Optional<Note> result = notebookService.findOptionalIndexNote(managed);

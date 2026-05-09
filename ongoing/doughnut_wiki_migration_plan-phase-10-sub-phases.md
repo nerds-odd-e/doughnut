@@ -9,6 +9,7 @@
 - **Stop-safe:** after any sub-phase, the app remains shippable. Existing note editing, folder listing, and notebook navigation do not regress.
 - **Behavior first:** favor user-visible slices (editable notebook index, folder page, search filtering) over broad backend restructuring.
 - **One source of truth:** scoped defaults live in index-note frontmatter. Persisted `index_note_id` fields are pointers/caches, not duplicate config blobs.
+- **JPA for pointers in code:** map notebook/folder index pointers with entity associations (for example `Notebook` / `Folder` to `Note`) and exercise them through normal persistence and test fixtures (e.g. builders that set the association). Avoid ad-hoc `UPDATE … SET index_note_id` in application or test code; reserve SQL for Flyway migrations and documented one-off maintenance.
 - **One editor pipeline:** notebook page, folder page, and `/d/n/:noteId` use the same Markdown/frontmatter save path wherever practical.
 - **Route owns mode:** pages are either a container page (notebook or folder) or a note page. There is no "active folder + active note" product state.
 - **Tests by capability:** name tests/features after behaviors (index editing, folder navigation, search), not sub-phase numbers.
@@ -27,6 +28,8 @@ folder.index_note_id   -> note.id
 ```
 
 Title-based lookup remains useful for backfill, import, repair, and compatibility with the existing notebook index behavior, but it should not be the primary read path once a pointer exists.
+
+In backend Java and tests, treat these pointers as JPA associations to `Note` (not as columns you set only via raw SQL).
 
 ### Frontmatter carries scoped configuration
 

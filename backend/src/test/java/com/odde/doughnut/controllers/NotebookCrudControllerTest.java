@@ -17,13 +17,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookCrudControllerTest extends NotebookControllerTestBase {
-
-  @Autowired JdbcTemplate jdbcTemplate;
 
   @Nested
   class CreateNotebook {
@@ -135,8 +131,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Note designated =
           makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("Notebook Welcome").please();
-      jdbcTemplate.update(
-          "UPDATE notebook SET index_note_id = ? WHERE id = ?", designated.getId(), nb.getId());
+      makeMe.theNotebook(nb).indexNote(designated).please();
+      makeMe.entityPersister.flush();
 
       NotebookPageClientView view = controller.get(nb);
 

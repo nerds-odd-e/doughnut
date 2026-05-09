@@ -16,12 +16,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 class SearchControllerTests extends ControllerTestBase {
   @Autowired SearchController controller;
-  @Autowired JdbcTemplate jdbcTemplate;
   @Autowired EntityManager entityManager;
 
   @BeforeEach
@@ -172,10 +170,8 @@ class SearchControllerTests extends ControllerTestBase {
       Note regularNote =
           makeMe.aNote("Regular IdxTok999 Topic").creatorAndOwner(user).inNotebook(nb).please();
 
-      jdbcTemplate.update(
-          "UPDATE notebook SET index_note_id = ? WHERE id = ?",
-          designatedIndex.getId(),
-          nb.getId());
+      makeMe.theNotebook(nb).indexNote(designatedIndex).please();
+      entityManager.flush();
       entityManager.clear();
 
       SearchTerm searchTerm = new SearchTerm();

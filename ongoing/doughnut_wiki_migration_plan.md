@@ -39,7 +39,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 **Folder** = structural containment. **`note.parent_id`** is removed (Phase 7); folder alignment and motion use folder placement and `NoteChildContainerFolderService` / `NoteMotionService` where applicable (see codebase).
 
-**Index note** — Optional **`index`** note (title case-insensitive for discovery/import) per **notebook root** (`folderId` absent) and per **folder**; **`notebook.index_note_id`** and **`folder.index_note_id`** cache the note id for hot reads and **default search exclusion**. Scoped defaults (e.g. title pattern, question-generation instruction) live in **index frontmatter**; **lazy create**: notebook/folder page shows the editor and creates the note on first persist. Notebook has **`name`** and **`description`**; no `headNote` on APIs. See north star for folder page routing vs note routes.
+**Index note** — Optional **`index`** note (title case-insensitive for discovery/import) per **notebook root** (`folderId` absent) and per **folder**; **`notebook.index_note_id`** and **`folder.index_note_id`** cache the note id for hot reads and **default search exclusion**. Scoped defaults (e.g. title pattern, question-generation instruction) live in **index frontmatter**; **lazy create**: notebook/folder page shows the editor and creates the note on first persist. Notebook has **`name`** and **`description`**; no `headNote` on APIs. In backend code and tests, prefer **JPA associations** to the index `Note` over raw SQL updates to those pointer columns (migrations remain Flyway/SQL). See north star for folder page routing vs note routes.
 
 **Properties** — Leading YAML in Markdown `content`; rich editor mirrors via frontmatter UI.
 
@@ -186,6 +186,7 @@ Parse links, show outgoing + backlinks, preserve unresolved, unify graph with wi
 
 - **Index note** — Ordinary note; notebook index at **root** (`folderId` null); folder index with **`folderId`** = that folder; reserved title **`index`** (case-insensitive for backfill/import); **at most one** index note per scope.
 - **Pointers** — Keep **`index_note_id`** in sync on create, delete, move, and title change; referenced note must match **notebook** and **folder scope**.
+- **Java and tests** — Prefer JPA-mapped associations for those pointers (set the linked `Note` on `Notebook` / `Folder`, or equivalent repository/service APIs) rather than raw SQL against `index_note_id`. Schema and one-time data fixes stay in Flyway migrations.
 - **No synthetic root folder** — Notebook root remains **`folderId` null**; no hidden folder row that holds all notes.
 - **Config location** — Scoped defaults live in **index frontmatter**, not a separate **`folder.config`** / duplicate blob (see Phase 11 target shape).
 
