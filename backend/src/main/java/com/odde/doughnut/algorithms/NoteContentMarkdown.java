@@ -20,7 +20,23 @@ public final class NoteContentMarkdown {
   private static final Set<String> NOTE_IMAGE_MAPPING_KEYS =
       Set.of(NOTE_IMAGE_KEY, NOTE_IMAGE_MASK_KEY);
 
-  public record LeadingFrontmatter(String yamlRaw, String body) {}
+  public static final class LeadingFrontmatter {
+    private final String yamlRaw;
+    private final String body;
+
+    private LeadingFrontmatter(String yamlRaw, String body) {
+      this.yamlRaw = yamlRaw;
+      this.body = body;
+    }
+
+    public YamlBuilder yamlBuilder() {
+      return new YamlBuilder(yamlRaw);
+    }
+
+    public String body() {
+      return body;
+    }
+  }
 
   public static String bodyWithoutLeadingFrontmatter(String content) {
     return splitLeadingFrontmatter(content).map(LeadingFrontmatter::body).orElse(content);
@@ -32,7 +48,7 @@ public final class NoteContentMarkdown {
    */
   public static Optional<String> wikidataIdScalarFromLeadingFrontmatter(String content) {
     return splitLeadingFrontmatter(content)
-        .flatMap(lf -> new YamlBuilder(lf.yamlRaw()).firstScalarValue(WIKIDATA_ID_KEY));
+        .flatMap(lf -> lf.yamlBuilder().firstScalarValue(WIKIDATA_ID_KEY));
   }
 
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
@@ -59,8 +75,7 @@ public final class NoteContentMarkdown {
           prependNoteImageScalarLines(imageUrl, imageMask), content);
     }
     LeadingFrontmatter lf = split.get();
-    List<String> kept =
-        new YamlBuilder(lf.yamlRaw()).linesOmittingMappingKeys(NOTE_IMAGE_MAPPING_KEYS);
+    List<String> kept = lf.yamlBuilder().linesOmittingMappingKeys(NOTE_IMAGE_MAPPING_KEYS);
     if (hasImage && !Strings.isBlank(imageUrl)) {
       YamlBuilder scalars = new YamlBuilder("");
       kept.add(scalars.mappingLine(NOTE_IMAGE_KEY, imageUrl.trim()));
@@ -89,7 +104,7 @@ public final class NoteContentMarkdown {
     return splitLeadingFrontmatter(content)
         .flatMap(
             lf ->
-                new YamlBuilder(lf.yamlRaw())
+                lf.yamlBuilder()
                     .transformValues(
                         v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", "")))
                     .map(

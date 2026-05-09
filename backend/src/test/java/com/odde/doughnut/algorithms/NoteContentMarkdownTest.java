@@ -35,7 +35,7 @@ class NoteContentMarkdownTest {
     Optional<NoteContentMarkdown.LeadingFrontmatter> split =
         NoteContentMarkdown.splitLeadingFrontmatter("---\nkey: v\n---\nHello");
     assertTrue(split.isPresent());
-    assertThat(split.get().yamlRaw(), equalTo("key: v"));
+    assertThat(split.get().yamlBuilder().firstScalarValue("key"), equalTo(Optional.of("v")));
     assertThat(split.get().body(), equalTo("Hello"));
   }
 
