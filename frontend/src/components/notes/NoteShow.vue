@@ -34,7 +34,7 @@
                     asMarkdown,
                     readonly: readonly(noteRealm),
                     wikiTitles: noteRealm.wikiTitles ?? [],
-                    isIndexContext: noteRealm.indexNote ?? false,
+                    isIndexContext: isIndexTitle(noteRealm),
                   }"
                   @dead-link-click="onDeadLinkClick"
                 />
@@ -117,6 +117,9 @@ const props = defineProps({
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>
   !currentUser?.value || noteRealm.notebookView.readonly === true
+
+const isIndexTitle = (noteRealm: NoteRealm) =>
+  (noteRealm.note.noteTopology.title ?? "").trim().toLowerCase() === "index"
 
 const pendingDeadLinkTitle = ref<string | null>(null)
 

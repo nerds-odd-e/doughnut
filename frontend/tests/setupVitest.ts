@@ -43,10 +43,7 @@ console.log = (...args: unknown[]) => {
 // Fail only on Vue warnings; suppress known library noise in test output
 console.warn = (...args: unknown[]) => {
   const message = args.join(" ")
-  if (
-    message.includes("decodeEntities option is passed") ||
-    message.includes("Indexing all PDF objects")
-  ) {
+  if (message.includes("decodeEntities option is passed")) {
     return
   }
 

@@ -28,7 +28,7 @@
           aria-hidden="true"
         />
       </button>
-      <div class="folder-label-area" @click="setUserActiveFolderOnly">
+      <div class="folder-label-area" @click="onFolderLabelAreaClick">
         <router-link
           class="sidebar-folder-label"
           data-testid="sidebar-folder-open-page-link"
@@ -186,6 +186,11 @@ function setUserActiveFolderOnly() {
     id: folderId.value,
     name: props.folder.name,
   }
+}
+
+function onFolderLabelAreaClick() {
+  setUserActiveFolderOnly()
+  ensureFolderExpandedById(folderId.value)
 }
 
 function toggleExpand() {

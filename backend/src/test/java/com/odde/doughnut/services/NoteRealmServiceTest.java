@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
@@ -253,59 +252,5 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(root, user);
 
     assertThat(realm.getAncestorFolders(), empty());
-  }
-
-  @Test
-  void index_note_flag_true_for_designated_notebook_index_note() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note indexNote =
-        makeMe.aNote().creatorAndOwner(user).inNotebook(root.getNotebook()).title("index").please();
-    makeMe.theNotebook(root.getNotebook()).indexNote(indexNote).please();
-
-    NoteRealm realm = noteRealmService.build(indexNote, user);
-
-    assertThat(realm.isIndexNote(), is(true));
-  }
-
-  @Test
-  void index_note_flag_false_for_normal_note() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Note indexNote =
-        makeMe.aNote().creatorAndOwner(user).inNotebook(root.getNotebook()).title("index").please();
-    makeMe.theNotebook(root.getNotebook()).indexNote(indexNote).please();
-    Note normalNote = makeMe.aNote().creatorAndOwner(user).inNotebook(root.getNotebook()).please();
-
-    NoteRealm realm = noteRealmService.build(normalNote, user);
-
-    assertThat(realm.isIndexNote(), is(false));
-  }
-
-  @Test
-  void index_note_flag_true_for_designated_folder_index_note() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Folder folder = makeMe.aFolder().notebook(root.getNotebook()).please();
-    Note folderIndex = makeMe.aNote().creatorAndOwner(user).folder(folder).title("index").please();
-    makeMe.theFolder(folder).indexNote(folderIndex).please();
-
-    NoteRealm realm = noteRealmService.build(folderIndex, user);
-
-    assertThat(realm.isIndexNote(), is(true));
-  }
-
-  @Test
-  void index_note_flag_false_for_normal_note_in_folder() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().creatorAndOwner(user).please();
-    Folder folder = makeMe.aFolder().notebook(root.getNotebook()).please();
-    Note folderIndex = makeMe.aNote().creatorAndOwner(user).folder(folder).title("index").please();
-    makeMe.theFolder(folder).indexNote(folderIndex).please();
-    Note normalNote = makeMe.aNote().creatorAndOwner(user).folder(folder).please();
-
-    NoteRealm realm = noteRealmService.build(normalNote, user);
-
-    assertThat(realm.isIndexNote(), is(false));
   }
 }

@@ -310,7 +310,10 @@ async function loadPdf(bytes: ArrayBuffer | Uint8Array) {
 
   const data =
     bytes instanceof Uint8Array ? new Uint8Array(bytes) : new Uint8Array(bytes)
-  const loadingTask = getDocument({ data })
+  const loadingTask = getDocument({
+    data,
+    verbosity: 0,
+  })
   currentLoadingTask = loadingTask
 
   try {
