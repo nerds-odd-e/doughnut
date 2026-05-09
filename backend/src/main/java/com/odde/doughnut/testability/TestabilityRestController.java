@@ -129,7 +129,6 @@ class TestabilityRestController {
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = new Note();
       note.initializeNewNote(user, null, currentUTCTimestamp, title);
-      NoteAccessory accessory = note.getOrInitializeNoteAccessory();
 
       note.setTitle(title);
       note.setContent(content);
@@ -140,24 +139,13 @@ class TestabilityRestController {
       if (rememberSpelling != null) {
         note.getRecallSetting().setRememberSpelling(rememberSpelling);
       }
-      accessory.setImageMask(imageMask);
-      accessory.setImageUrl(imageUrl);
 
-      ImageWithMask imageWithMask = accessory.getImageWithMask();
-      boolean hasImage =
-          imageWithMask != null
-              && imageWithMask.noteImage != null
-              && !imageWithMask.noteImage.isBlank();
-      String imageUrl = "";
-      String mask = "";
-      if (hasImage) {
-        ImageWithMask iwm = Objects.requireNonNull(imageWithMask);
-        imageUrl = iwm.noteImage;
-        mask = iwm.imageMask != null ? iwm.imageMask : "";
-      }
+      String url = imageUrl != null ? imageUrl.trim() : "";
+      boolean hasImage = !Strings.isBlank(url);
+      String mask = imageMask != null ? imageMask : "";
       note.setContent(
           NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-              note.getContent(), hasImage, imageUrl, mask));
+              note.getContent() != null ? note.getContent() : "", hasImage, url, mask));
 
       note.setUpdatedAt(currentUTCTimestamp);
       return note;

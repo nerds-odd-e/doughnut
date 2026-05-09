@@ -31,7 +31,6 @@ beforeEach(() => {
       })
       .please()
   )
-  mockSdkService(NoteController, "showNoteAccessory", { id: 0 })
   mockSdkService(AiController, "generateUnderstandingChecklist", { points: [] })
   router = createRouter({
     history: createWebHistory(),

@@ -24,7 +24,6 @@ beforeEach(() => {
       })
       .please()
   )
-  mockSdkService(NoteController, "showNoteAccessory", { id: 0 })
   mockSdkService(NoteController, "showNote", noteRealm)
   mockSdkService(AiController, "generateUnderstandingChecklist", { points: [] })
   // Suppress Vue warnings about emitted events (false positives)

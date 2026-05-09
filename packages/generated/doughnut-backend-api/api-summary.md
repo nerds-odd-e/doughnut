@@ -89,13 +89,11 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateNoteRecallSetting`: POST `/api/notes/{note}/recall-setting` -> `UpdateNoteRecallSettingResponse` (request: `UpdateNoteRecallSettingData`; path: note; body: NoteRecallSetting; response body: RedirectToNoteResponse)
 - `uploadNoteImage`: POST `/api/notes/{note}/images` -> `UploadNoteImageResponse` (request: `UploadNoteImageData`; path: note; body: NoteImageUploadDto; response body: NoteImageUploadResult)
 - `deleteNote`: POST `/api/notes/{note}/delete` -> `DeleteNoteResponse` (request: `DeleteNoteData`; path: note; body: NoteDeleteDto; response body: Array<NoteRealm>)
-- `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
-- `updateNoteAccessories`: PATCH `/api/notes/{note}` -> `UpdateNoteAccessoriesResponse` (request: `UpdateNoteAccessoriesData`; path: note; body: NoteAccessoriesDto; response body: NoteAccessory)
 - `undoDeleteNote`: PATCH `/api/notes/{note}/undo-delete` -> `UndoDeleteNoteResponse` (request: `UndoDeleteNoteData`; path: note; response body: NoteRealm)
+- `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
 - `getNoteInfo`: GET `/api/notes/{note}/note-info` -> `GetNoteInfoResponse` (request: `GetNoteInfoData`; path: note; response body: NoteRecallInfo)
 - `getGraph`: GET `/api/notes/{note}/graph` -> `GetGraphResponse` (request: `GetGraphData`; path: note; query: tokenLimit; response body: FocusContextResult)
 - `getAiContextMarkdown`: GET `/api/notes/{note}/ai-context-markdown` -> `GetAiContextMarkdownResponse` (request: `GetAiContextMarkdownData`; path: note; query: tokenLimit; response body: NoteAiContextMarkdown)
-- `showNoteAccessory`: GET `/api/notes/{note}/accessory` -> `ShowNoteAccessoryResponse` (request: `ShowNoteAccessoryData`; path: note; response body: NoteAccessory)
 - `getRecentNotes`: GET `/api/notes/recent` -> `GetRecentNotesResponse` (request: none; response body: Array<NoteSearchResult>)
 
 ## Search Controller

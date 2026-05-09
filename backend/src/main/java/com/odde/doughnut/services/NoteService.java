@@ -1,19 +1,17 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
-import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.NoteImageUploadDTO;
 import com.odde.doughnut.controllers.dto.NoteImageUploadResult;
 import com.odde.doughnut.entities.Image;
-import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteAccessory;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.entities.repositories.NoteAccessoryRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -37,6 +35,7 @@ public class NoteService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final WikiTitleCacheService wikiTitleCacheService;
   private final ImageRepository imageRepository;
+  private final NoteAccessoryRepository noteAccessoryRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
 
@@ -46,6 +45,7 @@ public class NoteService {
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       WikiTitleCacheService wikiTitleCacheService,
       ImageRepository imageRepository,
+      NoteAccessoryRepository noteAccessoryRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
@@ -53,6 +53,7 @@ public class NoteService {
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.imageRepository = imageRepository;
+    this.noteAccessoryRepository = noteAccessoryRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
   }
@@ -221,15 +222,16 @@ public class NoteService {
   }
 
   private void clearAccessoryImageFkIfPointsTo(Note note, Image image) {
-    NoteAccessory acc = note.getNoteAccessory();
-    if (acc == null) {
-      return;
-    }
-    Image attached = acc.getImageAttachment();
-    if (attached != null && Objects.equals(attached.getId(), image.getId())) {
-      acc.setImageAttachment(null);
-      entityPersister.merge(acc);
-    }
+    noteAccessoryRepository
+        .findByNote_Id(note.getId())
+        .ifPresent(
+            acc -> {
+              Image attached = acc.getImageAttachment();
+              if (attached != null && Objects.equals(attached.getId(), image.getId())) {
+                acc.setImageAttachment(null);
+                entityPersister.merge(acc);
+              }
+            });
   }
 
   public void restore(Note note) {
@@ -260,29 +262,5 @@ public class NoteService {
     entityPersister.flush();
     String imagePath = "/attachments/images/" + image.getId() + "/" + image.getName();
     return new NoteImageUploadResult(imagePath);
-  }
-
-  public NoteAccessory updateNoteAccessories(
-      Note note, NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
-    ImageWithMask imageWithMask = note.getNoteAccessory().getImageWithMask();
-    boolean hasImage =
-        imageWithMask != null
-            && imageWithMask.noteImage != null
-            && !imageWithMask.noteImage.isBlank();
-    String imageUrl = "";
-    String mask = "";
-    if (hasImage) {
-      ImageWithMask iwm = Objects.requireNonNull(imageWithMask);
-      imageUrl = iwm.noteImage;
-      mask = iwm.imageMask != null ? iwm.imageMask : "";
-    }
-    note.setContent(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            note.getContent(), hasImage, imageUrl, mask));
-    entityPersister.save(note);
-    deleteOrphanImagesForPersistedContent(note);
-    return note.getNoteAccessory();
   }
 }

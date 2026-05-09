@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -182,12 +183,24 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder imageUrl(String url) {
-    entity.getOrInitializeNoteAccessory().setImageUrl(url);
+    boolean hasImage = url != null && !url.trim().isEmpty();
+    entity.setContent(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            entity.getContent() != null ? entity.getContent() : "",
+            hasImage,
+            hasImage ? url.trim() : "",
+            ""));
     return this;
   }
 
   public void withUploadedImage() {
-    entity.getOrInitializeNoteAccessory().setImageAttachment(makeMe.anImage().please());
+    Image image = makeMe.anImage().please();
+    image.setNote(entity);
+    makeMe.entityPersister.save(image);
+    String path = "/attachments/images/" + image.getId() + "/" + image.getName();
+    entity.setContent(
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
+            entity.getContent() != null ? entity.getContent() : "", true, path, ""));
   }
 
   public NoteBuilder notebookOwnership(User user) {

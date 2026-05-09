@@ -61,19 +61,6 @@ class NoteController {
     return noteRealmService.build(note, user);
   }
 
-  @PatchMapping(
-      path = "/{note}",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  @Transactional
-  public NoteAccessory updateNoteAccessories(
-      @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
-      throws UnexpectedNoAccessRightException, IOException {
-    authorizationService.assertAuthorization(note);
-    return noteService.updateNoteAccessories(
-        note, noteAccessoriesDTO, authorizationService.getCurrentUser());
-  }
-
   @PostMapping(value = "/{note}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Transactional
   public NoteImageUploadResult uploadNoteImage(
@@ -83,13 +70,6 @@ class NoteController {
     authorizationService.assertAuthorization(note);
     return noteService.uploadNoteImage(
         note, noteImageUploadDTO, authorizationService.getCurrentUser());
-  }
-
-  @GetMapping("/{note}/accessory")
-  public NoteAccessory showNoteAccessory(@PathVariable("note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(note);
-    return note.getOrInitializeNoteAccessory();
   }
 
   @GetMapping("/{note}/note-info")

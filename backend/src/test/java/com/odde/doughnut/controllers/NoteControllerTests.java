@@ -248,49 +248,6 @@ class NoteControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class updateNoteTest {
-    Note note;
-    NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(currentUser.getUser()).please();
-    }
-
-    @Test
-    void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
-      NoteAccessory response = controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      assertThat(response.getNote().getId(), equalTo(note.getId()));
-    }
-
-    @Test
-    void shouldAddUploadedImage() throws UnexpectedNoAccessRightException, IOException {
-      noteAccessoriesDTO.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
-      controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
-      assertThat(
-          note.getNoteAccessory().getImageAttachment().getNote().getId(), equalTo(note.getId()));
-      note.getNoteAccessory().getImageAttachment().getBlob().getData();
-    }
-
-    @Test
-    void shouldSaveTheBlogData() throws UnexpectedNoAccessRightException, IOException {
-      noteAccessoriesDTO.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
-      controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      byte[] data = note.getNoteAccessory().getImageAttachment().getBlob().getData();
-      assertThat(data.length, is(68));
-    }
-
-    @Test
-    void shouldNotRemoveTheImageIfNoNewImageInTheUpdate()
-        throws UnexpectedNoAccessRightException, IOException {
-      makeMe.theNote(note).withUploadedImage();
-      controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
-    }
-  }
-
-  @Nested
   class UploadNoteImage {
     @Test
     void shouldReturnImagePathAndPersistImageLinkedToNote()

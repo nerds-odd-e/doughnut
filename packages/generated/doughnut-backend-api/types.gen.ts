@@ -620,24 +620,6 @@ export type UpdateNotebookGroupRequest = {
     notebookGroupId?: number;
 };
 
-export type NoteAccessoriesDto = {
-    imageUrl?: string;
-    imageMask?: string;
-    uploadImage?: Blob | File;
-};
-
-export type ImageWithMask = {
-    noteImage?: string;
-    imageMask?: string;
-};
-
-export type NoteAccessory = {
-    id: number;
-    imageUrl?: string;
-    imageMask?: string;
-    imageWithMask?: ImageWithMask;
-};
-
 export type BookLastReadPositionRequest = {
     locator?: ContentLocatorFull;
     /**
@@ -2416,42 +2398,6 @@ export type UpdateSubscriptionGroupResponses = {
 
 export type UpdateSubscriptionGroupResponse = UpdateSubscriptionGroupResponses[keyof UpdateSubscriptionGroupResponses];
 
-export type ShowNoteData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}';
-};
-
-export type ShowNoteResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type ShowNoteResponse = ShowNoteResponses[keyof ShowNoteResponses];
-
-export type UpdateNoteAccessoriesData = {
-    body?: NoteAccessoriesDto;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}';
-};
-
-export type UpdateNoteAccessoriesResponses = {
-    /**
-     * OK
-     */
-    200: NoteAccessory;
-};
-
-export type UpdateNoteAccessoriesResponse = UpdateNoteAccessoriesResponses[keyof UpdateNoteAccessoriesResponses];
-
 export type UndoDeleteNoteData = {
     body?: never;
     path: {
@@ -2830,6 +2776,24 @@ export type ExportQuestionGenerationResponses = {
 
 export type ExportQuestionGenerationResponse = ExportQuestionGenerationResponses[keyof ExportQuestionGenerationResponses];
 
+export type ShowNoteData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}';
+};
+
+export type ShowNoteResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type ShowNoteResponse = ShowNoteResponses[keyof ShowNoteResponses];
+
 export type GetNoteInfoData = {
     body?: never;
     path: {
@@ -2893,24 +2857,6 @@ export type GetAiContextMarkdownResponses = {
 };
 
 export type GetAiContextMarkdownResponse = GetAiContextMarkdownResponses[keyof GetAiContextMarkdownResponses];
-
-export type ShowNoteAccessoryData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/accessory';
-};
-
-export type ShowNoteAccessoryResponses = {
-    /**
-     * OK
-     */
-    200: NoteAccessory;
-};
-
-export type ShowNoteAccessoryResponse = ShowNoteAccessoryResponses[keyof ShowNoteAccessoryResponses];
 
 export type GetRecentNotesData = {
     body?: never;

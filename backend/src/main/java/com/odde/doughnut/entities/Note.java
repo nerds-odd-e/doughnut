@@ -49,11 +49,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Folder folder;
 
-  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
-  @JsonIgnore
-  @Getter
-  private NoteAccessory noteAccessory;
-
   @Column(name = "content", columnDefinition = "mediumtext")
   @Getter
   @Setter
@@ -136,13 +131,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
-  @JsonIgnore
-  public ImageWithMask getImageWithMask() {
-    if (this.noteAccessory == null) return null;
-
-    return noteAccessory.getImageWithMask();
-  }
-
   public void prependContent(String addition) {
     String prev = getContent() != null ? getContent() : "";
     String merged = prev.isEmpty() ? addition : addition + "\n\n" + prev;
@@ -152,15 +140,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
     return getNoteTitle().matches(spellingAnswer);
-  }
-
-  @JsonIgnore
-  public NoteAccessory getOrInitializeNoteAccessory() {
-    if (noteAccessory == null) {
-      noteAccessory = new NoteAccessory();
-      noteAccessory.setNote(this);
-    }
-    return noteAccessory;
   }
 
   @NonNull

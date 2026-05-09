@@ -1,14 +1,10 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.persistence.*;
-import java.io.IOException;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "note_accessory")
@@ -54,34 +50,5 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
     if (Objects.equals(accessoryNote.getId(), previous.getNote().getId())) {
       previous.setNote(null);
     }
-  }
-
-  @JsonIgnore
-  public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
-    BeanUtils.copyProperties(noteAccessoriesDTO, this);
-    Image uploadImage = noteAccessoriesDTO.fetchUploadedImage(user);
-    if (uploadImage != null) {
-      setImageAttachment(uploadImage);
-    }
-  }
-
-  public ImageWithMask getImageWithMask() {
-    String url = getUrlOfImage();
-    if (url == null) return null;
-
-    ImageWithMask imageWithMask = new ImageWithMask();
-    imageWithMask.noteImage = url;
-    imageWithMask.imageMask = imageMask;
-    return imageWithMask;
-  }
-
-  private String getUrlOfImage() {
-    if (imageAttachment != null) {
-      return "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName();
-    }
-    if (!Strings.isBlank(imageUrl)) {
-      return imageUrl;
-    }
-    return null;
   }
 }
