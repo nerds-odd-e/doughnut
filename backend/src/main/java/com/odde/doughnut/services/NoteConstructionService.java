@@ -35,6 +35,7 @@ public class NoteConstructionService {
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteService noteService;
+  private final NotebookService notebookService;
 
   @Autowired
   public NoteConstructionService(
@@ -45,7 +46,8 @@ public class NoteConstructionService {
       EntityPersister entityPersister,
       NoteRealmService noteRealmService,
       WikiTitleCacheService wikiTitleCacheService,
-      NoteService noteService) {
+      NoteService noteService,
+      NotebookService notebookService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
@@ -54,6 +56,7 @@ public class NoteConstructionService {
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteService = noteService;
+    this.notebookService = notebookService;
   }
 
   private Note createNoteInNotebookScopeWithoutWikidata(
@@ -128,6 +131,7 @@ public class NoteConstructionService {
     if (noteCreation.getContent() != null || wikidataIdWithApi != null) {
       wikiTitleCacheService.refreshForNote(note, user);
     }
+    notebookService.reconcileNotebookIndexNotePointer(notebook.getId());
     return noteRealmService.build(note, user);
   }
 
@@ -172,6 +176,7 @@ public class NoteConstructionService {
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
 
+    notebookService.reconcileNotebookIndexNotePointer(originalNote.getNotebook().getId());
     return noteRealmService.build(newNote, user);
   }
 }

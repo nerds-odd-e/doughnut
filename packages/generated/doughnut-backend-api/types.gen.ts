@@ -773,7 +773,7 @@ export type NotebookPageClientView = {
     hasAttachedBook?: boolean;
     readonly?: boolean;
     /**
-     * Id of this notebook's index landing note when one exists (root folder scope, title equal to "index" case-insensitive); omitted when absent.
+     * Notebook index landing note id from cached notebook.index_note_id when valid; otherwise repaired from the sole root note titled "index" (case-insensitive). Omitted when absent.
      */
     indexNoteId?: number;
 };

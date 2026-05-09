@@ -4,15 +4,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 class NotebookServiceTest {
 
   @Autowired NotebookService notebookService;
-  @Autowired NoteRepository noteRepository;
+  @Autowired NotebookRepository notebookRepository;
+  @Autowired JdbcTemplate jdbcTemplate;
   @Autowired MakeMe makeMe;
 
   @Test
@@ -59,5 +62,39 @@ class NotebookServiceTest {
 
     assertThat(result.isPresent(), is(true));
     assertThat(result.get().getId(), equalTo(root.getId()));
+  }
+
+  @Test
+  void findOptionalIndexNote_whenCachedPointerValid_returnsEvenWhenTitleNotLiteralIndex() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Note landing =
+        makeMe.aNote().creatorAndOwner(owner).inNotebook(notebook).title("Welcome").please();
+    jdbcTemplate.update(
+        "UPDATE notebook SET index_note_id = ? WHERE id = ?", landing.getId(), notebook.getId());
+
+    Notebook managed = notebookRepository.findById(notebook.getId()).orElseThrow();
+    Optional<Note> result = notebookService.findOptionalIndexNote(managed);
+
+    assertThat(result.map(Note::getId), equalTo(Optional.of(landing.getId())));
+  }
+
+  @Test
+  void findOptionalIndexNote_whenCachedPointerInvalid_repairsFromRootIndexTitle() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Folder folder = makeMe.aFolder().notebook(notebook).please();
+    Note wrong = makeMe.aNote().creatorAndOwner(owner).folder(folder).title("misc").please();
+    Note indexNote =
+        makeMe.aNote().creatorAndOwner(owner).inNotebook(notebook).title("index").please();
+    jdbcTemplate.update(
+        "UPDATE notebook SET index_note_id = ? WHERE id = ?", wrong.getId(), notebook.getId());
+
+    Notebook managed = notebookRepository.findById(notebook.getId()).orElseThrow();
+    Optional<Note> result = notebookService.findOptionalIndexNote(managed);
+
+    assertThat(result.map(Note::getId), equalTo(Optional.of(indexNote.getId())));
+    Notebook updated = notebookRepository.findById(notebook.getId()).orElseThrow();
+    assertThat(updated.getIndexNote().getId(), equalTo(indexNote.getId()));
   }
 }

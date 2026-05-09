@@ -35,6 +35,7 @@ public class NoteService {
   private final ImageRepository imageRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
+  private final NotebookService notebookService;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -43,7 +44,8 @@ public class NoteService {
       WikiTitleCacheService wikiTitleCacheService,
       ImageRepository imageRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NotebookService notebookService) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
@@ -51,6 +53,7 @@ public class NoteService {
     this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
+    this.notebookService = notebookService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -156,6 +159,7 @@ public class NoteService {
     if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
       removeNoteLinksFromReferrerProperties(note, viewer, currentUTCTimestamp);
     }
+    Integer notebookId = note.getNotebook().getId();
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
@@ -163,6 +167,7 @@ public class NoteService {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
     }
+    notebookService.reconcileNotebookIndexNotePointer(notebookId);
   }
 
   private void removeNoteLinksFromReferrerProperties(
@@ -227,6 +232,7 @@ public class NoteService {
     }
     note.setDeletedAt(null);
     entityPersister.merge(note);
+    notebookService.reconcileNotebookIndexNotePointer(note.getNotebook().getId());
   }
 
   private boolean sameTimestamp(Timestamp a, Timestamp b) {

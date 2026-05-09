@@ -22,6 +22,7 @@ erDiagram
     "note" ||--o{ memory_tracker : "note_id"
     "note" ||--o{ note_wiki_title_cache : "note_id"
     "note" ||--o{ note_wiki_title_cache : "target_note_id"
+    "note" ||--o{ notebook : "index_note_id"
     "note" ||--o{ predefined_question : "note_id"
     notebook ||--o{ bazaar_notebook : "notebook_id"
     notebook ||--o{ book : "notebook_id"
@@ -141,6 +142,7 @@ erDiagram
         int ownership_id FK
         int creator_id FK
         int notebook_group_id FK
+        int index_note_id FK
     }
     notebook_ai_assistant {
         bigint id PK

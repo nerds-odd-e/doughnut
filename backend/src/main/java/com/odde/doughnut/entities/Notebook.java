@@ -77,6 +77,14 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private NotebookGroup notebookGroup;
 
+  /** Cached designated notebook index note (root scope, title {@code index} by convention). */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "index_note_id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Note indexNote;
+
   @Column(name = "description")
   @Getter
   @Setter
