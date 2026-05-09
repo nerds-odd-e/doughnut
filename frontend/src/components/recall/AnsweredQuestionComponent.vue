@@ -4,6 +4,7 @@
       v-bind="{
         noteTopology: note.noteTopology,
         ancestorFolders: answeredQuestion.ancestorFolders ?? [],
+        breadcrumbNotebookId: answeredQuestion.notebook.id,
       }"
     />
     <ViewMemoryTrackerLink

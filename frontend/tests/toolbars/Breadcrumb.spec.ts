@@ -80,4 +80,31 @@ describe("breadcrumb with circles", () => {
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
   })
+
+  it("links each folder segment to folderPage for that folder", async () => {
+    const notebook = makeMe.aNotebook.please()
+    helper
+      .component(BreadcrumbWithCircle)
+      .withProps({
+        notebookView: {
+          notebook,
+          readonly: false,
+        },
+        ancestorFolders: [
+          { id: 10, name: "Outer" },
+          { id: 20, name: "Inner" },
+        ],
+      })
+      .render()
+    const outerLink = screen.getByText("Outer").closest("a")
+    const innerLink = screen.getByText("Inner").closest("a")
+    expect(outerLink).not.toBeNull()
+    expect(innerLink).not.toBeNull()
+    expect(outerLink?.getAttribute("to")).toContain(`"name":"folderPage"`)
+    expect(outerLink?.getAttribute("to")).toContain(`"folderId":"10"`)
+    expect(outerLink?.getAttribute("to")).toContain(
+      `"notebookId":"${notebook.id}"`
+    )
+    expect(innerLink?.getAttribute("to")).toContain(`"folderId":"20"`)
+  })
 })

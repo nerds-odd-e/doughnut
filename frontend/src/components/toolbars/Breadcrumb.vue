@@ -1,5 +1,8 @@
 <template>
-  <BasicBreadcrumb :folder-segments="ancestorFolders">
+  <BasicBreadcrumb
+    :folder-segments="ancestorFolders"
+    :breadcrumb-notebook-id="breadcrumbNotebookId"
+  >
     <template #topLink>
       <slot name="topLink" />
     </template>
@@ -18,6 +21,10 @@ defineProps({
   ancestorFolders: {
     type: Array as PropType<Folder[]>,
     default: () => [],
+  },
+  breadcrumbNotebookId: {
+    type: Number as PropType<number | undefined>,
+    default: undefined,
   },
 })
 </script>

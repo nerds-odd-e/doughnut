@@ -32,6 +32,7 @@ export const WithAncestors: Story = {
       testFolderStub(1, "Programming"),
       testFolderStub(2, "Languages"),
     ],
+    breadcrumbNotebookId: 1,
   },
 }
 
@@ -42,6 +43,7 @@ export const WithManyAncestors: Story = {
     ancestorFolders: Array.from({ length: 10 }, (_, i) =>
       testFolderStub(i + 1, `Ancestor ${i + 1}`)
     ),
+    breadcrumbNotebookId: 1,
   },
   decorators: [
     () => ({

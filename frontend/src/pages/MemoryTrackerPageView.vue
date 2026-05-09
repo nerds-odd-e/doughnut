@@ -82,6 +82,7 @@
         v-bind="{
           noteTopology: memoryTracker.note.noteTopology,
           ancestorFolders: memoryTracker.ancestorFolders ?? [],
+          breadcrumbNotebookId: memoryTrackerBreadcrumbNotebookId,
         }"
       />
     </div>
@@ -164,12 +165,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, type PropType } from "vue"
 import type {
   RecallPrompt,
   MemoryTracker,
 } from "@generated/doughnut-backend-api"
-import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import ConversationButton from "@/components/recall/ConversationButton.vue"
@@ -192,6 +192,10 @@ const props = defineProps({
     required: true,
   },
 })
+
+const memoryTrackerBreadcrumbNotebookId = computed(
+  () => props.recallPrompts.find((p) => p.notebook)?.notebook.id
+)
 
 const emit = defineEmits<{
   (e: "removedFromTracking"): void

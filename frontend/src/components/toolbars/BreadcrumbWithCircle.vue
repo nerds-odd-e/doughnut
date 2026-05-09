@@ -1,5 +1,10 @@
 <template>
-  <Breadcrumb v-bind="{ ancestorFolders }">
+  <Breadcrumb
+    v-bind="{
+      ancestorFolders,
+      breadcrumbNotebookId: notebookView.notebook.id,
+    }"
+  >
     <template #topLink>
       <li v-if="notebookView.readonly">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>

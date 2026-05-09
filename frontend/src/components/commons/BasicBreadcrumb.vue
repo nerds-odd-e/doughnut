@@ -6,7 +6,14 @@
         v-for="segment in folderSegments"
         :key="'folder-' + segment.id"
       >
-        <span class="daisy-text-base-content">{{ segment.name }}</span>
+        <router-link
+          v-if="breadcrumbNotebookId != null"
+          class="daisy-text-base-content"
+          :to="folderPageTo(segment.id)"
+        >
+          {{ segment.name }}
+        </router-link>
+        <span v-else class="daisy-text-base-content">{{ segment.name }}</span>
       </li>
       <li v-if="$slots.additional">
         <slot name="additional" />
@@ -19,10 +26,23 @@
 import type { PropType } from "vue"
 import type { Folder } from "@generated/doughnut-backend-api"
 
-defineProps({
+const props = defineProps({
   folderSegments: {
     type: Array as PropType<Folder[]>,
     default: () => [],
+  },
+  /** When set, each folder segment links to that folder's container page. */
+  breadcrumbNotebookId: {
+    type: Number as PropType<number | undefined>,
+    default: undefined,
+  },
+})
+
+const folderPageTo = (folderId: number) => ({
+  name: "folderPage" as const,
+  params: {
+    notebookId: String(props.breadcrumbNotebookId),
+    folderId: String(folderId),
   },
 })
 </script>

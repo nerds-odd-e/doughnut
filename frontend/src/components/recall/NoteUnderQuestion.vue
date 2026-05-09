@@ -2,7 +2,10 @@
   <div class="note-under-question daisy-bg-base-200 daisy-border-base-300">
     <div class="note-label daisy-bg-base-200 daisy-text-base-content">Note under question</div>
     <div class="breadcrumb-wrapper">
-      <Breadcrumb :ancestor-folders="ancestorFolders ?? []">
+      <Breadcrumb
+        :ancestor-folders="ancestorFolders ?? []"
+        :breadcrumb-notebook-id="breadcrumbNotebookId"
+      >
         <template #additional>
           <NoteTitleWithLink v-bind="{ noteTopology }" />
         </template>
@@ -24,6 +27,10 @@ defineProps({
   },
   ancestorFolders: {
     type: Array as PropType<Folder[] | undefined>,
+    default: undefined,
+  },
+  breadcrumbNotebookId: {
+    type: Number as PropType<number | undefined>,
     default: undefined,
   },
 })
