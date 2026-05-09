@@ -73,6 +73,39 @@ function stubFolderListingForTree(
   })
 }
 
+function mockShowNoteForRealms(realms: NoteRealm[]) {
+  const byId = Object.fromEntries(realms.map((r) => [r.id, r])) as Record<
+    number,
+    NoteRealm
+  >
+  mockSdkServiceWithImplementation("showNote", (options) => {
+    const id = (options as Options<ShowNoteData>).path.note
+    const realm = byId[id]
+    if (realm === undefined) {
+      throw new Error(`Sidebar.spec: unmocked showNote for note id ${id}`)
+    }
+    return realm
+  })
+}
+
+function rootRowLabels(w: VueWrapper<unknown>): string[] {
+  const rootUl = w.get("ul.sidebar-tree-list")
+  return Array.from(rootUl.element.children).map((li) => {
+    const folder = li.querySelector(".sidebar-folder-label")
+    if (folder) return `folder:${folder.textContent?.trim()}`
+    const note = li.querySelector(".title-text")
+    if (note) return `note:${note.textContent?.trim()}`
+    return "?"
+  })
+}
+
+const DEFAULT_ROOT_PEER_ORDER = [
+  "folder:banana",
+  "folder:mango",
+  "note:apple",
+  "note:zebra",
+] as const
+
 describe("Sidebar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
@@ -147,6 +180,52 @@ describe("Sidebar", () => {
     return wrapper
   }
 
+  /** Signed-in user + optional notebook id (defaults from active realm). */
+  function mountSidebarSignedIn(active: NoteRealm, notebookId?: number) {
+    const nb = notebookId ?? active.notebookView.notebook.id
+    wrapper = helper
+      .component(Sidebar)
+      .withCurrentUser(makeMe.aUser.please())
+      .withProps({
+        activeNoteRealm: realmAsActiveInSidebarStub(active),
+        notebookId: nb,
+      })
+      .mount({ attachTo: document.body })
+    return wrapper
+  }
+
+  /** Root list: two folders + zebra/apple notes; empty folder listings. */
+  function setupRootPeersWithFolders(
+    realmZ: NoteRealm,
+    realmA: NoteRealm,
+    folderExtras?: {
+      mango?: Partial<ReturnType<typeof testFolderStub>>
+      banana?: Partial<ReturnType<typeof testFolderStub>>
+    }
+  ) {
+    const nbId = topNoteRealm.notebookView.notebook.id
+    storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
+    storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
+    storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+
+    const folderBanana = {
+      ...testFolderStub(9001, "banana"),
+      ...folderExtras?.banana,
+    }
+    const folderMango = {
+      ...testFolderStub(9002, "mango"),
+      ...folderExtras?.mango,
+    }
+
+    mockSdkService("listNotebookRootNotes", {
+      noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
+      folders: [folderMango, folderBanana],
+    })
+    mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
+    mockShowNoteForRealms([topNoteRealm, realmZ, realmA])
+    return { nbId, realmA, realmZ }
+  }
+
   beforeEach(() => {
     sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
     storageAccessor.value = createNoteStorage()
@@ -168,25 +247,13 @@ describe("Sidebar", () => {
       firstGenerationSibling,
       secondGeneration
     )
+    mockShowNoteForRealms([
+      topNoteRealm,
+      firstGeneration,
+      firstGenerationSibling,
+      secondGeneration,
+    ])
 
-    const fullRealmByNoteId: Record<number, NoteRealm> = {
-      [topNoteRealm.id]: topNoteRealm,
-      [firstGeneration.id]: firstGeneration,
-      [firstGenerationSibling.id]: firstGenerationSibling,
-      [secondGeneration.id]: secondGeneration,
-    }
-    mockSdkServiceWithImplementation("showNote", (options) => {
-      const id = (options as Options<ShowNoteData>).path.note
-      const realm = fullRealmByNoteId[id]
-      if (realm === undefined) {
-        throw new Error(`Sidebar.spec: unmocked showNote for note id ${id}`)
-      }
-      return realm
-    })
-  })
-
-  beforeEach(() => {
-    // Browser Mode: Mock getBoundingClientRect, offsetWidth, clientWidth for deterministic tests
     Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
       top: 0,
       bottom: 100,
@@ -196,10 +263,8 @@ describe("Sidebar", () => {
       right: 200,
       x: 0,
       y: 0,
-      // toJSON is required by DOMRect interface but unused in tests
       toJSON: () => ({}),
     })
-
     Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
       configurable: true,
       get() {
@@ -212,10 +277,6 @@ describe("Sidebar", () => {
         return 200
       },
     })
-  })
-
-  beforeEach(() => {
-    // Browser Mode: Spy on REAL scrollIntoView method!
     vi.spyOn(HTMLElement.prototype, "scrollIntoView")
   })
 
@@ -226,7 +287,6 @@ describe("Sidebar", () => {
     vi.restoreAllMocks()
   })
 
-  // Note titles appear in `.title-text`; folder rows use `.sidebar-folder-label`.
   const findSidebarItem = (text: string): DOMWrapper<Element> | undefined => {
     const inner = wrapper
       .findAll(".title-text")
@@ -246,11 +306,15 @@ describe("Sidebar", () => {
       return li ? new DOMWrapper(li) : undefined
     }
 
-    it("applies sidebar-folder-user-active when a folder row is clicked", async () => {
+    async function mountFirstGenSidebarAndWaitNoteRow() {
       mountSidebar(firstGeneration)
       await vi.waitUntil(() =>
         findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
+    }
+
+    it("applies sidebar-folder-user-active when a folder row is clicked", async () => {
+      await mountFirstGenSidebarAndWaitNoteRow()
       const folderRow = findRootFolderRowByTopTitle()
       expect(folderRow?.exists()).toBe(true)
       await folderRow!.find(".sidebar-folder-label").trigger("click")
@@ -259,10 +323,7 @@ describe("Sidebar", () => {
     })
 
     it("activates folder but does not toggle expand when only the folder label track padding is clicked", async () => {
-      mountSidebar(firstGeneration)
-      await vi.waitUntil(() =>
-        findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
-      )
+      await mountFirstGenSidebarAndWaitNoteRow()
       const folderRow = findRootFolderRowByTopTitle()
       expect(folderRow?.exists()).toBe(true)
       const expandedBefore = folderRow!.attributes("aria-expanded")
@@ -292,14 +353,7 @@ describe("Sidebar", () => {
     })
 
     it("does not clear user active folder when modal opens after toolbar click (Safari behavior)", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebarSignedIn(firstGeneration)
       await flushPromises()
       await vi.waitUntil(() =>
         findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
@@ -311,37 +365,25 @@ describe("Sidebar", () => {
 
       const toolbarBtn = wrapper.find('button[title="New note"]')
       expect(toolbarBtn.exists()).toBe(true)
-
-      // Safari: mousedown fires on toolbar button but button doesn't receive focus
       toolbarBtn.element.dispatchEvent(
         new MouseEvent("mousedown", { bubbles: true })
       )
-
-      // Safari: when the modal opens and autofocuses an element (teleported to body),
-      // focusout fires with relatedTarget = the modal element (not in toolbar)
       const modalInput = document.createElement("input")
       document.body.appendChild(modalInput)
       folderRow!.element.focus()
-      const leave = new FocusEvent("focusout", {
-        bubbles: true,
-        relatedTarget: modalInput,
-      })
-      folderRow!.element.dispatchEvent(leave)
+      folderRow!.element.dispatchEvent(
+        new FocusEvent("focusout", {
+          bubbles: true,
+          relatedTarget: modalInput,
+        })
+      )
       await flushPromises()
       document.body.removeChild(modalInput)
-
       expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
     })
 
     it("does not clear user active folder when focus moves to the sidebar toolbar", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebarSignedIn(firstGeneration)
       await flushPromises()
       await vi.waitUntil(() =>
         findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
@@ -351,91 +393,27 @@ describe("Sidebar", () => {
       await flushPromises()
       const toolbarBtn = wrapper.find('button[title="New folder"]')
       expect(toolbarBtn.exists()).toBe(true)
-
       folderRow!.element.focus()
-      const leave = new FocusEvent("focusout", {
-        bubbles: true,
-        relatedTarget: toolbarBtn.element,
-      })
-      folderRow!.element.dispatchEvent(leave)
+      folderRow!.element.dispatchEvent(
+        new FocusEvent("focusout", {
+          bubbles: true,
+          relatedTarget: toolbarBtn.element,
+        })
+      )
       await flushPromises()
       expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
     })
   })
 
-  it("lists folders above notes; each group sorted by title (A–Z)", async () => {
-    storageAccessor.value = createNoteStorage()
-    const nbId = topNoteRealm.notebookView.notebook.id
-    const realmZ = makeMe.aNoteRealm.title("zebra").under(topNoteRealm).please()
-    const realmA = makeMe.aNoteRealm.title("apple").under(topNoteRealm).please()
-    storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
-    storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
-    storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
-
-    mockSdkService("listNotebookRootNotes", {
-      noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
-      folders: [testFolderStub(9002, "mango"), testFolderStub(9001, "banana")],
-    })
-    mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
-    const fullRealmByNoteId: Record<number, NoteRealm> = {
-      [topNoteRealm.id]: topNoteRealm,
-      [realmZ.id]: realmZ,
-      [realmA.id]: realmA,
-    }
-    mockSdkServiceWithImplementation("showNote", (options) => {
-      const id = (options as Options<ShowNoteData>).path.note
-      const realm = fullRealmByNoteId[id]
-      if (realm === undefined) {
-        throw new Error(`unmocked showNote for note id ${id}`)
-      }
-      return realm
-    })
-
-    wrapper = helper
-      .component(Sidebar)
-      .withProps({
-        activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
-        notebookId: nbId,
-      })
-      .mount({ attachTo: document.body })
-    await flushPromises()
-    await vi.waitUntil(
-      () => wrapper.findAll(".sidebar-folder-label").length >= 2
-    )
-
-    const rootUl = wrapper.get("ul.sidebar-tree-list")
-    const rowLabels = Array.from(rootUl.element.children).map((li) => {
-      const folder = li.querySelector(".sidebar-folder-label")
-      if (folder) return `folder:${folder.textContent?.trim()}`
-      const note = li.querySelector(".title-text")
-      if (note) return `note:${note.textContent?.trim()}`
-      return "?"
-    })
-    expect(rowLabels).toEqual([
-      "folder:banana",
-      "folder:mango",
-      "note:apple",
-      "note:zebra",
-    ])
-  })
-
   describe("sidebar peer sort", () => {
     it("shows sort control in the sidebar toolbar", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
-          notebookId: topNoteRealm.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebarSignedIn(topNoteRealm)
       await flushPromises()
       expect(wrapper.find("[data-note-sidebar-sort]").exists()).toBe(true)
     })
 
-    it("reorders root peers when Title (Z–A) is chosen", async () => {
+    it("lists folders above notes (A–Z) and reorders root peers when Title (Z–A) is chosen", async () => {
       storageAccessor.value = createNoteStorage()
-      const nbId = topNoteRealm.notebookView.notebook.id
       const realmZ = makeMe.aNoteRealm
         .title("zebra")
         .under(topNoteRealm)
@@ -444,37 +422,16 @@ describe("Sidebar", () => {
         .title("apple")
         .under(topNoteRealm)
         .please()
-      storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
-      storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
-      storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
-
-      mockSdkService("listNotebookRootNotes", {
-        noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
-        folders: [
-          testFolderStub(9002, "mango"),
-          testFolderStub(9001, "banana"),
-        ],
-      })
-      mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
-      const fullRealmByNoteId: Record<number, NoteRealm> = {
-        [topNoteRealm.id]: topNoteRealm,
-        [realmZ.id]: realmZ,
-        [realmA.id]: realmA,
-      }
-      mockSdkServiceWithImplementation("showNote", (options) => {
-        const id = (options as Options<ShowNoteData>).path.note
-        const realm = fullRealmByNoteId[id]
-        if (realm === undefined) {
-          throw new Error(`unmocked showNote for note id ${id}`)
-        }
-        return realm
-      })
+      const { nbId, realmA: activeA } = setupRootPeersWithFolders(
+        realmZ,
+        realmA
+      )
 
       wrapper = helper
         .component(Sidebar)
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
-          activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
+          activeNoteRealm: { ...activeA, ancestorFolders: [] } as NoteRealm,
           notebookId: nbId,
         })
         .mount({ attachTo: document.body })
@@ -483,29 +440,14 @@ describe("Sidebar", () => {
         () => wrapper.findAll(".sidebar-folder-label").length >= 2
       )
 
-      const rootUl = () => wrapper.get("ul.sidebar-tree-list")
-      const rowLabels = () =>
-        Array.from(rootUl().element.children).map((li) => {
-          const folder = li.querySelector(".sidebar-folder-label")
-          if (folder) return `folder:${folder.textContent?.trim()}`
-          const note = li.querySelector(".title-text")
-          if (note) return `note:${note.textContent?.trim()}`
-          return "?"
-        })
-
-      expect(rowLabels()).toEqual([
-        "folder:banana",
-        "folder:mango",
-        "note:apple",
-        "note:zebra",
-      ])
+      expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
 
       await wrapper.find("[data-note-sidebar-sort] summary").trigger("click")
       await flushPromises()
       await wrapper.find('button[title="Title (Z–A)"]').trigger("click")
       await flushPromises()
 
-      expect(rowLabels()).toEqual([
+      expect(rootRowLabels(wrapper)).toEqual([
         "folder:mango",
         "folder:banana",
         "note:zebra",
@@ -519,7 +461,6 @@ describe("Sidebar", () => {
         JSON.stringify({ field: "updated", direction: "desc" })
       )
       storageAccessor.value = createNoteStorage()
-      const nbId = topNoteRealm.notebookView.notebook.id
       const realmZ = makeMe.aNoteRealm
         .title("zebra")
         .updatedAt("2015-06-01T00:00:00.000Z")
@@ -530,36 +471,9 @@ describe("Sidebar", () => {
         .updatedAt("2020-01-01T00:00:00.000Z")
         .under(topNoteRealm)
         .please()
-      storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
-      storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
-      storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
-
-      const folderBanana = {
-        ...testFolderStub(9001, "banana"),
-        updatedAt: "2018-01-01T00:00:00.000Z",
-      }
-      const folderMango = {
-        ...testFolderStub(9002, "mango"),
-        updatedAt: "2005-01-01T00:00:00.000Z",
-      }
-
-      mockSdkService("listNotebookRootNotes", {
-        noteTopologies: [realmZ.note.noteTopology, realmA.note.noteTopology],
-        folders: [folderMango, folderBanana],
-      })
-      mockSdkService("listFolderListing", { noteTopologies: [], folders: [] })
-      const fullRealmByNoteId: Record<number, NoteRealm> = {
-        [topNoteRealm.id]: topNoteRealm,
-        [realmZ.id]: realmZ,
-        [realmA.id]: realmA,
-      }
-      mockSdkServiceWithImplementation("showNote", (options) => {
-        const id = (options as Options<ShowNoteData>).path.note
-        const realm = fullRealmByNoteId[id]
-        if (realm === undefined) {
-          throw new Error(`unmocked showNote for note id ${id}`)
-        }
-        return realm
+      setupRootPeersWithFolders(realmZ, realmA, {
+        banana: { updatedAt: "2018-01-01T00:00:00.000Z" },
+        mango: { updatedAt: "2005-01-01T00:00:00.000Z" },
       })
 
       wrapper = helper
@@ -567,7 +481,7 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
-          notebookId: nbId,
+          notebookId: topNoteRealm.notebookView.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -575,21 +489,8 @@ describe("Sidebar", () => {
         () => wrapper.findAll(".sidebar-folder-label").length >= 2
       )
 
-      const rootUl = wrapper.get("ul.sidebar-tree-list")
-      const rowLabels = Array.from(rootUl.element.children).map((li) => {
-        const folder = li.querySelector(".sidebar-folder-label")
-        if (folder) return `folder:${folder.textContent?.trim()}`
-        const note = li.querySelector(".title-text")
-        if (note) return `note:${note.textContent?.trim()}`
-        return "?"
-      })
-
-      expect(rowLabels).toEqual([
-        "folder:banana",
-        "folder:mango",
-        "note:apple",
-        "note:zebra",
-      ])
+      const expectedOrder = [...DEFAULT_ROOT_PEER_ORDER]
+      expect(rootRowLabels(wrapper)).toEqual(expectedOrder)
 
       wrapper.unmount()
       wrapper = helper
@@ -597,24 +498,14 @@ describe("Sidebar", () => {
         .withCurrentUser(makeMe.aUser.please())
         .withProps({
           activeNoteRealm: { ...realmA, ancestorFolders: [] } as NoteRealm,
-          notebookId: nbId,
+          notebookId: topNoteRealm.notebookView.notebook.id,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
       await vi.waitUntil(
         () => wrapper.findAll(".sidebar-folder-label").length >= 2
       )
-      const rootUlAfter = wrapper.get("ul.sidebar-tree-list")
-      const rowLabelsAfterRemount = Array.from(
-        rootUlAfter.element.children
-      ).map((li) => {
-        const folder = li.querySelector(".sidebar-folder-label")
-        if (folder) return `folder:${folder.textContent?.trim()}`
-        const note = li.querySelector(".title-text")
-        if (note) return `note:${note.textContent?.trim()}`
-        return "?"
-      })
-      expect(rowLabelsAfterRemount).toEqual(rowLabels)
+      expect(rootRowLabels(wrapper)).toEqual(expectedOrder)
     })
   })
 
@@ -718,43 +609,24 @@ describe("Sidebar", () => {
     it("should scroll to active note", async () => {
       mountSidebar(firstGeneration)
       await flushPromises()
-
-      // Browser Mode: Real IntersectionObserver checks visibility
-      await flushPromises()
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(undefined))
       )
-
-      // Browser Mode: Verify the active item is rendered correctly
       await vi.waitUntil(() =>
         findSidebarItem(firstGeneration.note.noteTopology.title)?.exists()
       )
-
-      // Check for active class on parent li or similar
-      // Assuming Sidebar structure: li > .active-item or similar
-      // The original test checked parent.parent.parent
-      // Let's check if we can find .active-item class
       const activeElement = wrapper.find(".active-item")
       expect(activeElement.exists()).toBe(true)
       expect(activeElement.text()).toContain(
         firstGeneration.note.noteTopology.title
       )
-
-      const scrollSpy = HTMLElement.prototype.scrollIntoView as ReturnType<
-        typeof vi.spyOn
-      >
-      const scrollCallCount = scrollSpy.mock?.calls?.length || 0
-      expect(scrollCallCount).toBeGreaterThanOrEqual(0)
     })
 
     it("should not scroll if already visible", async () => {
-      // Browser Mode: Use real IntersectionObserver but control its behavior
       const originalIntersectionObserver = window.IntersectionObserver
-
       window.IntersectionObserver = class extends originalIntersectionObserver {
         constructor(callback: IntersectionObserverCallback) {
           super(callback)
-          // Immediately call callback with isIntersecting: true (element is visible)
           setTimeout(() => {
             callback(
               [{ isIntersecting: true }] as IntersectionObserverEntry[],
@@ -766,16 +638,11 @@ describe("Sidebar", () => {
 
       mountSidebar(firstGeneration)
       await flushPromises()
-      // Browser Mode: Use requestAnimationFrame for proper async waiting instead of setTimeout
       await new Promise((resolve) =>
         requestAnimationFrame(() => resolve(undefined))
       )
       await flushPromises()
-
-      // Browser Mode: scrollIntoView should NOT be called if already visible
       expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
-
-      // Restore original IntersectionObserver
       window.IntersectionObserver = originalIntersectionObserver
     })
 
@@ -808,48 +675,20 @@ describe("Sidebar", () => {
       const sibling = findSidebarItem(
         firstGenerationSibling.note.noteTopology.title
       )!.element
-
       expect(isBefore(secondGen, sibling)).toBe(true)
     })
   })
 
   describe("sidebar toolbar", () => {
-    it("shows New note and New folder when a user is present and notebook is not from bazaar", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
-      await flushPromises()
-      expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
-      expect(wrapper.find('button[title="New folder"]').exists()).toBe(true)
-    })
-
-    it("shows New note when active note has no parent", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withCurrentUser(makeMe.aUser.please())
-        .withProps({
-          activeNoteRealm: realmAsActiveInSidebarStub(topNoteRealm),
-          notebookId: topNoteRealm.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+    it("shows New note and New folder when signed in and notebook is not from bazaar", async () => {
+      mountSidebarSignedIn(topNoteRealm)
       await flushPromises()
       expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
       expect(wrapper.find('button[title="New folder"]').exists()).toBe(true)
     })
 
     it("hides New folder when no current user", async () => {
-      wrapper = helper
-        .component(Sidebar)
-        .withProps({
-          activeNoteRealm: realmAsActiveInSidebarStub(firstGeneration),
-          notebookId: firstGeneration.notebookView.notebook.id,
-        })
-        .mount({ attachTo: document.body })
+      mountSidebar(firstGeneration)
       await flushPromises()
       expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)
     })
@@ -896,9 +735,9 @@ describe("Sidebar", () => {
       .mount({ attachTo: document.body })
     await flushPromises()
     await flushPromises()
-
-    const expandBtn = wrapper.find('button[aria-label="expand children"]')
-    expect(expandBtn.exists()).toBe(true)
+    expect(wrapper.find('button[aria-label="expand children"]').exists()).toBe(
+      true
+    )
   })
 
   it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {
@@ -911,13 +750,11 @@ describe("Sidebar", () => {
       })
       .mount({ attachTo: document.body })
     await flushPromises()
-
     await wrapper.setProps({
       activeNoteRealm: undefined,
       notebookId: topNoteRealm.notebookView.notebook.id,
     })
     await flushPromises()
-
     expect(
       findSidebarItem(topNoteRealm.note.noteTopology.title)?.exists()
     ).toBe(true)
