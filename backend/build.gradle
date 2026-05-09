@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 buildscript {
   repositories {
@@ -99,15 +100,15 @@ tasks.named('bootRun') {
   jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
 }
 
-tasks.register("bootRunE2E") {
+tasks.register("bootRunE2E", BootRun) {
   group = "application"
-  description = "Runs Doughnut SpringBoot application in e2e profile"
-  doFirst {
-    tasks.bootRun.configure {
-      systemProperty("spring.profiles.active", "e2e")
-    }
+  description = "Runs Doughnut SpringBoot application in e2e profile without devtools (SUT/CI)"
+  classpath = sourceSets.main.runtimeClasspath.filter { file ->
+    !file.name.contains('spring-boot-devtools')
   }
-  finalizedBy("bootRun")
+  mainClass = springBoot.mainClass
+  systemProperty("spring.profiles.active", "e2e")
+  jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
 }
 
 spotless {
