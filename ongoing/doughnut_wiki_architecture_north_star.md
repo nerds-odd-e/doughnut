@@ -34,8 +34,10 @@ folder = containment and navigation
 note = knowledge unit
 link = semantic connection
 id = internal stable identity (canonical in URLs)
-config = behavior and defaults
+config = behavior and defaults (see index notes and notebook row)
 ```
+
+**Notebook root is first-class.** Notes may have **`folderId` absent** to live at notebook root. The product does **not** introduce a hidden default top-level folder that holds all notes; that would duplicate the notebook boundary.
 
 ## Final Conceptual Model
 
@@ -47,12 +49,12 @@ A notebook may contain:
 
 - notebook name
 - optional short plain-text **description** (settings message, separate from note body)
-- notebook-level configuration
-- optional `index` note
+- notebook-level configuration (settings and API-facing fields distinct from index body text, where the product keeps them)
+- optional **index** note (see below)
 - folders
 - notes
 
-The notebook keeps its own name. Notebook page content comes from an optional ordinary note titled `index`, not from a notebook-owned content field.
+The notebook keeps its own name. **Notebook page** body content comes from the optional **index** note, not from a notebook-owned rich-content field.
 
 #### Shape
 
@@ -62,15 +64,31 @@ Notebook
   name
   description (optional short plain text)
   config
+  indexNoteId optional (nullable FK to Note; cached pointer for hot reads)
   createdAt
   updatedAt
 ```
 
-#### Index note
+#### Index notes (notebook scope and folder scope)
 
-A notebook may have an ordinary root-level note titled `index` (title compared case-insensitively for resolution).
+An **index note** is an ordinary note used as the **landing page** and **scoped configuration carrier** for a notebook or for a folder.
 
-The index note supplies the notebook page body summary when it exists. The notebook page loads it by **`indexNoteId`** from the notebook API once that id is known. Editing full body content uses the normal note show route **`/d/n/:noteId`**. The index note is otherwise a normal note: stable id, title, content, links, backlinks, properties, and export/import behavior.
+- **Notebook index** — A root-level note in that notebook (`folderId` absent) with reserved title **`index`** (case-insensitive for discovery, import, and repair). The notebook row **`indexNoteId`** caches its id for APIs and navigation; **primary reads use the id**, not title lookup.
+- **Folder index** — A note in that folder (`folderId` = that folder) with the same **`index`** title convention. The folder row **`indexNoteId`** caches its id the same way.
+
+The index note is otherwise a normal note: stable id, title, Markdown **content** (body + leading YAML frontmatter), links, backlinks, and export/import behavior. Full editing may use **`/d/n/:noteId`** or the **notebook page** / **folder page** surfaces (same markdown and frontmatter pipeline).
+
+**Scoped configuration in frontmatter** — Leading YAML on an index note may hold **product-defined keys** for defaults and behavior in that scope (e.g. **note title pattern**, **question-generation instruction**). The Markdown file remains the portable source of truth. **Predefined property rows** in the UI apply **only to index notes** so normal notes are not overloaded with folder/notebook admin fields.
+
+**Lazy creation** — If there is no index note yet, the notebook or folder page may still show the **editor** (empty state). The first **persist** creates the note, sets title **`index`** (or product policy), and writes **`indexNoteId`** on the notebook or folder. Service logic must enforce **at most one** index note per scope and keep **`indexNoteId`** consistent on create, delete, move, and title changes.
+
+**Search** — Notes that are the designated index for a notebook or folder (**`notebook.indexNoteId`** / **`folder.indexNoteId`**) are **excluded from default search** results so navigation and config carriers do not crowd content discovery. (A future opt-in or power-user affordance is optional.)
+
+**Navigation (product)** — A **folder page** is a first-class route (not only a sidebar selection). Opening a folder from the sidebar navigates to that page and **does not** keep a separate “active note” for that context: **container page** (notebook or folder) vs **note page** is mutually exclusive at the routing level. Sidebar chrome may still reflect location (e.g. folder containing the open note) without contradicting that rule.
+
+**Breadcrumbs** — Each **folder** segment in the breadcrumb trail links to that folder’s **folder page** (same destination as choosing that folder in the sidebar), not only a structural highlight.
+
+**Sidebar scroll** — When a **folder page** is open, the folder tree **scrolls** (or otherwise scrolls into view) so the **active folder** row is visible without manual scrolling.
 
 ### Folder
 
@@ -84,11 +102,14 @@ Folder
   notebookId
   parentFolderId optional
   name
+  indexNoteId optional (nullable FK to Note; cached pointer for hot reads)
   createdAt
   updatedAt
 ```
 
 Sibling folders under the same parent are distinguished by **name** within the notebook (enforced in persistence).
+
+**Folder-scoped defaults** — Behavioral defaults for notes in that folder (templates, title patterns, question instructions, etc.) are **not** a separate persisted **`folder.config`** blob in the target model: they live in the **folder index note’s frontmatter** (and inherit from parent folders or notebook index when policy defines inheritance). The **`indexNoteId`** pointer is the only extra persisted folder field for this story.
 
 ### Note
 
@@ -151,6 +172,6 @@ Table `note_wiki_title_cache`: `id`, source `note_id`, `target_note_id`, `link_t
 ## Principles
 
 1. **Single structural truth** — Folder placement and wiki links are orthogonal; folders do not replace semantic links.
-2. **Stable ids** — Prefer note id everywhere the product must not break when titles change.
-3. **Markdown as source of truth** — Body and leading YAML frontmatter carry portable meaning.
-4. **Notebook boundary** — Sharing and notebook-level configuration attach to notebooks.
+2. **Stable ids** — Prefer note id everywhere the product must not break when titles change; **index notes** are resolved by **`indexNoteId`** for reads and search exclusion, not by title alone.
+3. **Markdown as source of truth** — Body and leading YAML frontmatter carry portable meaning; **index** frontmatter carries scoped defaults where the product defines keys.
+4. **Notebook boundary** — Sharing attaches to notebooks; **notebook-level** settings may live on the notebook row, while **scoped creation defaults and landing content** for notebook root and each folder concentrate in **index** notes.

@@ -62,11 +62,21 @@ const notebookPage = () => {
       return this
     },
     ...sidebarChildNotePageMethods(),
-    addFirstRootNoteFromEmptyNotebookPage() {
-      cy.get('[data-testid="notebook-add-first-note"]')
-        .findByRole('button', { name: 'Add note' })
+    typeNotebookIndexDraftAndSave(text: string) {
+      cy.get('[data-testid="notebook-index-draft-editor"] .ql-editor')
+        .should('be.visible')
         .click()
+      cy.focused().type(text, { delay: 0 })
+      cy.get('[data-testid="notebook-index-create-save"]').click()
       pageIsNotLoading()
+      return this
+    },
+    expectNotebookIndexBodyContains(fragment: string) {
+      pageIsNotLoading()
+      cy.get('[data-testid="notebook-index-body"] .ql-editor').should(
+        'contain.text',
+        fragment
+      )
       return this
     },
     readBook(bookTitle: string) {

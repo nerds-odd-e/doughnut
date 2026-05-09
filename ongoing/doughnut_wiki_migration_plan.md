@@ -5,6 +5,7 @@
 - **Phase 5.24 (drop `note.target_note_id` — optional detail):** `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`
 - **Phase 6 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md` (complete)
 - **Phase 7 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`
+- **Phase 10 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-10-sub-phases.md`
 
 ## Purpose
 
@@ -24,7 +25,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 7 — Remove note parent | Done |
 | 8 — Move / dissolve folder (organize) | Done |
 | 9 — Wiki-link parser and link index | Not started |
-| 10 — Folder configuration | Not started |
+| 10 — Index-scoped configuration (notebook + folder) | Not started |
 | 11 — Remove legacy assumptions | Not started |
 | 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
@@ -38,7 +39,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 **Folder** = structural containment. **`note.parent_id`** is removed (Phase 7); folder alignment and motion use folder placement and `NoteChildContainerFolderService` / `NoteMotionService` where applicable (see codebase).
 
-**Index note** — Optional root note titled `index` / slug `index`; notebook has **`name`** and **`description`**; no `headNote` on APIs.
+**Index note** — Optional **`index`** note (title case-insensitive for discovery/import) per **notebook root** (`folderId` absent) and per **folder**; **`notebook.index_note_id`** and **`folder.index_note_id`** cache the note id for hot reads and **default search exclusion**. Scoped defaults (e.g. title pattern, question-generation instruction) live in **index frontmatter**; **lazy create**: notebook/folder page shows the editor and creates the note on first persist. Notebook has **`name`** and **`description`**; no `headNote` on APIs. See north star for folder page routing vs note routes.
 
 **Properties** — Leading YAML in Markdown `content`; rich editor mirrors via frontmatter UI.
 
@@ -126,7 +127,7 @@ Shared sibling-name checks: `FolderSiblingNameValidation`. Move destination grap
 
 ## Non-goals
 
-Cross-notebook moves, bulk note moves unrelated to dissolve, wiki-link parsing (**Phase 9**), folder templates (**Phase 10**), slug/path columns (retired at boundary).
+Cross-notebook moves, bulk note moves unrelated to dissolve, wiki-link parsing (**Phase 9**), index-scoped defaults and folder index (**Phase 10**), slug/path columns (retired at boundary).
 
 ## Expected result
 
@@ -175,16 +176,39 @@ Parse links, show outgoing + backlinks, preserve unresolved, unify graph with wi
 
 ---
 
-# Phase 10 — Folder configuration behavior
+# Phase 10 — Index-scoped configuration (notebook root + folders)
 
 ## Goal
 
-Folders define defaults: templates, `defaultProperties`, title patterns, journal/relationship/map-style behaviors.
+**Notebook root** and each **folder** have an optional **index** note whose **Markdown body and YAML frontmatter** are the portable source of truth for **landing page content** and **scoped behavior**. Persisted **`notebook.index_note_id`** and **`folder.index_note_id`** (nullable FKs to `note`) speed up reads and define **which note is “the index”** for search filtering and invariants.
 
-## Examples (illustrative)
+## Model
+
+- **Index note** — Ordinary note; notebook index at **root** (`folderId` null); folder index with **`folderId`** = that folder; reserved title **`index`** (case-insensitive for backfill/import); **at most one** index note per scope.
+- **Pointers** — Keep **`index_note_id`** in sync on create, delete, move, and title change; referenced note must match **notebook** and **folder scope**.
+- **No synthetic root folder** — Notebook root remains **`folderId` null**; no hidden folder row that holds all notes.
+- **Config location** — Scoped defaults live in **index frontmatter**, not a separate **`folder.config`** / duplicate blob (see Phase 11 target shape).
+
+## Product (UI / UX)
+
+- **Notebook page** and **folder page** embed the **same** markdown + frontmatter editing pipeline as note show where practical (layout polish can follow).
+- **Empty index** — Still show the editor; **first save** creates the index note and sets **`index_note_id`**.
+- **Folder page** — First-class route; sidebar entry navigates to the folder page and uses **container vs note** routing (not **active folder + active note** simultaneously).
+- **Breadcrumbs** — Folder segments in the breadcrumb link to the corresponding **folder page** (consistent with sidebar navigation).
+- **Sidebar** — With a folder page open, the tree **auto-scrolls** so the active folder is visible in the sidebar.
+- **Predefined properties** — Product-defined keys (e.g. **note title pattern**, **question generation instruction**) appear **only** on index notes on notebook page, folder page, and when viewing the index at **`/d/n/:noteId`**.
+- **Search** — Exclude notes pointed to by **`notebook.index_note_id`** or **`folder.index_note_id`** from default search (optional later: opt-in).
+
+## Examples (illustrative frontmatter)
 
 ```yaml
-# journal-style
+# creation defaults / AI (examples; exact keys are product-defined)
+titlePattern: "{{date}}"
+questionGenerationInstruction: "Focus on definitions; avoid trick wording."
+```
+
+```yaml
+# journal-style (future / illustrative)
 template: daily-note
 defaultProperties:
   type: journal
@@ -193,7 +217,7 @@ defaultExportBasenamePattern: "{{date}}"
 ```
 
 ```yaml
-# relationship-style
+# relationship-style (future / illustrative)
 template: relationship-note
 defaultProperties:
   type: relationship
@@ -201,16 +225,18 @@ titlePattern: "{{source}} vs {{target}}"
 defaultExportBasenamePattern: "{{source}}-vs-{{target}}"
 ```
 
+**Inheritance** — Folder → parent folders → notebook index can be defined in implementation so defaults compose predictably.
+
 ## Distinction
 
 ```text
-stable config = long-term product behavior
+stable config = long-term product behavior (index frontmatter + notebook row settings as needed)
 migration config = temporary transformation rules
 ```
 
 ## Expected result
 
-Folder-level creation defaults and templates; migration-only rules isolated.
+Cached index pointers; notebook and folder landing pages with lazy index creation; index-only predefined properties; scoped defaults and instructions in frontmatter; default search excludes designated index notes; no parallel **`folder.config`** column for the same data.
 
 ---
 
@@ -232,10 +258,10 @@ slug columns and path-primary routes as canonical identity (already removed at b
 ## Target shape (aligns north star)
 
 ```text
-Notebook — id, name, config
-Folder — id, notebookId, parentFolderId?, name (unique among siblings), config
+Notebook — id, name, description?, config, indexNoteId?, …
+Folder — id, notebookId, parentFolderId?, name (unique among siblings), indexNoteId?, …
 Note — id, notebookId, folderId?, title, Markdown content (+ frontmatter)
-(no parentNoteId, no note.slug column)
+(no parentNoteId, no note.slug column; scoped defaults on index notes, not a duplicate Folder.config blob)
 LinkIndex — derived from content
 ```
 
@@ -286,7 +312,7 @@ Renaming a note does not strand stale wiki tokens or cache rows in common cases;
 7. Remove note parent
 8. Move / dissolve folder
 9. Wiki-link parser + indexes
-10. Folder config
+10. Index-scoped config (notebook + folder)
 11. Legacy cleanup
 12. Title rename propagates wiki references (deferred from Phase 5.25)
 ```
@@ -302,7 +328,7 @@ folders + (historical slugs until boundary)
           → drop structural note parent (done)
             → folder move / dissolve (done)
               → wiki links + indexes
-                → folder config
+                → index-scoped config (notebook + folder)
                   → legacy cleanup
                     → title rename propagates wiki references
 ```

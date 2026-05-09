@@ -22,49 +22,62 @@
     </div>
 
     <div
-      v-else-if="indexNoteStatus === 'present'"
+      v-else-if="indexNoteStatus === 'present' && indexRealm && indexNoteId != null"
       class="notebook-page-index-body daisy-mb-6"
       data-testid="notebook-index-body"
     >
-      <div
-        class="daisy-flex daisy-justify-between daisy-items-start daisy-gap-3 daisy-mb-1"
-      >
-        <h2 class="daisy-text-lg daisy-font-semibold daisy-text-base-content">
-          {{ indexDisplayTitle }}
-        </h2>
-        <router-link
-          :to="indexNoteEditLocation"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-shrink-0"
-          title="Edit index note"
-          data-testid="notebook-index-edit"
-        >
-          <Pencil class="daisy-h-6 daisy-w-6" />
-        </router-link>
-      </div>
-      <p
-        v-if="indexSummaryLine"
-        class="notebook-page-index-body-summary daisy-text-sm daisy-text-base-content/80"
-      >
-        {{ indexSummaryLine }}
-      </p>
+      <h2 class="daisy-text-lg daisy-font-semibold daisy-text-base-content daisy-mb-2">
+        {{ indexDisplayTitle }}
+      </h2>
+      <NoteEditableContent
+        :note-id="indexNoteId"
+        :note-content="indexRealm.note.content ?? ''"
+        :readonly="false"
+        :as-markdown="false"
+        :wiki-titles="indexRealm.wikiTitles ?? []"
+        :note-title-for-wikidata-search="indexRealm.note.noteTopology.title ?? ''"
+        data-testid="notebook-index-editable-content"
+        @dead-link-click="pendingDeadLinkTitle = $event"
+      />
+      <NoteDeadLinkCreateModal
+        v-model="pendingDeadLinkTitle"
+        :notebook-id="notebook.id"
+        :note-realm="indexRealm"
+        :source-note-id="indexRealm.id"
+      />
     </div>
 
     <div
-      v-if="showAddFirstNote"
-      class="daisy-alert daisy-alert-info daisy-mb-6"
-      data-testid="notebook-add-first-note"
+      v-else-if="indexNoteStatus === 'absent'"
+      class="notebook-page-index-body daisy-mb-6"
+      data-testid="notebook-index-body"
     >
-      <div class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-3">
-        <span>This notebook has no index note yet. Add a top-level note to get started.</span>
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-primary daisy-btn-sm"
-          :disabled="addingRootNote"
-          @click="addFirstRootNote"
-        >
-          {{ addingRootNote ? "Adding…" : "Add note" }}
-        </button>
+      <h2 class="daisy-text-lg daisy-font-semibold daisy-text-base-content daisy-mb-2">
+        Index
+      </h2>
+      <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-3">
+        No index note yet. Edit below and save to create a root note titled
+        <span class="daisy-font-mono">index</span>.
+      </p>
+      <div data-testid="notebook-index-draft-editor">
+        <RichMarkdownEditor
+          v-model="indexDraftMarkdown"
+          :multiple-line="true"
+          scope-name="notebook-index"
+          field="content"
+          :readonly="false"
+          :wiki-titles="[]"
+        />
       </div>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-mt-3"
+        data-testid="notebook-index-create-save"
+        :disabled="savingIndexDraft"
+        @click="saveIndexDraft"
+      >
+        {{ savingIndexDraft ? "Saving…" : "Save index" }}
+      </button>
     </div>
 
     <NotebookAttachedBookSection :notebook-id="notebook.id" />
@@ -190,9 +203,8 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref, watch, computed } from "vue"
+import { ref, watch, computed, nextTick } from "vue"
 import { useRouter } from "vue-router"
-import { noteShowLocation } from "@/routes/noteShowLocation"
 import type {
   Notebook,
   User,
@@ -205,18 +217,24 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { GitMerge, Pencil, Share2 } from "lucide-vue-next"
+import { GitMerge, Share2 } from "lucide-vue-next"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import NotebookAssistantManagementForm from "@/components/notebook/NotebookAssistantManagementForm.vue"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
+import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
+import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
+import NoteDeadLinkCreateModal from "@/components/notes/NoteDeadLinkCreateModal.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
-  showAddFirstNote: { type: Boolean, default: false },
+  fetchNotebookPage: {
+    type: Function as PropType<() => Promise<void>>,
+    required: true,
+  },
   indexNoteStatus: {
     type: String as PropType<"pending" | "present" | "absent">,
     default: "absent",
@@ -237,18 +255,6 @@ const indexDisplayTitle = computed(() => {
   const t = indexRealm.value?.note.noteTopology.title.trim()
   return t && t.length > 0 ? t : "Index"
 })
-
-const indexSummaryLine = computed(() => {
-  const r = indexRealm.value
-  if (!r) return ""
-  const d = r.note.content?.trim()
-  if (!d) return ""
-  return d.length > 160 ? `${d.slice(0, 157)}…` : d
-})
-
-const indexNoteEditLocation = computed(() =>
-  noteShowLocation(props.indexNoteId!)
-)
 
 const aiAssistant = ref<NotebookAiAssistant | undefined>(undefined)
 
@@ -277,23 +283,57 @@ watch(
 
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
+  (e: "index-note-created"): void
 }>()
 
-const { showSuccessToast } = useToast()
+const { showSuccessToast, showErrorToast } = useToast()
 const router = useRouter()
 const { popups } = usePopups()
-const addingRootNote = ref(false)
 
-const addFirstRootNote = async () => {
-  addingRootNote.value = true
+const indexDraftMarkdown = ref("")
+const savingIndexDraft = ref(false)
+const pendingDeadLinkTitle = ref<string | null>(null)
+
+watch(
+  () => [props.notebook.id, props.indexNoteStatus] as const,
+  ([, status]) => {
+    if (status === "absent") {
+      indexDraftMarkdown.value = ""
+    }
+  }
+)
+
+const saveIndexDraft = async () => {
+  savingIndexDraft.value = true
   try {
-    await storageAccessor.value
-      .storedApi()
-      .createRootNoteAtNotebook(router, props.notebook.id, {
-        newTitle: "Untitled",
-      })
+    await storageAccessor.value.storedApi().createRootNoteAtNotebook(
+      router,
+      props.notebook.id,
+      {
+        newTitle: "index",
+        content: indexDraftMarkdown.value,
+      },
+      { skipRouterReplace: true }
+    )
+    showSuccessToast("Notebook index saved")
+    emit("index-note-created")
+  } catch (e: unknown) {
+    const status = (e as { status?: number }).status
+    if (status === 409) {
+      await props.fetchNotebookPage()
+      for (let i = 0; i < 20 && props.indexNoteStatus !== "present"; i++) {
+        await nextTick()
+      }
+      if (props.indexNoteStatus === "present") {
+        showSuccessToast("Notebook index is now available")
+        return
+      }
+      showErrorToast(
+        "Could not create index: a conflicting note may exist. Refresh the page and try again."
+      )
+    }
   } finally {
-    addingRootNote.value = false
+    savingIndexDraft.value = false
   }
 }
 
@@ -404,11 +444,6 @@ const updateIndexNotebook = async () => {
   background: oklch(var(--b2) / 0.8);
   border-radius: 8px;
   padding: 1rem 1.25rem;
-}
-
-.notebook-page-index-body-summary {
-  line-height: 1.5;
-  margin-top: 0.25rem;
 }
 
 .settings-section {

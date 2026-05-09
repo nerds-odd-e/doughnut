@@ -72,8 +72,20 @@ When(
   }
 )
 
-When('I add the first note from the empty notebook page', () => {
-  notebookPage().addFirstRootNoteFromEmptyNotebookPage()
+When(
+  'I type notebook index body {string} on the notebook page and save',
+  (body: string) => {
+    notebookPage().typeNotebookIndexDraftAndSave(body)
+  }
+)
+
+When('I reload the notebook page', () => {
+  cy.reload()
+  pageIsNotLoading()
+})
+
+Then('the notebook index body includes {string}', (fragment: string) => {
+  notebookPage().expectNotebookIndexBodyContains(fragment)
 })
 
 Then('I should see popup {string}', (message: string) => {

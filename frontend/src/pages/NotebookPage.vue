@@ -9,10 +9,11 @@
       v-else
       :notebook="notebook"
       :user="user"
-      :show-add-first-note="indexNoteStatus === 'absent'"
+      :fetch-notebook-page="fetchNotebook"
       :index-note-status="indexNoteStatus"
       :index-note-id="sidebarAnchorNoteId"
       @notebook-updated="handleNotebookUpdated"
+      @index-note-created="fetchNotebook"
     />
   </div>
 </template>
