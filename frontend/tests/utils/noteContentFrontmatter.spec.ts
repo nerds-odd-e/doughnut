@@ -391,7 +391,10 @@ describe("isUrlPropertyKey", () => {
 })
 
 describe("titlePatternFromNoteMarkdown", () => {
-  it("reads titlePattern case-insensitively", () => {
+  it("reads title_pattern and legacy TitlePattern keys", () => {
+    expect(
+      titlePatternFromNoteMarkdown('---\ntitle_pattern: "{{date}}"\n---\n')
+    ).toBe("{{date}}")
     const md = '---\nTitlePattern: "{{date}}"\n---\n'
     expect(titlePatternFromNoteMarkdown(md)).toBe("{{date}}")
   })
@@ -399,7 +402,7 @@ describe("titlePatternFromNoteMarkdown", () => {
   it("returns undefined when key missing or blank", () => {
     expect(titlePatternFromNoteMarkdown("---\na: 1\n---\n")).toBeUndefined()
     expect(
-      titlePatternFromNoteMarkdown('---\ntitlePattern: ""\n---\n')
+      titlePatternFromNoteMarkdown('---\ntitle_pattern: ""\n---\n')
     ).toBeUndefined()
   })
 })

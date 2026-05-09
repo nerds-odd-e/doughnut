@@ -204,8 +204,8 @@ Parse links, show outgoing + backlinks, preserve unresolved, unify graph with wi
 
 ```yaml
 # creation defaults / AI (examples; exact keys are product-defined)
-titlePattern: "{{date}}"
-questionGenerationInstruction: "Focus on definitions; avoid trick wording."
+title_pattern: "{{date}}"
+question_generation_instruction: "Focus on definitions; avoid trick wording."
 ```
 
 ```yaml
@@ -213,7 +213,7 @@ questionGenerationInstruction: "Focus on definitions; avoid trick wording."
 template: daily-note
 defaultProperties:
   type: journal
-titlePattern: "{{date}}"
+title_pattern: "{{date}}"
 defaultExportBasenamePattern: "{{date}}"
 ```
 
@@ -222,7 +222,7 @@ defaultExportBasenamePattern: "{{date}}"
 template: relationship-note
 defaultProperties:
   type: relationship
-titlePattern: "{{source}} vs {{target}}"
+title_pattern: "{{source}} vs {{target}}"
 defaultExportBasenamePattern: "{{source}}-vs-{{target}}"
 ```
 

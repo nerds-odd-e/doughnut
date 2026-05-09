@@ -34,7 +34,7 @@ public class NoteRealm {
 
   /**
    * Full markdown of the designated index note that supplies the nearest non-blank {@code
-   * titlePattern} (leaf folder → parent folders → notebook root). Omitted when none applies.
+   * title_pattern} (leaf folder → parent folders → notebook root). Omitted when none applies.
    */
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Getter

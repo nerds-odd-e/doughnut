@@ -16,7 +16,7 @@ function notebookPageIndexNoteId(): number | undefined {
   return v?.indexNoteId
 }
 
-/** Raw `titlePattern` from the active scoped index (note / notebook / folder page context). */
+/** Raw `title_pattern` from the active scoped index (note / notebook / folder page context). */
 export function useScopedTitlePatternString(): ComputedRef<string | undefined> {
   const route = useRoute()
   const storageAccessor = useStorageAccessor()

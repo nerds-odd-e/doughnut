@@ -36,8 +36,8 @@ In backend Java and tests, treat these pointers as JPA associations to `Note` (n
 The first index-only predefined properties are:
 
 ```yaml
-titlePattern: "{{date}}"
-questionGenerationInstruction: "Focus on definitions; avoid trick wording."
+title_pattern: "{{date}}"
+question_generation_instruction: "Focus on definitions; avoid trick wording."
 ```
 
 These are visible/editable only for designated index notes: notebook page, folder page, and the index note's own `/d/n/:noteId` page.
@@ -241,7 +241,7 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 
 **Trigger:** User edits index properties.
 
-**Post-condition:** UI exposes index-only fields for `titlePattern` and `questionGenerationInstruction`, serializes them into leading YAML frontmatter, and normal notes do not show those predefined fields.
+**Post-condition:** UI exposes index-only fields for `title_pattern` and `question_generation_instruction`, serializes them into leading YAML frontmatter, and normal notes do not show those predefined fields.
 
 **Scope:**
 - Add index-note detection by cached pointer/id where available, with safe fallback during transition.
@@ -253,15 +253,15 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Frontend editor tests: normal note does not show those index-only predefined rows.
 - Backend test only if the API needs to expose an explicit "isIndexNote" field.
 
-### 10.12 — Behavior: new notes can use scoped `titlePattern`
+### 10.12 — Behavior: new notes can use scoped `title_pattern`
 
 **Why now:** This is the first concrete behavior powered by index frontmatter, and it can be delivered as a mostly frontend capability once the active context already carries the resolved index properties.
 
-**Pre-condition:** Notebook or folder index frontmatter contains `titlePattern`, and the frontend has loaded the relevant index properties with the active note or active folder context.
+**Pre-condition:** Notebook or folder index frontmatter contains `title_pattern`, and the frontend has loaded the relevant index properties with the active note or active folder context.
 
 **Trigger:** User creates a note from the sidebar or note-creation UI while a note or folder is active.
 
-**Post-condition:** The create-note request is sent with an initial title rendered from the nearest loaded scoped `titlePattern`; existing explicit-title creation remains explicit.
+**Post-condition:** The create-note request is sent with an initial title rendered from the nearest loaded scoped `title_pattern`; existing explicit-title creation remains explicit.
 
 **Scope:**
 - Treat this as a frontend-owned defaulting feature: the backend create-note API should continue to receive an ordinary explicit title, not learn template rendering or implicit scoped defaults in this slice.
@@ -279,9 +279,9 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 
 ### 10.13 — Behavior: question generation uses scoped instruction
 
-**Why now:** It delivers the second planned property after the scoped config and inheritance mechanism are proven by `titlePattern`.
+**Why now:** It delivers the second planned property after the scoped config and inheritance mechanism are proven by `title_pattern`.
 
-**Pre-condition:** Notebook or folder index frontmatter contains `questionGenerationInstruction`.
+**Pre-condition:** Notebook or folder index frontmatter contains `question_generation_instruction`.
 
 **Trigger:** User invokes question generation for a note in that scope.
 
@@ -346,8 +346,8 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 | Sidebar scrolls to active folder page | 10.9 |
 | Breadcrumb folder links open folder pages | 10.10 |
 | Index-only predefined properties | 10.11 |
-| `titlePattern` applies to note creation | 10.12 |
-| `questionGenerationInstruction` applies to question generation | 10.13 |
+| `title_pattern` applies to note creation | 10.12 |
+| `question_generation_instruction` applies to question generation | 10.13 |
 | Default search excludes folder index | 10.14 |
 | Interim cleanup and plan refresh | 10.15 |
 

@@ -267,6 +267,27 @@ class NoteRealmServiceTest {
             .creatorAndOwner(user)
             .inNotebook(nb)
             .title("index")
+            .content("---\ntitle_pattern: \"{{date}}\"\n---\n")
+            .please();
+    makeMe.theNotebook(nb).indexNote(index).please();
+    Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+    NoteRealm realm = noteRealmService.build(normal, user);
+
+    assertThat(realm.getIndexNoteContent(), equalTo(index.getContent()));
+  }
+
+  @Test
+  void index_note_content_recognizes_legacy_camel_case_title_pattern_key() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+    Note index =
+        makeMe
+            .aNote()
+            .creatorAndOwner(user)
+            .inNotebook(nb)
+            .title("index")
             .content("---\ntitlePattern: \"{{date}}\"\n---\n")
             .please();
     makeMe.theNotebook(nb).indexNote(index).please();
@@ -288,7 +309,7 @@ class NoteRealmServiceTest {
             .creatorAndOwner(user)
             .inNotebook(nb)
             .title("index")
-            .content("---\ntitlePattern: \"nb\"\n---\n")
+            .content("---\ntitle_pattern: \"nb\"\n---\n")
             .please();
     makeMe.theNotebook(nb).indexNote(nbIndex).please();
 
@@ -299,7 +320,7 @@ class NoteRealmServiceTest {
             .creatorAndOwner(user)
             .folder(outer)
             .title("index")
-            .content("---\ntitlePattern: \"outer\"\n---\n")
+            .content("---\ntitle_pattern: \"outer\"\n---\n")
             .please();
     makeMe.theFolder(outer).indexNote(outerIdx).please();
 
@@ -310,7 +331,7 @@ class NoteRealmServiceTest {
             .creatorAndOwner(user)
             .folder(inner)
             .title("index")
-            .content("---\ntitlePattern: \"inner\"\n---\n")
+            .content("---\ntitle_pattern: \"inner\"\n---\n")
             .please();
     makeMe.theFolder(inner).indexNote(innerIdx).please();
 
@@ -334,7 +355,7 @@ class NoteRealmServiceTest {
             .creatorAndOwner(user)
             .folder(outer)
             .title("index")
-            .content("---\ntitlePattern: \"outer\"\n---\n")
+            .content("---\ntitle_pattern: \"outer\"\n---\n")
             .please();
     makeMe.theFolder(outer).indexNote(outerIdx).please();
 
@@ -367,7 +388,7 @@ class NoteRealmServiceTest {
             .creatorAndOwner(user)
             .inNotebook(nb)
             .title("index")
-            .content("---\ntitlePattern: \"nb\"\n---\n")
+            .content("---\ntitle_pattern: \"nb\"\n---\n")
             .please();
     makeMe.theNotebook(nb).indexNote(nbIndex).please();
 

@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.Frontmatter;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteRealmService {
 
-  private static final String TITLE_PATTERN_KEY = "titlePattern";
+  /** Canonical `title_pattern` first; legacy camelCase supported for existing notes. */
+  private static final List<String> TITLE_PATTERN_KEYS = List.of("title_pattern", "titlePattern");
 
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
@@ -75,10 +77,18 @@ public class NoteRealmService {
       return false;
     }
     return NoteContentMarkdown.splitLeadingFrontmatter(content)
-        .flatMap(lf -> lf.frontmatter().getString(TITLE_PATTERN_KEY))
-        .map(String::trim)
-        .filter(s -> !s.isEmpty())
+        .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
+        .filter(this::frontmatterHasNonBlankTitlePattern)
         .isPresent();
+  }
+
+  private boolean frontmatterHasNonBlankTitlePattern(Frontmatter fm) {
+    for (String key : TITLE_PATTERN_KEYS) {
+      if (fm.getString(key).map(String::trim).filter(s -> !s.isEmpty()).isPresent()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Re-load notes with associations so JSON serialization does not hit Hibernate proxies. */

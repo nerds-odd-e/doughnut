@@ -194,7 +194,23 @@ export function parseNoteContentMarkdown(
   return { ok: true, properties: mapped.properties, body }
 }
 
-/** Reads `titlePattern` from leading YAML (case-insensitive key) when present and non-blank. */
+/** Preset property keys offered in rich-mode property name UI. */
+export const RICH_MODE_PRESET_PROPERTY_KEYS = [
+  "image",
+  "wikidata_id",
+  "url",
+] as const
+
+/**
+ * Predefined property keys shown only when editing a designated index note
+ * (notebook index, folder index, or direct /d/n/:noteId for those notes).
+ */
+export const INDEX_ONLY_PRESET_PROPERTY_KEYS = [
+  "title_pattern",
+  "question_generation_instruction",
+] as const
+
+/** Reads scoped title pattern from leading YAML (`title_pattern` or legacy `titlePattern`; key match ignores case and underscores). */
 export function titlePatternFromNoteMarkdown(
   markdown: string | undefined | null
 ): string | undefined {
@@ -202,12 +218,50 @@ export function titlePatternFromNoteMarkdown(
   const p = parseNoteContentMarkdown(markdown)
   if (!p.ok) return
   for (const [k, v] of Object.entries(p.properties)) {
-    if (k.trim().toLowerCase() === "titlepattern") {
+    if (isTitlePatternPropertyKey(k)) {
       const t = (v ?? "").trim()
       return t.length > 0 ? t : undefined
     }
   }
   return
+}
+
+/** True when `key` is the title-pattern slot (`title_pattern`, `titlePattern`, etc.). */
+export function isTitlePatternPropertyKey(key: string): boolean {
+  const t = key.trim().toLowerCase().replace(/_/g, "")
+  return t === "titlepattern"
+}
+
+/** True when `key` is the question-generation instruction slot (canonical or legacy camelCase). */
+export function isQuestionGenerationInstructionPropertyKey(
+  key: string
+): boolean {
+  const t = key.trim().toLowerCase().replace(/_/g, "")
+  return t === "questiongenerationinstruction"
+}
+
+/** True when `key` is any index-only predefined slot, including legacy camelCase aliases. */
+export function isReservedIndexOnlyPropertyKey(key: string): boolean {
+  return (
+    (INDEX_ONLY_PRESET_PROPERTY_KEYS as readonly string[]).includes(key) ||
+    isTitlePatternPropertyKey(key) ||
+    isQuestionGenerationInstructionPropertyKey(key)
+  )
+}
+
+/** True when `rowKey` already fills the slot for `canonicalPresetKey` (same key or legacy alias). */
+export function rowFillsIndexOnlyPresetSlot(
+  rowKey: string,
+  canonicalPresetKey: (typeof INDEX_ONLY_PRESET_PROPERTY_KEYS)[number]
+): boolean {
+  if (rowKey === canonicalPresetKey) return true
+  if (canonicalPresetKey === "title_pattern") {
+    return isTitlePatternPropertyKey(rowKey)
+  }
+  if (canonicalPresetKey === "question_generation_instruction") {
+    return isQuestionGenerationInstructionPropertyKey(rowKey)
+  }
+  return false
 }
 
 /** True when any key is the `relation` property (trimmed, case-insensitive), matching rich editor rows. */
@@ -245,22 +299,6 @@ export function composeNoteContentMarkdown(input: {
 
 /** One key/value row for rich property editing (order matches sorted keys). */
 export type PropertyRow = { key: string; value: string }
-
-/** Preset property keys offered in rich-mode property name UI. */
-export const RICH_MODE_PRESET_PROPERTY_KEYS = [
-  "image",
-  "wikidata_id",
-  "url",
-] as const
-
-/**
- * Predefined property keys shown only when editing a designated index note
- * (notebook index, folder index, or direct /d/n/:noteId for those notes).
- */
-export const INDEX_ONLY_PRESET_PROPERTY_KEYS = [
-  "titlePattern",
-  "questionGenerationInstruction",
-] as const
 
 /** Rich-mode property key for Wikidata Q-id (YAML may use `wikidata_id` or `wikidataId`). */
 export function isWikidataIdPropertyKey(key: string): boolean {

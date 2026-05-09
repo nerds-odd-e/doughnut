@@ -78,7 +78,7 @@ An **index note** is an ordinary note used as the **landing page** and **scoped 
 
 The index note is otherwise a normal note: stable id, title, Markdown **content** (body + leading YAML frontmatter), links, backlinks, and export/import behavior. Full editing may use **`/d/n/:noteId`** or the **notebook page** / **folder page** surfaces (same markdown and frontmatter pipeline).
 
-**Scoped configuration in frontmatter** — Leading YAML on an index note may hold **product-defined keys** for defaults and behavior in that scope (e.g. **note title pattern**, **question-generation instruction**). The Markdown file remains the portable source of truth. **Predefined property rows** in the UI apply **only to index notes** so normal notes are not overloaded with folder/notebook admin fields.
+**Scoped configuration in frontmatter** — Leading YAML on an index note may hold **product-defined keys** for defaults and behavior in that scope (e.g. **`title_pattern`** for note-title templates, **`question_generation_instruction`** for AI prompts). The Markdown file remains the portable source of truth. **Predefined property rows** in the UI apply **only to index notes** so normal notes are not overloaded with folder/notebook admin fields.
 
 **Lazy creation** — If there is no index note yet, the notebook or folder page may still show the **editor** (empty state). The first **persist** creates the note, sets title **`index`** (or product policy), and writes **`indexNoteId`** on the notebook or folder. Service logic must enforce **at most one** index note per scope and keep **`indexNoteId`** consistent on create, delete, move, and title changes.
 

@@ -84,7 +84,7 @@ const props = withDefaults(
     parentLocationDescription?: string
     initialTitle?: string
     /**
-     * Default title from scoped index `titlePattern` (already rendered). Does not mark the title
+     * Default title from scoped index `title_pattern` (already rendered). Does not mark the title
      * as user-edited; ignored when `initialTitle` is set.
      */
     defaultTitleFromScopedPattern?: string

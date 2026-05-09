@@ -536,7 +536,7 @@ Paragraph.\n`
         const keyInput = r.find(
           '[data-testid="rich-note-property-row-key-input"]'
         )
-        return (keyInput.element as HTMLInputElement).value === "titlePattern"
+        return (keyInput.element as HTMLInputElement).value === "title_pattern"
       })
       expect(titlePatternRow).toBeDefined()
 
@@ -548,7 +548,7 @@ Paragraph.\n`
       await flushPromises()
 
       const last = h.lastEmittedMarkdown()
-      expect(last).toContain("titlePattern:")
+      expect(last).toContain("title_pattern:")
       expect(last).toContain("{{date}}")
       expect(last).toContain("Body")
     })
@@ -562,15 +562,15 @@ Paragraph.\n`
       await flushPromises()
 
       const last = h.lastEmittedMarkdown()
-      expect(last).not.toContain("titlePattern")
-      expect(last).not.toContain("questionGenerationInstruction")
+      expect(last).not.toContain("title_pattern")
+      expect(last).not.toContain("question_generation_instruction")
       expect(last).toContain("Updated Body")
     })
 
     it("index-only fields are shown when note already has those keys in frontmatter", async () => {
       const markdown = `---
-titlePattern: "{{date}}"
-questionGenerationInstruction: Focus on facts.
+title_pattern: "{{date}}"
+question_generation_instruction: Focus on facts.
 ---
 
 # Body`
@@ -583,8 +583,8 @@ questionGenerationInstruction: Focus on facts.
       const keyValues = keyInputs.map(
         (el) => (el.element as HTMLInputElement).value
       )
-      expect(keyValues).toContain("titlePattern")
-      expect(keyValues).toContain("questionGenerationInstruction")
+      expect(keyValues).toContain("title_pattern")
+      expect(keyValues).toContain("question_generation_instruction")
       expect(wrapper.text()).toContain("{{date}}")
       expect(wrapper.text()).toContain("Focus on facts.")
     })
