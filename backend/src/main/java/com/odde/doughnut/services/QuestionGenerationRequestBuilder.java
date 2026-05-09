@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
@@ -97,14 +98,24 @@ public class QuestionGenerationRequestBuilder {
             .stream()
             .findFirst()
             .orElse(note);
-    RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed);
+
+    String instruction =
+        noteRealmService.resolveScopedQuestionGenerationInstruction(focus).orElse(null);
+    int instructionTokens =
+        instruction != null ? ApproximateUtf8TokenBudget.estimateApproxTokens(instruction) : 0;
+    int focusBudget =
+        Math.max(
+            0,
+            FocusContextConstants.FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET - instructionTokens);
+    RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed, focusBudget);
+
     FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(focus, config);
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
 
     OpenAIChatRequestBuilder builder = new OpenAIChatRequestBuilder().model(modelName);
-    noteRealmService
-        .resolveScopedQuestionGenerationInstruction(focus)
-        .ifPresent(builder::addUserMessage);
+    if (instruction != null) {
+      builder.addUserMessage(instruction);
+    }
     return builder.addUserMessage(focusContextMarkdown);
   }
 }

@@ -158,6 +158,37 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
+    void shouldStillIncludeFocusContextAfterDeductingInstructionTokensFromBudget() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Notebook nb = root.getNotebook();
+      Note index =
+          makeMe
+              .aNote()
+              .creatorAndOwner(user)
+              .inNotebook(nb)
+              .title("index")
+              .content("---\nquestion_generation_instruction: BUDGET_CHECK_MARKER\n---\n")
+              .please();
+      makeMe.theNotebook(nb).indexNote(index).please();
+      Note noteInScope =
+          makeMe
+              .aNote()
+              .creatorAndOwner(user)
+              .underSameNotebookAs(root)
+              .content("A note with enough body text to appear in the focus context.")
+              .please();
+      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+      ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(noteInScope, null);
+
+      List<String> userBodies = userMessageContentStrings(request);
+      assertThat(userBodies.get(0), containsString("BUDGET_CHECK_MARKER"));
+      assertThat(userBodies.get(1), containsString("# Focus Context"));
+    }
+
+    @Test
     void shouldPlaceScopedQuestionInstructionAsFirstUserMessageBeforeFocusContext() {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();

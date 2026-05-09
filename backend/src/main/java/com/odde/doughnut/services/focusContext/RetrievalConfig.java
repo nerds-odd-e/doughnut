@@ -24,6 +24,10 @@ public class RetrievalConfig {
     return new RetrievalConfig(DEFAULT_MAX_DEPTH, sampleSeed, null);
   }
 
+  public static RetrievalConfig forQuestionGeneration(Long sampleSeed, int contentTokenBudget) {
+    return new RetrievalConfig(DEFAULT_MAX_DEPTH, sampleSeed, contentTokenBudget);
+  }
+
   public static RetrievalConfig depth1() {
     return new RetrievalConfig(1, null, null);
   }
