@@ -41,6 +41,7 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
   currentActiveNoteId,
   currentNotebookId,
+  folderPageBreadcrumbFolders,
   notebookSidebarNotebookClientView,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -148,6 +149,7 @@ watch(
 )
 
 onMounted(async () => {
+  folderPageBreadcrumbFolders.value = []
   await fetchNotebook()
 })
 

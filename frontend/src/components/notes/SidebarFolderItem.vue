@@ -13,7 +13,7 @@
     }"
     @focusout="onFolderRowFocusOut"
   >
-    <div class="folder-row" @click="setUserActiveFolderOnly">
+    <div class="folder-row">
       <button
         class="chevron-btn"
         aria-label="expand children"
@@ -28,9 +28,20 @@
         />
       </button>
       <div class="folder-label-area">
-        <span class="sidebar-folder-label" @click.stop="toggleExpand">{{
-          folder.name
-        }}</span>
+        <router-link
+          class="sidebar-folder-label"
+          data-testid="sidebar-folder-open-page-link"
+          :to="{
+            name: 'folderPage',
+            params: {
+              notebookId: String(notebookId),
+              folderId: String(folderId),
+            },
+          }"
+          @click="setUserActiveFolderOnly"
+        >
+          {{ folder.name }}
+        </router-link>
       </div>
       <span v-if="structuralChildCount != null" class="child-count">{{
         structuralChildCount
@@ -57,6 +68,7 @@ import { ChevronRight } from "lucide-vue-next"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue"
+import { useRoute } from "vue-router"
 
 const props = defineProps<{
   folder: Folder
@@ -75,6 +87,8 @@ const {
   activeNoteFolderIds,
   userActiveFolder,
 } = tree
+
+const route = useRoute()
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
@@ -108,11 +122,19 @@ const isNotePathFolder = computed(
       ancestorFolderIds.value.has(folderId.value))
 )
 
+const isFolderPageForThisFolder = computed(
+  () =>
+    route.name === "folderPage" &&
+    Number(route.params.notebookId) === props.notebookId &&
+    Number(route.params.folderId) === folderId.value
+)
+
 const isUserActiveFolder = computed(
   () =>
-    userActiveFolder != null &&
-    folderId.value != null &&
-    userActiveFolder.value?.id === folderId.value
+    (userActiveFolder != null &&
+      folderId.value != null &&
+      userActiveFolder.value?.id === folderId.value) ||
+    isFolderPageForThisFolder.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -233,6 +255,12 @@ function toggleExpand() {
   cursor: pointer;
   width: fit-content;
   max-width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar-folder-label:hover {
+  text-decoration: underline;
 }
 
 .child-count {

@@ -1,4 +1,7 @@
-import type { NotebookClientView } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  NotebookClientView,
+} from "@generated/doughnut-backend-api"
 import { ref, shallowRef, type Ref, type ShallowRef } from "vue"
 import type { SidebarUserActiveFolder } from "@/components/notes/useNoteSidebarTree"
 
@@ -14,9 +17,13 @@ export const currentActiveNoteId: Ref<number | undefined> = ref(undefined)
 export const notebookSidebarUserActiveFolder: Ref<SidebarUserActiveFolder | null> =
   ref(null)
 
+/** Root-to-leaf folder segments for `folderPage` breadcrumbs (see flat index walk). */
+export const folderPageBreadcrumbFolders: Ref<Folder[]> = ref([])
+
 export function resetNotebookSidebarState(): void {
   currentNotebookId.value = undefined
   currentActiveNoteId.value = undefined
   notebookSidebarNotebookClientView.value = undefined
   notebookSidebarUserActiveFolder.value = null
+  folderPageBreadcrumbFolders.value = []
 }

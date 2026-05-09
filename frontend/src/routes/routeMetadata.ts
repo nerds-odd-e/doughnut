@@ -34,6 +34,14 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
+    path: "/d/notebooks/:notebookId(\\d+)/folders/:folderId(\\d+)",
+    name: "folderPage",
+    props: (route: RouteLocation) => ({
+      notebookId: Number(route.params.notebookId),
+      folderId: Number(route.params.folderId),
+    }),
+  },
+  {
     path: "/d/notebooks/:notebookId(\\d+)",
     name: "notebookPage",
     props: (route: RouteLocation) => ({

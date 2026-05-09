@@ -114,6 +114,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/FolderPage': RouteRecordInfo<
+      '/FolderPage',
+      '/FolderPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/HomePage': RouteRecordInfo<
       '/HomePage',
       '/HomePage',
@@ -308,6 +315,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/FailureReportPage.vue': {
       routes:
         | '/FailureReportPage'
+      views:
+        | never
+    }
+    'src/pages/FolderPage.vue': {
+      routes:
+        | '/FolderPage'
       views:
         | never
     }

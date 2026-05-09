@@ -113,7 +113,7 @@ export const noteSidebar = () => {
 
     activateFolderByLabel(folderLabel: string) {
       pageIsNotLoading()
-      folderTreitemByLabel(folderLabel).find('.sidebar-folder-label').click()
+      folderTreitemByLabel(folderLabel).find('.chevron-btn').first().click()
       pageIsNotLoading()
     },
 
@@ -127,8 +127,16 @@ export const noteSidebar = () => {
         )
         .filter(':visible')
         .last()
-        .find('.sidebar-folder-label')
+        .find('.chevron-btn')
         .first()
+        .click()
+      pageIsNotLoading()
+    },
+
+    openFolderPageByLabel(folderLabel: string) {
+      pageIsNotLoading()
+      folderTreitemByLabel(folderLabel)
+        .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
       pageIsNotLoading()
     },

@@ -34,7 +34,11 @@ const userLoaded = ref(false)
 const newUser = computed(() => !user.value && !!externalIdentifier.value)
 
 const route = useRoute()
-const notebookSidebarRouteNames = new Set(["notebookPage", "noteShow"])
+const notebookSidebarRouteNames = new Set([
+  "notebookPage",
+  "folderPage",
+  "noteShow",
+])
 const showsNotebookSidebarLayout = computed(() =>
   notebookSidebarRouteNames.has(String(route.name))
 )

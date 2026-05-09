@@ -29,7 +29,7 @@
       <BreadcrumbWithCircle
         v-else-if="sidebarNotebookClientView"
         :notebook-view="sidebarNotebookClientView"
-        :ancestor-folders="[]"
+        :ancestor-folders="chromeBreadcrumbAncestorFolders"
       />
     </GlobalBar>
     <div
@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { Folder, NoteRealm } from "@generated/doughnut-backend-api"
 import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
@@ -80,6 +80,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
   currentNotebookId,
+  folderPageBreadcrumbFolders,
   notebookSidebarNotebookClientView,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -107,10 +108,17 @@ const sidebarRealm = computed((): NoteRealm | undefined => {
 })
 
 const noteRealmForBreadcrumb = computed(() => {
-  if (route.name === "notebookPage") {
+  if (route.name === "notebookPage" || route.name === "folderPage") {
     return undefined
   }
   return sidebarRealm.value
+})
+
+const chromeBreadcrumbAncestorFolders = computed((): Folder[] => {
+  if (route.name === "folderPage") {
+    return folderPageBreadcrumbFolders.value
+  }
+  return []
 })
 
 const handleResize = () => {

@@ -17,6 +17,7 @@ import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
+import FolderPage from "@/pages/FolderPage.vue"
 import NotebookGroupPage from "@/pages/NotebookGroupPage.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
 import { routeMetadata } from "./routeMetadata"
@@ -46,6 +47,7 @@ const componentMap: Record<string, unknown> = {
   manageAccessTokens: ManageAccessTokensPage,
   memoryTrackerShow: MemoryTrackerPage,
   notebookPage: NotebookPage,
+  folderPage: FolderPage,
   bookReading: BookReadingPage,
 }
 
