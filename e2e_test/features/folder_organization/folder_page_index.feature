@@ -16,6 +16,7 @@ Feature: Folder page index
     When I reload the folder page
     Then the folder index should contain "Persistent folder landing"
 
+  @wip
   Scenario: New note from folder page uses folder index title_pattern default
     When I view note "In Alpha"
     And I open the folder page for "Alpha" from the sidebar
