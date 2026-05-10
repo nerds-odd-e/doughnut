@@ -92,10 +92,7 @@ const fetchFolderPage = async () => {
     } else {
       folderPageBreadcrumbFolders.value = [page.folder]
     }
-    notebookSidebarActiveFolder.value = {
-      id: page.folder.id,
-      name: page.folder.name,
-    }
+    notebookSidebarActiveFolder.value = page
     return
   }
   folderPageClient.value = undefined

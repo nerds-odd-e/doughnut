@@ -26,14 +26,13 @@ import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
 import { useDefaultNewNoteTitleFromPattern } from "@/composables/useScopedTitlePatternForNewNote"
 import NoteNewForm from "../NoteNewForm.vue"
-import type { SidebarActiveFolder } from "../useNoteSidebarTree"
 
 defineProps<{
   notebookId: number
   buttonTitle: string
   ariaLabel?: string
   /** Resolved parent folder for create dialog (sidebar selection or active note folder). */
-  initialFolder?: SidebarActiveFolder
+  initialFolder?: Folder
   parentLocationDescription?: string
   titleSearchAnchorNote?: Note | null
   ancestorFolders?: Folder[]

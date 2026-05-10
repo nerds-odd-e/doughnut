@@ -4,24 +4,43 @@ import {
   resolvedCreateParentFolderIdFrom,
   useNotebookRootCreateTarget,
 } from "@/components/notes/useNoteSidebarTree"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type {
+  FolderPageClientView,
+  NoteRealm,
+} from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { computed, ref } from "vue"
 import { describe, expect, it } from "vitest"
+
+function folderPageClientStub(id: number, name: string): FolderPageClientView {
+  const now = new Date().toISOString()
+  return {
+    notebook: makeMe.aNotebook.please(),
+    folder: {
+      id,
+      name,
+      createdAt: now,
+      updatedAt: now,
+    },
+  }
+}
 
 describe("useNoteSidebarTree create context", () => {
   it("resolvedCreateParentFolderIdFrom prefers the sidebar-selected folder over the active note folder", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     expect(
-      resolvedCreateParentFolderIdFrom({ id: 99, name: "Pinned" }, realm, true)
+      resolvedCreateParentFolderIdFrom(
+        folderPageClientStub(99, "Pinned"),
+        realm,
+        true
+      )
     ).toBe(99)
   })
 
   it("resolvedCreateParentFolderFrom returns the sidebar-selected folder object when set", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
-    expect(
-      resolvedCreateParentFolderFrom({ id: 99, name: "Pinned" }, realm, true)
-    ).toEqual({ id: 99, name: "Pinned" })
+    const pinned = folderPageClientStub(99, "Pinned")
+    expect(resolvedCreateParentFolderFrom(pinned, realm, true)).toEqual(pinned)
   })
 
   it("resolvedCreateParentFolderFrom returns the realm leaf folder when none selected", () => {
@@ -51,7 +70,7 @@ describe("useNoteSidebarTree create context", () => {
       .please()
     expect(
       createParentLocationDescriptionFrom(
-        { id: 2, name: "My folder" },
+        folderPageClientStub(2, "My folder"),
         realm,
         true
       )
@@ -77,11 +96,12 @@ describe("useNoteSidebarTree create context", () => {
 
   it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {
     const realm = makeMe.aNoteRealm.inFolder(8, "Lab").please()
-    const activeFolder = ref<{ id: number; name: string } | null>(null)
+    const activeFolder = ref<FolderPageClientView | null>(null)
     const activeNoteRealm = ref<NoteRealm | undefined>(realm)
     const noteContextResolved = ref(true)
     const {
       resolvedCreateParentFolder,
+      resolvedCreateParentFolderRow,
       resolvedCreateParentFolderId,
       createParentLocationDescription,
     } = useNotebookRootCreateTarget(
@@ -110,7 +130,12 @@ describe("useNoteSidebarTree create context", () => {
         noteContextResolved.value
       )
     )
-    activeFolder.value = { id: 9, name: "Pinned" }
+    expect(resolvedCreateParentFolderRow.value).toEqual(
+      realm.ancestorFolders!.at(-1)!
+    )
+    const pinned = folderPageClientStub(9, "Pinned")
+    activeFolder.value = pinned
+    expect(resolvedCreateParentFolderRow.value).toEqual(pinned.folder)
     expect(resolvedCreateParentFolderId.value).toBe(9)
     expect(createParentLocationDescription.value).toBe(
       'Adds to folder "Pinned".'

@@ -1,8 +1,12 @@
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  FolderPageClientView,
+  NoteRealm,
+} from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type InjectionKey, type Ref } from "vue"
 
-/** Folder the user explicitly selected in the sidebar tree (new note / new folder scope). */
-export type SidebarActiveFolder = { id: number; name: string }
+/** Resolved parent folder for create-note / new-folder (sidebar folder page, else realm leaf). */
+export type ResolvedCreateParentFolder = FolderPageClientView | Folder
 
 /** Leaf folder for placement UI: last segment of `ancestorFolders` (notebook root when absent). */
 export function realmLeafFolder(realm: NoteRealm | undefined) {
@@ -12,10 +16,10 @@ export function realmLeafFolder(realm: NoteRealm | undefined) {
 }
 
 export function resolvedCreateParentFolderFrom(
-  activeFolder: SidebarActiveFolder | null,
+  activeFolder: FolderPageClientView | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
-): SidebarActiveFolder | null {
+): ResolvedCreateParentFolder | null {
   if (activeFolder != null) return activeFolder
   const leaf = realmLeafFolder(activeNoteRealm)
   if (leaf != null && noteContextResolved) {
@@ -24,27 +28,43 @@ export function resolvedCreateParentFolderFrom(
   return null
 }
 
+/** Folder row for forms that only accept {@link Folder} (not full folder page payload). */
+function folderFromResolvedCreateParent(
+  v: ResolvedCreateParentFolder | null | undefined
+): Folder | undefined {
+  if (v == null) return
+  return "folder" in v ? v.folder : v
+}
+
+export function resolvedFolderIdFromPageOrFolder(
+  v: ResolvedCreateParentFolder | null
+): number | null {
+  return folderFromResolvedCreateParent(v)?.id ?? null
+}
+
 export function resolvedCreateParentFolderIdFrom(
-  activeFolder: SidebarActiveFolder | null,
+  activeFolder: FolderPageClientView | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): number | null {
   return (
-    resolvedCreateParentFolderFrom(
-      activeFolder,
-      activeNoteRealm,
-      noteContextResolved
-    )?.id ?? null
+    resolvedFolderIdFromPageOrFolder(
+      resolvedCreateParentFolderFrom(
+        activeFolder,
+        activeNoteRealm,
+        noteContextResolved
+      )
+    ) ?? null
   )
 }
 
 export function createParentLocationDescriptionFrom(
-  activeFolder: SidebarActiveFolder | null,
+  activeFolder: FolderPageClientView | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): string {
   if (activeFolder != null) {
-    return `Adds to folder "${activeFolder.name}".`
+    return `Adds to folder "${activeFolder.folder.name}".`
   }
   if (!noteContextResolved) return "Adds to the notebook root."
   const leaf = realmLeafFolder(activeNoteRealm)
@@ -54,11 +74,13 @@ export function createParentLocationDescriptionFrom(
 }
 
 export function useNotebookRootCreateTarget(
-  activeFolder: Ref<SidebarActiveFolder | null>,
+  activeFolder: Ref<FolderPageClientView | null>,
   activeNoteRealm: Ref<NoteRealm | undefined>,
   noteContextResolved: Ref<boolean>
 ): {
-  resolvedCreateParentFolder: ComputedRef<SidebarActiveFolder | null>
+  resolvedCreateParentFolder: ComputedRef<ResolvedCreateParentFolder | null>
+  /** Same scope as {@link resolvedCreateParentFolder}, normalized to a {@link Folder} row for forms. */
+  resolvedCreateParentFolderRow: ComputedRef<Folder | null>
   resolvedCreateParentFolderId: ComputedRef<number | null>
   createParentLocationDescription: ComputedRef<string>
 } {
@@ -69,8 +91,16 @@ export function useNotebookRootCreateTarget(
       noteContextResolved.value
     )
   )
-  const resolvedCreateParentFolderId = computed(
-    () => resolvedCreateParentFolder.value?.id ?? null
+  const resolvedCreateParentFolderRow = computed(
+    (): Folder | null =>
+      folderFromResolvedCreateParent(resolvedCreateParentFolder.value) ?? null
+  )
+  const resolvedCreateParentFolderId = computed(() =>
+    resolvedCreateParentFolderIdFrom(
+      activeFolder.value,
+      activeNoteRealm.value,
+      noteContextResolved.value
+    )
   )
   const createParentLocationDescription = computed(() =>
     createParentLocationDescriptionFrom(
@@ -81,6 +111,7 @@ export function useNotebookRootCreateTarget(
   )
   return {
     resolvedCreateParentFolder,
+    resolvedCreateParentFolderRow,
     resolvedCreateParentFolderId,
     createParentLocationDescription,
   }
@@ -89,7 +120,7 @@ export function useNotebookRootCreateTarget(
 export interface SidebarTreeContext {
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolder: Ref<SidebarActiveFolder | null>
+  activeFolder: Ref<FolderPageClientView | null>
 }
 
 export const sidebarTreeKey: InjectionKey<SidebarTreeContext> =

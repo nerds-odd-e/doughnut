@@ -71,7 +71,6 @@ import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import usePopups from "@/components/commons/Popups/usePopups"
-import type { SidebarActiveFolder } from "./useNoteSidebarTree"
 
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
@@ -81,7 +80,7 @@ const props = withDefaults(
   defineProps<{
     notebookRootNotebookId: number
     /** Initial folder scope for create-note (sidebar selection or active note folder). User can change via FolderSelector. */
-    initialFolder?: SidebarActiveFolder
+    initialFolder?: Folder
     parentLocationDescription?: string
     initialTitle?: string
     /**

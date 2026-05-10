@@ -8,6 +8,7 @@
       :notebook-id="notebookId"
       :note="activeNoteRealm?.note"
       :resolved-create-parent-folder="resolvedCreateParentFolder"
+      :resolved-create-parent-folder-row="resolvedCreateParentFolderRow"
       :create-parent-location-description="createParentLocationDescription"
       :active-folder="notebookSidebarActiveFolder"
       :ancestor-folders="activeNoteRealm?.ancestorFolders ?? []"
@@ -100,12 +101,15 @@ const noteContextResolved = computed(() => activeNoteTopology.value != null)
 
 const activeNoteRealmRef = computed(() => props.activeNoteRealm)
 
-const { resolvedCreateParentFolder, createParentLocationDescription } =
-  useNotebookRootCreateTarget(
-    notebookSidebarActiveFolder,
-    activeNoteRealmRef,
-    noteContextResolved
-  )
+const {
+  resolvedCreateParentFolder,
+  resolvedCreateParentFolderRow,
+  createParentLocationDescription,
+} = useNotebookRootCreateTarget(
+  notebookSidebarActiveFolder,
+  activeNoteRealmRef,
+  noteContextResolved
+)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(

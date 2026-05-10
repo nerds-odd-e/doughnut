@@ -9,7 +9,7 @@
       <div class="daisy-btn-group daisy-btn-group-sm daisy-overflow-visible">
         <NotebookRootNoteNewButton
           :notebook-id="notebookId"
-          :initial-folder="resolvedCreateParentFolder ?? undefined"
+          :initial-folder="resolvedCreateParentFolderRow ?? undefined"
           :parent-location-description="createParentLocationDescription"
           :title-search-anchor-note="note"
           :ancestor-folders="ancestorFolders"
@@ -21,8 +21,12 @@
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="ancestorFolders"
-          :context-folder-id="resolvedCreateParentFolder?.id ?? null"
-          :initial-parent-folder-id="resolvedCreateParentFolder?.id ?? null"
+          :context-folder-id="
+            resolvedFolderIdFromPageOrFolder(resolvedCreateParentFolder)
+          "
+          :initial-parent-folder-id="
+            resolvedFolderIdFromPageOrFolder(resolvedCreateParentFolder)
+          "
           button-title="New folder"
           aria-label="New folder"
         >
@@ -31,8 +35,8 @@
         <FolderOrganizeButton
           v-if="activeFolder != null"
           :notebook-id="notebookId"
-          :moving-folder-id="activeFolder.id"
-          :moving-folder-name="activeFolder.name"
+          :moving-folder-id="activeFolder.folder.id"
+          :moving-folder-name="activeFolder.folder.name"
           :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
@@ -83,7 +87,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder, Note } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  FolderPageClientView,
+  Note,
+} from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
   useNoteSidebarPeerSort,
@@ -100,16 +108,21 @@ import FolderNewButton from "./core/FolderNewButton.vue"
 import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
-import type { SidebarActiveFolder } from "./useNoteSidebarTree"
+import {
+  resolvedFolderIdFromPageOrFolder,
+  type ResolvedCreateParentFolder,
+} from "./useNoteSidebarTree"
 
 defineProps<{
   notebookId: number
   note?: Note
   /** Parent folder for new note / new folder (sidebar selection, else active note's folder). */
-  resolvedCreateParentFolder: SidebarActiveFolder | null
+  resolvedCreateParentFolder: ResolvedCreateParentFolder | null
+  /** Same scope as {@link resolvedCreateParentFolder}, as a {@link Folder} row for {@link NoteNewForm}. */
+  resolvedCreateParentFolderRow: Folder | null
   createParentLocationDescription: string
   /** Folder selected in the tree (organize); independent of create parent when viewing a note. */
-  activeFolder: SidebarActiveFolder | null
+  activeFolder: FolderPageClientView | null
   /** Root-to-leaf ancestor chain from NoteRealm, passed to folder organise dialog. */
   ancestorFolders: Folder[]
 }>()

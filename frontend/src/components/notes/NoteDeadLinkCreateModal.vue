@@ -3,7 +3,7 @@
     <template #body>
       <NoteNewForm
         :notebook-root-notebook-id="notebookId"
-        :initial-folder="resolvedCreateParentFolder ?? undefined"
+        :initial-folder="resolvedCreateParentFolderRow ?? undefined"
         :parent-location-description="createParentLocationDescription"
         :initial-title="modelValue"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
@@ -34,7 +34,7 @@ const noteContextResolved = computed(
   () => props.noteRealm.note?.noteTopology != null
 )
 
-const { resolvedCreateParentFolder, createParentLocationDescription } =
+const { resolvedCreateParentFolderRow, createParentLocationDescription } =
   useNotebookRootCreateTarget(
     notebookSidebarActiveFolder,
     activeNoteRealmRef,

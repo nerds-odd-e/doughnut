@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
@@ -100,11 +101,14 @@ watch(
     [
       activePathFolderIds.value,
       folderId.value,
-      activeFolder?.value?.id ?? null,
+      activeFolder?.value?.folder.id ?? null,
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (activeFolder != null && activeFolder.value?.id === folderId.value) {
+    if (
+      activeFolder != null &&
+      activeFolder.value?.folder.id === folderId.value
+    ) {
       return
     }
     if (activePathFolderIds.value.has(folderId.value)) {
@@ -126,7 +130,7 @@ const isUserActiveFolder = computed(
   () =>
     activeFolder != null &&
     folderId.value != null &&
-    activeFolder.value?.id === folderId.value
+    activeFolder.value?.folder.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -151,7 +155,7 @@ function onFolderRowFocusOut(event: FocusEvent) {
   if (
     activeFolder == null ||
     folderId.value == null ||
-    activeFolder.value?.id !== folderId.value
+    activeFolder.value?.folder.id !== folderId.value
   ) {
     return
   }
@@ -171,12 +175,21 @@ function onFolderRowFocusOut(event: FocusEvent) {
   activeFolder.value = null
 }
 
-function setUserActiveFolderOnly() {
+async function navigateToFolderPage() {
   if (folderId.value == null) return
-  activeFolder.value = {
-    id: folderId.value,
-    name: props.folder.name,
+  const { data: page, error } = await NotebookController.getFolderPage({
+    path: { notebook: props.notebookId, folder: folderId.value },
+  })
+  if (!error && page) {
+    activeFolder.value = page
   }
+  await router.push({
+    name: "folderPage",
+    params: {
+      notebookId: String(props.notebookId),
+      folderId: String(folderId.value),
+    },
+  })
 }
 
 function toggleExpand() {
@@ -188,18 +201,6 @@ function toggleExpand() {
     next.add(folderId.value)
   }
   expandedFolderIds.value = next
-}
-
-function navigateToFolderPage() {
-  if (folderId.value == null) return
-  setUserActiveFolderOnly()
-  router.push({
-    name: "folderPage",
-    params: {
-      notebookId: String(props.notebookId),
-      folderId: String(folderId.value),
-    },
-  })
 }
 
 function onLabelAreaClick() {
