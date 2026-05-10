@@ -148,9 +148,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteTopology.setId(getId());
     noteTopology.setTitle(getTitle() != null ? getTitle() : "");
     Objects.requireNonNull(getNotebook());
-    if (getFolder() != null) {
-      noteTopology.setFolderId(getFolder().getId());
-    }
     noteTopology.setCreatedAt(getCreatedAt());
     noteTopology.setUpdatedAt(getUpdatedAt());
     return noteTopology;

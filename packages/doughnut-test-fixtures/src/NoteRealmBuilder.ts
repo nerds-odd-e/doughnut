@@ -73,13 +73,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
-  folder(folderId: number): NoteRealmBuilder {
-    this.noteBuilder.folder(folderId)
-    return this
-  }
-
   inFolder(folderId: number, folderName: string): NoteRealmBuilder {
-    this.noteBuilder.folder(folderId)
     this.data.ancestorFolders = [folderStub(folderId, folderName)]
     return this
   }
@@ -108,11 +102,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       nb.name = this.data.note.noteTopology.title
     }
     this.data.wikiTitles ??= []
-    const ancestors = this.data.ancestorFolders ?? []
-    if (ancestors.length > 0) {
-      const last = ancestors[ancestors.length - 1]!
-      this.data.note.noteTopology.folderId = last.id
-    }
     return this.data
   }
 }

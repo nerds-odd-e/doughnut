@@ -65,22 +65,6 @@ describe("useNoteSidebarTree create context", () => {
     )
   })
 
-  it("createParentLocationDescriptionFrom ignores topology folderId when ancestorFolders is empty", () => {
-    const r = makeMe.aNoteRealm.please()
-    const realm = {
-      ...r,
-      ancestorFolders: [],
-      note: {
-        ...r.note,
-        noteTopology: { ...r.note.noteTopology, folderId: 404 },
-      },
-    } as NoteRealm
-    expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(
-      "Adds to the notebook root."
-    )
-    expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(null)
-  })
-
   it("createParentLocationDescriptionFrom describes notebook root when appropriate", () => {
     const realm = makeMe.aNoteRealm.please()
     expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(

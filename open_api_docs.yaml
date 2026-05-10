@@ -3291,9 +3291,6 @@ components:
         title:
           type: string
           minLength: 1
-        folderId:
-          type: integer
-          format: int32
         createdAt:
           type: string
           format: date-time

@@ -13,9 +13,6 @@ public class NoteTopology {
 
   @NotBlank private String title;
 
-  /** Present when the note is assigned to a folder (folder-first containment). */
-  private Integer folderId;
-
   private Timestamp createdAt;
 
   private Timestamp updatedAt;
