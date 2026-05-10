@@ -33,10 +33,10 @@
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
         <FolderOrganizeButton
-          v-if="notebookSidebarActiveFolder != null"
+          v-if="activeFolderRealmRef != null"
           :notebook-id="notebookId"
-          :moving-folder-id="notebookSidebarActiveFolder.folder.id"
-          :moving-folder-name="notebookSidebarActiveFolder.folder.name"
+          :moving-folder-id="activeFolderRealmRef.folder.id"
+          :moving-folder-name="activeFolderRealmRef.folder.name"
           :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
@@ -87,8 +87,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder, NoteRealm } from "@generated/doughnut-backend-api"
-import { notebookSidebarActiveFolder } from "@/composables/useCurrentNoteSidebarState"
+import type {
+  Folder,
+  FolderRealm,
+  NoteRealm,
+} from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
   useNoteSidebarPeerSort,
@@ -113,9 +116,11 @@ import {
 const props = defineProps<{
   notebookId: number
   activeNoteRealm?: NoteRealm
+  activeFolderRealm?: FolderRealm | null
 }>()
 
 const activeNoteRealmRef = computed(() => props.activeNoteRealm)
+const activeFolderRealmRef = computed(() => props.activeFolderRealm ?? null)
 const noteContextResolved = computed(
   () => props.activeNoteRealm?.note?.noteTopology != null
 )
@@ -125,7 +130,7 @@ const {
   resolvedCreateParentFolderRow,
   createParentLocationDescription,
 } = useNotebookRootCreateTarget(
-  notebookSidebarActiveFolder,
+  activeFolderRealmRef,
   activeNoteRealmRef,
   noteContextResolved
 )
@@ -134,8 +139,8 @@ const ancestorFolders = computed((): Folder[] => {
   if (props.activeNoteRealm != null) {
     return props.activeNoteRealm.ancestorFolders ?? []
   }
-  if (notebookSidebarActiveFolder.value != null) {
-    return notebookSidebarActiveFolder.value.ancestorFolders ?? []
+  if (props.activeFolderRealm != null) {
+    return props.activeFolderRealm.ancestorFolders ?? []
   }
   return []
 })

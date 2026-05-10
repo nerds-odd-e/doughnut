@@ -7,6 +7,7 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
+      :active-folder-realm="notebookSidebarActiveFolder"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
