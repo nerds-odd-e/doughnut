@@ -9,7 +9,7 @@
       <div class="daisy-btn-group daisy-btn-group-sm daisy-overflow-visible">
         <NotebookRootNoteNewButton
           :notebook-id="notebookId"
-          :initial-folder="resolvedCreateParentFolder ?? undefined"
+          :initial-folder="parentFolderForCreation ?? undefined"
           :parent-location-description="createParentLocationDescription"
           :title-search-anchor-note="anchorNote"
           :ancestor-folders="ancestorFolders"
@@ -21,8 +21,7 @@
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="ancestorFolders"
-          :context-folder-id="resolvedCreateParentFolder?.id ?? null"
-          :initial-parent-folder-id="resolvedCreateParentFolder?.id ?? null"
+          :context-folder-id="parentFolderForCreation?.id ?? null"
           button-title="New folder"
           aria-label="New folder"
         >
@@ -116,7 +115,7 @@ const noteContextResolved = computed(
   () => props.activeNoteRealm?.note?.noteTopology != null
 )
 
-const resolvedCreateParentFolder = computed((): Folder | null => {
+const parentFolderForCreation = computed((): Folder | null => {
   const activeFolder = props.activeFolderRealm ?? null
   const activeNoteRealm = props.activeNoteRealm
   const resolved = noteContextResolved.value

@@ -34,7 +34,6 @@ describe("FolderNewForm", () => {
         notebookId: 301,
         ancestorFolders: [],
         contextFolderId: null,
-        initialParentFolderId: null,
       })
       .mount({ attachTo: document.body })
 
@@ -64,7 +63,6 @@ describe("FolderNewForm", () => {
         notebookId: 301,
         ancestorFolders: [],
         contextFolderId: null,
-        initialParentFolderId: null,
       })
       .mount({ attachTo: document.body })
 

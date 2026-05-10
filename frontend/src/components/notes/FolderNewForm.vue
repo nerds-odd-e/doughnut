@@ -51,7 +51,6 @@ const props = defineProps<{
   notebookId: number
   ancestorFolders: Folder[]
   contextFolderId: number | null
-  initialParentFolderId: number | null
 }>()
 
 const emit = defineEmits<{
@@ -67,7 +66,7 @@ const processing = ref(false)
 const selectedParentFolderId = ref<number | null>(null)
 
 watch(
-  () => props.initialParentFolderId,
+  () => props.contextFolderId,
   (v) => {
     selectedParentFolderId.value = v
   },

@@ -8,7 +8,6 @@
         :notebook-id="notebookId"
         :ancestor-folders="ancestorFolders"
         :context-folder-id="contextFolderId"
-        :initial-parent-folder-id="initialParentFolderId"
         @close-dialog="closer"
       />
     </template>
@@ -24,7 +23,6 @@ defineProps<{
   notebookId: number
   ancestorFolders: Folder[]
   contextFolderId: number | null
-  initialParentFolderId: number | null
   buttonTitle: string
   ariaLabel?: string
 }>()
