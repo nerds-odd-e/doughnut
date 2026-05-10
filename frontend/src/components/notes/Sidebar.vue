@@ -3,7 +3,7 @@
     data-note-sidebar-root
     class="daisy-flex daisy-flex-col daisy-flex-1 daisy-min-h-0 daisy-overflow-x-visible"
   >
-    <NoteSidebarToolbar
+    <SidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
@@ -29,7 +29,7 @@
 import type { PropType, Ref } from "vue"
 import { computed, inject, provide, ref, watch } from "vue"
 import type { NoteRealm, User } from "@generated/doughnut-backend-api"
-import NoteSidebarToolbar from "./NoteSidebarToolbar.vue"
+import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import {
   sidebarTreeKey,
