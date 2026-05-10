@@ -10,7 +10,7 @@
       :active-note-topology-resolved="noteContextResolved"
       :resolved-create-parent-folder-id="resolvedCreateParentFolderId"
       :create-parent-location-description="createParentLocationDescription"
-      :user-active-folder="userActiveFolder"
+      :user-active-folder="notebookSidebarUserActiveFolder"
       :ancestor-folders="activeNoteRealm?.ancestorFolders ?? []"
     />
     <div
@@ -35,11 +35,11 @@ import SidebarInner from "./SidebarInner.vue"
 import {
   sidebarTreeKey,
   useNotebookRootCreateTarget,
-  type SidebarUserActiveFolder,
 } from "./useNoteSidebarTree"
 import {
   notebookSidebarNotebookClientView,
   notebookSidebarUserActiveFolder,
+  folderPageBreadcrumbFolders,
 } from "@/composables/useCurrentNoteSidebarState"
 
 const props = defineProps({
@@ -53,7 +53,6 @@ const props = defineProps({
 })
 
 const expandedFolderIds = ref<Set<number>>(new Set())
-const userActiveFolder = ref<SidebarUserActiveFolder | null>(null)
 
 function ensureFolderExpanded(folderId: number | undefined) {
   if (folderId == null) return
@@ -61,35 +60,20 @@ function ensureFolderExpanded(folderId: number | undefined) {
   expandedFolderIds.value = new Set([...expandedFolderIds.value, folderId])
 }
 
-function toggleFolderId(folderId: number) {
-  const next = new Set(expandedFolderIds.value)
-  if (next.has(folderId)) {
-    next.delete(folderId)
-  } else {
-    next.add(folderId)
-  }
-  expandedFolderIds.value = next
-}
-
 const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
 
-const activeNoteFolderIds = computed(() => {
+const activePathFolderIds = computed(() => {
   const ids = new Set<number>()
-  const fid = activeNoteTopology.value?.folderId
-  if (fid != null) {
-    ids.add(fid)
-  }
-  return ids
-})
-
-const ancestorFolderIds = computed(() => {
-  const ids = new Set<number>()
-  for (const seg of props.activeNoteRealm?.ancestorFolders ?? []) {
-    if (seg.id != null) {
-      ids.add(seg.id)
+  if (notebookSidebarUserActiveFolder.value != null) {
+    for (const seg of folderPageBreadcrumbFolders.value) {
+      if (seg.id != null) ids.add(seg.id)
     }
+    return ids
+  }
+  for (const seg of props.activeNoteRealm?.ancestorFolders ?? []) {
+    if (seg.id != null) ids.add(seg.id)
   }
   const fid = activeNoteTopology.value?.folderId
   if (fid != null) ids.add(fid)
@@ -98,10 +82,8 @@ const ancestorFolderIds = computed(() => {
 
 provide(sidebarTreeKey, {
   expandedFolderIds,
-  toggleFolder: toggleFolderId,
-  ancestorFolderIds,
-  activeNoteFolderIds,
-  userActiveFolder,
+  activePathFolderIds,
+  userActiveFolder: notebookSidebarUserActiveFolder,
 })
 
 watch(
@@ -117,7 +99,7 @@ watch(
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderIds.value = new Set()
-      userActiveFolder.value = null
+      notebookSidebarUserActiveFolder.value = null
     }
   }
 )
@@ -137,18 +119,10 @@ const activeNoteRealmRef = computed(() => props.activeNoteRealm)
 
 const { resolvedCreateParentFolderId, createParentLocationDescription } =
   useNotebookRootCreateTarget(
-    userActiveFolder,
+    notebookSidebarUserActiveFolder,
     activeNoteRealmRef,
     noteContextResolved
   )
-
-watch(
-  userActiveFolder,
-  (v) => {
-    notebookSidebarUserActiveFolder.value = v
-  },
-  { deep: true, immediate: true }
-)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(

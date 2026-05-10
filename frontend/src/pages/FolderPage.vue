@@ -45,7 +45,6 @@ import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReado
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
-  currentActiveNoteId,
   currentNotebookId,
   folderPageBreadcrumbFolders,
   folderSidebarFolderPageClientView,
@@ -129,7 +128,6 @@ watch(
     if (key === undefined) {
       sidebarAnchorNoteId.value = undefined
       indexNoteStatus.value = "pending"
-      currentActiveNoteId.value = undefined
       return
     }
 
@@ -152,14 +150,6 @@ watch(
       if (gen !== indexResolveGeneration) return
       indexNoteStatus.value = "absent"
     }
-  },
-  { immediate: true }
-)
-
-watch(
-  sidebarAnchorNoteId,
-  (id) => {
-    currentActiveNoteId.value = id
   },
   { immediate: true }
 )

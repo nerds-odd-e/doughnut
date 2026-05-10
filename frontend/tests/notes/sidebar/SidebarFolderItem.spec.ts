@@ -10,6 +10,9 @@ function mountFolderItem(
   options: {
     folderId: number
     notebookId: number
+    userActiveFolder?: ReturnType<
+      typeof ref<{ id: number; name: string } | null>
+    >
   }
 ) {
   const folder = {
@@ -19,7 +22,7 @@ function mountFolderItem(
     updatedAt: "2020-01-01T00:00:00Z",
   }
   const expandedFolderIds = ref(new Set<number>())
-  const userActiveFolder = ref(null)
+  const userActiveFolder = options.userActiveFolder ?? ref(null)
   return mount(SidebarFolderItem, {
     props: {
       folder,
@@ -30,9 +33,7 @@ function mountFolderItem(
       provide: {
         [sidebarTreeKey]: {
           expandedFolderIds,
-          toggleFolder: vi.fn(),
-          ancestorFolderIds: computed(() => new Set()),
-          activeNoteFolderIds: computed(() => new Set()),
+          activePathFolderIds: computed(() => new Set()),
           userActiveFolder,
         },
       },
@@ -72,7 +73,7 @@ describe("SidebarFolderItem", () => {
     expect(link.text()).toContain("Alpha")
   })
 
-  it("scrolls folder row into view on folderPage when row is not intersecting", async () => {
+  it("scrolls folder row into view when user-active and row is not intersecting", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
     globalThis.IntersectionObserver = class {
       constructor(private readonly cb: IntersectionObserverCallback) {}
@@ -92,8 +93,9 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    mountFolderItem(router, { folderId: 42, notebookId: 7 })
-    await router.push("/d/notebooks/7/folders/42")
+    const userActiveFolder = ref<{ id: number; name: string } | null>(null)
+    mountFolderItem(router, { folderId: 42, notebookId: 7, userActiveFolder })
+    userActiveFolder.value = { id: 42, name: "Alpha" }
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
@@ -101,7 +103,7 @@ describe("SidebarFolderItem", () => {
     expect(scrollSpy).toHaveBeenCalled()
   })
 
-  it("does not scroll folder row when already intersecting on folderPage", async () => {
+  it("does not scroll folder row when user-active but already intersecting", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
     globalThis.IntersectionObserver = class {
       constructor(private readonly cb: IntersectionObserverCallback) {}
@@ -121,8 +123,9 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    mountFolderItem(router, { folderId: 42, notebookId: 7 })
-    await router.push("/d/notebooks/7/folders/42")
+    const userActiveFolder = ref<{ id: number; name: string } | null>(null)
+    mountFolderItem(router, { folderId: 42, notebookId: 7, userActiveFolder })
+    userActiveFolder.value = { id: 42, name: "Alpha" }
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()

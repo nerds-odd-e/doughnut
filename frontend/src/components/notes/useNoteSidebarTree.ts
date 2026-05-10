@@ -69,9 +69,7 @@ export function useNotebookRootCreateTarget(
 
 export interface SidebarTreeContext {
   expandedFolderIds: Ref<Set<number>>
-  toggleFolder: (id: number) => void
-  ancestorFolderIds: ComputedRef<Set<number>>
-  activeNoteFolderIds: ComputedRef<Set<number>>
+  activePathFolderIds: ComputedRef<Set<number>>
   userActiveFolder: Ref<SidebarUserActiveFolder | null>
 }
 

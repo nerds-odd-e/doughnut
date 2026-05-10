@@ -1,4 +1,7 @@
-import { notebookSidebarNotebookClientView } from "@/composables/useCurrentNoteSidebarState"
+import {
+  notebookSidebarNotebookClientView,
+  notebookSidebarUserActiveFolder,
+} from "@/composables/useCurrentNoteSidebarState"
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import createNoteStorage from "@/store/createNoteStorage"
@@ -310,6 +313,7 @@ export function teardownSidebarComponentTest(
   wrapper: VueWrapper<unknown> | undefined
 ) {
   notebookSidebarNotebookClientView.value = undefined
+  notebookSidebarUserActiveFolder.value = null
   wrapper?.unmount()
   document.body.innerHTML = ""
   vi.restoreAllMocks()

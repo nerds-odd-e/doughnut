@@ -8,18 +8,18 @@
     :aria-expanded="isExpanded"
     :aria-label="folder.name"
     :class="{
-      'active-item': isNotePathFolder,
+      'active-item': isOnActivePath,
       'sidebar-folder-user-active': isUserActiveFolder,
     }"
     @focusout="onFolderRowFocusOut"
   >
-    <ScrollTo v-if="isFolderPageForThisFolder" />
+    <ScrollTo v-if="isUserActiveFolder" />
     <div class="folder-row">
       <button
         class="chevron-btn"
         aria-label="expand children"
         tabindex="-1"
-        @click.stop="toggleExpand"
+        @click.stop="onChevronClick"
       >
         <ChevronRight
           :size="14"
@@ -69,7 +69,7 @@ import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue"
-import { useRoute } from "vue-router"
+import { useRouter } from "vue-router"
 
 const props = defineProps<{
   folder: Folder
@@ -81,15 +81,9 @@ const props = defineProps<{
 const currentLevel = computed(() => props.level ?? 1)
 
 const tree = inject(sidebarTreeKey)!
-const {
-  expandedFolderIds,
-  toggleFolder: toggleFolderId,
-  ancestorFolderIds,
-  activeNoteFolderIds,
-  userActiveFolder,
-} = tree
+const { expandedFolderIds, activePathFolderIds, userActiveFolder } = tree
 
-const route = useRoute()
+const router = useRouter()
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
@@ -102,10 +96,10 @@ function ensureFolderExpandedById(id: number | undefined) {
 }
 
 watch(
-  () => [ancestorFolderIds.value, folderId.value] as const,
+  () => [activePathFolderIds.value, folderId.value] as const,
   () => {
     if (folderId.value == null) return
-    if (ancestorFolderIds.value.has(folderId.value)) {
+    if (activePathFolderIds.value.has(folderId.value)) {
       ensureFolderExpandedById(folderId.value)
     }
   },
@@ -116,26 +110,15 @@ const isExpanded = computed(
   () => folderId.value != null && expandedFolderIds.value.has(folderId.value)
 )
 
-const isNotePathFolder = computed(
-  () =>
-    folderId.value != null &&
-    (activeNoteFolderIds.value.has(folderId.value) ||
-      ancestorFolderIds.value.has(folderId.value))
-)
-
-const isFolderPageForThisFolder = computed(
-  () =>
-    route.name === "folderPage" &&
-    Number(route.params.notebookId) === props.notebookId &&
-    Number(route.params.folderId) === folderId.value
+const isOnActivePath = computed(
+  () => folderId.value != null && activePathFolderIds.value.has(folderId.value)
 )
 
 const isUserActiveFolder = computed(
   () =>
-    (userActiveFolder != null &&
-      folderId.value != null &&
-      userActiveFolder.value?.id === folderId.value) ||
-    isFolderPageForThisFolder.value
+    userActiveFolder != null &&
+    folderId.value != null &&
+    userActiveFolder.value?.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -193,10 +176,16 @@ function onFolderLabelAreaClick() {
   ensureFolderExpandedById(folderId.value)
 }
 
-function toggleExpand() {
+function onChevronClick() {
   if (folderId.value == null) return
   setUserActiveFolderOnly()
-  toggleFolderId(folderId.value)
+  router.push({
+    name: "folderPage",
+    params: {
+      notebookId: String(props.notebookId),
+      folderId: String(folderId.value),
+    },
+  })
 }
 </script>
 
