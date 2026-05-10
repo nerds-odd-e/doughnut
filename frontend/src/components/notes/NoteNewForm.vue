@@ -122,13 +122,9 @@ const folderSelectorLabel = computed((): string | undefined => {
 })
 
 /** Context folder for FolderSelector quick picks; null at notebook root. */
-const folderSelectorContextFolderId = computed((): number | null => {
-  const fromTarget = selectedFolderId.value ?? props.initialFolder?.id ?? null
-  if (fromTarget != null) return fromTarget
-  const anchorFolder = props.titleSearchAnchorNote?.noteTopology.folderId
-  if (anchorFolder != null) return anchorFolder
-  return null
-})
+const folderSelectorContextFolderId = computed(
+  (): number | null => selectedFolderId.value ?? props.initialFolder?.id ?? null
+)
 
 // Emits
 const emit = defineEmits<{
