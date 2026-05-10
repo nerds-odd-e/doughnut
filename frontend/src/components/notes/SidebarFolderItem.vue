@@ -17,9 +17,9 @@
     <div class="folder-row" @click="onFolderRowClick">
       <button
         class="chevron-btn"
-        aria-label="Open folder page"
+        aria-label="expand children"
         tabindex="-1"
-        @click.stop="navigateToFolderPage"
+        @click.stop="toggleExpand"
       >
         <ChevronRight
           :size="14"
@@ -28,7 +28,7 @@
           aria-hidden="true"
         />
       </button>
-      <div class="folder-label-area">
+      <div class="folder-label-area" @click.stop="onLabelAreaClick">
         <router-link
           class="sidebar-folder-label"
           data-testid="sidebar-folder-open-page-link"
@@ -182,6 +182,17 @@ function setUserActiveFolderOnly() {
   }
 }
 
+function toggleExpand() {
+  if (folderId.value == null) return
+  const next = new Set(expandedFolderIds.value)
+  if (next.has(folderId.value)) {
+    next.delete(folderId.value)
+  } else {
+    next.add(folderId.value)
+  }
+  expandedFolderIds.value = next
+}
+
 function navigateToFolderPage() {
   if (folderId.value == null) return
   setUserActiveFolderOnly()
@@ -194,13 +205,12 @@ function navigateToFolderPage() {
   })
 }
 
-function onFolderRowClick(e: MouseEvent) {
-  const target = e.target as Element | null
-  if (target?.closest(".chevron-btn")) return
-  if (target?.closest('[data-testid="sidebar-folder-open-page-link"]')) {
-    setUserActiveFolderOnly()
-    return
-  }
+function onLabelAreaClick() {
+  toggleExpand()
+  navigateToFolderPage()
+}
+
+function onFolderRowClick() {
   navigateToFolderPage()
 }
 </script>

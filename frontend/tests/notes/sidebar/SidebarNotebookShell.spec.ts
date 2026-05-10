@@ -38,7 +38,7 @@ describe("Sidebar notebook shell", () => {
       fixtures.topNoteRealm.notebookView.notebook.id
     )
     await flushPromises()
-    expect(wrapper.find('button[aria-label="Open folder page"]').exists()).toBe(
+    expect(wrapper.find('button[aria-label="expand children"]').exists()).toBe(
       true
     )
   })
