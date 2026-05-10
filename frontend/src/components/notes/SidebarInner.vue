@@ -51,7 +51,7 @@ function rowKey(row: SidebarStructuralRow): string {
 
 interface Props {
   notebookId: number
-  /** When omitted (e.g. notebook overview with no `index` note), root notes still render without selection */
+  /** When omitted (e.g. notebook overview with no `index` note), root notes still render without an active note in the tree */
   activeNoteTopology?: NoteTopology
   /** When set, list notes inside this folder. When omitted, list notebook root notes. */
   folderId?: number

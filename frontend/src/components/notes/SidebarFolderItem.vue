@@ -9,11 +9,11 @@
     :aria-label="folder.name"
     :class="{
       'active-item': isOnActivePath,
-      'sidebar-folder-user-active': isUserActiveFolder,
+      'sidebar-folder-active': isActiveFolderRow,
     }"
     @focusout="onFolderRowFocusOut"
   >
-    <ScrollTo v-if="isUserActiveFolder" />
+    <ScrollTo v-if="isActiveFolderRow" />
     <div class="folder-row" @click="onFolderRowClick">
       <button
         class="chevron-btn"
@@ -88,8 +88,8 @@ const currentLevel = computed(() => props.level ?? 1)
 const tree = inject(sidebarTreeKey)!
 const { expandedFolderIds, activePathFolderIds, activeFolder } = tree
 
-/** Folder page realm, or minimal `{ id }` used by tests for user-active folder selection. */
-function selectedFolderIdFromSidebarActive(
+/** Resolves folder id from a {@link FolderRealm} or minimal `{ id }` (tests). */
+function folderIdFromActiveFolderRealm(
   v: FolderRealm | { id: number } | null | undefined
 ): number | null {
   if (v == null) return null
@@ -98,10 +98,10 @@ function selectedFolderIdFromSidebarActive(
   return null
 }
 
-const activeFolderSelectedId = computed(() =>
+const sidebarActiveFolderId = computed(() =>
   activeFolder == null
     ? null
-    : selectedFolderIdFromSidebarActive(activeFolder.value)
+    : folderIdFromActiveFolderRealm(activeFolder.value)
 )
 
 const router = useRouter()
@@ -121,13 +121,13 @@ watch(
     [
       activePathFolderIds.value,
       folderId.value,
-      activeFolderSelectedId.value,
+      sidebarActiveFolderId.value,
     ] as const,
   () => {
     if (folderId.value == null) return
     if (
       activeFolder != null &&
-      activeFolderSelectedId.value === folderId.value
+      sidebarActiveFolderId.value === folderId.value
     ) {
       return
     }
@@ -146,11 +146,11 @@ const isOnActivePath = computed(
   () => folderId.value != null && activePathFolderIds.value.has(folderId.value)
 )
 
-const isUserActiveFolder = computed(
+const isActiveFolderRow = computed(
   () =>
     activeFolder != null &&
     folderId.value != null &&
-    activeFolderSelectedId.value === folderId.value
+    sidebarActiveFolderId.value === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -175,7 +175,7 @@ function onFolderRowFocusOut(event: FocusEvent) {
   if (
     activeFolder == null ||
     folderId.value == null ||
-    activeFolderSelectedId.value !== folderId.value
+    sidebarActiveFolderId.value !== folderId.value
   ) {
     return
   }
@@ -322,7 +322,7 @@ function onFolderRowClick() {
   background-color: var(--fallback-b3, oklch(var(--b3) / 1));
 }
 
-.sidebar-folder-user-active > .folder-row {
+.sidebar-folder-active > .folder-row {
   color: var(--fallback-bc, oklch(var(--bc) / 1));
   background-color: color-mix(
     in oklch,

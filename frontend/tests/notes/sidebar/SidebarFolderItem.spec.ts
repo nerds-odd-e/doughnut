@@ -71,7 +71,7 @@ describe("SidebarFolderItem", () => {
     expect(link.text()).toContain("Alpha")
   })
 
-  it("scrolls folder row into view when user-active and row is not intersecting", async () => {
+  it("scrolls folder row into view when active folder row is not intersecting", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
     globalThis.IntersectionObserver = class {
       constructor(private readonly cb: IntersectionObserverCallback) {}
@@ -101,7 +101,7 @@ describe("SidebarFolderItem", () => {
     expect(scrollSpy).toHaveBeenCalled()
   })
 
-  it("does not scroll folder row when user-active but already intersecting", async () => {
+  it("does not scroll folder row when active folder row is already intersecting", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
     globalThis.IntersectionObserver = class {
       constructor(private readonly cb: IntersectionObserverCallback) {}

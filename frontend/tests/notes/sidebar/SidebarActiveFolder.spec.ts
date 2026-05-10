@@ -11,7 +11,7 @@ import {
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
 
-describe("Sidebar user active folder", () => {
+describe("Sidebar active folder", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: import("@vue/test-utils").VueWrapper<any>
   const storageAccessor = useStorageAccessor()
@@ -49,7 +49,7 @@ describe("Sidebar user active folder", () => {
     )
   }
 
-  async function mountSignedInFirstGenWithRootFolderUserActive() {
+  async function mountSignedInFirstGenWithRootFolderActive() {
     wrapper = mountSidebarSignedIn(
       helper,
       fixtures.firstGeneration,
@@ -66,17 +66,17 @@ describe("Sidebar user active folder", () => {
     expect(folderRow?.exists()).toBe(true)
     await folderRow!.find(".sidebar-folder-label").trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).toContain("sidebar-folder-active")
     return folderRow!
   }
 
-  it("applies sidebar-folder-user-active when a folder row is clicked", async () => {
+  it("applies sidebar-folder-active when a folder row is clicked", async () => {
     await mountFirstGenSidebarAndWaitNoteRow()
     const folderRow = findRootFolderRowByTopTitle()
     expect(folderRow?.exists()).toBe(true)
     await folderRow!.find(".sidebar-folder-label").trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).toContain("sidebar-folder-active")
   })
 
   it("activates folder and toggles expand when the folder label area is clicked", async () => {
@@ -88,11 +88,11 @@ describe("Sidebar user active folder", () => {
     expect(track.exists()).toBe(true)
     await track.trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).toContain("sidebar-folder-active")
     expect(folderRow!.attributes("aria-expanded")).not.toBe(expandedBefore)
   })
 
-  it("clears user active folder styling when a note row is clicked", async () => {
+  it("clears active folder styling when a note row is clicked", async () => {
     wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await vi.waitUntil(() =>
       findSidebarItem(
@@ -103,7 +103,7 @@ describe("Sidebar user active folder", () => {
     const folderRow = findRootFolderRowByTopTitle()
     await folderRow!.find(".sidebar-folder-label").trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).toContain("sidebar-folder-active")
 
     const noteRow = findSidebarItem(
       wrapper,
@@ -112,11 +112,11 @@ describe("Sidebar user active folder", () => {
     expect(noteRow?.exists()).toBe(true)
     await noteRow!.trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).not.toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).not.toContain("sidebar-folder-active")
   })
 
-  it("does not clear user active folder when modal opens after toolbar click (Safari behavior)", async () => {
-    const folderRow = await mountSignedInFirstGenWithRootFolderUserActive()
+  it("does not clear active folder when modal opens after toolbar click (Safari behavior)", async () => {
+    const folderRow = await mountSignedInFirstGenWithRootFolderActive()
 
     const toolbarBtn = wrapper.find('button[title="New note"]')
     expect(toolbarBtn.exists()).toBe(true)
@@ -134,11 +134,11 @@ describe("Sidebar user active folder", () => {
     )
     await flushPromises()
     document.body.removeChild(modalInput)
-    expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).toContain("sidebar-folder-active")
   })
 
-  it("does not clear user active folder when focus moves to the sidebar toolbar", async () => {
-    const folderRow = await mountSignedInFirstGenWithRootFolderUserActive()
+  it("does not clear active folder when focus moves to the sidebar toolbar", async () => {
+    const folderRow = await mountSignedInFirstGenWithRootFolderActive()
     const toolbarBtn = wrapper.find('button[title="New folder"]')
     expect(toolbarBtn.exists()).toBe(true)
     folderRow!.element.focus()
@@ -149,6 +149,6 @@ describe("Sidebar user active folder", () => {
       })
     )
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-user-active")
+    expect(folderRow!.classes()).toContain("sidebar-folder-active")
   })
 })

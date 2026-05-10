@@ -13,7 +13,7 @@ export const notebookSidebarNotebookRealm: ShallowRef<
 export const currentNotebookId: Ref<number | undefined> = ref(undefined)
 export const currentActiveNoteId: Ref<number | undefined> = ref(undefined)
 
-/** Mirrors Sidebar's user-selected folder for create-note scope (notebook layout). */
+/** Sidebar active folder: toolbar create/move scope and folder-page alignment (notebook layout). */
 export const notebookSidebarActiveFolder: Ref<FolderRealm | null> = ref(null)
 
 /** Root-to-leaf folder segments for `folderPage` breadcrumbs (see flat index walk). */

@@ -7,7 +7,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, expect, it } from "vitest"
 
 describe("useNoteSidebarTree create context", () => {
-  it("resolvedCreateParentFolderIdFrom prefers the sidebar-selected folder over the active note folder", () => {
+  it("resolvedCreateParentFolderIdFrom prefers the sidebar active folder over the active note folder", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     expect(
       resolvedCreateParentFolderIdFrom(
@@ -18,19 +18,19 @@ describe("useNoteSidebarTree create context", () => {
     ).toBe(99)
   })
 
-  it("resolvedCreateParentFolderFrom returns the sidebar-selected folder object when set", () => {
+  it("resolvedCreateParentFolderFrom returns the sidebar active folder object when set", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     const pinned = makeMe.aFolderRealm.folder(99, "Pinned").please()
     expect(resolvedCreateParentFolderFrom(pinned, realm, true)).toEqual(pinned)
   })
 
-  it("resolvedCreateParentFolderFrom returns the realm leaf folder when none selected", () => {
+  it("resolvedCreateParentFolderFrom returns the realm leaf folder when sidebar active folder is null", () => {
     const realm = makeMe.aNoteRealm.inFolder(42, "Science").please()
     const leaf = realm.ancestorFolders!.at(-1)!
     expect(resolvedCreateParentFolderFrom(null, realm, true)).toBe(leaf)
   })
 
-  it("resolvedCreateParentFolderIdFrom uses the active note folder when no sidebar-selected folder", () => {
+  it("resolvedCreateParentFolderIdFrom uses the active note folder when sidebar active folder is null", () => {
     const realm = makeMe.aNoteRealm.inFolder(42, "Science").please()
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(42)
   })
@@ -45,9 +45,9 @@ describe("useNoteSidebarTree create context", () => {
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(null)
   })
 
-  it("createParentLocationDescriptionFrom describes the sidebar-selected folder by name", () => {
+  it("createParentLocationDescriptionFrom describes the sidebar active folder by name", () => {
     const realm = makeMe.aNoteRealm
-      .inFolder(1, "ignored when user folder active")
+      .inFolder(1, "ignored when sidebar active folder is set")
       .please()
     expect(
       createParentLocationDescriptionFrom(
