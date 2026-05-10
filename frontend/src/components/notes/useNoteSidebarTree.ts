@@ -15,19 +15,6 @@ export function realmLeafFolder(realm: NoteRealm | undefined) {
   return chain[chain.length - 1]
 }
 
-export function resolvedCreateParentFolderFrom(
-  activeFolder: FolderRealm | null,
-  activeNoteRealm: NoteRealm | undefined,
-  noteContextResolved: boolean
-): ResolvedCreateParentFolder | null {
-  if (activeFolder != null) return activeFolder
-  const leaf = realmLeafFolder(activeNoteRealm)
-  if (leaf != null && noteContextResolved) {
-    return leaf
-  }
-  return null
-}
-
 /** Folder row for forms that only accept {@link Folder} (not full folder page payload). */
 function folderFromResolvedCreateParent(
   v: ResolvedCreateParentFolder | null | undefined
@@ -47,29 +34,16 @@ export function resolvedCreateParentFolderIdFrom(
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): number | null {
-  return (
-    resolvedFolderIdFromPageOrFolder(
-      resolvedCreateParentFolderFrom(
-        activeFolder,
-        activeNoteRealm,
-        noteContextResolved
-      )
-    ) ?? null
-  )
-}
-
-export function createParentLocationDescriptionFrom(
-  activeFolder: FolderRealm | null,
-  activeNoteRealm: NoteRealm | undefined,
-  noteContextResolved: boolean
-): string {
+  let parent: ResolvedCreateParentFolder | null = null
   if (activeFolder != null) {
-    return `Adds to folder "${activeFolder.folder.name}".`
+    parent = activeFolder
+  } else {
+    const leaf = realmLeafFolder(activeNoteRealm)
+    if (leaf != null && noteContextResolved) {
+      parent = leaf
+    }
   }
-  if (!noteContextResolved) return "Adds to the notebook root."
-  const leaf = realmLeafFolder(activeNoteRealm)
-  if (leaf == null) return "Adds to the notebook root."
-  return `Adds to folder "${leaf.name}".`
+  return resolvedFolderIdFromPageOrFolder(parent) ?? null
 }
 
 export function useNotebookRootCreateTarget(
@@ -83,12 +57,16 @@ export function useNotebookRootCreateTarget(
   resolvedCreateParentFolderId: ComputedRef<number | null>
   createParentLocationDescription: ComputedRef<string>
 } {
-  const resolvedCreateParentFolder = computed(() =>
-    resolvedCreateParentFolderFrom(
-      activeFolder.value,
-      activeNoteRealm.value,
-      noteContextResolved.value
-    )
+  const resolvedCreateParentFolder = computed(
+    (): ResolvedCreateParentFolder | null => {
+      const af = activeFolder.value
+      const ar = activeNoteRealm.value
+      const ncr = noteContextResolved.value
+      if (af != null) return af
+      const leaf = realmLeafFolder(ar)
+      if (leaf != null && ncr) return leaf
+      return null
+    }
   )
   const resolvedCreateParentFolderRow = computed(
     (): Folder | null =>
@@ -101,13 +79,18 @@ export function useNotebookRootCreateTarget(
       noteContextResolved.value
     )
   )
-  const createParentLocationDescription = computed(() =>
-    createParentLocationDescriptionFrom(
-      activeFolder.value,
-      activeNoteRealm.value,
-      noteContextResolved.value
-    )
-  )
+  const createParentLocationDescription = computed(() => {
+    const af = activeFolder.value
+    const ar = activeNoteRealm.value
+    const ncr = noteContextResolved.value
+    if (af != null) {
+      return `Adds to folder "${af.folder.name}".`
+    }
+    if (!ncr) return "Adds to the notebook root."
+    const leaf = realmLeafFolder(ar)
+    if (leaf == null) return "Adds to the notebook root."
+    return `Adds to folder "${leaf.name}".`
+  })
   return {
     resolvedCreateParentFolder,
     resolvedCreateParentFolderRow,

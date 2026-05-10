@@ -109,8 +109,7 @@ import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
 import {
-  createParentLocationDescriptionFrom,
-  resolvedCreateParentFolderFrom,
+  realmLeafFolder,
   resolvedFolderIdFromPageOrFolder,
   type ResolvedCreateParentFolder,
 } from "./useNoteSidebarTree"
@@ -126,12 +125,15 @@ const noteContextResolved = computed(
 )
 
 const resolvedCreateParentFolder = computed(
-  (): ResolvedCreateParentFolder | null =>
-    resolvedCreateParentFolderFrom(
-      props.activeFolderRealm ?? null,
-      props.activeNoteRealm,
-      noteContextResolved.value
-    )
+  (): ResolvedCreateParentFolder | null => {
+    const activeFolder = props.activeFolderRealm ?? null
+    const activeNoteRealm = props.activeNoteRealm
+    const resolved = noteContextResolved.value
+    if (activeFolder != null) return activeFolder
+    const leaf = realmLeafFolder(activeNoteRealm)
+    if (leaf != null && resolved) return leaf
+    return null
+  }
 )
 
 const resolvedCreateParentFolderRow = computed((): Folder | null => {
@@ -140,13 +142,18 @@ const resolvedCreateParentFolderRow = computed((): Folder | null => {
   return "folder" in v ? v.folder : v
 })
 
-const createParentLocationDescription = computed(() =>
-  createParentLocationDescriptionFrom(
-    props.activeFolderRealm ?? null,
-    props.activeNoteRealm,
-    noteContextResolved.value
-  )
-)
+const createParentLocationDescription = computed(() => {
+  const activeFolder = props.activeFolderRealm ?? null
+  const activeNoteRealm = props.activeNoteRealm
+  const resolved = noteContextResolved.value
+  if (activeFolder != null) {
+    return `Adds to folder "${activeFolder.folder.name}".`
+  }
+  if (!resolved) return "Adds to the notebook root."
+  const leaf = realmLeafFolder(activeNoteRealm)
+  if (leaf == null) return "Adds to the notebook root."
+  return `Adds to folder "${leaf.name}".`
+})
 
 const ancestorFolders = computed((): Folder[] => {
   if (props.activeNoteRealm != null) {

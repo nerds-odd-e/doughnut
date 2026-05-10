@@ -1,8 +1,4 @@
-import {
-  createParentLocationDescriptionFrom,
-  resolvedCreateParentFolderFrom,
-  resolvedCreateParentFolderIdFrom,
-} from "@/components/notes/useNoteSidebarTree"
+import { resolvedCreateParentFolderIdFrom } from "@/components/notes/useNoteSidebarTree"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, expect, it } from "vitest"
 
@@ -18,18 +14,6 @@ describe("useNoteSidebarTree create context", () => {
     ).toBe(99)
   })
 
-  it("resolvedCreateParentFolderFrom returns the sidebar active folder object when set", () => {
-    const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
-    const pinned = makeMe.aFolderRealm.folder(99, "Pinned").please()
-    expect(resolvedCreateParentFolderFrom(pinned, realm, true)).toEqual(pinned)
-  })
-
-  it("resolvedCreateParentFolderFrom returns the realm leaf folder when sidebar active folder is null", () => {
-    const realm = makeMe.aNoteRealm.inFolder(42, "Science").please()
-    const leaf = realm.ancestorFolders!.at(-1)!
-    expect(resolvedCreateParentFolderFrom(null, realm, true)).toBe(leaf)
-  })
-
   it("resolvedCreateParentFolderIdFrom uses the active note folder when sidebar active folder is null", () => {
     const realm = makeMe.aNoteRealm.inFolder(42, "Science").please()
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(42)
@@ -43,35 +27,5 @@ describe("useNoteSidebarTree create context", () => {
   it("resolvedCreateParentFolderIdFrom is null for a note at the notebook root", () => {
     const realm = makeMe.aNoteRealm.please()
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(null)
-  })
-
-  it("createParentLocationDescriptionFrom describes the sidebar active folder by name", () => {
-    const realm = makeMe.aNoteRealm
-      .inFolder(1, "ignored when sidebar active folder is set")
-      .please()
-    expect(
-      createParentLocationDescriptionFrom(
-        makeMe.aFolderRealm.folder(2, "My folder").please(),
-        realm,
-        true
-      )
-    ).toBe('Adds to folder "My folder".')
-  })
-
-  it("createParentLocationDescriptionFrom uses ancestor folder label for the active note folder", () => {
-    const realm = makeMe.aNoteRealm.inFolder(5, "History").please()
-    expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(
-      'Adds to folder "History".'
-    )
-  })
-
-  it("createParentLocationDescriptionFrom describes notebook root when appropriate", () => {
-    const realm = makeMe.aNoteRealm.please()
-    expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(
-      "Adds to the notebook root."
-    )
-    expect(createParentLocationDescriptionFrom(null, realm, false)).toBe(
-      "Adds to the notebook root."
-    )
   })
 })
