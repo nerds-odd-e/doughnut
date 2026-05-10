@@ -6,7 +6,7 @@
     <NoteSidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
-      :note-realm="activeNoteRealm"
+      :active-note-realm="activeNoteRealm"
       :resolved-create-parent-folder="resolvedCreateParentFolder"
       :resolved-create-parent-folder-row="resolvedCreateParentFolderRow"
       :create-parent-location-description="createParentLocationDescription"

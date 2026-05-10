@@ -94,10 +94,6 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
-  folderPageBreadcrumbFolders,
-  notebookSidebarActiveFolder,
-} from "@/composables/useCurrentNoteSidebarState"
-import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,
 } from "@/composables/useNoteSidebarPeerSort"
@@ -119,7 +115,7 @@ import {
 
 const props = defineProps<{
   notebookId: number
-  noteRealm?: NoteRealm
+  activeNoteRealm?: NoteRealm
   /** Parent folder for new note / new folder (sidebar selection, else active note's folder). */
   resolvedCreateParentFolder: ResolvedCreateParentFolder | null
   /** Same scope as {@link resolvedCreateParentFolder}, as a {@link Folder} row for {@link NoteNewForm}. */
@@ -129,14 +125,17 @@ const props = defineProps<{
   activeFolder: FolderRealm | null
 }>()
 
-const ancestorFolders = computed(() => {
-  if (notebookSidebarActiveFolder.value != null) {
-    return folderPageBreadcrumbFolders.value
+const ancestorFolders = computed((): Folder[] => {
+  if (props.activeNoteRealm != null) {
+    return props.activeNoteRealm.ancestorFolders ?? []
   }
-  return props.noteRealm?.ancestorFolders ?? []
+  if (props.activeFolder != null) {
+    return props.activeFolder.ancestorFolders ?? []
+  }
+  return []
 })
 
-const anchorNote = computed(() => props.noteRealm?.note)
+const anchorNote = computed(() => props.activeNoteRealm?.note)
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
 
