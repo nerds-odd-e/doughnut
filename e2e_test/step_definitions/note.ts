@@ -225,22 +225,6 @@ When(
 )
 
 When(
-  'I create a note belonging to {string} with title {string}',
-  (folder: string, title: string) => {
-    start.jumpToNotePage(folder)
-    start
-      .noteSidebar()
-      .activateFolderByLabel(folder)
-      .addingNewNoteFromToolbar()
-      .createNoteWithTitle(title)
-    start.assumeNotePage(title)
-    if (title !== '') {
-      start.testability().rememberUiCreatedNote(title)
-    }
-  }
-)
-
-When(
   'I create a note with title {string} under the folder {string} in the notebook {string}',
   (title: string, folder: string, notebook: string) => {
     start.navigateToNotebooksPage().navigateToNotebook(notebook)
@@ -257,13 +241,12 @@ When(
 )
 
 When(
-  'I create a note belonging to {string} with title {string} and wikidata id {string}',
-  (noteTopology: string, title: string, wikidataId: string) => {
+  'I create a note with title {string} and wikidata id {string} in the notebook {string}',
+  (title: string, wikidataId: string, notebook: string) => {
+    start.navigateToNotebooksPage().navigateToNotebook(notebook)
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
-    start.jumpToNotePage(noteTopology)
     start
       .noteSidebar()
-      .activateFolderByLabel(noteTopology)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
     // Wikidata creation enriches siblings (authors, country); backend work can exceed default 6s.

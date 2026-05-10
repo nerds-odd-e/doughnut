@@ -12,7 +12,7 @@ Feature: Nested Note Create with wikidata
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
     Given Wikidata.org has an entity "Q2102" with label "long animal"
-    When I create a note belonging to "Animals" with title "snake" and wikidata id "Q2102"
+    When I create a note with title "snake" and wikidata id "Q2102" in the notebook "Wildlife notes"
     Then the Wiki association of note "snake" should link to "https://www.wikidata.org/wiki/Q2102"
 
   @usingMockedWikidataService @mockBrowserTime
