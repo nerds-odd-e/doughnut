@@ -11,8 +11,7 @@
     <template #default="{ closer }">
       <FolderOrganizeForm
         :notebook-id="notebookId"
-        :moving-folder-id="movingFolderId"
-        :moving-folder-name="movingFolderName"
+        :moving-folder="movingFolder"
         :ancestor-folders="ancestorFolders"
         @close-dialog="closer"
       />
@@ -27,8 +26,7 @@ import FolderOrganizeForm from "../FolderOrganizeForm.vue"
 
 defineProps<{
   notebookId: number
-  movingFolderId: number
-  movingFolderName: string
+  movingFolder: Folder
   ancestorFolders: Folder[]
 }>()
 </script>

@@ -4,7 +4,7 @@
       <form @submit.prevent="submitMove">
         <fieldset>
           <p class="daisy-text-sm daisy-mb-3">
-            Move folder "{{ movingFolderName }}".
+            Move folder "{{ movingFolder.name }}".
           </p>
           <label class="daisy-label" for="folder-move-destination">
             <span class="daisy-label-text">Destination</span>
@@ -13,7 +13,7 @@
             <FolderSelector
               v-model="selectedParentFolderId"
               :notebook-id="notebookId"
-              :context-folder-id="movingFolderId"
+              :context-folder-id="movingFolder.id"
               :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />
@@ -33,7 +33,7 @@
       </form>
       <div class="daisy-divider daisy-my-4">or</div>
       <p class="daisy-text-sm daisy-mb-2">
-        Dissolve "{{ movingFolderName }}". Notes and subfolders will move to
+        Dissolve "{{ movingFolder.name }}". Notes and subfolders will move to
         {{ dissolveParentLabel }}.
       </p>
       <p
@@ -69,8 +69,7 @@ import { dissolveParentLabelFromChain } from "./folderSelectorUtils"
 
 const props = defineProps<{
   notebookId: number
-  movingFolderId: number
-  movingFolderName: string
+  movingFolder: Folder
   /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
   ancestorFolders: Folder[]
 }>()
@@ -87,7 +86,7 @@ const dissolveError = ref<string | undefined>(undefined)
 const selectedParentFolderId = ref<number | null>(null)
 
 const dissolveParentLabel = computed(() =>
-  dissolveParentLabelFromChain(props.movingFolderId, props.ancestorFolders)
+  dissolveParentLabelFromChain(props.movingFolder.id, props.ancestorFolders)
 )
 
 const submitMove = async () => {
@@ -101,7 +100,7 @@ const submitMove = async () => {
         : { newParentFolderId: selectedParentFolderId.value }
     const { error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
-        path: { notebook: props.notebookId, folder: props.movingFolderId },
+        path: { notebook: props.notebookId, folder: props.movingFolder.id },
         body,
       })
     )
@@ -118,7 +117,7 @@ const submitMove = async () => {
 const dissolve = async () => {
   if (processing.value) return
   const ok = await popups.confirm(
-    `Dissolve folder "${props.movingFolderName}"? Notes and subfolders will be kept.`
+    `Dissolve folder "${props.movingFolder.name}"? Notes and subfolders will be kept.`
   )
   if (!ok) return
   processing.value = true
@@ -126,7 +125,7 @@ const dissolve = async () => {
   try {
     const { error } = await apiCallWithLoading(() =>
       NotebookController.dissolveFolder({
-        path: { notebook: props.notebookId, folder: props.movingFolderId },
+        path: { notebook: props.notebookId, folder: props.movingFolder.id },
       })
     )
     if (error) throw error
