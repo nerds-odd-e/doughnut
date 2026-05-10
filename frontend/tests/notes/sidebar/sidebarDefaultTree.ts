@@ -25,12 +25,7 @@ const secondGeneration = makeMe.aNoteRealm
 const defaultTreeFolderListings: SidebarTreeFixtures["defaultTreeFolderListings"] =
   {
     [String(undefined)]: {
-      noteTopologies: [
-        {
-          ...topNoteRealm.note.noteTopology,
-          folderId: topNoteRealm.note.noteTopology.folderId ?? 0,
-        },
-      ],
+      noteTopologies: [{ ...topNoteRealm.note.noteTopology }],
       folders: [structuralFolder(FOLDER_TOP_NOTE_CHILDREN_ID, topNoteRealm)],
     },
     [String(FOLDER_TOP_NOTE_CHILDREN_ID)]: {
