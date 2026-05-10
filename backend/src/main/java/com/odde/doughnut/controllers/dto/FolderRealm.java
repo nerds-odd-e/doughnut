@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 @Schema(
     description =
         "Notebook chrome plus folder row for loading the folder page: same notebook fields as"
-            + " NotebookPageClientView (without notebook-level indexNoteId), plus folder identity,"
+            + " NotebookRealm (without notebook-level indexNoteId), plus folder identity,"
             + " optional parent folder id, and optional designated folder index note id.")
 public record FolderRealm(
     @NotNull Notebook notebook,

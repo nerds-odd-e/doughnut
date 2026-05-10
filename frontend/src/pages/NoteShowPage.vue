@@ -37,7 +37,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
   currentNotebookId,
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocation } from "@/routes/noteShowLocation"
@@ -110,7 +110,7 @@ const handleCloseConversation = (conversationRealm: NoteRealm) => {
 }
 
 onMounted(() => {
-  notebookSidebarNotebookClientView.value = undefined
+  notebookSidebarNotebookRealm.value = undefined
 })
 </script>
 

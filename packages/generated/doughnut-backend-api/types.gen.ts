@@ -766,9 +766,9 @@ export type SubscriptionForNotebooksListing = {
 };
 
 /**
- * Notebook client view for loading the notebook page: same payload as NotebookClientView plus optional index landing note id when present.
+ * Notebook chrome for loading the notebook page: same payload as NotebookClientView plus optional index landing note id when present.
  */
-export type NotebookPageClientView = {
+export type NotebookRealm = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
@@ -779,7 +779,7 @@ export type NotebookPageClientView = {
 };
 
 /**
- * Notebook chrome plus folder row for loading the folder page: same notebook fields as NotebookPageClientView (without notebook-level indexNoteId), plus folder identity, optional parent folder id, and optional designated folder index note id.
+ * Notebook chrome plus folder row for loading the folder page: same notebook fields as NotebookRealm (without notebook-level indexNoteId), plus folder identity, optional parent folder id, and optional designated folder index note id.
  */
 export type FolderRealm = {
     notebook: Notebook;
@@ -1745,7 +1745,7 @@ export type GetResponses = {
     /**
      * OK
      */
-    200: NotebookPageClientView;
+    200: NotebookRealm;
 };
 
 export type GetResponse = GetResponses[keyof GetResponses];

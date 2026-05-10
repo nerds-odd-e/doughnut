@@ -1,5 +1,5 @@
 import {
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
@@ -267,7 +267,7 @@ export function prepareSidebarDefaultMountContext(options: {
 export function teardownSidebarComponentTest(
   wrapper: VueWrapper<unknown> | undefined
 ) {
-  notebookSidebarNotebookClientView.value = undefined
+  notebookSidebarNotebookRealm.value = undefined
   notebookSidebarActiveFolder.value = null
   wrapper?.unmount()
   document.body.innerHTML = ""

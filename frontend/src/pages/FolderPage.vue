@@ -49,7 +49,7 @@ import {
   currentNotebookId,
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -104,7 +104,7 @@ watch(
   (c) => {
     folderSidebarFolderRealm.value = c
     if (!c) {
-      notebookSidebarNotebookClientView.value = undefined
+      notebookSidebarNotebookRealm.value = undefined
       const routeNotebookId = Number(route.params.notebookId)
       currentNotebookId.value = Number.isFinite(routeNotebookId)
         ? routeNotebookId
@@ -112,7 +112,7 @@ watch(
       return
     }
     currentNotebookId.value = c.notebook.id
-    notebookSidebarNotebookClientView.value = notebookChromeFromFolderRealm(c)
+    notebookSidebarNotebookRealm.value = notebookChromeFromFolderRealm(c)
   },
   { immediate: true, deep: true }
 )
@@ -176,7 +176,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  notebookSidebarNotebookClientView.value = undefined
+  notebookSidebarNotebookRealm.value = undefined
   folderSidebarFolderRealm.value = undefined
   folderPageBreadcrumbFolders.value = []
 })

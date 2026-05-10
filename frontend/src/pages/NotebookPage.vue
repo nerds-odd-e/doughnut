@@ -32,7 +32,7 @@ import { useRoute } from "vue-router"
 import type {
   Notebook,
   User,
-  NotebookPageClientView,
+  NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
@@ -43,19 +43,19 @@ import {
   currentNotebookId,
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 const user = inject<Ref<User | undefined>>("currentUser")
-const notebookClient = ref<NotebookPageClientView | undefined>(undefined)
+const notebookRealm = ref<NotebookRealm | undefined>(undefined)
 
-const notebook = computed(() => notebookClient.value?.notebook)
+const notebook = computed(() => notebookRealm.value?.notebook)
 
 const isNotebookReadOnly = computed(
-  () => notebookClient.value?.readonly === true
+  () => notebookRealm.value?.readonly === true
 )
 
 const sidebarAnchorNoteId = ref<number | undefined>()
@@ -68,39 +68,39 @@ const fetchNotebook = async () => {
     path: { notebook: notebookId },
   })
   if (!error && result) {
-    notebookClient.value = result
+    notebookRealm.value = result
     return
   }
-  notebookClient.value = undefined
+  notebookRealm.value = undefined
 }
 
 const handleNotebookUpdated = (updatedNotebook: Notebook) => {
-  const prev = notebookClient.value
+  const prev = notebookRealm.value
   if (prev != null) {
-    notebookClient.value = { ...prev, notebook: updatedNotebook }
+    notebookRealm.value = { ...prev, notebook: updatedNotebook }
   }
 }
 
 watch(
-  notebookClient,
+  notebookRealm,
   (c) => {
     if (!c) {
-      notebookSidebarNotebookClientView.value = undefined
+      notebookSidebarNotebookRealm.value = undefined
       currentNotebookId.value = undefined
       return
     }
     currentNotebookId.value = c.notebook.id
-    notebookSidebarNotebookClientView.value = c
+    notebookSidebarNotebookRealm.value = c
   },
   { immediate: true, deep: true }
 )
 
 watch(
   () =>
-    notebookClient.value
+    notebookRealm.value
       ? ([
-          notebookClient.value.notebook.id,
-          notebookClient.value.indexNoteId ?? null,
+          notebookRealm.value.notebook.id,
+          notebookRealm.value.indexNoteId ?? null,
         ] as const)
       : undefined,
   async (key) => {
@@ -156,7 +156,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  notebookSidebarNotebookClientView.value = undefined
+  notebookSidebarNotebookRealm.value = undefined
   folderSidebarFolderRealm.value = undefined
 })
 </script>

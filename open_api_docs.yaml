@@ -923,7 +923,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebookPageClientView"
+                $ref: "#/components/schemas/NotebookRealm"
     post:
       tags:
       - notebook-controller
@@ -4352,10 +4352,10 @@ components:
       - dailyTargetOfNewNotes
       - id
       - notebook
-    NotebookPageClientView:
+    NotebookRealm:
       type: object
-      description: "Notebook client view for loading the notebook page: same payload\
-        \ as NotebookClientView plus optional index landing note id when present."
+      description: "Notebook chrome for loading the notebook page: same payload as\
+        \ NotebookClientView plus optional index landing note id when present."
       properties:
         notebook:
           $ref: "#/components/schemas/Notebook"
@@ -4374,9 +4374,9 @@ components:
     FolderRealm:
       type: object
       description: "Notebook chrome plus folder row for loading the folder page: same\
-        \ notebook fields as NotebookPageClientView (without notebook-level indexNoteId),\
-        \ plus folder identity, optional parent folder id, and optional designated\
-        \ folder index note id."
+        \ notebook fields as NotebookRealm (without notebook-level indexNoteId), plus\
+        \ folder identity, optional parent folder id, and optional designated folder\
+        \ index note id."
       properties:
         notebook:
           $ref: "#/components/schemas/Notebook"

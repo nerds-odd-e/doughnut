@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
-import com.odde.doughnut.controllers.dto.NotebookPageClientView;
+import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -68,8 +68,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       NotebookClientView response = controller.createNotebook(noteCreation);
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
 
-      NotebookPageClientView wire = controller.get(nb);
-      String json = objectMapper.writeValueAsString(wire);
+      NotebookRealm realm = controller.get(nb);
+      String json = objectMapper.writeValueAsString(realm);
       JsonNode tree = objectMapper.readTree(json);
 
       assertThat(tree.has("headNoteId"), is(false));
@@ -84,24 +84,24 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
   @Nested
   class GetNotebook {
     @Test
-    void ownerGetsWritableNotebookClientView() throws UnexpectedNoAccessRightException {
+    void ownerGetsWritableNotebookRealm() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      NotebookPageClientView view = controller.get(nb);
-      assertThat(view.notebook().getId(), equalTo(nb.getId()));
-      assertThat(view.readonly(), is(false));
+      NotebookRealm realm = controller.get(nb);
+      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.readonly(), is(false));
     }
 
     @Test
-    void anonymousGetsReadonlyNotebookClientViewWhenNotebookInBazaar()
+    void anonymousGetsReadonlyNotebookRealmWhenNotebookInBazaar()
         throws UnexpectedNoAccessRightException {
       User owner = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       makeMe.aBazaarNotebook(nb).please();
       currentUser.setUser(null);
-      NotebookPageClientView view = controller.get(nb);
-      assertThat(view.notebook().getId(), equalTo(nb.getId()));
-      assertThat(view.readonly(), is(true));
+      NotebookRealm realm = controller.get(nb);
+      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.readonly(), is(true));
     }
 
     @Test
@@ -119,9 +119,9 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Note index = makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("index").please();
 
-      NotebookPageClientView view = controller.get(nb);
+      NotebookRealm realm = controller.get(nb);
 
-      assertThat(view.indexNoteId(), equalTo(index.getId()));
+      assertThat(realm.indexNoteId(), equalTo(index.getId()));
     }
 
     @Test
@@ -134,9 +134,9 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       makeMe.theNotebook(nb).indexNote(designated).please();
       makeMe.entityPersister.flush();
 
-      NotebookPageClientView view = controller.get(nb);
+      NotebookRealm realm = controller.get(nb);
 
-      assertThat(view.indexNoteId(), equalTo(designated.getId()));
+      assertThat(realm.indexNoteId(), equalTo(designated.getId()));
     }
 
     @Test
@@ -153,9 +153,9 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
 
-      NotebookPageClientView view = controller.get(nb);
+      NotebookRealm realm = controller.get(nb);
 
-      assertThat(view.indexNoteId(), nullValue());
+      assertThat(realm.indexNoteId(), nullValue());
     }
   }
 

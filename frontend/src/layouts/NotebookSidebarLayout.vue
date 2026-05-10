@@ -27,8 +27,8 @@
         }"
       />
       <BreadcrumbWithCircle
-        v-else-if="sidebarNotebookClientView"
-        :notebook-view="sidebarNotebookClientView"
+        v-else-if="sidebarNotebookRealm"
+        :notebook-view="sidebarNotebookRealm"
         :ancestor-folders="chromeBreadcrumbAncestorFolders"
       />
     </GlobalBar>
@@ -81,7 +81,7 @@ import {
   currentActiveNoteId,
   currentNotebookId,
   folderPageBreadcrumbFolders,
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 
@@ -95,9 +95,7 @@ const windowWidth = ref(
 
 const isMdOrLarger = computed(() => windowWidth.value >= 768)
 
-const sidebarNotebookClientView = computed(
-  () => notebookSidebarNotebookClientView.value
-)
+const sidebarNotebookRealm = computed(() => notebookSidebarNotebookRealm.value)
 
 const sidebarNotebookId = computed(() => currentNotebookId.value)
 

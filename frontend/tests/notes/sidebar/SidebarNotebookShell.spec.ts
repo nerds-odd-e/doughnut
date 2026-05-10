@@ -1,4 +1,4 @@
-import { notebookSidebarNotebookClientView } from "@/composables/useCurrentNoteSidebarState"
+import { notebookSidebarNotebookRealm } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -64,7 +64,7 @@ describe("Sidebar notebook shell", () => {
   })
 
   it("hides New note when notebook page is readonly and anchor realm is not loaded yet", async () => {
-    notebookSidebarNotebookClientView.value = {
+    notebookSidebarNotebookRealm.value = {
       notebook: makeMe.aNotebook.please(),
       readonly: true,
     }

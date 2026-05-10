@@ -6,7 +6,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
-import com.odde.doughnut.controllers.dto.NotebookPageClientView;
+import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
 import com.odde.doughnut.entities.Folder;
@@ -55,11 +55,11 @@ public class NotebookCatalogService {
     return NotebookClientView.of(notebook, hasAttachedBook, readonly);
   }
 
-  public NotebookPageClientView notebookPageClientViewFor(Notebook notebook, User viewer) {
+  public NotebookRealm notebookRealmFor(Notebook notebook, User viewer) {
     NotebookClientView base = clientViewFor(notebook, viewer);
     Integer indexNoteId =
         notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
-    return NotebookPageClientView.of(base, indexNoteId);
+    return NotebookRealm.of(base, indexNoteId);
   }
 
   public FolderRealm folderRealmFor(Notebook notebook, Folder folder, User viewer) {

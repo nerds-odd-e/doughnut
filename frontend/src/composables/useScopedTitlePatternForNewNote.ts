@@ -1,19 +1,15 @@
-import type { NotebookPageClientView } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef } from "vue"
 import { useRoute } from "vue-router"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderSidebarFolderRealm,
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
 } from "@/composables/useCurrentNoteSidebarState"
 import { titlePatternFromNoteMarkdown } from "@/utils/noteContentFrontmatter"
 import { renderTitleFromPattern } from "@/utils/titlePatternRender"
 
 function notebookPageIndexNoteId(): number | undefined {
-  const v = notebookSidebarNotebookClientView.value as
-    | NotebookPageClientView
-    | undefined
-  return v?.indexNoteId
+  return notebookSidebarNotebookRealm.value?.indexNoteId
 }
 
 /** Raw `title_pattern` from the active scoped index (note / notebook / folder page context). */

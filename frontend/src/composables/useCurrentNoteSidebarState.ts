@@ -1,13 +1,13 @@
 import type {
   Folder,
   FolderRealm,
-  NotebookClientView,
+  NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { ref, shallowRef, type Ref, type ShallowRef } from "vue"
 
 /** Set on `notebookPage` from {@link NotebookController.get} for layout chrome before a note realm exists. */
-export const notebookSidebarNotebookClientView: ShallowRef<
-  NotebookClientView | undefined
+export const notebookSidebarNotebookRealm: ShallowRef<
+  NotebookRealm | undefined
 > = shallowRef(undefined)
 
 export const currentNotebookId: Ref<number | undefined> = ref(undefined)
@@ -26,7 +26,7 @@ export const folderSidebarFolderRealm: ShallowRef<FolderRealm | undefined> =
 export function resetNotebookSidebarState(): void {
   currentNotebookId.value = undefined
   currentActiveNoteId.value = undefined
-  notebookSidebarNotebookClientView.value = undefined
+  notebookSidebarNotebookRealm.value = undefined
   notebookSidebarActiveFolder.value = null
   folderPageBreadcrumbFolders.value = []
   folderSidebarFolderRealm.value = undefined

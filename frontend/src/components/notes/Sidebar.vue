@@ -37,7 +37,7 @@ import {
   useNotebookRootCreateTarget,
 } from "./useNoteSidebarTree"
 import {
-  notebookSidebarNotebookClientView,
+  notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
   folderPageBreadcrumbFolders,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -94,7 +94,7 @@ const sidebarReadonly = computed(() => {
   const realmReadonly = props.activeNoteRealm?.notebookView.readonly
   if (realmReadonly === true) return true
   if (props.activeNoteRealm != null) return false
-  return notebookSidebarNotebookClientView.value?.readonly === true
+  return notebookSidebarNotebookRealm.value?.readonly === true
 })
 
 const noteContextResolved = computed(() => activeNoteTopology.value != null)

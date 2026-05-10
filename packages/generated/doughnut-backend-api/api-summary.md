@@ -105,7 +105,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Notebook Controller
 
-- `get`: GET `/api/notebooks/{notebook}` -> `GetResponse` (request: `GetData`; path: notebook; response body: NotebookPageClientView)
+- `get`: GET `/api/notebooks/{notebook}` -> `GetResponse` (request: `GetData`; path: notebook; response body: NotebookRealm)
 - `updateNotebook`: POST `/api/notebooks/{notebook}` -> `UpdateNotebookResponse` (request: `UpdateNotebookData`; path: notebook; body: NotebookUpdateRequest; response body: Notebook)
 - `updateNotebookIndex`: POST `/api/notebooks/{notebook}/update-index` -> `UpdateNotebookIndexResponse` (request: `UpdateNotebookIndexData`; path: notebook; response body: void)
 - `shareNotebook`: POST `/api/notebooks/{notebook}/share` -> `ShareNotebookResponse` (request: `ShareNotebookData`; path: notebook; response body: Notebook)
