@@ -17,6 +17,7 @@ import {
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -273,7 +274,7 @@ export default class StoredApiCollection implements StoredApi {
     if (!realm?.note) return null
     const notebookId = realm.notebookView.notebook.id
     if (notebookId == null) return null
-    const folderId = realm.note.noteTopology.folderId ?? null
+    const folderId = realmLeafFolder(realm)?.id ?? null
     return { folderId, notebookId }
   }
 
