@@ -1,6 +1,5 @@
 import {
   createParentLocationDescriptionFrom,
-  folderLabelForRealmFolderId,
   resolvedCreateParentFolderFrom,
   resolvedCreateParentFolderIdFrom,
   useNotebookRootCreateTarget,
@@ -38,12 +37,10 @@ describe("useNoteSidebarTree create context", () => {
     ).toEqual({ id: 99, name: "Pinned" })
   })
 
-  it("resolvedCreateParentFolderFrom derives id and label from the active note folder when none selected", () => {
+  it("resolvedCreateParentFolderFrom returns the realm leaf folder when none selected", () => {
     const realm = realmInFolder(42, "Science")
-    expect(resolvedCreateParentFolderFrom(null, realm, true)).toEqual({
-      id: 42,
-      name: "Science",
-    })
+    const leaf = realm.ancestorFolders!.at(-1)!
+    expect(resolvedCreateParentFolderFrom(null, realm, true)).toBe(leaf)
   })
 
   it("resolvedCreateParentFolderIdFrom uses the active note folder when no sidebar-selected folder", () => {
@@ -51,7 +48,7 @@ describe("useNoteSidebarTree create context", () => {
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(42)
   })
 
-  it("resolvedCreateParentFolderIdFrom is null when topology is not resolved", () => {
+  it("resolvedCreateParentFolderIdFrom is null when note context is not resolved", () => {
     const realm = realmInFolder(7, "X")
     expect(resolvedCreateParentFolderIdFrom(null, realm, false)).toBe(null)
   })
@@ -72,13 +69,6 @@ describe("useNoteSidebarTree create context", () => {
     ).toBe('Adds to folder "My folder".')
   })
 
-  it("createParentLocationDescriptionFrom uses the realm trail when user folder name is empty", () => {
-    const realm = realmInFolder(3, "Trail name")
-    expect(
-      createParentLocationDescriptionFrom({ id: 3, name: "" }, realm, true)
-    ).toBe('Adds to folder "Trail name".')
-  })
-
   it("createParentLocationDescriptionFrom uses ancestor folder label for the active note folder", () => {
     const realm = realmInFolder(5, "History")
     expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(
@@ -86,7 +76,7 @@ describe("useNoteSidebarTree create context", () => {
     )
   })
 
-  it("createParentLocationDescriptionFrom uses Folder #id when ancestor trail has no name match", () => {
+  it("createParentLocationDescriptionFrom ignores topology folderId when ancestorFolders is empty", () => {
     const r = makeMe.aNoteRealm.please()
     const realm = {
       ...r,
@@ -97,8 +87,9 @@ describe("useNoteSidebarTree create context", () => {
       },
     } as NoteRealm
     expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(
-      'Adds to folder "Folder #404".'
+      "Adds to the notebook root."
     )
+    expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(null)
   })
 
   it("createParentLocationDescriptionFrom describes notebook root when appropriate", () => {
@@ -109,10 +100,6 @@ describe("useNoteSidebarTree create context", () => {
     expect(createParentLocationDescriptionFrom(null, realm, false)).toBe(
       "Adds to the notebook root."
     )
-  })
-
-  it("folderLabelForRealmFolderId falls back to Folder #id", () => {
-    expect(folderLabelForRealmFolderId(undefined, 12)).toBe("Folder #12")
   })
 
   it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {

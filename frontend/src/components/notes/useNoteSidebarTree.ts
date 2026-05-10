@@ -4,12 +4,10 @@ import { computed, type ComputedRef, type InjectionKey, type Ref } from "vue"
 /** Folder the user explicitly selected in the sidebar tree (new note / new folder scope). */
 export type SidebarActiveFolder = { id: number; name: string }
 
-export function folderLabelForRealmFolderId(
-  realm: NoteRealm | undefined,
-  folderId: number
-): string {
-  const seg = realm?.ancestorFolders?.find((s) => s.id === folderId)
-  return seg?.name ?? `Folder #${folderId}`
+function realmLeafFolder(realm: NoteRealm | undefined) {
+  const chain = realm?.ancestorFolders
+  if (chain == null || chain.length === 0) return
+  return chain[chain.length - 1]
 }
 
 export function resolvedCreateParentFolderFrom(
@@ -18,12 +16,9 @@ export function resolvedCreateParentFolderFrom(
   noteContextResolved: boolean
 ): SidebarActiveFolder | null {
   if (activeFolder != null) return activeFolder
-  const fid = activeNoteRealm?.note?.noteTopology?.folderId
-  if (fid != null && noteContextResolved) {
-    return {
-      id: fid,
-      name: folderLabelForRealmFolderId(activeNoteRealm, fid),
-    }
+  const leaf = realmLeafFolder(activeNoteRealm)
+  if (leaf != null && noteContextResolved) {
+    return leaf
   }
   return null
 }
@@ -48,16 +43,12 @@ export function createParentLocationDescriptionFrom(
   noteContextResolved: boolean
 ): string {
   if (activeFolder != null) {
-    const label =
-      activeFolder.name !== ""
-        ? activeFolder.name
-        : folderLabelForRealmFolderId(activeNoteRealm, activeFolder.id)
-    return `Adds to folder "${label}".`
+    return `Adds to folder "${activeFolder.name}".`
   }
   if (!noteContextResolved) return "Adds to the notebook root."
-  const fid = activeNoteRealm?.note?.noteTopology?.folderId
-  if (fid == null) return "Adds to the notebook root."
-  const label = folderLabelForRealmFolderId(activeNoteRealm, fid)
+  const leaf = realmLeafFolder(activeNoteRealm)
+  if (leaf == null) return "Adds to the notebook root."
+  const label = leaf.name !== "" ? leaf.name : `Folder #${leaf.id}`
   return `Adds to folder "${label}".`
 }
 
