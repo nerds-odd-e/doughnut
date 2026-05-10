@@ -14,12 +14,12 @@
     @focusout="onFolderRowFocusOut"
   >
     <ScrollTo v-if="isUserActiveFolder" />
-    <div class="folder-row">
+    <div class="folder-row" @click="onFolderRowClick">
       <button
         class="chevron-btn"
-        aria-label="expand children"
+        aria-label="Open folder page"
         tabindex="-1"
-        @click.stop="onChevronClick"
+        @click.stop="navigateToFolderPage"
       >
         <ChevronRight
           :size="14"
@@ -28,7 +28,7 @@
           aria-hidden="true"
         />
       </button>
-      <div class="folder-label-area" @click="onFolderLabelAreaClick">
+      <div class="folder-label-area">
         <router-link
           class="sidebar-folder-label"
           data-testid="sidebar-folder-open-page-link"
@@ -171,12 +171,7 @@ function setUserActiveFolderOnly() {
   }
 }
 
-function onFolderLabelAreaClick() {
-  setUserActiveFolderOnly()
-  ensureFolderExpandedById(folderId.value)
-}
-
-function onChevronClick() {
+function navigateToFolderPage() {
   if (folderId.value == null) return
   setUserActiveFolderOnly()
   router.push({
@@ -186,6 +181,16 @@ function onChevronClick() {
       folderId: String(folderId.value),
     },
   })
+}
+
+function onFolderRowClick(e: MouseEvent) {
+  const target = e.target as Element | null
+  if (target?.closest(".chevron-btn")) return
+  if (target?.closest('[data-testid="sidebar-folder-open-page-link"]')) {
+    setUserActiveFolderOnly()
+    return
+  }
+  navigateToFolderPage()
 }
 </script>
 

@@ -72,26 +72,19 @@ describe("Sidebar first generation", () => {
     window.IntersectionObserver = originalIntersectionObserver
   })
 
-  it("should have child note of active first gen", async () => {
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
-    await flushPromises()
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.firstGenerationSibling.note.noteTopology.title
-      )?.exists()
-    )
-    const firstTitle = fixtures.firstGeneration.note.noteTopology.title
-    const nestedFolderLabel = wrapper
-      .findAll(".sidebar-folder-label")
-      .find((w) => w.text().trim() === firstTitle)
-    expect(nestedFolderLabel?.exists()).toBe(true)
-    await nestedFolderLabel!.trigger("click")
+  it("orders nested child note before same-folder sibling when deeper note is active", async () => {
+    wrapper = mountSidebar(helper, fixtures, fixtures.secondGeneration)
     await flushPromises()
     await vi.waitUntil(() =>
       findSidebarItem(
         wrapper,
         fixtures.secondGeneration.note.noteTopology.title
+      )?.exists()
+    )
+    await vi.waitUntil(() =>
+      findSidebarItem(
+        wrapper,
+        fixtures.firstGenerationSibling.note.noteTopology.title
       )?.exists()
     )
 
