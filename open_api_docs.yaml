@@ -2235,7 +2235,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/FolderPageClientView"
+                $ref: "#/components/schemas/FolderRealm"
     delete:
       tags:
       - notebook-controller
@@ -4371,7 +4371,7 @@ components:
             (case-insensitive). Omitted when absent.
       required:
       - notebook
-    FolderPageClientView:
+    FolderRealm:
       type: object
       description: "Notebook chrome plus folder row for loading the folder page: same\
         \ notebook fields as NotebookPageClientView (without notebook-level indexNoteId),\

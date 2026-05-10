@@ -3,7 +3,7 @@ import { computed, type ComputedRef } from "vue"
 import { useRoute } from "vue-router"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
-  folderSidebarFolderPageClientView,
+  folderSidebarFolderRealm,
   notebookSidebarNotebookClientView,
 } from "@/composables/useCurrentNoteSidebarState"
 import { titlePatternFromNoteMarkdown } from "@/utils/noteContentFrontmatter"
@@ -36,8 +36,8 @@ export function useScopedTitlePatternString(): ComputedRef<string | undefined> {
       return titlePatternFromNoteMarkdown(ir?.note.content ?? null)
     }
     if (name === "folderPage") {
-      const fp = folderSidebarFolderPageClientView.value
-      const idx = fp?.folderIndexNoteId
+      const folderRealm = folderSidebarFolderRealm.value
+      const idx = folderRealm?.folderIndexNoteId
       if (idx == null) return
       const ir = storageAccessor.value.refOfNoteRealm(idx).value
       return titlePatternFromNoteMarkdown(ir?.note.content ?? null)

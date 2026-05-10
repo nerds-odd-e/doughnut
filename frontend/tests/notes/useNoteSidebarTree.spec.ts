@@ -4,15 +4,12 @@ import {
   resolvedCreateParentFolderIdFrom,
   useNotebookRootCreateTarget,
 } from "@/components/notes/useNoteSidebarTree"
-import type {
-  FolderPageClientView,
-  NoteRealm,
-} from "@generated/doughnut-backend-api"
+import type { FolderRealm, NoteRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { computed, ref } from "vue"
 import { describe, expect, it } from "vitest"
 
-function folderPageClientStub(id: number, name: string): FolderPageClientView {
+function folderRealmStub(id: number, name: string): FolderRealm {
   const now = new Date().toISOString()
   return {
     notebook: makeMe.aNotebook.please(),
@@ -30,7 +27,7 @@ describe("useNoteSidebarTree create context", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     expect(
       resolvedCreateParentFolderIdFrom(
-        folderPageClientStub(99, "Pinned"),
+        folderRealmStub(99, "Pinned"),
         realm,
         true
       )
@@ -39,7 +36,7 @@ describe("useNoteSidebarTree create context", () => {
 
   it("resolvedCreateParentFolderFrom returns the sidebar-selected folder object when set", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
-    const pinned = folderPageClientStub(99, "Pinned")
+    const pinned = folderRealmStub(99, "Pinned")
     expect(resolvedCreateParentFolderFrom(pinned, realm, true)).toEqual(pinned)
   })
 
@@ -70,7 +67,7 @@ describe("useNoteSidebarTree create context", () => {
       .please()
     expect(
       createParentLocationDescriptionFrom(
-        folderPageClientStub(2, "My folder"),
+        folderRealmStub(2, "My folder"),
         realm,
         true
       )
@@ -96,7 +93,7 @@ describe("useNoteSidebarTree create context", () => {
 
   it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {
     const realm = makeMe.aNoteRealm.inFolder(8, "Lab").please()
-    const activeFolder = ref<FolderPageClientView | null>(null)
+    const activeFolder = ref<FolderRealm | null>(null)
     const activeNoteRealm = ref<NoteRealm | undefined>(realm)
     const noteContextResolved = ref(true)
     const {
@@ -133,7 +130,7 @@ describe("useNoteSidebarTree create context", () => {
     expect(resolvedCreateParentFolderRow.value).toEqual(
       realm.ancestorFolders!.at(-1)!
     )
-    const pinned = folderPageClientStub(9, "Pinned")
+    const pinned = folderRealmStub(9, "Pinned")
     activeFolder.value = pinned
     expect(resolvedCreateParentFolderRow.value).toEqual(pinned.folder)
     expect(resolvedCreateParentFolderId.value).toBe(9)

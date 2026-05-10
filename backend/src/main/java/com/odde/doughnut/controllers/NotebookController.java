@@ -4,7 +4,7 @@ import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
-import com.odde.doughnut.controllers.dto.FolderPageClientView;
+import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -349,7 +349,7 @@ class NotebookController {
           "Notebook chrome, folder metadata, parent folder id when nested, and designated folder"
               + " index note id when resolved.")
   @GetMapping("/{notebook}/folders/{folder}")
-  public FolderPageClientView getFolderPage(
+  public FolderRealm getFolderPage(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder)
       throws UnexpectedNoAccessRightException {
@@ -358,7 +358,7 @@ class NotebookController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
     User user = authorizationService.getCurrentUser();
-    return notebookCatalogService.folderPageClientViewFor(notebook, folder, user);
+    return notebookCatalogService.folderRealmFor(notebook, folder, user);
   }
 
   @Operation(

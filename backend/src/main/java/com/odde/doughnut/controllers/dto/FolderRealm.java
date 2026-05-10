@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
         "Notebook chrome plus folder row for loading the folder page: same notebook fields as"
             + " NotebookPageClientView (without notebook-level indexNoteId), plus folder identity,"
             + " optional parent folder id, and optional designated folder index note id.")
-public record FolderPageClientView(
+public record FolderRealm(
     @NotNull Notebook notebook,
     @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
     boolean readonly,
@@ -28,9 +28,9 @@ public record FolderPageClientView(
                     + " (case-insensitive). Omitted when absent.")
         Integer folderIndexNoteId) {
 
-  public static FolderPageClientView of(
+  public static FolderRealm of(
       NotebookClientView chrome, Folder folder, Integer parentFolderId, Integer folderIndexNoteId) {
-    return new FolderPageClientView(
+    return new FolderRealm(
         chrome.notebook(),
         chrome.hasAttachedBook(),
         chrome.readonly(),

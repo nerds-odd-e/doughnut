@@ -781,7 +781,7 @@ export type NotebookPageClientView = {
 /**
  * Notebook chrome plus folder row for loading the folder page: same notebook fields as NotebookPageClientView (without notebook-level indexNoteId), plus folder identity, optional parent folder id, and optional designated folder index note id.
  */
-export type FolderPageClientView = {
+export type FolderRealm = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
@@ -2940,7 +2940,7 @@ export type GetFolderPageResponses = {
     /**
      * OK
      */
-    200: FolderPageClientView;
+    200: FolderRealm;
 };
 
 export type GetFolderPageResponse = GetFolderPageResponses[keyof GetFolderPageResponses];

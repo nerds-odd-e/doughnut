@@ -1,12 +1,12 @@
 import type {
   Folder,
-  FolderPageClientView,
+  FolderRealm,
   NoteRealm,
 } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type InjectionKey, type Ref } from "vue"
 
 /** Resolved parent folder for create-note / new-folder (sidebar folder page, else realm leaf). */
-export type ResolvedCreateParentFolder = FolderPageClientView | Folder
+export type ResolvedCreateParentFolder = FolderRealm | Folder
 
 /** Leaf folder for placement UI: last segment of `ancestorFolders` (notebook root when absent). */
 export function realmLeafFolder(realm: NoteRealm | undefined) {
@@ -16,7 +16,7 @@ export function realmLeafFolder(realm: NoteRealm | undefined) {
 }
 
 export function resolvedCreateParentFolderFrom(
-  activeFolder: FolderPageClientView | null,
+  activeFolder: FolderRealm | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): ResolvedCreateParentFolder | null {
@@ -43,7 +43,7 @@ export function resolvedFolderIdFromPageOrFolder(
 }
 
 export function resolvedCreateParentFolderIdFrom(
-  activeFolder: FolderPageClientView | null,
+  activeFolder: FolderRealm | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): number | null {
@@ -59,7 +59,7 @@ export function resolvedCreateParentFolderIdFrom(
 }
 
 export function createParentLocationDescriptionFrom(
-  activeFolder: FolderPageClientView | null,
+  activeFolder: FolderRealm | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): string {
@@ -74,7 +74,7 @@ export function createParentLocationDescriptionFrom(
 }
 
 export function useNotebookRootCreateTarget(
-  activeFolder: Ref<FolderPageClientView | null>,
+  activeFolder: Ref<FolderRealm | null>,
   activeNoteRealm: Ref<NoteRealm | undefined>,
   noteContextResolved: Ref<boolean>
 ): {
@@ -120,7 +120,7 @@ export function useNotebookRootCreateTarget(
 export interface SidebarTreeContext {
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolder: Ref<FolderPageClientView | null>
+  activeFolder: Ref<FolderRealm | null>
 }
 
 export const sidebarTreeKey: InjectionKey<SidebarTreeContext> =

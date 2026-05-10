@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.FolderListing;
-import com.odde.doughnut.controllers.dto.FolderPageClientView;
+import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -242,13 +242,13 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
 
-      FolderPageClientView view = controller.getFolderPage(nb, folder);
+      FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(view.notebook().getId(), equalTo(nb.getId()));
-      assertThat(view.folder().getId(), equalTo(folder.getId()));
-      assertThat(view.folder().getName(), equalTo("Box"));
-      assertThat(view.readonly(), is(false));
-      assertThat(view.parentFolderId(), nullValue());
+      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.folder().getId(), equalTo(folder.getId()));
+      assertThat(realm.folder().getName(), equalTo("Box"));
+      assertThat(realm.readonly(), is(false));
+      assertThat(realm.parentFolderId(), nullValue());
     }
 
     @Test
@@ -266,9 +266,9 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
               .title("index")
               .please();
 
-      FolderPageClientView view = controller.getFolderPage(nb, folder);
+      FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(view.folderIndexNoteId(), equalTo(index.getId()));
+      assertThat(realm.folderIndexNoteId(), equalTo(index.getId()));
     }
 
     @Test
@@ -288,9 +288,9 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       makeMe.theFolder(folder).indexNote(designated).please();
       makeMe.entityPersister.flush();
 
-      FolderPageClientView view = controller.getFolderPage(nb, folder);
+      FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(view.folderIndexNoteId(), equalTo(designated.getId()));
+      assertThat(realm.folderIndexNoteId(), equalTo(designated.getId()));
     }
 
     @Test
@@ -299,9 +299,9 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Empty").please();
 
-      FolderPageClientView view = controller.getFolderPage(nb, folder);
+      FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(view.folderIndexNoteId(), nullValue());
+      assertThat(realm.folderIndexNoteId(), nullValue());
     }
 
     @Test
@@ -311,9 +311,9 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
       Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
 
-      FolderPageClientView view = controller.getFolderPage(nb, nested);
+      FolderRealm realm = controller.getFolderPage(nb, nested);
 
-      assertThat(view.parentFolderId(), equalTo(parent.getId()));
+      assertThat(realm.parentFolderId(), equalTo(parent.getId()));
     }
 
     @Test
@@ -338,10 +338,10 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       makeMe.aBazaarNotebook(nb).please();
       currentUser.setUser(null);
 
-      FolderPageClientView view = controller.getFolderPage(nb, folder);
+      FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(view.notebook().getId(), equalTo(nb.getId()));
-      assertThat(view.readonly(), is(true));
+      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.readonly(), is(true));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.FolderPageClientView;
+import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
@@ -62,8 +62,7 @@ public class NotebookCatalogService {
     return NotebookPageClientView.of(base, indexNoteId);
   }
 
-  public FolderPageClientView folderPageClientViewFor(
-      Notebook notebook, Folder folder, User viewer) {
+  public FolderRealm folderRealmFor(Notebook notebook, Folder folder, User viewer) {
     Folder loaded =
         folderRepository
             .findById(folder.getId())
@@ -73,7 +72,7 @@ public class NotebookCatalogService {
         loaded.getParentFolder() == null ? null : loaded.getParentFolder().getId();
     Integer folderIndexNoteId =
         folderService.findOptionalIndexNote(loaded).map(Note::getId).orElse(null);
-    return FolderPageClientView.of(chrome, loaded, parentFolderId, folderIndexNoteId);
+    return FolderRealm.of(chrome, loaded, parentFolderId, folderIndexNoteId);
   }
 
   /**

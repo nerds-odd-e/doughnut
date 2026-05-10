@@ -87,11 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Folder,
-  FolderPageClientView,
-  Note,
-} from "@generated/doughnut-backend-api"
+import type { Folder, FolderRealm, Note } from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
   useNoteSidebarPeerSort,
@@ -122,7 +118,7 @@ defineProps<{
   resolvedCreateParentFolderRow: Folder | null
   createParentLocationDescription: string
   /** Folder selected in the tree (organize); independent of create parent when viewing a note. */
-  activeFolder: FolderPageClientView | null
+  activeFolder: FolderRealm | null
   /** Root-to-leaf ancestor chain from NoteRealm, passed to folder organise dialog. */
   ancestorFolders: Folder[]
 }>()

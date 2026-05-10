@@ -1,20 +1,20 @@
 <template>
-  <ContentLoader v-if="folderPageClient === undefined" />
+  <ContentLoader v-if="folderRealm === undefined" />
   <div v-else class="daisy-py-4">
     <NotebookPageReadonlySummary
-      v-if="folderPageClient.readonly === true"
-      :notebook="folderPageClient.notebook"
+      v-if="folderRealm.readonly === true"
+      :notebook="folderRealm.notebook"
     />
     <div v-else class="daisy-container daisy-mx-auto daisy-max-w-6xl">
       <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-4">
         Folder
         <span class="daisy-font-semibold daisy-text-base-content">{{
-          folderPageClient.folder.name
+          folderRealm.folder.name
         }}</span>
       </p>
       <ScopedIndexNoteEditor
-        :notebook-id="folderPageClient.notebook.id"
-        :folder-id="folderPageClient.folder.id"
+        :notebook-id="folderRealm.notebook.id"
+        :folder-id="folderRealm.folder.id"
         :index-note-status="indexNoteStatus"
         :index-note-id="sidebarAnchorNoteId"
         :fetch-page="fetchFolderPage"
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import type { FolderPageClientView } from "@generated/doughnut-backend-api"
+import type { FolderRealm } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
@@ -48,7 +48,7 @@ import {
   currentActiveNoteId,
   currentNotebookId,
   folderPageBreadcrumbFolders,
-  folderSidebarFolderPageClientView,
+  folderSidebarFolderRealm,
   notebookSidebarNotebookClientView,
   notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -58,13 +58,13 @@ import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChai
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
-const folderPageClient = ref<FolderPageClientView | undefined>(undefined)
+const folderRealm = ref<FolderRealm | undefined>(undefined)
 
 const sidebarAnchorNoteId = ref<number | undefined>()
 const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
 let indexResolveGeneration = 0
 
-function notebookChromeFromFolderPage(c: FolderPageClientView) {
+function notebookChromeFromFolderRealm(c: FolderRealm) {
   return {
     notebook: c.notebook,
     hasAttachedBook: c.hasAttachedBook,
@@ -79,7 +79,7 @@ const fetchFolderPage = async () => {
     path: { notebook: notebookId, folder: folderId },
   })
   if (!error && page) {
-    folderPageClient.value = page
+    folderRealm.value = page
     const { data: indexRows, error: indexErr } =
       await NotebookController.listNotebookFolderIndex({
         path: { notebook: notebookId },
@@ -95,14 +95,14 @@ const fetchFolderPage = async () => {
     notebookSidebarActiveFolder.value = page
     return
   }
-  folderPageClient.value = undefined
+  folderRealm.value = undefined
   folderPageBreadcrumbFolders.value = []
 }
 
 watch(
-  folderPageClient,
+  folderRealm,
   (c) => {
-    folderSidebarFolderPageClientView.value = c
+    folderSidebarFolderRealm.value = c
     if (!c) {
       notebookSidebarNotebookClientView.value = undefined
       const routeNotebookId = Number(route.params.notebookId)
@@ -112,17 +112,17 @@ watch(
       return
     }
     currentNotebookId.value = c.notebook.id
-    notebookSidebarNotebookClientView.value = notebookChromeFromFolderPage(c)
+    notebookSidebarNotebookClientView.value = notebookChromeFromFolderRealm(c)
   },
   { immediate: true, deep: true }
 )
 
 watch(
   () =>
-    folderPageClient.value
+    folderRealm.value
       ? ([
-          folderPageClient.value.folder.id,
-          folderPageClient.value.folderIndexNoteId ?? null,
+          folderRealm.value.folder.id,
+          folderRealm.value.folderIndexNoteId ?? null,
         ] as const)
       : undefined,
   async (key) => {
@@ -177,7 +177,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   notebookSidebarNotebookClientView.value = undefined
-  folderSidebarFolderPageClientView.value = undefined
+  folderSidebarFolderRealm.value = undefined
   folderPageBreadcrumbFolders.value = []
 })
 </script>
