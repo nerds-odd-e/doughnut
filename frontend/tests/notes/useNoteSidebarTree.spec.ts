@@ -9,25 +9,12 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { computed, ref } from "vue"
 import { describe, expect, it } from "vitest"
 
-function folderRealmStub(id: number, name: string): FolderRealm {
-  const now = new Date().toISOString()
-  return {
-    notebook: makeMe.aNotebook.please(),
-    folder: {
-      id,
-      name,
-      createdAt: now,
-      updatedAt: now,
-    },
-  }
-}
-
 describe("useNoteSidebarTree create context", () => {
   it("resolvedCreateParentFolderIdFrom prefers the sidebar-selected folder over the active note folder", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     expect(
       resolvedCreateParentFolderIdFrom(
-        folderRealmStub(99, "Pinned"),
+        makeMe.aFolderRealm.folder(99, "Pinned").please(),
         realm,
         true
       )
@@ -36,7 +23,7 @@ describe("useNoteSidebarTree create context", () => {
 
   it("resolvedCreateParentFolderFrom returns the sidebar-selected folder object when set", () => {
     const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
-    const pinned = folderRealmStub(99, "Pinned")
+    const pinned = makeMe.aFolderRealm.folder(99, "Pinned").please()
     expect(resolvedCreateParentFolderFrom(pinned, realm, true)).toEqual(pinned)
   })
 
@@ -67,7 +54,7 @@ describe("useNoteSidebarTree create context", () => {
       .please()
     expect(
       createParentLocationDescriptionFrom(
-        folderRealmStub(2, "My folder"),
+        makeMe.aFolderRealm.folder(2, "My folder").please(),
         realm,
         true
       )
@@ -130,7 +117,7 @@ describe("useNoteSidebarTree create context", () => {
     expect(resolvedCreateParentFolderRow.value).toEqual(
       realm.ancestorFolders!.at(-1)!
     )
-    const pinned = folderRealmStub(9, "Pinned")
+    const pinned = makeMe.aFolderRealm.folder(9, "Pinned").please()
     activeFolder.value = pinned
     expect(resolvedCreateParentFolderRow.value).toEqual(pinned.folder)
     expect(resolvedCreateParentFolderId.value).toBe(9)
