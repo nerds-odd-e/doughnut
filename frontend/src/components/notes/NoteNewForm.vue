@@ -33,9 +33,8 @@
               </template>
             </PathNameEditor>
             <SearchResults
-              v-if="titleSearchScopeNote"
               v-bind="{
-                noteId: titleSearchScopeNote.id,
+                noteId: titleSearchScopeNote?.id,
                 inputSearchKey: effectiveSearchKey,
                 isDropdown: true,
                 notebookId: notebookRootNotebookId,
@@ -88,7 +87,10 @@ const props = withDefaults(
      * as user-edited; ignored when `initialTitle` is set.
      */
     defaultTitleFromScopedPattern?: string
-    /** Duplicate title search is scoped from this note (e.g. current note in sidebar). */
+    /**
+     * When set, search is scoped under this note; when omitted (e.g. notebook-level new note), search
+     * is global and the dropdown still prioritizes hits in `notebookRootNotebookId`.
+     */
     titleSearchAnchorNote?: Note
     /** After notebook-root create, refresh wiki title cache for this note before navigating away. */
     wikiTitleCacheRefreshSourceNoteId?: number

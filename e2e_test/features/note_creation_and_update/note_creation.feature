@@ -10,7 +10,7 @@ Feature: Nested Note creation
       | team         | LeSS in Action |
       | tech         | LeSS in Action |
 
-  Scenario: Create a new note belonging to another note
+  Scenario: Create a new note under a folder in a notebook
     When I create a note with title "Re-quirement" under the folder "LeSS in Action" in the notebook "LeSS training"
     Then I should see the note tree in the sidebar
       | note-title     |

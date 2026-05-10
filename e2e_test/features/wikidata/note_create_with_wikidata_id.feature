@@ -4,10 +4,7 @@ Feature: Nested Note Create with wikidata
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Wildlife notes" with notes:
-      | Title | Folder  |
-      | Animals | |
-      | keep  | Animals |
+    And I have a notebook "Wildlife notes"
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
@@ -17,13 +14,13 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
-    When I attempt to create a note belonging to "Animals" with title "snake" and wikidata id "Q12345R"
+    When I attempt to create a note with title "snake" and wikidata id "Q12345R" in the notebook "Wildlife notes"
     Then I should see an error "The wikidata Id should be Q<numbers>" on Wikidata Id in note creation
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Select one of the Wikidata entries from the search result
     Given Wikidata search result always has "Dog" with ID "Q11399"
-    When I am creating a note under "Wildlife notes/Animals"
+    When I am creating a note in the notebook "Wildlife notes"
     And I search with phrase "dog" on Wikidata
     And I select wikidataID "Q11399" from the Wikidata search result
     Then I should see that the Title becomes "Dog"

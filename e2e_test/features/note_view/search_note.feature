@@ -34,6 +34,6 @@ Feature: search note
 
   @mockBrowserTime
   Scenario: Search when adding new note
-    Given I am creating a note under "Sedation care/Sedation"
+    Given I am creating a note in the notebook "Sedation care"
     When I type "ph" in the title
     Then I should see "Physical" as the possible duplicate

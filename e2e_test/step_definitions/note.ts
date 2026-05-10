@@ -243,35 +243,33 @@ When(
 When(
   'I create a note with title {string} and wikidata id {string} in the notebook {string}',
   (title: string, wikidataId: string, notebook: string) => {
-    start.navigateToNotebooksPage().navigateToNotebook(notebook)
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start
-      .noteSidebar()
+      .navigateToNotebooksPage()
+      .navigateToNotebook(notebook)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
-    // Wikidata creation enriches siblings (authors, country); backend work can exceed default 6s.
     start.assumeNotePage(title, { timeout: 30000 })
     start.testability().rememberUiCreatedNote(title)
   }
 )
 
 When(
-  'I attempt to create a note belonging to {string} with title {string} and wikidata id {string}',
-  (noteTopology: string, title: string, wikidataId: string) => {
+  'I attempt to create a note with title {string} and wikidata id {string} in the notebook {string}',
+  (title: string, wikidataId: string, notebook: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
-    start.jumpToNotePage(noteTopology)
     start
-      .noteSidebar()
-      .activateFolderByLabel(noteTopology)
+      .navigateToNotebooksPage()
+      .navigateToNotebook(notebook)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
   }
 )
 
-When('I am creating a note under {notepath}', (notePath: NotePath) => {
+When('I am creating a note in the notebook {string}', (notebook: string) => {
   start
     .navigateToNotebooksPage()
-    .navigateToPath(notePath)
+    .navigateToNotebook(notebook)
     .addingNewNoteFromToolbar()
 })
 
