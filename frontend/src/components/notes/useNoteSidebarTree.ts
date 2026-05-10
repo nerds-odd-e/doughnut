@@ -69,8 +69,7 @@ export function createParentLocationDescriptionFrom(
   if (!noteContextResolved) return "Adds to the notebook root."
   const leaf = realmLeafFolder(activeNoteRealm)
   if (leaf == null) return "Adds to the notebook root."
-  const label = leaf.name !== "" ? leaf.name : `Folder #${leaf.id}`
-  return `Adds to folder "${label}".`
+  return `Adds to folder "${leaf.name}".`
 }
 
 export function useNotebookRootCreateTarget(

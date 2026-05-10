@@ -11,7 +11,7 @@
       :resolved-create-parent-folder-row="resolvedCreateParentFolderRow"
       :create-parent-location-description="createParentLocationDescription"
       :active-folder="notebookSidebarActiveFolder"
-      :ancestor-folders="activeNoteRealm?.ancestorFolders ?? []"
+      :ancestor-folders="toolbarAncestorFolders"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -58,15 +58,17 @@ const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
 
+/** Matches toolbar / folder-page context: breadcrumb chain when a tree folder is active, else note ancestors. */
+const toolbarAncestorFolders = computed(() => {
+  if (notebookSidebarActiveFolder.value != null) {
+    return folderPageBreadcrumbFolders.value
+  }
+  return props.activeNoteRealm?.ancestorFolders ?? []
+})
+
 const activePathFolderIds = computed(() => {
   const ids = new Set<number>()
-  if (notebookSidebarActiveFolder.value != null) {
-    for (const seg of folderPageBreadcrumbFolders.value) {
-      if (seg.id != null) ids.add(seg.id)
-    }
-    return ids
-  }
-  for (const seg of props.activeNoteRealm?.ancestorFolders ?? []) {
+  for (const seg of toolbarAncestorFolders.value) {
     if (seg.id != null) ids.add(seg.id)
   }
   return ids

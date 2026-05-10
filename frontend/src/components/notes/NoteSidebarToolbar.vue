@@ -119,7 +119,7 @@ defineProps<{
   createParentLocationDescription: string
   /** Folder selected in the tree (organize); independent of create parent when viewing a note. */
   activeFolder: FolderRealm | null
-  /** Root-to-leaf ancestor chain from NoteRealm, passed to folder organise dialog. */
+  /** Root-to-leaf chain: folder-page breadcrumbs when a sidebar folder is active, else NoteRealm.ancestorFolders. */
   ancestorFolders: Folder[]
 }>()
 
