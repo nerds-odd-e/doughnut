@@ -284,9 +284,6 @@ export const noteSidebar = () => {
 }
 
 export const sidebarChildNotePageMethods = () => ({
-  addingNoteButton() {
-    return noteSidebar().addingNoteButton()
-  },
   addingChildNoteButton() {
     return noteSidebar().addingChildNoteButton()
   },

@@ -62,8 +62,7 @@ When(
     start
       .assumeCirclePage()
       .navigateToNotebook(parentNoteTitle)
-      .addingNoteButton()
-      .click()
+      .addingNewNoteFromToolbar()
       .createNoteWithTitle(noteTopology)
   }
 )
