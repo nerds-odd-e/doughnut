@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class QuestionGenerationRequestBuilder {
+  static final String CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER = "Custom instruction for focus note:";
+
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
@@ -57,8 +59,9 @@ public class QuestionGenerationRequestBuilder {
   }
 
   /**
-   * Optional scoped {@code question_generation_instruction} as a user message, then focus context
-   * as a user message, then optional {@code additionalMessage}—same order as {@link
+   * Optional scoped {@code question_generation_instruction} as a user message (prefixed with the
+   * same header line as {@link #CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER}), then focus context as a
+   * user message, then optional {@code additionalMessage}—same order as {@link
    * #buildQuestionGenerationRequest}. Notebook assistant hints and the MCQ JSON schema instruction
    * are not attached here; they are added after the schema instruction in {@link
    * #buildQuestionGenerationRequest} or when calling {@code OpenAiApiHandler}'s three-argument
@@ -101,8 +104,12 @@ public class QuestionGenerationRequestBuilder {
 
     String instruction =
         noteRealmService.resolveScopedQuestionGenerationInstruction(focus).orElse(null);
+    String instructionUserBlock =
+        instruction != null ? CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER + "\n" + instruction : null;
     int instructionTokens =
-        instruction != null ? ApproximateUtf8TokenBudget.estimateApproxTokens(instruction) : 0;
+        instructionUserBlock != null
+            ? ApproximateUtf8TokenBudget.estimateApproxTokens(instructionUserBlock)
+            : 0;
     int focusBudget =
         Math.max(
             0,
@@ -113,8 +120,8 @@ public class QuestionGenerationRequestBuilder {
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
 
     OpenAIChatRequestBuilder builder = new OpenAIChatRequestBuilder().model(modelName);
-    if (instruction != null) {
-      builder.addUserMessage(instruction);
+    if (instructionUserBlock != null) {
+      builder.addUserMessage(instructionUserBlock);
     }
     return builder.addUserMessage(focusContextMarkdown);
   }

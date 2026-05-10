@@ -109,8 +109,16 @@ class NoteQuestionGenerationServiceTests {
           ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
       List<String> userBodies = userMessageContentStrings(paramsCaptor.getValue());
+      assertThat(
+          userBodies.get(0),
+          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
       assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
       assertThat(userBodies.get(1), containsString("# Focus Context"));
+      assertThat(
+          systemMessageContains(
+              paramsCaptor.getValue(),
+              QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER),
+          is(false));
       assertThat(systemMessageContains(paramsCaptor.getValue(), "SCOPED_QGEN_MARKER"), is(false));
     }
 
@@ -184,6 +192,9 @@ class NoteQuestionGenerationServiceTests {
           service.buildQuestionGenerationRequest(noteInScope, null);
 
       List<String> userBodies = userMessageContentStrings(request);
+      assertThat(
+          userBodies.get(0),
+          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
       assertThat(userBodies.get(0), containsString("BUDGET_CHECK_MARKER"));
       assertThat(userBodies.get(1), containsString("# Focus Context"));
     }
@@ -209,9 +220,16 @@ class NoteQuestionGenerationServiceTests {
           service.buildQuestionGenerationRequest(noteInScope, null);
 
       List<String> userBodies = userMessageContentStrings(request);
+      assertThat(
+          userBodies.get(0),
+          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
       assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
       assertThat(userBodies.get(1), containsString("# Focus Context"));
       assertThat(systemMessageContains(request, "SCOPED_QGEN_MARKER"), is(false));
+      assertThat(
+          systemMessageContains(
+              request, QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER),
+          is(false));
       assertThat(systemMessageContains(request, "focus note"), is(true));
     }
 
@@ -279,6 +297,9 @@ class NoteQuestionGenerationServiceTests {
 
       List<String> userBodies = userMessageContentStrings(request);
       assertThat(userBodies, hasSize(3));
+      assertThat(
+          userBodies.get(0),
+          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
       assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
       assertThat(userBodies.get(1), containsString("# Focus Context"));
       assertThat(userBodies.get(2), containsString("Generate a question about the capital city"));
