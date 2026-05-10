@@ -10,9 +10,7 @@ function mountFolderItem(
   options: {
     folderId: number
     notebookId: number
-    userActiveFolder?: ReturnType<
-      typeof ref<{ id: number; name: string } | null>
-    >
+    activeFolder?: ReturnType<typeof ref<{ id: number; name: string } | null>>
   }
 ) {
   const folder = {
@@ -22,7 +20,7 @@ function mountFolderItem(
     updatedAt: "2020-01-01T00:00:00Z",
   }
   const expandedFolderIds = ref(new Set<number>())
-  const userActiveFolder = options.userActiveFolder ?? ref(null)
+  const activeFolder = options.activeFolder ?? ref(null)
   return mount(SidebarFolderItem, {
     props: {
       folder,
@@ -34,7 +32,7 @@ function mountFolderItem(
         [sidebarTreeKey]: {
           expandedFolderIds,
           activePathFolderIds: computed(() => new Set()),
-          userActiveFolder,
+          activeFolder,
         },
       },
     },
@@ -93,9 +91,9 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const userActiveFolder = ref<{ id: number; name: string } | null>(null)
-    mountFolderItem(router, { folderId: 42, notebookId: 7, userActiveFolder })
-    userActiveFolder.value = { id: 42, name: "Alpha" }
+    const activeFolder = ref<{ id: number; name: string } | null>(null)
+    mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
+    activeFolder.value = { id: 42, name: "Alpha" }
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
@@ -123,9 +121,9 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const userActiveFolder = ref<{ id: number; name: string } | null>(null)
-    mountFolderItem(router, { folderId: 42, notebookId: 7, userActiveFolder })
-    userActiveFolder.value = { id: 42, name: "Alpha" }
+    const activeFolder = ref<{ id: number; name: string } | null>(null)
+    mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
+    activeFolder.value = { id: 42, name: "Alpha" }
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()

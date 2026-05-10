@@ -81,7 +81,7 @@ const props = defineProps<{
 const currentLevel = computed(() => props.level ?? 1)
 
 const tree = inject(sidebarTreeKey)!
-const { expandedFolderIds, activePathFolderIds, userActiveFolder } = tree
+const { expandedFolderIds, activePathFolderIds, activeFolder } = tree
 
 const router = useRouter()
 
@@ -100,14 +100,11 @@ watch(
     [
       activePathFolderIds.value,
       folderId.value,
-      userActiveFolder?.value?.id ?? null,
+      activeFolder?.value?.id ?? null,
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (
-      userActiveFolder != null &&
-      userActiveFolder.value?.id === folderId.value
-    ) {
+    if (activeFolder != null && activeFolder.value?.id === folderId.value) {
       return
     }
     if (activePathFolderIds.value.has(folderId.value)) {
@@ -127,9 +124,9 @@ const isOnActivePath = computed(
 
 const isUserActiveFolder = computed(
   () =>
-    userActiveFolder != null &&
+    activeFolder != null &&
     folderId.value != null &&
-    userActiveFolder.value?.id === folderId.value
+    activeFolder.value?.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -152,9 +149,9 @@ onUnmounted(() =>
 
 function onFolderRowFocusOut(event: FocusEvent) {
   if (
-    userActiveFolder == null ||
+    activeFolder == null ||
     folderId.value == null ||
-    userActiveFolder.value?.id !== folderId.value
+    activeFolder.value?.id !== folderId.value
   ) {
     return
   }
@@ -171,12 +168,12 @@ function onFolderRowFocusOut(event: FocusEvent) {
     return
   }
   if (lastMousedownInToolbar) return
-  userActiveFolder.value = null
+  activeFolder.value = null
 }
 
 function setUserActiveFolderOnly() {
   if (folderId.value == null) return
-  userActiveFolder.value = {
+  activeFolder.value = {
     id: folderId.value,
     name: props.folder.name,
   }

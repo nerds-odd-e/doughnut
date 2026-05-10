@@ -50,7 +50,7 @@ import {
   folderPageBreadcrumbFolders,
   folderSidebarFolderPageClientView,
   notebookSidebarNotebookClientView,
-  notebookSidebarUserActiveFolder,
+  notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
@@ -92,7 +92,7 @@ const fetchFolderPage = async () => {
     } else {
       folderPageBreadcrumbFolders.value = [page.folder]
     }
-    notebookSidebarUserActiveFolder.value = {
+    notebookSidebarActiveFolder.value = {
       id: page.folder.id,
       name: page.folder.name,
     }

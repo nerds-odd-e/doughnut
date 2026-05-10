@@ -9,9 +9,8 @@
       <div class="daisy-btn-group daisy-btn-group-sm daisy-overflow-visible">
         <NotebookRootNoteNewButton
           :notebook-id="notebookId"
-          :target-folder-id="resolvedCreateParentFolderId ?? undefined"
+          :initial-folder="resolvedCreateParentFolder ?? undefined"
           :parent-location-description="createParentLocationDescription"
-          :target-folder-label="targetFolderLabel"
           :title-search-anchor-note="note"
           :ancestor-folders="ancestorFolders"
           button-title="New note"
@@ -22,18 +21,18 @@
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="ancestorFolders"
-          :context-folder-id="resolvedCreateParentFolderId"
-          :initial-parent-folder-id="resolvedCreateParentFolderId"
+          :context-folder-id="resolvedCreateParentFolder?.id ?? null"
+          :initial-parent-folder-id="resolvedCreateParentFolder?.id ?? null"
           button-title="New folder"
           aria-label="New folder"
         >
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
         <FolderOrganizeButton
-          v-if="userActiveFolder != null"
+          v-if="activeFolder != null"
           :notebook-id="notebookId"
-          :moving-folder-id="userActiveFolder.id"
-          :moving-folder-name="userActiveFolder.name"
+          :moving-folder-id="activeFolder.id"
+          :moving-folder-name="activeFolder.name"
           :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
@@ -101,20 +100,18 @@ import FolderNewButton from "./core/FolderNewButton.vue"
 import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
-import type { SidebarUserActiveFolder } from "./useNoteSidebarTree"
+import type { SidebarActiveFolder } from "./useNoteSidebarTree"
 
-const props = defineProps<{
+defineProps<{
   notebookId: number
   note?: Note
-  activeNoteTopologyResolved: boolean
-  /** Parent folder for new note / new folder (active sidebar folder, else active note's folder). */
-  resolvedCreateParentFolderId: number | null
+  /** Parent folder for new note / new folder (sidebar selection, else active note's folder). */
+  resolvedCreateParentFolder: SidebarActiveFolder | null
   createParentLocationDescription: string
-  userActiveFolder: SidebarUserActiveFolder | null
+  /** Folder selected in the tree (organize); independent of create parent when viewing a note. */
+  activeFolder: SidebarActiveFolder | null
   /** Root-to-leaf ancestor chain from NoteRealm, passed to folder organise dialog. */
   ancestorFolders: Folder[]
-  /** Display label for the target folder when its name can't be resolved from ancestorFolders. */
-  targetFolderLabel?: string
 }>()
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()

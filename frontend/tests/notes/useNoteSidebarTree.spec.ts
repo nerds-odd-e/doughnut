@@ -1,6 +1,7 @@
 import {
   createParentLocationDescriptionFrom,
   folderLabelForRealmFolderId,
+  resolvedCreateParentFolderFrom,
   resolvedCreateParentFolderIdFrom,
   useNotebookRootCreateTarget,
 } from "@/components/notes/useNoteSidebarTree"
@@ -23,14 +24,29 @@ describe("useNoteSidebarTree create context", () => {
     } as NoteRealm
   }
 
-  it("resolvedCreateParentFolderIdFrom prefers the user-selected folder over the active note folder", () => {
+  it("resolvedCreateParentFolderIdFrom prefers the sidebar-selected folder over the active note folder", () => {
     const realm = realmInFolder(10, "From note")
     expect(
       resolvedCreateParentFolderIdFrom({ id: 99, name: "Pinned" }, realm, true)
     ).toBe(99)
   })
 
-  it("resolvedCreateParentFolderIdFrom uses the active note folder when no user-selected folder", () => {
+  it("resolvedCreateParentFolderFrom returns the sidebar-selected folder object when set", () => {
+    const realm = realmInFolder(10, "From note")
+    expect(
+      resolvedCreateParentFolderFrom({ id: 99, name: "Pinned" }, realm, true)
+    ).toEqual({ id: 99, name: "Pinned" })
+  })
+
+  it("resolvedCreateParentFolderFrom derives id and label from the active note folder when none selected", () => {
+    const realm = realmInFolder(42, "Science")
+    expect(resolvedCreateParentFolderFrom(null, realm, true)).toEqual({
+      id: 42,
+      name: "Science",
+    })
+  })
+
+  it("resolvedCreateParentFolderIdFrom uses the active note folder when no sidebar-selected folder", () => {
     const realm = realmInFolder(42, "Science")
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(42)
   })
@@ -45,7 +61,7 @@ describe("useNoteSidebarTree create context", () => {
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(null)
   })
 
-  it("createParentLocationDescriptionFrom describes the user-selected folder by name", () => {
+  it("createParentLocationDescriptionFrom describes the sidebar-selected folder by name", () => {
     const realm = realmInFolder(1, "ignored when user folder active")
     expect(
       createParentLocationDescriptionFrom(
@@ -101,30 +117,40 @@ describe("useNoteSidebarTree create context", () => {
 
   it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {
     const realm = realmInFolder(8, "Lab")
-    const userActiveFolder = ref<{ id: number; name: string } | null>(null)
+    const activeFolder = ref<{ id: number; name: string } | null>(null)
     const activeNoteRealm = ref<NoteRealm | undefined>(realm)
     const noteContextResolved = ref(true)
-    const { resolvedCreateParentFolderId, createParentLocationDescription } =
-      useNotebookRootCreateTarget(
-        userActiveFolder,
-        activeNoteRealm,
-        noteContextResolved
+    const {
+      resolvedCreateParentFolder,
+      resolvedCreateParentFolderId,
+      createParentLocationDescription,
+    } = useNotebookRootCreateTarget(
+      activeFolder,
+      activeNoteRealm,
+      noteContextResolved
+    )
+    expect(resolvedCreateParentFolder.value).toEqual(
+      resolvedCreateParentFolderFrom(
+        activeFolder.value,
+        activeNoteRealm.value,
+        noteContextResolved.value
       )
+    )
     expect(resolvedCreateParentFolderId.value).toBe(
       resolvedCreateParentFolderIdFrom(
-        userActiveFolder.value,
+        activeFolder.value,
         activeNoteRealm.value,
         noteContextResolved.value
       )
     )
     expect(createParentLocationDescription.value).toBe(
       createParentLocationDescriptionFrom(
-        userActiveFolder.value,
+        activeFolder.value,
         activeNoteRealm.value,
         noteContextResolved.value
       )
     )
-    userActiveFolder.value = { id: 9, name: "Pinned" }
+    activeFolder.value = { id: 9, name: "Pinned" }
     expect(resolvedCreateParentFolderId.value).toBe(9)
     expect(createParentLocationDescription.value).toBe(
       'Adds to folder "Pinned".'

@@ -2,7 +2,7 @@ import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { computed, type ComputedRef, type InjectionKey, type Ref } from "vue"
 
 /** Folder the user explicitly selected in the sidebar tree (new note / new folder scope). */
-export type SidebarUserActiveFolder = { id: number; name: string }
+export type SidebarActiveFolder = { id: number; name: string }
 
 export function folderLabelForRealmFolderId(
   realm: NoteRealm | undefined,
@@ -12,27 +12,46 @@ export function folderLabelForRealmFolderId(
   return seg?.name ?? `Folder #${folderId}`
 }
 
-export function resolvedCreateParentFolderIdFrom(
-  userActiveFolder: SidebarUserActiveFolder | null,
+export function resolvedCreateParentFolderFrom(
+  activeFolder: SidebarActiveFolder | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
-): number | null {
-  if (userActiveFolder != null) return userActiveFolder.id
+): SidebarActiveFolder | null {
+  if (activeFolder != null) return activeFolder
   const fid = activeNoteRealm?.note?.noteTopology?.folderId
-  if (fid != null && noteContextResolved) return fid
+  if (fid != null && noteContextResolved) {
+    return {
+      id: fid,
+      name: folderLabelForRealmFolderId(activeNoteRealm, fid),
+    }
+  }
   return null
 }
 
+export function resolvedCreateParentFolderIdFrom(
+  activeFolder: SidebarActiveFolder | null,
+  activeNoteRealm: NoteRealm | undefined,
+  noteContextResolved: boolean
+): number | null {
+  return (
+    resolvedCreateParentFolderFrom(
+      activeFolder,
+      activeNoteRealm,
+      noteContextResolved
+    )?.id ?? null
+  )
+}
+
 export function createParentLocationDescriptionFrom(
-  userActiveFolder: SidebarUserActiveFolder | null,
+  activeFolder: SidebarActiveFolder | null,
   activeNoteRealm: NoteRealm | undefined,
   noteContextResolved: boolean
 ): string {
-  if (userActiveFolder != null) {
+  if (activeFolder != null) {
     const label =
-      userActiveFolder.name !== ""
-        ? userActiveFolder.name
-        : folderLabelForRealmFolderId(activeNoteRealm, userActiveFolder.id)
+      activeFolder.name !== ""
+        ? activeFolder.name
+        : folderLabelForRealmFolderId(activeNoteRealm, activeFolder.id)
     return `Adds to folder "${label}".`
   }
   if (!noteContextResolved) return "Adds to the notebook root."
@@ -43,34 +62,42 @@ export function createParentLocationDescriptionFrom(
 }
 
 export function useNotebookRootCreateTarget(
-  userActiveFolder: Ref<SidebarUserActiveFolder | null>,
+  activeFolder: Ref<SidebarActiveFolder | null>,
   activeNoteRealm: Ref<NoteRealm | undefined>,
   noteContextResolved: Ref<boolean>
 ): {
+  resolvedCreateParentFolder: ComputedRef<SidebarActiveFolder | null>
   resolvedCreateParentFolderId: ComputedRef<number | null>
   createParentLocationDescription: ComputedRef<string>
 } {
-  const resolvedCreateParentFolderId = computed(() =>
-    resolvedCreateParentFolderIdFrom(
-      userActiveFolder.value,
+  const resolvedCreateParentFolder = computed(() =>
+    resolvedCreateParentFolderFrom(
+      activeFolder.value,
       activeNoteRealm.value,
       noteContextResolved.value
     )
+  )
+  const resolvedCreateParentFolderId = computed(
+    () => resolvedCreateParentFolder.value?.id ?? null
   )
   const createParentLocationDescription = computed(() =>
     createParentLocationDescriptionFrom(
-      userActiveFolder.value,
+      activeFolder.value,
       activeNoteRealm.value,
       noteContextResolved.value
     )
   )
-  return { resolvedCreateParentFolderId, createParentLocationDescription }
+  return {
+    resolvedCreateParentFolder,
+    resolvedCreateParentFolderId,
+    createParentLocationDescription,
+  }
 }
 
 export interface SidebarTreeContext {
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  userActiveFolder: Ref<SidebarUserActiveFolder | null>
+  activeFolder: Ref<SidebarActiveFolder | null>
 }
 
 export const sidebarTreeKey: InjectionKey<SidebarTreeContext> =

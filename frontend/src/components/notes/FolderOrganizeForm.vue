@@ -63,7 +63,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import usePopups from "../commons/Popups/usePopups"
-import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
+import { notebookSidebarActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import FolderSelector from "./FolderSelector.vue"
 import { dissolveParentLabelFromChain } from "./folderSelectorUtils"
 
@@ -131,7 +131,7 @@ const dissolve = async () => {
     )
     if (error) throw error
     refreshSidebarStructuralListings()
-    notebookSidebarUserActiveFolder.value = null
+    notebookSidebarActiveFolder.value = null
     emit("closeDialog")
   } catch (e: unknown) {
     dissolveError.value =

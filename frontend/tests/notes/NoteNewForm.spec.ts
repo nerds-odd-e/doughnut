@@ -101,7 +101,7 @@ describe("adding new note", () => {
     ancestorFolders: realm.ancestorFolders ?? [],
   }
 
-  it("shows folder dropdown label when target folder is outside ancestorFolders", async () => {
+  it("shows folder dropdown label when initial folder is outside ancestorFolders", async () => {
     const wrapper = helper
       .component(NoteNewForm)
       .withCleanStorage()
@@ -109,8 +109,7 @@ describe("adding new note", () => {
         notebookRootNotebookId: realm.notebookView.notebook.id,
         titleSearchAnchorNote: note,
         ancestorFolders: [],
-        targetFolderId: 99,
-        targetFolderLabel: "LeSS in Action",
+        initialFolder: { id: 99, name: "LeSS in Action" },
       })
       .mount({ attachTo: document.body })
 
@@ -312,7 +311,7 @@ describe("adding new note", () => {
         .withCleanStorage()
         .withProps({
           ...notebookRootProps,
-          targetFolderId: 42,
+          initialFolder: { id: 42, name: "Alpha" },
         })
         .mount({ attachTo: document.body })
       await setNoteNewFormTitle(wrapper, "in folder")
@@ -342,7 +341,7 @@ describe("adding new note", () => {
         .withCleanStorage()
         .withProps({
           ...notebookRootProps,
-          targetFolderId: 7,
+          initialFolder: { id: 7, name: "One" },
         })
         .mount({ attachTo: document.body })
       await setNoteNewFormTitle(wrapper, "moved")

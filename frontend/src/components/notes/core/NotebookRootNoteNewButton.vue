@@ -10,11 +10,10 @@
     <template #default="{ closer }">
       <NoteNewForm
         :notebook-root-notebook-id="notebookId"
-        :target-folder-id="targetFolderId ?? undefined"
+        :initial-folder="initialFolder"
         :parent-location-description="parentLocationDescription"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         :ancestor-folders="ancestorFolders ?? []"
-        :target-folder-label="targetFolderLabel"
         :default-title-from-scoped-pattern="defaultTitleFromScopedPattern"
         @close-dialog="closer"
       />
@@ -27,16 +26,17 @@ import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
 import { useDefaultNewNoteTitleFromPattern } from "@/composables/useScopedTitlePatternForNewNote"
 import NoteNewForm from "../NoteNewForm.vue"
+import type { SidebarActiveFolder } from "../useNoteSidebarTree"
 
 defineProps<{
   notebookId: number
   buttonTitle: string
   ariaLabel?: string
-  targetFolderId?: number | null
+  /** Resolved parent folder for create dialog (sidebar selection or active note folder). */
+  initialFolder?: SidebarActiveFolder
   parentLocationDescription?: string
   titleSearchAnchorNote?: Note | null
   ancestorFolders?: Folder[]
-  targetFolderLabel?: string
 }>()
 
 const defaultTitleFromScopedPattern = useDefaultNewNoteTitleFromPattern()

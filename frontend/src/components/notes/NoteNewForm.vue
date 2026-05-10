@@ -71,6 +71,7 @@ import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import usePopups from "@/components/commons/Popups/usePopups"
+import type { SidebarActiveFolder } from "./useNoteSidebarTree"
 
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
@@ -79,8 +80,8 @@ const { popups } = usePopups()
 const props = withDefaults(
   defineProps<{
     notebookRootNotebookId: number
-    /** Initial folder scope for create-note (active sidebar folder). User can change via FolderSelector. */
-    targetFolderId?: number
+    /** Initial folder scope for create-note (sidebar selection or active note folder). User can change via FolderSelector. */
+    initialFolder?: SidebarActiveFolder
     parentLocationDescription?: string
     initialTitle?: string
     /**
@@ -97,21 +98,16 @@ const props = withDefaults(
     wikiTitleCacheRefreshSourceNoteId?: number
     /** Root-to-leaf ancestor chain for FolderSelector (same as NoteRealm.ancestorFolders). */
     ancestorFolders?: Folder[]
-    /**
-     * Display label for the target folder when its name cannot be resolved from ancestorFolders.
-     * Used as a fallback in the folder selector dropdown.
-     */
-    targetFolderLabel?: string
   }>(),
   { ancestorFolders: () => [] }
 )
 
 const titleSearchScopeNote = computed(() => props.titleSearchAnchorNote)
 
-const selectedFolderId = ref<number | null>(props.targetFolderId ?? null)
+const selectedFolderId = ref<number | null>(props.initialFolder?.id ?? null)
 
 watch(
-  () => props.targetFolderId,
+  () => props.initialFolder?.id,
   (v) => {
     selectedFolderId.value = v ?? null
   }
@@ -119,15 +115,15 @@ watch(
 
 /** Fallback label for the folder selector when the path can't be resolved from ancestorFolders. */
 const folderSelectorLabel = computed((): string | undefined => {
-  const id = selectedFolderId.value ?? props.targetFolderId ?? null
+  const id = selectedFolderId.value ?? props.initialFolder?.id ?? null
   if (id == null) return undefined
   const found = props.ancestorFolders.find((f) => f.id === id)
-  return found?.name ?? props.targetFolderLabel
+  return found?.name ?? props.initialFolder?.name
 })
 
 /** Context folder for FolderSelector quick picks; null at notebook root. */
 const folderSelectorContextFolderId = computed((): number | null => {
-  const fromTarget = selectedFolderId.value ?? props.targetFolderId ?? null
+  const fromTarget = selectedFolderId.value ?? props.initialFolder?.id ?? null
   if (fromTarget != null) return fromTarget
   const anchorFolder = props.titleSearchAnchorNote?.noteTopology.folderId
   if (anchorFolder != null) return anchorFolder

@@ -3,7 +3,7 @@
     <template #body>
       <NoteNewForm
         :notebook-root-notebook-id="notebookId"
-        :target-folder-id="resolvedCreateParentFolderId ?? undefined"
+        :initial-folder="resolvedCreateParentFolder ?? undefined"
         :parent-location-description="createParentLocationDescription"
         :initial-title="modelValue"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
@@ -18,7 +18,7 @@
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { computed } from "vue"
 import Modal from "@/components/commons/Modal.vue"
-import { notebookSidebarUserActiveFolder } from "@/composables/useCurrentNoteSidebarState"
+import { notebookSidebarActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import { useNotebookRootCreateTarget } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
 
@@ -34,9 +34,9 @@ const noteContextResolved = computed(
   () => props.noteRealm.note?.noteTopology != null
 )
 
-const { resolvedCreateParentFolderId, createParentLocationDescription } =
+const { resolvedCreateParentFolder, createParentLocationDescription } =
   useNotebookRootCreateTarget(
-    notebookSidebarUserActiveFolder,
+    notebookSidebarActiveFolder,
     activeNoteRealmRef,
     noteContextResolved
   )

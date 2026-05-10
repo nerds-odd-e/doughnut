@@ -38,7 +38,7 @@ import {
   currentActiveNoteId,
   currentNotebookId,
   notebookSidebarNotebookClientView,
-  notebookSidebarUserActiveFolder,
+  notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
@@ -69,7 +69,7 @@ watch(
   (id) => {
     if (id != null) {
       currentActiveNoteId.value = id
-      notebookSidebarUserActiveFolder.value = null
+      notebookSidebarActiveFolder.value = null
     }
   },
   { immediate: true }

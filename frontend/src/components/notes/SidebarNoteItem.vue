@@ -43,7 +43,7 @@ import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { inject } from "vue"
 
 const tree = inject(sidebarTreeKey)
-const userActiveFolder = tree?.userActiveFolder
+const activeFolder = tree?.activeFolder
 
 interface Props {
   noteTopology: NoteTopology
@@ -53,8 +53,8 @@ interface Props {
 const props = defineProps<Props>()
 
 function onNoteRowClick() {
-  if (userActiveFolder != null) {
-    userActiveFolder.value = null
+  if (activeFolder != null) {
+    activeFolder.value = null
   }
 }
 </script>

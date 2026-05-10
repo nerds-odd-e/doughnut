@@ -7,12 +7,10 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :note="activeNoteRealm?.note"
-      :active-note-topology-resolved="noteContextResolved"
-      :resolved-create-parent-folder-id="resolvedCreateParentFolderId"
+      :resolved-create-parent-folder="resolvedCreateParentFolder"
       :create-parent-location-description="createParentLocationDescription"
-      :user-active-folder="notebookSidebarUserActiveFolder"
+      :active-folder="notebookSidebarActiveFolder"
       :ancestor-folders="activeNoteRealm?.ancestorFolders ?? []"
-      :target-folder-label="activeFolderLabel"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -39,7 +37,7 @@ import {
 } from "./useNoteSidebarTree"
 import {
   notebookSidebarNotebookClientView,
-  notebookSidebarUserActiveFolder,
+  notebookSidebarActiveFolder,
   folderPageBreadcrumbFolders,
 } from "@/composables/useCurrentNoteSidebarState"
 
@@ -61,7 +59,7 @@ const activeNoteTopology = computed(
 
 const activePathFolderIds = computed(() => {
   const ids = new Set<number>()
-  if (notebookSidebarUserActiveFolder.value != null) {
+  if (notebookSidebarActiveFolder.value != null) {
     for (const seg of folderPageBreadcrumbFolders.value) {
       if (seg.id != null) ids.add(seg.id)
     }
@@ -78,7 +76,7 @@ const activePathFolderIds = computed(() => {
 provide(sidebarTreeKey, {
   expandedFolderIds,
   activePathFolderIds,
-  userActiveFolder: notebookSidebarUserActiveFolder,
+  activeFolder: notebookSidebarActiveFolder,
 })
 
 watch(
@@ -86,7 +84,7 @@ watch(
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderIds.value = new Set()
-      notebookSidebarUserActiveFolder.value = null
+      notebookSidebarActiveFolder.value = null
     }
   }
 )
@@ -104,17 +102,12 @@ const noteContextResolved = computed(() => activeNoteTopology.value != null)
 
 const activeNoteRealmRef = computed(() => props.activeNoteRealm)
 
-const { resolvedCreateParentFolderId, createParentLocationDescription } =
+const { resolvedCreateParentFolder, createParentLocationDescription } =
   useNotebookRootCreateTarget(
-    notebookSidebarUserActiveFolder,
+    notebookSidebarActiveFolder,
     activeNoteRealmRef,
     noteContextResolved
   )
-
-/** Name of the active folder for use as a fallback label in the folder selector dropdown. */
-const activeFolderLabel = computed(
-  () => notebookSidebarUserActiveFolder.value?.name ?? undefined
-)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(
