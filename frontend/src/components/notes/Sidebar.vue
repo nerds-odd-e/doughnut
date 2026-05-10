@@ -68,8 +68,6 @@ const activePathFolderIds = computed(() => {
   for (const seg of props.activeNoteRealm?.ancestorFolders ?? []) {
     if (seg.id != null) ids.add(seg.id)
   }
-  const fid = activeNoteTopology.value?.folderId
-  if (fid != null) ids.add(fid)
   return ids
 })
 
