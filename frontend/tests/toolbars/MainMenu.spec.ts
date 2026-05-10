@@ -10,7 +10,11 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, vi } from "vitest"
 import { computed, ref } from "vue"
-import { createRouter, createWebHistory } from "vue-router"
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationRaw,
+} from "vue-router"
 
 vi.mock("@/composables/useRecallData")
 
@@ -124,15 +128,19 @@ describe("main menu", () => {
     }
   }
 
+  const mountMainMenu = () =>
+    helper.component(MainMenu).withProps({ user }).withRouter(router).render()
+
   // Helper to render component and expand menu if needed
   const renderComponent = async () => {
-    const result = helper
-      .component(MainMenu)
-      .withProps({ user })
-      .withRouter(router)
-      .render()
+    const result = mountMainMenu()
     await expandMenuIfNeeded()
     return result
+  }
+
+  const expectNavLinkPrimary = (ariaLabel: string) => {
+    const link = screen.getByLabelText(ariaLabel)
+    expect(link.closest(".nav-item")).toHaveClass("daisy-text-primary")
   }
 
   beforeEach(() => {
@@ -149,74 +157,51 @@ describe("main menu", () => {
     vi.restoreAllMocks()
   })
 
-  it("shows assimilate link in main menu", async () => {
+  it("shows assimilate link as an anchor in the menu", async () => {
     await renderComponent()
-
     const assimilateLink = screen.getByLabelText("Assimilate")
     expect(assimilateLink).toBeInTheDocument()
     expect(assimilateLink.tagName).toBe("A")
   })
 
-  it("highlights the note link when on notebooks page", async () => {
-    await router.push({ name: "notebooks" })
+  it.each([
+    {
+      linkLabel: "Note",
+      route: { name: "notebooks" } as RouteLocationRaw,
+      context: "notebooks",
+    },
+    {
+      linkLabel: "Note",
+      route: {
+        name: "notebookPage",
+        params: { notebookId: "1" },
+      } as RouteLocationRaw,
+      context: "notebook page",
+    },
+    {
+      linkLabel: "Note",
+      route: {
+        name: "folderPage",
+        params: { notebookId: "1", folderId: "2" },
+      } as RouteLocationRaw,
+      context: "folder page",
+    },
+    {
+      linkLabel: "Circles",
+      route: {
+        name: "circleShow",
+        params: { circleId: "1" },
+      } as RouteLocationRaw,
+      context: "circle show page",
+    },
+  ])("applies primary nav styling to $linkLabel on $context", async ({
+    linkLabel,
+    route,
+  }) => {
+    await router.push(route)
     await flushPromises()
-
     await renderComponent()
-
-    const noteLink = screen.getByLabelText("Note")
-    const navItem = noteLink.closest(".nav-item")
-    expect(navItem).toHaveClass("daisy-text-primary")
-  })
-
-  it("highlights the note link when on notebook page", async () => {
-    await router.push({ name: "notebookPage", params: { notebookId: "1" } })
-    await flushPromises()
-
-    await renderComponent()
-
-    const noteLink = screen.getByLabelText("Note")
-    const navItem = noteLink.closest(".nav-item")
-    expect(navItem).toHaveClass("daisy-text-primary")
-  })
-
-  it("highlights the note link when on folder page", async () => {
-    await router.push({
-      name: "folderPage",
-      params: { notebookId: "1", folderId: "2" },
-    })
-    await flushPromises()
-
-    await renderComponent()
-
-    const noteLink = screen.getByLabelText("Note")
-    const navItem = noteLink.closest(".nav-item")
-    expect(navItem).toHaveClass("daisy-text-primary")
-  })
-
-  it("shows note link in main menu", async () => {
-    await renderComponent()
-
-    const noteLink = screen.getByLabelText("Note")
-    expect(noteLink).toBeInTheDocument()
-  })
-
-  it("highlights the circles link when on circle show page", async () => {
-    await router.push({ name: "circleShow", params: { circleId: "1" } })
-    await flushPromises()
-
-    await renderComponent()
-
-    const circlesLink = screen.getByLabelText("Circles")
-    const navItem = circlesLink.closest(".nav-item")
-    expect(navItem).toHaveClass("daisy-text-primary")
-  })
-
-  it("shows assimilate link in both main menu and dropdown menu", async () => {
-    await renderComponent()
-
-    const mainMenuAssimilateLink = screen.getByLabelText("Assimilate")
-
-    expect(mainMenuAssimilateLink).toBeInTheDocument()
+    expectNavLinkPrimary(linkLabel)
   })
 
   describe("assimilate due count", () => {
@@ -233,11 +218,7 @@ describe("main menu", () => {
         })
       )
 
-      const { getByText } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
+      const { getByText } = mountMainMenu()
       await flushPromises()
 
       const dueCount = getByText("5")
@@ -246,18 +227,14 @@ describe("main menu", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      const { queryByText } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
+      const { queryByText } = mountMainMenu()
       await flushPromises()
 
       const dueCount = queryByText("0")
       expect(dueCount).not.toBeInTheDocument()
     })
 
-    it("fetches menu data when user changes", async () => {
+    it("calls getMenuData with timezone and refetches when user changes", async () => {
       const getMenuDataSpy = mockSdkService(
         UserController,
         "getMenuData",
@@ -270,44 +247,28 @@ describe("main menu", () => {
         })
       )
 
-      const { rerender } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
-      await flushPromises()
-
-      const newUser = { ...user, id: 2 }
-      await rerender({ user: newUser })
-      await flushPromises()
-
-      expect(getMenuDataSpy).toHaveBeenCalledTimes(2)
-    })
-
-    it("calls getMenuData with the correct timezone", async () => {
-      const getMenuDataSpy = mockSdkService(
-        UserController,
-        "getMenuData",
-        createMenuData({
-          assimilationCount: {
-            dueCount: 3,
-            assimilatedCountOfTheDay: 0,
-            totalUnassimilatedCount: 0,
-          },
-        })
-      )
-
-      helper.component(MainMenu).withProps({ user }).withRouter(router).render()
+      const { rerender } = mountMainMenu()
       await flushPromises()
 
       expect(getMenuDataSpy).toHaveBeenCalledWith({
         query: { timezone: timezoneParam() },
       })
+
+      await rerender({ user: { ...user, id: 2 } })
+      await flushPromises()
+
+      expect(getMenuDataSpy).toHaveBeenCalledTimes(2)
     })
   })
 
   describe("recall count", () => {
-    it("shows recall count when there are items to repeat", async () => {
+    it.each([
+      { linkLabel: "Recall", isRecallPaused: false },
+      { linkLabel: "Resume", isRecallPaused: true },
+    ])("shows recall count on $linkLabel when there are items to repeat", async ({
+      linkLabel,
+      isRecallPaused,
+    }) => {
       mockSdkService(
         UserController,
         "getMenuData",
@@ -322,28 +283,25 @@ describe("main menu", () => {
 
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
+          isRecallPaused,
           toRepeat: memoryTrackerLitesStub(789),
         })
       )
 
-      const { getByText } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
+      mountMainMenu()
       await flushPromises()
 
-      const recallCount = getByText("789")
+      const link = screen.getByLabelText(linkLabel)
+      const recallCount = link
+        .closest(".nav-item")
+        ?.querySelector(".recall-count")
       expect(recallCount).toBeInTheDocument()
+      expect(recallCount).toHaveTextContent("789")
       expect(recallCount).toHaveClass("recall-count")
     })
 
     it("does not show recall count when there are no items to repeat", async () => {
-      const { queryByText } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
+      const { queryByText } = mountMainMenu()
       await flushPromises()
 
       const recallCount = queryByText("0")
@@ -360,11 +318,7 @@ describe("main menu", () => {
 
       vi.mocked(useRecallData).mockReturnValue(mockData)
 
-      const { getAllByText, rerender } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
+      const { getAllByText, rerender } = mountMainMenu()
       await flushPromises()
 
       // Initially shows 10 items (may appear on both Recall and Resume if currentIndex > 0)
@@ -390,67 +344,34 @@ describe("main menu", () => {
       createMatchMediaSpy(false)
     })
 
-    it("keeps menu expanded when clicking account button", async () => {
-      helper.component(MainMenu).withProps({ user }).withRouter(router).render()
+    it("keeps nav expanded when opening account and lists account actions", async () => {
+      mountMainMenu()
 
-      // Browser Mode: Real click event on expand button!
-      // Expand the menu first
       const expandButton = screen.getByLabelText("Toggle menu")
       await fireEvent.click(expandButton)
 
-      // Verify menu is expanded by checking if assimilate link is visible
       const assimilateLink = screen.getByLabelText("Assimilate")
       expect(assimilateLink).toBeInTheDocument()
 
-      // Click on account button
-      const accountButton = screen.getByLabelText("Account")
-      await fireEvent.click(accountButton)
+      await fireEvent.click(screen.getByLabelText("Account"))
 
-      // Menu should still be expanded (assimilate link should still be visible)
       expect(assimilateLink).toBeInTheDocument()
-
-      // Account dropdown should be visible
-      const settingsLink = screen.getByText(/Settings for/)
-      expect(settingsLink).toBeInTheDocument()
-    })
-
-    it("shows account dropdown when clicking account button on horizontal menu", async () => {
-      helper.component(MainMenu).withProps({ user }).withRouter(router).render()
-
-      // Browser Mode: Real click event on expand button!
-      // Expand the menu first
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
-
-      // Click on account button
-      const accountButton = screen.getByLabelText("Account")
-      await fireEvent.click(accountButton)
-
-      // Account dropdown should be visible with menu items
       expect(screen.getByText(/Settings for/)).toBeInTheDocument()
       expect(screen.getByText("Recent...")).toBeInTheDocument()
       expect(screen.getByText("Logout")).toBeInTheDocument()
     })
 
     it("collapses menu when clicking outside menu and account dropdown", async () => {
-      helper.component(MainMenu).withProps({ user }).withRouter(router).render()
+      mountMainMenu()
 
-      // Browser Mode: Real click event on expand button!
-      // Expand the menu first
       const expandButton = screen.getByLabelText("Toggle menu")
       await fireEvent.click(expandButton)
 
-      // Verify menu is expanded by checking if assimilate link is visible
       const assimilateLink = screen.getByLabelText("Assimilate")
       expect(assimilateLink).toBeInTheDocument()
 
-      // Browser Mode: Real click event on document.body!
-      // Click outside the menu
       await fireEvent.click(document.body)
 
-      // Menu should be collapsed (assimilate link should not be visible in expanded state)
-      // The menu might still exist but in collapsed state
-      // We can verify by checking that the expand button is still there
       expect(screen.getByLabelText("Toggle menu")).toBeInTheDocument()
     })
   })
@@ -465,25 +386,14 @@ describe("main menu", () => {
       )
     })
 
-    it("shows and highlights resume recall menu item when recall is paused", async () => {
+    it("shows highlighted Resume before Note when recall is paused", async () => {
       await renderComponent()
 
       const resumeRecallLink = screen.getByLabelText("Resume")
-      expect(resumeRecallLink).toBeInTheDocument()
-      const navItem = resumeRecallLink.closest(".nav-item")
-      expect(navItem).toHaveClass("resume-recall-active")
-    })
+      expect(resumeRecallLink.closest(".nav-item")).toHaveClass(
+        "resume-recall-active"
+      )
 
-    it("shows resume recall as first item when recall is paused", async () => {
-      await renderComponent()
-
-      // Browser Mode: Real getByLabelText!
-      // Check that resume recall element is in the document
-      const resumeRecallElement = screen.getByLabelText("Resume")
-      const noteElement = screen.getByLabelText("Note")
-
-      // Browser Mode: Real document.querySelectorAll!
-      // Get all navigation items
       const allNavItems = Array.from(document.querySelectorAll(".nav-item"))
       const resumeNavItem = allNavItems.find(
         (el) =>
@@ -496,18 +406,11 @@ describe("main menu", () => {
           el.querySelector('[aria-label="Note"]')
       )
 
-      expect(resumeRecallElement).toBeInTheDocument()
-      expect(noteElement).toBeInTheDocument()
       expect(resumeNavItem).toBeDefined()
       expect(noteNavItem).toBeDefined()
-
-      // Browser Mode: Real indexOf!
-      // Check that resume recall appears before note
-      const resumeIndex = allNavItems.indexOf(resumeNavItem!)
-      const noteIndex = allNavItems.indexOf(noteNavItem!)
-      expect(resumeIndex).toBeGreaterThan(-1)
-      expect(noteIndex).toBeGreaterThan(-1)
-      expect(resumeIndex).toBeLessThan(noteIndex)
+      expect(allNavItems.indexOf(resumeNavItem!)).toBeLessThan(
+        allNavItems.indexOf(noteNavItem!)
+      )
     })
 
     it("does not show resume recall menu item when recall is not paused", async () => {
@@ -534,7 +437,7 @@ describe("main menu", () => {
         })
       )
 
-      helper.component(MainMenu).withProps({ user }).withRouter(router).render()
+      mountMainMenu()
 
       // Browser Mode: Real getByLabelText!
       // Menu should be collapsed initially
@@ -551,37 +454,6 @@ describe("main menu", () => {
       expect(resumeRecallSpy).toHaveBeenCalled()
     })
 
-    it("shows recall count badge on resume item when there are items to repeat", async () => {
-      mockSdkService(
-        UserController,
-        "getMenuData",
-        createMenuData({
-          recallStatus: {
-            toRepeat: memoryTrackerLitesStub(789),
-            currentRecallWindowEndAt: "",
-            totalAssimilatedCount: 0,
-          },
-        })
-      )
-
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: true,
-          toRepeat: memoryTrackerLitesStub(789),
-        })
-      )
-
-      helper.component(MainMenu).withProps({ user }).withRouter(router).render()
-      await flushPromises()
-
-      const resumeLink = screen.getByLabelText("Resume")
-      const resumeNavItem = resumeLink.closest(".nav-item")
-      const resumeCount = resumeNavItem?.querySelector(".recall-count")
-      expect(resumeCount).toBeInTheDocument()
-      expect(resumeCount).toHaveTextContent("789")
-      expect(resumeCount).toHaveClass("recall-count")
-    })
-
     it("does not show recall count badge on resume item when there are no items to repeat", async () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
@@ -590,11 +462,7 @@ describe("main menu", () => {
         })
       )
 
-      const { queryByText } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .withRouter(router)
-        .render()
+      const { queryByText } = mountMainMenu()
       await flushPromises()
 
       const resumeCount = queryByText("0")
