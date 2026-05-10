@@ -33,10 +33,10 @@
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
         <FolderOrganizeButton
-          v-if="activeFolderRealmRef != null"
+          v-if="activeFolderRealm != null"
           :notebook-id="notebookId"
-          :moving-folder-id="activeFolderRealmRef.folder.id"
-          :moving-folder-name="activeFolderRealmRef.folder.name"
+          :moving-folder-id="activeFolderRealm.folder.id"
+          :moving-folder-name="activeFolderRealm.folder.name"
           :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
@@ -109,8 +109,10 @@ import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
 import {
+  createParentLocationDescriptionFrom,
+  resolvedCreateParentFolderFrom,
   resolvedFolderIdFromPageOrFolder,
-  useNotebookRootCreateTarget,
+  type ResolvedCreateParentFolder,
 } from "./useNoteSidebarTree"
 
 const props = defineProps<{
@@ -119,20 +121,31 @@ const props = defineProps<{
   activeFolderRealm?: FolderRealm | null
 }>()
 
-const activeNoteRealmRef = computed(() => props.activeNoteRealm)
-const activeFolderRealmRef = computed(() => props.activeFolderRealm ?? null)
 const noteContextResolved = computed(
   () => props.activeNoteRealm?.note?.noteTopology != null
 )
 
-const {
-  resolvedCreateParentFolder,
-  resolvedCreateParentFolderRow,
-  createParentLocationDescription,
-} = useNotebookRootCreateTarget(
-  activeFolderRealmRef,
-  activeNoteRealmRef,
-  noteContextResolved
+const resolvedCreateParentFolder = computed(
+  (): ResolvedCreateParentFolder | null =>
+    resolvedCreateParentFolderFrom(
+      props.activeFolderRealm ?? null,
+      props.activeNoteRealm,
+      noteContextResolved.value
+    )
+)
+
+const resolvedCreateParentFolderRow = computed((): Folder | null => {
+  const v = resolvedCreateParentFolder.value
+  if (v == null) return null
+  return "folder" in v ? v.folder : v
+})
+
+const createParentLocationDescription = computed(() =>
+  createParentLocationDescriptionFrom(
+    props.activeFolderRealm ?? null,
+    props.activeNoteRealm,
+    noteContextResolved.value
+  )
 )
 
 const ancestorFolders = computed((): Folder[] => {
