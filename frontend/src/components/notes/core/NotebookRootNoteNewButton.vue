@@ -14,6 +14,7 @@
         :parent-location-description="parentLocationDescription"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         :ancestor-folders="ancestorFolders ?? []"
+        :target-folder-label="targetFolderLabel"
         :default-title-from-scoped-pattern="defaultTitleFromScopedPattern"
         @close-dialog="closer"
       />
@@ -35,6 +36,7 @@ defineProps<{
   parentLocationDescription?: string
   titleSearchAnchorNote?: Note | null
   ancestorFolders?: Folder[]
+  targetFolderLabel?: string
 }>()
 
 const defaultTitleFromScopedPattern = useDefaultNewNoteTitleFromPattern()

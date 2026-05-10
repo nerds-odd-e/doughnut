@@ -101,6 +101,29 @@ describe("adding new note", () => {
     ancestorFolders: realm.ancestorFolders ?? [],
   }
 
+  it("shows folder dropdown label when target folder is outside ancestorFolders", async () => {
+    const wrapper = helper
+      .component(NoteNewForm)
+      .withCleanStorage()
+      .withProps({
+        notebookRootNotebookId: realm.notebookView.notebook.id,
+        titleSearchAnchorNote: note,
+        ancestorFolders: [],
+        targetFolderId: 99,
+        targetFolderLabel: "LeSS in Action",
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    const select = wrapper.find('[data-testid="folder-move-parent-select"]')
+      .element as HTMLSelectElement
+    const selectedText = select.selectedOptions[0]?.textContent?.trim() ?? ""
+    expect(selectedText).toBe("LeSS in Action")
+
+    wrapper.unmount()
+  })
+
   it("does not search for initial default 'Untitled' title", async () => {
     searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
     const wrapper = helper

@@ -100,6 +100,11 @@ const props = defineProps<{
   /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
   ancestorFolders: Folder[]
   modelValue: number | null
+  /**
+   * Display label for the current selection when its path cannot be resolved from the local index.
+   * Used as a fallback for the synthetic dropdown option before the full folder index is loaded.
+   */
+  modelValueLabel?: string
   disabled?: boolean
 }>()
 
@@ -180,7 +185,9 @@ const needsSyntheticOption = computed(
 
 const selectionSummary = computed(() => {
   if (props.modelValue == null) return "Notebook root"
-  return folderPathLabel(props.modelValue, displayById.value)
+  const path = folderPathLabel(props.modelValue, displayById.value)
+  if (path) return path
+  return props.modelValueLabel ?? `Folder #${props.modelValue}`
 })
 
 function quickPathLabel(id: number): string {

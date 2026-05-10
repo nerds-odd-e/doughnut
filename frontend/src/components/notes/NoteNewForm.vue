@@ -12,6 +12,7 @@
               :notebook-id="notebookRootNotebookId"
               :context-folder-id="folderSelectorContextFolderId"
               :ancestor-folders="ancestorFolders"
+              :model-value-label="folderSelectorLabel"
               :disabled="processing"
             />
           </div>
@@ -96,6 +97,11 @@ const props = withDefaults(
     wikiTitleCacheRefreshSourceNoteId?: number
     /** Root-to-leaf ancestor chain for FolderSelector (same as NoteRealm.ancestorFolders). */
     ancestorFolders?: Folder[]
+    /**
+     * Display label for the target folder when its name cannot be resolved from ancestorFolders.
+     * Used as a fallback in the folder selector dropdown.
+     */
+    targetFolderLabel?: string
   }>(),
   { ancestorFolders: () => [] }
 )
@@ -110,6 +116,14 @@ watch(
     selectedFolderId.value = v ?? null
   }
 )
+
+/** Fallback label for the folder selector when the path can't be resolved from ancestorFolders. */
+const folderSelectorLabel = computed((): string | undefined => {
+  const id = selectedFolderId.value ?? props.targetFolderId ?? null
+  if (id == null) return undefined
+  const found = props.ancestorFolders.find((f) => f.id === id)
+  return found?.name ?? props.targetFolderLabel
+})
 
 /** Context folder for FolderSelector quick picks; null at notebook root. */
 const folderSelectorContextFolderId = computed((): number | null => {

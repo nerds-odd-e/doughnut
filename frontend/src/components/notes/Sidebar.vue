@@ -12,6 +12,7 @@
       :create-parent-location-description="createParentLocationDescription"
       :user-active-folder="notebookSidebarUserActiveFolder"
       :ancestor-folders="activeNoteRealm?.ancestorFolders ?? []"
+      :target-folder-label="activeFolderLabel"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -109,6 +110,11 @@ const { resolvedCreateParentFolderId, createParentLocationDescription } =
     activeNoteRealmRef,
     noteContextResolved
   )
+
+/** Name of the active folder for use as a fallback label in the folder selector dropdown. */
+const activeFolderLabel = computed(
+  () => notebookSidebarUserActiveFolder.value?.name ?? undefined
+)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(

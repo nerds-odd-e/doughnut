@@ -11,6 +11,7 @@
           :notebook-id="notebookId"
           :target-folder-id="resolvedCreateParentFolderId ?? undefined"
           :parent-location-description="createParentLocationDescription"
+          :target-folder-label="targetFolderLabel"
           :title-search-anchor-note="note"
           :ancestor-folders="ancestorFolders"
           button-title="New note"
@@ -112,6 +113,8 @@ const props = defineProps<{
   userActiveFolder: SidebarUserActiveFolder | null
   /** Root-to-leaf ancestor chain from NoteRealm, passed to folder organise dialog. */
   ancestorFolders: Folder[]
+  /** Display label for the target folder when its name can't be resolved from ancestorFolders. */
+  targetFolderLabel?: string
 }>()
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
