@@ -179,6 +179,20 @@ describe("main menu", () => {
     expect(navItem).toHaveClass("daisy-text-primary")
   })
 
+  it("highlights the note link when on folder page", async () => {
+    await router.push({
+      name: "folderPage",
+      params: { notebookId: "1", folderId: "2" },
+    })
+    await flushPromises()
+
+    await renderComponent()
+
+    const noteLink = screen.getByLabelText("Note")
+    const navItem = noteLink.closest(".nav-item")
+    expect(navItem).toHaveClass("daisy-text-primary")
+  })
+
   it("shows note link in main menu", async () => {
     await renderComponent()
 
