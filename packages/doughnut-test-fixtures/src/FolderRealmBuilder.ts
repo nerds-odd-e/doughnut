@@ -1,4 +1,4 @@
-import type { FolderRealm } from '@generated/doughnut-backend-api'
+import type { FolderRealm, NotebookClientView } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NotebookBuilder from './NotebookBuilder'
 
@@ -15,8 +15,14 @@ class FolderRealmBuilder extends Builder<FolderRealm> {
 
   do(): FolderRealm {
     const now = new Date().toISOString()
+    const notebook = this.notebookBuilder.do()
+    const notebookView: NotebookClientView = {
+      notebook,
+      readonly: false,
+    }
     return {
-      notebook: this.notebookBuilder.do(),
+      notebookView,
+      ancestorFolders: [],
       folder: {
         id: this.folderId,
         name: this.folderName,

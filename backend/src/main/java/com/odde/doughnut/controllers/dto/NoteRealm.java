@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import jakarta.validation.constraints.NotNull;
@@ -28,18 +28,7 @@ public class NoteRealm {
 
   @NotNull @Getter private Note note;
 
-  @NotNull @Getter @Setter private NotebookClientView notebookView;
-
-  @Getter @Setter private List<Folder> ancestorFolders = List.of();
-
-  /**
-   * Full markdown of the designated index note that supplies the nearest non-blank {@code
-   * title_pattern} (leaf folder → parent folders → notebook root). Omitted when none applies.
-   */
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @Getter
-  @Setter
-  private String indexNoteContent;
+  @JsonUnwrapped private final RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
 
   @Getter private final List<WikiTitle> wikiTitles;
 
@@ -51,5 +40,29 @@ public class NoteRealm {
   @NotNull
   public Integer getId() {
     return note.getId();
+  }
+
+  public NotebookClientView getNotebookView() {
+    return sidebar.getNotebookView();
+  }
+
+  public void setNotebookView(NotebookClientView notebookView) {
+    sidebar.setNotebookView(notebookView);
+  }
+
+  public List<Folder> getAncestorFolders() {
+    return sidebar.getAncestorFolders();
+  }
+
+  public void setAncestorFolders(List<Folder> ancestorFolders) {
+    sidebar.setAncestorFolders(ancestorFolders);
+  }
+
+  public String getIndexNoteContent() {
+    return sidebar.getIndexNoteContent();
+  }
+
+  public void setIndexNoteContent(String indexNoteContent) {
+    sidebar.setIndexNoteContent(indexNoteContent);
   }
 }

@@ -1,20 +1,19 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.odde.doughnut.entities.Folder;
-import com.odde.doughnut.entities.Notebook;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 @Schema(
     description =
-        "Notebook chrome plus folder row for loading the folder page: same notebook fields as"
-            + " NotebookRealm (without notebook-level indexNoteId), plus folder identity,"
-            + " optional parent folder id, and optional designated folder index note id.")
+        "Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as"
+            + " NoteRealm (without note-level fields), plus folder identity, optional parent folder id,"
+            + " and optional designated folder index note id.")
 public record FolderRealm(
-    @NotNull Notebook notebook,
-    @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
-    boolean readonly,
+    @NotNull @JsonUnwrapped RealmNotebookSidebar sidebar,
     @NotNull Folder folder,
     @JsonInclude(JsonInclude.Include.NON_NULL)
         @Schema(
@@ -29,13 +28,16 @@ public record FolderRealm(
         Integer folderIndexNoteId) {
 
   public static FolderRealm of(
-      NotebookClientView chrome, Folder folder, Integer parentFolderId, Integer folderIndexNoteId) {
-    return new FolderRealm(
-        chrome.notebook(),
-        chrome.hasAttachedBook(),
-        chrome.readonly(),
-        folder,
-        parentFolderId,
-        folderIndexNoteId);
+      NotebookClientView chrome,
+      List<Folder> ancestorFolders,
+      String indexNoteContent,
+      Folder folder,
+      Integer parentFolderId,
+      Integer folderIndexNoteId) {
+    RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
+    sidebar.setNotebookView(chrome);
+    sidebar.setAncestorFolders(ancestorFolders);
+    sidebar.setIndexNoteContent(indexNoteContent);
+    return new FolderRealm(sidebar, folder, parentFolderId, folderIndexNoteId);
   }
 }

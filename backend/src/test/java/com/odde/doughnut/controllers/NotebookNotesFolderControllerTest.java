@@ -244,10 +244,10 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.sidebar().getNotebookView().notebook().getId(), equalTo(nb.getId()));
       assertThat(realm.folder().getId(), equalTo(folder.getId()));
       assertThat(realm.folder().getName(), equalTo("Box"));
-      assertThat(realm.readonly(), is(false));
+      assertThat(realm.sidebar().getNotebookView().readonly(), is(false));
       assertThat(realm.parentFolderId(), nullValue());
     }
 
@@ -317,6 +317,20 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
+    void nestedFolderAncestorFoldersListsOnlyAncestorsNotSelf()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
+      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+
+      FolderRealm realm = controller.getFolderPage(nb, nested);
+
+      assertThat(realm.sidebar().getAncestorFolders(), hasSize(1));
+      assertThat(realm.sidebar().getAncestorFolders().get(0).getId(), equalTo(parent.getId()));
+    }
+
+    @Test
     void folderFromAnotherNotebookReturnsNotFound() {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
@@ -340,8 +354,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
-      assertThat(realm.readonly(), is(true));
+      assertThat(realm.sidebar().getNotebookView().notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.sidebar().getNotebookView().readonly(), is(true));
     }
 
     @Test

@@ -2,8 +2,8 @@
   <ContentLoader v-if="folderRealm === undefined" />
   <div v-else class="daisy-py-4">
     <NotebookPageReadonlySummary
-      v-if="folderRealm.readonly === true"
-      :notebook="folderRealm.notebook"
+      v-if="folderRealm.notebookView.readonly === true"
+      :notebook="folderRealm.notebookView.notebook"
     />
     <div v-else class="daisy-container daisy-mx-auto daisy-max-w-6xl">
       <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-4">
@@ -13,7 +13,7 @@
         }}</span>
       </p>
       <ScopedIndexNoteEditor
-        :notebook-id="folderRealm.notebook.id"
+        :notebook-id="folderRealm.notebookView.notebook.id"
         :folder-id="folderRealm.folder.id"
         :index-note-status="indexNoteStatus"
         :index-note-id="sidebarAnchorNoteId"
@@ -39,7 +39,10 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import type { FolderRealm } from "@generated/doughnut-backend-api"
+import type {
+  FolderRealm,
+  NotebookRealm,
+} from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
@@ -64,12 +67,8 @@ const sidebarAnchorNoteId = ref<number | undefined>()
 const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
 let indexResolveGeneration = 0
 
-function notebookChromeFromFolderRealm(c: FolderRealm) {
-  return {
-    notebook: c.notebook,
-    hasAttachedBook: c.hasAttachedBook,
-    readonly: c.readonly,
-  }
+function notebookChromeFromFolderRealm(c: FolderRealm): NotebookRealm {
+  return { ...c.notebookView }
 }
 
 const fetchFolderPage = async () => {
@@ -111,7 +110,7 @@ watch(
         : undefined
       return
     }
-    currentNotebookId.value = c.notebook.id
+    currentNotebookId.value = c.notebookView.notebook.id
     notebookSidebarNotebookRealm.value = notebookChromeFromFolderRealm(c)
   },
   { immediate: true, deep: true }

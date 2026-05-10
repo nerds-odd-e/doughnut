@@ -23,11 +23,28 @@ public final class FolderTrailSegments {
     if (folder == null) {
       return List.of();
     }
+    return fromRootToFolder(folder);
+  }
+
+  /** Outermost folder first, from notebook root through {@code folder} (inclusive). */
+  public static List<Folder> fromRootToFolder(Folder folder) {
     List<Folder> leafToRoot = new ArrayList<>();
     for (Folder f = folder; f != null; f = f.getParentFolder()) {
       leafToRoot.add(f);
     }
     Collections.reverse(leafToRoot);
     return List.copyOf(leafToRoot);
+  }
+
+  /**
+   * Outermost first, from notebook root through the parent of {@code folder}. Empty when {@code
+   * folder} is at notebook root.
+   */
+  public static List<Folder> ancestorsFromRootToParent(Folder folder) {
+    Folder parent = folder.getParentFolder();
+    if (parent == null) {
+      return List.of();
+    }
+    return fromRootToFolder(parent);
   }
 }

@@ -33,10 +33,7 @@ export function useScopedTitlePatternString(): ComputedRef<string | undefined> {
     }
     if (name === "folderPage") {
       const folderRealm = folderSidebarFolderRealm.value
-      const idx = folderRealm?.folderIndexNoteId
-      if (idx == null) return
-      const ir = storageAccessor.value.refOfNoteRealm(idx).value
-      return titlePatternFromNoteMarkdown(ir?.note.content ?? null)
+      return titlePatternFromNoteMarkdown(folderRealm?.indexNoteContent ?? null)
     }
     return
   })

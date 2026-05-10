@@ -63,7 +63,11 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  FolderRealm,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -84,6 +88,22 @@ const currentLevel = computed(() => props.level ?? 1)
 const tree = inject(sidebarTreeKey)!
 const { expandedFolderIds, activePathFolderIds, activeFolder } = tree
 
+/** Folder page realm, or minimal `{ id }` used by tests for user-active folder selection. */
+function selectedFolderIdFromSidebarActive(
+  v: FolderRealm | { id: number } | null | undefined
+): number | null {
+  if (v == null) return null
+  if ("folder" in v && v.folder != null) return v.folder.id
+  if ("id" in v && typeof v.id === "number") return v.id
+  return null
+}
+
+const activeFolderSelectedId = computed(() =>
+  activeFolder == null
+    ? null
+    : selectedFolderIdFromSidebarActive(activeFolder.value)
+)
+
 const router = useRouter()
 
 const structuralChildCount = ref<number | undefined>(undefined)
@@ -101,13 +121,13 @@ watch(
     [
       activePathFolderIds.value,
       folderId.value,
-      activeFolder?.value?.folder.id ?? null,
+      activeFolderSelectedId.value,
     ] as const,
   () => {
     if (folderId.value == null) return
     if (
       activeFolder != null &&
-      activeFolder.value?.folder.id === folderId.value
+      activeFolderSelectedId.value === folderId.value
     ) {
       return
     }
@@ -130,7 +150,7 @@ const isUserActiveFolder = computed(
   () =>
     activeFolder != null &&
     folderId.value != null &&
-    activeFolder.value?.folder.id === folderId.value
+    activeFolderSelectedId.value === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -155,7 +175,7 @@ function onFolderRowFocusOut(event: FocusEvent) {
   if (
     activeFolder == null ||
     folderId.value == null ||
-    activeFolder.value?.folder.id !== folderId.value
+    activeFolderSelectedId.value !== folderId.value
   ) {
     return
   }

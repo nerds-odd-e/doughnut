@@ -243,6 +243,25 @@ export function setupDefaultSidebarSdkMocks(fixtures: SidebarTreeFixtures) {
     fixtures.firstGenerationSibling,
     fixtures.secondGeneration,
   ])
+  mockSdkServiceWithImplementation(
+    NotebookController,
+    "getFolderPage",
+    (options) => {
+      type Opt = Parameters<typeof NotebookController.getFolderPage>[0]
+      const { path } = options as Opt
+      const nameById: Record<number, string> = {
+        [FOLDER_TOP_NOTE_CHILDREN_ID]:
+          fixtures.topNoteRealm.note.noteTopology.title,
+        [FOLDER_FIRST_GEN_CHILDREN_ID]:
+          fixtures.firstGeneration.note.noteTopology.title,
+      }
+      const title = nameById[path.folder] ?? `Folder #${path.folder}`
+      return {
+        ...makeMe.aFolderRealm.folder(path.folder, title).please(),
+        notebookView: fixtures.topNoteRealm.notebookView,
+      }
+    }
+  )
 }
 
 export function resetSidebarPeerSortSessionStorage() {

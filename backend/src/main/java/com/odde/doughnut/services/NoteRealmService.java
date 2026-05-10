@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.index.IndexScope;
@@ -51,8 +52,16 @@ public class NoteRealmService {
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     realm.setNotebookView(notebookCatalogService.clientViewFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
-    realm.setIndexNoteContent(resolveIndexNoteContentForScopedTitlePattern(focus));
+    realm.setIndexNoteContent(resolveIndexNoteContentForNote(focus));
     return realm;
+  }
+
+  public String resolveIndexNoteContentForFolder(Folder folder) {
+    if (folder.getNotebook() == null) {
+      return null;
+    }
+    return resolveIndexNoteContent(
+        FolderTrailSegments.fromRootToFolder(folder), folder.getNotebook());
   }
 
   /**
@@ -82,11 +91,15 @@ public class NoteRealmService {
         .flatMap(this::questionGenerationInstructionFromIndexNote);
   }
 
-  private String resolveIndexNoteContentForScopedTitlePattern(Note focus) {
+  private String resolveIndexNoteContentForNote(Note focus) {
     if (focus.getNotebook() == null) {
       return null;
     }
-    List<Folder> outerToInner = FolderTrailSegments.fromRootToContainingFolder(focus);
+    return resolveIndexNoteContent(
+        FolderTrailSegments.fromRootToContainingFolder(focus), focus.getNotebook());
+  }
+
+  private String resolveIndexNoteContent(List<Folder> outerToInner, Notebook notebook) {
     for (int i = outerToInner.size() - 1; i >= 0; i--) {
       Optional<Note> designated =
           scopedIndexNoteService.findDesignatedIndexNote(
@@ -96,7 +109,7 @@ public class NoteRealmService {
       }
     }
     return scopedIndexNoteService
-        .findDesignatedIndexNote(new IndexScope.NotebookRoot(focus.getNotebook()))
+        .findDesignatedIndexNote(new IndexScope.NotebookRoot(notebook))
         .filter(this::hasNonBlankTitlePattern)
         .map(Note::getContent)
         .orElse(null);

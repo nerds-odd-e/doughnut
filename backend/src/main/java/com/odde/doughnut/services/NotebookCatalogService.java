@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.FolderRealm;
+import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,16 +38,19 @@ public class NotebookCatalogService {
   private final FolderRepository folderRepository;
   private final FolderService folderService;
   private final NotebookService notebookService;
+  private final NoteRealmService noteRealmService;
 
   public NotebookCatalogService(
       BookRepository bookRepository,
       FolderRepository folderRepository,
       FolderService folderService,
-      NotebookService notebookService) {
+      NotebookService notebookService,
+      @Lazy NoteRealmService noteRealmService) {
     this.bookRepository = bookRepository;
     this.folderRepository = folderRepository;
     this.folderService = folderService;
     this.notebookService = notebookService;
+    this.noteRealmService = noteRealmService;
   }
 
   public NotebookClientView clientViewFor(Notebook notebook, User viewer) {
@@ -72,7 +77,13 @@ public class NotebookCatalogService {
         loaded.getParentFolder() == null ? null : loaded.getParentFolder().getId();
     Integer folderIndexNoteId =
         folderService.findOptionalIndexNote(loaded).map(Note::getId).orElse(null);
-    return FolderRealm.of(chrome, loaded, parentFolderId, folderIndexNoteId);
+    return FolderRealm.of(
+        chrome,
+        FolderTrailSegments.ancestorsFromRootToParent(loaded),
+        noteRealmService.resolveIndexNoteContentForFolder(loaded),
+        loaded,
+        parentFolderId,
+        folderIndexNoteId);
   }
 
   /**

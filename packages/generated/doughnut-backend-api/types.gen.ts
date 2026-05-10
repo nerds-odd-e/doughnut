@@ -207,10 +207,19 @@ export type Note = {
 export type NoteRealm = {
     id: number;
     note: Note;
+    /**
+     * Notebook entity plus optional client-only fields.
+     */
     notebookView: NotebookClientView;
+    /**
+     * Folders from notebook root outward; see each realm for trail semantics.
+     */
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
+    /**
+     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     */
     indexNoteContent?: string;
 };
 
@@ -779,12 +788,21 @@ export type NotebookRealm = {
 };
 
 /**
- * Notebook chrome plus folder row for loading the folder page: same notebook fields as NotebookRealm (without notebook-level indexNoteId), plus folder identity, optional parent folder id, and optional designated folder index note id.
+ * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional designated folder index note id.
  */
 export type FolderRealm = {
-    notebook: Notebook;
-    hasAttachedBook?: boolean;
-    readonly?: boolean;
+    /**
+     * Notebook entity plus optional client-only fields.
+     */
+    notebookView: NotebookClientView;
+    /**
+     * Folders from notebook root outward; see each realm for trail semantics.
+     */
+    ancestorFolders?: Array<Folder>;
+    /**
+     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     */
+    indexNoteContent?: string;
     folder: Folder;
     /**
      * Parent folder id when this folder is nested; omitted at notebook root.
@@ -915,10 +933,19 @@ export type NoteWritable = {
 export type NoteRealmWritable = {
     id: number;
     note: NoteWritable;
+    /**
+     * Notebook entity plus optional client-only fields.
+     */
     notebookView: NotebookClientView;
+    /**
+     * Folders from notebook root outward; see each realm for trail semantics.
+     */
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
+    /**
+     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     */
     indexNoteContent?: string;
 };
 
