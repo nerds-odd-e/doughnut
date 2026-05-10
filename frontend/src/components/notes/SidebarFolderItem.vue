@@ -96,9 +96,20 @@ function ensureFolderExpandedById(id: number | undefined) {
 }
 
 watch(
-  () => [activePathFolderIds.value, folderId.value] as const,
+  () =>
+    [
+      activePathFolderIds.value,
+      folderId.value,
+      userActiveFolder?.value?.id ?? null,
+    ] as const,
   () => {
     if (folderId.value == null) return
+    if (
+      userActiveFolder != null &&
+      userActiveFolder.value?.id === folderId.value
+    ) {
+      return
+    }
     if (activePathFolderIds.value.has(folderId.value)) {
       ensureFolderExpandedById(folderId.value)
     }

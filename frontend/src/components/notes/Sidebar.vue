@@ -54,12 +54,6 @@ const props = defineProps({
 
 const expandedFolderIds = ref<Set<number>>(new Set())
 
-function ensureFolderExpanded(folderId: number | undefined) {
-  if (folderId == null) return
-  if (expandedFolderIds.value.has(folderId)) return
-  expandedFolderIds.value = new Set([...expandedFolderIds.value, folderId])
-}
-
 const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
@@ -85,14 +79,6 @@ provide(sidebarTreeKey, {
   activePathFolderIds,
   userActiveFolder: notebookSidebarUserActiveFolder,
 })
-
-watch(
-  activeNoteTopology,
-  (topology) => {
-    ensureFolderExpanded(topology?.folderId)
-  },
-  { immediate: true, deep: true }
-)
 
 watch(
   () => props.notebookId,
