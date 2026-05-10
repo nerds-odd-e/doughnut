@@ -234,7 +234,9 @@ When(
       .addingNewNoteFromToolbar()
       .createNoteWithTitle(title)
     start.assumeNotePage(title)
-    start.testability().rememberUiCreatedNote(title)
+    if (title !== '') {
+      start.testability().rememberUiCreatedNote(title)
+    }
   }
 )
 

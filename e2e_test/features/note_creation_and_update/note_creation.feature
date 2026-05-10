@@ -24,7 +24,6 @@ Feature: Nested Note creation
       | tech         |
       | Re-quirement |
 
-  @ignore
   Scenario: Create a new note with incorrect info
     When I create a note belonging to "LeSS in Action" with title ""
     Then I should see that the note creation is not successful
