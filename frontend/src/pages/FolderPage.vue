@@ -1,20 +1,20 @@
 <template>
-  <ContentLoader v-if="folderRealm === undefined" />
+  <ContentLoader v-if="folderForView === undefined" />
   <div v-else class="daisy-py-4">
     <NotebookPageReadonlySummary
-      v-if="folderRealm.notebookView.readonly === true"
-      :notebook="folderRealm.notebookView.notebook"
+      v-if="folderForView.notebookView.readonly === true"
+      :notebook="folderForView.notebookView.notebook"
     />
     <div v-else class="daisy-container daisy-mx-auto daisy-max-w-6xl">
       <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-4">
         Folder
         <span class="daisy-font-semibold daisy-text-base-content">{{
-          folderRealm.folder.name
+          folderForView.folder.name
         }}</span>
       </p>
       <ScopedIndexNoteEditor
-        :notebook-id="folderRealm.notebookView.notebook.id"
-        :folder-id="folderRealm.folder.id"
+        :notebook-id="folderForView.notebookView.notebook.id"
+        :folder-id="folderForView.folder.id"
         :index-note-status="indexNoteStatus"
         :index-note-id="sidebarAnchorNoteId"
         :fetch-page="fetchFolderPage"
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import type {
   FolderRealm,
@@ -63,6 +63,12 @@ const storageAccessor = useStorageAccessor()
 
 const folderRealm = ref<FolderRealm | undefined>(undefined)
 
+const folderForView = computed((): FolderRealm | undefined => {
+  const r = folderRealm.value
+  if (r?.notebookView?.notebook == null) return undefined
+  return r
+})
+
 const sidebarAnchorNoteId = ref<number | undefined>()
 const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
 let indexResolveGeneration = 0
@@ -77,7 +83,7 @@ const fetchFolderPage = async () => {
   const { data: page, error } = await NotebookController.getFolderPage({
     path: { notebook: notebookId, folder: folderId },
   })
-  if (!error && page) {
+  if (!error && page?.notebookView?.notebook) {
     folderRealm.value = page
     const { data: indexRows, error: indexErr } =
       await NotebookController.listNotebookFolderIndex({
@@ -102,7 +108,8 @@ watch(
   folderRealm,
   (c) => {
     folderSidebarFolderRealm.value = c
-    if (!c) {
+    const chromeNotebookId = c?.notebookView?.notebook?.id
+    if (chromeNotebookId == null) {
       notebookSidebarNotebookRealm.value = undefined
       const routeNotebookId = Number(route.params.notebookId)
       currentNotebookId.value = Number.isFinite(routeNotebookId)
@@ -110,15 +117,17 @@ watch(
         : undefined
       return
     }
-    currentNotebookId.value = c.notebookView.notebook.id
-    notebookSidebarNotebookRealm.value = notebookChromeFromFolderRealm(c)
+    currentNotebookId.value = chromeNotebookId
+    notebookSidebarNotebookRealm.value = notebookChromeFromFolderRealm(
+      c as FolderRealm
+    )
   },
   { immediate: true, deep: true }
 )
 
 watch(
   () =>
-    folderRealm.value
+    folderRealm.value?.folder
       ? ([
           folderRealm.value.folder.id,
           folderRealm.value.folderIndexNoteId ?? null,
