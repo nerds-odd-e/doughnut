@@ -40,6 +40,7 @@
 import type { Folder } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ref, watch } from "vue"
+import { useRouter } from "vue-router"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -56,6 +57,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   closeDialog: []
 }>()
+
+const router = useRouter()
 
 const name = ref("")
 const nameError = ref<string | undefined>(undefined)
@@ -89,6 +92,13 @@ const processForm = async () => {
     )
     if (error || !data) throw error ?? new Error("Failed to create folder")
     refreshSidebarStructuralListings()
+    await router.push({
+      name: "folderPage",
+      params: {
+        notebookId: String(props.notebookId),
+        folderId: String(data.id),
+      },
+    })
     emit("closeDialog")
   } catch (res: unknown) {
     nameError.value = toOpenApiError(res).message ?? "Failed to create folder"
