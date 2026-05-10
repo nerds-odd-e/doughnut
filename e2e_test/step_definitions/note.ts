@@ -241,6 +241,22 @@ When(
 )
 
 When(
+  'I create a note with title {string} under the folder {string} in the notebook {string}',
+  (title: string, folder: string, notebook: string) => {
+    start.navigateToNotebooksPage().navigateToNotebook(notebook)
+    start
+      .noteSidebar()
+      .activateFolderByLabel(folder)
+      .addingNewNoteFromToolbar()
+      .createNoteWithTitle(title)
+    start.assumeNotePage(title)
+    if (title !== '') {
+      start.testability().rememberUiCreatedNote(title)
+    }
+  }
+)
+
+When(
   'I create a note belonging to {string} with title {string} and wikidata id {string}',
   (noteTopology: string, title: string, wikidataId: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
