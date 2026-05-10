@@ -6,7 +6,7 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import folderPage from '../start/pageObjects/folderPage'
-import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
+import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
 import { pageIsNotLoading } from '../start/pageBase'
 
 When(

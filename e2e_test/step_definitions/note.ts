@@ -226,9 +226,9 @@ When(
 
 When(
   'I create a note belonging to {string} with title {string}',
-  (noteTopology: string, title: string) => {
-    start.jumpToNotePage(noteTopology)
-    start.noteSidebar().activateFolderByLabel(noteTopology)
+  (folder: string, title: string) => {
+    start.jumpToNotePage(folder)
+    start.noteSidebar().activateFolderByLabel(folder)
     start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
     start.assumeNotePage(title)
     start.testability().rememberUiCreatedNote(title)

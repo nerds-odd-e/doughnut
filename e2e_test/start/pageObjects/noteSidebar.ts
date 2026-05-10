@@ -1,5 +1,5 @@
 import { pageIsNotLoading } from '../pageBase'
-import noteCreationForm from './noteForms/noteCreationForm'
+import noteCreationForm from './forms/noteCreationForm'
 import { assumeSidebarFolderOrganizeForm } from './sidebarFolderOrganizeForm'
 
 const sidebarActionTimeoutMs = 20000

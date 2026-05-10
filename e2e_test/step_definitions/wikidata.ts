@@ -4,7 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
-import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
+import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
 import { assumeAssociateWikidataDialog } from '../start/pageObjects/associateWikidataDialog'
 
 When(

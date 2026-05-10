@@ -17,16 +17,6 @@ const noteCreationForm = {
     })
   },
 
-  createNotebookWithNameAndDescription(
-    notebookName: string,
-    description: string
-  ) {
-    return submittableForm.submitWith({
-      Title: notebookName,
-      Description: description,
-    })
-  },
-
   createNoteWithTitleAndWikidataId(title: string, wikidataId: string) {
     const form = submittableForm.fill({
       Title: title,

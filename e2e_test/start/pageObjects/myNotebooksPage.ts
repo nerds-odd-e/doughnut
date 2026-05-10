@@ -8,9 +8,9 @@ import {
 import { noteSidebar } from './noteSidebar'
 import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
-import noteCreationForm from './noteForms/noteCreationForm'
 import { subscribedNotebooks } from './subscribedNotebooks'
 import router from 'start/router'
+import notebookCreationForm from './forms/notebookCreationForm'
 
 const addNewNotebookButton = () =>
   cy.findByRole('button', { name: 'Add New Notebook' })
@@ -66,13 +66,10 @@ const myNotebooksPage = () => {
     },
     creatingNotebook(notebookTopic: string, description?: string) {
       addNewNotebookButton().click()
-      if (description !== undefined) {
-        return noteCreationForm.createNotebookWithNameAndDescription(
-          notebookTopic,
-          description
-        )
-      }
-      return noteCreationForm.createNoteWithTitle(notebookTopic)
+      return notebookCreationForm.createNotebookWithNameAndDescription(
+        notebookTopic,
+        description
+      )
     },
     notebookCard(notebook: string) {
       return notebookCard(notebook)

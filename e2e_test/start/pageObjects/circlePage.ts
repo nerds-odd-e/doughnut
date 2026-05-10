@@ -1,4 +1,3 @@
-import noteCreationForm from './noteForms/noteCreationForm'
 import { bazaarOrCircle } from './BazaarOrCircle'
 import {
   clickNotebookCardTitleToOpenNotebookPage,
@@ -7,6 +6,7 @@ import {
 import { pageIsNotLoading } from '../pageBase'
 import { navigateToMyCircles } from './myCirclesPage'
 import notebookPage from './notebookPage'
+import notebookCreationForm from './forms/notebookCreationForm'
 
 const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
   cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
@@ -20,7 +20,10 @@ const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
 export const assumeCirclePage = () => ({
   creatingNotebook(notebookTopic: string) {
     cy.findByText('Add New Notebook In This Circle').click()
-    return noteCreationForm.createNoteWithTitle(notebookTopic)
+    return notebookCreationForm.createNotebookWithNameAndDescription(
+      notebookTopic,
+      undefined
+    )
   },
   haveMembers(count: number) {
     cy.get('body').find('.circle-member').should('have.length', count)
