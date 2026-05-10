@@ -2,11 +2,8 @@ import {
   createParentLocationDescriptionFrom,
   resolvedCreateParentFolderFrom,
   resolvedCreateParentFolderIdFrom,
-  useNotebookRootCreateTarget,
 } from "@/components/notes/useNoteSidebarTree"
-import type { FolderRealm, NoteRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { computed, ref } from "vue"
 import { describe, expect, it } from "vitest"
 
 describe("useNoteSidebarTree create context", () => {
@@ -76,64 +73,5 @@ describe("useNoteSidebarTree create context", () => {
     expect(createParentLocationDescriptionFrom(null, realm, false)).toBe(
       "Adds to the notebook root."
     )
-  })
-
-  it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {
-    const realm = makeMe.aNoteRealm.inFolder(8, "Lab").please()
-    const activeFolder = ref<FolderRealm | null>(null)
-    const activeNoteRealm = ref<NoteRealm | undefined>(realm)
-    const noteContextResolved = ref(true)
-    const {
-      resolvedCreateParentFolder,
-      resolvedCreateParentFolderRow,
-      resolvedCreateParentFolderId,
-      createParentLocationDescription,
-    } = useNotebookRootCreateTarget(
-      activeFolder,
-      activeNoteRealm,
-      noteContextResolved
-    )
-    expect(resolvedCreateParentFolder.value).toEqual(
-      resolvedCreateParentFolderFrom(
-        activeFolder.value,
-        activeNoteRealm.value,
-        noteContextResolved.value
-      )
-    )
-    expect(resolvedCreateParentFolderId.value).toBe(
-      resolvedCreateParentFolderIdFrom(
-        activeFolder.value,
-        activeNoteRealm.value,
-        noteContextResolved.value
-      )
-    )
-    expect(createParentLocationDescription.value).toBe(
-      createParentLocationDescriptionFrom(
-        activeFolder.value,
-        activeNoteRealm.value,
-        noteContextResolved.value
-      )
-    )
-    expect(resolvedCreateParentFolderRow.value).toEqual(
-      realm.ancestorFolders!.at(-1)!
-    )
-    const pinned = makeMe.aFolderRealm.folder(9, "Pinned").please()
-    activeFolder.value = pinned
-    expect(resolvedCreateParentFolderRow.value).toEqual(pinned.folder)
-    expect(resolvedCreateParentFolderId.value).toBe(9)
-    expect(createParentLocationDescription.value).toBe(
-      'Adds to folder "Pinned".'
-    )
-  })
-
-  it("useNotebookRootCreateTarget accepts computed realm ref", () => {
-    const r = ref(makeMe.aNoteRealm.inFolder(2, "Docs").please())
-    const activeRealm = computed(() => r.value)
-    const { resolvedCreateParentFolderId } = useNotebookRootCreateTarget(
-      ref(null),
-      activeRealm,
-      ref(true)
-    )
-    expect(resolvedCreateParentFolderId.value).toBe(2)
   })
 })

@@ -33,10 +33,10 @@
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
         <FolderOrganizeButton
-          v-if="activeFolder != null"
+          v-if="notebookSidebarActiveFolder != null"
           :notebook-id="notebookId"
-          :moving-folder-id="activeFolder.folder.id"
-          :moving-folder-name="activeFolder.folder.name"
+          :moving-folder-id="notebookSidebarActiveFolder.folder.id"
+          :moving-folder-name="notebookSidebarActiveFolder.folder.name"
           :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
@@ -87,11 +87,8 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Folder,
-  FolderRealm,
-  NoteRealm,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NoteRealm } from "@generated/doughnut-backend-api"
+import { notebookSidebarActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
 import {
   useNoteSidebarPeerSort,
@@ -110,27 +107,35 @@ import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
 import {
   resolvedFolderIdFromPageOrFolder,
-  type ResolvedCreateParentFolder,
+  useNotebookRootCreateTarget,
 } from "./useNoteSidebarTree"
 
 const props = defineProps<{
   notebookId: number
   activeNoteRealm?: NoteRealm
-  /** Parent folder for new note / new folder (sidebar selection, else active note's folder). */
-  resolvedCreateParentFolder: ResolvedCreateParentFolder | null
-  /** Same scope as {@link resolvedCreateParentFolder}, as a {@link Folder} row for {@link NoteNewForm}. */
-  resolvedCreateParentFolderRow: Folder | null
-  createParentLocationDescription: string
-  /** Folder selected in the tree (organize); independent of create parent when viewing a note. */
-  activeFolder: FolderRealm | null
 }>()
+
+const activeNoteRealmRef = computed(() => props.activeNoteRealm)
+const noteContextResolved = computed(
+  () => props.activeNoteRealm?.note?.noteTopology != null
+)
+
+const {
+  resolvedCreateParentFolder,
+  resolvedCreateParentFolderRow,
+  createParentLocationDescription,
+} = useNotebookRootCreateTarget(
+  notebookSidebarActiveFolder,
+  activeNoteRealmRef,
+  noteContextResolved
+)
 
 const ancestorFolders = computed((): Folder[] => {
   if (props.activeNoteRealm != null) {
     return props.activeNoteRealm.ancestorFolders ?? []
   }
-  if (props.activeFolder != null) {
-    return props.activeFolder.ancestorFolders ?? []
+  if (notebookSidebarActiveFolder.value != null) {
+    return notebookSidebarActiveFolder.value.ancestorFolders ?? []
   }
   return []
 })

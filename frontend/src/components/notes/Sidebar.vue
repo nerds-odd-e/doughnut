@@ -7,10 +7,6 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
-      :resolved-create-parent-folder="resolvedCreateParentFolder"
-      :resolved-create-parent-folder-row="resolvedCreateParentFolderRow"
-      :create-parent-location-description="createParentLocationDescription"
-      :active-folder="notebookSidebarActiveFolder"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -31,10 +27,7 @@ import { computed, inject, provide, ref, watch } from "vue"
 import type { NoteRealm, User } from "@generated/doughnut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
-import {
-  sidebarTreeKey,
-  useNotebookRootCreateTarget,
-} from "./useNoteSidebarTree"
+import { sidebarTreeKey } from "./useNoteSidebarTree"
 import {
   notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
@@ -96,20 +89,6 @@ const sidebarReadonly = computed(() => {
   if (props.activeNoteRealm != null) return false
   return notebookSidebarNotebookRealm.value?.readonly === true
 })
-
-const noteContextResolved = computed(() => activeNoteTopology.value != null)
-
-const activeNoteRealmRef = computed(() => props.activeNoteRealm)
-
-const {
-  resolvedCreateParentFolder,
-  resolvedCreateParentFolderRow,
-  createParentLocationDescription,
-} = useNotebookRootCreateTarget(
-  notebookSidebarActiveFolder,
-  activeNoteRealmRef,
-  noteContextResolved
-)
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(
