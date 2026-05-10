@@ -113,7 +113,7 @@ export const noteSidebar = () => {
 
     activateFolderByLabel(folderLabel: string) {
       pageIsNotLoading()
-      folderTreitemByLabel(folderLabel).find('.chevron-btn').first().click()
+      folderTreitemByLabel(folderLabel).click()
       pageIsNotLoading()
     },
 
@@ -127,8 +127,7 @@ export const noteSidebar = () => {
         )
         .filter(':visible')
         .last()
-        .find('.chevron-btn')
-        .first()
+        .findByText(childLabel)
         .click()
       pageIsNotLoading()
     },
