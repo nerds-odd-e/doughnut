@@ -32,7 +32,6 @@ describe("Sidebar toolbar", () => {
   it("shows New note and New folder when signed in and notebook is not from bazaar", async () => {
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       fixtures.topNoteRealm,
       fixtures.topNoteRealm.notebookView.notebook.id
     )
@@ -42,7 +41,7 @@ describe("Sidebar toolbar", () => {
   })
 
   it("hides New folder when no current user", async () => {
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await flushPromises()
     expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)
   })
@@ -57,7 +56,6 @@ describe("Sidebar toolbar", () => {
     } as NoteRealm
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       bazaarRealm,
       bazaarRealm.notebookView.notebook.id
     )

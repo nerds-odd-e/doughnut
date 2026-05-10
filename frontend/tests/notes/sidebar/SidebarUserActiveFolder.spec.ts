@@ -40,7 +40,7 @@ describe("Sidebar user active folder", () => {
   }
 
   async function mountFirstGenSidebarAndWaitNoteRow() {
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await vi.waitUntil(() =>
       findSidebarItem(
         wrapper,
@@ -52,7 +52,6 @@ describe("Sidebar user active folder", () => {
   async function mountSignedInFirstGenWithRootFolderUserActive() {
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       fixtures.firstGeneration,
       fixtures.firstGeneration.notebookView.notebook.id
     )
@@ -94,7 +93,7 @@ describe("Sidebar user active folder", () => {
   })
 
   it("clears user active folder styling when a note row is clicked", async () => {
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await vi.waitUntil(() =>
       findSidebarItem(
         wrapper,

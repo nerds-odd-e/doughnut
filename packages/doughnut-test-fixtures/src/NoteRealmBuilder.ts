@@ -84,6 +84,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
+  ancestorFolders(folders: Folder[]): NoteRealmBuilder {
+    this.data.ancestorFolders = folders
+    return this
+  }
+
   image(value: string): NoteRealmBuilder {
     this.noteBuilder.image(value)
     return this
@@ -103,6 +108,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       nb.name = this.data.note.noteTopology.title
     }
     this.data.wikiTitles ??= []
+    const ancestors = this.data.ancestorFolders ?? []
+    if (ancestors.length > 0) {
+      const last = ancestors[ancestors.length - 1]!
+      this.data.note.noteTopology.folderId = last.id
+    }
     return this.data
   }
 }

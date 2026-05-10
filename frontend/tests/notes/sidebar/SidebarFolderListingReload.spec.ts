@@ -10,7 +10,6 @@ import {
   folderListingForQueryParent,
   mountSidebar,
   prepareSidebarDefaultMountContext,
-  realmAsActiveInSidebarStub,
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
 
@@ -39,7 +38,7 @@ describe("Sidebar folder listing reload", () => {
       (options) =>
         folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)
     )
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await flushPromises()
     const rootRequestCount = () =>
       countFolderListingCallsForParent(listingSpy, undefined)
@@ -52,10 +51,7 @@ describe("Sidebar folder listing reload", () => {
     ).toBe(true)
 
     await wrapper.setProps({
-      activeNoteRealm: realmAsActiveInSidebarStub(
-        fixtures.secondGeneration,
-        fixtures.folderContextByRealmId
-      ),
+      activeNoteRealm: fixtures.secondGeneration,
       notebookId: fixtures.firstGeneration.notebookView.notebook.id,
     })
     await flushPromises()

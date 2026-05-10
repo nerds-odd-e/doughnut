@@ -57,7 +57,7 @@ describe("Sidebar gradual ancestor population", () => {
       }
     )
 
-    wrapper = mountSidebar(helper, fixtures, fixtures.secondGeneration)
+    wrapper = mountSidebar(helper, fixtures.secondGeneration)
     await flushPromises()
 
     expect(countFolderListingCallsForParent(listingSpy, undefined)).toBe(1)

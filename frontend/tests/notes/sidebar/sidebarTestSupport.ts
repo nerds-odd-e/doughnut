@@ -73,14 +73,6 @@ export function structuralFolder(folderId: number, noteRealm: NoteRealm) {
   return testFolderStub(folderId, noteRealm.note.noteTopology.title)
 }
 
-/** Aligns listing payloads with folder-first sidebar drag rules (same folderId = same drop column). */
-export function noteTopologyInFolder(realm: NoteRealm, folderId: number) {
-  return {
-    ...realm.note.noteTopology,
-    folderId,
-  }
-}
-
 export function mockShowNoteForRealms(realms: NoteRealm[]) {
   const byId = Object.fromEntries(realms.map((r) => [r.id, r])) as Record<
     number,
@@ -119,38 +111,12 @@ export const DEFAULT_ROOT_PEER_ORDER = [
   "note:zebra",
 ] as const
 
-/** Folder context keyed by realm id — ancestorFolders and optional folderId override. */
-export type SidebarFolderContext = {
-  ancestorFolders: ReturnType<typeof testFolderStub>[]
-  folderId?: number
-}
-
 export type SidebarTreeFixtures = {
   topNoteRealm: NoteRealm
   firstGeneration: NoteRealm
   firstGenerationSibling: NoteRealm
   secondGeneration: NoteRealm
   defaultTreeFolderListings: Record<string, FolderListing>
-  folderContextByRealmId: Record<number, SidebarFolderContext>
-}
-
-/** Aligns active realm with folder-first API: ancestorFolders + folderId for the default stub tree. */
-export function realmAsActiveInSidebarStub(
-  realm: NoteRealm,
-  folderContextByRealmId: Record<number, SidebarFolderContext>
-): NoteRealm {
-  const ctx = folderContextByRealmId[realm.id] ?? {
-    ancestorFolders: realm.ancestorFolders ?? [],
-  }
-  const noteTopology =
-    ctx.folderId !== undefined
-      ? { ...realm.note.noteTopology, folderId: ctx.folderId }
-      : realm.note.noteTopology
-  return {
-    ...realm,
-    ancestorFolders: ctx.ancestorFolders,
-    note: { ...realm.note, noteTopology },
-  } as NoteRealm
 }
 
 export function stubNotebookFolderListings(
@@ -206,19 +172,12 @@ export function installSidebarDomMeasurementStubs(vi: {
 
 export type SidebarTestHelper = typeof import("@tests/helpers").default
 
-export function mountSidebar(
-  h: SidebarTestHelper,
-  fixtures: SidebarTreeFixtures,
-  active: NoteRealm
-) {
+export function mountSidebar(h: SidebarTestHelper, active: NoteRealm) {
   return h
     .component(Sidebar)
     .withRouter()
     .withProps({
-      activeNoteRealm: realmAsActiveInSidebarStub(
-        active,
-        fixtures.folderContextByRealmId
-      ),
+      activeNoteRealm: active,
       notebookId: active.notebookView.notebook.id,
     })
     .mount({
@@ -234,7 +193,6 @@ export function mountSidebar(
 
 export function mountSidebarSignedIn(
   h: SidebarTestHelper,
-  fixtures: SidebarTreeFixtures,
   active: NoteRealm | undefined,
   notebookId: number
 ) {
@@ -243,10 +201,7 @@ export function mountSidebarSignedIn(
     .withRouter()
     .withCurrentUser(makeMe.aUser.please())
     .withProps({
-      activeNoteRealm:
-        active !== undefined
-          ? realmAsActiveInSidebarStub(active, fixtures.folderContextByRealmId)
-          : undefined,
+      activeNoteRealm: active,
       notebookId,
     })
     .mount({

@@ -33,7 +33,6 @@ describe("Sidebar notebook shell", () => {
   it("shows folder expand control at notebook root with shallow folder listing", async () => {
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       undefined,
       fixtures.topNoteRealm.notebookView.notebook.id
     )
@@ -46,7 +45,6 @@ describe("Sidebar notebook shell", () => {
   it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       fixtures.topNoteRealm,
       fixtures.topNoteRealm.notebookView.notebook.id
     )
@@ -72,7 +70,6 @@ describe("Sidebar notebook shell", () => {
     }
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       undefined,
       fixtures.topNoteRealm.notebookView.notebook.id
     )

@@ -52,7 +52,6 @@ describe("Sidebar peer sort", () => {
   it("shows sort control in the sidebar toolbar", async () => {
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       fixtures.topNoteRealm,
       fixtures.topNoteRealm.notebookView.notebook.id
     )
@@ -70,7 +69,7 @@ describe("Sidebar peer sort", () => {
       realmA,
     })
 
-    wrapper = mountSidebarSignedIn(helper, fixtures, activeA, nbId)
+    wrapper = mountSidebarSignedIn(helper, activeA, nbId)
     await flushUntilTwoRootFolderLabels()
 
     expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
@@ -111,7 +110,6 @@ describe("Sidebar peer sort", () => {
 
     wrapper = mountSidebarSignedIn(
       helper,
-      fixtures,
       realmA,
       fixtures.topNoteRealm.notebookView.notebook.id
     )

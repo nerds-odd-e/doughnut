@@ -30,7 +30,7 @@ describe("Sidebar first generation", () => {
   })
 
   it("should scroll to active note", async () => {
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await flushPromises()
     await new Promise((resolve) =>
       requestAnimationFrame(() => resolve(undefined))
@@ -62,7 +62,7 @@ describe("Sidebar first generation", () => {
       }
     } as typeof IntersectionObserver
 
-    wrapper = mountSidebar(helper, fixtures, fixtures.firstGeneration)
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await flushPromises()
     await new Promise((resolve) =>
       requestAnimationFrame(() => resolve(undefined))
@@ -73,7 +73,7 @@ describe("Sidebar first generation", () => {
   })
 
   it("orders nested child note before same-folder sibling when deeper note is active", async () => {
-    wrapper = mountSidebar(helper, fixtures, fixtures.secondGeneration)
+    wrapper = mountSidebar(helper, fixtures.secondGeneration)
     await flushPromises()
     await vi.waitUntil(() =>
       findSidebarItem(
