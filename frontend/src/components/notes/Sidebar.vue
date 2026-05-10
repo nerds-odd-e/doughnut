@@ -6,12 +6,11 @@
     <NoteSidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
-      :note="activeNoteRealm?.note"
+      :note-realm="activeNoteRealm"
       :resolved-create-parent-folder="resolvedCreateParentFolder"
       :resolved-create-parent-folder-row="resolvedCreateParentFolderRow"
       :create-parent-location-description="createParentLocationDescription"
       :active-folder="notebookSidebarActiveFolder"
-      :ancestor-folders="toolbarAncestorFolders"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -58,7 +57,6 @@ const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
 
-/** Matches toolbar / folder-page context: breadcrumb chain when a tree folder is active, else note ancestors. */
 const toolbarAncestorFolders = computed(() => {
   if (notebookSidebarActiveFolder.value != null) {
     return folderPageBreadcrumbFolders.value

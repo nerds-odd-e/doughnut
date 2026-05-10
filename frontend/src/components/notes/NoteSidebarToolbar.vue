@@ -11,7 +11,7 @@
           :notebook-id="notebookId"
           :initial-folder="resolvedCreateParentFolderRow ?? undefined"
           :parent-location-description="createParentLocationDescription"
-          :title-search-anchor-note="note"
+          :title-search-anchor-note="anchorNote"
           :ancestor-folders="ancestorFolders"
           button-title="New note"
           aria-label="New note"
@@ -87,8 +87,16 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder, FolderRealm, Note } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  FolderRealm,
+  NoteRealm,
+} from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
+import {
+  folderPageBreadcrumbFolders,
+  notebookSidebarActiveFolder,
+} from "@/composables/useCurrentNoteSidebarState"
 import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,
@@ -109,9 +117,9 @@ import {
   type ResolvedCreateParentFolder,
 } from "./useNoteSidebarTree"
 
-defineProps<{
+const props = defineProps<{
   notebookId: number
-  note?: Note
+  noteRealm?: NoteRealm
   /** Parent folder for new note / new folder (sidebar selection, else active note's folder). */
   resolvedCreateParentFolder: ResolvedCreateParentFolder | null
   /** Same scope as {@link resolvedCreateParentFolder}, as a {@link Folder} row for {@link NoteNewForm}. */
@@ -119,9 +127,16 @@ defineProps<{
   createParentLocationDescription: string
   /** Folder selected in the tree (organize); independent of create parent when viewing a note. */
   activeFolder: FolderRealm | null
-  /** Root-to-leaf chain: folder-page breadcrumbs when a sidebar folder is active, else NoteRealm.ancestorFolders. */
-  ancestorFolders: Folder[]
 }>()
+
+const ancestorFolders = computed(() => {
+  if (notebookSidebarActiveFolder.value != null) {
+    return folderPageBreadcrumbFolders.value
+  }
+  return props.noteRealm?.ancestorFolders ?? []
+})
+
+const anchorNote = computed(() => props.noteRealm?.note)
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
 
