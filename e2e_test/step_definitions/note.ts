@@ -228,8 +228,11 @@ When(
   'I create a note belonging to {string} with title {string}',
   (folder: string, title: string) => {
     start.jumpToNotePage(folder)
-    start.noteSidebar().activateFolderByLabel(folder)
-    start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
+    start
+      .noteSidebar()
+      .activateFolderByLabel(folder)
+      .addingNewNoteFromToolbar()
+      .createNoteWithTitle(title)
     start.assumeNotePage(title)
     start.testability().rememberUiCreatedNote(title)
   }
@@ -240,9 +243,9 @@ When(
   (noteTopology: string, title: string, wikidataId: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start.jumpToNotePage(noteTopology)
-    start.noteSidebar().activateFolderByLabel(noteTopology)
     start
       .noteSidebar()
+      .activateFolderByLabel(noteTopology)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
     // Wikidata creation enriches siblings (authors, country); backend work can exceed default 6s.
@@ -256,9 +259,9 @@ When(
   (noteTopology: string, title: string, wikidataId: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start.jumpToNotePage(noteTopology)
-    start.noteSidebar().activateFolderByLabel(noteTopology)
     start
       .noteSidebar()
+      .activateFolderByLabel(noteTopology)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
   }
@@ -650,8 +653,11 @@ When(
   'I activate folder {string} in the sidebar and create a new note with title {string}',
   (folderLabel: string, title: string) => {
     start.jumpToNotePage('team')
-    start.noteSidebar().activateFolderByLabel(folderLabel)
-    start.noteSidebar().addingNewNoteFromToolbar().createNoteWithTitle(title)
+    start
+      .noteSidebar()
+      .activateFolderByLabel(folderLabel)
+      .addingNewNoteFromToolbar()
+      .createNoteWithTitle(title)
     start.assumeNotePage(title)
     start.testability().rememberUiCreatedNote(title)
   }

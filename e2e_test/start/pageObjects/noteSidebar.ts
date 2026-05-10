@@ -115,6 +115,7 @@ export const noteSidebar = () => {
       pageIsNotLoading()
       folderTreitemByLabel(folderLabel).click()
       pageIsNotLoading()
+      return this
     },
 
     activateFolderUnderParent(parentLabel: string, childLabel: string) {
