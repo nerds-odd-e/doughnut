@@ -4,7 +4,8 @@ import { computed, type ComputedRef, type InjectionKey, type Ref } from "vue"
 /** Folder the user explicitly selected in the sidebar tree (new note / new folder scope). */
 export type SidebarActiveFolder = { id: number; name: string }
 
-function realmLeafFolder(realm: NoteRealm | undefined) {
+/** Leaf folder for placement UI: last segment of `ancestorFolders` (notebook root when absent). */
+export function realmLeafFolder(realm: NoteRealm | undefined) {
   const chain = realm?.ancestorFolders
   if (chain == null || chain.length === 0) return
   return chain[chain.length - 1]

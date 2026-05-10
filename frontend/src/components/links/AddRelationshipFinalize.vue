@@ -42,6 +42,7 @@ import {
   formatRelationshipNoteMarkdown,
   formatRelationshipNoteTitle,
 } from "@/utils/relationshipNoteCompose"
+import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import {
   resolveRelationshipNoteFolderId,
   type RelationshipNotePlacement,
@@ -107,7 +108,7 @@ const relationTypeSelected = async (relationType: string | undefined) => {
     }
 
     const sourceNotebookName = realm.notebookView.notebook.name
-    const sourceFolderId = props.note.noteTopology.folderId
+    const sourceFolderId = realmLeafFolder(realm)?.id
     const sourceTitle = props.note.noteTopology.title
 
     const api = storageAccessor.value.storedApi()
