@@ -1,5 +1,6 @@
 import {
   NoteController,
+  RelationController,
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
@@ -8,6 +9,7 @@ import NoteEditingHistory from "@/store/NoteEditingHistory"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 describe("storedApiCollection", () => {
@@ -191,6 +193,28 @@ describe("storedApiCollection", () => {
           content: "<p>Desc</p>world!",
         },
       })
+    })
+  })
+
+  describe("move note", () => {
+    it("refreshes sidebar structural listings after moveNoteToFolder", async () => {
+      mockSdkService(RelationController, "moveNoteToFolder", [note])
+      storageAccessor.value.refreshNoteRealm(note)
+      const before = sidebarStructuralRefreshKey.value
+      const sa = storageAccessor.value.storedApi()
+      await sa.moveNoteToFolder(note.id, 99)
+      expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+    })
+
+    it("refreshes sidebar structural listings after moveNoteToNotebookRoot", async () => {
+      mockSdkService(RelationController, "moveNoteToNotebookRootInNotebook", [
+        note,
+      ])
+      storageAccessor.value.refreshNoteRealm(note)
+      const before = sidebarStructuralRefreshKey.value
+      const sa = storageAccessor.value.storedApi()
+      await sa.moveNoteToNotebookRoot(note.id, note.notebookView.notebook.id)
+      expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
   })
 

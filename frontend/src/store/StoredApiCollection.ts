@@ -262,6 +262,7 @@ export default class StoredApiCollection implements StoredApi {
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
+    refreshSidebarStructuralListings()
   }
 
   private placementUndoForNote(sourceId: Doughnut.ID): {
