@@ -9,7 +9,7 @@
       <div class="daisy-btn-group daisy-btn-group-sm daisy-overflow-visible">
         <NotebookRootNoteNewButton
           :notebook-id="notebookId"
-          :initial-folder="resolvedCreateParentFolderRow ?? undefined"
+          :initial-folder="resolvedCreateParentFolder ?? undefined"
           :parent-location-description="createParentLocationDescription"
           :title-search-anchor-note="anchorNote"
           :ancestor-folders="ancestorFolders"
@@ -21,12 +21,8 @@
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="ancestorFolders"
-          :context-folder-id="
-            resolvedFolderIdFromPageOrFolder(resolvedCreateParentFolder)
-          "
-          :initial-parent-folder-id="
-            resolvedFolderIdFromPageOrFolder(resolvedCreateParentFolder)
-          "
+          :context-folder-id="resolvedCreateParentFolder?.id ?? null"
+          :initial-parent-folder-id="resolvedCreateParentFolder?.id ?? null"
           button-title="New folder"
           aria-label="New folder"
         >
@@ -108,11 +104,7 @@ import FolderNewButton from "./core/FolderNewButton.vue"
 import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
-import {
-  realmLeafFolder,
-  resolvedFolderIdFromPageOrFolder,
-  type ResolvedCreateParentFolder,
-} from "./useNoteSidebarTree"
+import { realmLeafFolder } from "./useNoteSidebarTree"
 
 const props = defineProps<{
   notebookId: number
@@ -124,22 +116,14 @@ const noteContextResolved = computed(
   () => props.activeNoteRealm?.note?.noteTopology != null
 )
 
-const resolvedCreateParentFolder = computed(
-  (): ResolvedCreateParentFolder | null => {
-    const activeFolder = props.activeFolderRealm ?? null
-    const activeNoteRealm = props.activeNoteRealm
-    const resolved = noteContextResolved.value
-    if (activeFolder != null) return activeFolder
-    const leaf = realmLeafFolder(activeNoteRealm)
-    if (leaf != null && resolved) return leaf
-    return null
-  }
-)
-
-const resolvedCreateParentFolderRow = computed((): Folder | null => {
-  const v = resolvedCreateParentFolder.value
-  if (v == null) return null
-  return "folder" in v ? v.folder : v
+const resolvedCreateParentFolder = computed((): Folder | null => {
+  const activeFolder = props.activeFolderRealm ?? null
+  const activeNoteRealm = props.activeNoteRealm
+  const resolved = noteContextResolved.value
+  if (activeFolder != null) return activeFolder.folder
+  const leaf = realmLeafFolder(activeNoteRealm)
+  if (leaf != null && resolved) return leaf
+  return null
 })
 
 const createParentLocationDescription = computed(() => {

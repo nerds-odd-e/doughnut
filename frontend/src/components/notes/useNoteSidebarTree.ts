@@ -23,12 +23,6 @@ function folderFromResolvedCreateParent(
   return "folder" in v ? v.folder : v
 }
 
-export function resolvedFolderIdFromPageOrFolder(
-  v: ResolvedCreateParentFolder | null
-): number | null {
-  return folderFromResolvedCreateParent(v)?.id ?? null
-}
-
 export function resolvedCreateParentFolderIdFrom(
   activeFolder: FolderRealm | null,
   activeNoteRealm: NoteRealm | undefined,
@@ -43,7 +37,7 @@ export function resolvedCreateParentFolderIdFrom(
       parent = leaf
     }
   }
-  return resolvedFolderIdFromPageOrFolder(parent) ?? null
+  return folderFromResolvedCreateParent(parent)?.id ?? null
 }
 
 export function useNotebookRootCreateTarget(
