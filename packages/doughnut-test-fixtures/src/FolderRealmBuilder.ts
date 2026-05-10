@@ -1,4 +1,7 @@
-import type { FolderRealm, NotebookClientView } from '@generated/doughnut-backend-api'
+import type {
+  FolderRealm,
+  NotebookClientView,
+} from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NotebookBuilder from './NotebookBuilder'
 
