@@ -6,60 +6,49 @@ import {
 } from "@/components/notes/useNoteSidebarTree"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { testFolderStub } from "@tests/helpers"
 import { computed, ref } from "vue"
 import { describe, expect, it } from "vitest"
 
 describe("useNoteSidebarTree create context", () => {
-  const realmInFolder = (folderId: number, folderName: string): NoteRealm => {
-    const r = makeMe.aNoteRealm.title("child").please()
-    return {
-      ...r,
-      ancestorFolders: [testFolderStub(folderId, folderName)],
-      note: {
-        ...r.note,
-        noteTopology: { ...r.note.noteTopology, folderId },
-      },
-    } as NoteRealm
-  }
-
   it("resolvedCreateParentFolderIdFrom prefers the sidebar-selected folder over the active note folder", () => {
-    const realm = realmInFolder(10, "From note")
+    const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     expect(
       resolvedCreateParentFolderIdFrom({ id: 99, name: "Pinned" }, realm, true)
     ).toBe(99)
   })
 
   it("resolvedCreateParentFolderFrom returns the sidebar-selected folder object when set", () => {
-    const realm = realmInFolder(10, "From note")
+    const realm = makeMe.aNoteRealm.inFolder(10, "From note").please()
     expect(
       resolvedCreateParentFolderFrom({ id: 99, name: "Pinned" }, realm, true)
     ).toEqual({ id: 99, name: "Pinned" })
   })
 
   it("resolvedCreateParentFolderFrom returns the realm leaf folder when none selected", () => {
-    const realm = realmInFolder(42, "Science")
+    const realm = makeMe.aNoteRealm.inFolder(42, "Science").please()
     const leaf = realm.ancestorFolders!.at(-1)!
     expect(resolvedCreateParentFolderFrom(null, realm, true)).toBe(leaf)
   })
 
   it("resolvedCreateParentFolderIdFrom uses the active note folder when no sidebar-selected folder", () => {
-    const realm = realmInFolder(42, "Science")
+    const realm = makeMe.aNoteRealm.inFolder(42, "Science").please()
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(42)
   })
 
   it("resolvedCreateParentFolderIdFrom is null when note context is not resolved", () => {
-    const realm = realmInFolder(7, "X")
+    const realm = makeMe.aNoteRealm.inFolder(7, "X").please()
     expect(resolvedCreateParentFolderIdFrom(null, realm, false)).toBe(null)
   })
 
   it("resolvedCreateParentFolderIdFrom is null for a note at the notebook root", () => {
-    const realm = makeMe.aNoteRealm.title("root note").please()
+    const realm = makeMe.aNoteRealm.please()
     expect(resolvedCreateParentFolderIdFrom(null, realm, true)).toBe(null)
   })
 
   it("createParentLocationDescriptionFrom describes the sidebar-selected folder by name", () => {
-    const realm = realmInFolder(1, "ignored when user folder active")
+    const realm = makeMe.aNoteRealm
+      .inFolder(1, "ignored when user folder active")
+      .please()
     expect(
       createParentLocationDescriptionFrom(
         { id: 2, name: "My folder" },
@@ -70,7 +59,7 @@ describe("useNoteSidebarTree create context", () => {
   })
 
   it("createParentLocationDescriptionFrom uses ancestor folder label for the active note folder", () => {
-    const realm = realmInFolder(5, "History")
+    const realm = makeMe.aNoteRealm.inFolder(5, "History").please()
     expect(createParentLocationDescriptionFrom(null, realm, true)).toBe(
       'Adds to folder "History".'
     )
@@ -103,7 +92,7 @@ describe("useNoteSidebarTree create context", () => {
   })
 
   it("useNotebookRootCreateTarget matches the from helpers for the same refs", () => {
-    const realm = realmInFolder(8, "Lab")
+    const realm = makeMe.aNoteRealm.inFolder(8, "Lab").please()
     const activeFolder = ref<{ id: number; name: string } | null>(null)
     const activeNoteRealm = ref<NoteRealm | undefined>(realm)
     const noteContextResolved = ref(true)
@@ -145,7 +134,7 @@ describe("useNoteSidebarTree create context", () => {
   })
 
   it("useNotebookRootCreateTarget accepts computed realm ref", () => {
-    const r = ref(realmInFolder(2, "Docs"))
+    const r = ref(makeMe.aNoteRealm.inFolder(2, "Docs").please())
     const activeRealm = computed(() => r.value)
     const { resolvedCreateParentFolderId } = useNotebookRootCreateTarget(
       ref(null),

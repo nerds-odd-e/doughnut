@@ -1,9 +1,21 @@
 import type {
+  Folder,
   NoteRealm,
   NotebookClientView,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
+
+const FOLDER_STUB_DATE_TIME = '2000-01-01T00:00:00.000Z'
+
+function folderStub(id: number, name: string): Folder {
+  return {
+    id,
+    name,
+    createdAt: FOLDER_STUB_DATE_TIME,
+    updatedAt: FOLDER_STUB_DATE_TIME,
+  }
+}
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
   data: NoteRealm
@@ -63,6 +75,12 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   folder(folderId: number): NoteRealmBuilder {
     this.noteBuilder.folder(folderId)
+    return this
+  }
+
+  inFolder(folderId: number, folderName: string): NoteRealmBuilder {
+    this.noteBuilder.folder(folderId)
+    this.data.ancestorFolders = [folderStub(folderId, folderName)]
     return this
   }
 
