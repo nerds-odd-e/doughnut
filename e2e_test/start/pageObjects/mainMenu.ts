@@ -31,6 +31,7 @@ export const mainMenu = () => {
             changeName(name: string) {
               form.getField('Name').assignValue(name)
               cy.findByText('Submit').click()
+              pageIsNotLoading()
             },
           }
         },
