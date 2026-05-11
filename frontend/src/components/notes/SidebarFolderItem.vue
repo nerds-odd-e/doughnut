@@ -55,6 +55,9 @@
           activeNoteTopology,
           onStructuralPeerCount: setStructuralChildCount,
           level: currentLevel + 1,
+          expandedFolderIds,
+          activePathFolderIds,
+          activeFolder,
         }"
         :key="`folder-${folderId}`"
       />

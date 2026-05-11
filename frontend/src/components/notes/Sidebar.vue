@@ -17,6 +17,7 @@
         :key="notebookId"
         :notebook-id="notebookId"
         :active-note-topology="activeNoteTopology"
+        v-bind="sidebarInnerTreeProps"
       />
     </div>
   </div>
@@ -24,7 +25,7 @@
 
 <script setup lang="ts">
 import type { PropType, Ref } from "vue"
-import { computed, inject, provide, ref, watch } from "vue"
+import { computed, inject, ref, toRef, watch } from "vue"
 import type {
   FolderRealm,
   NoteRealm,
@@ -33,7 +34,6 @@ import type {
 } from "@generated/doughnut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
-import { sidebarTreeKey } from "./useNoteSidebarTree"
 import { folderPageBreadcrumbFolders } from "@/composables/useCurrentNoteSidebarState"
 
 const props = defineProps({
@@ -77,11 +77,11 @@ const activePathFolderIds = computed(() => {
   return ids
 })
 
-provide(sidebarTreeKey, {
+const sidebarInnerTreeProps = {
   expandedFolderIds,
   activePathFolderIds,
-  activeFolder: props.activeFolder,
-})
+  activeFolder: toRef(props, "activeFolder"),
+}
 
 watch(
   () => props.notebookId,

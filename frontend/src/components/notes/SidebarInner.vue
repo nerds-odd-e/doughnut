@@ -10,7 +10,7 @@
         v-if="row.kind === 'note'"
         :note-topology="row.noteTopology"
         :active-note-topology="activeNoteTopology"
-        :active-folder="sidebarTree.activeFolder"
+        :active-folder="activeFolder"
         :aria-level="currentLevel"
       />
       <SidebarFolderItem
@@ -20,9 +20,9 @@
           folder: row.folder,
           activeNoteTopology,
           level: currentLevel,
-          expandedFolderIds: sidebarTree.expandedFolderIds,
-          activePathFolderIds: sidebarTree.activePathFolderIds,
-          activeFolder: sidebarTree.activeFolder,
+          expandedFolderIds,
+          activePathFolderIds,
+          activeFolder,
         }"
       />
     </template>
@@ -30,17 +30,21 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
+import type {
+  FolderRealm,
+  NoteTopology,
+  Folder,
+} from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
-import { sidebarTreeKey } from "./useNoteSidebarTree"
 import {
   buildUnsortedStructuralRows,
   sortSidebarStructuralRows,
   type SidebarStructuralRow,
 } from "./sidebarStructuralSort"
-import { computed, inject, ref, watch } from "vue"
+import type { ComputedRef, Ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
@@ -69,11 +73,12 @@ interface Props {
   onStructuralPeerCount?: (count: number) => void
   /** ARIA level for treeitem descendants. Defaults to 1 (root tree). */
   level?: number
+  expandedFolderIds: Ref<Set<number>>
+  activePathFolderIds: ComputedRef<Set<number>>
+  activeFolder: Ref<FolderRealm | null>
 }
 
 const props = defineProps<Props>()
-
-const sidebarTree = inject(sidebarTreeKey)!
 
 const currentLevel = computed(() => props.level ?? 1)
 
