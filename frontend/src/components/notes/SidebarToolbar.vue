@@ -7,7 +7,7 @@
       class="daisy-flex daisy-flex-row daisy-items-center daisy-overflow-visible daisy-min-w-0"
     >
       <div class="daisy-btn-group daisy-btn-group-sm daisy-overflow-visible">
-        <NotebookRootNoteNewButton
+        <NoteNewButton
           :notebook-id="notebookId"
           :initial-folder="parentFolderForCreation ?? undefined"
           :parent-location-description="createParentLocationDescription"
@@ -17,7 +17,7 @@
           aria-label="New note"
         >
           <NotebookPen class="daisy-w-6 daisy-h-6" />
-        </NotebookRootNoteNewButton>
+        </NoteNewButton>
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="ancestorFolders"
@@ -100,7 +100,7 @@ import {
 import { computed, ref } from "vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
 import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
-import NotebookRootNoteNewButton from "./core/NotebookRootNoteNewButton.vue"
+import NoteNewButton from "./core/NoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
 import { realmLeafFolder } from "./useNoteSidebarTree"
 
