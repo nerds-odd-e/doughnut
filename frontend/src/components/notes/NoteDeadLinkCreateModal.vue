@@ -3,7 +3,7 @@
     <template #body>
       <NoteNewForm
         :notebookId="notebookId"
-        :initial-folder="resolvedCreateParentFolderRow ?? undefined"
+        :initial-folder="realmLeafFolder(noteRealm)"
         :initial-title="modelValue"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
@@ -15,10 +15,8 @@
 
 <script setup lang="ts">
 import type { NoteRealm } from "@generated/doughnut-backend-api"
-import { computed } from "vue"
 import Modal from "@/components/commons/Modal.vue"
-import { notebookSidebarActiveFolder } from "@/composables/useCurrentNoteSidebarState"
-import { useNotebookRootCreateTarget } from "./useNoteSidebarTree"
+import { realmLeafFolder } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
 
 const props = defineProps<{
@@ -27,13 +25,6 @@ const props = defineProps<{
   modelValue: string | null
   sourceNoteId: number
 }>()
-
-const activeNoteRealmRef = computed(() => props.noteRealm)
-
-const { resolvedCreateParentFolderRow } = useNotebookRootCreateTarget(
-  notebookSidebarActiveFolder,
-  activeNoteRealmRef
-)
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | null]
