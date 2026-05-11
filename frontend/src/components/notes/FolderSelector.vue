@@ -95,9 +95,9 @@ const props = defineProps<{
   notebookId: number
   /**
    * Folder used for quick-pick neighbours (organize = moving folder; new folder = default parent).
-   * Null when the UI context is notebook root (no folder id).
+   * Null when the UI context is notebook root (no folder).
    */
-  contextFolderId: number | null
+  contextFolder: Folder | null
   /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
   ancestorFolders: Folder[]
   /** `null` means notebook root. */
@@ -131,20 +131,22 @@ const neighbourRows = computed((): NotebookFolderIndexRow[] =>
   }))
 )
 
+const contextFolderId = computed(() => props.contextFolder?.id ?? null)
+
 const ancestorRows = computed(() => {
-  if (props.contextFolderId == null) return []
-  return ancestorsFromChain(props.contextFolderId, props.ancestorFolders)
+  if (contextFolderId.value == null) return []
+  return ancestorsFromChain(contextFolderId.value, props.ancestorFolders)
     .ancestorRows
 })
 
 const parentFolderId = computed(() => {
-  if (props.contextFolderId == null) return null
-  return ancestorsFromChain(props.contextFolderId, props.ancestorFolders)
+  if (contextFolderId.value == null) return null
+  return ancestorsFromChain(contextFolderId.value, props.ancestorFolders)
     .parentFolderId
 })
 
 /** Omit when null so folder search does not exclude a subtree (new folder at root). */
-const searchContextFolderId = computed(() => props.contextFolderId ?? undefined)
+const searchContextFolderId = computed(() => contextFolderId.value ?? undefined)
 
 onMounted(async () => {
   const pid = parentFolderId.value
@@ -155,7 +157,7 @@ onMounted(async () => {
     if (error || !listing)
       throw new Error("Failed to load neighbouring folders")
     neighbourFolders.value = (listing.folders ?? []).filter(
-      (f) => f.id !== props.contextFolderId
+      (f) => f.id !== contextFolderId.value
     )
   } catch {
     loadError.value = "Failed to load neighbouring folders"

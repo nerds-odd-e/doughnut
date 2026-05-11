@@ -10,7 +10,7 @@
             <FolderSelector
               v-model="selectedParentFolder"
               :notebook-id="notebookId"
-              :context-folder-id="contextFolderIdForSelector"
+              :context-folder="contextFolder"
               :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -52,10 +52,6 @@ const props = defineProps<{
   ancestorFolders: Folder[]
   contextFolder: Folder | null
 }>()
-
-const contextFolderIdForSelector = computed(
-  () => props.contextFolder?.id ?? null
-)
 
 const emit = defineEmits<{
   closeDialog: []

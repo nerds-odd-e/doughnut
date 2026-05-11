@@ -13,7 +13,7 @@
             <FolderSelector
               v-model="selectedParentFolder"
               :notebook-id="notebookId"
-              :context-folder-id="movingFolder.id"
+              :context-folder="movingFolder"
               :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />

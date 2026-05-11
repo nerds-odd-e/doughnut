@@ -13,7 +13,7 @@
             <FolderSelector
               v-model="selectedFolder"
               :notebook-id="notebookId"
-              :context-folder-id="folderSelectorContextFolderId"
+              :context-folder="folderSelectorContextFolder"
               :ancestor-folders="ancestorFolders"
               :model-value-label="folderSelectorLabel"
               :disabled="processing"
@@ -133,9 +133,8 @@ const parentLocationDescription = computed(() => {
 })
 
 /** Context folder for FolderSelector quick picks; null at notebook root. */
-const folderSelectorContextFolderId = computed(
-  (): number | null =>
-    selectedFolder.value?.id ?? props.initialFolder?.id ?? null
+const folderSelectorContextFolder = computed(
+  (): Folder | null => selectedFolder.value ?? props.initialFolder ?? null
 )
 
 // Emits
