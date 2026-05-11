@@ -27,6 +27,7 @@
 import type { Ref } from "vue"
 import { computed, inject, ref, watch } from "vue"
 import type {
+  Folder,
   FolderRealm,
   NoteRealm,
   NotebookRealm,
@@ -34,18 +35,22 @@ import type {
 } from "@generated/doughnut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
-import { folderPageBreadcrumbFolders } from "@/composables/useCurrentNoteSidebarState"
 
-const props = defineProps<{
-  /** When set, highlights the active note and expands its ancestors */
-  activeNoteRealm?: NoteRealm
-  /** Notebook id for sidebar chrome; toolbar shows root create until active note topology exists */
-  notebookId: number
-  /** Layout chrome before a note realm exists (e.g. notebook overview); used for readonly when no active note */
-  notebookRealm?: NotebookRealm
-  /** Set on folder page for active-folder toolbar/tree scope */
-  activeFolderRealm?: FolderRealm
-}>()
+const props = withDefaults(
+  defineProps<{
+    /** When set, highlights the active note and expands its ancestors */
+    activeNoteRealm?: NoteRealm
+    /** Notebook id for sidebar chrome; toolbar shows root create until active note topology exists */
+    notebookId: number
+    /** Layout chrome before a note realm exists (e.g. notebook overview); used for readonly when no active note */
+    notebookRealm?: NotebookRealm
+    /** Set on folder page for active-folder toolbar/tree scope */
+    activeFolderRealm?: FolderRealm
+    /** Root-to-leaf folder segments for folder page breadcrumbs (from layout flat index walk) */
+    folderPageBreadcrumbFolders?: Folder[]
+  }>(),
+  { folderPageBreadcrumbFolders: () => [] }
+)
 
 const expandedFolderIds = ref<Set<number>>(new Set())
 
@@ -55,7 +60,7 @@ const activeNoteTopology = computed(
 
 const toolbarAncestorFolders = computed(() => {
   if (props.activeFolderRealm) {
-    return folderPageBreadcrumbFolders.value
+    return props.folderPageBreadcrumbFolders
   }
   return props.activeNoteRealm?.ancestorFolders ?? []
 })

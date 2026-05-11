@@ -8,7 +8,6 @@ import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
-import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
 import { screen, waitFor } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
 import { flushPromises } from "@vue/test-utils"
@@ -24,7 +23,6 @@ describe("NotebookPage.spec", () => {
       history: createWebHistory(),
       routes,
     })
-    resetNotebookSidebarState()
     mockSdkService(NotebookController, "getAiAssistant", {
       id: 1,
       additionalInstructionsToAi: "",

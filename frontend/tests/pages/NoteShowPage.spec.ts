@@ -9,7 +9,6 @@ import helper, {
   mockNotebookGetForNoteRealm,
   mockSdkService,
 } from "@tests/helpers"
-import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
@@ -20,7 +19,6 @@ describe("all in note show page", () => {
   let router: ReturnType<typeof createRouter>
 
   beforeEach(() => {
-    resetNotebookSidebarState()
     router = createRouter({
       history: createWebHistory(),
       routes,

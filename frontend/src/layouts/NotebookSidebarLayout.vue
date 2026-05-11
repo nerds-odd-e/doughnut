@@ -59,6 +59,7 @@
           :notebook-id="sidebarNotebookId"
           :notebook-realm="sidebarNotebookView"
           :active-folder-realm="activeFolderRef"
+          :folder-page-breadcrumb-folders="folderPageBreadcrumbFolders"
         />
       </aside>
       <main
@@ -98,16 +99,13 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import {
-  folderPageBreadcrumbFolders,
-  resetNotebookSidebarState,
-} from "@/composables/useCurrentNoteSidebarState"
 import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
 const activeFolderRef = ref<FolderRealm | undefined>(undefined)
+const folderPageBreadcrumbFolders = ref<Folder[]>([])
 
 const sidebarOpened = ref(false)
 const windowWidth = ref(
@@ -133,12 +131,9 @@ const sidebarRealm = computed((): NoteRealm | undefined => {
   return storageAccessor.value.refOfNoteRealm(id).value
 })
 
-const chromeBreadcrumbAncestorFolders = computed((): Folder[] => {
-  if (route.name === "folderPage") {
-    return folderPageBreadcrumbFolders.value
-  }
-  return []
-})
+const chromeBreadcrumbAncestorFolders = computed((): Folder[] =>
+  route.name === "folderPage" ? folderPageBreadcrumbFolders.value : []
+)
 
 const folderRealm = ref<FolderRealm | undefined>(undefined)
 
@@ -244,7 +239,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize)
-  resetNotebookSidebarState()
 })
 </script>
 
