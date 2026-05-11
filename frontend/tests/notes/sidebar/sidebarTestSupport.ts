@@ -181,6 +181,7 @@ export function mountSidebar(
       activeNoteRealm: active,
       notebookId: active.notebookView.notebook.id,
       notebookRealm,
+      breadcrumbFolders: active.ancestorFolders ?? [],
     })
     .mount({
       attachTo: document.body,
@@ -207,6 +208,7 @@ export function mountSidebarSignedIn(
       activeNoteRealm: active,
       notebookId,
       notebookRealm,
+      breadcrumbFolders: active?.ancestorFolders ?? [],
     })
     .mount({
       attachTo: document.body,

@@ -23,13 +23,13 @@
         v-if="sidebarRealm"
         v-bind="{
           notebookView: sidebarRealm.notebookView,
-          ancestorFolders: sidebarRealm.ancestorFolders ?? [],
+          ancestorFolders: breadcrumbFolders,
         }"
       />
       <BreadcrumbWithCircle
         v-else-if="sidebarNotebookView"
         :notebook-view="sidebarNotebookView"
-        :ancestor-folders="chromeBreadcrumbAncestorFolders"
+        :ancestor-folders="breadcrumbFolders"
       />
     </GlobalBar>
     <div
@@ -59,7 +59,7 @@
           :notebook-id="sidebarNotebookId"
           :notebook-realm="sidebarNotebookView"
           :active-folder-realm="activeFolderRef"
-          :folder-page-breadcrumb-folders="folderPageBreadcrumbFolders"
+          :breadcrumb-folders="breadcrumbFolders"
         />
       </aside>
       <main
@@ -105,7 +105,7 @@ const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
 const activeFolderRef = ref<FolderRealm | undefined>(undefined)
-const folderPageBreadcrumbFolders = ref<Folder[]>([])
+const folderRouteBreadcrumbFolders = ref<Folder[]>([])
 
 const sidebarOpened = ref(false)
 const windowWidth = ref(
@@ -131,9 +131,15 @@ const sidebarRealm = computed((): NoteRealm | undefined => {
   return storageAccessor.value.refOfNoteRealm(id).value
 })
 
-const chromeBreadcrumbAncestorFolders = computed((): Folder[] =>
-  route.name === "folderPage" ? folderPageBreadcrumbFolders.value : []
-)
+const breadcrumbFolders = computed((): Folder[] => {
+  if (route.name === "noteShow") {
+    return sidebarRealm.value?.ancestorFolders ?? []
+  }
+  if (route.name === "folderPage") {
+    return folderRouteBreadcrumbFolders.value
+  }
+  return []
+})
 
 const folderRealm = ref<FolderRealm | undefined>(undefined)
 
@@ -161,18 +167,18 @@ const fetchFolderPage = async () => {
         path: { notebook: notebookId },
       })
     if (!indexErr && indexRows) {
-      folderPageBreadcrumbFolders.value = folderBreadcrumbChainFromFlatIndex(
+      folderRouteBreadcrumbFolders.value = folderBreadcrumbChainFromFlatIndex(
         page.folder,
         indexRows
       )
     } else {
-      folderPageBreadcrumbFolders.value = [page.folder]
+      folderRouteBreadcrumbFolders.value = [page.folder]
     }
     activeFolderRef.value = page
     return
   }
   folderRealm.value = undefined
-  folderPageBreadcrumbFolders.value = []
+  folderRouteBreadcrumbFolders.value = []
 }
 
 watch(
@@ -199,7 +205,7 @@ watch(
   async ({ isFolderPage }) => {
     if (!isFolderPage) {
       folderRealm.value = undefined
-      folderPageBreadcrumbFolders.value = []
+      folderRouteBreadcrumbFolders.value = []
       activeFolderRef.value = undefined
       return
     }

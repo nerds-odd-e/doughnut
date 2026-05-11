@@ -11,14 +11,14 @@
           :notebook-id="notebookId"
           :initial-folder="parentFolderForCreation ?? undefined"
           :title-search-anchor-note="anchorNote"
-          :ancestor-folders="ancestorFolders"
+          :ancestor-folders="breadcrumbFolders"
           :initial-title="initialTitle"
         >
           <NotebookPen class="daisy-w-6 daisy-h-6" />
         </NoteNewButton>
         <FolderNewButton
           :notebook-id="notebookId"
-          :ancestor-folders="ancestorFolders"
+          :ancestor-folders="breadcrumbFolders"
           :context-folder="parentFolderForCreation"
           button-title="New folder"
           aria-label="New folder"
@@ -106,6 +106,7 @@ const props = defineProps<{
   notebookId: number
   activeNoteRealm?: NoteRealm
   activeFolderRealm?: FolderRealm
+  breadcrumbFolders: Folder[]
 }>()
 
 const initialTitle = computed(() => {
@@ -121,16 +122,6 @@ const initialTitle = computed(() => {
 const parentFolderForCreation = computed((): Folder | null => {
   if (props.activeFolderRealm) return props.activeFolderRealm.folder
   return realmLeafFolder(props.activeNoteRealm) ?? null
-})
-
-const ancestorFolders = computed((): Folder[] => {
-  if (props.activeNoteRealm != null) {
-    return props.activeNoteRealm.ancestorFolders ?? []
-  }
-  if (props.activeFolderRealm) {
-    return props.activeFolderRealm.ancestorFolders ?? []
-  }
-  return []
 })
 
 const anchorNote = computed(() => props.activeNoteRealm?.note)

@@ -8,6 +8,7 @@
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
       :active-folder-realm="activeFolderRealm"
+      :breadcrumb-folders="breadcrumbFolders"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -46,10 +47,9 @@ const props = withDefaults(
     notebookRealm?: NotebookRealm
     /** Set on folder page for active-folder toolbar/tree scope */
     activeFolderRealm?: FolderRealm
-    /** Root-to-leaf folder segments for folder page breadcrumbs (from layout flat index walk) */
-    folderPageBreadcrumbFolders?: Folder[]
+    breadcrumbFolders?: Folder[]
   }>(),
-  { folderPageBreadcrumbFolders: () => [] }
+  { breadcrumbFolders: () => [] }
 )
 
 const expandedFolderIds = ref<Set<number>>(new Set())
@@ -58,16 +58,9 @@ const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
 
-const toolbarAncestorFolders = computed(() => {
-  if (props.activeFolderRealm) {
-    return props.folderPageBreadcrumbFolders
-  }
-  return props.activeNoteRealm?.ancestorFolders ?? []
-})
-
 const activePathFolderIds = computed(() => {
   const ids = new Set<number>()
-  for (const seg of toolbarAncestorFolders.value) {
+  for (const seg of props.breadcrumbFolders) {
     if (seg.id != null) ids.add(seg.id)
   }
   return ids
