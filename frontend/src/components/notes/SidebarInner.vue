@@ -10,7 +10,6 @@
         v-if="row.kind === 'note'"
         :note-topology="row.noteTopology"
         :active-note-topology="activeNoteTopology"
-        :active-folder="activeFolder"
         :aria-level="currentLevel"
       />
       <SidebarFolderItem

@@ -9,7 +9,6 @@
         activeNoteTopology != null &&
         noteTopology.id === activeNoteTopology.id,
     }"
-    @click.capture="onNoteRowClick"
   >
     <ScrollTo
       v-if="
@@ -34,9 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import type { FolderRealm, NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/doughnut-backend-api"
 import { RouterLink } from "vue-router"
-import type { Ref } from "vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
@@ -44,14 +42,9 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 interface Props {
   noteTopology: NoteTopology
   activeNoteTopology?: NoteTopology
-  activeFolder: Ref<FolderRealm | null>
 }
 
 const props = defineProps<Props>()
-
-function onNoteRowClick() {
-  props.activeFolder.value = null
-}
 </script>
 
 <style lang="scss" scoped>

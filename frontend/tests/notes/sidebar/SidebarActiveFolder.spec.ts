@@ -92,29 +92,6 @@ describe("Sidebar active folder", () => {
     expect(folderRow!.attributes("aria-expanded")).not.toBe(expandedBefore)
   })
 
-  it("clears active folder styling when a note row is clicked", async () => {
-    wrapper = mountSidebar(helper, fixtures.firstGeneration)
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.topNoteRealm.note.noteTopology.title
-      )?.exists()
-    )
-    const folderRow = findRootFolderRowByTopTitle()
-    await folderRow!.find(".sidebar-folder-label").trigger("click")
-    await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-active")
-
-    const noteRow = findSidebarItem(
-      wrapper,
-      fixtures.topNoteRealm.note.noteTopology.title
-    )
-    expect(noteRow?.exists()).toBe(true)
-    await noteRow!.trigger("click")
-    await flushPromises()
-    expect(folderRow!.classes()).not.toContain("sidebar-folder-active")
-  })
-
   it("does not clear active folder when modal opens after toolbar click (Safari behavior)", async () => {
     const folderRow = await mountSignedInFirstGenWithRootFolderActive()
 
