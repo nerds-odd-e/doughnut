@@ -28,7 +28,7 @@
         <FolderOrganizeButton
           v-if="activeFolderRealm != null"
           :notebook-id="notebookId"
-          :moving-folder="activeFolderRealm.folder"
+          :moving-folder-realm="activeFolderRealm"
           :ancestor-folders="ancestorFolders"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />

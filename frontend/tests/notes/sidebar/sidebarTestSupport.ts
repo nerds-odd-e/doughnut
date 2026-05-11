@@ -185,6 +185,7 @@ export function mountSidebar(
       activeNoteRealm: active,
       notebookId: active.notebookView.notebook.id,
       notebookRealm,
+      activeFolder: notebookSidebarActiveFolder,
     })
     .mount({
       attachTo: document.body,
@@ -211,6 +212,7 @@ export function mountSidebarSignedIn(
       activeNoteRealm: active,
       notebookId,
       notebookRealm,
+      activeFolder: notebookSidebarActiveFolder,
     })
     .mount({
       attachTo: document.body,

@@ -11,7 +11,7 @@
     <template #default="{ closer }">
       <FolderOrganizeForm
         :notebook-id="notebookId"
-        :moving-folder="movingFolder"
+        :moving-folder-realm="movingFolderRealm"
         :ancestor-folders="ancestorFolders"
         @close-dialog="closer"
       />
@@ -20,13 +20,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import FolderOrganizeForm from "../FolderOrganizeForm.vue"
 
 defineProps<{
   notebookId: number
-  movingFolder: Folder
+  movingFolderRealm: FolderRealm
   ancestorFolders: Folder[]
 }>()
 </script>

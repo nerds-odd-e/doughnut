@@ -58,6 +58,7 @@
           :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
           :notebook-realm="sidebarNotebookRealm"
+          :active-folder="sidebarActiveFolderRefForSidebar()"
         />
       </aside>
       <main
@@ -70,9 +71,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from "vue"
 import { useRoute } from "vue-router"
-import type { Folder, NoteRealm } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  FolderRealm,
+  NoteRealm,
+} from "@generated/doughnut-backend-api"
 import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
@@ -80,12 +85,17 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderPageBreadcrumbFolders,
+  notebookSidebarActiveFolder,
   notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
+
+function sidebarActiveFolderRefForSidebar(): Ref<FolderRealm | null> {
+  return notebookSidebarActiveFolder
+}
 
 const sidebarOpened = ref(false)
 const windowWidth = ref(

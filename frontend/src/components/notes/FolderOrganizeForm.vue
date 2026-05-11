@@ -4,7 +4,7 @@
       <form @submit.prevent="submitMove">
         <fieldset>
           <p class="daisy-text-sm daisy-mb-3">
-            Move folder "{{ movingFolder.name }}".
+            Move folder "{{ movingFolderRealm.folder.name }}".
           </p>
           <label class="daisy-label" for="folder-move-destination">
             <span class="daisy-label-text">Destination</span>
@@ -13,7 +13,7 @@
             <FolderSelector
               v-model="selectedParentFolder"
               :notebook-id="notebookId"
-              :context-folder="movingFolder"
+              :context-folder="movingFolderRealm.folder"
               :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />
@@ -33,7 +33,7 @@
       </form>
       <div class="daisy-divider daisy-my-4">or</div>
       <p class="daisy-text-sm daisy-mb-2">
-        Dissolve "{{ movingFolder.name }}". Notes and subfolders will move to
+        Dissolve "{{ movingFolderRealm.folder.name }}". Notes and subfolders will move to
         {{ dissolveParentLabel }}.
       </p>
       <p
@@ -56,20 +56,19 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, ref } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import usePopups from "../commons/Popups/usePopups"
-import { notebookSidebarActiveFolder } from "@/composables/useCurrentNoteSidebarState"
 import FolderSelector from "./FolderSelector.vue"
 import { dissolveParentLabelFromChain } from "./folderSelectorUtils"
 
 const props = defineProps<{
   notebookId: number
-  movingFolder: Folder
+  movingFolderRealm: FolderRealm
   /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
   ancestorFolders: Folder[]
 }>()
@@ -86,7 +85,10 @@ const dissolveError = ref<string | undefined>(undefined)
 const selectedParentFolder = ref<Folder | null>(null)
 
 const dissolveParentLabel = computed(() =>
-  dissolveParentLabelFromChain(props.movingFolder.id, props.ancestorFolders)
+  dissolveParentLabelFromChain(
+    props.movingFolderRealm.folder.id,
+    props.ancestorFolders
+  )
 )
 
 const submitMove = async () => {
@@ -100,7 +102,10 @@ const submitMove = async () => {
         : { newParentFolderId: selectedParentFolder.value.id }
     const { error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
-        path: { notebook: props.notebookId, folder: props.movingFolder.id },
+        path: {
+          notebook: props.notebookId,
+          folder: props.movingFolderRealm.folder.id,
+        },
         body,
       })
     )
@@ -117,7 +122,7 @@ const submitMove = async () => {
 const dissolve = async () => {
   if (processing.value) return
   const ok = await popups.confirm(
-    `Dissolve folder "${props.movingFolder.name}"? Notes and subfolders will be kept.`
+    `Dissolve folder "${props.movingFolderRealm.folder.name}"? Notes and subfolders will be kept.`
   )
   if (!ok) return
   processing.value = true
@@ -125,12 +130,14 @@ const dissolve = async () => {
   try {
     const { error } = await apiCallWithLoading(() =>
       NotebookController.dissolveFolder({
-        path: { notebook: props.notebookId, folder: props.movingFolder.id },
+        path: {
+          notebook: props.notebookId,
+          folder: props.movingFolderRealm.folder.id,
+        },
       })
     )
     if (error) throw error
     refreshSidebarStructuralListings()
-    notebookSidebarActiveFolder.value = null
     emit("closeDialog")
   } catch (e: unknown) {
     dissolveError.value =

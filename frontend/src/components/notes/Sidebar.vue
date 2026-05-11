@@ -7,7 +7,7 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
-      :active-folder-realm="notebookSidebarActiveFolder"
+      :active-folder-realm="activeFolder.value"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -26,6 +26,7 @@
 import type { PropType, Ref } from "vue"
 import { computed, inject, provide, ref, watch } from "vue"
 import type {
+  FolderRealm,
   NoteRealm,
   NotebookRealm,
   User,
@@ -33,10 +34,7 @@ import type {
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
-import {
-  notebookSidebarActiveFolder,
-  folderPageBreadcrumbFolders,
-} from "@/composables/useCurrentNoteSidebarState"
+import { folderPageBreadcrumbFolders } from "@/composables/useCurrentNoteSidebarState"
 
 const props = defineProps({
   /** When set, highlights the active note and expands its ancestors */
@@ -51,6 +49,11 @@ const props = defineProps({
     type: Object as PropType<NotebookRealm | undefined>,
     required: false,
   },
+  /** Same ref as notebook layout / folder page; tree and toolbar mutate `.value` for active-folder scope */
+  activeFolder: {
+    type: Object as PropType<Ref<FolderRealm | null>>,
+    required: true,
+  },
 })
 
 const expandedFolderIds = ref<Set<number>>(new Set())
@@ -60,7 +63,7 @@ const activeNoteTopology = computed(
 )
 
 const toolbarAncestorFolders = computed(() => {
-  if (notebookSidebarActiveFolder.value != null) {
+  if (props.activeFolder.value != null) {
     return folderPageBreadcrumbFolders.value
   }
   return props.activeNoteRealm?.ancestorFolders ?? []
@@ -77,7 +80,7 @@ const activePathFolderIds = computed(() => {
 provide(sidebarTreeKey, {
   expandedFolderIds,
   activePathFolderIds,
-  activeFolder: notebookSidebarActiveFolder,
+  activeFolder: props.activeFolder,
 })
 
 watch(
@@ -85,7 +88,7 @@ watch(
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderIds.value = new Set()
-      notebookSidebarActiveFolder.value = null
+      props.activeFolder.value = null
     }
   }
 )
