@@ -68,7 +68,6 @@ import type {
   FolderRealm,
   NoteTopology,
 } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
@@ -195,15 +194,9 @@ function onFolderRowFocusOut(event: FocusEvent) {
   activeFolder.value = null
 }
 
-async function navigateToFolderPage() {
+function navigateToFolderPage() {
   if (folderId.value == null) return
-  const { data: page, error } = await NotebookController.getFolderPage({
-    path: { notebook: props.notebookId, folder: folderId.value },
-  })
-  if (!error && page) {
-    activeFolder.value = page
-  }
-  await router.push({
+  router.push({
     name: "folderPage",
     params: {
       notebookId: String(props.notebookId),
