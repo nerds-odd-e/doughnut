@@ -26,7 +26,7 @@
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
         <FolderOrganizeButton
-          v-if="activeFolderRealm != null"
+          v-if="activeFolderRealm"
           :moving-folder-realm="activeFolderRealm"
         >
           <FolderInput class="daisy-w-6 daisy-h-6" />
@@ -105,7 +105,7 @@ import { renderTitleFromPattern } from "@/utils/titlePatternRender"
 const props = defineProps<{
   notebookId: number
   activeNoteRealm?: NoteRealm
-  activeFolderRealm?: FolderRealm | null
+  activeFolderRealm?: FolderRealm
 }>()
 
 const initialTitle = computed(() => {
@@ -119,7 +119,7 @@ const initialTitle = computed(() => {
 })
 
 const parentFolderForCreation = computed((): Folder | null => {
-  if (props.activeFolderRealm != null) return props.activeFolderRealm.folder
+  if (props.activeFolderRealm) return props.activeFolderRealm.folder
   return realmLeafFolder(props.activeNoteRealm) ?? null
 })
 
@@ -127,7 +127,7 @@ const ancestorFolders = computed((): Folder[] => {
   if (props.activeNoteRealm != null) {
     return props.activeNoteRealm.ancestorFolders ?? []
   }
-  if (props.activeFolderRealm != null) {
+  if (props.activeFolderRealm) {
     return props.activeFolderRealm.ancestorFolders ?? []
   }
   return []

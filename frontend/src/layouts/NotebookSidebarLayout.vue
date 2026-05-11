@@ -106,7 +106,7 @@ import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChai
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
-const activeFolderRef = ref<FolderRealm | null>(null)
+const activeFolderRef = ref<FolderRealm | undefined>(undefined)
 
 const sidebarOpened = ref(false)
 const windowWidth = ref(
@@ -189,7 +189,7 @@ watch(
       folderRealm.value = undefined
       folderSidebarFolderRealm.value = undefined
       folderPageBreadcrumbFolders.value = []
-      activeFolderRef.value = null
+      activeFolderRef.value = undefined
       return
     }
     await fetchFolderPage()

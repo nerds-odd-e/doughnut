@@ -43,8 +43,8 @@ const props = defineProps<{
   notebookId: number
   /** Layout chrome before a note realm exists (e.g. notebook overview); used for readonly when no active note */
   notebookRealm?: NotebookRealm
-  /** Set on folder page for active-folder toolbar/tree scope; null on note routes */
-  activeFolderRealm: FolderRealm | null
+  /** Set on folder page for active-folder toolbar/tree scope */
+  activeFolderRealm?: FolderRealm
 }>()
 
 const expandedFolderIds = ref<Set<number>>(new Set())
@@ -54,7 +54,7 @@ const activeNoteTopology = computed(
 )
 
 const toolbarAncestorFolders = computed(() => {
-  if (props.activeFolderRealm != null) {
+  if (props.activeFolderRealm) {
     return folderPageBreadcrumbFolders.value
   }
   return props.activeNoteRealm?.ancestorFolders ?? []
@@ -71,8 +71,7 @@ const activePathFolderIds = computed(() => {
 const sidebarInnerTreeProps = computed(() => ({
   expandedFolderIds,
   activePathFolderIds,
-  activeFolder:
-    props.activeFolderRealm == null ? undefined : props.activeFolderRealm,
+  activeFolder: props.activeFolderRealm,
 }))
 
 watch(
