@@ -7,6 +7,7 @@ const folderPage = () => ({
       .click()
     cy.focused().type(text, { delay: 0 })
     cy.get('[data-testid="folder-index-create-save"]').click()
+    cy.get('[data-testid="folder-index-create-save"]').should('not.exist')
     pageIsNotLoading()
     return this
   },
