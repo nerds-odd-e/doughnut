@@ -100,7 +100,6 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderPageBreadcrumbFolders,
-  folderSidebarFolderRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
@@ -182,14 +181,6 @@ const fetchFolderPage = async () => {
 }
 
 watch(
-  folderRealm,
-  (c) => {
-    folderSidebarFolderRealm.value = c
-  },
-  { immediate: true }
-)
-
-watch(
   () => ({
     isNotebookPage: route.name === "notebookPage",
     notebookId: route.params.notebookId,
@@ -213,7 +204,6 @@ watch(
   async ({ isFolderPage }) => {
     if (!isFolderPage) {
       folderRealm.value = undefined
-      folderSidebarFolderRealm.value = undefined
       folderPageBreadcrumbFolders.value = []
       activeFolderRef.value = undefined
       return
