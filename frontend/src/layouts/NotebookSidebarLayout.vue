@@ -20,15 +20,8 @@
         />
       </button>
       <BreadcrumbWithCircle
-        v-if="sidebarRealm"
-        v-bind="{
-          notebookView: sidebarRealm.notebookView,
-          ancestorFolders: breadcrumbFolders,
-        }"
-      />
-      <BreadcrumbWithCircle
-        v-else-if="sidebarNotebookView"
-        :notebook-view="sidebarNotebookView"
+        v-if="breadcrumbNotebookView"
+        :notebook-view="breadcrumbNotebookView"
         :ancestor-folders="breadcrumbFolders"
       />
     </GlobalBar>
@@ -40,25 +33,13 @@
     <div
       class="daisy-h-full daisy-relative daisy-flex daisy-flex-1 daisy-min-h-0"
     >
-      <aside
-        :class="[
-          'daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-flex daisy-flex-col daisy-overflow-x-visible',
-          !isMdOrLarger && 'notebook-sidebar-drawer',
-          isMdOrLarger
-            ? sidebarOpened
-              ? 'daisy-relative'
-              : 'daisy-hidden'
-            : sidebarOpened
-              ? 'daisy-translate-x-0 daisy-fixed daisy-left-0 daisy-z-40'
-              : '-daisy-translate-x-full daisy-fixed daisy-left-0 daisy-z-40',
-        ]"
-      >
+      <aside :class="sidebarClasses">
         <Sidebar
-          v-if="sidebarNotebookId != null && !Number.isNaN(sidebarNotebookId)"
+          v-if="sidebarNotebookId != null"
           :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
           :notebook-realm="sidebarNotebookView"
-          :active-folder-realm="activeFolderRef"
+          :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
         />
       </aside>
@@ -67,16 +48,7 @@
       >
         <slot>
           <RouterView v-slot="{ Component }">
-            <component
-              :is="Component"
-              v-bind="
-                route.name === 'notebookPage'
-                  ? { notebookRealm, fetchNotebookPage }
-                  : route.name === 'folderPage'
-                    ? { folderRealm, fetchFolderPage }
-                    : {}
-              "
-            />
+            <component :is="Component" v-bind="routeViewProps" />
           </RouterView>
         </slot>
       </main>
@@ -103,8 +75,8 @@ import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChai
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
+const SIDEBAR_BREAKPOINT_PX = 768
 
-const activeFolderRef = ref<FolderRealm | undefined>(undefined)
 const folderRouteBreadcrumbFolders = ref<Folder[]>([])
 
 const sidebarOpened = ref(false)
@@ -112,11 +84,12 @@ const windowWidth = ref(
   typeof window !== "undefined" ? window.innerWidth : 1024
 )
 
-const isMdOrLarger = computed(() => windowWidth.value >= 768)
+const isMdOrLarger = computed(() => windowWidth.value >= SIDEBAR_BREAKPOINT_PX)
 
 const notebookRealm = ref<NotebookRealm | undefined>(undefined)
+const folderRealm = ref<FolderRealm | undefined>(undefined)
 
-const fetchNotebookPage = async () => {
+async function fetchNotebookPage() {
   const notebookId = Number(route.params.notebookId)
   const { data, error } = await NotebookController.get({
     path: { notebook: notebookId },
@@ -141,20 +114,51 @@ const breadcrumbFolders = computed((): Folder[] => {
   return []
 })
 
-const folderRealm = ref<FolderRealm | undefined>(undefined)
-
 const sidebarNotebookView = computed(
   (): NotebookRealm | undefined =>
     notebookRealm.value ?? folderRealm.value?.notebookView
 )
 
-const sidebarNotebookId = computed(
-  () =>
-    sidebarNotebookView.value?.notebook?.id ??
-    sidebarRealm.value?.notebookView?.notebook?.id
+const breadcrumbNotebookView = computed(
+  (): NotebookRealm | undefined =>
+    sidebarRealm.value?.notebookView ?? sidebarNotebookView.value
 )
 
-const fetchFolderPage = async () => {
+const sidebarNotebookId = computed(
+  () => breadcrumbNotebookView.value?.notebook?.id
+)
+
+const activeFolderRealm = computed(() =>
+  route.name === "folderPage" ? folderRealm.value : undefined
+)
+
+const desktopSidebarClass = computed(() =>
+  sidebarOpened.value ? "daisy-relative" : "daisy-hidden"
+)
+
+const mobileSidebarClass = computed(() => [
+  "notebook-sidebar-drawer daisy-fixed daisy-left-0 daisy-z-40",
+  sidebarOpened.value ? "daisy-translate-x-0" : "-daisy-translate-x-full",
+])
+
+const sidebarClasses = computed(() => [
+  "daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-flex daisy-flex-col daisy-overflow-x-visible",
+  ...(isMdOrLarger.value
+    ? [desktopSidebarClass.value]
+    : mobileSidebarClass.value),
+])
+
+const routeViewProps = computed(() => {
+  if (route.name === "notebookPage") {
+    return { notebookRealm: notebookRealm.value, fetchNotebookPage }
+  }
+  if (route.name === "folderPage") {
+    return { folderRealm: folderRealm.value, fetchFolderPage }
+  }
+  return {}
+})
+
+async function fetchFolderPage() {
   const notebookId = Number(route.params.notebookId)
   const folderId = Number(route.params.folderId)
   const { data: page, error } = await NotebookController.getFolderPage({
@@ -174,7 +178,6 @@ const fetchFolderPage = async () => {
     } else {
       folderRouteBreadcrumbFolders.value = [page.folder]
     }
-    activeFolderRef.value = page
     return
   }
   folderRealm.value = undefined
@@ -206,7 +209,6 @@ watch(
     if (!isFolderPage) {
       folderRealm.value = undefined
       folderRouteBreadcrumbFolders.value = []
-      activeFolderRef.value = undefined
       return
     }
     await fetchFolderPage()
@@ -218,27 +220,23 @@ const handleResize = () => {
   windowWidth.value = window.innerWidth
 }
 
-watch(
-  () => sidebarNotebookId.value,
-  () => {
-    if (!isMdOrLarger.value) {
-      sidebarOpened.value = false
-    }
+const closeSidebarOnMobile = () => {
+  if (!isMdOrLarger.value) {
+    sidebarOpened.value = false
   }
-)
+}
 
 watch(
-  () => (route.name === "noteShow" ? Number(route.params.noteId) : undefined),
-  () => {
-    if (!isMdOrLarger.value) {
-      sidebarOpened.value = false
-    }
-  }
+  () => [
+    sidebarNotebookId.value,
+    route.name === "noteShow" ? route.params.noteId : undefined,
+  ],
+  closeSidebarOnMobile
 )
 
 onMounted(() => {
   window.addEventListener("resize", handleResize)
-  if (windowWidth.value >= 768) {
+  if (windowWidth.value >= SIDEBAR_BREAKPOINT_PX) {
     sidebarOpened.value = true
   }
 })
@@ -265,10 +263,7 @@ onBeforeUnmount(() => {
   }
 }
 
-aside {
-  max-height: 100%;
-}
-
+aside,
 main {
   max-height: 100%;
 }
