@@ -25,12 +25,15 @@
 <script setup lang="ts">
 import type { PropType, Ref } from "vue"
 import { computed, inject, provide, ref, watch } from "vue"
-import type { NoteRealm, User } from "@generated/doughnut-backend-api"
+import type {
+  NoteRealm,
+  NotebookRealm,
+  User,
+} from "@generated/doughnut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { sidebarTreeKey } from "./useNoteSidebarTree"
 import {
-  notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
   folderPageBreadcrumbFolders,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -43,6 +46,11 @@ const props = defineProps({
   },
   /** Notebook id for sidebar chrome; toolbar shows root create until active note topology exists */
   notebookId: { type: Number, required: true },
+  /** Layout chrome before a note realm exists (e.g. notebook overview); used for readonly when no active note */
+  notebookRealm: {
+    type: Object as PropType<NotebookRealm | undefined>,
+    required: false,
+  },
 })
 
 const expandedFolderIds = ref<Set<number>>(new Set())
@@ -88,7 +96,7 @@ const sidebarReadonly = computed(() => {
   const realmReadonly = props.activeNoteRealm?.notebookView.readonly
   if (realmReadonly === true) return true
   if (props.activeNoteRealm != null) return false
-  return notebookSidebarNotebookRealm.value?.readonly === true
+  return props.notebookRealm?.readonly === true
 })
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */

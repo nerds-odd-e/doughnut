@@ -8,6 +8,7 @@ import createNoteStorage from "@/store/createNoteStorage"
 import type {
   FolderListing,
   NoteRealm,
+  NotebookRealm,
   Options,
   ShowNoteData,
 } from "@generated/doughnut-backend-api"
@@ -172,13 +173,18 @@ export function installSidebarDomMeasurementStubs(vi: {
 
 export type SidebarTestHelper = typeof import("@tests/helpers").default
 
-export function mountSidebar(h: SidebarTestHelper, active: NoteRealm) {
+export function mountSidebar(
+  h: SidebarTestHelper,
+  active: NoteRealm,
+  notebookRealm?: NotebookRealm
+) {
   return h
     .component(Sidebar)
     .withRouter()
     .withProps({
       activeNoteRealm: active,
       notebookId: active.notebookView.notebook.id,
+      notebookRealm,
     })
     .mount({
       attachTo: document.body,
@@ -194,7 +200,8 @@ export function mountSidebar(h: SidebarTestHelper, active: NoteRealm) {
 export function mountSidebarSignedIn(
   h: SidebarTestHelper,
   active: NoteRealm | undefined,
-  notebookId: number
+  notebookId: number,
+  notebookRealm?: NotebookRealm
 ) {
   return h
     .component(Sidebar)
@@ -203,6 +210,7 @@ export function mountSidebarSignedIn(
     .withProps({
       activeNoteRealm: active,
       notebookId,
+      notebookRealm,
     })
     .mount({
       attachTo: document.body,

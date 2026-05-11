@@ -57,6 +57,7 @@
           v-if="sidebarNotebookId != null && !Number.isNaN(sidebarNotebookId)"
           :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
+          :notebook-realm="sidebarNotebookRealm"
         />
       </aside>
       <main

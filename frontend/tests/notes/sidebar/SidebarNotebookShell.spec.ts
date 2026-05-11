@@ -1,4 +1,3 @@
-import { notebookSidebarNotebookRealm } from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -64,14 +63,14 @@ describe("Sidebar notebook shell", () => {
   })
 
   it("hides New note when notebook page is readonly and anchor realm is not loaded yet", async () => {
-    notebookSidebarNotebookRealm.value = {
-      notebook: makeMe.aNotebook.please(),
-      readonly: true,
-    }
     wrapper = mountSidebarSignedIn(
       helper,
       undefined,
-      fixtures.topNoteRealm.notebookView.notebook.id
+      fixtures.topNoteRealm.notebookView.notebook.id,
+      {
+        notebook: makeMe.aNotebook.please(),
+        readonly: true,
+      }
     )
     await flushPromises()
     expect(wrapper.find('button[title="New note"]').exists()).toBe(false)
