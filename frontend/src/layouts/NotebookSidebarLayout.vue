@@ -79,7 +79,6 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderPageBreadcrumbFolders,
-  folderSidebarFolderRealm,
   notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -100,27 +99,10 @@ const sidebarNotebookId = computed(
   () => notebookSidebarNotebookRealm.value?.notebook.id
 )
 
-/** Route / chrome index id; sidebar only resolves a realm once it exists in storage. */
-const sidebarActiveNoteIdCandidate = computed((): number | undefined => {
-  const name = route.name
-  if (name === "noteShow") {
-    const id = Number(route.params.noteId)
-    return Number.isFinite(id) ? id : undefined
-  }
-  if (name === "notebookPage") {
-    const id = notebookSidebarNotebookRealm.value?.indexNoteId
-    return id != null && Number.isFinite(id) ? id : undefined
-  }
-  if (name === "folderPage") {
-    const id = folderSidebarFolderRealm.value?.folderIndexNoteId
-    return id != null && Number.isFinite(id) ? id : undefined
-  }
-  return undefined
-})
-
 const sidebarRealm = computed((): NoteRealm | undefined => {
-  const id = sidebarActiveNoteIdCandidate.value
-  if (id == null) return undefined
+  if (route.name !== "noteShow") return undefined
+  const id = Number(route.params.noteId)
+  if (!Number.isFinite(id)) return undefined
   return storageAccessor.value.refOfNoteRealm(id).value
 })
 
@@ -152,7 +134,7 @@ watch(
 )
 
 watch(
-  () => sidebarActiveNoteIdCandidate.value,
+  () => (route.name === "noteShow" ? Number(route.params.noteId) : undefined),
   () => {
     if (!isMdOrLarger.value) {
       sidebarOpened.value = false
