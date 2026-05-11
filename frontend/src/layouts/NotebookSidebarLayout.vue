@@ -58,7 +58,7 @@
           :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
           :notebook-realm="sidebarNotebookRealm"
-          :active-folder="activeFolderForSidebar()"
+          :active-folder-realm="activeFolderRef"
         />
       </aside>
       <main
@@ -107,9 +107,6 @@ const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
 const activeFolderRef = ref<FolderRealm | null>(null)
-function activeFolderForSidebar() {
-  return activeFolderRef
-}
 
 const sidebarOpened = ref(false)
 const windowWidth = ref(

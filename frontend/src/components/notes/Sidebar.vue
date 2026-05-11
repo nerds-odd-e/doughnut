@@ -7,7 +7,7 @@
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
       :active-note-realm="activeNoteRealm"
-      :active-folder-realm="activeFolder.value"
+      :active-folder-realm="activeFolderRealm"
     />
     <div
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType, Ref } from "vue"
+import type { Ref } from "vue"
 import { computed, inject, ref, watch } from "vue"
 import type {
   FolderRealm,
@@ -36,25 +36,16 @@ import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { folderPageBreadcrumbFolders } from "@/composables/useCurrentNoteSidebarState"
 
-const props = defineProps({
+const props = defineProps<{
   /** When set, highlights the active note and expands its ancestors */
-  activeNoteRealm: {
-    type: Object as PropType<NoteRealm | undefined>,
-    required: false,
-  },
+  activeNoteRealm?: NoteRealm
   /** Notebook id for sidebar chrome; toolbar shows root create until active note topology exists */
-  notebookId: { type: Number, required: true },
+  notebookId: number
   /** Layout chrome before a note realm exists (e.g. notebook overview); used for readonly when no active note */
-  notebookRealm: {
-    type: Object as PropType<NotebookRealm | undefined>,
-    required: false,
-  },
-  /** Same ref as notebook layout / folder page; tree and toolbar mutate `.value` for active-folder scope */
-  activeFolder: {
-    type: Object as PropType<Ref<FolderRealm | null>>,
-    required: true,
-  },
-})
+  notebookRealm?: NotebookRealm
+  /** Set on folder page for active-folder toolbar/tree scope; null on note routes */
+  activeFolderRealm: FolderRealm | null
+}>()
 
 const expandedFolderIds = ref<Set<number>>(new Set())
 
@@ -63,7 +54,7 @@ const activeNoteTopology = computed(
 )
 
 const toolbarAncestorFolders = computed(() => {
-  if (props.activeFolder.value != null) {
+  if (props.activeFolderRealm != null) {
     return folderPageBreadcrumbFolders.value
   }
   return props.activeNoteRealm?.ancestorFolders ?? []
@@ -77,19 +68,18 @@ const activePathFolderIds = computed(() => {
   return ids
 })
 
-const sidebarInnerTreeProps = {
+const sidebarInnerTreeProps = computed(() => ({
   expandedFolderIds,
   activePathFolderIds,
   activeFolder:
-    props.activeFolder.value == null ? undefined : props.activeFolder.value,
-}
+    props.activeFolderRealm == null ? undefined : props.activeFolderRealm,
+}))
 
 watch(
   () => props.notebookId,
   (notebookId, previousNotebookId) => {
     if (previousNotebookId !== undefined && notebookId !== previousNotebookId) {
       expandedFolderIds.value = new Set()
-      props.activeFolder.value = null
     }
   }
 )

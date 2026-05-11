@@ -4,7 +4,6 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import createNoteStorage from "@/store/createNoteStorage"
 import type {
   FolderListing,
-  FolderRealm,
   NoteRealm,
   NotebookRealm,
   Options,
@@ -21,7 +20,6 @@ import {
 } from "@tests/helpers"
 import { type VueWrapper, DOMWrapper } from "@vue/test-utils"
 import { expect, vi } from "vitest"
-import { ref } from "vue"
 
 /** Avoid real navigation during sidebar tests (would break folder expansion / listing). */
 const sidebarRouterLinkStub = {
@@ -184,7 +182,7 @@ export function mountSidebar(
       activeNoteRealm: active,
       notebookId: active.notebookView.notebook.id,
       notebookRealm,
-      activeFolder: ref<FolderRealm | null>(null),
+      activeFolderRealm: null,
     })
     .mount({
       attachTo: document.body,
@@ -211,7 +209,7 @@ export function mountSidebarSignedIn(
       activeNoteRealm: active,
       notebookId,
       notebookRealm,
-      activeFolder: ref<FolderRealm | null>(null),
+      activeFolderRealm: null,
     })
     .mount({
       attachTo: document.body,
