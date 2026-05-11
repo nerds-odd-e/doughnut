@@ -13,7 +13,7 @@
         :initial-folder="initialFolder"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         :ancestor-folders="ancestorFolders ?? []"
-        :default-title-from-scoped-pattern="defaultTitleFromScopedPattern"
+        :initial-title="defaultTitleFromScopedPattern"
         @close-dialog="closer"
       />
     </template>

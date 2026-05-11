@@ -85,11 +85,6 @@ const props = withDefaults(
     initialFolder?: Folder
     initialTitle?: string
     /**
-     * Default title from scoped index `title_pattern` (already rendered). Does not mark the title
-     * as user-edited; ignored when `initialTitle` is set.
-     */
-    defaultTitleFromScopedPattern?: string
-    /**
      * When set, search is scoped under this note; when omitted (e.g. notebook-level new note), search
      * is global and the dropdown still prioritizes hits in `notebookRootNotebookId`.
      */
@@ -142,9 +137,7 @@ function contentWithWikidataFrontmatter(
 }
 
 // Reactive state
-const newTitle = ref(
-  props.initialTitle ?? props.defaultTitleFromScopedPattern ?? "Untitled"
-)
+const newTitle = ref(props.initialTitle ?? "Untitled")
 const wikidataIdSelection = ref("")
 
 const noteFormErrors = ref({
@@ -154,16 +147,6 @@ const noteFormErrors = ref({
 
 const processing = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
-
-watch(
-  () => [props.defaultTitleFromScopedPattern, props.initialTitle] as const,
-  ([def, init]) => {
-    if (init !== undefined) return
-    if (!hasTitleBeenEdited.value) {
-      newTitle.value = def ?? "Untitled"
-    }
-  }
-)
 
 // Computed property to determine effective search key
 const effectiveSearchKey = computed(() => {
