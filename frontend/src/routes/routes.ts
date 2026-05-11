@@ -1,4 +1,4 @@
-import type { RouteRecordRaw } from "vue-router"
+import type { RouteComponent, RouteRecordRaw } from "vue-router"
 import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
@@ -20,6 +20,7 @@ import NotebookPage from "@/pages/NotebookPage.vue"
 import FolderPage from "@/pages/FolderPage.vue"
 import NotebookGroupPage from "@/pages/NotebookGroupPage.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
+import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
 
 // Please start most of the path with "/d/"
@@ -27,7 +28,7 @@ import { routeMetadata } from "./routeMetadata"
 // when refreshing the page or directly accessing the URL.
 
 // Map route names to components
-const componentMap: Record<string, unknown> = {
+const componentMap: Record<string, RouteComponent> = {
   root: HomePage,
   notebooks: NotebooksPage,
   notebookGroup: NotebookGroupPage,
@@ -51,6 +52,12 @@ const componentMap: Record<string, unknown> = {
   bookReading: BookReadingPage,
 }
 
+const notebookSidebarNestedRouteNames = new Set([
+  "noteShow",
+  "notebookPage",
+  "folderPage",
+])
+
 // Combine route metadata with components
 const routes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
   if (metadata.redirect !== undefined) {
@@ -59,9 +66,29 @@ const routes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
       redirect: metadata.redirect,
     } as RouteRecordRaw
   }
+  const name = metadata.name!
+  if (notebookSidebarNestedRouteNames.has(name)) {
+    const parent: RouteRecordRaw = {
+      path: metadata.path,
+      component: NotebookSidebarLayout,
+      children: [
+        {
+          path: "",
+          name,
+          component: componentMap[name]!,
+          props: metadata.props,
+          meta: metadata.meta,
+        },
+      ],
+    }
+    if (metadata.alias !== undefined) {
+      parent.alias = metadata.alias
+    }
+    return parent
+  }
   return {
     ...metadata,
-    component: componentMap[metadata.name!],
+    component: componentMap[name]!,
   }
 }) as RouteRecordRaw[]
 

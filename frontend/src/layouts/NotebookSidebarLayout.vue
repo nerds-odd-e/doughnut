@@ -64,7 +64,9 @@
       <main
         class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
       >
-        <slot />
+        <slot>
+          <RouterView />
+        </slot>
       </main>
     </div>
   </div>
@@ -72,7 +74,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from "vue"
-import { useRoute } from "vue-router"
+import { RouterView, useRoute } from "vue-router"
 import type {
   Folder,
   FolderRealm,

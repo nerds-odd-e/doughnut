@@ -4,6 +4,24 @@ import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import routes from "@/routes/routes"
 
+function findRouteRecordByName(
+  routeList: RouteRecordRaw[],
+  name: string
+): RouteRecordRaw | undefined {
+  for (const r of routeList) {
+    if (r.name === name) {
+      return r
+    }
+    if (r.children) {
+      const found = findRouteRecordByName(r.children, name)
+      if (found) {
+        return found
+      }
+    }
+  }
+  return
+}
+
 /** Absorbs otherwise-unmatched URLs so legacy-path tests do not trigger Vue Router warnings. */
 const testCatchAll: RouteRecordRaw = {
   path: "/:pathMatch(.*)*",
@@ -29,7 +47,7 @@ describe("routes", () => {
       expect(route.name).toBe("noteShow")
       expect(route.params.noteId).toBe("123")
 
-      const meta = routes.find((r) => r.name === "noteShow")
+      const meta = findRouteRecordByName(routes, "noteShow")
       expect(meta).toBeDefined()
       if (meta && typeof meta.props === "function") {
         expect(meta.props(route)).toEqual({
@@ -49,7 +67,7 @@ describe("routes", () => {
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
       expect(route.params.noteId).toBe("456")
-      const meta = routes.find((r) => r.name === "noteShow")
+      const meta = findRouteRecordByName(routes, "noteShow")
       expect(meta).toBeDefined()
       if (meta && typeof meta.props === "function") {
         expect(meta.props(route)).toEqual({

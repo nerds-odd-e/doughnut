@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 import { computed, onMounted, provide, ref } from "vue"
-import { useRoute } from "vue-router"
-import NotebookSidebarLayout from "./layouts/NotebookSidebarLayout.vue"
 import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
@@ -32,16 +30,6 @@ const environment = ref("production")
 const userLoaded = ref(false)
 
 const newUser = computed(() => !user.value && !!externalIdentifier.value)
-
-const route = useRoute()
-const notebookSidebarRouteNames = new Set([
-  "notebookPage",
-  "folderPage",
-  "noteShow",
-])
-const showsNotebookSidebarLayout = computed(() =>
-  notebookSidebarRouteNames.has(String(route.name))
-)
 
 onMounted(async () => {
   environment.value = getEnvironment()
@@ -81,10 +69,7 @@ onMounted(async () => {
       <template v-else-if="userLoaded">
         <router-view v-slot="{ Component }">
           <KeepAlive :include="['RecallPage']">
-            <NotebookSidebarLayout v-if="showsNotebookSidebarLayout">
-              <component :is="Component" />
-            </NotebookSidebarLayout>
-            <component v-else :is="Component" />
+            <component :is="Component" />
           </KeepAlive>
         </router-view>
       </template>
