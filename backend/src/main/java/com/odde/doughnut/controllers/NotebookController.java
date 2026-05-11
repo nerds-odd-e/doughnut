@@ -10,7 +10,6 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
-import com.odde.doughnut.controllers.dto.NotebookFolderIndexRow;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
@@ -364,16 +363,14 @@ class NotebookController {
   @Operation(
       summary = "List all folders in notebook (flat index)",
       description =
-          "Minimal rows (id, name, parentFolderId) for building folder trees and paths. Ordered"
-              + " by id.")
+          "Folder rows (including parentFolderId) for building folder trees and paths. Ordered by"
+              + " id.")
   @GetMapping("/{notebook}/folders/index")
-  public List<NotebookFolderIndexRow> listNotebookFolderIndex(
+  public List<Folder> listNotebookFolderIndex(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    return folderRepository.findIndexRowsByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-        .map(r -> new NotebookFolderIndexRow(r.getId(), r.getName(), r.getParentFolderId()))
-        .toList();
+    return folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
   }
 
   @PostMapping("/{notebook}/update-index")

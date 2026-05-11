@@ -1,23 +1,9 @@
-import type {
-  Folder,
-  NotebookFolderIndexRow,
-} from "@generated/doughnut-backend-api"
-
-const PLACEHOLDER_ISO = "1970-01-01T00:00:00.000Z"
-
-function rowToFolder(row: NotebookFolderIndexRow): Folder {
-  return {
-    id: row.id,
-    name: row.name,
-    createdAt: PLACEHOLDER_ISO,
-    updatedAt: PLACEHOLDER_ISO,
-  }
-}
+import type { Folder } from "@generated/doughnut-backend-api"
 
 /** Builds root-to-leaf folder segments for breadcrumbs using the flat folder index. */
 export function folderBreadcrumbChainFromFlatIndex(
   leafFolder: Folder,
-  rows: NotebookFolderIndexRow[]
+  rows: Folder[]
 ): Folder[] {
   const byId = new Map(rows.map((r) => [r.id, r]))
   const idsRev: number[] = []
@@ -30,7 +16,5 @@ export function folderBreadcrumbChainFromFlatIndex(
     cur = row?.parentFolderId
   }
   const ids = idsRev.reverse()
-  return ids.map((id) =>
-    id === leafFolder.id ? leafFolder : rowToFolder(byId.get(id)!)
-  )
+  return ids.map((id) => (id === leafFolder.id ? leafFolder : byId.get(id)!))
 }

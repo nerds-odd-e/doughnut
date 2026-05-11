@@ -749,7 +749,7 @@ export class NotebookController {
     /**
      * List all folders in notebook (flat index)
      *
-     * Minimal rows (id, name, parentFolderId) for building folder trees and paths. Ordered by id.
+     * Folder rows (including parentFolderId) for building folder trees and paths. Ordered by id.
      */
     public static listNotebookFolderIndex<ThrowOnError extends boolean = false>(options: Options<ListNotebookFolderIndexData, ThrowOnError>) {
         return (options.client ?? client).get<ListNotebookFolderIndexResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/index', ...options });

@@ -9,10 +9,11 @@ describe("folderBreadcrumbChainFromFlatIndex", () => {
       createdAt: "2021-01-01T00:00:00Z",
       updatedAt: "2021-01-01T00:00:00Z",
     }
+    const ts = "2021-01-01T00:00:00Z"
     const rows = [
-      { id: 1, name: "Root" },
-      { id: 2, name: "Mid", parentFolderId: 1 },
-      { id: 3, name: "Leaf", parentFolderId: 2 },
+      { id: 1, name: "Root", createdAt: ts, updatedAt: ts },
+      { id: 2, name: "Mid", parentFolderId: 1, createdAt: ts, updatedAt: ts },
+      { id: 3, name: "Leaf", parentFolderId: 2, createdAt: ts, updatedAt: ts },
     ]
     const chain = folderBreadcrumbChainFromFlatIndex(leaf, rows)
     expect(chain.map((f) => f.id)).toEqual([1, 2, 3])

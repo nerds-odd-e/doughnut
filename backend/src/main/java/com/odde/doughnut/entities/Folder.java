@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -53,4 +55,11 @@ public class Folder extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Timestamp updatedAt;
+
+  /** Serialized as {@code parentFolderId} for API consumers (parent association stays lazy). */
+  @Schema(description = "Parent folder id when nested; omitted at notebook root.")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Integer getParentFolderId() {
+    return parentFolder == null ? null : parentFolder.getId();
+  }
 }

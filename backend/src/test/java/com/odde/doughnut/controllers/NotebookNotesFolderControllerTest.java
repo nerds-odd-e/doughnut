@@ -13,7 +13,6 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
-import com.odde.doughnut.controllers.dto.NotebookFolderIndexRow;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -380,14 +379,14 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
       makeMe.aFolder().notebook(nb).name("SiblingRoot").please();
 
-      List<NotebookFolderIndexRow> rows = controller.listNotebookFolderIndex(nb);
+      List<Folder> rows = controller.listNotebookFolderIndex(nb);
       assertEquals(3, rows.size());
-      NotebookFolderIndexRow nestedRow =
-          rows.stream().filter(r -> r.id().equals(nested.getId())).findFirst().orElseThrow();
-      assertThat(nestedRow.name(), equalTo("Nested"));
-      assertThat(nestedRow.parentFolderId(), equalTo(parent.getId()));
+      Folder nestedRow =
+          rows.stream().filter(r -> r.getId().equals(nested.getId())).findFirst().orElseThrow();
+      assertThat(nestedRow.getName(), equalTo("Nested"));
+      assertThat(nestedRow.getParentFolderId(), equalTo(parent.getId()));
 
-      long rootLevelCount = rows.stream().filter(r -> r.parentFolderId() == null).count();
+      long rootLevelCount = rows.stream().filter(r -> r.getParentFolderId() == null).count();
       assertEquals(2, rootLevelCount);
     }
 

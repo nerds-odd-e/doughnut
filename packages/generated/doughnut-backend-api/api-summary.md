@@ -121,7 +121,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
 - `getFolderPage`: GET `/api/notebooks/{notebook}/folders/{folder}` -> `GetFolderPageResponse` (request: `GetFolderPageData`; path: notebook, folder; response body: FolderRealm)
 - `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; response body: void)
-- `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<NotebookFolderIndexRow>)
+- `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
 - `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 
 ## Notebook Group Controller

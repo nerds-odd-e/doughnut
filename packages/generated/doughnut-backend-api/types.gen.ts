@@ -195,6 +195,10 @@ export type Folder = {
     name: string;
     createdAt: string;
     updatedAt: string;
+    /**
+     * Parent folder id when nested; omitted at notebook root.
+     */
+    parentFolderId?: number;
 };
 
 export type Note = {
@@ -812,18 +816,6 @@ export type FolderRealm = {
      * Folder index landing note id from cached folder.index_note_id when valid; otherwise repaired from notes titled "index" in this folder (case-insensitive). Omitted when absent.
      */
     folderIndexNoteId?: number;
-};
-
-/**
- * Flat folder row for building folder trees and paths within a notebook.
- */
-export type NotebookFolderIndexRow = {
-    id: number;
-    name: string;
-    /**
-     * Null when the folder is at notebook root.
-     */
-    parentFolderId?: number;
 };
 
 /**
@@ -2985,7 +2977,7 @@ export type ListNotebookFolderIndexResponses = {
     /**
      * OK
      */
-    200: Array<NotebookFolderIndexRow>;
+    200: Array<Folder>;
 };
 
 export type ListNotebookFolderIndexResponse = ListNotebookFolderIndexResponses[keyof ListNotebookFolderIndexResponses];

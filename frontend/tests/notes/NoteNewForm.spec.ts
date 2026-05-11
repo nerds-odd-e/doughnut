@@ -304,7 +304,7 @@ describe("adding new note", () => {
     it("sends folderId when a target folder is pre-selected", async () => {
       wrapper.unmount()
       mockSdkService(NotebookController, "listNotebookFolderIndex", [
-        { id: 42, name: "Alpha" },
+        testFolderStub(42, "Alpha"),
       ])
       wrapper = helper
         .component(NoteNewForm)
@@ -333,8 +333,8 @@ describe("adding new note", () => {
         folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
       })
       mockSdkService(NotebookController, "listNotebookFolderIndex", [
-        { id: 7, name: "One" },
-        { id: 8, name: "Two" },
+        testFolderStub(7, "One"),
+        testFolderStub(8, "Two"),
       ])
       wrapper = helper
         .component(NoteNewForm)

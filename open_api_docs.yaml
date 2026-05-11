@@ -2263,8 +2263,8 @@ paths:
       tags:
       - notebook-controller
       summary: List all folders in notebook (flat index)
-      description: "Minimal rows (id, name, parentFolderId) for building folder trees\
-        \ and paths. Ordered by id."
+      description: Folder rows (including parentFolderId) for building folder trees
+        and paths. Ordered by id.
       operationId: listNotebookFolderIndex
       parameters:
       - name: notebook
@@ -2280,7 +2280,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NotebookFolderIndexRow"
+                  $ref: "#/components/schemas/Folder"
   /api/notebooks/{notebook}/folder-listing:
     get:
       tags:
@@ -3232,6 +3232,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        parentFolderId:
+          type: integer
+          format: int32
+          description: Parent folder id when nested; omitted at notebook root.
       required:
       - createdAt
       - id
@@ -4414,22 +4418,6 @@ components:
       required:
       - folder
       - notebookView
-    NotebookFolderIndexRow:
-      type: object
-      description: Flat folder row for building folder trees and paths within a notebook.
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          type: string
-        parentFolderId:
-          type: integer
-          format: int32
-          description: Null when the folder is at notebook root.
-      required:
-      - id
-      - name
     FolderListing:
       type: object
       description: Note topologies and child folders in a structural listing scope

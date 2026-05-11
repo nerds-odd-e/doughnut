@@ -1,31 +1,25 @@
-import type {
-  Folder,
-  NotebookFolderIndexRow,
-} from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/doughnut-backend-api"
 
-/** Timestamps when only index-row data is available (e.g. search pick). */
+/** Timestamps when only id/name are known (e.g. synthetic dropdown fallback). */
 const FOLDER_PLACEHOLDER_TIMESTAMP = "1970-01-01T00:00:00.000Z"
 
-/** Build a `Folder` from an index row when the listing API did not return a full row. */
-export function folderFromIndexRow(row: NotebookFolderIndexRow): Folder {
+export function stubFolder(id: number, name: string): Folder {
   return {
-    id: row.id,
-    name: row.name,
+    id,
+    name,
     createdAt: FOLDER_PLACEHOLDER_TIMESTAMP,
     updatedAt: FOLDER_PLACEHOLDER_TIMESTAMP,
   }
 }
 
-export function folderRowsById(
-  rows: NotebookFolderIndexRow[]
-): Map<number, NotebookFolderIndexRow> {
+export function folderRowsById(rows: Folder[]): Map<number, Folder> {
   return new Map(rows.map((r) => [r.id, r]))
 }
 
 /** Path from notebook root to folder, segments joined with ` / `. */
 export function folderPathLabel(
   folderId: number,
-  byId: Map<number, NotebookFolderIndexRow>
+  byId: Map<number, Folder>
 ): string {
   const segments: string[] = []
   let id: number | undefined = folderId
@@ -39,15 +33,15 @@ export function folderPathLabel(
 }
 
 /**
- * Convert a root-to-leaf Folder array (as stored in NoteRealm.ancestorFolders)
- * into NotebookFolderIndexRow entries with inferred parentFolderId.
+ * Copy a root-to-leaf Folder array with inferred parentFolderId on each entry
+ * (outermost folder has no parent).
  */
-export function folderChainToIndexRows(
-  chain: readonly Folder[]
-): NotebookFolderIndexRow[] {
+export function folderChainWithParentIds(chain: readonly Folder[]): Folder[] {
   return chain.map((f, i) => ({
     id: f.id,
     name: f.name,
+    createdAt: f.createdAt,
+    updatedAt: f.updatedAt,
     parentFolderId: i === 0 ? undefined : chain[i - 1]!.id,
   }))
 }
@@ -61,25 +55,25 @@ export function folderChainToIndexRows(
 export function ancestorsFromChain(
   movingFolderId: number,
   chain: readonly Folder[]
-): { ancestorRows: NotebookFolderIndexRow[]; parentFolderId: number | null } {
+): { ancestorFolders: Folder[]; parentFolderId: number | null } {
   const idx = chain.findIndex((f) => f.id === movingFolderId)
   if (idx === -1) {
     // Moving folder not in chain – return chain as ancestors (best-effort)
     return {
-      ancestorRows: folderChainToIndexRows(chain),
+      ancestorFolders: folderChainWithParentIds(chain),
       parentFolderId: chain.length > 0 ? chain[chain.length - 1]!.id : null,
     }
   }
   const ancestors = chain.slice(0, idx)
   return {
-    ancestorRows: folderChainToIndexRows(ancestors),
+    ancestorFolders: folderChainWithParentIds(ancestors),
     parentFolderId: idx > 0 ? chain[idx - 1]!.id : null,
   }
 }
 
 export function collectSubtreeFolderIds(
   rootId: number,
-  rows: NotebookFolderIndexRow[]
+  rows: Folder[]
 ): Set<number> {
   const excluded = new Set<number>()
   function dfs(id: number) {

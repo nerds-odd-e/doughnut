@@ -73,10 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Folder,
-  NotebookFolderIndexRow,
-} from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/doughnut-backend-api"
 import { MoreHorizontal } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
 import Modal from "@/components/commons/Modal.vue"
@@ -85,10 +82,10 @@ import { requestNotebookFolderListing } from "@/utils/notebookFolderListingReque
 import FolderSearchForm from "./FolderSearchForm.vue"
 import {
   ancestorsFromChain,
-  folderChainToIndexRows,
-  folderFromIndexRow,
+  folderChainWithParentIds,
   folderPathLabel,
   folderRowsById,
+  stubFolder,
 } from "./folderSelectorUtils"
 
 const props = defineProps<{
@@ -118,15 +115,14 @@ const loadError = ref<string | undefined>(undefined)
 const searchOpen = ref(false)
 
 // Rows loaded only for the search dialog (full index, lazy)
-const searchIndexRows = ref<NotebookFolderIndexRow[]>([])
+const searchIndexRows = ref<Folder[]>([])
 
 // Neighbour folders loaded via one cheap listing call (full rows for v-model)
 const neighbourFolders = ref<Folder[]>([])
 
-const neighbourRows = computed((): NotebookFolderIndexRow[] =>
+const neighbourRows = computed((): Folder[] =>
   neighbourFolders.value.map((f) => ({
-    id: f.id,
-    name: f.name,
+    ...f,
     parentFolderId: parentFolderId.value ?? undefined,
   }))
 )
@@ -136,7 +132,7 @@ const contextFolderId = computed(() => props.contextFolder?.id ?? null)
 const ancestorRows = computed(() => {
   if (contextFolderId.value == null) return []
   return ancestorsFromChain(contextFolderId.value, props.ancestorFolders)
-    .ancestorRows
+    .ancestorFolders
 })
 
 const parentFolderId = computed(() => {
@@ -166,7 +162,7 @@ onMounted(async () => {
 
 /** Minimal byId map built from quick-pick data only. Used for path display in the dropdown. */
 const quickPickById = computed(() => {
-  const allAncestorRows = folderChainToIndexRows(props.ancestorFolders)
+  const allAncestorRows = folderChainWithParentIds(props.ancestorFolders)
   return folderRowsById([...allAncestorRows, ...neighbourRows.value])
 })
 
@@ -210,7 +206,7 @@ function resolveFolderById(id: number): Folder {
   if (fromChain) return fromChain
   const fromNeighbours = neighbourFolders.value.find((f) => f.id === id)
   if (fromNeighbours) return fromNeighbours
-  return folderFromIndexRow({ id, name: `Folder #${id}` })
+  return stubFolder(id, `Folder #${id}`)
 }
 
 const selectModel = computed({
@@ -224,12 +220,12 @@ const selectModel = computed({
   },
 })
 
-function onSearchSelect(row: NotebookFolderIndexRow | null) {
-  emit("update:modelValue", row == null ? null : folderFromIndexRow(row))
+function onSearchSelect(row: Folder | null) {
+  emit("update:modelValue", row)
   searchOpen.value = false
 }
 
-function onIndexLoaded(rows: NotebookFolderIndexRow[]) {
+function onIndexLoaded(rows: Folder[]) {
   searchIndexRows.value = rows
 }
 </script>

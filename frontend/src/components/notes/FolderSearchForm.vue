@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NotebookFolderIndexRow } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { Search } from "lucide-vue-next"
 import { computed, onMounted, ref } from "vue"
@@ -92,12 +92,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  select: [row: NotebookFolderIndexRow | null]
+  select: [row: Folder | null]
   /** Emit loaded rows so caller can use them for path display after selection */
-  indexLoaded: [rows: NotebookFolderIndexRow[]]
+  indexLoaded: [rows: Folder[]]
 }>()
 
-const indexRows = ref<NotebookFolderIndexRow[]>([])
+const indexRows = ref<Folder[]>([])
 const indexLoadError = ref<string | undefined>(undefined)
 const query = ref("")
 
@@ -132,7 +132,7 @@ const showRootRow = computed(() => {
 })
 
 const filteredFolders = computed(() => {
-  const out: NotebookFolderIndexRow[] = []
+  const out: Folder[] = []
   for (const r of indexRows.value) {
     if (excludedFolderIds.value.has(r.id)) continue
     const path = folderPathLabel(r.id, byId.value).toLowerCase()
@@ -153,7 +153,7 @@ function rowDisplay(id: number): string {
   return folderPathLabel(id, byId.value)
 }
 
-function pickRow(row: NotebookFolderIndexRow | null) {
+function pickRow(row: Folder | null) {
   emit("select", row)
   emit("close")
 }
