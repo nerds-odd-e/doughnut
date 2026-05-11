@@ -32,7 +32,7 @@
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
     "vue-toastification": "2.0.0-rc.5",
-    "yaml": ">=2.8.4"
+    "yaml": "2.9.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
@@ -41,7 +41,7 @@
     "@storybook/vue3-vite": "10.3.6",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
-    "@types/node": "25.6.0",
+    "@types/node": "25.6.2",
     "@types/turndown": "^5.0.6",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
