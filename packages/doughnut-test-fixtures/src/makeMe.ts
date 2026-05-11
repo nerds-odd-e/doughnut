@@ -17,6 +17,7 @@ import CircleNoteBuilder from './CircleNoteBuilder'
 import ConversationBuilder from './ConversationBuilder'
 import ConversationListItemBuilder from './ConversationListItemBuilder'
 import DueMemoryTrackersBuilder from './DueMemoryTrackersBuilder'
+import FolderBuilder from './FolderBuilder'
 import FolderRealmBuilder from './FolderRealmBuilder'
 import {
   FailureReportBuilder,
@@ -95,6 +96,10 @@ class MakeMe {
 
   static get aNotebook(): NotebookBuilder {
     return new NotebookBuilder()
+  }
+
+  static get aFolder(): FolderBuilder {
+    return new FolderBuilder()
   }
 
   static get aFolderRealm(): FolderRealmBuilder {

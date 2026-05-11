@@ -1,17 +1,5 @@
 import type { Folder } from "@generated/doughnut-backend-api"
 
-/** Timestamps when only id/name are known (e.g. synthetic dropdown fallback). */
-const FOLDER_PLACEHOLDER_TIMESTAMP = "1970-01-01T00:00:00.000Z"
-
-export function stubFolder(id: number, name: string): Folder {
-  return {
-    id,
-    name,
-    createdAt: FOLDER_PLACEHOLDER_TIMESTAMP,
-    updatedAt: FOLDER_PLACEHOLDER_TIMESTAMP,
-  }
-}
-
 export function folderRowsById(rows: Folder[]): Map<number, Folder> {
   return new Map(rows.map((r) => [r.id, r]))
 }

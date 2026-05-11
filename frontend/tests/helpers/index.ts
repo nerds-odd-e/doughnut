@@ -13,16 +13,9 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { vi } from "vitest"
 
-const TEST_FOLDER_DATE_TIME = "2000-01-01T00:00:00.000Z"
-
 /** API-shaped `Folder` rows for tests and stories (timestamps required by the type). */
 export function testFolderStub(id: number, name: string): Folder {
-  return {
-    id,
-    name,
-    createdAt: TEST_FOLDER_DATE_TIME,
-    updatedAt: TEST_FOLDER_DATE_TIME,
-  }
+  return makeMe.aFolder.folder(id, name).please()
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: controller statics are heterogeneous; any is required for Parameters/ReturnType plumbing

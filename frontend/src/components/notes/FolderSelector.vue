@@ -85,7 +85,6 @@ import {
   folderChainWithParentIds,
   folderPathLabel,
   folderRowsById,
-  stubFolder,
 } from "./folderSelectorUtils"
 
 const props = defineProps<{
@@ -103,7 +102,6 @@ const props = defineProps<{
    * Display label for the current selection when its path cannot be resolved from the local index.
    * Used as a fallback for the synthetic dropdown option before the full folder index is loaded.
    */
-  modelValueLabel?: string
   disabled?: boolean
 }>()
 
@@ -193,20 +191,18 @@ const selectionSummary = computed(() => {
   const id = props.modelValue.id
   const path = folderPathLabel(id, displayById.value)
   if (path) return path
-  return props.modelValueLabel ?? props.modelValue.name ?? `Folder #${id}`
+  return props.modelValue.name
 })
 
 function quickPathLabel(id: number): string {
   return folderPathLabel(id, quickPickById.value)
 }
 
-function resolveFolderById(id: number): Folder {
+function resolveFolderById(id: number): Folder | null {
   if (props.modelValue?.id === id) return props.modelValue
   const fromChain = props.ancestorFolders.find((f) => f.id === id)
   if (fromChain) return fromChain
-  const fromNeighbours = neighbourFolders.value.find((f) => f.id === id)
-  if (fromNeighbours) return fromNeighbours
-  return stubFolder(id, `Folder #${id}`)
+  return neighbourFolders.value.find((f) => f.id === id) ?? null
 }
 
 const selectModel = computed({

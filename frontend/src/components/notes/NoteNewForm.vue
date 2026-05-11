@@ -15,7 +15,6 @@
               :notebook-id="notebookId"
               :context-folder="folderSelectorContextFolder"
               :ancestor-folders="ancestorFolders"
-              :model-value-label="folderSelectorLabel"
               :disabled="processing"
             />
           </div>
@@ -113,14 +112,6 @@ watch(
     selectedFolder.value = f ?? null
   }
 )
-
-/** Fallback label for the folder selector when the path can't be resolved from ancestorFolders. */
-const folderSelectorLabel = computed((): string | undefined => {
-  const folder = selectedFolder.value ?? props.initialFolder ?? null
-  if (folder == null) return undefined
-  const found = props.ancestorFolders.find((f) => f.id === folder.id)
-  return found?.name ?? folder.name
-})
 
 const parentLocationDescription = computed(() => {
   const folder = selectedFolder.value ?? props.initialFolder ?? null
