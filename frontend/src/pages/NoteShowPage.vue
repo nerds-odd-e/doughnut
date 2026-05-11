@@ -35,7 +35,6 @@ import NoteConversation from "../components/conversations/NoteConversation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
-  currentActiveNoteId,
   notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -67,7 +66,6 @@ watch(
   resolvedNoteId,
   (id) => {
     if (id != null) {
-      currentActiveNoteId.value = id
       notebookSidebarActiveFolder.value = null
     }
   },

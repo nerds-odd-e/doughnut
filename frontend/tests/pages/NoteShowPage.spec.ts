@@ -10,6 +10,7 @@ import helper, {
   mockSdkService,
 } from "@tests/helpers"
 import { resetNotebookSidebarState } from "@/composables/useCurrentNoteSidebarState"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
@@ -45,6 +46,7 @@ describe("all in note show page", () => {
         .withCleanStorage()
         .withProps({ noteId: noteRealm.id })
         .withRouter(router)
+        .currentRoute(noteShowLocation(noteRealm.id))
         .render()
 
       await flushPromises()

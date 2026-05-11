@@ -39,7 +39,6 @@ import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReado
 import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
-  currentActiveNoteId,
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
   notebookSidebarNotebookRealm,
@@ -104,7 +103,6 @@ watch(
     if (key === undefined) {
       sidebarAnchorNoteId.value = undefined
       indexNoteStatus.value = "pending"
-      currentActiveNoteId.value = undefined
       return
     }
 
@@ -127,14 +125,6 @@ watch(
       if (gen !== indexResolveGeneration) return
       indexNoteStatus.value = "absent"
     }
-  },
-  { immediate: true }
-)
-
-watch(
-  sidebarAnchorNoteId,
-  (id) => {
-    currentActiveNoteId.value = id
   },
   { immediate: true }
 )
