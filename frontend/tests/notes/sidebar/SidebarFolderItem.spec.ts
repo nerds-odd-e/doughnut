@@ -1,5 +1,4 @@
 import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
-import { sidebarTreeKey } from "@/components/notes/useNoteSidebarTree"
 import type { FolderRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, mount } from "@vue/test-utils"
@@ -27,16 +26,12 @@ function mountFolderItem(
     props: {
       folder,
       notebookId: options.notebookId,
+      expandedFolderIds,
+      activePathFolderIds: computed(() => new Set<number>()),
+      activeFolder,
     },
     global: {
       plugins: [router],
-      provide: {
-        [sidebarTreeKey]: {
-          expandedFolderIds,
-          activePathFolderIds: computed(() => new Set()),
-          activeFolder,
-        },
-      },
     },
   })
 }

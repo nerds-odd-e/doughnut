@@ -10,11 +10,20 @@
         v-if="row.kind === 'note'"
         :note-topology="row.noteTopology"
         :active-note-topology="activeNoteTopology"
+        :active-folder="sidebarTree.activeFolder"
         :aria-level="currentLevel"
       />
       <SidebarFolderItem
         v-else
-        v-bind="{ notebookId, folder: row.folder, activeNoteTopology, level: currentLevel }"
+        v-bind="{
+          notebookId,
+          folder: row.folder,
+          activeNoteTopology,
+          level: currentLevel,
+          expandedFolderIds: sidebarTree.expandedFolderIds,
+          activePathFolderIds: sidebarTree.activePathFolderIds,
+          activeFolder: sidebarTree.activeFolder,
+        }"
       />
     </template>
   </ul>
@@ -25,12 +34,13 @@ import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
+import { sidebarTreeKey } from "./useNoteSidebarTree"
 import {
   buildUnsortedStructuralRows,
   sortSidebarStructuralRows,
   type SidebarStructuralRow,
 } from "./sidebarStructuralSort"
-import { computed, ref, watch } from "vue"
+import { computed, inject, ref, watch } from "vue"
 import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
@@ -62,6 +72,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const sidebarTree = inject(sidebarTreeKey)!
 
 const currentLevel = computed(() => props.level ?? 1)
 

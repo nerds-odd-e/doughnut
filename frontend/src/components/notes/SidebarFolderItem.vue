@@ -63,13 +63,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
+import type {
+  Folder,
+  FolderRealm,
+  NoteTopology,
+} from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
-import { sidebarTreeKey } from "./useNoteSidebarTree"
-import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue"
+import type { ComputedRef, Ref } from "vue"
+import { computed, onMounted, onUnmounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
 const props = defineProps<{
@@ -77,12 +81,12 @@ const props = defineProps<{
   notebookId: number
   activeNoteTopology?: NoteTopology
   level?: number
+  expandedFolderIds: Ref<Set<number>>
+  activePathFolderIds: ComputedRef<Set<number>>
+  activeFolder: Ref<FolderRealm | null>
 }>()
 
 const currentLevel = computed(() => props.level ?? 1)
-
-const tree = inject(sidebarTreeKey)!
-const { expandedFolderIds, activePathFolderIds, activeFolder } = tree
 
 const router = useRouter()
 
@@ -92,26 +96,26 @@ const folderId = computed(() => props.folder.id)
 
 function ensureFolderExpandedById(id: number | undefined) {
   if (id == null) return
-  if (expandedFolderIds.value.has(id)) return
-  expandedFolderIds.value = new Set([...expandedFolderIds.value, id])
+  if (props.expandedFolderIds.value.has(id)) return
+  props.expandedFolderIds.value = new Set([
+    ...props.expandedFolderIds.value,
+    id,
+  ])
 }
 
 watch(
   () =>
     [
-      activePathFolderIds.value,
+      props.activePathFolderIds.value,
       folderId.value,
-      activeFolder.value?.folder.id,
+      props.activeFolder.value?.folder.id,
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (
-      activeFolder != null &&
-      activeFolder.value?.folder.id === folderId.value
-    ) {
+    if (props.activeFolder.value?.folder.id === folderId.value) {
       return
     }
-    if (activePathFolderIds.value.has(folderId.value)) {
+    if (props.activePathFolderIds.value.has(folderId.value)) {
       ensureFolderExpandedById(folderId.value)
     }
   },
@@ -119,18 +123,20 @@ watch(
 )
 
 const isExpanded = computed(
-  () => folderId.value != null && expandedFolderIds.value.has(folderId.value)
+  () =>
+    folderId.value != null && props.expandedFolderIds.value.has(folderId.value)
 )
 
 const isOnActivePath = computed(
-  () => folderId.value != null && activePathFolderIds.value.has(folderId.value)
+  () =>
+    folderId.value != null &&
+    props.activePathFolderIds.value.has(folderId.value)
 )
 
 const isActiveFolderRow = computed(
   () =>
-    activeFolder != null &&
     folderId.value != null &&
-    activeFolder.value?.folder.id === folderId.value
+    props.activeFolder.value?.folder.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -153,9 +159,8 @@ onUnmounted(() =>
 
 function onFolderRowFocusOut(event: FocusEvent) {
   if (
-    activeFolder == null ||
     folderId.value == null ||
-    activeFolder.value?.folder.id !== folderId.value
+    props.activeFolder.value?.folder.id !== folderId.value
   ) {
     return
   }
@@ -172,7 +177,7 @@ function onFolderRowFocusOut(event: FocusEvent) {
     return
   }
   if (lastMousedownInToolbar) return
-  activeFolder.value = null
+  props.activeFolder.value = null
 }
 
 function navigateToFolderPage() {
@@ -187,24 +192,24 @@ function navigateToFolderPage() {
 }
 
 async function activateFolder() {
-  if (activeFolder == null || folderId.value == null) return
+  if (folderId.value == null) return
   const { data } = await NotebookController.getFolderPage({
     path: { notebook: props.notebookId, folder: folderId.value },
   })
   if (data != null) {
-    activeFolder.value = data
+    props.activeFolder.value = data
   }
 }
 
 function toggleExpand() {
   if (folderId.value == null) return
-  const next = new Set(expandedFolderIds.value)
+  const next = new Set(props.expandedFolderIds.value)
   if (next.has(folderId.value)) {
     next.delete(folderId.value)
   } else {
     next.add(folderId.value)
   }
-  expandedFolderIds.value = next
+  props.expandedFolderIds.value = next
 }
 
 function onLabelAreaClick() {

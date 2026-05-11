@@ -34,28 +34,23 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { FolderRealm, NoteTopology } from "@generated/doughnut-backend-api"
 import { RouterLink } from "vue-router"
+import type { Ref } from "vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { sidebarTreeKey } from "./useNoteSidebarTree"
-import { inject } from "vue"
-
-const tree = inject(sidebarTreeKey)
-const activeFolder = tree?.activeFolder
 
 interface Props {
   noteTopology: NoteTopology
   activeNoteTopology?: NoteTopology
+  activeFolder: Ref<FolderRealm | null>
 }
 
 const props = defineProps<Props>()
 
 function onNoteRowClick() {
-  if (activeFolder != null) {
-    activeFolder.value = null
-  }
+  props.activeFolder.value = null
 }
 </script>
 
