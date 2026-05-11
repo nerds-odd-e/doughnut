@@ -63,11 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Folder,
-  FolderRealm,
-  NoteTopology,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -88,22 +84,6 @@ const currentLevel = computed(() => props.level ?? 1)
 const tree = inject(sidebarTreeKey)!
 const { expandedFolderIds, activePathFolderIds, activeFolder } = tree
 
-/** Resolves folder id from a {@link FolderRealm} or minimal `{ id }` (tests). */
-function folderIdFromActiveFolderRealm(
-  v: FolderRealm | { id: number } | null | undefined
-): number | null {
-  if (v == null) return null
-  if ("folder" in v && v.folder != null) return v.folder.id
-  if ("id" in v && typeof v.id === "number") return v.id
-  return null
-}
-
-const sidebarActiveFolderId = computed(() =>
-  activeFolder == null
-    ? null
-    : folderIdFromActiveFolderRealm(activeFolder.value)
-)
-
 const router = useRouter()
 
 const structuralChildCount = ref<number | undefined>(undefined)
@@ -121,13 +101,13 @@ watch(
     [
       activePathFolderIds.value,
       folderId.value,
-      sidebarActiveFolderId.value,
+      activeFolder.value?.folder.id,
     ] as const,
   () => {
     if (folderId.value == null) return
     if (
       activeFolder != null &&
-      sidebarActiveFolderId.value === folderId.value
+      activeFolder.value?.folder.id === folderId.value
     ) {
       return
     }
@@ -150,7 +130,7 @@ const isActiveFolderRow = computed(
   () =>
     activeFolder != null &&
     folderId.value != null &&
-    sidebarActiveFolderId.value === folderId.value
+    activeFolder.value?.folder.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
@@ -175,7 +155,7 @@ function onFolderRowFocusOut(event: FocusEvent) {
   if (
     activeFolder == null ||
     folderId.value == null ||
-    sidebarActiveFolderId.value !== folderId.value
+    activeFolder.value?.folder.id !== folderId.value
   ) {
     return
   }

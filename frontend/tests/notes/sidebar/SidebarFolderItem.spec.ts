@@ -1,7 +1,9 @@
 import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
 import { sidebarTreeKey } from "@/components/notes/useNoteSidebarTree"
+import type { FolderRealm } from "@generated/doughnut-backend-api"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, mount } from "@vue/test-utils"
-import { computed, ref } from "vue"
+import { computed, ref, type Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -10,7 +12,7 @@ function mountFolderItem(
   options: {
     folderId: number
     notebookId: number
-    activeFolder?: ReturnType<typeof ref<{ id: number; name: string } | null>>
+    activeFolder?: Ref<FolderRealm | null>
   }
 ) {
   const folder = {
@@ -91,9 +93,9 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const activeFolder = ref<{ id: number; name: string } | null>(null)
+    const activeFolder = ref<FolderRealm | null>(null)
     mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
-    activeFolder.value = { id: 42, name: "Alpha" }
+    activeFolder.value = makeMe.aFolderRealm.folder(42, "Alpha").please()
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
@@ -121,9 +123,9 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const activeFolder = ref<{ id: number; name: string } | null>(null)
+    const activeFolder = ref<FolderRealm | null>(null)
     mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
-    activeFolder.value = { id: 42, name: "Alpha" }
+    activeFolder.value = makeMe.aFolderRealm.folder(42, "Alpha").please()
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
