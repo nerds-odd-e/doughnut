@@ -13,15 +13,31 @@ import { screen, waitFor } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect } from "vitest"
+import { createRouter, createWebHistory } from "vue-router"
+import routes from "@/routes/routes"
 
 describe("NotebookPage.spec", () => {
+  let router: ReturnType<typeof createRouter>
+
   beforeEach(() => {
+    router = createRouter({
+      history: createWebHistory(),
+      routes,
+    })
     resetNotebookSidebarState()
     mockSdkService(NotebookController, "getAiAssistant", {
       id: 1,
       additionalInstructionsToAi: "",
     })
   })
+
+  async function navigateToNotebookPage(notebookId: number) {
+    await router.push({
+      name: "notebookPage",
+      params: { notebookId: String(notebookId) },
+    })
+    await flushPromises()
+  }
 
   it("shows the sidebar toggle and loads index state when notebook exposes landing id", async () => {
     const notebook = makeMe.aNotebook.please()
@@ -37,14 +53,10 @@ describe("NotebookPage.spec", () => {
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
-      .withRouter()
+      .withRouter(router)
       .withCurrentUser(makeMe.aUser.please())
-      .currentRoute({
-        name: "notebookPage",
-        params: { notebookId: String(notebook.id) },
-      })
       .render()
-    await flushPromises()
+    await navigateToNotebookPage(notebook.id)
     expect(screen.getByLabelText("Show sidebar")).toBeInTheDocument()
     expect(showSpy).toHaveBeenCalledWith({
       path: { note: indexRealm.id },
@@ -75,14 +87,10 @@ describe("NotebookPage.spec", () => {
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
-      .withRouter()
+      .withRouter(router)
       .withCurrentUser(makeMe.aUser.please())
-      .currentRoute({
-        name: "notebookPage",
-        params: { notebookId: String(notebook.id) },
-      })
       .render()
-    await flushPromises()
+    await navigateToNotebookPage(notebook.id)
     expect(screen.queryByTestId("notebook-index-draft-editor")).toBeNull()
     expect(screen.getByTestId("notebook-index-loading")).toBeInTheDocument()
     release()
@@ -104,14 +112,10 @@ describe("NotebookPage.spec", () => {
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
-      .withRouter()
+      .withRouter(router)
       .withCurrentUser(makeMe.aUser.please())
-      .currentRoute({
-        name: "notebookPage",
-        params: { notebookId: String(notebook.id) },
-      })
       .render()
-    await flushPromises()
+    await navigateToNotebookPage(notebook.id)
     expect(screen.getByLabelText("Show sidebar")).toBeInTheDocument()
     expect(
       screen.getByTestId("notebook-index-draft-editor")
@@ -142,14 +146,10 @@ describe("NotebookPage.spec", () => {
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
-      .withRouter()
+      .withRouter(router)
       .withCurrentUser(makeMe.aUser.please())
-      .currentRoute({
-        name: "notebookPage",
-        params: { notebookId: String(notebook.id) },
-      })
       .render()
-    await flushPromises()
+    await navigateToNotebookPage(notebook.id)
 
     expect(
       screen.getByTestId("notebook-index-editable-content")
@@ -199,14 +199,10 @@ describe("NotebookPage.spec", () => {
     helper
       .component(NotebookPageWithNotebookSidebarLayout)
       .withCleanStorage()
-      .withRouter()
+      .withRouter(router)
       .withCurrentUser(makeMe.aUser.please())
-      .currentRoute({
-        name: "notebookPage",
-        params: { notebookId: String(notebook.id) },
-      })
       .render()
-    await flushPromises()
+    await navigateToNotebookPage(notebook.id)
 
     const rich = document.querySelector(
       '[data-testid="notebook-index-draft-editor"] [data-testid="rich-note-frontmatter-parse-error"]'

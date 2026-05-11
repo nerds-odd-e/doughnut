@@ -27,8 +27,8 @@
         }"
       />
       <BreadcrumbWithCircle
-        v-else-if="sidebarNotebookRealm"
-        :notebook-view="sidebarNotebookRealm"
+        v-else-if="sidebarNotebookView"
+        :notebook-view="sidebarNotebookView"
         :ancestor-folders="chromeBreadcrumbAncestorFolders"
       />
     </GlobalBar>
@@ -57,7 +57,7 @@
           v-if="sidebarNotebookId != null && !Number.isNaN(sidebarNotebookId)"
           :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
-          :notebook-realm="sidebarNotebookRealm"
+          :notebook-realm="sidebarNotebookView"
           :active-folder-realm="activeFolderRef"
         />
       </aside>
@@ -69,9 +69,11 @@
             <component
               :is="Component"
               v-bind="
-                route.name === 'folderPage'
-                  ? { folderRealm, fetchFolderPage }
-                  : {}
+                route.name === 'notebookPage'
+                  ? { notebookRealm, fetchNotebookPage }
+                  : route.name === 'folderPage'
+                    ? { folderRealm, fetchFolderPage }
+                    : {}
               "
             />
           </RouterView>
@@ -88,6 +90,7 @@ import type {
   Folder,
   FolderRealm,
   NoteRealm,
+  NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
@@ -98,7 +101,6 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
-  notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
 import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
@@ -115,11 +117,15 @@ const windowWidth = ref(
 
 const isMdOrLarger = computed(() => windowWidth.value >= 768)
 
-const sidebarNotebookRealm = computed(() => notebookSidebarNotebookRealm.value)
+const notebookRealm = ref<NotebookRealm | undefined>(undefined)
 
-const sidebarNotebookId = computed(
-  () => notebookSidebarNotebookRealm.value?.notebook.id
-)
+const fetchNotebookPage = async () => {
+  const notebookId = Number(route.params.notebookId)
+  const { data, error } = await NotebookController.get({
+    path: { notebook: notebookId },
+  })
+  notebookRealm.value = !error && data ? data : undefined
+}
 
 const sidebarRealm = computed((): NoteRealm | undefined => {
   if (route.name !== "noteShow") return undefined
@@ -136,6 +142,17 @@ const chromeBreadcrumbAncestorFolders = computed((): Folder[] => {
 })
 
 const folderRealm = ref<FolderRealm | undefined>(undefined)
+
+const sidebarNotebookView = computed(
+  (): NotebookRealm | undefined =>
+    notebookRealm.value ?? folderRealm.value?.notebookView
+)
+
+const sidebarNotebookId = computed(
+  () =>
+    sidebarNotebookView.value?.notebook?.id ??
+    sidebarRealm.value?.notebookView?.notebook?.id
+)
 
 const fetchFolderPage = async () => {
   const notebookId = Number(route.params.notebookId)
@@ -168,14 +185,23 @@ watch(
   folderRealm,
   (c) => {
     folderSidebarFolderRealm.value = c
-    const chromeNotebookId = c?.notebookView?.notebook?.id
-    if (chromeNotebookId == null) {
-      notebookSidebarNotebookRealm.value = undefined
+  },
+  { immediate: true }
+)
+
+watch(
+  () => ({
+    isNotebookPage: route.name === "notebookPage",
+    notebookId: route.params.notebookId,
+  }),
+  async ({ isNotebookPage }) => {
+    if (!isNotebookPage) {
+      notebookRealm.value = undefined
       return
     }
-    notebookSidebarNotebookRealm.value = { ...(c as FolderRealm).notebookView }
+    await fetchNotebookPage()
   },
-  { immediate: true, deep: true }
+  { immediate: true }
 )
 
 watch(
@@ -202,7 +228,7 @@ const handleResize = () => {
 }
 
 watch(
-  () => notebookSidebarNotebookRealm.value?.notebook.id,
+  () => sidebarNotebookId.value,
   () => {
     if (!isMdOrLarger.value) {
       sidebarOpened.value = false

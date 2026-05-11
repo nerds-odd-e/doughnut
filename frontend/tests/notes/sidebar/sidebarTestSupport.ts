@@ -1,4 +1,3 @@
-import { notebookSidebarNotebookRealm } from "@/composables/useCurrentNoteSidebarState"
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import createNoteStorage from "@/store/createNoteStorage"
@@ -291,7 +290,6 @@ export function prepareSidebarDefaultMountContext(options: {
 export function teardownSidebarComponentTest(
   wrapper: VueWrapper<unknown> | undefined
 ) {
-  notebookSidebarNotebookRealm.value = undefined
   wrapper?.unmount()
   document.body.innerHTML = ""
   vi.restoreAllMocks()

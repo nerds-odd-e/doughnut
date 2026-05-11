@@ -9,94 +9,47 @@
       v-else
       :notebook="notebook"
       :user="user"
-      :fetch-notebook-page="fetchNotebook"
+      :fetch-notebook-page="fetchNotebookPage"
       :index-note-status="indexNoteStatus"
       :index-note-id="sidebarAnchorNoteId"
-      @notebook-updated="handleNotebookUpdated"
-      @index-note-created="fetchNotebook"
+      @notebook-updated="() => fetchNotebookPage()"
+      @index-note-created="fetchNotebookPage"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  inject,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-  computed,
-  type Ref,
-} from "vue"
-import { useRoute } from "vue-router"
-import type {
-  Notebook,
-  User,
-  NotebookRealm,
-} from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { inject, ref, watch, computed, type Ref } from "vue"
+import type { User, NotebookRealm } from "@generated/doughnut-backend-api"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import {
-  folderPageBreadcrumbFolders,
-  folderSidebarFolderRealm,
-  notebookSidebarNotebookRealm,
-} from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-const route = useRoute()
+const props = defineProps<{
+  notebookRealm: NotebookRealm | undefined
+  fetchNotebookPage: () => Promise<void>
+}>()
+
 const storageAccessor = useStorageAccessor()
 const user = inject<Ref<User | undefined>>("currentUser")
-const notebookRealm = ref<NotebookRealm | undefined>(undefined)
 
-const notebook = computed(() => notebookRealm.value?.notebook)
+const notebook = computed(() => props.notebookRealm?.notebook)
 
 const isNotebookReadOnly = computed(
-  () => notebookRealm.value?.readonly === true
+  () => props.notebookRealm?.readonly === true
 )
 
 const sidebarAnchorNoteId = ref<number | undefined>()
 const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
 let indexResolveGeneration = 0
 
-const fetchNotebook = async () => {
-  const notebookId = Number(route.params.notebookId)
-  const { data: result, error } = await NotebookController.get({
-    path: { notebook: notebookId },
-  })
-  if (!error && result) {
-    notebookRealm.value = result
-    return
-  }
-  notebookRealm.value = undefined
-}
-
-const handleNotebookUpdated = (updatedNotebook: Notebook) => {
-  const prev = notebookRealm.value
-  if (prev != null) {
-    notebookRealm.value = { ...prev, notebook: updatedNotebook }
-  }
-}
-
-watch(
-  notebookRealm,
-  (c) => {
-    if (!c) {
-      notebookSidebarNotebookRealm.value = undefined
-      return
-    }
-    notebookSidebarNotebookRealm.value = c
-  },
-  { immediate: true, deep: true }
-)
-
 watch(
   () =>
-    notebookRealm.value
+    props.notebookRealm
       ? ([
-          notebookRealm.value.notebook.id,
-          notebookRealm.value.indexNoteId ?? null,
+          props.notebookRealm.notebook.id,
+          props.notebookRealm.indexNoteId ?? null,
         ] as const)
       : undefined,
   async (key) => {
@@ -128,22 +81,4 @@ watch(
   },
   { immediate: true }
 )
-
-watch(
-  () => route.params.notebookId,
-  async () => {
-    await fetchNotebook()
-  }
-)
-
-onMounted(async () => {
-  folderPageBreadcrumbFolders.value = []
-  folderSidebarFolderRealm.value = undefined
-  await fetchNotebook()
-})
-
-onBeforeUnmount(() => {
-  notebookSidebarNotebookRealm.value = undefined
-  folderSidebarFolderRealm.value = undefined
-})
 </script>

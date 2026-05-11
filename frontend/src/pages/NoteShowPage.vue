@@ -27,20 +27,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue"
+import { ref, computed } from "vue"
 
 import { useRoute, useRouter } from "vue-router"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { notebookSidebarNotebookRealm } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 
 const router = useRouter()
 const route = useRoute()
-const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
   noteId: { type: Number, required: false },
@@ -52,31 +49,6 @@ const resolvedNoteId = computed((): number | undefined => {
   }
   return undefined
 })
-
-const noteRealm = computed(() => {
-  const id = resolvedNoteId.value
-  if (id == null) return undefined
-  return storageAccessor.value.refOfNoteRealm(id).value
-})
-
-watch(
-  () => ({
-    realm: noteRealm.value,
-    noteId: props.noteId,
-  }),
-  ({ realm, noteId }) => {
-    if (noteId != null && !Number.isNaN(noteId)) {
-      if (realm != null) {
-        notebookSidebarNotebookRealm.value = { ...realm.notebookView }
-      }
-      return
-    }
-    if (noteId == null || Number.isNaN(noteId)) {
-      notebookSidebarNotebookRealm.value = undefined
-    }
-  },
-  { immediate: true }
-)
 
 const isContentMinimized = ref(false)
 
