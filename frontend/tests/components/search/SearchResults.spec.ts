@@ -341,7 +341,7 @@ describe("SearchResults.vue", () => {
       vi.useRealTimers()
     })
 
-    it("dropdown shows folder hit without router link", async () => {
+    it("dropdown shows folder hit as router-link to folder page", async () => {
       vi.useFakeTimers()
       const folderHit: RelationshipLiteralSearchHit = {
         hitKind: "FOLDER",
@@ -376,7 +376,15 @@ describe("SearchResults.vue", () => {
       expect(wrapper.text()).toContain("My NB")
       const folderRow = wrapper.find(".folder-search-hit")
       expect(folderRow.exists()).toBe(true)
-      expect(folderRow.find(".router-link").exists()).toBe(false)
+      const link = folderRow.find(".router-link")
+      expect(link.exists()).toBe(true)
+      const to = JSON.parse(link.attributes("to") ?? "{}") as {
+        name?: string
+        params?: { notebookId?: number; folderId?: number }
+      }
+      expect(to.name).toBe("folderPage")
+      expect(to.params?.notebookId).toBe(1)
+      expect(to.params?.folderId).toBe(42)
       vi.useRealTimers()
     })
 

@@ -27,7 +27,18 @@
           <Folder :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
         </div>
         <div class="daisy-min-w-0 daisy-flex-1">
-          <span class="daisy-font-medium">{{ hit.folderName }}</span>
+          <router-link
+            v-if="hit.folderId != null && hit.notebookId != null"
+            :to="{
+              name: 'folderPage',
+              params: {
+                notebookId: hit.notebookId,
+                folderId: hit.folderId,
+              },
+            }"
+            class="daisy-block daisy-font-medium daisy-text-decoration-none"
+          >{{ hit.folderName }}</router-link>
+          <span v-else class="daisy-font-medium">{{ hit.folderName }}</span>
           <span
             v-if="hit.notebookName"
             class="daisy-block daisy-text-xs daisy-opacity-70"

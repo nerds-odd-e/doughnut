@@ -109,7 +109,7 @@ describe("SearchResultListItem", () => {
     expect(wrapper.find(".notebook-name-label").exists()).toBe(false)
   })
 
-  it("renders folder title without note link", async () => {
+  it("renders folder hit as router-link to folder page", async () => {
     const hit: RelationshipLiteralSearchHit = {
       hitKind: "FOLDER",
       folderId: 9,
@@ -124,7 +124,15 @@ describe("SearchResultListItem", () => {
       .mount()
 
     expect(wrapper.text()).toContain("Archive")
-    expect(wrapper.find(".router-link").exists()).toBe(false)
+    const link = wrapper.find("a.folder-hit-title.router-link")
+    expect(link.exists()).toBe(true)
+    const to = JSON.parse(link.attributes("to") ?? "{}") as {
+      name?: string
+      params?: { notebookId?: number; folderId?: number }
+    }
+    expect(to.name).toBe("folderPage")
+    expect(to.params?.notebookId).toBe(1)
+    expect(to.params?.folderId).toBe(9)
   })
 
   it("renders notebook hit as router-link to notebook page", () => {

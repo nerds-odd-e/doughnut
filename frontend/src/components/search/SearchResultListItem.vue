@@ -18,6 +18,21 @@
           v-if="searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
           :note-topology="searchHit.noteSearchResult.noteTopology"
         />
+        <router-link
+          v-else-if="
+            searchHit.hitKind === 'FOLDER' &&
+            searchHit.folderId != null &&
+            searchHit.notebookId != null
+          "
+          :to="{
+            name: 'folderPage',
+            params: {
+              notebookId: searchHit.notebookId,
+              folderId: searchHit.folderId,
+            },
+          }"
+          class="folder-hit-title daisy-text-decoration-none"
+        >{{ searchHit.folderName }}</router-link>
         <span
           v-else-if="searchHit.hitKind === 'FOLDER'"
           class="folder-hit-title"

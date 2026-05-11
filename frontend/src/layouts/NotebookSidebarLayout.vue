@@ -20,10 +20,10 @@
         />
       </button>
       <BreadcrumbWithCircle
-        v-if="noteRealmForBreadcrumb"
+        v-if="sidebarRealm"
         v-bind="{
-          notebookView: noteRealmForBreadcrumb.notebookView,
-          ancestorFolders: noteRealmForBreadcrumb.ancestorFolders ?? [],
+          notebookView: sidebarRealm.notebookView,
+          ancestorFolders: sidebarRealm.ancestorFolders ?? [],
         }"
       />
       <BreadcrumbWithCircle
@@ -104,13 +104,6 @@ const sidebarRealm = computed((): NoteRealm | undefined => {
   const id = Number(route.params.noteId)
   if (!Number.isFinite(id)) return undefined
   return storageAccessor.value.refOfNoteRealm(id).value
-})
-
-const noteRealmForBreadcrumb = computed(() => {
-  if (route.name === "notebookPage" || route.name === "folderPage") {
-    return undefined
-  }
-  return sidebarRealm.value
 })
 
 const chromeBreadcrumbAncestorFolders = computed((): Folder[] => {
