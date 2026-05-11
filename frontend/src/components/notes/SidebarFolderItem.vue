@@ -68,6 +68,7 @@ import type {
   FolderRealm,
   NoteTopology,
 } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
@@ -205,6 +206,16 @@ function navigateToFolderPage() {
   })
 }
 
+async function activateFolder() {
+  if (activeFolder == null || folderId.value == null) return
+  const { data } = await NotebookController.getFolderPage({
+    path: { notebook: props.notebookId, folder: folderId.value },
+  })
+  if (data != null) {
+    activeFolder.value = data
+  }
+}
+
 function toggleExpand() {
   if (folderId.value == null) return
   const next = new Set(expandedFolderIds.value)
@@ -219,10 +230,12 @@ function toggleExpand() {
 function onLabelAreaClick() {
   toggleExpand()
   navigateToFolderPage()
+  activateFolder()
 }
 
 function onFolderRowClick() {
   navigateToFolderPage()
+  activateFolder()
 }
 </script>
 
