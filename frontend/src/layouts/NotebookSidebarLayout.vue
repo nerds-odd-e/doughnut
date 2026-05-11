@@ -53,9 +53,9 @@
               : '-daisy-translate-x-full daisy-fixed daisy-left-0 daisy-z-40',
         ]"
       >
-        <NoteSidebar
+        <Sidebar
           v-if="sidebarNotebookId != null && !Number.isNaN(sidebarNotebookId)"
-          :note-realm="sidebarRealm"
+          :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
         />
       </aside>
@@ -75,7 +75,7 @@ import type { Folder, NoteRealm } from "@generated/doughnut-backend-api"
 import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
-import NoteSidebar from "@/components/notes/NoteSidebar.vue"
+import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
