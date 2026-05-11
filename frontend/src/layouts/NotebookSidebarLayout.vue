@@ -65,7 +65,16 @@
         class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
       >
         <slot>
-          <RouterView />
+          <RouterView v-slot="{ Component }">
+            <component
+              :is="Component"
+              v-bind="
+                route.name === 'folderPage'
+                  ? { folderRealm, fetchFolderPage }
+                  : {}
+              "
+            />
+          </RouterView>
         </slot>
       </main>
     </div>
@@ -80,6 +89,7 @@ import type {
   FolderRealm,
   NoteRealm,
 } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
@@ -87,10 +97,12 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderPageBreadcrumbFolders,
+  folderSidebarFolderRealm,
   notebookSidebarActiveFolder,
   notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
+import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
@@ -125,6 +137,67 @@ const chromeBreadcrumbAncestorFolders = computed((): Folder[] => {
   }
   return []
 })
+
+const folderRealm = ref<FolderRealm | undefined>(undefined)
+
+const fetchFolderPage = async () => {
+  const notebookId = Number(route.params.notebookId)
+  const folderId = Number(route.params.folderId)
+  const { data: page, error } = await NotebookController.getFolderPage({
+    path: { notebook: notebookId, folder: folderId },
+  })
+  if (!error && page?.notebookView?.notebook) {
+    folderRealm.value = page
+    const { data: indexRows, error: indexErr } =
+      await NotebookController.listNotebookFolderIndex({
+        path: { notebook: notebookId },
+      })
+    if (!indexErr && indexRows) {
+      folderPageBreadcrumbFolders.value = folderBreadcrumbChainFromFlatIndex(
+        page.folder,
+        indexRows
+      )
+    } else {
+      folderPageBreadcrumbFolders.value = [page.folder]
+    }
+    notebookSidebarActiveFolder.value = page
+    return
+  }
+  folderRealm.value = undefined
+  folderPageBreadcrumbFolders.value = []
+}
+
+watch(
+  folderRealm,
+  (c) => {
+    folderSidebarFolderRealm.value = c
+    const chromeNotebookId = c?.notebookView?.notebook?.id
+    if (chromeNotebookId == null) {
+      notebookSidebarNotebookRealm.value = undefined
+      return
+    }
+    notebookSidebarNotebookRealm.value = { ...(c as FolderRealm).notebookView }
+  },
+  { immediate: true, deep: true }
+)
+
+watch(
+  () => ({
+    isFolderPage: route.name === "folderPage",
+    notebookId: route.params.notebookId,
+    folderId: route.params.folderId,
+  }),
+  async ({ isFolderPage }) => {
+    if (!isFolderPage) {
+      folderRealm.value = undefined
+      folderSidebarFolderRealm.value = undefined
+      folderPageBreadcrumbFolders.value = []
+      return
+    }
+    await fetchFolderPage()
+  },
+  { immediate: true }
+)
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth

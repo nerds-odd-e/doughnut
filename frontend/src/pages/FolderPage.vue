@@ -37,32 +37,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
-import { useRoute } from "vue-router"
-import type {
-  FolderRealm,
-  NotebookRealm,
-} from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { computed, ref, watch } from "vue"
+import type { FolderRealm } from "@generated/doughnut-backend-api"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import {
-  folderPageBreadcrumbFolders,
-  folderSidebarFolderRealm,
-  notebookSidebarNotebookRealm,
-  notebookSidebarActiveFolder,
-} from "@/composables/useCurrentNoteSidebarState"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
 
-const route = useRoute()
+const props = defineProps<{
+  folderRealm: FolderRealm | undefined
+  fetchFolderPage: () => Promise<void>
+}>()
+
 const storageAccessor = useStorageAccessor()
 
-const folderRealm = ref<FolderRealm | undefined>(undefined)
-
 const folderForView = computed((): FolderRealm | undefined => {
-  const r = folderRealm.value
+  const r = props.folderRealm
   if (r?.notebookView?.notebook == null) return undefined
   return r
 })
@@ -71,59 +61,12 @@ const sidebarAnchorNoteId = ref<number | undefined>()
 const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
 let indexResolveGeneration = 0
 
-function notebookChromeFromFolderRealm(c: FolderRealm): NotebookRealm {
-  return { ...c.notebookView }
-}
-
-const fetchFolderPage = async () => {
-  const notebookId = Number(route.params.notebookId)
-  const folderId = Number(route.params.folderId)
-  const { data: page, error } = await NotebookController.getFolderPage({
-    path: { notebook: notebookId, folder: folderId },
-  })
-  if (!error && page?.notebookView?.notebook) {
-    folderRealm.value = page
-    const { data: indexRows, error: indexErr } =
-      await NotebookController.listNotebookFolderIndex({
-        path: { notebook: notebookId },
-      })
-    if (!indexErr && indexRows) {
-      folderPageBreadcrumbFolders.value = folderBreadcrumbChainFromFlatIndex(
-        page.folder,
-        indexRows
-      )
-    } else {
-      folderPageBreadcrumbFolders.value = [page.folder]
-    }
-    notebookSidebarActiveFolder.value = page
-    return
-  }
-  folderRealm.value = undefined
-  folderPageBreadcrumbFolders.value = []
-}
-
-watch(
-  folderRealm,
-  (c) => {
-    folderSidebarFolderRealm.value = c
-    const chromeNotebookId = c?.notebookView?.notebook?.id
-    if (chromeNotebookId == null) {
-      notebookSidebarNotebookRealm.value = undefined
-      return
-    }
-    notebookSidebarNotebookRealm.value = notebookChromeFromFolderRealm(
-      c as FolderRealm
-    )
-  },
-  { immediate: true, deep: true }
-)
-
 watch(
   () =>
-    folderRealm.value?.folder
+    props.folderRealm?.folder
       ? ([
-          folderRealm.value.folder.id,
-          folderRealm.value.folderIndexNoteId ?? null,
+          props.folderRealm.folder.id,
+          props.folderRealm.folderIndexNoteId ?? null,
         ] as const)
       : undefined,
   async (key) => {
@@ -155,21 +98,4 @@ watch(
   },
   { immediate: true }
 )
-
-watch(
-  () => [route.params.notebookId, route.params.folderId] as const,
-  async () => {
-    await fetchFolderPage()
-  }
-)
-
-onMounted(async () => {
-  await fetchFolderPage()
-})
-
-onBeforeUnmount(() => {
-  notebookSidebarNotebookRealm.value = undefined
-  folderSidebarFolderRealm.value = undefined
-  folderPageBreadcrumbFolders.value = []
-})
 </script>
