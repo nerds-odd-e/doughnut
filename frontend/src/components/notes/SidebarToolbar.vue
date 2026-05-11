@@ -12,8 +12,7 @@
           :initial-folder="parentFolderForCreation ?? undefined"
           :title-search-anchor-note="anchorNote"
           :ancestor-folders="ancestorFolders"
-          button-title="New note"
-          aria-label="New note"
+          :initial-title="initialTitle"
         >
           <NotebookPen class="daisy-w-6 daisy-h-6" />
         </NoteNewButton>
@@ -102,6 +101,8 @@ import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NoteNewButton from "./core/NoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
 import { realmLeafFolder } from "./useNoteSidebarTree"
+import { titlePatternFromNoteMarkdown } from "@/utils/noteContentFrontmatter"
+import { renderTitleFromPattern } from "@/utils/titlePatternRender"
 
 const props = defineProps<{
   notebookId: number
@@ -109,18 +110,19 @@ const props = defineProps<{
   activeFolderRealm?: FolderRealm | null
 }>()
 
-const noteContextResolved = computed(
-  () => props.activeNoteRealm?.note?.noteTopology != null
-)
+const initialTitle = computed(() => {
+  const markdown =
+    props.activeNoteRealm?.indexNoteContent ??
+    props.activeFolderRealm?.indexNoteContent ??
+    null
+  const pattern = titlePatternFromNoteMarkdown(markdown)
+  if (pattern == null || pattern === "") return undefined
+  return renderTitleFromPattern(pattern)
+})
 
 const parentFolderForCreation = computed((): Folder | null => {
-  const activeFolder = props.activeFolderRealm ?? null
-  const activeNoteRealm = props.activeNoteRealm
-  const resolved = noteContextResolved.value
-  if (activeFolder != null) return activeFolder.folder
-  const leaf = realmLeafFolder(activeNoteRealm)
-  if (leaf != null && resolved) return leaf
-  return null
+  if (props.activeFolderRealm != null) return props.activeFolderRealm.folder
+  return realmLeafFolder(props.activeNoteRealm) ?? null
 })
 
 const ancestorFolders = computed((): Folder[] => {

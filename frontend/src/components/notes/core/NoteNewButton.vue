@@ -1,7 +1,7 @@
 <template>
   <PopButton
-    :title="buttonTitle"
-    :aria-label="ariaLabel ?? buttonTitle"
+    title="New note"
+    aria-label="New note"
     align-modal-top
   >
     <template #button_face>
@@ -13,7 +13,7 @@
         :initial-folder="initialFolder"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         :ancestor-folders="ancestorFolders ?? []"
-        :initial-title="defaultTitleFromScopedPattern"
+        :initial-title="initialTitle"
         @close-dialog="closer"
       />
     </template>
@@ -23,18 +23,14 @@
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
-import { useDefaultNewNoteTitleFromPattern } from "@/composables/useScopedTitlePatternForNewNote"
 import NoteNewForm from "../NoteNewForm.vue"
 
 defineProps<{
   notebookId: number
-  buttonTitle: string
-  ariaLabel?: string
   /** Resolved parent folder for create dialog (sidebar selection or active note folder). */
   initialFolder?: Folder
   titleSearchAnchorNote?: Note | null
   ancestorFolders?: Folder[]
+  initialTitle?: string
 }>()
-
-const defaultTitleFromScopedPattern = useDefaultNewNoteTitleFromPattern()
 </script>
