@@ -49,7 +49,6 @@ import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.v
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
   currentActiveNoteId,
-  currentNotebookId,
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
   notebookSidebarNotebookRealm,
@@ -111,13 +110,8 @@ watch(
     const chromeNotebookId = c?.notebookView?.notebook?.id
     if (chromeNotebookId == null) {
       notebookSidebarNotebookRealm.value = undefined
-      const routeNotebookId = Number(route.params.notebookId)
-      currentNotebookId.value = Number.isFinite(routeNotebookId)
-        ? routeNotebookId
-        : undefined
       return
     }
-    currentNotebookId.value = chromeNotebookId
     notebookSidebarNotebookRealm.value = notebookChromeFromFolderRealm(
       c as FolderRealm
     )

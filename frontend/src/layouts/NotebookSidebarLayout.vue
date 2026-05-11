@@ -79,7 +79,6 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
-  currentNotebookId,
   folderPageBreadcrumbFolders,
   notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
@@ -97,7 +96,9 @@ const isMdOrLarger = computed(() => windowWidth.value >= 768)
 
 const sidebarNotebookRealm = computed(() => notebookSidebarNotebookRealm.value)
 
-const sidebarNotebookId = computed(() => currentNotebookId.value)
+const sidebarNotebookId = computed(
+  () => notebookSidebarNotebookRealm.value?.notebook.id
+)
 
 const sidebarRealm = computed((): NoteRealm | undefined => {
   const id = currentActiveNoteId.value
@@ -124,7 +125,7 @@ const handleResize = () => {
 }
 
 watch(
-  () => currentNotebookId.value,
+  () => notebookSidebarNotebookRealm.value?.notebook.id,
   () => {
     if (!isMdOrLarger.value) {
       sidebarOpened.value = false

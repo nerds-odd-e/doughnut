@@ -10,7 +10,6 @@ export const notebookSidebarNotebookRealm: ShallowRef<
   NotebookRealm | undefined
 > = shallowRef(undefined)
 
-export const currentNotebookId: Ref<number | undefined> = ref(undefined)
 export const currentActiveNoteId: Ref<number | undefined> = ref(undefined)
 
 /** Sidebar active folder: toolbar create/move scope and folder-page alignment (notebook layout). */
@@ -24,7 +23,6 @@ export const folderSidebarFolderRealm: ShallowRef<FolderRealm | undefined> =
   shallowRef(undefined)
 
 export function resetNotebookSidebarState(): void {
-  currentNotebookId.value = undefined
   currentActiveNoteId.value = undefined
   notebookSidebarNotebookRealm.value = undefined
   notebookSidebarActiveFolder.value = null

@@ -40,7 +40,6 @@ import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import {
   currentActiveNoteId,
-  currentNotebookId,
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
   notebookSidebarNotebookRealm,
@@ -86,10 +85,8 @@ watch(
   (c) => {
     if (!c) {
       notebookSidebarNotebookRealm.value = undefined
-      currentNotebookId.value = undefined
       return
     }
-    currentNotebookId.value = c.notebook.id
     notebookSidebarNotebookRealm.value = c
   },
   { immediate: true, deep: true }

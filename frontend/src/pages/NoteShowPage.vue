@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from "vue"
+import { ref, watch, computed } from "vue"
 
 import { useRoute, useRouter } from "vue-router"
 import NoteShow from "../components/notes/NoteShow.vue"
@@ -36,7 +36,6 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   currentActiveNoteId,
-  currentNotebookId,
   notebookSidebarNotebookRealm,
   notebookSidebarActiveFolder,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -82,14 +81,13 @@ watch(
   }),
   ({ realm, noteId }) => {
     if (noteId != null && !Number.isNaN(noteId)) {
-      const nb = realm?.notebookView.notebook.id
-      if (nb != null) {
-        currentNotebookId.value = nb
+      if (realm != null) {
+        notebookSidebarNotebookRealm.value = { ...realm.notebookView }
       }
       return
     }
     if (noteId == null || Number.isNaN(noteId)) {
-      currentNotebookId.value = undefined
+      notebookSidebarNotebookRealm.value = undefined
     }
   },
   { immediate: true }
@@ -108,10 +106,6 @@ const handleCloseConversation = (conversationRealm: NoteRealm) => {
     query: {},
   })
 }
-
-onMounted(() => {
-  notebookSidebarNotebookRealm.value = undefined
-})
 </script>
 
 <style scoped>
