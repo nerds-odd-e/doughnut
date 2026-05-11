@@ -25,57 +25,40 @@ function folderFromResolvedCreateParent(
 
 export function resolvedCreateParentFolderIdFrom(
   activeFolder: FolderRealm | null,
-  activeNoteRealm: NoteRealm | undefined,
-  noteContextResolved: boolean
+  activeNoteRealm: NoteRealm | undefined
 ): number | null {
   let parent: ResolvedCreateParentFolder | null = null
   if (activeFolder != null) {
     parent = activeFolder
   } else {
-    const leaf = realmLeafFolder(activeNoteRealm)
-    if (leaf != null && noteContextResolved) {
-      parent = leaf
-    }
+    parent = realmLeafFolder(activeNoteRealm) ?? null
   }
   return folderFromResolvedCreateParent(parent)?.id ?? null
 }
 
 export function useNotebookRootCreateTarget(
   activeFolder: Ref<FolderRealm | null>,
-  activeNoteRealm: Ref<NoteRealm | undefined>,
-  noteContextResolved: Ref<boolean>
+  activeNoteRealm: Ref<NoteRealm | undefined>
 ): {
-  resolvedCreateParentFolder: ComputedRef<ResolvedCreateParentFolder | null>
-  /** Same scope as {@link resolvedCreateParentFolder}, normalized to a {@link Folder} row for forms. */
   resolvedCreateParentFolderRow: ComputedRef<Folder | null>
-  resolvedCreateParentFolderId: ComputedRef<number | null>
 } {
   const resolvedCreateParentFolder = computed(
     (): ResolvedCreateParentFolder | null => {
       const af = activeFolder.value
       const ar = activeNoteRealm.value
-      const ncr = noteContextResolved.value
       if (af != null) return af
       const leaf = realmLeafFolder(ar)
-      if (leaf != null && ncr) return leaf
-      return null
+      return leaf ?? null
     }
   )
+
   const resolvedCreateParentFolderRow = computed(
     (): Folder | null =>
       folderFromResolvedCreateParent(resolvedCreateParentFolder.value) ?? null
   )
-  const resolvedCreateParentFolderId = computed(() =>
-    resolvedCreateParentFolderIdFrom(
-      activeFolder.value,
-      activeNoteRealm.value,
-      noteContextResolved.value
-    )
-  )
+
   return {
-    resolvedCreateParentFolder,
     resolvedCreateParentFolderRow,
-    resolvedCreateParentFolderId,
   }
 }
 

@@ -29,14 +29,10 @@ const props = defineProps<{
 }>()
 
 const activeNoteRealmRef = computed(() => props.noteRealm)
-const noteContextResolved = computed(
-  () => props.noteRealm.note?.noteTopology != null
-)
 
 const { resolvedCreateParentFolderRow } = useNotebookRootCreateTarget(
   notebookSidebarActiveFolder,
-  activeNoteRealmRef,
-  noteContextResolved
+  activeNoteRealmRef
 )
 
 const emit = defineEmits<{
