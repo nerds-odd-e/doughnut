@@ -49,7 +49,6 @@ export function useNotebookRootCreateTarget(
   /** Same scope as {@link resolvedCreateParentFolder}, normalized to a {@link Folder} row for forms. */
   resolvedCreateParentFolderRow: ComputedRef<Folder | null>
   resolvedCreateParentFolderId: ComputedRef<number | null>
-  createParentLocationDescription: ComputedRef<string>
 } {
   const resolvedCreateParentFolder = computed(
     (): ResolvedCreateParentFolder | null => {
@@ -73,23 +72,10 @@ export function useNotebookRootCreateTarget(
       noteContextResolved.value
     )
   )
-  const createParentLocationDescription = computed(() => {
-    const af = activeFolder.value
-    const ar = activeNoteRealm.value
-    const ncr = noteContextResolved.value
-    if (af != null) {
-      return `Adds to folder "${af.folder.name}".`
-    }
-    if (!ncr) return "Adds to the notebook root."
-    const leaf = realmLeafFolder(ar)
-    if (leaf == null) return "Adds to the notebook root."
-    return `Adds to folder "${leaf.name}".`
-  })
   return {
     resolvedCreateParentFolder,
     resolvedCreateParentFolderRow,
     resolvedCreateParentFolderId,
-    createParentLocationDescription,
   }
 }
 

@@ -9,9 +9,8 @@
     </template>
     <template #default="{ closer }">
       <NoteNewForm
-        :notebook-root-notebook-id="notebookId"
+        :notebookId="notebookId"
         :initial-folder="initialFolder"
-        :parent-location-description="parentLocationDescription"
         :title-search-anchor-note="titleSearchAnchorNote ?? undefined"
         :ancestor-folders="ancestorFolders ?? []"
         :default-title-from-scoped-pattern="defaultTitleFromScopedPattern"
@@ -33,7 +32,6 @@ defineProps<{
   ariaLabel?: string
   /** Resolved parent folder for create dialog (sidebar selection or active note folder). */
   initialFolder?: Folder
-  parentLocationDescription?: string
   titleSearchAnchorNote?: Note | null
   ancestorFolders?: Folder[]
 }>()

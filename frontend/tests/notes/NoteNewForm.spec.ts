@@ -96,7 +96,7 @@ describe("adding new note", () => {
   const note = realm.note
 
   const notebookRootProps = {
-    notebookRootNotebookId: realm.notebookView.notebook.id,
+    notebookId: realm.notebookView.notebook.id,
     titleSearchAnchorNote: note,
     ancestorFolders: realm.ancestorFolders ?? [],
   }
@@ -106,7 +106,7 @@ describe("adding new note", () => {
       .component(NoteNewForm)
       .withCleanStorage()
       .withProps({
-        notebookRootNotebookId: realm.notebookView.notebook.id,
+        notebookId: realm.notebookView.notebook.id,
         titleSearchAnchorNote: note,
         ancestorFolders: [],
         initialFolder: { id: 99, name: "LeSS in Action" },

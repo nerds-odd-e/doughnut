@@ -7,9 +7,12 @@
             <p class="daisy-text-sm daisy-mb-2">
               Folder
             </p>
+            <p class="daisy-text-xs daisy-opacity-70 daisy-mb-2">
+              {{ parentLocationDescription }}
+            </p>
             <FolderSelector
               v-model="selectedFolderId"
-              :notebook-id="notebookRootNotebookId"
+              :notebook-id="notebookId"
               :context-folder-id="folderSelectorContextFolderId"
               :ancestor-folders="ancestorFolders"
               :model-value-label="folderSelectorLabel"
@@ -38,7 +41,7 @@
                 noteId: titleSearchScopeNote?.id,
                 inputSearchKey: effectiveSearchKey,
                 isDropdown: true,
-                notebookId: notebookRootNotebookId,
+                notebookId: notebookId,
               }"
               class="title-search-results"
             />
@@ -78,10 +81,9 @@ const { popups } = usePopups()
 
 const props = withDefaults(
   defineProps<{
-    notebookRootNotebookId: number
+    notebookId: number
     /** Initial folder scope for create-note (sidebar selection or active note folder). User can change via FolderSelector. */
     initialFolder?: Folder
-    parentLocationDescription?: string
     initialTitle?: string
     /**
      * Default title from scoped index `title_pattern` (already rendered). Does not mark the title
@@ -118,6 +120,16 @@ const folderSelectorLabel = computed((): string | undefined => {
   if (id == null) return undefined
   const found = props.ancestorFolders.find((f) => f.id === id)
   return found?.name ?? props.initialFolder?.name
+})
+
+const parentLocationDescription = computed(() => {
+  const id = selectedFolderId.value ?? props.initialFolder?.id ?? null
+  if (id == null) return "Adds to the notebook root."
+  const found = props.ancestorFolders.find((f) => f.id === id)
+  const name = found?.name ?? props.initialFolder?.name
+  return name != null
+    ? `Adds to folder "${name}".`
+    : "Adds to the notebook root."
 })
 
 /** Context folder for FolderSelector quick picks; null at notebook root. */
@@ -226,18 +238,13 @@ const processForm = async () => {
     ...(wikidataContent !== undefined ? { content: wikidataContent } : {}),
   }
   try {
-    await api.createRootNoteAtNotebook(
-      router,
-      props.notebookRootNotebookId,
-      body,
-      {
-        folderId: selectedFolderId.value ?? undefined,
-        refreshWikiTitleCacheForNoteIds:
-          props.wikiTitleCacheRefreshSourceNoteId != null
-            ? [props.wikiTitleCacheRefreshSourceNoteId]
-            : undefined,
-      }
-    )
+    await api.createRootNoteAtNotebook(router, props.notebookId, body, {
+      folderId: selectedFolderId.value ?? undefined,
+      refreshWikiTitleCacheForNoteIds:
+        props.wikiTitleCacheRefreshSourceNoteId != null
+          ? [props.wikiTitleCacheRefreshSourceNoteId]
+          : undefined,
+    })
     emit("closeDialog")
   } catch (e: unknown) {
     const { fieldErrors, softDeletedNoteId } = parseCreateNoteFailure(e)

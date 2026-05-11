@@ -10,7 +10,6 @@
         <NoteNewButton
           :notebook-id="notebookId"
           :initial-folder="parentFolderForCreation ?? undefined"
-          :parent-location-description="createParentLocationDescription"
           :title-search-anchor-note="anchorNote"
           :ancestor-folders="ancestorFolders"
           button-title="New note"
@@ -122,19 +121,6 @@ const parentFolderForCreation = computed((): Folder | null => {
   const leaf = realmLeafFolder(activeNoteRealm)
   if (leaf != null && resolved) return leaf
   return null
-})
-
-const createParentLocationDescription = computed(() => {
-  const activeFolder = props.activeFolderRealm ?? null
-  const activeNoteRealm = props.activeNoteRealm
-  const resolved = noteContextResolved.value
-  if (activeFolder != null) {
-    return `Adds to folder "${activeFolder.folder.name}".`
-  }
-  if (!resolved) return "Adds to the notebook root."
-  const leaf = realmLeafFolder(activeNoteRealm)
-  if (leaf == null) return "Adds to the notebook root."
-  return `Adds to folder "${leaf.name}".`
 })
 
 const ancestorFolders = computed((): Folder[] => {

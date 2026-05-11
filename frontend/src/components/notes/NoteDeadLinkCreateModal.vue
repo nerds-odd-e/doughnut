@@ -2,9 +2,8 @@
   <Modal v-if="modelValue !== null" @close_request="close">
     <template #body>
       <NoteNewForm
-        :notebook-root-notebook-id="notebookId"
+        :notebookId="notebookId"
         :initial-folder="resolvedCreateParentFolderRow ?? undefined"
-        :parent-location-description="createParentLocationDescription"
         :initial-title="modelValue"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
@@ -34,12 +33,11 @@ const noteContextResolved = computed(
   () => props.noteRealm.note?.noteTopology != null
 )
 
-const { resolvedCreateParentFolderRow, createParentLocationDescription } =
-  useNotebookRootCreateTarget(
-    notebookSidebarActiveFolder,
-    activeNoteRealmRef,
-    noteContextResolved
-  )
+const { resolvedCreateParentFolderRow } = useNotebookRootCreateTarget(
+  notebookSidebarActiveFolder,
+  activeNoteRealmRef,
+  noteContextResolved
+)
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | null]
