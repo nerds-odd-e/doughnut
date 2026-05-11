@@ -74,7 +74,7 @@ interface Props {
   level?: number
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolder: Ref<FolderRealm | null>
+  activeFolder?: FolderRealm
 }
 
 const props = defineProps<Props>()

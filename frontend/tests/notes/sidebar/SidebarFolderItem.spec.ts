@@ -2,7 +2,7 @@ import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
 import type { FolderRealm } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, mount } from "@vue/test-utils"
-import { computed, ref, type Ref } from "vue"
+import { computed, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -11,7 +11,7 @@ function mountFolderItem(
   options: {
     folderId: number
     notebookId: number
-    activeFolder?: Ref<FolderRealm | null>
+    activeFolder?: FolderRealm | null
   }
 ) {
   const folder = {
@@ -21,14 +21,13 @@ function mountFolderItem(
     updatedAt: "2020-01-01T00:00:00Z",
   }
   const expandedFolderIds = ref(new Set<number>())
-  const activeFolder = options.activeFolder ?? ref(null)
   return mount(SidebarFolderItem, {
     props: {
       folder,
       notebookId: options.notebookId,
       expandedFolderIds,
       activePathFolderIds: computed(() => new Set<number>()),
-      activeFolder,
+      activeFolder: options.activeFolder ?? undefined,
     },
     global: {
       plugins: [router],
@@ -88,9 +87,8 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const activeFolder = ref<FolderRealm | null>(null)
+    const activeFolder = makeMe.aFolderRealm.folder(42, "Alpha").please()
     mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
-    activeFolder.value = makeMe.aFolderRealm.folder(42, "Alpha").please()
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
@@ -118,9 +116,8 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const activeFolder = ref<FolderRealm | null>(null)
+    const activeFolder = makeMe.aFolderRealm.folder(42, "Alpha").please()
     mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
-    activeFolder.value = makeMe.aFolderRealm.folder(42, "Alpha").please()
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()

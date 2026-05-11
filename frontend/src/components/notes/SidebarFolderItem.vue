@@ -11,7 +11,6 @@
       'active-item': isOnActivePath,
       'sidebar-folder-active': isActiveFolderRow,
     }"
-    @focusout="onFolderRowFocusOut"
   >
     <ScrollTo v-if="isActiveFolderRow" />
     <div class="folder-row" @click="onFolderRowClick">
@@ -71,12 +70,11 @@ import type {
   FolderRealm,
   NoteTopology,
 } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
 import type { ComputedRef, Ref } from "vue"
-import { computed, onMounted, onUnmounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
 const props = defineProps<{
@@ -86,7 +84,7 @@ const props = defineProps<{
   level?: number
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolder: Ref<FolderRealm | null>
+  activeFolder?: FolderRealm
 }>()
 
 const currentLevel = computed(() => props.level ?? 1)
@@ -111,11 +109,11 @@ watch(
     [
       props.activePathFolderIds.value,
       folderId.value,
-      props.activeFolder.value?.folder.id,
+      props.activeFolder?.folder.id,
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (props.activeFolder.value?.folder.id === folderId.value) {
+    if (props.activeFolder?.folder.id === folderId.value) {
       return
     }
     if (props.activePathFolderIds.value.has(folderId.value)) {
@@ -138,49 +136,11 @@ const isOnActivePath = computed(
 
 const isActiveFolderRow = computed(
   () =>
-    folderId.value != null &&
-    props.activeFolder.value?.folder.id === folderId.value
+    folderId.value != null && props.activeFolder?.folder.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
   structuralChildCount.value = count
-}
-
-// Safari doesn't focus buttons on click, so focusout relatedTarget can be null or point to a
-// modal element instead of the toolbar button. Track mousedown to detect toolbar interactions.
-let lastMousedownInToolbar = false
-
-function onDocumentMousedown(e: MouseEvent) {
-  const target = e.target as Element | null
-  lastMousedownInToolbar = !!target?.closest("[data-note-sidebar-toolbar]")
-}
-
-onMounted(() => document.addEventListener("mousedown", onDocumentMousedown))
-onUnmounted(() =>
-  document.removeEventListener("mousedown", onDocumentMousedown)
-)
-
-function onFolderRowFocusOut(event: FocusEvent) {
-  if (
-    folderId.value == null ||
-    props.activeFolder.value?.folder.id !== folderId.value
-  ) {
-    return
-  }
-  const li = event.currentTarget as HTMLElement
-  const next = event.relatedTarget as Node | null
-  if (next && li.contains(next)) return
-  const root = li.closest("[data-note-sidebar-root]")
-  if (
-    next instanceof Element &&
-    root != null &&
-    root.contains(next) &&
-    next.closest("[data-note-sidebar-toolbar]")
-  ) {
-    return
-  }
-  if (lastMousedownInToolbar) return
-  props.activeFolder.value = null
 }
 
 function navigateToFolderPage() {
@@ -192,16 +152,6 @@ function navigateToFolderPage() {
       folderId: String(folderId.value),
     },
   })
-}
-
-async function activateFolder() {
-  if (folderId.value == null) return
-  const { data } = await NotebookController.getFolderPage({
-    path: { notebook: props.notebookId, folder: folderId.value },
-  })
-  if (data != null) {
-    props.activeFolder.value = data
-  }
 }
 
 function toggleExpand() {
@@ -218,12 +168,10 @@ function toggleExpand() {
 function onLabelAreaClick() {
   toggleExpand()
   navigateToFolderPage()
-  activateFolder()
 }
 
 function onFolderRowClick() {
   navigateToFolderPage()
-  activateFolder()
 }
 </script>
 

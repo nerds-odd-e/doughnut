@@ -4,9 +4,9 @@ import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import helper from "@tests/helpers"
 import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
 import {
+  FOLDER_TOP_NOTE_CHILDREN_ID,
   findSidebarItem,
   mountSidebar,
-  mountSidebarSignedIn,
   prepareSidebarDefaultMountContext,
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
@@ -49,34 +49,21 @@ describe("Sidebar active folder", () => {
     )
   }
 
-  async function mountSignedInFirstGenWithRootFolderActive() {
-    wrapper = mountSidebarSignedIn(
-      helper,
-      fixtures.firstGeneration,
-      fixtures.firstGeneration.notebookView.notebook.id
-    )
-    await flushPromises()
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.firstGeneration.note.noteTopology.title
-      )?.exists()
-    )
-    const folderRow = findRootFolderRowByTopTitle()
-    expect(folderRow?.exists()).toBe(true)
-    await folderRow!.find(".sidebar-folder-label").trigger("click")
-    await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-active")
-    return folderRow!
-  }
-
-  it("applies sidebar-folder-active when a folder row is clicked", async () => {
+  it("navigates to folderPage when the folder label is clicked", async () => {
     await mountFirstGenSidebarAndWaitNoteRow()
     const folderRow = findRootFolderRowByTopTitle()
     expect(folderRow?.exists()).toBe(true)
+    const router = wrapper.vm.$router
+    const pushSpy = vi.spyOn(router, "push").mockResolvedValue(undefined)
     await folderRow!.find(".sidebar-folder-label").trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-active")
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: "folderPage",
+      params: {
+        notebookId: String(fixtures.firstGeneration.notebookView.notebook.id),
+        folderId: String(FOLDER_TOP_NOTE_CHILDREN_ID),
+      },
+    })
   })
 
   it("activates folder and toggles expand when the folder label area is clicked", async () => {
@@ -88,44 +75,6 @@ describe("Sidebar active folder", () => {
     expect(track.exists()).toBe(true)
     await track.trigger("click")
     await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-active")
     expect(folderRow!.attributes("aria-expanded")).not.toBe(expandedBefore)
-  })
-
-  it("does not clear active folder when modal opens after toolbar click (Safari behavior)", async () => {
-    const folderRow = await mountSignedInFirstGenWithRootFolderActive()
-
-    const toolbarBtn = wrapper.find('button[title="New note"]')
-    expect(toolbarBtn.exists()).toBe(true)
-    toolbarBtn.element.dispatchEvent(
-      new MouseEvent("mousedown", { bubbles: true })
-    )
-    const modalInput = document.createElement("input")
-    document.body.appendChild(modalInput)
-    folderRow!.element.focus()
-    folderRow!.element.dispatchEvent(
-      new FocusEvent("focusout", {
-        bubbles: true,
-        relatedTarget: modalInput,
-      })
-    )
-    await flushPromises()
-    document.body.removeChild(modalInput)
-    expect(folderRow!.classes()).toContain("sidebar-folder-active")
-  })
-
-  it("does not clear active folder when focus moves to the sidebar toolbar", async () => {
-    const folderRow = await mountSignedInFirstGenWithRootFolderActive()
-    const toolbarBtn = wrapper.find('button[title="New folder"]')
-    expect(toolbarBtn.exists()).toBe(true)
-    folderRow!.element.focus()
-    folderRow!.element.dispatchEvent(
-      new FocusEvent("focusout", {
-        bubbles: true,
-        relatedTarget: toolbarBtn.element,
-      })
-    )
-    await flushPromises()
-    expect(folderRow!.classes()).toContain("sidebar-folder-active")
   })
 })

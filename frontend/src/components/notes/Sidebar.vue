@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import type { PropType, Ref } from "vue"
-import { computed, inject, ref, toRef, watch } from "vue"
+import { computed, inject, ref, watch } from "vue"
 import type {
   FolderRealm,
   NoteRealm,
@@ -80,7 +80,8 @@ const activePathFolderIds = computed(() => {
 const sidebarInnerTreeProps = {
   expandedFolderIds,
   activePathFolderIds,
-  activeFolder: toRef(props, "activeFolder"),
+  activeFolder:
+    props.activeFolder.value == null ? undefined : props.activeFolder.value,
 }
 
 watch(
