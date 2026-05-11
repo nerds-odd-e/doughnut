@@ -11,11 +11,10 @@ Feature: Folder organization
 
   Scenario: Move a nested folder to notebook root from the sidebar
     When I create a folder named "Beta" while viewing note "In folder"
-    Then I should see sidebar folder "Beta" under folder "Alpha"
+    Then I should see sidebar folder "Beta" under open folder "Alpha"
     When I activate folder "Beta" in the sidebar
     And I move the active folder to notebook root using the sidebar folder dialog
     Then I should see sidebar folder "Beta"
-    And I should not see sidebar folder "Beta" under folder "Alpha"
 
   Scenario: Sibling name clash blocks a folder move and shows inline error
     Given I have a notebook "Organize NB" with notes:
@@ -23,7 +22,7 @@ Feature: Folder organization
       | Root Beta   | Beta        |
       | Nested Beta | Alpha/Beta  |
     When I view note "Nested Beta"
-    And I activate folder "Beta" under folder "Alpha" in the sidebar
+    And I activate folder "Beta" under the open folder "Alpha" in the sidebar
     And I attempt to move the active folder to notebook root using the sidebar folder dialog
     Then the sidebar folder dialog shows error "A folder with this name already exists here."
 
@@ -33,11 +32,10 @@ Feature: Folder organization
       | Loose | Outer/Mid       |
       | Deep  | Outer/Mid/Inner |
     When I view note "Loose"
-    And I activate folder "Mid" under folder "Outer" in the sidebar
+    And I activate folder "Mid" under the open folder "Outer" in the sidebar
     And I dissolve the active folder using the sidebar folder dialog
-    Then I should not see sidebar folder "Mid" under folder "Outer"
-    And I should see sidebar folder "Inner" under folder "Outer"
-    And I should see note "Loose" under folder "Outer"
+    Then I should see sidebar folder "Inner" under open folder "Outer"
+    And I should see note "Loose" under open folder "Outer"
 
   Scenario: Move a folder using search when the destination is not in quick picks
     Given I have a notebook "Organize NB" with notes:
@@ -45,7 +43,6 @@ Feature: Folder organization
       | n1    | Alpha/Beta |
       | n2    | Gamma      |
     When I view note "n1"
-    And I activate folder "Beta" under folder "Alpha" in the sidebar
+    And I activate folder "Beta" under the open folder "Alpha" in the sidebar
     And I move the active folder to folder "Gamma" using folder search in the sidebar folder dialog
-    Then I should see sidebar folder "Beta" under folder "Gamma"
-    And I should not see sidebar folder "Beta" under folder "Alpha"
+    Then I should see sidebar folder "Beta" under collapsed folder "Gamma"

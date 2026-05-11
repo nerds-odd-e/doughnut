@@ -30,9 +30,9 @@ When('I activate folder {string} in the sidebar', (folderLabel: string) => {
 })
 
 When(
-  'I activate folder {string} under folder {string} in the sidebar',
+  'I activate folder {string} under the open folder {string} in the sidebar',
   (childLabel: string, parentLabel: string) => {
-    start.noteSidebar().activateFolderUnderParent(parentLabel, childLabel)
+    start.noteSidebar().activateFolderUnderOpenParent(parentLabel, childLabel)
   }
 )
 

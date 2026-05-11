@@ -48,7 +48,7 @@ const myNotebooksPage = () => {
      * Walks the catalog sidebar treating every path segment after the notebook as structural
      * (folders). Unlike {@link navigateToPath}, does not open the last segment as a note.
      */
-    openFolder(notePath: NotePath) {
+    expandFolderInSidebar(notePath: NotePath) {
       const segments = notePath.path
       if (segments.length < 2) {
         throw new Error(

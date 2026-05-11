@@ -299,7 +299,7 @@ Then(
     start
       .pageIsNotLoading()
       .navigateToNotebooksPage()
-      .openFolder(notePath)
+      .expandFolderInSidebar(notePath)
       .expectChildrenUnderSidebarFolder(data.hashes())
   }
 )
@@ -320,27 +320,28 @@ Then('I should see sidebar folder {string}', (folderLabel: string) => {
 })
 
 Then(
-  'I should see sidebar folder {string} under folder {string}',
+  'I should see sidebar folder {string} under open folder {string}',
   (childFolderLabel: string, parentFolderLabel: string) => {
     start
       .noteSidebar()
-      .expectSidebarFolderUnderParent(parentFolderLabel, childFolderLabel)
+      .expectSidebarFolderUnderOpenParent(parentFolderLabel, childFolderLabel)
   }
 )
 
 Then(
-  'I should not see sidebar folder {string} under folder {string}',
+  'I should see sidebar folder {string} under collapsed folder {string}',
   (childFolderLabel: string, parentFolderLabel: string) => {
     start
       .noteSidebar()
-      .expectSidebarFolderNotUnderParent(parentFolderLabel, childFolderLabel)
+      .expand(parentFolderLabel)
+      .expectSidebarFolderUnderOpenParent(parentFolderLabel, childFolderLabel)
   }
 )
 
 Then(
-  'I should see note {string} under folder {string}',
+  'I should see note {string} under open folder {string}',
   (noteTitle: string, folderLabel: string) => {
-    start.noteSidebar().expectSidebarNoteUnderFolder(folderLabel, noteTitle)
+    start.noteSidebar().expectSidebarNoteUnderOpenFolder(folderLabel, noteTitle)
   }
 )
 

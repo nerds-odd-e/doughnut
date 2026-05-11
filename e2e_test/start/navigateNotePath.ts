@@ -26,7 +26,7 @@ export function navigateAlongNotebookCatalogPath(segments: string[]) {
   const leafNoteTitle = titles[titles.length - 1]!
 
   for (const segment of folderLabels) {
-    sidebar.navigateStructuralIntermediate(segment)
+    sidebar.expand(segment)
   }
   sidebar.navigateToNote(leafNoteTitle)
   return assumeNotePage(leafNoteTitle)
@@ -47,6 +47,6 @@ export function openFolderAlongNotebookCatalogPath(segments: string[]) {
   notebookList().navigateToNotebook(notebookName!)
   const sidebar = noteSidebar()
   for (const segment of pathInNotebook) {
-    sidebar.expandStructuralIntermediateFolderOnly(segment)
+    sidebar.expand(segment)
   }
 }

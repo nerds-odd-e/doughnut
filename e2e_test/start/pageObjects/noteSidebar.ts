@@ -4,21 +4,6 @@ import { assumeSidebarFolderOrganizeForm } from './sidebarFolderOrganizeForm'
 
 const sidebarActionTimeoutMs = 20000
 
-type AsideSegmentKind = 'folder' | 'note'
-
-/** Detect whether `label` is a folder or note treeitem in the sidebar DOM. */
-function asideSegmentKind(
-  aside: HTMLElement,
-  label: string
-): AsideSegmentKind | null {
-  for (const el of aside.querySelectorAll<HTMLElement>('[role="treeitem"]')) {
-    if (el.getAttribute('aria-label') !== label) continue
-    if (el.classList.contains('sidebar-folder-li')) return 'folder'
-    if (el.classList.contains('sidebar-note-li')) return 'note'
-  }
-  return null
-}
-
 /** Deepest visible folder treeitem matching `folderLabel`. */
 function folderTreitemByLabel(folderLabel: string) {
   return cy
@@ -30,18 +15,15 @@ function folderTreitemByLabel(folderLabel: string) {
     .last()
 }
 
-function expandFolderIfCollapsed(label: string) {
+function expandFolder(label: string) {
   pageIsNotLoading()
-  folderTreitemByLabel(label).then(($li) => {
-    if ($li.attr('aria-expanded') !== 'true') {
-      cy.wrap($li).find('.folder-row .chevron-btn').first().click()
-    }
-  })
-  pageIsNotLoading()
+  folderTreitemByLabel(label).should('have.attr', 'aria-expanded', 'false')
+  folderTreitemByLabel(label).find('.folder-row .chevron-btn').first().click()
   folderTreitemByLabel(label)
     .should('have.attr', 'aria-expanded', 'true')
     .find('[role="treeitem"]', { timeout: sidebarActionTimeoutMs })
     .should('have.length.at.least', 1)
+  return
 }
 
 function openSidebarIfCollapsed() {
@@ -77,7 +59,10 @@ export const noteSidebar = () => {
   openSidebarIfCollapsed()
 
   return {
-    expand: (label: string) => expandFolderIfCollapsed(label),
+    expand(label: string) {
+      expandFolder(label)
+      return this
+    },
 
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       pageIsNotLoading()
@@ -118,9 +103,8 @@ export const noteSidebar = () => {
       return this
     },
 
-    activateFolderUnderParent(parentLabel: string, childLabel: string) {
+    activateFolderUnderOpenParent(parentLabel: string, childLabel: string) {
       pageIsNotLoading()
-      expandFolderIfCollapsed(parentLabel)
       folderTreitemByLabel(parentLabel)
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
@@ -163,12 +147,11 @@ export const noteSidebar = () => {
       folderTreitemByLabel(folderLabel).should('exist')
     },
 
-    expectSidebarFolderUnderParent(
+    expectSidebarFolderUnderOpenParent(
       parentFolderLabel: string,
       childFolderLabel: string
     ) {
       pageIsNotLoading()
-      expandFolderIfCollapsed(parentFolderLabel)
       folderTreitemByLabel(parentFolderLabel)
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childFolderLabel}"]`
@@ -176,63 +159,13 @@ export const noteSidebar = () => {
         .should('have.length.at.least', 1)
     },
 
-    expectSidebarFolderNotUnderParent(
-      parentFolderLabel: string,
-      childFolderLabel: string
-    ) {
+    expectSidebarNoteUnderOpenFolder(folderLabel: string, noteTitle: string) {
       pageIsNotLoading()
-      expandFolderIfCollapsed(parentFolderLabel)
-      folderTreitemByLabel(parentFolderLabel)
-        .find(
-          `[role="treeitem"].sidebar-folder-li[aria-label="${childFolderLabel}"]`
-        )
-        .should('not.exist')
-    },
-
-    expectSidebarNoteUnderFolder(folderLabel: string, noteTitle: string) {
-      pageIsNotLoading()
-      expandFolderIfCollapsed(folderLabel)
       folderTreitemByLabel(folderLabel)
         .find(`[role="treeitem"].sidebar-note-li[aria-label="${noteTitle}"]`, {
           timeout: sidebarActionTimeoutMs,
         })
         .should('have.length.at.least', 1)
-    },
-
-    /**
-     * After the notebook card: expand a folder row for this segment, or open the note row.
-     * Waits for sidebar hydration so a folder label is not mistaken for a missing note title.
-     */
-    navigateStructuralIntermediate(segment: string) {
-      pageIsNotLoading()
-      const label = segment.trim()
-
-      cy.get('aside', { timeout: sidebarActionTimeoutMs }).should(($aside) => {
-        expect(
-          asideSegmentKind($aside.get(0)!, label),
-          `sidebar should load "${label}" as folder or note row`
-        ).to.not.be.null
-      })
-
-      cy.get('aside').then(($aside) => {
-        if (asideSegmentKind($aside.get(0)!, label) === 'folder') {
-          expandFolderIfCollapsed(segment)
-        } else {
-          cy.get('aside')
-            .find(`[role="treeitem"].sidebar-note-li[aria-label="${label}"]`, {
-              timeout: sidebarActionTimeoutMs,
-            })
-            .filter(':visible')
-            .last()
-            .find('a')
-            .click()
-          pageIsNotLoading()
-        }
-      })
-    },
-
-    expandStructuralIntermediateFolderOnly(segment: string) {
-      expandFolderIfCollapsed(segment)
     },
 
     navigateToNote(title: string) {

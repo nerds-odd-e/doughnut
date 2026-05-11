@@ -57,4 +57,4 @@ Feature: Nested Note creation
 
   Scenario: Create a nested folder under an existing folder
     When I create a folder named "Deep" while viewing note "team"
-    Then I should see sidebar folder "Deep" under folder "LeSS in Action"
+    Then I should see sidebar folder "Deep" under open folder "LeSS in Action"
