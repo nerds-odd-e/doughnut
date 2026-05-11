@@ -12,9 +12,9 @@
           <div id="folder-move-destination">
             <FolderSelector
               v-model="selectedParentFolder"
-              :notebook-id="notebookId"
+              :notebook-id="movingFolderRealm.notebookView.notebook.id"
               :context-folder="movingFolderRealm.folder"
-              :ancestor-folders="ancestorFolders"
+              :ancestor-folders="movingFolderRealm.ancestorFolders ?? []"
               :disabled="processing"
             />
           </div>
@@ -64,13 +64,9 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import usePopups from "../commons/Popups/usePopups"
 import FolderSelector from "./FolderSelector.vue"
-import { dissolveParentLabelFromChain } from "./folderSelectorUtils"
 
 const props = defineProps<{
-  notebookId: number
   movingFolderRealm: FolderRealm
-  /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
-  ancestorFolders: Folder[]
 }>()
 
 const emit = defineEmits<{
@@ -84,10 +80,20 @@ const moveError = ref<string | undefined>(undefined)
 const dissolveError = ref<string | undefined>(undefined)
 const selectedParentFolder = ref<Folder | null>(null)
 
+function dissolveParentLabelFromChain(
+  movingFolderId: number,
+  chain: readonly Folder[]
+): string {
+  const idx = chain.findIndex((f) => f.id === movingFolderId)
+  if (idx <= 0) return "notebook root"
+  const parentChain = chain.slice(0, idx)
+  return `"${parentChain.map((f) => f.name).join(" / ")}"`
+}
+
 const dissolveParentLabel = computed(() =>
   dissolveParentLabelFromChain(
     props.movingFolderRealm.folder.id,
-    props.ancestorFolders
+    props.movingFolderRealm.ancestorFolders ?? []
   )
 )
 
@@ -103,7 +109,7 @@ const submitMove = async () => {
     const { error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
-          notebook: props.notebookId,
+          notebook: props.movingFolderRealm.notebookView.notebook.id,
           folder: props.movingFolderRealm.folder.id,
         },
         body,
@@ -131,7 +137,7 @@ const dissolve = async () => {
     const { error } = await apiCallWithLoading(() =>
       NotebookController.dissolveFolder({
         path: {
-          notebook: props.notebookId,
+          notebook: props.movingFolderRealm.notebookView.notebook.id,
           folder: props.movingFolderRealm.folder.id,
         },
       })

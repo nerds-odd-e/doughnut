@@ -73,17 +73,3 @@ export function collectSubtreeFolderIds(
   dfs(rootId)
   return excluded
 }
-
-/**
- * Quoted path label of the parent of the moving folder, for the dissolve
- * confirmation text. Derived purely from the ancestor chain.
- */
-export function dissolveParentLabelFromChain(
-  movingFolderId: number,
-  chain: readonly Folder[]
-): string {
-  const idx = chain.findIndex((f) => f.id === movingFolderId)
-  if (idx <= 0) return "notebook root"
-  const parentChain = chain.slice(0, idx)
-  return `"${parentChain.map((f) => f.name).join(" / ")}"`
-}
