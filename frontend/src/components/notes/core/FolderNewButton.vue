@@ -7,7 +7,7 @@
       <FolderNewForm
         :notebook-id="notebookId"
         :ancestor-folders="ancestorFolders"
-        :context-folder-id="contextFolderId"
+        :context-folder="contextFolder"
         @close-dialog="closer"
       />
     </template>
@@ -22,7 +22,7 @@ import FolderNewForm from "../FolderNewForm.vue"
 defineProps<{
   notebookId: number
   ancestorFolders: Folder[]
-  contextFolderId: number | null
+  contextFolder: Folder | null
   buttonTitle: string
   ariaLabel?: string
 }>()

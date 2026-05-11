@@ -11,7 +11,7 @@
               {{ parentLocationDescription }}
             </p>
             <FolderSelector
-              v-model="selectedFolderId"
+              v-model="selectedFolder"
               :notebook-id="notebookId"
               :context-folder-id="folderSelectorContextFolderId"
               :ancestor-folders="ancestorFolders"
@@ -105,28 +105,28 @@ const props = withDefaults(
 
 const titleSearchScopeNote = computed(() => props.titleSearchAnchorNote)
 
-const selectedFolderId = ref<number | null>(props.initialFolder?.id ?? null)
+const selectedFolder = ref<Folder | null>(props.initialFolder ?? null)
 
 watch(
-  () => props.initialFolder?.id,
-  (v) => {
-    selectedFolderId.value = v ?? null
+  () => props.initialFolder,
+  (f) => {
+    selectedFolder.value = f ?? null
   }
 )
 
 /** Fallback label for the folder selector when the path can't be resolved from ancestorFolders. */
 const folderSelectorLabel = computed((): string | undefined => {
-  const id = selectedFolderId.value ?? props.initialFolder?.id ?? null
-  if (id == null) return undefined
-  const found = props.ancestorFolders.find((f) => f.id === id)
-  return found?.name ?? props.initialFolder?.name
+  const folder = selectedFolder.value ?? props.initialFolder ?? null
+  if (folder == null) return undefined
+  const found = props.ancestorFolders.find((f) => f.id === folder.id)
+  return found?.name ?? folder.name
 })
 
 const parentLocationDescription = computed(() => {
-  const id = selectedFolderId.value ?? props.initialFolder?.id ?? null
-  if (id == null) return "Adds to the notebook root."
-  const found = props.ancestorFolders.find((f) => f.id === id)
-  const name = found?.name ?? props.initialFolder?.name
+  const folder = selectedFolder.value ?? props.initialFolder ?? null
+  if (folder == null) return "Adds to the notebook root."
+  const found = props.ancestorFolders.find((f) => f.id === folder.id)
+  const name = found?.name ?? folder.name
   return name != null
     ? `Adds to folder "${name}".`
     : "Adds to the notebook root."
@@ -134,7 +134,8 @@ const parentLocationDescription = computed(() => {
 
 /** Context folder for FolderSelector quick picks; null at notebook root. */
 const folderSelectorContextFolderId = computed(
-  (): number | null => selectedFolderId.value ?? props.initialFolder?.id ?? null
+  (): number | null =>
+    selectedFolder.value?.id ?? props.initialFolder?.id ?? null
 )
 
 // Emits
@@ -239,7 +240,7 @@ const processForm = async () => {
   }
   try {
     await api.createRootNoteAtNotebook(router, props.notebookId, body, {
-      folderId: selectedFolderId.value ?? undefined,
+      folderId: selectedFolder.value?.id ?? undefined,
       refreshWikiTitleCacheForNoteIds:
         props.wikiTitleCacheRefreshSourceNoteId != null
           ? [props.wikiTitleCacheRefreshSourceNoteId]

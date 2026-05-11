@@ -8,9 +8,9 @@
           </label>
           <div class="daisy-mb-4">
             <FolderSelector
-              v-model="selectedParentFolderId"
+              v-model="selectedParentFolder"
               :notebook-id="notebookId"
-              :context-folder-id="contextFolderId"
+              :context-folder-id="contextFolderIdForSelector"
               :ancestor-folders="ancestorFolders"
               :disabled="processing"
             />
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -50,8 +50,12 @@ import FolderSelector from "./FolderSelector.vue"
 const props = defineProps<{
   notebookId: number
   ancestorFolders: Folder[]
-  contextFolderId: number | null
+  contextFolder: Folder | null
 }>()
+
+const contextFolderIdForSelector = computed(
+  () => props.contextFolder?.id ?? null
+)
 
 const emit = defineEmits<{
   closeDialog: []
@@ -63,12 +67,12 @@ const name = ref("")
 const nameError = ref<string | undefined>(undefined)
 const processing = ref(false)
 
-const selectedParentFolderId = ref<number | null>(null)
+const selectedParentFolder = ref<Folder | null>(null)
 
 watch(
-  () => props.contextFolderId,
-  (v) => {
-    selectedParentFolderId.value = v
+  () => props.contextFolder,
+  (folder) => {
+    selectedParentFolder.value = folder
   },
   { immediate: true }
 )
@@ -83,9 +87,7 @@ const processForm = async () => {
         path: { notebook: props.notebookId },
         body: {
           name: name.value,
-          ...(selectedParentFolderId.value != null
-            ? { underFolderId: selectedParentFolderId.value }
-            : {}),
+          underFolderId: selectedParentFolder.value?.id ?? undefined,
         },
       })
     )

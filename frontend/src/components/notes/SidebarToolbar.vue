@@ -20,7 +20,7 @@
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="ancestorFolders"
-          :context-folder-id="parentFolderForCreation?.id ?? null"
+          :context-folder="parentFolderForCreation"
           button-title="New folder"
           aria-label="New folder"
         >

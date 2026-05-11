@@ -35,7 +35,7 @@
             </option>
           </optgroup>
           <optgroup v-if="needsSyntheticOption && modelValue != null" label="Selected">
-            <option :value="String(modelValue)">
+            <option :value="String(modelValue.id)">
               {{ selectionSummary }}
             </option>
           </optgroup>
@@ -86,6 +86,7 @@ import FolderSearchForm from "./FolderSearchForm.vue"
 import {
   ancestorsFromChain,
   folderChainToIndexRows,
+  folderFromIndexRow,
   folderPathLabel,
   folderRowsById,
 } from "./folderSelectorUtils"
@@ -99,7 +100,8 @@ const props = defineProps<{
   contextFolderId: number | null
   /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
   ancestorFolders: Folder[]
-  modelValue: number | null
+  /** `null` means notebook root. */
+  modelValue: Folder | null
   /**
    * Display label for the current selection when its path cannot be resolved from the local index.
    * Used as a fallback for the synthetic dropdown option before the full folder index is loaded.
@@ -109,7 +111,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: number | null]
+  "update:modelValue": [value: Folder | null]
 }>()
 
 const loadError = ref<string | undefined>(undefined)
@@ -118,8 +120,16 @@ const searchOpen = ref(false)
 // Rows loaded only for the search dialog (full index, lazy)
 const searchIndexRows = ref<NotebookFolderIndexRow[]>([])
 
-// Neighbour folders loaded via one cheap listing call
-const neighbourRows = ref<NotebookFolderIndexRow[]>([])
+// Neighbour folders loaded via one cheap listing call (full rows for v-model)
+const neighbourFolders = ref<Folder[]>([])
+
+const neighbourRows = computed((): NotebookFolderIndexRow[] =>
+  neighbourFolders.value.map((f) => ({
+    id: f.id,
+    name: f.name,
+    parentFolderId: parentFolderId.value ?? undefined,
+  }))
+)
 
 const ancestorRows = computed(() => {
   if (props.contextFolderId == null) return []
@@ -144,13 +154,9 @@ onMounted(async () => {
     )
     if (error || !listing)
       throw new Error("Failed to load neighbouring folders")
-    neighbourRows.value = (listing.folders ?? [])
-      .filter((f) => f.id !== props.contextFolderId)
-      .map((f) => ({
-        id: f.id,
-        name: f.name,
-        parentFolderId: pid ?? undefined,
-      }))
+    neighbourFolders.value = (listing.folders ?? []).filter(
+      (f) => f.id !== props.contextFolderId
+    )
   } catch {
     loadError.value = "Failed to load neighbouring folders"
   }
@@ -180,33 +186,44 @@ const quickPickIdSet = computed(() => {
 })
 
 const needsSyntheticOption = computed(
-  () => props.modelValue != null && !quickPickIdSet.value.has(props.modelValue)
+  () =>
+    props.modelValue != null && !quickPickIdSet.value.has(props.modelValue.id)
 )
 
 const selectionSummary = computed(() => {
   if (props.modelValue == null) return "Notebook root"
-  const path = folderPathLabel(props.modelValue, displayById.value)
+  const id = props.modelValue.id
+  const path = folderPathLabel(id, displayById.value)
   if (path) return path
-  return props.modelValueLabel ?? `Folder #${props.modelValue}`
+  return props.modelValueLabel ?? props.modelValue.name ?? `Folder #${id}`
 })
 
 function quickPathLabel(id: number): string {
   return folderPathLabel(id, quickPickById.value)
 }
 
+function resolveFolderById(id: number): Folder {
+  if (props.modelValue?.id === id) return props.modelValue
+  const fromChain = props.ancestorFolders.find((f) => f.id === id)
+  if (fromChain) return fromChain
+  const fromNeighbours = neighbourFolders.value.find((f) => f.id === id)
+  if (fromNeighbours) return fromNeighbours
+  return folderFromIndexRow({ id, name: `Folder #${id}` })
+}
+
 const selectModel = computed({
   get(): string {
     if (props.modelValue == null) return "__root__"
-    return String(props.modelValue)
+    return String(props.modelValue.id)
   },
   set(v: string) {
     if (v === "__root__") emit("update:modelValue", null)
-    else emit("update:modelValue", Number(v))
+    else emit("update:modelValue", resolveFolderById(Number(v)))
   },
 })
 
-function onSearchSelect(folderId: number | null) {
-  emit("update:modelValue", folderId)
+function onSearchSelect(row: NotebookFolderIndexRow | null) {
+  emit("update:modelValue", row == null ? null : folderFromIndexRow(row))
   searchOpen.value = false
 }
 

@@ -3,6 +3,19 @@ import type {
   NotebookFolderIndexRow,
 } from "@generated/doughnut-backend-api"
 
+/** Timestamps when only index-row data is available (e.g. search pick). */
+const FOLDER_PLACEHOLDER_TIMESTAMP = "1970-01-01T00:00:00.000Z"
+
+/** Build a `Folder` from an index row when the listing API did not return a full row. */
+export function folderFromIndexRow(row: NotebookFolderIndexRow): Folder {
+  return {
+    id: row.id,
+    name: row.name,
+    createdAt: FOLDER_PLACEHOLDER_TIMESTAMP,
+    updatedAt: FOLDER_PLACEHOLDER_TIMESTAMP,
+  }
+}
+
 export function folderRowsById(
   rows: NotebookFolderIndexRow[]
 ): Map<number, NotebookFolderIndexRow> {

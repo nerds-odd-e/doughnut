@@ -11,7 +11,7 @@
           </label>
           <div id="folder-move-destination">
             <FolderSelector
-              v-model="selectedParentFolderId"
+              v-model="selectedParentFolder"
               :notebook-id="notebookId"
               :context-folder-id="movingFolder.id"
               :ancestor-folders="ancestorFolders"
@@ -83,7 +83,7 @@ const { popups } = usePopups()
 const processing = ref(false)
 const moveError = ref<string | undefined>(undefined)
 const dissolveError = ref<string | undefined>(undefined)
-const selectedParentFolderId = ref<number | null>(null)
+const selectedParentFolder = ref<Folder | null>(null)
 
 const dissolveParentLabel = computed(() =>
   dissolveParentLabelFromChain(props.movingFolder.id, props.ancestorFolders)
@@ -95,9 +95,9 @@ const submitMove = async () => {
   moveError.value = undefined
   try {
     const body =
-      selectedParentFolderId.value == null
+      selectedParentFolder.value == null
         ? {}
-        : { newParentFolderId: selectedParentFolderId.value }
+        : { newParentFolderId: selectedParentFolder.value.id }
     const { error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: { notebook: props.notebookId, folder: props.movingFolder.id },

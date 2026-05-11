@@ -36,7 +36,7 @@
           class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
           data-testid="folder-selector-search-result"
           data-folder-id="__root__"
-          @click="pick(null)"
+          @click="pickRow(null)"
         >
           Notebook root
         </button>
@@ -47,7 +47,7 @@
           class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
           data-testid="folder-selector-search-result"
           :data-folder-id="String(r.id)"
-          @click="pick(r.id)"
+          @click="pickRow(r)"
         >
           {{ rowDisplay(r.id) }}
         </button>
@@ -92,7 +92,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  select: [folderId: number | null]
+  select: [row: NotebookFolderIndexRow | null]
   /** Emit loaded rows so caller can use them for path display after selection */
   indexLoaded: [rows: NotebookFolderIndexRow[]]
 }>()
@@ -153,8 +153,8 @@ function rowDisplay(id: number): string {
   return folderPathLabel(id, byId.value)
 }
 
-function pick(folderId: number | null) {
-  emit("select", folderId)
+function pickRow(row: NotebookFolderIndexRow | null) {
+  emit("select", row)
   emit("close")
 }
 

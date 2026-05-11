@@ -109,7 +109,7 @@ describe("adding new note", () => {
         notebookId: realm.notebookView.notebook.id,
         titleSearchAnchorNote: note,
         ancestorFolders: [],
-        initialFolder: { id: 99, name: "LeSS in Action" },
+        initialFolder: testFolderStub(99, "LeSS in Action"),
       })
       .mount({ attachTo: document.body })
 
@@ -311,7 +311,7 @@ describe("adding new note", () => {
         .withCleanStorage()
         .withProps({
           ...notebookRootProps,
-          initialFolder: { id: 42, name: "Alpha" },
+          initialFolder: testFolderStub(42, "Alpha"),
         })
         .mount({ attachTo: document.body })
       await setNoteNewFormTitle(wrapper, "in folder")
@@ -341,7 +341,7 @@ describe("adding new note", () => {
         .withCleanStorage()
         .withProps({
           ...notebookRootProps,
-          initialFolder: { id: 7, name: "One" },
+          initialFolder: testFolderStub(7, "One"),
         })
         .mount({ attachTo: document.body })
       await setNoteNewFormTitle(wrapper, "moved")
