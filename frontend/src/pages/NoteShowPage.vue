@@ -34,10 +34,7 @@ import NoteShow from "../components/notes/NoteShow.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import {
-  notebookSidebarNotebookRealm,
-  notebookSidebarActiveFolder,
-} from "@/composables/useCurrentNoteSidebarState"
+import { notebookSidebarNotebookRealm } from "@/composables/useCurrentNoteSidebarState"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 
@@ -61,16 +58,6 @@ const noteRealm = computed(() => {
   if (id == null) return undefined
   return storageAccessor.value.refOfNoteRealm(id).value
 })
-
-watch(
-  resolvedNoteId,
-  (id) => {
-    if (id != null) {
-      notebookSidebarActiveFolder.value = null
-    }
-  },
-  { immediate: true }
-)
 
 watch(
   () => ({

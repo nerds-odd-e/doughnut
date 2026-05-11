@@ -1,12 +1,10 @@
-import {
-  notebookSidebarNotebookRealm,
-  notebookSidebarActiveFolder,
-} from "@/composables/useCurrentNoteSidebarState"
+import { notebookSidebarNotebookRealm } from "@/composables/useCurrentNoteSidebarState"
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import createNoteStorage from "@/store/createNoteStorage"
 import type {
   FolderListing,
+  FolderRealm,
   NoteRealm,
   NotebookRealm,
   Options,
@@ -23,6 +21,7 @@ import {
 } from "@tests/helpers"
 import { type VueWrapper, DOMWrapper } from "@vue/test-utils"
 import { expect, vi } from "vitest"
+import { ref } from "vue"
 
 /** Avoid real navigation during sidebar tests (would break folder expansion / listing). */
 const sidebarRouterLinkStub = {
@@ -185,7 +184,7 @@ export function mountSidebar(
       activeNoteRealm: active,
       notebookId: active.notebookView.notebook.id,
       notebookRealm,
-      activeFolder: notebookSidebarActiveFolder,
+      activeFolder: ref<FolderRealm | null>(null),
     })
     .mount({
       attachTo: document.body,
@@ -212,7 +211,7 @@ export function mountSidebarSignedIn(
       activeNoteRealm: active,
       notebookId,
       notebookRealm,
-      activeFolder: notebookSidebarActiveFolder,
+      activeFolder: ref<FolderRealm | null>(null),
     })
     .mount({
       attachTo: document.body,
@@ -297,7 +296,6 @@ export function teardownSidebarComponentTest(
   wrapper: VueWrapper<unknown> | undefined
 ) {
   notebookSidebarNotebookRealm.value = undefined
-  notebookSidebarActiveFolder.value = null
   wrapper?.unmount()
   document.body.innerHTML = ""
   vi.restoreAllMocks()

@@ -10,9 +10,6 @@ export const notebookSidebarNotebookRealm: ShallowRef<
   NotebookRealm | undefined
 > = shallowRef(undefined)
 
-/** Sidebar active folder: toolbar create/move scope and folder-page alignment (notebook layout). */
-export const notebookSidebarActiveFolder: Ref<FolderRealm | null> = ref(null)
-
 /** Root-to-leaf folder segments for `folderPage` breadcrumbs (see flat index walk). */
 export const folderPageBreadcrumbFolders: Ref<Folder[]> = ref([])
 
@@ -22,7 +19,6 @@ export const folderSidebarFolderRealm: ShallowRef<FolderRealm | undefined> =
 
 export function resetNotebookSidebarState(): void {
   notebookSidebarNotebookRealm.value = undefined
-  notebookSidebarActiveFolder.value = null
   folderPageBreadcrumbFolders.value = []
   folderSidebarFolderRealm.value = undefined
 }

@@ -58,7 +58,7 @@
           :active-note-realm="sidebarRealm"
           :notebook-id="sidebarNotebookId"
           :notebook-realm="sidebarNotebookRealm"
-          :active-folder="sidebarActiveFolderRefForSidebar()"
+          :active-folder="activeFolderForSidebar()"
         />
       </aside>
       <main
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { RouterView, useRoute } from "vue-router"
 import type {
   Folder,
@@ -98,7 +98,6 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   folderPageBreadcrumbFolders,
   folderSidebarFolderRealm,
-  notebookSidebarActiveFolder,
   notebookSidebarNotebookRealm,
   resetNotebookSidebarState,
 } from "@/composables/useCurrentNoteSidebarState"
@@ -107,8 +106,9 @@ import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChai
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 
-function sidebarActiveFolderRefForSidebar(): Ref<FolderRealm | null> {
-  return notebookSidebarActiveFolder
+const activeFolderRef = ref<FolderRealm | null>(null)
+function activeFolderForSidebar() {
+  return activeFolderRef
 }
 
 const sidebarOpened = ref(false)
@@ -160,7 +160,7 @@ const fetchFolderPage = async () => {
     } else {
       folderPageBreadcrumbFolders.value = [page.folder]
     }
-    notebookSidebarActiveFolder.value = page
+    activeFolderRef.value = page
     return
   }
   folderRealm.value = undefined
@@ -192,6 +192,7 @@ watch(
       folderRealm.value = undefined
       folderSidebarFolderRealm.value = undefined
       folderPageBreadcrumbFolders.value = []
+      activeFolderRef.value = null
       return
     }
     await fetchFolderPage()
