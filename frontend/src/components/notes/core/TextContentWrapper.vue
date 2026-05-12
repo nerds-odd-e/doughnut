@@ -13,22 +13,21 @@
     >
       <p class="daisy-text-sm daisy-opacity-80">
         This note is linked from other notes. Choose how wiki links to this note
-        should change, then save.
+        should change:
       </p>
-      <RadioButtons
-        v-model="titleReferenceChoice"
-        scope-name="titleRenameReferenceHandling"
-        :options="TITLE_RENAME_REFERENCE_RADIO_OPTIONS"
-      />
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-w-fit"
-        data-testid="referenced-title-save-button"
-        :disabled="savingReferencedTitle"
-        @click="saveReferencedTitle"
-      >
-        Save title
-      </button>
+      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+        <button
+          v-for="opt in TITLE_RENAME_REFERENCE_SAVE_OPTIONS"
+          :key="opt.value"
+          type="button"
+          class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          :data-testid="opt.testid"
+          :disabled="savingReferencedTitle"
+          @click="saveReferencedTitleWithChoice(opt.value)"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -37,7 +36,6 @@
 import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
-import RadioButtons from "@/components/form/RadioButtons.vue"
 import type { TitleRenameReferenceHandling } from "@/store/StoredApiCollection"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
@@ -45,12 +43,21 @@ import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 
 const storageAccessor = useStorageAccessor()
 
-const TITLE_RENAME_REFERENCE_RADIO_OPTIONS: {
+const TITLE_RENAME_REFERENCE_SAVE_OPTIONS: {
   value: TitleRenameReferenceHandling
   label: string
+  testid: string
 }[] = [
-  { value: "UPDATE_VISIBLE_TEXT", label: "Update visible reference text" },
-  { value: "KEEP_VISIBLE_TEXT", label: "Keep visible reference text" },
+  {
+    value: "UPDATE_VISIBLE_TEXT",
+    label: "Update visible reference text",
+    testid: "referenced-title-save-update-visible-text",
+  },
+  {
+    value: "KEEP_VISIBLE_TEXT",
+    label: "Keep visible reference text",
+    testid: "referenced-title-save-keep-visible-text",
+  },
 ]
 
 const props = defineProps({
@@ -73,8 +80,6 @@ const pendingSaveValues = new Set<string>()
 const needsExplicitReferencedTitleSave = (): boolean =>
   props.field === "edit title" && props.titleRenameNeedsExplicitReferenceChoice
 
-const titleReferenceChoice =
-  ref<TitleRenameReferenceHandling>("KEEP_VISIBLE_TEXT")
 const savingReferencedTitle = ref(false)
 const changerInner = async (
   noteId: number,
@@ -187,7 +192,9 @@ const setError = (errs: unknown) => {
   }
 }
 
-const saveReferencedTitle = async () => {
+const saveReferencedTitleWithChoice = async (
+  referenceHandling: TitleRenameReferenceHandling
+) => {
   if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
   const noteId = props.titleEditNoteId
   if (noteId == null) return
@@ -197,7 +204,7 @@ const saveReferencedTitle = async () => {
     await storageAccessor.value
       .storedApi()
       .updateTextField(noteId, "edit title", localValue.value, {
-        titleReferenceHandling: titleReferenceChoice.value,
+        titleReferenceHandling: referenceHandling,
       })
     savedVersion.value = version.value
     lastSavedValue.value = localValue.value

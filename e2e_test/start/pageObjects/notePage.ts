@@ -18,12 +18,12 @@ const noteContentRegion = { role: 'region' as const, name: 'Note content' }
 
 type TitleRenameReferenceChoice = 'KEEP_VISIBLE_TEXT' | 'UPDATE_VISIBLE_TEXT'
 
-const titleRenameReferenceOptionLabel: Record<
+const titleRenameReferenceSaveTestId: Record<
   TitleRenameReferenceChoice,
   string
 > = {
-  KEEP_VISIBLE_TEXT: 'Keep visible reference text',
-  UPDATE_VISIBLE_TEXT: 'Update visible reference text',
+  KEEP_VISIBLE_TEXT: 'referenced-title-save-keep-visible-text',
+  UPDATE_VISIBLE_TEXT: 'referenced-title-save-update-visible-text',
 }
 
 function wikiLinkInNoteContentFluent(linkText: string) {
@@ -183,9 +183,8 @@ export const assumeNotePage = (
       cy.findByRole('title').click()
       cy.clearFocusedText().type(newTitle)
       cy.findByTestId('referenced-title-save-panel')
-        .contains('label', titleRenameReferenceOptionLabel[choice])
+        .find(`[data-testid="${titleRenameReferenceSaveTestId[choice]}"]`)
         .click()
-      cy.findByTestId('referenced-title-save-button').click()
       cy.findByTestId('referenced-title-save-panel').should('not.exist')
       cy.findByText(newTitle, { selector: '[role=title]' })
       pageIsNotLoading()
