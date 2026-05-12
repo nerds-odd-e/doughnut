@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -91,6 +92,52 @@ class WikiTitleCacheServiceTest {
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
+    }
+
+    @Test
+    void multiple_display_labels_to_same_target_keep_separate_cache_rows_and_wiki_titles() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note shared = makeMe.aNote().title("Same").underSameNotebookAs(root).please();
+      Note carrier =
+          makeMe
+              .aNote()
+              .underSameNotebookAs(root)
+              .content("[[Same|first label]] and [[Same|second label]]")
+              .please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(2));
+      assertThat(rows.get(0).getLinkText(), equalTo("Same|first label"));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
+      assertThat(rows.get(1).getLinkText(), equalTo("Same|second label"));
+      assertThat(rows.get(1).getTargetNote().getId(), equalTo(shared.getId()));
+
+      List<WikiTitle> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
+      assertThat(titles, hasSize(2));
+      assertThat(titles.get(0).getTargetToken(), equalTo("Same"));
+      assertThat(titles.get(0).getDisplayText(), equalTo("first label"));
+      assertThat(titles.get(1).getTargetToken(), equalTo("Same"));
+      assertThat(titles.get(1).getDisplayText(), equalTo("second label"));
+    }
+
+    @Test
+    void outgoing_targets_dedupe_by_resolved_note_id_across_display_text_variants() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      makeMe.aNote().title("Same").underSameNotebookAs(root).please();
+      Note carrier =
+          makeMe.aNote().underSameNotebookAs(root).content("[[Same|a]] [[Same|b]]").please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<Note> outgoing =
+          wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(carrier, user);
+      assertThat(outgoing, hasSize(1));
+      assertThat(outgoing.get(0).getTitle(), equalTo("Same"));
     }
 
     @Test

@@ -57,13 +57,20 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * Authorized outgoing wiki-link target notes for viewer (same authorization and order as {@link
-   * #wikiTitlesForViewer}).
+   * Authorized outgoing wiki-link target notes for viewer (same authorization as {@link
+   * #wikiTitlesForViewer}). Each target note appears once: multiple resolved links that share the
+   * same target token (with different display text) still yield one outgoing note for graph-style
+   * consumers; {@link #wikiTitlesForViewer} retains one entry per distinct stored link text.
    */
   public List<Note> outgoingWikiLinkTargetNotesForViewer(Note focusNote, User viewer) {
     List<Note> notes = new ArrayList<>();
+    Set<Integer> seenTargetIds = new LinkedHashSet<>();
     for (WikiTitle wt : wikiTitlesForViewer(focusNote, viewer)) {
-      Note n = entityManager.find(Note.class, wt.getNoteId());
+      Integer id = wt.getNoteId();
+      if (id == null || !seenTargetIds.add(id)) {
+        continue;
+      }
+      Note n = entityManager.find(Note.class, id);
       if (n != null) {
         notes.add(n);
       }
