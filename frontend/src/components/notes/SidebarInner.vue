@@ -23,6 +23,7 @@
           activePathFolderIds,
           activeFolder,
         }"
+        @update:expanded-folder-ids="emit('update:expandedFolderIds', $event)"
       />
     </template>
   </ul>
@@ -38,7 +39,6 @@ import {
   sortSidebarStructuralRows,
   type SidebarStructuralRow,
 } from "./sidebarStructuralSort"
-import type { Ref } from "vue"
 import { computed, ref, watch } from "vue"
 import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -68,12 +68,16 @@ interface Props {
   onStructuralPeerCount?: (count: number) => void
   /** ARIA level for treeitem descendants. Defaults to 1 (root tree). */
   level?: number
-  expandedFolderIds: Ref<Set<number>>
+  expandedFolderIds: Set<number>
   activePathFolderIds: Set<number>
   activeFolder?: Folder
 }
 
 const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  "update:expandedFolderIds": [next: Set<number>]
+}>()
 
 const currentLevel = computed(() => props.level ?? 1)
 

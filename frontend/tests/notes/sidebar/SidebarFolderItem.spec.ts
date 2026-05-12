@@ -2,7 +2,6 @@ import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
 import type { Folder } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, mount } from "@vue/test-utils"
-import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -20,12 +19,11 @@ function mountFolderItem(
     createdAt: "2020-01-01T00:00:00Z",
     updatedAt: "2020-01-01T00:00:00Z",
   }
-  const expandedFolderIds = ref(new Set<number>())
   return mount(SidebarFolderItem, {
     props: {
       folder,
       notebookId: options.notebookId,
-      expandedFolderIds,
+      expandedFolderIds: new Set<number>(),
       activePathFolderIds: new Set<number>(),
       activeFolder: options.activeFolder ?? undefined,
     },

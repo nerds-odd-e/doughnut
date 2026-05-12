@@ -59,6 +59,7 @@
           activeFolder,
         }"
         :key="`folder-${folderId}`"
+        @update:expanded-folder-ids="emit('update:expandedFolderIds', $event)"
       />
     </div>
   </li>
@@ -69,7 +70,6 @@ import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
-import type { Ref } from "vue"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
@@ -78,9 +78,13 @@ const props = defineProps<{
   notebookId: number
   activeNoteTopology?: NoteTopology
   level?: number
-  expandedFolderIds: Ref<Set<number>>
+  expandedFolderIds: Set<number>
   activePathFolderIds: Set<number>
   activeFolder?: Folder
+}>()
+
+const emit = defineEmits<{
+  "update:expandedFolderIds": [next: Set<number>]
 }>()
 
 const currentLevel = computed(() => props.level ?? 1)
@@ -93,11 +97,8 @@ const folderId = computed(() => props.folder.id)
 
 function ensureFolderExpandedById(id: number | undefined) {
   if (id == null) return
-  if (props.expandedFolderIds.value.has(id)) return
-  props.expandedFolderIds.value = new Set([
-    ...props.expandedFolderIds.value,
-    id,
-  ])
+  if (props.expandedFolderIds.has(id)) return
+  emit("update:expandedFolderIds", new Set([...props.expandedFolderIds, id]))
 }
 
 watch(
@@ -120,8 +121,7 @@ watch(
 )
 
 const isExpanded = computed(
-  () =>
-    folderId.value != null && props.expandedFolderIds.value.has(folderId.value)
+  () => folderId.value != null && props.expandedFolderIds.has(folderId.value)
 )
 
 const isOnActivePath = computed(
@@ -149,13 +149,13 @@ function navigateToFolderPage() {
 
 function toggleExpand() {
   if (folderId.value == null) return
-  const next = new Set(props.expandedFolderIds.value)
+  const next = new Set(props.expandedFolderIds)
   if (next.has(folderId.value)) {
     next.delete(folderId.value)
   } else {
     next.add(folderId.value)
   }
-  props.expandedFolderIds.value = next
+  emit("update:expandedFolderIds", next)
 }
 
 function onLabelAreaClick() {

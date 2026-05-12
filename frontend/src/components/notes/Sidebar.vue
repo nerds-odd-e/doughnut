@@ -20,7 +20,8 @@
         :active-note-topology="activeNoteTopology"
         :activeFolder="activeFolderRealm?.folder"
         :activePathFolderIds="activePathFolderIds"
-        v-bind="sidebarInnerTreeProps"
+        :expanded-folder-ids="expandedFolderIds"
+        @update:expanded-folder-ids="onUpdateExpandedFolderIds"
       />
     </div>
   </div>
@@ -56,6 +57,10 @@ const props = withDefaults(
 
 const expandedFolderIds = ref<Set<number>>(new Set())
 
+function onUpdateExpandedFolderIds(next: Set<number>) {
+  expandedFolderIds.value = next
+}
+
 const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
@@ -63,10 +68,6 @@ const activeNoteTopology = computed(
 const activePathFolderIds = computed(
   () => new Set(props.breadcrumbFolders.map((seg) => seg.id))
 )
-
-const sidebarInnerTreeProps = computed(() => ({
-  expandedFolderIds,
-}))
 
 watch(
   () => props.notebookId,
