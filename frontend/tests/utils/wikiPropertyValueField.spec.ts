@@ -11,6 +11,36 @@ describe("wikiPropertyValueField utils", () => {
     expect(escapeHtmlForWikiPropertyValue(`a<b>"c`)).toBe("a&lt;b&gt;&quot;c")
   })
 
+  it("renders unresolved wiki link with display text after pipe", () => {
+    const html = propertyValuePlainToDisplayHtml(
+      "See [[Unknown Topic|friendly label]] here",
+      []
+    )
+    expect(html).toContain('class="dead-link"')
+    expect(html).toContain('data-wiki-title="Unknown Topic"')
+    expect(html).toContain('data-wiki-display="friendly label"')
+    expect(html).toContain("friendly label")
+    expect(html).not.toContain("Unknown Topic|friendly label")
+  })
+
+  it("round-trips display text wiki link from a field root", () => {
+    const root = document.createElement("div")
+    root.innerHTML = propertyValuePlainToDisplayHtml(
+      "[[Target Page|alias text]]",
+      []
+    )
+    expect(serializeWikiPropertyValueFieldRoot(root)).toBe(
+      "[[Target Page|alias text]]"
+    )
+  })
+
+  it("deadLinkCreateTitleFromAnchor prefers data-wiki-title for piped links", () => {
+    const wrap = document.createElement("div")
+    wrap.innerHTML = propertyValuePlainToDisplayHtml("[[Missing|Shown]]", [])
+    const a = wrap.querySelector("a.dead-link") as HTMLAnchorElement
+    expect(deadLinkCreateTitleFromAnchor(a)).toBe("Missing")
+  })
+
   it("turns only well-formed wiki markers into dead-link anchors with visible brackets", () => {
     const html = propertyValuePlainToDisplayHtml("See [[X]] here", [])
     expect(html).toContain('class="dead-link"')

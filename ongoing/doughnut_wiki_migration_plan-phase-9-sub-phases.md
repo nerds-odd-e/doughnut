@@ -27,7 +27,7 @@ Users can read and author wiki links whose stored target text differs from the v
 ## 9.1 — Rich Mode Shows Display Text for Unresolved Links
 
 **Type:** Behavior  
-**Status:** Planned
+**Status:** Done
 
 Pre-condition: A note body contains an unresolved wiki link such as `[[Unknown Topic|friendly label]]`.
 

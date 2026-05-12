@@ -53,13 +53,14 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   it.each`
-    label                                     | html                                                            | expected
-    ${"preserves complete double brackets"}   | ${"<p>[[WikiLink]]</p>"}                                        | ${"[[WikiLink]]"}
-    ${"converts doughnut-link anchors"}       | ${'<p><a href="/d/n/701" class="doughnut-link">MyNote</a></p>'} | ${"[[MyNote]]"}
-    ${"note /d/n href without doughnut-link"} | ${'<p><a href="/d/n/701">MyNote</a></p>'}                       | ${"[[MyNote]]"}
-    ${"absolute URL to note show"}            | ${'<p><a href="https://app.test/d/n/42">T</a></p>'}             | ${"[[T]]"}
-    ${"note href without doughnut-link"}      | ${'<p><a href="/n123">looks internal</a></p>'}                  | ${"[looks internal](/n123)"}
-    ${"converts dead wiki anchors"}           | ${'<p><a href="#" class="dead-link">Unknown</a></p>'}           | ${"[[Unknown]]"}
+    label                                        | html                                                                                                                                                                                                    | expected
+    ${"preserves complete double brackets"}      | ${"<p>[[WikiLink]]</p>"}                                                                                                                                                                                | ${"[[WikiLink]]"}
+    ${"converts doughnut-link anchors"}          | ${'<p><a href="/d/n/701" class="doughnut-link">MyNote</a></p>'}                                                                                                                                         | ${"[[MyNote]]"}
+    ${"note /d/n href without doughnut-link"}    | ${'<p><a href="/d/n/701">MyNote</a></p>'}                                                                                                                                                               | ${"[[MyNote]]"}
+    ${"absolute URL to note show"}               | ${'<p><a href="https://app.test/d/n/42">T</a></p>'}                                                                                                                                                     | ${"[[T]]"}
+    ${"note href without doughnut-link"}         | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                                                                          | ${"[looks internal](/n123)"}
+    ${"converts dead wiki anchors"}              | ${'<p><a href="#" class="dead-link" data-wiki-title="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'}                                                 | ${"[[Unknown]]"}
+    ${"converts dead wiki anchors with display"} | ${'<p><a href="#" class="dead-link" data-wiki-title="Unknown Topic" data-wiki-display="friendly label"><span class="wiki-bracket">[[</span>friendly label<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown Topic|friendly label]]"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
@@ -76,6 +77,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"extra [ before resolved"}        | ${"<p>[[[WikiLink]]</p>"}                         | ${linkifiedWikiLink99} | ${String.raw`\[[[WikiLink]]`}
     ${"extra ] after resolved"}         | ${"<p>[[WikiLink]]]</p>"}                         | ${linkifiedWikiLink99} | ${"[[WikiLink]]\\]"}
     ${"extra [ before and ] after"}     | ${"<p>[[[WikiLink]]]</p>"}                        | ${linkifiedWikiLink99} | ${String.raw`\[[[WikiLink]]\]`}
+    ${"piped unresolved stays piped"}   | ${"<p>[[Unknown Topic|friendly label]]</p>"}      | ${[]}                  | ${"[[Unknown Topic|friendly label]]"}
   `("linkified wiki links: $label", ({ raw, resolves, expected }) => {
     const html = replaceWikiLinksInHtml(raw, [...resolves])
     expect(htmlToMarkdown(html)).toBe(expected)

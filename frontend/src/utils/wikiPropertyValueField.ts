@@ -9,18 +9,35 @@ export function escapeHtmlForWikiPropertyValue(s: string): string {
     .replace(/"/g, "&quot;")
 }
 
-function escapeHtmlAttributeValue(s: string): string {
+export function escapeHtmlAttributeValue(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
 }
 
 /** `[[` / `]]` shown literally; title text escaped (same visible shape as plain wiki syntax). */
-function wikiLinkBracketedInnerHtml(plainTitleInner: string): string {
+export function wikiLinkBracketedInnerHtml(plainTitleInner: string): string {
   return `<span class="wiki-bracket">[[</span>${escapeHtmlForWikiPropertyValue(plainTitleInner)}<span class="wiki-bracket">]]</span>`
 }
 
 /** Valid wiki segment: non-empty after trim, no brackets or newlines inside (regex already constrains). */
-function isValidPropertyWikiInner(rawBetweenBrackets: string): boolean {
+export function isValidPropertyWikiInner(rawBetweenBrackets: string): boolean {
   return rawBetweenBrackets.trim().length > 0
+}
+
+/** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */
+export function splitWikiLinkInner(rawBetweenBrackets: string): {
+  target: string
+  display: string
+} {
+  const i = rawBetweenBrackets.indexOf("|")
+  if (i === -1) {
+    return { target: rawBetweenBrackets, display: rawBetweenBrackets }
+  }
+  const target = rawBetweenBrackets.slice(0, i)
+  const display = rawBetweenBrackets.slice(i + 1)
+  if (display.trim().length === 0) {
+    return { target, display: target }
+  }
+  return { target, display }
 }
 
 /**
@@ -53,13 +70,18 @@ export function propertyValuePlainToDisplayHtml(
       continue
     }
 
-    const noteId = map.get(titleRaw) ?? map.get(titleRaw.trim())
-    const innerHtml = wikiLinkBracketedInnerHtml(titleRaw)
-    const attr = escapeHtmlAttributeValue(titleRaw)
+    const { target, display } = splitWikiLinkInner(titleRaw)
+    const noteId = map.get(target) ?? map.get(target.trim())
+    const innerHtml = wikiLinkBracketedInnerHtml(display)
+    const attrTarget = escapeHtmlAttributeValue(target)
+    const displayAttr =
+      display !== target
+        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
+        : ""
     if (noteId !== undefined) {
-      out += `<a href="${noteShowHref(noteId)}" class="doughnut-link" data-wiki-title="${attr}">${innerHtml}</a>`
+      out += `<a href="${noteShowHref(noteId)}" class="doughnut-link" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     } else {
-      out += `<a href="#" class="dead-link" data-wiki-title="${attr}">${innerHtml}</a>`
+      out += `<a href="#" class="dead-link" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     }
   }
   out += escapeHtmlForWikiPropertyValue(plain.slice(lastIndex))
@@ -71,12 +93,38 @@ export function propertyValuePlainToDisplayHtml(
  * otherwise text after `[[`, or full trimmed text (matches what the user actually typed).
  */
 export function deadLinkCreateTitleFromAnchor(anchor: HTMLElement): string {
+  const fromAttr = anchor.getAttribute("data-wiki-title")
+  if (fromAttr !== null && fromAttr !== "") return fromAttr
   const raw = anchor.textContent?.trim() ?? ""
   const closed = /^\[\[([^\[\]\r\n]*)\]\]$/.exec(raw)
   if (closed?.[1] !== undefined) return closed[1].trim()
   const open = /^\[\[([^\[\]\r\n]*)$/.exec(raw)
   if (open?.[1] !== undefined) return open[1].trim()
   return raw
+}
+
+/** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-wiki-title` / bracketed display. */
+export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
+  const raw = anchor.textContent?.trim() ?? ""
+  const target = anchor.getAttribute("data-wiki-title")
+  if (target === null || target === "") {
+    const bracketed = /^\[\[([\s\S]*)\]\]$/.exec(raw)
+    if (bracketed?.[1] !== undefined) {
+      return `[[${bracketed[1]}]]`
+    }
+    return `[[${raw}]]`
+  }
+  const innerM = /^\[\[([\s\S]*)\]\]$/.exec(raw)
+  if (innerM === null) {
+    return raw
+  }
+  const visibleInner = innerM[1]!
+  const fromDisplayAttr = anchor.getAttribute("data-wiki-display")
+  const displayPart = fromDisplayAttr ?? visibleInner
+  if (displayPart === target) {
+    return `[[${target}]]`
+  }
+  return `[[${target}|${displayPart}]]`
 }
 
 /** Serializes the editor root (top-level nodes) back to a plain scalar. Wiki anchors use visible text only (so in-place edits are saved). */
@@ -92,7 +140,7 @@ export function serializeWikiPropertyValueFieldRoot(el: HTMLElement): string {
         node.classList.contains("doughnut-link") ||
         node.classList.contains("dead-link")
       ) {
-        out += node.textContent ?? ""
+        out += wikiAnchorToMarkdownToken(node)
         continue
       }
       out += node.textContent ?? ""

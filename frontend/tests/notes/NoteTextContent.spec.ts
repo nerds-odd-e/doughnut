@@ -360,3 +360,49 @@ describe("in place edit on title", () => {
     })
   })
 })
+
+describe("rich mode wiki dead link display text", () => {
+  const noteWithWiki = makeMe.aNote
+    .title("Wiki test")
+    .content("Intro [[Unknown Topic|friendly label]] out.")
+    .please()
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.useFakeTimers()
+    mockSdkServiceWithImplementation(
+      TextContentController,
+      "updateNoteTitle",
+      async (options) => await mockedUpdateTitleCall(options)
+    )
+    wrapper = helper
+      .component(NoteTextContent)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({
+        readonly: true,
+        note: noteWithWiki,
+        wikiTitles: [],
+      })
+      .mount({ attachTo: document.body })
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+    vi.useRealTimers()
+  })
+
+  it("shows display text after pipe for unresolved body wiki link", async () => {
+    await flushPromises()
+    await vi.waitUntil(() => document.querySelector(".ql-editor a.dead-link"))
+    const dead = document.querySelector(
+      ".ql-editor a.dead-link"
+    ) as HTMLAnchorElement
+    expect(dead.textContent).toContain("friendly label")
+    expect(dead.textContent).not.toContain("Unknown Topic|")
+    expect(dead.getAttribute("data-wiki-title")).toBe("Unknown Topic")
+  })
+})

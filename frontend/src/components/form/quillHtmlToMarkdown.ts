@@ -1,5 +1,6 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
+import { wikiAnchorToMarkdownToken } from "@/utils/wikiPropertyValueField"
 
 export const turndownService = new TurndownService({
   br: "<br>",
@@ -309,8 +310,7 @@ turndownService.addRule("doughnutDeadWikiLink", {
     return (node as HTMLElement).classList.contains("dead-link")
   },
   replacement(_content, node) {
-    const text = (node as HTMLElement).textContent?.trim() ?? ""
-    return `[[${text}]]`
+    return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)
   },
 })
 

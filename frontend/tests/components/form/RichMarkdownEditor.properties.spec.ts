@@ -300,6 +300,25 @@ Body`
     expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Missing Note"])
   })
 
+  it("emits deadLinkClick with target token when a property wiki link uses display text", async () => {
+    const markdown = `---
+topic: "[[Ghost Page|shown text]]"
+---
+
+Body`
+    const wrapper = await h.mountEditor(markdown)
+    await flushPromises()
+
+    const valField = wrapper.find(
+      '[data-testid="rich-note-property-row-value-input"]'
+    )
+    const dead = valField.find("a.dead-link")
+    expect(dead.exists()).toBe(true)
+    await dead.trigger("click")
+    await flushPromises()
+    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Ghost Page"])
+  })
+
   it("editing an existing property row emits renamed keys and updated values", async () => {
     const markdown = `---
 topic: training
