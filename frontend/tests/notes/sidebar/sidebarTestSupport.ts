@@ -17,13 +17,33 @@ import {
   testFolderStub,
 } from "@tests/helpers"
 import { type VueWrapper, DOMWrapper } from "@vue/test-utils"
+import { computed, defineComponent } from "vue"
+import { useRouter, type RouteLocationRaw } from "vue-router"
 import { expect, vi } from "vitest"
 
-/** Avoid real navigation during sidebar tests (would break folder expansion / listing). */
-const sidebarRouterLinkStub = {
-  props: ["to"],
-  template: `<a class="router-link"><slot /></a>`,
-}
+/** SPA navigation only (no document navigation); matches real RouterLink enough for sidebar tests. */
+const sidebarRouterLinkStub = defineComponent({
+  name: "SidebarRouterLinkStub",
+  props: {
+    to: { type: [String, Object], required: true },
+  },
+  inheritAttrs: true,
+  setup(props) {
+    const router = useRouter()
+    const href = computed(() => {
+      try {
+        return router.resolve(props.to as RouteLocationRaw).href
+      } catch {
+        return "#"
+      }
+    })
+    async function onClick() {
+      await router.push(props.to as RouteLocationRaw)
+    }
+    return { href, onClick }
+  },
+  template: `<a class="router-link" :href="href" @click.prevent="onClick"><slot /></a>`,
+})
 
 export function isBefore(node1: Node, node2: Node) {
   return !!(

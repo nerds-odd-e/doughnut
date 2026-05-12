@@ -13,7 +13,7 @@
     }"
   >
     <ScrollTo v-if="isActiveFolderRow" />
-    <div class="folder-row" @click="onFolderRowClick">
+    <div class="folder-row">
       <button
         class="chevron-btn"
         aria-label="expand children"
@@ -27,7 +27,7 @@
           aria-hidden="true"
         />
       </button>
-      <div class="folder-label-area" @click.stop="onLabelAreaClick">
+      <div class="folder-label-area" @click="toggleExpand">
         <router-link
           class="sidebar-folder-label"
           data-testid="sidebar-folder-open-page-link"
@@ -71,7 +71,6 @@ import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { computed, ref, watch } from "vue"
-import { useRouter } from "vue-router"
 
 const props = defineProps<{
   folder: Folder
@@ -88,8 +87,6 @@ const emit = defineEmits<{
 }>()
 
 const currentLevel = computed(() => props.level ?? 1)
-
-const router = useRouter()
 
 const structuralChildCount = ref<number | undefined>(undefined)
 
@@ -136,17 +133,6 @@ function setStructuralChildCount(count: number) {
   structuralChildCount.value = count
 }
 
-function navigateToFolderPage() {
-  if (folderId.value == null) return
-  router.push({
-    name: "folderPage",
-    params: {
-      notebookId: String(props.notebookId),
-      folderId: String(folderId.value),
-    },
-  })
-}
-
 function toggleExpand() {
   if (folderId.value == null) return
   const next = new Set(props.expandedFolderIds)
@@ -156,15 +142,6 @@ function toggleExpand() {
     next.add(folderId.value)
   }
   emit("update:expandedFolderIds", next)
-}
-
-function onLabelAreaClick() {
-  toggleExpand()
-  navigateToFolderPage()
-}
-
-function onFolderRowClick() {
-  navigateToFolderPage()
 }
 </script>
 
@@ -179,7 +156,6 @@ function onFolderRowClick() {
   gap: 0.25rem;
   min-height: 2rem;
   padding: 0.125rem 0.25rem 0.125rem 0;
-  cursor: pointer;
   border-radius: 0.25rem;
 
   &:hover {
@@ -224,11 +200,12 @@ function onFolderRowClick() {
 }
 
 .sidebar-folder-label {
+  display: block;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
+  min-width: 0;
   color: inherit;
   text-decoration: none;
 }
