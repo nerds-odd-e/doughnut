@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
+import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -216,34 +217,21 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * Persists the renamed note's new title first so updated referrer tokens resolve, then rewrites
-   * inbound wiki links with {@code UPDATE_VISIBLE_TEXT} semantics and rebuilds each changed
-   * referrer's wiki-title cache.
+   * Rewrites inbound wiki links and rebuilds each changed referrer's wiki-title cache. Persists the
+   * renamed note's new title first so updated referrer tokens resolve.
    */
   @Transactional
-  public void rewriteInboundWikiLinksForVisibleTitleRename(
-      Note targetNote, String newTitle, Timestamp updatedAt, User viewer) {
-    rewriteInboundWikiLinksForTitleRename(
-        targetNote,
-        newTitle,
-        updatedAt,
-        viewer,
-        lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle));
-  }
-
-  /**
-   * Same as {@link #rewriteInboundWikiLinksForVisibleTitleRename} but with {@code
-   * KEEP_VISIBLE_TEXT} link inner semantics.
-   */
-  @Transactional
-  public void rewriteInboundWikiLinksForKeepVisibleTitleRename(
-      Note targetNote, String newTitle, Timestamp updatedAt, User viewer) {
-    rewriteInboundWikiLinksForTitleRename(
-        targetNote,
-        newTitle,
-        updatedAt,
-        viewer,
-        lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle));
+  public void rewriteInboundWikiLinksForTitleRename(
+      Note targetNote,
+      String newTitle,
+      Timestamp updatedAt,
+      User viewer,
+      TitleRenameReferenceHandling handling) {
+    UnaryOperator<String> fn =
+        handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT
+            ? lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle)
+            : lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle);
+    rewriteInboundWikiLinksForTitleRename(targetNote, newTitle, updatedAt, viewer, fn);
   }
 
   private void rewriteInboundWikiLinksForTitleRename(

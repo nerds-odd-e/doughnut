@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
-import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.ApiException;
@@ -60,15 +59,14 @@ class TextContentController {
     authorizationService.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     User viewer = authorizationService.getCurrentUser();
-    if (TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT.equals(titleDTO.getReferenceHandling())
-        && !Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
-      wikiTitleCacheService.rewriteInboundWikiLinksForVisibleTitleRename(
-          note, titleDTO.getNewTitle(), currentUTCTimestamp, viewer);
-    } else if (TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT.equals(
-            titleDTO.getReferenceHandling())
-        && !Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
-      wikiTitleCacheService.rewriteInboundWikiLinksForKeepVisibleTitleRename(
-          note, titleDTO.getNewTitle(), currentUTCTimestamp, viewer);
+    boolean titleChanged = !Objects.equals(note.getTitle(), titleDTO.getNewTitle());
+    if (titleChanged && titleDTO.getReferenceHandling() != null) {
+      wikiTitleCacheService.rewriteInboundWikiLinksForTitleRename(
+          note,
+          titleDTO.getNewTitle(),
+          currentUTCTimestamp,
+          viewer,
+          titleDTO.getReferenceHandling());
     } else {
       note.setUpdatedAt(currentUTCTimestamp);
       note.setTitle(titleDTO.getNewTitle());

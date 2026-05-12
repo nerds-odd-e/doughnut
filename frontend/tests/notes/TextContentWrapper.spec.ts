@@ -6,6 +6,11 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi, afterEach } from "vitest"
 import { h, nextTick } from "vue"
 
+const waitForAnimationFrames = () =>
+  new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  })
+
 describe("TextContentWrapper referenced title rename", () => {
   afterEach(() => {
     document.body.innerHTML = ""
@@ -58,11 +63,7 @@ describe("TextContentWrapper referenced title rename", () => {
 
     input.blur()
     await flushPromises()
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => resolve())
-      })
-    })
+    await waitForAnimationFrames()
     await nextTick()
 
     expect(input.value).toBe("Original")
@@ -97,11 +98,7 @@ describe("TextContentWrapper referenced title rename", () => {
 
     keepBtn.click()
     await flushPromises()
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => resolve())
-      })
-    })
+    await waitForAnimationFrames()
     await nextTick()
 
     expect(input.value).toBe("Edited")
