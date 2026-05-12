@@ -37,7 +37,7 @@ import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
-const props = defineProps({
+defineProps({
   note: { type: Object as PropType<Note>, required: true },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,

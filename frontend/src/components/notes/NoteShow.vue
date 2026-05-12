@@ -35,8 +35,7 @@
                     readonly: readonly(noteRealm),
                     wikiTitles: noteRealm.wikiTitles ?? [],
                     isIndexContext: isIndexTitle(noteRealm),
-                    hasInboundReferences:
-                      (noteRealm.references?.length ?? 0) > 0,
+                    hasInboundReferences: noteHasInboundWikiReferences(noteRealm),
                   }"
                   @dead-link-click="onDeadLinkClick"
                 />
@@ -62,7 +61,7 @@
                     </span>
                   </p>
                 </NoteRecentUpdateIndicator>
-                <template v-if="(noteRealm.references?.length ?? 0) > 0">
+                <template v-if="noteHasInboundWikiReferences(noteRealm)">
                   <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">References</h3>
                   <NoteReferences
                     v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
@@ -91,11 +90,10 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watch, type Ref } from "vue"
+import { inject, ref, watch, type PropType, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { Folder, NoteRealm, User } from "@generated/doughnut-backend-api"
-import type { PropType } from "vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
@@ -123,6 +121,9 @@ const readonly = (noteRealm: NoteRealm) =>
 
 const isIndexTitle = (noteRealm: NoteRealm) =>
   (noteRealm.note.noteTopology.title ?? "").trim().toLowerCase() === "index"
+
+const noteHasInboundWikiReferences = (noteRealm: NoteRealm) =>
+  (noteRealm.references?.length ?? 0) > 0
 
 const pendingDeadLink = ref<DeadLinkPayload | null>(null)
 

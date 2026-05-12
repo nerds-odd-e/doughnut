@@ -18,7 +18,7 @@
       <RadioButtons
         v-model="titleReferenceChoice"
         scope-name="titleRenameReferenceHandling"
-        :options="titleReferenceRadioOptions"
+        :options="TITLE_RENAME_REFERENCE_RADIO_OPTIONS"
       />
       <button
         type="button"
@@ -45,6 +45,14 @@ import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 
 const storageAccessor = useStorageAccessor()
 
+const TITLE_RENAME_REFERENCE_RADIO_OPTIONS: {
+  value: TitleRenameReferenceHandling
+  label: string
+}[] = [
+  { value: "UPDATE_VISIBLE_TEXT", label: "Update visible reference text" },
+  { value: "KEEP_VISIBLE_TEXT", label: "Keep visible reference text" },
+]
+
 const props = defineProps({
   field: {
     type: String as PropType<"edit title" | "edit content">,
@@ -62,28 +70,12 @@ const savedVersion = ref(0)
 const lastSavedValue = ref(props.value ?? "")
 const pendingSaveValues = new Set<string>()
 
-const referencedTitleExplicitSave = (): boolean =>
+const needsExplicitReferencedTitleSave = (): boolean =>
   props.field === "edit title" && props.titleRenameNeedsExplicitReferenceChoice
-
-const titleReferenceRadioOptions: {
-  value: TitleRenameReferenceHandling
-  label: string
-}[] = [
-  {
-    value: "UPDATE_VISIBLE_TEXT",
-    label: "Update visible reference text",
-  },
-  {
-    value: "KEEP_VISIBLE_TEXT",
-    label: "Keep visible reference text",
-  },
-]
 
 const titleReferenceChoice =
   ref<TitleRenameReferenceHandling>("KEEP_VISIBLE_TEXT")
 const savingReferencedTitle = ref(false)
-const activeNoteId = ref<number | null>(null)
-
 const changerInner = async (
   noteId: number,
   newValue: string,
@@ -118,7 +110,7 @@ const hasUnsavedChanges = (): boolean => {
 }
 
 const showReferencedTitleSavePanel = computed(
-  () => referencedTitleExplicitSave() && hasUnsavedChanges()
+  () => needsExplicitReferencedTitleSave() && hasUnsavedChanges()
 )
 
 const wrapperClass = computed(() => {
@@ -129,7 +121,6 @@ const wrapperClass = computed(() => {
 })
 
 const onUpdate = (noteId: number, newValue: string) => {
-  activeNoteId.value = noteId
   if (props.field === "edit title" && !newValue.trim()) {
     return
   }
@@ -157,7 +148,7 @@ const onUpdate = (noteId: number, newValue: string) => {
   errors.value = {}
   localValue.value = newValue
 
-  if (referencedTitleExplicitSave()) {
+  if (needsExplicitReferencedTitleSave()) {
     version.value += 1
     return
   }
@@ -167,7 +158,7 @@ const onUpdate = (noteId: number, newValue: string) => {
 }
 
 const onBlur = () => {
-  if (referencedTitleExplicitSave()) {
+  if (needsExplicitReferencedTitleSave()) {
     changer.cancel()
     return
   }
@@ -197,8 +188,8 @@ const setError = (errs: unknown) => {
 }
 
 const saveReferencedTitle = async () => {
-  if (!referencedTitleExplicitSave() || !hasUnsavedChanges()) return
-  const noteId = props.titleEditNoteId ?? activeNoteId.value
+  if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+  const noteId = props.titleEditNoteId
   if (noteId == null) return
   savingReferencedTitle.value = true
   errors.value = {}
@@ -256,11 +247,7 @@ const handlePropChange = (newValue: string | undefined) => {
 watch(() => props.value, handlePropChange)
 
 onUnmounted(() => {
-  if (!referencedTitleExplicitSave()) {
-    changer.flush()
-  } else {
-    changer.cancel()
-  }
+  needsExplicitReferencedTitleSave() ? changer.cancel() : changer.flush()
 })
 </script>
 

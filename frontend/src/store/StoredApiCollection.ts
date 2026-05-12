@@ -1,10 +1,10 @@
 import type {
   NoteContentCompletion,
+  NoteCreationDto,
   NoteDeleteDto,
   NoteRealm,
   NoteUpdateTitleDto,
 } from "@generated/doughnut-backend-api"
-import type { NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
   RelationController,
   NoteController,

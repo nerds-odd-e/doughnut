@@ -16,6 +16,16 @@ const noteShowPathInUrl = /\/d\/n\/\d+/
 
 const noteContentRegion = { role: 'region' as const, name: 'Note content' }
 
+type TitleRenameReferenceChoice = 'KEEP_VISIBLE_TEXT' | 'UPDATE_VISIBLE_TEXT'
+
+const titleRenameReferenceOptionLabel: Record<
+  TitleRenameReferenceChoice,
+  string
+> = {
+  KEEP_VISIBLE_TEXT: 'Keep visible reference text',
+  UPDATE_VISIBLE_TEXT: 'Update visible reference text',
+}
+
 function wikiLinkInNoteContentFluent(linkText: string) {
   const locator = () =>
     cy
@@ -168,17 +178,12 @@ export const assumeNotePage = (
     },
     saveReferencedNoteTitle: (
       newTitle: string,
-      choice: 'KEEP_VISIBLE_TEXT' | 'UPDATE_VISIBLE_TEXT'
+      choice: TitleRenameReferenceChoice
     ) => {
       cy.findByRole('title').click()
       cy.clearFocusedText().type(newTitle)
       cy.findByTestId('referenced-title-save-panel')
-        .contains(
-          'label',
-          choice === 'KEEP_VISIBLE_TEXT'
-            ? 'Keep visible reference text'
-            : 'Update visible reference text'
-        )
+        .contains('label', titleRenameReferenceOptionLabel[choice])
         .click()
       cy.findByTestId('referenced-title-save-button').click()
       cy.findByTestId('referenced-title-save-panel').should('not.exist')
