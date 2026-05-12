@@ -79,6 +79,24 @@ describe("storedApiCollection", () => {
       })
     })
 
+    it("should navigate to folderPage when the note was inside a folder", async () => {
+      const folderId = 901
+      const noteInFolder = makeMe.aNoteRealm.inFolder(folderId, "Work").please()
+      mockSdkService(NoteController, "deleteNote", [parentNote])
+      storageAccessor.value.refreshNoteRealm(noteInFolder)
+
+      const sa = storageAccessor.value.storedApi()
+      await sa.deleteNote(router, noteInFolder.id, "REMOVE_FROM_PROPERTIES")
+
+      expect(routerReplace).toHaveBeenCalledWith({
+        name: "folderPage",
+        params: {
+          notebookId: noteInFolder.notebookRealm.notebook.id,
+          folderId,
+        },
+      })
+    })
+
     it("refreshes sidebar structural listings after deleteNote", async () => {
       storageAccessor.value.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value

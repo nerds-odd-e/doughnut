@@ -391,6 +391,16 @@ Then(
   }
 )
 
+Then('I should be on a notebook folder page in the browser', () => {
+  start.pageIsNotLoading()
+  cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/folders\/\d+$/)
+})
+
+Then('I should be on the notebook root page in the browser', () => {
+  start.pageIsNotLoading()
+  cy.location('pathname').should('match', /^\/d\/notebooks\/\d+$/)
+})
+
 When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
 })

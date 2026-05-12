@@ -14,6 +14,14 @@ Feature: Note deletion
     When I delete note "TDD"
     Then I should see the note "TDD" is marked as deleted
 
+  Scenario: Deleting a note in a folder navigates to that folder page
+    When I delete note "TDD"
+    Then I should be on a notebook folder page in the browser
+
+  Scenario: Deleting a note at notebook root navigates to the notebook page
+    When I delete note "LeSS in Action"
+    Then I should be on the notebook root page in the browser
+
   Scenario: Deleting a note leaves folder peers; undo restores relationships
     Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
     And I should see "TDD" has relationship "a part of" "tech"

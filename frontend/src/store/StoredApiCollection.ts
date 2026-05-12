@@ -466,10 +466,18 @@ export default class StoredApiCollection implements StoredApi {
     }
     refreshSidebarStructuralListings()
     if (notebookId !== undefined) {
-      await router.replace({
-        name: "notebookPage",
-        params: { notebookId },
-      })
+      const leaf = realmLeafFolder(cachedRealm)
+      if (leaf?.id != null) {
+        await router.replace({
+          name: "folderPage",
+          params: { notebookId, folderId: leaf.id },
+        })
+      } else {
+        await router.replace({
+          name: "notebookPage",
+          params: { notebookId },
+        })
+      }
       return focusRealm
     }
     await this.routerReplaceFocus(router)
