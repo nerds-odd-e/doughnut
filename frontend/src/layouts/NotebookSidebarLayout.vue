@@ -37,7 +37,7 @@
         <Sidebar
           v-if="currentNotebookId != null"
           :key="currentNotebookId"
-          :active-note-realm="sidebarRealm"
+          :active-note-realm="activeNoteRealm"
           :notebook-id="currentNotebookId"
           :notebook-readonly="sidebarNotebookRealm?.readonly === true"
           :active-folder-realm="activeFolderRealm"
@@ -72,13 +72,10 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { folderBreadcrumbChainFromFlatIndex } from "@/utils/folderBreadcrumbChain"
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
 const SIDEBAR_BREAKPOINT_PX = 768
-
-const folderRouteBreadcrumbFolders = ref<Folder[]>([])
 
 const sidebarOpened = ref(false)
 const windowWidth = ref(
@@ -99,22 +96,19 @@ async function fetchNotebookPage() {
   activeNotebookRealm.value = !error && data ? data : undefined
 }
 
-const sidebarRealm = computed((): NoteRealm | undefined => {
+const activeNoteRealm = computed((): NoteRealm | undefined => {
   if (route.name !== "noteShow") return undefined
   const id = Number(route.params.noteId)
   if (!Number.isFinite(id)) return undefined
   return storageAccessor.value.refOfNoteRealm(id).value
 })
 
-const breadcrumbFolders = computed((): Folder[] => {
-  if (route.name === "noteShow") {
-    return sidebarRealm.value?.ancestorFolders ?? []
-  }
-  if (route.name === "folderPage") {
-    return folderRouteBreadcrumbFolders.value
-  }
-  return []
-})
+const breadcrumbFolders = computed(
+  (): Folder[] =>
+    activeNoteRealm.value?.ancestorFolders ??
+    activeFolderRealm.value?.ancestorFolders ??
+    []
+)
 
 const sidebarNotebookRealm = computed(
   (): NotebookRealm | undefined =>
@@ -123,7 +117,7 @@ const sidebarNotebookRealm = computed(
 
 const currentNotebookRealm = computed(
   (): NotebookRealm | undefined =>
-    sidebarRealm.value?.notebookRealm ?? sidebarNotebookRealm.value
+    activeNoteRealm.value?.notebookRealm ?? sidebarNotebookRealm.value
 )
 
 const currentNotebookId = computed(
@@ -164,22 +158,9 @@ async function fetchFolderPage() {
   })
   if (!error && page?.notebookRealm?.notebook) {
     activeFolderRealm.value = page
-    const { data: indexRows, error: indexErr } =
-      await NotebookController.listNotebookFolderIndex({
-        path: { notebook: notebookId },
-      })
-    if (!indexErr && indexRows) {
-      folderRouteBreadcrumbFolders.value = folderBreadcrumbChainFromFlatIndex(
-        page.folder,
-        indexRows
-      )
-    } else {
-      folderRouteBreadcrumbFolders.value = [page.folder]
-    }
     return
   }
   activeFolderRealm.value = undefined
-  folderRouteBreadcrumbFolders.value = []
 }
 
 watch(
@@ -206,7 +187,6 @@ watch(
   async ({ isFolderPage }) => {
     if (!isFolderPage) {
       activeFolderRealm.value = undefined
-      folderRouteBreadcrumbFolders.value = []
       return
     }
     await fetchFolderPage()
