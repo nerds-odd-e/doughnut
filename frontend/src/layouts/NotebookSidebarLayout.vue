@@ -39,7 +39,7 @@
           :key="currentNotebookId"
           :active-note-realm="activeNoteRealm"
           :notebook-id="currentNotebookId"
-          :notebook-readonly="sidebarNotebookRealm?.readonly === true"
+          :notebook-readonly="currentNotebookRealm?.readonly === true"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
         />
@@ -88,14 +88,6 @@ const isMdOrLarger = computed(() => windowWidth.value >= SIDEBAR_BREAKPOINT_PX)
 const activeNotebookRealm = ref<NotebookRealm | undefined>(undefined)
 const activeFolderRealm = ref<FolderRealm | undefined>(undefined)
 
-async function fetchNotebookPage() {
-  const notebookId = Number(route.params.notebookId)
-  const { data, error } = await NotebookController.get({
-    path: { notebook: notebookId },
-  })
-  activeNotebookRealm.value = !error && data ? data : undefined
-}
-
 const activeNoteRealm = computed((): NoteRealm | undefined => {
   if (route.name !== "noteShow") return undefined
   const id = Number(route.params.noteId)
@@ -110,14 +102,11 @@ const breadcrumbFolders = computed(
     []
 )
 
-const sidebarNotebookRealm = computed(
-  (): NotebookRealm | undefined =>
-    activeNotebookRealm.value ?? activeFolderRealm.value?.notebookRealm
-)
-
 const currentNotebookRealm = computed(
   (): NotebookRealm | undefined =>
-    activeNoteRealm.value?.notebookRealm ?? sidebarNotebookRealm.value
+    activeNotebookRealm.value ??
+    activeNoteRealm.value?.notebookRealm ??
+    activeFolderRealm.value?.notebookRealm
 )
 
 const currentNotebookId = computed(
@@ -149,6 +138,14 @@ const routeViewProps = computed(() => {
   }
   return {}
 })
+
+async function fetchNotebookPage() {
+  const notebookId = Number(route.params.notebookId)
+  const { data, error } = await NotebookController.get({
+    path: { notebook: notebookId },
+  })
+  activeNotebookRealm.value = !error && data ? data : undefined
+}
 
 async function fetchFolderPage() {
   const notebookId = Number(route.params.notebookId)
