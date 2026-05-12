@@ -64,6 +64,7 @@ public class NoteConstructionService {
 
   private Note createNoteInNotebookScopeWithoutWikidata(
       Notebook notebook, Folder folderOrNull, String title) {
+    throwIfReservedTitle(title);
     throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
     if (folderOrNull != null) {
       return persistNewNoteInNotebookFolder(notebook, folderOrNull, title);
@@ -139,6 +140,17 @@ public class NoteConstructionService {
       folderService.reconcileFolderIndexNotePointer(folder.getId());
     }
     return noteRealmService.build(note, user);
+  }
+
+  private void throwIfReservedTitle(String title) {
+    if (title != null && title.trim().equalsIgnoreCase("index")) {
+      ApiError apiError =
+          new ApiError(
+              "'index' is reserved for notebook and folder index content.",
+              ApiError.ErrorType.BINDING_ERROR);
+      apiError.add("newTitle", "'index' is reserved for notebook and folder index content.");
+      throw new ApiException(apiError);
+    }
   }
 
   private void throwIfSoftDeletedTitleBlocks(Notebook notebook, Folder folderOrNull, String title) {

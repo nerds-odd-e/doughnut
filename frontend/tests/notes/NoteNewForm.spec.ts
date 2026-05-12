@@ -330,6 +330,30 @@ describe("adding new note", () => {
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledTimes(1)
     })
 
+    it("displays reserved title error when api returns binding error for newTitle", async () => {
+      await setNoteNewFormTitle(wrapper, "index")
+
+      mockedCreateNoteAtRoot.mockResolvedValueOnce({
+        data: undefined,
+        error: {
+          message: "binding error",
+          errorType: "BINDING_ERROR",
+          errors: {
+            newTitle:
+              "'index' is reserved for notebook and folder index content.",
+          },
+        },
+        request: {} as Request,
+        response: { status: 400, url: "" } as Response,
+        // biome-ignore lint/suspicious/noExplicitAny: SDK error result shape
+      } as any)
+
+      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("reserved")
+    })
+
     it("asks confirmation on soft-deleted title conflict and calls undo delete when confirmed", async () => {
       popupsMock.confirm.mockResolvedValueOnce(true)
       const restoredRealm = makeMe.aNoteRealm.please()

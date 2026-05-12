@@ -10,6 +10,8 @@ import jakarta.validation.Validator;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -64,5 +66,23 @@ class NoteUpdateTitleDTOTest {
     dto.setNewTitle(makeMe.aStringOfLength(Note.MAX_TITLE_LENGTH + 1));
     Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
     assertEquals(1, violations.size());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"index", "INDEX", "Index", " index ", "  INDEX  "})
+  void rejectsReservedIndexTitle(String reserved) {
+    dto.setNewTitle(reserved);
+    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
+    assertEquals(1, violations.size());
+    assertTrue(
+        violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("newTitle")));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"index_to_be_deleted", "index2", "reindex", "my index"})
+  void allowsTitlesThatContainIndexAsSubstring(String title) {
+    dto.setNewTitle(title);
+    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
+    assertEquals(0, violations.size());
   }
 }

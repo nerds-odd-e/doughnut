@@ -265,6 +265,24 @@ describe("in place edit on title", () => {
     })
   })
 
+  describe("renaming to reserved title", () => {
+    beforeEach(async () => {
+      const w = mountComponent(note)
+      mockedUpdateTitleCall.mockRejectedValueOnce({
+        title: "'index' is reserved for notebook and folder index content.",
+        status: 400,
+      })
+      await editTitleThenBlur(w)
+      await flushPromises()
+    })
+
+    it("displays the reserved title error in the title field", async () => {
+      expect(
+        wrapper.find(".path-name-editor .daisy-text-error").text()
+      ).toContain("reserved")
+    })
+  })
+
   it("should not trigger changes for initial note content", async () => {
     note.content = "initial\n\ndescription"
     mountComponent(note)

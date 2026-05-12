@@ -141,6 +141,10 @@ export default class StoredApiCollection implements StoredApi {
         })
       )
       if (error || !data) {
+        const fieldErrors = toOpenApiError(error).errors
+        if (fieldErrors?.newTitle) {
+          throw { title: fieldErrors.newTitle }
+        }
         throw new Error(toErrorMessage(error, "Failed to update note title"))
       }
       return data

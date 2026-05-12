@@ -1,5 +1,5 @@
 Feature: Folder page index
-  As a learner, I want a folder landing page with an editable index note
+  As a learner, I want a folder landing page with editable index content
   so that folder-level context persists like the notebook index.
 
   Background:
@@ -8,7 +8,7 @@ Feature: Folder page index
       | Title    | Folder |
       | In Alpha | Alpha  |
 
-  Scenario: Folder index lazy create persists after reload
+  Scenario: Folder index content persists after reload
     When I view note "In Alpha"
     And I open the folder page for "Alpha" from the sidebar
     And I type and save the folder index with text "Persistent folder landing"

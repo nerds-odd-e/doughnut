@@ -3,12 +3,14 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -87,5 +89,60 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
                 .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.errorType").value("RESOURCE_CONFLICT"));
+  }
+
+  @Test
+  void createNoteReturns400WhenTitleIsReservedIndex() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+
+    NoteCreationDTO dto = new NoteCreationDTO();
+    dto.setNewTitle("index");
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}/create-note", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"))
+        .andExpect(jsonPath("$.errors.newTitle").value(containsString("reserved")));
+  }
+
+  @Test
+  void createNoteReturns400WhenTitleIsReservedIndexCaseInsensitive() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+
+    NoteCreationDTO dto = new NoteCreationDTO();
+    dto.setNewTitle("INDEX");
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}/create-note", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"))
+        .andExpect(jsonPath("$.errors.newTitle").value(containsString("reserved")));
+  }
+
+  @Test
+  void renamingNoteToIndexReturns400() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Note note = makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("original").please();
+
+    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
+    dto.setNewTitle("index");
+
+    mockMvc
+        .perform(
+            patch("/api/text_content/{noteId}/title", note.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"))
+        .andExpect(jsonPath("$.errors.newTitle").value(containsString("reserved")));
   }
 }
