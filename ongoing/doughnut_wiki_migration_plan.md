@@ -7,6 +7,7 @@
 - **Phase 7 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`
 - **Phase 9 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-9-sub-phases.md`
 - **Phase 10 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-10-sub-phases.md`
+- **Phase 12 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-12-sub-phases.md`
 
 ## Purpose
 
@@ -28,7 +29,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 9 — Wiki-link parser and link index | Not started |
 | 10 — Index-scoped configuration (notebook + folder) | Done — container `indexContent` is canonical; `index_note_id` columns removed (10.18). Legacy notes renamed to `index_to_be_deleted` during migration remain for manual review; a later user-facing bulk delete or archive is optional follow-up. |
 | 11 — Remove legacy assumptions | Not started |
-| 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
+| 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Planned — see `doughnut_wiki_migration_plan-phase-12-sub-phases.md` |
 
 ---
 
@@ -274,7 +275,7 @@ LinkIndex — derived from content
 
 ## Goal
 
-When a note’s **title** changes, notes that wiki-linked the **old** title are **reverse-updated** to the **new** title in their Markdown (`content` / frontmatter `[[…]]` tokens where applicable), and **`note_wiki_title_cache`** rows are refreshed so **`NoteRealm.references`**, graph, and search stay consistent.
+When a note’s **title** changes, notes that wiki-linked the **old** title are **reverse-updated** according to an explicit user choice, and **`note_wiki_title_cache`** rows are refreshed so **`NoteRealm.references`**, graph, and search stay consistent. Execution detail lives in `ongoing/doughnut_wiki_migration_plan-phase-12-sub-phases.md`.
 
 ## Rationale
 
@@ -290,11 +291,11 @@ A user or automation changes a note title.
 
 ## Post-condition
 
-Sources that pointed at the old title show updated `[[…]]` text and cache rows for the new title; tests cover title update (controller/service) with at least one referrer.
+Sources that pointed at the old title either show updated visible reference text or preserve their current visible text while linking to the renamed note; cache rows point at the renamed note. Tests cover title update with at least one referrer, the backend exception when no reference-handling choice is provided, one successful E2E browser scenario, and reference updates when a note moves to another notebook.
 
 ## Verify
 
-Focused backend tests; optional targeted E2E if end-to-end note show must assert reference text after rename.
+Focused backend tests, generated API refresh after DTO changes, and targeted E2E for the wiki-link feature.
 
 ## Expected result
 
