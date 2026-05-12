@@ -3668,6 +3668,11 @@ components:
           maxLength: 150
           minLength: 0
           pattern: "^[^\\\\/:]*$"
+        referenceHandling:
+          type: string
+          enum:
+          - UPDATE_VISIBLE_TEXT
+          - KEEP_VISIBLE_TEXT
         folderId:
           type: integer
           format: int32
@@ -3867,6 +3872,11 @@ components:
           maxLength: 150
           minLength: 0
           pattern: "^[^\\\\/:]*$"
+        referenceHandling:
+          type: string
+          enum:
+          - UPDATE_VISIBLE_TEXT
+          - KEEP_VISIBLE_TEXT
         description:
           type: string
           maxLength: 500
@@ -4110,6 +4120,11 @@ components:
           maxLength: 150
           minLength: 0
           pattern: "^[^\\\\/:]*$"
+        referenceHandling:
+          type: string
+          enum:
+          - UPDATE_VISIBLE_TEXT
+          - KEEP_VISIBLE_TEXT
       required:
       - newTitle
     NoteUpdateContentDTO:

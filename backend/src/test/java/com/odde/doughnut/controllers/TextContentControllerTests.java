@@ -1,20 +1,24 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.io.IOException;
 import java.util.List;
@@ -72,6 +76,70 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNoteTitle(note, noteUpdateTitleDTO));
+    }
+  }
+
+  @Nested
+  class updateNoteTitleInboundWikiReferences {
+    @Test
+    void rejectsRenameWithoutReferenceHandlingWhenInboundWikiLinksExist()
+        throws UnexpectedNoAccessRightException {
+      Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
+
+      NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+      contentDto.setContent("[[TargetTitle]]");
+      controller.updateNoteContent(carrier, contentDto);
+
+      NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
+      titleDto.setNewTitle("RenamedTarget");
+
+      ApiException thrown =
+          assertThrows(ApiException.class, () -> controller.updateNoteTitle(target, titleDto));
+      assertThat(thrown.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(
+          thrown.getErrorBody().getErrors().get("referenceHandling"), containsString("wiki"));
+
+      makeMe.refresh(target);
+      assertThat(target.getTitle(), equalTo("TargetTitle"));
+    }
+
+    @Test
+    void allowsSameTitleWithoutReferenceHandlingWhenInboundWikiLinksExist()
+        throws UnexpectedNoAccessRightException {
+      Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
+
+      NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+      contentDto.setContent("[[TargetTitle]]");
+      controller.updateNoteContent(carrier, contentDto);
+
+      NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
+      titleDto.setNewTitle("TargetTitle");
+
+      NoteRealm response = controller.updateNoteTitle(target, titleDto);
+      assertThat(response.getNote().getTitle(), equalTo("TargetTitle"));
+    }
+
+    @Test
+    void allowsRenameWithExplicitReferenceHandlingWhenInboundWikiLinksExist()
+        throws UnexpectedNoAccessRightException {
+      Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
+
+      NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+      contentDto.setContent("[[TargetTitle]]");
+      controller.updateNoteContent(carrier, contentDto);
+
+      NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
+      titleDto.setNewTitle("RenamedTarget");
+      titleDto.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
+
+      NoteRealm response = controller.updateNoteTitle(target, titleDto);
+      assertThat(response.getNote().getTitle(), equalTo("RenamedTarget"));
     }
   }
 

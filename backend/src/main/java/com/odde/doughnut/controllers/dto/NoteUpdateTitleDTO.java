@@ -17,4 +17,6 @@ public class NoteUpdateTitleDTO {
   @Getter
   @Setter
   private String newTitle = "";
+
+  @Getter @Setter private TitleRenameReferenceHandling referenceHandling;
 }

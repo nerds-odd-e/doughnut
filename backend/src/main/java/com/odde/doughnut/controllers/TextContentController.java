@@ -1,9 +1,11 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -14,6 +16,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +54,26 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateTitleDTO titleDTO)
       throws UnexpectedNoAccessRightException {
+    assertReferencedTitleRenameIsUnambiguous(note, titleDTO);
     return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()), false);
+  }
+
+  private void assertReferencedTitleRenameIsUnambiguous(Note note, NoteUpdateTitleDTO titleDTO) {
+    if (Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
+      return;
+    }
+    if (!wikiTitleCacheService.hasInboundWikiTitleCacheRowsFromNonDeletedReferrers(note.getId())) {
+      return;
+    }
+    if (titleDTO.getReferenceHandling() != null) {
+      return;
+    }
+    String message =
+        "This note is linked from other notes. Choose how wiki references should be updated"
+            + " when renaming.";
+    ApiError apiError = new ApiError(message, ApiError.ErrorType.BINDING_ERROR);
+    apiError.add("referenceHandling", message);
+    throw new ApiException(apiError);
   }
 
   @PatchMapping(path = "/{note}/content")

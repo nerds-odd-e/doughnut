@@ -138,6 +138,16 @@ public class WikiTitleCacheService {
   }
 
   /**
+   * True when at least one non-deleted note has a wiki-title cache row pointing at {@code
+   * targetNoteId}. Used to require an explicit reference-handling choice on title rename.
+   */
+  public boolean hasInboundWikiTitleCacheRowsFromNonDeletedReferrers(Integer targetNoteId) {
+    return !noteWikiTitleCacheRepository
+        .findRowsReferringToNonDeletedNotesForTarget(targetNoteId)
+        .isEmpty();
+  }
+
+  /**
    * Inbound referrers for focus-context only: same visibility as {@link #referencesNotesForViewer},
    * distinct by referrer id, excluding {@code excludeNoteIds}, capped in the database.
    */

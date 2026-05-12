@@ -410,6 +410,7 @@ export type FolderMoveRequest = {
 
 export type NoteCreationDto = {
     newTitle: string;
+    referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
     folderId?: number;
     content?: string;
 };
@@ -512,6 +513,7 @@ export type AttachBookRequestFull = {
 
 export type NotebookCreationRequest = {
     newTitle: string;
+    referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
     description?: string;
 };
 
@@ -631,6 +633,7 @@ export type UserDto = {
 
 export type NoteUpdateTitleDto = {
     newTitle: string;
+    referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
 };
 
 export type NoteUpdateContentDto = {
