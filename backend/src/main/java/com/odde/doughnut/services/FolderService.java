@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.FolderRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.index.IndexScope;
 import com.odde.doughnut.services.index.ScopedIndexNoteService;
 import java.util.Optional;
@@ -14,15 +13,11 @@ public class FolderService {
 
   private final FolderRepository folderRepository;
   private final ScopedIndexNoteService scopedIndexNoteService;
-  private final EntityPersister entityPersister;
 
   public FolderService(
-      FolderRepository folderRepository,
-      ScopedIndexNoteService scopedIndexNoteService,
-      EntityPersister entityPersister) {
+      FolderRepository folderRepository, ScopedIndexNoteService scopedIndexNoteService) {
     this.folderRepository = folderRepository;
     this.scopedIndexNoteService = scopedIndexNoteService;
-    this.entityPersister = entityPersister;
   }
 
   /**
