@@ -119,6 +119,15 @@ export function deadLinkCreateTitleFromAnchor(anchor: HTMLElement): string {
 /** Dead-link click payload containing the target token and visible display text. */
 export type DeadLinkPayload = { targetToken: string; displayText: string }
 
+/** Markdown `[[...]]` token for the clicked dead link (matches stored content for replace). */
+export function markdownWikiTokenFromDeadLinkPayload(
+  p: DeadLinkPayload
+): string {
+  const { targetToken, displayText } = p
+  if (targetToken === displayText) return `[[${targetToken}]]`
+  return `[[${targetToken}|${displayText}]]`
+}
+
 /** Extracts target token and display text from a dead-link anchor element. */
 export function deadLinkPayloadFromAnchor(
   anchor: HTMLElement

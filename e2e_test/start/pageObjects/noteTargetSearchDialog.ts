@@ -56,6 +56,18 @@ function searchNote(searchKey: string, options: string[]) {
   cy.tick(1000)
 }
 
+function clickAddLinkOnRelationshipTargetNote(toNoteTopic: string) {
+  cy.get('.search-result [role=listitem]')
+    .filter((_, el) => {
+      const a = el.querySelector(
+        '.search-result-item-title a:not(.notebook-hit-title)'
+      )
+      return a?.textContent?.trim() === toNoteTopic
+    })
+    .findByRole('button', { name: 'Add link' })
+    .click()
+}
+
 export const assumeNoteTargetSearchDialog = () => {
   return {
     enableSemanticSearch() {
@@ -123,44 +135,20 @@ export const assumeNoteTargetSearchDialog = () => {
       pageIsNotLoading()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
-      cy.get('.search-result [role=listitem]')
-        .filter((_, el) => {
-          const a = el.querySelector(
-            '.search-result-item-title a:not(.notebook-hit-title)'
-          )
-          return a?.textContent?.trim() === toNoteTopic
-        })
-        .findByRole('button', { name: 'Add link' })
-        .click()
+      clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Add a new relationship note' }).click()
       form.getField('Relation Type').clickOption(relationType)
       pageIsNotLoading()
     },
     insertWikiLinkToTarget(toNoteTopic: string) {
-      cy.get('.search-result [role=listitem]')
-        .filter((_, el) => {
-          const a = el.querySelector(
-            '.search-result-item-title a:not(.notebook-hit-title)'
-          )
-          return a?.textContent?.trim() === toNoteTopic
-        })
-        .findByRole('button', { name: 'Add link' })
-        .click()
+      clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
       pageIsNotLoading()
     },
     insertDeadLinkToTarget(toNoteTopic: string, displayText: string) {
-      cy.get('.search-result [role=listitem]')
-        .filter((_, el) => {
-          const a = el.querySelector(
-            '.search-result-item-title a:not(.notebook-hit-title)'
-          )
-          return a?.textContent?.trim() === toNoteTopic
-        })
-        .findByRole('button', { name: 'Add link' })
-        .click()
+      clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', {
-        name: new RegExp(`Link.*${displayText}.*to this note`),
+        name: `Link "${displayText}" to this note`,
       }).click()
       pageIsNotLoading()
     },

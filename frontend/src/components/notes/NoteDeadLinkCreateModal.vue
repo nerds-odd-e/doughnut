@@ -3,14 +3,14 @@
     <template #body>
       <div v-if="!showCreateForm && !linkingToExisting" class="daisy-flex daisy-flex-col daisy-gap-3">
         <p class="daisy-text-sm daisy-opacity-70">
-          Dead link: <strong>{{ modelValue }}</strong>
+          Dead link: <strong>{{ modelValue.displayText }}</strong>
         </p>
         <div class="daisy-flex daisy-flex-col daisy-gap-2">
           <button
             class="daisy-btn daisy-btn-primary"
             @click="showCreateForm = true"
           >
-            Create a new note named "{{ modelValue }}"
+            Create a new note named "{{ modelValue.displayText }}"
           </button>
           <button
             class="daisy-btn daisy-btn-secondary"
@@ -21,18 +21,18 @@
         </div>
       </div>
       <NoteNewForm
-        v-else-if="showCreateForm"
+        v-else-if="showCreateForm && modelValue !== null"
         :notebookId="notebookId"
         :initial-folder="realmLeafFolder(noteRealm)"
-        :initial-title="modelValue"
+        :initial-title="modelValue.displayText"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
       />
       <SearchForm
-        v-else-if="linkingToExisting"
+        v-else-if="linkingToExisting && modelValue !== null"
         :note="noteRealm.note"
-        :dead-link-payload="deadLinkPayload ?? undefined"
+        :dead-link-payload="modelValue"
         :modal-closer="close"
         @close-dialog="close"
       />
@@ -49,17 +49,15 @@ import NoteNewForm from "./NoteNewForm.vue"
 import SearchForm from "@/components/links/SearchForm.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
-const props = defineProps<{
+defineProps<{
   notebookId: number
   noteRealm: NoteRealm
-  modelValue: string | null
+  modelValue: DeadLinkPayload | null
   sourceNoteId: number
-  deadLinkPayload?: DeadLinkPayload | null
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: string | null]
-  closed: []
+  "update:modelValue": [value: DeadLinkPayload | null]
 }>()
 
 const linkingToExisting = ref(false)
@@ -69,6 +67,5 @@ const close = () => {
   linkingToExisting.value = false
   showCreateForm.value = false
   emit("update:modelValue", null)
-  emit("closed")
 }
 </script>

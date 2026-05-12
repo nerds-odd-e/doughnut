@@ -77,12 +77,10 @@
           />
 
           <NoteDeadLinkCreateModal
-            v-model="pendingDeadLinkTitle"
-            :dead-link-payload="pendingDeadLinkPayload"
+            v-model="pendingDeadLink"
             :notebook-id="noteRealm.notebookRealm.notebook.id"
             :note-realm="noteRealm"
             :source-note-id="noteRealm.id"
-            @closed="pendingDeadLinkPayload = null"
           />
         </template>
       </template>
@@ -124,12 +122,10 @@ const readonly = (noteRealm: NoteRealm) =>
 const isIndexTitle = (noteRealm: NoteRealm) =>
   (noteRealm.note.noteTopology.title ?? "").trim().toLowerCase() === "index"
 
-const pendingDeadLinkTitle = ref<string | null>(null)
-const pendingDeadLinkPayload = ref<DeadLinkPayload | null>(null)
+const pendingDeadLink = ref<DeadLinkPayload | null>(null)
 
 const onDeadLinkClick = (payload: DeadLinkPayload) => {
-  pendingDeadLinkTitle.value = payload.displayText
-  pendingDeadLinkPayload.value = payload
+  pendingDeadLink.value = payload
 }
 
 const asMarkdown = ref(false)
@@ -138,6 +134,7 @@ watch(
   () => props.noteId,
   () => {
     asMarkdown.value = false
+    pendingDeadLink.value = null
   }
 )
 

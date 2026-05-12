@@ -2,12 +2,28 @@ import { describe, expect, it } from "vitest"
 import {
   deadLinkCreateTitleFromAnchor,
   escapeHtmlForWikiPropertyValue,
+  markdownWikiTokenFromDeadLinkPayload,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
   wikiTitleFromInnerAndNoteId,
 } from "@/utils/wikiPropertyValueField"
 
 describe("wikiPropertyValueField utils", () => {
+  it("markdownWikiTokenFromDeadLinkPayload matches simple and piped stored tokens", () => {
+    expect(
+      markdownWikiTokenFromDeadLinkPayload({
+        targetToken: "a",
+        displayText: "a",
+      })
+    ).toBe("[[a]]")
+    expect(
+      markdownWikiTokenFromDeadLinkPayload({
+        targetToken: "Target",
+        displayText: "label",
+      })
+    ).toBe("[[Target|label]]")
+  })
+
   it("escapes HTML-sensitive characters for display pipeline", () => {
     expect(escapeHtmlForWikiPropertyValue(`a<b>"c`)).toBe("a&lt;b&gt;&quot;c")
   })

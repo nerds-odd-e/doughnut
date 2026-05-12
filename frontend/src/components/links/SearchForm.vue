@@ -36,7 +36,10 @@ import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import {
+  type DeadLinkPayload,
+  markdownWikiTokenFromDeadLinkPayload,
+} from "@/utils/wikiPropertyValueField"
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
@@ -65,16 +68,18 @@ const noteRealm = computed(() =>
 )
 const notebookId = computed(() => noteRealm.value?.notebookRealm.notebook.id)
 
+async function closeDialogThen(run: () => void | Promise<void>) {
+  emit("closeDialog")
+  await nextTick()
+  await run()
+}
+
 async function onInsertWikiLink() {
   if (!selectedSearchResult.value) return
   const linkText = buildWikiLinkText(selectedSearchResult.value, {
     notebookId: notebookId.value,
   })
-  // Close the dialog first so the editor is back in a normal DOM state
-  // before Quill's insertText / setSelection are called.
-  emit("closeDialog")
-  await nextTick()
-  insert(linkText)
+  await closeDialogThen(() => insert(linkText))
 }
 
 async function onInsertWikiLinkAsProperty() {
@@ -82,9 +87,7 @@ async function onInsertWikiLinkAsProperty() {
   const linkText = buildWikiLinkText(selectedSearchResult.value, {
     notebookId: notebookId.value,
   })
-  emit("closeDialog")
-  await nextTick()
-  insertWikiLinkAsProperty(linkText)
+  await closeDialogThen(() => insertWikiLinkAsProperty(linkText))
 }
 
 async function onLinkDeadLinkToNote() {
@@ -93,19 +96,15 @@ async function onLinkDeadLinkToNote() {
     notebookId: notebookId.value,
     displayText: deadLinkPayload.displayText,
   })
-  const { targetToken, displayText } = deadLinkPayload
-  const originalToken =
-    targetToken === displayText
-      ? `[[${targetToken}]]`
-      : `[[${targetToken}|${displayText}]]`
+  const originalToken = markdownWikiTokenFromDeadLinkPayload(deadLinkPayload)
   const currentContent =
     storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
   const newContent = currentContent.replace(originalToken, newLinkText)
-  emit("closeDialog")
-  await nextTick()
-  await storageAccessor.value
-    .storedApi()
-    .updateTextField(note.id, "edit content", newContent)
+  await closeDialogThen(() =>
+    storageAccessor.value
+      .storedApi()
+      .updateTextField(note.id, "edit content", newContent)
+  )
 }
 
 async function moveUnderFolder(targetFolderId: number) {
