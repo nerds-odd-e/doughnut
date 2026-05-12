@@ -7,10 +7,10 @@
 ## Guiding principles for these sub-phases
 
 - **Stop-safe:** after any sub-phase, the app remains shippable. Existing note editing, folder listing, and notebook navigation do not regress.
-- **Behavior first:** favor user-visible slices (editable notebook index, folder page, search filtering) over broad backend restructuring.
-- **One source of truth:** scoped defaults live in index-note frontmatter. Persisted `index_note_id` fields are pointers/caches, not duplicate config blobs.
-- **JPA for pointers in code:** map notebook/folder index pointers with entity associations (for example `Notebook` / `Folder` to `Note`) and exercise them through normal persistence and test fixtures (e.g. builders that set the association). Avoid ad-hoc `UPDATE … SET index_note_id` in application or test code; reserve SQL for Flyway migrations and documented one-off maintenance.
-- **One editor pipeline:** notebook page, folder page, and `/d/n/:noteId` use the same Markdown/frontmatter save path wherever practical.
+- **Behavior first:** favor user-visible slices (editable notebook index, folder page, direct container saves) over broad backend restructuring.
+- **One source of truth from 10.14 onward:** scoped defaults live in notebook/folder `indexContent` frontmatter. Earlier `index_note_id` work is migration input, not the final target.
+- **JPA for historical pointers in code:** for completed 10.1–10.13 work, map notebook/folder index pointers with entity associations (for example `Notebook` / `Folder` to `Note`) and exercise them through normal persistence and test fixtures. From 10.14 onward, avoid adding new pointer behavior except migration/cleanup.
+- **One editor pipeline:** notebook page, folder page, and `/d/n/:noteId` use compatible Markdown/frontmatter editing behavior wherever practical, but notebook/folder index saves target container `indexContent`.
 - **Route owns mode:** pages are either a container page (notebook or folder) or a note page. There is no "active folder + active note" product state.
 - **Tests by capability:** name tests/features after behaviors (index editing, folder navigation, search), not sub-phase numbers.
 
@@ -18,7 +18,7 @@
 
 ## Central design decisions
 
-### Scoped index identity
+### Historical scoped index identity through 10.13
 
 Notebook and folder index notes are ordinary notes titled `index` by convention. The product resolves hot reads by cached pointer:
 
@@ -31,16 +31,18 @@ Title-based lookup remains useful for backfill, import, repair, and compatibilit
 
 In backend Java and tests, treat these pointers as JPA associations to `Note` (not as columns you set only via raw SQL).
 
-### Frontmatter carries scoped configuration
+From 10.14 onward, this is no longer the target architecture. The pointers and legacy index notes are migration inputs to populate notebook/folder `indexContent`, then cleanup removes the normal read/write dependency on designated index notes.
 
-The first index-only predefined properties are:
+### Container index content carries scoped configuration from 10.14 onward
+
+The first predefined properties are:
 
 ```yaml
 title_pattern: "{{date}}"
 question_generation_instruction: "Focus on definitions; avoid trick wording."
 ```
 
-These are visible/editable only for designated index notes: notebook page, folder page, and the index note's own `/d/n/:noteId` page.
+These are visible/editable on notebook and folder index editors and are serialized into the container's `indexContent` frontmatter. Normal notes, including migrated `index_to_be_deleted` notes, do not get these predefined rows.
 
 ### Likely implementation touchpoints
 
@@ -296,38 +298,117 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 - Backend service/controller test proving the resolved instruction is included in the generation request.
 - Existing AI/question generation tests stay green.
 
-### 10.14 — Behavior: folder index notes are excluded from default search
+### Direction change from 10.14 onward
 
-**Why now:** After folder index pointers exist, search can apply the full Phase 10 exclusion rule.
+Phases 10.1 through 10.13 shipped the index-note model far enough to prove editable notebook/folder configuration, scoped title patterns, and scoped question-generation instructions. From 10.14 onward, stop extending that model: the canonical index content moves onto the container itself:
 
-**Pre-condition:** Notebook contains a folder with a designated index note and normal notes.
+```text
+notebook.indexContent
+folder.indexContent
+```
 
-**Trigger:** User runs default search for text present in the folder index and normal notes.
+The previous note titled `index` becomes legacy migration input only. After migration, notes may not be named `index`; migrated legacy index notes are renamed to `index_to_be_deleted` so they are visible for manual review but no longer participate in scoped configuration.
 
-**Post-condition:** Folder index note is omitted; normal notes still appear.
+### 10.14 — Behavior: migrate index note content onto notebooks and folders
+
+**Why now:** This preserves user-authored index text and frontmatter before removing the index-note save path.
+
+**Pre-condition:** A notebook or folder may have a designated legacy index note created by earlier Phase 10 work.
+
+**Trigger:** The database migration runs during deployment.
+
+**Post-condition:** The notebook/folder row stores the former index note Markdown/frontmatter in `indexContent`; the former index note is renamed to `index_to_be_deleted`; notebook and folder page read APIs return the same visible index content as before, now from the container field.
 
 **Scope:**
-- Extend default search exclusion from notebook index ids to folder index ids.
-- Ensure the rule is based on pointers, not title `index` alone, so ordinary non-designated notes are not accidentally hidden.
+- Add nullable `indexContent` storage to notebooks and folders using the repo's normal naming conventions for DB columns, entity fields, DTOs, and generated API types.
+- Flyway migration: copy the current designated index note content into the owning notebook/folder, then rename those notes to `index_to_be_deleted`.
+- Preserve ambiguity handling explicitly: if a legacy pointer or title lookup is ambiguous, do not guess; leave enough diagnostic signal for manual cleanup.
+- Update notebook/folder page backend reads so the page payload exposes container `indexContent` and no longer requires a note id to display the index editor.
+- Regenerate the frontend API client in this phase if DTO signatures change.
 
 **Tests:**
-- Backend search test for folder index exclusion.
-- Existing notebook-index exclusion test from 10.3 stays green.
+- Migration test or repository-level verification proving notebook and folder legacy index content is copied and legacy notes are renamed.
+- Backend page/API test: notebook and folder pages expose `indexContent` after migration without resolving an index note page.
+- Existing 10.12 and 10.13 behavior tests stay green until the next phase moves scoped configuration reads.
 
-### 10.15 — Cleanup and Phase 10 closeout
+### 10.15 — Behavior: scoped configuration resolves from container `indexContent`
 
-**Why last:** Cleanup is meaningful only after all user-facing Phase 10 behaviors are present.
+**Why now:** `title_pattern` and `question_generation_instruction` already shipped; they must keep working after index notes stop being canonical.
+
+**Pre-condition:** Notebook and folder `indexContent` frontmatter contains scoped configuration.
+
+**Trigger:** User creates a note in that scope or invokes question generation for a note in that scope.
+
+**Post-condition:** The nearest folder/notebook `indexContent` frontmatter supplies the scoped title pattern and question-generation instruction. A legacy `index_to_be_deleted` note has no special behavior.
 
 **Scope:**
-- Remove interim title-lookup code paths that are no longer needed for normal reads; keep only import/repair/backfill paths.
-- Audit navigation state so container page vs note page is consistent across notebook, folder, and note routes.
+- Replace normal scoped-config reads from index note lookup/pointers with parsing of notebook/folder `indexContent`.
+- Keep inheritance behavior from 10.12/10.13: folder → parent folders → notebook.
+- Remove index-note-specific editor affordances from normal note pages; scoped fields belong to notebook/folder pages through `indexContent`.
+- Keep any temporary fallback only if needed for a safe rollout window, and schedule its removal in 10.18.
+
+**Tests:**
+- Existing `title_pattern` tests rewritten so setup stores frontmatter on notebook/folder `indexContent`, not on index notes.
+- Existing question-generation instruction tests rewritten the same way.
+- Regression test: a note renamed `index_to_be_deleted` does not affect scoped configuration.
+
+### 10.16 — Behavior: notebook and folder index editors save directly to `indexContent`
+
+**Why now:** Once reads and scoped configuration use container content, the save path can become the simpler product model.
+
+**Pre-condition:** User opens a notebook page or folder page.
+
+**Trigger:** User edits the index editor and saves.
+
+**Post-condition:** The save updates the notebook/folder `indexContent` field directly. No note titled `index` is created, updated, renamed, moved, or selected as part of saving container index content.
+
+**Scope:**
+- Replace notebook/folder index save calls that create or update notes with focused notebook/folder index-content update APIs or existing container update APIs if they fit cleanly.
+- Simplify frontend state: the editor needs container id + content, not `indexNoteId`, note route state, or lazy note creation logic.
+- Update save conflict/error handling to match the chosen container update contract.
+- Update E2E coverage for notebook and folder index editing so it asserts the final behavior: edit, save, reload, content remains, and no `index` note is produced as a user-visible artifact.
+
+**Tests:**
+- Backend API tests for notebook and folder `indexContent` update.
+- Frontend component/page tests for notebook and folder save flows without `indexNoteId`.
+- Targeted E2E feature update for notebook/folder index editing.
+
+### 10.17 — Behavior: `index` is a reserved note title
+
+**Why now:** After migration and direct container saves, users should not be able to recreate the old index-note convention accidentally.
+
+**Pre-condition:** User creates a note, renames a note, imports a note, or otherwise submits a note title.
+
+**Trigger:** The submitted title is exactly `index` using the product's normal title normalization rules.
+
+**Post-condition:** The operation is rejected with a clear validation message; existing migrated `index_to_be_deleted` notes remain editable under that non-reserved title.
+
+**Scope:**
+- Enforce the reserved title in backend note creation and title update paths, including APIs used by sidebar creation and editor title saves.
+- Decide and document whether matching is case-insensitive; prefer case-insensitive if title uniqueness/search already normalizes by lower-case.
+- Surface the validation error in the frontend create/rename flows without leaving optimistic UI state behind.
+- Include import/bulk paths if they share note creation; otherwise document them as a follow-up before closeout.
+
+**Tests:**
+- Backend controller/service tests for create and rename rejection.
+- Frontend tests for visible create/rename error handling.
+- E2E update if the current note creation feature already covers validation errors; otherwise keep this covered by backend/frontend tests.
+
+### 10.18 — Structure: remove remaining index-note infrastructure and close Phase 10
+
+**Why last:** This cleanup is only safe after data is migrated, reads use `indexContent`, saves no longer create notes, and `index` is reserved.
+
+**Scope:**
+- Remove normal-read usage of `notebook.index_note_id`, `folder.index_note_id`, scoped index note services, reconciliation hooks, and search exclusions that only existed for designated index notes.
+- Drop or deprecate index pointer columns in the safest migration style for the project; if immediate dropping is too risky, mark the follow-up explicitly in the parent plan.
+- Remove frontend state and generated API fields that only supported index-note ids.
 - Update `ongoing/doughnut_wiki_migration_plan.md` Phase 10 status when complete.
-- Add implementation notes for any deferred follow-up, such as "include index notes" search toggle or richer template syntax.
+- Record any remaining operational cleanup for `index_to_be_deleted` notes, such as a later user-facing delete/archive task.
 
 **Tests:**
-- Targeted backend test set for notebook/folder index services and search.
-- Targeted frontend/page tests for notebook page, folder page, breadcrumbs, sidebar.
-- Targeted E2E features touched by the phase.
+- Targeted backend tests for notebook/folder `indexContent` reads, writes, scoped config, and reserved-title validation.
+- Targeted frontend/page tests for notebook page, folder page, breadcrumbs, sidebar, and direct saves.
+- Targeted E2E features touched by the migration and save-flow changes.
 
 ---
 
@@ -348,8 +429,11 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 | Index-only predefined properties | 10.11 |
 | `title_pattern` applies to note creation | 10.12 |
 | `question_generation_instruction` applies to question generation | 10.13 |
-| Default search excludes folder index | 10.14 |
-| Interim cleanup and plan refresh | 10.15 |
+| Legacy index note content migrates to notebook/folder `indexContent` | 10.14 |
+| Scoped configuration reads from container `indexContent` | 10.15 |
+| Notebook/folder index editors save directly to container `indexContent` | 10.16 |
+| `index` is a reserved note title | 10.17 |
+| Index-note infrastructure cleanup and plan refresh | 10.18 |
 
 ## Stop-safety check per sub-phase
 
@@ -368,8 +452,11 @@ Numbering is **10.N** and is plan-only bookkeeping. Commit messages, tests, rout
 | 10.11 | Index-only properties are visible and saved consistently |
 | 10.12 | Scoped title pattern affects new note titles |
 | 10.13 | Scoped question instruction affects question generation |
-| 10.14 | Default search excludes all designated index notes |
-| 10.15 | Interim code and planning notes are cleaned up |
+| 10.14 | Existing index text is preserved on notebooks/folders; legacy notes are renamed |
+| 10.15 | Scoped title and question config work without canonical index notes |
+| 10.16 | Notebook/folder index saves update container content directly |
+| 10.17 | Users cannot create or rename notes to `index` |
+| 10.18 | Index-note-specific infrastructure and planning notes are cleaned up |
 
 ## Commit checklist per sub-phase
 

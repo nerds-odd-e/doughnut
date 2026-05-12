@@ -25,7 +25,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 7 — Remove note parent | Done |
 | 8 — Move / dissolve folder (organize) | Done |
 | 9 — Wiki-link parser and link index | Not started |
-| 10 — Index-scoped configuration (notebook + folder) | Not started |
+| 10 — Index-scoped configuration (notebook + folder) | In progress — 10.13 done; 10.14+ replanned around container `indexContent` |
 | 11 — Remove legacy assumptions | Not started |
 | 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
@@ -39,7 +39,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 **Folder** = structural containment. **`note.parent_id`** is removed (Phase 7); folder alignment and motion use folder placement and `NoteChildContainerFolderService` / `NoteMotionService` where applicable (see codebase).
 
-**Index note** — Optional **`index`** note (title case-insensitive for discovery/import) per **notebook root** (`folderId` absent) and per **folder**; **`notebook.index_note_id`** and **`folder.index_note_id`** cache the note id for hot reads and **default search exclusion**. Scoped defaults (e.g. title pattern, question-generation instruction) live in **index frontmatter**; **lazy create**: notebook/folder page shows the editor and creates the note on first persist. Notebook has **`name`** and **`description`**; no `headNote` on APIs. In backend code and tests, prefer **JPA associations** to the index `Note` over raw SQL updates to those pointer columns (migrations remain Flyway/SQL). See north star for folder page routing vs note routes.
+**Container index content** — After Phase **10.14+**, notebook root and folders store landing-page Markdown plus scoped configuration frontmatter directly on **`notebook.indexContent`** and **`folder.indexContent`**. Earlier Phase 10 sub-phases used ordinary notes titled **`index`** plus **`index_note_id`** pointers; the remaining Phase 10 work migrates that content onto containers, renames legacy index notes to **`index_to_be_deleted`**, reserves **`index`** as a note title, and removes index-note pointer infrastructure. Notebook has **`name`** and **`description`**; no `headNote` on APIs. See north star for folder page routing vs note routes.
 
 **Properties** — Leading YAML in Markdown `content`; rich editor mirrors via frontmatter UI.
 
@@ -178,27 +178,29 @@ Parse links, show outgoing + backlinks, preserve unresolved, unify graph with wi
 
 # Phase 10 — Index-scoped configuration (notebook root + folders)
 
+**Status:** In progress — sub-phases **10.1 through 10.13** are done. Remaining work is redirected in `ongoing/doughnut_wiki_migration_plan-phase-10-sub-phases.md` so index content lives on notebooks/folders instead of canonical index notes.
+
 ## Goal
 
-**Notebook root** and each **folder** have an optional **index** note whose **Markdown body and YAML frontmatter** are the portable source of truth for **landing page content** and **scoped behavior**. Persisted **`notebook.index_note_id`** and **`folder.index_note_id`** (nullable FKs to `note`) speed up reads and define **which note is “the index”** for search filtering and invariants.
+**Notebook root** and each **folder** have optional **`indexContent`** whose **Markdown body and YAML frontmatter** are the portable source of truth for **landing page content** and **scoped behavior**.
 
 ## Model
 
-- **Index note** — Ordinary note; notebook index at **root** (`folderId` null); folder index with **`folderId`** = that folder; reserved title **`index`** (case-insensitive for backfill/import); **at most one** index note per scope.
-- **Pointers** — Keep **`index_note_id`** in sync on create, delete, move, and title change; referenced note must match **notebook** and **folder scope**.
-- **Java and tests** — Prefer JPA-mapped associations for those pointers (set the linked `Note` on `Notebook` / `Folder`, or equivalent repository/service APIs) rather than raw SQL against `index_note_id`. Schema and one-time data fixes stay in Flyway migrations.
+- **Container content** — Notebook and folder rows own nullable **`indexContent`** Markdown. Leading YAML frontmatter on that content carries scoped defaults.
+- **Legacy migration** — Existing index notes from 10.1–10.13 are migration input only: copy their content to the owning notebook/folder `indexContent`, then rename the notes to **`index_to_be_deleted`**.
+- **Reserved title** — After migration, **`index`** is a reserved note title; create/rename paths reject it so the old convention cannot reappear.
 - **No synthetic root folder** — Notebook root remains **`folderId` null**; no hidden folder row that holds all notes.
-- **Config location** — Scoped defaults live in **index frontmatter**, not a separate **`folder.config`** / duplicate blob (see Phase 11 target shape).
+- **Config location** — Scoped defaults live in **container `indexContent` frontmatter**, not a separate **`folder.config`** / duplicate blob (see Phase 11 target shape).
 
 ## Product (UI / UX)
 
 - **Notebook page** and **folder page** embed the **same** markdown + frontmatter editing pipeline as note show where practical (layout polish can follow).
-- **Empty index** — Still show the editor; **first save** creates the index note and sets **`index_note_id`**.
+- **Empty index content** — Still show the editor; **first save** updates notebook/folder **`indexContent`** directly.
 - **Folder page** — First-class route; sidebar entry navigates to the folder page and uses **container vs note** routing (not **active folder + active note** simultaneously).
 - **Breadcrumbs** — Folder segments in the breadcrumb link to the corresponding **folder page** (consistent with sidebar navigation).
 - **Sidebar** — With a folder page open, the tree **auto-scrolls** so the active folder is visible in the sidebar.
-- **Predefined properties** — Product-defined keys (e.g. **note title pattern**, **question generation instruction**) appear **only** on index notes on notebook page, folder page, and when viewing the index at **`/d/n/:noteId`**.
-- **Search** — Exclude notes pointed to by **`notebook.index_note_id`** or **`folder.index_note_id`** from default search (optional later: opt-in).
+- **Predefined properties** — Product-defined keys (e.g. **note title pattern**, **question generation instruction**) appear in notebook/folder index editors, not on normal notes.
+- **Search** — No search exclusion is needed for container index content because it is not a note.
 
 ## Examples (illustrative frontmatter)
 
@@ -226,18 +228,18 @@ title_pattern: "{{source}} vs {{target}}"
 defaultExportBasenamePattern: "{{source}}-vs-{{target}}"
 ```
 
-**Inheritance** — Folder → parent folders → notebook index can be defined in implementation so defaults compose predictably.
+**Inheritance** — Folder `indexContent` → parent folder `indexContent` → notebook `indexContent` can be defined in implementation so defaults compose predictably.
 
 ## Distinction
 
 ```text
-stable config = long-term product behavior (index frontmatter + notebook row settings as needed)
+stable config = long-term product behavior (container indexContent frontmatter + notebook row settings as needed)
 migration config = temporary transformation rules
 ```
 
 ## Expected result
 
-Cached index pointers; notebook and folder landing pages with lazy index creation; index-only predefined properties; scoped defaults and instructions in frontmatter; default search excludes designated index notes; no parallel **`folder.config`** column for the same data.
+Notebook and folder landing pages save directly to container `indexContent`; index-only predefined properties are available in those container editors; scoped defaults and instructions come from `indexContent` frontmatter; legacy index notes are migrated to `index_to_be_deleted`; **`index`** is reserved as a note title; no parallel **`folder.config`** column for the same data.
 
 ---
 
@@ -259,10 +261,10 @@ slug columns and path-primary routes as canonical identity (already removed at b
 ## Target shape (aligns north star)
 
 ```text
-Notebook — id, name, description?, config, indexNoteId?, …
-Folder — id, notebookId, parentFolderId?, name (unique among siblings), indexNoteId?, …
+Notebook — id, name, description?, config, indexContent?, …
+Folder — id, notebookId, parentFolderId?, name (unique among siblings), indexContent?, …
 Note — id, notebookId, folderId?, title, Markdown content (+ frontmatter)
-(no parentNoteId, no note.slug column; scoped defaults on index notes, not a duplicate Folder.config blob)
+(no parentNoteId, no note.slug column; scoped defaults on notebook/folder indexContent, not a duplicate Folder.config blob)
 LinkIndex — derived from content
 ```
 
@@ -313,7 +315,7 @@ Renaming a note does not strand stale wiki tokens or cache rows in common cases;
 7. Remove note parent
 8. Move / dissolve folder
 9. Wiki-link parser + indexes
-10. Index-scoped config (notebook + folder)
+10. Index-scoped config (notebook + folder indexContent)
 11. Legacy cleanup
 12. Title rename propagates wiki references (deferred from Phase 5.25)
 ```
@@ -329,7 +331,7 @@ folders + (historical slugs until boundary)
           → drop structural note parent (done)
             → folder move / dissolve (done)
               → wiki links + indexes
-                → index-scoped config (notebook + folder)
+                → index-scoped config (notebook + folder indexContent)
                   → legacy cleanup
                     → title rename propagates wiki references
 ```
