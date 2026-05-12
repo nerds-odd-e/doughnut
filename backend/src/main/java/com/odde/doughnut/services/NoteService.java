@@ -70,17 +70,6 @@ public class NoteService {
   }
 
   /**
-   * Notes in the same structural scope as {@code note}: its folder, or notebook root when no
-   * folder.
-   */
-  public List<Note> findStructuralPeerNotesInOrder(Note note) {
-    if (note.getFolder() != null) {
-      return findNotesInFolderScope(note.getFolder().getId());
-    }
-    return findNotebookRootNotes(note.getNotebook().getId());
-  }
-
-  /**
    * Structural peers (same folder, or notebook root when {@code anchor} has no folder), excluding
    * the anchor, optional focus note, and {@code excludeNoteIds}, capped at {@code cap} rows from
    * the database. Without a sample seed, peers are ordered by id ascending; with a seed, order is

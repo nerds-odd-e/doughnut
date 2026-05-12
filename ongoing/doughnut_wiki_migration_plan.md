@@ -5,6 +5,7 @@
 - **Phase 5.24 (drop `note.target_note_id` — optional detail):** `ongoing/doughnut_wiki_migration_plan-phase-5.24-sub-phases.md`
 - **Phase 6 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-6-sub-phases.md` (complete)
 - **Phase 7 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-7-sub-phases.md`
+- **Phase 9 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-9-sub-phases.md`
 - **Phase 10 breakdown:** `ongoing/doughnut_wiki_migration_plan-phase-10-sub-phases.md`
 
 ## Purpose
@@ -137,19 +138,20 @@ Tree and listings reflect new parents after move; after dissolve, notes and prom
 
 # Phase 9 — Wiki-link parser and link index
 
+**Scope note:** Current Phase 9 planning is narrowed to display text only; folder-qualified paths are deferred.
+
 ## Goal
 
-First-class `[[wiki links]]` in content; derived indexes for outgoing/backlinks.
+First-class display text in `[[wiki links]]` in content and rich mode.
 
 ## Syntax (authoring)
 
 ```markdown
 [[note title]]
 [[note title|display text]]
-[[folder/name/…/segment/note title|display text]]
 ```
 
-Path segments = **nested folder sibling names** (`Folder.name`), not resurrected slug columns.
+No folder path syntax in this slice. Existing notebook-qualified title syntax may continue where already supported, but the new work is only the `|display text` part.
 
 ## Indexes (conceptual)
 
@@ -163,16 +165,14 @@ Rule: **index is derived; note content is source of truth.**
 ## Resolution (authoring-time)
 
 1. Exact **title** in notebook scope when unambiguous  
-2. **Folder-qualified path** by `Folder.name` chain + note title in that folder  
-3. **Relative** from source note’s folder  
-4. **Unique shorthand title** when one match among accessible notes  
-5. **Unresolved** — preserve token  
+2. Unique shorthand title when one match among accessible notes  
+3. Unresolved — preserve token and display text  
 
 Do **not** treat persisted slug/path on rows as authoritative (none after boundary).
 
 ## Expected result
 
-Parse links, show outgoing + backlinks, preserve unresolved, unify graph with wiki semantics.
+Parse `[[note title|display text]]`, show display text in rich mode, preserve unresolved tokens, and allow a dead-link token to be linked to an existing note while retaining the original wiki text as display text.
 
 ---
 
