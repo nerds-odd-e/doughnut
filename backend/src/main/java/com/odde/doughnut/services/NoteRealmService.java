@@ -9,8 +9,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.index.IndexScope;
-import com.odde.doughnut.services.index.ScopedIndexNoteService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,17 +28,14 @@ public class NoteRealmService {
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
   private final NotebookCatalogService notebookCatalogService;
-  private final ScopedIndexNoteService scopedIndexNoteService;
 
   public NoteRealmService(
       WikiTitleCacheService wikiTitleCacheService,
       NoteRepository noteRepository,
-      NotebookCatalogService notebookCatalogService,
-      ScopedIndexNoteService scopedIndexNoteService) {
+      NotebookCatalogService notebookCatalogService) {
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteRepository = noteRepository;
     this.notebookCatalogService = notebookCatalogService;
-    this.scopedIndexNoteService = scopedIndexNoteService;
   }
 
   public NoteRealm build(Note note, User viewer) {
@@ -65,10 +60,8 @@ public class NoteRealmService {
   }
 
   /**
-   * Nearest non-blank {@code question_generation_instruction} from designated index notes: inner
-   * folder → parent folders → notebook root. The {@code focus} note must already carry notebook and
-   * folder associations (e.g. from {@link
-   * NoteRepository#hydrateNonDeletedNotesWithNotebookAndFolderByIds}).
+   * Nearest non-blank {@code question_generation_instruction} from container {@code indexContent}:
+   * inner folder → parent folders → notebook root.
    */
   public Optional<String> resolveScopedQuestionGenerationInstruction(Note focus) {
     if (focus.getNotebook() == null) {
@@ -76,19 +69,13 @@ public class NoteRealmService {
     }
     List<Folder> outerToInner = FolderTrailSegments.fromRootToContainingFolder(focus);
     for (int i = outerToInner.size() - 1; i >= 0; i--) {
-      Optional<Note> designated =
-          scopedIndexNoteService.findDesignatedIndexNote(
-              new IndexScope.FolderIndex(outerToInner.get(i)));
-      if (designated.isPresent()) {
-        Optional<String> instruction = questionGenerationInstructionFromIndexNote(designated.get());
-        if (instruction.isPresent()) {
-          return instruction;
-        }
+      Optional<String> instruction =
+          questionGenerationInstructionFromContent(outerToInner.get(i).getIndexContent());
+      if (instruction.isPresent()) {
+        return instruction;
       }
     }
-    return scopedIndexNoteService
-        .findDesignatedIndexNote(new IndexScope.NotebookRoot(focus.getNotebook()))
-        .flatMap(this::questionGenerationInstructionFromIndexNote);
+    return questionGenerationInstructionFromContent(focus.getNotebook().getIndexContent());
   }
 
   private String resolveIndexNoteContentForNote(Note focus) {
@@ -101,22 +88,16 @@ public class NoteRealmService {
 
   private String resolveIndexNoteContent(List<Folder> outerToInner, Notebook notebook) {
     for (int i = outerToInner.size() - 1; i >= 0; i--) {
-      Optional<Note> designated =
-          scopedIndexNoteService.findDesignatedIndexNote(
-              new IndexScope.FolderIndex(outerToInner.get(i)));
-      if (designated.isPresent() && hasNonBlankTitlePattern(designated.get())) {
-        return designated.get().getContent();
+      String content = outerToInner.get(i).getIndexContent();
+      if (hasNonBlankTitlePatternInContent(content)) {
+        return content;
       }
     }
-    return scopedIndexNoteService
-        .findDesignatedIndexNote(new IndexScope.NotebookRoot(notebook))
-        .filter(this::hasNonBlankTitlePattern)
-        .map(Note::getContent)
-        .orElse(null);
+    String nbContent = notebook.getIndexContent();
+    return hasNonBlankTitlePatternInContent(nbContent) ? nbContent : null;
   }
 
-  private boolean hasNonBlankTitlePattern(Note indexNote) {
-    String content = indexNote.getContent();
+  private boolean hasNonBlankTitlePatternInContent(String content) {
     if (content == null || content.isBlank()) {
       return false;
     }
@@ -135,8 +116,7 @@ public class NoteRealmService {
     return false;
   }
 
-  private Optional<String> questionGenerationInstructionFromIndexNote(Note indexNote) {
-    String content = indexNote.getContent();
+  private Optional<String> questionGenerationInstructionFromContent(String content) {
     if (content == null || content.isBlank()) {
       return Optional.empty();
     }

@@ -335,7 +335,7 @@ The previous note titled `index` becomes legacy migration input only. After migr
 - `TextContentControllerTests.ContainerIndexContentMirrorBridge`: mirrors to notebook `indexContent` when note is designated, does not mirror for non-designated notes, mirrors to folder `indexContent` when note is designated folder index.
 - Existing 10.12 and 10.13 behavior tests stay green until 10.15 moves scoped configuration reads.
 
-### 10.15 — Behavior: scoped configuration resolves from container `indexContent`
+### 10.15 — Behavior: scoped configuration resolves from container `indexContent` ✅
 
 **Why now:** `title_pattern` and `question_generation_instruction` already shipped; they must keep working after index notes stop being canonical.
 
@@ -457,7 +457,7 @@ The previous note titled `index` becomes legacy migration input only. After migr
 | 10.12 | Scoped title pattern affects new note titles |
 | 10.13 | Scoped question instruction affects question generation |
 | 10.14 | Existing index text is preserved on notebooks/folders; legacy notes are renamed |
-| 10.15 | Scoped title and question config work without canonical index notes |
+| 10.15 ✅ | Scoped title and question config work without canonical index notes |
 | 10.16 | Notebook/folder index saves update container content directly |
 | 10.17 | Users cannot create or rename notes to `index` |
 | 10.18 | Index-note-specific infrastructure and planning notes are cleaned up |

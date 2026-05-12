@@ -259,24 +259,17 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void index_note_content_from_notebook_index_when_note_at_root_and_index_has_title_pattern() {
+  void index_note_content_from_notebook_index_content_when_note_at_root_and_has_title_pattern() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note index =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\ntitle_pattern: \"{{date}}\"\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(index).please();
+    String indexContent = "---\ntitle_pattern: \"{{date}}\"\n---\n";
+    makeMe.theNotebook(nb).indexContent(indexContent).please();
     Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(index.getContent()));
+    assertThat(realm.getIndexNoteContent(), equalTo(indexContent));
   }
 
   @Test
@@ -284,64 +277,34 @@ class NoteRealmServiceTest {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note index =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\ntitlePattern: \"{{date}}\"\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(index).please();
+    String indexContent = "---\ntitlePattern: \"{{date}}\"\n---\n";
+    makeMe.theNotebook(nb).indexContent(indexContent).please();
     Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(index.getContent()));
+    assertThat(realm.getIndexNoteContent(), equalTo(indexContent));
   }
 
   @Test
-  void index_note_content_prefers_inner_folder_index_title_pattern() {
+  void index_note_content_prefers_inner_folder_index_content_title_pattern() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note nbIndex =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\ntitle_pattern: \"nb\"\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(nbIndex).please();
+    makeMe.theNotebook(nb).indexContent("---\ntitle_pattern: \"nb\"\n---\n").please();
 
     Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-    Note outerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(outer)
-            .title("index")
-            .content("---\ntitle_pattern: \"outer\"\n---\n")
-            .please();
-    makeMe.theFolder(outer).indexNote(outerIdx).please();
+    makeMe.theFolder(outer).indexContent("---\ntitle_pattern: \"outer\"\n---\n").please();
 
     Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
-    Note innerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(inner)
-            .title("index")
-            .content("---\ntitle_pattern: \"inner\"\n---\n")
-            .please();
-    makeMe.theFolder(inner).indexNote(innerIdx).please();
+    String innerContent = "---\ntitle_pattern: \"inner\"\n---\n";
+    makeMe.theFolder(inner).indexContent(innerContent).please();
 
     Note inInner = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
 
     NoteRealm realm = noteRealmService.build(inInner, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(innerIdx.getContent()));
+    assertThat(realm.getIndexNoteContent(), equalTo(innerContent));
   }
 
   @Test
@@ -351,65 +314,35 @@ class NoteRealmServiceTest {
     Notebook nb = root.getNotebook();
 
     Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-    Note outerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(outer)
-            .title("index")
-            .content("---\ntitle_pattern: \"outer\"\n---\n")
-            .please();
-    makeMe.theFolder(outer).indexNote(outerIdx).please();
+    String outerContent = "---\ntitle_pattern: \"outer\"\n---\n";
+    makeMe.theFolder(outer).indexContent(outerContent).please();
 
     Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
-    Note innerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(inner)
-            .title("index")
-            .content("---\nother: x\n---\n")
-            .please();
-    makeMe.theFolder(inner).indexNote(innerIdx).please();
+    makeMe.theFolder(inner).indexContent("---\nother: x\n---\n").please();
 
     Note inInner = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
 
     NoteRealm realm = noteRealmService.build(inInner, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(outerIdx.getContent()));
+    assertThat(realm.getIndexNoteContent(), equalTo(outerContent));
   }
 
   @Test
-  void index_note_content_from_notebook_when_folder_index_has_no_title_pattern() {
+  void index_note_content_from_notebook_when_folder_index_content_has_no_title_pattern() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note nbIndex =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\ntitle_pattern: \"nb\"\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(nbIndex).please();
+    String nbContent = "---\ntitle_pattern: \"nb\"\n---\n";
+    makeMe.theNotebook(nb).indexContent(nbContent).please();
 
     Folder folder = makeMe.aFolder().notebook(nb).please();
-    Note folderIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(folder)
-            .title("index")
-            .content("---\n---\n")
-            .please();
-    makeMe.theFolder(folder).indexNote(folderIdx).please();
+    makeMe.theFolder(folder).indexContent("---\n---\n").please();
 
     Note inFolder = makeMe.aNote().creatorAndOwner(user).folder(folder).please();
 
     NoteRealm realm = noteRealmService.build(inFolder, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(nbIndex.getContent()));
+    assertThat(realm.getIndexNoteContent(), equalTo(nbContent));
   }
 
   @Test
@@ -424,19 +357,33 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void scoped_question_instruction_from_notebook_index_for_note_at_root() {
+  void index_to_be_deleted_note_does_not_affect_scoped_title_pattern() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note index =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\nquestion_generation_instruction: Focus on definitions\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(index).please();
+    makeMe
+        .aNote()
+        .creatorAndOwner(user)
+        .inNotebook(nb)
+        .title("index_to_be_deleted")
+        .content("---\ntitle_pattern: \"{{date}}\"\n---\n")
+        .please();
+    Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+    NoteRealm realm = noteRealmService.build(normal, user);
+
+    assertThat(realm.getIndexNoteContent(), nullValue());
+  }
+
+  @Test
+  void scoped_question_instruction_from_notebook_index_content_for_note_at_root() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+    makeMe
+        .theNotebook(nb)
+        .indexContent("---\nquestion_generation_instruction: Focus on definitions\n---\n")
+        .please();
     Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
     assertThat(
@@ -449,15 +396,10 @@ class NoteRealmServiceTest {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note index =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\nquestionGenerationInstruction: Legacy key text\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(index).please();
+    makeMe
+        .theNotebook(nb)
+        .indexContent("---\nquestionGenerationInstruction: Legacy key text\n---\n")
+        .please();
     Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
     assertThat(
@@ -466,41 +408,23 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void scoped_question_instruction_prefers_inner_folder_index() {
+  void scoped_question_instruction_prefers_inner_folder_index_content() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
     Notebook nb = root.getNotebook();
-    Note nbIndex =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .inNotebook(nb)
-            .title("index")
-            .content("---\nquestion_generation_instruction: nb\n---\n")
-            .please();
-    makeMe.theNotebook(nb).indexNote(nbIndex).please();
+    makeMe.theNotebook(nb).indexContent("---\nquestion_generation_instruction: nb\n---\n").please();
 
     Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-    Note outerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(outer)
-            .title("index")
-            .content("---\nquestion_generation_instruction: outer\n---\n")
-            .please();
-    makeMe.theFolder(outer).indexNote(outerIdx).please();
+    makeMe
+        .theFolder(outer)
+        .indexContent("---\nquestion_generation_instruction: outer\n---\n")
+        .please();
 
     Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
-    Note innerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(inner)
-            .title("index")
-            .content("---\nquestion_generation_instruction: inner\n---\n")
-            .please();
-    makeMe.theFolder(inner).indexNote(innerIdx).please();
+    makeMe
+        .theFolder(inner)
+        .indexContent("---\nquestion_generation_instruction: inner\n---\n")
+        .please();
 
     Note inInner = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
 
@@ -516,26 +440,13 @@ class NoteRealmServiceTest {
     Notebook nb = root.getNotebook();
 
     Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-    Note outerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(outer)
-            .title("index")
-            .content("---\nquestion_generation_instruction: outer-only\n---\n")
-            .please();
-    makeMe.theFolder(outer).indexNote(outerIdx).please();
+    makeMe
+        .theFolder(outer)
+        .indexContent("---\nquestion_generation_instruction: outer-only\n---\n")
+        .please();
 
     Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
-    Note innerIdx =
-        makeMe
-            .aNote()
-            .creatorAndOwner(user)
-            .folder(inner)
-            .title("index")
-            .content("---\nother: x\n---\n")
-            .please();
-    makeMe.theFolder(inner).indexNote(innerIdx).please();
+    makeMe.theFolder(inner).indexContent("---\nother: x\n---\n").please();
 
     Note inInner = makeMe.aNote().creatorAndOwner(user).folder(inner).please();
 
@@ -548,6 +459,24 @@ class NoteRealmServiceTest {
   void scoped_question_instruction_empty_when_no_scoped_index_has_instruction() {
     User user = makeMe.aUser().please();
     Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal), is(Optional.empty()));
+  }
+
+  @Test
+  void index_to_be_deleted_note_does_not_affect_scoped_question_instruction() {
+    User user = makeMe.aUser().please();
+    Note root = makeMe.aNote().creatorAndOwner(user).please();
+    Notebook nb = root.getNotebook();
+    makeMe
+        .aNote()
+        .creatorAndOwner(user)
+        .inNotebook(nb)
+        .title("index_to_be_deleted")
+        .content("---\nquestion_generation_instruction: should not appear\n---\n")
+        .please();
     Note normal = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
     assertThat(

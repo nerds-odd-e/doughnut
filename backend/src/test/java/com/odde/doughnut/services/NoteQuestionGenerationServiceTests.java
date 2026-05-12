@@ -88,15 +88,10 @@ class NoteQuestionGenerationServiceTests {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
-      Note index =
-          makeMe
-              .aNote()
-              .creatorAndOwner(user)
-              .inNotebook(nb)
-              .title("index")
-              .content("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
-              .please();
-      makeMe.theNotebook(nb).indexNote(index).please();
+      makeMe
+          .theNotebook(nb)
+          .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
+          .please();
       Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
       makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
@@ -170,15 +165,10 @@ class NoteQuestionGenerationServiceTests {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
-      Note index =
-          makeMe
-              .aNote()
-              .creatorAndOwner(user)
-              .inNotebook(nb)
-              .title("index")
-              .content("---\nquestion_generation_instruction: BUDGET_CHECK_MARKER\n---\n")
-              .please();
-      makeMe.theNotebook(nb).indexNote(index).please();
+      makeMe
+          .theNotebook(nb)
+          .indexContent("---\nquestion_generation_instruction: BUDGET_CHECK_MARKER\n---\n")
+          .please();
       Note noteInScope =
           makeMe
               .aNote()
@@ -204,15 +194,10 @@ class NoteQuestionGenerationServiceTests {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
-      Note index =
-          makeMe
-              .aNote()
-              .creatorAndOwner(user)
-              .inNotebook(nb)
-              .title("index")
-              .content("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
-              .please();
-      makeMe.theNotebook(nb).indexNote(index).please();
+      makeMe
+          .theNotebook(nb)
+          .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
+          .please();
       Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
       makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
@@ -279,15 +264,10 @@ class NoteQuestionGenerationServiceTests {
       User user = makeMe.aUser().please();
       Note root = makeMe.aNote().creatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
-      Note index =
-          makeMe
-              .aNote()
-              .creatorAndOwner(user)
-              .inNotebook(nb)
-              .title("index")
-              .content("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
-              .please();
-      makeMe.theNotebook(nb).indexNote(index).please();
+      makeMe
+          .theNotebook(nb)
+          .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
+          .please();
       Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
       makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
 
