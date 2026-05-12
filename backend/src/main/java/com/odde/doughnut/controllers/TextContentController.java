@@ -68,7 +68,10 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNote(note, n -> n.setContent(contentDTO.getContent()), true, true);
+    NoteRealm realm = updateNote(note, n -> n.setContent(contentDTO.getContent()), true, true);
+    notebookService.syncNotebookIndexContentIfDesignated(note);
+    folderService.syncFolderIndexContentIfDesignated(note);
+    return realm;
   }
 
   private NoteRealm updateNote(

@@ -64,7 +64,11 @@ public class NotebookCatalogService {
     Integer indexNoteId =
         notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
     return NotebookRealm.of(
-        notebook, hasAttachedBook(notebook), readonlyFor(notebook, viewer), indexNoteId);
+        notebook,
+        hasAttachedBook(notebook),
+        readonlyFor(notebook, viewer),
+        indexNoteId,
+        notebook.getIndexContent());
   }
 
   public FolderRealm folderRealmFor(Notebook notebook, Folder folder, User viewer) {
@@ -83,7 +87,8 @@ public class NotebookCatalogService {
         noteRealmService.resolveIndexNoteContentForFolder(loaded),
         loaded,
         parentFolderId,
-        folderIndexNoteId);
+        folderIndexNoteId,
+        loaded.getIndexContent());
   }
 
   /**
@@ -112,7 +117,7 @@ public class NotebookCatalogService {
                 nb.getId(),
                 __ ->
                     NotebookRealm.of(
-                        nb, withBook.contains(nb.getId()), readonlyFor(nb, viewer), null));
+                        nb, withBook.contains(nb.getId()), readonlyFor(nb, viewer), null, null));
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();

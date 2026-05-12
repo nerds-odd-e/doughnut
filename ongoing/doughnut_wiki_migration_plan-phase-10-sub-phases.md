@@ -309,7 +309,7 @@ folder.indexContent
 
 The previous note titled `index` becomes legacy migration input only. After migration, notes may not be named `index`; migrated legacy index notes are renamed to `index_to_be_deleted` so they are visible for manual review but no longer participate in scoped configuration.
 
-### 10.14 — Behavior: migrate index note content onto notebooks and folders
+### 10.14 — Behavior: migrate index note content onto notebooks and folders ✅
 
 **Why now:** This preserves user-authored index text and frontmatter before removing the index-note save path.
 
@@ -320,16 +320,20 @@ The previous note titled `index` becomes legacy migration input only. After migr
 **Post-condition:** The notebook/folder row stores the former index note Markdown/frontmatter in `indexContent`; the former index note is renamed to `index_to_be_deleted`; notebook and folder page read APIs return the same visible index content as before, now from the container field.
 
 **Scope:**
-- Add nullable `indexContent` storage to notebooks and folders using the repo's normal naming conventions for DB columns, entity fields, DTOs, and generated API types.
-- Flyway migration: copy the current designated index note content into the owning notebook/folder, then rename those notes to `index_to_be_deleted`.
-- Preserve ambiguity handling explicitly: if a legacy pointer or title lookup is ambiguous, do not guess; leave enough diagnostic signal for manual cleanup.
-- Update notebook/folder page backend reads so the page payload exposes container `indexContent` and no longer requires a note id to display the index editor.
-- Regenerate the frontend API client in this phase if DTO signatures change.
+- Added nullable `index_content MEDIUMTEXT` columns to `notebook` and `folder`; mapped as `indexContent` on `Notebook` and `Folder` entities.
+- Flyway migration `V300000193__container_index_content.sql`: copies unambiguous designated index note content into the owning container, renames migrated notes to `index_to_be_deleted` with collision-safe fallback (`index_to_be_deleted_<noteId>`), clears stale `index_note_id` pointers on renamed containers.
+- Ambiguity: when more than one live note titled `index` exists in a scope, no content is copied and the source notes are not renamed.
+- `NotebookRealm` and `FolderRealm` now expose `indexContent` (optional) alongside existing `indexNoteId`/`folderIndexNoteId` fields.
+- `NotebookCatalogService.notebookRealmFor` and `folderRealmFor` populate `indexContent` from the container entity.
+- Transition save bridge: `TextContentController.updateNoteContent` now calls `NotebookService.syncNotebookIndexContentIfDesignated` and `FolderService.syncFolderIndexContentIfDesignated` to mirror content saves on designated index notes back to the container `indexContent` field — keeping it current until 10.16 replaces note saves with direct container saves.
+- Frontend API client regenerated (`open_api_docs.yaml`, `types.gen.ts`, `sdk.gen.ts` updated).
+- Database ERD regenerated.
 
-**Tests:**
-- Migration test or repository-level verification proving notebook and folder legacy index content is copied and legacy notes are renamed.
-- Backend page/API test: notebook and folder pages expose `indexContent` after migration without resolving an index note page.
-- Existing 10.12 and 10.13 behavior tests stay green until the next phase moves scoped configuration reads.
+**Tests added:**
+- `NotebookCrudControllerTest`: `exposesContainerIndexContentWhenMigratedMarkdownExists`, `omitsIndexContentWhenNonePresent`.
+- `NotebookNotesFolderControllerTest`: `exposesFolderContainerIndexContentWhenPresent`, `omitsFolderIndexContentWhenNonePresent`.
+- `TextContentControllerTests.ContainerIndexContentMirrorBridge`: mirrors to notebook `indexContent` when note is designated, does not mirror for non-designated notes, mirrors to folder `indexContent` when note is designated folder index.
+- Existing 10.12 and 10.13 behavior tests stay green until 10.15 moves scoped configuration reads.
 
 ### 10.15 — Behavior: scoped configuration resolves from container `indexContent`
 

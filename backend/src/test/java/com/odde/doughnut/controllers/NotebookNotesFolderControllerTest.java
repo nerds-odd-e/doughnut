@@ -367,6 +367,35 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getFolderPage(nb, folder));
     }
+
+    @Test
+    void exposesFolderContainerIndexContentWhenPresent() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder =
+          makeMe
+              .aFolder()
+              .notebook(nb)
+              .name("Configured")
+              .indexContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes")
+              .please();
+
+      FolderRealm realm = controller.getFolderPage(nb, folder);
+
+      assertThat(
+          realm.indexContent(), equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes"));
+    }
+
+    @Test
+    void omitsFolderIndexContentWhenNonePresent() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Empty").please();
+
+      FolderRealm realm = controller.getFolderPage(nb, folder);
+
+      assertThat(realm.indexContent(), nullValue());
+    }
   }
 
   @Nested

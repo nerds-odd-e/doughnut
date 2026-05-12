@@ -3176,6 +3176,8 @@ components:
         updatedAt:
           type: string
           format: date-time
+        indexContent:
+          type: string
       required:
       - createdAt
       - id
@@ -3222,6 +3224,8 @@ components:
         id:
           type: integer
           format: int32
+        indexContent:
+          type: string
         name:
           type: string
           maxLength: 512
@@ -3314,7 +3318,8 @@ components:
     NotebookRealm:
       type: object
       description: "Notebook chrome: entity plus optional catalog hints (attached\
-        \ book, readonly), optional notebook index landing note id when present."
+        \ book, readonly), optional notebook index landing note id when present, and\
+        \ optional container-owned index markdown."
       properties:
         notebook:
           $ref: "#/components/schemas/Notebook"
@@ -3328,6 +3333,10 @@ components:
           description: Notebook index landing note id from cached notebook.index_note_id
             when valid; otherwise repaired from the sole root note titled "index"
             (case-insensitive). Omitted when absent.
+        indexContent:
+          type: string
+          description: Container-owned notebook index markdown (populated by migration
+            from legacy index note). Omitted when absent.
       required:
       - notebook
     WikiTitle:
@@ -4373,8 +4382,8 @@ components:
       type: object
       description: "Notebook chrome plus folder row for loading the folder page: same\
         \ shared realm sidebar as NoteRealm (without note-level fields), plus folder\
-        \ identity, optional parent folder id, and optional designated folder index\
-        \ note id."
+        \ identity, optional parent folder id, optional designated folder index note\
+        \ id, and optional container-owned folder index markdown."
       properties:
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
@@ -4404,6 +4413,10 @@ components:
           description: Folder index landing note id from cached folder.index_note_id
             when valid; otherwise repaired from notes titled "index" in this folder
             (case-insensitive). Omitted when absent.
+        indexContent:
+          type: string
+          description: Container-owned folder index markdown (populated by migration
+            from legacy index note). Omitted when absent.
       required:
       - folder
       - notebookRealm

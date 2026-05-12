@@ -100,4 +100,9 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     entity.setIndexNote(note);
     return this;
   }
+
+  public NotebookBuilder indexContent(String content) {
+    entity.setIndexContent(content);
+    return this;
+  }
 }

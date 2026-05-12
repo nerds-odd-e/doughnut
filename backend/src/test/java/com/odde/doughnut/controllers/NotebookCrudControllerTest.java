@@ -156,6 +156,34 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
       assertThat(realm.indexNoteId(), nullValue());
     }
+
+    @Test
+    void exposesContainerIndexContentWhenMigratedMarkdownExists()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(owner)
+              .indexContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook index body")
+              .please();
+
+      NotebookRealm realm = controller.get(nb);
+
+      assertThat(
+          realm.indexContent(),
+          equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook index body"));
+    }
+
+    @Test
+    void omitsIndexContentWhenNonePresent() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+
+      NotebookRealm realm = controller.get(nb);
+
+      assertThat(realm.indexContent(), nullValue());
+    }
   }
 
   @Nested

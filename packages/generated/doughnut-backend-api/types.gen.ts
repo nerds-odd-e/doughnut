@@ -170,6 +170,7 @@ export type Notebook = {
     description?: string;
     createdAt: string;
     updatedAt: string;
+    indexContent?: string;
 };
 
 export type NotebookSettings = {
@@ -192,6 +193,7 @@ export type GlobalAiModelSettings = {
 
 export type Folder = {
     id: number;
+    indexContent?: string;
     name: string;
     createdAt: string;
     updatedAt: string;
@@ -235,7 +237,7 @@ export type NoteTopology = {
 };
 
 /**
- * Notebook chrome: entity plus optional catalog hints (attached book, readonly), optional notebook index landing note id when present.
+ * Notebook chrome: entity plus optional catalog hints (attached book, readonly), optional notebook index landing note id when present, and optional container-owned index markdown.
  */
 export type NotebookRealm = {
     notebook: Notebook;
@@ -245,6 +247,10 @@ export type NotebookRealm = {
      * Notebook index landing note id from cached notebook.index_note_id when valid; otherwise repaired from the sole root note titled "index" (case-insensitive). Omitted when absent.
      */
     indexNoteId?: number;
+    /**
+     * Container-owned notebook index markdown (populated by migration from legacy index note). Omitted when absent.
+     */
+    indexContent?: string;
 };
 
 export type WikiTitle = {
@@ -783,7 +789,7 @@ export type SubscriptionForNotebooksListing = {
 };
 
 /**
- * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional designated folder index note id.
+ * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, optional designated folder index note id, and optional container-owned folder index markdown.
  */
 export type FolderRealm = {
     /**
@@ -807,6 +813,10 @@ export type FolderRealm = {
      * Folder index landing note id from cached folder.index_note_id when valid; otherwise repaired from notes titled "index" in this folder (case-insensitive). Omitted when absent.
      */
     folderIndexNoteId?: number;
+    /**
+     * Container-owned folder index markdown (populated by migration from legacy index note). Omitted when absent.
+     */
+    indexContent?: string;
 };
 
 /**

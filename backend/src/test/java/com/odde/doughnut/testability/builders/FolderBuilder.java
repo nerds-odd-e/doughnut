@@ -72,4 +72,9 @@ public class FolderBuilder extends EntityBuilder<Folder> {
     entity.setIndexNote(note);
     return this;
   }
+
+  public FolderBuilder indexContent(String content) {
+    entity.setIndexContent(content);
+    return this;
+  }
 }

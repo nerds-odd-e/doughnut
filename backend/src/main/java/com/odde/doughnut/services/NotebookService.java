@@ -72,4 +72,28 @@ public class NotebookService {
   public Optional<Note> findOptionalIndexNote(Notebook notebook) {
     return scopedIndexNoteService.findDesignatedIndexNote(new IndexScope.NotebookRoot(notebook));
   }
+
+  /**
+   * Transition bridge (10.14–10.16): when the designated notebook index note's content is updated,
+   * mirror it to {@link Notebook#getIndexContent()} so the container field stays current until
+   * 10.16 replaces note-based saves with direct container saves.
+   */
+  public void syncNotebookIndexContentIfDesignated(Note note) {
+    Notebook notebook = note.getNotebook();
+    if (notebook == null || notebook.getId() == null) {
+      return;
+    }
+    notebookRepository
+        .findById(notebook.getId())
+        .ifPresent(
+            nb -> {
+              Note designatedIndex = nb.getIndexNote();
+              if (designatedIndex != null
+                  && designatedIndex.getId() != null
+                  && designatedIndex.getId().equals(note.getId())) {
+                nb.setIndexContent(note.getContent());
+                entityPersister.merge(nb);
+              }
+            });
+  }
 }
