@@ -464,6 +464,7 @@ export default class StoredApiCollection implements StoredApi {
       focusRealm = this.storage.refreshNoteRealm(res[0]!)
       notebookId = notebookId ?? focusRealm.notebookRealm.notebook.id
     }
+    refreshSidebarStructuralListings()
     if (notebookId !== undefined) {
       await router.replace({
         name: "notebookPage",

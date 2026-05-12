@@ -78,6 +78,14 @@ describe("storedApiCollection", () => {
         params: { notebookId: note.notebookRealm.notebook.id },
       })
     })
+
+    it("refreshes sidebar structural listings after deleteNote", async () => {
+      storageAccessor.value.refreshNoteRealm(note)
+      const before = sidebarStructuralRefreshKey.value
+      const sa = storageAccessor.value.storedApi()
+      await sa.deleteNote(router, note.id, "LEAVE_DEAD_LINKS")
+      expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+    })
   })
 
   describe("undo create note", () => {
