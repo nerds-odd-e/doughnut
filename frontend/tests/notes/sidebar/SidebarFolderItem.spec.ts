@@ -1,5 +1,5 @@
 import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
-import type { FolderRealm } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, mount } from "@vue/test-utils"
 import { computed, ref } from "vue"
@@ -11,7 +11,7 @@ function mountFolderItem(
   options: {
     folderId: number
     notebookId: number
-    activeFolder?: FolderRealm | null
+    activeFolder?: Folder | null
   }
 ) {
   const folder = {
@@ -87,7 +87,7 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const activeFolder = makeMe.aFolderRealm.folder(42, "Alpha").please()
+    const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
     mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
@@ -116,7 +116,7 @@ describe("SidebarFolderItem", () => {
       }
     } as unknown as typeof IntersectionObserver
 
-    const activeFolder = makeMe.aFolderRealm.folder(42, "Alpha").please()
+    const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
     mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))

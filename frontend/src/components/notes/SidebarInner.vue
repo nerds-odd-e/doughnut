@@ -21,7 +21,7 @@
           level: currentLevel,
           expandedFolderIds,
           activePathFolderIds,
-          activeFolderRealm,
+          activeFolder,
         }"
       />
     </template>
@@ -29,11 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  FolderRealm,
-  NoteTopology,
-  Folder,
-} from "@generated/doughnut-backend-api"
+import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
@@ -74,7 +70,7 @@ interface Props {
   level?: number
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolderRealm?: FolderRealm
+  activeFolder?: Folder
 }
 
 const props = defineProps<Props>()

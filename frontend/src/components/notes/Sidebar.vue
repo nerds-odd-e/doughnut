@@ -18,6 +18,7 @@
         :key="notebookId"
         :notebook-id="notebookId"
         :active-note-topology="activeNoteTopology"
+        :activeFolder="activeFolderRealm?.folder"
         v-bind="sidebarInnerTreeProps"
       />
     </div>
@@ -69,7 +70,6 @@ const activePathFolderIds = computed(() => {
 const sidebarInnerTreeProps = computed(() => ({
   expandedFolderIds,
   activePathFolderIds,
-  activeFolder: props.activeFolderRealm,
 }))
 
 watch(

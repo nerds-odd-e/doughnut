@@ -56,7 +56,7 @@
           level: currentLevel + 1,
           expandedFolderIds,
           activePathFolderIds,
-          activeFolderRealm,
+          activeFolder,
         }"
         :key="`folder-${folderId}`"
       />
@@ -65,11 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Folder,
-  FolderRealm,
-  NoteTopology,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
@@ -84,7 +80,7 @@ const props = defineProps<{
   level?: number
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolderRealm?: FolderRealm
+  activeFolder?: Folder
 }>()
 
 const currentLevel = computed(() => props.level ?? 1)
@@ -109,11 +105,11 @@ watch(
     [
       props.activePathFolderIds.value,
       folderId.value,
-      props.activeFolderRealm?.folder.id,
+      props.activeFolder?.id,
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (props.activeFolderRealm?.folder.id === folderId.value) {
+    if (props.activeFolder?.id === folderId.value) {
       return
     }
     if (props.activePathFolderIds.value.has(folderId.value)) {
@@ -135,9 +131,7 @@ const isOnActivePath = computed(
 )
 
 const isActiveFolderRow = computed(
-  () =>
-    folderId.value != null &&
-    props.activeFolderRealm?.folder.id === folderId.value
+  () => folderId.value != null && props.activeFolder?.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
