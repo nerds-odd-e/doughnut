@@ -87,15 +87,16 @@ const windowWidth = ref(
 
 const isMdOrLarger = computed(() => windowWidth.value >= SIDEBAR_BREAKPOINT_PX)
 
-const notebookRealm = ref<NotebookRealm | undefined>(undefined)
-const folderRealm = ref<FolderRealm | undefined>(undefined)
+// Only populated on notebookPage route
+const activeNotebookRealm = ref<NotebookRealm | undefined>(undefined)
+const activeFolderRealm = ref<FolderRealm | undefined>(undefined)
 
 async function fetchNotebookPage() {
   const notebookId = Number(route.params.notebookId)
   const { data, error } = await NotebookController.get({
     path: { notebook: notebookId },
   })
-  notebookRealm.value = !error && data ? data : undefined
+  activeNotebookRealm.value = !error && data ? data : undefined
 }
 
 const sidebarRealm = computed((): NoteRealm | undefined => {
@@ -117,7 +118,7 @@ const breadcrumbFolders = computed((): Folder[] => {
 
 const sidebarNotebookRealm = computed(
   (): NotebookRealm | undefined =>
-    notebookRealm.value ?? folderRealm.value?.notebookRealm
+    activeNotebookRealm.value ?? activeFolderRealm.value?.notebookRealm
 )
 
 const currentNotebookRealm = computed(
@@ -127,10 +128,6 @@ const currentNotebookRealm = computed(
 
 const currentNotebookId = computed(
   () => currentNotebookRealm.value?.notebook?.id
-)
-
-const activeFolderRealm = computed(() =>
-  route.name === "folderPage" ? folderRealm.value : undefined
 )
 
 const desktopSidebarClass = computed(() =>
@@ -151,10 +148,10 @@ const sidebarClasses = computed(() => [
 
 const routeViewProps = computed(() => {
   if (route.name === "notebookPage") {
-    return { notebookRealm: notebookRealm.value, fetchNotebookPage }
+    return { notebookRealm: activeNotebookRealm.value, fetchNotebookPage }
   }
   if (route.name === "folderPage") {
-    return { folderRealm: folderRealm.value, fetchFolderPage }
+    return { folderRealm: activeFolderRealm.value, fetchFolderPage }
   }
   return {}
 })
@@ -166,7 +163,7 @@ async function fetchFolderPage() {
     path: { notebook: notebookId, folder: folderId },
   })
   if (!error && page?.notebookRealm?.notebook) {
-    folderRealm.value = page
+    activeFolderRealm.value = page
     const { data: indexRows, error: indexErr } =
       await NotebookController.listNotebookFolderIndex({
         path: { notebook: notebookId },
@@ -181,7 +178,7 @@ async function fetchFolderPage() {
     }
     return
   }
-  folderRealm.value = undefined
+  activeFolderRealm.value = undefined
   folderRouteBreadcrumbFolders.value = []
 }
 
@@ -192,7 +189,7 @@ watch(
   }),
   async ({ isNotebookPage }) => {
     if (!isNotebookPage) {
-      notebookRealm.value = undefined
+      activeNotebookRealm.value = undefined
       return
     }
     await fetchNotebookPage()
@@ -208,7 +205,7 @@ watch(
   }),
   async ({ isFolderPage }) => {
     if (!isFolderPage) {
-      folderRealm.value = undefined
+      activeFolderRealm.value = undefined
       folderRouteBreadcrumbFolders.value = []
       return
     }
