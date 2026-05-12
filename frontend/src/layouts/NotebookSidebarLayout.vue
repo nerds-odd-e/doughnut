@@ -109,8 +109,17 @@ const currentNotebookRealm = computed(
     activeFolderRealm.value?.notebookRealm
 )
 
-const currentNotebookId = computed(
-  () => currentNotebookRealm.value?.notebook?.id
+const currentNotebookId = ref<number | undefined>(undefined)
+
+watch(
+  () => currentNotebookRealm.value?.notebook?.id,
+  (id) => {
+    if (typeof id !== "number" || !Number.isFinite(id)) return
+    if (currentNotebookId.value !== id) {
+      currentNotebookId.value = id
+    }
+  },
+  { immediate: true }
 )
 
 const desktopSidebarClass = computed(() =>
