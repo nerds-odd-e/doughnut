@@ -1,5 +1,5 @@
 <template>
-  <div :class="wrapperClass">
+  <div :class="wrapperClass" @focusout="onReferencedTitleFocusOut">
     <slot
       :value="localValue"
       :update="onUpdate"
@@ -112,6 +112,32 @@ const hasUnsavedChanges = (): boolean => {
     return normalizedCurrent !== normalizedSaved
   }
   return localValue.value !== lastSavedValue.value
+}
+
+const discardReferencedTitleDraft = () => {
+  errors.value = {}
+  localValue.value = lastSavedValue.value ?? ""
+  version.value = savedVersion.value
+}
+
+const onReferencedTitleFocusOut = (event: FocusEvent) => {
+  if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+  changer.cancel()
+  const root = event.currentTarget as HTMLElement
+  const next = event.relatedTarget as Node | null
+  if (next && root.contains(next)) return
+  if (next == null) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+        const focused = document.activeElement
+        if (focused instanceof Node && root.contains(focused)) return
+        discardReferencedTitleDraft()
+      })
+    })
+    return
+  }
+  discardReferencedTitleDraft()
 }
 
 const showReferencedTitleSavePanel = computed(
