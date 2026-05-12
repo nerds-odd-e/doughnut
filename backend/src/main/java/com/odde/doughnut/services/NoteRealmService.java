@@ -50,7 +50,7 @@ public class NoteRealmService {
     List<Note> refNotes =
         hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer));
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
-    realm.setNotebookView(notebookCatalogService.clientViewFor(focus.getNotebook(), viewer));
+    realm.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
     realm.setIndexNoteContent(resolveIndexNoteContentForNote(focus));
     return realm;

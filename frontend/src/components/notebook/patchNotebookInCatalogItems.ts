@@ -3,7 +3,7 @@ import type {
   NotebookCatalogGroupItem,
   NotebookCatalogNotebookItem,
   NotebookCatalogSubscribedNotebookItem,
-  NotebookClientView,
+  NotebookRealm,
 } from "@generated/doughnut-backend-api"
 
 export type NotebookCatalogEntry =
@@ -12,9 +12,9 @@ export type NotebookCatalogEntry =
   | NotebookCatalogSubscribedNotebookItem
 
 function patchGroupedMember(
-  nb: NotebookClientView,
+  nb: NotebookRealm,
   updated: Notebook
-): NotebookClientView {
+): NotebookRealm {
   if (nb.notebook.id !== updated.id) return nb
   return { ...nb, notebook: { ...nb.notebook, ...updated } }
 }

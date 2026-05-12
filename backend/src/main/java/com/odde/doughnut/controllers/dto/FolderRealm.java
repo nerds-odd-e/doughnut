@@ -28,14 +28,14 @@ public record FolderRealm(
         Integer folderIndexNoteId) {
 
   public static FolderRealm of(
-      NotebookClientView chrome,
+      NotebookRealm chrome,
       List<Folder> ancestorFolders,
       String indexNoteContent,
       Folder folder,
       Integer parentFolderId,
       Integer folderIndexNoteId) {
     RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
-    sidebar.setNotebookView(chrome);
+    sidebar.setNotebookRealm(chrome);
     sidebar.setAncestorFolders(ancestorFolders);
     sidebar.setIndexNoteContent(indexNoteContent);
     return new FolderRealm(sidebar, folder, parentFolderId, folderIndexNoteId);

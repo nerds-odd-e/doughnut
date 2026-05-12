@@ -20,8 +20,8 @@
         />
       </button>
       <BreadcrumbWithCircle
-        v-if="currentNotebookView"
-        :notebook-view="currentNotebookView"
+        v-if="currentNotebookRealm"
+        :notebook-realm="currentNotebookRealm"
         :ancestor-folders="breadcrumbFolders"
       />
     </GlobalBar>
@@ -39,7 +39,7 @@
           :key="currentNotebookId"
           :active-note-realm="sidebarRealm"
           :notebook-id="currentNotebookId"
-          :notebook-realm="sidebarNotebookView"
+          :notebook-realm="sidebarNotebookRealm"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
         />
@@ -115,18 +115,18 @@ const breadcrumbFolders = computed((): Folder[] => {
   return []
 })
 
-const sidebarNotebookView = computed(
+const sidebarNotebookRealm = computed(
   (): NotebookRealm | undefined =>
-    notebookRealm.value ?? folderRealm.value?.notebookView
+    notebookRealm.value ?? folderRealm.value?.notebookRealm
 )
 
-const currentNotebookView = computed(
+const currentNotebookRealm = computed(
   (): NotebookRealm | undefined =>
-    sidebarRealm.value?.notebookView ?? sidebarNotebookView.value
+    sidebarRealm.value?.notebookRealm ?? sidebarNotebookRealm.value
 )
 
 const currentNotebookId = computed(
-  () => currentNotebookView.value?.notebook?.id
+  () => currentNotebookRealm.value?.notebook?.id
 )
 
 const activeFolderRealm = computed(() =>
@@ -165,7 +165,7 @@ async function fetchFolderPage() {
   const { data: page, error } = await NotebookController.getFolderPage({
     path: { notebook: notebookId, folder: folderId },
   })
-  if (!error && page?.notebookView?.notebook) {
+  if (!error && page?.notebookRealm?.notebook) {
     folderRealm.value = page
     const { data: indexRows, error: indexErr } =
       await NotebookController.listNotebookFolderIndex({

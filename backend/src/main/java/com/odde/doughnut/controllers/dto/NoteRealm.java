@@ -12,7 +12,7 @@ import lombok.Setter;
 @JsonPropertyOrder({
   "id",
   "note",
-  "notebookView",
+  "notebookRealm",
   "ancestorFolders",
   "references",
   "wikiTitles",
@@ -42,12 +42,12 @@ public class NoteRealm {
     return note.getId();
   }
 
-  public NotebookClientView getNotebookView() {
-    return sidebar.getNotebookView();
+  public NotebookRealm getNotebookRealm() {
+    return sidebar.getNotebookRealm();
   }
 
-  public void setNotebookView(NotebookClientView notebookView) {
-    sidebar.setNotebookView(notebookView);
+  public void setNotebookRealm(NotebookRealm notebookRealm) {
+    sidebar.setNotebookRealm(notebookRealm);
   }
 
   public List<Folder> getAncestorFolders() {

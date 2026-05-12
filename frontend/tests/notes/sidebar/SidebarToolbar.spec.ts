@@ -33,7 +33,7 @@ describe("Sidebar toolbar", () => {
     wrapper = mountSidebarSignedIn(
       helper,
       fixtures.topNoteRealm,
-      fixtures.topNoteRealm.notebookView.notebook.id
+      fixtures.topNoteRealm.notebookRealm.notebook.id
     )
     await flushPromises()
     expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
@@ -49,15 +49,15 @@ describe("Sidebar toolbar", () => {
   it("hides New folder when note realm is from bazaar", async () => {
     const bazaarRealm = {
       ...fixtures.firstGeneration,
-      notebookView: {
-        ...fixtures.firstGeneration.notebookView,
+      notebookRealm: {
+        ...fixtures.firstGeneration.notebookRealm,
         readonly: true,
       },
     } as NoteRealm
     wrapper = mountSidebarSignedIn(
       helper,
       bazaarRealm,
-      bazaarRealm.notebookView.notebook.id
+      bazaarRealm.notebookRealm.notebook.id
     )
     await flushPromises()
     expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)

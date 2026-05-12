@@ -212,9 +212,9 @@ export type NoteRealm = {
     id: number;
     note: Note;
     /**
-     * Notebook entity plus optional client-only fields.
+     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
      */
-    notebookView: NotebookClientView;
+    notebookRealm: NotebookRealm;
     /**
      * Folders from notebook root outward; see each realm for trail semantics.
      */
@@ -235,12 +235,16 @@ export type NoteTopology = {
 };
 
 /**
- * Notebook entity plus optional client-only fields (e.g. catalog attachment hints).
+ * Notebook chrome: entity plus optional catalog hints (attached book, readonly), optional notebook index landing note id when present.
  */
-export type NotebookClientView = {
+export type NotebookRealm = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
+    /**
+     * Notebook index landing note id from cached notebook.index_note_id when valid; otherwise repaired from the sole root note titled "index" (case-insensitive). Omitted when absent.
+     */
+    indexNoteId?: number;
 };
 
 export type WikiTitle = {
@@ -742,7 +746,7 @@ export type NotebookCatalogGroupItem = Omit<NotebookCatalogItem, 'type'> & {
     id: number;
     name: string;
     createdAt: string;
-    notebooks: Array<NotebookClientView>;
+    notebooks: Array<NotebookRealm>;
     type: 'notebookGroup';
 };
 
@@ -764,7 +768,7 @@ export type NotebookCatalogSubscribedNotebookItem = Omit<NotebookCatalogItem, 't
 };
 
 export type NotebooksViewedByUser = {
-    notebooks: Array<NotebookClientView>;
+    notebooks: Array<NotebookRealm>;
     catalogItems: Array<NotebookCatalogGroupItem | NotebookCatalogNotebookItem | NotebookCatalogSubscribedNotebookItem>;
     subscriptions?: Array<SubscriptionForNotebooksListing>;
 };
@@ -779,26 +783,13 @@ export type SubscriptionForNotebooksListing = {
 };
 
 /**
- * Notebook chrome for loading the notebook page: same payload as NotebookClientView plus optional index landing note id when present.
- */
-export type NotebookRealm = {
-    notebook: Notebook;
-    hasAttachedBook?: boolean;
-    readonly?: boolean;
-    /**
-     * Notebook index landing note id from cached notebook.index_note_id when valid; otherwise repaired from the sole root note titled "index" (case-insensitive). Omitted when absent.
-     */
-    indexNoteId?: number;
-};
-
-/**
  * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional designated folder index note id.
  */
 export type FolderRealm = {
     /**
-     * Notebook entity plus optional client-only fields.
+     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
      */
-    notebookView: NotebookClientView;
+    notebookRealm: NotebookRealm;
     /**
      * Folders from notebook root outward; see each realm for trail semantics.
      */
@@ -926,9 +917,9 @@ export type NoteRealmWritable = {
     id: number;
     note: NoteWritable;
     /**
-     * Notebook entity plus optional client-only fields.
+     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
      */
-    notebookView: NotebookClientView;
+    notebookRealm: NotebookRealm;
     /**
      * Folders from notebook root outward; see each realm for trail semantics.
      */
@@ -1981,7 +1972,7 @@ export type CreateNotebookResponses = {
     /**
      * OK
      */
-    200: NotebookClientView;
+    200: NotebookRealm;
 };
 
 export type CreateNotebookResponse = CreateNotebookResponses[keyof CreateNotebookResponses];
@@ -2205,7 +2196,7 @@ export type CreateNotebookInCircleResponses = {
     /**
      * OK
      */
-    200: NotebookClientView;
+    200: NotebookRealm;
 };
 
 export type CreateNotebookInCircleResponse = CreateNotebookInCircleResponses[keyof CreateNotebookInCircleResponses];

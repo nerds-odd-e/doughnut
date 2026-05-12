@@ -2,8 +2,8 @@
   <ContentLoader v-if="folderForView === undefined" />
   <div v-else class="daisy-py-4">
     <NotebookPageReadonlySummary
-      v-if="folderForView.notebookView.readonly === true"
-      :notebook="folderForView.notebookView.notebook"
+      v-if="folderForView.notebookRealm.readonly === true"
+      :notebook="folderForView.notebookRealm.notebook"
     />
     <div v-else class="daisy-container daisy-mx-auto daisy-max-w-6xl">
       <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-4">
@@ -13,7 +13,7 @@
         }}</span>
       </p>
       <ScopedIndexNoteEditor
-        :notebook-id="folderForView.notebookView.notebook.id"
+        :notebook-id="folderForView.notebookRealm.notebook.id"
         :folder-id="folderForView.folder.id"
         :index-note-status="indexNoteStatus"
         :index-note-id="sidebarAnchorNoteId"
@@ -53,7 +53,7 @@ const storageAccessor = useStorageAccessor()
 
 const folderForView = computed((): FolderRealm | undefined => {
   const r = props.folderRealm
-  if (r?.notebookView?.notebook == null) return undefined
+  if (r?.notebookRealm?.notebook == null) return undefined
   return r
 })
 

@@ -9,7 +9,7 @@
               <BreadcrumbWithCircle
                 v-bind="{
                   ancestorFolders,
-                  notebookView: noteRealm.notebookView,
+                  notebookRealm: noteRealm.notebookRealm,
                 }"
               />
             </div>
@@ -78,7 +78,7 @@
 
           <NoteDeadLinkCreateModal
             v-model="pendingDeadLinkTitle"
-            :notebook-id="noteRealm.notebookView.notebook.id"
+            :notebook-id="noteRealm.notebookRealm.notebook.id"
             :note-realm="noteRealm"
             :source-note-id="noteRealm.id"
           />
@@ -116,7 +116,7 @@ const props = defineProps({
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>
-  !currentUser?.value || noteRealm.notebookView.readonly === true
+  !currentUser?.value || noteRealm.notebookRealm.readonly === true
 
 const isIndexTitle = (noteRealm: NoteRealm) =>
   (noteRealm.note.noteTopology.title ?? "").trim().toLowerCase() === "index"

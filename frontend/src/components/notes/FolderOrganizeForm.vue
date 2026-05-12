@@ -12,7 +12,7 @@
           <div id="folder-move-destination">
             <FolderSelector
               v-model="selectedParentFolder"
-              :notebook-id="movingFolderRealm.notebookView.notebook.id"
+              :notebook-id="movingFolderRealm.notebookRealm.notebook.id"
               :context-folder="movingFolderRealm.folder"
               :ancestor-folders="movingFolderRealm.ancestorFolders ?? []"
               :disabled="processing"
@@ -109,7 +109,7 @@ const submitMove = async () => {
     const { error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
-          notebook: props.movingFolderRealm.notebookView.notebook.id,
+          notebook: props.movingFolderRealm.notebookRealm.notebook.id,
           folder: props.movingFolderRealm.folder.id,
         },
         body,
@@ -137,7 +137,7 @@ const dissolve = async () => {
     const { error } = await apiCallWithLoading(() =>
       NotebookController.dissolveFolder({
         path: {
-          notebook: props.movingFolderRealm.notebookView.notebook.id,
+          notebook: props.movingFolderRealm.notebookRealm.notebook.id,
           folder: props.movingFolderRealm.folder.id,
         },
       })

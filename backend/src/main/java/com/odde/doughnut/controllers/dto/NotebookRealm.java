@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(
     description =
-        "Notebook chrome for loading the notebook page: same payload as NotebookClientView"
-            + " plus optional index landing note id when present.")
+        "Notebook chrome: entity plus optional catalog hints (attached book, readonly), optional"
+            + " notebook index landing note id when present.")
 public record NotebookRealm(
     @NotNull Notebook notebook,
     @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
@@ -21,7 +21,8 @@ public record NotebookRealm(
                     + " (case-insensitive). Omitted when absent.")
         Integer indexNoteId) {
 
-  public static NotebookRealm of(NotebookClientView base, Integer indexNoteId) {
-    return new NotebookRealm(base.notebook(), base.hasAttachedBook(), base.readonly(), indexNoteId);
+  public static NotebookRealm of(
+      Notebook notebook, Boolean hasAttachedBook, boolean readonly, Integer indexNoteId) {
+    return new NotebookRealm(notebook, hasAttachedBook, readonly, indexNoteId);
   }
 }

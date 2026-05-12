@@ -17,8 +17,11 @@ import lombok.Setter;
 public class RealmNotebookSidebar {
 
   @NotNull
-  @Schema(description = "Notebook entity plus optional client-only fields.")
-  private NotebookClientView notebookView;
+  @Schema(
+      description =
+          "Notebook chrome: entity plus optional catalog hints and optional notebook index landing"
+              + " note id.")
+  private NotebookRealm notebookRealm;
 
   @Schema(description = "Folders from notebook root outward; see each realm for trail semantics.")
   private List<Folder> ancestorFolders = List.of();

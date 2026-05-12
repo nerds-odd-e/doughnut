@@ -117,7 +117,7 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
     realm.note.noteTopology.createdAt ??
     new Date().toISOString()
   const notebook: Notebook = {
-    id: realm.notebookView.notebook.id,
+    id: realm.notebookRealm.notebook.id,
     name: "Notebook",
     notebookSettings: { skipMemoryTrackingEntirely: false },
     createdAt: realm.note.noteTopology.createdAt ?? ts,
@@ -127,7 +127,7 @@ export function mockNotebookGetForNoteRealm(realm: NoteRealm, circle?: Circle) {
   return mockSdkService(NotebookController, "get", {
     notebook,
     hasAttachedBook: false,
-    readonly: realm.notebookView.readonly ?? false,
+    readonly: realm.notebookRealm.readonly ?? false,
   })
 }
 

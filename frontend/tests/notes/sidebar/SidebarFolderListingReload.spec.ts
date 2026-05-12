@@ -52,7 +52,7 @@ describe("Sidebar folder listing reload", () => {
 
     await wrapper.setProps({
       activeNoteRealm: fixtures.secondGeneration,
-      notebookId: fixtures.firstGeneration.notebookView.notebook.id,
+      notebookId: fixtures.firstGeneration.notebookRealm.notebook.id,
     })
     await flushPromises()
     expect(rootRequestCount()).toBe(1)

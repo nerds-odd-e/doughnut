@@ -8,7 +8,6 @@ import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
@@ -117,8 +116,7 @@ class NotebookController {
 
   @PostMapping({"/create"})
   @Transactional
-  public NotebookClientView createNotebook(
-      @Valid @RequestBody NotebookCreationRequest noteCreation) {
+  public NotebookRealm createNotebook(@Valid @RequestBody NotebookCreationRequest noteCreation) {
     authorizationService.assertLoggedIn();
     User userEntity = authorizationService.getCurrentUser();
     Notebook notebook =
@@ -128,7 +126,7 @@ class NotebookController {
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
-    return notebookCatalogService.clientViewFor(notebook, userEntity);
+    return notebookCatalogService.notebookRealmFor(notebook, userEntity);
   }
 
   @PostMapping(value = "/{notebook}/create-note")

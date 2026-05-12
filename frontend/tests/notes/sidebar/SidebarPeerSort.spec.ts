@@ -53,7 +53,7 @@ describe("Sidebar peer sort", () => {
     wrapper = mountSidebarSignedIn(
       helper,
       fixtures.topNoteRealm,
-      fixtures.topNoteRealm.notebookView.notebook.id
+      fixtures.topNoteRealm.notebookRealm.notebook.id
     )
     await flushPromises()
     expect(wrapper.find("[data-note-sidebar-sort]").exists()).toBe(true)
@@ -111,7 +111,7 @@ describe("Sidebar peer sort", () => {
     wrapper = mountSidebarSignedIn(
       helper,
       realmA,
-      fixtures.topNoteRealm.notebookView.notebook.id
+      fixtures.topNoteRealm.notebookRealm.notebook.id
     )
     await flushUntilTwoRootFolderLabels()
 

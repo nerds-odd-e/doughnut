@@ -40,7 +40,7 @@ describe("NotebookPage.spec", () => {
   it("shows the sidebar toggle and loads index state when notebook exposes landing id", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
-    indexRealm.notebookView = { notebook, readonly: false }
+    indexRealm.notebookRealm = { notebook, readonly: false }
     mockSdkService(NotebookController, "get", {
       notebook,
       hasAttachedBook: false,
@@ -67,7 +67,7 @@ describe("NotebookPage.spec", () => {
   it("does not show absent index editor while landing note load is delayed", async () => {
     const notebook = makeMe.aNotebook.please()
     const indexRealm = makeMe.aNoteRealm.title("index").please()
-    indexRealm.notebookView = { notebook, readonly: false }
+    indexRealm.notebookRealm = { notebook, readonly: false }
     mockSdkService(NotebookController, "get", {
       notebook,
       hasAttachedBook: false,
@@ -127,7 +127,7 @@ describe("NotebookPage.spec", () => {
       .title("index")
       .content("existing")
       .please()
-    indexRealm.notebookView = { notebook, readonly: false }
+    indexRealm.notebookRealm = { notebook, readonly: false }
     mockSdkService(NotebookController, "get", {
       notebook,
       hasAttachedBook: false,
@@ -161,7 +161,7 @@ describe("NotebookPage.spec", () => {
       .title("index")
       .content("Notebook index body")
       .please()
-    indexRealm.notebookView = { notebook, readonly: false }
+    indexRealm.notebookRealm = { notebook, readonly: false }
 
     let getCount = 0
     mockSdkServiceWithImplementation(NotebookController, "get", async () => {

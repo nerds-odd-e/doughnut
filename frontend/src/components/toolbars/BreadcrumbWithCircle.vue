@@ -2,24 +2,24 @@
   <Breadcrumb
     v-bind="{
       ancestorFolders,
-      breadcrumbNotebookId: notebookView.notebook.id,
+      breadcrumbNotebookId: notebookRealm.notebook.id,
     }"
   >
     <template #topLink>
-      <li v-if="notebookView.readonly">
+      <li v-if="notebookRealm.readonly">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
         <li>
           <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
         </li>
-        <li v-if="notebookView.notebook.circle">
+        <li v-if="notebookRealm.notebook.circle">
           <router-link
             :to="{
               name: 'circleShow',
-              params: { circleId: notebookView.notebook.circle.id },
+              params: { circleId: notebookRealm.notebook.circle.id },
             }"
-            >{{ notebookView.notebook.circle.name }}</router-link
+            >{{ notebookRealm.notebook.circle.name }}</router-link
           >
         </li>
       </template>
@@ -27,9 +27,9 @@
         <router-link
           :to="{
             name: 'notebookPage',
-            params: { notebookId: String(notebookView.notebook.id) },
+            params: { notebookId: String(notebookRealm.notebook.id) },
           }"
-          >{{ notebookView.notebook.name }}</router-link
+          >{{ notebookRealm.notebook.name }}</router-link
         >
       </li>
     </template>
@@ -37,10 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Folder,
-  NotebookClientView,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NotebookRealm } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 
@@ -49,8 +46,8 @@ defineProps({
     type: Array as PropType<Folder[]>,
     default: () => [],
   },
-  notebookView: {
-    type: Object as PropType<NotebookClientView>,
+  notebookRealm: {
+    type: Object as PropType<NotebookRealm>,
     required: true,
   },
 })

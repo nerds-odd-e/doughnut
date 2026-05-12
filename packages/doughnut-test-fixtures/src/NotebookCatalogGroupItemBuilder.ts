@@ -1,7 +1,7 @@
 import type {
   Notebook,
   NotebookCatalogGroupItem,
-  NotebookClientView,
+  NotebookRealm,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import NotebookBuilder from './NotebookBuilder'
@@ -11,7 +11,7 @@ class NotebookCatalogGroupItemBuilder extends Builder<NotebookCatalogGroupItem> 
   private groupId = generateId()
   private groupName = 'Notebook group'
   private groupCreatedAt = new Date().toISOString()
-  private memberNotebooks: NotebookClientView[] = []
+  private memberNotebooks: NotebookRealm[] = []
 
   name(value: string) {
     this.groupName = value
@@ -37,7 +37,7 @@ class NotebookCatalogGroupItemBuilder extends Builder<NotebookCatalogGroupItem> 
     return this
   }
 
-  members(entries: NotebookClientView[]) {
+  members(entries: NotebookRealm[]) {
     this.memberNotebooks = [...entries]
     return this
   }

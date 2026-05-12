@@ -113,7 +113,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `createFolder`: POST `/api/notebooks/{notebook}/folders` -> `CreateFolderResponse` (request: `CreateFolderData`; path: notebook; body: FolderCreationRequest; response body: Folder)
 - `moveFolder`: POST `/api/notebooks/{notebook}/folders/{folder}/move` -> `MoveFolderResponse` (request: `MoveFolderData`; path: notebook, folder; body: FolderMoveRequest; response body: Folder)
 - `createNoteAtNotebookRoot`: POST `/api/notebooks/{notebook}/create-note` -> `CreateNoteAtNotebookRootResponse` (request: `CreateNoteAtNotebookRootData`; path: notebook; body: NoteCreationDto; response body: NoteRealm)
-- `createNotebook`: POST `/api/notebooks/create` -> `CreateNotebookResponse` (request: `CreateNotebookData`; body: NotebookCreationRequest; response body: NotebookClientView)
+- `createNotebook`: POST `/api/notebooks/create` -> `CreateNotebookResponse` (request: `CreateNotebookData`; body: NotebookCreationRequest; response body: NotebookRealm)
 - `updateNotebookGroup`: PATCH `/api/notebooks/{notebook}/notebook-group` -> `UpdateNotebookGroupResponse` (request: `UpdateNotebookGroupData`; path: notebook; body: UpdateNotebookGroupRequest; response body: Notebook)
 - `moveToCircle`: PATCH `/api/notebooks/{notebook}/move-to-circle/{circle}` -> `MoveToCircleResponse` (request: `MoveToCircleData`; path: notebook, circle; response body: Notebook)
 - `getAiAssistant`: GET `/api/notebooks/{notebook}/ai-assistant` -> `GetAiAssistantResponse` (request: `GetAiAssistantData`; path: notebook; response body: NotebookAiAssistant)
@@ -166,7 +166,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `index`: GET `/api/circles` -> `IndexResponse` (request: none; response body: Array<Circle>)
 - `createCircle`: POST `/api/circles` -> `CreateCircleResponse` (request: `CreateCircleData`; body: Circle; response body: Circle)
-- `createNotebookInCircle`: POST `/api/circles/{circle}/notebooks` -> `CreateNotebookInCircleResponse` (request: `CreateNotebookInCircleData`; path: circle; body: NotebookCreationRequest; response body: NotebookClientView)
+- `createNotebookInCircle`: POST `/api/circles/{circle}/notebooks` -> `CreateNotebookInCircleResponse` (request: `CreateNotebookInCircleData`; path: circle; body: NotebookCreationRequest; response body: NotebookRealm)
 - `joinCircle`: POST `/api/circles/join` -> `JoinCircleResponse` (request: `JoinCircleData`; body: CircleJoiningByInvitation; response body: Circle)
 - `showCircle`: GET `/api/circles/{circle}` -> `ShowCircleResponse` (request: `ShowCircleData`; path: circle; response body: CircleForUserView)
 

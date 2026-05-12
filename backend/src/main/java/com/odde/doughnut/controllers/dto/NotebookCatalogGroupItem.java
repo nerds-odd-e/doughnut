@@ -10,12 +10,12 @@ public final class NotebookCatalogGroupItem implements NotebookCatalogItem {
   @NotNull public Integer id;
   @NotNull public String name;
   @NotNull public Timestamp createdAt;
-  @NotNull public List<NotebookClientView> notebooks;
+  @NotNull public List<NotebookRealm> notebooks;
 
   public NotebookCatalogGroupItem() {}
 
   public NotebookCatalogGroupItem(
-      Integer id, String name, Timestamp createdAt, List<NotebookClientView> notebooks) {
+      Integer id, String name, Timestamp createdAt, List<NotebookRealm> notebooks) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;

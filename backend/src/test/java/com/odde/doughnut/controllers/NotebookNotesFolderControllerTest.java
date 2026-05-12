@@ -11,8 +11,8 @@ import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
+import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -30,7 +30,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
   private Notebook createNotebookWithTitle(String title) {
     NotebookCreationRequest createNb = new NotebookCreationRequest();
     createNb.setNewTitle(title);
-    NotebookClientView redirect = controller.createNotebook(createNb);
+    NotebookRealm redirect = controller.createNotebook(createNb);
     return notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
   }
 
@@ -243,10 +243,10 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(realm.sidebar().getNotebookView().notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.sidebar().getNotebookRealm().notebook().getId(), equalTo(nb.getId()));
       assertThat(realm.folder().getId(), equalTo(folder.getId()));
       assertThat(realm.folder().getName(), equalTo("Box"));
-      assertThat(realm.sidebar().getNotebookView().readonly(), is(false));
+      assertThat(realm.sidebar().getNotebookRealm().readonly(), is(false));
       assertThat(realm.parentFolderId(), nullValue());
     }
 
@@ -353,8 +353,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
 
       FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(realm.sidebar().getNotebookView().notebook().getId(), equalTo(nb.getId()));
-      assertThat(realm.sidebar().getNotebookView().readonly(), is(true));
+      assertThat(realm.sidebar().getNotebookRealm().notebook().getId(), equalTo(nb.getId()));
+      assertThat(realm.sidebar().getNotebookRealm().readonly(), is(true));
     }
 
     @Test

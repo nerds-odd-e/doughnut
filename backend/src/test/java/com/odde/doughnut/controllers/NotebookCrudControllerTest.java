@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
@@ -27,7 +26,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     void returnsNotebookIdAndDoesNotCreateNotes() throws UnexpectedNoAccessRightException {
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("My Notebook Title");
-      NotebookClientView response = controller.createNotebook(noteCreation);
+      NotebookRealm response = controller.createNotebook(noteCreation);
       assertThat(response.notebook().getId(), notNullValue());
       notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(
@@ -41,7 +40,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("Notebook With Blurb");
       noteCreation.setDescription("  Catalog blurb  ");
-      NotebookClientView response = controller.createNotebook(noteCreation);
+      NotebookRealm response = controller.createNotebook(noteCreation);
       assertThat(response.notebook().getId(), notNullValue());
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), equalTo("Catalog blurb"));
@@ -51,7 +50,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     void leavesDescriptionNullWhenUnset() throws UnexpectedNoAccessRightException {
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("Notebook No Blurb");
-      NotebookClientView response = controller.createNotebook(noteCreation);
+      NotebookRealm response = controller.createNotebook(noteCreation);
       assertThat(response.notebook().getId(), notNullValue());
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), nullValue());
@@ -65,7 +64,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("API Shape NB");
       noteCreation.setDescription("Blurb");
-      NotebookClientView response = controller.createNotebook(noteCreation);
+      NotebookRealm response = controller.createNotebook(noteCreation);
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
 
       NotebookRealm realm = controller.get(nb);
@@ -175,7 +174,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       assertEquals(
           notebooks,
           controller.myNotebooks().notebooks.stream()
-              .map(com.odde.doughnut.controllers.dto.NotebookClientView::notebook)
+              .map(com.odde.doughnut.controllers.dto.NotebookRealm::notebook)
               .toList());
     }
   }

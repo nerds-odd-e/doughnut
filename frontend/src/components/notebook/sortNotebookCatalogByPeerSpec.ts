@@ -1,4 +1,4 @@
-import type { NotebookClientView } from "@generated/doughnut-backend-api"
+import type { NotebookRealm } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import type { SidebarPeerSortSpec } from "@/composables/useNoteSidebarPeerSort"
 
@@ -91,8 +91,8 @@ function compareCatalogEntries(
 }
 
 function compareGroupMembers(
-  a: NotebookClientView,
-  b: NotebookClientView,
+  a: NotebookRealm,
+  b: NotebookRealm,
   spec: SidebarPeerSortSpec
 ): number {
   if (spec.field === "title") {

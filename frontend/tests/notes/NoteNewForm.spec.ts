@@ -96,7 +96,7 @@ describe("adding new note", () => {
   const note = realm.note
 
   const notebookRootProps = {
-    notebookId: realm.notebookView.notebook.id,
+    notebookId: realm.notebookRealm.notebook.id,
     titleSearchAnchorNote: note,
     ancestorFolders: realm.ancestorFolders ?? [],
   }
@@ -106,7 +106,7 @@ describe("adding new note", () => {
       .component(NoteNewForm)
       .withCleanStorage()
       .withProps({
-        notebookId: realm.notebookView.notebook.id,
+        notebookId: realm.notebookRealm.notebook.id,
         titleSearchAnchorNote: note,
         ancestorFolders: [],
         initialFolder: testFolderStub(99, "LeSS in Action"),
@@ -153,7 +153,7 @@ describe("adding new note", () => {
     await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
     await flushPromises()
     expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
-      path: { notebook: realm.notebookView.notebook.id },
+      path: { notebook: realm.notebookRealm.notebook.id },
       body: expect.objectContaining({ newTitle: "2026-05-09" }),
     })
     wrapper.unmount()
@@ -251,7 +251,7 @@ describe("adding new note", () => {
       await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
         path: {
-          notebook: realm.notebookView.notebook.id,
+          notebook: realm.notebookRealm.notebook.id,
         },
         body: expect.objectContaining({
           newTitle: "note title",
@@ -281,7 +281,7 @@ describe("adding new note", () => {
 
       await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
-        path: { notebook: realm.notebookView.notebook.id },
+        path: { notebook: realm.notebookRealm.notebook.id },
         body: expect.objectContaining({
           newTitle: "in folder",
           folderId: 42,
@@ -315,7 +315,7 @@ describe("adding new note", () => {
 
       await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
-        path: { notebook: realm.notebookView.notebook.id },
+        path: { notebook: realm.notebookRealm.notebook.id },
         body: expect.objectContaining({
           newTitle: "moved",
           folderId: 8,

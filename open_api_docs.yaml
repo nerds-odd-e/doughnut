@@ -1198,7 +1198,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebookClientView"
+                $ref: "#/components/schemas/NotebookRealm"
   /api/notebook-groups:
     post:
       tags:
@@ -1436,7 +1436,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebookClientView"
+                $ref: "#/components/schemas/NotebookRealm"
   /api/circles/join:
     post:
       tags:
@@ -3266,9 +3266,10 @@ components:
           format: int32
         note:
           $ref: "#/components/schemas/Note"
-        notebookView:
-          $ref: "#/components/schemas/NotebookClientView"
-          description: Notebook entity plus optional client-only fields.
+        notebookRealm:
+          $ref: "#/components/schemas/NotebookRealm"
+          description: "Notebook chrome: entity plus optional catalog hints and optional\
+            \ notebook index landing note id."
         ancestorFolders:
           type: array
           description: Folders from notebook root outward; see each realm for trail
@@ -3291,7 +3292,7 @@ components:
       required:
       - id
       - note
-      - notebookView
+      - notebookRealm
     NoteTopology:
       type: object
       properties:
@@ -3310,10 +3311,10 @@ components:
       required:
       - id
       - title
-    NotebookClientView:
+    NotebookRealm:
       type: object
-      description: Notebook entity plus optional client-only fields (e.g. catalog
-        attachment hints).
+      description: "Notebook chrome: entity plus optional catalog hints (attached\
+        \ book, readonly), optional notebook index landing note id when present."
       properties:
         notebook:
           $ref: "#/components/schemas/Notebook"
@@ -3321,6 +3322,12 @@ components:
           type: boolean
         readonly:
           type: boolean
+        indexNoteId:
+          type: integer
+          format: int32
+          description: Notebook index landing note id from cached notebook.index_note_id
+            when valid; otherwise repaired from the sole root note titled "index"
+            (case-insensitive). Omitted when absent.
       required:
       - notebook
     WikiTitle:
@@ -4276,7 +4283,7 @@ components:
           notebooks:
             type: array
             items:
-              $ref: "#/components/schemas/NotebookClientView"
+              $ref: "#/components/schemas/NotebookRealm"
       required:
       - createdAt
       - id
@@ -4326,7 +4333,7 @@ components:
         notebooks:
           type: array
           items:
-            $ref: "#/components/schemas/NotebookClientView"
+            $ref: "#/components/schemas/NotebookRealm"
         catalogItems:
           type: array
           items:
@@ -4362,25 +4369,6 @@ components:
       - dailyTargetOfNewNotes
       - id
       - notebook
-    NotebookRealm:
-      type: object
-      description: "Notebook chrome for loading the notebook page: same payload as\
-        \ NotebookClientView plus optional index landing note id when present."
-      properties:
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        hasAttachedBook:
-          type: boolean
-        readonly:
-          type: boolean
-        indexNoteId:
-          type: integer
-          format: int32
-          description: Notebook index landing note id from cached notebook.index_note_id
-            when valid; otherwise repaired from the sole root note titled "index"
-            (case-insensitive). Omitted when absent.
-      required:
-      - notebook
     FolderRealm:
       type: object
       description: "Notebook chrome plus folder row for loading the folder page: same\
@@ -4388,9 +4376,10 @@ components:
         \ identity, optional parent folder id, and optional designated folder index\
         \ note id."
       properties:
-        notebookView:
-          $ref: "#/components/schemas/NotebookClientView"
-          description: Notebook entity plus optional client-only fields.
+        notebookRealm:
+          $ref: "#/components/schemas/NotebookRealm"
+          description: "Notebook chrome: entity plus optional catalog hints and optional\
+            \ notebook index landing note id."
         ancestorFolders:
           type: array
           description: Folders from notebook root outward; see each realm for trail
@@ -4417,7 +4406,7 @@ components:
             (case-insensitive). Omitted when absent.
       required:
       - folder
-      - notebookView
+      - notebookRealm
     FolderListing:
       type: object
       description: Note topologies and child folders in a structural listing scope

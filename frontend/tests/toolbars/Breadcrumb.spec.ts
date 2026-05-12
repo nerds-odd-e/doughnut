@@ -9,7 +9,7 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        notebookView: {
+        notebookRealm: {
           notebook: makeMe.aNotebook.please(),
           readonly: true,
         },
@@ -24,7 +24,7 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        notebookView: { notebook, readonly: false },
+        notebookRealm: { notebook, readonly: false },
         ancestorFolders: [],
       })
       .render()
@@ -37,7 +37,7 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        notebookView: {
+        notebookRealm: {
           notebook: makeMe.aNotebook.please(),
           readonly: false,
         },
@@ -59,7 +59,7 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        notebookView: {
+        notebookRealm: {
           notebook: makeMe.aNotebook.please(),
           readonly: false,
         },
@@ -86,7 +86,7 @@ describe("breadcrumb with circles", () => {
     helper
       .component(BreadcrumbWithCircle)
       .withProps({
-        notebookView: {
+        notebookRealm: {
           notebook,
           readonly: false,
         },

@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
-import com.odde.doughnut.controllers.dto.NotebookClientView;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
@@ -53,18 +52,19 @@ public class NotebookCatalogService {
     this.noteRealmService = noteRealmService;
   }
 
-  public NotebookClientView clientViewFor(Notebook notebook, User viewer) {
-    boolean hasAttachedBook =
-        !bookRepository.findNotebookIdsWithAttachedBooksIn(List.of(notebook.getId())).isEmpty();
-    boolean readonly = viewer == null || !viewer.owns(notebook);
-    return NotebookClientView.of(notebook, hasAttachedBook, readonly);
+  private boolean hasAttachedBook(Notebook notebook) {
+    return !bookRepository.findNotebookIdsWithAttachedBooksIn(List.of(notebook.getId())).isEmpty();
+  }
+
+  private static boolean readonlyFor(Notebook notebook, User viewer) {
+    return viewer == null || !viewer.owns(notebook);
   }
 
   public NotebookRealm notebookRealmFor(Notebook notebook, User viewer) {
-    NotebookClientView base = clientViewFor(notebook, viewer);
     Integer indexNoteId =
         notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
-    return NotebookRealm.of(base, indexNoteId);
+    return NotebookRealm.of(
+        notebook, hasAttachedBook(notebook), readonlyFor(notebook, viewer), indexNoteId);
   }
 
   public FolderRealm folderRealmFor(Notebook notebook, Folder folder, User viewer) {
@@ -72,7 +72,7 @@ public class NotebookCatalogService {
         folderRepository
             .findById(folder.getId())
             .orElseThrow(() -> new IllegalStateException("Folder not found."));
-    NotebookClientView chrome = clientViewFor(notebook, viewer);
+    NotebookRealm chrome = notebookRealmFor(notebook, viewer);
     Integer parentFolderId =
         loaded.getParentFolder() == null ? null : loaded.getParentFolder().getId();
     Integer folderIndexNoteId =
@@ -105,14 +105,14 @@ public class NotebookCatalogService {
             ? Set.of()
             : new HashSet<>(bookRepository.findNotebookIdsWithAttachedBooksIn(ids));
 
-    Map<Integer, NotebookClientView> byNotebookId = new HashMap<>();
-    Function<Notebook, NotebookClientView> wrap =
+    Map<Integer, NotebookRealm> byNotebookId = new HashMap<>();
+    Function<Notebook, NotebookRealm> wrap =
         nb ->
             byNotebookId.computeIfAbsent(
                 nb.getId(),
                 __ ->
-                    NotebookClientView.of(
-                        nb, withBook.contains(nb.getId()), viewer == null || !viewer.owns(nb)));
+                    NotebookRealm.of(
+                        nb, withBook.contains(nb.getId()), readonlyFor(nb, viewer), null));
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();
@@ -143,7 +143,7 @@ public class NotebookCatalogService {
       List<Notebook> allNotebooks,
       List<NotebookGroup> groups,
       List<Subscription> subscriptions,
-      Function<Notebook, NotebookClientView> wrap,
+      Function<Notebook, NotebookRealm> wrap,
       Set<Integer> withBook) {
     List<SortableRow> rows = new ArrayList<>();
 

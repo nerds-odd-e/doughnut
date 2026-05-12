@@ -1,8 +1,8 @@
-import type { NotebookClientView } from "@generated/doughnut-backend-api"
+import type { NotebookRealm } from "@generated/doughnut-backend-api"
 
 export function groupCatalogMemberPreviewHint(args: {
   groupName: string
-  notebooks: NotebookClientView[]
+  notebooks: NotebookRealm[]
   memberPreviewLimit: number | null
   catalogFilterActive: boolean
 }): {

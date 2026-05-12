@@ -80,7 +80,7 @@ watch(
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const sidebarReadonly = computed(() => {
   if (!currentUser?.value) return true
-  const realmReadonly = props.activeNoteRealm?.notebookView.readonly
+  const realmReadonly = props.activeNoteRealm?.notebookRealm.readonly
   if (realmReadonly === true) return true
   if (props.activeNoteRealm != null) return false
   return props.notebookRealm?.readonly === true

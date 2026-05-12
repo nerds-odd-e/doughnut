@@ -73,9 +73,9 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.aBazaarNotebook(note.getNotebook()).please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
-      assertThat(noteRealm.getNotebookView().readonly(), is(true));
+      assertThat(noteRealm.getNotebookRealm().readonly(), is(true));
       assertThat(
-          noteRealm.getNotebookView().notebook().getId(), equalTo(note.getNotebook().getId()));
+          noteRealm.getNotebookRealm().notebook().getId(), equalTo(note.getNotebook().getId()));
     }
 
     @Test
@@ -83,9 +83,9 @@ class NoteControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
-      assertThat(noteRealm.getNotebookView().readonly(), is(false));
+      assertThat(noteRealm.getNotebookRealm().readonly(), is(false));
       assertThat(
-          noteRealm.getNotebookView().notebook().getId(), equalTo(note.getNotebook().getId()));
+          noteRealm.getNotebookRealm().notebook().getId(), equalTo(note.getNotebook().getId()));
     }
 
     @Test

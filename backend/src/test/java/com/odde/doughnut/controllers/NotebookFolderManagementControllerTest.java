@@ -28,7 +28,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       com.odde.doughnut.controllers.dto.NotebookCreationRequest createNb =
           new com.odde.doughnut.controllers.dto.NotebookCreationRequest();
       createNb.setNewTitle("NB Create Folder Root");
-      com.odde.doughnut.controllers.dto.NotebookClientView redirect =
+      com.odde.doughnut.controllers.dto.NotebookRealm redirect =
           controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
 
@@ -47,7 +47,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       com.odde.doughnut.controllers.dto.NotebookCreationRequest createNb =
           new com.odde.doughnut.controllers.dto.NotebookCreationRequest();
       createNb.setNewTitle("NB Create Nested");
-      com.odde.doughnut.controllers.dto.NotebookClientView redirect =
+      com.odde.doughnut.controllers.dto.NotebookRealm redirect =
           controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
 
@@ -70,7 +70,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       com.odde.doughnut.controllers.dto.NotebookCreationRequest createNb =
           new com.odde.doughnut.controllers.dto.NotebookCreationRequest();
       createNb.setNewTitle("NB Create Under Folder Id");
-      com.odde.doughnut.controllers.dto.NotebookClientView redirect =
+      com.odde.doughnut.controllers.dto.NotebookRealm redirect =
           controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
 
@@ -91,7 +91,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       com.odde.doughnut.controllers.dto.NotebookCreationRequest createNb =
           new com.odde.doughnut.controllers.dto.NotebookCreationRequest();
       createNb.setNewTitle("NB Dup Folder");
-      com.odde.doughnut.controllers.dto.NotebookClientView redirect =
+      com.odde.doughnut.controllers.dto.NotebookRealm redirect =
           controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
 

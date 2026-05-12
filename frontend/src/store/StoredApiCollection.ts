@@ -272,7 +272,7 @@ export default class StoredApiCollection implements StoredApi {
   } | null {
     const realm = this.storage.refOfNoteRealm(sourceId).value
     if (!realm?.note) return null
-    const notebookId = realm.notebookView.notebook.id
+    const notebookId = realm.notebookRealm.notebook.id
     if (notebookId == null) return null
     const folderId = realmLeafFolder(realm)?.id ?? null
     return { folderId, notebookId }
@@ -404,7 +404,7 @@ export default class StoredApiCollection implements StoredApi {
     notebookFallbackId?: number
   }> {
     const cached = this.storage.refOfNoteRealm(noteId).value
-    const notebookFallbackId = cached?.notebookView.notebook.id
+    const notebookFallbackId = cached?.notebookRealm.notebook.id
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
@@ -458,11 +458,11 @@ export default class StoredApiCollection implements StoredApi {
     }
     this.noteEditingHistory.deleteNote(noteId)
     this.storage.removeNoteRealm(noteId)
-    let notebookId = cachedRealm?.notebookView.notebook.id
+    let notebookId = cachedRealm?.notebookRealm.notebook.id
     let focusRealm: NoteRealm | undefined
     if (res.length > 0) {
       focusRealm = this.storage.refreshNoteRealm(res[0]!)
-      notebookId = notebookId ?? focusRealm.notebookView.notebook.id
+      notebookId = notebookId ?? focusRealm.notebookRealm.notebook.id
     }
     if (notebookId !== undefined) {
       await router.replace({

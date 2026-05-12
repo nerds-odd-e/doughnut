@@ -102,12 +102,12 @@ const relationTypeSelected = async (relationType: string | undefined) => {
     const { useRouter } = await import("vue-router")
     const router = useRouter()
     const realm = storageAccessor.value.refOfNoteRealm(props.note.id).value
-    const notebookId = realm?.notebookView.notebook.id
+    const notebookId = realm?.notebookRealm.notebook.id
     if (realm == null || notebookId == null) {
       throw new Error("Missing notebook for source note")
     }
 
-    const sourceNotebookName = realm.notebookView.notebook.name
+    const sourceNotebookName = realm.notebookRealm.notebook.name
     const sourceFolderId = realmLeafFolder(realm)?.id
     const sourceTitle = props.note.noteTopology.title
 

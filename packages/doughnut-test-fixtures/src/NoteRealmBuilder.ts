@@ -1,7 +1,7 @@
 import type {
   Folder,
   NoteRealm,
-  NotebookClientView,
+  NotebookRealm,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import FolderBuilder from './FolderBuilder'
@@ -24,7 +24,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       createdAt: ts,
       updatedAt: ts,
     }
-    const notebookView: NotebookClientView = {
+    const notebookRealm: NotebookRealm = {
       notebook,
       readonly: false,
     }
@@ -33,7 +33,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       note: noteData,
       references: [],
       wikiTitles: [],
-      notebookView,
+      notebookRealm,
       ancestorFolders: [],
     }
   }
@@ -88,7 +88,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do()
     this.data.id = this.data.note.id
-    const nb = this.data.notebookView.notebook
+    const nb = this.data.notebookRealm.notebook
     if (nb) {
       nb.id = this.noteBuilder.realmNotebookId
       nb.name = this.data.note.noteTopology.title

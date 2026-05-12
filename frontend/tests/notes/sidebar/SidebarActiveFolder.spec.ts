@@ -60,7 +60,7 @@ describe("Sidebar active folder", () => {
     expect(pushSpy).toHaveBeenCalledWith({
       name: "folderPage",
       params: {
-        notebookId: String(fixtures.firstGeneration.notebookView.notebook.id),
+        notebookId: String(fixtures.firstGeneration.notebookRealm.notebook.id),
         folderId: String(FOLDER_TOP_NOTE_CHILDREN_ID),
       },
     })

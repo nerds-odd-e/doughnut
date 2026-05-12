@@ -179,7 +179,7 @@ export function mountSidebar(
     .withRouter()
     .withProps({
       activeNoteRealm: active,
-      notebookId: active.notebookView.notebook.id,
+      notebookId: active.notebookRealm.notebook.id,
       notebookRealm,
       breadcrumbFolders: active.ancestorFolders ?? [],
     })
@@ -264,7 +264,7 @@ export function setupDefaultSidebarSdkMocks(fixtures: SidebarTreeFixtures) {
       const title = nameById[path.folder] ?? `Folder #${path.folder}`
       return {
         ...makeMe.aFolderRealm.folder(path.folder, title).please(),
-        notebookView: fixtures.topNoteRealm.notebookView,
+        notebookRealm: fixtures.topNoteRealm.notebookRealm,
       }
     }
   )
@@ -309,7 +309,7 @@ export function setupRootPeersWithFolders(options: {
 }) {
   const { storageAccessor, topNoteRealm, realmZ, realmA, folderExtras } =
     options
-  const nbId = topNoteRealm.notebookView.notebook.id
+  const nbId = topNoteRealm.notebookRealm.notebook.id
   storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
   storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
   storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm

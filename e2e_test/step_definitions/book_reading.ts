@@ -183,7 +183,7 @@ Given(
       )
       .then((showResponse) => {
         const realm = unwrapData<NoteRealm>(showResponse)
-        const notebookId = realm.notebookView.notebook.id
+        const notebookId = realm.notebookRealm.notebook.id
         expect(notebookId, 'note must belong to a notebook').to.be.a('number')
         return cy
           .wrap(

@@ -33,7 +33,7 @@ describe("Sidebar notebook shell", () => {
     wrapper = mountSidebarSignedIn(
       helper,
       undefined,
-      fixtures.topNoteRealm.notebookView.notebook.id
+      fixtures.topNoteRealm.notebookRealm.notebook.id
     )
     await flushPromises()
     expect(wrapper.find('button[aria-label="expand children"]').exists()).toBe(
@@ -45,12 +45,12 @@ describe("Sidebar notebook shell", () => {
     wrapper = mountSidebarSignedIn(
       helper,
       fixtures.topNoteRealm,
-      fixtures.topNoteRealm.notebookView.notebook.id
+      fixtures.topNoteRealm.notebookRealm.notebook.id
     )
     await flushPromises()
     await wrapper.setProps({
       activeNoteRealm: undefined,
-      notebookId: fixtures.topNoteRealm.notebookView.notebook.id,
+      notebookId: fixtures.topNoteRealm.notebookRealm.notebook.id,
     })
     await flushPromises()
     expect(
@@ -66,7 +66,7 @@ describe("Sidebar notebook shell", () => {
     wrapper = mountSidebarSignedIn(
       helper,
       undefined,
-      fixtures.topNoteRealm.notebookView.notebook.id,
+      fixtures.topNoteRealm.notebookRealm.notebook.id,
       {
         notebook: makeMe.aNotebook.please(),
         readonly: true,
