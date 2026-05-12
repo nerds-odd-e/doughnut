@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.entities.Folder;
@@ -428,6 +429,62 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.listNotebookFolderIndex(nb));
+    }
+  }
+
+  @Nested
+  class UpdateFolderIndexContent {
+    @Test
+    void updatesFolderIndexContentDirectly() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
+      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
+      dto.setContent("direct folder index content");
+
+      FolderRealm result = controller.updateFolderIndexContent(nb, folder, dto);
+
+      assertThat(result.indexContent(), equalTo("direct folder index content"));
+    }
+
+    @Test
+    void clearsFolderIndexContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder =
+          makeMe.aFolder().notebook(nb).name("Box").indexContent("old folder content").please();
+      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
+      dto.setContent("   ");
+
+      FolderRealm result = controller.updateFolderIndexContent(nb, folder, dto);
+
+      assertThat(result.indexContent(), nullValue());
+    }
+
+    @Test
+    void requiresAuthorizationToUpdateFolderIndexContent() {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
+      currentUser.setUser(makeMe.aUser().please());
+      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateFolderIndexContent(nb, folder, dto));
+    }
+
+    @Test
+    void rejectsFolderFromAnotherNotebook() {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder foreign = makeMe.aFolder().notebook(otherNb).name("Other").please();
+      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.updateFolderIndexContent(nb, foreign, dto));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
   }
 

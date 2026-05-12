@@ -15,87 +15,34 @@
       <ScopedIndexNoteEditor
         :notebook-id="folderForView.notebookRealm.notebook.id"
         :folder-id="folderForView.folder.id"
-        :index-note-status="indexNoteStatus"
-        :index-note-id="sidebarAnchorNoteId"
-        :fetch-page="fetchFolderPage"
+        :index-content="folderForView.indexContent ?? null"
         test-id-prefix="folder-index"
         rich-editor-scope-name="folder-index"
-        loading-hint="Loading folder index…"
-        absent-heading="Folder index"
-        absent-help-before="No index note yet. Edit below and save to create a note titled "
-        absent-help-after=" in this folder."
-        present-title-fallback="Folder index"
+        heading-label="Folder index"
         save-button-idle-label="Save folder index"
         save-button-saving-label="Saving…"
         success-toast-saved="Folder index saved"
-        success-toast-after-race="Folder index is now available"
-        error-toast-after-race="Could not create folder index: a conflicting note may exist. Refresh the page and try again."
-        @index-note-created="fetchFolderPage"
+        @saved="fetchFolderPage"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import type { FolderRealm } from "@generated/doughnut-backend-api"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
   fetchFolderPage: () => Promise<void>
 }>()
 
-const storageAccessor = useStorageAccessor()
-
 const folderForView = computed((): FolderRealm | undefined => {
   const r = props.folderRealm
   if (r?.notebookRealm?.notebook == null) return undefined
   return r
 })
-
-const sidebarAnchorNoteId = ref<number | undefined>()
-const indexNoteStatus = ref<"pending" | "present" | "absent">("pending")
-let indexResolveGeneration = 0
-
-watch(
-  () =>
-    props.folderRealm?.folder
-      ? ([
-          props.folderRealm.folder.id,
-          props.folderRealm.folderIndexNoteId ?? null,
-        ] as const)
-      : undefined,
-  async (key) => {
-    if (key === undefined) {
-      sidebarAnchorNoteId.value = undefined
-      indexNoteStatus.value = "pending"
-      return
-    }
-
-    const [, folderIndexNoteId] = key
-    const gen = ++indexResolveGeneration
-    sidebarAnchorNoteId.value = undefined
-    indexNoteStatus.value = "pending"
-
-    if (folderIndexNoteId == null) {
-      indexNoteStatus.value = "absent"
-      return
-    }
-
-    try {
-      await storageAccessor.value.storedApi().loadNoteRealm(folderIndexNoteId)
-      if (gen !== indexResolveGeneration) return
-      sidebarAnchorNoteId.value = folderIndexNoteId
-      indexNoteStatus.value = "present"
-    } catch {
-      if (gen !== indexResolveGeneration) return
-      indexNoteStatus.value = "absent"
-    }
-  },
-  { immediate: true }
-)
 </script>

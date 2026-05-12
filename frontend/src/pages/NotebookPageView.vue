@@ -14,10 +14,8 @@
 
     <ScopedIndexNoteEditor
       :notebook-id="notebook.id"
-      :index-note-status="indexNoteStatus"
-      :index-note-id="indexNoteId"
-      :fetch-page="fetchNotebookPage"
-      @index-note-created="emit('index-note-created')"
+      :index-content="indexContent"
+      @saved="emit('index-content-updated')"
     />
 
     <NotebookAttachedBookSection :notebook-id="notebook.id" />
@@ -172,11 +170,11 @@ const props = defineProps({
     type: Function as PropType<() => Promise<void>>,
     required: true,
   },
-  indexNoteStatus: {
-    type: String as PropType<"pending" | "present" | "absent">,
-    default: "absent",
+  indexContent: {
+    type: String as PropType<string | null>,
+    required: false,
+    default: null,
   },
-  indexNoteId: { type: Number, required: false },
 })
 
 const aiAssistant = ref<NotebookAiAssistant | undefined>(undefined)
@@ -206,7 +204,7 @@ watch(
 
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
-  (e: "index-note-created"): void
+  (e: "index-content-updated"): void
 }>()
 
 const { showSuccessToast } = useToast()

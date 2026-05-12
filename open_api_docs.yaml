@@ -1773,6 +1773,65 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebook}/index-content:
+    patch:
+      tags:
+      - notebook-controller
+      summary: Update notebook index content directly
+      description: Saves the given markdown (with optional YAML frontmatter) as the
+        notebook container's indexContent field. Blank content clears the field.
+      operationId: updateNotebookIndexContent
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteUpdateContentDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookRealm"
+  /api/notebooks/{notebook}/folders/{folder}/index-content:
+    patch:
+      tags:
+      - notebook-controller
+      summary: Update folder index content directly
+      description: Saves the given markdown (with optional YAML frontmatter) as the
+        folder container's indexContent field. Blank content clears the field.
+      operationId: updateFolderIndexContent
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteUpdateContentDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FolderRealm"
   /api/notebooks/{notebook}/book/reading-position:
     get:
       tags:
@@ -2262,7 +2321,6 @@ paths:
     get:
       tags:
       - notebook-controller
-      summary: List all folders in notebook (flat index)
       description: Folder rows (including parentFolderId) for building folder trees
         and paths. Ordered by id.
       operationId: listNotebookFolderIndex
@@ -4066,6 +4124,48 @@ components:
         notebookGroupId:
           type: integer
           format: int32
+    FolderRealm:
+      type: object
+      description: "Notebook chrome plus folder row for loading the folder page: same\
+        \ shared realm sidebar as NoteRealm (without note-level fields), plus folder\
+        \ identity, optional parent folder id, optional designated folder index note\
+        \ id, and optional container-owned folder index markdown."
+      properties:
+        notebookRealm:
+          $ref: "#/components/schemas/NotebookRealm"
+          description: "Notebook chrome: entity plus optional catalog hints and optional\
+            \ notebook index landing note id."
+        ancestorFolders:
+          type: array
+          description: Folders from notebook root outward; see each realm for trail
+            semantics.
+          items:
+            $ref: "#/components/schemas/Folder"
+        indexNoteContent:
+          type: string
+          description: Full markdown of the designated index note that supplies the
+            nearest non-blank title_pattern (inner scope toward notebook root). Omitted
+            when none applies.
+        folder:
+          $ref: "#/components/schemas/Folder"
+        parentFolderId:
+          type: integer
+          format: int32
+          description: Parent folder id when this folder is nested; omitted at notebook
+            root.
+        folderIndexNoteId:
+          type: integer
+          format: int32
+          description: Folder index landing note id from cached folder.index_note_id
+            when valid; otherwise repaired from notes titled "index" in this folder
+            (case-insensitive). Omitted when absent.
+        indexContent:
+          type: string
+          description: Container-owned folder index markdown (populated by migration
+            from legacy index note). Omitted when absent.
+      required:
+      - folder
+      - notebookRealm
     BookLastReadPositionRequest:
       type: object
       properties:
@@ -4378,48 +4478,6 @@ components:
       - dailyTargetOfNewNotes
       - id
       - notebook
-    FolderRealm:
-      type: object
-      description: "Notebook chrome plus folder row for loading the folder page: same\
-        \ shared realm sidebar as NoteRealm (without note-level fields), plus folder\
-        \ identity, optional parent folder id, optional designated folder index note\
-        \ id, and optional container-owned folder index markdown."
-      properties:
-        notebookRealm:
-          $ref: "#/components/schemas/NotebookRealm"
-          description: "Notebook chrome: entity plus optional catalog hints and optional\
-            \ notebook index landing note id."
-        ancestorFolders:
-          type: array
-          description: Folders from notebook root outward; see each realm for trail
-            semantics.
-          items:
-            $ref: "#/components/schemas/Folder"
-        indexNoteContent:
-          type: string
-          description: Full markdown of the designated index note that supplies the
-            nearest non-blank title_pattern (inner scope toward notebook root). Omitted
-            when none applies.
-        folder:
-          $ref: "#/components/schemas/Folder"
-        parentFolderId:
-          type: integer
-          format: int32
-          description: Parent folder id when this folder is nested; omitted at notebook
-            root.
-        folderIndexNoteId:
-          type: integer
-          format: int32
-          description: Folder index landing note id from cached folder.index_note_id
-            when valid; otherwise repaired from notes titled "index" in this folder
-            (case-insensitive). Omitted when absent.
-        indexContent:
-          type: string
-          description: Container-owned folder index markdown (populated by migration
-            from legacy index note). Omitted when absent.
-      required:
-      - folder
-      - notebookRealm
     FolderListing:
       type: object
       description: Note topologies and child folders in a structural listing scope

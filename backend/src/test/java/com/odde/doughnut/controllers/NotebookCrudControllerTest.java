@@ -187,6 +187,44 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
   }
 
   @Nested
+  class UpdateNotebookIndexContent {
+    @Test
+    void updatesIndexContentDirectly() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
+      dto.setContent("direct notebook index content");
+
+      NotebookRealm result = controller.updateNotebookIndexContent(nb, dto);
+
+      assertThat(result.indexContent(), equalTo("direct notebook index content"));
+    }
+
+    @Test
+    void clearsIndexContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).indexContent("old content").please();
+      var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
+      dto.setContent("   ");
+
+      NotebookRealm result = controller.updateNotebookIndexContent(nb, dto);
+
+      assertThat(result.indexContent(), nullValue());
+    }
+
+    @Test
+    void requiresAuthorizationToUpdateIndexContent() {
+      User owner = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      currentUser.setUser(makeMe.aUser().please());
+      var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateNotebookIndexContent(nb, dto));
+    }
+  }
+
+  @Nested
   class showNoteTest {
     @Test
     void whenNotLogin() {

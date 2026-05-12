@@ -4,22 +4,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.controllers.dto.WikiTitle;
-import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
-import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.io.IOException;
 import java.util.List;
@@ -32,8 +27,6 @@ class TextContentControllerTests extends ControllerTestBase {
   @Autowired TextContentController controller;
   @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   @Autowired ImageRepository imageRepository;
-  @Autowired NotebookRepository notebookRepository;
-  @Autowired FolderRepository folderRepository;
 
   Note note;
 
@@ -240,90 +233,6 @@ class TextContentControllerTests extends ControllerTestBase {
 
       assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(true));
       assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(true));
-    }
-  }
-
-  @Nested
-  class ContainerIndexContentMirrorBridge {
-
-    @Test
-    void mirrorsContentToNotebookIndexContentWhenNoteIsDesignatedNotebookIndex()
-        throws UnexpectedNoAccessRightException {
-      Note indexNote =
-          makeMe
-              .aNote()
-              .creatorAndOwner(currentUser.getUser())
-              .title("index")
-              .content("old content")
-              .please();
-      Notebook nb = indexNote.getNotebook();
-      makeMe.theNotebook(nb).indexNote(indexNote).please();
-      makeMe.entityPersister.flush();
-
-      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
-      dto.setContent("updated notebook index content");
-      controller.updateNoteContent(indexNote, dto);
-
-      makeMe.entityPersister.flush();
-      Notebook reloaded = notebookRepository.findById(nb.getId()).orElseThrow();
-      assertThat(reloaded.getIndexContent(), equalTo("updated notebook index content"));
-    }
-
-    @Test
-    void doesNotMirrorToNotebookIndexContentForNonDesignatedNote()
-        throws UnexpectedNoAccessRightException {
-      Note regularNote =
-          makeMe
-              .aNote()
-              .creatorAndOwner(currentUser.getUser())
-              .title("regular")
-              .content("initial")
-              .please();
-      Notebook nb = regularNote.getNotebook();
-      Note designatedIndex =
-          makeMe
-              .aNote()
-              .creatorAndOwner(currentUser.getUser())
-              .inNotebook(nb)
-              .title("index")
-              .content("index content")
-              .please();
-      makeMe.theNotebook(nb).indexNote(designatedIndex).please();
-      makeMe.entityPersister.flush();
-
-      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
-      dto.setContent("should not mirror");
-      controller.updateNoteContent(regularNote, dto);
-
-      makeMe.entityPersister.flush();
-      Notebook reloaded = notebookRepository.findById(nb.getId()).orElseThrow();
-      assertThat(reloaded.getIndexContent(), nullValue());
-    }
-
-    @Test
-    void mirrorsContentToFolderIndexContentWhenNoteIsDesignatedFolderIndex()
-        throws UnexpectedNoAccessRightException {
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Folder folder = makeMe.aFolder().notebook(nb).name("Scoped").please();
-      Note folderIndexNote =
-          makeMe
-              .aNote()
-              .creatorAndOwner(currentUser.getUser())
-              .inNotebook(nb)
-              .folder(folder)
-              .title("index")
-              .content("old folder index")
-              .please();
-      makeMe.theFolder(folder).indexNote(folderIndexNote).please();
-      makeMe.entityPersister.flush();
-
-      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
-      dto.setContent("updated folder index content");
-      controller.updateNoteContent(folderIndexNote, dto);
-
-      makeMe.entityPersister.flush();
-      Folder reloaded = folderRepository.findById(folder.getId()).orElseThrow();
-      assertThat(reloaded.getIndexContent(), equalTo("updated folder index content"));
     }
   }
 }

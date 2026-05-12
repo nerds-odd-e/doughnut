@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
@@ -359,7 +360,48 @@ class NotebookController {
   }
 
   @Operation(
-      summary = "List all folders in notebook (flat index)",
+      summary = "Update notebook index content directly",
+      description =
+          "Saves the given markdown (with optional YAML frontmatter) as the notebook container's"
+              + " indexContent field. Blank content clears the field.")
+  @PatchMapping("/{notebook}/index-content")
+  @Transactional
+  public NotebookRealm updateNotebookIndexContent(
+      @PathVariable @Schema(type = "integer") Notebook notebook,
+      @RequestBody NoteUpdateContentDTO dto)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    String content = dto.getContent();
+    notebook.setIndexContent(content == null || content.isBlank() ? null : content);
+    entityPersister.flush();
+    User user = authorizationService.getCurrentUser();
+    return notebookCatalogService.notebookRealmFor(notebook, user);
+  }
+
+  @Operation(
+      summary = "Update folder index content directly",
+      description =
+          "Saves the given markdown (with optional YAML frontmatter) as the folder container's"
+              + " indexContent field. Blank content clears the field.")
+  @PatchMapping("/{notebook}/folders/{folder}/index-content")
+  @Transactional
+  public FolderRealm updateFolderIndexContent(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder,
+      @RequestBody NoteUpdateContentDTO dto)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    if (!folder.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    }
+    String content = dto.getContent();
+    folder.setIndexContent(content == null || content.isBlank() ? null : content);
+    entityPersister.flush();
+    User user = authorizationService.getCurrentUser();
+    return notebookCatalogService.folderRealmFor(notebook, folder, user);
+  }
+
+  @Operation(
       description =
           "Folder rows (including parentFolderId) for building folder trees and paths. Ordered by"
               + " id.")

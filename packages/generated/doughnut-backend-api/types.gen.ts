@@ -643,6 +643,37 @@ export type UpdateNotebookGroupRequest = {
     notebookGroupId?: number;
 };
 
+/**
+ * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, optional designated folder index note id, and optional container-owned folder index markdown.
+ */
+export type FolderRealm = {
+    /**
+     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
+     */
+    notebookRealm: NotebookRealm;
+    /**
+     * Folders from notebook root outward; see each realm for trail semantics.
+     */
+    ancestorFolders?: Array<Folder>;
+    /**
+     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     */
+    indexNoteContent?: string;
+    folder: Folder;
+    /**
+     * Parent folder id when this folder is nested; omitted at notebook root.
+     */
+    parentFolderId?: number;
+    /**
+     * Folder index landing note id from cached folder.index_note_id when valid; otherwise repaired from notes titled "index" in this folder (case-insensitive). Omitted when absent.
+     */
+    folderIndexNoteId?: number;
+    /**
+     * Container-owned folder index markdown (populated by migration from legacy index note). Omitted when absent.
+     */
+    indexContent?: string;
+};
+
 export type BookLastReadPositionRequest = {
     locator?: ContentLocatorFull;
     /**
@@ -786,37 +817,6 @@ export type SubscriptionForNotebooksListing = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     name?: string;
-};
-
-/**
- * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, optional designated folder index note id, and optional container-owned folder index markdown.
- */
-export type FolderRealm = {
-    /**
-     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
-     */
-    notebookRealm: NotebookRealm;
-    /**
-     * Folders from notebook root outward; see each realm for trail semantics.
-     */
-    ancestorFolders?: Array<Folder>;
-    /**
-     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
-     */
-    indexNoteContent?: string;
-    folder: Folder;
-    /**
-     * Parent folder id when this folder is nested; omitted at notebook root.
-     */
-    parentFolderId?: number;
-    /**
-     * Folder index landing note id from cached folder.index_note_id when valid; otherwise repaired from notes titled "index" in this folder (case-insensitive). Omitted when absent.
-     */
-    folderIndexNoteId?: number;
-    /**
-     * Container-owned folder index markdown (populated by migration from legacy index note). Omitted when absent.
-     */
-    indexContent?: string;
 };
 
 /**
@@ -2491,6 +2491,43 @@ export type MoveToCircleResponses = {
 };
 
 export type MoveToCircleResponse = MoveToCircleResponses[keyof MoveToCircleResponses];
+
+export type UpdateNotebookIndexContentData = {
+    body: NoteUpdateContentDto;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/index-content';
+};
+
+export type UpdateNotebookIndexContentResponses = {
+    /**
+     * OK
+     */
+    200: NotebookRealm;
+};
+
+export type UpdateNotebookIndexContentResponse = UpdateNotebookIndexContentResponses[keyof UpdateNotebookIndexContentResponses];
+
+export type UpdateFolderIndexContentData = {
+    body: NoteUpdateContentDto;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}/index-content';
+};
+
+export type UpdateFolderIndexContentResponses = {
+    /**
+     * OK
+     */
+    200: FolderRealm;
+};
+
+export type UpdateFolderIndexContentResponse = UpdateFolderIndexContentResponses[keyof UpdateFolderIndexContentResponses];
 
 export type GetNotebookBookReadingPositionData = {
     body?: never;
