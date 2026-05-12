@@ -15,15 +15,7 @@ class AiToolFactoryTest {
     assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getMessageBody(), containsString("focus note"));
     assertThat(result.getMessageBody(), containsString("memory-stimulating, single-answer MCQ"));
-    assertThat(result.getMessageBody(), containsString("exactly three choices"));
-    assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
-  }
-
-  @Test
-  void shouldMaintainBackwardCompatibilityWithMcqMethod() {
-    InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool();
-
-    assertThat(result.getMessageBody(), containsString("exactly three choices"));
+    assertThat(result.getMessageBody(), containsString("exactly 4 choices"));
     assertThat(result.getParameterClass(), equalTo(MCQWithAnswer.class));
   }
 
