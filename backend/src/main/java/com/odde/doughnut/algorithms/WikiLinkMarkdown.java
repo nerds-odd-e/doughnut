@@ -12,7 +12,32 @@ public final class WikiLinkMarkdown {
 
   public static final Pattern INNER_LINK_PATTERN = Pattern.compile("\\[\\[([^\\]]+)]]");
 
+  /**
+   * Target and display segments of {@code [[inner]]} (first {@code |} separates; mirrors frontend).
+   */
+  public record WikiInnerSplit(String target, String display) {}
+
   private WikiLinkMarkdown() {}
+
+  /**
+   * Splits wiki link inner text on the first {@code |}. Empty right-hand side is treated as no pipe
+   * (display equals target).
+   */
+  public static WikiInnerSplit splitInner(String rawBetweenBrackets) {
+    if (rawBetweenBrackets == null || rawBetweenBrackets.isEmpty()) {
+      return new WikiInnerSplit("", "");
+    }
+    int i = rawBetweenBrackets.indexOf('|');
+    if (i == -1) {
+      return new WikiInnerSplit(rawBetweenBrackets, rawBetweenBrackets);
+    }
+    String target = rawBetweenBrackets.substring(0, i);
+    String display = rawBetweenBrackets.substring(i + 1);
+    if (display.trim().isEmpty()) {
+      return new WikiInnerSplit(target, target);
+    }
+    return new WikiInnerSplit(target, display);
+  }
 
   public static List<String> innerTitlesInOccurrenceOrder(String markdown) {
     if (markdown == null || markdown.isEmpty()) {

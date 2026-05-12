@@ -299,8 +299,7 @@ turndownService.addRule("doughnutWikiNoteLink", {
     return (node as HTMLElement).classList.contains("doughnut-link")
   },
   replacement(_content, node) {
-    const text = (node as HTMLElement).textContent?.trim() ?? ""
-    return `[[${text}]]`
+    return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)
   },
 })
 
@@ -329,6 +328,9 @@ turndownService.addRule("doughnutNoteShowHrefWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
     const el = node as HTMLAnchorElement
+    if (el.classList.contains("doughnut-link")) {
+      return false
+    }
     return hrefIsInternalNoteShow(el.getAttribute("href"))
   },
   replacement(_content, node) {

@@ -1,3 +1,4 @@
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -33,7 +34,7 @@ describe("RichMarkdownEditor", () => {
   })
 
   it("linkifies wikilinks in Quill HTML while model matches the interval", async () => {
-    const wikiTitles = [{ linkText: "MyNote", noteId: 42 }]
+    const wikiTitles = [wikiTitleFromInnerAndNoteId("MyNote", 42)]
     const wrapper = await h.mountEditor("", { wikiTitles })
     await flushPromises()
 
@@ -44,7 +45,7 @@ describe("RichMarkdownEditor", () => {
     await flushPromises()
 
     expect(String(quill.props("modelValue"))).toContain(
-      '<a href="/d/n/42" class="doughnut-link">'
+      '<a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote"'
     )
   })
 })

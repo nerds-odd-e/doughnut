@@ -3395,12 +3395,18 @@ components:
       properties:
         linkText:
           type: string
+        targetToken:
+          type: string
+        displayText:
+          type: string
         noteId:
           type: integer
           format: int32
       required:
+      - displayText
       - linkText
       - noteId
+      - targetToken
     QuestionContestResult:
       type: object
       properties:

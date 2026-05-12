@@ -51,7 +51,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteTextContent.sp
 ## 9.2 — Rich Mode Shows Display Text for Resolved Links
 
 **Type:** Behavior  
-**Status:** Planned
+**Status:** Done
 
 Pre-condition: A source note contains `[[Target Note|friendly label]]`, and `Target Note` resolves to an existing note.
 

@@ -1,6 +1,24 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { noteShowHref } from "@/routes/noteShowLocation"
 
+/** Builds API-shaped {@link WikiTitle} for tests and local fixtures from markdown inner + note id. */
+export function wikiTitleFromInnerAndNoteId(
+  inner: string,
+  noteId: number
+): WikiTitle {
+  const { target, display } = splitWikiLinkInner(inner)
+  return { linkText: inner, targetToken: target, displayText: display, noteId }
+}
+
+/** Normalized target, display label, and full inner for a wiki title from the note realm. */
+export function wikiTitleParts(w: WikiTitle): {
+  target: string
+  display: string
+  inner: string
+} {
+  return { target: w.targetToken, display: w.displayText, inner: w.linkText }
+}
+
 export function escapeHtmlForWikiPropertyValue(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -50,7 +68,9 @@ export function propertyValuePlainToDisplayHtml(
 ): string {
   const map = new Map<string, number>()
   for (const w of wikiTitles) {
-    map.set(w.linkText, w.noteId)
+    const { target } = wikiTitleParts(w)
+    map.set(target.trim(), w.noteId)
+    map.set(w.linkText.trim(), w.noteId)
   }
 
   const re = /\[\[([^\[\]\r\n]*)\]\]/g
@@ -71,7 +91,7 @@ export function propertyValuePlainToDisplayHtml(
     }
 
     const { target, display } = splitWikiLinkInner(titleRaw)
-    const noteId = map.get(target) ?? map.get(target.trim())
+    const noteId = map.get(titleRaw.trim()) ?? map.get(target.trim())
     const innerHtml = wikiLinkBracketedInnerHtml(display)
     const attrTarget = escapeHtmlAttributeValue(target)
     const displayAttr =
@@ -114,17 +134,34 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
     }
     return `[[${raw}]]`
   }
+
+  const fromDisplayAttr = anchor.getAttribute("data-wiki-display")
   const innerM = /^\[\[([\s\S]*)\]\]$/.exec(raw)
-  if (innerM === null) {
+
+  if (fromDisplayAttr !== null && fromDisplayAttr !== "") {
+    const displayPart = fromDisplayAttr
+    if (displayPart === target) {
+      return `[[${target}]]`
+    }
+    return `[[${target}|${displayPart}]]`
+  }
+
+  if (innerM !== null) {
+    const visibleInner = innerM[1]!
+    if (visibleInner === target) {
+      return `[[${target}]]`
+    }
+    return `[[${target}|${visibleInner}]]`
+  }
+
+  if (raw.startsWith("[[") && !raw.endsWith("]]")) {
     return raw
   }
-  const visibleInner = innerM[1]!
-  const fromDisplayAttr = anchor.getAttribute("data-wiki-display")
-  const displayPart = fromDisplayAttr ?? visibleInner
-  if (displayPart === target) {
+
+  if (raw === target) {
     return `[[${target}]]`
   }
-  return `[[${target}|${displayPart}]]`
+  return `[[${target}|${raw}]]`
 }
 
 /** Serializes the editor root (top-level nodes) back to a plain scalar. Wiki anchors use visible text only (so in-place edits are saved). */

@@ -46,7 +46,12 @@ public class WikiLinkResolver {
   }
 
   private Note resolveToken(String token, User viewer, Note focusNote) {
-    Qualified qualified = Qualified.tryParse(token);
+    var parts = WikiLinkMarkdown.splitInner(token);
+    String resolutionKey = parts.target();
+    if (resolutionKey == null || resolutionKey.isBlank()) {
+      return null;
+    }
+    Qualified qualified = Qualified.tryParse(resolutionKey);
     if (qualified != null) {
       return firstReadableNotebookMatch(qualified.notebookName(), qualified.noteTitle(), viewer);
     }
@@ -54,7 +59,7 @@ public class WikiLinkResolver {
     if (focusNotebook == null) {
       return null;
     }
-    return firstReadableNotebookMatch(focusNotebook.getName(), token, viewer);
+    return firstReadableNotebookMatch(focusNotebook.getName(), resolutionKey, viewer);
   }
 
   private Note firstReadableNotebookMatch(String notebookName, String noteTitle, User viewer) {

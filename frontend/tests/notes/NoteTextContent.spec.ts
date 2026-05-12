@@ -3,6 +3,7 @@ import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
@@ -404,5 +405,59 @@ describe("rich mode wiki dead link display text", () => {
     expect(dead.textContent).toContain("friendly label")
     expect(dead.textContent).not.toContain("Unknown Topic|")
     expect(dead.getAttribute("data-wiki-title")).toBe("Unknown Topic")
+  })
+})
+
+describe("rich mode wiki resolved link display text", () => {
+  const targetNote = makeMe.aNote.title("Target Title").please()
+  const carrier = makeMe.aNote
+    .content("Go [[Target Title|friendly label]] ok.")
+    .please()
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any>
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.useFakeTimers()
+    mockSdkServiceWithImplementation(
+      TextContentController,
+      "updateNoteTitle",
+      async (options) => await mockedUpdateTitleCall(options)
+    )
+    wrapper = helper
+      .component(NoteTextContent)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({
+        readonly: true,
+        note: carrier,
+        wikiTitles: [
+          wikiTitleFromInnerAndNoteId(
+            "Target Title|friendly label",
+            targetNote.id!
+          ),
+        ],
+      })
+      .mount({ attachTo: document.body })
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+    vi.useRealTimers()
+  })
+
+  it("shows display text for resolved body wiki link", async () => {
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.doughnut-link")
+    )
+    const live = document.querySelector(
+      ".ql-editor a.doughnut-link"
+    ) as HTMLAnchorElement
+    expect(live.textContent).toContain("friendly label")
+    expect(live.textContent).not.toContain("Target Title|")
+    expect(live.getAttribute("href")).toBe(`/d/n/${targetNote.id}`)
+    expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
   })
 })

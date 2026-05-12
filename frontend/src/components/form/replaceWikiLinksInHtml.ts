@@ -6,16 +6,18 @@ import {
   isValidPropertyWikiInner,
   splitWikiLinkInner,
   wikiLinkBracketedInnerHtml,
+  wikiTitleParts,
 } from "@/utils/wikiPropertyValueField"
 
-function deadLinkVisibleInnerMatchesLinkText(
+/** Visible inner text of a dead-link anchor (bracket UI or plain). */
+function deadLinkBracketDisplayMatches(
   anchor: Element,
-  linkText: string
+  display: string
 ): boolean {
   const raw = anchor.textContent?.trim() ?? ""
   const innerM = /^\[\[(.*)\]\]$/.exec(raw)
   const visibleInner = innerM?.[1] !== undefined ? innerM[1].trim() : raw
-  return visibleInner === linkText.trim()
+  return visibleInner === display.trim()
 }
 
 /** Rich editor HTML uses dead-link anchors, not [[ ]] literals; upgrade when titles resolve. */
@@ -28,21 +30,25 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
   const wrap = doc.getElementById("doughnut-wiki-upgrade-wrap")
   if (!wrap) return html
 
-  for (const { linkText, noteId } of wikiTitles) {
-    const href = noteShowHref(noteId)
+  for (const w of wikiTitles) {
+    const { target, display } = wikiTitleParts(w)
+    const href = noteShowHref(w.noteId)
     for (const a of [...wrap.querySelectorAll("a.dead-link")]) {
       const dt = a.getAttribute("data-wiki-title")
       if (dt !== null && dt !== "") {
-        if (dt !== linkText && dt.trim() !== linkText.trim()) continue
-        if (!deadLinkVisibleInnerMatchesLinkText(a, linkText)) continue
-      } else if (!deadLinkVisibleInnerMatchesLinkText(a, linkText)) {
-        const raw = a.textContent?.trim() ?? ""
-        if (raw !== linkText) continue
+        if (dt !== target && dt.trim() !== target.trim()) continue
+        if (!deadLinkBracketDisplayMatches(a, display)) continue
+      } else if (!deadLinkBracketDisplayMatches(a, display)) {
+        continue
       }
       const live = doc.createElement("a")
       live.setAttribute("href", href)
       live.className = "doughnut-link"
-      live.textContent = linkText
+      live.setAttribute("data-wiki-title", target)
+      if (display !== target) {
+        live.setAttribute("data-wiki-display", display)
+      }
+      live.textContent = display
       a.replaceWith(live)
     }
   }
@@ -67,10 +73,16 @@ export function replaceWikiLinksInHtml(
   wikiTitles: WikiTitle[]
 ): string {
   let result = html
-  wikiTitles.forEach(({ linkText, noteId }) => {
+  wikiTitles.forEach((w) => {
+    const { target, display, inner } = wikiTitleParts(w)
+    const attrTarget = escapeHtmlAttributeValue(target)
+    const displayAttr =
+      display !== target
+        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
+        : ""
     result = result.replaceAll(
-      `[[${linkText}]]`,
-      `<a href="${noteShowHref(noteId)}" class="doughnut-link">${linkText}</a>`
+      `[[${inner}]]`,
+      `<a href="${noteShowHref(w.noteId)}" class="doughnut-link" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
     )
   })
   result = upgradeDeadWikiAnchors(result, wikiTitles)

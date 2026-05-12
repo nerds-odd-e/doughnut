@@ -11,8 +11,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WikiTitle {
+  /** Full wiki link inner text as stored in markdown (between {@code [[} and {@code ]]}}). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String linkText;
+
+  /** Target token used for resolution (part before {@code |}). */
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String targetToken;
+
+  /** Visible label in rich mode (part after {@code |}, or same as target when absent). */
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String displayText;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer noteId;

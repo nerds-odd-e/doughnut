@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -47,7 +48,9 @@ public class WikiTitleCacheService {
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
-        out.add(new WikiTitle(row.getLinkText(), resolved.getId()));
+        WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitInner(row.getLinkText());
+        out.add(
+            new WikiTitle(row.getLinkText(), parts.target(), parts.display(), resolved.getId()));
       }
     }
     return List.copyOf(out);

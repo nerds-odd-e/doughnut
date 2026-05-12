@@ -127,12 +127,38 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
       assertThat(wt.getLinkText(), equalTo("OnlyA"));
+      assertThat(wt.getTargetToken(), equalTo("OnlyA"));
+      assertThat(wt.getDisplayText(), equalTo("OnlyA"));
       assertThat(wt.getNoteId(), equalTo(onlyA.getId()));
 
       List<NoteWikiTitleCache> rows =
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
       assertThat(rows, hasSize(1));
       assertThat(rows.getFirst().getLinkText(), equalTo("OnlyA"));
+      assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyA.getId()));
+    }
+
+    @Test
+    void refreshesWikiTitleCacheWhenContentHasResolvedWikiLinkWithDisplayText()
+        throws UnexpectedNoAccessRightException {
+      Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note onlyA = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
+
+      noteUpdateContentDTO.setContent("[[OnlyA|alias label]]");
+      NoteRealm response = controller.updateNoteContent(carrier, noteUpdateContentDTO);
+
+      assertThat(response.getWikiTitles(), hasSize(1));
+      WikiTitle wt = response.getWikiTitles().getFirst();
+      assertThat(wt.getLinkText(), equalTo("OnlyA|alias label"));
+      assertThat(wt.getTargetToken(), equalTo("OnlyA"));
+      assertThat(wt.getDisplayText(), equalTo("alias label"));
+      assertThat(wt.getNoteId(), equalTo(onlyA.getId()));
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.getFirst().getLinkText(), equalTo("OnlyA|alias label"));
       assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyA.getId()));
     }
 
@@ -153,6 +179,8 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
       assertThat(wt.getLinkText(), equalTo("OnlyB"));
+      assertThat(wt.getTargetToken(), equalTo("OnlyB"));
+      assertThat(wt.getDisplayText(), equalTo("OnlyB"));
       assertThat(wt.getNoteId(), equalTo(onlyB.getId()));
 
       List<NoteWikiTitleCache> rows =

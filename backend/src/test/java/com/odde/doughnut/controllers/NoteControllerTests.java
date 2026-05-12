@@ -105,8 +105,40 @@ class NoteControllerTests extends ControllerTestBase {
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
-      assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("LinkedPage"));
-      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(matched.getId()));
+      WikiTitle wt = realm.getWikiTitles().get(0);
+      assertThat(wt.getLinkText(), equalTo("LinkedPage"));
+      assertThat(wt.getTargetToken(), equalTo("LinkedPage"));
+      assertThat(wt.getDisplayText(), equalTo("LinkedPage"));
+      assertThat(wt.getNoteId(), equalTo(matched.getId()));
+    }
+
+    @Test
+    void shouldResolveWikiLinkUsingTargetBeforePipeAndExposeDisplayFields()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note root = makeMe.aNote().creatorAndOwner(user).title("root-head").please();
+      Note matched =
+          makeMe
+              .aNote()
+              .title("Target Title")
+              .creator(user)
+              .inNotebook(root.getNotebook())
+              .please();
+      Note viewer =
+          makeMe
+              .aNote()
+              .creator(user)
+              .inNotebook(root.getNotebook())
+              .content("Text [[Target Title|friendly label]] end.")
+              .please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      WikiTitle wt = realm.getWikiTitles().get(0);
+      assertThat(wt.getLinkText(), equalTo("Target Title|friendly label"));
+      assertThat(wt.getTargetToken(), equalTo("Target Title"));
+      assertThat(wt.getDisplayText(), equalTo("friendly label"));
+      assertThat(wt.getNoteId(), equalTo(matched.getId()));
     }
 
     @Test
@@ -130,8 +162,11 @@ class NoteControllerTests extends ControllerTestBase {
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
-      assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("Other Notebook:LinkedPage"));
-      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(targetInOther.getId()));
+      WikiTitle wt = realm.getWikiTitles().get(0);
+      assertThat(wt.getLinkText(), equalTo("Other Notebook:LinkedPage"));
+      assertThat(wt.getTargetToken(), equalTo("Other Notebook:LinkedPage"));
+      assertThat(wt.getDisplayText(), equalTo("Other Notebook:LinkedPage"));
+      assertThat(wt.getNoteId(), equalTo(targetInOther.getId()));
     }
 
     @Test
@@ -155,8 +190,11 @@ class NoteControllerTests extends ControllerTestBase {
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
-      assertThat(realm.getWikiTitles().get(0).getLinkText(), equalTo("FrontmatterTarget"));
-      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(fromFm.getId()));
+      WikiTitle wt = realm.getWikiTitles().get(0);
+      assertThat(wt.getLinkText(), equalTo("FrontmatterTarget"));
+      assertThat(wt.getTargetToken(), equalTo("FrontmatterTarget"));
+      assertThat(wt.getDisplayText(), equalTo("FrontmatterTarget"));
+      assertThat(wt.getNoteId(), equalTo(fromFm.getId()));
     }
   }
 

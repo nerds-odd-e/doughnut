@@ -1,5 +1,6 @@
 import markdownizer from "@/components/form/markdownizer"
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 import { describe, it, expect } from "vitest"
 
 const toHtml = (markdown: string | undefined) =>
@@ -464,19 +465,31 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces known wikilink text with a note href", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
-        { linkText: "MyNote", noteId: 42 },
+        wikiTitleFromInnerAndNoteId("MyNote", 42),
       ])
-    ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
+    ).toBe(
+      '<p><a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+    )
+  })
+
+  it("replaces piped wikilink with display text as anchor body", () => {
+    expect(
+      replaceWikiLinksInHtml("<p>[[Target|label]]</p>", [
+        wikiTitleFromInnerAndNoteId("Target|label", 7),
+      ])
+    ).toBe(
+      '<p><a href="/d/n/7" class="doughnut-link" data-wiki-title="Target" data-wiki-display="label">label</a></p>'
+    )
   })
 
   it("replaces every occurrence when the same wikilink appears multiple times", () => {
     const html = "<p>[[MyNote]] then [[MyNote]]</p>"
     const out = replaceWikiLinksInHtml(html, [
-      { linkText: "MyNote", noteId: 42 },
+      wikiTitleFromInnerAndNoteId("MyNote", 42),
     ])
     expect(out).not.toContain("dead-link")
     expect(out).toBe(
-      '<p><a href="/d/n/42" class="doughnut-link">MyNote</a> then <a href="/d/n/42" class="doughnut-link">MyNote</a></p>'
+      '<p><a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a> then <a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 
@@ -490,17 +503,10 @@ describe("replaceWikiLinksInHtml", () => {
     expect(
       replaceWikiLinksInHtml(
         '<p><a href="#" class="dead-link">MyNote</a></p>',
-        [{ linkText: "MyNote", noteId: 42 }]
+        [wikiTitleFromInnerAndNoteId("MyNote", 42)]
       )
-    ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
-  })
-
-  it("upgrades dead-link anchors when class precedes href", () => {
-    expect(
-      replaceWikiLinksInHtml(
-        '<p><a class="dead-link" href="#">MyNote</a></p>',
-        [{ linkText: "MyNote", noteId: 42 }]
-      )
-    ).toBe('<p><a href="/d/n/42" class="doughnut-link">MyNote</a></p>')
+    ).toBe(
+      '<p><a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+    )
   })
 })

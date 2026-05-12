@@ -4,6 +4,7 @@ import {
   escapeHtmlForWikiPropertyValue,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
+  wikiTitleFromInnerAndNoteId,
 } from "@/utils/wikiPropertyValueField"
 
 describe("wikiPropertyValueField utils", () => {
@@ -66,11 +67,21 @@ describe("wikiPropertyValueField utils", () => {
 
   it("resolves wiki markers when title is known", () => {
     const html = propertyValuePlainToDisplayHtml("[[My Note]]", [
-      { linkText: "My Note", noteId: 42 },
+      wikiTitleFromInnerAndNoteId("My Note", 42),
     ])
     expect(html).toContain("doughnut-link")
     expect(html).toContain("/d/n/42")
     expect(html).toContain('class="wiki-bracket"')
+  })
+
+  it("resolves piped wiki marker using target and shows display as visible link", () => {
+    const html = propertyValuePlainToDisplayHtml("[[Target Page|friendly]]", [
+      wikiTitleFromInnerAndNoteId("Target Page|friendly", 99),
+    ])
+    expect(html).toContain("doughnut-link")
+    expect(html).toContain("/d/n/99")
+    expect(html).toContain("friendly")
+    expect(html).not.toContain("Target Page|friendly")
   })
 
   it("round-trips mixed text and wiki anchors from a field root", () => {
@@ -82,7 +93,7 @@ describe("wikiPropertyValueField utils", () => {
   it("serializes live link anchors from visible text (textContent)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[N]]", [
-      { linkText: "N", noteId: 1 },
+      wikiTitleFromInnerAndNoteId("N", 1),
     ])
     expect(serializeWikiPropertyValueFieldRoot(root)).toBe("[[N]]")
   })
@@ -90,7 +101,7 @@ describe("wikiPropertyValueField utils", () => {
   it("serializes a wiki anchor as plain text when the user replaced inner content (broken link)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[English]]", [
-      { linkText: "English", noteId: 1 },
+      wikiTitleFromInnerAndNoteId("English", 1),
     ])
     const a = root.querySelector("a.doughnut-link") as HTMLAnchorElement
     a.textContent = "[[Eng]"

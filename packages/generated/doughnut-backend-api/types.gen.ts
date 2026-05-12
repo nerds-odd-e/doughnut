@@ -251,6 +251,8 @@ export type NotebookRealm = {
 
 export type WikiTitle = {
     linkText: string;
+    targetToken: string;
+    displayText: string;
     noteId: number;
 };
 

@@ -43,4 +43,24 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
   }
+
+  @Test
+  void wikiLinkResolver_resolvesTargetBeforePipe() {
+    User owner = makeMe.aUser().please();
+    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note child =
+        makeMe
+            .aNote()
+            .title("Child")
+            .underSameNotebookAs(parent)
+            .content("See [[Alpha|friendly alias]]")
+            .please();
+    makeMe.entityPersister.flush();
+    makeMe.entityPersister.refresh(parent);
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(child, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().linkText(), equalTo("Alpha|friendly alias"));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(parent.getId()));
+  }
 }
