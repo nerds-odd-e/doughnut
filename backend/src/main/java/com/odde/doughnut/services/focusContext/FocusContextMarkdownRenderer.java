@@ -34,9 +34,13 @@ public class FocusContextMarkdownRenderer {
       sb.append("Folder: ").append(focusNote.getFolderPath()).append("\n");
     }
     sb.append("Depth: ").append(focusNote.getDepth()).append("\n");
-    sb.append("Truncated: ").append(focusNote.isContentTruncated()).append("\n");
-    sb.append("\nContent:\n\n");
-    appendFencedContent(sb, focusNote.getContent());
+    if (focusNote.isContentTruncated()) {
+      sb.append("Truncated: true\n");
+    }
+    if (hasRenderableContent(focusNote.getContent())) {
+      sb.append("\nContent:\n\n");
+      appendFencedContent(sb, focusNote.getContent());
+    }
   }
 
   private void appendRetrievedNote(StringBuilder sb, FocusContextNote note) {
@@ -55,9 +59,17 @@ public class FocusContextMarkdownRenderer {
     if (note.getEdgeType() != null) {
       sb.append("Reached by: ").append(note.getEdgeType()).append("\n");
     }
-    sb.append("Truncated: ").append(note.isContentTruncated()).append("\n");
-    sb.append("\nContent:\n\n");
-    appendFencedContent(sb, note.getContent());
+    if (note.isContentTruncated()) {
+      sb.append("Truncated: true\n");
+    }
+    if (hasRenderableContent(note.getContent())) {
+      sb.append("\nContent:\n\n");
+      appendFencedContent(sb, note.getContent());
+    }
+  }
+
+  private static boolean hasRenderableContent(String content) {
+    return content != null && !content.isBlank();
   }
 
   private void appendFencedContent(StringBuilder sb, String content) {

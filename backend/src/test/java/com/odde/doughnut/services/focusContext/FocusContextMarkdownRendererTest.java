@@ -52,23 +52,34 @@ class FocusContextMarkdownRendererTest {
       assertThat(output, containsString("Notebook: My Notebook"));
       assertThat(output, containsString("Depth: 0"));
       assertThat(output, containsString("Max depth: 1"));
-      assertThat(output, containsString("Truncated: false"));
+      assertThat(output, not(containsString("Truncated:")));
       assertThat(output, containsString("```doughnut-note-md"));
       assertThat(output, containsString("Some content"));
       assertThat(output, not(containsString("## Retrieved Note")));
     }
 
     @Test
-    void truncationFlagRenderedForTrueAndFalse() {
+    void truncatedFocusNoteIncludesTruncatedLine() {
       String truncatedOut =
           renderer.render(
               new FocusContextResult(focusNote("NB", "T", "short…", true)), depth1Config);
       assertThat(truncatedOut, containsString("Truncated: true"));
+    }
 
+    @Test
+    void nonTruncatedFocusNoteOmitsTruncatedLine() {
       String fullOut =
           renderer.render(
               new FocusContextResult(focusNote("NB", "T", "full content", false)), depth1Config);
-      assertThat(fullOut, containsString("Truncated: false"));
+      assertThat(fullOut, not(containsString("Truncated:")));
+    }
+
+    @Test
+    void focusNoteWithBlankBodyOmitsContentSection() {
+      String out =
+          renderer.render(new FocusContextResult(focusNote("NB", "T", "", false)), depth1Config);
+      assertThat(out, not(containsString("\nContent:\n")));
+      assertThat(out, not(containsString("doughnut-note-md")));
     }
   }
 
