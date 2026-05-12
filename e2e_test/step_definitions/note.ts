@@ -208,6 +208,15 @@ Given(
   }
 )
 
+When(
+  'I set the note title to {string} keeping visible reference text',
+  (newTitle: string) => {
+    start
+      .assumeNotePage()
+      .saveReferencedNoteTitle(newTitle, 'KEEP_VISIBLE_TEXT')
+  }
+)
+
 Given(
   'I update note {string} content from {string} to become {string}',
   (noteTopology: string, previousContent: string, newContent: string) => {

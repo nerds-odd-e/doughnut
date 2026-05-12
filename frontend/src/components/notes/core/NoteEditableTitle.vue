@@ -2,6 +2,8 @@
   <TextContentWrapper
     :value="noteTopology.title"
     field="edit title"
+    :title-rename-needs-explicit-reference-choice="hasInboundReferences"
+    :title-edit-note-id="noteId"
   >
     <template #default="{ value, update, blur, errors }">
       <PathNameEditor
@@ -9,7 +11,7 @@
         :error-message="errors.title"
         :readonly="readonly"
         hide-label
-        @update:model-value="update(noteTopology.id, $event)"
+        @update:model-value="update(noteId, $event)"
         @blur="blur"
       >
         <template #title="{ bindings, editor }">
@@ -30,7 +32,9 @@ import PathNameEditor from "./PathNameEditor.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
+  noteId: { type: Number, required: true },
   readonly: { type: Boolean, default: true },
+  hasInboundReferences: { type: Boolean, default: false },
 })
 </script>
 

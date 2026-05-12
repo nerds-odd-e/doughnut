@@ -35,6 +35,8 @@
                     readonly: readonly(noteRealm),
                     wikiTitles: noteRealm.wikiTitles ?? [],
                     isIndexContext: isIndexTitle(noteRealm),
+                    hasInboundReferences:
+                      (noteRealm.references?.length ?? 0) > 0,
                   }"
                   @dead-link-click="onDeadLinkClick"
                 />

@@ -81,6 +81,19 @@ Feature: Wiki links in notes
       | a   | WikiLinks E2E CI |
     And the link "WikiLinks E2E CI" should link to the note with the same title
 
+  Scenario: Renaming a referenced note while keeping visible reference text
+    When I update note "WikiLinks E2E Tech" content using markdown to become:
+      """
+      See [[WikiLinks E2E CI]] for process.
+      """
+    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E CI" note
+    When I set the note title to "WikiLinks E2E CI Renamed" keeping visible reference text
+    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
+    Then I should see the rich content of the note with content:
+      | Tag | Content          |
+      | a   | WikiLinks E2E CI |
+    And the link "WikiLinks E2E CI" should open the note titled "WikiLinks E2E CI Renamed"
+
   @mockBrowserTime
   Scenario: Insert a qualified wiki link to a note in another notebook via the toolbar
     Given I have a notebook "WikiCross Tgt NB" with notes:

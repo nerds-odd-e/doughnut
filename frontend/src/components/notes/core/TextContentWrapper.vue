@@ -6,6 +6,30 @@
       :blur="onBlur"
       :errors="errors"
     />
+    <div
+      v-if="showReferencedTitleSavePanel"
+      class="referenced-title-save daisy-mt-3 daisy-flex daisy-flex-col daisy-gap-3"
+      data-testid="referenced-title-save-panel"
+    >
+      <p class="daisy-text-sm daisy-opacity-80">
+        This note is linked from other notes. Choose how wiki links to this note
+        should change, then save.
+      </p>
+      <RadioButtons
+        v-model="titleReferenceChoice"
+        scope-name="titleRenameReferenceHandling"
+        :options="titleReferenceRadioOptions"
+      />
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-w-fit"
+        data-testid="referenced-title-save-button"
+        :disabled="savingReferencedTitle"
+        @click="saveReferencedTitle"
+      >
+        Save title
+      </button>
+    </div>
   </div>
 </template>
 
@@ -13,13 +37,15 @@
 import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
+import RadioButtons from "@/components/form/RadioButtons.vue"
+import type { TitleRenameReferenceHandling } from "@/store/StoredApiCollection"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 
 const storageAccessor = useStorageAccessor()
 
-const { field, value } = defineProps({
+const props = defineProps({
   field: {
     type: String as PropType<"edit title" | "edit content">,
     required: true,
@@ -28,11 +54,36 @@ const { field, value } = defineProps({
     type: String,
     required: false,
   },
+  titleRenameNeedsExplicitReferenceChoice: { type: Boolean, default: false },
+  titleEditNoteId: { type: Number, required: false },
 })
 
 const savedVersion = ref(0)
-const lastSavedValue = ref(value)
+const lastSavedValue = ref(props.value ?? "")
 const pendingSaveValues = new Set<string>()
+
+const referencedTitleExplicitSave = (): boolean =>
+  props.field === "edit title" && props.titleRenameNeedsExplicitReferenceChoice
+
+const titleReferenceRadioOptions: {
+  value: TitleRenameReferenceHandling
+  label: string
+}[] = [
+  {
+    value: "UPDATE_VISIBLE_TEXT",
+    label: "Update visible reference text",
+  },
+  {
+    value: "KEEP_VISIBLE_TEXT",
+    label: "Keep visible reference text",
+  },
+]
+
+const titleReferenceChoice =
+  ref<TitleRenameReferenceHandling>("KEEP_VISIBLE_TEXT")
+const savingReferencedTitle = ref(false)
+const activeNoteId = ref<number | null>(null)
+
 const changerInner = async (
   noteId: number,
   newValue: string,
@@ -43,7 +94,7 @@ const changerInner = async (
   try {
     await storageAccessor.value
       .storedApi()
-      .updateTextField(noteId, field, newValue)
+      .updateTextField(noteId, props.field, newValue)
       .catch(errorHander)
     savedVersion.value = version
     lastSavedValue.value = newValue
@@ -53,18 +104,22 @@ const changerInner = async (
 }
 const changer = debounce(changerInner, 1000)
 
-const localValue = ref(value)
+const localValue = ref(props.value ?? "")
 const version = ref(0)
 const errors = ref({} as Record<string, string>)
 
 const hasUnsavedChanges = (): boolean => {
-  if (field === "edit content") {
+  if (props.field === "edit content") {
     const normalizedCurrent = normalizeNoteContent(localValue.value ?? "")
     const normalizedSaved = normalizeNoteContent(lastSavedValue.value ?? "")
     return normalizedCurrent !== normalizedSaved
   }
   return localValue.value !== lastSavedValue.value
 }
+
+const showReferencedTitleSavePanel = computed(
+  () => referencedTitleExplicitSave() && hasUnsavedChanges()
+)
 
 const wrapperClass = computed(() => {
   if (hasUnsavedChanges()) {
@@ -74,11 +129,12 @@ const wrapperClass = computed(() => {
 })
 
 const onUpdate = (noteId: number, newValue: string) => {
-  if (field === "edit title" && !newValue.trim()) {
+  activeNoteId.value = noteId
+  if (props.field === "edit title" && !newValue.trim()) {
     return
   }
 
-  if (field === "edit content") {
+  if (props.field === "edit content") {
     const normalizedNewValue = normalizeNoteContent(newValue)
     const normalizedLastSaved = normalizeNoteContent(lastSavedValue.value ?? "")
     const prevNormalized = normalizeNoteContent(localValue.value ?? "")
@@ -100,11 +156,21 @@ const onUpdate = (noteId: number, newValue: string) => {
 
   errors.value = {}
   localValue.value = newValue
+
+  if (referencedTitleExplicitSave()) {
+    version.value += 1
+    return
+  }
+
   changer(noteId, newValue, version.value + 1, setError)
   version.value += 1
 }
 
 const onBlur = () => {
+  if (referencedTitleExplicitSave()) {
+    changer.cancel()
+    return
+  }
   changer.flush()
 }
 
@@ -130,6 +196,27 @@ const setError = (errs: unknown) => {
   }
 }
 
+const saveReferencedTitle = async () => {
+  if (!referencedTitleExplicitSave() || !hasUnsavedChanges()) return
+  const noteId = props.titleEditNoteId ?? activeNoteId.value
+  if (noteId == null) return
+  savingReferencedTitle.value = true
+  errors.value = {}
+  try {
+    await storageAccessor.value
+      .storedApi()
+      .updateTextField(noteId, "edit title", localValue.value, {
+        titleReferenceHandling: titleReferenceChoice.value,
+      })
+    savedVersion.value = version.value
+    lastSavedValue.value = localValue.value
+  } catch (errs: unknown) {
+    setError(errs)
+  } finally {
+    savingReferencedTitle.value = false
+  }
+}
+
 const handleNavigation = (newValue: string) => {
   changer.cancel()
   version.value = savedVersion.value
@@ -138,7 +225,6 @@ const handleNavigation = (newValue: string) => {
 }
 
 const updateToPropValue = (newValue: string | undefined) => {
-  // Convert undefined to empty string for localValue (which is a string ref)
   const valueToSet = newValue ?? ""
   localValue.value = valueToSet
   lastSavedValue.value = valueToSet
@@ -146,7 +232,6 @@ const updateToPropValue = (newValue: string | undefined) => {
 
 const handlePropChange = (newValue: string | undefined) => {
   if (version.value !== savedVersion.value) {
-    // Convert undefined to empty string for comparison
     const normalizedNewValue = newValue ?? ""
     if (
       normalizedNewValue !== "" &&
@@ -154,7 +239,6 @@ const handlePropChange = (newValue: string | undefined) => {
     ) {
       return
     }
-    // Check if this is navigation (value changed from current or last saved)
     const normalizedCurrentValue = localValue.value ?? ""
     const normalizedLastSaved = lastSavedValue.value ?? ""
     if (
@@ -169,10 +253,14 @@ const handlePropChange = (newValue: string | undefined) => {
   updateToPropValue(newValue)
 }
 
-watch(() => value, handlePropChange)
+watch(() => props.value, handlePropChange)
 
 onUnmounted(() => {
-  changer.flush()
+  if (!referencedTitleExplicitSave()) {
+    changer.flush()
+  } else {
+    changer.cancel()
+  }
 })
 </script>
 

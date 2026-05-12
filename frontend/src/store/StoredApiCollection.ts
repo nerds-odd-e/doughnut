@@ -2,6 +2,7 @@ import type {
   NoteContentCompletion,
   NoteDeleteDto,
   NoteRealm,
+  NoteUpdateTitleDto,
 } from "@generated/doughnut-backend-api"
 import type { NoteCreationDto } from "@generated/doughnut-backend-api"
 import {
@@ -24,6 +25,10 @@ import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
 
 export type NoteDeleteReferenceHandling = NoteDeleteDto["referenceHandling"]
+
+export type TitleRenameReferenceHandling = NonNullable<
+  NoteUpdateTitleDto["referenceHandling"]
+>
 
 function toErrorMessage(error: unknown, fallback: string): string {
   if (typeof error === "string") return error
@@ -62,7 +67,10 @@ export interface StoredApi {
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit title" | "edit content",
-    value: string
+    value: string,
+    options?: {
+      titleReferenceHandling?: TitleRenameReferenceHandling
+    }
   ): Promise<void>
 
   /** Persists note content without recording undo (e.g. initial body after create). */
@@ -115,10 +123,11 @@ export default class StoredApiCollection implements StoredApi {
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
     field: "edit title" | "edit content",
-    content: string
+    content: string,
+    titleReferenceHandling?: TitleRenameReferenceHandling
   ) {
     const realm = this.storage.refreshNoteRealm(
-      await this.callUpdateApi(noteId, field, content)
+      await this.callUpdateApi(noteId, field, content, titleReferenceHandling)
     )
     if (field === "edit title") {
       refreshSidebarStructuralListings()
@@ -129,15 +138,20 @@ export default class StoredApiCollection implements StoredApi {
   private async callUpdateApi(
     noteId: Doughnut.ID,
     field: "edit title" | "edit content",
-    content: string
+    content: string,
+    titleReferenceHandling?: TitleRenameReferenceHandling
   ) {
     if (field === "edit title") {
+      const body: NoteUpdateTitleDto = {
+        newTitle: content,
+        ...(titleReferenceHandling != null
+          ? { referenceHandling: titleReferenceHandling }
+          : {}),
+      }
       const { data, error } = await apiCallWithLoading(() =>
         TextContentController.updateNoteTitle({
           path: { note: noteId },
-          body: {
-            newTitle: content,
-          },
+          body,
         })
       )
       if (error || !data) {
@@ -288,7 +302,8 @@ export default class StoredApiCollection implements StoredApi {
   async updateTextField(
     noteId: Doughnut.ID,
     field: "edit title" | "edit content",
-    value: string
+    value: string,
+    options?: { titleReferenceHandling?: TitleRenameReferenceHandling }
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (currentNote) {
@@ -301,7 +316,12 @@ export default class StoredApiCollection implements StoredApi {
       }
       this.noteEditingHistory.addEditingToUndoHistory(noteId, field, old)
     }
-    await this.updateTextContentWithoutUndo(noteId, field, value)
+    await this.updateTextContentWithoutUndo(
+      noteId,
+      field,
+      value,
+      field === "edit title" ? options?.titleReferenceHandling : undefined
+    )
   }
 
   async setNoteContentWithoutUndo(noteId: Doughnut.ID, content: string) {

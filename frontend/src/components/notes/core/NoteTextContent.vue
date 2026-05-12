@@ -2,7 +2,14 @@
   <div class="daisy-alert daisy-alert-warning" v-if="note.deletedAt">
     This note has been deleted
   </div>
-  <NoteEditableTitle v-bind="{ noteTopology: note.noteTopology, readonly }" />
+  <NoteEditableTitle
+    v-bind="{
+      noteTopology: note.noteTopology,
+      noteId: note.id,
+      readonly,
+      hasInboundReferences,
+    }"
+  />
   <div
     role="region"
     aria-label="Note content"
@@ -36,6 +43,7 @@ const props = defineProps({
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
   isIndexContext: { type: Boolean, default: false },
+  hasInboundReferences: { type: Boolean, default: false },
 })
 
 defineEmits<{ deadLinkClick: [payload: DeadLinkPayload] }>()

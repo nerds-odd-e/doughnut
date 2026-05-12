@@ -166,6 +166,25 @@ export const assumeNotePage = (
       this.toolbarButton(`undo ${undoType}`).click()
       cy.findByRole('button', { name: 'OK' }).click()
     },
+    saveReferencedNoteTitle: (
+      newTitle: string,
+      choice: 'KEEP_VISIBLE_TEXT' | 'UPDATE_VISIBLE_TEXT'
+    ) => {
+      cy.findByRole('title').click()
+      cy.clearFocusedText().type(newTitle)
+      cy.findByTestId('referenced-title-save-panel')
+        .contains(
+          'label',
+          choice === 'KEEP_VISIBLE_TEXT'
+            ? 'Keep visible reference text'
+            : 'Update visible reference text'
+        )
+        .click()
+      cy.findByTestId('referenced-title-save-button').click()
+      cy.findByTestId('referenced-title-save-panel').should('not.exist')
+      cy.findByText(newTitle, { selector: '[role=title]' })
+      pageIsNotLoading()
+    },
     editTextContent: (noteAttributes: Record<string, string>) => {
       const parseSpecialKeys = (text: string): string => {
         // Replace <Shift-Enter> with Cypress key sequence {shift}{enter}
