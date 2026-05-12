@@ -54,7 +54,8 @@ public class NoteQuestionGenerationService {
 
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String additionalMessage, Long contextSeed) {
-    InstructionAndSchema tool = AiToolFactory.questionAiTool();
+    InstructionAndSchema tool =
+        AiToolFactory.questionAiTool(requestBuilder.isFocusNoteTitleAndContentEmpty(note));
     OpenAIChatRequestBuilder chatRequestBuilder =
         requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
 

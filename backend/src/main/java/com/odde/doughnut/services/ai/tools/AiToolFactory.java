@@ -14,14 +14,31 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return questionAiTool();
+    return mcqWithAnswerAiTool(false);
+  }
+
+  public static InstructionAndSchema mcqWithAnswerAiTool(boolean focusNoteTitleAndContentEmpty) {
+    return questionAiTool(focusNoteTitleAndContentEmpty);
   }
 
   public static InstructionAndSchema questionAiTool() {
-    return new InstructionAndSchema(getBaseInstruction(), askSingleAnswerMultipleChoiceQuestion());
+    return questionAiTool(false);
   }
 
-  private static String getBaseInstruction() {
+  public static InstructionAndSchema questionAiTool(boolean focusNoteTitleAndContentEmpty) {
+    return new InstructionAndSchema(
+        getBaseInstruction(focusNoteTitleAndContentEmpty), askSingleAnswerMultipleChoiceQuestion());
+  }
+
+  private static String getBaseInstruction(boolean focusNoteTitleAndContentEmpty) {
+    String correctAnswerSupportRule =
+        focusNoteTitleAndContentEmpty
+            ? "- The correct answer must be supported by its title or direct references."
+            : "- The correct answer must be supported by the Focus Note title or content.";
+    String verifyGroundingRule =
+        focusNoteTitleAndContentEmpty
+            ? "- The correct answer is grounded in its title or direct references."
+            : "- The correct answer is grounded in the Focus Note.";
     return """
     Create one memory-stimulating, single-answer MCQ that helps the learner recall the Focus Note.
 
@@ -37,7 +54,7 @@ public class AiToolFactory {
     '''
 
     Rules:
-    - The correct answer must be supported by the Focus Note title or content.
+    %s
     - Retrieved Notes may clarify context or provide distractors, but must not be necessary to know the correct answer.
     - Do not use external knowledge as the basis for the correct answer.
     - If the Focus Note is weak, generic, uncertain, truncated, or mostly empty, test only the most concrete stable point available and note the limitation in validationRationale.
@@ -55,7 +72,7 @@ public class AiToolFactory {
 
     Before output, silently verify:
     - One and only one correct answer.
-    - The correct answer is grounded in the Focus Note.
+    %s
     - No hidden-context labels appear in learner-facing text.
     - No choice labels or numbering appear inside the choices.
     - No meta-choices or order-dependent choices are used.
@@ -65,7 +82,8 @@ public class AiToolFactory {
     Output:
     - Return only JSON matching the provided schema.
 
-        """;
+        """
+        .formatted(correctAnswerSupportRule, verifyGroundingRule);
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {

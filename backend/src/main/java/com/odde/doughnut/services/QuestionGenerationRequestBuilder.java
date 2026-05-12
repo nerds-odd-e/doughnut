@@ -47,7 +47,8 @@ public class QuestionGenerationRequestBuilder {
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, String additionalMessage, Long contextSeed) {
-    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool();
+    InstructionAndSchema tool =
+        AiToolFactory.mcqWithAnswerAiTool(isFocusNoteTitleAndContentEmpty(note));
     OpenAIChatRequestBuilder chatRequestBuilder =
         openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
     chatRequestBuilder.responseJsonSchema(tool);
@@ -93,14 +94,27 @@ public class QuestionGenerationRequestBuilder {
     return getChatRequestBuilder(note, null);
   }
 
+  public boolean isFocusNoteTitleAndContentEmpty(Note note) {
+    return focusNoteTitleAndContentEmpty(hydrateFocusNoteForQuestionGeneration(note));
+  }
+
+  private static boolean focusNoteTitleAndContentEmpty(Note focus) {
+    String title = focus.getTitle() == null ? "" : focus.getTitle().trim();
+    String content = focus.getContent() == null ? "" : focus.getContent().trim();
+    return title.isEmpty() && content.isEmpty();
+  }
+
+  private Note hydrateFocusNoteForQuestionGeneration(Note note) {
+    return noteRepository
+        .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(note.getId()))
+        .stream()
+        .findFirst()
+        .orElse(note);
+  }
+
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note, Long contextSeed) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    Note focus =
-        noteRepository
-            .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(note.getId()))
-            .stream()
-            .findFirst()
-            .orElse(note);
+    Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
     String instruction =
         noteRealmService.resolveScopedQuestionGenerationInstruction(focus).orElse(null);
