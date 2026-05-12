@@ -102,10 +102,8 @@ tasks.named('bootRun') {
 
 tasks.register("bootRunE2E", BootRun) {
   group = "application"
-  description = "Runs Doughnut SpringBoot application in e2e profile without devtools (SUT/CI)"
-  classpath = sourceSets.main.runtimeClasspath.filter { file ->
-    !file.name.contains('spring-boot-devtools')
-  }
+  description = "Runs Doughnut SpringBoot application with the e2e profile (SUT; DevTools on classpath for live reload with pnpm backend:watch)"
+  classpath = sourceSets.main.runtimeClasspath
   mainClass = springBoot.mainClass
   systemProperty("spring.profiles.active", "e2e")
   jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
