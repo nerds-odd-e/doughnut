@@ -42,6 +42,33 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void newInnerForKeepVisibleText_plainLinkAddsDisplay() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForKeepVisibleText("OldTitle", "NewTitle"),
+        equalTo("NewTitle|OldTitle"));
+  }
+
+  @Test
+  void newInnerForKeepVisibleText_preservesCustomDisplay() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForKeepVisibleText("OldTitle|custom text", "NewTitle"),
+        equalTo("NewTitle|custom text"));
+  }
+
+  @Test
+  void newInnerForKeepVisibleText_qualifiedPlainLink() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForKeepVisibleText("MyNb:OldTitle", "NewTitle"),
+        equalTo("MyNb:NewTitle|MyNb:OldTitle"));
+  }
+
+  @Test
+  void newInnerForKeepVisibleText_emptyPipeUsesTargetAsDisplay() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForKeepVisibleText("Alpha|", "Beta"), equalTo("Beta|Alpha"));
+  }
+
+  @Test
   void replaceWikiLinksMatchingTrimmedInner_matchesWhitespaceInsideBrackets() {
     assertThat(
         WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(

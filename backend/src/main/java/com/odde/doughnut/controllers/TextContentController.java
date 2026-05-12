@@ -64,6 +64,11 @@ class TextContentController {
         && !Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
       wikiTitleCacheService.rewriteInboundWikiLinksForVisibleTitleRename(
           note, titleDTO.getNewTitle(), currentUTCTimestamp, viewer);
+    } else if (TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT.equals(
+            titleDTO.getReferenceHandling())
+        && !Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
+      wikiTitleCacheService.rewriteInboundWikiLinksForKeepVisibleTitleRename(
+          note, titleDTO.getNewTitle(), currentUTCTimestamp, viewer);
     } else {
       note.setUpdatedAt(currentUTCTimestamp);
       note.setTitle(titleDTO.getNewTitle());

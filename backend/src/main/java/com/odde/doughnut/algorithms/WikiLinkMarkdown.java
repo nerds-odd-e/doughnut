@@ -81,6 +81,33 @@ public final class WikiLinkMarkdown {
   }
 
   /**
+   * Wiki inner text after a title rename with {@code KEEP_VISIBLE_TEXT}: plain links gain an
+   * explicit display segment equal to the prior inner text; links that already had {@code |} keep
+   * the display segment while the target token is updated to {@code newNoteTitle} (keeping {@code
+   * notebook:} prefix when present).
+   */
+  public static String newInnerForKeepVisibleText(String storedLinkInner, String newNoteTitle) {
+    if (newNoteTitle == null) {
+      throw new IllegalArgumentException("newNoteTitle");
+    }
+    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
+      return newNoteTitle;
+    }
+    int pipeIdx = storedLinkInner.indexOf('|');
+    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
+    String newTargetToken =
+        replaceUnqualifiedOrQualifiedNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
+    if (pipeIdx == -1) {
+      return newTargetToken + "|" + storedLinkInner.trim();
+    }
+    String rawDisplay = storedLinkInner.substring(pipeIdx + 1);
+    if (rawDisplay.trim().isEmpty()) {
+      return newTargetToken + "|" + rawTargetPart.trim();
+    }
+    return newTargetToken + "|" + rawDisplay;
+  }
+
+  /**
    * Replaces every {@code [[...]]} whose trimmed inner equals {@code oldInnerTrimmed} with {@code
    * [[newInner]]}, leaving other links unchanged.
    */

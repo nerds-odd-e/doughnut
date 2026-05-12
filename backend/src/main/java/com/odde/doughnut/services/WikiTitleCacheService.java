@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.UnaryOperator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -222,6 +223,35 @@ public class WikiTitleCacheService {
   @Transactional
   public void rewriteInboundWikiLinksForVisibleTitleRename(
       Note targetNote, String newTitle, Timestamp updatedAt, User viewer) {
+    rewriteInboundWikiLinksForTitleRename(
+        targetNote,
+        newTitle,
+        updatedAt,
+        viewer,
+        lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle));
+  }
+
+  /**
+   * Same as {@link #rewriteInboundWikiLinksForVisibleTitleRename} but with {@code
+   * KEEP_VISIBLE_TEXT} link inner semantics.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForKeepVisibleTitleRename(
+      Note targetNote, String newTitle, Timestamp updatedAt, User viewer) {
+    rewriteInboundWikiLinksForTitleRename(
+        targetNote,
+        newTitle,
+        updatedAt,
+        viewer,
+        lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle));
+  }
+
+  private void rewriteInboundWikiLinksForTitleRename(
+      Note targetNote,
+      String newTitle,
+      Timestamp updatedAt,
+      User viewer,
+      UnaryOperator<String> newInnerFromLinkText) {
     Integer targetId = targetNote.getId();
     List<NoteWikiTitleCache> rows =
         noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
@@ -245,7 +275,7 @@ public class WikiTitleCacheService {
       }
       String content = referrer.getContent() != null ? referrer.getContent() : "";
       for (String linkText : linkTextsByReferrer.get(referrerId)) {
-        String newInner = WikiLinkMarkdown.newInnerForUpdateVisibleText(linkText, newTitle);
+        String newInner = newInnerFromLinkText.apply(linkText);
         content =
             WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
       }

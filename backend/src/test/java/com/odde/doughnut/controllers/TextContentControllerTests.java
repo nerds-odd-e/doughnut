@@ -240,6 +240,60 @@ class TextContentControllerTests extends ControllerTestBase {
       makeMe.refresh(carrier);
       assertThat(carrier.getContent(), equalTo("[[NbFixed:RenamedTarget]]"));
     }
+
+    @Test
+    void keepVisibleText_plainWikiLinkBecomesDisplayLinkAndRefreshesCache()
+        throws UnexpectedNoAccessRightException {
+      Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
+
+      NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+      contentDto.setContent("[[TargetTitle]]");
+      controller.updateNoteContent(carrier, contentDto);
+
+      NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
+      titleDto.setNewTitle("RenamedTarget");
+      titleDto.setReferenceHandling(TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
+
+      NoteRealm response = controller.updateNoteTitle(target, titleDto);
+      assertThat(response.getNote().getTitle(), equalTo("RenamedTarget"));
+      assertThat(response.getReferences(), hasSize(1));
+
+      makeMe.refresh(carrier);
+      assertThat(carrier.getContent(), equalTo("[[RenamedTarget|TargetTitle]]"));
+      NoteWikiTitleCache row =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()).getFirst();
+      assertThat(row.getLinkText(), equalTo("RenamedTarget|TargetTitle"));
+      assertThat(row.getTargetNote().getId(), equalTo(target.getId()));
+    }
+
+    @Test
+    void keepVisibleText_preservesExplicitDisplayWhileRetargetingTitle()
+        throws UnexpectedNoAccessRightException {
+      Note root = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
+
+      NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+      contentDto.setContent("[[TargetTitle|custom text]]");
+      controller.updateNoteContent(carrier, contentDto);
+
+      NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
+      titleDto.setNewTitle("RenamedTarget");
+      titleDto.setReferenceHandling(TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
+
+      controller.updateNoteTitle(target, titleDto);
+
+      makeMe.refresh(carrier);
+      assertThat(carrier.getContent(), equalTo("[[RenamedTarget|custom text]]"));
+      assertThat(
+          noteWikiTitleCacheRepository
+              .findByNote_IdOrderByIdAsc(carrier.getId())
+              .getFirst()
+              .getLinkText(),
+          equalTo("RenamedTarget|custom text"));
+    }
   }
 
   @Nested
