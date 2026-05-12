@@ -43,7 +43,7 @@ public class AiToolFactory {
     - If the Focus Note is weak, generic, uncertain, truncated, or mostly empty, test only the most concrete stable point available and note the limitation in validationRationale.
     - The stem must be self-contained.
     - Learner-facing fields must not say "focus note", "retrieved note", "above context", "this note", or "according to the context".
-    - Provide exactly three choices.
+    - Provide exactly 4 choices.
     - Do not prefix choices with labels such as "A.", "B.", "C.", "1.", "2.", or "3."; provide only the choice text.
     - Exactly one choice must be correct under a reasonable interpretation.
     - Distractors must be plausible but clearly incorrect.
