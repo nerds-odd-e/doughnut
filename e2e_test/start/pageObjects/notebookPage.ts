@@ -63,11 +63,11 @@ const notebookPage = () => {
     },
     ...sidebarChildNotePageMethods(),
     typeNotebookIndexDraftAndSave(text: string) {
-      cy.get('[data-testid="notebook-index-draft-editor"] .ql-editor')
+      cy.get('[data-testid="notebook-index-editor"] .ql-editor')
         .should('be.visible')
         .click()
-      cy.focused().type(text, { delay: 0 })
-      cy.get('[data-testid="notebook-index-create-save"]').click()
+        .type(text, { delay: 0 })
+      cy.get('[data-testid="notebook-index-save"]').click()
       pageIsNotLoading()
       return this
     },

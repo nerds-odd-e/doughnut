@@ -373,6 +373,7 @@ class NotebookController {
     authorizationService.assertAuthorization(notebook);
     String content = dto.getContent();
     notebook.setIndexContent(content == null || content.isBlank() ? null : content);
+    entityPersister.save(notebook);
     entityPersister.flush();
     User user = authorizationService.getCurrentUser();
     return notebookCatalogService.notebookRealmFor(notebook, user);
@@ -396,6 +397,7 @@ class NotebookController {
     }
     String content = dto.getContent();
     folder.setIndexContent(content == null || content.isBlank() ? null : content);
+    entityPersister.save(folder);
     entityPersister.flush();
     User user = authorizationService.getCurrentUser();
     return notebookCatalogService.folderRealmFor(notebook, folder, user);
