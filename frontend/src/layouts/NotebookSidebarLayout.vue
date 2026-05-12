@@ -39,7 +39,7 @@
           :key="currentNotebookId"
           :active-note-realm="sidebarRealm"
           :notebook-id="currentNotebookId"
-          :notebook-realm="sidebarNotebookRealm"
+          :notebook-readonly="sidebarNotebookRealm?.readonly === true"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
         />

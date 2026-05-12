@@ -33,7 +33,6 @@ import type {
   Folder,
   FolderRealm,
   NoteRealm,
-  NotebookRealm,
   User,
 } from "@generated/doughnut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
@@ -45,8 +44,8 @@ const props = withDefaults(
     activeNoteRealm?: NoteRealm
     /** Notebook id for sidebar chrome; toolbar shows root create until active note topology exists */
     notebookId: number
-    /** Layout chrome before a note realm exists (e.g. notebook overview); used for readonly when no active note */
-    notebookRealm?: NotebookRealm
+    /** When no active note realm (e.g. notebook overview); mirrors notebook realm readonly for toolbar */
+    notebookReadonly?: boolean
     /** Set on folder page for active-folder toolbar/tree scope */
     activeFolderRealm?: FolderRealm
     breadcrumbFolders?: Folder[]
@@ -83,7 +82,7 @@ const sidebarReadonly = computed(() => {
   const realmReadonly = props.activeNoteRealm?.notebookRealm.readonly
   if (realmReadonly === true) return true
   if (props.activeNoteRealm != null) return false
-  return props.notebookRealm?.readonly === true
+  return props.notebookReadonly === true
 })
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */

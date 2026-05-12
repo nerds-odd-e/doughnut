@@ -1,5 +1,4 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
@@ -67,10 +66,7 @@ describe("Sidebar notebook shell", () => {
       helper,
       undefined,
       fixtures.topNoteRealm.notebookRealm.notebook.id,
-      {
-        notebook: makeMe.aNotebook.please(),
-        readonly: true,
-      }
+      true
     )
     await flushPromises()
     expect(wrapper.find('button[title="New note"]').exists()).toBe(false)
