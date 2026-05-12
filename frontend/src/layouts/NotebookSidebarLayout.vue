@@ -20,8 +20,8 @@
         />
       </button>
       <BreadcrumbWithCircle
-        v-if="breadcrumbNotebookView"
-        :notebook-view="breadcrumbNotebookView"
+        v-if="currentNotebookView"
+        :notebook-view="currentNotebookView"
         :ancestor-folders="breadcrumbFolders"
       />
     </GlobalBar>
@@ -35,9 +35,10 @@
     >
       <aside :class="sidebarClasses">
         <Sidebar
-          v-if="sidebarNotebookId != null"
+          v-if="currentNotebookId != null"
+          :key="currentNotebookId"
           :active-note-realm="sidebarRealm"
-          :notebook-id="sidebarNotebookId"
+          :notebook-id="currentNotebookId"
           :notebook-realm="sidebarNotebookView"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
@@ -119,13 +120,13 @@ const sidebarNotebookView = computed(
     notebookRealm.value ?? folderRealm.value?.notebookView
 )
 
-const breadcrumbNotebookView = computed(
+const currentNotebookView = computed(
   (): NotebookRealm | undefined =>
     sidebarRealm.value?.notebookView ?? sidebarNotebookView.value
 )
 
-const sidebarNotebookId = computed(
-  () => breadcrumbNotebookView.value?.notebook?.id
+const currentNotebookId = computed(
+  () => currentNotebookView.value?.notebook?.id
 )
 
 const activeFolderRealm = computed(() =>
@@ -228,7 +229,7 @@ const closeSidebarOnMobile = () => {
 
 watch(
   () => [
-    sidebarNotebookId.value,
+    currentNotebookId.value,
     route.name === "noteShow" ? route.params.noteId : undefined,
   ],
   closeSidebarOnMobile

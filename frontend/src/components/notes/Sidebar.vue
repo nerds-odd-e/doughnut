@@ -15,7 +15,6 @@
     >
       <SidebarInner
         v-if="sidebarTreeShown"
-        :key="notebookId"
         :notebook-id="notebookId"
         :active-note-topology="activeNoteTopology"
         :activeFolder="activeFolderRealm?.folder"
