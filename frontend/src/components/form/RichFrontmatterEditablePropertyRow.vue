@@ -187,6 +187,7 @@ import {
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import {
   isKnownRelationKebab,
   relationTypeFromKebab,
@@ -208,7 +209,7 @@ const emit = defineEmits<{
   commit: []
   remove: []
   "wikidata-dialog-open": []
-  "dead-link-click": [title: string]
+  "dead-link-click": [payload: DeadLinkPayload]
   "relation-type-selected": [type: string | undefined]
   "image-upload-state": [inProgress: boolean]
 }>()

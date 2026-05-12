@@ -149,6 +149,21 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
       pageIsNotLoading()
     },
+    insertDeadLinkToTarget(toNoteTopic: string, displayText: string) {
+      cy.get('.search-result [role=listitem]')
+        .filter((_, el) => {
+          const a = el.querySelector(
+            '.search-result-item-title a:not(.notebook-hit-title)'
+          )
+          return a?.textContent?.trim() === toNoteTopic
+        })
+        .findByRole('button', { name: 'Add link' })
+        .click()
+      cy.findByRole('button', {
+        name: new RegExp(`Link.*${displayText}.*to this note`),
+      }).click()
+      pageIsNotLoading()
+    },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {
         selector: '.result-title',

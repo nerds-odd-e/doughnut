@@ -54,9 +54,10 @@ import {
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const emit = defineEmits<{
-  deadLinkClick: [title: string]
+  deadLinkClick: [payload: DeadLinkPayload]
 }>()
 
 const props = defineProps({

@@ -2,6 +2,7 @@ import {
   NoteController,
   RelationController,
   SearchController,
+  TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import SearchForm from "@/components/links/SearchForm.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -9,6 +10,8 @@ import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import createNoteStorage from "@/store/createNoteStorage"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 function makeNoteHit(title: string, notebookId: number) {
@@ -243,6 +246,93 @@ describe("SearchForm", () => {
           targetNotebook: targetNotebookId,
         },
       })
+    })
+  })
+
+  describe("Dead link - link to existing note", () => {
+    it("shows 'Link ... to this note' button when dead link payload is provided", async () => {
+      const note = MakeMe.aNote.please()
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeNoteHit("Selected Note", note.noteTopology.id + 100),
+      ])
+
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({
+          note,
+          deadLinkPayload: {
+            targetToken: "original text",
+            displayText: "original text",
+          },
+        })
+        .render()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "Selected")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      fireEvent.click(await screen.findByText("Add link"))
+      await flushPromises()
+
+      expect(
+        await screen.findByText('Link "original text" to this note')
+      ).toBeInTheDocument()
+    })
+
+    it("rewrites note content when linking dead link to existing note", async () => {
+      const noteRealm = MakeMe.aNoteRealm
+        .content("See [[original text]] for details.")
+        .please()
+      const note = noteRealm.note
+      const targetNotebookId = note.noteTopology.id + 100
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeNoteHit("Selected Note", targetNotebookId),
+      ])
+      const updateSpy = mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        MakeMe.aNoteRealm.please()
+      )
+
+      // Reset storage and pre-populate with the note realm so content is accessible
+      const storageAccessor = useStorageAccessor()
+      storageAccessor.value = createNoteStorage()
+      storageAccessor.value.refreshNoteRealm(noteRealm)
+
+      helper
+        .component(SearchForm)
+        .withProps({
+          note,
+          deadLinkPayload: {
+            targetToken: "original text",
+            displayText: "original text",
+          },
+        })
+        .render()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "Selected")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      fireEvent.click(await screen.findByText("Add link"))
+      await flushPromises()
+
+      fireEvent.click(
+        await screen.findByText('Link "original text" to this note')
+      )
+      await flushPromises()
+
+      expect(updateSpy).toHaveBeenCalledTimes(1)
+      expect(updateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({
+            content: "See [[Selected Note|original text]] for details.",
+          }),
+        })
+      )
     })
   })
 })

@@ -8,19 +8,28 @@
     </div>
     <div class="daisy-flex daisy-flex-col daisy-gap-2">
       <button
+        v-if="deadLinkDisplayText"
+        class="daisy-btn daisy-btn-primary"
+        @click="$emit('chooseLinkDeadLink')"
+      >
+        Link "{{ deadLinkDisplayText }}" to this note
+      </button>
+      <button
+        v-if="!deadLinkDisplayText"
         class="daisy-btn daisy-btn-primary"
         @click="$emit('chooseInsertWikiLink')"
       >
         Insert as a wiki link
       </button>
       <button
-        v-if="wikiPropertyOptionAvailable"
+        v-if="wikiPropertyOptionAvailable && !deadLinkDisplayText"
         class="daisy-btn daisy-btn-accent"
         @click="$emit('chooseInsertWikiLinkAsProperty')"
       >
         Add wiki link as a new property
       </button>
       <button
+        v-if="!deadLinkDisplayText"
         class="daisy-btn daisy-btn-secondary"
         @click="$emit('chooseAddRelationship')"
       >
@@ -41,12 +50,14 @@ import { Reply } from "lucide-vue-next"
 defineProps<{
   targetNoteTopology: NoteTopology
   wikiPropertyOptionAvailable?: boolean
+  deadLinkDisplayText?: string
 }>()
 
 defineEmits<{
   chooseInsertWikiLink: []
   chooseInsertWikiLinkAsProperty: []
   chooseAddRelationship: []
+  chooseLinkDeadLink: []
   goBack: []
 }>()
 </script>

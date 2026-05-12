@@ -21,7 +21,8 @@ import { ref, watch, onMounted, type PropType } from "vue"
 import { useRouter } from "vue-router"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
-  deadLinkCreateTitleFromAnchor,
+  deadLinkPayloadFromAnchor,
+  type DeadLinkPayload,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
 } from "@/utils/wikiPropertyValueField"
@@ -40,7 +41,7 @@ const props = defineProps({
 const emit = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
-  deadLinkClick: [title: string]
+  deadLinkClick: [payload: DeadLinkPayload]
 }>()
 
 const router = useRouter()
@@ -97,7 +98,7 @@ function onClickCapture(event: MouseEvent) {
   const href = anchor.getAttribute("href")
   if (!href) return
   if (!props.readonly && anchor.classList.contains("dead-link")) {
-    emit("deadLinkClick", deadLinkCreateTitleFromAnchor(anchor))
+    emit("deadLinkClick", deadLinkPayloadFromAnchor(anchor))
     return
   }
   if (/^https?:\/\//i.test(href) || href.startsWith("//")) {

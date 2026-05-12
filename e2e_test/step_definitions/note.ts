@@ -719,3 +719,13 @@ Then(
     start.assumeNotePage(linkTitle)
   }
 )
+
+When(
+  'I link dead link {string} to existing note {string}',
+  (deadLinkText: string, existingNoteTitle: string) => {
+    start
+      .assumeNotePage()
+      .followDeadLink(deadLinkText)
+      .linkToExistingNote(existingNoteTitle, deadLinkText)
+  }
+)

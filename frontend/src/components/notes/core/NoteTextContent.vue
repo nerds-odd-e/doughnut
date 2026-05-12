@@ -28,6 +28,7 @@ import { type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
@@ -37,5 +38,5 @@ const props = defineProps({
   isIndexContext: { type: Boolean, default: false },
 })
 
-defineEmits<{ deadLinkClick: [title: string] }>()
+defineEmits<{ deadLinkClick: [payload: DeadLinkPayload] }>()
 </script>

@@ -113,14 +113,36 @@ export function propertyValuePlainToDisplayHtml(
  * otherwise text after `[[`, or full trimmed text (matches what the user actually typed).
  */
 export function deadLinkCreateTitleFromAnchor(anchor: HTMLElement): string {
-  const fromAttr = anchor.getAttribute("data-wiki-title")
-  if (fromAttr !== null && fromAttr !== "") return fromAttr
+  return deadLinkPayloadFromAnchor(anchor).targetToken
+}
+
+/** Dead-link click payload containing the target token and visible display text. */
+export type DeadLinkPayload = { targetToken: string; displayText: string }
+
+/** Extracts target token and display text from a dead-link anchor element. */
+export function deadLinkPayloadFromAnchor(
+  anchor: HTMLElement
+): DeadLinkPayload {
   const raw = anchor.textContent?.trim() ?? ""
-  const closed = /^\[\[([^\[\]\r\n]*)\]\]$/.exec(raw)
-  if (closed?.[1] !== undefined) return closed[1].trim()
-  const open = /^\[\[([^\[\]\r\n]*)$/.exec(raw)
-  if (open?.[1] !== undefined) return open[1].trim()
-  return raw
+  let targetToken: string
+  const fromAttr = anchor.getAttribute("data-wiki-title")
+  if (fromAttr !== null && fromAttr !== "") {
+    targetToken = fromAttr
+  } else {
+    const closed = /^\[\[([^\[\]\r\n]*)\]\]$/.exec(raw)
+    if (closed?.[1] !== undefined) {
+      targetToken = closed[1].trim()
+    } else {
+      const open = /^\[\[([^\[\]\r\n]*)$/.exec(raw)
+      targetToken = open?.[1]?.trim() ?? raw
+    }
+  }
+
+  const displayAttr = anchor.getAttribute("data-wiki-display")
+  if (displayAttr !== null && displayAttr !== "") {
+    return { targetToken, displayText: displayAttr }
+  }
+  return { targetToken, displayText: targetToken }
 }
 
 /** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-wiki-title` / bracketed display. */

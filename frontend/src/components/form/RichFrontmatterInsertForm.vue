@@ -144,6 +144,7 @@ import {
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = defineProps<{
   insertOpen: boolean
@@ -160,7 +161,7 @@ const emit = defineEmits<{
   "update:draftKey": [string]
   "update:draftValue": [string]
   "value-blur": []
-  "dead-link-click": [title: string]
+  "dead-link-click": [payload: DeadLinkPayload]
   "wikidata-dialog-open": []
   "image-upload-state": [inProgress: boolean]
 }>()

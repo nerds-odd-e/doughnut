@@ -297,7 +297,9 @@ Body`
     expect(dead.exists()).toBe(true)
     await dead.trigger("click")
     await flushPromises()
-    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Missing Note"])
+    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([
+      { targetToken: "Missing Note", displayText: "Missing Note" },
+    ])
   })
 
   it("emits deadLinkClick with target token when a property wiki link uses display text", async () => {
@@ -316,7 +318,9 @@ Body`
     expect(dead.exists()).toBe(true)
     await dead.trigger("click")
     await flushPromises()
-    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual(["Ghost Page"])
+    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([
+      { targetToken: "Ghost Page", displayText: "shown text" },
+    ])
   })
 
   it("editing an existing property row emits renamed keys and updated values", async () => {

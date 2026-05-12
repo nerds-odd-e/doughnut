@@ -8,7 +8,10 @@ import type { Router } from "vue-router"
 import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
-import { deadLinkCreateTitleFromAnchor } from "@/utils/wikiPropertyValueField"
+import {
+  deadLinkPayloadFromAnchor,
+  type DeadLinkPayload,
+} from "@/utils/wikiPropertyValueField"
 
 // Define soft line break blot
 // Quill.import returns dynamic types that aren't fully typed in the Quill library
@@ -95,7 +98,7 @@ const emits = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
   pasteComplete: [content: string]
-  deadLinkClick: [title: string]
+  deadLinkClick: [payload: DeadLinkPayload]
 }>()
 
 const router = getCurrentInstance()?.appContext.config.globalProperties
@@ -223,7 +226,7 @@ onMounted(async () => {
         const href = anchor.getAttribute("href")
         if (!href) return
         if (!props.readonly && anchor.classList.contains("dead-link")) {
-          emits("deadLinkClick", deadLinkCreateTitleFromAnchor(anchor))
+          emits("deadLinkClick", deadLinkPayloadFromAnchor(anchor))
           return
         }
         if (/^https?:\/\//i.test(href) || href.startsWith("//")) {

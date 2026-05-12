@@ -50,6 +50,7 @@ import {
   parseNoteContentMarkdown,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const quillRef = ref<InstanceType<typeof QuillEditor> | null>(null)
 
@@ -71,7 +72,7 @@ const emits = defineEmits<{
   (e: "update:modelValue", value: string): void
   (e: "blur"): void
   (e: "pasteComplete", value: string): void
-  (e: "deadLinkClick", title: string): void
+  (e: "deadLinkClick", payload: DeadLinkPayload): void
 }>()
 
 /** Body markdown (or full note content when frontmatter could not be parsed). */

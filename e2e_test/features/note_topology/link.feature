@@ -57,6 +57,22 @@ Feature: Wiki links in notes
       | a:not(.dead-link) | WikiLinks E2E Tech    |
 
   @mockBrowserTime
+  Scenario: A dead wiki link can be relinked to an existing note
+    When I update note "WikiLinks E2E CI" content using markdown to become:
+      """
+      Continuous integration relies on [[original text]].
+      """
+    Then I should see the rich content of the note with content:
+      | Tag         | Content       |
+      | a.dead-link | original text |
+    When I link dead link "original text" to existing note "WikiLinks E2E Tech"
+    Then I should see the rich content of the note with content:
+      | Tag               | Content       |
+      | a:not(.dead-link) | original text |
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiLinks E2E Tech|original text]]"
+
+  @mockBrowserTime
   Scenario: Insert a wiki link to a note in the same notebook via the toolbar
     When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
     And I insert a wiki link to "WikiLinks E2E CI" via the link toolbar

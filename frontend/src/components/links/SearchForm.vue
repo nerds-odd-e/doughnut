@@ -11,9 +11,11 @@
     v-if="selectedSearchResult && !targetSearchResult && note"
     :target-note-topology="selectedSearchResult.noteTopology"
     :wiki-property-option-available="wikiPropertyOptionAvailable"
+    :dead-link-display-text="deadLinkPayload?.displayText"
     @choose-insert-wiki-link="onInsertWikiLink"
     @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
     @choose-add-relationship="targetSearchResult = selectedSearchResult!"
+    @choose-link-dead-link="onLinkDeadLinkToNote"
     @go-back="selectedSearchResult = undefined"
   />
   <AddRelationshipFinalize
@@ -34,6 +36,7 @@ import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
@@ -44,9 +47,10 @@ const wikiPropertyOptionAvailable = computed(() =>
   canInsertWikiLinkAsProperty()
 )
 
-const { note, modalCloser } = defineProps<{
+const { note, modalCloser, deadLinkPayload } = defineProps<{
   note?: Note
   modalCloser?: () => void
+  deadLinkPayload?: DeadLinkPayload
 }>()
 
 const emit = defineEmits<{
@@ -81,6 +85,27 @@ async function onInsertWikiLinkAsProperty() {
   emit("closeDialog")
   await nextTick()
   insertWikiLinkAsProperty(linkText)
+}
+
+async function onLinkDeadLinkToNote() {
+  if (!selectedSearchResult.value || !note || !deadLinkPayload) return
+  const newLinkText = buildWikiLinkText(selectedSearchResult.value, {
+    notebookId: notebookId.value,
+    displayText: deadLinkPayload.displayText,
+  })
+  const { targetToken, displayText } = deadLinkPayload
+  const originalToken =
+    targetToken === displayText
+      ? `[[${targetToken}]]`
+      : `[[${targetToken}|${displayText}]]`
+  const currentContent =
+    storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
+  const newContent = currentContent.replace(originalToken, newLinkText)
+  emit("closeDialog")
+  await nextTick()
+  await storageAccessor.value
+    .storedApi()
+    .updateTextField(note.id, "edit content", newContent)
 }
 
 async function moveUnderFolder(targetFolderId: number) {

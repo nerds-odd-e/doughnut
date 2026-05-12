@@ -423,7 +423,17 @@ export const assumeNotePage = (
         .click()
       return {
         createNote: () => {
+          cy.findByRole('button', { name: /Create a new note/ }).click()
           noteCreationForm.submit()
+        },
+        linkToExistingNote: (
+          existingNoteTitle: string,
+          displayText: string
+        ) => {
+          cy.findByRole('button', { name: 'Link to an existing note' }).click()
+          assumeNoteTargetSearchDialog()
+            .findTarget(existingNoteTitle)
+            .insertDeadLinkToTarget(existingNoteTitle, displayText)
         },
       }
     },

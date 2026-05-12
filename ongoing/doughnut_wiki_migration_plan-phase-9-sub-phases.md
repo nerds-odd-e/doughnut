@@ -105,7 +105,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/links/InsertWikiLink.spe
 ## 9.4 — Dead Link Can Be Linked to an Existing Note
 
 **Type:** Behavior  
-**Status:** Planned
+**Status:** Done
 
 Pre-condition: A note contains an unresolved wiki link such as `[[original wiki text]]`, and a suitable existing note can be found by search.
 

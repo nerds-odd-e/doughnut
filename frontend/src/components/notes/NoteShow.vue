@@ -78,9 +78,11 @@
 
           <NoteDeadLinkCreateModal
             v-model="pendingDeadLinkTitle"
+            :dead-link-payload="pendingDeadLinkPayload"
             :notebook-id="noteRealm.notebookRealm.notebook.id"
             :note-realm="noteRealm"
             :source-note-id="noteRealm.id"
+            @closed="pendingDeadLinkPayload = null"
           />
         </template>
       </template>
@@ -102,6 +104,7 @@ import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 const props = defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
@@ -122,9 +125,11 @@ const isIndexTitle = (noteRealm: NoteRealm) =>
   (noteRealm.note.noteTopology.title ?? "").trim().toLowerCase() === "index"
 
 const pendingDeadLinkTitle = ref<string | null>(null)
+const pendingDeadLinkPayload = ref<DeadLinkPayload | null>(null)
 
-const onDeadLinkClick = (title: string) => {
-  pendingDeadLinkTitle.value = title
+const onDeadLinkClick = (payload: DeadLinkPayload) => {
+  pendingDeadLinkTitle.value = payload.displayText
+  pendingDeadLinkPayload.value = payload
 }
 
 const asMarkdown = ref(false)

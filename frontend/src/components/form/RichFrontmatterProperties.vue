@@ -129,6 +129,7 @@ import {
   validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = defineProps<{
   contentMarkdown: string
@@ -147,7 +148,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   "properties-changed": [rows: PropertyRow[]]
-  deadLinkClick: [title: string]
+  deadLinkClick: [payload: DeadLinkPayload]
   "image-upload-state": [inProgress: boolean]
 }>()
 
