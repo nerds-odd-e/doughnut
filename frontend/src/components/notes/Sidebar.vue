@@ -19,6 +19,7 @@
         :notebook-id="notebookId"
         :active-note-topology="activeNoteTopology"
         :activeFolder="activeFolderRealm?.folder"
+        :activePathFolderIds="activePathFolderIds"
         v-bind="sidebarInnerTreeProps"
       />
     </div>
@@ -59,17 +60,12 @@ const activeNoteTopology = computed(
   () => props.activeNoteRealm?.note?.noteTopology
 )
 
-const activePathFolderIds = computed(() => {
-  const ids = new Set<number>()
-  for (const seg of props.breadcrumbFolders) {
-    if (seg.id != null) ids.add(seg.id)
-  }
-  return ids
-})
+const activePathFolderIds = computed(
+  () => new Set(props.breadcrumbFolders.map((seg) => seg.id))
+)
 
 const sidebarInnerTreeProps = computed(() => ({
   expandedFolderIds,
-  activePathFolderIds,
 }))
 
 watch(

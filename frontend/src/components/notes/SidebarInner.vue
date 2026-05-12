@@ -38,7 +38,7 @@ import {
   sortSidebarStructuralRows,
   type SidebarStructuralRow,
 } from "./sidebarStructuralSort"
-import type { ComputedRef, Ref } from "vue"
+import type { Ref } from "vue"
 import { computed, ref, watch } from "vue"
 import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -69,7 +69,7 @@ interface Props {
   /** ARIA level for treeitem descendants. Defaults to 1 (root tree). */
   level?: number
   expandedFolderIds: Ref<Set<number>>
-  activePathFolderIds: ComputedRef<Set<number>>
+  activePathFolderIds: Set<number>
   activeFolder?: Folder
 }
 

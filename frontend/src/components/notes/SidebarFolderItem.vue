@@ -69,7 +69,7 @@ import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import { ChevronRight } from "lucide-vue-next"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
-import type { ComputedRef, Ref } from "vue"
+import type { Ref } from "vue"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
@@ -79,7 +79,7 @@ const props = defineProps<{
   activeNoteTopology?: NoteTopology
   level?: number
   expandedFolderIds: Ref<Set<number>>
-  activePathFolderIds: ComputedRef<Set<number>>
+  activePathFolderIds: Set<number>
   activeFolder?: Folder
 }>()
 
@@ -103,7 +103,7 @@ function ensureFolderExpandedById(id: number | undefined) {
 watch(
   () =>
     [
-      props.activePathFolderIds.value,
+      props.activePathFolderIds,
       folderId.value,
       props.activeFolder?.id,
     ] as const,
@@ -112,7 +112,7 @@ watch(
     if (props.activeFolder?.id === folderId.value) {
       return
     }
-    if (props.activePathFolderIds.value.has(folderId.value)) {
+    if (props.activePathFolderIds.has(folderId.value)) {
       ensureFolderExpandedById(folderId.value)
     }
   },
@@ -125,9 +125,7 @@ const isExpanded = computed(
 )
 
 const isOnActivePath = computed(
-  () =>
-    folderId.value != null &&
-    props.activePathFolderIds.value.has(folderId.value)
+  () => folderId.value != null && props.activePathFolderIds.has(folderId.value)
 )
 
 const isActiveFolderRow = computed(
