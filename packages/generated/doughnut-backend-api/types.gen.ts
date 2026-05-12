@@ -237,16 +237,12 @@ export type NoteTopology = {
 };
 
 /**
- * Notebook chrome: entity plus optional catalog hints (attached book, readonly), optional notebook index landing note id when present, and optional container-owned index markdown.
+ * Notebook chrome: entity plus optional catalog hints (attached book, readonly), and optional container-owned index markdown.
  */
 export type NotebookRealm = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
-    /**
-     * Notebook index landing note id from cached notebook.index_note_id when valid; otherwise repaired from the sole root note titled "index" (case-insensitive). Omitted when absent.
-     */
-    indexNoteId?: number;
     /**
      * Container-owned notebook index markdown (populated by migration from legacy index note). Omitted when absent.
      */
@@ -644,7 +640,7 @@ export type UpdateNotebookGroupRequest = {
 };
 
 /**
- * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, optional designated folder index note id, and optional container-owned folder index markdown.
+ * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional container-owned folder index markdown.
  */
 export type FolderRealm = {
     /**
@@ -664,10 +660,6 @@ export type FolderRealm = {
      * Parent folder id when this folder is nested; omitted at notebook root.
      */
     parentFolderId?: number;
-    /**
-     * Folder index landing note id from cached folder.index_note_id when valid; otherwise repaired from notes titled "index" in this folder (case-insensitive). Omitted when absent.
-     */
-    folderIndexNoteId?: number;
     /**
      * Container-owned folder index markdown (populated by migration from legacy index note). Omitted when absent.
      */

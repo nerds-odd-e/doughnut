@@ -252,59 +252,6 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
-    void includesFolderIndexNoteIdWhenEligibleIndexNoteExists()
-        throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
-      Note index =
-          makeMe
-              .aNote()
-              .creatorAndOwner(owner)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("index")
-              .please();
-
-      FolderRealm realm = controller.getFolderPage(nb, folder);
-
-      assertThat(realm.folderIndexNoteId(), equalTo(index.getId()));
-    }
-
-    @Test
-    void includesFolderIndexNoteIdFromCachedFolderPointer()
-        throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
-      Note designated =
-          makeMe
-              .aNote()
-              .creatorAndOwner(owner)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("Welcome")
-              .please();
-      makeMe.theFolder(folder).indexNote(designated).please();
-      makeMe.entityPersister.flush();
-
-      FolderRealm realm = controller.getFolderPage(nb, folder);
-
-      assertThat(realm.folderIndexNoteId(), equalTo(designated.getId()));
-    }
-
-    @Test
-    void omitsFolderIndexNoteIdWhenNoDesignatedIndexYet() throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Folder folder = makeMe.aFolder().notebook(nb).name("Empty").please();
-
-      FolderRealm realm = controller.getFolderPage(nb, folder);
-
-      assertThat(realm.folderIndexNoteId(), nullValue());
-    }
-
-    @Test
     void nestedFolderIncludesParentFolderId() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();

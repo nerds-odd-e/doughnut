@@ -112,49 +112,11 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
-    void includesLandingNoteIndexIdWhenEligibleRootNoteExists()
-        throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Note index = makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("index").please();
-
-      NotebookRealm realm = controller.get(nb);
-
-      assertThat(realm.indexNoteId(), equalTo(index.getId()));
-    }
-
-    @Test
-    void includesLandingNoteIndexIdFromCachedNotebookPointer()
-        throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Note designated =
-          makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("Notebook Welcome").please();
-      makeMe.theNotebook(nb).indexNote(designated).please();
-      makeMe.entityPersister.flush();
-
-      NotebookRealm realm = controller.get(nb);
-
-      assertThat(realm.indexNoteId(), equalTo(designated.getId()));
-    }
-
-    @Test
     void deniesLoggedInUserWithoutReadAccessToNotebook() {
       User owner = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.get(nb));
-    }
-
-    @Test
-    void omitsLandingNoteIndexIdWhenNoEligibleIndexNoteYet()
-        throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-
-      NotebookRealm realm = controller.get(nb);
-
-      assertThat(realm.indexNoteId(), nullValue());
     }
 
     @Test

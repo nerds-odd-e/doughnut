@@ -29,14 +29,6 @@ public class Folder extends EntityIdentifiedByIdOnly {
   @Setter
   private Folder parentFolder;
 
-  /** Cached designated folder index note (title {@code index} by convention). */
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "index_note_id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private Note indexNote;
-
   /** Container-owned index markdown (populated by migration; canonical from 10.15 onward). */
   @Column(name = "index_content", columnDefinition = "mediumtext")
   @Getter

@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -93,11 +92,6 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   public NotebookBuilder owner(Circle circle) {
     entity.setOwnership(circle.getOwnership());
-    return this;
-  }
-
-  public NotebookBuilder indexNote(Note note) {
-    entity.setIndexNote(note);
     return this;
   }
 

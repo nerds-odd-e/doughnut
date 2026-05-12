@@ -15,7 +15,6 @@ import com.odde.doughnut.services.EmbeddingService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
@@ -376,7 +375,6 @@ public class NoteSearchService {
         orderedIds.stream()
             .map(id -> idToNote.get(id))
             .filter(java.util.Objects::nonNull)
-            .filter(n -> !isDesignatedNotebookIndexNote(n))
             .map(n -> noteToSearchResult(n, noteIdToDistance.get(n.getId())))
             .toList();
 
@@ -451,8 +449,8 @@ public class NoteSearchService {
 
   private List<NoteSearchResult> combineExactAndPartialMatches(
       List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId, Integer notebookId) {
-    List<Note> filteredExactMatches = excludeDesignatedNotebookIndexNotes(exactMatches);
-    List<Note> filteredPartialMatchesInput = excludeDesignatedNotebookIndexNotes(partialMatches);
+    List<Note> filteredExactMatches = exactMatches;
+    List<Note> filteredPartialMatchesInput = partialMatches;
 
     List<Note> filteredPartialMatches =
         filteredPartialMatchesInput.stream()
@@ -480,19 +478,6 @@ public class NoteSearchService {
     }
 
     return sortByDistanceThenNotebook(results, notebookId);
-  }
-
-  private static boolean isDesignatedNotebookIndexNote(Note note) {
-    var notebook = note.getNotebook();
-    if (notebook == null) {
-      return false;
-    }
-    var indexNote = notebook.getIndexNote();
-    return indexNote != null && Objects.equals(note.getId(), indexNote.getId());
-  }
-
-  private static List<Note> excludeDesignatedNotebookIndexNotes(List<Note> notes) {
-    return notes.stream().filter(n -> !isDesignatedNotebookIndexNote(n)).toList();
   }
 
   private NoteSearchResult noteToSearchResult(Note note, Float distance) {

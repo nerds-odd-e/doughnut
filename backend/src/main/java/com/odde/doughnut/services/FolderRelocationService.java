@@ -23,24 +23,18 @@ public class FolderRelocationService {
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final FolderService folderService;
-  private final NotebookService notebookService;
 
   public FolderRelocationService(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
-      FolderService folderService,
-      NotebookService notebookService) {
+      TestabilitySettings testabilitySettings) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.folderService = folderService;
-    this.notebookService = notebookService;
   }
 
   public Folder moveFolder(Notebook notebook, Folder folder, FolderMoveRequest request) {
@@ -109,11 +103,6 @@ public class FolderRelocationService {
     }
 
     entityPersister.flush();
-    if (destinationId != null) {
-      folderService.reconcileFolderIndexNotePointer(destinationId);
-    } else {
-      notebookService.reconcileNotebookIndexNotePointer(notebook.getId());
-    }
     entityPersister.remove(folder);
   }
 }

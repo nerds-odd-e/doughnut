@@ -25,7 +25,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 | 7 — Remove note parent | Done |
 | 8 — Move / dissolve folder (organize) | Done |
 | 9 — Wiki-link parser and link index | Not started |
-| 10 — Index-scoped configuration (notebook + folder) | In progress — 10.13 done; 10.14+ replanned around container `indexContent` |
+| 10 — Index-scoped configuration (notebook + folder) | Done — container `indexContent` is canonical; `index_note_id` columns removed (10.18). Legacy notes renamed to `index_to_be_deleted` during migration remain for manual review; a later user-facing bulk delete or archive is optional follow-up. |
 | 11 — Remove legacy assumptions | Not started |
 | 12 — Title rename propagates wiki references (deferred from Phase **5.25**) | Not started |
 
@@ -39,7 +39,7 @@ Phased migration toward the wiki-style, markdown-first architecture in the north
 
 **Folder** = structural containment. **`note.parent_id`** is removed (Phase 7); folder alignment and motion use folder placement and `NoteChildContainerFolderService` / `NoteMotionService` where applicable (see codebase).
 
-**Container index content** — After Phase **10.14+**, notebook root and folders store landing-page Markdown plus scoped configuration frontmatter directly on **`notebook.indexContent`** and **`folder.indexContent`**. Earlier Phase 10 sub-phases used ordinary notes titled **`index`** plus **`index_note_id`** pointers; the remaining Phase 10 work migrates that content onto containers, renames legacy index notes to **`index_to_be_deleted`**, reserves **`index`** as a note title, and removes index-note pointer infrastructure. Notebook has **`name`** and **`description`**; no `headNote` on APIs. See north star for folder page routing vs note routes.
+**Container index content** — Notebook root and folders store landing-page Markdown plus scoped configuration frontmatter on **`notebook.indexContent`** and **`folder.indexContent`** (Phase **10** complete). Legacy index notes were migrated and renamed to **`index_to_be_deleted`**; **`index`** is reserved as a note title; **`index_note_id`** pointer columns were dropped. Notebook has **`name`** and **`description`**; no `headNote` on APIs. See north star for folder page routing vs note routes.
 
 **Properties** — Leading YAML in Markdown `content`; rich editor mirrors via frontmatter UI.
 

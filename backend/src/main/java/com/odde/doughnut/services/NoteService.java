@@ -35,8 +35,6 @@ public class NoteService {
   private final ImageRepository imageRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final NotebookService notebookService;
-  private final FolderService folderService;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -45,9 +43,7 @@ public class NoteService {
       WikiTitleCacheService wikiTitleCacheService,
       ImageRepository imageRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
-      NotebookService notebookService,
-      FolderService folderService) {
+      TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
@@ -55,8 +51,6 @@ public class NoteService {
     this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.notebookService = notebookService;
-    this.folderService = folderService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -162,17 +156,12 @@ public class NoteService {
     if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
       removeNoteLinksFromReferrerProperties(note, viewer, currentUTCTimestamp);
     }
-    Integer notebookId = note.getNotebook().getId();
     note.setUpdatedAt(currentUTCTimestamp);
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
     for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
-    }
-    notebookService.reconcileNotebookIndexNotePointer(notebookId);
-    if (note.getFolder() != null) {
-      folderService.reconcileFolderIndexNotePointer(note.getFolder().getId());
     }
   }
 
@@ -238,10 +227,6 @@ public class NoteService {
     }
     note.setDeletedAt(null);
     entityPersister.merge(note);
-    notebookService.reconcileNotebookIndexNotePointer(note.getNotebook().getId());
-    if (note.getFolder() != null) {
-      folderService.reconcileFolderIndexNotePointer(note.getFolder().getId());
-    }
   }
 
   private boolean sameTimestamp(Timestamp a, Timestamp b) {

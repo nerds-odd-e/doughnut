@@ -10,7 +10,6 @@ import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.SubscriptionForNotebooksListing;
 import com.odde.doughnut.entities.Folder;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
@@ -35,20 +34,14 @@ public class NotebookCatalogService {
 
   private final BookRepository bookRepository;
   private final FolderRepository folderRepository;
-  private final FolderService folderService;
-  private final NotebookService notebookService;
   private final NoteRealmService noteRealmService;
 
   public NotebookCatalogService(
       BookRepository bookRepository,
       FolderRepository folderRepository,
-      FolderService folderService,
-      NotebookService notebookService,
       @Lazy NoteRealmService noteRealmService) {
     this.bookRepository = bookRepository;
     this.folderRepository = folderRepository;
-    this.folderService = folderService;
-    this.notebookService = notebookService;
     this.noteRealmService = noteRealmService;
   }
 
@@ -61,13 +54,10 @@ public class NotebookCatalogService {
   }
 
   public NotebookRealm notebookRealmFor(Notebook notebook, User viewer) {
-    Integer indexNoteId =
-        notebookService.findOptionalIndexNote(notebook).map(Note::getId).orElse(null);
     return NotebookRealm.of(
         notebook,
         hasAttachedBook(notebook),
         readonlyFor(notebook, viewer),
-        indexNoteId,
         notebook.getIndexContent());
   }
 
@@ -79,15 +69,12 @@ public class NotebookCatalogService {
     NotebookRealm chrome = notebookRealmFor(notebook, viewer);
     Integer parentFolderId =
         loaded.getParentFolder() == null ? null : loaded.getParentFolder().getId();
-    Integer folderIndexNoteId =
-        folderService.findOptionalIndexNote(loaded).map(Note::getId).orElse(null);
     return FolderRealm.of(
         chrome,
         FolderTrailSegments.ancestorsFromRootToParent(loaded),
         noteRealmService.resolveIndexNoteContentForFolder(loaded),
         loaded,
         parentFolderId,
-        folderIndexNoteId,
         loaded.getIndexContent());
   }
 
@@ -117,7 +104,7 @@ public class NotebookCatalogService {
                 nb.getId(),
                 __ ->
                     NotebookRealm.of(
-                        nb, withBook.contains(nb.getId()), readonlyFor(nb, viewer), null, null));
+                        nb, withBook.contains(nb.getId()), readonlyFor(nb, viewer), null));
 
     NotebooksViewedByUser dto = new NotebooksViewedByUser();
     dto.notebooks = allNotebooks.stream().map(wrap).toList();

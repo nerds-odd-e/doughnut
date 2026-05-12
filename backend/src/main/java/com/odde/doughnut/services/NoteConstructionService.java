@@ -38,8 +38,6 @@ public class NoteConstructionService {
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteService noteService;
-  private final NotebookService notebookService;
-  private final FolderService folderService;
 
   @Autowired
   public NoteConstructionService(
@@ -50,9 +48,7 @@ public class NoteConstructionService {
       EntityPersister entityPersister,
       NoteRealmService noteRealmService,
       WikiTitleCacheService wikiTitleCacheService,
-      NoteService noteService,
-      NotebookService notebookService,
-      FolderService folderService) {
+      NoteService noteService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteRepository = noteRepository;
@@ -61,8 +57,6 @@ public class NoteConstructionService {
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteService = noteService;
-    this.notebookService = notebookService;
-    this.folderService = folderService;
   }
 
   private Note createNoteInNotebookScopeWithoutWikidata(
@@ -138,10 +132,6 @@ public class NoteConstructionService {
     if (noteCreation.getContent() != null || wikidataIdWithApi != null) {
       wikiTitleCacheService.refreshForNote(note, user);
     }
-    notebookService.reconcileNotebookIndexNotePointer(notebook.getId());
-    if (folder != null) {
-      folderService.reconcileFolderIndexNotePointer(folder.getId());
-    }
     return noteRealmService.build(note, user);
   }
 
@@ -195,10 +185,6 @@ public class NoteConstructionService {
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
 
-    notebookService.reconcileNotebookIndexNotePointer(originalNote.getNotebook().getId());
-    if (originalNote.getFolder() != null) {
-      folderService.reconcileFolderIndexNotePointer(originalNote.getFolder().getId());
-    }
     return noteRealmService.build(newNote, user);
   }
 }

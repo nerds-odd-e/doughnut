@@ -77,22 +77,4 @@ public class NoteMotionServiceTest {
         noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(root.getNotebook().getId());
     assertThat(rootScope.stream().map(Note::getId).toList(), hasItem(equalTo(mover.getId())));
   }
-
-  @Test
-  void executeMoveToNotebookRoot_reconcilesFolderIndexPointerWhenDesignatedIndexLeavesFolder() {
-    User user = makeMe.aUser().please();
-    Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
-    Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("f").please();
-    Note indexNote = makeMe.aNote("index").creatorAndOwner(user).underSameNotebookAs(root).please();
-    makeMe.entityPersister.flush();
-    noteMotionService.executeMoveIntoFolder(indexNote, folder);
-    makeMe.entityPersister.flush();
-    makeMe.theFolder(folder).indexNote(indexNote).please();
-    makeMe.entityPersister.flush();
-
-    noteMotionService.executeMoveToNotebookRoot(indexNote);
-
-    makeMe.refresh(folder);
-    assertThat(folder.getIndexNote(), nullValue());
-  }
 }

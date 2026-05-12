@@ -7,10 +7,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.services.FolderService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,8 +29,6 @@ class TextContentController {
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteService noteService;
-  private final NotebookService notebookService;
-  private final FolderService folderService;
 
   public TextContentController(
       EntityPersister entityPersister,
@@ -40,17 +36,13 @@ class TextContentController {
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
       WikiTitleCacheService wikiTitleCacheService,
-      NoteService noteService,
-      NotebookService notebookService,
-      FolderService folderService) {
+      NoteService noteService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteService = noteService;
-    this.notebookService = notebookService;
-    this.folderService = folderService;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -59,7 +51,7 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateTitleDTO titleDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNoteTitleAndReconcileIndexPointer(note, n -> n.setTitle(titleDTO.getNewTitle()));
+    return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()), false);
   }
 
   @PatchMapping(path = "/{note}/content")
@@ -95,15 +87,5 @@ class TextContentController {
       Note note, Consumer<Note> updateFunction, boolean refreshWikiTitleCache)
       throws UnexpectedNoAccessRightException {
     return updateNote(note, updateFunction, refreshWikiTitleCache, false);
-  }
-
-  private NoteRealm updateNoteTitleAndReconcileIndexPointer(
-      Note note, Consumer<Note> updateFunction) throws UnexpectedNoAccessRightException {
-    NoteRealm realm = updateNote(note, updateFunction, false);
-    notebookService.reconcileNotebookIndexNotePointer(note.getNotebook().getId());
-    if (note.getFolder() != null) {
-      folderService.reconcileFolderIndexNotePointer(note.getFolder().getId());
-    }
-    return realm;
   }
 }

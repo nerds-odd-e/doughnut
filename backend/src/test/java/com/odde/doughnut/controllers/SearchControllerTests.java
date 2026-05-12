@@ -161,8 +161,7 @@ class SearchControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldExcludeDesignatedNotebookIndexNoteFromLiteralSearch()
-        throws UnexpectedNoAccessRightException {
+    void literalSearchReturnsAllMatchingNotes() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
       Note designatedIndex =
@@ -170,7 +169,6 @@ class SearchControllerTests extends ControllerTestBase {
       Note regularNote =
           makeMe.aNote("Regular IdxTok999 Topic").creatorAndOwner(user).inNotebook(nb).please();
 
-      makeMe.theNotebook(nb).indexNote(designatedIndex).please();
       entityManager.flush();
       entityManager.clear();
 
@@ -183,7 +181,7 @@ class SearchControllerTests extends ControllerTestBase {
       var notes = RelationshipLiteralSearchHits.noteMatches(result);
       assertThat(
           notes.stream().map(r -> r.getNoteTopology().getId()).toList(),
-          containsInAnyOrder(regularNote.getId()));
+          containsInAnyOrder(designatedIndex.getId(), regularNote.getId()));
     }
 
     @Test

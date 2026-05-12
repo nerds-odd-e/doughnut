@@ -7,20 +7,12 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(
     description =
-        "Notebook chrome: entity plus optional catalog hints (attached book, readonly), optional"
-            + " notebook index landing note id when present, and optional container-owned index"
-            + " markdown.")
+        "Notebook chrome: entity plus optional catalog hints (attached book, readonly), and"
+            + " optional container-owned index markdown.")
 public record NotebookRealm(
     @NotNull Notebook notebook,
     @JsonInclude(JsonInclude.Include.NON_NULL) Boolean hasAttachedBook,
     boolean readonly,
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-        @Schema(
-            description =
-                "Notebook index landing note id from cached notebook.index_note_id when valid;"
-                    + " otherwise repaired from the sole root note titled \"index\""
-                    + " (case-insensitive). Omitted when absent.")
-        Integer indexNoteId,
     @JsonInclude(JsonInclude.Include.NON_NULL)
         @Schema(
             description =
@@ -29,11 +21,7 @@ public record NotebookRealm(
         String indexContent) {
 
   public static NotebookRealm of(
-      Notebook notebook,
-      Boolean hasAttachedBook,
-      boolean readonly,
-      Integer indexNoteId,
-      String indexContent) {
-    return new NotebookRealm(notebook, hasAttachedBook, readonly, indexNoteId, indexContent);
+      Notebook notebook, Boolean hasAttachedBook, boolean readonly, String indexContent) {
+    return new NotebookRealm(notebook, hasAttachedBook, readonly, indexContent);
   }
 }
