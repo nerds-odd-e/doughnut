@@ -21,7 +21,7 @@
           level: currentLevel,
           expandedFolderIds,
           activePathFolderIds,
-          activeFolder,
+          activeFolderRealm,
         }"
       />
     </template>
@@ -74,7 +74,7 @@ interface Props {
   level?: number
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolder?: FolderRealm
+  activeFolderRealm?: FolderRealm
 }
 
 const props = defineProps<Props>()

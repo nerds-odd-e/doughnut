@@ -76,6 +76,7 @@ Feature: Note tree view
     When I open the note "CI" from the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
+      # | TPP            |
       | ATDD           |
       | CI             |
       | TDD            |

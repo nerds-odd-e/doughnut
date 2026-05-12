@@ -56,7 +56,7 @@
           level: currentLevel + 1,
           expandedFolderIds,
           activePathFolderIds,
-          activeFolder,
+          activeFolderRealm,
         }"
         :key="`folder-${folderId}`"
       />
@@ -84,7 +84,7 @@ const props = defineProps<{
   level?: number
   expandedFolderIds: Ref<Set<number>>
   activePathFolderIds: ComputedRef<Set<number>>
-  activeFolder?: FolderRealm
+  activeFolderRealm?: FolderRealm
 }>()
 
 const currentLevel = computed(() => props.level ?? 1)
@@ -109,11 +109,11 @@ watch(
     [
       props.activePathFolderIds.value,
       folderId.value,
-      props.activeFolder?.folder.id,
+      props.activeFolderRealm?.folder.id,
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (props.activeFolder?.folder.id === folderId.value) {
+    if (props.activeFolderRealm?.folder.id === folderId.value) {
       return
     }
     if (props.activePathFolderIds.value.has(folderId.value)) {
@@ -136,7 +136,8 @@ const isOnActivePath = computed(
 
 const isActiveFolderRow = computed(
   () =>
-    folderId.value != null && props.activeFolder?.folder.id === folderId.value
+    folderId.value != null &&
+    props.activeFolderRealm?.folder.id === folderId.value
 )
 
 function setStructuralChildCount(count: number) {
