@@ -4,15 +4,25 @@ export function buildWikiLinkText(
     notebookId: number
     notebookName?: string
   },
-  source: { notebookId?: number }
+  source: { notebookId?: number; displayText?: string }
 ): string {
   const title = target.noteTopology.title
-  if (
+  const useNotebookPrefix =
     source.notebookId !== undefined &&
     target.notebookId !== source.notebookId &&
-    target.notebookName
-  ) {
-    return `[[${target.notebookName}:${title}]]`
-  }
-  return `[[${title}]]`
+    Boolean(target.notebookName)
+
+  const defaultInner = useNotebookPrefix
+    ? `${target.notebookName}:${title}`
+    : title
+
+  const trimmedDisplay = source.displayText?.trim() ?? ""
+  const inner =
+    trimmedDisplay.length > 0 &&
+    defaultInner.length > 0 &&
+    trimmedDisplay !== defaultInner
+      ? `${defaultInner}|${trimmedDisplay}`
+      : defaultInner
+
+  return `[[${inner}]]`
 }
