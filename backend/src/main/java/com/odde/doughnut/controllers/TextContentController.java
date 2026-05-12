@@ -4,7 +4,9 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -55,7 +57,19 @@ class TextContentController {
       @Valid @RequestBody NoteUpdateTitleDTO titleDTO)
       throws UnexpectedNoAccessRightException {
     assertReferencedTitleRenameIsUnambiguous(note, titleDTO);
-    return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()), false);
+    authorizationService.assertAuthorization(note);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    User viewer = authorizationService.getCurrentUser();
+    if (TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT.equals(titleDTO.getReferenceHandling())
+        && !Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
+      wikiTitleCacheService.rewriteInboundWikiLinksForVisibleTitleRename(
+          note, titleDTO.getNewTitle(), currentUTCTimestamp, viewer);
+    } else {
+      note.setUpdatedAt(currentUTCTimestamp);
+      note.setTitle(titleDTO.getNewTitle());
+      entityPersister.save(note);
+    }
+    return noteRealmService.build(note, viewer);
   }
 
   private void assertReferencedTitleRenameIsUnambiguous(Note note, NoteUpdateTitleDTO titleDTO) {
@@ -103,11 +117,5 @@ class TextContentController {
       wikiTitleCacheService.refreshForNote(note, authorizationService.getCurrentUser());
     }
     return noteRealmService.build(note, authorizationService.getCurrentUser());
-  }
-
-  private NoteRealm updateNote(
-      Note note, Consumer<Note> updateFunction, boolean refreshWikiTitleCache)
-      throws UnexpectedNoAccessRightException {
-    return updateNote(note, updateFunction, refreshWikiTitleCache, false);
   }
 }

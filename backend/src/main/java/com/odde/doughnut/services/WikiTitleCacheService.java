@@ -7,13 +7,17 @@ import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -30,16 +34,19 @@ public class WikiTitleCacheService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final AuthorizationService authorizationService;
   private final JdbcTemplate jdbcTemplate;
+  private final EntityPersister entityPersister;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       AuthorizationService authorizationService,
-      JdbcTemplate jdbcTemplate) {
+      JdbcTemplate jdbcTemplate,
+      EntityPersister entityPersister) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.authorizationService = authorizationService;
     this.jdbcTemplate = jdbcTemplate;
+    this.entityPersister = entityPersister;
   }
 
   public List<WikiTitle> wikiTitlesForViewer(Note focusNote, User viewer) {
@@ -205,6 +212,48 @@ public class WikiTitleCacheService {
       return false;
     }
     return viewer.canReferTo(referrerNotebook);
+  }
+
+  /**
+   * Persists the renamed note's new title first so updated referrer tokens resolve, then rewrites
+   * inbound wiki links with {@code UPDATE_VISIBLE_TEXT} semantics and rebuilds each changed
+   * referrer's wiki-title cache.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForVisibleTitleRename(
+      Note targetNote, String newTitle, Timestamp updatedAt, User viewer) {
+    Integer targetId = targetNote.getId();
+    List<NoteWikiTitleCache> rows =
+        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
+    targetNote.setTitle(newTitle);
+    targetNote.setUpdatedAt(updatedAt);
+    entityPersister.save(targetNote);
+    entityManager.flush();
+
+    Map<Integer, LinkedHashSet<String>> linkTextsByReferrer = new LinkedHashMap<>();
+    for (NoteWikiTitleCache row : rows) {
+      linkTextsByReferrer
+          .computeIfAbsent(row.getNote().getId(), _ -> new LinkedHashSet<>())
+          .add(row.getLinkText());
+    }
+    List<Integer> referrerIds = new ArrayList<>(linkTextsByReferrer.keySet());
+    Collections.sort(referrerIds);
+    for (Integer referrerId : referrerIds) {
+      Note referrer = entityManager.find(Note.class, referrerId);
+      if (referrer == null || referrer.getDeletedAt() != null) {
+        continue;
+      }
+      String content = referrer.getContent() != null ? referrer.getContent() : "";
+      for (String linkText : linkTextsByReferrer.get(referrerId)) {
+        String newInner = WikiLinkMarkdown.newInnerForUpdateVisibleText(linkText, newTitle);
+        content =
+            WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
+      }
+      referrer.setContent(content);
+      referrer.setUpdatedAt(updatedAt);
+      entityPersister.save(referrer);
+      refreshForNote(referrer, viewer);
+    }
   }
 
   @Transactional

@@ -20,4 +20,32 @@ class WikiLinkMarkdownTest {
     assertThat(s.target(), equalTo("Alpha"));
     assertThat(s.display(), equalTo("Alpha"));
   }
+
+  @Test
+  void newInnerForUpdateVisibleText_plainLink() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForUpdateVisibleText("OldTitle", "NewTitle"), equalTo("NewTitle"));
+  }
+
+  @Test
+  void newInnerForUpdateVisibleText_keepsDisplaySegment() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForUpdateVisibleText("OldTitle|custom label", "NewTitle"),
+        equalTo("NewTitle|custom label"));
+  }
+
+  @Test
+  void newInnerForUpdateVisibleText_keepsNotebookQualifier() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForUpdateVisibleText("MyNb:OldTitle|x", "NewTitle"),
+        equalTo("MyNb:NewTitle|x"));
+  }
+
+  @Test
+  void replaceWikiLinksMatchingTrimmedInner_matchesWhitespaceInsideBrackets() {
+    assertThat(
+        WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(
+            "see [[  Old  ]] end", "Old", "NewTitle"),
+        equalTo("see [[NewTitle]] end"));
+  }
 }
