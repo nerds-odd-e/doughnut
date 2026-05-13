@@ -328,9 +328,7 @@ class NotebookController {
             .findById(parentFolderId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-    }
+    assertFolderInNotebook(notebook, folder);
     List<NoteTopology> noteTopologies =
         noteService.findNotesInFolderScope(folder.getId()).stream()
             .map(Note::getNoteTopology)
@@ -352,9 +350,7 @@ class NotebookController {
       @PathVariable("folder") @Schema(type = "integer") Folder folder)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-    }
+    assertFolderInNotebook(notebook, folder);
     User user = authorizationService.getCurrentUser();
     return notebookCatalogService.folderRealmFor(notebook, folder, user);
   }
@@ -392,9 +388,7 @@ class NotebookController {
       @RequestBody NoteUpdateContentDTO dto)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    if (!folder.getNotebook().getId().equals(notebook.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
-    }
+    assertFolderInNotebook(notebook, folder);
     String content = dto.getContent();
     folder.setIndexContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(folder);
@@ -431,5 +425,11 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     notebookIndexingService.resetNotebookIndex(notebook);
+  }
+
+  private void assertFolderInNotebook(Notebook notebook, Folder folder) {
+    if (!folder.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
+    }
   }
 }
