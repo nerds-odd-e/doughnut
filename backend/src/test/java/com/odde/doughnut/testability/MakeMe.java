@@ -63,10 +63,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new NotebookGroupBuilder(this, null);
   }
 
-  public NotebookGroupBuilder theNotebookGroup(NotebookGroup group) {
-    return new NotebookGroupBuilder(this, group);
-  }
-
   public BookBuilder aBook() {
     return new BookBuilder(this);
   }
@@ -97,7 +93,7 @@ public class MakeMe extends MakeMeWithoutDB {
     MemoryTracker memoryTracker = MemoryTracker.buildMemoryTrackerForNote(note);
     MemoryTrackerBuilder memoryTrackerBuilder = new MemoryTrackerBuilder(memoryTracker, this);
     memoryTrackerBuilder.entity.setNote(note);
-    memoryTrackerBuilder.by(note.getCreator());
+    memoryTrackerBuilder.by(note.getNotebook().getOwnership().getUser());
     return memoryTrackerBuilder;
   }
 

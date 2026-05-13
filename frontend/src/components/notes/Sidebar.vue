@@ -11,8 +11,15 @@
       :breadcrumb-folders="breadcrumbFolders"
     />
     <div
+      ref="treeScrollRef"
       class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
     >
+      <SidebarNotebookTreeScrollportPathHint
+        v-if="sidebarTreeShown && breadcrumbFolders.length > 0"
+        :path-folders="breadcrumbFolders"
+        :notebook-id="notebookId"
+        :scroll-root="treeScrollRef"
+      />
       <SidebarInner
         v-if="sidebarTreeShown"
         :notebook-id="notebookId"
@@ -37,6 +44,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
+import SidebarNotebookTreeScrollportPathHint from "./SidebarNotebookTreeScrollportPathHint.vue"
 
 const props = withDefaults(
   defineProps<{
@@ -52,6 +60,8 @@ const props = withDefaults(
   }>(),
   { breadcrumbFolders: () => [] }
 )
+
+const treeScrollRef = ref<HTMLElement | null>(null)
 
 const expandedFolderIds = ref<Set<number>>(new Set())
 

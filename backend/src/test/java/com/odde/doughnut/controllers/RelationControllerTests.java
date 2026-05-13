@@ -45,12 +45,7 @@ class RelationControllerTests extends ControllerTestBase {
 
     @Test
     void moveNoteToFolderSuccessfully() throws UnexpectedNoAccessRightException {
-      Note mover =
-          makeMe
-              .aNote("mover")
-              .notebookCreatorAndOwner(currentUser.getUser())
-              .underSameNotebookAs(ownNote)
-              .please();
+      Note mover = makeMe.aNote("mover").underSameNotebookAs(ownNote).please();
       var result = controller.moveNoteToFolder(mover, targetFolder);
       assertThat(result, hasSize(1));
       mover = noteRepository.findById(mover.getId()).orElseThrow();
@@ -81,12 +76,9 @@ class RelationControllerTests extends ControllerTestBase {
       User u = currentUser.getUser();
       Note anchor = makeMe.aRootNote("top").notebookCreatorAndOwner(u).please();
       Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F").please();
-      Note peerA =
-          makeMe.aNote("A").notebookCreatorAndOwner(u).underSameNotebookAs(anchor).please();
-      Note peerB =
-          makeMe.aNote("B").notebookCreatorAndOwner(u).underSameNotebookAs(anchor).please();
-      Note mover =
-          makeMe.aNote("M").notebookCreatorAndOwner(u).underSameNotebookAs(anchor).please();
+      Note peerA = makeMe.aNote("A").underSameNotebookAs(anchor).please();
+      Note peerB = makeMe.aNote("B").underSameNotebookAs(anchor).please();
+      Note mover = makeMe.aNote("M").underSameNotebookAs(anchor).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(peerA, folder);
       controller.moveNoteToFolder(peerB, folder);
@@ -106,8 +98,7 @@ class RelationControllerTests extends ControllerTestBase {
       User u = currentUser.getUser();
       Note anchor = makeMe.aRootNote("top2").notebookCreatorAndOwner(u).please();
       Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F2").please();
-      Note peerA =
-          makeMe.aNote("A2").notebookCreatorAndOwner(u).underSameNotebookAs(anchor).please();
+      Note peerA = makeMe.aNote("A2").underSameNotebookAs(anchor).please();
       Note peerB =
           makeMe.aNote("B2").notebookCreatorAndOwner(u).underSameNotebookAs(anchor).please();
       Note mover =
@@ -140,7 +131,7 @@ class RelationControllerTests extends ControllerTestBase {
       User u = currentUser.getUser();
       Note root = makeMe.aRootNote("top").notebookCreatorAndOwner(u).please();
       Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
-      Note mover = makeMe.aNote("M").notebookCreatorAndOwner(u).underSameNotebookAs(root).please();
+      Note mover = makeMe.aNote("M").underSameNotebookAs(root).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(mover, folder);
       makeMe.entityPersister.flush();
@@ -160,8 +151,7 @@ class RelationControllerTests extends ControllerTestBase {
       Note nb1Root = makeMe.aRootNote("nb1").notebookCreatorAndOwner(u).please();
       Note nb2Root = makeMe.aRootNote("nb2").notebookCreatorAndOwner(u).please();
       Folder folder = makeMe.aFolder().notebook(nb1Root.getNotebook()).name("F").please();
-      Note mover =
-          makeMe.aNote("M").notebookCreatorAndOwner(u).underSameNotebookAs(nb1Root).please();
+      Note mover = makeMe.aNote("M").underSameNotebookAs(nb1Root).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(mover, folder);
       makeMe.entityPersister.flush();
@@ -179,8 +169,7 @@ class RelationControllerTests extends ControllerTestBase {
       User other = makeMe.aUser().please();
       Note nb1Root = makeMe.aRootNote("mine").notebookCreatorAndOwner(u).please();
       makeMe.aRootNote("theirs").notebookCreatorAndOwner(other).please();
-      Note mover =
-          makeMe.aNote("M").notebookCreatorAndOwner(u).underSameNotebookAs(nb1Root).please();
+      Note mover = makeMe.aNote("M").underSameNotebookAs(nb1Root).please();
       Notebook foreignNb = makeMe.aNote().notebookCreatorAndOwner(other).please().getNotebook();
       assertThrows(
           UnexpectedNoAccessRightException.class,
