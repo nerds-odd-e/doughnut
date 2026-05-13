@@ -8,6 +8,9 @@
       'active-item':
         activeNoteTopology != null &&
         noteTopology.id === activeNoteTopology.id,
+      'sidebar-note-active':
+        activeNoteTopology != null &&
+        noteTopology.id === activeNoteTopology.id,
     }"
   >
     <ScrollTo
@@ -20,14 +23,7 @@
       :to="noteShowLocation(noteTopology.id)"
       class="note-row daisy-text-decoration-none"
     >
-      <NoteTitleComponent
-        :class="{
-          'active-title':
-            activeNoteTopology != null &&
-            noteTopology.id === activeNoteTopology.id,
-        }"
-        v-bind="{ noteTopology }"
-      />
+      <NoteTitleComponent v-bind="{ noteTopology }" />
     </RouterLink>
   </li>
 </template>
@@ -73,7 +69,13 @@ const props = defineProps<Props>()
   background-color: var(--fallback-b3, oklch(var(--b3) / 1));
 }
 
-.active-title {
-  font-weight: 600;
+.sidebar-note-active > .note-row {
+  color: var(--fallback-bc, oklch(var(--bc) / 1));
+  background-color: color-mix(
+    in oklch,
+    var(--fallback-b2, oklch(var(--b2) / 1)) 78%,
+    var(--fallback-p, oklch(var(--p) / 1)) 22%
+  ) !important;
+  box-shadow: inset 2px 0 0 var(--fallback-p, oklch(var(--p) / 1));
 }
 </style>

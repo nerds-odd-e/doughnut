@@ -360,7 +360,6 @@ class AiControllerTest extends ControllerTestBase {
           makeMe
               .aNote()
               .title("Sample")
-              .notebookCreatorAndOwner(currentUser.getUser())
               .inNotebook(notebook)
               .folder(folder)
               .content("Original content with a key point to promote.")

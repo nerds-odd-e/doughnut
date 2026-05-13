@@ -49,8 +49,8 @@ class AdminUserControllerTest extends ControllerTestBase {
     @Test
     void canListUsersWithCorrectNoteCount() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
-      makeMe.aNote().notebookCreatorAndOwner(userWithNotes).please();
-      makeMe.aNote().notebookCreatorAndOwner(userWithNotes).please();
+      makeMe.aNote().creator(userWithNotes).please();
+      makeMe.aNote().creator(userWithNotes).please();
 
       UserListingPage result = controller.listUsers(0, 100);
 
@@ -84,7 +84,7 @@ class AdminUserControllerTest extends ControllerTestBase {
     void canListUsersWithLastNoteTime() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
       Timestamp noteTime = makeMe.aTimestamp().of(2025, 6).please();
-      makeMe.aNote().notebookCreatorAndOwner(userWithNotes).createdAt(noteTime).please();
+      makeMe.aNote().creator(userWithNotes).createdAt(noteTime).please();
 
       UserListingPage result = controller.listUsers(0, 100);
 

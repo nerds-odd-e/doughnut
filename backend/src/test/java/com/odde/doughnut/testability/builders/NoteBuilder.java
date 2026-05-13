@@ -96,11 +96,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder notebookOwnership(Ownership ownership) {
-    entity.getNotebook().setOwnership(ownership);
-    return this;
-  }
-
   public NoteBuilder underSameNotebookAs(Note note) {
     inNotebook(note.getNotebook());
     note.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
