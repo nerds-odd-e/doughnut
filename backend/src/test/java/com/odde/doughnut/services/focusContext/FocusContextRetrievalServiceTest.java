@@ -662,27 +662,12 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void largeFolderSampleSiblingsCappedAtSix() {
-      Notebook nb = makeMe.aNotebook().please();
-      Folder folder = makeMe.aFolder().notebook(nb).please();
       User viewer = makeMe.aUser().please();
-      Note focus =
-          makeMe
-              .aNote()
-              .notebookCreatorAndOwner(viewer)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("FocusCap")
-              .content("x")
-              .please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      Note focus = makeMe.aNote().folder(folder).please();
       for (int i = 0; i < 25; i++) {
-        makeMe
-            .aNote()
-            .creator(viewer)
-            .inNotebook(nb)
-            .folder(folder)
-            .title("CapPeer" + i)
-            .content("y")
-            .please();
+        makeMe.aNote().folder(folder).please();
       }
 
       FocusContextResult result =
@@ -693,27 +678,12 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void differentSeedsProduceDifferentSampleSiblingsSelection() {
-      Notebook nb = makeMe.aNotebook().please();
-      Folder folder = makeMe.aFolder().notebook(nb).please();
       User viewer = makeMe.aUser().please();
-      Note focus =
-          makeMe
-              .aNote()
-              .notebookCreatorAndOwner(viewer)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("FocusSeedSib")
-              .content("solo")
-              .please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      Note focus = makeMe.aNote().folder(folder).please();
       for (int i = 0; i < 15; i++) {
-        makeMe
-            .aNote()
-            .creator(viewer)
-            .inNotebook(nb)
-            .folder(folder)
-            .title("SeedSibPeer" + i)
-            .content("x")
-            .please();
+        makeMe.aNote().folder(folder).please();
       }
 
       List<String> baseline =
@@ -745,24 +715,11 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void largeNotebookRootSampleSiblingsCappedAtSix() {
-      Notebook nb = makeMe.aNotebook().please();
       User viewer = makeMe.aUser().please();
-      Note focus =
-          makeMe
-              .aNote()
-              .notebookCreatorAndOwner(viewer)
-              .inNotebook(nb)
-              .title("RootFocusCap")
-              .content("x")
-              .please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Note focus = makeMe.aNote().inNotebook(nb).please();
       for (int i = 0; i < 22; i++) {
-        makeMe
-            .aNote()
-            .creator(viewer)
-            .inNotebook(nb)
-            .title("RootCapPeer" + i)
-            .content("y")
-            .please();
+        makeMe.aNote().inNotebook(nb).please();
       }
 
       FocusContextResult result =
@@ -773,26 +730,11 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void graphApiWithTightBudgetOmitsFolderPeersAndSampleSiblings() {
-      Notebook nb = makeMe.aNotebook().please();
-      Folder folder = makeMe.aFolder().notebook(nb).please();
       User viewer = makeMe.aUser().please();
-      Note focus =
-          makeMe
-              .aNote()
-              .notebookCreatorAndOwner(viewer)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("TightA")
-              .content("solo")
-              .please();
-      makeMe
-          .aNote()
-          .notebookCreatorAndOwner(viewer)
-          .inNotebook(nb)
-          .folder(folder)
-          .title("TightB")
-          .content("solo")
-          .please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Folder folder = makeMe.aFolder().notebook(nb).please();
+      Note focus = makeMe.aNote().folder(folder).please();
+      makeMe.aNote().folder(folder).please();
 
       FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.forGraphApi(10));
 
@@ -802,30 +744,13 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void folderSiblingsIncludeStructuralPeersInSameFolder() {
-      Notebook nb = makeMe.aNotebook().please();
+      User viewer = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
       Folder folder = makeMe.aFolder().notebook(nb).please();
-      Note focus =
-          makeMe
-              .aNote()
-              .inNotebook(nb)
-              .folder(folder)
-              .title("FocusF")
-              .content("See [[LinkT]].")
-              .please();
-      User viewer = focus.getCreator();
-      Note linkT =
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("LinkT")
-              .content("target")
-              .please();
+      Note focus = makeMe.aNote().folder(folder).title("FocusF").content("See [[LinkT]].").please();
+      Note linkT = makeMe.aNote().folder(folder).title("LinkT").content("target").please();
       makeMe
           .aNote()
-          .creator(viewer)
-          .inNotebook(nb)
           .folder(folder)
           .title("OtherFolderPeer")
           .content("from same folder as link target")
