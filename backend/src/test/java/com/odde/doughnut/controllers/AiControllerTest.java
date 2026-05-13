@@ -102,8 +102,7 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      testNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      testNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");

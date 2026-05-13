@@ -132,14 +132,10 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder other = makeMe.aFolder().notebook(nb).name("Other").please();
       User user = currentUser.getUser();
 
-      NoteBuilder noteBuilder3 = makeMe.aNote("In Scope A").inNotebook(nb);
-      Note inScopeA = noteBuilder3.nbCreatorAndOwner(user).folder(scope).please();
-      NoteBuilder noteBuilder2 = makeMe.aNote("In Scope B").inNotebook(nb);
-      Note inScopeB = noteBuilder2.nbCreatorAndOwner(user).folder(scope).please();
-      NoteBuilder noteBuilder1 = makeMe.aNote("Elsewhere").inNotebook(nb);
-      Note elsewhere = noteBuilder1.nbCreatorAndOwner(user).folder(other).please();
-      NoteBuilder noteBuilder = makeMe.aNote("At Root").inNotebook(nb);
-      Note atRoot = noteBuilder.nbCreatorAndOwner(user).please();
+      Note inScopeA = makeMe.aNote("In Scope A").folder(scope).please();
+      Note inScopeB = makeMe.aNote("In Scope B").folder(scope).please();
+      Note elsewhere = makeMe.aNote("Elsewhere").folder(other).please();
+      Note atRoot = makeMe.aNote("At Root").inNotebook(nb).please();
 
       FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(
@@ -199,14 +195,10 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder fDt = makeMe.aFolder().notebook(nb).name("Descendants Test").please();
       Folder fParent = makeMe.aFolder().notebook(nb).parentFolder(fDt).name("parent").please();
       Folder fChild = makeMe.aFolder().notebook(nb).parentFolder(fParent).name("child").please();
-      NoteBuilder noteBuilder3 = makeMe.aNote("Descendants Test").inNotebook(nb);
-      noteBuilder3.nbCreatorAndOwner(owner).please();
-      NoteBuilder noteBuilder2 = makeMe.aNote("parent").inNotebook(nb);
-      noteBuilder2.nbCreatorAndOwner(owner).folder(fDt).please();
-      NoteBuilder noteBuilder1 = makeMe.aNote("child").inNotebook(nb);
-      Note noteChild = noteBuilder1.nbCreatorAndOwner(owner).folder(fParent).please();
-      NoteBuilder noteBuilder = makeMe.aNote("Unit Test").inNotebook(nb);
-      noteBuilder.nbCreatorAndOwner(owner).folder(fChild).please();
+      makeMe.aNote("Descendants Test").inNotebook(nb).please();
+      makeMe.aNote("parent").folder(fDt).please();
+      Note noteChild = makeMe.aNote("child").folder(fParent).please();
+      makeMe.aNote("Unit Test").folder(fChild).please();
 
       noteService.destroy(noteChild);
       makeMe.entityPersister.flush();

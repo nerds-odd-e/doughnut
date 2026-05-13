@@ -270,14 +270,10 @@ class WikiTitleCacheServiceTest {
   @Test
   void references_notes_for_viewer_orders_referrers_by_note_id() {
     User user = makeMe.aUser().please();
-    NoteBuilder noteBuilder3 = makeMe.aNote();
-    Note root = noteBuilder3.nbCreatorAndOwner(user).please();
-    NoteBuilder noteBuilder2 = makeMe.aNote().title("Focal").underSameNotebookAs(root);
-    Note focal = noteBuilder2.nbCreatorAndOwner(user).please();
-    NoteBuilder noteBuilder1 = makeMe.aNote().underSameNotebookAs(root);
-    Note second = noteBuilder1.nbCreatorAndOwner(user).content("[[Focal]]").please();
-    NoteBuilder noteBuilder = makeMe.aNote().underSameNotebookAs(root);
-    Note first = noteBuilder.nbCreatorAndOwner(user).content("[[Focal]]").please();
+    Note root = makeMe.aNote().nbCreatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
+    Note second = makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
+    Note first = makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(first, user);
     wikiTitleCacheService.refreshForNote(second, user);
 
@@ -291,10 +287,8 @@ class WikiTitleCacheServiceTest {
   @Test
   void references_notes_for_viewer_includes_notebook_root_referrer_linking_to_descendant() {
     User user = makeMe.aUser().please();
-    NoteBuilder noteBuilder1 = makeMe.aNote();
-    Note root = noteBuilder1.nbCreatorAndOwner(user).please();
-    NoteBuilder noteBuilder = makeMe.aNote().title("Focal").underSameNotebookAs(root);
-    Note focal = noteBuilder.nbCreatorAndOwner(user).please();
+    Note root = makeMe.aNote().nbCreatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
     Note referrerAtNotebookRoot =
         makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(referrerAtNotebookRoot, user);

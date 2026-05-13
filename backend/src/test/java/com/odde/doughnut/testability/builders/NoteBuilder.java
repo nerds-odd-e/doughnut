@@ -72,9 +72,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder nbCreatorAndOwner(User user) {
     if (entity.getNotebook() != null) {
-      entity.getNotebook().setOwnership(user.getOwnership());
-      entity.getNotebook().setCreatorEntity(user);
-      return this;
+      throw new AssertionError(
+          "Notebook already set for `" + entity + "`, cannot set creator and owner for notebook.");
     }
     attachToNewNotebook(user.getOwnership());
     entity.getNotebook().setCreatorEntity(user);

@@ -54,6 +54,7 @@ public class FolderBuilder extends EntityBuilder<Folder> {
 
   public FolderBuilder notebook(Notebook notebook) {
     this.notebook = notebook;
+    assertNotebook();
     return this;
   }
 
@@ -64,7 +65,19 @@ public class FolderBuilder extends EntityBuilder<Folder> {
 
   public FolderBuilder parentFolder(Folder parentFolder) {
     this.parentFolder = parentFolder;
+    assertNotebook();
+    if (this.parentFolder != null) {
+      this.notebook = parentFolder.getNotebook();
+    }
     return this;
+  }
+
+  private void assertNotebook() {
+    if (this.parentFolder != null) {
+      if (this.notebook != null && this.parentFolder.getNotebook() != this.notebook) {
+        throw new AssertionError("Parent folder's notebook does not match the specified notebook.");
+      }
+    }
   }
 
   public FolderBuilder indexContent(String content) {

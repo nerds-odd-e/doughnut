@@ -14,7 +14,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -53,8 +52,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
 
       Folder scope = makeMe.aFolder().notebook(nb).name("Scope").please();
-      NoteBuilder noteBuilder = makeMe.aNote("Inside").inNotebook(nb);
-      Note noteInScope = noteBuilder.nbCreatorAndOwner(owner).folder(scope).please();
+      Note noteInScope = makeMe.aNote("Inside").folder(scope).please();
 
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("Sub");
@@ -112,8 +110,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
       Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
-      NoteBuilder noteBuilder = makeMe.aNote("Only B").inNotebook(nbB);
-      Note noteInB = noteBuilder.nbCreatorAndOwner(owner).please();
+      Note noteInB = makeMe.aNote("Only B").inNotebook(nbB).please();
 
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("Bad");
@@ -261,8 +258,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
       Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
-      NoteBuilder noteBuilder = makeMe.aNote("Loose").inNotebook(nb);
-      Note loose = noteBuilder.nbCreatorAndOwner(owner).folder(mid).please();
+      Note loose = makeMe.aNote("Loose").folder(mid).please();
 
       controller.dissolveFolder(nb, mid);
       makeMe.refresh(loose);
@@ -279,8 +275,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder rootFolder = makeMe.aFolder().notebook(nb).name("Root Folder").please();
-      NoteBuilder noteBuilder = makeMe.aNote("Inside").inNotebook(nb);
-      Note inside = noteBuilder.nbCreatorAndOwner(owner).folder(rootFolder).please();
+      Note inside = makeMe.aNote("Inside").folder(rootFolder).please();
 
       controller.dissolveFolder(nb, rootFolder);
       makeMe.refresh(inside);
@@ -297,8 +292,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
       Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
       Folder inner = makeMe.aFolder().notebook(nb).parentFolder(mid).name("Inner").please();
-      NoteBuilder noteBuilder = makeMe.aNote("Deep").inNotebook(nb);
-      Note deep = noteBuilder.nbCreatorAndOwner(owner).folder(inner).please();
+      Note deep = makeMe.aNote("Deep").folder(inner).please();
 
       controller.dissolveFolder(nb, mid);
       makeMe.refresh(inner);

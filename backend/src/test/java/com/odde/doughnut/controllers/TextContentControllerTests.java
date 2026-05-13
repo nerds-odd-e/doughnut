@@ -223,10 +223,8 @@ class TextContentControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       Notebook nb =
           makeMe.aNotebook().name("NbFixed").creatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder1 = makeMe.aNote().title("TargetTitle").inNotebook(nb);
-      Note target = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder = makeMe.aNote().inNotebook(nb);
-      Note carrier = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote().title("TargetTitle").inNotebook(nb).please();
+      Note carrier = makeMe.aNote().inNotebook(nb).please();
 
       NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
       contentDto.setContent("[[NbFixed:TargetTitle]]");

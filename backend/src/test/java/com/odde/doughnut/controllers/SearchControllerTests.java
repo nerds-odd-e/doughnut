@@ -146,10 +146,8 @@ class SearchControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Notebook recipeNotebook =
           makeMe.aNotebook().creatorAndOwner(user).name("Recipe Ideas").please();
-      NoteBuilder noteBuilder1 = makeMe.aNote().inNotebook(recipeNotebook);
-      noteBuilder1.nbCreatorAndOwner(user).please();
-      NoteBuilder noteBuilder = makeMe.aNote("My Recipe Card");
-      noteBuilder.nbCreatorAndOwner(user).please();
+      makeMe.aNote().inNotebook(recipeNotebook).please();
+      makeMe.aNote("My Recipe Card").nbCreatorAndOwner(user).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Recipe");
