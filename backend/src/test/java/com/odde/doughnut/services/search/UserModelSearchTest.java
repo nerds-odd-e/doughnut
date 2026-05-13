@@ -38,7 +38,7 @@ public class UserModelSearchTest {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().notebookCreatorAndOwner(user).please();
+    note = makeMe.aNote().nbCreatorAndOwner(user).please();
     anotherUser = makeMe.aUser().please();
   }
 
