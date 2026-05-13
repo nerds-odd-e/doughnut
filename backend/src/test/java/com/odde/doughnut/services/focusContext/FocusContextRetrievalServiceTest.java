@@ -28,8 +28,8 @@ class FocusContextRetrievalServiceTest {
   @Autowired private FocusContextRetrievalService service;
   @Autowired private WikiTitleCacheService wikiTitleCacheService;
 
-  private void refreshWikiCache(Note note) {
-    wikiTitleCacheService.refreshForNote(note, note.getCreator());
+  private void refreshWikiCache(Note note, User viewer) {
+    wikiTitleCacheService.refreshForNote(note, viewer);
   }
 
   private static List<String> folderSiblingTitles(FocusContextResult result) {
@@ -84,7 +84,7 @@ class FocusContextRetrievalServiceTest {
           .title("Linked")
           .content("Linked content")
           .please();
-      refreshWikiCache(focusNote);
+      refreshWikiCache(focusNote, viewer);
     }
 
     @Test
@@ -121,7 +121,7 @@ class FocusContextRetrievalServiceTest {
               .title("Referrer")
               .content("Links to [[Focus]].")
               .please();
-      refreshWikiCache(referrer);
+      refreshWikiCache(referrer, viewer);
     }
 
     @Test
@@ -153,7 +153,7 @@ class FocusContextRetrievalServiceTest {
                 .title("Ref" + i)
                 .content("Links to [[HubFocus]].")
                 .please();
-        refreshWikiCache(r);
+        refreshWikiCache(r, viewer);
       }
     }
 
@@ -219,7 +219,7 @@ class FocusContextRetrievalServiceTest {
                 .title("Extra" + i)
                 .content("Links to [[HubFocus]].")
                 .please();
-        refreshWikiCache(r);
+        refreshWikiCache(r, viewer);
       }
       RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
       FocusContextResult result = service.retrieve(focusNote, viewer, cfg);
@@ -250,8 +250,8 @@ class FocusContextRetrievalServiceTest {
             .content("Links to [[XHub]].")
             .please();
       }
-      refreshWikiCache(hub);
-      refreshWikiCache(shared);
+      refreshWikiCache(hub, viewer);
+      refreshWikiCache(shared, viewer);
 
       FocusContextResult result =
           service.retrieve(hub, viewer, RetrievalConfig.forQuestionGeneration(null));
@@ -278,7 +278,7 @@ class FocusContextRetrievalServiceTest {
               .title("Depth1Hub")
               .content("Links to [[HubFocus]].")
               .please();
-      refreshWikiCache(depth1Ref);
+      refreshWikiCache(depth1Ref, viewer);
       for (int i = 0; i < 5; i++) {
         Note d2 =
             makeMe
@@ -288,7 +288,7 @@ class FocusContextRetrievalServiceTest {
                 .title("D2Ref" + i)
                 .content("Links to [[Depth1Hub]].")
                 .please();
-        refreshWikiCache(d2);
+        refreshWikiCache(d2, viewer);
       }
 
       FocusContextResult result =
@@ -330,8 +330,8 @@ class FocusContextRetrievalServiceTest {
               .title("Both")
               .content("Links back to [[Focus]].")
               .please();
-      refreshWikiCache(focusNote);
-      refreshWikiCache(both);
+      refreshWikiCache(focusNote, viewer);
+      refreshWikiCache(both, viewer);
 
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 
@@ -367,7 +367,7 @@ class FocusContextRetrievalServiceTest {
             .content(largeDetails)
             .please();
       }
-      refreshWikiCache(focusNote);
+      refreshWikiCache(focusNote, viewer);
 
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 
@@ -396,8 +396,8 @@ class FocusContextRetrievalServiceTest {
           .title("LeafDepth2")
           .content("Only at depth 2")
           .please();
-      refreshWikiCache(focus);
-      refreshWikiCache(mid);
+      refreshWikiCache(focus, viewer);
+      refreshWikiCache(mid, viewer);
 
       FocusContextResult result =
           service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
@@ -436,8 +436,8 @@ class FocusContextRetrievalServiceTest {
           .title("LeafShallow")
           .content("deep")
           .please();
-      refreshWikiCache(focus);
-      refreshWikiCache(mid);
+      refreshWikiCache(focus, viewer);
+      refreshWikiCache(mid, viewer);
 
       FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.depth1());
 
@@ -464,8 +464,8 @@ class FocusContextRetrievalServiceTest {
               .title("CycleB")
               .content("Back [[CycleA]].")
               .please();
-      refreshWikiCache(a);
-      refreshWikiCache(b);
+      refreshWikiCache(a, viewer);
+      refreshWikiCache(b, viewer);
 
       FocusContextResult result = service.retrieve(a, viewer, RetrievalConfig.defaultMaxDepth());
 
@@ -493,8 +493,8 @@ class FocusContextRetrievalServiceTest {
               .title("ViaBridge")
               .content("See [[DirectShort]].")
               .please();
-      refreshWikiCache(focus);
-      refreshWikiCache(bridge);
+      refreshWikiCache(focus, viewer);
+      refreshWikiCache(bridge, viewer);
 
       FocusContextResult result =
           service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
@@ -529,8 +529,8 @@ class FocusContextRetrievalServiceTest {
               .title("RefersToHub")
               .content("Hub is [[HubInbound]].")
               .please();
-      refreshWikiCache(hub);
-      refreshWikiCache(depth2Referrer);
+      refreshWikiCache(hub, viewer);
+      refreshWikiCache(depth2Referrer, viewer);
 
       FocusContextResult result =
           service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
@@ -586,8 +586,8 @@ class FocusContextRetrievalServiceTest {
           .title("LeafAfterBudget")
           .content("never reached")
           .please();
-      refreshWikiCache(focus);
-      refreshWikiCache(bridge);
+      refreshWikiCache(focus, viewer);
+      refreshWikiCache(bridge, viewer);
 
       FocusContextResult result =
           service.retrieve(
@@ -745,50 +745,40 @@ class FocusContextRetrievalServiceTest {
           .title("OtherFolderPeer")
           .content("from same folder as link target")
           .please();
-      refreshWikiCache(focus);
-      refreshWikiCache(linkT);
+      refreshWikiCache(focus, viewer);
+      refreshWikiCache(linkT, viewer);
 
       FocusContextResult result =
           service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
 
       List<String> siblingTitles = folderSiblingTitles(result);
-      assertThat(siblingTitles, hasItem("LinkT"));
       assertThat(siblingTitles, hasItem("OtherFolderPeer"));
+      assertThat(
+          "wiki-resolved targets are not duplicated as folder siblings",
+          siblingTitles,
+          not(hasItem("LinkT")));
+      assertThat(
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink)
+              .map(FocusContextNote::getTitle)
+              .toList(),
+          hasItem("LinkT"));
     }
 
     @Test
     void folderSiblingIsNotWikiExpansionFrontier() {
       User viewer = makeMe.aUser().please();
-      Note focus = makeMe.aNote().creator(viewer).title("RootFS").content("[[MidFS]].").please();
-      Notebook nb = focus.getNotebook();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Note focus = makeMe.aNote().title("RootFS").content("[[MidFS]].").notebook(nb).please();
       Folder folderB = makeMe.aFolder().notebook(nb).please();
-      Note mid =
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .folder(folderB)
-              .title("MidFS")
-              .content("no link to deep")
-              .please();
+      Note mid = makeMe.aNote().folder(folderB).title("MidFS").content("no link to deep").please();
       Note sideSib =
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .folder(folderB)
-              .title("SideSib")
-              .content("[[DeepOnly]].")
-              .please();
+          makeMe.aNote().folder(folderB).title("SideSib").content("[[DeepOnly]].").please();
       Folder folderDeep = makeMe.aFolder().notebook(nb).please();
-      makeMe
-          .aNote()
-          .creator(viewer)
-          .folder(folderDeep)
-          .title("DeepOnly")
-          .content("deep body")
-          .please();
-      refreshWikiCache(focus);
-      refreshWikiCache(mid);
-      refreshWikiCache(sideSib);
+      makeMe.aNote().folder(folderDeep).title("DeepOnly").content("deep body").please();
+      refreshWikiCache(focus, viewer);
+      refreshWikiCache(mid, viewer);
+      refreshWikiCache(sideSib, viewer);
 
       FocusContextResult result =
           service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
