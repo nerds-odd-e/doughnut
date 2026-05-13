@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -42,14 +43,12 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnMatchingNotes() throws UnexpectedNoAccessRightException {
-      Note note1 =
-          makeMe.aNote("Java Programming").notebookCreatorAndOwner(currentUser.getUser()).please();
-      Note note2 =
-          makeMe.aNote("JavaScript Basics").notebookCreatorAndOwner(currentUser.getUser()).please();
-      makeMe
-          .aNote("Python Tutorial")
-          .notebookCreatorAndOwner(currentUser.getUser())
-          .please(); // Different topic
+      NoteBuilder noteBuilder2 = makeMe.aNote("Java Programming");
+      Note note1 = noteBuilder2.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote("JavaScript Basics");
+      Note note2 = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Python Tutorial");
+      noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please(); // Different topic
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Java");
@@ -73,8 +72,10 @@ class SearchControllerTests extends ControllerTestBase {
     @Test
     void shouldSetDistanceZeroForExactMatchesAndPointNineForPartialMatches()
         throws UnexpectedNoAccessRightException {
-      makeMe.aNote("Java").notebookCreatorAndOwner(currentUser.getUser()).please();
-      makeMe.aNote("Java Programming").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote("Java");
+      noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Java Programming");
+      noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Java");
@@ -98,10 +99,10 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldRespectSearchScopeSettings() throws UnexpectedNoAccessRightException {
-      Note note1 =
-          makeMe.aNote("Local Note").notebookCreatorAndOwner(currentUser.getUser()).please();
-      Note note2 =
-          makeMe.aNote("Shared Note").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote("Local Note");
+      Note note1 = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Shared Note");
+      Note note2 = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Note");
@@ -117,10 +118,8 @@ class SearchControllerTests extends ControllerTestBase {
     void shouldReturnFolderHitsAlongsideNoteHits() throws UnexpectedNoAccessRightException {
       var notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       makeMe.aFolder().notebook(notebook).name("Trip Planning").please();
-      makeMe
-          .aNote("My Trip Planning Ideas")
-          .notebookCreatorAndOwner(currentUser.getUser())
-          .please();
+      NoteBuilder noteBuilder = makeMe.aNote("My Trip Planning Ideas");
+      noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Plann");
@@ -147,8 +146,10 @@ class SearchControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Notebook recipeNotebook =
           makeMe.aNotebook().creatorAndOwner(user).name("Recipe Ideas").please();
-      makeMe.aNote().inNotebook(recipeNotebook).notebookCreatorAndOwner(user).please();
-      makeMe.aNote("My Recipe Card").notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote().inNotebook(recipeNotebook);
+      noteBuilder1.nbCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder = makeMe.aNote("My Recipe Card");
+      noteBuilder.nbCreatorAndOwner(user).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Recipe");
@@ -170,18 +171,8 @@ class SearchControllerTests extends ControllerTestBase {
     void literalSearchReturnsAllMatchingNotes() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note designatedIndex =
-          makeMe
-              .aNote("IdxTok999 Welcome Page")
-              .notebookCreatorAndOwner(user)
-              .inNotebook(nb)
-              .please();
-      Note regularNote =
-          makeMe
-              .aNote("Regular IdxTok999 Topic")
-              .notebookCreatorAndOwner(user)
-              .inNotebook(nb)
-              .please();
+      Note designatedIndex = makeMe.aNote("IdxTok999 Welcome Page").inNotebook(nb).please();
+      Note regularNote = makeMe.aNote("Regular IdxTok999 Topic").inNotebook(nb).please();
 
       entityManager.flush();
       entityManager.clear();
@@ -225,8 +216,8 @@ class SearchControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      referenceNote =
-          makeMe.aNote("Reference Note").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Reference Note");
+      referenceNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -246,11 +237,8 @@ class SearchControllerTests extends ControllerTestBase {
       Note child1 = makeMe.aNote("Child Java Note").underSameNotebookAs(referenceNote).please();
       Note child2 =
           makeMe.aNote("Child JavaScript Note").underSameNotebookAs(referenceNote).please();
-      Note unrelated =
-          makeMe
-              .aNote("Unrelated Java Note")
-              .notebookCreatorAndOwner(currentUser.getUser())
-              .please();
+      NoteBuilder noteBuilder = makeMe.aNote("Unrelated Java Note");
+      Note unrelated = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Java");
@@ -286,7 +274,8 @@ class SearchControllerTests extends ControllerTestBase {
     @Test
     void shouldSuppressNotebookLiteralHitsWhenScopedWithoutGlobalFlags()
         throws UnexpectedNoAccessRightException {
-      makeMe.aNote("OrphanNotebookTitle").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("OrphanNotebookTitle");
+      noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Orphan");
@@ -350,8 +339,8 @@ class SearchControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      referenceNote =
-          makeMe.aNote("Reference Note").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Reference Note");
+      referenceNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test

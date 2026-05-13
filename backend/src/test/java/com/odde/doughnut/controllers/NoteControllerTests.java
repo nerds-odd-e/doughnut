@@ -18,6 +18,7 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import jakarta.validation.Validation;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -62,14 +63,16 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(otherUser).please();
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showNote(note));
     }
 
     @Test
     void shouldReturnTheNoteInfoIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(otherUser).please();
       makeMe.aBazaarNotebook(note.getNotebook()).please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
@@ -80,7 +83,8 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getNotebookRealm().readonly(), is(false));
@@ -92,7 +96,8 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldReturnWikiTitlesForUnqualifiedLinksByNotebookNameAndTitle()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Note root = makeMe.aNote().notebookCreatorAndOwner(user).title("root-head").please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(user).title("root-head").please();
       Note matched =
           makeMe.aNote().title("LinkedPage").creator(user).inNotebook(root.getNotebook()).please();
       Note viewer =
@@ -116,7 +121,8 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldResolveWikiLinkUsingTargetBeforePipeAndExposeDisplayFields()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Note root = makeMe.aNote().notebookCreatorAndOwner(user).title("root-head").please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(user).title("root-head").please();
       Note matched =
           makeMe
               .aNote()
@@ -172,7 +178,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Note root = makeMe.aNote().notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(user).please();
       Note fromFm =
           makeMe
               .aNote()
@@ -203,14 +210,16 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(otherUser).please();
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getNoteInfo(note));
     }
 
     @Test
     void shouldReturnTheNoteInfoIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(otherUser).please();
       makeMe
           .aSubscription()
           .forUser(currentUser.getUser())
@@ -223,7 +232,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldIncludeSkippedMemoryTrackersInNoteInfo() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(otherUser).please();
       makeMe
           .aSubscription()
           .forUser(currentUser.getUser())
@@ -252,8 +262,8 @@ class NoteControllerTests extends ControllerTestBase {
   class VerifySpelling {
     @Test
     void returnsCorrectWhenSpellingMatches() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe.aNote().title("sedition").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote().title("sedition");
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();
       dto.setSpellingAnswer("sedition");
 
@@ -264,12 +274,8 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void returnsCorrectWhenAlternativeSpellingMatches() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .title("colour／color")
-              .notebookCreatorAndOwner(currentUser.getUser())
-              .please();
+      NoteBuilder noteBuilder = makeMe.aNote().title("colour／color");
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();
       dto.setSpellingAnswer("colour");
 
@@ -280,8 +286,8 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void returnsIncorrectWhenSpellingDoesNotMatch() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe.aNote().title("sedition").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote().title("sedition");
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();
       dto.setSpellingAnswer("wrong answer");
 
@@ -296,7 +302,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldReturnImagePathAndPersistImageLinkedToNote()
         throws UnexpectedNoAccessRightException, IOException {
-      Note note = makeMe.aNote("n").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("n");
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       NoteImageUploadDTO dto = new NoteImageUploadDTO();
       dto.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
 
@@ -316,7 +323,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotAllowUploadForNoteBelongingToAnotherUser() {
       User other = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(other).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(other).please();
       NoteImageUploadDTO dto = new NoteImageUploadDTO();
       dto.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
       assertThrows(
@@ -342,7 +350,8 @@ class NoteControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      subject = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      subject = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       child =
           makeMe
               .aNote("child")
@@ -354,7 +363,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.deleteNote(note, leaveDeadLinksDeleteRequest()));
@@ -369,7 +379,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
         throws UnexpectedNoAccessRightException {
-      Note target = makeMe.aNote("Target").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Target");
+      Note target = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note referrer =
           makeMe
               .aNote("Referrer")
@@ -392,7 +403,8 @@ class NoteControllerTests extends ControllerTestBase {
       void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists()
           throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+        NoteBuilder noteBuilder = makeMe.aNote();
+        Note otherNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
         makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
         testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
 
@@ -410,7 +422,8 @@ class NoteControllerTests extends ControllerTestBase {
           throws UnexpectedNoAccessRightException {
         MemoryTracker deletedTracker =
             makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+        NoteBuilder noteBuilder = makeMe.aNote();
+        Note otherNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
         MemoryTracker activeTracker =
             makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
@@ -431,7 +444,8 @@ class NoteControllerTests extends ControllerTestBase {
           throws UnexpectedNoAccessRightException {
         MemoryTracker deletedTracker =
             makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+        NoteBuilder noteBuilder = makeMe.aNote();
+        Note otherNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
         MemoryTracker activeTracker =
             makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
@@ -446,7 +460,8 @@ class NoteControllerTests extends ControllerTestBase {
       void shouldExcludeMemoryTrackersForDeletedNotesFromTotalAssimilatedCount()
           throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+        NoteBuilder noteBuilder = makeMe.aNote();
+        Note otherNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
         makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
@@ -471,7 +486,8 @@ class NoteControllerTests extends ControllerTestBase {
       @Test
       void shouldRestoreMemoryTrackersWhenNoteIsRestored() throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+        NoteBuilder noteBuilder = makeMe.aNote();
+        Note otherNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
         makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
@@ -494,8 +510,10 @@ class NoteControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      source = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
-      target = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote();
+      source = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      target = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -522,7 +540,8 @@ class NoteControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      rootNote = makeMe.aNote("Root").notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Root");
+      rootNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -553,7 +572,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotAllowAccessToUnauthorizedNotes() {
       User otherUser = makeMe.aUser().please();
-      Note unauthorizedNote = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note unauthorizedNote = noteBuilder.nbCreatorAndOwner(otherUser).please();
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -565,12 +585,8 @@ class NoteControllerTests extends ControllerTestBase {
   class AiContextMarkdownTests {
     @Test
     void shouldReturnMarkdownForReadableNote() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote("Focus")
-              .content("Body")
-              .notebookCreatorAndOwner(currentUser.getUser())
-              .please();
+      NoteBuilder noteBuilder = makeMe.aNote("Focus").content("Body");
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       NoteAiContextMarkdown dto = controller.getAiContextMarkdown(note, 5000);
       assertThat(dto.markdown(), containsString("Focus"));
       assertThat(dto.markdown(), containsString("Body"));
@@ -579,7 +595,8 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldNotAllowAccessToUnauthorizedNotes() {
       User otherUser = makeMe.aUser().please();
-      Note unauthorizedNote = makeMe.aNote().notebookCreatorAndOwner(otherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note unauthorizedNote = noteBuilder.nbCreatorAndOwner(otherUser).please();
 
       assertThrows(
           UnexpectedNoAccessRightException.class,

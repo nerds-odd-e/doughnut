@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -39,7 +40,8 @@ class ConversationMessageServiceTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt =
           recallPromptBuilder.withPredefinedQuestionForNote(note).answerChoiceIndex(1).please();

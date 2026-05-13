@@ -19,6 +19,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Nested;
@@ -131,28 +132,14 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder other = makeMe.aFolder().notebook(nb).name("Other").please();
       User user = currentUser.getUser();
 
-      Note inScopeA =
-          makeMe
-              .aNote("In Scope A")
-              .inNotebook(nb)
-              .notebookCreatorAndOwner(user)
-              .folder(scope)
-              .please();
-      Note inScopeB =
-          makeMe
-              .aNote("In Scope B")
-              .inNotebook(nb)
-              .notebookCreatorAndOwner(user)
-              .folder(scope)
-              .please();
-      Note elsewhere =
-          makeMe
-              .aNote("Elsewhere")
-              .inNotebook(nb)
-              .notebookCreatorAndOwner(user)
-              .folder(other)
-              .please();
-      Note atRoot = makeMe.aNote("At Root").inNotebook(nb).notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder3 = makeMe.aNote("In Scope A").inNotebook(nb);
+      Note inScopeA = noteBuilder3.nbCreatorAndOwner(user).folder(scope).please();
+      NoteBuilder noteBuilder2 = makeMe.aNote("In Scope B").inNotebook(nb);
+      Note inScopeB = noteBuilder2.nbCreatorAndOwner(user).folder(scope).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote("Elsewhere").inNotebook(nb);
+      Note elsewhere = noteBuilder1.nbCreatorAndOwner(user).folder(other).please();
+      NoteBuilder noteBuilder = makeMe.aNote("At Root").inNotebook(nb);
+      Note atRoot = noteBuilder.nbCreatorAndOwner(user).please();
 
       FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(
@@ -212,21 +199,14 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder fDt = makeMe.aFolder().notebook(nb).name("Descendants Test").please();
       Folder fParent = makeMe.aFolder().notebook(nb).parentFolder(fDt).name("parent").please();
       Folder fChild = makeMe.aFolder().notebook(nb).parentFolder(fParent).name("child").please();
-      makeMe.aNote("Descendants Test").inNotebook(nb).notebookCreatorAndOwner(owner).please();
-      makeMe.aNote("parent").inNotebook(nb).notebookCreatorAndOwner(owner).folder(fDt).please();
-      Note noteChild =
-          makeMe
-              .aNote("child")
-              .inNotebook(nb)
-              .notebookCreatorAndOwner(owner)
-              .folder(fParent)
-              .please();
-      makeMe
-          .aNote("Unit Test")
-          .inNotebook(nb)
-          .notebookCreatorAndOwner(owner)
-          .folder(fChild)
-          .please();
+      NoteBuilder noteBuilder3 = makeMe.aNote("Descendants Test").inNotebook(nb);
+      noteBuilder3.nbCreatorAndOwner(owner).please();
+      NoteBuilder noteBuilder2 = makeMe.aNote("parent").inNotebook(nb);
+      noteBuilder2.nbCreatorAndOwner(owner).folder(fDt).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote("child").inNotebook(nb);
+      Note noteChild = noteBuilder1.nbCreatorAndOwner(owner).folder(fParent).please();
+      NoteBuilder noteBuilder = makeMe.aNote("Unit Test").inNotebook(nb);
+      noteBuilder.nbCreatorAndOwner(owner).folder(fChild).please();
 
       noteService.destroy(noteChild);
       makeMe.entityPersister.flush();
@@ -471,7 +451,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebookIndex(note.getNotebook()));

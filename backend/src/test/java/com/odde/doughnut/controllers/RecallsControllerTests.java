@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.NoteService;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
@@ -109,8 +110,10 @@ class RecallsControllerTests extends ControllerTestBase {
     void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      Note activeNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote();
+      Note activeNote = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note deletedNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       makeMe
           .aMemoryTrackerFor(activeNote)
           .by(currentUser.getUser())
@@ -153,7 +156,8 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
@@ -178,7 +182,8 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp previousWindowTime = makeMe.aTimestamp().of(0, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(previousWindowTime);
 
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
@@ -204,7 +209,8 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -42,7 +43,8 @@ public class AssimilationServiceTest {
 
   @Test
   void whenThereIsNoNotesForUser() {
-    makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+    NoteBuilder noteBuilder = makeMe.aNote();
+    noteBuilder.nbCreatorAndOwner(anotherUser).please();
     assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(0));
   }
@@ -54,8 +56,10 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      note1 = makeMe.aNote("note1").notebookCreatorAndOwner(user).please();
-      note2 = makeMe.aNote("note2").notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote("note1");
+      note1 = noteBuilder1.nbCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder = makeMe.aNote("note2");
+      note2 = noteBuilder.nbCreatorAndOwner(user).please();
     }
 
     @Test
@@ -86,7 +90,8 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
-        anotherNote = makeMe.aNote("another note").notebookCreatorAndOwner(user).please();
+        NoteBuilder noteBuilder = makeMe.aNote("another note");
+        anotherNote = noteBuilder.nbCreatorAndOwner(user).please();
       }
 
       private List<Note> getAllDueMemoryTrackers() {
@@ -182,7 +187,8 @@ public class AssimilationServiceTest {
     @BeforeEach
     void setup() {
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().skipMemoryTracking().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote().skipMemoryTracking();
+      Note top = noteBuilder.nbCreatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().underSameNotebookAs(top).please();
       note2 = makeMe.aNote().underSameNotebookAs(top).please();
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
@@ -245,7 +251,8 @@ public class AssimilationServiceTest {
       makeMe.theUser(user).dailyAssimilationCount(2).please();
       // Set up subscription notes
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().skipMemoryTracking().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote().skipMemoryTracking();
+      Note top = noteBuilder1.nbCreatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().underSameNotebookAs(top).please();
       note2 = makeMe.aNote().underSameNotebookAs(top).please();
       note3 = makeMe.aNote().underSameNotebookAs(top).please();
@@ -255,7 +262,8 @@ public class AssimilationServiceTest {
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
 
       // Set up a note that belongs to the user
-      makeMe.aNote().notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      noteBuilder.nbCreatorAndOwner(user).please();
 
       makeMe.refresh(user);
 

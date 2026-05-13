@@ -13,14 +13,12 @@ import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.controllers.dto.WikiTitle;
-import com.odde.doughnut.entities.Image;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteWikiTitleCache;
-import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +36,8 @@ class TextContentControllerTests extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    note = makeMe.aNote("new").notebookCreatorAndOwner(currentUser.getUser()).please();
+    NoteBuilder noteBuilder = makeMe.aNote("new");
+    note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
   }
 
   @Nested
@@ -73,7 +72,8 @@ class TextContentControllerTests extends ControllerTestBase {
 
     @Test
     void shouldNotAllowOthersToChange() {
-      note = makeMe.aNote("another").notebookCreatorAndOwner(makeMe.aUser().please()).please();
+      NoteBuilder noteBuilder = makeMe.aNote("another");
+      note = noteBuilder.nbCreatorAndOwner(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNoteTitle(note, noteUpdateTitleDTO));
@@ -85,7 +85,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void rejectsRenameWithoutReferenceHandlingWhenInboundWikiLinksExist()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -109,7 +110,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void allowsSameTitleWithoutReferenceHandlingWhenInboundWikiLinksExist()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -127,7 +129,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void allowsRenameWithExplicitReferenceHandlingWhenInboundWikiLinksExist()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -154,7 +157,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void updateVisibleText_preservesExplicitDisplayTextAndRefreshesInboundMetadata()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -182,7 +186,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void updateVisibleText_rewritesWikiLinkInsideYamlFrontmatter()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("Alpha").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -218,15 +223,10 @@ class TextContentControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       Notebook nb =
           makeMe.aNotebook().name("NbFixed").creatorAndOwner(currentUser.getUser()).please();
-      Note target =
-          makeMe
-              .aNote()
-              .title("TargetTitle")
-              .inNotebook(nb)
-              .notebookCreatorAndOwner(currentUser.getUser())
-              .please();
-      Note carrier =
-          makeMe.aNote().inNotebook(nb).notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder1 = makeMe.aNote().title("TargetTitle").inNotebook(nb);
+      Note target = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote().inNotebook(nb);
+      Note carrier = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
 
       NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
       contentDto.setContent("[[NbFixed:TargetTitle]]");
@@ -245,7 +245,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void keepVisibleText_plainWikiLinkBecomesDisplayLinkAndRefreshesCache()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -272,7 +273,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void keepVisibleText_preservesExplicitDisplayWhileRetargetingTitle()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note target = makeMe.aNote().title("TargetTitle").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -338,7 +340,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void refreshesWikiTitleCacheWhenContentContainResolvedWikiLink()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note onlyA = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
@@ -363,7 +366,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void refreshesWikiTitleCacheWhenContentHasResolvedWikiLinkWithDisplayText()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       Note onlyA = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 
@@ -387,7 +391,8 @@ class TextContentControllerTests extends ControllerTestBase {
     @Test
     void replacingWikiLinkUpdatesNoteRealmWikiTitlesAndPersistedCache()
         throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
@@ -414,7 +419,8 @@ class TextContentControllerTests extends ControllerTestBase {
 
     @Test
     void clearsWikiTitleCacheWhenContentBecomeBlank() throws UnexpectedNoAccessRightException {
-      Note root = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note root = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(root).please();
 

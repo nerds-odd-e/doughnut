@@ -56,8 +56,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
   void createNoteReturns409WhenSoftDeletedNoteHasSameTitleAtRoot() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note n =
-        makeMe.aNote().notebookCreatorAndOwner(owner).inNotebook(nb).title("DupTitle").please();
+    Note n = makeMe.aNote().inNotebook(nb).title("DupTitle").please();
     noteService.destroy(n);
 
     NoteCreationDTO dto = new NoteCreationDTO();
@@ -77,8 +76,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
   void undoDeleteRestoresNoteAfterSoftDeletedTitleConflict() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note n =
-        makeMe.aNote().notebookCreatorAndOwner(owner).inNotebook(nb).title("RestoreMe").please();
+    Note n = makeMe.aNote().inNotebook(nb).title("RestoreMe").please();
     noteService.destroy(n);
 
     NoteCreationDTO dto = new NoteCreationDTO();
@@ -101,14 +99,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
-    Note n =
-        makeMe
-            .aNote()
-            .notebookCreatorAndOwner(owner)
-            .inNotebook(nb)
-            .folder(folder)
-            .title("InFolder")
-            .please();
+    Note n = makeMe.aNote().inNotebook(nb).folder(folder).title("InFolder").please();
     noteService.destroy(n);
 
     NoteCreationDTO dto = new NoteCreationDTO();

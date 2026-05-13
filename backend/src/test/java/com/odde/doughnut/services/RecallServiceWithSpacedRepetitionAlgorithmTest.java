@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -43,7 +44,8 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      note = noteBuilder.nbCreatorAndOwner(user).please();
     }
 
     @Test

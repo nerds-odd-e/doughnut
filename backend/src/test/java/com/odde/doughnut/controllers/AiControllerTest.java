@@ -20,6 +20,7 @@ import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.openai.client.OpenAIClient;
 import com.openai.models.models.ModelListPage;
 import com.openai.services.blocking.ModelService;
@@ -101,7 +102,8 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      testNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
@@ -155,7 +157,8 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      testNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     }
 
@@ -259,7 +262,8 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      testNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     }
 
@@ -324,7 +328,8 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     private Note newRootNoteWithPromotableContent() {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       note.setContent("Original content with a key point to promote.");
       return note;
     }

@@ -3,13 +3,10 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.ConversationMessage;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NotebookAiAssistant;
-import com.odde.doughnut.entities.RecallPrompt;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
@@ -33,7 +30,8 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   @BeforeEach
   void setUp() {
     currentUser.setUser(makeMe.aUser().please());
-    note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+    NoteBuilder noteBuilder = makeMe.aNote();
+    note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
     conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
   }
 
@@ -121,7 +119,8 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
     @BeforeEach
     void setup() {
-      questionNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      questionNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(questionNote).please();
       recallConversation =

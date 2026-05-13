@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -212,7 +213,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebook(note.getNotebook(), new NotebookUpdateRequest()));
@@ -220,7 +222,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldPersistDescriptionOnUpdate() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
       request.setDescription("Notebook blurb");
@@ -230,7 +233,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldClearDescriptionWhenEmptyString() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setDescription("was set");
       var setRequest = new NotebookUpdateRequest();
       setRequest.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
@@ -242,7 +246,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldLeaveDescriptionUnchangedWhenDescriptionOmitted()
         throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setDescription("unchanged");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
@@ -252,7 +257,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldPersistNameOnUpdate() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setName("Old Title");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
@@ -263,7 +269,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldRejectEmptyOrWhitespaceNameOnUpdate() {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
       request.setName("   ");
@@ -278,7 +285,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldLeaveNameUnchangedWhenNameOmitted() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setName("Original Name");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));

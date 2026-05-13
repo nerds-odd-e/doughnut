@@ -18,6 +18,7 @@ import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,8 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.shareNotebook(note.getNotebook()));
@@ -340,7 +342,8 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedUpdate() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
 
       UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
       request.setAdditionalInstructions("Some instructions");
@@ -382,7 +385,8 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedAccess() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
 
       assertThrows(
           UnexpectedNoAccessRightException.class,

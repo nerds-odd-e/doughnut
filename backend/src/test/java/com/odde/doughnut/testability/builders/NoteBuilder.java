@@ -70,14 +70,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return existingId != null && existingId.equals(requestedId);
   }
 
-  public NoteBuilder notebookCreatorAndOwner(User user) {
-    if (entity.getNotebook() != null) {
-      entity.getNotebook().setOwnership(user.getOwnership());
-      entity.getNotebook().setCreatorEntity(user);
-    }
-    return creator(user);
-  }
-
   public NoteBuilder nbCreatorAndOwner(User user) {
     if (entity.getNotebook() != null) {
       entity.getNotebook().setOwnership(user.getOwnership());

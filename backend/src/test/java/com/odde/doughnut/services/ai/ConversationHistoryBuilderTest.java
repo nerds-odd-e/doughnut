@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.openai.models.chat.completions.ChatCompletionDeveloperMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import java.util.List;
@@ -60,7 +61,8 @@ class ConversationHistoryBuilderTest {
     void shouldIncludeUserAndAssistantMessages() {
       // Given a conversation with messages
       User user = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookCreatorAndOwner(user).please();
+      NoteBuilder noteBuilder = makeMe.aNote();
+      Note note = noteBuilder.nbCreatorAndOwner(user).please();
       Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
 
       ConversationMessage userMsg1 =
