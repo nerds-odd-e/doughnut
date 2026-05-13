@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
+import { replaceWellFormedWikiLinksWithDisplayPlain } from "@/utils/questionStemWikiPlain"
 import QuillEditor from "../form/QuillEditor.vue"
 import markdownizer from "../form/markdownizer"
 
@@ -15,6 +16,10 @@ const props = defineProps<{
 }>()
 
 const stemHtml = computed(() =>
-  props.stem ? markdownizer.markdownToHtml(props.stem) : ""
+  props.stem
+    ? markdownizer.markdownToHtml(
+        replaceWellFormedWikiLinksWithDisplayPlain(props.stem)
+      )
+    : ""
 )
 </script>
