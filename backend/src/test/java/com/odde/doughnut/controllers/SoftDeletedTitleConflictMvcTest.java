@@ -99,7 +99,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
-    Note n = makeMe.aNote().inNotebook(nb).folder(folder).title("InFolder").please();
+    Note n = makeMe.aNote().folder(folder).title("InFolder").please();
     noteService.destroy(n);
 
     NoteCreationDTO dto = new NoteCreationDTO();

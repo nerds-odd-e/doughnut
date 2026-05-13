@@ -102,10 +102,8 @@ class WikiTitleCacheServiceTest {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Folder folderA = makeMe.aFolder().notebook(notebook).name("HiraFolder").please();
       Folder folderB = makeMe.aFolder().notebook(notebook).name("KataFolder").please();
-      Note hiraganaTarget =
-          makeMe.aNote().title("ごろ").inNotebook(notebook).folder(folderA).please();
-      Note katakanaTarget =
-          makeMe.aNote().title("ゴロ").inNotebook(notebook).folder(folderB).please();
+      Note hiraganaTarget = makeMe.aNote().title("ごろ").folder(folderA).please();
+      Note katakanaTarget = makeMe.aNote().title("ゴロ").folder(folderB).please();
       Note carrier = makeMe.aNote().inNotebook(notebook).content("[[ごろ]] [[ゴロ]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
@@ -172,8 +170,8 @@ class WikiTitleCacheServiceTest {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Folder folderA = makeMe.aFolder().notebook(notebook).name("A").please();
       Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
-      Note firstCreated = makeMe.aNote().title("Dup").inNotebook(notebook).folder(folderA).please();
-      makeMe.aNote().title("Dup").inNotebook(notebook).folder(folderB).please();
+      Note firstCreated = makeMe.aNote().title("Dup").folder(folderA).please();
+      makeMe.aNote().title("Dup").folder(folderB).please();
       Note carrier = makeMe.aNote().inNotebook(notebook).content("[[Dup]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
@@ -190,8 +188,8 @@ class WikiTitleCacheServiceTest {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Folder folderA = makeMe.aFolder().notebook(notebook).name("KoroFolder").please();
       Folder folderB = makeMe.aFolder().notebook(notebook).name("GoroFolder").please();
-      makeMe.aNote().title("ころ").inNotebook(notebook).folder(folderA).please();
-      Note voiced = makeMe.aNote().title("ごろ").inNotebook(notebook).folder(folderB).please();
+      makeMe.aNote().title("ころ").folder(folderA).please();
+      Note voiced = makeMe.aNote().title("ごろ").folder(folderB).please();
       Note carrier = makeMe.aNote().inNotebook(notebook).content("[[ごろ]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);

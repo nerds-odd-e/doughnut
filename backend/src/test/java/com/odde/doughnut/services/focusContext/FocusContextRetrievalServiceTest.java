@@ -616,27 +616,17 @@ class FocusContextRetrievalServiceTest {
   class FolderSiblings {
     @Nested
     class SamplingStability {
-      private Notebook nb;
-      private Folder folder;
       private Note focus;
       private User viewer;
 
       @BeforeEach
       void setup() {
-        nb = makeMe.aNotebook().please();
-        folder = makeMe.aFolder().notebook(nb).please();
-        focus =
-            makeMe.aNote().inNotebook(nb).folder(folder).title("FocusSib").content("solo").please();
+        Notebook nb = makeMe.aNotebook().please();
+        Folder folder = makeMe.aFolder().notebook(nb).please();
+        focus = makeMe.aNote().folder(folder).title("FocusSib").content("solo").please();
         viewer = focus.getCreator();
         for (int i = 0; i < 6; i++) {
-          makeMe
-              .aNote()
-              .creator(viewer)
-              .inNotebook(nb)
-              .folder(folder)
-              .title("Peer" + i)
-              .content("x")
-              .please();
+          makeMe.aNote().creator(viewer).folder(folder).title("Peer" + i).content("x").please();
         }
       }
 
@@ -776,7 +766,6 @@ class FocusContextRetrievalServiceTest {
           makeMe
               .aNote()
               .creator(viewer)
-              .inNotebook(nb)
               .folder(folderB)
               .title("MidFS")
               .content("no link to deep")
@@ -785,7 +774,6 @@ class FocusContextRetrievalServiceTest {
           makeMe
               .aNote()
               .creator(viewer)
-              .inNotebook(nb)
               .folder(folderB)
               .title("SideSib")
               .content("[[DeepOnly]].")
@@ -794,7 +782,6 @@ class FocusContextRetrievalServiceTest {
       makeMe
           .aNote()
           .creator(viewer)
-          .inNotebook(nb)
           .folder(folderDeep)
           .title("DeepOnly")
           .content("deep body")

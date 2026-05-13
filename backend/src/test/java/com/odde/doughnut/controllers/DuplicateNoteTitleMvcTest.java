@@ -76,7 +76,7 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
-    makeMe.aNote().inNotebook(nb).folder(folder).title("InFolder").please();
+    makeMe.aNote().folder(folder).title("InFolder").please();
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("InFolder");

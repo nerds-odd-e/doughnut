@@ -136,8 +136,12 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder folder(Folder folder) {
-    this.folder = folder;
+    if (entity.getNotebook() != null) {
+      throw new AssertionError(
+          "Don't set folder and notebook at the same time. It leads to inconsistency in test.");
+    }
     inNotebook(folder.getNotebook());
+    this.folder = folder;
     return this;
   }
 

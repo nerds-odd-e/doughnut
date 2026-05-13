@@ -63,9 +63,9 @@ class NoteSearchServiceExactMatchTest {
       Folder folder1 = makeMe.aFolder().notebook(searchNotebook).name("f1").please();
       Folder folder2 = makeMe.aFolder().notebook(searchNotebook).name("f2").please();
       makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
-      Note exactMatch1 = makeMe.aNote("Pam").inNotebook(searchNotebook).folder(folder1).please();
+      Note exactMatch1 = makeMe.aNote("Pam").folder(folder1).please();
       makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
-      Note exactMatch2 = makeMe.aNote("pam").inNotebook(searchNotebook).folder(folder2).please();
+      Note exactMatch2 = makeMe.aNote("pam").folder(folder2).please();
       makeMe.aNote("Clonazepam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
