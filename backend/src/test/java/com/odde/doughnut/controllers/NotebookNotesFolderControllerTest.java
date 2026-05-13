@@ -157,7 +157,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Notebook nb = createNotebookWithTitle("NB Folders");
       makeMe.aFolder().notebook(nb).name("Inbox").please();
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+      makeMe.aFolder().parentFolder(parent).name("Nested").please();
 
       FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertEquals(2, root.folders().size());
@@ -192,8 +192,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder fDt = makeMe.aFolder().notebook(nb).name("Descendants Test").please();
-      Folder fParent = makeMe.aFolder().notebook(nb).parentFolder(fDt).name("parent").please();
-      Folder fChild = makeMe.aFolder().notebook(nb).parentFolder(fParent).name("child").please();
+      Folder fParent = makeMe.aFolder().parentFolder(fDt).name("parent").please();
+      Folder fChild = makeMe.aFolder().parentFolder(fParent).name("child").please();
       makeMe.aNote("Descendants Test").inNotebook(nb).please();
       makeMe.aNote("parent").folder(fDt).please();
       Note noteChild = makeMe.aNote("child").folder(fParent).please();
@@ -252,7 +252,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+      Folder nested = makeMe.aFolder().parentFolder(parent).name("Nested").please();
 
       FolderRealm realm = controller.getFolderPage(nb, nested);
 
@@ -265,7 +265,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+      Folder nested = makeMe.aFolder().parentFolder(parent).name("Nested").please();
 
       FolderRealm realm = controller.getFolderPage(nb, nested);
 
@@ -349,7 +349,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Notebook nb = createNotebookWithTitle("NB Folder Index");
 
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      Folder nested = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Nested").please();
+      Folder nested = makeMe.aFolder().parentFolder(parent).name("Nested").please();
       makeMe.aFolder().notebook(nb).name("SiblingRoot").please();
 
       List<Folder> rows = controller.listNotebookFolderIndex(nb);

@@ -86,8 +86,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     void assignsNestedFolderHierarchyForLeaf()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Folder bookHead = makeMe.aFolder().notebook(notebook).name("BookHead").please();
-      Folder section =
-          makeMe.aFolder().notebook(notebook).name("Section").parentFolder(bookHead).please();
+      Folder section = makeMe.aFolder().name("Section").parentFolder(bookHead).please();
       noteCreation.setNewTitle("Leaf");
       noteCreation.setFolderId(section.getId());
       Note leaf =
@@ -114,8 +113,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     void nestedFolderNamesMatchAncestorChain()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Folder bookHead = makeMe.aFolder().notebook(notebook).name("BookHead").please();
-      Folder section =
-          makeMe.aFolder().notebook(notebook).name("Section").parentFolder(bookHead).please();
+      Folder section = makeMe.aFolder().name("Section").parentFolder(bookHead).please();
       noteCreation.setNewTitle("Leaf");
       noteCreation.setFolderId(section.getId());
       Note leaf =

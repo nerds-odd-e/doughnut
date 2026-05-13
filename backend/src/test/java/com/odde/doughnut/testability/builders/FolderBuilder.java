@@ -53,8 +53,11 @@ public class FolderBuilder extends EntityBuilder<Folder> {
   }
 
   public FolderBuilder notebook(Notebook notebook) {
+    if (this.parentFolder != null) {
+      throw new AssertionError(
+          "Don't set notebook and parent folder at the same time. It leads to inconsistency in test.");
+    }
     this.notebook = notebook;
-    assertNotebook();
     return this;
   }
 
@@ -64,20 +67,15 @@ public class FolderBuilder extends EntityBuilder<Folder> {
   }
 
   public FolderBuilder parentFolder(Folder parentFolder) {
+    if (this.notebook != null) {
+      throw new AssertionError(
+          "Don't set notebook and parent folder at the same time. It leads to inconsistency in test.");
+    }
     this.parentFolder = parentFolder;
-    assertNotebook();
     if (this.parentFolder != null) {
       this.notebook = parentFolder.getNotebook();
     }
     return this;
-  }
-
-  private void assertNotebook() {
-    if (this.parentFolder != null) {
-      if (this.notebook != null && this.parentFolder.getNotebook() != this.notebook) {
-        throw new AssertionError("Parent folder's notebook does not match the specified notebook.");
-      }
-    }
   }
 
   public FolderBuilder indexContent(String content) {

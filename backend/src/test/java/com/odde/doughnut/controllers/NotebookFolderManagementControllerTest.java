@@ -143,7 +143,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder parent = makeMe.aFolder().notebook(nb).name("Parent").please();
-      Folder child = makeMe.aFolder().notebook(nb).parentFolder(parent).name("Child").please();
+      Folder child = makeMe.aFolder().parentFolder(parent).name("Child").please();
 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setNewParentFolderId(null);
@@ -161,7 +161,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-      Folder inner = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
+      Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setNewParentFolderId(inner.getId());
@@ -191,7 +191,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       makeMe.aFolder().notebook(nb).name("Dup").please();
       Folder holder = makeMe.aFolder().notebook(nb).name("Holder").please();
-      Folder nestedDup = makeMe.aFolder().notebook(nb).parentFolder(holder).name("Dup").please();
+      Folder nestedDup = makeMe.aFolder().parentFolder(holder).name("Dup").please();
 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setNewParentFolderId(null);
@@ -257,7 +257,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-      Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
+      Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
       Note loose = makeMe.aNote("Loose").folder(mid).please();
 
       controller.dissolveFolder(nb, mid);
@@ -290,8 +290,8 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-      Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
-      Folder inner = makeMe.aFolder().notebook(nb).parentFolder(mid).name("Inner").please();
+      Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+      Folder inner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
       Note deep = makeMe.aNote("Deep").folder(inner).please();
 
       controller.dissolveFolder(nb, mid);
@@ -311,9 +311,9 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
-      Folder mid = makeMe.aFolder().notebook(nb).parentFolder(outer).name("Mid").please();
-      makeMe.aFolder().notebook(nb).parentFolder(outer).name("Inner").please();
-      makeMe.aFolder().notebook(nb).parentFolder(mid).name("Inner").please();
+      Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+      makeMe.aFolder().parentFolder(outer).name("Inner").please();
+      makeMe.aFolder().parentFolder(mid).name("Inner").please();
 
       ResponseStatusException ex =
           assertThrows(ResponseStatusException.class, () -> controller.dissolveFolder(nb, mid));

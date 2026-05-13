@@ -43,7 +43,7 @@ class FolderRepositoryTest {
   void persistsNestedFolderWithParent() {
     Notebook notebook = makeMe.aNotebook().please();
     Folder parent = makeMe.aFolder().notebook(notebook).name("Parent").please();
-    Folder child = makeMe.aFolder().notebook(notebook).parentFolder(parent).name("Child").please();
+    Folder child = makeMe.aFolder().parentFolder(parent).name("Child").please();
     makeMe.entityPersister.flush();
 
     Folder loaded = folderRepository.findById(child.getId()).orElseThrow();
@@ -74,31 +74,5 @@ class FolderRepositoryTest {
 
     assertThat(loaded.getFolder(), nullValue());
     assertThat(loaded.getId(), notNullValue());
-  }
-
-  void nestedFoldersMirrorContainmentHierarchyForNotes() {
-    Notebook notebook = makeMe.aNotebook().please();
-    Note root = makeMe.aNote().inNotebook(notebook).please();
-    Folder folderForRootChildren =
-        makeMe.aFolder().notebook(notebook).name(root.getTitle()).please();
-    Folder folderForSectionChildren =
-        makeMe
-            .aFolder()
-            .notebook(notebook)
-            .parentFolder(folderForRootChildren)
-            .name("Section")
-            .please();
-
-    Note section = makeMe.aNote().title("Section").folder(folderForRootChildren).please();
-    Note leaf = makeMe.aNote().title("Leaf").folder(folderForSectionChildren).please();
-    makeMe.entityPersister.flush();
-
-    Note loadedSection = noteRepository.findById(section.getId()).orElseThrow();
-    Note loadedLeaf = noteRepository.findById(leaf.getId()).orElseThrow();
-
-    assertThat(loadedSection.getFolder().getId(), equalTo(folderForRootChildren.getId()));
-    assertThat(loadedLeaf.getFolder().getId(), equalTo(folderForSectionChildren.getId()));
-    assertThat(
-        loadedLeaf.getFolder().getParentFolder().getId(), equalTo(folderForRootChildren.getId()));
   }
 }

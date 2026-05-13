@@ -191,7 +191,7 @@ class NoteRealmServiceTest {
   @Test
   void ancestor_folders_ordered_outermost_to_innermost() {
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
-    Folder inner = makeMe.aFolder().notebook(notebook).parentFolder(outer).name("Inner").please();
+    Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
     Note inFolder = makeMe.aNote().folder(inner).please();
 
     NoteRealm realm = noteRealmService.build(inFolder, user);
@@ -264,7 +264,7 @@ class NoteRealmServiceTest {
             "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer\n---\n")
         .please();
 
-    Folder inner = makeMe.aFolder().notebook(notebook).parentFolder(outer).name("Inner").please();
+    Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
     String innerIndex =
         "---\ntitle_pattern: \"inner\"\nquestion_generation_instruction: inner\n---\n";
     makeMe.theFolder(inner).indexContent(innerIndex).please();
@@ -286,7 +286,7 @@ class NoteRealmServiceTest {
         "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer-only\n---\n";
     makeMe.theFolder(outer).indexContent(outerIndex).please();
 
-    Folder inner = makeMe.aFolder().notebook(notebook).parentFolder(outer).name("Inner").please();
+    Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
     makeMe.theFolder(inner).indexContent("---\nother: x\n---\n").please();
 
     Note inInner = makeMe.aNote().folder(inner).please();
