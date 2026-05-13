@@ -6,12 +6,10 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
-import java.util.function.Consumer;
 
 public class NotebookBuilder extends EntityBuilder<Notebook> {
   private final boolean existingNotebook;
   private BookBuilder bookAttachment;
-  private NoteBuilder childTreeBuilder;
 
   public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
     super(makeMe, notebook != null ? notebook : new Notebook());
@@ -44,9 +42,6 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    if (childTreeBuilder != null) {
-      childTreeBuilder.please(needPersist);
-    }
     if (bookAttachment != null) {
       bookAttachment.notebook(entity);
       bookAttachment.please(needPersist);
@@ -58,11 +53,6 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     return this;
   }
 
-  public NotebookBuilder withABook(BookBuilder bookBuilder) {
-    this.bookAttachment = bookBuilder;
-    return this;
-  }
-
   public NotebookBuilder creatorAndOwner(User user) {
     entity.setOwnership(user.getOwnership());
     entity.setCreatorEntity(user);
@@ -71,17 +61,6 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   public NotebookBuilder name(String name) {
     entity.setName(name);
-    return this;
-  }
-
-  public NotebookBuilder withNChildrenThat(int count, Consumer<NoteBuilder> childNoteThat) {
-    if (childTreeBuilder == null) {
-      childTreeBuilder = makeMe.aNote().inNotebook(entity);
-      if (entity.getCreatorEntity() != null) {
-        childTreeBuilder.creator(entity.getCreatorEntity());
-      }
-    }
-    childTreeBuilder.withNChildrenThat(count, childNoteThat);
     return this;
   }
 

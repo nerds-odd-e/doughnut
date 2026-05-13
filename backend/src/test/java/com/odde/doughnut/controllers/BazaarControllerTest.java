@@ -29,7 +29,7 @@ class BazaarControllerTest extends ControllerTestBase {
   void setup() {
     currentUser.setUser(makeMe.anAdmin().please());
     notebookOwnerUser = makeMe.aUser().please();
-    topNote = makeMe.aNote().nbCreatorAndOwner(notebookOwnerUser).please();
+    topNote = makeMe.aNote().notebookOwnedBy(notebookOwnerUser).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
   }

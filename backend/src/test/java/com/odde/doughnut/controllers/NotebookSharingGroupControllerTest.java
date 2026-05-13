@@ -41,7 +41,7 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.shareNotebook(note.getNotebook()));
@@ -340,7 +340,7 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedUpdate() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
 
       UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
       request.setAdditionalInstructions("Some instructions");
@@ -382,7 +382,7 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedAccess() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
 
       assertThrows(
           UnexpectedNoAccessRightException.class,

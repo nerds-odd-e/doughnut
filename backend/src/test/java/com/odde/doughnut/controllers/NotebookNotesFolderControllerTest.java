@@ -442,7 +442,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebookIndex(note.getNotebook()));

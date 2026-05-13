@@ -100,10 +100,10 @@ public class UserModelSearchTest {
 
     @BeforeEach
     void setupBazaarNotes() {
-      bazaarNote = makeMe.aNote(commonPhrase + " bazaar").nbCreatorAndOwner(anotherUser).please();
+      bazaarNote = makeMe.aNote(commonPhrase + " bazaar").notebookOwnedBy(anotherUser).please();
       makeMe.aBazaarNotebook(bazaarNote.getNotebook()).please();
       subscribedBazaarNote =
-          makeMe.aNote(commonPhrase + " subscription").nbCreatorAndOwner(anotherUser).please();
+          makeMe.aNote(commonPhrase + " subscription").notebookOwnedBy(anotherUser).please();
       makeMe.aBazaarNotebook(subscribedBazaarNote.getNotebook()).please();
       makeMe.aSubscription().forNotebook(subscribedBazaarNote.getNotebook()).forUser(user).please();
     }

@@ -60,13 +60,12 @@ public class NoteBuilder extends EntityBuilder<Note> {
     throw new AssertionError("Notebook already set for `" + entity + "`.");
   }
 
-  public NoteBuilder nbCreatorAndOwner(User user) {
+  public NoteBuilder notebookOwnedBy(User user) {
     if (entity.getNotebook() != null) {
       throw new AssertionError(
           "Notebook already set for `" + entity + "`, cannot set creator and owner for notebook.");
     }
     attachToNewNotebook(user.getOwnership());
-    entity.getNotebook().setCreatorEntity(user);
     return this;
   }
 

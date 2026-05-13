@@ -102,7 +102,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
@@ -124,7 +124,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       // Setup
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
@@ -137,7 +137,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       // Mock a response with malformed JSON content to trigger a RuntimeException
       openAIChatCompletionMock.mockChatCompletionWithMalformedJsonContent("{invalid json}");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
@@ -147,7 +147,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
@@ -160,7 +160,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   class GenerateQuestionWithoutSave {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
           OpenAiNotAvailableException.class, () -> controller.generateQuestionWithoutSave(note));
@@ -176,7 +176,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       note =
           makeMe
               .aNote()
-              .nbCreatorAndOwner(currentUser.getUser())
+              .notebookOwnedBy(currentUser.getUser())
               .title("There are 42 prefectures in Japan")
               .please();
     }

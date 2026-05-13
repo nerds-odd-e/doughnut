@@ -30,7 +30,7 @@ class AssimilationControllerTests extends ControllerTestBase {
   class Assimilating {
     @Test
     void assimilating() {
-      Note n = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
       List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -45,7 +45,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldHandleInvalidTimezoneByUsingUTC() {
-      Note n = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
       List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -64,7 +64,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       note.getRecallSetting().setRememberSpelling(true);
       noteRepository.save(note);
 
@@ -84,7 +84,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       AssimilationRequestDTO request = new AssimilationRequestDTO();
@@ -100,7 +100,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       note.getRecallSetting().setRememberSpelling(true);
       noteRepository.save(note);
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();

@@ -42,7 +42,7 @@ public class AssimilationServiceTest {
 
   @Test
   void whenThereIsNoNotesForUser() {
-    makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
+    makeMe.aNote().notebookOwnedBy(anotherUser).please();
     assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(0));
   }
@@ -54,8 +54,8 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      note1 = makeMe.aNote("note1").nbCreatorAndOwner(user).please();
-      note2 = makeMe.aNote("note2").nbCreatorAndOwner(user).please();
+      note1 = makeMe.aNote("note1").notebookOwnedBy(user).please();
+      note2 = makeMe.aNote("note2").notebookOwnedBy(user).please();
     }
 
     @Test
@@ -86,7 +86,7 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
-        anotherNote = makeMe.aNote("another note").nbCreatorAndOwner(user).please();
+        anotherNote = makeMe.aNote("another note").notebookOwnedBy(user).please();
       }
 
       private List<Note> getAllDueMemoryTrackers() {

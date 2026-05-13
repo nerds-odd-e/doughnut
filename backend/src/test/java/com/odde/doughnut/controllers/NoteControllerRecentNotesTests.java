@@ -32,13 +32,13 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
     Note note1 =
         makeMe
             .aNote()
-            .nbCreatorAndOwner(currentUser.getUser())
+            .notebookOwnedBy(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 0).please())
             .please();
     Note note2 =
         makeMe
             .aNote()
-            .nbCreatorAndOwner(currentUser.getUser())
+            .notebookOwnedBy(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 1).please())
             .please();
 

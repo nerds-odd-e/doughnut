@@ -39,7 +39,7 @@ class ConversationMessageServiceTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt =
           recallPromptBuilder.withPredefinedQuestionForNote(note).answerChoiceIndex(1).please();

@@ -37,7 +37,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    topNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+    topNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
   }
@@ -71,7 +71,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
 
   @Test
   void notAllowToSubscribeToNoneBazaarNote() {
-    Note anotherNote = makeMe.aNote().nbCreatorAndOwner(makeMe.aUser().please()).please();
+    Note anotherNote = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
     SubscriptionDTO subscription = new SubscriptionDTO();
     assertThrows(
         UnexpectedNoAccessRightException.class,

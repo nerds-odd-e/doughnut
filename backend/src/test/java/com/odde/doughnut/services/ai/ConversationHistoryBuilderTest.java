@@ -60,7 +60,7 @@ class ConversationHistoryBuilderTest {
     void shouldIncludeUserAndAssistantMessages() {
       // Given a conversation with messages
       User user = makeMe.aUser().please();
-      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
       Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
 
       ConversationMessage userMsg1 =

@@ -101,7 +101,7 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
@@ -155,7 +155,7 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     }
 
@@ -259,7 +259,7 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     }
 
@@ -324,7 +324,7 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     private Note newRootNoteWithPromotableContent() {
-      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       note.setContent("Original content with a key point to promote.");
       return note;
     }
