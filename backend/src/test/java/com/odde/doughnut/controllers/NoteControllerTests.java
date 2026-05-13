@@ -379,13 +379,13 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
         throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote("Target");
-      Note target = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Target").inNotebook(nb).please();
       Note referrer =
           makeMe
               .aNote("Referrer")
               .creator(currentUser.getUser())
-              .underSameNotebookAs(target)
+              .inNotebook(nb)
               .content(
                   "---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
               .please();

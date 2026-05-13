@@ -4,9 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,9 +24,9 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
     User owner = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote().title("Alpha");
-    Note parent = noteBuilder.nbCreatorAndOwner(owner).please();
-    Note child = makeMe.aNote().title("Child").underSameNotebookAs(parent).please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Note parent = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
+    Note child = makeMe.aNote().title("Child").inNotebook(notebook).please();
     child.setContent("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
     makeMe.entityPersister.merge(child);
     makeMe.entityPersister.flush();
@@ -37,10 +37,10 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_findsPlainWikiLinkInBody() {
     User owner = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote().title("Alpha");
-    Note parent = noteBuilder.nbCreatorAndOwner(owner).please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Note parent = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
     Note child =
-        makeMe.aNote().title("Child").underSameNotebookAs(parent).content("See [[Alpha]]").please();
+        makeMe.aNote().title("Child").inNotebook(notebook).content("See [[Alpha]]").please();
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(parent);
 
@@ -50,13 +50,13 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_resolvesTargetBeforePipe() {
     User owner = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote().title("Alpha");
-    Note parent = noteBuilder.nbCreatorAndOwner(owner).please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Note parent = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
     Note child =
         makeMe
             .aNote()
             .title("Child")
-            .underSameNotebookAs(parent)
+            .inNotebook(notebook)
             .content("See [[Alpha|friendly alias]]")
             .please();
     makeMe.entityPersister.flush();

@@ -187,11 +187,10 @@ public class AssimilationServiceTest {
     @BeforeEach
     void setup() {
       User anotherUser = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote().skipMemoryTracking();
-      Note top = noteBuilder.nbCreatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().underSameNotebookAs(top).please();
-      note2 = makeMe.aNote().underSameNotebookAs(top).please();
-      makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
+      Notebook topNb = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
+      note1 = makeMe.aNote().inNotebook(topNb).please();
+      note2 = makeMe.aNote().inNotebook(topNb).please();
+      makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
       makeMe.refresh(user);
     }
 
@@ -204,7 +203,7 @@ public class AssimilationServiceTest {
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
       makeMe.theNote(note1).skipMemoryTracking().please();
-      Note link = makeMe.aNote().underSameNotebookAs(note1).please();
+      Note link = makeMe.aNote().inNotebook(note1.getNotebook()).please();
       makeMe.refresh(user);
       Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();
       List<Integer> dueInSubscribedNotebook =
@@ -251,19 +250,18 @@ public class AssimilationServiceTest {
       makeMe.theUser(user).dailyAssimilationCount(2).please();
       // Set up subscription notes
       User anotherUser = makeMe.aUser().please();
-      NoteBuilder noteBuilder1 = makeMe.aNote().skipMemoryTracking();
-      Note top = noteBuilder1.nbCreatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().underSameNotebookAs(top).please();
-      note2 = makeMe.aNote().underSameNotebookAs(top).please();
-      note3 = makeMe.aNote().underSameNotebookAs(top).please();
-      note4 = makeMe.aNote().underSameNotebookAs(top).please();
+      Notebook topNb = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
+      note1 = makeMe.aNote().inNotebook(topNb).please();
+      note2 = makeMe.aNote().inNotebook(topNb).please();
+      note3 = makeMe.aNote().inNotebook(topNb).please();
+      note4 = makeMe.aNote().inNotebook(topNb).please();
 
       // Set up subscription with daily limit of 1
-      makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
+      makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
 
       // Set up a note that belongs to the user
-      NoteBuilder noteBuilder = makeMe.aNote();
-      noteBuilder.nbCreatorAndOwner(user).please();
+      Notebook userNb = makeMe.aNotebook().creatorAndOwner(user).please();
+      makeMe.aNote().inNotebook(userNb).please();
 
       makeMe.refresh(user);
 

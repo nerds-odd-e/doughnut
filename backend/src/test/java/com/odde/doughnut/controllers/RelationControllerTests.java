@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -38,16 +37,16 @@ class RelationControllerTests extends ControllerTestBase {
     @BeforeEach
     void setup() {
       anotherUser = makeMe.aUser().please();
-      NoteBuilder noteBuilder1 = makeMe.aNote("flower");
-      ownNote = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder = makeMe.aRootNote("nbroot");
-      Note anchor = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
-      targetFolder = makeMe.aFolder().notebook(anchor.getNotebook()).name("TargetF").please();
+      Notebook ownNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      ownNote = makeMe.aNote("flower").inNotebook(ownNotebook).please();
+      Notebook anchorNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aRootNote("nbroot").inNotebook(anchorNotebook).please();
+      targetFolder = makeMe.aFolder().notebook(anchorNotebook).name("TargetF").please();
     }
 
     @Test
     void moveNoteToFolderSuccessfully() throws UnexpectedNoAccessRightException {
-      Note mover = makeMe.aNote("mover").underSameNotebookAs(ownNote).please();
+      Note mover = makeMe.aNote("mover").inNotebook(ownNote.getNotebook()).please();
       var result = controller.moveNoteToFolder(mover, targetFolder);
       assertThat(result, hasSize(1));
       mover = noteRepository.findById(mover.getId()).orElseThrow();
@@ -56,8 +55,8 @@ class RelationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldNotAllowMoveOtherPeoplesNoteToFolder() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note mover = noteBuilder.nbCreatorAndOwner(anotherUser).please();
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
+      Note mover = makeMe.aNote().inNotebook(otherNotebook).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveNoteToFolder(mover, targetFolder));
@@ -65,12 +64,11 @@ class RelationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldNotAllowMoveToUnauthorizedFolderNotebook() {
-      NoteBuilder noteBuilder1 = makeMe.aNote();
-      Note mover = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder = makeMe.aRootNote("other");
-      Note otherAnchor = noteBuilder.nbCreatorAndOwner(anotherUser).please();
-      Folder otherFolder =
-          makeMe.aFolder().notebook(otherAnchor.getNotebook()).name("ForeignF").please();
+      Notebook moverNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note mover = makeMe.aNote().inNotebook(moverNotebook).please();
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
+      Note otherAnchor = makeMe.aRootNote("other").inNotebook(otherNotebook).please();
+      Folder otherFolder = makeMe.aFolder().notebook(otherNotebook).name("ForeignF").please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveNoteToFolder(mover, otherFolder));
@@ -79,12 +77,12 @@ class RelationControllerTests extends ControllerTestBase {
     @Test
     void moveNoteIntoFolder_collectsPeersInFolder() throws Throwable {
       User u = currentUser.getUser();
-      NoteBuilder noteBuilder = makeMe.aRootNote("top");
-      Note anchor = noteBuilder.nbCreatorAndOwner(u).please();
-      Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F").please();
-      Note peerA = makeMe.aNote("A").underSameNotebookAs(anchor).please();
-      Note peerB = makeMe.aNote("B").underSameNotebookAs(anchor).please();
-      Note mover = makeMe.aNote("M").underSameNotebookAs(anchor).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
+      makeMe.aRootNote("top").inNotebook(notebook).please();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
+      Note peerA = makeMe.aNote("A").inNotebook(notebook).please();
+      Note peerB = makeMe.aNote("B").inNotebook(notebook).please();
+      Note mover = makeMe.aNote("M").inNotebook(notebook).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(peerA, folder);
       controller.moveNoteToFolder(peerB, folder);
@@ -102,12 +100,12 @@ class RelationControllerTests extends ControllerTestBase {
     @Test
     void moveNoteToSameFolder_isIdempotent() throws Throwable {
       User u = currentUser.getUser();
-      NoteBuilder noteBuilder = makeMe.aRootNote("top2");
-      Note anchor = noteBuilder.nbCreatorAndOwner(u).please();
-      Folder folder = makeMe.aFolder().notebook(anchor.getNotebook()).name("F2").please();
-      Note peerA = makeMe.aNote("A2").underSameNotebookAs(anchor).please();
-      Note peerB = makeMe.aNote("B2").underSameNotebookAs(anchor).please();
-      Note mover = makeMe.aNote("M2").underSameNotebookAs(anchor).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
+      makeMe.aRootNote("top2").inNotebook(notebook).please();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("F2").please();
+      Note peerA = makeMe.aNote("A2").inNotebook(notebook).please();
+      Note peerB = makeMe.aNote("B2").inNotebook(notebook).please();
+      Note mover = makeMe.aNote("M2").inNotebook(notebook).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(peerA, folder);
       controller.moveNoteToFolder(peerB, folder);
@@ -134,10 +132,10 @@ class RelationControllerTests extends ControllerTestBase {
     @Test
     void moveNoteToNotebookRoot_clearsFolder() throws UnexpectedNoAccessRightException {
       User u = currentUser.getUser();
-      NoteBuilder noteBuilder = makeMe.aRootNote("top");
-      Note root = noteBuilder.nbCreatorAndOwner(u).please();
-      Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("F").please();
-      Note mover = makeMe.aNote("M").underSameNotebookAs(root).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
+      makeMe.aRootNote("top").inNotebook(notebook).please();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
+      Note mover = makeMe.aNote("M").inNotebook(notebook).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(mover, folder);
       makeMe.entityPersister.flush();
@@ -154,17 +152,17 @@ class RelationControllerTests extends ControllerTestBase {
     void moveNoteToNotebookRootInNotebook_movesToTargetNotebookRoot()
         throws UnexpectedNoAccessRightException {
       User u = currentUser.getUser();
-      NoteBuilder noteBuilder1 = makeMe.aRootNote("nb1");
-      Note nb1Root = noteBuilder1.nbCreatorAndOwner(u).please();
-      NoteBuilder noteBuilder = makeMe.aRootNote("nb2");
-      Note nb2Root = noteBuilder.nbCreatorAndOwner(u).please();
-      Folder folder = makeMe.aFolder().notebook(nb1Root.getNotebook()).name("F").please();
-      Note mover = makeMe.aNote("M").underSameNotebookAs(nb1Root).please();
+      Notebook nb1 = makeMe.aNotebook().creatorAndOwner(u).please();
+      makeMe.aRootNote("nb1").inNotebook(nb1).please();
+      Notebook nb2 = makeMe.aNotebook().creatorAndOwner(u).please();
+      makeMe.aRootNote("nb2").inNotebook(nb2).please();
+      Folder folder = makeMe.aFolder().notebook(nb1).name("F").please();
+      Note mover = makeMe.aNote("M").inNotebook(nb1).please();
       makeMe.entityPersister.flush();
       controller.moveNoteToFolder(mover, folder);
       makeMe.entityPersister.flush();
 
-      Notebook targetNb = nb2Root.getNotebook();
+      Notebook targetNb = nb2;
       controller.moveNoteToNotebookRootInNotebook(mover, targetNb);
       makeMe.refresh(mover);
       assertThat(mover.getFolder(), nullValue());
@@ -175,13 +173,13 @@ class RelationControllerTests extends ControllerTestBase {
     void moveNoteToNotebookRootInNotebook_rejectsUnauthorizedTargetNotebook() {
       User u = currentUser.getUser();
       User other = makeMe.aUser().please();
-      NoteBuilder noteBuilder2 = makeMe.aRootNote("mine");
-      Note nb1Root = noteBuilder2.nbCreatorAndOwner(u).please();
-      NoteBuilder noteBuilder1 = makeMe.aRootNote("theirs");
-      noteBuilder1.nbCreatorAndOwner(other).please();
-      Note mover = makeMe.aNote("M").underSameNotebookAs(nb1Root).please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Notebook foreignNb = noteBuilder.nbCreatorAndOwner(other).please().getNotebook();
+      Notebook nb1 = makeMe.aNotebook().creatorAndOwner(u).please();
+      makeMe.aRootNote("mine").inNotebook(nb1).please();
+      Notebook theirsNb = makeMe.aNotebook().creatorAndOwner(other).please();
+      makeMe.aRootNote("theirs").inNotebook(theirsNb).please();
+      Note mover = makeMe.aNote("M").inNotebook(nb1).please();
+      Notebook foreignNb = makeMe.aNotebook().creatorAndOwner(other).please();
+      makeMe.aNote().inNotebook(foreignNb).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveNoteToNotebookRootInNotebook(mover, foreignNb));

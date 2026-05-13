@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
@@ -33,12 +34,14 @@ public class UserModelSearchTest {
   User user;
   User anotherUser;
   Note note;
+  Notebook notebook;
   final SearchTerm searchTerm = new SearchTerm();
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().nbCreatorAndOwner(user).please();
+    notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    note = makeMe.aNote().inNotebook(notebook).please();
     anotherUser = makeMe.aUser().please();
   }
 
@@ -59,7 +62,7 @@ public class UserModelSearchTest {
 
   @Test
   void theSearchIsCaseInsensitive() {
-    Note anotherNote = makeMe.aNote("Some Note").underSameNotebookAs(note).please();
+    Note anotherNote = makeMe.aNote("Some Note").inNotebook(notebook).please();
     searchTerm.setSearchKey("not");
     NoteTopology expected = anotherNote.getNoteTopology();
     assertThat(
@@ -71,7 +74,7 @@ public class UserModelSearchTest {
 
   @Test
   void theSearchResultShouldNotIncludeSoftDeletedNote() {
-    makeMe.aNote("Some Note").underSameNotebookAs(note).softDeleted().please();
+    makeMe.aNote("Some Note").inNotebook(notebook).softDeleted().please();
     searchTerm.setSearchKey("not");
     assertTrue(search().isEmpty());
   }
@@ -80,7 +83,7 @@ public class UserModelSearchTest {
   void searchResultShouldNotExceedTwenty() {
     String commonTitle = "CommonTitle";
     for (int i = 0; i < 25; i++) {
-      makeMe.aNote(commonTitle + i).underSameNotebookAs(note).please();
+      makeMe.aNote(commonTitle + i).inNotebook(notebook).please();
     }
     searchTerm.setSearchKey("CommonTitle");
     assertThat(RelationshipLiteralSearchHits.noteMatches(search()).size(), lessThanOrEqualTo(20));
@@ -108,9 +111,10 @@ public class UserModelSearchTest {
     @BeforeEach
     void setup() {
       noteInTheSameNotebook =
-          makeMe.aNote(commonPhrase + " same notebook").underSameNotebookAs(note).please();
+          makeMe.aNote(commonPhrase + " same notebook").inNotebook(notebook).please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();
       noteFromMyOtherNotebook =
-          makeMe.aNote(commonPhrase + " other notebook").nbCreatorAndOwner(user).please();
+          makeMe.aNote(commonPhrase + " other notebook").inNotebook(otherNb).please();
       Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();
       circleNote = makeMe.aNote(commonPhrase + " circle").inCircle(circle).please();
     }

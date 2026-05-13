@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -54,10 +56,11 @@ public class NoteServiceTest {
 
     @Test
     void shouldNotCascadeSoftDeleteToStructuralChildNotes() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note parent = noteBuilder.nbCreatorAndOwner(makeMe.aUser().please()).please();
-      Note subject = makeMe.aNote().underSameNotebookAs(parent).please();
-      Note child = makeMe.aNote("child").underSameNotebookAs(subject).please();
+      User u = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
+      Note parent = makeMe.aNote().inNotebook(notebook).please();
+      Note subject = makeMe.aNote().inNotebook(notebook).please();
+      Note child = makeMe.aNote("child").inNotebook(notebook).please();
 
       noteService.destroy(subject);
 

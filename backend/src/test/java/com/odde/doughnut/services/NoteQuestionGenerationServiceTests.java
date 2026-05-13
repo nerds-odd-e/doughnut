@@ -13,7 +13,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.sql.Timestamp;
@@ -87,15 +86,13 @@ class NoteQuestionGenerationServiceTests {
     void shouldPassScopedQuestionGenerationInstructionAsFirstUserMessage()
         throws JsonProcessingException {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Notebook nb = root.getNotebook();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().underSameNotebookAs(root).please();
-      makeMe.aNote().underSameNotebookAs(root).please();
+      Note noteInScope = makeMe.aNote().inNotebook(nb).please();
+      makeMe.aNote().inNotebook(nb).please();
 
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
@@ -165,9 +162,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldStillIncludeFocusContextAfterDeductingInstructionTokensFromBudget() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Notebook nb = root.getNotebook();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: BUDGET_CHECK_MARKER\n---\n")
@@ -175,10 +170,10 @@ class NoteQuestionGenerationServiceTests {
       Note noteInScope =
           makeMe
               .aNote()
-              .underSameNotebookAs(root)
+              .inNotebook(nb)
               .content("A note with enough body text to appear in the focus context.")
               .please();
-      makeMe.aNote().underSameNotebookAs(root).please();
+      makeMe.aNote().inNotebook(nb).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -194,15 +189,13 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldPlaceScopedQuestionInstructionAsFirstUserMessageBeforeFocusContext() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Notebook nb = root.getNotebook();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().underSameNotebookAs(root).please();
-      makeMe.aNote().underSameNotebookAs(root).please();
+      Note noteInScope = makeMe.aNote().inNotebook(nb).please();
+      makeMe.aNote().inNotebook(nb).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -265,15 +258,13 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Notebook nb = root.getNotebook();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().underSameNotebookAs(root).please();
-      makeMe.aNote().underSameNotebookAs(root).please();
+      Note noteInScope = makeMe.aNote().inNotebook(nb).please();
+      makeMe.aNote().inNotebook(nb).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(

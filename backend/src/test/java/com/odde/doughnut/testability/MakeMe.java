@@ -48,7 +48,7 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public NoteBuilder aRootNote(String title) {
-    return aNote().title(title);
+    return aNote(title);
   }
 
   public NotebookBuilder aNotebook() {

@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
@@ -26,13 +27,15 @@ class NoteSearchServiceExactMatchTest {
   @Autowired MakeMe makeMe;
   @Autowired NoteSearchService noteSearchService;
   User user;
+  Notebook searchNotebook;
   Note parentNote;
   final SearchTerm searchTerm = new SearchTerm();
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    parentNote = makeMe.aNote().nbCreatorAndOwner(user).please();
+    searchNotebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    parentNote = makeMe.aNote().inNotebook(searchNotebook).please();
   }
 
   @Nested
@@ -40,10 +43,10 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldPutExactMatchFirstWhenSearching() {
-      makeMe.aNote("Diazepam").underSameNotebookAs(parentNote).please();
-      makeMe.aNote("Lorazepam").underSameNotebookAs(parentNote).please();
-      makeMe.aNote("Clonazepam").underSameNotebookAs(parentNote).please();
-      Note exactMatch = makeMe.aNote("Pam").underSameNotebookAs(parentNote).please();
+      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Clonazepam").inNotebook(searchNotebook).please();
+      Note exactMatch = makeMe.aNote("Pam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -57,15 +60,13 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldPutMultipleExactMatchesFirstWhenSearching() {
-      Folder folder1 = makeMe.aFolder().notebook(parentNote.getNotebook()).name("f1").please();
-      Folder folder2 = makeMe.aFolder().notebook(parentNote.getNotebook()).name("f2").please();
-      makeMe.aNote("Diazepam").underSameNotebookAs(parentNote).please();
-      Note exactMatch1 =
-          makeMe.aNote("Pam").underSameNotebookAs(parentNote).folder(folder1).please();
-      makeMe.aNote("Lorazepam").underSameNotebookAs(parentNote).please();
-      Note exactMatch2 =
-          makeMe.aNote("pam").underSameNotebookAs(parentNote).folder(folder2).please();
-      makeMe.aNote("Clonazepam").underSameNotebookAs(parentNote).please();
+      Folder folder1 = makeMe.aFolder().notebook(searchNotebook).name("f1").please();
+      Folder folder2 = makeMe.aFolder().notebook(searchNotebook).name("f2").please();
+      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
+      Note exactMatch1 = makeMe.aNote("Pam").inNotebook(searchNotebook).folder(folder1).please();
+      makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
+      Note exactMatch2 = makeMe.aNote("pam").inNotebook(searchNotebook).folder(folder2).please();
+      makeMe.aNote("Clonazepam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -82,9 +83,9 @@ class NoteSearchServiceExactMatchTest {
     @Test
     void shouldIncludeExactMatchesEvenWhenMoreThan20PartialMatches() {
       for (int i = 0; i < 25; i++) {
-        makeMe.aNote("Diazepam" + i).underSameNotebookAs(parentNote).please();
+        makeMe.aNote("Diazepam" + i).inNotebook(searchNotebook).please();
       }
-      Note exactMatch = makeMe.aNote("Pam").underSameNotebookAs(parentNote).please();
+      Note exactMatch = makeMe.aNote("Pam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -98,9 +99,9 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldHandleCaseInsensitiveExactMatching() {
-      makeMe.aNote("Diazepam").underSameNotebookAs(parentNote).please();
-      Note exactMatch = makeMe.aNote("PAM").underSameNotebookAs(parentNote).please();
-      makeMe.aNote("Lorazepam").underSameNotebookAs(parentNote).please();
+      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
+      Note exactMatch = makeMe.aNote("PAM").inNotebook(searchNotebook).please();
+      makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -114,8 +115,8 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldHandleEmptySearchKey() {
-      makeMe.aNote("Diazepam").underSameNotebookAs(parentNote).please();
-      makeMe.aNote("Pam").underSameNotebookAs(parentNote).please();
+      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Pam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("");
       List<RelationshipLiteralSearchHit> results =
@@ -126,8 +127,8 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldHandleWhitespaceOnlySearchKey() {
-      makeMe.aNote("Diazepam").underSameNotebookAs(parentNote).please();
-      makeMe.aNote("Pam").underSameNotebookAs(parentNote).please();
+      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Pam").inNotebook(searchNotebook).please();
 
       searchTerm.setSearchKey("   ");
       List<RelationshipLiteralSearchHit> results =
@@ -138,10 +139,10 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldPrioritizeSameNotebookWhenDistancesAreEqual() {
-      Note sameNotebookNote = makeMe.aNote("MatchInSame").underSameNotebookAs(parentNote).please();
-      Note otherNotebookHead = makeMe.aNote("Other Head").nbCreatorAndOwner(user).please();
-      Note otherNotebookNote =
-          makeMe.aNote("MatchInOther").underSameNotebookAs(otherNotebookHead).please();
+      Note sameNotebookNote = makeMe.aNote("MatchInSame").inNotebook(searchNotebook).please();
+      Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();
+      makeMe.aNote("Other Head").inNotebook(otherNb).please();
+      Note otherNotebookNote = makeMe.aNote("MatchInOther").inNotebook(otherNb).please();
 
       searchTerm.setSearchKey("Match");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);

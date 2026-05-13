@@ -11,10 +11,10 @@ import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,14 +38,13 @@ class WikiTitleCacheServiceTest {
     @Test
     void stores_resolved_links_from_relationship_frontmatter_and_body() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Note source = makeMe.aNote().title("Alpha").underSameNotebookAs(root).please();
-      Note target = makeMe.aNote().title("Beta").underSameNotebookAs(root).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note source = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
+      Note target = makeMe.aNote().title("Beta").inNotebook(notebook).please();
       String markdown =
           RelationshipNoteMarkdownFormatter.format(
               "related to", source.getTitle(), target.getTitle(), null);
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content(markdown).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content(markdown).please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -61,11 +60,10 @@ class WikiTitleCacheServiceTest {
     @Test
     void replaces_previous_rows_on_second_refresh() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Note a = makeMe.aNote().title("OnlyA").underSameNotebookAs(root).please();
-      Note b = makeMe.aNote().title("OnlyB").underSameNotebookAs(root).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[OnlyA]]").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note a = makeMe.aNote().title("OnlyA").inNotebook(notebook).please();
+      Note b = makeMe.aNote().title("OnlyB").inNotebook(notebook).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[OnlyA]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
       assertThat(
@@ -85,11 +83,10 @@ class WikiTitleCacheServiceTest {
     @Test
     void dedupes_duplicate_link_text_in_order_of_first_occurrence() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Note shared = makeMe.aNote().title("Same").underSameNotebookAs(root).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note shared = makeMe.aNote().title("Same").inNotebook(notebook).please();
       Note carrier =
-          makeMe.aNote().underSameNotebookAs(root).content("[[Same]] and again [[Same]]").please();
+          makeMe.aNote().inNotebook(notebook).content("[[Same]] and again [[Same]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -102,15 +99,14 @@ class WikiTitleCacheServiceTest {
     @Test
     void keeps_distinct_cache_rows_when_link_spellings_collide_under_unicode_ci() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Folder folderA = makeMe.aFolder().notebook(root.getNotebook()).name("HiraFolder").please();
-      Folder folderB = makeMe.aFolder().notebook(root.getNotebook()).name("KataFolder").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Folder folderA = makeMe.aFolder().notebook(notebook).name("HiraFolder").please();
+      Folder folderB = makeMe.aFolder().notebook(notebook).name("KataFolder").please();
       Note hiraganaTarget =
-          makeMe.aNote().title("ごろ").underSameNotebookAs(root).folder(folderA).please();
+          makeMe.aNote().title("ごろ").inNotebook(notebook).folder(folderA).please();
       Note katakanaTarget =
-          makeMe.aNote().title("ゴロ").underSameNotebookAs(root).folder(folderB).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[ごろ]] [[ゴロ]]").please();
+          makeMe.aNote().title("ゴロ").inNotebook(notebook).folder(folderB).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[ごろ]] [[ゴロ]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -128,13 +124,12 @@ class WikiTitleCacheServiceTest {
     @Test
     void multiple_display_labels_to_same_target_keep_separate_cache_rows_and_wiki_titles() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Note shared = makeMe.aNote().title("Same").underSameNotebookAs(root).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note shared = makeMe.aNote().title("Same").inNotebook(notebook).please();
       Note carrier =
           makeMe
               .aNote()
-              .underSameNotebookAs(root)
+              .inNotebook(notebook)
               .content("[[Same|first label]] and [[Same|second label]]")
               .please();
 
@@ -159,11 +154,9 @@ class WikiTitleCacheServiceTest {
     @Test
     void outgoing_targets_dedupe_by_resolved_note_id_across_display_text_variants() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      makeMe.aNote().title("Same").underSameNotebookAs(root).please();
-      Note carrier =
-          makeMe.aNote().underSameNotebookAs(root).content("[[Same|a]] [[Same|b]]").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      makeMe.aNote().title("Same").inNotebook(notebook).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[Same|a]] [[Same|b]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -176,14 +169,12 @@ class WikiTitleCacheServiceTest {
     @Test
     void unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Folder folderA = makeMe.aFolder().notebook(root.getNotebook()).name("A").please();
-      Folder folderB = makeMe.aFolder().notebook(root.getNotebook()).name("B").please();
-      Note firstCreated =
-          makeMe.aNote().title("Dup").underSameNotebookAs(root).folder(folderA).please();
-      makeMe.aNote().title("Dup").underSameNotebookAs(root).folder(folderB).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[Dup]]").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Folder folderA = makeMe.aFolder().notebook(notebook).name("A").please();
+      Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
+      Note firstCreated = makeMe.aNote().title("Dup").inNotebook(notebook).folder(folderA).please();
+      makeMe.aNote().title("Dup").inNotebook(notebook).folder(folderB).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[Dup]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -196,13 +187,12 @@ class WikiTitleCacheServiceTest {
     @Test
     void unqualified_link_distinguishes_unvoiced_and_voiced_hiragana_title_spellings() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Folder folderA = makeMe.aFolder().notebook(root.getNotebook()).name("KoroFolder").please();
-      Folder folderB = makeMe.aFolder().notebook(root.getNotebook()).name("GoroFolder").please();
-      makeMe.aNote().title("ころ").underSameNotebookAs(root).folder(folderA).please();
-      Note voiced = makeMe.aNote().title("ごろ").underSameNotebookAs(root).folder(folderB).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[ごろ]]").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Folder folderA = makeMe.aFolder().notebook(notebook).name("KoroFolder").please();
+      Folder folderB = makeMe.aFolder().notebook(notebook).name("GoroFolder").please();
+      makeMe.aNote().title("ころ").inNotebook(notebook).folder(folderA).please();
+      Note voiced = makeMe.aNote().title("ごろ").inNotebook(notebook).folder(folderB).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[ごろ]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -215,10 +205,9 @@ class WikiTitleCacheServiceTest {
     @Test
     void unqualified_link_does_not_resolve_voiced_target_to_unvoiced_title() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      makeMe.aNote().title("ころ").underSameNotebookAs(root).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[ごろ]]").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      makeMe.aNote().title("ころ").inNotebook(notebook).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[ごろ]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -228,17 +217,16 @@ class WikiTitleCacheServiceTest {
     @Test
     void omits_qualified_link_when_target_notebook_is_not_readable() {
       User otherUser = makeMe.aUser().please();
-      NoteBuilder noteBuilder1 = makeMe.aNote();
-      Note headSecret = noteBuilder1.nbCreatorAndOwner(otherUser).title("Secret Notebook").please();
-      makeMe.aNote().title("Hidden Note").underSameNotebookAs(headSecret).please();
+      Notebook secretNb =
+          makeMe.aNotebook().creatorAndOwner(otherUser).name("Secret Notebook").please();
+      makeMe.aNote().title("Hidden Note").inNotebook(secretNb).please();
 
       User viewer = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note headSource = noteBuilder.nbCreatorAndOwner(viewer).title("My Notebook").please();
+      Notebook viewerNb = makeMe.aNotebook().creatorAndOwner(viewer).name("My Notebook").please();
       Note carrier =
           makeMe
               .aNote()
-              .underSameNotebookAs(headSource)
+              .inNotebook(viewerNb)
               .content("Try [[Secret Notebook:Hidden Note]].")
               .please();
 
@@ -250,10 +238,9 @@ class WikiTitleCacheServiceTest {
     @Test
     void clears_rows_when_content_becomes_blank() {
       User user = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note root = noteBuilder.nbCreatorAndOwner(user).please();
-      Note a = makeMe.aNote().title("A").underSameNotebookAs(root).please();
-      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[A]]").please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note a = makeMe.aNote().title("A").inNotebook(notebook).please();
+      Note carrier = makeMe.aNote().inNotebook(notebook).content("[[A]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
       assertThat(
@@ -270,10 +257,10 @@ class WikiTitleCacheServiceTest {
   @Test
   void references_notes_for_viewer_orders_referrers_by_note_id() {
     User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().nbCreatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
-    Note second = makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
-    Note first = makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").inNotebook(notebook).please();
+    Note second = makeMe.aNote().inNotebook(notebook).content("[[Focal]]").please();
+    Note first = makeMe.aNote().inNotebook(notebook).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(first, user);
     wikiTitleCacheService.refreshForNote(second, user);
 
@@ -287,10 +274,9 @@ class WikiTitleCacheServiceTest {
   @Test
   void references_notes_for_viewer_includes_notebook_root_referrer_linking_to_descendant() {
     User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().nbCreatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").underSameNotebookAs(root).please();
-    Note referrerAtNotebookRoot =
-        makeMe.aNote().underSameNotebookAs(root).content("[[Focal]]").please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").inNotebook(notebook).please();
+    Note referrerAtNotebookRoot = makeMe.aNote().inNotebook(notebook).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(referrerAtNotebookRoot, user);
 
     List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);

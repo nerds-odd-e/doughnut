@@ -214,8 +214,8 @@ class SearchControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote("Reference Note");
-      referenceNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      referenceNote = makeMe.aNote("Reference Note").inNotebook(notebook).please();
     }
 
     @Test
@@ -232,11 +232,12 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnMatchingNotesInRelationToReference() throws UnexpectedNoAccessRightException {
-      Note child1 = makeMe.aNote("Child Java Note").underSameNotebookAs(referenceNote).please();
+      Note child1 =
+          makeMe.aNote("Child Java Note").inNotebook(referenceNote.getNotebook()).please();
       Note child2 =
-          makeMe.aNote("Child JavaScript Note").underSameNotebookAs(referenceNote).please();
-      NoteBuilder noteBuilder = makeMe.aNote("Unrelated Java Note");
-      Note unrelated = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+          makeMe.aNote("Child JavaScript Note").inNotebook(referenceNote.getNotebook()).please();
+      Notebook unrelatedNb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note unrelated = makeMe.aNote("Unrelated Java Note").inNotebook(unrelatedNb).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Java");
@@ -256,8 +257,10 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldRespectSearchScopeSettingsWithinRelation() throws UnexpectedNoAccessRightException {
-      Note child1 = makeMe.aNote("Local Child Note").underSameNotebookAs(referenceNote).please();
-      Note child2 = makeMe.aNote("Shared Child Note").underSameNotebookAs(referenceNote).please();
+      Note child1 =
+          makeMe.aNote("Local Child Note").inNotebook(referenceNote.getNotebook()).please();
+      Note child2 =
+          makeMe.aNote("Shared Child Note").inNotebook(referenceNote.getNotebook()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Child");
@@ -272,8 +275,13 @@ class SearchControllerTests extends ControllerTestBase {
     @Test
     void shouldSuppressNotebookLiteralHitsWhenScopedWithoutGlobalFlags()
         throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote("OrphanNotebookTitle");
-      noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Notebook orphanNb =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("OrphanNotebookTitle")
+              .please();
+      makeMe.aNote().inNotebook(orphanNb).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Orphan");
@@ -337,8 +345,8 @@ class SearchControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote("Reference Note");
-      referenceNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      referenceNote = makeMe.aNote("Reference Note").inNotebook(notebook).please();
     }
 
     @Test
