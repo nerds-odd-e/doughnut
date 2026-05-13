@@ -91,9 +91,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (entity.getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
     }
-    if (entity.getNotebook() == null) {
-      attachToNewNotebook(entity.getCreator().getOwnership());
-    }
     NotebookBuilder notebookBuilder = new NotebookBuilder(entity.getNotebook(), makeMe);
     entity.assignNotebook(notebookBuilder.please(needPersist));
     if (folder != null) {

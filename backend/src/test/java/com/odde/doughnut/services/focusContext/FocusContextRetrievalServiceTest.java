@@ -32,6 +32,10 @@ class FocusContextRetrievalServiceTest {
     wikiTitleCacheService.refreshForNote(note, viewer);
   }
 
+  private Notebook notebookReadableBy(User viewer) {
+    return makeMe.aNotebook().creatorAndOwner(viewer).please();
+  }
+
   private static List<String> folderSiblingTitles(FocusContextResult result) {
     return result.getRelatedNotes().stream()
         .filter(n -> n.getEdgeType() == FocusContextEdgeType.FolderSibling)
@@ -43,9 +47,16 @@ class FocusContextRetrievalServiceTest {
   class FocusNoteOnly {
     @Test
     void noLinksProducesEmptyRelatedNotes() {
-      Note note = makeMe.aNote().title("Solo").content("Some content").please();
-      FocusContextResult result =
-          service.retrieve(note, note.getCreator(), RetrievalConfig.depth1());
+      User viewer = makeMe.aUser().please();
+      Note note =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(notebookReadableBy(viewer))
+              .title("Solo")
+              .content("Some content")
+              .please();
+      FocusContextResult result = service.retrieve(note, viewer, RetrievalConfig.depth1());
 
       assertThat(result.getFocusNote().getTitle(), equalTo("Solo"));
       assertThat(result.getRelatedNotes(), empty());
@@ -53,16 +64,25 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void focusNoteContentTruncationMatchesApproximateTokenBudget() {
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
       String longContent = "a".repeat(10000);
-      Note longNote = makeMe.aNote().title("Long").content(longContent).please();
-      FocusContextResult longResult =
-          service.retrieve(longNote, longNote.getCreator(), RetrievalConfig.depth1());
+      Note longNote =
+          makeMe.aNote().creator(viewer).notebook(nb).title("Long").content(longContent).please();
+      FocusContextResult longResult = service.retrieve(longNote, viewer, RetrievalConfig.depth1());
       assertThat(longResult.getFocusNote().isContentTruncated(), is(true));
       assertThat(longResult.getFocusNote().getContent().length(), lessThan(longContent.length()));
 
-      Note shortNote = makeMe.aNote().title("Short").content("Small content").please();
+      Note shortNote =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("Short")
+              .content("Small content")
+              .please();
       FocusContextResult shortResult =
-          service.retrieve(shortNote, shortNote.getCreator(), RetrievalConfig.depth1());
+          service.retrieve(shortNote, viewer, RetrievalConfig.depth1());
       assertThat(shortResult.getFocusNote().isContentTruncated(), is(false));
       assertThat(shortResult.getFocusNote().getContent(), equalTo("Small content"));
     }
@@ -75,8 +95,16 @@ class FocusContextRetrievalServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().title("Focus").content("See [[Linked]].").please();
-      viewer = focusNote.getCreator();
+      viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      focusNote =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("Focus")
+              .content("See [[Linked]].")
+              .please();
       makeMe
           .aNote()
           .creator(viewer)
@@ -111,8 +139,9 @@ class FocusContextRetrievalServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().title("Focus").please();
-      viewer = focusNote.getCreator();
+      viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      focusNote = makeMe.aNote().creator(viewer).notebook(nb).title("Focus").please();
       referrer =
           makeMe
               .aNote()
@@ -142,8 +171,9 @@ class FocusContextRetrievalServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().title("HubFocus").please();
-      viewer = focusNote.getCreator();
+      viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      focusNote = makeMe.aNote().creator(viewer).notebook(nb).title("HubFocus").please();
       for (int i = 0; i < 10; i++) {
         Note r =
             makeMe
@@ -320,8 +350,16 @@ class FocusContextRetrievalServiceTest {
   class Deduplication {
     @Test
     void noteReachedAsBothOutgoingAndInboundKeepsOutgoingEdgeType() {
-      Note focusNote = makeMe.aNote().title("Focus").content("See [[Both]].").please();
-      User viewer = focusNote.getCreator();
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      Note focusNote =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("Focus")
+              .content("See [[Both]].")
+              .please();
       Note both =
           makeMe
               .aNote()
@@ -354,9 +392,16 @@ class FocusContextRetrievalServiceTest {
       for (String t : titles) {
         linkLine.append("[[").append(t).append("]] ");
       }
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
       Note focusNote =
-          makeMe.aNote().title("Focus").content(linkLine.toString().trim() + ".").please();
-      User viewer = focusNote.getCreator();
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("Focus")
+              .content(linkLine.toString().trim() + ".")
+              .please();
       String largeDetails = "x".repeat(3500);
       for (String title : titles) {
         makeMe
@@ -379,8 +424,16 @@ class FocusContextRetrievalServiceTest {
   class BreadthFirstDepth2 {
     @Test
     void outgoingChainReachesDepthTwoLeaf() {
-      Note focus = makeMe.aNote().title("ChainRoot").content("Start [[MidDepth]].").please();
-      User viewer = focus.getCreator();
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      Note focus =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("ChainRoot")
+              .content("Start [[MidDepth]].")
+              .please();
       Note mid =
           makeMe
               .aNote()
@@ -419,8 +472,16 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void maxDepthOneSkipsSecondHop() {
-      Note focus = makeMe.aNote().title("ShallowRoot").content("[[MidShallow]].").please();
-      User viewer = focus.getCreator();
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      Note focus =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("ShallowRoot")
+              .content("[[MidShallow]].")
+              .please();
       Note mid =
           makeMe
               .aNote()
@@ -454,8 +515,16 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void cycleBetweenTwoNotesDoesNotLoop() {
-      Note a = makeMe.aNote().title("CycleA").content("To [[CycleB]].").please();
-      User viewer = a.getCreator();
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      Note a =
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("CycleA")
+              .content("To [[CycleB]].")
+              .please();
       Note b =
           makeMe
               .aNote()
@@ -475,9 +544,16 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void shorterPathWinsWhenSameNoteReachableAtDepthOneAndTwo() {
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
       Note focus =
-          makeMe.aNote().title("ShortFocus").content("[[DirectShort]] [[ViaBridge]].").please();
-      User viewer = focus.getCreator();
+          makeMe
+              .aNote()
+              .creator(viewer)
+              .notebook(nb)
+              .title("ShortFocus")
+              .content("[[DirectShort]] [[ViaBridge]].")
+              .please();
       makeMe
           .aNote()
           .creator(viewer)
@@ -511,8 +587,9 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void depthTwoInboundFromExpandedNote() {
-      Note focus = makeMe.aNote().title("InboundRoot").please();
-      User viewer = focus.getCreator();
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
+      Note focus = makeMe.aNote().creator(viewer).notebook(nb).title("InboundRoot").please();
       Note hub =
           makeMe
               .aNote()
@@ -555,13 +632,16 @@ class FocusContextRetrievalServiceTest {
     @Test
     void budgetExhaustedMidRingLeavesLaterDepthOneNotesAndDepthTwoUnreachable() {
       String maxChunk = "z".repeat(2400);
+      User viewer = makeMe.aUser().please();
+      Notebook nb = notebookReadableBy(viewer);
       Note focus =
           makeMe
               .aNote()
+              .creator(viewer)
+              .notebook(nb)
               .title("BudgetRoot")
               .content("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[Spend5]] [[BridgeBudget]]")
               .please();
-      User viewer = focus.getCreator();
       for (int i = 1; i <= 5; i++) {
         makeMe
             .aNote()
@@ -621,10 +701,17 @@ class FocusContextRetrievalServiceTest {
 
       @BeforeEach
       void setup() {
-        Notebook nb = makeMe.aNotebook().please();
+        viewer = makeMe.aUser().please();
+        Notebook nb = notebookReadableBy(viewer);
         Folder folder = makeMe.aFolder().notebook(nb).please();
-        focus = makeMe.aNote().folder(folder).title("FocusSib").content("solo").please();
-        viewer = focus.getCreator();
+        focus =
+            makeMe
+                .aNote()
+                .creator(viewer)
+                .folder(folder)
+                .title("FocusSib")
+                .content("solo")
+                .please();
         for (int i = 0; i < 6; i++) {
           makeMe.aNote().creator(viewer).folder(folder).title("Peer" + i).content("x").please();
         }
