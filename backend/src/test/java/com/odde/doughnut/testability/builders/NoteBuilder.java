@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.RelationshipNoteMarkdownFormatter;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -136,10 +135,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder withNoDescription() {
-    return content("");
-  }
-
   public NoteBuilder folder(Folder folder) {
     this.folder = folder;
     inNotebook(folder.getNotebook());
@@ -179,27 +174,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder imageUrl(String url) {
-    boolean hasImage = url != null && !url.trim().isEmpty();
-    entity.setContent(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            entity.getContent() != null ? entity.getContent() : "",
-            hasImage,
-            hasImage ? url.trim() : "",
-            ""));
-    return this;
-  }
-
-  public void withUploadedImage() {
-    Image image = makeMe.anImage().please();
-    image.setNote(entity);
-    makeMe.entityPersister.save(image);
-    String path = "/attachments/images/" + image.getId() + "/" + image.getName();
-    entity.setContent(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            entity.getContent() != null ? entity.getContent() : "", true, path, ""));
-  }
-
   public NoteBuilder notebookOwnership(User user) {
     entity.getNotebook().setOwnership(user.getOwnership());
     return this;
@@ -220,13 +194,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     PredefinedQuestionBuilder predefinedQuestionBuilder =
         makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(entity);
     this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
-    return this;
-  }
-
-  public NoteBuilder hasPredefinedQuestions(int numQuestions) {
-    for (int i = 0; i < numQuestions; i++) {
-      this.hasAPredefinedQuestion();
-    }
     return this;
   }
 

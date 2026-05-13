@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -32,8 +31,7 @@ public class RecallPromptRepositoryTest {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote();
-    note = noteBuilder.nbCreatorAndOwner(user).please();
+    note = makeMe.aNote().nbCreatorAndOwner(user).please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
     now = makeMe.aTimestamp().of(15, 8).fromShanghai().please();
     twoWeeksAgo = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -117,8 +115,7 @@ public class RecallPromptRepositoryTest {
 
     @Test
     void shouldOnlyCountAnswersForSpecificNote() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note otherNote = noteBuilder.nbCreatorAndOwner(user).please();
+      Note otherNote = makeMe.aNote().nbCreatorAndOwner(user).please();
       MemoryTracker otherTracker = makeMe.aMemoryTrackerFor(otherNote).by(user).please();
 
       makeMe

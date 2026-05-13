@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +47,7 @@ public class MemoryTrackerServiceTest {
 
     @Test
     void assimilatingShouldSetBothInitialAndLastRecallAt() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
       AssimilationRequestDTO request = new AssimilationRequestDTO();
       request.noteId = note.getId();
       request.skipMemoryTracking = false;
@@ -62,8 +60,7 @@ public class MemoryTrackerServiceTest {
 
     @Test
     void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
       makeMe.aMemoryTrackerFor(note).by(user).please();
 
       AssimilationRequestDTO request = new AssimilationRequestDTO();
@@ -77,8 +74,7 @@ public class MemoryTrackerServiceTest {
 
     @Test
     void shouldAddOnlySpellingTrackerWhenNoteHasTrackersButNoSpellingAndRememberSpelling() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
       note.getRecallSetting().setRememberSpelling(true);
       makeMe.entityPersister.merge(note);
       makeMe.aMemoryTrackerFor(note).by(user).please();
@@ -98,8 +94,7 @@ public class MemoryTrackerServiceTest {
   class GetAllRecallPrompts {
     @Test
     void shouldReturnEmptyListWhenNoPrompts() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
 
       List<RecallPrompt> prompts = memoryTrackerService.getAllRecallPrompts(memoryTracker);
@@ -109,8 +104,7 @@ public class MemoryTrackerServiceTest {
 
     @Test
     void shouldReturnAllPromptsOrderedByIdDesc() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
 
       RecallPrompt prompt1 =
@@ -142,8 +136,7 @@ public class MemoryTrackerServiceTest {
 
     @Test
     void shouldIncludeBothAnsweredAndUnansweredPrompts() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(user).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(user).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
 
       RecallPrompt unansweredPrompt =
@@ -175,8 +168,7 @@ public class MemoryTrackerServiceTest {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      note = noteBuilder.nbCreatorAndOwner(user).please();
+      note = makeMe.aNote().nbCreatorAndOwner(user).please();
       memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
     }
 

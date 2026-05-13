@@ -5,7 +5,6 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,7 @@ class NoteRealmJsonSerializationTest {
   @Test
   void serializes_realm_when_focus_note_is_uninitialized_proxy() throws Exception {
     User user = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote();
-    Note real = noteBuilder.nbCreatorAndOwner(user).title("Head").please();
+    Note real = makeMe.aNote().nbCreatorAndOwner(user).title("Head").please();
     entityManager.flush();
     entityManager.clear();
 
@@ -41,8 +39,7 @@ class NoteRealmJsonSerializationTest {
   @Test
   void serializes_realm_with_wiki_cache_references() throws Exception {
     User user = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote();
-    Note root = noteBuilder.nbCreatorAndOwner(user).please();
+    Note root = makeMe.aNote().nbCreatorAndOwner(user).please();
     Note focal = makeMe.aNote().title("Focal").please();
     Note subject = makeMe.aNote().please();
     Note relation = makeMe.aNote().please();

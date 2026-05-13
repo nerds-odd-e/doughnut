@@ -17,7 +17,6 @@ import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
 import java.util.List;
@@ -47,8 +46,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   class GetThresholdExceeded {
     @Test
     void shouldReturnFalseWhenBelowThreshold() throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -71,8 +69,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldReturnTrueWhenAtThreshold() throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -95,8 +92,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldReturnTrueWhenAboveThreshold() throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -139,8 +135,12 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnSpellingRecallPromptForSpellingMemoryTracker()
         throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote("moon").content("partner of earth");
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note =
+          makeMe
+              .aNote("moon")
+              .content("partner of earth")
+              .nbCreatorAndOwner(currentUser.getUser())
+              .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
 
       RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
@@ -152,8 +152,12 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldRecycleUnansweredSpellingRecallPromptForSpellingMemoryTracker()
         throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote("moon").content("partner of earth");
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note =
+          makeMe
+              .aNote("moon")
+              .content("partner of earth")
+              .nbCreatorAndOwner(currentUser.getUser())
+              .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
 
       // Create an unanswered spelling recall prompt
@@ -170,8 +174,13 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnMCQRecallPromptForNonSpellingMemoryTracker()
         throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote("moon").content("partner of earth");
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).rememberSpelling().please();
+      Note note =
+          makeMe
+              .aNote("moon")
+              .content("partner of earth")
+              .nbCreatorAndOwner(currentUser.getUser())
+              .rememberSpelling()
+              .please();
       makeMe.aNote().please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
@@ -201,8 +210,13 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldThrowWhenOpenAiNotAvailableAndGeneratingQuestion() {
-      NoteBuilder noteBuilder = makeMe.aNote("moon").content("partner of earth");
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).rememberSpelling().please();
+      Note note =
+          makeMe
+              .aNote("moon")
+              .content("partner of earth")
+              .nbCreatorAndOwner(currentUser.getUser())
+              .rememberSpelling()
+              .please();
       makeMe.aNote().please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       testabilitySettings.setOpenAiTokenOverride("");
@@ -312,10 +326,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotes() {
-      NoteBuilder noteBuilder1 = makeMe.aNote();
-      Note activeNote = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note deletedNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker activeTracker =
           makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       MemoryTracker deletedTracker =
@@ -364,10 +376,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotes() {
-      NoteBuilder noteBuilder1 = makeMe.aNote();
-      Note activeNote = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note deletedNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker activeTracker =
           makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       MemoryTracker deletedTracker =

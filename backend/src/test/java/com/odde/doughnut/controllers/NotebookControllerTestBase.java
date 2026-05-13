@@ -15,7 +15,6 @@ import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookGroupService;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +66,6 @@ abstract class NotebookControllerTestBase extends ControllerTestBase {
             });
 
     currentUser.setUser(makeMe.aUser().please());
-    NoteBuilder noteBuilder = makeMe.aNote();
-    topNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+    topNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
   }
 }

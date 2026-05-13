@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -43,8 +42,7 @@ public class AssimilationServiceTest {
 
   @Test
   void whenThereIsNoNotesForUser() {
-    NoteBuilder noteBuilder = makeMe.aNote();
-    noteBuilder.nbCreatorAndOwner(anotherUser).please();
+    makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
     assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(0));
   }
@@ -56,10 +54,8 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder1 = makeMe.aNote("note1");
-      note1 = noteBuilder1.nbCreatorAndOwner(user).please();
-      NoteBuilder noteBuilder = makeMe.aNote("note2");
-      note2 = noteBuilder.nbCreatorAndOwner(user).please();
+      note1 = makeMe.aNote("note1").nbCreatorAndOwner(user).please();
+      note2 = makeMe.aNote("note2").nbCreatorAndOwner(user).please();
     }
 
     @Test
@@ -90,8 +86,7 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
-        NoteBuilder noteBuilder = makeMe.aNote("another note");
-        anotherNote = noteBuilder.nbCreatorAndOwner(user).please();
+        anotherNote = makeMe.aNote("another note").nbCreatorAndOwner(user).please();
       }
 
       private List<Note> getAllDueMemoryTrackers() {

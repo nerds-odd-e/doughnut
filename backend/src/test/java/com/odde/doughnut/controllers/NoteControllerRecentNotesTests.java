@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +29,15 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
 
   @Test
   void shouldReturnRecentNotes() throws UnexpectedNoAccessRightException {
-    NoteBuilder noteBuilder1 = makeMe.aNote();
     Note note1 =
-        noteBuilder1
+        makeMe
+            .aNote()
             .nbCreatorAndOwner(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 0).please())
             .please();
-    NoteBuilder noteBuilder = makeMe.aNote();
     Note note2 =
-        noteBuilder
+        makeMe
+            .aNote()
             .nbCreatorAndOwner(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 1).please())
             .please();

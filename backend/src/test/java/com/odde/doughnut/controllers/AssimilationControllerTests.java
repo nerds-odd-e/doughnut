@@ -9,7 +9,6 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -31,8 +30,7 @@ class AssimilationControllerTests extends ControllerTestBase {
   class Assimilating {
     @Test
     void assimilating() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note n = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note n = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
       List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -47,8 +45,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldHandleInvalidTimezoneByUsingUTC() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note n = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note n = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
       List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -67,8 +64,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       note.getRecallSetting().setRememberSpelling(true);
       noteRepository.save(note);
 
@@ -88,8 +84,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       AssimilationRequestDTO request = new AssimilationRequestDTO();
@@ -105,8 +100,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       note.getRecallSetting().setRememberSpelling(true);
       noteRepository.save(note);
       makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();

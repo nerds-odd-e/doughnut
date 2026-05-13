@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.ChatMessageContent;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,8 +90,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void ownerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
       User initiator = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       Conversation conversation = makeMe.aConversation().from(initiator).forANote(note).please();
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
@@ -153,8 +151,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       User noteOwner = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      note = noteBuilder.nbCreatorAndOwner(noteOwner).please();
+      note = makeMe.aNote().nbCreatorAndOwner(noteOwner).please();
     }
 
     @Test
@@ -273,8 +270,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       User noteOwner = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      note = noteBuilder.nbCreatorAndOwner(noteOwner).please();
+      note = makeMe.aNote().nbCreatorAndOwner(noteOwner).please();
       otherUser = makeMe.aUser().please();
     }
 
@@ -354,9 +350,9 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       User noteOwner = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
       note =
-          noteBuilder
+          makeMe
+              .aNote()
               .nbCreatorAndOwner(noteOwner)
               .title("There are 42 prefectures in Japan")
               .please();

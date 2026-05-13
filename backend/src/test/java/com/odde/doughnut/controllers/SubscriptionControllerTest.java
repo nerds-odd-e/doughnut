@@ -19,7 +19,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NotebookGroupService;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,8 +37,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    NoteBuilder noteBuilder = makeMe.aNote();
-    topNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+    topNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
   }
@@ -73,8 +71,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
 
   @Test
   void notAllowToSubscribeToNoneBazaarNote() {
-    NoteBuilder noteBuilder = makeMe.aNote();
-    Note anotherNote = noteBuilder.nbCreatorAndOwner(makeMe.aUser().please()).please();
+    Note anotherNote = makeMe.aNote().nbCreatorAndOwner(makeMe.aUser().please()).please();
     SubscriptionDTO subscription = new SubscriptionDTO();
     assertThrows(
         UnexpectedNoAccessRightException.class,

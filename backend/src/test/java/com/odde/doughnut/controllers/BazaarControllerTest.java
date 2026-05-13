@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.BazaarService;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -30,8 +29,7 @@ class BazaarControllerTest extends ControllerTestBase {
   void setup() {
     currentUser.setUser(makeMe.anAdmin().please());
     notebookOwnerUser = makeMe.aUser().please();
-    NoteBuilder noteBuilder = makeMe.aNote();
-    topNote = noteBuilder.nbCreatorAndOwner(notebookOwnerUser).please();
+    topNote = makeMe.aNote().nbCreatorAndOwner(notebookOwnerUser).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
   }

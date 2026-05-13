@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.openai.client.OpenAIClient;
 import com.openai.models.embeddings.CreateEmbeddingResponse;
 import com.openai.models.embeddings.EmbeddingCreateParams;
@@ -79,8 +78,8 @@ class SearchControllerSemanticTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote("Reference Note");
-      referenceNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").nbCreatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -140,8 +139,8 @@ class SearchControllerSemanticTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote("Reference Note");
-      referenceNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").nbCreatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test

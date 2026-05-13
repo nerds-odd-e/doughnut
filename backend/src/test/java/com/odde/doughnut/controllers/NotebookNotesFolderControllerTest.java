@@ -19,7 +19,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Nested;
@@ -443,8 +442,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedUser() {
       User anotherUser = makeMe.aUser().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebookIndex(note.getNotebook()));

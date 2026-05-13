@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Nested;
@@ -32,8 +31,7 @@ public class NoteServiceTest {
   class Destroy {
     @Test
     void shouldSoftDeleteMemoryTrackersWhenNoteIsDeleted() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(makeMe.aUser().please()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(makeMe.aUser().please()).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
 
       noteService.destroy(note);
@@ -45,8 +43,7 @@ public class NoteServiceTest {
 
     @Test
     void shouldExcludeSoftDeletedMemoryTrackersFromGetMemoryTrackersFor() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(makeMe.aUser().please()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(makeMe.aUser().please()).please();
       makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
 
       noteService.destroy(note);
@@ -76,8 +73,7 @@ public class NoteServiceTest {
       Timestamp t1 = makeMe.aTimestamp().of(1, 0).please();
       Timestamp t2 = TimestampOperations.addHoursToTimestamp(t1, 1);
 
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(makeMe.aUser().please()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(makeMe.aUser().please()).please();
       MemoryTracker mtDeletedAtT1 = makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
       MemoryTracker mtDeletedAtT2 =
           makeMe.aMemoryTrackerFor(note).by(note.getCreator()).spelling().please();

@@ -12,7 +12,6 @@ import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.List;
@@ -103,8 +102,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
@@ -126,8 +124,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       // Setup
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
@@ -140,8 +137,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       // Mock a response with malformed JSON content to trigger a RuntimeException
       openAIChatCompletionMock.mockChatCompletionWithMalformedJsonContent("{invalid json}");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
@@ -151,8 +147,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
@@ -165,8 +160,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   class GenerateQuestionWithoutSave {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
           OpenAiNotAvailableException.class, () -> controller.generateQuestionWithoutSave(note));
@@ -179,9 +173,9 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote();
       note =
-          noteBuilder
+          makeMe
+              .aNote()
               .nbCreatorAndOwner(currentUser.getUser())
               .title("There are 42 prefectures in Japan")
               .please();

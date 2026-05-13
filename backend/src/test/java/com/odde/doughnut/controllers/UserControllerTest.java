@@ -15,7 +15,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
@@ -190,8 +189,7 @@ class UserControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnAssimilationCountsForLoggedInUser() {
       // Create a note that needs assimilation
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       assertThat(note.getId(), notNullValue());
 
       MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
@@ -222,10 +220,8 @@ class UserControllerTest extends ControllerTestBase {
     void shouldExcludeMemoryTrackersForDeletedNotesFromOverview() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      NoteBuilder noteBuilder1 = makeMe.aNote();
-      Note activeNote = noteBuilder1.nbCreatorAndOwner(currentUser.getUser()).please();
-      NoteBuilder noteBuilder = makeMe.aNote();
-      Note deletedNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 

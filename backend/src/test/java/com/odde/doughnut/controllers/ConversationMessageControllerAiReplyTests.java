@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
@@ -30,8 +29,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   @BeforeEach
   void setUp() {
     currentUser.setUser(makeMe.aUser().please());
-    NoteBuilder noteBuilder = makeMe.aNote();
-    note = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+    note = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
     conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
   }
 
@@ -119,8 +117,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
     @BeforeEach
     void setup() {
-      NoteBuilder noteBuilder = makeMe.aNote();
-      questionNote = noteBuilder.nbCreatorAndOwner(currentUser.getUser()).please();
+      questionNote = makeMe.aNote().nbCreatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(questionNote).please();
       recallConversation =
