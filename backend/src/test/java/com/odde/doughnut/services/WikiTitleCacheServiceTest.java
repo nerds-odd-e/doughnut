@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -92,6 +93,25 @@ class WikiTitleCacheServiceTest {
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
+    }
+
+    @Test
+    void keeps_distinct_cache_rows_when_link_spellings_collide_under_unicode_ci() {
+      User user = makeMe.aUser().please();
+      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note target = makeMe.aNote().title("ごろ").underSameNotebookAs(root).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(root).content("[[ごろ]] [[ゴロ]]").please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(2));
+      assertThat(
+          rows.stream().map(NoteWikiTitleCache::getLinkText).toList(),
+          containsInAnyOrder("ごろ", "ゴロ"));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+      assertThat(rows.get(1).getTargetNote().getId(), equalTo(target.getId()));
     }
 
     @Test
