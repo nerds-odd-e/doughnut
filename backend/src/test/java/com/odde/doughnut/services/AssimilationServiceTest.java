@@ -183,8 +183,8 @@ public class AssimilationServiceTest {
     void setup() {
       User anotherUser = makeMe.aUser().please();
       Notebook topNb = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().inNotebook(topNb).please();
-      note2 = makeMe.aNote().inNotebook(topNb).please();
+      note1 = makeMe.aNote().notebook(topNb).please();
+      note2 = makeMe.aNote().notebook(topNb).please();
       makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
       makeMe.refresh(user);
     }
@@ -198,7 +198,7 @@ public class AssimilationServiceTest {
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
       makeMe.theNote(note1).skipMemoryTracking().please();
-      Note link = makeMe.aNote().inNotebook(note1.getNotebook()).please();
+      Note link = makeMe.aNote().notebook(note1.getNotebook()).please();
       makeMe.refresh(user);
       Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();
       List<Integer> dueInSubscribedNotebook =
@@ -246,17 +246,17 @@ public class AssimilationServiceTest {
       // Set up subscription notes
       User anotherUser = makeMe.aUser().please();
       Notebook topNb = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().inNotebook(topNb).please();
-      note2 = makeMe.aNote().inNotebook(topNb).please();
-      note3 = makeMe.aNote().inNotebook(topNb).please();
-      note4 = makeMe.aNote().inNotebook(topNb).please();
+      note1 = makeMe.aNote().notebook(topNb).please();
+      note2 = makeMe.aNote().notebook(topNb).please();
+      note3 = makeMe.aNote().notebook(topNb).please();
+      note4 = makeMe.aNote().notebook(topNb).please();
 
       // Set up subscription with daily limit of 1
       makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
 
       // Set up a note that belongs to the user
       Notebook userNb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote().inNotebook(userNb).please();
+      makeMe.aNote().notebook(userNb).please();
 
       makeMe.refresh(user);
 

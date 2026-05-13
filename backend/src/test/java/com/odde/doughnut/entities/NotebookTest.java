@@ -22,21 +22,21 @@ class NotebookTest {
   @BeforeEach
   void setup() {
     notebook = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
-    rootNote = makeMe.aNote().inNotebook(notebook).please();
+    rootNote = makeMe.aNote().notebook(notebook).please();
   }
 
   @Nested
   class NotesManagementTests {
     @Test
     void shouldIncludeAllNonDeletedNotesInNotebook() {
-      makeMe.aNote().inNotebook(notebook).please();
+      makeMe.aNote().notebook(notebook).please();
       makeMe.refresh(notebook);
       assertThat(notebook.getNotes().size()).isEqualTo(2);
     }
 
     @Test
     void shouldExcludeSoftDeletedNotesFromNotebook() {
-      makeMe.aNote().inNotebook(notebook).softDeleted().please();
+      makeMe.aNote().notebook(notebook).softDeleted().please();
       makeMe.refresh(notebook);
       assertThat(notebook.getNotes().size()).isEqualTo(1);
     }

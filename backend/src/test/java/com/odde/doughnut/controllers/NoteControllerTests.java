@@ -94,12 +94,12 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
       Note matched =
-          makeMe.aNote().title("LinkedPage").creator(user).inNotebook(root.getNotebook()).please();
+          makeMe.aNote().title("LinkedPage").creator(user).notebook(root.getNotebook()).please();
       Note viewer =
           makeMe
               .aNote()
               .creator(user)
-              .inNotebook(root.getNotebook())
+              .notebook(root.getNotebook())
               .content("Text [[LinkedPage]] and [[NoSuch]].")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
@@ -118,17 +118,12 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
       Note matched =
-          makeMe
-              .aNote()
-              .title("Target Title")
-              .creator(user)
-              .inNotebook(root.getNotebook())
-              .please();
+          makeMe.aNote().title("Target Title").creator(user).notebook(root.getNotebook()).please();
       Note viewer =
           makeMe
               .aNote()
               .creator(user)
-              .inNotebook(root.getNotebook())
+              .notebook(root.getNotebook())
               .content("Text [[Target Title|friendly label]] end.")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
@@ -147,16 +142,16 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Notebook otherNotebook =
           makeMe.aNotebook().creatorAndOwner(user).name("Other Notebook").please();
-      makeMe.aNote().creator(user).inNotebook(otherNotebook).please();
+      makeMe.aNote().creator(user).notebook(otherNotebook).please();
       Note targetInOther =
-          makeMe.aNote().title("LinkedPage").creator(user).inNotebook(otherNotebook).please();
+          makeMe.aNote().title("LinkedPage").creator(user).notebook(otherNotebook).please();
       Notebook mainNotebook = makeMe.aNotebook().creatorAndOwner(user).name("Main").please();
-      makeMe.aNote().creator(user).inNotebook(mainNotebook).please();
+      makeMe.aNote().creator(user).notebook(mainNotebook).please();
       Note viewer =
           makeMe
               .aNote()
               .creator(user)
-              .inNotebook(mainNotebook)
+              .notebook(mainNotebook)
               .content("See [[Other Notebook:LinkedPage]] for more.")
               .please();
       wikiTitleCacheService.refreshForNote(viewer, user);
@@ -178,7 +173,7 @@ class NoteControllerTests extends ControllerTestBase {
               .aNote()
               .title("FrontmatterTarget")
               .creator(user)
-              .inNotebook(root.getNotebook())
+              .notebook(root.getNotebook())
               .please();
       String markdown =
           "---\n"
@@ -186,7 +181,7 @@ class NoteControllerTests extends ControllerTestBase {
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
       Note viewer =
-          makeMe.aNote().creator(user).inNotebook(root.getNotebook()).content(markdown).please();
+          makeMe.aNote().creator(user).notebook(root.getNotebook()).content(markdown).please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
@@ -341,7 +336,7 @@ class NoteControllerTests extends ControllerTestBase {
           makeMe
               .aNote("child")
               .creator(currentUser.getUser())
-              .inNotebook(subject.getNotebook())
+              .notebook(subject.getNotebook())
               .please();
     }
 
@@ -364,12 +359,12 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
         throws UnexpectedNoAccessRightException {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note target = makeMe.aNote("Target").inNotebook(nb).please();
+      Note target = makeMe.aNote("Target").notebook(nb).please();
       Note referrer =
           makeMe
               .aNote("Referrer")
               .creator(currentUser.getUser())
-              .inNotebook(nb)
+              .notebook(nb)
               .content(
                   "---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
               .please();

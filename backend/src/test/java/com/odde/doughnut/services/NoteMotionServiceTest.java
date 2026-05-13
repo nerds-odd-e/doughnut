@@ -29,9 +29,9 @@ public class NoteMotionServiceTest {
   void executeMoveIntoFolder_setsFolderAndNotebook() {
     User user = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    makeMe.aRootNote("root").inNotebook(notebook).please();
+    makeMe.aRootNote("root").notebook(notebook).please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("Dest").please();
-    Note mover = makeMe.aNote("mover").inNotebook(notebook).please();
+    Note mover = makeMe.aNote("mover").notebook(notebook).please();
     makeMe.entityPersister.flush();
 
     noteMotionService.executeMoveIntoFolder(mover, folder);
@@ -45,11 +45,11 @@ public class NoteMotionServiceTest {
   void executeMoveIntoFolder_includesNoteAmongFolderPeers() {
     User user = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    makeMe.aRootNote("root").inNotebook(notebook).please();
+    makeMe.aRootNote("root").notebook(notebook).please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("box").please();
-    Note n1 = makeMe.aNote("n1").inNotebook(notebook).please();
-    Note n2 = makeMe.aNote("n2").inNotebook(notebook).please();
-    Note mover = makeMe.aNote("mv").inNotebook(notebook).please();
+    Note n1 = makeMe.aNote("n1").notebook(notebook).please();
+    Note n2 = makeMe.aNote("n2").notebook(notebook).please();
+    Note mover = makeMe.aNote("mv").notebook(notebook).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(n1, folder);
     noteMotionService.executeMoveIntoFolder(n2, folder);
@@ -66,10 +66,10 @@ public class NoteMotionServiceTest {
   void executeMoveToNotebookRoot_placesNoteInNotebookRoot() {
     User user = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    makeMe.aRootNote("root").inNotebook(notebook).please();
-    makeMe.aNote("peer").inNotebook(notebook).please();
+    makeMe.aRootNote("root").notebook(notebook).please();
+    makeMe.aNote("peer").notebook(notebook).please();
     Folder folder = makeMe.aFolder().notebook(notebook).name("f").please();
-    Note mover = makeMe.aNote("mv").inNotebook(notebook).please();
+    Note mover = makeMe.aNote("mv").notebook(notebook).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(mover, folder);
     makeMe.entityPersister.flush();

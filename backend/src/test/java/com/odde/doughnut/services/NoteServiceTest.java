@@ -55,9 +55,9 @@ public class NoteServiceTest {
     void shouldNotCascadeSoftDeleteToStructuralChildNotes() {
       User u = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
-      Note parent = makeMe.aNote().inNotebook(notebook).please();
-      Note subject = makeMe.aNote().inNotebook(notebook).please();
-      Note child = makeMe.aNote("child").inNotebook(notebook).please();
+      Note parent = makeMe.aNote().notebook(notebook).please();
+      Note subject = makeMe.aNote().notebook(notebook).please();
+      Note child = makeMe.aNote("child").notebook(notebook).please();
 
       noteService.destroy(subject);
 

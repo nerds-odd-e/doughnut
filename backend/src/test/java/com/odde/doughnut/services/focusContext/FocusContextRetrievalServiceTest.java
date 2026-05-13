@@ -707,9 +707,9 @@ class FocusContextRetrievalServiceTest {
     void largeNotebookRootSampleSiblingsCappedAtSix() {
       User viewer = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
-      Note focus = makeMe.aNote().inNotebook(nb).please();
+      Note focus = makeMe.aNote().notebook(nb).please();
       for (int i = 0; i < 22; i++) {
-        makeMe.aNote().inNotebook(nb).please();
+        makeMe.aNote().notebook(nb).please();
       }
 
       FocusContextResult result =
@@ -758,8 +758,8 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void folderSiblingIsNotWikiExpansionFrontier() {
-      Note focus = makeMe.aNote().title("RootFS").content("[[MidFS]].").please();
-      User viewer = focus.getCreator();
+      User viewer = makeMe.aUser().please();
+      Note focus = makeMe.aNote().creator(viewer).title("RootFS").content("[[MidFS]].").please();
       Notebook nb = focus.getNotebook();
       Folder folderB = makeMe.aFolder().notebook(nb).please();
       Note mid =

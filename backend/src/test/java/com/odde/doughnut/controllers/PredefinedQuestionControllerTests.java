@@ -50,12 +50,12 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @BeforeEach
     void setUp() {
       Notebook readingNb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note rootNote = makeMe.aRootNote("My reading list").inNotebook(readingNb).please();
+      Note rootNote = makeMe.aRootNote("My reading list").notebook(readingNb).please();
       makeMe.theNote(rootNote).withNChildren(10).please();
       noteWithoutQuestions =
-          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").inNotebook(readingNb).please();
+          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").notebook(readingNb).please();
       Notebook lilaNb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note lila = makeMe.aNote("Lila").inNotebook(lilaNb).please();
+      Note lila = makeMe.aNote("Lila").notebook(lilaNb).please();
       noteWithQuestions = makeMe.theNote(lila).hasAPredefinedQuestion().please();
     }
 

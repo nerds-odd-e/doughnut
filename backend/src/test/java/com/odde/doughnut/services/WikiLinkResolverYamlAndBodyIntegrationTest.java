@@ -25,8 +25,8 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note parent = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
-    Note child = makeMe.aNote().title("Child").inNotebook(notebook).please();
+    Note parent = makeMe.aNote().title("Alpha").notebook(notebook).please();
+    Note child = makeMe.aNote().title("Child").notebook(notebook).please();
     child.setContent("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
     makeMe.entityPersister.merge(child);
     makeMe.entityPersister.flush();
@@ -38,9 +38,8 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   void wikiLinkResolver_findsPlainWikiLinkInBody() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note parent = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
-    Note child =
-        makeMe.aNote().title("Child").inNotebook(notebook).content("See [[Alpha]]").please();
+    Note parent = makeMe.aNote().title("Alpha").notebook(notebook).please();
+    Note child = makeMe.aNote().title("Child").notebook(notebook).content("See [[Alpha]]").please();
     makeMe.entityPersister.flush();
     makeMe.entityPersister.refresh(parent);
 
@@ -51,12 +50,12 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   void wikiLinkResolver_resolvesTargetBeforePipe() {
     User owner = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note parent = makeMe.aNote().title("Alpha").inNotebook(notebook).please();
+    Note parent = makeMe.aNote().title("Alpha").notebook(notebook).please();
     Note child =
         makeMe
             .aNote()
             .title("Child")
-            .inNotebook(notebook)
+            .notebook(notebook)
             .content("See [[Alpha|friendly alias]]")
             .please();
     makeMe.entityPersister.flush();

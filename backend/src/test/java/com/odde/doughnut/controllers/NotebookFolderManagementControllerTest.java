@@ -110,7 +110,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       User owner = currentUser.getUser();
       Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
       Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
-      Note noteInB = makeMe.aNote("Only B").inNotebook(nbB).please();
+      Note noteInB = makeMe.aNote("Only B").notebook(nbB).please();
 
       FolderCreationRequest req = new FolderCreationRequest();
       req.setName("Bad");

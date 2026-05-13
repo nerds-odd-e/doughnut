@@ -134,7 +134,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Note inScopeA = makeMe.aNote("In Scope A").folder(scope).please();
       Note inScopeB = makeMe.aNote("In Scope B").folder(scope).please();
       Note elsewhere = makeMe.aNote("Elsewhere").folder(other).please();
-      Note atRoot = makeMe.aNote("At Root").inNotebook(nb).please();
+      Note atRoot = makeMe.aNote("At Root").notebook(nb).please();
 
       FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(
@@ -194,7 +194,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder fDt = makeMe.aFolder().notebook(nb).name("Descendants Test").please();
       Folder fParent = makeMe.aFolder().parentFolder(fDt).name("parent").please();
       Folder fChild = makeMe.aFolder().parentFolder(fParent).name("child").please();
-      makeMe.aNote("Descendants Test").inNotebook(nb).please();
+      makeMe.aNote("Descendants Test").notebook(nb).please();
       makeMe.aNote("parent").folder(fDt).please();
       Note noteChild = makeMe.aNote("child").folder(fParent).please();
       makeMe.aNote("Unit Test").folder(fChild).please();

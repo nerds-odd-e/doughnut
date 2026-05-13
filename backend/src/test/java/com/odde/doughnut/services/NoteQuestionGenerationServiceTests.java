@@ -91,8 +91,8 @@ class NoteQuestionGenerationServiceTests {
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().inNotebook(nb).please();
-      makeMe.aNote().inNotebook(nb).please();
+      Note noteInScope = makeMe.aNote().notebook(nb).please();
+      makeMe.aNote().notebook(nb).please();
 
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
@@ -170,10 +170,10 @@ class NoteQuestionGenerationServiceTests {
       Note noteInScope =
           makeMe
               .aNote()
-              .inNotebook(nb)
+              .notebook(nb)
               .content("A note with enough body text to appear in the focus context.")
               .please();
-      makeMe.aNote().inNotebook(nb).please();
+      makeMe.aNote().notebook(nb).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -194,8 +194,8 @@ class NoteQuestionGenerationServiceTests {
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().inNotebook(nb).please();
-      makeMe.aNote().inNotebook(nb).please();
+      Note noteInScope = makeMe.aNote().notebook(nb).please();
+      makeMe.aNote().notebook(nb).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -263,8 +263,8 @@ class NoteQuestionGenerationServiceTests {
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().inNotebook(nb).please();
-      makeMe.aNote().inNotebook(nb).please();
+      Note noteInScope = makeMe.aNote().notebook(nb).please();
+      makeMe.aNote().notebook(nb).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(

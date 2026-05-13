@@ -47,13 +47,13 @@ class NoteRealmServiceTest {
   void defaultNotebook() {
     user = makeMe.aUser().please();
     notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    root = makeMe.aNote().inNotebook(notebook).please();
+    root = makeMe.aNote().notebook(notebook).please();
   }
 
   @Test
   void wiki_titles_empty_when_content_has_links_but_cache_not_refreshed() {
-    makeMe.aNote().title("LinkedPage").inNotebook(notebook).please();
-    Note carrier = makeMe.aNote().inNotebook(notebook).content("[[LinkedPage]]").please();
+    makeMe.aNote().title("LinkedPage").notebook(notebook).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content("[[LinkedPage]]").please();
 
     assertThat(noteRealmService.build(carrier, user).getWikiTitles(), empty());
   }
@@ -62,11 +62,11 @@ class NoteRealmServiceTest {
   void omits_cached_target_when_viewer_cannot_read_target_notebook() {
     User otherUser = makeMe.aUser().please();
     Notebook secretNb = makeMe.aNotebook().creatorAndOwner(otherUser).name("SecretNb").please();
-    Note hidden = makeMe.aNote().title("Hidden").inNotebook(secretNb).please();
+    Note hidden = makeMe.aNote().title("Hidden").notebook(secretNb).please();
 
     User viewer = makeMe.aUser().please();
     Notebook viewerNb = makeMe.aNotebook().creatorAndOwner(viewer).please();
-    Note carrier = makeMe.aNote().inNotebook(viewerNb).content("plain").please();
+    Note carrier = makeMe.aNote().notebook(viewerNb).content("plain").please();
 
     persistWikiLink(carrier, hidden, "SecretNb:Hidden");
 
@@ -75,8 +75,8 @@ class NoteRealmServiceTest {
 
   @Test
   void omits_cached_target_when_target_note_is_soft_deleted() {
-    Note target = makeMe.aNote().title("Target").creator(user).inNotebook(notebook).please();
-    Note carrier = makeMe.aNote().inNotebook(notebook).content("[[Target]]").please();
+    Note target = makeMe.aNote().title("Target").creator(user).notebook(notebook).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content("[[Target]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     softDelete(target);
@@ -86,8 +86,8 @@ class NoteRealmServiceTest {
 
   @Test
   void references_empty_when_cache_rows_deleted_for_relation_carrier() {
-    Note focal = makeMe.aNote().title("Focal").inNotebook(notebook).please();
-    Note subject = makeMe.aNote().inNotebook(notebook).please();
+    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
+    Note subject = makeMe.aNote().notebook(notebook).please();
     Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
@@ -96,8 +96,8 @@ class NoteRealmServiceTest {
 
   @Test
   void body_wikilink_carrier_in_references() {
-    Note focal = makeMe.aNote().title("Focal").creator(user).inNotebook(notebook).please();
-    Note carrier = makeMe.aNote().creator(user).inNotebook(notebook).content("[[Focal]]").please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).notebook(notebook).please();
+    Note carrier = makeMe.aNote().creator(user).notebook(notebook).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -108,8 +108,8 @@ class NoteRealmServiceTest {
 
   @Test
   void parent_yaml_carrier_appears_in_references() {
-    Note focal = makeMe.aNote().title("Focal").creator(user).inNotebook(notebook).please();
-    Note carrier = makeMe.aNote().title("Child").creator(user).inNotebook(notebook).please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).notebook(notebook).please();
+    Note carrier = makeMe.aNote().title("Child").creator(user).notebook(notebook).please();
     carrier.setContent("---\nparent: \"[[Focal]]\"\n---\n\nBody.");
     makeMe.entityPersister.merge(carrier);
     makeMe.entityPersister.flush();
@@ -123,8 +123,8 @@ class NoteRealmServiceTest {
 
   @Test
   void references_omit_soft_deleted_relation_even_if_cache_row_remains() {
-    Note focal = makeMe.aNote().title("Focal").inNotebook(notebook).please();
-    Note subject = makeMe.aNote().inNotebook(notebook).please();
+    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
+    Note subject = makeMe.aNote().notebook(notebook).please();
     Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
     relation.setContent(
         RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
@@ -149,9 +149,9 @@ class NoteRealmServiceTest {
     User focalOwner = makeMe.aUser().please();
     User carrierOwner = carrierSharesOwnerWithViewer ? focalOwner : makeMe.aUser().please();
     Notebook mainNb = makeMe.aNotebook().creatorAndOwner(focalOwner).name("MainNb").please();
-    Note focal = makeMe.aNote().title("Focal").creator(focalOwner).inNotebook(mainNb).please();
+    Note focal = makeMe.aNote().title("Focal").creator(focalOwner).notebook(mainNb).please();
     Notebook otherNb = makeMe.aNotebook().creatorAndOwner(carrierOwner).name("OtherNb").please();
-    Note carrier = makeMe.aNote().creator(carrierOwner).inNotebook(otherNb).please();
+    Note carrier = makeMe.aNote().creator(carrierOwner).notebook(otherNb).please();
 
     persistWikiLink(carrier, focal, "MainNb:Focal");
 
@@ -165,8 +165,8 @@ class NoteRealmServiceTest {
 
   @Test
   void references_omit_soft_deleted_carrier_even_if_cache_row_remains() {
-    Note focal = makeMe.aNote().title("Focal").inNotebook(notebook).please();
-    Note carrier = makeMe.aNote().inNotebook(notebook).content("[[Focal]]").please();
+    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     softDelete(carrier);
@@ -176,8 +176,8 @@ class NoteRealmServiceTest {
 
   @Test
   void references_dedupe_multiple_cache_rows_for_same_carrier_note() {
-    Note focal = makeMe.aNote().title("Focal").creator(user).inNotebook(notebook).please();
-    Note carrier = makeMe.aNote().creator(user).inNotebook(notebook).please();
+    Note focal = makeMe.aNote().title("Focal").creator(user).notebook(notebook).please();
+    Note carrier = makeMe.aNote().creator(user).notebook(notebook).please();
 
     persistWikiLink(carrier, focal, "one");
     persistWikiLink(carrier, focal, "two");
@@ -213,7 +213,7 @@ class NoteRealmServiceTest {
     String indexContent =
         "---\ntitle_pattern: \"{{date}}\"\nquestion_generation_instruction: Focus on definitions\n---\n";
     makeMe.theNotebook(notebook).indexContent(indexContent).please();
-    Note normal = makeMe.aNote().inNotebook(notebook).please();
+    Note normal = makeMe.aNote().notebook(notebook).please();
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
@@ -231,7 +231,7 @@ class NoteRealmServiceTest {
   void index_note_content_recognizes_title_pattern_key_aliases(String key, String value) {
     String indexContent = "---\n" + key + ": \"" + value + "\"\n---\n";
     makeMe.theNotebook(notebook).indexContent(indexContent).please();
-    Note normal = makeMe.aNote().inNotebook(notebook).please();
+    Note normal = makeMe.aNote().notebook(notebook).please();
 
     assertThat(noteRealmService.build(normal, user).getIndexNoteContent(), equalTo(indexContent));
   }
@@ -243,7 +243,7 @@ class NoteRealmServiceTest {
   })
   void scoped_question_instruction_recognizes_instruction_key_aliases(String key, String text) {
     makeMe.theNotebook(notebook).indexContent("---\n" + key + ": \"" + text + "\"\n---\n").please();
-    Note normal = makeMe.aNote().inNotebook(notebook).please();
+    Note normal = makeMe.aNote().notebook(notebook).please();
 
     assertThat(
         noteRealmService.resolveScopedQuestionGenerationInstruction(normal),
@@ -314,7 +314,7 @@ class NoteRealmServiceTest {
 
   @Test
   void scoped_metadata_absent_when_notebook_has_no_matching_frontmatter() {
-    Note normal = makeMe.aNote().inNotebook(notebook).please();
+    Note normal = makeMe.aNote().notebook(notebook).please();
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
@@ -327,12 +327,12 @@ class NoteRealmServiceTest {
   void index_note_titled_for_deletion_does_not_supply_scoped_metadata() {
     makeMe
         .aNote()
-        .inNotebook(notebook)
+        .notebook(notebook)
         .title("index_to_be_deleted")
         .content(
             "---\ntitle_pattern: \"{{date}}\"\nquestion_generation_instruction: should not appear\n---\n")
         .please();
-    Note normal = makeMe.aNote().inNotebook(notebook).please();
+    Note normal = makeMe.aNote().notebook(notebook).please();
 
     NoteRealm realm = noteRealmService.build(normal, user);
 

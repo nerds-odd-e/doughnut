@@ -35,7 +35,7 @@ class NoteSearchServiceExactMatchTest {
   void setup() {
     user = makeMe.aUser().please();
     searchNotebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    parentNote = makeMe.aNote().inNotebook(searchNotebook).please();
+    parentNote = makeMe.aNote().notebook(searchNotebook).please();
   }
 
   @Nested
@@ -43,10 +43,10 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldPutExactMatchFirstWhenSearching() {
-      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
-      makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
-      makeMe.aNote("Clonazepam").inNotebook(searchNotebook).please();
-      Note exactMatch = makeMe.aNote("Pam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Diazepam").notebook(searchNotebook).please();
+      makeMe.aNote("Lorazepam").notebook(searchNotebook).please();
+      makeMe.aNote("Clonazepam").notebook(searchNotebook).please();
+      Note exactMatch = makeMe.aNote("Pam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -62,11 +62,11 @@ class NoteSearchServiceExactMatchTest {
     void shouldPutMultipleExactMatchesFirstWhenSearching() {
       Folder folder1 = makeMe.aFolder().notebook(searchNotebook).name("f1").please();
       Folder folder2 = makeMe.aFolder().notebook(searchNotebook).name("f2").please();
-      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Diazepam").notebook(searchNotebook).please();
       Note exactMatch1 = makeMe.aNote("Pam").folder(folder1).please();
-      makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Lorazepam").notebook(searchNotebook).please();
       Note exactMatch2 = makeMe.aNote("pam").folder(folder2).please();
-      makeMe.aNote("Clonazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Clonazepam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -83,9 +83,9 @@ class NoteSearchServiceExactMatchTest {
     @Test
     void shouldIncludeExactMatchesEvenWhenMoreThan20PartialMatches() {
       for (int i = 0; i < 25; i++) {
-        makeMe.aNote("Diazepam" + i).inNotebook(searchNotebook).please();
+        makeMe.aNote("Diazepam" + i).notebook(searchNotebook).please();
       }
-      Note exactMatch = makeMe.aNote("Pam").inNotebook(searchNotebook).please();
+      Note exactMatch = makeMe.aNote("Pam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -99,9 +99,9 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldHandleCaseInsensitiveExactMatching() {
-      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
-      Note exactMatch = makeMe.aNote("PAM").inNotebook(searchNotebook).please();
-      makeMe.aNote("Lorazepam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Diazepam").notebook(searchNotebook).please();
+      Note exactMatch = makeMe.aNote("PAM").notebook(searchNotebook).please();
+      makeMe.aNote("Lorazepam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
       List<RelationshipLiteralSearchHit> results =
@@ -115,8 +115,8 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldHandleEmptySearchKey() {
-      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
-      makeMe.aNote("Pam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Diazepam").notebook(searchNotebook).please();
+      makeMe.aNote("Pam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("");
       List<RelationshipLiteralSearchHit> results =
@@ -127,8 +127,8 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldHandleWhitespaceOnlySearchKey() {
-      makeMe.aNote("Diazepam").inNotebook(searchNotebook).please();
-      makeMe.aNote("Pam").inNotebook(searchNotebook).please();
+      makeMe.aNote("Diazepam").notebook(searchNotebook).please();
+      makeMe.aNote("Pam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("   ");
       List<RelationshipLiteralSearchHit> results =
@@ -139,10 +139,10 @@ class NoteSearchServiceExactMatchTest {
 
     @Test
     void shouldPrioritizeSameNotebookWhenDistancesAreEqual() {
-      Note sameNotebookNote = makeMe.aNote("MatchInSame").inNotebook(searchNotebook).please();
+      Note sameNotebookNote = makeMe.aNote("MatchInSame").notebook(searchNotebook).please();
       Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote("Other Head").inNotebook(otherNb).please();
-      Note otherNotebookNote = makeMe.aNote("MatchInOther").inNotebook(otherNb).please();
+      makeMe.aNote("Other Head").notebook(otherNb).please();
+      Note otherNotebookNote = makeMe.aNote("MatchInOther").notebook(otherNb).please();
 
       searchTerm.setSearchKey("Match");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);

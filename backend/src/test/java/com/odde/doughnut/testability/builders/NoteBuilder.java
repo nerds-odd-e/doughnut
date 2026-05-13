@@ -45,10 +45,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
     notebook.setCreatedAt(ts);
     notebook.setUpdatedAt(ts);
     notebook.setName(notebookTestNameCounter.generate());
-    return inNotebook(notebook);
+    return notebook(notebook);
   }
 
-  public NoteBuilder inNotebook(Notebook notebook) {
+  public NoteBuilder notebook(Notebook notebook) {
     if (entity.getNotebook() == null) {
       entity.assignNotebook(notebook);
       return this;
@@ -77,7 +77,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder underSameNotebookAs(Note note) {
-    inNotebook(note.getNotebook());
+    notebook(note.getNotebook());
     note.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
     return this;
   }
@@ -123,7 +123,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
       throw new AssertionError(
           "Don't set folder and notebook at the same time. It leads to inconsistency in test.");
     }
-    inNotebook(folder.getNotebook());
+    notebook(folder.getNotebook());
     this.folder = folder;
     return this;
   }

@@ -41,7 +41,7 @@ public class UserModelSearchTest {
   void setup() {
     user = makeMe.aUser().please();
     notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    note = makeMe.aNote().inNotebook(notebook).please();
+    note = makeMe.aNote().notebook(notebook).please();
     anotherUser = makeMe.aUser().please();
   }
 
@@ -62,7 +62,7 @@ public class UserModelSearchTest {
 
   @Test
   void theSearchIsCaseInsensitive() {
-    Note anotherNote = makeMe.aNote("Some Note").inNotebook(notebook).please();
+    Note anotherNote = makeMe.aNote("Some Note").notebook(notebook).please();
     searchTerm.setSearchKey("not");
     NoteTopology expected = anotherNote.getNoteTopology();
     assertThat(
@@ -74,7 +74,7 @@ public class UserModelSearchTest {
 
   @Test
   void theSearchResultShouldNotIncludeSoftDeletedNote() {
-    makeMe.aNote("Some Note").inNotebook(notebook).softDeleted().please();
+    makeMe.aNote("Some Note").notebook(notebook).softDeleted().please();
     searchTerm.setSearchKey("not");
     assertTrue(search().isEmpty());
   }
@@ -83,7 +83,7 @@ public class UserModelSearchTest {
   void searchResultShouldNotExceedTwenty() {
     String commonTitle = "CommonTitle";
     for (int i = 0; i < 25; i++) {
-      makeMe.aNote(commonTitle + i).inNotebook(notebook).please();
+      makeMe.aNote(commonTitle + i).notebook(notebook).please();
     }
     searchTerm.setSearchKey("CommonTitle");
     assertThat(RelationshipLiteralSearchHits.noteMatches(search()).size(), lessThanOrEqualTo(20));
@@ -111,10 +111,10 @@ public class UserModelSearchTest {
     @BeforeEach
     void setup() {
       noteInTheSameNotebook =
-          makeMe.aNote(commonPhrase + " same notebook").inNotebook(notebook).please();
+          makeMe.aNote(commonPhrase + " same notebook").notebook(notebook).please();
       Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();
       noteFromMyOtherNotebook =
-          makeMe.aNote(commonPhrase + " other notebook").inNotebook(otherNb).please();
+          makeMe.aNote(commonPhrase + " other notebook").notebook(otherNb).please();
       Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();
       circleNote = makeMe.aNote(commonPhrase + " circle").inCircle(circle).please();
     }

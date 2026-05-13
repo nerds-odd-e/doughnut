@@ -54,7 +54,7 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
   void createNoteAtNotebookRootReturns409WhenTitleDuplicatesAtRoot() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    makeMe.aNote().inNotebook(nb).title("SameTitle").please();
+    makeMe.aNote().notebook(nb).title("SameTitle").please();
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("SameTitle");
@@ -131,7 +131,7 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
   void renamingNoteToIndexReturns400() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note note = makeMe.aNote().inNotebook(nb).title("original").please();
+    Note note = makeMe.aNote().notebook(nb).title("original").please();
 
     NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
     dto.setNewTitle("index");
