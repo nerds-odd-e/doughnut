@@ -261,7 +261,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    if (notebook.getCreatorEntity().getId() != authorizationService.getCurrentUser().getId()) {
+    if (notebook.getCreator().getId() != authorizationService.getCurrentUser().getId()) {
       throw new UnexpectedNoAccessRightException();
     }
     notebook.setOwnership(circle.getOwnership());

@@ -36,7 +36,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (entity.getNotebook() != null)
       throw new AssertionError("Can add notebook for `" + entity + "`, a notebook already exist.");
     Notebook notebook = new Notebook();
-    notebook.setCreatorEntity(null);
+    notebook.setCreator(null);
     notebook.setOwnership(ownership);
     Timestamp ts =
         entity.getCreatedAt() != null
@@ -94,15 +94,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (entity.getNotebook() == null) {
       attachToNewNotebook(entity.getCreator().getOwnership());
     }
-    if (entity.getNotebook().getCreatorEntity() == null) {
-      entity.getNotebook().setCreatorEntity(entity.getCreator());
-    }
-    if (entity.getNotebook().getOwnership() == null) {
-      entity.getNotebook().setOwnership(entity.getCreator().getOwnership());
-    }
-    if (entity.getNotebook().getId() == null && needPersist) {
-      makeMe.entityPersister.save(entity.getNotebook());
-    }
+    NotebookBuilder notebookBuilder = new NotebookBuilder(entity.getNotebook(), makeMe);
+    entity.assignNotebook(notebookBuilder.please(needPersist));
     if (folder != null) {
       entity.setFolder(folder);
     }

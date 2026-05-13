@@ -46,8 +46,7 @@ class NotebookTest {
   class NotebookMetadataTests {
     @Test
     void shouldReturnCorrectCreatorId() {
-      assertThat(notebook.getCreatorId())
-          .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
+      assertThat(notebook.getCreatorId()).isEqualTo(notebook.getCreator().getExternalIdentifier());
     }
   }
 }

@@ -8,19 +8,14 @@ import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class NotebookBuilder extends EntityBuilder<Notebook> {
-  private final boolean existingNotebook;
   private BookBuilder bookAttachment;
 
   public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
     super(makeMe, notebook != null ? notebook : new Notebook());
-    this.existingNotebook = notebook != null;
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (existingNotebook) {
-      return;
-    }
     Timestamp now = new Timestamp(System.currentTimeMillis());
     if (entity.getCreatedAt() == null) {
       entity.setCreatedAt(now);
@@ -31,12 +26,11 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     if (entity.getName() == null || entity.getName().isBlank()) {
       entity.setName(NoteBuilder.notebookTestNameCounter.generate());
     }
-    if (entity.getCreatorEntity() == null && entity.getOwnership() == null) {
-      User user = makeMe.aUser().please(needPersist);
-      entity.setCreatorEntity(user);
-      entity.setOwnership(user.getOwnership());
-    } else if (entity.getOwnership() == null) {
-      entity.setOwnership(entity.getCreatorEntity().getOwnership());
+    if (entity.getCreator() == null) {
+      entity.setCreator(makeMe.aUser().please(needPersist));
+    }
+    if (entity.getOwnership() == null) {
+      entity.setOwnership(makeMe.aUser().please(needPersist).getOwnership());
     }
   }
 
@@ -55,7 +49,7 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   public NotebookBuilder creatorAndOwner(User user) {
     entity.setOwnership(user.getOwnership());
-    entity.setCreatorEntity(user);
+    entity.setCreator(user);
     return this;
   }
 

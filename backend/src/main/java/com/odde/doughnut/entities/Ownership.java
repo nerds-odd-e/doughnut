@@ -58,7 +58,7 @@ public class Ownership {
   public Notebook prepareNotebookForNewNotebook(
       User creator, Timestamp currentUTCTimestamp, String titleConstructor, String description) {
     Notebook notebook = new Notebook();
-    notebook.setCreatorEntity(creator);
+    notebook.setCreator(creator);
     notebook.setOwnership(this);
     notebook.setUpdatedAt(currentUTCTimestamp);
     notebook.setCreatedAt(currentUTCTimestamp);

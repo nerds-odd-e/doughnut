@@ -29,7 +29,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   @Getter
   @Setter
-  private User creatorEntity;
+  private User creator;
 
   @OneToOne
   @JoinColumn(name = "ownership_id")
@@ -113,7 +113,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   }
 
   public String getCreatorId() {
-    return creatorEntity.getExternalIdentifier();
+    return creator.getExternalIdentifier();
   }
 
   public Circle getCircle() {
