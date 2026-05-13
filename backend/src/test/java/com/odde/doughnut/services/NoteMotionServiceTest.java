@@ -27,9 +27,10 @@ public class NoteMotionServiceTest {
   @Test
   void executeMoveIntoFolder_setsFolderAndNotebook() {
     User user = makeMe.aUser().please();
-    Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
+    Note root = makeMe.aRootNote("root").notebookCreatorAndOwner(user).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("Dest").please();
-    Note mover = makeMe.aNote("mover").creatorAndOwner(user).underSameNotebookAs(root).please();
+    Note mover =
+        makeMe.aNote("mover").notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
     makeMe.entityPersister.flush();
 
     noteMotionService.executeMoveIntoFolder(mover, folder);
@@ -42,11 +43,12 @@ public class NoteMotionServiceTest {
   @Test
   void executeMoveIntoFolder_includesNoteAmongFolderPeers() {
     User user = makeMe.aUser().please();
-    Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
+    Note root = makeMe.aRootNote("root").notebookCreatorAndOwner(user).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("box").please();
-    Note n1 = makeMe.aNote("n1").creatorAndOwner(user).underSameNotebookAs(root).please();
-    Note n2 = makeMe.aNote("n2").creatorAndOwner(user).underSameNotebookAs(root).please();
-    Note mover = makeMe.aNote("mv").creatorAndOwner(user).underSameNotebookAs(root).please();
+    Note n1 = makeMe.aNote("n1").notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
+    Note n2 = makeMe.aNote("n2").notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
+    Note mover =
+        makeMe.aNote("mv").notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(n1, folder);
     noteMotionService.executeMoveIntoFolder(n2, folder);
@@ -62,10 +64,11 @@ public class NoteMotionServiceTest {
   @Test
   void executeMoveToNotebookRoot_placesNoteInNotebookRoot() {
     User user = makeMe.aUser().please();
-    Note root = makeMe.aRootNote("root").creatorAndOwner(user).please();
-    makeMe.aNote("peer").creatorAndOwner(user).underSameNotebookAs(root).please();
+    Note root = makeMe.aRootNote("root").notebookCreatorAndOwner(user).please();
+    makeMe.aNote("peer").notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
     Folder folder = makeMe.aFolder().notebook(root.getNotebook()).name("f").please();
-    Note mover = makeMe.aNote("mv").creatorAndOwner(user).underSameNotebookAs(root).please();
+    Note mover =
+        makeMe.aNote("mv").notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
     makeMe.entityPersister.flush();
     noteMotionService.executeMoveIntoFolder(mover, folder);
     makeMe.entityPersister.flush();

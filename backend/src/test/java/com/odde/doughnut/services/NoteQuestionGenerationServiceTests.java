@@ -86,14 +86,15 @@ class NoteQuestionGenerationServiceTests {
     void shouldPassScopedQuestionGenerationInstructionAsFirstUserMessage()
         throws JsonProcessingException {
       User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note root = makeMe.aNote().notebookCreatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
-      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      Note noteInScope =
+          makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
 
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
@@ -163,7 +164,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldStillIncludeFocusContextAfterDeductingInstructionTokensFromBudget() {
       User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note root = makeMe.aNote().notebookCreatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
       makeMe
           .theNotebook(nb)
@@ -172,11 +173,11 @@ class NoteQuestionGenerationServiceTests {
       Note noteInScope =
           makeMe
               .aNote()
-              .creatorAndOwner(user)
+              .notebookCreatorAndOwner(user)
               .underSameNotebookAs(root)
               .content("A note with enough body text to appear in the focus context.")
               .please();
-      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -192,14 +193,15 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldPlaceScopedQuestionInstructionAsFirstUserMessageBeforeFocusContext() {
       User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note root = makeMe.aNote().notebookCreatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
-      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      Note noteInScope =
+          makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -262,14 +264,15 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
       User user = makeMe.aUser().please();
-      Note root = makeMe.aNote().creatorAndOwner(user).please();
+      Note root = makeMe.aNote().notebookCreatorAndOwner(user).please();
       Notebook nb = root.getNotebook();
       makeMe
           .theNotebook(nb)
           .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
           .please();
-      Note noteInScope = makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
-      makeMe.aNote().creatorAndOwner(user).underSameNotebookAs(root).please();
+      Note noteInScope =
+          makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
+      makeMe.aNote().notebookCreatorAndOwner(user).underSameNotebookAs(root).please();
 
       ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(

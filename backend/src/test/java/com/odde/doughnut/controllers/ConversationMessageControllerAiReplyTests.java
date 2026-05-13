@@ -33,7 +33,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   @BeforeEach
   void setUp() {
     currentUser.setUser(makeMe.aUser().please());
-    note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+    note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
     conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
   }
 
@@ -121,7 +121,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
     @BeforeEach
     void setup() {
-      questionNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      questionNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(questionNote).please();
       recallConversation =

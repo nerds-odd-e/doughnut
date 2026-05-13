@@ -90,7 +90,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void ownerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
       User initiator = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       Conversation conversation = makeMe.aConversation().from(initiator).forANote(note).please();
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
@@ -151,7 +151,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       User noteOwner = makeMe.aUser().please();
-      note = makeMe.aNote().creatorAndOwner(noteOwner).please();
+      note = makeMe.aNote().notebookCreatorAndOwner(noteOwner).please();
     }
 
     @Test
@@ -270,7 +270,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       User noteOwner = makeMe.aUser().please();
-      note = makeMe.aNote().creatorAndOwner(noteOwner).please();
+      note = makeMe.aNote().notebookCreatorAndOwner(noteOwner).please();
       otherUser = makeMe.aUser().please();
     }
 
@@ -353,7 +353,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       note =
           makeMe
               .aNote()
-              .creatorAndOwner(noteOwner)
+              .notebookCreatorAndOwner(noteOwner)
               .title("There are 42 prefectures in Japan")
               .please();
       conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();

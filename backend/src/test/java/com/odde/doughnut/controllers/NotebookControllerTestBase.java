@@ -66,6 +66,6 @@ abstract class NotebookControllerTestBase extends ControllerTestBase {
             });
 
     currentUser.setUser(makeMe.aUser().please());
-    topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+    topNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
   }
 }

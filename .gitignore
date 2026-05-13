@@ -148,4 +148,5 @@ tt/
 
 # SUT background process artifacts
 sut.log
+sut.log.*
 sut.pid

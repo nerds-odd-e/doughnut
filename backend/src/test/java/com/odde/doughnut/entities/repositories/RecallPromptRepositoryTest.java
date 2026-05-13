@@ -31,7 +31,7 @@ public class RecallPromptRepositoryTest {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().creatorAndOwner(user).please();
+    note = makeMe.aNote().notebookCreatorAndOwner(user).please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
     now = makeMe.aTimestamp().of(15, 8).fromShanghai().please();
     twoWeeksAgo = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -115,7 +115,7 @@ public class RecallPromptRepositoryTest {
 
     @Test
     void shouldOnlyCountAnswersForSpecificNote() {
-      Note otherNote = makeMe.aNote().creatorAndOwner(user).please();
+      Note otherNote = makeMe.aNote().notebookCreatorAndOwner(user).please();
       MemoryTracker otherTracker = makeMe.aMemoryTrackerFor(otherNote).by(user).please();
 
       makeMe

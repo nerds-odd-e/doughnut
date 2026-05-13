@@ -132,12 +132,27 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       User user = currentUser.getUser();
 
       Note inScopeA =
-          makeMe.aNote("In Scope A").inNotebook(nb).creatorAndOwner(user).folder(scope).please();
+          makeMe
+              .aNote("In Scope A")
+              .inNotebook(nb)
+              .notebookCreatorAndOwner(user)
+              .folder(scope)
+              .please();
       Note inScopeB =
-          makeMe.aNote("In Scope B").inNotebook(nb).creatorAndOwner(user).folder(scope).please();
+          makeMe
+              .aNote("In Scope B")
+              .inNotebook(nb)
+              .notebookCreatorAndOwner(user)
+              .folder(scope)
+              .please();
       Note elsewhere =
-          makeMe.aNote("Elsewhere").inNotebook(nb).creatorAndOwner(user).folder(other).please();
-      Note atRoot = makeMe.aNote("At Root").inNotebook(nb).creatorAndOwner(user).please();
+          makeMe
+              .aNote("Elsewhere")
+              .inNotebook(nb)
+              .notebookCreatorAndOwner(user)
+              .folder(other)
+              .please();
+      Note atRoot = makeMe.aNote("At Root").inNotebook(nb).notebookCreatorAndOwner(user).please();
 
       FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(
@@ -197,11 +212,21 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Folder fDt = makeMe.aFolder().notebook(nb).name("Descendants Test").please();
       Folder fParent = makeMe.aFolder().notebook(nb).parentFolder(fDt).name("parent").please();
       Folder fChild = makeMe.aFolder().notebook(nb).parentFolder(fParent).name("child").please();
-      makeMe.aNote("Descendants Test").inNotebook(nb).creatorAndOwner(owner).please();
-      makeMe.aNote("parent").inNotebook(nb).creatorAndOwner(owner).folder(fDt).please();
+      makeMe.aNote("Descendants Test").inNotebook(nb).notebookCreatorAndOwner(owner).please();
+      makeMe.aNote("parent").inNotebook(nb).notebookCreatorAndOwner(owner).folder(fDt).please();
       Note noteChild =
-          makeMe.aNote("child").inNotebook(nb).creatorAndOwner(owner).folder(fParent).please();
-      makeMe.aNote("Unit Test").inNotebook(nb).creatorAndOwner(owner).folder(fChild).please();
+          makeMe
+              .aNote("child")
+              .inNotebook(nb)
+              .notebookCreatorAndOwner(owner)
+              .folder(fParent)
+              .please();
+      makeMe
+          .aNote("Unit Test")
+          .inNotebook(nb)
+          .notebookCreatorAndOwner(owner)
+          .folder(fChild)
+          .please();
 
       noteService.destroy(noteChild);
       makeMe.entityPersister.flush();
@@ -446,7 +471,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotAllowUnauthorizedUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebookIndex(note.getNotebook()));

@@ -32,7 +32,7 @@ class NoteSearchServiceExactMatchTest {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    parentNote = makeMe.aNote().creatorAndOwner(user).please();
+    parentNote = makeMe.aNote().notebookCreatorAndOwner(user).please();
   }
 
   @Nested
@@ -139,7 +139,7 @@ class NoteSearchServiceExactMatchTest {
     @Test
     void shouldPrioritizeSameNotebookWhenDistancesAreEqual() {
       Note sameNotebookNote = makeMe.aNote("MatchInSame").underSameNotebookAs(parentNote).please();
-      Note otherNotebookHead = makeMe.aNote("Other Head").creatorAndOwner(user).please();
+      Note otherNotebookHead = makeMe.aNote("Other Head").notebookCreatorAndOwner(user).please();
       Note otherNotebookNote =
           makeMe.aNote("MatchInOther").underSameNotebookAs(otherNotebookHead).please();
 

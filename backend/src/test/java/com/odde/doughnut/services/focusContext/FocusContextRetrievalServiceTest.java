@@ -668,7 +668,7 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe
               .aNote()
-              .creatorAndOwner(viewer)
+              .notebookCreatorAndOwner(viewer)
               .inNotebook(nb)
               .folder(folder)
               .title("FocusCap")
@@ -699,7 +699,7 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe
               .aNote()
-              .creatorAndOwner(viewer)
+              .notebookCreatorAndOwner(viewer)
               .inNotebook(nb)
               .folder(folder)
               .title("FocusSeedSib")
@@ -750,7 +750,7 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe
               .aNote()
-              .creatorAndOwner(viewer)
+              .notebookCreatorAndOwner(viewer)
               .inNotebook(nb)
               .title("RootFocusCap")
               .content("x")
@@ -779,7 +779,7 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe
               .aNote()
-              .creatorAndOwner(viewer)
+              .notebookCreatorAndOwner(viewer)
               .inNotebook(nb)
               .folder(folder)
               .title("TightA")
@@ -787,7 +787,7 @@ class FocusContextRetrievalServiceTest {
               .please();
       makeMe
           .aNote()
-          .creatorAndOwner(viewer)
+          .notebookCreatorAndOwner(viewer)
           .inNotebook(nb)
           .folder(folder)
           .title("TightB")

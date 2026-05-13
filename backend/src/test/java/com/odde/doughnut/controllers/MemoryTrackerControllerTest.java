@@ -46,7 +46,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   class GetThresholdExceeded {
     @Test
     void shouldReturnFalseWhenBelowThreshold() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -69,7 +69,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldReturnTrueWhenAtThreshold() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -92,7 +92,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldReturnTrueWhenAboveThreshold() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
@@ -139,7 +139,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe
               .aNote("moon")
               .content("partner of earth")
-              .creatorAndOwner(currentUser.getUser())
+              .notebookCreatorAndOwner(currentUser.getUser())
               .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
 
@@ -156,7 +156,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe
               .aNote("moon")
               .content("partner of earth")
-              .creatorAndOwner(currentUser.getUser())
+              .notebookCreatorAndOwner(currentUser.getUser())
               .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
 
@@ -178,7 +178,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe
               .aNote("moon")
               .content("partner of earth")
-              .creatorAndOwner(currentUser.getUser())
+              .notebookCreatorAndOwner(currentUser.getUser())
               .rememberSpelling()
               .please();
       makeMe.aNote().please();
@@ -214,7 +214,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe
               .aNote("moon")
               .content("partner of earth")
-              .creatorAndOwner(currentUser.getUser())
+              .notebookCreatorAndOwner(currentUser.getUser())
               .rememberSpelling()
               .please();
       makeMe.aNote().please();
@@ -326,8 +326,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotes() {
-      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker activeTracker =
           makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       MemoryTracker deletedTracker =
@@ -376,8 +376,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotes() {
-      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker activeTracker =
           makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       MemoryTracker deletedTracker =

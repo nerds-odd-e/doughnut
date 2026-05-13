@@ -43,7 +43,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().creatorAndOwner(user).please();
+      note = makeMe.aNote().notebookCreatorAndOwner(user).please();
     }
 
     @Test

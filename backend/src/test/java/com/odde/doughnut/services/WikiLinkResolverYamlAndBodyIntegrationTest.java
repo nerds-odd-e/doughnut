@@ -23,7 +23,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
     User owner = makeMe.aUser().please();
-    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note parent = makeMe.aNote().title("Alpha").notebookCreatorAndOwner(owner).please();
     Note child = makeMe.aNote().title("Child").underSameNotebookAs(parent).please();
     child.setContent("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
     makeMe.entityPersister.merge(child);
@@ -35,7 +35,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_findsPlainWikiLinkInBody() {
     User owner = makeMe.aUser().please();
-    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note parent = makeMe.aNote().title("Alpha").notebookCreatorAndOwner(owner).please();
     Note child =
         makeMe.aNote().title("Child").underSameNotebookAs(parent).content("See [[Alpha]]").please();
     makeMe.entityPersister.flush();
@@ -47,7 +47,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_resolvesTargetBeforePipe() {
     User owner = makeMe.aUser().please();
-    Note parent = makeMe.aNote().title("Alpha").creatorAndOwner(owner).please();
+    Note parent = makeMe.aNote().title("Alpha").notebookCreatorAndOwner(owner).please();
     Note child =
         makeMe
             .aNote()

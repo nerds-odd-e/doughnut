@@ -109,8 +109,8 @@ class RecallsControllerTests extends ControllerTestBase {
     void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       makeMe
           .aMemoryTrackerFor(activeNote)
           .by(currentUser.getUser())
@@ -153,7 +153,7 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
@@ -178,7 +178,7 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp previousWindowTime = makeMe.aTimestamp().of(0, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(previousWindowTime);
 
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
@@ -204,7 +204,7 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 

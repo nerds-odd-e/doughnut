@@ -212,7 +212,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateNotebook(note.getNotebook(), new NotebookUpdateRequest()));
@@ -220,7 +220,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldPersistDescriptionOnUpdate() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
       request.setDescription("Notebook blurb");
@@ -230,7 +230,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldClearDescriptionWhenEmptyString() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setDescription("was set");
       var setRequest = new NotebookUpdateRequest();
       setRequest.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
@@ -242,7 +242,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     @Test
     void shouldLeaveDescriptionUnchangedWhenDescriptionOmitted()
         throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setDescription("unchanged");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
@@ -252,7 +252,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldPersistNameOnUpdate() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setName("Old Title");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
@@ -263,7 +263,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldRejectEmptyOrWhitespaceNameOnUpdate() {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
       request.setName("   ");
@@ -278,7 +278,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void shouldLeaveNameUnchangedWhenNameOmitted() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       note.getNotebook().setName("Original Name");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));

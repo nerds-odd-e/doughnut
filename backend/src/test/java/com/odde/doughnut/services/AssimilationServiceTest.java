@@ -42,7 +42,7 @@ public class AssimilationServiceTest {
 
   @Test
   void whenThereIsNoNotesForUser() {
-    makeMe.aNote().creatorAndOwner(anotherUser).please();
+    makeMe.aNote().notebookCreatorAndOwner(anotherUser).please();
     assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(0));
   }
@@ -54,8 +54,8 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      note1 = makeMe.aNote("note1").creatorAndOwner(user).please();
-      note2 = makeMe.aNote("note2").creatorAndOwner(user).please();
+      note1 = makeMe.aNote("note1").notebookCreatorAndOwner(user).please();
+      note2 = makeMe.aNote("note2").notebookCreatorAndOwner(user).please();
     }
 
     @Test
@@ -86,7 +86,7 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
-        anotherNote = makeMe.aNote("another note").creatorAndOwner(user).please();
+        anotherNote = makeMe.aNote("another note").notebookCreatorAndOwner(user).please();
       }
 
       private List<Note> getAllDueMemoryTrackers() {
@@ -182,7 +182,7 @@ public class AssimilationServiceTest {
     @BeforeEach
     void setup() {
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
+      Note top = makeMe.aNote().skipMemoryTracking().notebookCreatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().underSameNotebookAs(top).please();
       note2 = makeMe.aNote().underSameNotebookAs(top).please();
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
@@ -245,7 +245,7 @@ public class AssimilationServiceTest {
       makeMe.theUser(user).dailyAssimilationCount(2).please();
       // Set up subscription notes
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
+      Note top = makeMe.aNote().skipMemoryTracking().notebookCreatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().underSameNotebookAs(top).please();
       note2 = makeMe.aNote().underSameNotebookAs(top).please();
       note3 = makeMe.aNote().underSameNotebookAs(top).please();
@@ -255,7 +255,7 @@ public class AssimilationServiceTest {
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
 
       // Set up a note that belongs to the user
-      makeMe.aNote().creatorAndOwner(user).please();
+      makeMe.aNote().notebookCreatorAndOwner(user).please();
 
       makeMe.refresh(user);
 

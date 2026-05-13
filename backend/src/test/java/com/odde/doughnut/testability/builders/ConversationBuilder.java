@@ -14,7 +14,7 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
   protected void beforeCreate(boolean needPersist) {
     if (entity.getSubject().isEmpty()) {
       User noteOwner = makeMe.aUser().please(needPersist);
-      Note note = makeMe.aNote().creatorAndOwner(noteOwner).please(needPersist);
+      Note note = makeMe.aNote().notebookCreatorAndOwner1(noteOwner).please(needPersist);
       forANote(note);
     }
     if (this.entity.getConversationInitiator() == null) {

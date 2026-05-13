@@ -189,7 +189,7 @@ class UserControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnAssimilationCountsForLoggedInUser() {
       // Create a note that needs assimilation
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       assertThat(note.getId(), notNullValue());
 
       MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
@@ -220,8 +220,8 @@ class UserControllerTest extends ControllerTestBase {
     void shouldExcludeMemoryTrackersForDeletedNotesFromOverview() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note activeNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().notebookCreatorAndOwner(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 

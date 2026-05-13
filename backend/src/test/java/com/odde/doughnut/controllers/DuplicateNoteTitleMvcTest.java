@@ -54,7 +54,7 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
   void createNoteAtNotebookRootReturns409WhenTitleDuplicatesAtRoot() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("SameTitle").please();
+    makeMe.aNote().notebookCreatorAndOwner(owner).inNotebook(nb).title("SameTitle").please();
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("SameTitle");
@@ -76,7 +76,13 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
-    makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).folder(folder).title("InFolder").please();
+    makeMe
+        .aNote()
+        .notebookCreatorAndOwner(owner)
+        .inNotebook(nb)
+        .folder(folder)
+        .title("InFolder")
+        .please();
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("InFolder");
@@ -131,7 +137,8 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
   void renamingNoteToIndexReturns400() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note note = makeMe.aNote().creatorAndOwner(owner).inNotebook(nb).title("original").please();
+    Note note =
+        makeMe.aNote().notebookCreatorAndOwner(owner).inNotebook(nb).title("original").please();
 
     NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
     dto.setNewTitle("index");

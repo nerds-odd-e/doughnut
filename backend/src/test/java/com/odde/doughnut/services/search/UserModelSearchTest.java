@@ -38,7 +38,7 @@ public class UserModelSearchTest {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().creatorAndOwner(user).please();
+    note = makeMe.aNote().notebookCreatorAndOwner(user).please();
     anotherUser = makeMe.aUser().please();
   }
 
@@ -97,10 +97,14 @@ public class UserModelSearchTest {
 
     @BeforeEach
     void setupBazaarNotes() {
-      bazaarNote = makeMe.aNote(commonPhrase + " bazaar").creatorAndOwner(anotherUser).please();
+      bazaarNote =
+          makeMe.aNote(commonPhrase + " bazaar").notebookCreatorAndOwner(anotherUser).please();
       makeMe.aBazaarNotebook(bazaarNote.getNotebook()).please();
       subscribedBazaarNote =
-          makeMe.aNote(commonPhrase + " subscription").creatorAndOwner(anotherUser).please();
+          makeMe
+              .aNote(commonPhrase + " subscription")
+              .notebookCreatorAndOwner(anotherUser)
+              .please();
       makeMe.aBazaarNotebook(subscribedBazaarNote.getNotebook()).please();
       makeMe.aSubscription().forNotebook(subscribedBazaarNote.getNotebook()).forUser(user).please();
     }
@@ -110,7 +114,7 @@ public class UserModelSearchTest {
       noteInTheSameNotebook =
           makeMe.aNote(commonPhrase + " same notebook").underSameNotebookAs(note).please();
       noteFromMyOtherNotebook =
-          makeMe.aNote(commonPhrase + " other notebook").creatorAndOwner(user).please();
+          makeMe.aNote(commonPhrase + " other notebook").notebookCreatorAndOwner(user).please();
       Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();
       circleNote = makeMe.aNote(commonPhrase + " circle").inCircle(circle).please();
     }
