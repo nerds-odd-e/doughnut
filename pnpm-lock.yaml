@@ -70,7 +70,7 @@ importers:
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
         specifier: ^24.0.1
-        version: 24.0.1(@babel/core@7.29.0)(cypress@15.14.2)(typescript@6.0.3)
+        version: 24.0.1(@babel/core@7.29.0)(cypress@15.15.0)(typescript@6.0.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.8
         version: 2.2.8(esbuild@0.28.0)
@@ -97,7 +97,7 @@ importers:
         version: 2.30.4(@opentelemetry/api@1.9.1)(core-js@3.49.0)(css-to-react-native@3.2.0)
       '@testing-library/cypress':
         specifier: 10.1.3
-        version: 10.1.3(cypress@15.14.2)
+        version: 10.1.3(cypress@15.15.0)
       '@types/cypress-cucumber-preprocessor':
         specifier: ^4.0.5
         version: 4.0.5
@@ -108,11 +108,11 @@ importers:
         specifier: 25.6.2
         version: 25.6.2
       cypress:
-        specifier: 15.14.2
-        version: 15.14.2
+        specifier: 15.15.0
+        version: 15.15.0
       cypress-file-upload:
         specifier: ^5.0.8
-        version: 5.0.8(cypress@15.14.2)
+        version: 5.0.8(cypress@15.15.0)
       github_action_sound:
         specifier: ^1.0.8
         version: 1.0.8(canvas@3.2.3)
@@ -807,9 +807,9 @@ packages:
   '@cucumber/tag-expressions@9.1.0':
     resolution: {integrity: sha512-bvHjcRFZ+J1TqIa9eFNO1wGHqwx4V9ZKV3hYgkuK/VahHx73uiP4rKV3JVrvWSMrwrFvJG6C8aEwnCWSvbyFdQ==}
 
-  '@cypress/request@3.0.10':
-    resolution: {integrity: sha512-hauBrOdvu08vOsagkZ/Aju5XuiZx6ldsLfByg1htFeldhex+PeMrYauANzFsMJeAA0+dyPLbDoX2OYuvVoLDkQ==}
-    engines: {node: '>= 6'}
+  '@cypress/request@4.0.0':
+    resolution: {integrity: sha512-wGTQfwDMMMiz/muFw4YbCLwTh0uZsXKK+6zWBzftADpitSi6iM62C8GzEhNcng2srUiGPksOriQkA8zakW2R0g==}
+    engines: {node: '>= 14.17.0'}
 
   '@cypress/xvfb@1.2.4':
     resolution: {integrity: sha512-skbBzPggOVYCbnGgV+0dmBdW/s77ZkAOXIC1knS8NagwDjBrNC1LuXtQJeiN6l+m7lzmHtaoUw/ctJKdqkG57Q==}
@@ -3006,8 +3006,8 @@ packages:
     peerDependencies:
       cypress: '>3.0.0'
 
-  cypress@15.14.2:
-    resolution: {integrity: sha512-xMWg/iEImeIThRQZdnf3BFJT1a84apM/R91Feoa4vVWGuYWDphMT5jLhRVTBVlCgi+6axegF1zqhNyjhug2SsQ==}
+  cypress@15.15.0:
+    resolution: {integrity: sha512-N8qBv3AUYn6xfIG73O5O58kTClUBSZ7a3C08IQFkSGTUdEauJ3BqwTFb/f9KPZgadftoZjllC0XSwD7xNNolbA==}
     engines: {node: ^20.1.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
 
@@ -7249,7 +7249,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@badeball/cypress-cucumber-preprocessor@24.0.1(@babel/core@7.29.0)(cypress@15.14.2)(typescript@6.0.3)':
+  '@badeball/cypress-cucumber-preprocessor@24.0.1(@babel/core@7.29.0)(cypress@15.15.0)(typescript@6.0.3)':
     dependencies:
       '@cucumber/ci-environment': 13.0.0
       '@cucumber/cucumber': 12.8.3
@@ -7265,7 +7265,7 @@ snapshots:
       cli-table: 0.3.11
       common-ancestor-path: 2.0.0
       cosmiconfig: 9.0.1(typescript@6.0.3)
-      cypress: 15.14.2
+      cypress: 15.15.0
       debug: 4.4.3(supports-color@8.1.1)
       error-stack-parser: 2.1.4
       find-cypress-specs: 1.54.12(@babel/core@7.29.0)
@@ -7463,7 +7463,7 @@ snapshots:
 
   '@cucumber/tag-expressions@9.1.0': {}
 
-  '@cypress/request@3.0.10':
+  '@cypress/request@4.0.0':
     dependencies:
       aws-sign2: 0.7.0
       aws4: 1.13.2
@@ -7482,7 +7482,6 @@ snapshots:
       safe-buffer: 5.2.1
       tough-cookie: 5.1.2
       tunnel-agent: 0.6.0
-      uuid: 14.0.0
 
   '@cypress/xvfb@1.2.4(supports-color@8.1.1)':
     dependencies:
@@ -8565,11 +8564,11 @@ snapshots:
 
   '@teppeis/multimaps@3.0.0': {}
 
-  '@testing-library/cypress@10.1.3(cypress@15.14.2)':
+  '@testing-library/cypress@10.1.3(cypress@15.15.0)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@testing-library/dom': 10.4.1
-      cypress: 15.14.2
+      cypress: 15.15.0
 
   '@testing-library/dom@10.4.1':
     dependencies:
@@ -9747,13 +9746,13 @@ snapshots:
 
   culori@3.3.0: {}
 
-  cypress-file-upload@5.0.8(cypress@15.14.2):
+  cypress-file-upload@5.0.8(cypress@15.15.0):
     dependencies:
-      cypress: 15.14.2
+      cypress: 15.15.0
 
-  cypress@15.14.2:
+  cypress@15.15.0:
     dependencies:
-      '@cypress/request': 3.0.10
+      '@cypress/request': 4.0.0
       '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
       '@types/sinonjs__fake-timers': 8.1.1
       '@types/sizzle': 2.3.10
