@@ -126,10 +126,8 @@ class TestabilityRestController {
     @Setter
     private String folder;
 
-    private Note buildNote(User user, Timestamp currentUTCTimestamp) {
+    private Note buildNote(Timestamp currentUTCTimestamp) {
       Note note = new Note();
-      note.initializeNewNote(user, null, currentUTCTimestamp, title);
-
       note.setTitle(title);
       note.setContent(content);
       note.setUpdatedAt(currentUTCTimestamp);
@@ -163,9 +161,9 @@ class TestabilityRestController {
     @Setter
     private String notebookName;
 
-    private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
+    private Map<String, Note> buildIndividualNotes(Timestamp currentUTCTimestamp) {
       return noteTestData.stream()
-          .map(noteTestData -> noteTestData.buildNote(user, currentUTCTimestamp))
+          .map(noteTestData -> noteTestData.buildNote(currentUTCTimestamp))
           .collect(Collectors.toMap(note -> note.getTitle(), n -> n));
     }
 
@@ -290,7 +288,7 @@ class TestabilityRestController {
                 () ->
                     notebookService.createNotebookForOwnership(
                         ownership, user, currentUTCTimestamp, notesTestData.notebookName, null));
-    Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
+    Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(currentUTCTimestamp);
     notesTestData.buildNoteTree(
         user, notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);

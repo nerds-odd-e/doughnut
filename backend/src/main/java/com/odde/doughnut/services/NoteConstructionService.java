@@ -17,7 +17,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -62,28 +61,22 @@ public class NoteConstructionService {
     throwIfReservedTitle(title);
     throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
     if (folderOrNull != null) {
-      return persistNewNoteInNotebookFolder(notebook, folderOrNull, title);
+      throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
+      Note note = new Note();
+      User user = authorizationService.getCurrentUser();
+      Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
+      note.initializeNewNote(user, notebook, ts, title);
+      note.assignNotebook(notebook);
+      note.setFolder(folderOrNull);
+      if (entityPersister != null) {
+        entityPersister.save(note);
+      }
+      return note;
     }
     Note note = new Note();
     User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(user, notebook, ts, title);
-    if (entityPersister != null) {
-      entityPersister.save(note);
-    }
-    return note;
-  }
-
-  private Note persistNewNoteInNotebookFolder(Notebook notebook, Folder folder, String title) {
-    Objects.requireNonNull(notebook, "notebook");
-    Objects.requireNonNull(folder, "folder");
-    throwIfSoftDeletedTitleBlocks(notebook, folder, title);
-    Note note = new Note();
-    User user = authorizationService.getCurrentUser();
-    Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-    note.initializeNewNote(user, notebook, ts, title);
-    note.assignNotebook(notebook);
-    note.setFolder(folder);
     if (entityPersister != null) {
       entityPersister.save(note);
     }
