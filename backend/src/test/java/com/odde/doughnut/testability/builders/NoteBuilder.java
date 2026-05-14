@@ -69,6 +69,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
+  public NoteBuilder toBeRemoved(User user) {
+    return this;
+  }
+
   public NoteBuilder creator(User user) {
     if (entity.getCreator() != null)
       throw new AssertionError("creator already set for " + entity.toString());
@@ -89,7 +93,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity.getCreator() == null) {
-      creator(makeMe.aUser().please(needPersist));
+      entity.setCreator(makeMe.aUser().please(needPersist));
     }
     NotebookBuilder notebookBuilder = new NotebookBuilder(entity.getNotebook(), makeMe);
     entity.assignNotebook(notebookBuilder.please(needPersist));

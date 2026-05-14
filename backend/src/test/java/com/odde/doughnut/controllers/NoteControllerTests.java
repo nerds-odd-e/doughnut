@@ -94,11 +94,16 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
       Note matched =
-          makeMe.aNote().title("LinkedPage").creator(user).notebook(root.getNotebook()).please();
+          makeMe
+              .aNote()
+              .title("LinkedPage")
+              .toBeRemoved(user)
+              .notebook(root.getNotebook())
+              .please();
       Note viewer =
           makeMe
               .aNote()
-              .creator(user)
+              .toBeRemoved(user)
               .notebook(root.getNotebook())
               .content("Text [[LinkedPage]] and [[NoSuch]].")
               .please();
@@ -118,11 +123,16 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
       Note matched =
-          makeMe.aNote().title("Target Title").creator(user).notebook(root.getNotebook()).please();
+          makeMe
+              .aNote()
+              .title("Target Title")
+              .toBeRemoved(user)
+              .notebook(root.getNotebook())
+              .please();
       Note viewer =
           makeMe
               .aNote()
-              .creator(user)
+              .toBeRemoved(user)
               .notebook(root.getNotebook())
               .content("Text [[Target Title|friendly label]] end.")
               .please();
@@ -142,15 +152,15 @@ class NoteControllerTests extends ControllerTestBase {
       User user = currentUser.getUser();
       Notebook otherNotebook =
           makeMe.aNotebook().creatorAndOwner(user).name("Other Notebook").please();
-      makeMe.aNote().creator(user).notebook(otherNotebook).please();
+      makeMe.aNote().toBeRemoved(user).notebook(otherNotebook).please();
       Note targetInOther =
-          makeMe.aNote().title("LinkedPage").creator(user).notebook(otherNotebook).please();
+          makeMe.aNote().title("LinkedPage").toBeRemoved(user).notebook(otherNotebook).please();
       Notebook mainNotebook = makeMe.aNotebook().creatorAndOwner(user).name("Main").please();
-      makeMe.aNote().creator(user).notebook(mainNotebook).please();
+      makeMe.aNote().toBeRemoved(user).notebook(mainNotebook).please();
       Note viewer =
           makeMe
               .aNote()
-              .creator(user)
+              .toBeRemoved(user)
               .notebook(mainNotebook)
               .content("See [[Other Notebook:LinkedPage]] for more.")
               .please();
@@ -172,7 +182,7 @@ class NoteControllerTests extends ControllerTestBase {
           makeMe
               .aNote()
               .title("FrontmatterTarget")
-              .creator(user)
+              .toBeRemoved(user)
               .notebook(root.getNotebook())
               .please();
       String markdown =
@@ -181,7 +191,7 @@ class NoteControllerTests extends ControllerTestBase {
               + "---\n"
               + "[[FrontmatterTarget]] body\n";
       Note viewer =
-          makeMe.aNote().creator(user).notebook(root.getNotebook()).content(markdown).please();
+          makeMe.aNote().toBeRemoved(user).notebook(root.getNotebook()).content(markdown).please();
       wikiTitleCacheService.refreshForNote(viewer, user);
       NoteRealm realm = controller.showNote(viewer);
       assertThat(realm.getWikiTitles(), hasSize(1));
@@ -335,7 +345,7 @@ class NoteControllerTests extends ControllerTestBase {
       child =
           makeMe
               .aNote("child")
-              .creator(currentUser.getUser())
+              .toBeRemoved(currentUser.getUser())
               .notebook(subject.getNotebook())
               .please();
     }
@@ -363,7 +373,7 @@ class NoteControllerTests extends ControllerTestBase {
       Note referrer =
           makeMe
               .aNote("Referrer")
-              .creator(currentUser.getUser())
+              .toBeRemoved(currentUser.getUser())
               .notebook(nb)
               .content(
                   "---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")

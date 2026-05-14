@@ -57,7 +57,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
     Circle circle = makeMe.aCircle().hasMember(user).please();
     Notebook circleNotebook =
         makeMe
-            .refresh(makeMe.aNote("Circle notebook").creator(user).inCircle(circle).please())
+            .refresh(makeMe.aNote("Circle notebook").toBeRemoved(user).inCircle(circle).please())
             .getNotebook();
 
     SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
