@@ -10,7 +10,9 @@ import com.odde.doughnut.controllers.dto.CurrentUserInfo;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@ExtendWith(MockitoExtension.class)
 class CurrentUserInfoControllerTest {
   @Autowired MakeMe makeMe;
 

@@ -38,6 +38,5 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
 
   @Column(name = "created_at")
   @Builder.Default
-  @OrderBy("createdAt ASC")
   private Timestamp createdAt = new Timestamp(new Date().getTime());
 }

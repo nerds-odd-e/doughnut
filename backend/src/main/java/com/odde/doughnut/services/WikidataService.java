@@ -25,7 +25,7 @@ public class WikidataService {
     return new WikidataApi(
         new QueryBuilder(
             httpClientAdapter,
-            UriComponentsBuilder.fromHttpUrl(testabilitySettings.getWikidataServiceUrl())));
+            UriComponentsBuilder.fromUriString(testabilitySettings.getWikidataServiceUrl())));
   }
 
   public List<WikidataSearchEntity> searchWikidata(String search)

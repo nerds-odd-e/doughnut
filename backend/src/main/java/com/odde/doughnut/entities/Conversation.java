@@ -36,7 +36,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
   @Column(name = "updated_at")
   @NotNull
-  @OrderBy("updatedAt DESC")
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
   @JsonIgnore

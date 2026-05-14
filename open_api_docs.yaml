@@ -3840,6 +3840,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
+          minItems: 1
       required:
       - roots
     AttachBookRequest_Full:
@@ -3856,6 +3857,7 @@ components:
           enum:
           - pdf
           - epub
+          minLength: 1
         layout:
           $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
         contentList:

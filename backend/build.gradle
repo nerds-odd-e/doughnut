@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '3.5.14'
+  id 'org.springframework.boot' version '4.0.6'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.4.0"
   id "com.github.ben-manes.versions" version "0.54.0"
@@ -56,25 +56,23 @@ repositories {
   }
 }
 
-ext['flyway.version'] = '11.20.3'
-
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
   implementation platform('com.google.cloud:libraries-bom:26.82.0')
   implementation 'com.google.cloud:google-cloud-storage'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.21.3'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+  implementation 'org.springframework.boot:spring-boot-starter-flyway'
   implementation 'org.flywaydb:flyway-mysql'
-  compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.15'
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.2'
   implementation 'com.openai:openai-java:4.35.0'
   implementation 'org.yaml:snakeyaml'
   // RxJava2 for Flowable streaming support
@@ -85,6 +83,7 @@ dependencies {
   runtimeOnly 'com.mysql:mysql-connector-j:9.7.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
