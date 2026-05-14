@@ -6,19 +6,70 @@ packages:
   - packages/doughnut-test-fixtures
   - packages/generated/doughnut-backend-api
 
-onlyBuiltDependencies:
-  - '@badeball/cypress-cucumber-preprocessor'
-  - '@biomejs/biome'
-  - '@parcel/watcher'
-  - canvas
-  - core-js
-  - core-js-pure
-  - cypress
-  - ejs
-  - esbuild
-  - github_action_sound
-  - protobufjs
-  - tesseract.js
+overrides:
+  react: 19.2.6
+  react-dom: 19.2.6
+  ejs: '>=3.1.10'
+  'jsonpath-plus@<10.0.0': '>=10.2.0'
+  nodemailer: '>=8.0.5'
+  '*>superagent': '>=10.3.0'
+  '@anev/ts-mountebank>superagent': '>=10.3.0'
+  formidable: '>=3.5.3'
+  form-data: '>=4.0.4'
+  tmp: '>=0.2.4'
+  js-yaml: '>=4.1.1'
+  glob: '>=11.1.0'
+  body-parser: '>=2.2.1'
+  express: '>=5.2.0'
+  systeminformation: '>=5.31.6'
+  qs: '>=6.14.2'
+  hono: 4.12.18
+  '@hono/node-server': 2.0.2
+  undici: '>=7.24.0'
+  diff: '>=8.0.3'
+  lodash-es: '>=4.18.0'
+  lodash: '>=4.18.0'
+  fast-uri: '>=3.1.1'
+  fast-xml-builder: '>=1.1.7'
+  fast-xml-parser: '>=5.7.0'
+  brace-expansion: '>=5.0.5'
+  '@isaacs/brace-expansion': '>=5.0.5'
+  axios: '>=1.15.0'
+  minimatch: '>=10.2.3'
+  ajv: '>=8.18.0'
+  rollup: '>=4.59.0'
+  serialize-javascript: '>=7.0.5'
+  immutable: '>=5.1.5'
+  mailparser: '>=3.9.3'
+  '@tootallnate/once': '>=3.0.1'
+  dompurify: '>=3.4.0'
+  express-rate-limit: '>=8.2.2'
+  flatted: '>=3.4.2'
+  yauzl: '>=3.2.1'
+  picomatch: '>=4.0.4'
+  yaml: 2.9.0
+  handlebars: '>=4.7.9'
+  path-to-regexp: '>=8.4.0'
+  '@xmldom/xmldom': '>=0.9.10'
+  defu: '>=6.1.5'
+  canvas: '>=3.2.3'
+  follow-redirects: '>=1.16.0'
+  protobufjs: '>=7.5.5'
+  uuid: '>=14.0.0'
+  postcss: '>=8.5.14'
+  ip-address: '>=10.1.1'
 
-ignoredBuiltDependencies:
-  - es5-ext
+allowBuilds:
+  '@badeball/cypress-cucumber-preprocessor': true
+  '@biomejs/biome': true
+  '@parcel/watcher': true
+  canvas: true
+  core-js: true
+  core-js-pure: true
+  cypress: true
+  ejs: true
+  esbuild: true
+  github_action_sound: true
+  protobufjs: true
+  tesseract.js: true
+  es5-ext: false
