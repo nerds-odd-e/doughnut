@@ -58,6 +58,24 @@
         </div>
       </div>
 
+      <div
+        v-if="failureReports.length > 0"
+        class="daisy-flex daisy-items-center daisy-gap-2 daisy-px-1"
+      >
+        <label
+          class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2 daisy-m-0 daisy-p-0"
+        >
+          <input
+            ref="selectAllCheckboxRef"
+            type="checkbox"
+            class="daisy-checkbox daisy-checkbox-error"
+            :checked="allFailureReportsSelected"
+            @change="onSelectAllChange"
+          />
+          <span class="daisy-label-text">Select all</span>
+        </label>
+      </div>
+
       <div v-if="failureReports.length > 0" class="daisy-space-y-2">
         <div
           v-for="report in failureReports"
@@ -163,7 +181,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, computed, watch, nextTick, onMounted } from "vue"
 import type { FailureReport } from "@generated/doughnut-backend-api"
 import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -174,6 +192,54 @@ const failureReports = ref<FailureReport[] | null>(null)
 const errorMessage = ref<string | null>(null)
 const selectedFailureReports = ref<number[]>([])
 const showDeleteModal = ref(false)
+const selectAllCheckboxRef = ref<HTMLInputElement | null>(null)
+
+const allFailureReportsSelected = computed(() => {
+  const reports = failureReports.value
+  if (!reports?.length) {
+    return false
+  }
+  return selectedFailureReports.value.length === reports.length
+})
+
+const syncSelectAllIndeterminate = () => {
+  const el = selectAllCheckboxRef.value
+  const reports = failureReports.value
+  if (!el) {
+    return
+  }
+  if (!reports?.length) {
+    el.indeterminate = false
+    return
+  }
+  const n = selectedFailureReports.value.length
+  el.indeterminate = n > 0 && n < reports.length
+}
+
+watch(
+  [failureReports, selectedFailureReports],
+  () => {
+    nextTick(() => {
+      syncSelectAllIndeterminate()
+    })
+  },
+  { deep: true }
+)
+
+const onSelectAllChange = (event: Event) => {
+  const checked = (event.target as HTMLInputElement).checked
+  const reports = failureReports.value
+  if (!reports?.length) {
+    return
+  }
+  if (checked) {
+    selectedFailureReports.value = reports
+      .map((r) => r.id)
+      .filter((id): id is number => id !== undefined)
+  } else {
+    selectedFailureReports.value = []
+  }
+}
 
 const formatDateTime = (dateTime: string) => {
   const date = new Date(dateTime)
