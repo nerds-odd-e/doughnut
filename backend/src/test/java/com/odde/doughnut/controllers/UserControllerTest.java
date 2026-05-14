@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.GeneratedTokenDTO;
 import com.odde.doughnut.controllers.dto.MenuDataDTO;
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.Conversation;
@@ -225,7 +226,8 @@ class UserControllerTest extends ControllerTestBase {
       makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 
-      noteService.destroy(deletedNote);
+      noteService.destroy(
+          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
 

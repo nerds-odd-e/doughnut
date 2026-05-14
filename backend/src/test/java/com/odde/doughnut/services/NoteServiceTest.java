@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -31,10 +32,11 @@ public class NoteServiceTest {
   class Destroy {
     @Test
     void shouldSoftDeleteMemoryTrackersWhenNoteIsDeleted() {
-      Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
+      User owner = makeMe.aUser().please();
+      Note note = makeMe.aNote().notebookOwnedBy(owner).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
 
-      noteService.destroy(note);
+      noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
       MemoryTracker refreshed =
           makeMe.entityPersister.find(MemoryTracker.class, memoryTracker.getId());
@@ -43,10 +45,11 @@ public class NoteServiceTest {
 
     @Test
     void shouldExcludeSoftDeletedMemoryTrackersFromGetMemoryTrackersFor() {
-      Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
+      User owner = makeMe.aUser().please();
+      Note note = makeMe.aNote().notebookOwnedBy(owner).please();
       makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
 
-      noteService.destroy(note);
+      noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
       assertThat(userService.getMemoryTrackersFor(note.getCreator(), note), hasSize(0));
     }
@@ -59,7 +62,7 @@ public class NoteServiceTest {
       Note subject = makeMe.aNote().notebook(notebook).please();
       Note child = makeMe.aNote("child").notebook(notebook).please();
 
-      noteService.destroy(subject);
+      noteService.destroy(subject, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, u);
 
       assertThat(subject.getDeletedAt(), notNullValue());
       assertThat(child.getDeletedAt(), nullValue());

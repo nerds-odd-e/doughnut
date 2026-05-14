@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -57,7 +58,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Note n = makeMe.aNote().notebook(nb).title("DupTitle").please();
-    noteService.destroy(n);
+    noteService.destroy(n, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("DupTitle");
@@ -77,7 +78,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Note n = makeMe.aNote().notebook(nb).title("RestoreMe").please();
-    noteService.destroy(n);
+    noteService.destroy(n, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("RestoreMe");
@@ -100,7 +101,7 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
     Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
     Note n = makeMe.aNote().folder(folder).title("InFolder").please();
-    noteService.destroy(n);
+    noteService.destroy(n, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
     NoteCreationDTO dto = new NoteCreationDTO();
     dto.setNewTitle("InFolder");

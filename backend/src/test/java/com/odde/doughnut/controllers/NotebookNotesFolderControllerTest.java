@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
@@ -199,7 +200,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       Note noteChild = makeMe.aNote("child").folder(fParent).please();
       makeMe.aNote("Unit Test").folder(fChild).please();
 
-      noteService.destroy(noteChild);
+      noteService.destroy(noteChild, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
       makeMe.entityPersister.flush();
 
       FolderListing listing = controller.listNotebookFolderListing(nb, fChild.getId());

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -333,7 +334,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker deletedTracker =
           makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
 
-      noteService.destroy(deletedNote);
+      noteService.destroy(
+          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
@@ -386,7 +388,8 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       controller.markAsRecalled(activeTracker, true);
       controller.markAsRecalled(deletedTracker, true);
 
-      noteService.destroy(deletedNote);
+      noteService.destroy(
+          deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
       List<MemoryTracker> memoryTrackers = controller.getRecentlyRecalled();
 
