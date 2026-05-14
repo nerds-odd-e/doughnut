@@ -60,26 +60,12 @@ public class NoteConstructionService {
   private Note createNote(Notebook notebook, Folder folderOrNull, String title) {
     throwIfReservedTitle(title);
     throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
-    if (folderOrNull != null) {
-      throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
-      Note note = new Note();
-      User user = authorizationService.getCurrentUser();
-      Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-      note.initializeNewNote(user, notebook, ts, title);
-      note.assignNotebook(notebook);
-      note.setFolder(folderOrNull);
-      if (entityPersister != null) {
-        entityPersister.save(note);
-      }
-      return note;
-    }
     Note note = new Note();
     User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(user, notebook, ts, title);
-    if (entityPersister != null) {
-      entityPersister.save(note);
-    }
+    note.setFolder(folderOrNull);
+    entityPersister.save(note);
     return note;
   }
 
