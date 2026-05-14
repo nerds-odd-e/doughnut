@@ -28,7 +28,7 @@
       />
     </div>
     <ul
-      class="daisy-menu daisy-w-full daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto"
+      class="daisy-menu daisy-flex-nowrap daisy-w-full daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto"
     >
       <li v-if="showRootRow" class="daisy-w-full">
         <button

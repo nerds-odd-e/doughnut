@@ -57,7 +57,7 @@
         </button>
       </div>
     </div>
-    <Modal v-if="searchOpen" @close_request="searchOpen = false">
+    <Modal v-if="searchOpen" align-top @close_request="searchOpen = false">
       <template #body>
         <FolderSearchForm
           :notebook-id="notebookId"
