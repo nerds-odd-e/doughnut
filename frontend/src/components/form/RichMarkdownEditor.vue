@@ -44,7 +44,10 @@ import QuillEditor from "./QuillEditor.vue"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
+import {
+  replaceResolvedWikiLinksInHtml,
+  replaceWikiLinksInHtml,
+} from "./replaceWikiLinksInHtml"
 import {
   composeNoteContentFromPropertyRows,
   parseNoteContentMarkdown,
@@ -115,7 +118,7 @@ const htmlValue = computed(() => {
     p.ok &&
     p.body === currentIntervalBodyMarkdown
   ) {
-    return replaceWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
+    return replaceResolvedWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
   }
   if (
     currentIntervalHtml !== undefined &&
@@ -123,7 +126,7 @@ const htmlValue = computed(() => {
     !p.ok &&
     (props.modelValue ?? "") === currentIntervalBodyMarkdown
   ) {
-    return replaceWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
+    return replaceResolvedWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
   }
   return replaceWikiLinksInHtml(
     markdownizer.markdownToHtml(markdownForRichDisplay.value),

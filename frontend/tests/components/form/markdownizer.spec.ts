@@ -1,5 +1,8 @@
 import markdownizer from "@/components/form/markdownizer"
-import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
+import {
+  replaceResolvedWikiLinksInHtml,
+  replaceWikiLinksInHtml,
+} from "@/components/form/replaceWikiLinksInHtml"
 import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 import { describe, it, expect } from "vitest"
 
@@ -494,8 +497,14 @@ describe("replaceWikiLinksInHtml", () => {
   })
 
   it("marks unknown wikilinks as dead links", () => {
-    expect(replaceWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toContain(
-      'class="dead-link"'
+    expect(replaceWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toBe(
+      '<p><a href="#" class="dead-link" data-wiki-title="Unknown">Unknown</a></p>'
+    )
+  })
+
+  it("leaves unknown wikilink text alone when only resolving known links", () => {
+    expect(replaceResolvedWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toBe(
+      "<p>[[Unknown]]</p>"
     )
   })
 

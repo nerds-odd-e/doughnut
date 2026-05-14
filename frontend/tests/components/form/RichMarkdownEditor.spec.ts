@@ -48,4 +48,32 @@ describe("RichMarkdownEditor", () => {
       '<a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote"'
     )
   })
+
+  it("keeps canonical dead-link HTML identical to Quill internal HTML", async () => {
+    const wrapper = await h.mountEditor("[[Missing Note]]")
+    await flushPromises()
+    await nextTick()
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    const translatedHtml = String(quill.props("modelValue"))
+    const quillInternalHtml = h.quillEditorEl().innerHTML
+
+    expect(translatedHtml).toContain('class="dead-link"')
+    expect(quillInternalHtml).toContain('class="dead-link"')
+    expect(quillInternalHtml).toBe(translatedHtml)
+  })
+
+  it("keeps active Quill HTML identical when saved markdown with a dead link is echoed back", async () => {
+    const wrapper = await h.mountEditor("Hello")
+    await flushPromises()
+    await nextTick()
+
+    const quillWrapper = wrapper.findComponent({ name: "QuillEditor" })
+    quillWrapper.vm.$emit("update:modelValue", "<p>Hello [[Missing Note]]</p>")
+    await wrapper.setProps({ modelValue: "Hello [[Missing Note]]" })
+    await flushPromises()
+    await nextTick()
+
+    expect(quillWrapper.props("modelValue")).toBe(h.quillEditorEl().innerHTML)
+  })
 })

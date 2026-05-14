@@ -61,6 +61,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"absolute URL to note show"}            | ${'<p><a href="https://app.test/d/n/42">T</a></p>'}                                                                                                     | ${"[[T]]"}
     ${"note href without doughnut-link"}      | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                          | ${"[looks internal](/n123)"}
     ${"converts dead wiki anchors"}           | ${'<p><a href="#" class="dead-link" data-wiki-title="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
+    ${"converts plain dead wiki anchors"}     | ${'<p><a href="#" class="dead-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
     ${"doughnut-link with piped wiki attrs"}  | ${'<p><a href="/d/n/1" class="doughnut-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                      | ${"[[A|B]]"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)

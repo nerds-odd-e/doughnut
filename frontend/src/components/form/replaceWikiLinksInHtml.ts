@@ -5,7 +5,6 @@ import {
   escapeHtmlForWikiPropertyValue,
   isValidPropertyWikiInner,
   splitWikiLinkInner,
-  wikiLinkBracketedInnerHtml,
   wikiTitleParts,
 } from "@/utils/wikiPropertyValueField"
 
@@ -65,10 +64,10 @@ function deadWikiAnchorHtmlFromInner(innerRaw: string): string {
     display !== target
       ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
       : ""
-  return `<a href="#" class="dead-link" data-wiki-title="${attrTarget}"${displayAttr}>${wikiLinkBracketedInnerHtml(display)}</a>`
+  return `<a href="#" class="dead-link" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
 }
 
-export function replaceWikiLinksInHtml(
+export function replaceResolvedWikiLinksInHtml(
   html: string,
   wikiTitles: WikiTitle[]
 ): string {
@@ -85,7 +84,14 @@ export function replaceWikiLinksInHtml(
       `<a href="${noteShowHref(w.noteId)}" class="doughnut-link" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
     )
   })
-  result = upgradeDeadWikiAnchors(result, wikiTitles)
+  return upgradeDeadWikiAnchors(result, wikiTitles)
+}
+
+export function replaceWikiLinksInHtml(
+  html: string,
+  wikiTitles: WikiTitle[]
+): string {
+  let result = replaceResolvedWikiLinksInHtml(html, wikiTitles)
   result = result.replace(
     /\[\[([^\[\]\r\n]*)\]\]/g,
     (_fullMatch, inner: string) => deadWikiAnchorHtmlFromInner(inner)

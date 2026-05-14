@@ -136,10 +136,6 @@ public class NoteService {
     destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, note.getCreator());
   }
 
-  public void destroy(Note note, NoteDeleteReferenceHandling referenceHandling) {
-    destroy(note, referenceHandling, note.getCreator());
-  }
-
   public void destroy(Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
