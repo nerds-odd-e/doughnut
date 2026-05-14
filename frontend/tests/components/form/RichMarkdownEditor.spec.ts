@@ -74,6 +74,9 @@ describe("RichMarkdownEditor", () => {
     await flushPromises()
     await nextTick()
 
+    expect(String(quillWrapper.props("modelValue"))).toContain(
+      'class="dead-link"'
+    )
     expect(quillWrapper.props("modelValue")).toBe(h.quillEditorEl().innerHTML)
   })
 })

@@ -67,7 +67,7 @@ function deadWikiAnchorHtmlFromInner(innerRaw: string): string {
   return `<a href="#" class="dead-link" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
 }
 
-export function replaceResolvedWikiLinksInHtml(
+export function replaceWikiLinksInHtml(
   html: string,
   wikiTitles: WikiTitle[]
 ): string {
@@ -84,14 +84,7 @@ export function replaceResolvedWikiLinksInHtml(
       `<a href="${noteShowHref(w.noteId)}" class="doughnut-link" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
     )
   })
-  return upgradeDeadWikiAnchors(result, wikiTitles)
-}
-
-export function replaceWikiLinksInHtml(
-  html: string,
-  wikiTitles: WikiTitle[]
-): string {
-  let result = replaceResolvedWikiLinksInHtml(html, wikiTitles)
+  result = upgradeDeadWikiAnchors(result, wikiTitles)
   result = result.replace(
     /\[\[([^\[\]\r\n]*)\]\]/g,
     (_fullMatch, inner: string) => deadWikiAnchorHtmlFromInner(inner)
