@@ -51,7 +51,6 @@ class FocusContextRetrievalServiceTest {
       Note note =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .notebook(notebookReadableBy(viewer))
               .title("Solo")
               .content("Some content")
@@ -67,26 +66,12 @@ class FocusContextRetrievalServiceTest {
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
       String longContent = "a".repeat(10000);
-      Note longNote =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("Long")
-              .content(longContent)
-              .please();
+      Note longNote = makeMe.aNote().notebook(nb).title("Long").content(longContent).please();
       FocusContextResult longResult = service.retrieve(longNote, viewer, RetrievalConfig.depth1());
       assertThat(longResult.getFocusNote().isContentTruncated(), is(true));
       assertThat(longResult.getFocusNote().getContent().length(), lessThan(longContent.length()));
 
-      Note shortNote =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("Short")
-              .content("Small content")
-              .please();
+      Note shortNote = makeMe.aNote().notebook(nb).title("Short").content("Small content").please();
       FocusContextResult shortResult =
           service.retrieve(shortNote, viewer, RetrievalConfig.depth1());
       assertThat(shortResult.getFocusNote().isContentTruncated(), is(false));
@@ -103,17 +88,9 @@ class FocusContextRetrievalServiceTest {
     void setup() {
       viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
-      focusNote =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("Focus")
-              .content("See [[Linked]].")
-              .please();
+      focusNote = makeMe.aNote().notebook(nb).title("Focus").content("See [[Linked]].").please();
       makeMe
           .aNote()
-          .toBeRemoved(viewer)
           .underSameNotebookAs(focusNote)
           .title("Linked")
           .content("Linked content")
@@ -147,11 +124,10 @@ class FocusContextRetrievalServiceTest {
     void setup() {
       viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
-      focusNote = makeMe.aNote().toBeRemoved(viewer).notebook(nb).title("Focus").please();
+      focusNote = makeMe.aNote().notebook(nb).title("Focus").please();
       referrer =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focusNote)
               .title("Referrer")
               .content("Links to [[Focus]].")
@@ -179,12 +155,11 @@ class FocusContextRetrievalServiceTest {
     void setup() {
       viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
-      focusNote = makeMe.aNote().toBeRemoved(viewer).notebook(nb).title("HubFocus").please();
+      focusNote = makeMe.aNote().notebook(nb).title("HubFocus").please();
       for (int i = 0; i < 10; i++) {
         Note r =
             makeMe
                 .aNote()
-                .toBeRemoved(viewer)
                 .underSameNotebookAs(focusNote)
                 .title("Ref" + i)
                 .content("Links to [[HubFocus]].")
@@ -250,7 +225,6 @@ class FocusContextRetrievalServiceTest {
         Note r =
             makeMe
                 .aNote()
-                .toBeRemoved(viewer)
                 .underSameNotebookAs(focusNote)
                 .title("Extra" + i)
                 .content("Links to [[HubFocus]].")
@@ -265,12 +239,10 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void depth1InboundExcludesOutgoingTargetsBeforeCap() {
-      Note hub =
-          makeMe.aNote().toBeRemoved(viewer).underSameNotebookAs(focusNote).title("XHub").please();
+      Note hub = makeMe.aNote().underSameNotebookAs(focusNote).title("XHub").please();
       Note shared =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focusNote)
               .title("XShared")
               .content("Links to [[XHub]].")
@@ -280,7 +252,6 @@ class FocusContextRetrievalServiceTest {
       for (int i = 0; i < 8; i++) {
         makeMe
             .aNote()
-            .toBeRemoved(viewer)
             .underSameNotebookAs(focusNote)
             .title("XRef" + i)
             .content("Links to [[XHub]].")
@@ -309,7 +280,6 @@ class FocusContextRetrievalServiceTest {
       Note depth1Ref =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focusNote)
               .title("Depth1Hub")
               .content("Links to [[HubFocus]].")
@@ -319,7 +289,6 @@ class FocusContextRetrievalServiceTest {
         Note d2 =
             makeMe
                 .aNote()
-                .toBeRemoved(viewer)
                 .underSameNotebookAs(focusNote)
                 .title("D2Ref" + i)
                 .content("Links to [[Depth1Hub]].")
@@ -358,18 +327,10 @@ class FocusContextRetrievalServiceTest {
     void noteReachedAsBothOutgoingAndInboundKeepsOutgoingEdgeType() {
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
-      Note focusNote =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("Focus")
-              .content("See [[Both]].")
-              .please();
+      Note focusNote = makeMe.aNote().notebook(nb).title("Focus").content("See [[Both]].").please();
       Note both =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focusNote)
               .title("Both")
               .content("Links back to [[Focus]].")
@@ -403,20 +364,13 @@ class FocusContextRetrievalServiceTest {
       Note focusNote =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .notebook(nb)
               .title("Focus")
               .content(linkLine.toString().trim() + ".")
               .please();
       String largeDetails = "x".repeat(3500);
       for (String title : titles) {
-        makeMe
-            .aNote()
-            .toBeRemoved(viewer)
-            .underSameNotebookAs(focusNote)
-            .title(title)
-            .content(largeDetails)
-            .please();
+        makeMe.aNote().underSameNotebookAs(focusNote).title(title).content(largeDetails).please();
       }
       refreshWikiCache(focusNote, viewer);
 
@@ -433,24 +387,16 @@ class FocusContextRetrievalServiceTest {
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
       Note focus =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("ChainRoot")
-              .content("Start [[MidDepth]].")
-              .please();
+          makeMe.aNote().notebook(nb).title("ChainRoot").content("Start [[MidDepth]].").please();
       Note mid =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focus)
               .title("MidDepth")
               .content("Bridge [[LeafDepth2]].")
               .please();
       makeMe
           .aNote()
-          .toBeRemoved(viewer)
           .underSameNotebookAs(focus)
           .title("LeafDepth2")
           .content("Only at depth 2")
@@ -481,28 +427,15 @@ class FocusContextRetrievalServiceTest {
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
       Note focus =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("ShallowRoot")
-              .content("[[MidShallow]].")
-              .please();
+          makeMe.aNote().notebook(nb).title("ShallowRoot").content("[[MidShallow]].").please();
       Note mid =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focus)
               .title("MidShallow")
               .content("[[LeafShallow]].")
               .please();
-      makeMe
-          .aNote()
-          .toBeRemoved(viewer)
-          .underSameNotebookAs(focus)
-          .title("LeafShallow")
-          .content("deep")
-          .please();
+      makeMe.aNote().underSameNotebookAs(focus).title("LeafShallow").content("deep").please();
       refreshWikiCache(focus, viewer);
       refreshWikiCache(mid, viewer);
 
@@ -523,18 +456,10 @@ class FocusContextRetrievalServiceTest {
     void cycleBetweenTwoNotesDoesNotLoop() {
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
-      Note a =
-          makeMe
-              .aNote()
-              .toBeRemoved(viewer)
-              .notebook(nb)
-              .title("CycleA")
-              .content("To [[CycleB]].")
-              .please();
+      Note a = makeMe.aNote().notebook(nb).title("CycleA").content("To [[CycleB]].").please();
       Note b =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(a)
               .title("CycleB")
               .content("Back [[CycleA]].")
@@ -555,14 +480,12 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .notebook(nb)
               .title("ShortFocus")
               .content("[[DirectShort]] [[ViaBridge]].")
               .please();
       makeMe
           .aNote()
-          .toBeRemoved(viewer)
           .underSameNotebookAs(focus)
           .title("DirectShort")
           .content("direct body")
@@ -570,7 +493,6 @@ class FocusContextRetrievalServiceTest {
       Note bridge =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focus)
               .title("ViaBridge")
               .content("See [[DirectShort]].")
@@ -595,11 +517,10 @@ class FocusContextRetrievalServiceTest {
     void depthTwoInboundFromExpandedNote() {
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
-      Note focus = makeMe.aNote().toBeRemoved(viewer).notebook(nb).title("InboundRoot").please();
+      Note focus = makeMe.aNote().notebook(nb).title("InboundRoot").please();
       Note hub =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focus)
               .title("HubInbound")
               .content("Link [[InboundRoot]].")
@@ -607,7 +528,6 @@ class FocusContextRetrievalServiceTest {
       Note depth2Referrer =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focus)
               .title("RefersToHub")
               .content("Hub is [[HubInbound]].")
@@ -643,31 +563,22 @@ class FocusContextRetrievalServiceTest {
       Note focus =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .notebook(nb)
               .title("BudgetRoot")
               .content("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[Spend5]] [[BridgeBudget]]")
               .please();
       for (int i = 1; i <= 5; i++) {
-        makeMe
-            .aNote()
-            .toBeRemoved(viewer)
-            .underSameNotebookAs(focus)
-            .title("Spend" + i)
-            .content(maxChunk)
-            .please();
+        makeMe.aNote().underSameNotebookAs(focus).title("Spend" + i).content(maxChunk).please();
       }
       Note bridge =
           makeMe
               .aNote()
-              .toBeRemoved(viewer)
               .underSameNotebookAs(focus)
               .title("BridgeBudget")
               .content("[[LeafAfterBudget]].")
               .please();
       makeMe
           .aNote()
-          .toBeRemoved(viewer)
           .underSameNotebookAs(focus)
           .title("LeafAfterBudget")
           .content("never reached")
@@ -710,16 +621,9 @@ class FocusContextRetrievalServiceTest {
         viewer = makeMe.aUser().please();
         Notebook nb = notebookReadableBy(viewer);
         Folder folder = makeMe.aFolder().notebook(nb).please();
-        focus =
-            makeMe
-                .aNote()
-                .toBeRemoved(viewer)
-                .folder(folder)
-                .title("FocusSib")
-                .content("solo")
-                .please();
+        focus = makeMe.aNote().folder(folder).title("FocusSib").content("solo").please();
         for (int i = 0; i < 6; i++) {
-          makeMe.aNote().toBeRemoved(viewer).folder(folder).title("Peer" + i).content("x").please();
+          makeMe.aNote().folder(folder).title("Peer" + i).content("x").please();
         }
       }
 

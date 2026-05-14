@@ -39,7 +39,7 @@ public class AuthorizationServiceTest {
     @BeforeEach
     void setup() {
       circle = makeMe.aCircle().please();
-      note = makeMe.aNote().toBeRemoved(makeMe.aUser().please()).inCircle(circle).please();
+      note = makeMe.aNote().inCircle(circle).please();
     }
 
     @Test

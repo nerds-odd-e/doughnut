@@ -53,12 +53,9 @@ class SubscriptionControllerTest extends ControllerTestBase {
   @Test
   void createdSubscriptionForCircleNotebookSerializesWithoutLegacyNotebookFields()
       throws Exception {
-    User user = currentUser.getUser();
-    Circle circle = makeMe.aCircle().hasMember(user).please();
+    Circle circle = makeMe.aCircle().hasMember(currentUser.getUser()).please();
     Notebook circleNotebook =
-        makeMe
-            .refresh(makeMe.aNote("Circle notebook").toBeRemoved(user).inCircle(circle).please())
-            .getNotebook();
+        makeMe.refresh(makeMe.aNote("Circle notebook").inCircle(circle).please()).getNotebook();
 
     SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
     subscriptionDTO.setDailyTargetOfNewNotes(1);

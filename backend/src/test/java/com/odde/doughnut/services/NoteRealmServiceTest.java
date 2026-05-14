@@ -75,7 +75,7 @@ class NoteRealmServiceTest {
 
   @Test
   void omits_cached_target_when_target_note_is_soft_deleted() {
-    Note target = makeMe.aNote().title("Target").toBeRemoved(user).notebook(notebook).please();
+    Note target = makeMe.aNote().title("Target").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Target]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
@@ -96,9 +96,8 @@ class NoteRealmServiceTest {
 
   @Test
   void body_wikilink_carrier_in_references() {
-    Note focal = makeMe.aNote().title("Focal").toBeRemoved(user).notebook(notebook).please();
-    Note carrier =
-        makeMe.aNote().toBeRemoved(user).notebook(notebook).content("[[Focal]]").please();
+    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
     wikiTitleCacheService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
@@ -109,8 +108,8 @@ class NoteRealmServiceTest {
 
   @Test
   void parent_yaml_carrier_appears_in_references() {
-    Note focal = makeMe.aNote().title("Focal").toBeRemoved(user).notebook(notebook).please();
-    Note carrier = makeMe.aNote().title("Child").toBeRemoved(user).notebook(notebook).please();
+    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
+    Note carrier = makeMe.aNote().title("Child").notebook(notebook).please();
     carrier.setContent("---\nparent: \"[[Focal]]\"\n---\n\nBody.");
     makeMe.entityPersister.merge(carrier);
     makeMe.entityPersister.flush();
@@ -150,9 +149,9 @@ class NoteRealmServiceTest {
     User focalOwner = makeMe.aUser().please();
     User carrierOwner = carrierSharesOwnerWithViewer ? focalOwner : makeMe.aUser().please();
     Notebook mainNb = makeMe.aNotebook().creatorAndOwner(focalOwner).name("MainNb").please();
-    Note focal = makeMe.aNote().title("Focal").toBeRemoved(focalOwner).notebook(mainNb).please();
+    Note focal = makeMe.aNote().title("Focal").notebook(mainNb).please();
     Notebook otherNb = makeMe.aNotebook().creatorAndOwner(carrierOwner).name("OtherNb").please();
-    Note carrier = makeMe.aNote().toBeRemoved(carrierOwner).notebook(otherNb).please();
+    Note carrier = makeMe.aNote().notebook(otherNb).please();
 
     persistWikiLink(carrier, focal, "MainNb:Focal");
 
@@ -177,8 +176,8 @@ class NoteRealmServiceTest {
 
   @Test
   void references_dedupe_multiple_cache_rows_for_same_carrier_note() {
-    Note focal = makeMe.aNote().title("Focal").toBeRemoved(user).notebook(notebook).please();
-    Note carrier = makeMe.aNote().toBeRemoved(user).notebook(notebook).please();
+    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
+    Note carrier = makeMe.aNote().notebook(notebook).please();
 
     persistWikiLink(carrier, focal, "one");
     persistWikiLink(carrier, focal, "two");

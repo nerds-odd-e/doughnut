@@ -55,7 +55,7 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
       User anotherUser = makeMe.aUser().please();
       Circle circle1 =
           makeMe.aCircle().hasMember(anotherUser).hasMember(currentUser.getUser()).please();
-      Note note = makeMe.aNote().toBeRemoved(anotherUser).inCircle(circle1).please();
+      Note note = makeMe.aNote().inCircle(circle1).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveToCircle(note.getNotebook(), makeMe.aCircle().please()));
