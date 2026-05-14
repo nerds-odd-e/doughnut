@@ -15,7 +15,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter notebookTestNameCounter =
       new TestObjectCounter(n -> "notebook" + n);
 
-  List<NoteBuilder> relationBuilders = new ArrayList<>();
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
   private Folder folder;
@@ -88,9 +87,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (entity.getCreator() == null) {
-      entity.setCreator(makeMe.aUser().please(needPersist));
-    }
     NotebookBuilder notebookBuilder = new NotebookBuilder(entity.getNotebook(), makeMe);
     entity.assignNotebook(notebookBuilder.please(needPersist));
     if (folder != null) {
@@ -100,14 +96,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    relationBuilders.forEach(relationBuilder -> relationBuilder.please(needPersist));
-    predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
-    if (relationBuilders.isEmpty()
-        && predefinedQuestionBuilders.isEmpty()
-        && childrenBuilders.isEmpty()
-        && !needPersist) return;
-    makeMe.refresh(entity);
+    predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
   }
 
   public NoteBuilder skipMemoryTracking() {

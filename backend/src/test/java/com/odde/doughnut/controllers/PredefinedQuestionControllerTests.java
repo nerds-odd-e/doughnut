@@ -76,6 +76,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion questionOfNote =
           makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(noteWithoutQuestions).please();
+      makeMe.refresh(noteWithoutQuestions);
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
     }
@@ -84,6 +85,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
       makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(noteWithQuestions).please();
+      makeMe.refresh(noteWithQuestions);
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
