@@ -11,7 +11,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
-import java.util.List;
 
 public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
@@ -51,31 +50,12 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       }
       entity.setAnswer(answer);
     }
-    // Set MemoryTracker if not already set
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
       Note note =
           entity.getPredefinedQuestion() != null ? entity.getPredefinedQuestion().getNote() : null;
-      if (note != null && note.getCreator() != null) {
-        // Find existing memory tracker for this note and user, or create one
-        List<MemoryTracker> trackers =
-            makeMe
-                .entityPersister
-                .createQuery(
-                    "SELECT mt FROM MemoryTracker mt WHERE mt.note = :note AND mt.user = :user",
-                    MemoryTracker.class)
-                .setParameter("note", note)
-                .setParameter("user", note.getCreator())
-                .getResultList();
-        if (!trackers.isEmpty()) {
-          memoryTracker = trackers.get(0);
-        } else {
-          memoryTracker = makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please(needPersist);
-        }
-      }
+      memoryTracker = makeMe.aMemoryTrackerFor(note).please(needPersist);
     }
-    if (memoryTracker != null) {
-      entity.setMemoryTracker(memoryTracker);
-    }
+    entity.setMemoryTracker(memoryTracker);
   }
 
   public RecallPromptBuilder forMemoryTracker(MemoryTracker memoryTracker) {

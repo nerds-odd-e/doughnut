@@ -168,11 +168,6 @@ public class Note extends EntityIdentifiedByIdOnly {
         .formatted(NOTE_OF_CURRENT_FOCUS, prettyString);
   }
 
-  @JsonIgnore
-  public String getUri() {
-    return "/n" + getId();
-  }
-
   public void initializeNewNote(
       User user, Notebook notebookOrNull, Timestamp currentUTCTimestamp, String title) {
     if (notebookOrNull != null) {

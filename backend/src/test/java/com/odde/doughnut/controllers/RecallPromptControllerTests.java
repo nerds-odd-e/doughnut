@@ -133,6 +133,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       RecallPrompt secondRecallPrompt =
           makeMe
               .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
               .ofAIGeneratedQuestion(mcqWithAnswer, memoryTracker.getNote())
               .please();
       answerDTO.setThinkingTimeMs(40000);
@@ -162,6 +163,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       RecallPrompt secondRecallPrompt =
           makeMe
               .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
               .ofAIGeneratedQuestion(mcqWithAnswer, memoryTracker.getNote())
               .please();
       answerDTO.setThinkingTimeMs(null);
