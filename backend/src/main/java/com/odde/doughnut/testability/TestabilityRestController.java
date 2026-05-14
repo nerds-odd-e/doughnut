@@ -168,14 +168,13 @@ class TestabilityRestController {
     }
 
     private void buildNoteTree(
-        User user,
         Notebook notebook,
         Timestamp currentUTCTimestamp,
         Map<String, Note> titleNoteMap,
         EntityPersister entityPersister) {
       for (NoteTestData injection : noteTestData) {
         Note note = titleNoteMap.get(injection.title);
-        note.initializeNewNote(user, notebook, currentUTCTimestamp, injection.title);
+        note.initializeNewNote(notebook, currentUTCTimestamp, injection.title);
         notebook.setUpdatedAt(currentUTCTimestamp);
         entityPersister.merge(notebook);
       }
@@ -289,8 +288,7 @@ class TestabilityRestController {
                     notebookService.createNotebookForOwnership(
                         ownership, user, currentUTCTimestamp, notesTestData.notebookName, null));
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(currentUTCTimestamp);
-    notesTestData.buildNoteTree(
-        user, notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
+    notesTestData.buildNoteTree(notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     for (Note note : titleNoteMap.values()) {

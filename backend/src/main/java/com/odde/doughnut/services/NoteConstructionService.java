@@ -61,10 +61,11 @@ public class NoteConstructionService {
     throwIfReservedTitle(title);
     throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
     Note note = new Note();
-    User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-    note.initializeNewNote(user, notebook, ts, title);
+    note.initializeNewNote(notebook, ts, title);
     note.setFolder(folderOrNull);
+    User user = authorizationService.getCurrentUser();
+    note.setCreator(user);
     entityPersister.save(note);
     return note;
   }
