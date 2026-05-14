@@ -3713,7 +3713,6 @@ components:
       - newTitle
     BlockDepthSuggestion:
       type: object
-      description: Suggested depth for a single block
       properties:
         id:
           type: integer
@@ -3726,7 +3725,6 @@ components:
       - id
     BookLayoutReorganizationSuggestion:
       type: object
-      description: AI suggestion for reorganizing book block depths
       properties:
         blocks:
           type: array
@@ -3736,7 +3734,6 @@ components:
       - blocks
     BlockDepthSuggestion_Full:
       type: object
-      description: Suggested depth for a single block
       properties:
         id:
           type: integer
@@ -3749,7 +3746,6 @@ components:
       - id
     BookLayoutReorganizationSuggestion_Full:
       type: object
-      description: AI suggestion for reorganizing book block depths
       properties:
         blocks:
           type: array
@@ -4225,7 +4221,9 @@ components:
         locator:
           $ref: "#/components/schemas/ContentLocator_Full"
         selectedBookBlockId:
-          type: integer
+          type:
+          - integer
+          - "null"
           format: int32
           description: Selected book block id for reading UI; omit or null to leave
             the stored value unchanged
@@ -4553,7 +4551,9 @@ components:
         locator:
           $ref: "#/components/schemas/ContentLocator_Full"
         selectedBookBlockId:
-          type: integer
+          type:
+          - integer
+          - "null"
           format: int32
       required:
       - id

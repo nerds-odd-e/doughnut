@@ -415,32 +415,20 @@ export type NoteCreationDto = {
     content?: string;
 };
 
-/**
- * Suggested depth for a single block
- */
 export type BlockDepthSuggestion = {
     id: number;
     depth: number;
 };
 
-/**
- * AI suggestion for reorganizing book block depths
- */
 export type BookLayoutReorganizationSuggestion = {
     blocks: Array<BlockDepthSuggestion>;
 };
 
-/**
- * Suggested depth for a single block
- */
 export type BlockDepthSuggestionFull = {
     id: number;
     depth: number;
 };
 
-/**
- * AI suggestion for reorganizing book block depths
- */
 export type BookLayoutReorganizationSuggestionFull = {
     blocks: Array<BlockDepthSuggestionFull>;
 };
@@ -686,7 +674,7 @@ export type BookLastReadPositionRequest = {
     /**
      * Selected book block id for reading UI; omit or null to leave the stored value unchanged
      */
-    selectedBookBlockId?: number;
+    selectedBookBlockId?: number | null;
 };
 
 export type UpdateAiAssistantRequest = {
@@ -837,7 +825,7 @@ export type FolderListing = {
 export type BookUserLastReadPosition = {
     id: number;
     locator: ContentLocatorFull;
-    selectedBookBlockId?: number;
+    selectedBookBlockId?: number | null;
 };
 
 export type ThresholdExceededResult = {
