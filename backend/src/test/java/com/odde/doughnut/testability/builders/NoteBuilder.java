@@ -68,13 +68,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder creator(User user) {
-    if (entity.getCreator() != null)
-      throw new AssertionError("creator already set for " + entity.toString());
-    entity.setCreator(user);
-    return this;
-  }
-
   public NoteBuilder underSameNotebookAs(Note note) {
     notebook(note.getNotebook());
     note.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);

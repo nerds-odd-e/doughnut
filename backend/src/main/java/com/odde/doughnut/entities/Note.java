@@ -29,13 +29,6 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
-  @OneToOne
-  @JoinColumn(name = "creator_id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private User creator;
-
   @ManyToOne
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @JsonIgnore

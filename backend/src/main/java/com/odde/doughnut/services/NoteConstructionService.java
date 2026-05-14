@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteCreator;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
@@ -65,8 +66,8 @@ public class NoteConstructionService {
     note.initializeNewNote(notebook, ts, title);
     note.setFolder(folderOrNull);
     User user = authorizationService.getCurrentUser();
-    note.setCreator(user);
     entityPersister.save(note);
+    entityPersister.save(NoteCreator.forNoteAndUser(note, user));
     return note;
   }
 

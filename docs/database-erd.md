@@ -20,6 +20,7 @@ erDiagram
     "note" ||--o{ conversation : "note_id"
     "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
+    "note" ||--o{ note_creator : "note_id"
     "note" ||--o{ note_wiki_title_cache : "note_id"
     "note" ||--o{ note_wiki_title_cache : "target_note_id"
     "note" ||--o{ predefined_question : "note_id"
@@ -43,7 +44,7 @@ erDiagram
     "user" ||--o{ conversation_message : "sender"
     "user" ||--o{ image : "user_id"
     "user" ||--o{ memory_tracker : "user_id"
-    "user" ||--o{ "note" : "creator_id"
+    "user" ||--o{ note_creator : "user_id"
     "user" ||--o{ notebook : "creator_id"
     "user" ||--o{ ownership : "user_id"
     "user" ||--o{ subscription : "user_id"
@@ -126,7 +127,10 @@ erDiagram
         int image_id FK
         int notebook_id FK
         int folder_id FK
-        int creator_id FK
+    }
+    note_creator {
+        int note_id PK FK
+        int user_id FK
     }
     note_embeddings {
         bigint id PK

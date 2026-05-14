@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.UserForListing;
 import com.odde.doughnut.controllers.dto.UserListingPage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteCreator;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
@@ -49,8 +50,10 @@ class AdminUserControllerTest extends ControllerTestBase {
     @Test
     void canListUsersWithCorrectNoteCount() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
-      makeMe.aNote().creator(userWithNotes).please();
-      makeMe.aNote().creator(userWithNotes).please();
+      Note n1 = makeMe.aNote().please();
+      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(n1, userWithNotes));
+      Note n2 = makeMe.aNote().please();
+      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(n2, userWithNotes));
 
       UserListingPage result = controller.listUsers(0, 100);
 
@@ -84,7 +87,8 @@ class AdminUserControllerTest extends ControllerTestBase {
     void canListUsersWithLastNoteTime() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
       Timestamp noteTime = makeMe.aTimestamp().of(2025, 6).please();
-      makeMe.aNote().creator(userWithNotes).createdAt(noteTime).please();
+      Note note = makeMe.aNote().createdAt(noteTime).please();
+      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(note, userWithNotes));
 
       UserListingPage result = controller.listUsers(0, 100);
 
