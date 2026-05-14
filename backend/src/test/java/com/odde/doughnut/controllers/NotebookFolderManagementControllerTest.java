@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
+import com.odde.doughnut.controllers.dto.FolderRenameRequest;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -247,6 +248,64 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
               ResponseStatusException.class, () -> controller.moveFolder(nbA, folder, req));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
       assertThat(ex.getReason(), equalTo("Parent folder not in notebook."));
+    }
+  }
+
+  @Nested
+  class RenameFolder {
+    @Test
+    void renamesFolderInPlace() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Old").please();
+
+      FolderRenameRequest req = new FolderRenameRequest();
+      req.setName("  New  ");
+      Folder result = controller.renameFolder(nb, folder, req);
+      assertThat(result.getName(), equalTo("New"));
+    }
+
+    @Test
+    void noOpWhenNameUnchangedAfterTrim() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Same").please();
+
+      FolderRenameRequest req = new FolderRenameRequest();
+      req.setName("  Same  ");
+      Folder result = controller.renameFolder(nb, folder, req);
+      assertThat(result.getName(), equalTo("Same"));
+    }
+
+    @Test
+    void rejectsDuplicateSiblingName() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aFolder().notebook(nb).name("Taken").please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("Renaming").please();
+
+      FolderRenameRequest req = new FolderRenameRequest();
+      req.setName("Taken");
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.renameFolder(nb, folder, req));
+      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+    }
+
+    @Test
+    void folderNotInNotebookReturns404() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderInB = makeMe.aFolder().notebook(nbB).name("Only B").please();
+
+      FolderRenameRequest req = new FolderRenameRequest();
+      req.setName("X");
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.renameFolder(nbA, folderInB, req));
+      assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Folder not in notebook."));
     }
   }
 

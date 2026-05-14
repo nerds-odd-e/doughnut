@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
 import com.odde.doughnut.controllers.dto.FolderRealm;
+import com.odde.doughnut.controllers.dto.FolderRenameRequest;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -177,6 +178,23 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     return folderRelocationService.moveFolder(notebook, folder, request);
+  }
+
+  @Operation(
+      summary = "Rename a folder",
+      description =
+          "Changes the folder display name under its current parent. Sibling name conflicts are"
+              + " rejected.")
+  @PatchMapping("/{notebook}/folders/{folder}")
+  @Transactional
+  public Folder renameFolder(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("folder") @Schema(type = "integer") Folder folder,
+      @Valid @RequestBody FolderRenameRequest request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    assertFolderInNotebook(notebook, folder);
+    return folderRelocationService.renameFolder(notebook, folder, request);
   }
 
   @Operation(

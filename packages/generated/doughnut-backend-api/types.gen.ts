@@ -645,6 +645,16 @@ export type UpdateNotebookGroupRequest = {
 };
 
 /**
+ * Rename a folder in place within its current parent.
+ */
+export type FolderRenameRequest = {
+    /**
+     * New display name for the folder
+     */
+    name: string;
+};
+
+/**
  * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional container-owned folder index markdown.
  */
 export type FolderRealm = {
@@ -2507,6 +2517,61 @@ export type UpdateNotebookIndexContentResponses = {
 
 export type UpdateNotebookIndexContentResponse = UpdateNotebookIndexContentResponses[keyof UpdateNotebookIndexContentResponses];
 
+export type DissolveFolderData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}';
+};
+
+export type DissolveFolderResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetFolderPageData = {
+    body?: never;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}';
+};
+
+export type GetFolderPageResponses = {
+    /**
+     * OK
+     */
+    200: FolderRealm;
+};
+
+export type GetFolderPageResponse = GetFolderPageResponses[keyof GetFolderPageResponses];
+
+export type RenameFolderData = {
+    body: FolderRenameRequest;
+    path: {
+        notebook: number;
+        folder: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/folders/{folder}';
+};
+
+export type RenameFolderResponses = {
+    /**
+     * OK
+     */
+    200: Folder;
+};
+
+export type RenameFolderResponse = RenameFolderResponses[keyof RenameFolderResponses];
+
 export type UpdateFolderIndexContentData = {
     body: NoteUpdateContentDto;
     path: {
@@ -2962,42 +3027,6 @@ export type MyNotebooksResponses = {
 };
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
-
-export type DissolveFolderData = {
-    body?: never;
-    path: {
-        notebook: number;
-        folder: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/folders/{folder}';
-};
-
-export type DissolveFolderResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type GetFolderPageData = {
-    body?: never;
-    path: {
-        notebook: number;
-        folder: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/folders/{folder}';
-};
-
-export type GetFolderPageResponses = {
-    /**
-     * OK
-     */
-    200: FolderRealm;
-};
-
-export type GetFolderPageResponse = GetFolderPageResponses[keyof GetFolderPageResponses];
 
 export type ListNotebookFolderIndexData = {
     body?: never;

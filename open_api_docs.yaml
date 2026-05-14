@@ -1800,6 +1800,85 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookRealm"
+  /api/notebooks/{notebook}/folders/{folder}:
+    get:
+      tags:
+      - notebook-controller
+      summary: Get folder page payload
+      description: "Notebook chrome, folder metadata, parent folder id when nested,\
+        \ and designated folder index note id when resolved."
+      operationId: getFolderPage
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FolderRealm"
+    delete:
+      tags:
+      - notebook-controller
+      summary: Dissolve a folder
+      description: Removes the folder row. Direct notes and subfolders are promoted
+        to the dissolved folder's parent (or notebook root). Deeper descendants stay
+        under the promoted subfolder.
+      operationId: dissolveFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+    patch:
+      tags:
+      - notebook-controller
+      summary: Rename a folder
+      description: Changes the folder display name under its current parent. Sibling
+        name conflicts are rejected.
+      operationId: renameFolder
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: folder
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderRenameRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Folder"
   /api/notebooks/{notebook}/folders/{folder}/index-content:
     patch:
       tags:
@@ -2269,54 +2348,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
-  /api/notebooks/{notebook}/folders/{folder}:
-    get:
-      tags:
-      - notebook-controller
-      summary: Get folder page payload
-      description: "Notebook chrome, folder metadata, parent folder id when nested,\
-        \ and designated folder index note id when resolved."
-      operationId: getFolderPage
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: folder
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/FolderRealm"
-    delete:
-      tags:
-      - notebook-controller
-      summary: Dissolve a folder
-      description: Removes the folder row. Direct notes and subfolders are promoted
-        to the dissolved folder's parent (or notebook root). Deeper descendants stay
-        under the promoted subfolder.
-      operationId: dissolveFolder
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: folder
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/notebooks/{notebook}/folders/index:
     get:
       tags:
@@ -4140,6 +4171,18 @@ components:
         notebookGroupId:
           type: integer
           format: int32
+    FolderRenameRequest:
+      type: object
+      description: Rename a folder in place within its current parent.
+      properties:
+        name:
+          type: string
+          description: New display name for the folder
+          maxLength: 512
+          minLength: 0
+          pattern: "^[^\\\\/:]*$"
+      required:
+      - name
     FolderRealm:
       type: object
       description: "Notebook chrome plus folder row for loading the folder page: same\
