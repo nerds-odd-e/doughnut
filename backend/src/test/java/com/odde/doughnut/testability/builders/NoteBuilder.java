@@ -69,10 +69,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder toBeRemoved(User user) {
-    return this;
-  }
-
   public NoteBuilder creator(User user) {
     if (entity.getCreator() != null)
       throw new AssertionError("creator already set for " + entity.toString());
