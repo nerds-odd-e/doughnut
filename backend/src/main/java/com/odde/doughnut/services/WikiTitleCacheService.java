@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -281,7 +282,8 @@ public class WikiTitleCacheService {
 
   private void rebuildWikiTitleCache(Note note, User viewer) {
     Integer noteId = note.getId();
-    noteWikiTitleCacheRepository.deleteByNote_Id(noteId);
+    entityManager.find(Note.class, noteId, LockModeType.PESSIMISTIC_WRITE);
+    noteWikiTitleCacheRepository.deleteByNoteIdInBulk(noteId);
     entityManager.flush();
     Note cacheOwner = entityManager.getReference(Note.class, noteId);
     for (WikiLinkResolver.ResolvedWikiLink link :

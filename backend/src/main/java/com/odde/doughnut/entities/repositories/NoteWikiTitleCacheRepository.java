@@ -4,12 +4,17 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface NoteWikiTitleCacheRepository extends JpaRepository<NoteWikiTitleCache, Integer> {
 
   void deleteByNote_Id(Integer noteId);
+
+  @Modifying
+  @Query("DELETE FROM NoteWikiTitleCache c WHERE c.note.id = :noteId")
+  void deleteByNoteIdInBulk(@Param("noteId") Integer noteId);
 
   List<NoteWikiTitleCache> findByNote_IdOrderByIdAsc(Integer noteId);
 
