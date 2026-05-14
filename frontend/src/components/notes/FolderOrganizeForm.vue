@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, ref, watch } from "vue"
+import { computed, inject, ref, watch } from "vue"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -99,6 +99,11 @@ const emit = defineEmits<{
 }>()
 
 const { popups } = usePopups()
+
+const reloadFolderPage = inject<(() => Promise<void>) | undefined>(
+  "reloadFolderPage",
+  undefined
+)
 
 const processing = ref(false)
 const moveError = ref<string | undefined>(undefined)
@@ -156,6 +161,7 @@ const submitRename = async () => {
     )
     if (error) throw error
     refreshSidebarStructuralListings()
+    await reloadFolderPage?.()
     emit("closeDialog")
   } catch (e: unknown) {
     renameError.value = toOpenApiError(e).message ?? "Failed to rename folder"
@@ -184,6 +190,7 @@ const submitMove = async () => {
     )
     if (error) throw error
     refreshSidebarStructuralListings()
+    await reloadFolderPage?.()
     emit("closeDialog")
   } catch (e: unknown) {
     moveError.value = toOpenApiError(e).message ?? "Failed to move folder"
