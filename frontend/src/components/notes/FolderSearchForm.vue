@@ -141,12 +141,16 @@ const filteredFolders = computed(() => {
       out.push(r)
     }
   }
-  out.sort((a, b) =>
-    folderPathLabel(a.id, byId.value).localeCompare(
-      folderPathLabel(b.id, byId.value)
-    )
-  )
-  return out
+  const withPaths = out.map((r) => ({
+    row: r,
+    path: folderPathLabel(r.id, byId.value),
+  }))
+  withPaths.sort((a, b) => {
+    const byLen = a.path.length - b.path.length
+    if (byLen !== 0) return byLen
+    return a.path.localeCompare(b.path)
+  })
+  return withPaths.map((x) => x.row)
 })
 
 function rowDisplay(id: number): string {
