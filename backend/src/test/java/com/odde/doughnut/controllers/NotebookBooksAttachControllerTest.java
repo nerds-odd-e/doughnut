@@ -80,6 +80,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       Book detail = controller.getBook(nb);
       String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
       JsonNode tree = objectMapper.readTree(json);
+      assertThat(tree.path("bookName").asText(), equalTo("Linear Algebra"));
       JsonNode blocks = tree.get("blocks");
       assertThat(blocks.size(), equalTo(3));
       assertThat(blocks.get(0).get("depth").asInt(), equalTo(0));

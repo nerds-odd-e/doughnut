@@ -170,9 +170,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public void initializeNewNote(
       User user, Notebook notebookOrNull, Timestamp currentUTCTimestamp, String title) {
-    if (notebookOrNull != null) {
-      setNotebook(notebookOrNull);
-    }
+    setNotebook(notebookOrNull);
     setUpdatedAt(currentUTCTimestamp);
     setTitle(title != null ? title : "");
     setCreatedAt(currentUTCTimestamp);
