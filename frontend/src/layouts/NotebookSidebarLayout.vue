@@ -71,6 +71,7 @@ import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
+import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const route = useRoute()
@@ -199,6 +200,11 @@ watch(
   },
   { immediate: true }
 )
+
+watch(sidebarStructuralRefreshKey, async () => {
+  if (route.name !== "folderPage") return
+  await fetchFolderPage()
+})
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth
