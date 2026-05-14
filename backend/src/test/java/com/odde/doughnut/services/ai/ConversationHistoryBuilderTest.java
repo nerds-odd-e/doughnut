@@ -37,8 +37,7 @@ class ConversationHistoryBuilderTest {
     void shouldIncludeNoteContextAsFirstSystemMessage() {
       // Given a conversation about a note
       Note note = makeMe.aNote().please();
-      Conversation conversation =
-          makeMe.aConversation().forANote(note).from(note.getCreator()).please();
+      Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       // When building history
       ConversationHistoryBuilder builder =
@@ -94,8 +93,7 @@ class ConversationHistoryBuilderTest {
     void shouldHandleEmptyConversation() {
       // Given a conversation with no messages
       Note note = makeMe.aNote().please();
-      Conversation conversation =
-          makeMe.aConversation().forANote(note).from(note.getCreator()).please();
+      Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       // When building history
       ConversationHistoryBuilder builder =

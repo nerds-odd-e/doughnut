@@ -34,7 +34,7 @@ public class NoteServiceTest {
     void shouldSoftDeleteMemoryTrackersWhenNoteIsDeleted() {
       User owner = makeMe.aUser().please();
       Note note = makeMe.aNote().notebookOwnedBy(owner).please();
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(owner).please();
 
       noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
@@ -47,11 +47,11 @@ public class NoteServiceTest {
     void shouldExcludeSoftDeletedMemoryTrackersFromGetMemoryTrackersFor() {
       User owner = makeMe.aUser().please();
       Note note = makeMe.aNote().notebookOwnedBy(owner).please();
-      makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
+      makeMe.aMemoryTrackerFor(note).by(owner).please();
 
       noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
-      assertThat(userService.getMemoryTrackersFor(note.getCreator(), note), hasSize(0));
+      assertThat(userService.getMemoryTrackersFor(owner, note), hasSize(0));
     }
 
     @Test
@@ -76,10 +76,10 @@ public class NoteServiceTest {
       Timestamp t1 = makeMe.aTimestamp().of(1, 0).please();
       Timestamp t2 = TimestampOperations.addHoursToTimestamp(t1, 1);
 
-      Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
-      MemoryTracker mtDeletedAtT1 = makeMe.aMemoryTrackerFor(note).by(note.getCreator()).please();
-      MemoryTracker mtDeletedAtT2 =
-          makeMe.aMemoryTrackerFor(note).by(note.getCreator()).spelling().please();
+      User owner = makeMe.aUser().please();
+      Note note = makeMe.aNote().notebookOwnedBy(owner).please();
+      MemoryTracker mtDeletedAtT1 = makeMe.aMemoryTrackerFor(note).by(owner).please();
+      MemoryTracker mtDeletedAtT2 = makeMe.aMemoryTrackerFor(note).by(owner).spelling().please();
 
       mtDeletedAtT1.setDeletedAt(t1);
       makeMe.entityPersister.merge(mtDeletedAtT1);
@@ -96,7 +96,7 @@ public class NoteServiceTest {
           makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT2.getId());
       assertThat(refreshedT1.getDeletedAt(), notNullValue());
       assertThat(refreshedT2.getDeletedAt(), nullValue());
-      assertThat(userService.getMemoryTrackersFor(note.getCreator(), note), hasSize(1));
+      assertThat(userService.getMemoryTrackersFor(owner, note), hasSize(1));
     }
   }
 }
