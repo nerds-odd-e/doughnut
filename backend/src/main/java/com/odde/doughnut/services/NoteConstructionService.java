@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.PointExtractionResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
@@ -59,8 +58,7 @@ public class NoteConstructionService {
     this.noteService = noteService;
   }
 
-  private Note createNoteInNotebookScopeWithoutWikidata(
-      Notebook notebook, Folder folderOrNull, String title) {
+  private Note createNote(Notebook notebook, Folder folderOrNull, String title) {
     throwIfReservedTitle(title);
     throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
     if (folderOrNull != null) {
@@ -69,7 +67,7 @@ public class NoteConstructionService {
     Note note = new Note();
     User user = authorizationService.getCurrentUser();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-    note.initializeAsNotebookRoot(notebook, user, ts, title);
+    note.initializeNewNote(user, notebook, ts, title);
     if (entityPersister != null) {
       entityPersister.save(note);
     }
@@ -119,8 +117,7 @@ public class NoteConstructionService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder not in notebook.");
       }
     }
-    Note note =
-        createNoteInNotebookScopeWithoutWikidata(notebook, folder, noteCreation.getNewTitle());
+    Note note = createNote(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
       Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
       note.setContent(noteCreation.getContent());
@@ -167,13 +164,12 @@ public class NoteConstructionService {
   }
 
   public NoteRealm createNoteFromPromotedPointToSibling(
-      Note originalNote, PointExtractionResult aiResult) throws UnexpectedNoAccessRightException {
+      Note originalNote, PointExtractionResult aiResult) {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     Note newNote =
-        createNoteInNotebookScopeWithoutWikidata(
-            originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
+        createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     newNote.setContent(aiResult.newNoteContent);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);

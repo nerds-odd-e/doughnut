@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.NoteEmbeddingService;
-import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class MakeMe extends MakeMeWithoutDB {
   @Autowired public EntityPersister entityPersister;
-  @Autowired public WikiTitleCacheService wikiTitleCacheService;
   @Autowired public NoteEmbeddingService noteEmbeddingService;
   @Autowired public BookStorage bookStorage;
   @Autowired public TestabilitySettings testabilitySettings;
@@ -124,10 +122,6 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public RecallPromptBuilder aRecallPrompt() {
     return new RecallPromptBuilder(this, null);
-  }
-
-  public RecallPromptBuilder theRecallPrompt(RecallPrompt recallPrompt) {
-    return new RecallPromptBuilder(this, recallPrompt);
   }
 
   public FailureReportBuilder aFailureReport() {

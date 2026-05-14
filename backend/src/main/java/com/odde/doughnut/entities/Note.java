@@ -179,13 +179,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     setCreator(user);
   }
 
-  /** Notebook root scope: folder stays unset (null) until set explicitly. */
-  public void initializeAsNotebookRoot(
-      Notebook notebook, User user, Timestamp currentUTCTimestamp, String title) {
-    Objects.requireNonNull(notebook, "notebook");
-    initializeNewNote(user, notebook, currentUTCTimestamp, title);
-  }
-
   @JsonIgnore
   public String getNotebookAssistantInstructions() {
     NotebookAiAssistant notebookAiAssistant = getNotebook().getNotebookAiAssistant();

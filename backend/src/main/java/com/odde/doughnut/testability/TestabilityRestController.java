@@ -177,7 +177,7 @@ class TestabilityRestController {
         EntityPersister entityPersister) {
       for (NoteTestData injection : noteTestData) {
         Note note = titleNoteMap.get(injection.title);
-        note.initializeAsNotebookRoot(notebook, user, currentUTCTimestamp, injection.title);
+        note.initializeNewNote(user, notebook, currentUTCTimestamp, injection.title);
         notebook.setUpdatedAt(currentUTCTimestamp);
         entityPersister.merge(notebook);
       }
