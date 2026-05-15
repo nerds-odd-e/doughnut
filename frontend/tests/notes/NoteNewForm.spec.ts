@@ -48,6 +48,7 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 let searchForRelationshipTargetWithinSpy: ReturnType<typeof mockSdkService>
+let semanticSearchWithinSpy: ReturnType<typeof mockSdkService>
 let mockedCreateNoteAtRoot: ReturnType<typeof mockSdkService>
 
 async function setNoteNewFormTitle(
@@ -73,7 +74,11 @@ describe("adding new note", () => {
       []
     )
     mockSdkService(SearchController, "semanticSearch", [])
-    mockSdkService(SearchController, "semanticSearchWithin", [])
+    semanticSearchWithinSpy = mockSdkService(
+      SearchController,
+      "semanticSearchWithin",
+      []
+    )
     mockSdkService(NoteController, "getRecentNotes", [])
     mockSdkService(NotebookController, "listNotebookFolderIndex", [])
     mockSdkService(NotebookController, "listNotebookFolderListing", {
@@ -224,6 +229,35 @@ describe("adding new note", () => {
 
     expect(wrapper.text()).toContain("mythical")
     expect(searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
+      path: { note: note.id },
+      body: expect.objectContaining({ searchKey: "myth" }),
+    })
+    expect(semanticSearchWithinSpy).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it("runs semantic search when the semantic toggle is turned on", async () => {
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+    semanticSearchWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+    const wrapper = helper
+      .component(NoteNewForm)
+      .withCleanStorage()
+      .withProps(notebookRootProps)
+      .mount({ attachTo: document.body })
+    await setNoteNewFormTitle(wrapper, "myth")
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    semanticSearchWithinSpy.mockClear()
+    searchForRelationshipTargetWithinSpy.mockClear()
+
+    await wrapper
+      .find('[data-testid="note-new-form-semantic-search-toggle"]')
+      .trigger("click")
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    expect(semanticSearchWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "myth" }),
     })

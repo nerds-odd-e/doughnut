@@ -104,11 +104,11 @@
       </button>
     </div>
     <SearchResults
+      v-model:semantic-search-enabled="semanticSearchEnabled"
       v-bind="{
         noteId,
         inputSearchKey,
         notebookId,
-        semanticSearchEnabled,
       }"
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"

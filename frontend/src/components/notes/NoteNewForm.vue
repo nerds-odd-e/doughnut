@@ -36,12 +36,12 @@
               </template>
             </PathNameEditor>
             <SearchResults
-              v-bind="{
-                noteId: titleSearchScopeNote?.id,
-                inputSearchKey: effectiveSearchKey,
-                isDropdown: true,
-                notebookId: notebookId,
-              }"
+              v-model:semantic-search-enabled="semanticSearchEnabled"
+              :note-id="titleSearchScopeNote?.id"
+              :input-search-key="effectiveSearchKey"
+              :is-dropdown="true"
+              :notebook-id="notebookId"
+              embed-semantic-toggle
               class="title-search-results"
             />
           </div>
@@ -147,6 +147,7 @@ const noteFormErrors = ref({
 
 const processing = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
+const semanticSearchEnabled = ref(false)
 
 // Computed property to determine effective search key
 const effectiveSearchKey = computed(() => {
