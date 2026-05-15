@@ -9,7 +9,48 @@
         placeholder="Search"
         hide-label
         v-focus
-      />
+      >
+        <template #input_prepend>
+          <details
+            ref="historyDetailsRef"
+            class="search-key-history-details daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom daisy-relative daisy-inline-flex daisy-shrink-0"
+            data-testid="search-key-history-dropdown"
+            @toggle="onHistoryToggle"
+          >
+            <summary
+              class="daisy-input daisy-input-bordered daisy-flex daisy-w-12 daisy-min-w-12 daisy-max-w-12 daisy-shrink-0 daisy-flex-none daisy-items-center daisy-justify-center daisy-rounded-r-none daisy-px-0 daisy-py-0 list-none daisy-cursor-pointer daisy-bg-base-100"
+              title="Search history"
+              aria-label="Search history"
+              data-testid="search-key-history-trigger"
+            >
+              <Clock class="daisy-w-5 daisy-h-5" />
+            </summary>
+            <ul
+              tabindex="0"
+              class="daisy-dropdown-content daisy-menu daisy-bg-base-100 daisy-rounded-box daisy-min-w-[12rem] daisy-max-w-[20rem] daisy-max-h-60 daisy-overflow-y-auto daisy-p-2 daisy-shadow daisy-z-[1000]"
+            >
+              <li v-if="historyKeys.length === 0" class="daisy-px-2 daisy-py-1 daisy-text-sm daisy-opacity-60">
+                No search history yet
+              </li>
+              <li
+                v-for="(key, index) in historyKeys"
+                :key="`${index}-${key}`"
+                class="daisy-menu-item daisy-p-0"
+              >
+                <button
+                  type="button"
+                  class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal daisy-text-left daisy-whitespace-normal daisy-break-words"
+                  :title="key"
+                  :data-testid="`search-key-history-item-${index}`"
+                  @click="pickHistoryKey(key)"
+                >
+                  {{ key }}
+                </button>
+              </li>
+            </ul>
+          </details>
+        </template>
+      </TextInput>
       <button
         type="button"
         title="All My Notebooks And Subscriptions"
@@ -106,10 +147,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { BookOpen, Sparkles, Users, X } from "lucide-vue-next"
+import { BookOpen, Clock, Sparkles, Users, X } from "lucide-vue-next"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
 
 defineProps<{
   noteId?: number
@@ -128,4 +170,26 @@ const inputSearchKey = ref("")
 const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
 const semanticSearchEnabled = ref(false)
+
+const historyDetailsRef = ref<HTMLDetailsElement | null>(null)
+const historyKeys = ref<string[]>([])
+
+function onHistoryToggle() {
+  if (historyDetailsRef.value?.open) {
+    historyKeys.value = readSearchKeyHistory()
+  }
+}
+
+function pickHistoryKey(key: string) {
+  inputSearchKey.value = key
+  if (historyDetailsRef.value) {
+    historyDetailsRef.value.open = false
+  }
+}
 </script>
+
+<style scoped>
+.search-key-history-details > summary::-webkit-details-marker {
+  display: none;
+}
+</style>

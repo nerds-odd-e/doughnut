@@ -16,6 +16,7 @@ import {
   type Ref,
 } from "vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
+import { appendSearchKeyToHistory } from "@/utils/searchKeyHistoryCookie"
 
 const SEARCH_DEBOUNCE_MS = 1000
 
@@ -156,6 +157,9 @@ export function useSearchExecution(opts: {
       }
       if (!applyIfCurrent()) return
       model.completeSearch()
+      if (snapshotTrimmed !== "") {
+        appendSearchKeyToHistory(term.searchKey)
+      }
     })
   }
 

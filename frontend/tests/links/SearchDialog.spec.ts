@@ -12,6 +12,11 @@ import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
+import {
+  appendSearchKeyToHistory,
+  clearSearchKeyHistoryCookie,
+  readSearchKeyHistory,
+} from "@/utils/searchKeyHistoryCookie"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 function makeNoteHit(title: string, notebookId: number) {
@@ -27,6 +32,7 @@ function makeNoteHit(title: string, notebookId: number) {
 describe("SearchForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearSearchKeyHistoryCookie()
     // Mock services used by SearchResults component
     mockSdkService(NoteController, "getRecentNotes", [])
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
@@ -333,6 +339,56 @@ describe("SearchForm", () => {
           }),
         })
       )
+    })
+  })
+
+  describe("search key history", () => {
+    it("shows empty message when cookie has no entries", async () => {
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note: null })
+        .render()
+      await screen.findByPlaceholderText("Search")
+      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      await flushPromises()
+      expect(screen.getByText("No search history yet")).toBeInTheDocument()
+    })
+
+    it("lists cookie keys and fills the input when one is chosen", async () => {
+      appendSearchKeyToHistory("older")
+      appendSearchKeyToHistory("newer")
+      const note = MakeMe.aNote.please()
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+      await screen.findByPlaceholderText("Search")
+      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      await flushPromises()
+      fireEvent.click(screen.getByTestId("search-key-history-item-0"))
+      await flushPromises()
+      const input = screen.getByPlaceholderText("Search") as HTMLInputElement
+      expect(input.value).toBe("newer")
+    })
+
+    it("records trimmed search key after debounced search completes", async () => {
+      clearSearchKeyHistoryCookie()
+      const note = MakeMe.aNote.please()
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeNoteHit("Hit", note.noteTopology.id + 1),
+      ])
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+      const searchInput = await screen.findByPlaceholderText("Search")
+      fireEvent.update(searchInput, "  debounced-term  ")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+      expect(readSearchKeyHistory()).toEqual(["debounced-term"])
     })
   })
 })

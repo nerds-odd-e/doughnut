@@ -15,9 +15,9 @@
         {{ titlized }}
       </label>
       <i v-if="hint" class="hint" v-text="hint" />
-      <div class="daisy-join daisy-w-full">
+      <div class="daisy-join daisy-w-full daisy-items-stretch">
         <template v-if="$slots.input_prepend">
-          <div class="daisy-join-item">
+          <div class="daisy-join-item daisy-flex daisy-h-full daisy-items-stretch">
             <slot name="input_prepend" />
           </div>
         </template>
@@ -28,7 +28,7 @@
           <slot />
         </template>
         <template v-if="$slots.input_append">
-          <div class="daisy-join-item">
+          <div class="daisy-join-item daisy-flex daisy-h-full daisy-items-stretch">
             <slot name="input_append" />
           </div>
         </template>
