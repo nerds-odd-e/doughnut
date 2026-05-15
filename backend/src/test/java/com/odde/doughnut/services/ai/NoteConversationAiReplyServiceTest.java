@@ -8,11 +8,10 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ConversationService;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.client.OpenAIClient;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.ResponseCreateParams;
 import io.reactivex.Flowable;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,35 +25,30 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class ChatCompletionConversationServiceTest {
+class NoteConversationAiReplyServiceTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired GlobalSettingsService globalSettingsService;
   @MockitoBean OpenAiApiHandler openAiApiHandler;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
-  @Autowired ChatCompletionConversationService service;
+  @Autowired NoteConversationAiReplyService service;
   @Mock ConversationService conversationService;
 
   @Test
   void shouldGenerateStreamingResponseForConversation() {
-    // Given a conversation with a note
     Note note = makeMe.aNote().please();
     User user = makeMe.aUser().please();
     Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
     makeMe.aConversationMessage(conversation).sender(user).message("Tell me more").please();
 
-    // Mock the streaming response
-    when(openAiApiHandler.streamChatCompletion(any(ChatCompletionCreateParams.class)))
+    when(openAiApiHandler.streamResponseAsLegacyChatChunks(any(ResponseCreateParams.class)))
         .thenReturn(Flowable.empty());
 
-    // When generating a reply
     SseEmitter result = service.getReplyStream(conversation, conversationService);
 
-    // Then should return an emitter
     assertNotNull(result);
-    verify(openAiApiHandler).streamChatCompletion(any(ChatCompletionCreateParams.class));
+    verify(openAiApiHandler).streamResponseAsLegacyChatChunks(any(ResponseCreateParams.class));
   }
 }

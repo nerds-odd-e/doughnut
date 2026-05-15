@@ -1,3 +1,48 @@
+function flattenExportContent(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .map((p: { type?: string; text?: string }) => {
+        if (p?.type === 'input_text' || p?.type === 'text') return p.text ?? ''
+        return ''
+      })
+      .join('')
+  }
+  return ''
+}
+
+function exportMessagesFromJson(json: Record<string, unknown>): Array<{
+  role: string
+  content: string
+}> {
+  const legacy = json.messages
+  if (Array.isArray(legacy) && legacy.length > 0) {
+    return legacy as Array<{ role: string; content: string }>
+  }
+  const input = json.input as unknown
+  const inputList = Array.isArray(input)
+    ? input
+    : input &&
+        typeof input === 'object' &&
+        Array.isArray((input as { response?: unknown[] }).response)
+      ? (input as { response: unknown[] }).response
+      : []
+  if (!Array.isArray(inputList)) {
+    return []
+  }
+  return inputList
+    .filter(
+      (m) =>
+        m &&
+        typeof m === 'object' &&
+        typeof (m as { role?: string }).role === 'string'
+    )
+    .map((m) => {
+      const o = m as { role: string; content?: unknown }
+      return { role: o.role, content: flattenExportContent(o.content) }
+    })
+}
+
 export class ConversationAboutNotePage {
   replyToConversation(msg: string) {
     cy.focused().type(msg)
@@ -66,25 +111,18 @@ export class ConversationAboutNotePage {
       })
       .then(($textarea) => {
         const content = $textarea.val() as string
-        const json = JSON.parse(content)
-        // Handle both old structure (messages array) and new structure (messages array with different format)
-        const messages = json.messages || (Array.isArray(json) ? json : [])
+        const json = JSON.parse(content) as Record<string, unknown>
+        const messages = exportMessagesFromJson(json)
         if (!messages || messages.length === 0) {
           throw new Error(
             `No messages found in export. JSON structure: ${JSON.stringify(json, null, 2)}`
           )
         }
-        const userMessages = messages.filter((m: any) => {
-          // Check if message has user field (new structure) or role field (old structure)
-          const isUser = m.user !== undefined || m.role === 'user'
+        const userMessages = messages.filter((m) => {
+          const isUser = m.role === 'user'
           if (!isUser) return false
-          // Extract content from new structure (user.content) or old structure (content)
-          const messageContent = m.user?.content || m.content || ''
-          const contentStr =
-            typeof messageContent === 'string'
-              ? messageContent
-              : JSON.stringify(messageContent)
-          return contentStr.includes(message)
+          const messageContent = m.content || ''
+          return messageContent.includes(message)
         })
         expect(userMessages.length).to.be.greaterThan(0)
       })
@@ -100,26 +138,18 @@ export class ConversationAboutNotePage {
       })
       .then(($textarea) => {
         const content = $textarea.val() as string
-        const json = JSON.parse(content)
-        // Handle both old structure (messages array) and new structure (messages array with different format)
-        const messages = json.messages || (Array.isArray(json) ? json : [])
+        const json = JSON.parse(content) as Record<string, unknown>
+        const messages = exportMessagesFromJson(json)
         if (!messages || messages.length === 0) {
           throw new Error(
             `No messages found in export. JSON structure: ${JSON.stringify(json, null, 2)}`
           )
         }
-        const assistantMessages = messages.filter((m: any) => {
-          // Check if message has assistant field (new structure) or role field (old structure)
-          const isAssistant =
-            m.assistant !== undefined || m.role === 'assistant'
+        const assistantMessages = messages.filter((m) => {
+          const isAssistant = m.role === 'assistant'
           if (!isAssistant) return false
-          // Extract content from new structure (assistant.content) or old structure (content)
-          const messageContent = m.assistant?.content || m.content || ''
-          const contentStr =
-            typeof messageContent === 'string'
-              ? messageContent
-              : JSON.stringify(messageContent)
-          return contentStr.includes(reply)
+          const messageContent = m.content || ''
+          return messageContent.includes(reply)
         })
         expect(assistantMessages.length).to.be.greaterThan(0)
       })

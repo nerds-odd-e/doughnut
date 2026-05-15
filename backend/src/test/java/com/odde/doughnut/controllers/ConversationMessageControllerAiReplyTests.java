@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
+import com.odde.doughnut.testability.OpenAiResponseStreamMocker;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
@@ -35,11 +35,11 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
   @Nested
   class NewChatTests {
-    OpenAIChatCompletionStreamMocker chatMocker;
+    OpenAiResponseStreamMocker chatMocker;
 
     @BeforeEach
     void setUp() {
-      chatMocker = new OpenAIChatCompletionStreamMocker(officialClient);
+      chatMocker = new OpenAiResponseStreamMocker(officialClient);
       chatMocker.withMessage("I am a Chatbot").mockStreamResponse();
     }
 
@@ -127,8 +127,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
               .from(currentUser.getUser())
               .please();
 
-      OpenAIChatCompletionStreamMocker chatMocker =
-          new OpenAIChatCompletionStreamMocker(officialClient);
+      OpenAiResponseStreamMocker chatMocker = new OpenAiResponseStreamMocker(officialClient);
       chatMocker.withMessage("I am a Chatbot").mockStreamResponse();
     }
 

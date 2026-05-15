@@ -1,5 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ConversationListItem;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -10,12 +12,11 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
-import com.odde.doughnut.services.ai.ChatCompletionConversationService;
-import com.odde.doughnut.services.ai.ChatMessageContent;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import com.odde.doughnut.services.ai.NoteConversationAiReplyService;
+import com.openai.models.responses.ResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Map;
 import org.apache.coyote.BadRequestException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -25,16 +26,19 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/conversation")
 public class ConversationMessageController {
   private final ConversationService conversationService;
-  private final ChatCompletionConversationService chatCompletionConversationService;
+  private final NoteConversationAiReplyService noteConversationAiReplyService;
   private final AuthorizationService authorizationService;
+  private final ObjectMapper objectMapper;
 
   public ConversationMessageController(
       ConversationService conversationService,
-      ChatCompletionConversationService chatCompletionConversationService,
-      AuthorizationService authorizationService) {
+      NoteConversationAiReplyService noteConversationAiReplyService,
+      AuthorizationService authorizationService,
+      ObjectMapper objectMapper) {
     this.conversationService = conversationService;
-    this.chatCompletionConversationService = chatCompletionConversationService;
+    this.noteConversationAiReplyService = noteConversationAiReplyService;
     this.authorizationService = authorizationService;
+    this.objectMapper = objectMapper;
   }
 
   @PostMapping("/note/{note}")
@@ -92,11 +96,8 @@ public class ConversationMessageController {
             "Only note or recall prompt related conversation can have AI reply");
       }
 
-      // Use new chat completion service
-      return chatCompletionConversationService.getReplyStream(conversation, conversationService);
+      return noteConversationAiReplyService.getReplyStream(conversation, conversationService);
     } catch (OpenAiUnauthorizedException | OpenAiNotAvailableException e) {
-      // Since this method is asynchronous, the exception body is not returned to the client.
-      // Instead, the client will receive a 400 Bad Request status code, with no body.
       throw new BadRequestException(e.getMessage(), e);
     }
   }
@@ -111,43 +112,45 @@ public class ConversationMessageController {
 
   @GetMapping(value = "/{conversationId}/export", produces = "application/json")
   @org.springframework.web.bind.annotation.ResponseBody
-  public java.util.Map<String, Object> exportConversation(
+  public Map<String, Object> exportConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(conversation);
-    ChatCompletionCreateParams params =
-        chatCompletionConversationService.buildChatCompletionRequest(conversation);
-    // Manually construct Map for proper JSON serialization
-    java.util.Map<String, Object> result = new java.util.HashMap<>();
-    result.put("model", params.model().toString());
-    java.util.List<java.util.Map<String, Object>> messagesList = new java.util.ArrayList<>();
-    for (ChatCompletionMessageParam messageParam : params.messages()) {
-      java.util.Map<String, Object> messageMap = new java.util.HashMap<>();
-      if (messageParam.developer().isPresent()) {
-        messageMap.put("role", "developer");
-        messageMap.put(
-            "content",
-            ChatMessageContent.extractContentString(messageParam.developer().get().content()));
-      } else if (messageParam.user().isPresent()) {
-        messageMap.put("role", "user");
-        messageMap.put(
-            "content",
-            ChatMessageContent.extractContentString(messageParam.user().get().content()));
-      } else if (messageParam.assistant().isPresent()) {
-        messageMap.put("role", "assistant");
-        messageMap.put(
-            "content",
-            messageParam
-                .assistant()
-                .get()
-                .content()
-                .map(ChatMessageContent::extractContentString)
-                .orElse(null));
-      }
-      messagesList.add(messageMap);
+    ResponseCreateParams params =
+        noteConversationAiReplyService.buildResponseCreateParams(conversation);
+    return serializeResponseCreateParams(params);
+  }
+
+  private Map<String, Object> serializeResponseCreateParams(ResponseCreateParams params) {
+    try {
+      ResponseCreateParams.Body body = params._body();
+      String jsonString = objectMapper.writeValueAsString(body);
+      Map<String, Object> result =
+          objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+      removeValidFields(result);
+      return result;
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to serialize ResponseCreateParams", e);
     }
-    result.put("messages", messagesList);
-    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  private void removeValidFields(Object obj) {
+    if (obj == null) {
+      return;
+    }
+    if (obj instanceof Map) {
+      Map<String, Object> map = (Map<String, Object>) obj;
+      map.remove("valid");
+      for (Object value : map.values()) {
+        removeValidFields(value);
+      }
+    } else if (obj instanceof List) {
+      List<?> list = (List<?>) obj;
+      for (Object item : list) {
+        removeValidFields(item);
+      }
+    }
   }
 
   @GetMapping("/note/{note}")

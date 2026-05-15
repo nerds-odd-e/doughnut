@@ -153,7 +153,7 @@ Then('I contest the question', () => {
 
 Given('OpenAI will reply below for user messages:', (data: DataTable) => {
   // Use chat completion streaming
-  mock_services.openAi().stubChatCompletionStream(data.hashes())
+  mock_services.openAi().stubConversationAiReplyStream(data.hashes())
 })
 
 Given(

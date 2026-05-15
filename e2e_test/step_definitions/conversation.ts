@@ -101,10 +101,8 @@ Then('I should receive the following chat messages:', (data: DataTable) => {
   start.assumeConversationAboutNotePage().expectMessages(data.hashes())
 })
 
-Then('OpenAI chat completions were called with Doughnut focus context', () => {
-  mock_services
-    .openAi()
-    .expectLastChatCompletionsBodyContains('# Focus Context')
+Then('OpenAI responses were called with Doughnut focus context', () => {
+  mock_services.openAi().expectLastResponsesPostBodyContains('# Focus Context')
 })
 
 When('I export the conversation', () => {

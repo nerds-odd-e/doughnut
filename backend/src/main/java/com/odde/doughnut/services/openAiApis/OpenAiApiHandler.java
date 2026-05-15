@@ -6,7 +6,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.ResponseCreateParams;
 import com.openai.models.responses.StructuredResponse;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.reactivex.BackpressureStrategy;
@@ -45,34 +45,33 @@ public class OpenAiApiHandler {
     }
   }
 
-  public Flowable<String> streamChatCompletion(ChatCompletionCreateParams params) {
+  public Flowable<String> streamResponseAsLegacyChatChunks(ResponseCreateParams params) {
     assertOpenAiAvailable();
-    return Flowable.<String>create(
+    ResponseStreamToLegacyChatChunkMapper mapper =
+        new ResponseStreamToLegacyChatChunkMapper(objectMapper);
+    return Flowable.create(
         emitter -> {
-          // Use the async client's subscribe() method for true async streaming
-          // The OpenAI SDK's async API handles threading internally, so we don't need
-          // subscribeOn() which would move session-scoped bean access to a background thread
           officialClient
               .async()
-              .chat()
-              .completions()
+              .responses()
               .createStreaming(params)
               .subscribe(
-                  chunk -> {
+                  event -> {
                     try {
-                      // Convert ChatCompletionChunk to JSON string to preserve delta field
-                      // structure expected by frontend
-                      String jsonString = objectMapper.writeValueAsString(chunk);
-                      emitter.onNext(jsonString);
+                      for (String json : mapper.map(event)) {
+                        emitter.onNext(json);
+                      }
                     } catch (JsonProcessingException e) {
-                      emitter.onError(new RuntimeException("Failed to serialize chunk to JSON", e));
+                      emitter.onError(
+                          new RuntimeException("Failed to serialize legacy chat chunk", e));
+                    } catch (RuntimeException e) {
+                      emitter.onError(e);
                     }
                   })
               .onCompleteFuture()
               .whenComplete(
                   (unused, error) -> {
                     if (error != null) {
-                      // Handle unauthorized errors
                       if (error.getMessage() != null
                           && (error.getMessage().contains("401")
                               || error.getMessage().contains("Unauthorized"))) {

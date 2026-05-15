@@ -8,7 +8,7 @@ import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
-import { buildChatCompletionStreamEvent } from './openAiMessageComposer'
+import { buildResponsesStreamEvent } from './openAiMessageComposer'
 
 const OPEN_AI_IMPOSTER_PORT = 5001
 
@@ -113,7 +113,7 @@ const openAiService = () => {
       })
     },
 
-    expectLastChatCompletionsBodyContains(marker: string) {
+    expectLastResponsesPostBodyContains(marker: string) {
       const mountebank = new Mountebank()
       cy.request(
         'GET',
@@ -121,17 +121,24 @@ const openAiService = () => {
       ).then((res) => {
         expect(res.status).to.eq(200)
         const imposter = res.body as {
-          requests?: Array<{ method?: string; body?: string | object }>
+          requests?: Array<{
+            method?: string
+            path?: string
+            body?: string | object
+          }>
         }
         const requests = imposter.requests ?? []
         const postBodies = requests
-          .filter((r) => r.method === 'POST')
+          .filter(
+            (r) =>
+              r.method === 'POST' && (r.path?.includes('/responses') ?? false)
+          )
           .map((r) =>
             typeof r.body === 'string' ? r.body : JSON.stringify(r.body)
           )
         expect(
           postBodies.length,
-          'OpenAI POST requests recorded'
+          'OpenAI POST /responses requests recorded'
         ).to.be.greaterThan(0)
         const combined = postBodies.join('\n')
         expect(combined).to.include(marker)
@@ -236,21 +243,17 @@ const openAiService = () => {
       })
     },
 
-    stubChatCompletionStream(messages: Record<string, string>[]) {
-      // Create separate responses for each message
+    stubConversationAiReplyStream(messages: Record<string, string>[]) {
       const responses = messages.map((row) =>
-        buildChatCompletionStreamEvent(
+        buildResponsesStreamEvent(
           row['assistant reply']!,
           row['response type'] as 'requires action' | 'message delta & complete'
         )
       )
 
-      // Use stubPosterWithMultipleResponses to send each response in sequence
-      serviceMocker.stubPosterWithMultipleResponses(
-        `/chat/completions`,
-        responses,
-        { 'Content-Type': 'text/event-stream' }
-      )
+      serviceMocker.stubPosterWithMultipleResponses(`/responses`, responses, {
+        'Content-Type': 'text/event-stream',
+      })
       return this
     },
 

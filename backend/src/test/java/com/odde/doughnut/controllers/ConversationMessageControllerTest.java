@@ -367,11 +367,76 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           () -> controller.exportConversation(otherConversation));
     }
 
+    private List<java.util.Map<String, Object>> extractMessagesForExport(
+        java.util.Map<String, Object> request) {
+      Object legacy = request.get("messages");
+      if (legacy instanceof List<?> list
+          && !list.isEmpty()
+          && list.get(0) instanceof java.util.Map) {
+        @SuppressWarnings("unchecked")
+        List<java.util.Map<String, Object>> typed =
+            (List<java.util.Map<String, Object>>) (List<?>) list;
+        return typed;
+      }
+      Object inputObj = request.get("input");
+      if (inputObj instanceof List<?> list) {
+        return flattenResponseInputItems(list);
+      }
+      if (inputObj instanceof java.util.Map<?, ?> inputMap) {
+        Object response = inputMap.get("response");
+        if (response instanceof List<?> list) {
+          return flattenResponseInputItems(list);
+        }
+      }
+      return List.of();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<java.util.Map<String, Object>> flattenResponseInputItems(List<?> list) {
+      List<java.util.Map<String, Object>> messages = new java.util.ArrayList<>();
+      for (Object o : list) {
+        if (!(o instanceof java.util.Map)) {
+          continue;
+        }
+        java.util.Map<String, Object> item = (java.util.Map<String, Object>) o;
+        Object role = item.get("role");
+        if (!(role instanceof String)) {
+          continue;
+        }
+        java.util.Map<String, Object> row = new java.util.HashMap<>();
+        row.put("role", role);
+        row.put("content", contentToPlainText(item.get("content")));
+        messages.add(row);
+      }
+      return messages;
+    }
+
+    private String contentToPlainText(Object content) {
+      if (content instanceof String s) {
+        return s;
+      }
+      if (content instanceof List<?> parts) {
+        StringBuilder sb = new StringBuilder();
+        for (Object part : parts) {
+          if (part instanceof java.util.Map<?, ?> p) {
+            Object type = p.get("type");
+            if ("input_text".equals(type) || "text".equals(type)) {
+              Object text = p.get("text");
+              if (text != null) {
+                sb.append(text);
+              }
+            }
+          }
+        }
+        return sb.toString();
+      }
+      return content != null ? content.toString() : "";
+    }
+
     private String formatExportResponse(java.util.Map<String, Object> request) {
       StringBuilder export = new StringBuilder();
       export.append("## Context\n\n");
-      java.util.List<java.util.Map<String, Object>> messages =
-          (java.util.List<java.util.Map<String, Object>>) request.get("messages");
+      java.util.List<java.util.Map<String, Object>> messages = extractMessagesForExport(request);
       for (java.util.Map<String, Object> message : messages) {
         if ("developer".equals(message.get("role"))) {
           export.append(formatMessage((String) message.get("content"))).append("\n\n");
@@ -402,7 +467,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void shouldExportConversationWithRequest() throws UnexpectedNoAccessRightException {
       java.util.Map<String, Object> request = controller.exportConversation(conversation);
       assertThat(request).isNotNull();
-      assertThat(((java.util.List<?>) request.get("messages")).size()).isGreaterThan(0);
+      assertThat(extractMessagesForExport(request).size()).isGreaterThan(0);
     }
 
     @Test
