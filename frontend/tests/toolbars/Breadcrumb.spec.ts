@@ -28,8 +28,7 @@ describe("breadcrumb with circles", () => {
         ancestorFolders: [],
       })
       .render()
-    await screen.findByText("Notebooks")
-    const notebookName = screen.getByText(notebook.name)
+    const notebookName = await screen.findByText(notebook.name)
     expect(notebookName.closest("a")).not.toBeNull()
   })
 

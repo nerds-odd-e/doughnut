@@ -10,9 +10,6 @@
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
-        <li>
-          <router-link :to="{ name: 'notebooks' }">Notebooks</router-link>
-        </li>
         <li v-if="notebookRealm.notebook.circle">
           <router-link
             :to="{
@@ -25,12 +22,15 @@
       </template>
       <li>
         <router-link
+          class="daisy-inline-flex daisy-items-center daisy-gap-1 daisy-text-base-content"
           :to="{
             name: 'notebookPage',
             params: { notebookId: String(notebookRealm.notebook.id) },
           }"
-          >{{ notebookRealm.notebook.name }}</router-link
         >
+          <BookText class="daisy-h-3.5 daisy-w-3.5 daisy-shrink-0" aria-hidden="true" />
+          {{ notebookRealm.notebook.name }}
+        </router-link>
       </li>
     </template>
   </Breadcrumb>
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import type { Folder, NotebookRealm } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
+import { BookText } from "lucide-vue-next"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 
 defineProps({

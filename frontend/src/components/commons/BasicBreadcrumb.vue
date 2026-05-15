@@ -8,12 +8,16 @@
       >
         <router-link
           v-if="breadcrumbNotebookId != null"
-          class="daisy-text-base-content"
+          class="daisy-inline-flex daisy-items-center daisy-gap-1 daisy-text-base-content"
           :to="folderPageTo(segment.id)"
         >
+          <FolderIcon class="daisy-h-3.5 daisy-w-3.5 daisy-shrink-0" aria-hidden="true" />
           {{ segment.name }}
         </router-link>
-        <span v-else class="daisy-text-base-content">{{ segment.name }}</span>
+        <span v-else class="daisy-inline-flex daisy-items-center daisy-gap-1 daisy-text-base-content">
+          <FolderIcon class="daisy-h-3.5 daisy-w-3.5 daisy-shrink-0" aria-hidden="true" />
+          {{ segment.name }}
+        </span>
       </li>
       <li v-if="$slots.additional">
         <slot name="additional" />
@@ -25,6 +29,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { Folder } from "@generated/doughnut-backend-api"
+import { Folder as FolderIcon } from "lucide-vue-next"
 
 const props = defineProps({
   folderSegments: {
