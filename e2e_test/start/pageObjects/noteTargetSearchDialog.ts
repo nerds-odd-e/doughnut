@@ -83,36 +83,36 @@ export const assumeNoteTargetSearchDialog = () => {
       return this
     },
     expectNoRelationshipTargetNotes() {
-      cy.findByText('Search result', { selector: '.result-title' }).should(
-        'be.visible'
-      )
+      cy.findByText('Search result', {
+        selector: '.result-section-info',
+      }).should('be.visible')
       cy.get(relationshipTargetNoteTitleSelector).should('have.length', 0)
       return this
     },
     expectExactRelationshipTargets: (targets: string[]) => {
       if (targets.length === 0) {
-        cy.findByText('Search result', { selector: '.result-title' }).should(
-          'be.visible'
-        )
+        cy.findByText('Search result', {
+          selector: '.result-section-info',
+        }).should('be.visible')
         cy.findByText('No matching notes found.').should('be.visible')
         return
       }
-      cy.findByText('Search result', { selector: '.result-title' }).should(
-        'be.visible'
-      )
+      cy.findByText('Search result', {
+        selector: '.result-section-info',
+      }).should('be.visible')
       expectExactRelationshipTargetsWithRetry(targets)
     },
     expectExactDropdownTargets: (targets: string[]) => {
       if (targets.length === 0) {
-        cy.findByText('Search result', { selector: '.result-title' }).should(
-          'be.visible'
-        )
+        cy.findByText('Search result', {
+          selector: '.result-section-info',
+        }).should('be.visible')
         cy.findByText('No matching notes found.').should('be.visible')
         return
       }
-      cy.findByText('Search result', { selector: '.result-title' }).should(
-        'be.visible'
-      )
+      cy.findByText('Search result', {
+        selector: '.result-section-info',
+      }).should('be.visible')
       cy.get('.dropdown-list a:not(.notebook-hit-title)')
         .then((elms) => Cypress._.map(elms, (e) => e.textContent?.trim() ?? ''))
         .should('deep.equal', targets)
@@ -154,7 +154,7 @@ export const assumeNoteTargetSearchDialog = () => {
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {
-        selector: '.result-title',
+        selector: '.result-section-info',
       }).should('be.visible')
       // Note can be in the dropdown list or the scrollable list panel
       cy.contains('.result-section', noteTitle).should('be.visible')
@@ -162,15 +162,15 @@ export const assumeNoteTargetSearchDialog = () => {
     },
     expectRecentlyUpdatedSectionNotVisible() {
       cy.findByText('Recently updated notes', {
-        selector: '.result-title',
+        selector: '.result-section-info',
       }).should('not.exist')
       return this
     },
 
     expectNotebookNameInSearchResults(notebookName: string) {
-      cy.findByText('Search result', { selector: '.result-title' }).should(
-        'be.visible'
-      )
+      cy.findByText('Search result', {
+        selector: '.result-section-info',
+      }).should('be.visible')
       cy.get('.search-result').within(() => {
         cy.contains('.notebook-name-label', notebookName).should('be.visible')
       })
