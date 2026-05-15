@@ -6,7 +6,7 @@
     >
       <div
         v-if="showTitleBar"
-        class="result-title-row daisy-flex daisy-flex-nowrap daisy-items-center daisy-gap-2 daisy-w-full daisy-min-w-0"
+        class="result-section-info-row daisy-flex daisy-flex-nowrap daisy-items-center daisy-gap-2 daisy-w-full daisy-min-w-0"
       >
         <button
           v-if="embedSemanticToggle"
@@ -26,7 +26,7 @@
         </button>
         <span
           v-if="displayState.title"
-          class="result-title daisy-shrink-0"
+          class="result-section-info daisy-shrink-0 daisy-text-sm daisy-font-normal daisy-text-base-content/70"
         >
           {{ displayState.title }}
         </span>
@@ -279,13 +279,12 @@ const showTitleBar = computed(() => {
   margin-top: 1rem;
 }
 
-.result-title-row {
+.result-section-info-row {
   padding: 0.5rem 0.5rem 0;
   margin-bottom: 0.5rem;
 }
 
-.result-title {
-  font-weight: bold;
+.result-section-info {
   padding: 0;
   line-height: 1.25;
 }
