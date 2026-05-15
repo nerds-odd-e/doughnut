@@ -88,7 +88,7 @@ Then("I haven't login", () => {
 
 When('I visit the falure reports on the admin page', () => {
   cy.on('uncaught:exception', () => false)
-  cy.visit('/d/admin-dashboard')
+  cy.visit('/admin-dashboard')
   cy.get('body').then(($body) => {
     const hasFailureReportsTab = $body
       .find('[role="button"]')

@@ -642,7 +642,7 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-expanded")
 
       // Simulate route change by updating the mocked route fullPath
-      useRouteValue.fullPath = "/d/recall"
+      useRouteValue.fullPath = "/recall"
       useRouteValue.name = "recall"
 
       // Wait for watcher to process
@@ -678,7 +678,7 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-collapsed")
 
       // Simulate route change
-      useRouteValue.fullPath = "/d/notebooks"
+      useRouteValue.fullPath = "/notebooks"
       useRouteValue.name = "notebooks"
 
       // Wait for watcher to process

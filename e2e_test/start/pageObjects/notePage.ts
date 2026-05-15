@@ -11,9 +11,9 @@ import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { assumeAssimilationPage } from './assimilationPage'
 
-/** Matches `noteShowHref()` (`/n{id}`) or legacy `/d/n/:id` note links. */
-const noteShowHref = /^\/d\/n\/\d+$|^\/n\d+$/
-const noteShowPathInUrl = /\/d\/n\/\d+|\/n\d+/
+/** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
+const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
+const noteShowPathInUrl = /\/d\/n\/\d+|\/n\/\d+|\/n\d+/
 
 const noteContentRegion = { role: 'region' as const, name: 'Note content' }
 
@@ -551,13 +551,13 @@ export const assumeNotePage = (
     },
     openAssimilationSettings() {
       cy.url().then((href) => {
-        if (!String(href).includes('/d/assimilate/')) {
+        if (!String(href).includes('/assimilate/')) {
           makeSureNoteMoreOptionsFormIsOpen().openAssimilationPage()
         } else {
           assumeAssimilationPage().waitForAssimilationReady()
         }
       })
-      cy.url().should('include', '/d/assimilate/')
+      cy.url().should('include', '/assimilate/')
       pageIsNotLoading()
       return assumeAssimilationPage()
     },

@@ -7,7 +7,7 @@ import helper, { mockSdkService } from "@tests/helpers"
 const mockPush = vi.fn()
 const mockRoute = reactive({
   name: "recent",
-  path: "/d/recent",
+  path: "/recent",
   params: {},
   query: {},
 })

@@ -16,25 +16,25 @@ export interface RouteMetadata {
 export const routeMetadata: RouteMetadata[] = [
   { path: "/", name: "root" },
   {
-    path: "/d/notebooks",
+    path: "/notebooks",
     name: "notebooks",
   },
   {
-    path: "/d/notebooks/groups/:groupId",
+    path: "/notebooks/groups/:groupId",
     name: "notebookGroup",
     props: (route: RouteLocation) => ({
       groupId: Number(route.params.groupId),
     }),
   },
   {
-    path: "/d/notebooks/:notebookId/book",
+    path: "/notebooks/:notebookId/book",
     name: "bookReading",
     props: (route: RouteLocation) => ({
       notebookId: Number(route.params.notebookId),
     }),
   },
   {
-    path: "/d/notebooks/:notebookId(\\d+)/folders/:folderId(\\d+)",
+    path: "/notebooks/:notebookId(\\d+)/folders/:folderId(\\d+)",
     name: "folderPage",
     props: (route: RouteLocation) => ({
       notebookId: Number(route.params.notebookId),
@@ -42,14 +42,14 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
-    path: "/d/notebooks/:notebookId(\\d+)",
+    path: "/notebooks/:notebookId(\\d+)",
     name: "notebookPage",
     props: (route: RouteLocation) => ({
       notebookId: Number(route.params.notebookId),
     }),
   },
   {
-    path: "/d/n/:noteId(\\d+)",
+    path: "/n/:noteId(\\d+)",
     redirect: (to) => {
       const raw = to.params.noteId
       const id = Array.isArray(raw) ? raw[0] : raw
@@ -65,27 +65,27 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/circles/:circleId",
+    path: "/circles/:circleId",
     name: "circleShow",
     props: true,
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/bazaar",
+    path: "/bazaar",
     name: "bazaar",
   },
   {
-    path: "/d/admin-dashboard",
+    path: "/admin-dashboard",
     name: "adminDashboard",
     props: true,
   },
   {
-    path: "/d/circles/join/:invitationCode?",
+    path: "/circles/join/:invitationCode?",
     name: "circleJoin",
     props: true,
   },
   {
-    path: "/d/message-center/:conversationId?",
+    path: "/message-center/:conversationId?",
     name: "messageCenter",
     props: (route: RouteLocation) => ({
       conversationId: route.params.conversationId
@@ -95,23 +95,23 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/assimilate",
+    path: "/assimilate",
     name: "assimilate",
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/assimilate/:noteId",
+    path: "/assimilate/:noteId",
     name: "assimilateSingleNote",
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/recall",
+    path: "/recall",
     name: "recall",
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/failure-report-list/show/:failureReportId",
+    path: "/failure-report-list/show/:failureReportId",
     name: "failureReport",
     props: true,
   },
@@ -120,19 +120,19 @@ export const routeMetadata: RouteMetadata[] = [
     name: "nonproductionOnlyLogin",
   },
   {
-    path: "/d/recent",
+    path: "/recent",
     name: "recent",
   },
   {
-    path: "/d/circles",
+    path: "/circles",
     name: "circles",
   },
   {
-    path: "/d/generate-token",
+    path: "/generate-token",
     name: "manageAccessTokens",
   },
   {
-    path: "/d/memory-trackers/:memoryTrackerId",
+    path: "/memory-trackers/:memoryTrackerId",
     name: "memoryTrackerShow",
     props: (route: RouteLocation) => ({
       memoryTrackerId: Number(route.params.memoryTrackerId),

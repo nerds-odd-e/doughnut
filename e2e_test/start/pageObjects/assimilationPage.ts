@@ -251,7 +251,7 @@ export const assumeAssimilationPage = () => ({
   },
   removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
     cy.contains('tr', type).click()
-    cy.url().should('include', '/d/memory-trackers/')
+    cy.url().should('include', '/memory-trackers/')
     pageIsNotLoading()
     return assumeMemoryTrackerPage().removeFromRecall()
   },

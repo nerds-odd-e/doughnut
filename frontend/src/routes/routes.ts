@@ -1,4 +1,8 @@
-import type { RouteComponent, RouteRecordRaw } from "vue-router"
+import type {
+  RouteComponent,
+  RouteLocationRaw,
+  RouteRecordRaw,
+} from "vue-router"
 import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
@@ -23,9 +27,7 @@ import BookReadingPage from "@/pages/BookReadingPage.vue"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
 
-// Please start most of the path with "/d/"
-// so that the server will render the page correctly
-// when refreshing the page or directly accessing the URL.
+// Legacy bookmarks used a `/d/…` prefix; strip it and re-resolve (see `legacyDeeplinkPrefixRedirect`).
 
 // Map route names to components
 const componentMap: Record<string, RouteComponent> = {
@@ -59,7 +61,7 @@ const notebookSidebarNestedRouteNames = new Set([
 ])
 
 // Combine route metadata with components
-const routes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
+const routesFromMetadata: RouteRecordRaw[] = routeMetadata.map((metadata) => {
   if (metadata.redirect !== undefined) {
     return {
       path: metadata.path,
@@ -91,5 +93,20 @@ const routes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
     component: componentMap[name]!,
   }
 }) as RouteRecordRaw[]
+
+const legacyDeeplinkPrefixRedirect: RouteRecordRaw = {
+  path: "/d/:pathMatch(.*)*",
+  redirect: (to): RouteLocationRaw => {
+    const pm = to.params.pathMatch
+    if (pm === undefined || pm === "") return "/"
+    const suffix = Array.isArray(pm) ? pm.join("/") : String(pm)
+    return suffix === "" ? "/" : `/${suffix}`
+  },
+}
+
+const routes: RouteRecordRaw[] = [
+  ...routesFromMetadata,
+  legacyDeeplinkPrefixRedirect,
+]
 
 export default routes

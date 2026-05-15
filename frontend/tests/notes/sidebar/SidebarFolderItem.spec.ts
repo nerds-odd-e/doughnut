@@ -43,7 +43,7 @@ describe("SidebarFolderItem", () => {
       routes: [
         { path: "/", component: { template: "<div/>" } },
         {
-          path: "/d/notebooks/:notebookId(\\d+)/folders/:folderId(\\d+)",
+          path: "/notebooks/:notebookId(\\d+)/folders/:folderId(\\d+)",
           name: "folderPage",
           component: { template: "<div/>" },
         },

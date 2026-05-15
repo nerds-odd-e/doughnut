@@ -13,7 +13,7 @@ describe("NonproductionOnlyLoginPage", () => {
     })
     await router.push({
       path: "/users/identify",
-      query: { from: "/d/notebooks/1" },
+      query: { from: "/notebooks/1" },
     })
     await router.isReady()
 

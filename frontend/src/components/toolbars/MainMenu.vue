@@ -110,7 +110,7 @@ const logout = async () => {
   await fetch("/logout", {
     method: "POST",
   })
-  window.location.href = "/d/bazaar"
+  window.location.href = "/bazaar"
 }
 
 const showUserSettingsDialog = () => {

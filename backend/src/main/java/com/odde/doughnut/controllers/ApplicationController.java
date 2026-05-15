@@ -46,14 +46,26 @@ public class ApplicationController {
   }
 
   /**
-   * In prod, the load balancer sends {@code /} and {@code /assets/*} to GCS but deep links here
+   * In prod, the load balancer sends {@code /} and {@code /assets/*} to GCS but SPA deep links here
    * still hit the MIG. Serving classpath {@code index.html} would desync chunk names from the
    * active GCS tree when the jar and URL-map SHA differ; fetch the same shell the browser gets on
-   * {@code /}.
+   * {@code /}. Legacy {@code /d/**} URLs are still served so old bookmarks load the shell.
    */
   @RequestMapping(
       value = {
-        "/d/**", "/n**",
+        "/d/**",
+        "/n**",
+        "/notebooks/**",
+        "/circles/**",
+        "/bazaar",
+        "/admin-dashboard",
+        "/message-center/**",
+        "/assimilate/**",
+        "/recall",
+        "/failure-report-list/**",
+        "/recent",
+        "/generate-token",
+        "/memory-trackers/**",
       },
       method = RequestMethod.GET)
   public Object spaDeepLink() {

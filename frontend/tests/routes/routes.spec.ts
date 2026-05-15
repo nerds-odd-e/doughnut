@@ -65,6 +65,15 @@ describe("routes", () => {
       expect(route.params.noteId).toBe("888")
     })
 
+    it("redirects legacy /n/:noteId to /n:noteId", async () => {
+      await router.push("/n/888")
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteShow")
+      expect(route.path).toBe("/n888")
+      expect(route.params.noteId).toBe("888")
+    })
+
     it("should navigate by name with noteId param", async () => {
       await router.push({
         name: "noteShow",

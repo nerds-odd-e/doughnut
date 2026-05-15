@@ -122,7 +122,7 @@ const myNotebooksPage = () => {
 }
 
 export const navigateToNotebooksPage = () => {
-  router().push('/d/notebooks', 'notebooks', {})
+  router().push('/notebooks', 'notebooks', {})
   cy.get('.loading-bar').should('not.exist', { timeout: 30000 })
   return myNotebooksPage()
 }

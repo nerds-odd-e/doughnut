@@ -41,7 +41,7 @@ const noteMoreOptionsPage = () => {
     },
     openAssimilationPage() {
       toolbarButton('Assimilation settings').click()
-      cy.url().should('include', '/d/assimilate/')
+      cy.url().should('include', '/assimilate/')
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()
     },

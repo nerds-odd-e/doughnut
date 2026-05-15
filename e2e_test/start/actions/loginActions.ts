@@ -33,7 +33,7 @@ export const loginActions = {
         })
       )
       .then(() => {
-        cy.visit('/d/notebooks')
+        cy.visit('/notebooks')
       })
   },
 

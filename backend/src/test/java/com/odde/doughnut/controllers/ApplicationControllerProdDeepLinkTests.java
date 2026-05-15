@@ -58,7 +58,7 @@ class ApplicationControllerProdDeepLinkTests {
   }
 
   @Test
-  void prodDeepLinkUnderDReturnsHtmlFromConfiguredSpaOrigin() throws Exception {
+  void prodDeepLinkUnderNotebooksReturnsHtmlFromConfiguredSpaOrigin() throws Exception {
     String shell = "<!DOCTYPE html><html><head></head><body>spa-shell</body></html>";
     mockUpstream
         .expect(requestTo("http://127.0.0.1:18888/"))
@@ -66,7 +66,7 @@ class ApplicationControllerProdDeepLinkTests {
         .andRespond(withSuccess(shell, MediaType.TEXT_HTML));
 
     mockMvc
-        .perform(get("/d/notebooks/1"))
+        .perform(get("/notebooks/1"))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
         .andExpect(content().string(containsString("spa-shell")));

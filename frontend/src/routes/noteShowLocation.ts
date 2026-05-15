@@ -14,5 +14,9 @@ export function noteShowHref(noteId: number): string {
 }
 
 export function pathnameLooksLikeInternalNoteShow(pathname: string): boolean {
-  return /^\/d\/n\/\d+(\/|$)/.test(pathname) || /^\/n\d+$/.test(pathname)
+  return (
+    /^\/d\/n\/\d+(\/|$)/.test(pathname) ||
+    /^\/n\/\d+(\/|$)/.test(pathname) ||
+    /^\/n\d+$/.test(pathname)
+  )
 }
