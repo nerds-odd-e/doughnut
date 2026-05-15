@@ -11,7 +11,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.services.ai.NoteContentCompletion;
 import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
 import com.openai.models.responses.ResponseTextConfig;
@@ -41,7 +41,7 @@ class AiAudioControllerTests {
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void commonSetup() {
@@ -51,8 +51,8 @@ class AiAudioControllerTests {
   private void setupMocks() {
     String transcriptText = "test123";
     NoteContentCompletion completion = new NoteContentCompletion(transcriptText);
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-    openAIChatCompletionMock.stubStructuredResponse(completion);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
+    openAiStructuredResponseMock.stubStructuredResponse(completion);
     mockTranscriptionSrtResponse("test transcription");
   }
 
@@ -151,7 +151,7 @@ class AiAudioControllerTests {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<NoteContentCompletion> params = paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
       assertTrue(instructions.contains("Additional instruction:\nTranslate to Spanish"));
@@ -159,8 +159,6 @@ class AiAudioControllerTests {
           "Should use Responses structured text format",
           params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));
-      verify(openAIChatCompletionMock.completionService(), never())
-          .create(any(com.openai.models.chat.completions.ChatCompletionCreateParams.class));
     }
 
     @Test
@@ -170,7 +168,7 @@ class AiAudioControllerTests {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
       assertFalse(instructions.contains("Additional instruction"));
     }
@@ -185,7 +183,7 @@ class AiAudioControllerTests {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       String expectedJson =
           "{\"previousNoteContentToAppendTo\": \"Previous text with trailing space \"}";
       String input = paramsCaptor.getValue().rawParams().input().flatMap(i -> i.text()).orElse("");
@@ -199,7 +197,7 @@ class AiAudioControllerTests {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       String input = paramsCaptor.getValue().rawParams().input().flatMap(i -> i.text()).orElse("");
       assertFalse(input.contains("Previous note content (in JSON format):"));
     }

@@ -104,7 +104,7 @@ const addFocusContextShapeMcqStubs = async (
 }
 
 export const questionGenerationService = () => ({
-  resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
+  resetAndStubAskingMCQByResponses: (record: Record<string, string>) => {
     cy.then(async () => {
       await restartOpenAiAndStubMcqForUserMessage(
         { role: 'developer', content: 'Question Designer|Memory Assistant' },

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenAIResponseRequestBuilder<T> {
+  public static final String systemInstruction =
+      "This is a PKM system: wiki-style Markdown notes in notebooks, with [[wiki links]] between notes.";
+
   private static final String MESSAGE_SEPARATOR = "\n\n\n";
 
   private final Class<T> responseType;

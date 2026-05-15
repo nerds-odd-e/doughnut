@@ -3,7 +3,6 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -77,7 +76,7 @@ public class AiNoteAutomationService {
 
     OpenAIResponseRequestBuilder<T> builder =
         new OpenAIResponseRequestBuilder<>(resultClass).model(modelName);
-    builder.addInstruction(OpenAIChatRequestBuilder.systemInstruction);
+    builder.addInstruction(OpenAIResponseRequestBuilder.systemInstruction);
     builder.addInstruction(focusMarkdown);
     String notebookAssistant = note.getNotebookAssistantInstructions();
     if (notebookAssistant != null && !notebookAssistant.trim().isEmpty()) {

@@ -2,14 +2,9 @@ package com.odde.doughnut.services.openAiApis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.openai.models.chat.completions.ChatCompletionChunk;
-import com.openai.models.chat.completions.ChatCompletionChunk.Choice;
-import com.openai.models.chat.completions.ChatCompletionChunk.Choice.Delta;
-import com.openai.models.chat.completions.ChatCompletionChunk.Choice.Delta.ToolCall;
-import com.openai.models.chat.completions.ChatCompletionChunk.Choice.Delta.ToolCall.Function;
-import com.openai.models.chat.completions.ChatCompletionChunk.Choice.Delta.ToolCall.Type;
-import com.openai.models.chat.completions.ChatCompletionChunk.Choice.FinishReason;
 import com.openai.models.responses.ResponseFunctionToolCall;
 import com.openai.models.responses.ResponseOutputItem;
 import com.openai.models.responses.ResponseStreamEvent;
@@ -17,7 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Maps OpenAI Responses stream events to JSON strings in the legacy assistant-stream chunk shape
+ * expected by the frontend SSE handler.
+ */
 public final class ResponseStreamToLegacyChatChunkMapper {
+  private static final String FINISH_STOP = "stop";
+  private static final String FINISH_TOOL_CALLS = "tool_calls";
+
   private final ObjectMapper objectMapper;
   private String activeToolName;
   private String activeToolCallId;
@@ -80,47 +82,61 @@ public final class ResponseStreamToLegacyChatChunkMapper {
   }
 
   private String textDeltaChunk(String content) throws JsonProcessingException {
-    Delta delta = Delta.builder().content(content).build();
+    ObjectNode delta = objectMapper.createObjectNode();
+    delta.put("content", content);
     return chunkJson(delta, Optional.empty());
   }
 
   private String finishTextChunk() throws JsonProcessingException {
-    Delta delta = Delta.builder().build();
-    return chunkJson(delta, Optional.of(FinishReason.STOP));
+    return chunkJson(objectMapper.createObjectNode(), Optional.of(FINISH_STOP));
   }
 
   private String toolArgumentsChunk(
       Optional<String> name, String argumentsFragment, boolean includeMeta)
       throws JsonProcessingException {
-    Function.Builder fn = Function.builder();
-    name.ifPresent(fn::name);
-    fn.arguments(argumentsFragment);
-    ToolCall.Builder tc = ToolCall.builder().index(0L).type(Type.FUNCTION).function(fn.build());
+    ObjectNode function = objectMapper.createObjectNode();
+    name.ifPresent(n -> function.put("name", n));
+    function.put("arguments", argumentsFragment);
+
+    ObjectNode toolCall = objectMapper.createObjectNode();
+    toolCall.put("index", 0);
+    toolCall.put("type", "function");
+    toolCall.set("function", function);
     if (includeMeta && activeToolCallId != null) {
-      tc.id(activeToolCallId);
+      toolCall.put("id", activeToolCallId);
     }
-    Delta delta = Delta.builder().addToolCall(tc.build()).build();
+
+    ArrayNode toolCalls = objectMapper.createArrayNode();
+    toolCalls.add(toolCall);
+
+    ObjectNode delta = objectMapper.createObjectNode();
+    delta.set("tool_calls", toolCalls);
     return chunkJson(delta, Optional.empty());
   }
 
   private String finishToolCallsChunk() throws JsonProcessingException {
-    Delta delta = Delta.builder().build();
-    return chunkJson(delta, Optional.of(FinishReason.TOOL_CALLS));
+    return chunkJson(objectMapper.createObjectNode(), Optional.of(FINISH_TOOL_CALLS));
   }
 
-  private String chunkJson(Delta delta, Optional<FinishReason> finishReason)
+  private String chunkJson(ObjectNode delta, Optional<String> finishReason)
       throws JsonProcessingException {
-    Choice.Builder choiceBuilder =
-        Choice.builder().index(0L).delta(delta).logprobs(Optional.empty());
-    choiceBuilder.finishReason(finishReason);
-    Choice choice = choiceBuilder.build();
-    ChatCompletionChunk chunk =
-        ChatCompletionChunk.builder()
-            .id("chatcmpl-responses")
-            .created(System.currentTimeMillis() / 1000L)
-            .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
-            .choices(List.of(choice))
-            .build();
-    return objectMapper.writeValueAsString(chunk);
+    ObjectNode root = objectMapper.createObjectNode();
+    root.put("id", "chatcmpl-responses");
+    root.put("object", "chat.completion.chunk");
+    root.put("created", System.currentTimeMillis() / 1000L);
+    root.put("model", GlobalSettingsService.DEFAULT_CHAT_MODEL);
+
+    ObjectNode choice = objectMapper.createObjectNode();
+    choice.put("index", 0);
+    choice.set("delta", delta);
+    choice.putNull("logprobs");
+    finishReason.ifPresentOrElse(
+        reason -> choice.put("finish_reason", reason), () -> choice.putNull("finish_reason"));
+
+    ArrayNode choices = objectMapper.createArrayNode();
+    choices.add(choice);
+    root.set("choices", choices);
+
+    return objectMapper.writeValueAsString(root);
   }
 }

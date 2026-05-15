@@ -11,9 +11,7 @@ import com.openai.models.responses.ResponseStatus;
 import com.openai.models.responses.StructuredResponse;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import com.openai.models.responses.ToolChoiceOptions;
-import com.openai.services.blocking.ChatService;
 import com.openai.services.blocking.ResponseService;
-import com.openai.services.blocking.chat.ChatCompletionService;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,8 +21,7 @@ import java.util.Queue;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
-public class OpenAIChatCompletionMock {
-  private final ChatCompletionService completionService;
+public class OpenAiStructuredResponseMock {
   private final ResponseService responseService;
   private final ObjectMapperConfig objectMapperConfig = new ObjectMapperConfig();
   private final Map<Class<?>, Queue<Object>> structuredResults = new HashMap<>();
@@ -32,12 +29,8 @@ public class OpenAIChatCompletionMock {
 
   private record MalformedStructuredContent(String content) {}
 
-  public OpenAIChatCompletionMock(OpenAIClient officialClient) {
-    ChatService chatService = Mockito.mock(ChatService.class);
+  public OpenAiStructuredResponseMock(OpenAIClient officialClient) {
     this.responseService = Mockito.mock(ResponseService.class);
-    this.completionService = Mockito.mock(ChatCompletionService.class);
-    Mockito.when(officialClient.chat()).thenReturn(chatService);
-    Mockito.when(chatService.completions()).thenReturn(completionService);
     Mockito.when(officialClient.responses()).thenReturn(responseService);
     Mockito.when(responseService.create(ArgumentMatchers.any(StructuredResponseCreateParams.class)))
         .thenAnswer(
@@ -56,18 +49,11 @@ public class OpenAIChatCompletionMock {
             });
   }
 
-  public ChatCompletionService completionService() {
-    return completionService;
-  }
-
   public ResponseService responseService() {
     return responseService;
   }
 
-  /**
-   * Stubs the next {@code officialClient.responses().create(...)} result only; does not configure
-   * chat completions.
-   */
+  /** Stubs the next {@code officialClient.responses().create(...)} result. */
   public void stubStructuredResponse(Object result) {
     if (result == null) {
       fallbackStructuredResults.add(null);

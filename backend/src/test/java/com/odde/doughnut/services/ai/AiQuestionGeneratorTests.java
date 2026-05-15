@@ -11,7 +11,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.Randomizer;
 import com.openai.client.OpenAIClient;
@@ -41,12 +41,12 @@ class AiQuestionGeneratorTests {
   @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
   @Autowired AiQuestionGenerator aiQuestionGenerator;
   @Autowired TestabilitySettings testabilitySettings;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     // Initialize OpenAI mock
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     // Ensure OpenAI URL is reset to default before each test
     testabilitySettings.replaceServiceUrls(Map.of("openAi", "https://api.openai.com/v1/"));
   }
@@ -62,7 +62,7 @@ class AiQuestionGeneratorTests {
     MCQWithAnswer jsonQuestion =
         makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-    openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
+    openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
     Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     // another note is needed, otherwise the note will be the only note in the notebook
@@ -90,7 +90,7 @@ class AiQuestionGeneratorTests {
             .choicesMayBeShuffled(true)
             .please();
 
-    openAIChatCompletionMock.stubStructuredResponse(originalQuestion);
+    openAiStructuredResponseMock.stubStructuredResponse(originalQuestion);
 
     // Act
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
@@ -144,7 +144,7 @@ class AiQuestionGeneratorTests {
     List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
     doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
 
-    openAIChatCompletionMock.stubStructuredResponse(originalQuestion);
+    openAiStructuredResponseMock.stubStructuredResponse(originalQuestion);
 
     // Act
     MCQWithAnswer result =
@@ -170,7 +170,7 @@ class AiQuestionGeneratorTests {
             .correctChoiceIndex(3) // Invalid index!
             .please();
 
-    openAIChatCompletionMock.stubStructuredResponse(invalidQuestion);
+    openAiStructuredResponseMock.stubStructuredResponse(invalidQuestion);
 
     // Act
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);

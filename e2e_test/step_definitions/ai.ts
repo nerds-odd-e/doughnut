@@ -24,9 +24,7 @@ function parseSingleRowQuestion(questionTable: DataTable) {
 function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
   start
     .questionGenerationService()
-    .resetAndStubAskingMCQByChatCompletion(
-      parseSingleRowQuestion(questionTable)
-    )
+    .resetAndStubAskingMCQByResponses(parseSingleRowQuestion(questionTable))
 }
 
 function stubExtractPointResponse(
@@ -97,11 +95,11 @@ Given(
 )
 
 Then(
-  'OpenAI chat completion requests include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts',
+  'OpenAI Responses POST bodies include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts',
   () => {
     mock_services
       .openAi()
-      .expectChatCompletionBodiesIncludeFocusContextRetrievalPromptShapes()
+      .expectResponsesPostBodiesIncludeFocusContextRetrievalPromptShapes()
   }
 )
 
@@ -152,7 +150,6 @@ Then('I contest the question', () => {
 })
 
 Given('OpenAI will reply below for user messages:', (data: DataTable) => {
-  // Use chat completion streaming
   mock_services.openAi().stubConversationAiReplyStream(data.hashes())
 })
 

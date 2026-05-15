@@ -17,7 +17,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
@@ -39,21 +39,21 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired MakeMe makeMe;
   @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     testabilitySettings.setRandomization(new Randomization(first, 1));
 
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
 
     // Default structured response for question evaluation flows in this test class
     QuestionEvaluation evaluation = new QuestionEvaluation();
     evaluation.feasibleQuestion = false;
     evaluation.correctChoices = new int[] {0};
     evaluation.improvementAdvices = "This question needs improvement";
-    openAIChatCompletionMock.stubStructuredResponse(evaluation);
+    openAiStructuredResponseMock.stubStructuredResponse(evaluation);
   }
 
   RecallPromptController nullUserController() {
@@ -249,8 +249,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      // Mock the chat completion API calls
-      openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
+      // Mock the Responses API calls
+      openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
@@ -265,8 +265,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      // Mock the chat completion API calls
-      openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
+      // Mock the Responses API calls
+      openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
@@ -275,7 +275,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService(), atLeastOnce())
+      verify(openAiStructuredResponseMock.responseService(), atLeastOnce())
           .create(paramsCaptor.capture());
 
       String inputText =
@@ -329,7 +329,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void rejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
@@ -342,14 +342,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
 
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       controller.contest(recallPrompt);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       assertThat(
           paramsCaptor.getValue().rawParams().model().orElseThrow().asString(), equalTo("gpt-new"));
     }
@@ -357,7 +357,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       QuestionContestResult contestResult = controller.contest(recallPrompt);
       assertFalse(contestResult.rejected);
@@ -591,7 +591,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void shouldMarkQuestionAsContestedWhenContestIsAccepted() {
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       // When
       QuestionContestResult result = controller.contest(recallPrompt);
@@ -604,7 +604,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldNotMarkQuestionAsContestedWhenContestIsRejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       // When
       QuestionContestResult result = controller.contest(recallPrompt);

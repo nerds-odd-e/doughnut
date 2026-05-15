@@ -3,8 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +19,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import jakarta.validation.Validation;
@@ -326,7 +323,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
 
     @Test
     void returnsAiSuggestionWithValidatedDepths() throws Exception {
-      openAIChatCompletionMock.stubStructuredResponse(suggestionRenestingBAndC());
+      openAiStructuredResponseMock.stubStructuredResponse(suggestionRenestingBAndC());
 
       BookLayoutReorganizationSuggestion result = controller.suggestBookLayoutReorganization(nb);
 
@@ -351,7 +348,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<BookLayoutReorganizationSuggestion>>
           paramsCaptor = ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<BookLayoutReorganizationSuggestion> params =
           paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
@@ -362,8 +359,6 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
           "Should use Responses structured text format",
           params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));
-      verify(openAIChatCompletionMock.completionService(), never())
-          .create(any(ChatCompletionCreateParams.class));
     }
 
     @Test
@@ -378,7 +373,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
         items.add(e);
       }
       bad.setBlocks(items);
-      openAIChatCompletionMock.stubStructuredResponse(bad);
+      openAiStructuredResponseMock.stubStructuredResponse(bad);
 
       var ex =
           assertThrows(
@@ -401,7 +396,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
         items.add(e);
       }
       bad.setBlocks(items);
-      openAIChatCompletionMock.stubStructuredResponse(bad);
+      openAiStructuredResponseMock.stubStructuredResponse(bad);
 
       var ex =
           assertThrows(
@@ -411,7 +406,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
 
     @Test
     void rejectsWhenAiReturnsEmptyStructuredResponse() {
-      openAIChatCompletionMock.stubStructuredResponse(null);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
 
       assertThrows(
           OpenAIServiceErrorException.class, () -> controller.suggestBookLayoutReorganization(nb));

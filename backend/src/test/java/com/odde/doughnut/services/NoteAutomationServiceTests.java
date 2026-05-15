@@ -12,7 +12,7 @@ import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,13 +36,13 @@ class NoteAutomationServiceTests {
   @Autowired FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
   private Note testNote;
   private NoteAutomationService service;
 
   @BeforeEach
   void setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
 
     testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
@@ -59,7 +59,7 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldHandleNoToolCallWhenSuggestingTitle() throws JsonProcessingException {
-    openAIChatCompletionMock.stubStructuredResponse(null);
+    openAiStructuredResponseMock.stubStructuredResponse(null);
 
     String result = service.suggestTitle();
 
@@ -70,7 +70,7 @@ class NoteAutomationServiceTests {
   void shouldReturnSuggestedTitle() throws JsonProcessingException {
     TitleReplacement titleReplacement = new TitleReplacement();
     titleReplacement.setNewTitle("Suggested Title");
-    openAIChatCompletionMock.stubStructuredResponse(titleReplacement);
+    openAiStructuredResponseMock.stubStructuredResponse(titleReplacement);
 
     String result = service.suggestTitle();
 
@@ -84,7 +84,7 @@ class NoteAutomationServiceTests {
         List.of(
             "English is a language that is spoken in many countries.",
             "It is also the most widely spoken language in the world."));
-    openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+    openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
 
     List<String> result = service.generateUnderstandingChecklist();
 
@@ -98,7 +98,7 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldHandleNoToolCallWhenGeneratingUnderstandingChecklist() throws JsonProcessingException {
-    openAIChatCompletionMock.stubStructuredResponse(null);
+    openAiStructuredResponseMock.stubStructuredResponse(null);
 
     List<String> result = service.generateUnderstandingChecklist();
 
@@ -107,7 +107,7 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldReturnEmptyListWhenChecklistIsNull() throws JsonProcessingException {
-    openAIChatCompletionMock.stubStructuredResponse(null);
+    openAiStructuredResponseMock.stubStructuredResponse(null);
 
     List<String> result = service.generateUnderstandingChecklist();
 

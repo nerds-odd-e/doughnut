@@ -55,6 +55,24 @@ class ConversationAiRequestBuilderTest {
     }
 
     @Test
+    void firstDeveloperMessageShouldIncludeFocusNoteNotebookLabelAndContent() {
+      Note note = makeMe.aNote().content("description").please();
+      Conversation conversation = makeMe.aConversation().forANote(note).please();
+
+      ConversationAiRequestBuilder builder =
+          new ConversationAiRequestBuilder(
+              focusContextRetrievalService, focusContextMarkdownRenderer);
+      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
+      List<ResponseInputItem> items = params.input().flatMap(i -> i.response()).orElseThrow();
+      String body = items.getFirst().easyInputMessage().orElseThrow().content().asTextInput();
+
+      assertTrue(body.contains("## Focus Note"));
+      assertTrue(body.contains("Notebook:"));
+      assertTrue(body.contains("Content:"));
+      assertTrue(body.contains(note.getContent()));
+    }
+
+    @Test
     void shouldIncludeUserAndAssistantMessages() {
       User user = makeMe.aUser().please();
       Note note = makeMe.aNote().notebookOwnedBy(user).please();

@@ -10,7 +10,7 @@ import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import java.util.List;
@@ -37,14 +37,14 @@ class AiNoteAutomationServiceTest {
   @Autowired FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   @Autowired OpenAiApiHandler openAiApiHandler;
   @Autowired TestabilitySettings testabilitySettings;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
   private Note testNote;
   private AiNoteAutomationService service;
 
   @BeforeEach
   void setup() {
     testabilitySettings.setOpenAiTokenOverride(null);
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
 
     testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
@@ -67,7 +67,7 @@ class AiNoteAutomationServiceTest {
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -81,7 +81,7 @@ class AiNoteAutomationServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoResponse() throws JsonProcessingException {
-      openAIChatCompletionMock.stubStructuredResponse(null);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -92,7 +92,7 @@ class AiNoteAutomationServiceTest {
     void shouldReturnEmptyListWhenChecklistIsEmpty() throws JsonProcessingException {
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(List.of());
-      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -109,7 +109,7 @@ class AiNoteAutomationServiceTest {
               "Point 3: Third important aspect.",
               "Point 4: Fourth important aspect.",
               "Point 5: Fifth important aspect."));
-      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -123,7 +123,7 @@ class AiNoteAutomationServiceTest {
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(
           List.of("Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7"));
-      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 

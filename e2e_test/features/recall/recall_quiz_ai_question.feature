@@ -61,4 +61,4 @@ Feature: Recall Quiz
     And the note "DepthRecall" was assimilated on day 1
     And the note "FocusFolder" was assimilated on day 1
     When I am recalling my note on day 2
-    Then OpenAI chat completion requests include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts
+    Then OpenAI Responses POST bodies include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts

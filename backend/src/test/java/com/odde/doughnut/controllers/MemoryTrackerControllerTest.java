@@ -17,7 +17,7 @@ import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,12 +35,12 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   @Autowired MemoryTrackerController controller;
   @Autowired NoteService noteService;
   @Autowired ConversationRepository conversationRepository;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
   @Nested
@@ -186,7 +186,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
       // Mock OpenAI API call
-      openAIChatCompletionMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
+      openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
 
       RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
       assertThat(recallPrompt, notNullValue());

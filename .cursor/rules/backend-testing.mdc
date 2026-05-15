@@ -94,7 +94,7 @@ Note note = makeMe.aNote()
 - Use `@BeforeEach` for common setup, keeping setup minimal and relevant to the group.
 - Initialize test data using MakeMe builders.
 - Use mocking sparingly, mainly for external services.
-- Mock `OpenAIClient` chat completions with `OpenAIChatCompletionMock` in controller tests.
+- Mock `OpenAIClient` structured Responses output with `OpenAiStructuredResponseMock` in controller tests.
 
 ```java
 @Nested

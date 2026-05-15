@@ -17,7 +17,7 @@ import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.services.book.EpubLocator;
 import com.odde.doughnut.services.book.PdfLocator;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import jakarta.persistence.EntityManager;
 import java.nio.file.Files;
@@ -51,12 +51,12 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
   @Autowired ObjectMapper objectMapper;
   @Autowired EntityManager entityManager;
 
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialOpenAiClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialOpenAiClient);
   }
 
   Notebook myNotebook() {

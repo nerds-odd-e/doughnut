@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.Reasoning;
 import com.openai.models.ReasoningEffort;
@@ -43,12 +43,12 @@ class NoteQuestionGenerationServiceTests {
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired NoteQuestionGenerationService service;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
   private Note testNote;
 
   @BeforeEach
   void setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     testNote = makeMe.aNote().please();
     makeMe.aNote().please();
   }
@@ -96,7 +96,7 @@ class NoteQuestionGenerationServiceTests {
     void shouldGenerateQuestionWithCorrectStem() throws Exception {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
+      openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
       MCQWithAnswer generatedQuestion = service.generateQuestion(testNote, null);
 
@@ -118,13 +118,13 @@ class NoteQuestionGenerationServiceTests {
       makeMe.aNote().notebook(nb).please();
 
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
 
       service.generateQuestion(noteInScope, null);
 
       ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
           responseParamsCaptor();
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       List<String> userBodies = userMessageContentStrings(paramsCaptor.getValue());
       assertThat(
           userBodies.get(0),
@@ -145,13 +145,13 @@ class NoteQuestionGenerationServiceTests {
           .globalSettingQuestionGeneration()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-question-generation");
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
 
       service.generateQuestion(testNote, null);
 
       ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
           responseParamsCaptor();
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       assertThat(modelName(paramsCaptor.getValue()), is("gpt-question-generation"));
     }
 
@@ -159,7 +159,7 @@ class NoteQuestionGenerationServiceTests {
     void shouldUseSameRequestShapeAsExportedQuestionGenerationRequest()
         throws JsonProcessingException {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
 
       StructuredResponseCreateParams<MCQWithAnswer> exportedRequest =
           service.buildQuestionGenerationRequest(testNote, "Generate a focused question");
@@ -168,7 +168,7 @@ class NoteQuestionGenerationServiceTests {
 
       ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
           responseParamsCaptor();
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<MCQWithAnswer> runtimeRequest = paramsCaptor.getValue();
       assertThat(modelName(runtimeRequest), is(modelName(exportedRequest)));
       assertThat(inputText(runtimeRequest), is(inputText(exportedRequest)));
@@ -186,7 +186,7 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldReturnNullWhenStructuredResponseIsAbsent() throws JsonProcessingException {
-      openAIChatCompletionMock.stubStructuredResponse(null);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
 
       MCQWithAnswer result = service.generateQuestion(testNote, null);
 
@@ -368,7 +368,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldReturnEmptyWhenEvaluationFails() throws Exception {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.stubStructuredResponse(null);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
 
       Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
 
@@ -382,7 +382,7 @@ class NoteQuestionGenerationServiceTests {
       evaluation.feasibleQuestion = true;
       evaluation.correctChoices = new int[] {0};
       evaluation.improvementAdvices = "Good question";
-      openAIChatCompletionMock.stubStructuredResponse(evaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(evaluation);
 
       Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
 

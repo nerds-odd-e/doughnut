@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,14 +39,14 @@ class NullToNotFoundResponseBodyAdviceTest {
     return new CurrentUser();
   }
 
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     // Stub null Responses result so askAQuestion returns null
-    openAIChatCompletionMock.stubStructuredResponse(null);
+    openAiStructuredResponseMock.stubStructuredResponse(null);
   }
 
   @Test

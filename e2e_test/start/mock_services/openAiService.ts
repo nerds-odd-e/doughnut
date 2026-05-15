@@ -6,7 +6,6 @@ import {
 } from '@anev/ts-mountebank'
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
-import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
 import { buildResponsesStreamEvent } from './openAiMessageComposer'
 
@@ -31,10 +30,6 @@ const openAiService = () => {
 
     restartImposter() {
       return serviceMocker.install()
-    },
-
-    chatCompletion() {
-      return createOpenAiChatCompletionMock(serviceMocker)
     },
 
     responses() {
@@ -145,7 +140,7 @@ const openAiService = () => {
       })
     },
 
-    expectChatCompletionBodiesIncludeFocusContextRetrievalPromptShapes() {
+    expectResponsesPostBodiesIncludeFocusContextRetrievalPromptShapes() {
       const mountebank = new Mountebank()
       cy.request(
         'GET',

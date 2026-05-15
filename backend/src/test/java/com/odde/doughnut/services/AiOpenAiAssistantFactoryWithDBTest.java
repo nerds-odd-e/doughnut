@@ -10,7 +10,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,11 +33,11 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
-  private OpenAIChatCompletionMock openAIChatCompletionMock;
+  private OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void Setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
   @Nested
@@ -66,7 +66,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void rejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
       QuestionContestResult contest =
@@ -79,7 +79,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
+      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
       MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
       QuestionContestResult contest =
@@ -91,7 +91,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
     @Test
     void noFunctionCallInvoked() throws JsonProcessingException {
-      openAIChatCompletionMock.stubStructuredResponse(null);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
 
       assertThrows(
           RuntimeException.class,

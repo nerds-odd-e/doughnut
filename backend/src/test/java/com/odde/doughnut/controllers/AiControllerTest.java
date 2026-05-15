@@ -19,7 +19,7 @@ import com.odde.doughnut.services.ai.PointExtractionResult;
 import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.models.ModelListPage;
 import com.openai.models.responses.ResponseTextConfig;
@@ -99,15 +99,15 @@ class AiControllerTest extends ControllerTestBase {
   @Nested
   class SuggestNoteTitle {
     Note testNote;
-    OpenAIChatCompletionMock openAIChatCompletionMock;
+    OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
     @BeforeEach
     void setup() {
       testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+      openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
-      openAIChatCompletionMock.stubStructuredResponse(suggestedTopic);
+      openAiStructuredResponseMock.stubStructuredResponse(suggestedTopic);
     }
 
     @Test
@@ -124,7 +124,7 @@ class AiControllerTest extends ControllerTestBase {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<TitleReplacement>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<TitleReplacement> params = paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
       MatcherAssert.assertThat(
@@ -147,12 +147,12 @@ class AiControllerTest extends ControllerTestBase {
   @Nested
   class GenerateUnderstandingChecklist {
     Note testNote;
-    OpenAIChatCompletionMock openAIChatCompletionMock;
+    OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
     @BeforeEach
     void setup() {
       testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+      openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     }
 
     @Test
@@ -163,7 +163,7 @@ class AiControllerTest extends ControllerTestBase {
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
       testNote.setContent("English is a language that is spoken in many countries.");
 
       UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
@@ -209,7 +209,7 @@ class AiControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(List.of("Point 1", "Point 2"));
-      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
       testNote.setContent("Some note content");
 
       controller.generateUnderstandingChecklist(testNote);
@@ -217,7 +217,7 @@ class AiControllerTest extends ControllerTestBase {
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<UnderstandingChecklist>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<UnderstandingChecklist> params = paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
       MatcherAssert.assertThat(
@@ -243,18 +243,18 @@ class AiControllerTest extends ControllerTestBase {
   class RemovePointFromNote {
     Note testNote;
     RemovePointsResponseDTO result;
-    OpenAIChatCompletionMock openAIChatCompletionMock;
+    OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
     @BeforeEach
     void setup() {
       testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+      openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     }
 
     @Test
     void shouldReturnRegeneratedContentAfterRemovingPoints()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAIChatCompletionMock.stubStructuredResponse(
+      openAiStructuredResponseMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
       String originalContent =
           "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
@@ -269,7 +269,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldNotModifyNoteInDatabase()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAIChatCompletionMock.stubStructuredResponse(
+      openAiStructuredResponseMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
       String originalContent = "Original content with point to remove.";
       testNote.setContent(originalContent);
@@ -304,11 +304,11 @@ class AiControllerTest extends ControllerTestBase {
 
   @Nested
   class PromotePointToSibling {
-    OpenAIChatCompletionMock openAIChatCompletionMock;
+    OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
     @BeforeEach
     void setup() {
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+      openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     }
 
     private Note newRootNoteWithPromotableContent() {
@@ -325,7 +325,7 @@ class AiControllerTest extends ControllerTestBase {
       aiResult.setNewNoteTitle("Extracted Sibling Note");
       aiResult.setNewNoteContent("Expanded content for the sibling.");
       aiResult.setUpdatedParentContent("Updated parent with summary.");
-      openAIChatCompletionMock.stubStructuredResponse(aiResult);
+      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
@@ -356,7 +356,7 @@ class AiControllerTest extends ControllerTestBase {
       aiResult.setNewNoteTitle("Point B");
       aiResult.setNewNoteContent("Extracted");
       aiResult.setUpdatedParentContent("A. C. D. E.");
-      openAIChatCompletionMock.stubStructuredResponse(aiResult);
+      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
@@ -396,7 +396,7 @@ class AiControllerTest extends ControllerTestBase {
     void shouldThrowWhenAiReturnsNull()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote = newRootNoteWithPromotableContent();
-      openAIChatCompletionMock.stubStructuredResponse(null);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("a point"));
       assertResponseStatus(

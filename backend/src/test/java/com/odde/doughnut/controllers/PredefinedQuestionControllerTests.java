@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
@@ -29,11 +29,11 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   OpenAIClient officialClient;
 
   @Autowired PredefinedQuestionController controller;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     currentUser.setUser(makeMe.aUser().please());
   }
 
@@ -129,7 +129,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
 
       // Execute & Verify
       PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
@@ -141,9 +141,9 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       // Mock a response with malformed JSON content to trigger a RuntimeException
-      openAIChatCompletionMock.stubStructuredResponseMalformed("{invalid json}");
+      openAiStructuredResponseMock.stubStructuredResponseMalformed("{invalid json}");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
-      verify(openAIChatCompletionMock.responseService(), Mockito.times(1))
+      verify(openAiStructuredResponseMock.responseService(), Mockito.times(1))
           .create(ArgumentMatchers.any(StructuredResponseCreateParams.class));
     }
 
