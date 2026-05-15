@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.openai.models.responses.ResponseFunctionToolCall;
 import com.openai.models.responses.ResponseOutputItem;
 import com.openai.models.responses.ResponseStreamEvent;
@@ -12,10 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Maps OpenAI Responses stream events to JSON strings in the legacy assistant-stream chunk shape
- * expected by the frontend SSE handler.
- */
+/** Maps OpenAI Responses stream events to SSE chunk JSON strings consumed by the frontend. */
 public final class ResponseStreamToLegacyChatChunkMapper {
   private static final String FINISH_STOP = "stop";
   private static final String FINISH_TOOL_CALLS = "tool_calls";
@@ -120,19 +116,12 @@ public final class ResponseStreamToLegacyChatChunkMapper {
 
   private String chunkJson(ObjectNode delta, Optional<String> finishReason)
       throws JsonProcessingException {
-    ObjectNode root = objectMapper.createObjectNode();
-    root.put("id", "chatcmpl-responses");
-    root.put("object", "chat.completion.chunk");
-    root.put("created", System.currentTimeMillis() / 1000L);
-    root.put("model", GlobalSettingsService.DEFAULT_CHAT_MODEL);
-
     ObjectNode choice = objectMapper.createObjectNode();
-    choice.put("index", 0);
     choice.set("delta", delta);
-    choice.putNull("logprobs");
     finishReason.ifPresentOrElse(
         reason -> choice.put("finish_reason", reason), () -> choice.putNull("finish_reason"));
 
+    ObjectNode root = objectMapper.createObjectNode();
     ArrayNode choices = objectMapper.createArrayNode();
     choices.add(choice);
     root.set("choices", choices);
