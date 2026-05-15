@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public class AiNoteAutomationService {
+  private static final String STRUCTURED_RESPONSE_INPUT =
+      "Follow the instructions and return the requested structured response.";
   private static final long UNDERSTANDING_CHECKLIST_MAX_OUTPUT_TOKENS = 1000L;
   private static final long REMOVE_POINTS_MAX_OUTPUT_TOKENS = 2000L;
   private static final long PROMOTE_POINT_MAX_OUTPUT_TOKENS = 3000L;
@@ -109,6 +111,7 @@ public class AiNoteAutomationService {
       builder.maxOutputTokens(maxOutputTokens);
     }
     builder.addInstruction(tool.getMessageBody());
+    builder.addUserMessage(STRUCTURED_RESPONSE_INPUT);
     return builder.build();
   }
 

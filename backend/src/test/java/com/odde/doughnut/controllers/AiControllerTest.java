@@ -230,6 +230,7 @@ class AiControllerTest extends ControllerTestBase {
           "Should use Responses structured text format",
           params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));
+      assertThat(params.rawParams().input().flatMap(input -> input.text()).orElse("")).isNotBlank();
       assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
     }
 
