@@ -35,12 +35,12 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
   @Nested
   class NewChatTests {
-    OpenAiResponseStreamMocker chatMocker;
+    OpenAiResponseStreamMocker responseStreamMocker;
 
     @BeforeEach
     void setUp() {
-      chatMocker = new OpenAiResponseStreamMocker(officialClient);
-      chatMocker.withMessage("I am a Chatbot").mockStreamResponse();
+      responseStreamMocker = new OpenAiResponseStreamMocker(officialClient);
+      responseStreamMocker.withMessage("I am a Chatbot").mockStreamResponse();
     }
 
     @Test
@@ -83,8 +83,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
         throws UnexpectedNoAccessRightException, BadRequestException {
       controller.getAiReply(conversation);
 
-      // Verify streaming was called (the actual request parameters are tested via integration)
-      // The official client's createStreaming is called internally by OpenAiApiHandler
       assertThat(conversation.getConversationMessages().size()).isGreaterThan(0);
     }
 
@@ -103,8 +101,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
       controller.getAiReply(conversation);
 
-      // Verify streaming was called (the actual request parameters are tested via integration)
-      // The official client's createStreaming is called internally by OpenAiApiHandler
       assertThat(conversation.getConversationMessages().size()).isGreaterThan(0);
     }
   }
@@ -127,8 +123,9 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
               .from(currentUser.getUser())
               .please();
 
-      OpenAiResponseStreamMocker chatMocker = new OpenAiResponseStreamMocker(officialClient);
-      chatMocker.withMessage("I am a Chatbot").mockStreamResponse();
+      OpenAiResponseStreamMocker responseStreamMocker =
+          new OpenAiResponseStreamMocker(officialClient);
+      responseStreamMocker.withMessage("I am a Chatbot").mockStreamResponse();
     }
 
     @Test
@@ -136,8 +133,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
         throws UnexpectedNoAccessRightException, BadRequestException {
       controller.getAiReply(recallConversation);
 
-      // Verify streaming was called (the actual request parameters are tested via integration)
-      // The official client's createStreaming is called internally by OpenAiApiHandler
       assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
     }
 
@@ -146,8 +141,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
         throws UnexpectedNoAccessRightException, BadRequestException {
       controller.getAiReply(recallConversation);
 
-      // Verify streaming was called (the actual request parameters are tested via integration)
-      // The official client's createStreaming is called internally by OpenAiApiHandler
       assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
     }
   }

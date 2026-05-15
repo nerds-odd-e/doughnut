@@ -55,19 +55,20 @@ const restartOpenAiAndStubMcqForUserMessage = async (
   record: Record<string, string>,
   responseKind: 'jsonSchema' | 'questionGeneration'
 ) => {
-  if (responseKind === 'jsonSchema') {
-    await addJsonSchemaMcqStubForUserMessage(userMessageMatch, record)
-  } else {
-    const reply = mcqReplyJson(record)
-    await mock_services
-      .openAi()
-      .responses()
-      .requestMessageMatches(userMessageMatch)
+  const reply = mcqReplyJson(record)
+  const stub = mock_services
+    .openAi()
+    .responses()
+    .requestMessageMatches(userMessageMatch)
+  if (responseKind === 'questionGeneration') {
+    await stub
       .requestDoesNotMessageMatch({
         role: 'user',
         content: 'Previously generated non-feasible question',
       })
       .stubOutputText(reply)
+  } else {
+    await stub.stubOutputText(reply)
   }
 }
 

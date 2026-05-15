@@ -93,7 +93,7 @@ const openAiService = () => {
       )
     },
 
-    stubOpenAiCompletionWithErrorResponse() {
+    stubOpenAiWithErrorResponse() {
       return serviceMocker.stubGetterWithError500Response(`/*`, {})
     },
 

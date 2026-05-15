@@ -43,14 +43,6 @@ public class ConversationAiReplySseStream {
                 }
               }
 
-              JsonNode messageNode = choiceNode.get("message");
-              if (messageNode != null) {
-                JsonNode messageContentNode = messageNode.get("content");
-                if (messageContentNode != null && messageContentNode.isTextual()) {
-                  accumulatedContent.append(messageContentNode.asText());
-                }
-              }
-
               JsonNode finishReasonNode = choiceNode.get("finish_reason");
               if (finishReasonNode != null && finishReasonNode.isTextual() && !consumerCalled[0]) {
                 String finishReason = finishReasonNode.asText();

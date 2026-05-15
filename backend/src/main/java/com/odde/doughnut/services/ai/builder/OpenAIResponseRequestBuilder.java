@@ -20,7 +20,6 @@ public class OpenAIResponseRequestBuilder<T> {
   private String modelName;
   private ReasoningEffort reasoningEffort = ReasoningEffort.NONE;
   private long maxOutputTokens = 700L;
-  private ResponseTextConfig.Verbosity verbosity = ResponseTextConfig.Verbosity.LOW;
 
   public OpenAIResponseRequestBuilder(Class<T> responseType) {
     this.responseType = responseType;
@@ -53,7 +52,10 @@ public class OpenAIResponseRequestBuilder<T> {
 
   public StructuredResponseCreateParams<T> build() {
     StructuredResponseTextConfig<T> textConfig =
-        StructuredResponseTextConfig.<T>builder().format(responseType).verbosity(verbosity).build();
+        StructuredResponseTextConfig.<T>builder()
+            .format(responseType)
+            .verbosity(ResponseTextConfig.Verbosity.LOW)
+            .build();
 
     return StructuredResponseCreateParams.<T>builder()
         .model(modelName)

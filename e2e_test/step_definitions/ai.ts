@@ -74,7 +74,7 @@ Given('OpenAI returns embeddings successfully', () => {
 })
 
 Given('An OpenAI response is unavailable', () => {
-  mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
+  mock_services.openAi().stubOpenAiWithErrorResponse()
 })
 
 Given('OpenAI generates this question:', stubOpenAiMcqFromSingleRowTable)

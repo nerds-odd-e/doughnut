@@ -90,8 +90,7 @@ public class ConversationMessageController {
       throws UnexpectedNoAccessRightException, BadRequestException {
     authorizationService.assertAuthorization(conversation);
     try {
-      Note note = conversation.getSubjectNote();
-      if (note == null) {
+      if (conversation.getSubjectNote() == null) {
         throw new RuntimeException(
             "Only note or recall prompt related conversation can have AI reply");
       }

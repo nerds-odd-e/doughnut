@@ -36,8 +36,8 @@ public class NoteConversationAiReplyService {
 
     Flowable<String> stream = openAiApiHandler.streamResponseAsLegacyChatChunks(request);
 
-    ConversationAiReplySseStream chatStream = new ConversationAiReplySseStream(stream);
-    return chatStream.getSseEmitter(
+    ConversationAiReplySseStream replySseStream = new ConversationAiReplySseStream(stream);
+    return replySseStream.getSseEmitter(
         content -> {
           if (content != null && !content.isEmpty()) {
             conversationService.addMessageToConversation(conversation, null, content);
