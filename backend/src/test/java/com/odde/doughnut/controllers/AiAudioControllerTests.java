@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +14,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
+import com.openai.models.responses.ResponseTextConfig;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -49,7 +52,7 @@ class AiAudioControllerTests {
     String transcriptText = "test123";
     NoteContentCompletion completion = new NoteContentCompletion(transcriptText);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(completion);
+    openAIChatCompletionMock.stubStructuredResponse(completion);
     mockTranscriptionSrtResponse("test transcription");
   }
 
@@ -141,80 +144,64 @@ class AiAudioControllerTests {
 
     @Test
     void shouldIncludeAdditionalInstructions() throws IOException {
-      // Setup
       audioUploadDTO.setAdditionalProcessingInstructions("Translate to Spanish");
 
-      // Execute
       controller.audioToText(audioUploadDTO);
 
-      // Verify
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      boolean hasInstruction =
-          paramsCaptor.getValue().messages().stream()
-              .map(Object::toString)
-              .anyMatch(msg -> msg.contains("Additional instruction:\nTranslate to Spanish"));
-      assertTrue(hasInstruction);
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<NoteContentCompletion> params = paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
+      assertTrue(instructions.contains("Additional instruction:\nTranslate to Spanish"));
+      assertThat(
+          "Should use Responses structured text format",
+          params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
+          is(true));
+      verify(openAIChatCompletionMock.completionService(), never())
+          .create(any(com.openai.models.chat.completions.ChatCompletionCreateParams.class));
     }
 
     @Test
     void shouldWorkWithoutAdditionalInstructions() throws IOException {
-      // Execute
       controller.audioToText(audioUploadDTO);
 
-      // Verify
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      boolean hasNoAdditionalInstructions =
-          paramsCaptor.getValue().messages().stream()
-              .map(Object::toString)
-              .noneMatch(msg -> msg.contains("Additional instruction"));
-      assertTrue(hasNoAdditionalInstructions);
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
+      assertFalse(instructions.contains("Additional instruction"));
     }
 
     @Test
     void shouldIncludePreviousContentAsUserMessage() throws IOException {
-      // Setup
       String previousContent = "Previous text with trailing space ";
       audioUploadDTO.setPreviousNoteContentToAppendTo(previousContent);
 
-      // Execute
       controller.audioToText(audioUploadDTO);
 
-      // Verify
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
       String expectedJson =
           "{\"previousNoteContentToAppendTo\": \"Previous text with trailing space \"}";
-      boolean hasPreviousContent =
-          paramsCaptor.getValue().messages().stream()
-              .map(Object::toString)
-              .anyMatch(
-                  msg -> msg.contains("Previous note content (in JSON format):\n" + expectedJson));
-      assertThat(hasPreviousContent, equalTo(true));
+      String input = paramsCaptor.getValue().rawParams().input().flatMap(i -> i.text()).orElse("");
+      assertThat(input, equalTo("Previous note content (in JSON format):\n" + expectedJson));
     }
 
     @Test
     void shouldWorkWithoutPreviousContent() throws IOException {
-      // Execute
       controller.audioToText(audioUploadDTO);
 
-      // Verify
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      boolean hasNoPreviousContent =
-          paramsCaptor.getValue().messages().stream()
-              .map(Object::toString)
-              .noneMatch(msg -> msg.contains("Previous content (in JSON format):"));
-      assertTrue(hasNoPreviousContent);
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      String input = paramsCaptor.getValue().rawParams().input().flatMap(i -> i.text()).orElse("");
+      assertFalse(input.contains("Previous note content (in JSON format):"));
     }
   }
 }

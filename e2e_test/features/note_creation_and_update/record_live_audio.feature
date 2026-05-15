@@ -12,7 +12,7 @@ Feature: Recording a live audio and append to note content
       its talk about dada struct day.
 
       """
-    # Note: This test is ignored. When re-enabled, update to use Chat Completion API
+    # Note: This test is ignored. Transcript post-processing uses the OpenAI Responses API (structured output).
     # And OpenAI will reply below for user messages:
     #   | user message | assistant reply | response type |
     #   | ...          | ...              | requires action |

@@ -1,13 +1,12 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.io.IOException;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -41,12 +40,14 @@ public final class OtherAiServices {
       String additionalInstructions,
       String previousContent) {
 
-    OpenAIChatRequestBuilder chatAboutNoteRequestBuilder = getOpenAIChatRequestBuilder(modelName);
+    InstructionAndSchema tool = AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
+    OpenAIResponseRequestBuilder<NoteContentCompletion> builder =
+        new OpenAIResponseRequestBuilder<>(NoteContentCompletion.class).model(modelName);
 
     if (additionalInstructions != null && !additionalInstructions.isEmpty()) {
-      chatAboutNoteRequestBuilder.addToOverallSystemMessage(
-          "Additional instruction:\n" + additionalInstructions);
+      builder.addInstruction("Additional instruction:\n" + additionalInstructions);
     }
+    builder.addInstruction(tool.getMessageBody());
 
     if (previousContent != null && !previousContent.isEmpty()) {
       try {
@@ -54,31 +55,14 @@ public final class OtherAiServices {
             String.format(
                 "{\"previousNoteContentToAppendTo\": %s}",
                 new ObjectMapperConfig().objectMapper().writeValueAsString(previousContent));
-        chatAboutNoteRequestBuilder.addUserMessage(
-            "Previous note content (in JSON format):\n" + jsonContent);
+        builder.addUserMessage("Previous note content (in JSON format):\n" + jsonContent);
       } catch (JsonProcessingException e) {
         return Optional.empty();
       }
     }
 
-    InstructionAndSchema questionEvaluationAiTool =
-        AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
-    return openAiApiHandler
-        .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
-        .flatMap(
-            jsonNode -> {
-              try {
-                ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
-                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                return Optional.of(mapper.treeToValue(jsonNode, NoteContentCompletion.class));
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            });
-  }
-
-  private static OpenAIChatRequestBuilder getOpenAIChatRequestBuilder(String modelName) {
-    return new OpenAIChatRequestBuilder().model(modelName);
+    StructuredResponseCreateParams<NoteContentCompletion> params = builder.build();
+    return openAiApiHandler.requestAndGetStructuredResponseResult(params);
   }
 
   public String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {

@@ -159,19 +159,16 @@ Given('OpenAI will reply below for user messages:', (data: DataTable) => {
 Given(
   'the OpenAI completion service will return the following response for the transcription to text request:',
   (data: DataTable) => {
+    const row = data.hashes()[0]!
+    const reply = JSON.stringify({ content: row.response! })
     mock_services
       .openAi()
-      .chatCompletion()
+      .responses()
       .requestMessageMatches({
-        role: 'user',
-        content: `.*${data.hashes()[0]!['request contains']}.*`,
+        role: 'developer',
+        content: `.*${row['request contains']}.*`,
       })
-      .stubJsonSchemaResponse(
-        JSON.stringify({
-          completion: data.hashes()[0]!.response!,
-          deleteFromEnd: 0,
-        })
-      )
+      .stubOutputText(reply)
   }
 )
 
