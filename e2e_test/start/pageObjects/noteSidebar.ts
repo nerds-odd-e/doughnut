@@ -17,13 +17,12 @@ function folderTreitemByLabel(folderLabel: string) {
 
 function expandFolder(label: string) {
   pageIsNotLoading()
-  const row = folderTreitemByLabel(label)
-  row.then(($el) => {
+  folderTreitemByLabel(label).then(($el) => {
     if (($el.attr('aria-expanded') ?? 'false') === 'false') {
       cy.wrap($el).find('.folder-row .chevron-btn').first().click()
     }
   })
-  row
+  folderTreitemByLabel(label)
     .should('have.attr', 'aria-expanded', 'true')
     .find('[role="treeitem"]', { timeout: sidebarActionTimeoutMs })
     .should('have.length.at.least', 1)
