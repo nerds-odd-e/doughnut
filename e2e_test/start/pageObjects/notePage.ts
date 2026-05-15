@@ -11,8 +11,9 @@ import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { assumeAssimilationPage } from './assimilationPage'
 
-const noteShowHref = /^\/d\/n\/\d+$/
-const noteShowPathInUrl = /\/d\/n\/\d+/
+/** Matches `noteShowHref()` (`/n{id}`) or legacy `/d/n/:id` note links. */
+const noteShowHref = /^\/d\/n\/\d+$|^\/n\d+$/
+const noteShowPathInUrl = /\/d\/n\/\d+|\/n\d+/
 
 const noteContentRegion = { role: 'region' as const, name: 'Note content' }
 
