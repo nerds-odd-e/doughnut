@@ -2,6 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,6 +63,28 @@ public final class WikiLinkMarkdown {
     return newInnerWithHandling(storedLinkInner, newNoteTitle, true);
   }
 
+  /**
+   * Rewrites the notebook prefix of a wiki link while preserving the note title and visible display
+   * text. Used when a note is moved to a different notebook.
+   *
+   * <ul>
+   *   <li>{@code [[X]]} → {@code [[NewNb:X|X]]}
+   *   <li>{@code [[OldNb:X]]} → {@code [[NewNb:X|OldNb:X]]}
+   *   <li>{@code [[OldNb:X|custom]]} → {@code [[NewNb:X|custom]]}
+   * </ul>
+   */
+  public static String newInnerForKeepNotebookMove(String storedLinkInner, String newNotebookName) {
+    if (newNotebookName == null) {
+      throw new IllegalArgumentException("newNotebookName");
+    }
+    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
+      return storedLinkInner;
+    }
+    return keepVisibleInner(
+        storedLinkInner,
+        rawTargetToken -> requalifyTargetTokenWithNotebook(rawTargetToken, newNotebookName));
+  }
+
   private static String newInnerWithHandling(
       String storedLinkInner, String newNoteTitle, boolean keepVisibleText) {
     if (newNoteTitle == null) {
@@ -82,6 +105,36 @@ public final class WikiLinkMarkdown {
       return keepVisibleText ? newTargetToken + "|" + rawTargetPart.trim() : newTargetToken;
     }
     return newTargetToken + "|" + rawDisplay;
+  }
+
+  /**
+   * Shared keep-visible-text branching: replaces the target token using the given transform and
+   * always preserves whatever text readers currently see.
+   */
+  private static String keepVisibleInner(
+      String storedLinkInner, UnaryOperator<String> targetTokenTransform) {
+    int pipeIdx = storedLinkInner.indexOf('|');
+    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
+    String newTargetToken = targetTokenTransform.apply(rawTargetPart.trim());
+    if (pipeIdx == -1) {
+      return newTargetToken + "|" + storedLinkInner.trim();
+    }
+    String rawDisplay = storedLinkInner.substring(pipeIdx + 1);
+    if (rawDisplay.trim().isEmpty()) {
+      return newTargetToken + "|" + rawTargetPart.trim();
+    }
+    return newTargetToken + "|" + rawDisplay;
+  }
+
+  /** Replaces or adds the notebook prefix on a target token, keeping the note title intact. */
+  private static String requalifyTargetTokenWithNotebook(
+      String targetToken, String newNotebookName) {
+    int colon = targetToken.indexOf(':');
+    String noteTitle =
+        (colon > 0 && colon < targetToken.length() - 1)
+            ? targetToken.substring(colon + 1).trim()
+            : targetToken;
+    return newNotebookName + ":" + noteTitle;
   }
 
   public static String replaceWikiLinksMatchingTrimmedInner(

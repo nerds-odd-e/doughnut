@@ -232,22 +232,33 @@ public class WikiTitleCacheService {
         handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT
             ? lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle)
             : lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle);
-    rewriteInboundWikiLinksForTitleRename(targetNote, newTitle, updatedAt, viewer, fn);
+    targetNote.setTitle(newTitle);
+    targetNote.setUpdatedAt(updatedAt);
+    entityPersister.save(targetNote);
+    entityManager.flush();
+    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
   }
 
-  private void rewriteInboundWikiLinksForTitleRename(
+  /**
+   * Rewrites inbound wiki links for a note that has moved to a different notebook. Preserves
+   * visible display text while qualifying all tokens with the new notebook name.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForNotebookMove(
+      Note targetNote, String newNotebookName, Timestamp updatedAt, User viewer) {
+    UnaryOperator<String> fn =
+        lt -> WikiLinkMarkdown.newInnerForKeepNotebookMove(lt, newNotebookName);
+    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
+  }
+
+  private void rewriteInboundWikiLinks(
       Note targetNote,
-      String newTitle,
       Timestamp updatedAt,
       User viewer,
       UnaryOperator<String> newInnerFromLinkText) {
     Integer targetId = targetNote.getId();
     List<NoteWikiTitleCache> rows =
         noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
-    targetNote.setTitle(newTitle);
-    targetNote.setUpdatedAt(updatedAt);
-    entityPersister.save(targetNote);
-    entityManager.flush();
 
     Map<Integer, LinkedHashSet<String>> linkTextsByReferrer = new LinkedHashMap<>();
     for (NoteWikiTitleCache row : rows) {

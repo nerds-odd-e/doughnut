@@ -7,12 +7,15 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class RelationControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
+  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   @Autowired RelationController controller;
+  @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;
 
   @BeforeEach
   void setup() {
@@ -183,6 +188,116 @@ class RelationControllerTests extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveNoteToNotebookRootInNotebook(mover, foreignNb));
+    }
+
+    @Test
+    void crossNotebookMove_qualifiesUnqualifiedReferrerLink()
+        throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root1").notebook(nb1).please();
+      Notebook nb2 = makeMe.aNotebook().name("NewNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root2").notebook(nb2).please();
+      Note target = makeMe.aNote("MyNote").notebook(nb1).please();
+      Note referrer = makeMe.aNote("Carrier").notebook(nb1).please();
+
+      referrer.setContent("[[MyNote]]");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(referrer, u);
+      makeMe.entityPersister.flush();
+
+      List<NoteRealm> result = controller.moveNoteToNotebookRootInNotebook(target, nb2);
+
+      makeMe.refresh(referrer);
+      assertThat(referrer.getContent(), equalTo("[[NewNb:MyNote|MyNote]]"));
+      assertThat(
+          noteWikiTitleCacheRepository
+              .findByNote_IdOrderByIdAsc(referrer.getId())
+              .getFirst()
+              .getLinkText(),
+          equalTo("NewNb:MyNote|MyNote"));
+      assertThat(result.getFirst().getReferences(), hasSize(1));
+      assertThat(result.getFirst().getReferences().getFirst().getId(), equalTo(referrer.getId()));
+    }
+
+    @Test
+    void crossNotebookMove_requalifiesQualifiedReferrerLink()
+        throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root1").notebook(nb1).please();
+      Notebook nb2 = makeMe.aNotebook().name("NewNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root2").notebook(nb2).please();
+      Note target = makeMe.aNote("MyNote").notebook(nb1).please();
+      Note referrer = makeMe.aNote("Carrier").notebook(nb1).please();
+      referrer.setContent("[[OldNb:MyNote]]");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(referrer, u);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToNotebookRootInNotebook(target, nb2);
+
+      makeMe.refresh(referrer);
+      assertThat(referrer.getContent(), equalTo("[[NewNb:MyNote|OldNb:MyNote]]"));
+    }
+
+    @Test
+    void crossNotebookMove_preservesExplicitDisplayText() throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root1").notebook(nb1).please();
+      Notebook nb2 = makeMe.aNotebook().name("NewNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root2").notebook(nb2).please();
+      Note target = makeMe.aNote("MyNote").notebook(nb1).please();
+      Note referrer = makeMe.aNote("Carrier").notebook(nb1).please();
+      referrer.setContent("[[OldNb:MyNote|custom text]]");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(referrer, u);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToNotebookRootInNotebook(target, nb2);
+
+      makeMe.refresh(referrer);
+      assertThat(referrer.getContent(), equalTo("[[NewNb:MyNote|custom text]]"));
+    }
+
+    @Test
+    void crossNotebookMove_doesNotRewriteWhenNotebookUnchanged()
+        throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root1").notebook(nb1).please();
+      Note target = makeMe.aNote("MyNote").notebook(nb1).please();
+      Note referrer = makeMe.aNote("Carrier").notebook(nb1).please();
+      referrer.setContent("[[MyNote]]");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(referrer, u);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToNotebookRootInNotebook(target, nb1);
+
+      makeMe.refresh(referrer);
+      assertThat(referrer.getContent(), equalTo("[[MyNote]]"));
+    }
+
+    @Test
+    void sameNotebookMove_doesNotRewriteReferrer() throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().name("SameNb").creatorAndOwner(u).please();
+      makeMe.aRootNote("root").notebook(nb1).please();
+      Folder folder = makeMe.aFolder().notebook(nb1).name("F").please();
+      Note target = makeMe.aNote("MyNote").notebook(nb1).please();
+      Note referrer = makeMe.aNote("Carrier").notebook(nb1).please();
+      referrer.setContent("[[MyNote]]");
+      makeMe.entityPersister.flush();
+      controller.moveNoteToFolder(target, folder);
+      wikiTitleCacheServiceBean.refreshForNote(referrer, u);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToNotebookRoot(target);
+
+      makeMe.refresh(referrer);
+      assertThat(referrer.getContent(), equalTo("[[MyNote]]"));
     }
   }
 }
