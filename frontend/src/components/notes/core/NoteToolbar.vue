@@ -4,6 +4,7 @@
       <PopButton
         v-if="!readonly"
         ref="linkPopButtonRef"
+        aria-label="Link"
         title="Link (Ctrl+Shift+F / Cmd+Shift+F)"
         align-modal-top
         :show-close-button="false"
