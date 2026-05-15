@@ -45,8 +45,8 @@ class NullToNotFoundResponseBodyAdviceTest {
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-    // Mock null chat completion to make askAQuestion return null
-    openAIChatCompletionMock.mockNullChatCompletion();
+    // Stub null Responses result so askAQuestion returns null
+    openAIChatCompletionMock.stubStructuredResponse(null);
   }
 
   @Test

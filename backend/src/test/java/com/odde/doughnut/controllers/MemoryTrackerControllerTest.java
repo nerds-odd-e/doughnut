@@ -186,8 +186,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
       // Mock OpenAI API call
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
-          makeMe.aMCQWithAnswer().please());
+      openAIChatCompletionMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
 
       RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
       assertThat(recallPrompt, notNullValue());

@@ -107,7 +107,7 @@ class AiControllerTest extends ControllerTestBase {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(suggestedTopic);
+      openAIChatCompletionMock.stubStructuredResponse(suggestedTopic);
     }
 
     @Test
@@ -163,7 +163,7 @@ class AiControllerTest extends ControllerTestBase {
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
       testNote.setContent("English is a language that is spoken in many countries.");
 
       UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
@@ -209,7 +209,7 @@ class AiControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(List.of("Point 1", "Point 2"));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
       testNote.setContent("Some note content");
 
       controller.generateUnderstandingChecklist(testNote);
@@ -254,7 +254,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldReturnRegeneratedContentAfterRemovingPoints()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
+      openAIChatCompletionMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
       String originalContent =
           "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
@@ -269,7 +269,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldNotModifyNoteInDatabase()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
+      openAIChatCompletionMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
       String originalContent = "Original content with point to remove.";
       testNote.setContent(originalContent);
@@ -325,7 +325,7 @@ class AiControllerTest extends ControllerTestBase {
       aiResult.setNewNoteTitle("Extracted Sibling Note");
       aiResult.setNewNoteContent("Expanded content for the sibling.");
       aiResult.setUpdatedParentContent("Updated parent with summary.");
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
+      openAIChatCompletionMock.stubStructuredResponse(aiResult);
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
@@ -356,7 +356,7 @@ class AiControllerTest extends ControllerTestBase {
       aiResult.setNewNoteTitle("Point B");
       aiResult.setNewNoteContent("Extracted");
       aiResult.setUpdatedParentContent("A. C. D. E.");
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(aiResult);
+      openAIChatCompletionMock.stubStructuredResponse(aiResult);
 
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("key point to promote"));
@@ -396,7 +396,7 @@ class AiControllerTest extends ControllerTestBase {
     void shouldThrowWhenAiReturnsNull()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote = newRootNoteWithPromotableContent();
-      openAIChatCompletionMock.mockNullChatCompletion();
+      openAIChatCompletionMock.stubStructuredResponse(null);
       PointsRequestDTO requestDTO = new PointsRequestDTO();
       requestDTO.setPoints(List.of("a point"));
       assertResponseStatus(

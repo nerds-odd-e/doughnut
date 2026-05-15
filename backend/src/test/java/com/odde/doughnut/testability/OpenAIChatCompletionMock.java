@@ -3,10 +3,6 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.openai.client.OpenAIClient;
-import com.openai.core.JsonValue;
-import com.openai.models.chat.completions.ChatCompletion;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.openai.models.chat.completions.ChatCompletionMessage;
 import com.openai.models.responses.Response;
 import com.openai.models.responses.ResponseOutputItem;
 import com.openai.models.responses.ResponseOutputMessage;
@@ -18,7 +14,6 @@ import com.openai.models.responses.ToolChoiceOptions;
 import com.openai.services.blocking.ChatService;
 import com.openai.services.blocking.ResponseService;
 import com.openai.services.blocking.chat.ChatCompletionService;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,33 +80,6 @@ public class OpenAIChatCompletionMock {
     fallbackStructuredResults.add(new MalformedStructuredContent(malformedJson));
   }
 
-  public void mockChatCompletionAndReturnJsonSchema(Object result) {
-    if (result == null) {
-      mockNullChatCompletion();
-      return;
-    }
-    String content = objectMapperConfig.objectMapper().valueToTree(result).toString();
-    ChatCompletion completion = buildContentCompletion(content);
-    Mockito.doReturn(completion)
-        .when(completionService)
-        .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
-    stubStructuredResponse(result);
-  }
-
-  public void mockNullChatCompletion() {
-    ChatCompletion completion =
-        ChatCompletion.builder()
-            .id("chatcmpl-null")
-            .created(System.currentTimeMillis() / 1000L)
-            .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
-            .choices(Collections.emptyList())
-            .build();
-    Mockito.doReturn(completion)
-        .when(completionService)
-        .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
-    stubStructuredResponse(null);
-  }
-
   private void addStructuredResult(Object result) {
     Queue<Object> resultsForType =
         structuredResults.computeIfAbsent(result.getClass(), ignored -> new LinkedList<>());
@@ -169,32 +137,6 @@ public class OpenAIChatCompletionMock {
         .tools(List.of())
         .topP(Optional.empty())
         .status(ResponseStatus.COMPLETED)
-        .build();
-  }
-
-  private boolean hasTools(ChatCompletionCreateParams params) {
-    return params.tools().map(list -> !list.isEmpty()).orElse(false);
-  }
-
-  private ChatCompletion buildContentCompletion(String content) {
-    ChatCompletionMessage message =
-        ChatCompletionMessage.builder()
-            .role(JsonValue.from("assistant"))
-            .content(content)
-            .refusal(Optional.empty())
-            .build();
-    ChatCompletion.Choice choice =
-        ChatCompletion.Choice.builder()
-            .index(0L)
-            .message(message)
-            .finishReason(ChatCompletion.Choice.FinishReason.STOP)
-            .logprobs(Optional.empty())
-            .build();
-    return ChatCompletion.builder()
-        .id("chatcmpl-mock")
-        .created(System.currentTimeMillis() / 1000L)
-        .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
-        .choices(List.of(choice))
         .build();
   }
 }

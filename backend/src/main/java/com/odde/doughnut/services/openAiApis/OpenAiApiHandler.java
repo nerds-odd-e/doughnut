@@ -1,19 +1,12 @@
 package com.odde.doughnut.services.openAiApis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
-import com.odde.doughnut.services.ai.ChatMessageContent;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
-import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.openai.models.chat.completions.ChatCompletionMessage;
 import com.openai.models.responses.StructuredResponse;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.reactivex.BackpressureStrategy;
@@ -50,15 +43,6 @@ public class OpenAiApiHandler {
     if (effectiveToken == null || effectiveToken.isEmpty()) {
       throw new OpenAiNotAvailableException("OpenAI is not available (no API key configured).");
     }
-  }
-
-  public Optional<ChatCompletion.Choice> chatCompletion(ChatCompletionCreateParams params) {
-    assertOpenAiAvailable();
-    ChatCompletion response = officialClient.chat().completions().create(params);
-    if (response == null || response.choices() == null || response.choices().isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.of(response.choices().get(0));
   }
 
   public Flowable<String> streamChatCompletion(ChatCompletionCreateParams params) {
@@ -129,11 +113,6 @@ public class OpenAiApiHandler {
     return transcription.toString();
   }
 
-  public Optional<JsonNode> requestAndGetJsonSchemaResult(
-      InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
-    return requestAndGetJsonSchemaResult(tool, openAIChatRequestBuilder, null);
-  }
-
   public <T> Optional<T> requestAndGetStructuredResponseResult(
       StructuredResponseCreateParams<T> responseRequest) {
     assertOpenAiAvailable();
@@ -147,63 +126,5 @@ public class OpenAiApiHandler {
         .flatMap(message -> message.content().stream())
         .flatMap(content -> content.outputText().stream())
         .findFirst();
-  }
-
-  public Optional<JsonNode> requestAndGetJsonSchemaResult(ChatCompletionCreateParams chatRequest) {
-    assertOpenAiAvailable();
-
-    // Guard against misuse: requestAndGetJsonSchemaResult must not be used with tools
-    if (chatRequest.tools().map(list -> !list.isEmpty()).orElse(false)) {
-      throw new RuntimeException(
-          "requestAndGetJsonSchemaResult must not be used with tools; use the conversation tooling path instead");
-    }
-
-    try {
-      Optional<ChatCompletion.Choice> choiceOpt = chatCompletion(chatRequest);
-      if (choiceOpt.isEmpty()) {
-        return Optional.empty();
-      }
-      ChatCompletion.Choice choice = choiceOpt.get();
-      ChatCompletionMessage message = choice.message();
-
-      // Extract content from message
-      Optional<?> contentOpt = message.content();
-      if (contentOpt.isEmpty()) {
-        return Optional.empty();
-      }
-      String content = ChatMessageContent.extractContentString(contentOpt.get());
-      if (content == null || content.isEmpty()) {
-        return Optional.empty();
-      }
-
-      try {
-        return Optional.of(new ObjectMapperConfig().objectMapper().readTree(content));
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-    } catch (RuntimeException e) {
-      if (e.getCause() instanceof MismatchedInputException) {
-        return Optional.empty();
-      }
-      throw e;
-    }
-  }
-
-  /**
-   * Appends {@code developerInstructionAfterSchemaInstruction} to the developer message after the
-   * tool/schema instruction from {@link OpenAIChatRequestBuilder#responseJsonSchema}.
-   */
-  public Optional<JsonNode> requestAndGetJsonSchemaResult(
-      InstructionAndSchema tool,
-      OpenAIChatRequestBuilder openAIChatRequestBuilder,
-      String developerInstructionAfterSchemaInstruction) {
-    assertOpenAiAvailable();
-    OpenAIChatRequestBuilder prepared = openAIChatRequestBuilder.responseJsonSchema(tool);
-    if (developerInstructionAfterSchemaInstruction != null
-        && !developerInstructionAfterSchemaInstruction.isBlank()) {
-      prepared.addToOverallSystemMessage(developerInstructionAfterSchemaInstruction);
-    }
-    ChatCompletionCreateParams chatRequest = prepared.build();
-    return requestAndGetJsonSchemaResult(chatRequest);
   }
 }
