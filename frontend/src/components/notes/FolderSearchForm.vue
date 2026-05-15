@@ -15,16 +15,32 @@
     </p>
     <div
       class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full daisy-mb-3 daisy-input daisy-input-bordered"
+      :aria-busy="foldersLoading"
     >
-      <Search class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50" />
+      <span
+        v-if="foldersLoading"
+        class="daisy-inline-flex daisy-shrink-0 daisy-items-center"
+        role="status"
+        aria-label="Loading folders"
+      >
+        <span
+          class="daisy-loading daisy-loading-spinner daisy-loading-sm"
+          data-testid="folder-selector-search-loading"
+        />
+      </span>
+      <Search
+        v-else
+        class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50"
+      />
       <input
+        ref="searchInputRef"
         v-model="query"
-        v-focus
         type="search"
         class="daisy-grow daisy-min-w-0 daisy-border-0 daisy-bg-transparent daisy-outline-none"
         placeholder="Search by name or path"
         data-testid="folder-selector-search-input"
         autocomplete="off"
+        :disabled="foldersLoading"
       />
     </div>
     <ul
@@ -70,7 +86,7 @@
 import type { Folder } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { Search } from "lucide-vue-next"
-import { computed, onMounted, ref } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import {
@@ -100,6 +116,15 @@ const emit = defineEmits<{
 const indexRows = ref<Folder[]>([])
 const indexLoadError = ref<string | undefined>(undefined)
 const query = ref("")
+const foldersLoading = ref(true)
+const searchInputRef = ref<HTMLInputElement | null>(null)
+
+watch(foldersLoading, async (loading) => {
+  if (!loading) {
+    await nextTick()
+    searchInputRef.value?.focus()
+  }
+})
 
 onMounted(async () => {
   query.value = ""
@@ -115,6 +140,8 @@ onMounted(async () => {
     emit("indexLoaded", indexRows.value)
   } catch (e: unknown) {
     indexLoadError.value = toOpenApiError(e).message ?? "Failed to load folders"
+  } finally {
+    foldersLoading.value = false
   }
 })
 
