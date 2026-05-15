@@ -37,6 +37,7 @@ class NoteQuestionGenerationServiceTests {
   OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
+  @Autowired GlobalSettingsService globalSettingsService;
   @Autowired NoteQuestionGenerationService service;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
@@ -117,7 +118,10 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldUseModelNameFromGlobalSettings() throws JsonProcessingException {
+    void shouldUseQuestionGenerationModelNameFromGlobalSettings() throws JsonProcessingException {
+      globalSettingsService
+          .globalSettingQuestionGeneration()
+          .setKeyValue(makeMe.aTimestamp().please(), "gpt-question-generation");
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
@@ -126,8 +130,31 @@ class NoteQuestionGenerationServiceTests {
       ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      assertThat(
-          paramsCaptor.getValue().model().asString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
+      assertThat(paramsCaptor.getValue().model().asString(), is("gpt-question-generation"));
+    }
+
+    @Test
+    void shouldUseSameRequestShapeAsExportedQuestionGenerationRequest()
+        throws JsonProcessingException {
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
+
+      ChatCompletionCreateParams exportedRequest =
+          service.buildQuestionGenerationRequest(testNote, "Generate a focused question");
+
+      service.generateQuestion(testNote, "Generate a focused question");
+
+      ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      ChatCompletionCreateParams runtimeRequest = paramsCaptor.getValue();
+      assertThat(runtimeRequest.model().asString(), is(exportedRequest.model().asString()));
+      assertThat(runtimeRequest.messages(), is(exportedRequest.messages()));
+      assertThat(runtimeRequest.reasoningEffort(), is(exportedRequest.reasoningEffort()));
+      assertThat(runtimeRequest.maxCompletionTokens(), is(exportedRequest.maxCompletionTokens()));
+      assertThat(runtimeRequest.maxCompletionTokens(), is(Optional.of(500L)));
+      assertThat(runtimeRequest.responseFormat(), is(exportedRequest.responseFormat()));
+      assertThat(runtimeRequest.responseFormat().isPresent(), is(true));
     }
 
     @Test

@@ -8,7 +8,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.Optional;
@@ -54,14 +53,11 @@ public class NoteQuestionGenerationService {
 
   private MCQWithAnswer generateQuestionWithChatCompletion(
       Note note, String additionalMessage, Long contextSeed) {
-    InstructionAndSchema tool =
-        AiToolFactory.questionAiTool(requestBuilder.isFocusNoteTitleAndContentEmpty(note));
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
+    ChatCompletionCreateParams chatRequest =
+        requestBuilder.buildQuestionGenerationRequest(note, additionalMessage, contextSeed);
 
     return openAiApiHandler
-        .requestAndGetJsonSchemaResult(
-            tool, chatRequestBuilder, note.getNotebookAssistantInstructions())
+        .requestAndGetJsonSchemaResult(chatRequest)
         .map(
             jsonNode -> {
               try {

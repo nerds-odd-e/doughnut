@@ -55,7 +55,7 @@ public class QuestionGenerationRequestBuilder {
     addNotebookAssistantInstructionsIfPresent(chatRequestBuilder, note);
     return chatRequestBuilder
         .reasoningEffort(ReasoningEffort.LOW)
-        .maxCompletionTokens(1000L)
+        .maxCompletionTokens(500L)
         .build();
   }
 
@@ -113,7 +113,7 @@ public class QuestionGenerationRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note, Long contextSeed) {
-    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
+    String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
     Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
     String instruction =

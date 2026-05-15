@@ -17,6 +17,8 @@ public class OpenAIChatRequestBuilder {
       "This is a PKM system: wiki-style Markdown notes in notebooks, with [[wiki links]] between notes.";
   public final List<ChatCompletionMessageParam> messages = new ArrayList<>();
   private final List<String> overallSystemMessages = new ArrayList<>();
+  private ReasoningEffort reasoningEffort = ReasoningEffort.NONE;
+  private long maxCompletionTokens = 700L;
   ChatCompletionCreateParams.Builder builder = ChatCompletionCreateParams.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
@@ -70,19 +72,19 @@ public class OpenAIChatRequestBuilder {
     return builder
         .messages(buildMessages())
         .n(1L)
-        .reasoningEffort(ReasoningEffort.NONE)
+        .reasoningEffort(reasoningEffort)
         .verbosity(ChatCompletionCreateParams.Verbosity.LOW)
-        .maxCompletionTokens(700L)
+        .maxCompletionTokens(maxCompletionTokens)
         .build();
   }
 
   public OpenAIChatRequestBuilder reasoningEffort(ReasoningEffort effort) {
-    builder.reasoningEffort(effort);
+    reasoningEffort = effort;
     return this;
   }
 
   public OpenAIChatRequestBuilder maxCompletionTokens(long tokens) {
-    builder.maxCompletionTokens(tokens);
+    maxCompletionTokens = tokens;
     return this;
   }
 
