@@ -2,6 +2,9 @@ import { pageIsNotLoading } from '../pageBase'
 
 const folderPage = () => ({
   typeFolderIndexDraftAndSave(text: string) {
+    cy.get('[data-testid="folder-index-editor"]')
+      .scrollIntoView()
+      .should('be.visible')
     cy.get('[data-testid="folder-index-editor"] .ql-editor')
       .should('be.visible')
       .click()
@@ -15,6 +18,9 @@ const folderPage = () => ({
   },
   expectFolderIndexBodyContains(fragment: string) {
     pageIsNotLoading()
+    cy.get('[data-testid="folder-index-body"]')
+      .scrollIntoView()
+      .should('be.visible')
     cy.get('[data-testid="folder-index-body"] .ql-editor').should(
       'contain.text',
       fragment
