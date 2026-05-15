@@ -5,7 +5,6 @@ import static com.odde.doughnut.services.book.BookReadingWireConstants.BOOK_FORM
 import static com.odde.doughnut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ApiError;
@@ -32,11 +31,12 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -163,27 +163,20 @@ public class BookService {
     }
     InstructionAndSchema tool = AiToolFactory.bookLayoutReorganizationAiTool();
     String model = globalSettingsService.globalSettingEvaluation().getValue();
-    OpenAIChatRequestBuilder builder =
-        new OpenAIChatRequestBuilder().model(model).addUserMessage(userJson);
-    JsonNode jsonNode =
+    StructuredResponseCreateParams<BookLayoutReorganizationSuggestion> params =
+        new OpenAIResponseRequestBuilder<>(BookLayoutReorganizationSuggestion.class)
+            .model(model)
+            .addInstruction(tool.getMessageBody())
+            .addUserMessage(userJson)
+            .build();
+    BookLayoutReorganizationSuggestion suggestion =
         openAiApiHandler
-            .requestAndGetJsonSchemaResult(tool, builder)
+            .requestAndGetStructuredResponseResult(params)
             .orElseThrow(
                 () ->
                     new OpenAIServiceErrorException(
                         "AI did not return a layout reorganization suggestion",
                         HttpStatus.BAD_GATEWAY));
-    BookLayoutReorganizationSuggestion suggestion;
-    try {
-      suggestion =
-          objectMapper
-              .copy()
-              .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-              .treeToValue(jsonNode, BookLayoutReorganizationSuggestion.class);
-    } catch (JsonProcessingException e) {
-      throw new OpenAIServiceErrorException(
-          "AI returned malformed layout suggestion", HttpStatus.BAD_GATEWAY);
-    }
     validateSuggestedLayout(ordered, suggestion);
     return suggestion;
   }

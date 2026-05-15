@@ -211,12 +211,12 @@ Given(
             return cy.then(async () => {
               await mock_services
                 .openAi()
-                .chatCompletion()
+                .responses()
                 .requestMessageMatches({
                   role: 'developer',
                   content: '.*You reorganize the outline nesting.*',
                 })
-                .stubJsonSchemaResponse(reply)
+                .stubOutputText(reply)
             })
           })
       })

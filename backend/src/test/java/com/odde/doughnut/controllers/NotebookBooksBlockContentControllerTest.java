@@ -3,6 +3,9 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
@@ -18,6 +21,9 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.ResponseTextConfig;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import jakarta.validation.Validation;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,6 +32,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
@@ -319,7 +326,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
 
     @Test
     void returnsAiSuggestionWithValidatedDepths() throws Exception {
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(suggestionRenestingBAndC());
+      openAIChatCompletionMock.stubStructuredResponse(suggestionRenestingBAndC());
 
       BookLayoutReorganizationSuggestion result = controller.suggestBookLayoutReorganization(nb);
 
@@ -340,6 +347,23 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
       assertThat(byTitle.get("B"), equalTo(1));
       assertThat(byTitle.get("C"), equalTo(2));
       assertThat(byTitle.get("D"), equalTo(0));
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<BookLayoutReorganizationSuggestion>>
+          paramsCaptor = ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<BookLayoutReorganizationSuggestion> params =
+          paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
+      assertThat(instructions, containsString("You reorganize the outline nesting"));
+      String input = params.rawParams().input().flatMap(i -> i.text()).orElse("");
+      assertThat(input, containsString("\"id\""));
+      assertThat(
+          "Should use Responses structured text format",
+          params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
+          is(true));
+      verify(openAIChatCompletionMock.completionService(), never())
+          .create(any(ChatCompletionCreateParams.class));
     }
 
     @Test
@@ -354,7 +378,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
         items.add(e);
       }
       bad.setBlocks(items);
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(bad);
+      openAIChatCompletionMock.stubStructuredResponse(bad);
 
       var ex =
           assertThrows(
@@ -377,7 +401,7 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
         items.add(e);
       }
       bad.setBlocks(items);
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(bad);
+      openAIChatCompletionMock.stubStructuredResponse(bad);
 
       var ex =
           assertThrows(
@@ -386,8 +410,8 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
     }
 
     @Test
-    void rejectsWhenAiReturnsEmptyCompletion() {
-      openAIChatCompletionMock.mockNullChatCompletion();
+    void rejectsWhenAiReturnsEmptyStructuredResponse() {
+      openAIChatCompletionMock.stubStructuredResponse(null);
 
       assertThrows(
           OpenAIServiceErrorException.class, () -> controller.suggestBookLayoutReorganization(nb));
