@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -100,11 +100,12 @@ public class AiQuestionGenerator {
   }
 
   private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        noteQuestionGenerationService.openAiChatRequestForSharedNoteContext(note, null);
-    chatRequestBuilder.model(modelName1);
+    OpenAIResponseRequestBuilder<MCQWithAnswerForRefinement> responseRequestBuilder =
+        noteQuestionGenerationService.openAiResponseRequestForSharedNoteContext(
+            MCQWithAnswerForRefinement.class, note, null);
+    responseRequestBuilder.model(modelName1);
     return new AiQuestionGeneratorForNote(
-        openAiApiHandler, chatRequestBuilder, note.getNotebookAssistantInstructions());
+        openAiApiHandler, responseRequestBuilder, note.getNotebookAssistantInstructions());
   }
 
   public MCQWithAnswer regenerateQuestion(

@@ -14,9 +14,12 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
+import com.openai.models.Reasoning;
 import com.openai.models.ReasoningEffort;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.ResponseTextConfig;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,23 +53,41 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().please();
   }
 
-  private boolean systemMessageContains(ChatCompletionCreateParams request, String text) {
-    return request.messages().stream()
-        .filter(message -> message.developer().isPresent())
-        .anyMatch(message -> message.developer().get().content().toString().contains(text));
+  private boolean systemMessageContains(
+      StructuredResponseCreateParams<MCQWithAnswer> request, String text) {
+    return instructionText(request).contains(text);
   }
 
-  private boolean userMessageContains(ChatCompletionCreateParams request, String text) {
-    return request.messages().stream()
-        .filter(message -> message.user().isPresent())
-        .anyMatch(message -> message.toString().contains(text));
+  private boolean userMessageContains(
+      StructuredResponseCreateParams<MCQWithAnswer> request, String text) {
+    return inputText(request).contains(text);
   }
 
-  private List<String> userMessageContentStrings(ChatCompletionCreateParams request) {
-    return request.messages().stream()
-        .filter(message -> message.user().isPresent())
-        .map(message -> message.user().get().content().toString())
-        .toList();
+  private List<String> userMessageContentStrings(
+      StructuredResponseCreateParams<MCQWithAnswer> request) {
+    return Arrays.asList(inputText(request).split("\n\n\n", -1));
+  }
+
+  private String instructionText(StructuredResponseCreateParams<MCQWithAnswer> request) {
+    return request.rawParams().instructions().orElse("");
+  }
+
+  private String inputText(StructuredResponseCreateParams<MCQWithAnswer> request) {
+    return request.rawParams().input().flatMap(input -> input.text()).orElse("");
+  }
+
+  private String modelName(StructuredResponseCreateParams<MCQWithAnswer> request) {
+    return request.rawParams().model().orElseThrow().asString();
+  }
+
+  private Optional<ReasoningEffort> reasoningEffort(
+      StructuredResponseCreateParams<MCQWithAnswer> request) {
+    return request.rawParams().reasoning().flatMap(Reasoning::effort);
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> responseParamsCaptor() {
+    return ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
   }
 
   @Nested
@@ -101,9 +122,9 @@ class NoteQuestionGenerationServiceTests {
 
       service.generateQuestion(noteInScope, null);
 
-      ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
+          responseParamsCaptor();
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
       List<String> userBodies = userMessageContentStrings(paramsCaptor.getValue());
       assertThat(
           userBodies.get(0),
@@ -128,10 +149,10 @@ class NoteQuestionGenerationServiceTests {
 
       service.generateQuestion(testNote, null);
 
-      ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      assertThat(paramsCaptor.getValue().model().asString(), is("gpt-question-generation"));
+      ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
+          responseParamsCaptor();
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      assertThat(modelName(paramsCaptor.getValue()), is("gpt-question-generation"));
     }
 
     @Test
@@ -140,23 +161,27 @@ class NoteQuestionGenerationServiceTests {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
-      ChatCompletionCreateParams exportedRequest =
+      StructuredResponseCreateParams<MCQWithAnswer> exportedRequest =
           service.buildQuestionGenerationRequest(testNote, "Generate a focused question");
 
       service.generateQuestion(testNote, "Generate a focused question");
 
-      ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      ChatCompletionCreateParams runtimeRequest = paramsCaptor.getValue();
-      assertThat(runtimeRequest.model().asString(), is(exportedRequest.model().asString()));
-      assertThat(runtimeRequest.messages(), is(exportedRequest.messages()));
-      assertThat(runtimeRequest.reasoningEffort(), is(exportedRequest.reasoningEffort()));
-      assertThat(runtimeRequest.reasoningEffort(), is(Optional.of(ReasoningEffort.LOW)));
-      assertThat(runtimeRequest.maxCompletionTokens(), is(exportedRequest.maxCompletionTokens()));
-      assertThat(runtimeRequest.maxCompletionTokens(), is(Optional.of(500L)));
-      assertThat(runtimeRequest.responseFormat(), is(exportedRequest.responseFormat()));
-      assertThat(runtimeRequest.responseFormat().isPresent(), is(true));
+      ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
+          responseParamsCaptor();
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<MCQWithAnswer> runtimeRequest = paramsCaptor.getValue();
+      assertThat(modelName(runtimeRequest), is(modelName(exportedRequest)));
+      assertThat(inputText(runtimeRequest), is(inputText(exportedRequest)));
+      assertThat(instructionText(runtimeRequest), is(instructionText(exportedRequest)));
+      assertThat(reasoningEffort(runtimeRequest), is(reasoningEffort(exportedRequest)));
+      assertThat(reasoningEffort(runtimeRequest), is(Optional.of(ReasoningEffort.LOW)));
+      assertThat(
+          runtimeRequest.rawParams().maxOutputTokens(),
+          is(exportedRequest.rawParams().maxOutputTokens()));
+      assertThat(runtimeRequest.rawParams().maxOutputTokens(), is(Optional.of(500L)));
+      assertThat(
+          runtimeRequest.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
+          is(true));
     }
 
     @Test
@@ -174,16 +199,18 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldBuildRequestWithNoteDescription() {
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(request, is(notNullValue()));
-      assertThat(request.model().toString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
+      assertThat(modelName(request), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
       assertThat(userMessageContains(request, "# Focus Context"), is(true));
     }
 
     @Test
     void shouldBuildRequestWithNoteInstructions() {
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(systemMessageContains(request, "Question Designer"), is(true));
     }
@@ -204,7 +231,7 @@ class NoteQuestionGenerationServiceTests {
               .please();
       makeMe.aNote().notebook(nb).please();
 
-      ChatCompletionCreateParams request =
+      StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(noteInScope, null);
 
       List<String> userBodies = userMessageContentStrings(request);
@@ -226,7 +253,7 @@ class NoteQuestionGenerationServiceTests {
       Note noteInScope = makeMe.aNote().notebook(nb).please();
       makeMe.aNote().notebook(nb).please();
 
-      ChatCompletionCreateParams request =
+      StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(noteInScope, null);
 
       List<String> userBodies = userMessageContentStrings(request);
@@ -254,7 +281,8 @@ class NoteQuestionGenerationServiceTests {
       makeMe.entityPersister.save(notebookAiAssistant);
       makeMe.refresh(testNote.getNotebook());
 
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(systemMessageContains(request, "Custom notebook instructions"), is(true));
     }
@@ -270,13 +298,9 @@ class NoteQuestionGenerationServiceTests {
       makeMe.entityPersister.save(notebookAiAssistant);
       makeMe.refresh(testNote.getNotebook());
 
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
-      String developerBody =
-          request.messages().stream()
-              .filter(message -> message.developer().isPresent())
-              .findFirst()
-              .map(m -> m.developer().get().content().toString())
-              .orElse("");
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
+      String developerBody = instructionText(request);
 
       assertThat(developerBody.indexOf("Question Designer"), greaterThan(-1));
       assertThat(
@@ -295,7 +319,7 @@ class NoteQuestionGenerationServiceTests {
       Note noteInScope = makeMe.aNote().notebook(nb).please();
       makeMe.aNote().notebook(nb).please();
 
-      ChatCompletionCreateParams request =
+      StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(
               noteInScope, "Generate a question about the capital city");
 
@@ -311,7 +335,7 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldIncludeAdditionalMessageWhenNoScopedInstruction() {
-      ChatCompletionCreateParams request =
+      StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(
               testNote, "Generate a question about the capital city");
 
@@ -324,16 +348,16 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
 
-      long systemMessageCount =
-          request.messages().stream().filter(message -> message.developer().isPresent()).count();
-      assertThat(systemMessageCount, is(1L));
+      assertThat(instructionText(request), is(not(emptyString())));
     }
 
     @Test
     void shouldNotIncludeRelationTypeSpecialInstructionForRegularNote() {
-      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(
           systemMessageContains(request, "Special Instruction for Relation Note"), is(false));

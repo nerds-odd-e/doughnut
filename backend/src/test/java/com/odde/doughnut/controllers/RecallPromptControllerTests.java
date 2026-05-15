@@ -20,6 +20,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.openai.client.OpenAIClient;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -271,26 +272,20 @@ class RecallPromptControllerTests extends ControllerTestBase {
       contestResult.advice = "test";
       controller.regenerate(recallPrompt, contestResult);
 
-      // Verify chat completion call contains message with question info and contest result
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService(), atLeastOnce())
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService(), atLeastOnce())
           .create(paramsCaptor.capture());
 
-      // Check if any message contains the required contest info
-      boolean hasContestInfo =
-          paramsCaptor.getValue().messages().stream()
-              .map(Object::toString)
-              .anyMatch(
-                  content ->
-                      content.contains("Previously generated non-feasible question")
-                          && content.contains("Improvement advice")
-                          && content.contains("test")
-                          && content.contains(
-                              "Please regenerate or refine the question based on the above advice"));
-
-      assertThat("A message should contain the contest information", hasContestInfo, is(true));
+      String inputText =
+          paramsCaptor.getValue().rawParams().input().flatMap(input -> input.text()).orElse("");
+      assertThat(inputText, containsString("Previously generated non-feasible question"));
+      assertThat(inputText, containsString("Improvement advice"));
+      assertThat(inputText, containsString("test"));
+      assertThat(
+          inputText,
+          containsString("Please regenerate or refine the question based on the above advice"));
     }
 
     @Test
@@ -351,11 +346,12 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       controller.contest(recallPrompt);
 
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      assertThat(paramsCaptor.getValue().model().asString(), equalTo("gpt-new"));
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      assertThat(
+          paramsCaptor.getValue().rawParams().model().orElseThrow().asString(), equalTo("gpt-new"));
     }
 
     @Test

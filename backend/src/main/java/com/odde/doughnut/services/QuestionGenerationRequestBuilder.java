@@ -2,7 +2,9 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
@@ -11,7 +13,7 @@ import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.openai.models.ReasoningEffort;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,22 +42,18 @@ public class QuestionGenerationRequestBuilder {
     this.noteRepository = noteRepository;
   }
 
-  public ChatCompletionCreateParams buildQuestionGenerationRequest(
-      Note note, String additionalMessage) {
-    return buildQuestionGenerationRequest(note, additionalMessage, null);
-  }
-
-  public ChatCompletionCreateParams buildQuestionGenerationRequest(
+  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed) {
     InstructionAndSchema tool =
         AiToolFactory.mcqWithAnswerAiTool(isFocusNoteTitleAndContentEmpty(note));
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        openAiChatRequestForQuestionGeneration(note, additionalMessage, contextSeed);
-    chatRequestBuilder.responseJsonSchema(tool);
-    addNotebookAssistantInstructionsIfPresent(chatRequestBuilder, note);
-    return chatRequestBuilder
+    OpenAIResponseRequestBuilder<MCQWithAnswer> responseRequestBuilder =
+        openAiResponseRequestForQuestionGeneration(
+            MCQWithAnswer.class, note, additionalMessage, contextSeed);
+    responseRequestBuilder.addInstruction(tool.getMessageBody());
+    addNotebookAssistantInstructionsIfPresent(responseRequestBuilder, note);
+    return responseRequestBuilder
         .reasoningEffort(ReasoningEffort.LOW)
-        .maxCompletionTokens(500L)
+        .maxOutputTokens(500L)
         .build();
   }
 
@@ -63,10 +61,9 @@ public class QuestionGenerationRequestBuilder {
    * Optional scoped {@code question_generation_instruction} as a user message (prefixed with the
    * same header line as {@link #CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER}), then focus context as a
    * user message, then optional {@code additionalMessage}—same order as {@link
-   * #buildQuestionGenerationRequest}. Notebook assistant hints and the MCQ JSON schema instruction
-   * are not attached here; they are added after the schema instruction in {@link
-   * #buildQuestionGenerationRequest} or when calling {@code OpenAiApiHandler}'s three-argument
-   * {@code requestAndGetJsonSchemaResult}.
+   * #buildQuestionGenerationResponseRequest}. Notebook assistant hints and the MCQ JSON schema
+   * instruction are not attached here; they are added after the schema instruction in {@link
+   * #buildQuestionGenerationResponseRequest}.
    */
   public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
       Note note, String additionalMessage) {
@@ -83,10 +80,10 @@ public class QuestionGenerationRequestBuilder {
   }
 
   private static void addNotebookAssistantInstructionsIfPresent(
-      OpenAIChatRequestBuilder chatRequestBuilder, Note note) {
+      OpenAIResponseRequestBuilder<?> responseRequestBuilder, Note note) {
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addToOverallSystemMessage(instructions);
+      responseRequestBuilder.addInstruction(instructions);
     }
   }
 
@@ -138,5 +135,56 @@ public class QuestionGenerationRequestBuilder {
       builder.addUserMessage(instructionUserBlock);
     }
     return builder.addUserMessage(focusContextMarkdown);
+  }
+
+  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionGeneration(
+      Class<T> responseType, Note note, String additionalMessage, Long contextSeed) {
+    String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
+    return openAiResponseRequestForQuestionGeneration(
+        responseType, note, additionalMessage, contextSeed, modelName);
+  }
+
+  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionEvaluation(
+      Class<T> responseType, Note note, String additionalMessage, Long contextSeed) {
+    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
+    return openAiResponseRequestForQuestionGeneration(
+        responseType, note, additionalMessage, contextSeed, modelName);
+  }
+
+  private <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionGeneration(
+      Class<T> responseType,
+      Note note,
+      String additionalMessage,
+      Long contextSeed,
+      String modelName) {
+    Note focus = hydrateFocusNoteForQuestionGeneration(note);
+
+    String instruction =
+        noteRealmService.resolveScopedQuestionGenerationInstruction(focus).orElse(null);
+    String instructionUserBlock =
+        instruction != null ? CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER + "\n" + instruction : null;
+    int instructionTokens =
+        instructionUserBlock != null
+            ? ApproximateUtf8TokenBudget.estimateApproxTokens(instructionUserBlock)
+            : 0;
+    int focusBudget =
+        Math.max(
+            0,
+            FocusContextConstants.FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET - instructionTokens);
+    RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed, focusBudget);
+
+    FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(focus, config);
+    String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
+
+    OpenAIResponseRequestBuilder<T> builder =
+        new OpenAIResponseRequestBuilder<T>(responseType).model(modelName);
+    if (instructionUserBlock != null) {
+      builder.addUserMessage(instructionUserBlock);
+    }
+    builder.addUserMessage(focusContextMarkdown);
+    if (additionalMessage != null) {
+      builder.addUserMessage(additionalMessage);
+    }
+    return builder;
   }
 }

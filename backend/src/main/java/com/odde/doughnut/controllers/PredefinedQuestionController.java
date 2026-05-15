@@ -14,7 +14,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.lang.reflect.Method;
@@ -111,16 +111,16 @@ class PredefinedQuestionController {
             focusContextMarkdownRenderer,
             noteRealmService,
             noteRepository);
-    ChatCompletionCreateParams params = requestBuilder.buildQuestionGenerationRequest(note, null);
-    return serializeChatCompletionCreateParams(params);
+    StructuredResponseCreateParams<MCQWithAnswer> params =
+        requestBuilder.buildQuestionGenerationResponseRequest(note, null, null);
+    return serializeResponseCreateParams(params);
   }
 
-  private Map<String, Object> serializeChatCompletionCreateParams(
-      ChatCompletionCreateParams params) {
+  private Map<String, Object> serializeResponseCreateParams(
+      StructuredResponseCreateParams<?> params) {
     try {
-      // Access the SDK's _body() method to get the Body class
-      Method bodyMethod = params.getClass().getMethod("_body");
-      Object body = bodyMethod.invoke(params);
+      Method bodyMethod = params.rawParams().getClass().getMethod("_body");
+      Object body = bodyMethod.invoke(params.rawParams());
       // Serialize the Body using ObjectMapper, which handles JsonField properly
       String jsonString = objectMapper.writeValueAsString(body);
       // Convert back to Map to ensure all non-empty fields are included
@@ -130,7 +130,7 @@ class PredefinedQuestionController {
       removeValidFields(result);
       return result;
     } catch (Exception e) {
-      throw new RuntimeException("Failed to serialize ChatCompletionCreateParams", e);
+      throw new RuntimeException("Failed to serialize ResponseCreateParams", e);
     }
   }
 

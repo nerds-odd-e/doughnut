@@ -13,7 +13,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -143,8 +143,8 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       // Mock a response with malformed JSON content to trigger a RuntimeException
       openAIChatCompletionMock.mockChatCompletionWithMalformedJsonContent("{invalid json}");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
-      verify(openAIChatCompletionMock.completionService(), Mockito.times(1))
-          .create(ArgumentMatchers.any(ChatCompletionCreateParams.class));
+      verify(openAIChatCompletionMock.responseService(), Mockito.times(1))
+          .create(ArgumentMatchers.any(StructuredResponseCreateParams.class));
     }
 
     @Test
@@ -198,14 +198,14 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       assertThat(request, notNullValue());
       assertThat(request.containsKey("model"), is(true));
       assertThat(request.get("model"), notNullValue());
-      assertThat(request.containsKey("messages"), is(true));
-      assertThat(request.get("messages"), notNullValue());
-      assertThat(request.containsKey("n"), is(true));
-      assertThat(request.get("n"), notNullValue());
-      // Verify response_format is included if present
-      if (request.containsKey("response_format")) {
-        assertThat(request.get("response_format"), notNullValue());
-      }
+      assertThat(request.containsKey("instructions"), is(true));
+      assertThat(request.get("instructions"), notNullValue());
+      assertThat(request.containsKey("input"), is(true));
+      assertThat(request.get("input"), notNullValue());
+      assertThat(request.containsKey("text"), is(true));
+      assertThat(request.get("text"), notNullValue());
+      assertThat(request.containsKey("max_output_tokens"), is(true));
+      assertThat(request.get("max_output_tokens"), is(500));
       // Verify the JSON is not empty
       String jsonString = new ObjectMapperConfig().objectMapper().writeValueAsString(request);
       assertThat(jsonString, not(equalTo("{}")));

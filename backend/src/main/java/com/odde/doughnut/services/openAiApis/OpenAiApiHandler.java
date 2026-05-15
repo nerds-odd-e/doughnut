@@ -14,6 +14,8 @@ import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
+import com.openai.models.responses.StructuredResponse;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import java.io.IOException;
@@ -130,6 +132,21 @@ public class OpenAiApiHandler {
   public Optional<JsonNode> requestAndGetJsonSchemaResult(
       InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
     return requestAndGetJsonSchemaResult(tool, openAIChatRequestBuilder, null);
+  }
+
+  public <T> Optional<T> requestAndGetStructuredResponseResult(
+      StructuredResponseCreateParams<T> responseRequest) {
+    assertOpenAiAvailable();
+    StructuredResponse<T> response = officialClient.responses().create(responseRequest);
+    if (response == null || response.output() == null || response.output().isEmpty()) {
+      return Optional.empty();
+    }
+
+    return response.output().stream()
+        .flatMap(output -> output.message().stream())
+        .flatMap(message -> message.content().stream())
+        .flatMap(content -> content.outputText().stream())
+        .findFirst();
   }
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(ChatCompletionCreateParams chatRequest) {

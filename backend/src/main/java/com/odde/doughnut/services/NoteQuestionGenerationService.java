@@ -1,15 +1,16 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.ReasoningEffort;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,16 +18,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteQuestionGenerationService {
   private final OpenAiApiHandler openAiApiHandler;
-  private final ObjectMapper objectMapper;
   private final QuestionGenerationRequestBuilder requestBuilder;
 
   @Autowired
   public NoteQuestionGenerationService(
-      OpenAiApiHandler openAiApiHandler,
-      ObjectMapper objectMapper,
-      QuestionGenerationRequestBuilder requestBuilder) {
+      OpenAiApiHandler openAiApiHandler, QuestionGenerationRequestBuilder requestBuilder) {
     this.openAiApiHandler = openAiApiHandler;
-    this.objectMapper = objectMapper;
     this.requestBuilder = requestBuilder;
   }
 
@@ -37,12 +34,12 @@ public class NoteQuestionGenerationService {
 
   public MCQWithAnswer generateQuestion(Note note, String additionalMessage, Long contextSeed)
       throws JsonProcessingException {
-    return generateQuestionWithChatCompletion(note, additionalMessage, contextSeed);
+    return generateQuestionWithResponses(note, additionalMessage, contextSeed);
   }
 
-  public ChatCompletionCreateParams buildQuestionGenerationRequest(
+  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
-    return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage, null);
+    return requestBuilder.buildQuestionGenerationResponseRequest(note, additionalMessage, null);
   }
 
   /** Same user-message layout as MCQ generation / evaluation (focus context; no developer text). */
@@ -51,57 +48,42 @@ public class NoteQuestionGenerationService {
     return requestBuilder.openAiChatRequestForQuestionGeneration(note, additionalMessage, null);
   }
 
-  private MCQWithAnswer generateQuestionWithChatCompletion(
+  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForSharedNoteContext(
+      Class<T> responseType, Note note, String additionalMessage) {
+    return requestBuilder.openAiResponseRequestForQuestionGeneration(
+        responseType, note, additionalMessage, null);
+  }
+
+  private MCQWithAnswer generateQuestionWithResponses(
       Note note, String additionalMessage, Long contextSeed) {
-    ChatCompletionCreateParams chatRequest =
-        requestBuilder.buildQuestionGenerationRequest(note, additionalMessage, contextSeed);
+    StructuredResponseCreateParams<MCQWithAnswer> responseRequest =
+        requestBuilder.buildQuestionGenerationResponseRequest(note, additionalMessage, contextSeed);
 
     return openAiApiHandler
-        .requestAndGetJsonSchemaResult(chatRequest)
-        .map(
-            jsonNode -> {
-              try {
-                MCQWithAnswer question = objectMapper.treeToValue(jsonNode, MCQWithAnswer.class);
-
-                // Validate the question
-                if (question != null && question.isValid()) {
-                  return question;
-                }
-                return null;
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
+        .requestAndGetStructuredResponseResult(responseRequest)
+        .map(question -> question != null && question.isValid() ? question : null)
         .orElse(null);
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(Note note, MCQWithAnswer question)
       throws JsonProcessingException {
-    return evaluateQuestionWithChatCompletion(note, question);
+    return evaluateQuestionWithResponses(note, question);
   }
 
-  private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(
+  private Optional<QuestionEvaluation> evaluateQuestionWithResponses(
       Note note, MCQWithAnswer question) {
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        requestBuilder.openAiChatRequestForQuestionGeneration(note, null, null);
-
-    Optional<JsonNode> result =
-        openAiApiHandler.requestAndGetJsonSchemaResult(
-            AiToolFactory.questionEvaluationAiTool(question),
-            chatRequestBuilder,
-            note.getNotebookAssistantInstructions());
-
-    if (result.isEmpty()) {
-      return Optional.empty();
+    InstructionAndSchema tool = AiToolFactory.questionEvaluationAiTool(question);
+    var responseRequestBuilder =
+        requestBuilder.openAiResponseRequestForQuestionEvaluation(
+            QuestionEvaluation.class, note, null, null);
+    responseRequestBuilder.addInstruction(tool.getMessageBody());
+    if (note.getNotebookAssistantInstructions() != null
+        && !note.getNotebookAssistantInstructions().isBlank()) {
+      responseRequestBuilder.addInstruction(note.getNotebookAssistantInstructions());
     }
+    StructuredResponseCreateParams<QuestionEvaluation> responseRequest =
+        responseRequestBuilder.reasoningEffort(ReasoningEffort.LOW).maxOutputTokens(500L).build();
 
-    return result.map(
-        jsonNode -> {
-          try {
-            return objectMapper.treeToValue(jsonNode, QuestionEvaluation.class);
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        });
+    return openAiApiHandler.requestAndGetStructuredResponseResult(responseRequest);
   }
 }
