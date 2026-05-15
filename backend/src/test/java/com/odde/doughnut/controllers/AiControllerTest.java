@@ -26,6 +26,7 @@ import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import com.openai.services.blocking.ModelService;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -229,6 +230,7 @@ class AiControllerTest extends ControllerTestBase {
           "Should use Responses structured text format",
           params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));
+      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
     }
 
     @Test
@@ -264,6 +266,25 @@ class AiControllerTest extends ControllerTestBase {
       RemovePointsResponseDTO response = controller.removePointFromNote(testNote, requestDTO);
       assertThat(response.getContent()).isNotEqualTo(originalContent);
       assertThat(response.getContent()).isEqualTo("Remaining content.");
+    }
+
+    @Test
+    void shouldLimitRemovalOutputToTwoThousandTokens()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(
+          new RegeneratedNoteContent("Remaining content."));
+      testNote.setContent("Original content with point to remove.");
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.points = List.of("point to remove");
+
+      controller.removePointFromNote(testNote, requestDTO);
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<RegeneratedNoteContent>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<RegeneratedNoteContent> params = paramsCaptor.getValue();
+      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(2000L));
     }
 
     @Test
@@ -337,6 +358,58 @@ class AiControllerTest extends ControllerTestBase {
           .isEqualTo("Updated parent with summary.");
       Note sibling = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(sibling.getFolder()).isNull();
+    }
+
+    @Test
+    void shouldLimitPromotionOutputToThreeThousandTokensAndRequestWikiLinks()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithPromotableContent();
+      PointExtractionResult aiResult = new PointExtractionResult();
+      aiResult.setNewNoteTitle("Point B");
+      aiResult.setNewNoteContent("Extracted");
+      aiResult.setUpdatedParentContent("A. C. D. E.");
+      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("key point to promote"));
+      controller.promotePointToSibling(testNote, requestDTO);
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<PointExtractionResult>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<PointExtractionResult> params = paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
+      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(3000L));
+      assertThat(instructions).contains("wiki link from the original note");
+      assertThat(instructions).contains("Wiki links are case-insensitive");
+      assertThat(instructions).contains("[[Canonical Note Title|visible text]]");
+    }
+
+    @Test
+    void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterPromotion()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote =
+          makeMe.aNote().title("Sample").notebookOwnedBy(currentUser.getUser()).please();
+      testNote.setContent("A. B. C.");
+      PointExtractionResult aiResult = new PointExtractionResult();
+      aiResult.setNewNoteTitle("Point B");
+      aiResult.setNewNoteContent("Extracted from [[sample|the original note]].");
+      aiResult.setUpdatedParentContent("A. See [[point b|the promoted point]]. C.");
+      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+
+      PointsRequestDTO requestDTO = new PointsRequestDTO();
+      requestDTO.setPoints(List.of("B"));
+      NoteRealm response = controller.promotePointToSibling(testNote, requestDTO);
+
+      assertThat(response.getWikiTitles())
+          .anyMatch(
+              wikiTitle ->
+                  wikiTitle.getTargetToken().equals("sample")
+                      && wikiTitle.getDisplayText().equals("the original note")
+                      && wikiTitle.getNoteId().equals(testNote.getId()));
+      assertThat(response.getReferences())
+          .anyMatch(reference -> reference.getId() == testNote.getId());
     }
 
     @Test

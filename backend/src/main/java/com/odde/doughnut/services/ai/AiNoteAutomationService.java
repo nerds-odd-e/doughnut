@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.function.Function;
 
 public class AiNoteAutomationService {
+  private static final long UNDERSTANDING_CHECKLIST_MAX_OUTPUT_TOKENS = 1000L;
+  private static final long REMOVE_POINTS_MAX_OUTPUT_TOKENS = 2000L;
+  private static final long PROMOTE_POINT_MAX_OUTPUT_TOKENS = 3000L;
+
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
@@ -48,19 +52,38 @@ public class AiNoteAutomationService {
         AiToolFactory.generateUnderstandingChecklistAiTool(),
         UnderstandingChecklist.class,
         UnderstandingChecklist::getPoints,
-        List.of());
+        List.of(),
+        UNDERSTANDING_CHECKLIST_MAX_OUTPUT_TOKENS);
   }
 
   public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
     String t = note.getTitle() != null ? note.getTitle() : "";
     String d = note.getContent() != null ? note.getContent() : "";
     InstructionAndSchema tool = AiToolFactory.promotePointToSiblingAiTool(point, t, d);
-    return executeWithTool(tool, PointExtractionResult.class, result -> result, null);
+    return executeWithTool(
+        tool, PointExtractionResult.class, result -> result, null, PROMOTE_POINT_MAX_OUTPUT_TOKENS);
   }
 
   private <T, R> R executeWithTool(
       InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue) {
-    StructuredResponseCreateParams<T> params = buildStructuredResponseParams(resultClass, tool);
+    StructuredResponseCreateParams<T> params =
+        buildStructuredResponseParams(resultClass, tool, null);
+    return executeWithParams(params, extractor, defaultValue);
+  }
+
+  private <T, R> R executeWithTool(
+      InstructionAndSchema tool,
+      Class<T> resultClass,
+      Function<T, R> extractor,
+      R defaultValue,
+      long maxOutputTokens) {
+    StructuredResponseCreateParams<T> params =
+        buildStructuredResponseParams(resultClass, tool, maxOutputTokens);
+    return executeWithParams(params, extractor, defaultValue);
+  }
+
+  private <T, R> R executeWithParams(
+      StructuredResponseCreateParams<T> params, Function<T, R> extractor, R defaultValue) {
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(params)
         .map(extractor)
@@ -68,7 +91,7 @@ public class AiNoteAutomationService {
   }
 
   private <T> StructuredResponseCreateParams<T> buildStructuredResponseParams(
-      Class<T> resultClass, InstructionAndSchema tool) {
+      Class<T> resultClass, InstructionAndSchema tool, Long maxOutputTokens) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
     FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
@@ -81,6 +104,9 @@ public class AiNoteAutomationService {
     String notebookAssistant = note.getNotebookAssistantInstructions();
     if (notebookAssistant != null && !notebookAssistant.trim().isEmpty()) {
       builder.addInstruction(notebookAssistant);
+    }
+    if (maxOutputTokens != null) {
+      builder.maxOutputTokens(maxOutputTokens);
     }
     builder.addInstruction(tool.getMessageBody());
     return builder.build();
@@ -95,6 +121,7 @@ public class AiNoteAutomationService {
         AiToolFactory.removePointsFromContentAiTool(pointsToRemove),
         RegeneratedNoteContent.class,
         r -> r.content,
-        note.getContent());
+        note.getContent(),
+        REMOVE_POINTS_MAX_OUTPUT_TOKENS);
   }
 }

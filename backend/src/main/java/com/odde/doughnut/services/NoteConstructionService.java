@@ -161,6 +161,8 @@ public class NoteConstructionService {
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
+    wikiTitleCacheService.refreshForNote(newNote, user);
+    wikiTitleCacheService.refreshForNote(originalNote, user);
 
     return noteRealmService.build(newNote, user);
   }
