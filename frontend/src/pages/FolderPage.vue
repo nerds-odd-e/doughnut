@@ -12,6 +12,18 @@
           folderForView.folder.name
         }}</span>
       </p>
+      <ScopedIndexNoteEditor
+        :notebook-id="folderForView.notebookRealm.notebook.id"
+        :folder-id="folderForView.folder.id"
+        :index-content="folderForView.indexContent ?? null"
+        test-id-prefix="folder-index"
+        rich-editor-scope-name="folder-index"
+        heading-label="Folder index"
+        save-button-idle-label="Save folder index"
+        save-button-saving-label="Saving…"
+        success-toast-saved="Folder index saved"
+        @saved="refreshFolderPage"
+      />
       <div class="daisy-card daisy-w-full daisy-mb-6" data-testid="folder-move-dialog">
         <div class="daisy-card-body">
           <form @submit.prevent="submitMove">
@@ -90,18 +102,6 @@
           </button>
         </div>
       </div>
-      <ScopedIndexNoteEditor
-        :notebook-id="folderForView.notebookRealm.notebook.id"
-        :folder-id="folderForView.folder.id"
-        :index-content="folderForView.indexContent ?? null"
-        test-id-prefix="folder-index"
-        rich-editor-scope-name="folder-index"
-        heading-label="Folder index"
-        save-button-idle-label="Save folder index"
-        save-button-saving-label="Saving…"
-        success-toast-saved="Folder index saved"
-        @saved="refreshFolderPage"
-      />
     </div>
   </div>
 </template>
