@@ -14,6 +14,7 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
+import com.openai.models.ReasoningEffort;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.sql.Timestamp;
 import java.util.List;
@@ -151,6 +152,7 @@ class NoteQuestionGenerationServiceTests {
       assertThat(runtimeRequest.model().asString(), is(exportedRequest.model().asString()));
       assertThat(runtimeRequest.messages(), is(exportedRequest.messages()));
       assertThat(runtimeRequest.reasoningEffort(), is(exportedRequest.reasoningEffort()));
+      assertThat(runtimeRequest.reasoningEffort(), is(Optional.of(ReasoningEffort.LOW)));
       assertThat(runtimeRequest.maxCompletionTokens(), is(exportedRequest.maxCompletionTokens()));
       assertThat(runtimeRequest.maxCompletionTokens(), is(Optional.of(500L)));
       assertThat(runtimeRequest.responseFormat(), is(exportedRequest.responseFormat()));
