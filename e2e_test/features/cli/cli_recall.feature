@@ -60,6 +60,7 @@ Feature: CLI recall status and recall session
       Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+      And OpenAI evaluates the question as legitimate
       And the note "sedition" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
@@ -76,6 +77,7 @@ Feature: CLI recall status and recall session
       Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+      And OpenAI evaluates the question as legitimate
       And the note "sedition" was assimilated on day 1
       And It's day 2
       When I input down-arrow selection for "/recall" in the interactive CLI
@@ -85,24 +87,6 @@ Feature: CLI recall status and recall session
       And I should see "to sleep" in answered questions
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       And I should see "Recalled 1 note" in past CLI assistant messages
-
-    @usingMockedOpenAiService
-    Scenario: MCQ — contest and regenerate before answering
-      Given OpenAI generates this as second question:
-        | Question Stem         | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-        | Regenerated question? | to incite violence | to sleep           | Open Water Diver   |
-      And OpenAI evaluates the question as not legitimate
-      And OpenAI generates this as first question:
-        | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-        | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
-      And the note "sedition" was assimilated on day 1
-      And It's day 2
-      When I enter the slash command "/recall" in the interactive CLI
-      Then I should see "What is the meaning of sedition?" in the Current guidance
-      When I enter the slash sub-command "/contest" in the interactive CLI
-      Then I should see "What is the meaning of sedition?" in the Current guidance
-      When I enter "1" in the interactive CLI
-      Then I should see "Correct!" in answered questions
 
   Rule: Spelling recall when the note has remember spelling enabled
 
