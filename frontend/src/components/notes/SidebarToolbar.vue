@@ -25,12 +25,6 @@
         >
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
-        <FolderOrganizeButton
-          v-if="activeFolderRealm"
-          :moving-folder-realm="activeFolderRealm"
-        >
-          <FolderInput class="daisy-w-6 daisy-h-6" />
-        </FolderOrganizeButton>
       </div>
       <details
         ref="sortDropdownRef"
@@ -87,15 +81,9 @@ import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,
 } from "@/composables/useNoteSidebarPeerSort"
-import {
-  ArrowDownAZ,
-  FolderInput,
-  FolderPlus,
-  NotebookPen,
-} from "lucide-vue-next"
+import { ArrowDownAZ, FolderPlus, NotebookPen } from "lucide-vue-next"
 import { computed, ref } from "vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
-import FolderOrganizeButton from "./core/FolderOrganizeButton.vue"
 import NoteNewButton from "./core/NoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
 import { realmLeafFolder } from "./useNoteSidebarTree"

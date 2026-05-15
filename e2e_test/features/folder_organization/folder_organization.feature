@@ -9,11 +9,11 @@ Feature: Folder organization
       | Root note |        |
       | In folder | Alpha  |
 
-  Scenario: Move a nested folder to notebook root from the sidebar
+  Scenario: Move a nested folder to notebook root from the folder page
     When I create a folder named "Beta" while viewing note "In folder"
     Then I should see sidebar folder "Beta" under open folder "Alpha"
     When I activate folder "Beta" in the sidebar
-    And I move the active folder to notebook root using the sidebar folder dialog
+    And I move folder "Beta" to notebook root using the folder page
     Then I should see sidebar folder "Beta"
 
   Scenario: Sibling name clash blocks a folder move and shows inline error
@@ -23,8 +23,8 @@ Feature: Folder organization
       | Nested Beta | Alpha/Beta  |
     When I view note "Nested Beta"
     And I activate folder "Beta" under the open folder "Alpha" in the sidebar
-    And I attempt to move the active folder to notebook root using the sidebar folder dialog
-    Then the sidebar folder dialog shows error "A folder with this name already exists here."
+    And I attempt to move folder "Beta" under "Alpha" to notebook root using the folder page
+    Then the folder page shows error "A folder with this name already exists here."
 
   Scenario: Dissolve a folder, promoting its notes and subfolders to the parent
     Given I have a notebook "Organize NB" with notes:
@@ -33,7 +33,7 @@ Feature: Folder organization
       | Deep  | Outer/Mid/Inner |
     When I view note "Loose"
     And I activate folder "Mid" under the open folder "Outer" in the sidebar
-    And I dissolve the active folder using the sidebar folder dialog
+    And I dissolve folder "Mid" under "Outer" using the folder page
     Then I should see sidebar folder "Inner" under open folder "Outer"
     And I should see note "Loose" under open folder "Outer"
 
@@ -44,5 +44,5 @@ Feature: Folder organization
       | n2    | Gamma      |
     When I view note "n1"
     And I activate folder "Beta" under the open folder "Alpha" in the sidebar
-    And I move the active folder to folder "Gamma" using folder search in the sidebar folder dialog
+    And I move folder "Beta" under "Alpha" to folder "Gamma" using folder search on the folder page
     Then I should see sidebar folder "Beta" under collapsed folder "Gamma"

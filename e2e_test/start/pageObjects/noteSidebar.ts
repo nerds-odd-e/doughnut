@@ -128,9 +128,30 @@ export const noteSidebar = () => {
       pageIsNotLoading()
     },
 
-    openFolderOrganizeForm() {
+    openFolderPageForOrganize(folderLabel: string) {
       pageIsNotLoading()
-      cy.get('aside').findByRole('button', { name: 'Folder…' }).click()
+      folderTreitemByLabel(folderLabel)
+        .find('[data-testid="sidebar-folder-open-page-link"]')
+        .click()
+      pageIsNotLoading()
+      return assumeSidebarFolderOrganizeForm()
+    },
+
+    openFolderPageForOrganizeUnderParent(
+      parentLabel: string,
+      childLabel: string
+    ) {
+      pageIsNotLoading()
+      folderTreitemByLabel(parentLabel)
+        .find(
+          `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
+          { timeout: sidebarActionTimeoutMs }
+        )
+        .filter(':visible')
+        .last()
+        .find('[data-testid="sidebar-folder-open-page-link"]')
+        .click()
+      pageIsNotLoading()
       return assumeSidebarFolderOrganizeForm()
     },
 

@@ -12,6 +12,84 @@
           folderForView.folder.name
         }}</span>
       </p>
+      <div class="daisy-card daisy-w-full daisy-mb-6" data-testid="folder-move-dialog">
+        <div class="daisy-card-body">
+          <form @submit.prevent="submitMove">
+            <fieldset :disabled="processing">
+              <p class="daisy-text-sm daisy-mb-3">
+                Move folder "{{ folderForView.folder.name }}".
+              </p>
+              <label class="daisy-label" for="folder-move-destination">
+                <span class="daisy-label-text">Destination</span>
+              </label>
+              <div id="folder-move-destination">
+                <FolderSelector
+                  v-model="selectedParentFolder"
+                  :notebook-id="folderForView.notebookRealm.notebook.id"
+                  :context-folder="folderForView.folder"
+                  :ancestor-folders="folderForView.ancestorFolders ?? []"
+                  :disabled="processing"
+                />
+              </div>
+              <p v-if="moveError" class="daisy-text-error daisy-text-sm daisy-mt-2">
+                {{ moveError }}
+              </p>
+              <button
+                type="submit"
+                class="daisy-btn daisy-btn-primary daisy-mt-4"
+                data-testid="folder-move-submit"
+                :disabled="processing"
+              >
+                Move folder
+              </button>
+            </fieldset>
+          </form>
+          <div class="daisy-divider daisy-my-4" />
+          <form @submit.prevent="submitRename">
+            <fieldset :disabled="processing">
+              <p class="daisy-text-sm daisy-mb-3">
+                Rename folder "{{ folderForView.folder.name }}".
+              </p>
+              <PathNameEditor
+                v-model="renameName"
+                :error-message="renameError"
+                label-text="Folder name"
+                editor-role="textbox"
+                placeholder="Folder name"
+                editor-data-test="folder-name"
+              />
+              <button
+                type="submit"
+                class="daisy-btn daisy-btn-secondary daisy-mt-4"
+                data-testid="folder-rename-submit"
+                :disabled="renameSubmitDisabled"
+              >
+                Rename folder
+              </button>
+            </fieldset>
+          </form>
+          <div class="daisy-divider daisy-my-4">or</div>
+          <p class="daisy-text-sm daisy-mb-2">
+            Dissolve "{{ folderForView.folder.name }}". Notes and subfolders will move to
+            {{ dissolveParentLabel }}.
+          </p>
+          <p
+            v-if="dissolveError"
+            class="daisy-text-error daisy-text-sm daisy-mt-2"
+          >
+            {{ dissolveError }}
+          </p>
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-error daisy-btn-outline"
+            data-testid="folder-dissolve-button"
+            :disabled="processing"
+            @click="dissolve"
+          >
+            Dissolve folder
+          </button>
+        </div>
+      </div>
       <ScopedIndexNoteEditor
         :notebook-id="folderForView.notebookRealm.notebook.id"
         :folder-id="folderForView.folder.id"
@@ -22,27 +100,186 @@
         save-button-idle-label="Save folder index"
         save-button-saving-label="Saving…"
         success-toast-saved="Folder index saved"
-        @saved="fetchFolderPage"
+        @saved="refreshFolderPage"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
-import type { FolderRealm } from "@generated/doughnut-backend-api"
+import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { computed, ref, watch } from "vue"
+import { useRouter } from "vue-router"
+import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
+import FolderSelector from "@/components/notes/FolderSelector.vue"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import usePopups from "@/components/commons/Popups/usePopups"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { toOpenApiError } from "@/managedApi/openApiError"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
   fetchFolderPage: () => Promise<void>
 }>()
 
+const router = useRouter()
+const { popups } = usePopups()
+
 const folderForView = computed((): FolderRealm | undefined => {
   const r = props.folderRealm
   if (r?.notebookRealm?.notebook == null) return undefined
   return r
 })
+
+const processing = ref(false)
+const moveError = ref<string | undefined>(undefined)
+const dissolveError = ref<string | undefined>(undefined)
+const renameError = ref<string | undefined>(undefined)
+const selectedParentFolder = ref<Folder | null>(null)
+const renameName = ref("")
+
+watch(
+  () => folderForView.value?.folder.id,
+  (id) => {
+    const r = folderForView.value
+    if (id == null || r == null) return
+    renameName.value = r.folder.name
+    renameError.value = undefined
+  },
+  { immediate: true }
+)
+
+const renameSubmitDisabled = computed(
+  () =>
+    processing.value ||
+    renameName.value.trim().length === 0 ||
+    folderForView.value == null ||
+    renameName.value.trim() === folderForView.value.folder.name
+)
+
+function dissolveParentLabelFromChain(
+  movingFolderId: number,
+  chain: readonly Folder[]
+): string {
+  const idx = chain.findIndex((f) => f.id === movingFolderId)
+  if (idx <= 0) return "notebook root"
+  const parentChain = chain.slice(0, idx)
+  return `"${parentChain.map((f) => f.name).join(" / ")}"`
+}
+
+const dissolveParentLabel = computed(() => {
+  const r = folderForView.value
+  if (r == null) return "notebook root"
+  return dissolveParentLabelFromChain(r.folder.id, r.ancestorFolders ?? [])
+})
+
+async function routeAfterDissolve(r: FolderRealm) {
+  const notebookId = r.notebookRealm.notebook.id
+  const ancestors = r.ancestorFolders ?? []
+  if (ancestors.length === 0) {
+    await router.push({
+      name: "notebookPage",
+      params: { notebookId },
+    })
+    return
+  }
+  const parent = ancestors[ancestors.length - 1]!
+  await router.push({
+    name: "folderPage",
+    params: {
+      notebookId: String(notebookId),
+      folderId: String(parent.id),
+    },
+  })
+}
+
+const refreshFolderPage = () => props.fetchFolderPage()
+
+const submitRename = async () => {
+  const r = folderForView.value
+  if (processing.value || renameSubmitDisabled.value || r == null) return
+  processing.value = true
+  renameError.value = undefined
+  try {
+    const trimmed = renameName.value.trim()
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.renameFolder({
+        path: {
+          notebook: r.notebookRealm.notebook.id,
+          folder: r.folder.id,
+        },
+        body: { name: trimmed },
+      })
+    )
+    if (error) throw error
+    refreshSidebarStructuralListings()
+    await refreshFolderPage()
+  } catch (e: unknown) {
+    renameError.value = toOpenApiError(e).message ?? "Failed to rename folder"
+  } finally {
+    processing.value = false
+  }
+}
+
+const submitMove = async () => {
+  const r = folderForView.value
+  if (processing.value || r == null) return
+  processing.value = true
+  moveError.value = undefined
+  try {
+    const body =
+      selectedParentFolder.value == null
+        ? {}
+        : { newParentFolderId: selectedParentFolder.value.id }
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.moveFolder({
+        path: {
+          notebook: r.notebookRealm.notebook.id,
+          folder: r.folder.id,
+        },
+        body,
+      })
+    )
+    if (error) throw error
+    refreshSidebarStructuralListings()
+    await refreshFolderPage()
+  } catch (e: unknown) {
+    moveError.value = toOpenApiError(e).message ?? "Failed to move folder"
+  } finally {
+    processing.value = false
+  }
+}
+
+const dissolve = async () => {
+  const r = folderForView.value
+  if (processing.value || r == null) return
+  const ok = await popups.confirm(
+    `Dissolve folder "${r.folder.name}"? Notes and subfolders will be kept.`
+  )
+  if (!ok) return
+  processing.value = true
+  dissolveError.value = undefined
+  try {
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.dissolveFolder({
+        path: {
+          notebook: r.notebookRealm.notebook.id,
+          folder: r.folder.id,
+        },
+      })
+    )
+    if (error) throw error
+    refreshSidebarStructuralListings()
+    await routeAfterDissolve(r)
+  } catch (e: unknown) {
+    dissolveError.value =
+      toOpenApiError(e).message ?? "Failed to dissolve folder"
+  } finally {
+    processing.value = false
+  }
+}
 </script>

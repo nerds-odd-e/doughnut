@@ -16,7 +16,7 @@ export type SidebarFolderOrganizeForm = {
 }
 
 /**
- * Page object for the folder move dialog (opened from the sidebar toolbar Folder… control).
+ * Page object for folder move / rename / dissolve on the folder page (`data-testid="folder-move-dialog"`).
  */
 export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
   return {

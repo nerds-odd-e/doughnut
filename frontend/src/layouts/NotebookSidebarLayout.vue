@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { RouterView, useRoute } from "vue-router"
 import type {
   Folder,
@@ -199,8 +199,6 @@ watch(
   },
   { immediate: true }
 )
-
-provide("reloadFolderPage", fetchFolderPage)
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth

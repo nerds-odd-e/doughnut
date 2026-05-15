@@ -41,45 +41,51 @@ When('I view note {string}', (noteTitle: string) => {
 })
 
 When(
-  'I move the active folder to notebook root using the sidebar folder dialog',
-  () => {
+  'I move folder {string} to notebook root using the folder page',
+  (folderLabel: string) => {
     start
       .noteSidebar()
-      .openFolderOrganizeForm()
+      .openFolderPageForOrganize(folderLabel)
       .selectNotebookRootAsDestination()
       .confirmMove()
   }
 )
 
 When(
-  'I attempt to move the active folder to notebook root using the sidebar folder dialog',
-  () => {
+  'I attempt to move folder {string} under {string} to notebook root using the folder page',
+  (childLabel: string, parentLabel: string) => {
     start
       .noteSidebar()
-      .openFolderOrganizeForm()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
       .selectNotebookRootAsDestination()
       .tryConfirmMove()
   }
 )
 
 When(
-  'I move the active folder to folder {string} using folder search in the sidebar folder dialog',
-  (folderName: string) => {
+  'I move folder {string} under {string} to folder {string} using folder search on the folder page',
+  (childLabel: string, parentLabel: string, destFolder: string) => {
     start
       .noteSidebar()
-      .openFolderOrganizeForm()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
       .openFolderSearch()
-      .searchFolderDestination(folderName)
-      .selectFolderSearchResultByName(folderName)
+      .searchFolderDestination(destFolder)
+      .selectFolderSearchResultByName(destFolder)
       .confirmMove()
   }
 )
 
-When('I dissolve the active folder using the sidebar folder dialog', () => {
-  start.noteSidebar().openFolderOrganizeForm().dissolveFolder()
-})
+When(
+  'I dissolve folder {string} under {string} using the folder page',
+  (childLabel: string, parentLabel: string) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+      .dissolveFolder()
+  }
+)
 
-Then('the sidebar folder dialog shows error {string}', (text: string) => {
+Then('the folder page shows error {string}', (text: string) => {
   assumeSidebarFolderOrganizeForm().expectErrorText(text)
 })
 
