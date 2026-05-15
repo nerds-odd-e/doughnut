@@ -3,7 +3,8 @@
     <div class="daisy-btn-group daisy-btn-group-sm">
       <PopButton
         v-if="!readonly"
-        title="Link"
+        ref="linkPopButtonRef"
+        title="Link (Ctrl+Shift+F / Cmd+Shift+F)"
         align-modal-top
         :show-close-button="false"
       >
@@ -40,7 +41,7 @@
         <LayoutTemplate class="daisy-w-6 daisy-h-6" />
       </button>
 
-      <button v-if="!readonly && !audioTools" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
+      <button v-if="!readonly && !audioTools" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
         <Mic class="daisy-w-6 daisy-h-6" />
       </button>
 
@@ -68,10 +69,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, onMounted, onUnmounted } from "vue"
 import type { Note } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import SearchForm from "../../links/SearchForm.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
 import {
   FileCode,
   LayoutTemplate,
@@ -85,7 +87,7 @@ import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 
-const { note } = defineProps<{
+const { note, readonly } = defineProps<{
   note: Note
   asMarkdown?: boolean
   conversationButton?: boolean
@@ -94,12 +96,34 @@ const { note } = defineProps<{
 
 const audioTools = ref(false)
 const moreOptions = ref(false)
+const linkPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
 
 const router = useRouter()
 
 defineEmits<{
   (e: "edit-as-markdown", value: boolean): void
 }>()
+
+function isLinkToolbarShortcut(e: KeyboardEvent): boolean {
+  if (!e.ctrlKey && !e.metaKey) return false
+  if (!e.shiftKey) return false
+  if (e.altKey) return false
+  return e.code === "KeyF" || e.key === "f" || e.key === "F"
+}
+
+function onWindowKeydownCapture(e: KeyboardEvent) {
+  if (readonly || !isLinkToolbarShortcut(e)) return
+  e.preventDefault()
+  linkPopButtonRef.value?.openDialog()
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", onWindowKeydownCapture, true)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", onWindowKeydownCapture, true)
+})
 
 watch(
   () => note.id,

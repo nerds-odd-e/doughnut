@@ -1,9 +1,13 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  NoteController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
+import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
@@ -150,5 +154,90 @@ describe("NoteToolbar", () => {
     // Verify dialog is closed
     dialog = wrapper.findComponent(NoteMoreOptionsForm)
     expect(dialog.exists()).toBe(false)
+  })
+
+  it("opens Link search on Ctrl+Shift+F when not readonly", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
+    mockSdkService(SearchController, "searchForRelationshipTarget", [])
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
+    mockSdkService(SearchController, "semanticSearch", [])
+    mockSdkService(SearchController, "semanticSearchWithin", [])
+
+    wrapper = helper
+      .component(NoteToolbar)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({
+        note: noteRealm.note,
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+    expect(screen.queryByPlaceholderText("Search")).toBeNull()
+
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "f",
+        code: "KeyF",
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    await flushPromises()
+
+    expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
+  })
+
+  it("does not open Link search on Ctrl+Shift+F when readonly", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
+
+    wrapper = helper
+      .component(NoteToolbar)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({
+        note: noteRealm.note,
+        readonly: true,
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "f",
+        code: "KeyF",
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    await flushPromises()
+
+    expect(screen.queryByPlaceholderText("Search")).toBeNull()
   })
 })

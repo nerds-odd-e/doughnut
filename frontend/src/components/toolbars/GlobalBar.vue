@@ -8,7 +8,7 @@
       <PopButton
         v-if="user"
         ref="searchNotePopButtonRef"
-        title="search note"
+        title="Search note (Ctrl+F / Cmd+F)"
         align-modal-top
         :show-close-button="false"
       >
