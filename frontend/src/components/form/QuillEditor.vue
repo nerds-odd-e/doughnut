@@ -134,7 +134,7 @@ const shiftEnterHandler = function (
 const brMatcher = () => new Delta().insert({ softbreak: true })
 
 const toolbarRows = [
-  ["bold", "italic", "underline"],
+  ["bold", "italic", "underline", "code"],
   [{ header: 1 }, { header: 2 }],
   ["blockquote", "code-block"],
   [{ list: "ordered" }, { list: "bullet" }],
@@ -162,6 +162,7 @@ const options: QuillOptions = {
     "bold",
     "italic",
     "underline",
+    "code",
     "header",
     "blockquote",
     "code-block",
@@ -326,6 +327,11 @@ defineExpose({ insertTextAtCursor })
     text-underline-offset: 0.15em
   a.dead-link
     color: red
+  code
+    background-color: color-mix(in oklch, oklch(var(--bc)) 12%, transparent)
+    padding: 0.1em 0.35em
+    border-radius: 0.25em
+    font-size: 0.9em
 .ql-container.ql-bubble
   border: none
   font-size: inherit !important

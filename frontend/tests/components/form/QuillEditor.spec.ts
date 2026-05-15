@@ -29,6 +29,24 @@ describe("QuillEditor.vue", () => {
     expect(document.querySelector(".ql-editor p")).toHaveTextContent("World")
   })
 
+  it("preserves inline code from markdown HTML (<code>)", async () => {
+    const html = `<p>Use <code>foo</code> for this.</p>`
+    wrapper = mount(QuillEditor, {
+      props: { modelValue: html },
+      attachTo: document.body,
+      global: { plugins: [router] },
+    })
+    await nextTick()
+    await vi.waitUntil(() => document.querySelector(".ql-editor code"))
+    const code = document.querySelector(".ql-editor code")
+    expect(code).not.toBeNull()
+    expect(code).toHaveTextContent("foo")
+    expect(document.querySelector(".ql-editor p")?.textContent).toContain("Use")
+    expect(document.querySelector(".ql-editor p")?.textContent).toContain(
+      "for this."
+    )
+  })
+
   it("emits correct modelValue when typing Hello<Shift+Enter>World", async () => {
     wrapper = mount(QuillEditor, {
       props: { modelValue: "" },
