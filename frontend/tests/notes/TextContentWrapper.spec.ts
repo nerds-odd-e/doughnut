@@ -113,4 +113,39 @@ describe("TextContentWrapper referenced title rename", () => {
 
     wrapper.unmount()
   })
+
+  it("does not discard when focusout has a misleading relatedTarget but focus remains inside the wrapper", async () => {
+    const wrapper = mountReferencedTitle()
+    await flushPromises()
+
+    const input = document.querySelector(
+      "[data-testid=title-slot-input]"
+    ) as HTMLInputElement
+    input.focus()
+    input.value = "Edited"
+    input.dispatchEvent(new Event("input", { bubbles: true }))
+    await nextTick()
+
+    const keepBtn = document.querySelector(
+      "[data-testid=referenced-title-save-keep-visible-text]"
+    ) as HTMLButtonElement
+    keepBtn.focus()
+
+    wrapper.element.dispatchEvent(
+      new FocusEvent("focusout", {
+        bubbles: false,
+        relatedTarget: document.body,
+      })
+    )
+    await flushPromises()
+    await waitForAnimationFrames()
+    await nextTick()
+
+    expect(input.value).toBe("Edited")
+    expect(
+      document.querySelector("[data-testid=referenced-title-save-panel]")
+    ).toBeTruthy()
+
+    wrapper.unmount()
+  })
 })

@@ -120,24 +120,24 @@ const discardReferencedTitleDraft = () => {
   version.value = savedVersion.value
 }
 
+const scheduleReferencedTitleBlurDiscardCheck = (root: HTMLElement) => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+      const focused = document.activeElement
+      if (focused instanceof Node && root.contains(focused)) return
+      discardReferencedTitleDraft()
+    })
+  })
+}
+
 const onReferencedTitleFocusOut = (event: FocusEvent) => {
   if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
   changer.cancel()
   const root = event.currentTarget as HTMLElement
   const next = event.relatedTarget as Node | null
   if (next && root.contains(next)) return
-  if (next == null) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
-        const focused = document.activeElement
-        if (focused instanceof Node && root.contains(focused)) return
-        discardReferencedTitleDraft()
-      })
-    })
-    return
-  }
-  discardReferencedTitleDraft()
+  scheduleReferencedTitleBlurDiscardCheck(root)
 }
 
 const showReferencedTitleSavePanel = computed(
