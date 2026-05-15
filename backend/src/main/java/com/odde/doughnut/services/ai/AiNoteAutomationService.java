@@ -1,10 +1,10 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
@@ -12,17 +12,18 @@ import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import java.util.function.Function;
 
-public class ChatCompletionNoteAutomationService {
+public class AiNoteAutomationService {
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final Note note;
 
-  public ChatCompletionNoteAutomationService(
+  public AiNoteAutomationService(
       OpenAiApiHandler openAiApiHandler,
       GlobalSettingsService globalSettingsService,
       FocusContextRetrievalService focusContextRetrievalService,
@@ -59,40 +60,31 @@ public class ChatCompletionNoteAutomationService {
   }
 
   private <T, R> R executeWithTool(
-      InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue)
-      throws JsonProcessingException {
-    OpenAIChatRequestBuilder chatRequestBuilder = createChatRequestBuilder();
-    chatRequestBuilder.responseJsonSchema(tool);
-
+      InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue) {
+    StructuredResponseCreateParams<T> params = buildStructuredResponseParams(resultClass, tool);
     return openAiApiHandler
-        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
-        .map(
-            jsonNode -> {
-              try {
-                T result =
-                    new ObjectMapperConfig().objectMapper().treeToValue(jsonNode, resultClass);
-                return extractor.apply(result);
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
+        .requestAndGetStructuredResponseResult(params)
+        .map(extractor)
         .orElse(defaultValue);
   }
 
-  private OpenAIChatRequestBuilder createChatRequestBuilder() {
+  private <T> StructuredResponseCreateParams<T> buildStructuredResponseParams(
+      Class<T> resultClass, InstructionAndSchema tool) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
     FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
     String focusMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, focusMarkdown);
 
-    String instructions = note.getNotebookAssistantInstructions();
-    if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addToOverallSystemMessage(instructions);
+    OpenAIResponseRequestBuilder<T> builder =
+        new OpenAIResponseRequestBuilder<>(resultClass).model(modelName);
+    builder.addInstruction(OpenAIChatRequestBuilder.systemInstruction);
+    builder.addInstruction(focusMarkdown);
+    String notebookAssistant = note.getNotebookAssistantInstructions();
+    if (notebookAssistant != null && !notebookAssistant.trim().isEmpty()) {
+      builder.addInstruction(notebookAssistant);
     }
-
-    return chatRequestBuilder;
+    builder.addInstruction(tool.getMessageBody());
+    return builder.build();
   }
 
   public String removePointsAndRegenerateContent(List<String> pointsToRemove)

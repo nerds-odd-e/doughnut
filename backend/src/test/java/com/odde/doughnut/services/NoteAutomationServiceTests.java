@@ -2,22 +2,18 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
+import com.odde.doughnut.services.ai.AiNoteAutomationService;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.UnderstandingChecklist;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,26 +44,22 @@ class NoteAutomationServiceTests {
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
-    // Create common test data
     testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
 
-    // Initialize common services
-    ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
-        new ChatCompletionNoteAutomationService(
+    AiNoteAutomationService aiNoteAutomationService =
+        new AiNoteAutomationService(
             openAiApiHandler,
             globalSettingsService,
             focusContextRetrievalService,
             focusContextMarkdownRenderer,
             testNote);
-    service = new NoteAutomationService(chatCompletionNoteAutomationService);
+    service = new NoteAutomationService(aiNoteAutomationService);
   }
 
   @Test
   void shouldHandleNoToolCallWhenSuggestingTitle() throws JsonProcessingException {
-    // Mock chat completion with no tool calls (empty response with tools)
-    // Use OpenAIChatCompletionMock to return an empty response
-    openAIChatCompletionMock.mockNullChatCompletion();
+    openAIChatCompletionMock.stubStructuredResponse(null);
 
     String result = service.suggestTitle();
 
@@ -76,10 +68,9 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldReturnSuggestedTitle() throws JsonProcessingException {
-    // Mock chat completion with JSON schema response
     TitleReplacement titleReplacement = new TitleReplacement();
     titleReplacement.setNewTitle("Suggested Title");
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(titleReplacement);
+    openAIChatCompletionMock.stubStructuredResponse(titleReplacement);
 
     String result = service.suggestTitle();
 
@@ -87,52 +78,13 @@ class NoteAutomationServiceTests {
   }
 
   @Test
-  void shouldThrowExceptionWhenRequestHasTools() {
-    // Create a minimal request with tools (which should trigger the guard)
-    // Note: We don't use responseFormat here to avoid type issues - we just need tools present
-    ChatCompletionCreateParams requestWithTools =
-        ChatCompletionCreateParams.builder()
-            .model(com.openai.models.ChatModel.of(GlobalSettingsService.DEFAULT_CHAT_MODEL))
-            .messages(
-                List.of(
-                    com.openai.models.chat.completions.ChatCompletionMessageParam.ofUser(
-                        com.openai.models.chat.completions.ChatCompletionUserMessageParam.builder()
-                            .content("test")
-                            .build())))
-            .addTool(com.odde.doughnut.services.ai.NoteContentCompletion.class)
-            .build();
-
-    // Create a custom builder that returns the request with tools
-    OpenAIChatRequestBuilder builderWithTools =
-        new OpenAIChatRequestBuilder() {
-          @Override
-          public com.openai.models.chat.completions.ChatCompletionCreateParams build() {
-            return requestWithTools;
-          }
-        };
-
-    // Verify that requestAndGetJsonSchemaResult throws RuntimeException when tools are present
-    RuntimeException exception =
-        assertThrows(
-            RuntimeException.class,
-            () ->
-                openAiApiHandler.requestAndGetJsonSchemaResult(
-                    AiToolFactory.suggestNoteTitleAiTool(), builderWithTools));
-
-    assertThat(
-        exception.getMessage(),
-        containsString("requestAndGetJsonSchemaResult must not be used with tools"));
-  }
-
-  @Test
   void shouldReturnUnderstandingPoints() throws JsonProcessingException {
-    // Mock chat completion with JSON schema response
     UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
     understandingChecklist.setPoints(
         List.of(
             "English is a language that is spoken in many countries.",
             "It is also the most widely spoken language in the world."));
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+    openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
 
     List<String> result = service.generateUnderstandingChecklist();
 
@@ -146,9 +98,7 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldHandleNoToolCallWhenGeneratingUnderstandingChecklist() throws JsonProcessingException {
-    // Mock chat completion with no tool calls (empty response with tools)
-    // Use OpenAIChatCompletionMock to return an empty response
-    openAIChatCompletionMock.mockNullChatCompletion();
+    openAIChatCompletionMock.stubStructuredResponse(null);
 
     List<String> result = service.generateUnderstandingChecklist();
 
@@ -157,8 +107,7 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldReturnEmptyListWhenChecklistIsNull() throws JsonProcessingException {
-    // Mock chat completion that returns null
-    openAIChatCompletionMock.mockNullChatCompletion();
+    openAIChatCompletionMock.stubStructuredResponse(null);
 
     List<String> result = service.generateUnderstandingChecklist();
 

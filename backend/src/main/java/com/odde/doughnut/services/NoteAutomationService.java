@@ -1,31 +1,30 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
+import com.odde.doughnut.services.ai.AiNoteAutomationService;
 
 public final class NoteAutomationService {
-  private final ChatCompletionNoteAutomationService chatCompletionNoteAutomationService;
+  private final AiNoteAutomationService aiNoteAutomationService;
 
-  public NoteAutomationService(
-      ChatCompletionNoteAutomationService chatCompletionNoteAutomationService) {
-    this.chatCompletionNoteAutomationService = chatCompletionNoteAutomationService;
+  public NoteAutomationService(AiNoteAutomationService aiNoteAutomationService) {
+    this.aiNoteAutomationService = aiNoteAutomationService;
   }
 
   public String suggestTitle() throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.suggestTitle();
+    return aiNoteAutomationService.suggestTitle();
   }
 
   public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.generateUnderstandingChecklist();
+    return aiNoteAutomationService.generateUnderstandingChecklist();
   }
 
   public com.odde.doughnut.services.ai.PointExtractionResult promotePointToSibling(String point)
       throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.promotePointToSibling(point);
+    return aiNoteAutomationService.promotePointToSibling(point);
   }
 
   public String removePointsAndRegenerateContent(java.util.List<String> pointsToRemove)
       throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.removePointsAndRegenerateContent(pointsToRemove);
+    return aiNoteAutomationService.removePointsAndRegenerateContent(pointsToRemove);
   }
 }

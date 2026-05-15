@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class ChatCompletionNoteAutomationServiceTest {
+class AiNoteAutomationServiceTest {
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
@@ -39,20 +39,18 @@ class ChatCompletionNoteAutomationServiceTest {
   @Autowired TestabilitySettings testabilitySettings;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
-  private ChatCompletionNoteAutomationService service;
+  private AiNoteAutomationService service;
 
   @BeforeEach
   void setup() {
     testabilitySettings.setOpenAiTokenOverride(null);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
-    // Create common test data
     testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
 
-    // Initialize service
     service =
-        new ChatCompletionNoteAutomationService(
+        new AiNoteAutomationService(
             openAiApiHandler,
             globalSettingsService,
             focusContextRetrievalService,
@@ -64,13 +62,12 @@ class ChatCompletionNoteAutomationServiceTest {
   class GenerateUnderstandingChecklist {
     @Test
     void shouldReturnUnderstandingPoints() throws JsonProcessingException {
-      // Mock chat completion with JSON schema response
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -84,8 +81,7 @@ class ChatCompletionNoteAutomationServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoResponse() throws JsonProcessingException {
-      // Mock chat completion with no tool calls (empty response)
-      openAIChatCompletionMock.mockNullChatCompletion();
+      openAIChatCompletionMock.stubStructuredResponse(null);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -94,10 +90,9 @@ class ChatCompletionNoteAutomationServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenChecklistIsEmpty() throws JsonProcessingException {
-      // Mock chat completion with empty checklist
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(List.of());
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -106,7 +101,6 @@ class ChatCompletionNoteAutomationServiceTest {
 
     @Test
     void shouldHandleChecklistWithMultiplePoints() throws JsonProcessingException {
-      // Mock chat completion with multiple understanding points
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(
           List.of(
@@ -115,7 +109,7 @@ class ChatCompletionNoteAutomationServiceTest {
               "Point 3: Third important aspect.",
               "Point 4: Fourth important aspect.",
               "Point 5: Fifth important aspect."));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
@@ -126,16 +120,13 @@ class ChatCompletionNoteAutomationServiceTest {
 
     @Test
     void shouldRespectMaximumOfFivePoints() throws JsonProcessingException {
-      // Mock chat completion with more than 5 points to verify the service doesn't limit
-      // (The limitation should be enforced by the AI tool instruction, not the service)
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(
           List.of("Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7"));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
+      openAIChatCompletionMock.stubStructuredResponse(understandingChecklist);
 
       List<String> result = service.generateUnderstandingChecklist();
 
-      // Service should return whatever the AI returns (limiting is done by AI instruction)
       assertThat(result, hasSize(7));
     }
   }

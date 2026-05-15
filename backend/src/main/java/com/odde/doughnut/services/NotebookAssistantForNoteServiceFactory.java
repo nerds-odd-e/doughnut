@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
+import com.odde.doughnut.services.ai.AiNoteAutomationService;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -31,14 +31,14 @@ public final class NotebookAssistantForNoteServiceFactory {
   }
 
   public NoteAutomationService createNoteAutomationService(Note note) {
-    ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
-        new ChatCompletionNoteAutomationService(
+    AiNoteAutomationService aiNoteAutomationService =
+        new AiNoteAutomationService(
             openAiApiHandler,
             globalSettingsService,
             focusContextRetrievalService,
             focusContextMarkdownRenderer,
             note);
-    return new NoteAutomationService(chatCompletionNoteAutomationService);
+    return new NoteAutomationService(aiNoteAutomationService);
   }
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {

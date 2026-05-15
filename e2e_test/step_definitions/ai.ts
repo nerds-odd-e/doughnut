@@ -43,12 +43,12 @@ function stubExtractPointResponse(
   cy.then(async () => {
     await mock_services
       .openAi()
-      .chatCompletion()
+      .responses()
       .requestMessageMatches({
         role: 'developer',
         content: contentPattern,
       })
-      .stubJsonSchemaResponse(reply)
+      .stubOutputText(reply)
   })
 }
 
@@ -207,12 +207,12 @@ Given(
       await mock_services.openAi().restartImposter()
       await mock_services
         .openAi()
-        .chatCompletion()
+        .responses()
         .requestMessageMatches({
           role: 'developer',
           content: '.*Please generate an understanding checklist.*',
         })
-        .stubJsonSchemaResponse(reply)
+        .stubOutputText(reply)
     })
   }
 )
@@ -225,12 +225,12 @@ Given(
     cy.then(async () => {
       await mock_services
         .openAi()
-        .chatCompletion()
+        .responses()
         .requestMessageMatches({
           role: 'developer',
           content: '.*remove.*points.*',
         })
-        .stubJsonSchemaResponse(reply)
+        .stubOutputText(reply)
     })
   }
 )

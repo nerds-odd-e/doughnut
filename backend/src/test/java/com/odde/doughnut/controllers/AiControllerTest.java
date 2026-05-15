@@ -22,6 +22,8 @@ import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.models.ModelListPage;
+import com.openai.models.responses.ResponseTextConfig;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import com.openai.services.blocking.ModelService;
 import java.util.List;
 import java.util.stream.Stream;
@@ -116,28 +118,22 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldCallChatCompletionWithRightMessage()
+    void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       controller.suggestTitle(testNote);
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      com.openai.models.chat.completions.ChatCompletionCreateParams params =
-          paramsCaptor.getValue();
-      boolean hasInstruction =
-          params.messages().stream()
-              .map(Object::toString)
-              .anyMatch(msg -> msg.contains("Please suggest a better title for the note"));
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<TitleReplacement>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<TitleReplacement> params = paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
       MatcherAssert.assertThat(
-          "A message should contain the instruction", hasInstruction, is(true));
-      MatcherAssert.assertThat(
-          "Should use responseFormat instead of tools",
-          params.responseFormat().isPresent(),
+          "Instructions should contain the title suggestion prompt",
+          instructions.contains("Please suggest a better title for the note"),
           is(true));
       MatcherAssert.assertThat(
-          "Should not have tools",
-          params.tools().map(list -> list.isEmpty()).orElse(true),
+          "Should use Responses structured text format",
+          params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));
     }
 
@@ -209,7 +205,7 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldCallChatCompletionWithRightMessage()
+    void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
       understandingChecklist.setPoints(List.of("Point 1", "Point 2"));
@@ -218,28 +214,20 @@ class AiControllerTest extends ControllerTestBase {
 
       controller.generateUnderstandingChecklist(testNote);
 
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
-      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-      com.openai.models.chat.completions.ChatCompletionCreateParams params =
-          paramsCaptor.getValue();
-      boolean hasInstruction =
-          params.messages().stream()
-              .map(Object::toString)
-              .anyMatch(
-                  msg ->
-                      msg.contains(
-                          "Please generate an understanding checklist of the note content broken down into key points"));
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<UnderstandingChecklist>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAIChatCompletionMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<UnderstandingChecklist> params = paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
       MatcherAssert.assertThat(
-          "A message should contain the instruction", hasInstruction, is(true));
-      MatcherAssert.assertThat(
-          "Should use responseFormat instead of tools",
-          params.responseFormat().isPresent(),
+          "Instructions should contain the checklist prompt",
+          instructions.contains(
+              "Please generate an understanding checklist of the note content broken down into key points"),
           is(true));
       MatcherAssert.assertThat(
-          "Should not have tools",
-          params.tools().map(list -> list.isEmpty()).orElse(true),
+          "Should use Responses structured text format",
+          params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));
     }
 
