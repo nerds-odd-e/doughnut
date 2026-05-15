@@ -7,7 +7,6 @@ import com.openai.models.responses.StructuredResponseCreateParams;
 import com.openai.models.responses.StructuredResponseTextConfig;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OpenAIResponseRequestBuilder<T> {
   private static final String MESSAGE_SEPARATOR = "\n\n\n";
@@ -64,10 +63,10 @@ public class OpenAIResponseRequestBuilder<T> {
   }
 
   private String buildInstructions() {
-    return instructions.stream().collect(Collectors.joining(MESSAGE_SEPARATOR));
+    return String.join(MESSAGE_SEPARATOR, instructions);
   }
 
   private String buildInput() {
-    return inputMessages.stream().collect(Collectors.joining(MESSAGE_SEPARATOR));
+    return String.join(MESSAGE_SEPARATOR, inputMessages);
   }
 }

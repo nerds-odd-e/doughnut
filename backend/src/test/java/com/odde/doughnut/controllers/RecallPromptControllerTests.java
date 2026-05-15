@@ -48,12 +48,12 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
-    // Mock chat completion for question evaluation
+    // Default structured response for question evaluation flows in this test class
     QuestionEvaluation evaluation = new QuestionEvaluation();
     evaluation.feasibleQuestion = false;
     evaluation.correctChoices = new int[] {0};
     evaluation.improvementAdvices = "This question needs improvement";
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
+    openAIChatCompletionMock.stubStructuredResponse(evaluation);
   }
 
   RecallPromptController nullUserController() {
@@ -250,7 +250,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       // Mock the chat completion API calls
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
+      openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
@@ -266,7 +266,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       // Mock the chat completion API calls
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
+      openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
@@ -329,7 +329,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void rejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
@@ -342,7 +342,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
 
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       controller.contest(recallPrompt);
 
@@ -357,7 +357,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       QuestionContestResult contestResult = controller.contest(recallPrompt);
       assertFalse(contestResult.rejected);
@@ -591,7 +591,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void shouldMarkQuestionAsContestedWhenContestIsAccepted() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       // When
       QuestionContestResult result = controller.contest(recallPrompt);
@@ -604,7 +604,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldNotMarkQuestionAsContestedWhenContestIsRejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       // When
       QuestionContestResult result = controller.contest(recallPrompt);

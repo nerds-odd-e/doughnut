@@ -66,7 +66,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void rejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
       QuestionContestResult contest =
@@ -79,7 +79,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIChatCompletionMock.stubStructuredResponse(questionEvaluation);
 
       MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
       QuestionContestResult contest =
@@ -91,7 +91,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
     @Test
     void noFunctionCallInvoked() throws JsonProcessingException {
-      openAIChatCompletionMock.mockNullChatCompletion();
+      openAIChatCompletionMock.stubStructuredResponse(null);
 
       assertThrows(
           RuntimeException.class,

@@ -53,7 +53,7 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().please();
   }
 
-  private boolean systemMessageContains(
+  private boolean instructionContains(
       StructuredResponseCreateParams<MCQWithAnswer> request, String text) {
     return instructionText(request).contains(text);
   }
@@ -96,7 +96,7 @@ class NoteQuestionGenerationServiceTests {
     void shouldGenerateQuestionWithCorrectStem() throws Exception {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
+      openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
 
       MCQWithAnswer generatedQuestion = service.generateQuestion(testNote, null);
 
@@ -118,7 +118,7 @@ class NoteQuestionGenerationServiceTests {
       makeMe.aNote().notebook(nb).please();
 
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
+      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
 
       service.generateQuestion(noteInScope, null);
 
@@ -132,11 +132,11 @@ class NoteQuestionGenerationServiceTests {
       assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
       assertThat(userBodies.get(1), containsString("# Focus Context"));
       assertThat(
-          systemMessageContains(
+          instructionContains(
               paramsCaptor.getValue(),
               QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER),
           is(false));
-      assertThat(systemMessageContains(paramsCaptor.getValue(), "SCOPED_QGEN_MARKER"), is(false));
+      assertThat(instructionContains(paramsCaptor.getValue(), "SCOPED_QGEN_MARKER"), is(false));
     }
 
     @Test
@@ -145,7 +145,7 @@ class NoteQuestionGenerationServiceTests {
           .globalSettingQuestionGeneration()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-question-generation");
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
+      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
 
       service.generateQuestion(testNote, null);
 
@@ -159,7 +159,7 @@ class NoteQuestionGenerationServiceTests {
     void shouldUseSameRequestShapeAsExportedQuestionGenerationRequest()
         throws JsonProcessingException {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
+      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
 
       StructuredResponseCreateParams<MCQWithAnswer> exportedRequest =
           service.buildQuestionGenerationRequest(testNote, "Generate a focused question");
@@ -185,8 +185,8 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldHandleNullChatCompletion() throws JsonProcessingException {
-      openAIChatCompletionMock.mockNullChatCompletion();
+    void shouldReturnNullWhenStructuredResponseIsAbsent() throws JsonProcessingException {
+      openAIChatCompletionMock.stubStructuredResponse(null);
 
       MCQWithAnswer result = service.generateQuestion(testNote, null);
 
@@ -212,7 +212,7 @@ class NoteQuestionGenerationServiceTests {
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(testNote, null);
 
-      assertThat(systemMessageContains(request, "Question Designer"), is(true));
+      assertThat(instructionContains(request, "Question Designer"), is(true));
     }
 
     @Test
@@ -262,12 +262,12 @@ class NoteQuestionGenerationServiceTests {
           containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
       assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
       assertThat(userBodies.get(1), containsString("# Focus Context"));
-      assertThat(systemMessageContains(request, "SCOPED_QGEN_MARKER"), is(false));
+      assertThat(instructionContains(request, "SCOPED_QGEN_MARKER"), is(false));
       assertThat(
-          systemMessageContains(
+          instructionContains(
               request, QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER),
           is(false));
-      assertThat(systemMessageContains(request, "focus note"), is(true));
+      assertThat(instructionContains(request, "focus note"), is(true));
     }
 
     @Test
@@ -284,7 +284,7 @@ class NoteQuestionGenerationServiceTests {
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(testNote, null);
 
-      assertThat(systemMessageContains(request, "Custom notebook instructions"), is(true));
+      assertThat(instructionContains(request, "Custom notebook instructions"), is(true));
     }
 
     @Test
@@ -359,8 +359,7 @@ class NoteQuestionGenerationServiceTests {
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(testNote, null);
 
-      assertThat(
-          systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
+      assertThat(instructionContains(request, "Special Instruction for Relation Note"), is(false));
     }
   }
 
@@ -369,8 +368,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldReturnEmptyWhenEvaluationFails() throws Exception {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
-      openAIChatCompletionMock.mockNullChatCompletion();
+      openAIChatCompletionMock.stubStructuredResponse(null);
 
       Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
 
@@ -384,7 +382,7 @@ class NoteQuestionGenerationServiceTests {
       evaluation.feasibleQuestion = true;
       evaluation.correctChoices = new int[] {0};
       evaluation.improvementAdvices = "Good question";
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
+      openAIChatCompletionMock.stubStructuredResponse(evaluation);
 
       Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
 

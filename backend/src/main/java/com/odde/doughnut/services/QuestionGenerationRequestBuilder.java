@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -57,38 +56,12 @@ public class QuestionGenerationRequestBuilder {
         .build();
   }
 
-  /**
-   * Optional scoped {@code question_generation_instruction} as a user message (prefixed with the
-   * same header line as {@link #CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER}), then focus context as a
-   * user message, then optional {@code additionalMessage}—same order as {@link
-   * #buildQuestionGenerationResponseRequest}. Notebook assistant hints and the MCQ JSON schema
-   * instruction are not attached here; they are added after the schema instruction in {@link
-   * #buildQuestionGenerationResponseRequest}.
-   */
-  public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
-      Note note, String additionalMessage) {
-    return openAiChatRequestForQuestionGeneration(note, additionalMessage, null);
-  }
-
-  public OpenAIChatRequestBuilder openAiChatRequestForQuestionGeneration(
-      Note note, String additionalMessage, Long contextSeed) {
-    OpenAIChatRequestBuilder chatRequestBuilder = getChatRequestBuilder(note, contextSeed);
-    if (additionalMessage != null) {
-      chatRequestBuilder.addUserMessage(additionalMessage);
-    }
-    return chatRequestBuilder;
-  }
-
   private static void addNotebookAssistantInstructionsIfPresent(
       OpenAIResponseRequestBuilder<?> responseRequestBuilder, Note note) {
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
       responseRequestBuilder.addInstruction(instructions);
     }
-  }
-
-  public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
-    return getChatRequestBuilder(note, null);
   }
 
   public boolean isFocusNoteTitleAndContentEmpty(Note note) {
@@ -107,34 +80,6 @@ public class QuestionGenerationRequestBuilder {
         .stream()
         .findFirst()
         .orElse(note);
-  }
-
-  public OpenAIChatRequestBuilder getChatRequestBuilder(Note note, Long contextSeed) {
-    String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
-    Note focus = hydrateFocusNoteForQuestionGeneration(note);
-
-    String instruction =
-        noteRealmService.resolveScopedQuestionGenerationInstruction(focus).orElse(null);
-    String instructionUserBlock =
-        instruction != null ? CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER + "\n" + instruction : null;
-    int instructionTokens =
-        instructionUserBlock != null
-            ? ApproximateUtf8TokenBudget.estimateApproxTokens(instructionUserBlock)
-            : 0;
-    int focusBudget =
-        Math.max(
-            0,
-            FocusContextConstants.FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET - instructionTokens);
-    RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed, focusBudget);
-
-    FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(focus, config);
-    String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
-
-    OpenAIChatRequestBuilder builder = new OpenAIChatRequestBuilder().model(modelName);
-    if (instructionUserBlock != null) {
-      builder.addUserMessage(instructionUserBlock);
-    }
-    return builder.addUserMessage(focusContextMarkdown);
   }
 
   public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionGeneration(

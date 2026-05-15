@@ -45,7 +45,7 @@ class AiQuestionGeneratorTests {
 
   @BeforeEach
   void setup() {
-    // Initialize chat completion mock
+    // Initialize OpenAI mock
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     // Ensure OpenAI URL is reset to default before each test
     testabilitySettings.replaceServiceUrls(Map.of("openAi", "https://api.openai.com/v1/"));
@@ -62,8 +62,7 @@ class AiQuestionGeneratorTests {
     MCQWithAnswer jsonQuestion =
         makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-    // Mock the chat completion API calls
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
+    openAIChatCompletionMock.stubStructuredResponse(jsonQuestion);
 
     Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
     // another note is needed, otherwise the note will be the only note in the notebook
@@ -91,8 +90,7 @@ class AiQuestionGeneratorTests {
             .choicesMayBeShuffled(true)
             .please();
 
-    // Mock the chat completion API calls
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(originalQuestion);
+    openAIChatCompletionMock.stubStructuredResponse(originalQuestion);
 
     // Act
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
@@ -146,8 +144,7 @@ class AiQuestionGeneratorTests {
     List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
     doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
 
-    // Mock the chat completion API calls
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(originalQuestion);
+    openAIChatCompletionMock.stubStructuredResponse(originalQuestion);
 
     // Act
     MCQWithAnswer result =
@@ -173,8 +170,7 @@ class AiQuestionGeneratorTests {
             .correctChoiceIndex(3) // Invalid index!
             .please();
 
-    // Mock the chat completion API calls
-    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(invalidQuestion);
+    openAIChatCompletionMock.stubStructuredResponse(invalidQuestion);
 
     // Act
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);

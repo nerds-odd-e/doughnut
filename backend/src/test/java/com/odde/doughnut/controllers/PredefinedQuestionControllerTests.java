@@ -129,7 +129,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
+      openAIChatCompletionMock.stubStructuredResponse(mcqWithAnswer);
 
       // Execute & Verify
       PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
@@ -141,7 +141,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       // Mock a response with malformed JSON content to trigger a RuntimeException
-      openAIChatCompletionMock.mockChatCompletionWithMalformedJsonContent("{invalid json}");
+      openAIChatCompletionMock.stubStructuredResponseMalformed("{invalid json}");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
       verify(openAIChatCompletionMock.responseService(), Mockito.times(1))
           .create(ArgumentMatchers.any(StructuredResponseCreateParams.class));

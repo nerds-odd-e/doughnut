@@ -69,6 +69,22 @@ public class OpenAIChatCompletionMock {
     return responseService;
   }
 
+  /**
+   * Stubs the next {@code officialClient.responses().create(...)} result only; does not configure
+   * chat completions.
+   */
+  public void stubStructuredResponse(Object result) {
+    if (result == null) {
+      fallbackStructuredResults.add(null);
+    } else {
+      addStructuredResult(result);
+    }
+  }
+
+  public void stubStructuredResponseMalformed(String malformedJson) {
+    fallbackStructuredResults.add(new MalformedStructuredContent(malformedJson));
+  }
+
   public void mockChatCompletionAndReturnJsonSchema(Object result) {
     if (result == null) {
       mockNullChatCompletion();
@@ -79,7 +95,7 @@ public class OpenAIChatCompletionMock {
     Mockito.doReturn(completion)
         .when(completionService)
         .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
-    addStructuredResult(result);
+    stubStructuredResponse(result);
   }
 
   public void mockNullChatCompletion() {
@@ -93,15 +109,7 @@ public class OpenAIChatCompletionMock {
     Mockito.doReturn(completion)
         .when(completionService)
         .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
-    fallbackStructuredResults.add(null);
-  }
-
-  public void mockChatCompletionWithMalformedJsonContent(String malformedJson) {
-    ChatCompletion completion = buildContentCompletion(malformedJson);
-    Mockito.doReturn(completion)
-        .when(completionService)
-        .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
-    fallbackStructuredResults.add(new MalformedStructuredContent(malformedJson));
+    stubStructuredResponse(null);
   }
 
   private void addStructuredResult(Object result) {
