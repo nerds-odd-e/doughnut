@@ -40,8 +40,8 @@ describe("routes", () => {
   })
 
   describe("noteShow route", () => {
-    it("should match /d/n/:noteId and pass noteId prop", async () => {
-      await router.push("/d/n/123")
+    it("should match /n:noteId and pass noteId prop", async () => {
+      await router.push("/n123")
 
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
@@ -54,6 +54,15 @@ describe("routes", () => {
           noteId: 123,
         })
       }
+    })
+
+    it("redirects legacy /d/n/:noteId to /n:noteId", async () => {
+      await router.push("/d/n/888")
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteShow")
+      expect(route.path).toBe("/n888")
+      expect(route.params.noteId).toBe("888")
     })
 
     it("should navigate by name with noteId param", async () => {

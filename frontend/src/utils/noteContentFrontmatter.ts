@@ -203,7 +203,7 @@ export const RICH_MODE_PRESET_PROPERTY_KEYS = [
 
 /**
  * Predefined property keys shown only when editing a designated index note
- * (notebook index, folder index, or direct /d/n/:noteId for those notes).
+ * (notebook index, folder index, or direct /n<noteId> for those notes).
  */
 export const INDEX_ONLY_PRESET_PROPERTY_KEYS = [
   "title_pattern",

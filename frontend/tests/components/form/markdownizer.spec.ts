@@ -468,7 +468,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiTitleFromInnerAndNoteId("MyNote", 42),
       ])
     ).toBe(
-      '<p><a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+      '<p><a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 
@@ -478,7 +478,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiTitleFromInnerAndNoteId("Target|label", 7),
       ])
     ).toBe(
-      '<p><a href="/d/n/7" class="doughnut-link" data-wiki-title="Target" data-wiki-display="label">label</a></p>'
+      '<p><a href="/n7" class="doughnut-link" data-wiki-title="Target" data-wiki-display="label">label</a></p>'
     )
   })
 
@@ -489,7 +489,7 @@ describe("replaceWikiLinksInHtml", () => {
     ])
     expect(out).not.toContain("dead-link")
     expect(out).toBe(
-      '<p><a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a> then <a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+      '<p><a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a> then <a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 
@@ -506,7 +506,7 @@ describe("replaceWikiLinksInHtml", () => {
         [wikiTitleFromInnerAndNoteId("MyNote", 42)]
       )
     ).toBe(
-      '<p><a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+      '<p><a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 })

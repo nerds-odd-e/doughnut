@@ -1,5 +1,6 @@
 import { marked, type Tokens } from "marked"
 import markdownizer from "@/components/form/markdownizer"
+import { pathnameLooksLikeInternalNoteShow } from "@/routes/noteShowLocation"
 import { verbatimFrontmatterPrefixAndBody } from "@/utils/noteContentFrontmatter"
 
 function isInternalNoteShowMarkdownHref(
@@ -11,7 +12,7 @@ function isInternalNoteShowMarkdownHref(
       href,
       href.startsWith("/") ? "http://local.invalid" : undefined
     )
-    return /^\/d\/n\/\d+(\/|$)/.test(u.pathname)
+    return pathnameLooksLikeInternalNoteShow(u.pathname)
   } catch {
     return false
   }

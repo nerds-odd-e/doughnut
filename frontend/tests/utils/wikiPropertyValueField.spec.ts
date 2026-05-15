@@ -86,7 +86,7 @@ describe("wikiPropertyValueField utils", () => {
       wikiTitleFromInnerAndNoteId("My Note", 42),
     ])
     expect(html).toContain("doughnut-link")
-    expect(html).toContain("/d/n/42")
+    expect(html).toContain("/n42")
     expect(html).toContain('class="wiki-bracket"')
   })
 
@@ -95,7 +95,7 @@ describe("wikiPropertyValueField utils", () => {
       wikiTitleFromInnerAndNoteId("Target Page|friendly", 99),
     ])
     expect(html).toContain("doughnut-link")
-    expect(html).toContain("/d/n/99")
+    expect(html).toContain("/n99")
     expect(html).toContain("friendly")
     expect(html).not.toContain("Target Page|friendly")
   })

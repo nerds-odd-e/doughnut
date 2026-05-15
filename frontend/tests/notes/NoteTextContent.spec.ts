@@ -457,7 +457,7 @@ describe("rich mode wiki resolved link display text", () => {
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("friendly label")
     expect(live.textContent).not.toContain("Target Title|")
-    expect(live.getAttribute("href")).toBe(`/d/n/${targetNote.id}`)
+    expect(live.getAttribute("href")).toBe(`/n${targetNote.id}`)
     expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
   })
 })

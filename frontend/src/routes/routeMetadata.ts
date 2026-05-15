@@ -50,6 +50,14 @@ export const routeMetadata: RouteMetadata[] = [
   },
   {
     path: "/d/n/:noteId(\\d+)",
+    redirect: (to) => {
+      const raw = to.params.noteId
+      const id = Array.isArray(raw) ? raw[0] : raw
+      return `/n${id ?? ""}`
+    },
+  },
+  {
+    path: "/n:noteId(\\d+)",
     name: "noteShow",
     props: (route: RouteLocation) => ({
       noteId: Number(route.params.noteId),

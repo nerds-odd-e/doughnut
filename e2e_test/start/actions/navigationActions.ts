@@ -7,7 +7,7 @@ export const navigationActions = {
     testability()
       .getInjectedNoteIdByTitle(noteTopology)
       .then((noteId: number) => {
-        const url = `/d/n/${noteId}`
+        const url = `/n${noteId}`
         if (forceLoadPage) cy.visit(url)
         else router().push(url, 'noteShow', { noteId })
       })

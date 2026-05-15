@@ -29,6 +29,13 @@ describe("stripMarkdownLinksAndImagesInNoteContent", () => {
     )
   })
 
+  it("treats compact /n<id> markdown hrefs as internal note links", () => {
+    const md = "[Beta](/n99) then [x](https://z.test)"
+    expect(stripMarkdownLinksAndImagesInNoteContent(md, true, false)).toBe(
+      "[[Beta]] then x"
+    )
+  })
+
   it("counts only non-internal-note links for the paste options prompt", () => {
     expect(
       countMarkdownLinksAndImagesInNoteContent(

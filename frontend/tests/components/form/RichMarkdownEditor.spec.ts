@@ -45,7 +45,7 @@ describe("RichMarkdownEditor", () => {
     await flushPromises()
 
     expect(String(quill.props("modelValue"))).toContain(
-      '<a href="/d/n/42" class="doughnut-link" data-wiki-title="MyNote"'
+      '<a href="/n42" class="doughnut-link" data-wiki-title="MyNote"'
     )
   })
 

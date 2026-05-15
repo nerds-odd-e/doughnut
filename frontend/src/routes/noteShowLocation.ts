@@ -10,5 +10,9 @@ export function noteShowLocation(noteId: number): RouteLocationNamedRaw {
 }
 
 export function noteShowHref(noteId: number): string {
-  return `/d/n/${noteId}`
+  return `/n${noteId}`
+}
+
+export function pathnameLooksLikeInternalNoteShow(pathname: string): boolean {
+  return /^\/d\/n\/\d+(\/|$)/.test(pathname) || /^\/n\d+$/.test(pathname)
 }

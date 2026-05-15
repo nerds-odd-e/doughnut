@@ -247,10 +247,10 @@ const testability = () => {
     rememberUiCreatedNote(noteTitle: string) {
       return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
         return cy.url().then((url) => {
-          const m = url.match(/\/d\/n\/(\d+)/)
+          const m = url.match(/\/n(\d+)/) ?? url.match(/\/d\/n\/(\d+)/)
           expect(
             m,
-            `could not parse note id from URL (expected /d/n/<digits>): ${url}`
+            `could not parse note id from URL (expected /n<id> or legacy /d/n/<digits>): ${url}`
           ).to.not.be.null
           const noteId = Number(m![1])
           const map = existingMap as Record<string, number>

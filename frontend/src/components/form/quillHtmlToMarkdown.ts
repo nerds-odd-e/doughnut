@@ -1,5 +1,6 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
+import { pathnameLooksLikeInternalNoteShow } from "@/routes/noteShowLocation"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiPropertyValueField"
 
 export const turndownService = new TurndownService({
@@ -313,12 +314,12 @@ turndownService.addRule("doughnutDeadWikiLink", {
   },
 })
 
-/** Pasted HTML often has plain <a href="/d/n/…"> without doughnut-link class. */
+/** Pasted HTML often has plain note-show hrefs without doughnut-link class. */
 function hrefIsInternalNoteShow(href: string | null): boolean {
   if (!href?.trim()) return false
   try {
     const pathname = new URL(href, "https://example.invalid").pathname
-    return /\/d\/n\/\d+/.test(pathname)
+    return pathnameLooksLikeInternalNoteShow(pathname)
   } catch {
     return false
   }

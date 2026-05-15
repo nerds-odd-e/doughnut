@@ -165,7 +165,7 @@ describe("QuillEditor.vue", () => {
     const pushSpy = vi.spyOn(router, "push").mockResolvedValue(undefined)
 
     const html =
-      '<p><a href="https://example.com/path">ext</a> <a href="/d/n/1" class="doughnut-link">wiki</a></p>'
+      '<p><a href="https://example.com/path">ext</a> <a href="/n1" class="doughnut-link">wiki</a></p>'
     wrapper = mount(QuillEditor, {
       props: { modelValue: html, readonly: true },
       attachTo: document.body,
@@ -199,7 +199,7 @@ describe("QuillEditor.vue", () => {
     )
     await nextTick()
     expect(openSpy).not.toHaveBeenCalled()
-    expect(pushSpy).toHaveBeenCalledWith("/d/n/1")
+    expect(pushSpy).toHaveBeenCalledWith("/n1")
 
     openSpy.mockRestore()
     pushSpy.mockRestore()
