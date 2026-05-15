@@ -187,13 +187,16 @@ export const assumeNotePage = (
       newTitle: string,
       choice: TitleRenameReferenceChoice
     ) => {
-      cy.findByRole('title').click()
+      cy.get('#main-note-content').find('[role=title]').first().click()
       cy.clearFocusedText().type(newTitle)
       cy.findByTestId('referenced-title-save-panel')
         .find(`[data-testid="${titleRenameReferenceSaveTestId[choice]}"]`)
         .click()
       cy.findByTestId('referenced-title-save-panel').should('not.exist')
-      cy.findByText(newTitle, { selector: '[role=title]' })
+      cy.get('#main-note-content')
+        .find('[role=title]')
+        .first()
+        .should('contain', newTitle)
       pageIsNotLoading()
     },
     editTextContent: (noteAttributes: Record<string, string>) => {

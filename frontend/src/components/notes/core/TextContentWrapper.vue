@@ -23,6 +23,7 @@
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           :data-testid="opt.testid"
           :disabled="savingReferencedTitle"
+          @mousedown.prevent
           @click="saveReferencedTitleWithChoice(opt.value)"
         >
           {{ opt.label }}
