@@ -11,7 +11,7 @@ export const navigateToMyCircles = () => {
 }
 
 export const assumeMyCirclesPage = () => {
-  cy.url().should('include', 'd/circles')
+  cy.url().should('include', '/circles')
   return {
     createNewCircle: (circleName: string) => {
       cy.findByRole('button', { name: 'Create a new circle' }).click()

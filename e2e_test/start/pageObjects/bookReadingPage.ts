@@ -80,7 +80,7 @@ const bookReadingPage = () => {
   return {
     expectEpubReadingViewShowsBookName(name: string) {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="book-reading-epub-global-bar-title"]').should(
         'contain',
@@ -96,7 +96,7 @@ const bookReadingPage = () => {
      */
     expectEpubContentTextVisible(text: string) {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 })
         .should('be.visible')
@@ -146,7 +146,7 @@ const bookReadingPage = () => {
      */
     scrollEpubReaderUntilTextInViewport(markerText: string) {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
         'be.visible'
@@ -197,7 +197,7 @@ const bookReadingPage = () => {
      */
     scrollEpubReaderHostToTop() {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
         'be.visible'
@@ -226,14 +226,14 @@ const bookReadingPage = () => {
       pageIsNotLoading()
       cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
       cy.location('pathname')
-        .should('match', /^\/d\/notebooks\/\d+\/book$/)
+        .should('match', /^\/notebooks\/\d+\/book$/)
         .then((pathname) => {
           const readingPath = pathname as unknown as string
           cy.wait(2000)
           cy.contains('a', 'Notebook').click()
           cy.location('pathname').should(
             'not.match',
-            /^\/d\/notebooks\/\d+\/book$/
+            /^\/notebooks\/\d+\/book$/
           )
           cy.visit(readingPath)
           pageIsNotLoading()
@@ -246,7 +246,7 @@ const bookReadingPage = () => {
     },
     expectBookLayoutRows(expected: BookLayoutRow[]) {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       bookBlockRows()
         .should('have.length', expected.length)
@@ -291,7 +291,7 @@ const bookReadingPage = () => {
      */
     clickBookLayoutBlockByTitle(title: string) {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       bookBlockRowByTitle(title).click()
       return this
@@ -301,7 +301,7 @@ const bookReadingPage = () => {
       substring: string
     ) {
       pageIsNotLoading()
-      cy.location('pathname').should('match', /^\/d\/notebooks\/\d+\/book$/)
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       bookBlockRowByTitle(title)
         .invoke('attr', 'data-epub-start-href')
         .should('include', substring)
