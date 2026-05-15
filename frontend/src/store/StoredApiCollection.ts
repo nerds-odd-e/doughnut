@@ -36,10 +36,6 @@ function toErrorMessage(error: unknown, fallback: string): string {
 }
 
 export interface StoredApi {
-  getNoteRealmRefAndReloadPosition(
-    noteId: Doughnut.ID
-  ): Ref<NoteRealm | undefined>
-
   getNoteRealmRefAndLoadWhenNeeded(
     noteId: Doughnut.ID
   ): Ref<NoteRealm | undefined>
@@ -56,8 +52,6 @@ export interface StoredApi {
     options?: {
       folderId?: number | null
       refreshWikiTitleCacheForNoteIds?: number[]
-      /** When true, refresh storage but do not navigate (e.g. relationship note creation). */
-      skipRouterReplace?: boolean
     }
   ): Promise<NoteRealm>
 
@@ -196,11 +190,6 @@ export default class StoredApiCollection implements StoredApi {
     return this.loadNote(noteId)
   }
 
-  getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
-    this.loadNote(noteId)
-    return this.storage.refOfNoteRealm(noteId)
-  }
-
   getNoteRealmRefAndLoadWhenNeeded(noteId: Doughnut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
     if (!result.value) this.loadNote(noteId)
@@ -218,13 +207,11 @@ export default class StoredApiCollection implements StoredApi {
     options?: {
       folderId?: number | null
       refreshWikiTitleCacheForNoteIds?: number[]
-      skipRouterReplace?: boolean
     }
   ) {
     const folderId = options?.folderId
     const refreshWikiTitleCacheForNoteIds =
       options?.refreshWikiTitleCacheForNoteIds
-    const skipRouterReplace = options?.skipRouterReplace
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
     const result = await apiCallWithLoading(() =>
@@ -261,9 +248,7 @@ export default class StoredApiCollection implements StoredApi {
         await this.refreshWikiLinkCacheForNote(id)
       }
     }
-    if (!skipRouterReplace) {
-      await this.routerReplaceFocus(router, focus)
-    }
+    await this.routerReplaceFocus(router, focus)
     return focus
   }
 

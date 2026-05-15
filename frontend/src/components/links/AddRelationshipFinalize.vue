@@ -145,10 +145,12 @@ const relationTypeSelected = async (relationType: string | undefined) => {
       { newTitle: metaTitle, content: markdown },
       {
         folderId: folderId ?? undefined,
-        skipRouterReplace: true,
+        refreshWikiTitleCacheForNoteIds: [
+          props.note.id,
+          props.targetSearchResult.noteTopology.id,
+        ],
       }
     )
-    await api.loadNoteRealm(props.note.id)
 
     emit("success")
   } catch (res) {

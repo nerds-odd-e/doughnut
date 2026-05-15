@@ -16,6 +16,9 @@ const noteShowPathInUrl = /\/d\/n\/\d+/
 
 const noteContentRegion = { role: 'region' as const, name: 'Note content' }
 
+const mainNoteHeadingTitleSelector =
+  '#main-note-content h2.path-name-heading [role=title]'
+
 type TitleRenameReferenceChoice = 'KEEP_VISIBLE_TEXT' | 'UPDATE_VISIBLE_TEXT'
 
 const titleRenameReferenceSaveTestId: Record<
@@ -50,10 +53,13 @@ export const assumeNotePage = (
   options?: { timeout?: number }
 ) => {
   const findNoteTitle = (title: string) =>
-    cy.findByText(title, {
-      selector: '[role=title]',
-      ...(options?.timeout !== undefined ? { timeout: options.timeout } : {}),
-    })
+    cy
+      .get(mainNoteHeadingTitleSelector, {
+        ...(options?.timeout !== undefined ? { timeout: options.timeout } : {}),
+      })
+      .should(($el) => {
+        expect($el.text().trim()).to.eq(title)
+      })
 
   if (noteTopology) {
     findNoteTitle(noteTopology)

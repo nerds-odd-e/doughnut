@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from "vue"
+import { computed, ref, toRefs, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps({
@@ -13,10 +13,20 @@ const props = defineProps({
 const storageAccessor = useStorageAccessor()
 const reactiveProps = toRefs(props)
 
+const loadGeneration = ref(0)
+
+watch(
+  () => reactiveProps.noteId.value,
+  async (noteId) => {
+    const my = ++loadGeneration.value
+    await storageAccessor.value.storedApi().loadNoteRealm(noteId)
+    if (my !== loadGeneration.value) return
+  },
+  { immediate: true }
+)
+
 const noteRealmRef = computed(() =>
-  storageAccessor.value
-    .storedApi()
-    .getNoteRealmRefAndReloadPosition(reactiveProps.noteId.value)
+  storageAccessor.value.storedApi().getNoteRealmRef(reactiveProps.noteId.value)
 )
 
 const noteRealm = computed(() => noteRealmRef.value?.value)
