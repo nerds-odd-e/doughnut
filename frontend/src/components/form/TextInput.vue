@@ -6,6 +6,7 @@
       <slot name="input_prepend" />
     </template>
     <input
+      ref="input"
       :class="`daisy-input daisy-input-bordered daisy-w-full ${!!errorMessage ? 'daisy-input-error' : ''} ${$slots.input_prepend ? 'daisy-rounded-l-none' : ''} ${$slots.input_append ? 'daisy-rounded-r-none' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
@@ -27,7 +28,8 @@
 
 <script setup lang="ts">
 import InputWithType from "./InputWithType.vue"
-import { onMounted } from "vue"
+import { onMounted, ref } from "vue"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 
 const props = defineProps({
   modelValue: { type: [String, Number], required: false },
@@ -49,13 +51,27 @@ defineEmits<{
   focus: []
 }>()
 
+const input = ref<HTMLInputElement | null>(null)
+
+function focus() {
+  input.value?.focus()
+}
+
+defineExpose({ focus })
+
 onMounted(() => {
+  if (props.autofocus) {
+    scheduleFocusTargetWithin(input.value, {
+      selectAll: props.initialSelectAll,
+    })
+  }
+
   if (props.initialSelectAll && props.modelValue) {
-    const input = document.getElementById(
+    const targetInput = document.getElementById(
       `${props.scopeName}-${props.field}`
     ) as HTMLInputElement
-    if (input) {
-      input.select()
+    if (targetInput) {
+      targetInput.select()
     }
   }
 })

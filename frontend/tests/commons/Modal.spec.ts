@@ -104,6 +104,58 @@ describe("Modal", () => {
     expect(wrapper.emitted("close_request")).toHaveLength(1)
   })
 
+  it("focuses the explicit autofocus target after opening the dialog", async () => {
+    const AutofocusModal = {
+      template: `
+        <Modal @close_request="$emit('close_request')">
+          <template #body>
+            <button id="before-input">Before</button>
+            <input id="target-input" autofocus />
+          </template>
+        </Modal>
+      `,
+      components: { Modal: Comp },
+      emits: ["close_request"],
+    }
+    wrapper = mount(AutofocusModal, {
+      global: { plugins: [router] },
+      attachTo: document.body,
+    })
+
+    await vi.waitUntil(() => document.activeElement?.id === "target-input", {
+      timeout: 1000,
+    })
+
+    expect(document.activeElement?.id).toBe("target-input")
+  })
+
+  it("prefers text controls inside a marked autofocus container", async () => {
+    const MarkedContainerModal = {
+      template: `
+        <Modal @close_request="$emit('close_request')">
+          <template #body>
+            <div data-autofocus>
+              <button id="history-button">History</button>
+              <input id="search-input" />
+            </div>
+          </template>
+        </Modal>
+      `,
+      components: { Modal: Comp },
+      emits: ["close_request"],
+    }
+    wrapper = mount(MarkedContainerModal, {
+      global: { plugins: [router] },
+      attachTo: document.body,
+    })
+
+    await vi.waitUntil(() => document.activeElement?.id === "search-input", {
+      timeout: 1000,
+    })
+
+    expect(document.activeElement?.id).toBe("search-input")
+  })
+
   it("closes when ESC is pressed", async () => {
     wrapper = mountModal()
     await vi.waitUntil(() => document.querySelector("dialog"), {

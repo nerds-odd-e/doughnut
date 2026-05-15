@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from "vue"
 import InputWithType from "./InputWithType.vue"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 
 const props = defineProps({
   modelValue: String,
@@ -46,6 +47,12 @@ const focus = () => {
 
 defineExpose({
   focus,
+})
+
+onMounted(() => {
+  if (props.autofocus) {
+    scheduleFocusTargetWithin(input.value)
+  }
 })
 
 const handleKeydown = (event: KeyboardEvent) => {

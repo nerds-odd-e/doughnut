@@ -1,7 +1,7 @@
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import { flushPromises, mount } from "@vue/test-utils"
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 function findSeamless(wrapper: ReturnType<typeof mount>) {
   return wrapper.findComponent(SeamlessTextEditor)
@@ -104,6 +104,28 @@ describe("PathNameEditor.vue", () => {
     await emitEditorValue(wrapper, "x/y:z")
     expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe("x/y:z")
     expect(wrapper.find(".daisy-text-warning").exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it("focuses and selects the editor through the shared autofocus target", async () => {
+    const wrapper = mount(PathNameEditor, {
+      props: {
+        modelValue: "Untitled",
+        autofocus: true,
+        initialSelectAll: true,
+      },
+      attachTo: document.body,
+    })
+
+    await vi.waitUntil(
+      () => document.activeElement?.classList.contains("seamless-editor"),
+      { timeout: 1000 }
+    )
+
+    expect(document.activeElement?.classList.contains("seamless-editor")).toBe(
+      true
+    )
+    expect(window.getSelection()?.toString()).toBe("Untitled")
     wrapper.unmount()
   })
 })

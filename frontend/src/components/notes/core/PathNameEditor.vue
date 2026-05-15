@@ -1,5 +1,10 @@
 <template>
-  <div ref="root" class="daisy-form-control path-name-editor">
+  <div
+    ref="root"
+    class="daisy-form-control path-name-editor"
+    :data-autofocus="autofocus ? 'true' : undefined"
+    :data-autofocus-select-all="initialSelectAll ? 'true' : undefined"
+  >
     <div v-if="$slots.append" class="daisy-join daisy-w-full path-name-editor-join">
       <div
         class="path-name-editor-join-editor daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-l-lg"
@@ -43,8 +48,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import SeamlessTextEditor from "../../form/SeamlessTextEditor.vue"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 
 const FULLWIDTH_REPLACE: Record<string, string> = {
   "\\": "＼",
@@ -154,21 +160,10 @@ const seamlessBindings = computed(() => ({
   onBlur: () => emit("blur"),
 }))
 
-function focusEditorAndMaybeSelectAll() {
-  const el = root.value?.querySelector<HTMLElement>(".seamless-editor")
-  el?.focus()
-  if (!props.initialSelectAll || !el) return
-  const range = document.createRange()
-  range.selectNodeContents(el)
-  const sel = window.getSelection()
-  sel?.removeAllRanges()
-  sel?.addRange(range)
-}
-
 onMounted(() => {
   if (!props.autofocus) return
-  nextTick(() => {
-    focusEditorAndMaybeSelectAll()
+  scheduleFocusTargetWithin(root.value, {
+    selectAll: props.initialSelectAll,
   })
 })
 </script>

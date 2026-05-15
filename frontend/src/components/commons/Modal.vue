@@ -40,6 +40,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from "vue"
 import { X } from "lucide-vue-next"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
+import { focusAutofocusTargetWithin } from "@/utils/focusTarget"
 
 // Props
 interface Props {
@@ -81,6 +82,9 @@ let unregister: (() => void) | undefined
 onMounted(() => {
   try {
     dialogRef.value?.showModal()
+    requestAnimationFrame(() => {
+      focusAutofocusTargetWithin(dialogRef.value)
+    })
   } catch {
     // Dialog not connected to document (e.g. Teleport stubbed in tests)
   }

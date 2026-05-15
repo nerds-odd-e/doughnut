@@ -6,6 +6,7 @@ import "vue-toastification/dist/index.css"
 import routes from "./routes/routes"
 import "./assets/daisyui.css"
 import DoughnutAppVue from "./DoughnutApp.vue"
+import { scheduleFocusTargetWithin } from "./utils/focusTarget"
 
 const router = createRouter({
   history: createWebHistory("/"),
@@ -36,20 +37,8 @@ app.use(Toast, {
 
 app.directive("focus", {
   mounted(el) {
-    // If the element itself is a button, focus it
-    if (el instanceof HTMLButtonElement) {
-      el.focus()
-      return
-    }
-    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
-      el.focus()
-      return
-    }
-    // Otherwise, look for input, textarea, or button inside
-    const focusable = el.querySelector("input, textarea, button")
-    if (focusable) {
-      focusable.focus()
-    }
+    el.setAttribute("data-autofocus", "true")
+    scheduleFocusTargetWithin(el)
   },
 })
 
