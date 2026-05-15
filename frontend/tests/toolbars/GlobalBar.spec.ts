@@ -55,4 +55,34 @@ describe("global bar", () => {
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled()
   })
+
+  it("opens note search on Ctrl+F when logged in", async () => {
+    helper.component(GlobalBar).withCurrentUser(user).render()
+    expect(screen.queryByPlaceholderText("Search")).toBeNull()
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "f",
+        code: "KeyF",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
+  })
+
+  it("does not open note search on Ctrl+F when logged out", async () => {
+    helper.component(GlobalBar).render()
+    expect(screen.queryByPlaceholderText("Search")).toBeNull()
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "f",
+        code: "KeyF",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    expect(screen.queryByPlaceholderText("Search")).toBeNull()
+  })
 })

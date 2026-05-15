@@ -7,6 +7,7 @@
       <slot name="right" />
       <PopButton
         v-if="user"
+        ref="searchNotePopButtonRef"
         title="search note"
         align-modal-top
         :show-close-button="false"
@@ -15,11 +16,7 @@
           <Search class="daisy-w-6 daisy-h-6" />
         </template>
         <template #default="{ closer }">
-          <SearchForm
-            v-bind="{ storageAccessor }"
-            :modal-closer="closer"
-            @close-dialog="closer"
-          />
+          <SearchForm :modal-closer="closer" @close-dialog="closer" />
         </template>
       </PopButton>
       <NoteUndoButton />
@@ -30,12 +27,33 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
-import { inject } from "vue"
+import { inject, onMounted, onUnmounted, ref } from "vue"
 import { Search } from "lucide-vue-next"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
 
-const storageAccessor = useStorageAccessor()
 const user = inject<Ref<User | undefined>>("currentUser")
+
+const searchNotePopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+
+function isBrowserFindShortcut(e: KeyboardEvent): boolean {
+  if (!e.ctrlKey && !e.metaKey) return false
+  if (e.shiftKey || e.altKey) return false
+  return e.code === "KeyF" || e.key === "f" || e.key === "F"
+}
+
+function onWindowKeydownCapture(e: KeyboardEvent) {
+  if (!user?.value || !isBrowserFindShortcut(e)) return
+  e.preventDefault()
+  searchNotePopButtonRef.value?.openDialog()
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", onWindowKeydownCapture, true)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", onWindowKeydownCapture, true)
+})
 </script>
 
 <style scoped lang="scss">

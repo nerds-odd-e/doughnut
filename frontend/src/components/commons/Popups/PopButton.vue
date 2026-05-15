@@ -48,6 +48,10 @@ defineProps({
 const show = ref(false)
 const buttonRef = ref<HTMLButtonElement | null>(null)
 
+const openDialog = () => {
+  show.value = true
+}
+
 const closeDialog = () => {
   show.value = false
   // Blur the button to remove focus style after closing dialog
@@ -57,6 +61,7 @@ const closeDialog = () => {
 }
 
 defineExpose({
+  openDialog,
   closeDialog,
 })
 </script>
