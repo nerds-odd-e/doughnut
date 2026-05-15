@@ -88,7 +88,8 @@ class NoteRealmServiceTest {
   void references_empty_when_cache_rows_deleted_for_relation_carrier() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note subject = makeMe.aNote().notebook(notebook).please();
-    Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
+    Note relation =
+        makeMe.aNote().notebook(notebook).withWikiLinksInFrontmatter(subject, focal).please();
     noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
 
     assertThat(noteRealmService.build(focal, user).getReferences(), empty());
@@ -125,10 +126,8 @@ class NoteRealmServiceTest {
   void references_omit_soft_deleted_relation_even_if_cache_row_remains() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note subject = makeMe.aNote().notebook(notebook).please();
-    Note relation = makeMe.aNote().withWikiLinksInFrontmatter(subject, focal).please();
-    relation.setContent(
-        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, "a specialization of", subject, focal, null));
+    Note relation =
+        makeMe.aNote().notebook(notebook).withWikiLinksInFrontmatter(subject, focal).please();
     makeMe.entityPersister.merge(relation);
     makeMe.entityPersister.flush();
     wikiTitleCacheService.refreshForNote(relation, user);

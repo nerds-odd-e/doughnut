@@ -75,7 +75,7 @@ export function formatRelationshipNoteTitle(
   return composed
 }
 
-/** Composes relationship note body (YAML + wiki line); aligned with `relationshipNoteCompose`. */
+/** Composes relationship note markdown (YAML frontmatter only; no body line). */
 export function formatRelationshipNoteMarkdown(args: {
   relationLabel: RelationTypeLabel | string
   sourceEndpoint: {
@@ -106,15 +106,12 @@ export function formatRelationshipNoteMarkdown(args: {
     args.targetEndpoint
   )
 
-  const bodyLine = `${sourceLink} ${relationLabel} ${targetLink}.`
-
   let out = "---\n"
   out += `type: ${NOTE_TYPE}\n`
   out += `relation: ${relationKebab}\n`
   out += `source: "${yamlDoubleQuotedInner(sourceLink)}"\n`
   out += `target: "${yamlDoubleQuotedInner(targetLink)}"\n`
   out += "---\n\n"
-  out += bodyLine
 
   const preserved = trimmedOrNull(args.preservedDetails)
   if (preserved != null) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -39,13 +40,17 @@ class NoteRealmJsonSerializationTest {
   @Test
   void serializes_realm_with_wiki_cache_references() throws Exception {
     User user = makeMe.aUser().please();
-    Note root = makeMe.aNote().notebookOwnedBy(user).please();
-    Note focal = makeMe.aNote().title("Focal").please();
-    Note subject = makeMe.aNote().please();
-    Note relation = makeMe.aNote().please();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note focal = makeMe.aNote().title("Focal").notebook(nb).please();
+    Note subject = makeMe.aNote().title("Subject").notebook(nb).please();
+    Note relation = makeMe.aNote().notebook(nb).please();
     relation.setContent(
-        RelationshipNoteMarkdownFormatter.formatForRelationshipNote(
-            relation, "a specialization of", subject, focal, null));
+        "---\n"
+            + "type: relationship\n"
+            + "relation: a-specialization-of\n"
+            + "source: \"[[Subject]]\"\n"
+            + "target: \"[[Focal]]\"\n"
+            + "---\n\n");
     makeMe.entityPersister.merge(relation);
     makeMe.entityPersister.flush();
     wikiTitleCacheService.refreshForNote(relation, user);

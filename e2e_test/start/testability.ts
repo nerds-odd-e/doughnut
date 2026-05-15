@@ -85,7 +85,7 @@ function relationshipNoteTitle(
   return composed
 }
 
-/** Same markdown shape as `relationshipNoteMarkdown` for same-notebook endpoints. */
+/** Same markdown shape as new relationship notes from the app (frontmatter only). */
 function relationshipNoteMarkdown(
   relationLabel: string,
   sourceTitle: string,
@@ -99,7 +99,6 @@ function relationshipNoteMarkdown(
     targetTitle.trim() === '' ? UNTITLED : targetTitle.trim()
   const sourceLink = `[[${sourceDisplay}]]`
   const targetLink = `[[${targetDisplay}]]`
-  const bodyLine = `${sourceLink} ${relationLabel} ${targetLink}.`
   const yamlEscape = (s: string) =>
     s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
   return `---
@@ -109,7 +108,6 @@ source: "${yamlEscape(sourceLink)}"
 target: "${yamlEscape(targetLink)}"
 ---
 
-${bodyLine}
 `
 }
 

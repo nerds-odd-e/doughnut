@@ -36,14 +36,18 @@ class WikiTitleCacheServiceTest {
   class refreshForNote {
 
     @Test
-    void stores_resolved_links_from_relationship_frontmatter_and_body() {
+    void stores_resolved_links_from_relationship_frontmatter() {
       User user = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Note source = makeMe.aNote().title("Alpha").notebook(notebook).please();
       Note target = makeMe.aNote().title("Beta").notebook(notebook).please();
       String markdown =
-          RelationshipNoteMarkdownFormatter.format(
-              "related to", source.getTitle(), target.getTitle(), null);
+          "---\n"
+              + "type: relationship\n"
+              + "relation: related-to\n"
+              + "source: \"[[Alpha]]\"\n"
+              + "target: \"[[Beta]]\"\n"
+              + "---\n\n";
       Note carrier = makeMe.aNote().notebook(notebook).content(markdown).please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
