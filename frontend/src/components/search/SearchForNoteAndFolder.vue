@@ -18,10 +18,12 @@
             @toggle="onHistoryToggle"
           >
             <summary
+              tabindex="-1"
               class="daisy-input daisy-input-bordered daisy-flex daisy-w-12 daisy-min-w-12 daisy-max-w-12 daisy-shrink-0 daisy-flex-none daisy-items-center daisy-justify-center daisy-rounded-r-none daisy-px-0 daisy-py-0 list-none daisy-cursor-pointer daisy-bg-base-100"
               title="Search history"
               aria-label="Search history"
               data-testid="search-key-history-trigger"
+              @focus="(ev: FocusEvent) => (ev.currentTarget as HTMLElement).blur()"
             >
               <Clock class="daisy-w-5 daisy-h-5" />
             </summary>
