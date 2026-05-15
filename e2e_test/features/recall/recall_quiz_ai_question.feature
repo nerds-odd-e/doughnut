@@ -17,6 +17,7 @@ Feature: Recall Quiz
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+    And OpenAI evaluates the question as legitimate
     And the note "sedition" was assimilated on day 1
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
@@ -31,6 +32,7 @@ Feature: Recall Quiz
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+    And OpenAI evaluates the question as legitimate
     And the note "sedition" was assimilated on day 1
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
@@ -54,6 +56,7 @@ Feature: Recall Quiz
       | How high is K2 in meters?  | 8611           | 3776               | 8849               |
       | What is the focus content? | Focus only     | sibling one        | unrelated          |
       | What is the Bahamas?       | An archipelago | A continent        | An act of sedition |
+    And OpenAI evaluates the question as legitimate
     And the note "WikiRecall" was assimilated on day 1
     And the note "DepthRecall" was assimilated on day 1
     And the note "FocusFolder" was assimilated on day 1

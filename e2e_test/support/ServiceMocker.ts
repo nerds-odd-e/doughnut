@@ -98,7 +98,13 @@ class ServiceMocker {
     headers?: Record<string, string>
   ): Promise<void> {
     const nots = bodyNotToMatch
-      ? [new NotPredicate(new FlexiPredicate().withBody(bodyNotToMatch))]
+      ? [
+          new NotPredicate(
+            new FlexiPredicate()
+              .withOperator(Operator.matches)
+              .withBody(bodyNotToMatch)
+          ),
+        ]
       : []
 
     const predicate = new FlexiPredicate()

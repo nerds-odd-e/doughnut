@@ -45,9 +45,9 @@ const addJsonSchemaMcqStubForUserMessage = async (
   const reply = mcqReplyJson(record)
   await mock_services
     .openAi()
-    .chatCompletion()
+    .responses()
     .requestMessageMatches(userMessageMatch)
-    .stubJsonSchemaResponse(reply)
+    .stubOutputText(reply)
 }
 
 const restartOpenAiAndStubMcqForUserMessage = async (
@@ -55,16 +55,19 @@ const restartOpenAiAndStubMcqForUserMessage = async (
   record: Record<string, string>,
   responseKind: 'jsonSchema' | 'questionGeneration'
 ) => {
-  await mock_services.openAi().restartImposter()
   if (responseKind === 'jsonSchema') {
     await addJsonSchemaMcqStubForUserMessage(userMessageMatch, record)
   } else {
     const reply = mcqReplyJson(record)
     await mock_services
       .openAi()
-      .chatCompletion()
+      .responses()
       .requestMessageMatches(userMessageMatch)
-      .stubQuestionGeneration(reply)
+      .requestDoesNotMessageMatch({
+        role: 'user',
+        content: 'Previously generated non-feasible question',
+      })
+      .stubOutputText(reply)
   }
 }
 
@@ -104,10 +107,24 @@ export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
     cy.then(async () => {
       await restartOpenAiAndStubMcqForUserMessage(
-        { role: 'user', content: 'Memory Assistant' },
+        { role: 'developer', content: 'Question Designer|Memory Assistant' },
         record,
         'questionGeneration'
       )
+    })
+  },
+
+  stubRegeneratedQuestion: (record: Record<string, string>) => {
+    cy.then(async () => {
+      const reply = mcqReplyJson(record)
+      await mock_services
+        .openAi()
+        .responses()
+        .requestMessageMatches({
+          role: 'user',
+          content: 'Previously generated non-feasible question',
+        })
+        .stubOutputText(reply)
     })
   },
 
@@ -138,9 +155,12 @@ export const questionGenerationService = () => ({
     cy.then(async () => {
       await mock_services
         .openAi()
-        .chatCompletion()
-        .requestMessageMatches({ role: 'user', content: 'Memory Assistant' })
-        .stubQuestionEvaluation(JSON.stringify(record))
+        .responses()
+        .requestMessageMatches({
+          role: 'developer',
+          content: 'evaluating a memory recall question',
+        })
+        .stubOutputText(JSON.stringify(record))
     })
   },
 })

@@ -143,9 +143,7 @@ Given('OpenAI evaluates the question as not legitimate', () => {
   cy.task('getTestState', 'secondQuestion').then((stored) => {
     const secondQuestion =
       (stored as Record<string, string> | undefined) ?? defaultSecondQuestion
-    start
-      .questionGenerationService()
-      .resetAndStubAskingMCQByChatCompletion(secondQuestion)
+    start.questionGenerationService().stubRegeneratedQuestion(secondQuestion)
   })
 })
 

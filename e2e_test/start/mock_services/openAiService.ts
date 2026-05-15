@@ -7,6 +7,7 @@ import {
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
+import createOpenAiResponsesMock from './createOpenAiResponsesMock'
 import { buildChatCompletionStreamEvent } from './openAiMessageComposer'
 
 const OPEN_AI_IMPOSTER_PORT = 5001
@@ -34,6 +35,10 @@ const openAiService = () => {
 
     chatCompletion() {
       return createOpenAiChatCompletionMock(serviceMocker)
+    },
+
+    responses() {
+      return createOpenAiResponsesMock(serviceMocker)
     },
 
     // Smarter stub for POST /embeddings used by semantic search tests.
@@ -149,14 +154,12 @@ const openAiService = () => {
           .map((r) =>
             typeof r.body === 'string' ? r.body : JSON.stringify(r.body)
           )
-          .filter(
-            (b) => b.includes('Focus Context') && b.includes('"messages"')
-          )
+          .filter((b) => b.includes('Focus Context') && b.includes('"input"'))
         expect(
           bodies.length,
           [
-            'Focus context recall E2E: expected at least 3 OpenAI chat completion POST bodies',
-            'that include the rendered focus block (# Focus Context) and JSON "messages".',
+            'Focus context recall E2E: expected at least 3 OpenAI Responses POST bodies',
+            'that include the rendered focus block (# Focus Context) and JSON "input".',
             'Recall eager-fetches one question per due memory tracker, so fewer bodies usually means',
             'fewer assimilated notes, failed requests, or Mountebank stubs not matching.',
             `Found ${bodies.length} matching body/bodies.`,
