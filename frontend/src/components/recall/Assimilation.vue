@@ -76,7 +76,6 @@ const noteRecallInfo = ref<{
 
 const onRememberSpellingChanged = (value: boolean) => {
   rememberSpelling.value = value
-  noteInfoLoaded.value = true
 }
 
 const onNoteRecallInfoLoaded = (info: {
