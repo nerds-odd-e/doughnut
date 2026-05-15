@@ -72,6 +72,27 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
   }
 
   @Test
+  void createNoteAtNotebookRootReturns409WhenTitleDiffersOnlyByCase() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aNote().notebook(nb).title("SameTitle").please();
+
+    NoteCreationDTO dto = new NoteCreationDTO();
+    dto.setNewTitle("sametitle");
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}/create-note", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.errorType").value("RESOURCE_CONFLICT"))
+        .andExpect(
+            jsonPath("$.message")
+                .value(containsString("A note with this title already exists in this notebook")));
+  }
+
+  @Test
   void createNoteAtNotebookRootReturns409WhenTitleDuplicatesInSameFolder() throws Exception {
     User owner = currentUser.getUser();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();

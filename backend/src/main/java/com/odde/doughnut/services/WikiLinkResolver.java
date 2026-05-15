@@ -9,6 +9,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -93,7 +94,7 @@ public class WikiLinkResolver {
     List<String> out = new ArrayList<>();
     Set<String> seenNormalized = new HashSet<>();
     for (String t : titles) {
-      String key = Normalizer.normalize(t, Normalizer.Form.NFKC);
+      String key = Normalizer.normalize(t, Normalizer.Form.NFKC).toLowerCase(Locale.ROOT);
       if (seenNormalized.add(key)) {
         out.add(t);
       }

@@ -61,7 +61,7 @@ class WikiTitleCacheServiceTest {
     void replaces_previous_rows_on_second_refresh() {
       User user = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note a = makeMe.aNote().title("OnlyA").notebook(notebook).please();
+      makeMe.aNote().title("OnlyA").notebook(notebook).please();
       Note b = makeMe.aNote().title("OnlyB").notebook(notebook).please();
       Note carrier = makeMe.aNote().notebook(notebook).content("[[OnlyA]]").please();
 
@@ -93,6 +93,57 @@ class WikiTitleCacheServiceTest {
       List<NoteWikiTitleCache> rows =
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
       assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
+    }
+
+    @Test
+    void unqualified_link_resolves_title_case_insensitively() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note target = makeMe.aNote().title("MixedCase").notebook(notebook).please();
+      Note carrier = makeMe.aNote().notebook(notebook).content("[[mixedcase]]").please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getLinkText(), equalTo("mixedcase"));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+    }
+
+    @Test
+    void qualified_link_resolves_notebook_and_title_case_insensitively() {
+      User user = makeMe.aUser().please();
+      Notebook targetNotebook = makeMe.aNotebook().creatorAndOwner(user).name("MyBook").please();
+      Note target = makeMe.aNote().title("MixedCase").notebook(targetNotebook).please();
+      Notebook sourceNotebook = makeMe.aNotebook().creatorAndOwner(user).name("Source").please();
+      Note carrier =
+          makeMe.aNote().notebook(sourceNotebook).content("[[mybook:MIXEDCASE]]").please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getLinkText(), equalTo("mybook:MIXEDCASE"));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+    }
+
+    @Test
+    void dedupes_link_text_that_differs_only_by_case() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note shared = makeMe.aNote().title("Same").notebook(notebook).please();
+      Note carrier =
+          makeMe.aNote().notebook(notebook).content("[[Same]] and again [[same]]").please();
+
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteWikiTitleCache> rows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getLinkText(), equalTo("Same"));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
     }
 
@@ -237,7 +288,7 @@ class WikiTitleCacheServiceTest {
     void clears_rows_when_content_becomes_blank() {
       User user = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note a = makeMe.aNote().title("A").notebook(notebook).please();
+      makeMe.aNote().title("A").notebook(notebook).please();
       Note carrier = makeMe.aNote().notebook(notebook).content("[[A]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);

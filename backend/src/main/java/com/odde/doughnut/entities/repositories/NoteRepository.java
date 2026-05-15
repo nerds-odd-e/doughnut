@@ -18,8 +18,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           selectFromNote
               + " WHERE n.notebook.id IN ("
-              + "SELECT nb.id FROM Notebook nb WHERE nb.name = :notebookName AND nb.deletedAt IS NULL)"
-              + " AND n.title = :key")
+              + "SELECT nb.id FROM Notebook nb "
+              + "WHERE LOWER(nb.name) = LOWER(:notebookName) AND nb.deletedAt IS NULL)"
+              + " AND LOWER(n.title) = LOWER(:key)")
   Note findFirstInNotebookByName(
       @Param("notebookName") String notebookName, @Param("key") String key);
 
@@ -27,9 +28,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           selectFromNote
               + " JOIN FETCH n.notebook nb "
-              + " WHERE n.title = :noteTitle AND n.deletedAt IS NULL "
+              + " WHERE LOWER(n.title) = LOWER(:noteTitle) AND n.deletedAt IS NULL "
               + " AND nb.deletedAt IS NULL "
-              + " AND nb.name = :notebookName "
+              + " AND LOWER(nb.name) = LOWER(:notebookName) "
               + " ORDER BY n.id ASC")
   List<Note> findByNotebookNameAndNoteTitleOrderByIdAsc(
       @Param("notebookName") String notebookName, @Param("noteTitle") String noteTitle);
