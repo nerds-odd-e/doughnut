@@ -466,6 +466,31 @@ describe("Notebooks Page", () => {
       ])
     })
 
+    it("collapses the sort dropdown when clicking outside", async () => {
+      const catalogItems = makeMe.notebookCatalog.notebook("Alpha").please()
+
+      const wrapper = helper
+        .component(NotebooksPageView)
+        .withProps({
+          catalogItems,
+          subscriptions: [],
+          user: makeMe.aUser.please(),
+        })
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const dropdown = wrapper.get('[data-testid="notebook-catalog-sort"]')
+        .element as HTMLDetailsElement
+      dropdown.open = true
+      document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+      await flushPromises()
+
+      expect(dropdown.open).toBe(false)
+    })
+
     it("returns to title A–Z after title Z–A", async () => {
       const catalogItems = makeMe.notebookCatalog
         .notebook("Top Loose")

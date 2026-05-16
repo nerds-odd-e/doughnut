@@ -50,7 +50,11 @@
       <span class="label">{{ label }}</span>
     </a>
 
-    <details v-if="hasDropdown && !nonClickable" ref="dropdownTrigger" class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right">
+    <AutoCollapseDropdown
+      v-if="hasDropdown && !nonClickable"
+      v-slot="{ closeDropdown }"
+      class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right"
+    >
       <summary
         tabindex="0"
         role="button"
@@ -67,15 +71,15 @@
       </summary>
 
       <slot name="dropdown" :closeDropdown="closeDropdown"></slot>
-    </details>
+    </AutoCollapseDropdown>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Component } from "vue"
-import { ref, onMounted, onUnmounted } from "vue"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 
-const props = defineProps<{
+defineProps<{
   name?: string
   label: string
   icon: Component
@@ -89,36 +93,6 @@ const props = defineProps<{
 defineEmits<{
   (e: "resumeRecall"): void
 }>()
-
-const dropdownTrigger = ref<HTMLDetailsElement | null>(null)
-
-const closeDropdown = () => {
-  if (dropdownTrigger.value) {
-    dropdownTrigger.value.open = false
-  }
-}
-
-const handleClickOutside = (event: MouseEvent) => {
-  if (dropdownTrigger.value && dropdownTrigger.value.open) {
-    const target = event.target as Node
-    if (!dropdownTrigger.value.contains(target)) {
-      closeDropdown()
-    }
-  }
-}
-
-// Only register click-outside listener for dropdown items
-onMounted(() => {
-  if (props.hasDropdown) {
-    document.addEventListener("click", handleClickOutside)
-  }
-})
-
-onUnmounted(() => {
-  if (props.hasDropdown) {
-    document.removeEventListener("click", handleClickOutside)
-  }
-})
 </script>
 
 <style lang="scss" scoped>

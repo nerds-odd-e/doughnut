@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-join daisy-flex daisy-items-center">
-    <details
-      ref="actionsDropdown"
+    <AutoCollapseDropdown
+      v-slot="{ closeDropdown }"
       class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
     >
       <summary
@@ -20,7 +20,7 @@
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
             title="Edit subscription"
-            @click="openEdit"
+            @click="openEdit(closeDropdown)"
           >
             Edit subscription
           </button>
@@ -30,13 +30,13 @@
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
             title="Move to group"
-            @click="openMoveToGroup"
+            @click="openMoveToGroup(closeDropdown)"
           >
             Move to group…
           </button>
         </li>
       </ul>
-    </details>
+    </AutoCollapseDropdown>
     <button
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
       title="Unsubscribe"
@@ -74,6 +74,7 @@ import type {
 import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
+import AutoCollapseDropdown from "../commons/AutoCollapseDropdown.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { Minus, MoreHorizontal } from "lucide-vue-next"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
@@ -99,17 +100,10 @@ const emit = defineEmits<{
 }>()
 
 const { popups } = usePopups()
-const actionsDropdown = ref<HTMLDetailsElement | null>(null)
 const showEdit = ref(false)
 const showMoveToGroup = ref(false)
 
-const closeDropdown = () => {
-  if (actionsDropdown.value) {
-    actionsDropdown.value.open = false
-  }
-}
-
-const openEdit = () => {
+const openEdit = (closeDropdown: () => void) => {
   closeDropdown()
   showEdit.value = true
 }
@@ -118,7 +112,7 @@ const closeEdit = () => {
   showEdit.value = false
 }
 
-const openMoveToGroup = () => {
+const openMoveToGroup = (closeDropdown: () => void) => {
   closeDropdown()
   showMoveToGroup.value = true
 }

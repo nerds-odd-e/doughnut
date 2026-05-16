@@ -11,8 +11,8 @@
         v-focus
       >
         <template #input_prepend>
-          <details
-            ref="historyDetailsRef"
+          <AutoCollapseDropdown
+            v-slot="{ closeDropdown }"
             class="search-key-history-details daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom daisy-relative daisy-inline-flex daisy-shrink-0"
             data-testid="search-key-history-dropdown"
             @toggle="onHistoryToggle"
@@ -44,13 +44,13 @@
                   class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal daisy-text-left daisy-whitespace-normal daisy-break-words"
                   :title="key"
                   :data-testid="`search-key-history-item-${index}`"
-                  @click="pickHistoryKey(key)"
+                  @click="pickHistoryKey(key, closeDropdown)"
                 >
                   {{ key }}
                 </button>
               </li>
             </ul>
-          </details>
+          </AutoCollapseDropdown>
         </template>
       </TextInput>
       <button
@@ -154,6 +154,7 @@ import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 
 defineProps<{
   noteId?: number
@@ -173,20 +174,18 @@ const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
 const semanticSearchEnabled = ref(false)
 
-const historyDetailsRef = ref<HTMLDetailsElement | null>(null)
 const historyKeys = ref<string[]>([])
 
-function onHistoryToggle() {
-  if (historyDetailsRef.value?.open) {
+function onHistoryToggle(event: Event) {
+  const details = event.target as HTMLDetailsElement
+  if (details.open) {
     historyKeys.value = readSearchKeyHistory()
   }
 }
 
-function pickHistoryKey(key: string) {
+function pickHistoryKey(key: string, closeDropdown: () => void) {
   inputSearchKey.value = key
-  if (historyDetailsRef.value) {
-    historyDetailsRef.value.open = false
-  }
+  closeDropdown()
 }
 </script>
 

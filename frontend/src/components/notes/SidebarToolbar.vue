@@ -26,8 +26,8 @@
           <FolderPlus class="daisy-w-6 daisy-h-6" />
         </FolderNewButton>
       </div>
-      <details
-        ref="sortDropdownRef"
+      <AutoCollapseDropdown
+        v-slot="{ closeDropdown }"
         data-note-sidebar-sort
         class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom daisy-relative daisy-z-30 daisy-shrink-0"
       >
@@ -51,7 +51,7 @@
               type="button"
               class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal daisy-whitespace-normal daisy-items-start daisy-text-left"
               :title="row.label"
-              @click="selectSort(row.spec)"
+              @click="selectSort(row.spec, closeDropdown)"
             >
               <component
                 :is="row.Icon"
@@ -65,7 +65,7 @@
             </button>
           </li>
         </ul>
-      </details>
+      </AutoCollapseDropdown>
     </div>
   </nav>
 </template>
@@ -82,7 +82,8 @@ import {
   type SidebarPeerSortSpec,
 } from "@/composables/useNoteSidebarPeerSort"
 import { ArrowDownAZ, FolderPlus, NotebookPen } from "lucide-vue-next"
-import { computed, ref } from "vue"
+import { computed } from "vue"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
 import NoteNewButton from "./core/NoteNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
@@ -116,8 +117,6 @@ const anchorNote = computed(() => props.activeNoteRealm?.note)
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
 
-const sortDropdownRef = ref<HTMLDetailsElement | null>(null)
-
 const triggerIcon = computed(() => {
   const match = SIDEBAR_PEER_SORT_MENU_ROWS.find(
     (row) =>
@@ -127,10 +126,8 @@ const triggerIcon = computed(() => {
   return match?.Icon ?? ArrowDownAZ
 })
 
-function selectSort(spec: SidebarPeerSortSpec) {
+function selectSort(spec: SidebarPeerSortSpec, closeDropdown: () => void) {
   setSortPeerSpec(spec)
-  if (sortDropdownRef.value) {
-    sortDropdownRef.value.open = false
-  }
+  closeDropdown()
 }
 </script>

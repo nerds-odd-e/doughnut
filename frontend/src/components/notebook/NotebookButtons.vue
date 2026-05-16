@@ -12,8 +12,8 @@
     >
       <BookOpen class="daisy-h-6 daisy-w-6" />
     </button>
-    <details
-      ref="actionsDropdown"
+    <AutoCollapseDropdown
+      v-slot="{ closeDropdown }"
       class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
     >
       <summary
@@ -32,13 +32,13 @@
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
             title="Move to group"
-            @click="openMoveToGroup"
+            @click="openMoveToGroup(closeDropdown)"
           >
             Move to group…
           </button>
         </li>
       </ul>
-    </details>
+    </AutoCollapseDropdown>
     <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
       <template #body>
         <NotebookCatalogMoveToGroupForm
@@ -61,6 +61,7 @@ import { useRouter } from "vue-router"
 import { BookOpen, MoreHorizontal } from "lucide-vue-next"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import Modal from "@/components/commons/Modal.vue"
 import {
   catalogMoveToGroupContextKey,
@@ -95,14 +96,7 @@ const emit = defineEmits<{
   (e: "refresh"): void
 }>()
 
-const actionsDropdown = ref<HTMLDetailsElement | null>(null)
 const showMoveToGroup = ref(false)
-
-const closeDropdown = () => {
-  if (actionsDropdown.value) {
-    actionsDropdown.value.open = false
-  }
-}
 
 const onReadBook = () => {
   router.push({
@@ -111,7 +105,7 @@ const onReadBook = () => {
   })
 }
 
-const openMoveToGroup = () => {
+const openMoveToGroup = (closeDropdown: () => void) => {
   closeDropdown()
   showMoveToGroup.value = true
 }

@@ -373,6 +373,29 @@ describe("SearchForm", () => {
       expect(input.value).toBe("newer")
     })
 
+    it("collapses search key history when clicking outside", async () => {
+      appendSearchKeyToHistory("older")
+      const note = MakeMe.aNote.please()
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+      const input = await screen.findByPlaceholderText("Search")
+      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      await flushPromises()
+
+      const dropdown = screen.getByTestId(
+        "search-key-history-dropdown"
+      ) as HTMLDetailsElement
+      expect(dropdown.open).toBe(true)
+
+      fireEvent.click(input)
+      await flushPromises()
+
+      expect(dropdown.open).toBe(false)
+    })
+
     it("records trimmed search key after debounced search completes", async () => {
       clearSearchKeyHistoryCookie()
       const note = MakeMe.aNote.please()

@@ -31,8 +31,8 @@
             <LayoutGrid class="daisy-h-6 daisy-w-6" />
           </button>
         </div>
-        <details
-          ref="notebooksSortDropdownRef"
+        <AutoCollapseDropdown
+          v-slot="{ closeDropdown }"
           data-testid="notebook-catalog-sort"
           class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom daisy-relative daisy-z-30 daisy-shrink-0"
         >
@@ -61,7 +61,7 @@
                 class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal daisy-whitespace-normal daisy-items-start daisy-text-left"
                 :title="row.label"
                 :data-catalog-sort="`${row.spec.field}-${row.spec.direction}`"
-                @click="selectCatalogPeerSort(row.spec)"
+                @click="selectCatalogPeerSort(row.spec, closeDropdown)"
               >
                 <component
                   :is="row.Icon"
@@ -75,7 +75,7 @@
               </button>
             </li>
           </ul>
-        </details>
+        </AutoCollapseDropdown>
         <NotebookNewButton
           v-if="user"
           btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-join-item"
@@ -188,6 +188,7 @@ import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
 import { narrowGroupNotebooksForCatalogFilter } from "@/components/notebook/narrowGroupNotebooksForCatalogFilter"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 
 const props = defineProps({
   catalogItems: {
@@ -225,13 +226,12 @@ const catalogPeerSortTriggerIcon = computed(() => {
   return match?.Icon ?? ArrowDownAZ
 })
 
-const notebooksSortDropdownRef = ref<HTMLDetailsElement | null>(null)
-
-function selectCatalogPeerSort(spec: SidebarPeerSortSpec) {
+function selectCatalogPeerSort(
+  spec: SidebarPeerSortSpec,
+  closeDropdown: () => void
+) {
   setSortPeerSpec(spec)
-  if (notebooksSortDropdownRef.value) {
-    notebooksSortDropdownRef.value.open = false
-  }
+  closeDropdown()
 }
 const filterText = ref("")
 const filterInputRef = ref<HTMLInputElement | null>(null)
