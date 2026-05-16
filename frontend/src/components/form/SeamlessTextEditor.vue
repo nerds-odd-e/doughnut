@@ -73,7 +73,14 @@ const onBlur = () => {
 }
 
 const onEnter = (event: KeyboardEvent) => {
-  event.target?.dispatchEvent(new Event("blur"))
+  const el = event.currentTarget as HTMLElement | null
+  if (!el) return
+  const form = el.closest("form")
+  if (form) {
+    form.requestSubmit()
+    return
+  }
+  el.dispatchEvent(new Event("blur"))
 }
 
 const onPaste = (event: ClipboardEvent) => {

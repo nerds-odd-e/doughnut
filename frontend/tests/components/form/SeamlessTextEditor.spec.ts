@@ -173,6 +173,41 @@ describe("SeamlessTextEditor", () => {
     expect(editor.innerText).toBe("existing appended")
   })
 
+  it("submits the nearest form on Enter", async () => {
+    const onSubmit = vi.fn((e: Event) => e.preventDefault())
+    const form = document.createElement("form")
+    form.addEventListener("submit", onSubmit)
+    const submit = document.createElement("input")
+    submit.type = "submit"
+    form.appendChild(submit)
+
+    wrapper = helper
+      .component(SeamlessTextEditor)
+      .withProps({ modelValue: "x" })
+      .mount({ attachTo: form })
+    await flushPromises()
+    await nextTick()
+
+    document.body.appendChild(form)
+
+    const editor = wrapper.find(".seamless-editor").element as HTMLElement
+    editor.focus()
+    await nextTick()
+
+    editor.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Enter",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    await flushPromises()
+    await nextTick()
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    form.remove()
+  })
+
   it("does not handle paste when readonly", async () => {
     await mountEditor("", { readonly: true })
     await flushPromises()
