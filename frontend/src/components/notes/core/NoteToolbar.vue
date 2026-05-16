@@ -46,14 +46,31 @@
         <Mic class="daisy-w-6 daisy-h-6" />
       </button>
 
-      <button
+      <AutoCollapseDropdown
         v-if="!readonly"
-        :class="['daisy-btn daisy-btn-ghost daisy-btn-sm', { 'daisy-btn-active': moreOptions }]"
-        title="more options"
-        @click="moreOptions = !moreOptions"
+        v-slot="{ closeDropdown, open }"
+        ref="moreOptionsDropdownRef"
+        class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
       >
-        <Settings class="daisy-w-6 daisy-h-6" />
-      </button>
+        <summary
+          :class="[
+            'daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer',
+            { 'daisy-btn-active': open },
+          ]"
+          title="more options"
+          aria-label="more options"
+          role="button"
+          tabindex="0"
+        >
+          <Settings class="daisy-w-6 daisy-h-6" />
+        </summary>
+        <NoteMoreOptionsForm
+          v-if="open"
+          class="daisy-dropdown-content daisy-z-[1000] daisy-mt-1"
+          v-bind="{ note }"
+          @close-dialog="closeDropdown"
+        />
+      </AutoCollapseDropdown>
     </div>
   </nav>
   <NoteAudioTools
@@ -61,12 +78,6 @@
     v-bind="{ note }"
     @close-dialog="audioTools = false"
   />
-  <NoteMoreOptionsForm
-    v-if="!readonly && moreOptions"
-    v-bind="{ note }"
-    @close-dialog="moreOptions = false"
-  />
-
 </template>
 
 <script setup lang="ts">
@@ -87,6 +98,7 @@ import { useRouter } from "vue-router"
 import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 
 const { note, readonly } = defineProps<{
   note: Note
@@ -96,8 +108,10 @@ const { note, readonly } = defineProps<{
 }>()
 
 const audioTools = ref(false)
-const moreOptions = ref(false)
 const linkPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+const moreOptionsDropdownRef = ref<InstanceType<
+  typeof AutoCollapseDropdown
+> | null>(null)
 
 const router = useRouter()
 
@@ -129,8 +143,7 @@ onUnmounted(() => {
 watch(
   () => note.id,
   () => {
-    moreOptions.value = false
+    moreOptionsDropdownRef.value?.closeDropdown()
   }
 )
 </script>
-

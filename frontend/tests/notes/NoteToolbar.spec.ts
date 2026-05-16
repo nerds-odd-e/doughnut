@@ -91,8 +91,7 @@ describe("NoteToolbar", () => {
 
     await flushPromises()
 
-    // Find the more options button by title
-    const moreOptionsButton = wrapper.find('button[title="more options"]')
+    const moreOptionsButton = wrapper.find('[title="more options"]')
 
     // Simulate a click event on the button to open the dialog
     await moreOptionsButton.trigger("click")
@@ -133,8 +132,7 @@ describe("NoteToolbar", () => {
 
     await flushPromises()
 
-    // Find the more options button by title
-    const moreOptionsButton = wrapper.find('button[title="more options"]')
+    const moreOptionsButton = wrapper.find('[title="more options"]')
 
     // Open the dialog
     await moreOptionsButton.trigger("click")

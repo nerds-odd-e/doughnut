@@ -34,19 +34,6 @@ beforeEach(() => {
 describe("NoteMoreOptionsForm", () => {
   const note = makeMe.aNote.please()
 
-  describe("close dialog", () => {
-    it("emits close-dialog when close button is clicked", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const closeButton = wrapper.find('button[title="Close"]')
-      await closeButton.trigger("click")
-
-      expect(wrapper.emitted()).toHaveProperty("close-dialog")
-    })
-  })
-
   describe("delete note", () => {
     it("calls deleteNote API when delete button is clicked and confirmed", async () => {
       deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
@@ -136,13 +123,17 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       expect(wrapper.find('button[title="Export..."]').exists()).toBe(true)
+      expect(wrapper.get("ul").text()).toContain("Export...")
       expect(
         wrapper.find('button[title="Questions for the note"]').exists()
       ).toBe(true)
+      expect(wrapper.get("ul").text()).toContain("Questions for the note")
       expect(
         wrapper.find('button[title="Assimilation settings"]').exists()
       ).toBe(true)
+      expect(wrapper.get("ul").text()).toContain("Assimilation settings")
       expect(wrapper.find('button[title="Delete note"]').exists()).toBe(true)
+      expect(wrapper.get("ul").text()).toContain("Delete note")
     })
   })
 

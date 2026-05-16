@@ -1,51 +1,61 @@
 <template>
   <div class="daisy-bg-base-200 daisy-rounded-b-lg daisy-p-5 daisy-shadow-lg animate-dropdown daisy-relative">
-    <button class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-circle daisy-absolute daisy-top-2 daisy-right-2" @click="closeDialog" title="Close">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
-      </svg>
-    </button>
-    <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end daisy-mt-2">
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Export..."
-      >
-        <template #button_face>
-          <Upload class="daisy-w-6 daisy-h-6" />
-        </template>
-        <template #default="{ closer }">
-          <NoteExportForm :note="note" @close-dialog="closer" />
-        </template>
-      </PopButton>
+    <ul class="daisy-menu daisy-mt-2 daisy-min-w-64 daisy-p-0">
+      <li>
+        <PopButton
+          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          title="Export..."
+        >
+          <template #button_face>
+            <Upload class="daisy-w-5 daisy-h-5 daisy-shrink-0" aria-hidden="true" />
+            <span>Export...</span>
+          </template>
+          <template #default="{ closer }">
+            <NoteExportForm :note="note" @close-dialog="closer" />
+          </template>
+        </PopButton>
+      </li>
 
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Questions for the note"
-      >
-        <template #button_face>
-          <MessageCircleQuestion class="daisy-w-6 daisy-h-6" />
-        </template>
-        <template #default>
-          <Questions v-bind="{ note }" />
-        </template>
-      </PopButton>
+      <li>
+        <PopButton
+          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          title="Questions for the note"
+        >
+          <template #button_face>
+            <MessageCircleQuestion
+              class="daisy-w-5 daisy-h-5 daisy-shrink-0"
+              aria-hidden="true"
+            />
+            <span>Questions for the note</span>
+          </template>
+          <template #default>
+            <Questions v-bind="{ note }" />
+          </template>
+        </PopButton>
+      </li>
 
-      <button
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Assimilation settings"
-        @click="assimilateNote"
-      >
-        <CircleCheck class="daisy-w-6 daisy-h-6" />
-      </button>
+      <li>
+        <button
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          title="Assimilation settings"
+          @click="assimilateNote"
+        >
+          <CircleCheck class="daisy-w-5 daisy-h-5 daisy-shrink-0" aria-hidden="true" />
+          <span>Assimilation settings</span>
+        </button>
+      </li>
 
-      <button
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        title="Delete note"
-        @click="deleteNote"
-      >
-        <Trash2 class="daisy-w-6 daisy-h-6" />
-      </button>
-    </div>
+      <li>
+        <button
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          title="Delete note"
+          @click="deleteNote"
+        >
+          <Trash2 class="daisy-w-5 daisy-h-5 daisy-shrink-0" aria-hidden="true" />
+          <span>Delete note</span>
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 

@@ -9,10 +9,15 @@ export function useAutoCollapseDetails(
     }
   }
 
+  const isInsideModal = (target: EventTarget | null) =>
+    target instanceof HTMLElement &&
+    Boolean(target.closest("dialog.modal-mask"))
+
   const shouldCloseForTarget = (target: EventTarget | null) =>
     detailsRef.value?.open === true &&
     target instanceof Node &&
-    !detailsRef.value.contains(target)
+    !detailsRef.value.contains(target) &&
+    !isInsideModal(target)
 
   const handleDocumentClick = (event: MouseEvent) => {
     if (shouldCloseForTarget(event.target)) {
@@ -20,20 +25,12 @@ export function useAutoCollapseDetails(
     }
   }
 
-  const handleDocumentFocusIn = (event: FocusEvent) => {
-    if (shouldCloseForTarget(event.target)) {
-      closeDetails()
-    }
-  }
-
   onMounted(() => {
     document.addEventListener("click", handleDocumentClick)
-    document.addEventListener("focusin", handleDocumentFocusIn)
   })
 
   onUnmounted(() => {
     document.removeEventListener("click", handleDocumentClick)
-    document.removeEventListener("focusin", handleDocumentFocusIn)
   })
 
   return { closeDetails }
