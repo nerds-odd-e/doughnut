@@ -185,39 +185,14 @@ const handleMenuIconClick = (event: MouseEvent) => {
   }
 }
 
-const isClickWithinAccountDropdown = (target: Node | null): boolean => {
-  if (!target) return false
-  let element = target as HTMLElement | null
-  while (element) {
-    // Check if the element is within a details dropdown (account menu uses details element)
-    if (element.tagName === "DETAILS" && element.closest(".menu-wrapper")) {
-      return true
-    }
-    // Check if the element is within the dropdown content
-    if (element.classList?.contains("daisy-dropdown-content")) {
-      return true
-    }
-    // Check if the element is the account menu item or within it
-    if (element.getAttribute?.("aria-label") === "Account") {
-      return true
-    }
-    // Check if parent is the account menu item
-    const accountMenuItem = element.closest?.('li[class*="menu-item"]')
-    if (accountMenuItem) {
-      const navItem = accountMenuItem.querySelector('[aria-label="Account"]')
-      if (navItem) {
-        return true
-      }
-    }
-    element = element.parentElement
-  }
-  return false
+const isWithinAutoCollapseDropdown = (target: Node | null): boolean => {
+  if (!(target instanceof HTMLElement)) return false
+  return Boolean(target.closest("[data-auto-collapse-dropdown]"))
 }
 
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as Node
-  // Don't collapse if clicking on account dropdown or its content
-  if (isClickWithinAccountDropdown(target)) {
+  if (isWithinAutoCollapseDropdown(target)) {
     return
   }
   if (menuRef.value && !menuRef.value.contains(target)) {
@@ -229,8 +204,7 @@ const handleFocusLoss = () => {
   // Use setTimeout to allow click events to process first
   setTimeout(() => {
     const activeElement = document.activeElement
-    // Don't collapse if focus is within the account dropdown
-    if (activeElement && isClickWithinAccountDropdown(activeElement)) {
+    if (isWithinAutoCollapseDropdown(activeElement)) {
       return
     }
     if (menuRef.value && activeElement !== menuRef.value) {
@@ -448,4 +422,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

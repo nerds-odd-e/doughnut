@@ -1,5 +1,5 @@
 <template>
-  <details ref="detailsRef" v-bind="$attrs">
+  <details ref="detailsRef" data-auto-collapse-dropdown v-bind="$attrs">
     <slot :closeDropdown="closeDropdown"></slot>
   </details>
 </template>
