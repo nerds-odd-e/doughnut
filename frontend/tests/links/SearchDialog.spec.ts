@@ -5,6 +5,7 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import SearchForm from "@/components/links/SearchForm.vue"
+import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -18,6 +19,7 @@ import {
   readSearchKeyHistory,
 } from "@/utils/searchKeyHistoryCookie"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { defineComponent } from "vue"
 
 function makeNoteHit(title: string, notebookId: number) {
   return {
@@ -391,6 +393,65 @@ describe("SearchForm", () => {
       expect(dropdown.open).toBe(true)
 
       fireEvent.click(input)
+      await flushPromises()
+
+      expect(dropdown.open).toBe(false)
+    })
+
+    it("collapses search key history when clicking a search scope toggle", async () => {
+      appendSearchKeyToHistory("older")
+      const note = MakeMe.aNote.please()
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+      await screen.findByPlaceholderText("Search")
+      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      await flushPromises()
+
+      const dropdown = screen.getByTestId(
+        "search-key-history-dropdown"
+      ) as HTMLDetailsElement
+      expect(dropdown.open).toBe(true)
+
+      fireEvent.click(screen.getByTitle("All My Circles"))
+      await flushPromises()
+
+      expect(dropdown.open).toBe(false)
+    })
+
+    it("collapses search key history inside a modal when clicking elsewhere in that modal", async () => {
+      appendSearchKeyToHistory("older")
+      const note = MakeMe.aNote.please()
+      const SearchFormInModal = defineComponent({
+        components: { Modal, SearchForm },
+        props: ["note"],
+        template: `
+          <Modal :show-close-button="false">
+            <template #body>
+              <SearchForm :note="note" />
+            </template>
+          </Modal>
+        `,
+      })
+
+      helper
+        .component(SearchFormInModal)
+        .withCleanStorage()
+        .withRouter()
+        .withProps({ note })
+        .render()
+      await screen.findByPlaceholderText("Search")
+      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      await flushPromises()
+
+      const dropdown = screen.getByTestId(
+        "search-key-history-dropdown"
+      ) as HTMLDetailsElement
+      expect(dropdown.open).toBe(true)
+
+      fireEvent.click(screen.getByTitle("All My Circles"))
       await flushPromises()
 
       expect(dropdown.open).toBe(false)

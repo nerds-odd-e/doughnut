@@ -9,15 +9,18 @@ export function useAutoCollapseDetails(
     }
   }
 
-  const isInsideModal = (target: EventTarget | null) =>
-    target instanceof HTMLElement &&
-    Boolean(target.closest("dialog.modal-mask"))
+  const isInsideAnotherModal = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false
+    const targetModal = target.closest("dialog.modal-mask")
+    const ownModal = detailsRef.value?.closest("dialog.modal-mask")
+    return targetModal != null && targetModal !== ownModal
+  }
 
   const shouldCloseForTarget = (target: EventTarget | null) =>
     detailsRef.value?.open === true &&
     target instanceof Node &&
     !detailsRef.value.contains(target) &&
-    !isInsideModal(target)
+    !isInsideAnotherModal(target)
 
   const handleDocumentClick = (event: MouseEvent) => {
     if (shouldCloseForTarget(event.target)) {
