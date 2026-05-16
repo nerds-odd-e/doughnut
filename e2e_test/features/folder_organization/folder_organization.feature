@@ -37,6 +37,28 @@ Feature: Folder organization
     Then I should see sidebar folder "Inner" under open folder "Outer"
     And I should see note "Loose" under open folder "Outer"
 
+  Scenario: Moving a folder into a same-name destination merges them when confirmed
+    Given I have a notebook "Organize NB" with notes:
+      | Title       | Folder      |
+      | Root note A | Shared      |
+      | Inner note  | Alpha/Shared |
+    When I view note "Inner note"
+    And I activate folder "Shared" under the open folder "Alpha" in the sidebar
+    And I move folder "Shared" under "Alpha" to notebook root and confirm merge using the folder page
+    Then I should see note "Root note A" under open folder "Shared"
+    And I should see note "Inner note" under open folder "Shared"
+
+  Scenario: Dissolving a folder merges promoted subfolders when confirmed
+    Given I have a notebook "Organize NB" with notes:
+      | Title      | Folder          |
+      | Outer note | Outer/Inner     |
+      | Mid note   | Outer/Mid/Inner |
+    When I view note "Mid note"
+    And I activate folder "Mid" under the open folder "Outer" in the sidebar
+    And I dissolve folder "Mid" under "Outer" and confirm merge using the folder page
+    Then I should see note "Outer note" under open folder "Inner"
+    And I should see note "Mid note" under open folder "Inner"
+
   Scenario: Move a folder using search when the destination is not in quick picks
     Given I have a notebook "Organize NB" with notes:
       | Title | Folder     |

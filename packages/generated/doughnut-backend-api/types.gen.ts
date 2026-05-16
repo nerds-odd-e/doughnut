@@ -406,6 +406,10 @@ export type FolderMoveRequest = {
      * Target parent folder id. When null or omitted, the folder is moved to notebook root.
      */
     newParentFolderId?: number;
+    /**
+     * When true, merges the folder into an existing same-name sibling at the destination instead of returning 409. Subfolder name clashes are resolved recursively.
+     */
+    merge?: boolean;
 };
 
 export type NoteCreationDto = {
@@ -2511,7 +2515,9 @@ export type DissolveFolderData = {
         notebook: number;
         folder: number;
     };
-    query?: never;
+    query?: {
+        merge?: boolean;
+    };
     url: '/api/notebooks/{notebook}/folders/{folder}';
 };
 

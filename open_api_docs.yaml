@@ -1830,9 +1830,10 @@ paths:
       tags:
       - notebook-controller
       summary: Dissolve a folder
-      description: Removes the folder row. Direct notes and subfolders are promoted
-        to the dissolved folder's parent (or notebook root). Deeper descendants stay
-        under the promoted subfolder.
+      description: "Removes the folder row. Direct notes and subfolders are promoted\
+        \ to the dissolved folder's parent (or notebook root). Deeper descendants\
+        \ stay under the promoted subfolder. When merge=true, clashing promoted subfolders\
+        \ are merged into the existing same-name sibling instead of returning 409."
       operationId: dissolveFolder
       parameters:
       - name: notebook
@@ -1845,6 +1846,12 @@ paths:
         required: true
         schema:
           type: integer
+      - name: merge
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "200":
           description: OK
@@ -3691,6 +3698,11 @@ components:
           format: int32
           description: "Target parent folder id. When null or omitted, the folder\
             \ is moved to notebook root."
+        merge:
+          type: boolean
+          description: "When true, merges the folder into an existing same-name sibling\
+            \ at the destination instead of returning 409. Subfolder name clashes\
+            \ are resolved recursively."
     NoteCreationDTO:
       type: object
       properties:

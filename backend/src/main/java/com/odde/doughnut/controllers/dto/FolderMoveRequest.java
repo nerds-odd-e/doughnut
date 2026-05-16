@@ -16,4 +16,10 @@ public class FolderMoveRequest {
       description =
           "Target parent folder id. When null or omitted, the folder is moved to notebook root.")
   private Integer newParentFolderId;
+
+  @Schema(
+      description =
+          "When true, merges the folder into an existing same-name sibling at the destination"
+              + " instead of returning 409. Subfolder name clashes are resolved recursively.")
+  private boolean merge = false;
 }

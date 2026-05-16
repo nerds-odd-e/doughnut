@@ -11,8 +11,10 @@ export type SidebarFolderOrganizeForm = {
   ) => SidebarFolderOrganizeForm
   confirmMove: () => void
   tryConfirmMove: () => SidebarFolderOrganizeForm
+  confirmMerge: () => void
   expectErrorText: (text: string) => SidebarFolderOrganizeForm
   dissolveFolder: () => void
+  dissolveFolderWithMerge: () => void
 }
 
 /**
@@ -60,6 +62,14 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       return assumeSidebarFolderOrganizeForm()
     },
 
+    confirmMerge() {
+      cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
+        .should('not.be.disabled')
+        .click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      pageIsNotLoading()
+    },
+
     expectErrorText(text: string) {
       cy.get('[data-testid="folder-move-dialog"]')
         .find('.daisy-text-error')
@@ -73,6 +83,17 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       })
         .should('not.be.disabled')
         .click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      pageIsNotLoading()
+    },
+
+    dissolveFolderWithMerge() {
+      cy.get('[data-testid="folder-dissolve-button"]', {
+        timeout: submitTimeoutMs,
+      })
+        .should('not.be.disabled')
+        .click()
+      cy.findByRole('button', { name: 'OK' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
     },

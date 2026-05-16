@@ -249,6 +249,59 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
       assertThat(ex.getReason(), equalTo("Parent folder not in notebook."));
     }
+
+    @Test
+    void mergesIntoSameNameDestinationWhenMergeRequested() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder target = makeMe.aFolder().notebook(nb).name("Dup").please();
+      Note noteInTarget = makeMe.aNote("NoteInTarget").folder(target).please();
+      Folder holder = makeMe.aFolder().notebook(nb).name("Holder").please();
+      Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+      Note noteInSource = makeMe.aNote("NoteInSource").folder(source).please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(null);
+      req.setMerge(true);
+      Folder result = controller.moveFolder(nb, source, req);
+
+      assertThat(result.getId(), equalTo(target.getId()));
+      makeMe.refresh(noteInTarget);
+      makeMe.refresh(noteInSource);
+      assertThat(noteInTarget.getFolder().getId(), equalTo(target.getId()));
+      assertThat(noteInSource.getFolder().getId(), equalTo(target.getId()));
+      FolderListing root = controller.listNotebookFolderListing(nb, null);
+      assertTrue(root.folders().stream().anyMatch(f -> f.getId().equals(target.getId())));
+      assertTrue(root.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+    }
+
+    @Test
+    void mergesRecursivelyOnNestedNameClash() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder target = makeMe.aFolder().notebook(nb).name("Dup").please();
+      Folder innerTarget = makeMe.aFolder().parentFolder(target).name("Inner").please();
+      Note deepNoteInTarget = makeMe.aNote("DeepTarget").folder(innerTarget).please();
+      Folder holder = makeMe.aFolder().notebook(nb).name("Holder").please();
+      Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+      Folder innerSource = makeMe.aFolder().parentFolder(source).name("Inner").please();
+      Note deepNoteInSource = makeMe.aNote("DeepSource").folder(innerSource).please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setNewParentFolderId(null);
+      req.setMerge(true);
+      controller.moveFolder(nb, source, req);
+
+      makeMe.refresh(deepNoteInTarget);
+      makeMe.refresh(deepNoteInSource);
+      assertThat(deepNoteInTarget.getFolder().getId(), equalTo(innerTarget.getId()));
+      assertThat(deepNoteInSource.getFolder().getId(), equalTo(innerTarget.getId()));
+      FolderListing underTarget = controller.listNotebookFolderListing(nb, target.getId());
+      assertTrue(
+          underTarget.folders().stream().anyMatch(f -> f.getId().equals(innerTarget.getId())));
+      assertTrue(
+          underTarget.folders().stream().noneMatch(f -> f.getId().equals(innerSource.getId())));
+    }
   }
 
   @Nested
@@ -319,7 +372,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
       Note loose = makeMe.aNote("Loose").folder(mid).please();
 
-      controller.dissolveFolder(nb, mid);
+      controller.dissolveFolder(nb, mid, false);
       makeMe.refresh(loose);
 
       assertThat(loose.getFolder(), notNullValue());
@@ -336,7 +389,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Folder rootFolder = makeMe.aFolder().notebook(nb).name("Root Folder").please();
       Note inside = makeMe.aNote("Inside").folder(rootFolder).please();
 
-      controller.dissolveFolder(nb, rootFolder);
+      controller.dissolveFolder(nb, rootFolder, false);
       makeMe.refresh(inside);
 
       assertThat(inside.getFolder(), nullValue());
@@ -353,7 +406,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Folder inner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
       Note deep = makeMe.aNote("Deep").folder(inner).please();
 
-      controller.dissolveFolder(nb, mid);
+      controller.dissolveFolder(nb, mid, false);
       makeMe.refresh(inner);
       makeMe.refresh(deep);
 
@@ -375,7 +428,8 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       makeMe.aFolder().parentFolder(mid).name("Inner").please();
 
       ResponseStatusException ex =
-          assertThrows(ResponseStatusException.class, () -> controller.dissolveFolder(nb, mid));
+          assertThrows(
+              ResponseStatusException.class, () -> controller.dissolveFolder(nb, mid, false));
       assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
       assertThat(
           ex.getReason(),
@@ -391,7 +445,8 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
 
       ResponseStatusException ex =
           assertThrows(
-              ResponseStatusException.class, () -> controller.dissolveFolder(nbA, folderInB));
+              ResponseStatusException.class,
+              () -> controller.dissolveFolder(nbA, folderInB, false));
       assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
       assertThat(ex.getReason(), equalTo("Folder not in notebook."));
     }
@@ -404,7 +459,53 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
 
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.dissolveFolder(nb, folder));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.dissolveFolder(nb, folder, false));
+    }
+
+    @Test
+    void dissolveMergesClashingSubfolderWhenMergeRequested()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+      Folder outerInner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
+      Note outerNote = makeMe.aNote("OuterNote").folder(outerInner).please();
+      Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+      Folder midInner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
+      Note midNote = makeMe.aNote("MidNote").folder(midInner).please();
+
+      controller.dissolveFolder(nb, mid, true);
+
+      makeMe.refresh(outerNote);
+      makeMe.refresh(midNote);
+      assertThat(outerNote.getFolder().getId(), equalTo(outerInner.getId()));
+      assertThat(midNote.getFolder().getId(), equalTo(outerInner.getId()));
+      FolderListing underOuter = controller.listNotebookFolderListing(nb, outer.getId());
+      assertTrue(underOuter.folders().stream().anyMatch(f -> f.getId().equals(outerInner.getId())));
+      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
+      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(midInner.getId())));
+    }
+
+    @Test
+    void dissolveOnlyMergesClashingSubfoldersOthersJustReparent()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+      makeMe.aFolder().parentFolder(outer).name("Clash").please();
+      Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+      Folder clash = makeMe.aFolder().parentFolder(mid).name("Clash").please();
+      Folder unique = makeMe.aFolder().parentFolder(mid).name("Unique").please();
+
+      controller.dissolveFolder(nb, mid, true);
+
+      makeMe.refresh(unique);
+      assertThat(unique.getParentFolder().getId(), equalTo(outer.getId()));
+      FolderListing underOuter = controller.listNotebookFolderListing(nb, outer.getId());
+      assertTrue(underOuter.folders().stream().anyMatch(f -> f.getId().equals(unique.getId())));
+      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(clash.getId())));
+      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
     }
   }
 }

@@ -728,7 +728,7 @@ export class NotebookController {
     /**
      * Dissolve a folder
      *
-     * Removes the folder row. Direct notes and subfolders are promoted to the dissolved folder's parent (or notebook root). Deeper descendants stay under the promoted subfolder.
+     * Removes the folder row. Direct notes and subfolders are promoted to the dissolved folder's parent (or notebook root). Deeper descendants stay under the promoted subfolder. When merge=true, clashing promoted subfolders are merged into the existing same-name sibling instead of returning 409.
      */
     public static dissolveFolder<ThrowOnError extends boolean = false>(options: Options<DissolveFolderData, ThrowOnError>) {
         return (options.client ?? client).delete<DissolveFolderResponses, unknown, ThrowOnError>({ url: '/api/notebooks/{notebook}/folders/{folder}', ...options });

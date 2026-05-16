@@ -63,6 +63,17 @@ When(
 )
 
 When(
+  'I move folder {string} under {string} to notebook root and confirm merge using the folder page',
+  (childLabel: string, parentLabel: string) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+      .selectNotebookRootAsDestination()
+      .confirmMerge()
+  }
+)
+
+When(
   'I move folder {string} under {string} to folder {string} using folder search on the folder page',
   (childLabel: string, parentLabel: string, destFolder: string) => {
     start
@@ -82,6 +93,16 @@ When(
       .noteSidebar()
       .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
       .dissolveFolder()
+  }
+)
+
+When(
+  'I dissolve folder {string} under {string} and confirm merge using the folder page',
+  (childLabel: string, parentLabel: string) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+      .dissolveFolderWithMerge()
   }
 )
 

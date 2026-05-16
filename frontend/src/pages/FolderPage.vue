@@ -26,7 +26,7 @@
       />
       <div class="daisy-card daisy-w-full daisy-mb-6" data-testid="folder-move-dialog">
         <div class="daisy-card-body">
-          <form @submit.prevent="submitMove">
+          <form @submit.prevent="() => submitMove()">
             <fieldset :disabled="processing">
               <p class="daisy-text-sm daisy-mb-3">
                 Move folder "{{ folderForView.folder.name }}".
@@ -96,7 +96,7 @@
             class="daisy-btn daisy-btn-error daisy-btn-outline"
             data-testid="folder-dissolve-button"
             :disabled="processing"
-            @click="dissolve"
+            @click="() => dissolve()"
           >
             Dissolve folder
           </button>
@@ -225,7 +225,7 @@ const submitRename = async () => {
   }
 }
 
-const submitMove = async () => {
+const submitMove = async (merge = false) => {
   const r = folderForView.value
   if (processing.value || r == null) return
   processing.value = true
@@ -233,8 +233,8 @@ const submitMove = async () => {
   try {
     const body =
       selectedParentFolder.value == null
-        ? {}
-        : { newParentFolderId: selectedParentFolder.value.id }
+        ? { merge }
+        : { newParentFolderId: selectedParentFolder.value.id, merge }
     const { error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
@@ -248,19 +248,36 @@ const submitMove = async () => {
     refreshSidebarStructuralListings()
     await refreshFolderPage()
   } catch (e: unknown) {
-    moveError.value = toOpenApiError(e).message ?? "Failed to move folder"
+    const apiError = toOpenApiError(e)
+    if (
+      !merge &&
+      apiError.status === 409 &&
+      apiError.message === "A folder with this name already exists here."
+    ) {
+      processing.value = false
+      const confirmed = await popups.confirm(
+        `A folder named "${r.folder.name}" already exists at the destination. Merge into it?`
+      )
+      if (confirmed) {
+        await submitMove(true)
+        return
+      }
+    }
+    moveError.value = apiError.message ?? "Failed to move folder"
   } finally {
     processing.value = false
   }
 }
 
-const dissolve = async () => {
+const dissolve = async (merge = false) => {
   const r = folderForView.value
   if (processing.value || r == null) return
-  const ok = await popups.confirm(
-    `Dissolve folder "${r.folder.name}"? Notes and subfolders will be kept.`
-  )
-  if (!ok) return
+  if (!merge) {
+    const ok = await popups.confirm(
+      `Dissolve folder "${r.folder.name}"? Notes and subfolders will be kept.`
+    )
+    if (!ok) return
+  }
   processing.value = true
   dissolveError.value = undefined
   try {
@@ -270,14 +287,31 @@ const dissolve = async () => {
           notebook: r.notebookRealm.notebook.id,
           folder: r.folder.id,
         },
+        query: merge ? { merge: true } : undefined,
       })
     )
     if (error) throw error
     refreshSidebarStructuralListings()
     await routeAfterDissolve(r)
   } catch (e: unknown) {
-    dissolveError.value =
-      toOpenApiError(e).message ?? "Failed to dissolve folder"
+    const apiError = toOpenApiError(e)
+    if (
+      !merge &&
+      apiError.status === 409 &&
+      apiError.message?.startsWith(
+        "A folder with this name already exists at the destination:"
+      )
+    ) {
+      processing.value = false
+      const confirmed = await popups.confirm(
+        "Some subfolders share names with siblings at the destination. Merge them?"
+      )
+      if (confirmed) {
+        await dissolve(true)
+        return
+      }
+    }
+    dissolveError.value = apiError.message ?? "Failed to dissolve folder"
   } finally {
     processing.value = false
   }

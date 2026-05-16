@@ -118,7 +118,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `moveToCircle`: PATCH `/api/notebooks/{notebook}/move-to-circle/{circle}` -> `MoveToCircleResponse` (request: `MoveToCircleData`; path: notebook, circle; response body: Notebook)
 - `updateNotebookIndexContent`: PATCH `/api/notebooks/{notebook}/index-content` -> `UpdateNotebookIndexContentResponse` (request: `UpdateNotebookIndexContentData`; path: notebook; body: NoteUpdateContentDto; response body: NotebookRealm)
 - `getFolderPage`: GET `/api/notebooks/{notebook}/folders/{folder}` -> `GetFolderPageResponse` (request: `GetFolderPageData`; path: notebook, folder; response body: FolderRealm)
-- `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; response body: void)
+- `dissolveFolder`: DELETE `/api/notebooks/{notebook}/folders/{folder}` -> `DissolveFolderResponse` (request: `DissolveFolderData`; path: notebook, folder; query: merge; response body: void)
 - `renameFolder`: PATCH `/api/notebooks/{notebook}/folders/{folder}` -> `RenameFolderResponse` (request: `RenameFolderData`; path: notebook, folder; body: FolderRenameRequest; response body: Folder)
 - `updateFolderIndexContent`: PATCH `/api/notebooks/{notebook}/folders/{folder}/index-content` -> `UpdateFolderIndexContentResponse` (request: `UpdateFolderIndexContentData`; path: notebook, folder; body: NoteUpdateContentDto; response body: FolderRealm)
 - `getAiAssistant`: GET `/api/notebooks/{notebook}/ai-assistant` -> `GetAiAssistantResponse` (request: `GetAiAssistantData`; path: notebook; response body: NotebookAiAssistant)

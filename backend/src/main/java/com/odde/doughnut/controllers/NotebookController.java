@@ -202,15 +202,17 @@ class NotebookController {
       description =
           "Removes the folder row. Direct notes and subfolders are promoted to the dissolved"
               + " folder's parent (or notebook root). Deeper descendants stay under the promoted"
-              + " subfolder.")
+              + " subfolder. When merge=true, clashing promoted subfolders are merged into the"
+              + " existing same-name sibling instead of returning 409.")
   @DeleteMapping("/{notebook}/folders/{folder}")
   @Transactional
   public void dissolveFolder(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @PathVariable("folder") @Schema(type = "integer") Folder folder)
+      @PathVariable("folder") @Schema(type = "integer") Folder folder,
+      @RequestParam(name = "merge", defaultValue = "false") boolean merge)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    folderRelocationService.dissolveFolder(notebook, folder);
+    folderRelocationService.dissolveFolder(notebook, folder, merge);
   }
 
   @PostMapping(value = "/{notebook}")

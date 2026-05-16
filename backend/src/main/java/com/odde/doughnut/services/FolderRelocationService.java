@@ -11,7 +11,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -60,8 +60,21 @@ public class FolderRelocationService {
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
 
     Integer destParentId = newParent == null ? null : newParent.getId();
-    folderSiblingNameValidation.requireNoConflictingSibling(
-        notebook.getId(), destParentId, folder.getName(), folder.getId());
+    Optional<Folder> existingSibling =
+        folderRepository
+            .findCandidateChildContainers(notebook.getId(), destParentId, folder.getName())
+            .stream()
+            .filter(f -> !f.getId().equals(folder.getId()))
+            .findFirst();
+
+    if (existingSibling.isPresent()) {
+      if (request != null && request.isMerge()) {
+        mergeFolderInto(folder, existingSibling.get());
+        return existingSibling.get();
+      }
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "A folder with this name already exists here.");
+    }
 
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
@@ -69,6 +82,39 @@ public class FolderRelocationService {
     entityPersister.merge(folder);
     entityPersister.flush();
     return folder;
+  }
+
+  private void mergeFolderInto(Folder source, Folder target) {
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+
+    List<Folder> srcSubfolders =
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId());
+    for (Folder srcChild : srcSubfolders) {
+      Optional<Folder> tgtChild =
+          folderRepository
+              .findCandidateChildContainers(
+                  target.getNotebook().getId(), target.getId(), srcChild.getName())
+              .stream()
+              .findFirst();
+      if (tgtChild.isPresent()) {
+        mergeFolderInto(srcChild, tgtChild.get());
+      } else {
+        srcChild.setParentFolder(target);
+        srcChild.setUpdatedAt(now);
+        entityPersister.merge(srcChild);
+      }
+    }
+
+    List<Note> srcNotes = noteRepository.findNotesInFolderOrderByIdAsc(source.getId());
+    for (Note note : srcNotes) {
+      note.setFolder(target);
+      entityPersister.merge(note);
+    }
+
+    target.setUpdatedAt(now);
+    entityPersister.merge(target);
+    entityPersister.flush();
+    entityPersister.remove(source);
   }
 
   public Folder renameFolder(Notebook notebook, Folder folder, FolderRenameRequest request) {
@@ -94,7 +140,7 @@ public class FolderRelocationService {
     return folder;
   }
 
-  public void dissolveFolder(Notebook notebook, Folder folder) {
+  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
@@ -104,17 +150,30 @@ public class FolderRelocationService {
 
     List<Folder> directSubfolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
+
     for (Folder child : directSubfolders) {
-      folderSiblingNameValidation.requireNoConflictingSibling(
-          notebook.getId(),
-          destinationId,
-          child.getName(),
-          Set.of(child.getId(), folder.getId()),
-          "A folder with this name already exists at the destination: " + child.getName());
+      Optional<Folder> existingSibling =
+          folderRepository
+              .findCandidateChildContainers(notebook.getId(), destinationId, child.getName())
+              .stream()
+              .filter(f -> !f.getId().equals(folder.getId()))
+              .findFirst();
+      if (existingSibling.isEmpty()) {
+        continue;
+      }
+      if (merge) {
+        mergeFolderInto(child, existingSibling.get());
+      } else {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "A folder with this name already exists at the destination: " + child.getName());
+      }
     }
 
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    for (Folder child : directSubfolders) {
+    List<Folder> remainingSubfolders =
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
+    for (Folder child : remainingSubfolders) {
       child.setParentFolder(destination);
       child.setUpdatedAt(now);
       entityPersister.merge(child);
