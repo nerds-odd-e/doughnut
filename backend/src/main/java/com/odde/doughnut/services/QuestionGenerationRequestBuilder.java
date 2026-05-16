@@ -52,7 +52,7 @@ public class QuestionGenerationRequestBuilder {
     addNotebookAssistantInstructionsIfPresent(responseRequestBuilder, note);
     return responseRequestBuilder
         .reasoningEffort(ReasoningEffort.LOW)
-        .maxOutputTokens(500L)
+        .maxOutputTokens(1000L)
         .build();
   }
 

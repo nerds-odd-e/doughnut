@@ -178,7 +178,7 @@ class NoteQuestionGenerationServiceTests {
       assertThat(
           runtimeRequest.rawParams().maxOutputTokens(),
           is(exportedRequest.rawParams().maxOutputTokens()));
-      assertThat(runtimeRequest.rawParams().maxOutputTokens(), is(Optional.of(500L)));
+      assertThat(runtimeRequest.rawParams().maxOutputTokens(), is(Optional.of(1000L)));
       assertThat(
           runtimeRequest.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           is(true));

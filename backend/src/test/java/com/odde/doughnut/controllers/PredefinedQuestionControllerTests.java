@@ -205,7 +205,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       assertThat(request.containsKey("text"), is(true));
       assertThat(request.get("text"), notNullValue());
       assertThat(request.containsKey("max_output_tokens"), is(true));
-      assertThat(request.get("max_output_tokens"), is(500));
+      assertThat(request.get("max_output_tokens"), is(1000));
       // Verify the JSON is not empty
       String jsonString = new ObjectMapperConfig().objectMapper().writeValueAsString(request);
       assertThat(jsonString, not(equalTo("{}")));
